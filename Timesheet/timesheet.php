@@ -22,7 +22,6 @@
       <i class="fa fa-plus"></i> اضافة ساعات عمل
     </a>
 
-    <!-- فورم إضافة ساعات عمل -->
     <form id="projectForm" action="" method="post" style="display:none; margin-top:20px;">
       <div class="form-grid">
         <div>
@@ -85,22 +84,21 @@
         <div>
           <label>ساعات الوردية</label>
           <input type="number" name="shift_hours" value="0">
-</div>
+        </div>
+
+      <div></div>
+      <div></div>
+      <div></div>
+      <h3> الساعات </h3>
+      <div></div>
+      <div></div>
+      <div></div>
 
         <div>
-            <label> ⏱️ عداد البداية</label>
-            <div>
-          <label>ثواني</label>
-          <input type="number" id="start_seconds" name="start_seconds" value="0" min="0" max="59" required>
-            </div>
-            <div>
-          <label>دقائق</label>
-          <input type="number" id="start_minutes" name="start_minutes" value="0" min="0" max="59" required>
-            </div>
-            <div>
-          <label>ساعات</label>
-          <input type="number" id="start_hours" name="start_hours" value="0">
-            </div>
+          <label> ⏱️ عداد البداية</label>
+          <input type="number" style="width: 30%" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="ثواني" required>
+          <input type="number" style="width: 30%" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="دقائق" required>
+          <input type="number" style="width: 30%" id="start_hours" name="start_hours" placeholder="ساعات" >
         </div>
 
         <div>
@@ -139,6 +137,14 @@
           <label>ملاحظات ساعات العمل</label>
           <textarea name="work_notes"></textarea>
       </div>
+      
+      <div></div>
+      <div></div>
+      <h3> ساعات الاعطال </h3>
+      <div></div>
+      <div></div>
+      <div></div>
+
       <div>
           <label>عطل HR</label>
           <input type="number" name="hr_fault" value="0">
@@ -169,13 +175,10 @@
       </div>
 
       <div>
-          <h5>⏱️ عداد النهاية</h5>
-          <label>ثواني</label>
-          <input type="number" id="end_seconds" name="end_seconds" value="0">
-          <label>دقائق</label>
-          <input type="number" id="end_minutes" name="end_minutes" value="0">
-          <label>ساعات</label>
-          <input type="number" id="end_hours" name="end_hours" value="0">
+          <label> ⏱️ عداد النهاية </label>
+          <input style="width: 30%" type="number" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="ثواني">
+          <input style="width: 30%"  type="number" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="دقائق">
+          <input style="width: 30%"  type="number" id="end_hours" name="end_hours" placeholder="ساعات">
       </div>
 
         <div>
@@ -183,6 +186,16 @@
           <input type="text" name="counter_diff" id="counter_diff_display" readonly>
           <input type="hidden" id="counter_diff" />
         </div>
+
+         <div></div>
+          <div></div>
+           <div></div>
+        <h3> الاعطال </h3>
+
+        <div></div>
+        <div></div>
+        <div></div>
+
         <div>
           <label>نوع العطل</label>
           <input type="text" name="fault_type" />
@@ -203,6 +216,17 @@
           <label>ملاحظات عامة</label>
           <textarea name="general_notes"></textarea>
         </div>
+
+        <div></div>
+        <div></div>
+        <div></div>
+
+        <h3> ساعات عمل المشغل </h3>
+
+        <div></div>
+        <div></div>
+        <div></div>
+
         <div>
           <label>⏱️ ساعات عمل المشغل</label>
           <input type="text" name="operator_hours" value="0">
