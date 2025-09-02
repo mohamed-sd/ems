@@ -102,7 +102,7 @@
             $query = "SELECT m.id,m.suppliers,m.type,m.code
 FROM equipments m
 JOIN operations pm ON m.id = pm.equipment
-WHERE pm.project = 7";
+WHERE pm.project = $project";
             $result = mysqli_query($conn, $query);
             $i = 1;
             while($row = mysqli_fetch_assoc($result)) {
