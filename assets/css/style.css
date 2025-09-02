@@ -279,7 +279,8 @@ body {
 }
 
 #projectForm input,
-#projectForm select {
+#projectForm select ,
+#projectForm textarea {
   padding: 12px 14px;
   width: 100%;
   border-radius: 8px;
@@ -289,7 +290,9 @@ body {
 }
 
 #projectForm input:focus,
-#projectForm select:focus {
+#projectForm select:focus,
+#projectForm textarea:focus
+{
   border-color: var(--btn-color);
   box-shadow: 0 0 5px rgba(255, 170, 51, 0.5);
   outline: none;
@@ -374,10 +377,17 @@ body {
     z-index: 1100;
     cursor: pointer;
   }
-}
-
-@media (min-width: 769px) {
   .mobile-menu-btn {
     display: none;
   }
+
+    #projectForm .form-grid {
+    grid-template-columns: 1fr; /* جوال: عنصر واحد في الصف */
+  }
+
+  #projectForm button {
+    grid-column: span 1; /* زر ياخذ صف واحد */
+  }
+
+
 }

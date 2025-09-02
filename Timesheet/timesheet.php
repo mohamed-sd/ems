@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-	<meta charset="UTF-8">
-  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>  إيكوبيشن | ساعات العمل </title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-	<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> إيكوبيشن | ساعات العمل </title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
 </head>
+
 <body>
 
 
-<?php include('../includes/insidebar.php'); ?>
+  <?php include('../includes/insidebar.php'); ?>
 
-<div class="main">
+  <div class="main">
 
     <a href="javascript:void(0)" id="toggleForm" class="add">
-        <i class="fa fa-plus"></i> اضافة ساعات عمل
+      <i class="fa fa-plus"></i> اضافة ساعات عمل
     </a>
 
     <!-- فورم إضافة ساعات عمل -->
     <form id="projectForm" action="" method="post" style="display:none; margin-top:20px;">
-        <!-- اختيار المشغل (من جدول التشغيل) -->
-        <label>المشغل</label>
-        <select name="operator" required>
+      <div class="form-grid">
+        <div>
+          <label>المشغل</label>
+          <select name="operator" required>
             <option value="">-- اختر المشغل --</option>
             <?php
             include '../config.php';
@@ -32,158 +35,248 @@
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN projects p ON o.project = p.id");
-            while($op = mysqli_fetch_assoc($op_res)){
-                echo "<option value='".$op['id']."'>".$op['eq_code']." - ".$op['eq_name']." | ".$op['project_name']."</option>";
+            while ($op = mysqli_fetch_assoc($op_res)) {
+              echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . " | " . $op['project_name'] . "</option>";
             }
             ?>
-        </select>
+          </select>
+        </div>
+        <div>
+          <label>السائق</label>
+          <select name="driver" required>
+            <option value="">-- اختر السائق --</option>
+            <?php
+            $dr_res = mysqli_query($conn, "SELECT id, name FROM drivers");
+            while ($dr = mysqli_fetch_assoc($dr_res)) {
+              echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
+            }
+            ?>
+          </select>
+        </div>
+        <div>
+          <label>الوردية</label>
+          <select name="shift">
+            <option value=""> -- اختار الوردية -- </option>
+            <option value="D"> صباحية </option>
+            <option value="N"> مسائية </option>
+          </select>
+        </div>
+        <div>
+            <label> ساعات العمل </label>
+          <input type="number" step="0.01" name="work_hours" placeholder="ساعات العمل" required />
+        </div>
+        <div>
+            <label>ساعات التوقف/الأعطال </label>
+          <input type="number" step="0.01" name="damage_hours" placeholder="ساعات التوقف/الأعطال" />
+      </div>
+      <div>
+          <input type="date" name="date" required />
+      </div>
+      <div>
+          <input type="text" name="movies" placeholder="ملاحظات/أفلام" />
+      </div>
+      <div>
+          <input type="text" name="jackhamr" placeholder="جاك هامر" />
+        </div>
 
-        <!-- اختيار السائق -->
-<label>السائق</label>
-<select name="driver" required>
-    <option value="">-- اختر السائق --</option>
-    <?php
-    $dr_res = mysqli_query($conn, "SELECT id, name FROM drivers");
-    while($dr = mysqli_fetch_assoc($dr_res)){
-        echo "<option value='".$dr['id']."'>".$dr['name']."</option>";
-    }
-    ?>
-</select>
-        <select name="shift">
-          <option value=""> -- اختار الوردية -- </option>
-          <option value="D"> صباحية </option>
-          <option value="N"> مسائية </option>
-        </select>
-        <input type="number" step="0.01" name="work_hours" placeholder="ساعات العمل" required />
-        <input type="number" step="0.01" name="damage_hours" placeholder="ساعات التوقف/الأعطال" />
-        <input type="date" name="date" required />
-        <input type="text" name="movies" placeholder="ملاحظات/أفلام" />
-        <input type="text" name="jackhamr" placeholder="جاك هامر" />
 
-        <label>ساعات الوردية</label>
-        <input type="number" name="shift_hours" value="0">
+        <!-- ********************************************************** -->
 
-        <label>
-            <h5>⏱️ عداد البداية</h5>
-        </label>
-        <label>ثواني</label>
-        <input type="number" id="start_seconds" name="start_seconds" value="0" min="0" max="59" required>
-        <label>دقائق</label>
-        <input type="number" id="start_minutes" name="start_minutes" value="0" min="0" max="59" required>
-        <label>ساعات</label>
-        <input type="number" id="start_hours" name="start_hours" value="0">
-        <label>الساعات المنفذة</label>
-        <input type="number" name="executed_hours" value="0">
-        <label>ساعات جردل</label>
-        <input type="number" name="bucket_hours" value="0">
-        <label>ساعات جاك همر</label>
-        <input type="number" name="jackhammer_hours" value="0">
-        <label>ساعات إضافية</label>
-        <input type="number" name="extra_hours" value="0">
-        <label>مجموع الساعات الإضافية</label>
-        <input type="number" name="extra_hours_total" value="0">
-        <label>ساعات الاستعداد (بسبب العميل)</label>
-        <input type="number" name="standby_hours" value="0">
-        <label>ساعات الاستعداد ( اعتماد )</label>
-        <input type="number" name="dependence_hours" value="0">
-        <label>مجموع ساعات العمل</label>
-        <input type="number" name="total_work_hours" value="0" readonly>
-        <label>ملاحظات ساعات العمل</label>
-        <textarea name="work_notes"></textarea>
-        <label>عطل HR</label>
-        <input type="number" name="hr_fault" value="0">
-        <label>عطل صيانة</label>
-        <input type="number" name="maintenance_fault" value="0">
-        <label>عطل تسويق</label>
-        <input type="number" name="marketing_fault" value="0">
-        <label>عطل اعتماد</label>
-        <input type="number" name="approval_fault" value="0">
-        <label>ساعات أعطال أخرى</label>
-        <input type="number" name="other_fault_hours" value="0">
-        <label> مجموع ساعات التعطل</label>
-        <input type="number" name="total_fault_hours" value="0" readonly>
-        <label>ملاحظات ساعات الأعطال</label>
-        <textarea name="fault_notes"></textarea>
-        <h5>⏱️ عداد النهاية</h5>
-        <label>ثواني</label>
-        <input type="number" id="end_seconds" name="end_seconds" value="0">
-        <label>دقائق</label>
-        <input type="number" id="end_minutes" name="end_minutes" value="0">
-        <label>ساعات</label>
-        <input type="number" id="end_hours" name="end_hours" value="0">
-        <label>⚡ فرق العداد</label>
-        <input type="text" name="counter_diff" id="counter_diff_display" readonly>
-        <input type="hidden" id="counter_diff" />
-        <label>نوع العطل</label>
-        <input type="text" name="fault_type" />
-        <label>قسم العطل</label>
-        <input type="text" name="fault_department" />
-        <label>الجزء المعطل</label>
-        <input type="text" name="fault_part" />
-        <label>تفاصيل العطل</label>
-        <textarea name="fault_details"></textarea>
-        <label>ملاحظات عامة</label>
-        <textarea name="general_notes"></textarea>
-        <label>⏱️ ساعات عمل المشغل</label>
-        <input type="text" name="operator_hours" value="0">
-        <label>⚙️ ساعات استعداد الآلية</label>
-        <input type="text" name="machine_standby_hours" value="0" readonly>
-        <label>⚙️ ساعات استعداد الجاك همر</label>
-        <input type="text" name="jackhammer_standby_hours" value="0">
-        <label>⚙️ ساعات استعداد الجردل</label>
-        <input type="text" name="bucket_standby_hours" value="0">
-        <label>➕ الساعات الإضافية</label>
-        <input type="text" name="extra_operator_hours" class="form-control" value="0">
-        <label>👷 ساعات استعداد المشغل</label>
-        <input type="text" name="operator_standby_hours" class="form-control" value="0">
-        <label>📝 ملاحظات المشغل</label>
-        <textarea name="operator_notes" class="form-control"></textarea>
+        <div>
+          <label>ساعات الوردية</label>
+          <input type="number" name="shift_hours" value="0">
+</div>
 
-        <br/>
+        <div>
+            <label> ⏱️ عداد البداية</label>
+            <div>
+          <label>ثواني</label>
+          <input type="number" id="start_seconds" name="start_seconds" value="0" min="0" max="59" required>
+            </div>
+            <div>
+          <label>دقائق</label>
+          <input type="number" id="start_minutes" name="start_minutes" value="0" min="0" max="59" required>
+            </div>
+            <div>
+          <label>ساعات</label>
+          <input type="number" id="start_hours" name="start_hours" value="0">
+            </div>
+        </div>
+
+        <div>
+          <label>الساعات المنفذة</label>
+          <input type="number" name="executed_hours" value="0">
+        </div>
+        <div>
+          <label>ساعات جردل</label>
+          <input type="number" name="bucket_hours" value="0">
+        </div>
+        <div>
+          <label>ساعات جاك همر</label>
+          <input type="number" name="jackhammer_hours" value="0">
+        </div>
+        <div>
+          <label>ساعات إضافية</label>
+          <input type="number" name="extra_hours" value="0">
+        </div>
+        <div>
+          <label>مجموع الساعات الإضافية</label>
+          <input type="number" name="extra_hours_total" value="0">
+      </div>
+      <div>
+          <label>ساعات الاستعداد (بسبب العميل)</label>
+          <input type="number" name="standby_hours" value="0">
+      </div>
+      <div>
+          <label>ساعات الاستعداد ( اعتماد )</label>
+          <input type="number" name="dependence_hours" value="0">
+      </div>
+      <div>
+          <label>مجموع ساعات العمل</label>
+          <input type="number" name="total_work_hours" value="0" readonly>
+      </div>
+      <div>
+          <label>ملاحظات ساعات العمل</label>
+          <textarea name="work_notes"></textarea>
+      </div>
+      <div>
+          <label>عطل HR</label>
+          <input type="number" name="hr_fault" value="0">
+      </div>
+      <div>
+          <label>عطل صيانة</label>
+          <input type="number" name="maintenance_fault" value="0">
+      </div>
+      <div>
+          <label>عطل تسويق</label>
+          <input type="number" name="marketing_fault" value="0">
+      </div>
+      <div>
+          <label>عطل اعتماد</label>
+          <input type="number" name="approval_fault" value="0">
+      </div>
+      <div>
+          <label>ساعات أعطال أخرى</label>
+          <input type="number" name="other_fault_hours" value="0">
+      </div>
+      <div>
+          <label> مجموع ساعات التعطل</label>
+          <input type="number" name="total_fault_hours" value="0" readonly>
+      </div>
+      <div>
+          <label>ملاحظات ساعات الأعطال</label>
+          <textarea name="fault_notes"></textarea>
+      </div>
+
+      <div>
+          <h5>⏱️ عداد النهاية</h5>
+          <label>ثواني</label>
+          <input type="number" id="end_seconds" name="end_seconds" value="0">
+          <label>دقائق</label>
+          <input type="number" id="end_minutes" name="end_minutes" value="0">
+          <label>ساعات</label>
+          <input type="number" id="end_hours" name="end_hours" value="0">
+      </div>
+
+        <div>
+          <label>⚡ فرق العداد</label>
+          <input type="text" name="counter_diff" id="counter_diff_display" readonly>
+          <input type="hidden" id="counter_diff" />
+        </div>
+        <div>
+          <label>نوع العطل</label>
+          <input type="text" name="fault_type" />
+        </div>
+        <div>
+          <label>قسم العطل</label>
+          <input type="text" name="fault_department" />
+        </div>
+        <div>
+          <label>الجزء المعطل</label>
+          <input type="text" name="fault_part" />
+        </div>
+        <div>
+          <label>تفاصيل العطل</label>
+          <textarea name="fault_details"></textarea>
+        </div>
+        <div>
+          <label>ملاحظات عامة</label>
+          <textarea name="general_notes"></textarea>
+        </div>
+        <div>
+          <label>⏱️ ساعات عمل المشغل</label>
+          <input type="text" name="operator_hours" value="0">
+        </div>
+        <div>
+          <label>⚙️ ساعات استعداد الآلية</label>
+          <input type="text" name="machine_standby_hours" value="0" readonly>
+        </div>
+        <div>
+          <label>⚙️ ساعات استعداد الجاك همر</label>
+          <input type="text" name="jackhammer_standby_hours" value="0">
+        </div>
+        <div>
+          <label>⚙️ ساعات استعداد الجردل</label>
+          <input type="text" name="bucket_standby_hours" value="0">
+        </div>
+        <div>
+          <label>➕ الساعات الإضافية</label>
+          <input type="text" name="extra_operator_hours" class="form-control" value="0">
+        </div>
+        <div>
+          <label>👷 ساعات استعداد المشغل</label>
+          <input type="text" name="operator_standby_hours" class="form-control" value="0">
+        </div>
+        <div>
+          <label>📝 ملاحظات المشغل</label>
+          <textarea name="operator_notes" class="form-control"></textarea>
+        </div>
         <button type="submit">حفظ الساعات</button>
+
+        </div>
     </form>
 
-    <br/><br/><br/>
+    <br /><br /><br />
 
     <!-- جدول ساعات العمل -->
     <h3>قائمة ساعات العمل</h3>
-    <br/>
+    <br />
     <table id="timesheetTable" class="display" style="width:100%; margin-top:20px;">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>المعدة</th>
-                <th>المشروع</th>
-                <th>المشغل</th>
-                <th>السائق</th>
-                <th>الوردية</th>
-                <th>ساعات العمل</th>
-                <th>ساعات التوقف</th>
-                <th>التاريخ</th>
-                <th>ملاحظات</th>
-                <th>جاك هامر</th>
-                <th>إجراءات</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            // إضافة سجل جديد
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
-                $operator = intval($_POST['operator']);
-                $driver = mysqli_real_escape_string($conn, $_POST['driver']);
-                $shift = mysqli_real_escape_string($conn, $_POST['shift']);
-                $work_hours = floatval($_POST['work_hours']);
-                $damage_hours = floatval($_POST['damage_hours']);
-                $date = mysqli_real_escape_string($conn, $_POST['date']);
-                $movies = mysqli_real_escape_string($conn, $_POST['movies']);
-                $jackhamr = mysqli_real_escape_string($conn, $_POST['jackhamr']);
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>المعدة</th>
+          <th>المشروع</th>
+          <th>المشغل</th>
+          <th>السائق</th>
+          <th>الوردية</th>
+          <th>ساعات العمل</th>
+          <th>ساعات التوقف</th>
+          <th>التاريخ</th>
+          <th>ملاحظات</th>
+          <th>جاك هامر</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        // إضافة سجل جديد
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
+          $operator = intval($_POST['operator']);
+          $driver = mysqli_real_escape_string($conn, $_POST['driver']);
+          $shift = mysqli_real_escape_string($conn, $_POST['shift']);
+          $work_hours = floatval($_POST['work_hours']);
+          $damage_hours = floatval($_POST['damage_hours']);
+          $date = mysqli_real_escape_string($conn, $_POST['date']);
+          $movies = mysqli_real_escape_string($conn, $_POST['movies']);
+          $jackhamr = mysqli_real_escape_string($conn, $_POST['jackhamr']);
 
-                mysqli_query($conn, "INSERT INTO timesheet (operator, driver, shift, work_hours, damage_hours, date, movies, jackhamr)
+          mysqli_query($conn, "INSERT INTO timesheet (operator, driver, shift, work_hours, damage_hours, date, movies, jackhamr)
                                      VALUES ('$operator', '$driver', '$shift', '$work_hours', '$damage_hours', '$date', '$movies', '$jackhamr')");
-            }
+        }
 
-            // عرض البيانات
-            $query = "SELECT t.id, t.shift, t.work_hours, t.damage_hours, t.date, t.movies, t.jackhamr,
+        // عرض البيانات
+        $query = "SELECT t.id, t.shift, t.work_hours, t.damage_hours, t.date, t.movies, t.jackhamr,
                  e.code AS eq_code, e.name AS eq_name,
                  p.name AS project_name,
                  o.id AS operation_id,
@@ -194,158 +287,159 @@
           JOIN projects p ON o.project = p.id
           JOIN drivers d ON t.driver = d.id
           ORDER BY t.id DESC";
-            $result = mysqli_query($conn, $query);
-            $i = 1;
-            while($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>";
-                echo "<td>".$i++."</td>";
-                echo "<td>".$row['eq_code']." - ".$row['eq_name']."</td>";
-                echo "<td>".$row['project_name']."</td>";
-                echo "<td>مشغل #".$row['operation_id']."</td>";
-                echo "<td>".$row['driver_name']."</td>";
-                echo $row['shift'] == "D" ? "<td> صباحية </td>" : "<td> مسائية </td>";
-                echo "<td>".$row['work_hours']."</td>";
-                echo "<td>".$row['damage_hours']."</td>";
-                echo "<td>".$row['date']."</td>";
-                echo "<td>".$row['movies']."</td>";
-                echo "<td>".$row['jackhamr']."</td>";
-                echo "<td>
-                        <a href='edit_timesheet.php?id=".$row['id']."'>تعديل</a> | 
-                        <a href='delete_timesheet.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href='timesheet_details.php?id=".$row['id']."'> عرض </a>
+        $result = mysqli_query($conn, $query);
+        $i = 1;
+        while ($row = mysqli_fetch_assoc($result)) {
+          echo "<tr>";
+          echo "<td>" . $i++ . "</td>";
+          echo "<td>" . $row['eq_code'] . " - " . $row['eq_name'] . "</td>";
+          echo "<td>" . $row['project_name'] . "</td>";
+          echo "<td>مشغل #" . $row['operation_id'] . "</td>";
+          echo "<td>" . $row['driver_name'] . "</td>";
+          echo $row['shift'] == "D" ? "<td> صباحية </td>" : "<td> مسائية </td>";
+          echo "<td>" . $row['work_hours'] . "</td>";
+          echo "<td>" . $row['damage_hours'] . "</td>";
+          echo "<td>" . $row['date'] . "</td>";
+          echo "<td>" . $row['movies'] . "</td>";
+          echo "<td>" . $row['jackhamr'] . "</td>";
+          echo "<td>
+                        <a href='edit_timesheet.php?id=" . $row['id'] . "'>تعديل</a> | 
+                        <a href='delete_timesheet.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href='timesheet_details.php?id=" . $row['id'] . "'> عرض </a>
                       </td>";
-                echo "</tr>";
-            }
-            ?>
-        </tbody>
-    </table>
-</div>
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-<script>
-(function() {
-    $(document).ready(function() {
-        $('#timesheetTable').DataTable({
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
-            }
-        });
-    });
-
-    const toggleFormBtn = document.getElementById('toggleForm');
-    const form = document.getElementById('projectForm');
-
-    toggleFormBtn.addEventListener('click', function() {
-        form.style.display = form.style.display === "none" ? "block" : "none";
-    });
-})();
-
-
-      function loadMachineData() {
-        let id = document.getElementById("cost_code").value;
-        if (id === "") return;
-        fetch("get_machine.php?id=" + id)
-          .then(res => res.json())
-          .then(data => {
-            if (data) {
-              document.querySelector("input[name='shift_hours']").value = data.hours / 2 || "";
-              document.querySelector("input[name='machine_name']").value = data.plant_no || "";
-              document.querySelector("input[name='project_name']").value = data.project_name || "";
-              document.querySelector("input[name='owner_name']").value = data.owner || "";
-            }
-          })
-          .catch(err => console.error("خطأ في جلب البيانات:", err));
-      }
-
-      document.querySelectorAll("#start_minutes, #start_seconds, #end_minutes, #end_seconds")
-        .forEach(inp => {
-          inp.addEventListener("input", function () {
-            let max = 59, min = 0;
-            if (this.value > max) this.value = max;
-            if (this.value < min) this.value = min;
-          });
-        });
-
-
-      // ✅ دالة لحساب العمليات الثلاثة
-      function calculateCustomHours() {
-        let dependence = parseFloat(document.querySelector("input[name='dependence_hours']").value) || 0;
-        let executed = parseFloat(document.querySelector("input[name='executed_hours']").value) || 0;
-        let extraTotal = parseFloat(document.querySelector("input[name='extra_hours_total']").value) || 0;
-        let standby = parseFloat(document.querySelector("input[name='standby_hours']").value) || 0;
-        let shift = parseFloat(document.querySelector("input[name='shift_hours']").value) || 0;
-        let maintenance = parseFloat(document.querySelector("input[name='maintenance_fault']").value) || 0;
-        let marketing = parseFloat(document.querySelector("input[name='marketing_fault']").value) || 0;
-
-        // العملية الأولى: مجموع ساعات العمل
-        let totalWork = executed + extraTotal + standby;
-        document.querySelector("input[name='total_work_hours']").value = totalWork;
-
-        // العملية الثانية: ساعات أعطال أخرى
-        let otherFault = shift - executed - standby - dependence;
-        if (otherFault < 0) otherFault = 0;
-        document.querySelector("input[name='total_fault_hours']").value = otherFault;
-
-        // العملية الثالثة: ساعات استعداد المشغل
-        let operatorStandby = 0;
-        if (executed < shift) {
-          operatorStandby = maintenance + marketing + dependence;
+          echo "</tr>";
         }
-        document.querySelector("input[name='operator_standby_hours']").value = operatorStandby;
+        ?>
+      </tbody>
+    </table>
+  </div>
 
-        // اسناد قيمة استعدات الاليه 
-        document.querySelector("input[name='machine_standby_hours']").value = standby;
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- DataTables JS -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+  <script>
+    (function () {
+      $(document).ready(function () {
+        $('#timesheetTable').DataTable({
+          "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+          }
+        });
+      });
+
+      const toggleFormBtn = document.getElementById('toggleForm');
+      const form = document.getElementById('projectForm');
+
+      toggleFormBtn.addEventListener('click', function () {
+        form.style.display = form.style.display === "none" ? "block" : "none";
+      });
+    })();
+
+
+    function loadMachineData() {
+      let id = document.getElementById("cost_code").value;
+      if (id === "") return;
+      fetch("get_machine.php?id=" + id)
+        .then(res => res.json())
+        .then(data => {
+          if (data) {
+            document.querySelector("input[name='shift_hours']").value = data.hours / 2 || "";
+            document.querySelector("input[name='machine_name']").value = data.plant_no || "";
+            document.querySelector("input[name='project_name']").value = data.project_name || "";
+            document.querySelector("input[name='owner_name']").value = data.owner || "";
+          }
+        })
+        .catch(err => console.error("خطأ في جلب البيانات:", err));
+    }
+
+    document.querySelectorAll("#start_minutes, #start_seconds, #end_minutes, #end_seconds")
+      .forEach(inp => {
+        inp.addEventListener("input", function () {
+          let max = 59, min = 0;
+          if (this.value > max) this.value = max;
+          if (this.value < min) this.value = min;
+        });
+      });
+
+
+    // ✅ دالة لحساب العمليات الثلاثة
+    function calculateCustomHours() {
+      let dependence = parseFloat(document.querySelector("input[name='dependence_hours']").value) || 0;
+      let executed = parseFloat(document.querySelector("input[name='executed_hours']").value) || 0;
+      let extraTotal = parseFloat(document.querySelector("input[name='extra_hours_total']").value) || 0;
+      let standby = parseFloat(document.querySelector("input[name='standby_hours']").value) || 0;
+      let shift = parseFloat(document.querySelector("input[name='shift_hours']").value) || 0;
+      let maintenance = parseFloat(document.querySelector("input[name='maintenance_fault']").value) || 0;
+      let marketing = parseFloat(document.querySelector("input[name='marketing_fault']").value) || 0;
+
+      // العملية الأولى: مجموع ساعات العمل
+      let totalWork = executed + extraTotal + standby;
+      document.querySelector("input[name='total_work_hours']").value = totalWork;
+
+      // العملية الثانية: ساعات أعطال أخرى
+      let otherFault = shift - executed - standby - dependence;
+      if (otherFault < 0) otherFault = 0;
+      document.querySelector("input[name='total_fault_hours']").value = otherFault;
+
+      // العملية الثالثة: ساعات استعداد المشغل
+      let operatorStandby = 0;
+      if (executed < shift) {
+        operatorStandby = maintenance + marketing + dependence;
       }
+      document.querySelector("input[name='operator_standby_hours']").value = operatorStandby;
 
-      // شغل الحساب عند أي تغيير في الحقول
-      document.querySelectorAll("input[name='executed_hours'], input[name='extra_hours_total'], input[name='standby_hours'], input[name='shift_hours'], input[name='maintenance_fault'], input[name='marketing_fault'] , input[name='dependence_hours'] , input[name='machine_standby_hours']  ")
-        .forEach(el => el.addEventListener("input", calculateCustomHours));
+      // اسناد قيمة استعدات الاليه 
+      document.querySelector("input[name='machine_standby_hours']").value = standby;
+    }
 
-      // ✅ استدعاء أول مرة
-      calculateCustomHours();
+    // شغل الحساب عند أي تغيير في الحقول
+    document.querySelectorAll("input[name='executed_hours'], input[name='extra_hours_total'], input[name='standby_hours'], input[name='shift_hours'], input[name='maintenance_fault'], input[name='marketing_fault'] , input[name='dependence_hours'] , input[name='machine_standby_hours']  ")
+      .forEach(el => el.addEventListener("input", calculateCustomHours));
 
-      function calculateDiff() {
-        // اجمع البداية
-        let start =
-          (parseInt(document.getElementById("start_hours").value || 0) * 3600) +
-          (parseInt(document.getElementById("start_minutes").value || 0) * 60) +
-          (parseInt(document.getElementById("start_seconds").value || 0));
+    // ✅ استدعاء أول مرة
+    calculateCustomHours();
 
-        // اجمع النهاية
-        let end =
-          (parseInt(document.getElementById("end_hours").value || 0) * 3600) +
-          (parseInt(document.getElementById("end_minutes").value || 0) * 60) +
-          (parseInt(document.getElementById("end_seconds").value || 0));
+    function calculateDiff() {
+      // اجمع البداية
+      let start =
+        (parseInt(document.getElementById("start_hours").value || 0) * 3600) +
+        (parseInt(document.getElementById("start_minutes").value || 0) * 60) +
+        (parseInt(document.getElementById("start_seconds").value || 0));
 
-        let executed = parseFloat(document.querySelector("input[name='executed_hours']").value) || 0;
-        let extraTotal = parseFloat(document.querySelector("input[name='extra_hours_total']").value) || 0;
+      // اجمع النهاية
+      let end =
+        (parseInt(document.getElementById("end_hours").value || 0) * 3600) +
+        (parseInt(document.getElementById("end_minutes").value || 0) * 60) +
+        (parseInt(document.getElementById("end_seconds").value || 0));
 
-        let diff = end - start;
-        if (diff < 0) diff = 0; // حماية
+      let executed = parseFloat(document.querySelector("input[name='executed_hours']").value) || 0;
+      let extraTotal = parseFloat(document.querySelector("input[name='extra_hours_total']").value) || 0;
 
-        // حوّل الفرق إلى ساعات/دقائق/ثواني
-        let hours = (executed + extraTotal) - Math.floor(diff / 3600);
-        let minutes = Math.floor((diff % 3600) / 60);
-        let seconds = diff % 60;
+      let diff = end - start;
+      if (diff < 0) diff = 0; // حماية
 
-        // عرض الفرق
-        document.getElementById("counter_diff_display").value =
-          hours + " ساعة " + minutes + " دقيقة " + seconds + " ثانية";
+      // حوّل الفرق إلى ساعات/دقائق/ثواني
+      let hours = (executed + extraTotal) - Math.floor(diff / 3600);
+      let minutes = Math.floor((diff % 3600) / 60);
+      let seconds = diff % 60;
 
-        // حفظ القيمة (بالثواني) للإرسال
-        document.getElementById("counter_diff").value = diff;
-      }
+      // عرض الفرق
+      document.getElementById("counter_diff_display").value =
+        hours + " ساعة " + minutes + " دقيقة " + seconds + " ثانية";
 
-      // شغل الحساب عند أي تغيير
-      document.querySelectorAll("#start_hours, #start_minutes, #start_seconds, #end_hours, #end_minutes, #end_seconds")
-        .forEach(el => el.addEventListener("input", calculateDiff));
+      // حفظ القيمة (بالثواني) للإرسال
+      document.getElementById("counter_diff").value = diff;
+    }
 
-      calculateDiff(); 
+    // شغل الحساب عند أي تغيير
+    document.querySelectorAll("#start_hours, #start_minutes, #start_seconds, #end_hours, #end_minutes, #end_seconds")
+      .forEach(el => el.addEventListener("input", calculateDiff));
 
-</script>
+    calculateDiff();
+
+  </script>
 
 </body>
+
 </html>
