@@ -59,6 +59,86 @@
         <input type="date" name="date" required />
         <input type="text" name="movies" placeholder="ملاحظات/أفلام" />
         <input type="text" name="jackhamr" placeholder="جاك هامر" />
+
+        <label>ساعات الوردية</label>
+        <input type="number" name="shift_hours" value="0" readonly>
+
+        <label>
+            <h5>⏱️ عداد البداية</h5>
+        </label>
+        <label>ثواني</label>
+        <input type="number" id="start_seconds" name="start_seconds" value="0" min="0" max="59" required>
+        <label>دقائق</label>
+        <input type="number" id="start_minutes" name="start_minutes" value="0" min="0" max="59" required>
+        <label>ساعات</label>
+        <input type="number" id="start_hours" name="start_hours" value="0">
+        <label>الساعات المنفذة</label>
+        <input type="number" name="executed_hours" value="0">
+        <label>ساعات جردل</label>
+        <input type="number" name="bucket_hours" value="0">
+        <label>ساعات جاك همر</label>
+        <input type="number" name="jackhammer_hours" value="0">
+        <label>ساعات إضافية</label>
+        <input type="number" name="extra_hours" value="0">
+        <label>مجموع الساعات الإضافية</label>
+        <input type="number" name="extra_hours_total" value="0">
+        <label>ساعات الاستعداد (بسبب العميل)</label>
+        <input type="number" name="standby_hours" value="0">
+        <label>ساعات الاستعداد ( اعتماد )</label>
+        <input type="number" name="dependence_hours" value="0">
+        <label>مجموع ساعات العمل</label>
+        <input type="number" name="total_work_hours" value="0" readonly>
+        <label>ملاحظات ساعات العمل</label>
+        <textarea name="work_notes"></textarea>
+        <label>عطل HR</label>
+        <input type="number" name="hr_fault" value="0">
+        <label>عطل صيانة</label>
+        <input type="number" name="maintenance_fault" value="0">
+        <label>عطل تسويق</label>
+        <input type="number" name="marketing_fault" value="0">
+        <label>عطل اعتماد</label>
+        <input type="number" name="approval_fault" value="0">
+        <label>ساعات أعطال أخرى</label>
+        <input type="number" name="other_fault_hours" value="0">
+        <label> مجموع ساعات التعطل</label>
+        <input type="number" name="total_fault_hours" value="0" readonly>
+        <label>ملاحظات ساعات الأعطال</label>
+        <textarea name="fault_notes"></textarea>
+        <h5>⏱️ عداد النهاية</h5>
+        <label>ثواني</label>
+        <input type="number" id="end_seconds" name="end_seconds" value="0">
+        <label>دقائق</label>
+        <input type="number" id="end_minutes" name="end_minutes" value="0">
+        <label>ساعات</label>
+        <input type="number" id="end_hours" name="end_hours" value="0">
+        <label>⚡ فرق العداد</label>
+        <input type="text" name="counter_diff" id="counter_diff_display" readonly>
+        <input type="hidden" id="counter_diff" />
+        <label>نوع العطل</label>
+        <input type="text" name="fault_type" />
+        <label>قسم العطل</label>
+        <input type="text" name="fault_department" />
+        <label>الجزء المعطل</label>
+        <input type="text" name="fault_part" />
+        <label>تفاصيل العطل</label>
+        <textarea name="fault_details"></textarea>
+        <label>ملاحظات عامة</label>
+        <textarea name="general_notes"></textarea>
+        <label>⏱️ ساعات عمل المشغل</label>
+        <input type="text" name="operator_hours" value="0">
+        <label>⚙️ ساعات استعداد الآلية</label>
+        <input type="text" name="machine_standby_hours" value="0" readonly>
+        <label>⚙️ ساعات استعداد الجاك همر</label>
+        <input type="text" name="jackhammer_standby_hours" value="0">
+        <label>⚙️ ساعات استعداد الجردل</label>
+        <input type="text" name="bucket_standby_hours" value="0">
+        <label>➕ الساعات الإضافية</label>
+        <input type="text" name="extra_operator_hours" class="form-control" value="0">
+        <label>👷 ساعات استعداد المشغل</label>
+        <input type="text" name="operator_standby_hours" class="form-control" value="0">
+        <label>📝 ملاحظات المشغل</label>
+        <textarea name="operator_notes" class="form-control"></textarea>
+
         <br/>
         <button type="submit">حفظ الساعات</button>
     </form>
@@ -162,6 +242,109 @@
         form.style.display = form.style.display === "none" ? "block" : "none";
     });
 })();
+
+
+      function loadMachineData() {
+        let id = document.getElementById("cost_code").value;
+        if (id === "") return;
+        fetch("get_machine.php?id=" + id)
+          .then(res => res.json())
+          .then(data => {
+            if (data) {
+              document.querySelector("input[name='shift_hours']").value = data.hours / 2 || "";
+              document.querySelector("input[name='machine_name']").value = data.plant_no || "";
+              document.querySelector("input[name='project_name']").value = data.project_name || "";
+              document.querySelector("input[name='owner_name']").value = data.owner || "";
+            }
+          })
+          .catch(err => console.error("خطأ في جلب البيانات:", err));
+      }
+
+      document.querySelectorAll("#start_minutes, #start_seconds, #end_minutes, #end_seconds")
+        .forEach(inp => {
+          inp.addEventListener("input", function () {
+            let max = 59, min = 0;
+            if (this.value > max) this.value = max;
+            if (this.value < min) this.value = min;
+          });
+        });
+
+
+      // ✅ دالة لحساب العمليات الثلاثة
+      function calculateCustomHours() {
+        let dependence = parseFloat(document.querySelector("input[name='dependence_hours']").value) || 0;
+        let executed = parseFloat(document.querySelector("input[name='executed_hours']").value) || 0;
+        let extraTotal = parseFloat(document.querySelector("input[name='extra_hours_total']").value) || 0;
+        let standby = parseFloat(document.querySelector("input[name='standby_hours']").value) || 0;
+        let shift = parseFloat(document.querySelector("input[name='shift_hours']").value) || 0;
+        let maintenance = parseFloat(document.querySelector("input[name='maintenance_fault']").value) || 0;
+        let marketing = parseFloat(document.querySelector("input[name='marketing_fault']").value) || 0;
+
+        // العملية الأولى: مجموع ساعات العمل
+        let totalWork = executed + extraTotal + standby;
+        document.querySelector("input[name='total_work_hours']").value = totalWork;
+
+        // العملية الثانية: ساعات أعطال أخرى
+        let otherFault = shift - executed - standby - dependence;
+        if (otherFault < 0) otherFault = 0;
+        document.querySelector("input[name='total_fault_hours']").value = otherFault;
+
+        // العملية الثالثة: ساعات استعداد المشغل
+        let operatorStandby = 0;
+        if (executed < shift) {
+          operatorStandby = maintenance + marketing + dependence;
+        }
+        document.querySelector("input[name='operator_standby_hours']").value = operatorStandby;
+
+        // اسناد قيمة استعدات الاليه 
+        document.querySelector("input[name='machine_standby_hours']").value = standby;
+      }
+
+      // شغل الحساب عند أي تغيير في الحقول
+      document.querySelectorAll("input[name='executed_hours'], input[name='extra_hours_total'], input[name='standby_hours'], input[name='shift_hours'], input[name='maintenance_fault'], input[name='marketing_fault'] , input[name='dependence_hours'] , input[name='machine_standby_hours']  ")
+        .forEach(el => el.addEventListener("input", calculateCustomHours));
+
+      // ✅ استدعاء أول مرة
+      calculateCustomHours();
+
+      function calculateDiff() {
+        // اجمع البداية
+        let start =
+          (parseInt(document.getElementById("start_hours").value || 0) * 3600) +
+          (parseInt(document.getElementById("start_minutes").value || 0) * 60) +
+          (parseInt(document.getElementById("start_seconds").value || 0));
+
+        // اجمع النهاية
+        let end =
+          (parseInt(document.getElementById("end_hours").value || 0) * 3600) +
+          (parseInt(document.getElementById("end_minutes").value || 0) * 60) +
+          (parseInt(document.getElementById("end_seconds").value || 0));
+
+        let executed = parseFloat(document.querySelector("input[name='executed_hours']").value) || 0;
+        let extraTotal = parseFloat(document.querySelector("input[name='extra_hours_total']").value) || 0;
+
+        let diff = end - start;
+        if (diff < 0) diff = 0; // حماية
+
+        // حوّل الفرق إلى ساعات/دقائق/ثواني
+        let hours = (executed + extraTotal) - Math.floor(diff / 3600);
+        let minutes = Math.floor((diff % 3600) / 60);
+        let seconds = diff % 60;
+
+        // عرض الفرق
+        document.getElementById("counter_diff_display").value =
+          hours + " ساعة " + minutes + " دقيقة " + seconds + " ثانية";
+
+        // حفظ القيمة (بالثواني) للإرسال
+        document.getElementById("counter_diff").value = diff;
+      }
+
+      // شغل الحساب عند أي تغيير
+      document.querySelectorAll("#start_hours, #start_minutes, #start_seconds, #end_hours, #end_minutes, #end_seconds")
+        .forEach(el => el.addEventListener("input", calculateDiff));
+
+      calculateDiff(); 
+
 </script>
 
 </body>
