@@ -111,25 +111,31 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th style="text-align: right;">تاريخ البداية</th>
-                <th style="text-align: right;"> تاريخ النهاية </th>
-                <th style="text-align: right;">الحالة</th>
+                <th style="text-align: right;">اسم المشروع</th>
+                <th style="text-align: right;"> الموقع </th>
+                <th style="text-align: right;"> القيمة الاجمالية </th>
+                <th style="text-align: right;"> التاريخ </th>
                 <th style="text-align: right;">إجراءات</th>
             </tr>
         </thead>
         <tbody>
             <?php
             include '../config.php';
-            
-            $query = "SELECT * FROM `contracts` where project LIKE '$project' ORDER BY id DESC";
+            $supplier = $_GET['id'];
+            $query = "SELECT DISTINCT * , p.name as 'project'
+            FROM projects p
+            JOIN operations o ON p.id = o.project
+            JOIN equipments e ON o.equipment = e.id
+            WHERE e.suppliers =$supplier;";
             $result = mysqli_query($conn, $query);
             $i = 1;
             while($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>";
                 echo "<td>".$i++."</td>";
-                echo "<td>".$row['start']."</td>";
-                echo "<td>".$row['end']."</td>";
-                echo "<td>".$row['status']."</td>";
+                echo "<td>".$row['project']."</td>";
+                echo "<td>".$row['location']."</td>";
+                echo "<td>".$row['total']."</td>";
+                echo "<td>".$row['create_at']."</td>";
                 echo "<td>
                         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
                         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
