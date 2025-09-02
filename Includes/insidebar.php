@@ -1,3 +1,8 @@
+<!-- زر القائمة في الموبايل -->
+<button class="mobile-menu-btn" id="mobileMenuBtn">
+  <i class="fa fa-bars"></i>
+</button>
+
 <div class="sidebar closed" id="sidebar">
   <div>
     <div class="toggle-btn" id="toggleBtn"><i class="fa fa-bars"></i></div>
@@ -6,7 +11,6 @@
     <ul>
       <li><a href="../dashbourd.php"><i class="fa fa-home"></i> <span>الرئيسية</span></a></li>
       <li><a href="../Projects/projects.php"><i class="fa fa-project-diagram"></i> <span>المشاريع</span></a></li>
-      <!-- <li><a href="../Contracts/contracts.php"><i class="fa fa-file-contract"></i> <span>العقود</span></a></li> -->
       <li><a href="../Suppliers/suppliers.php"><i class="fa fa-truck"></i> <span>الموردين</span></a></li>
       <li><a href="../Equipments/equipments.php"><i class="fa fa-tools"></i> <span>الآليات</span></a></li>
       <li><a href="../Drivers/drivers.php"><i class="fa fa-id-badge"></i> <span>المشغلين</span></a></li>
@@ -25,19 +29,20 @@
   </a>
 </div>
 
-  <script>
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('toggleBtn');
-
-    toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('closed');
-    });
-  </script>
-
-<!-- <script>
+<script>
   const sidebar = document.getElementById('sidebar');
   const toggleBtn = document.getElementById('toggleBtn');
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
+  // للحاسوب
   toggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle
-</script> -->
+    if (window.innerWidth > 768) {
+      sidebar.classList.toggle('closed');
+    }
+  });
+
+  // للموبايل
+  mobileMenuBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+  });
+</script>

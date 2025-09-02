@@ -1,18 +1,14 @@
-/* Constants */
+/* ================== Constants ================== */
 :root {
-  --main-color: #FFFFDD;
-  /* Main Background Colors */
-  --text-color: #000022;
-  /* The Page Text Color */
-  --btn-color: #FFFF55;
-  /* Buttons and primary */
-  --orange-color: #FFAA33;
-  /* The orange color */
-  --gray-color: #915e07;
-  /* The grey Color */
+  --main-color: #FFFFDD;   /* Background base */
+  --text-color: #000022;   /* Text */
+  --btn-color: #FFAA33;    /* Buttons */
+  --btn-hover: #e69500;    /* Darker button */
+  --gray-color: #915e07;   /* Sidebar hover */
+  --light-gray: #f9f9f9;   /* Light backgrounds */
 }
 
-/* Normal Design */
+/* ================== Reset ================== */
 * {
   margin: 0;
   padding: 0;
@@ -26,7 +22,7 @@ body {
   background-color: #f2f2f2;
 }
 
-/* Login Screen */
+/* ================== Login Screen ================== */
 .login-container {
   background-color: #fff;
   padding: 30px 40px;
@@ -40,29 +36,31 @@ body {
 .login-container h2 {
   text-align: center;
   margin-bottom: 25px;
+  color: var(--btn-color);
 }
 
 .login-container input {
   width: 100%;
   padding: 12px 15px;
   margin-bottom: 15px;
-  border: 1px solid #ccc;
+  border: 1px solid #bbb;
   border-radius: 8px;
   font-size: 16px;
-  border-color: var(--text-color);
+  transition: all 0.3s;
 }
 
 .login-container input:focus {
-  border-color: var(--orange-color);
+  border-color: var(--btn-color);
+  box-shadow: 0 0 4px rgba(255, 170, 51, 0.5);
   outline: none;
 }
 
 .login-container button {
   width: 100%;
   padding: 12px;
-  background-color: var(--orange-color);
+  background-color: var(--btn-color);
   border: none;
-  color: var(--text-color);
+  color: #fff;
   font-size: 18px;
   border-radius: 8px;
   cursor: pointer;
@@ -71,7 +69,7 @@ body {
 }
 
 .login-container button:hover {
-  background-color: #FFBB00;
+  background-color: var(--btn-hover);
 }
 
 .login-container .forgot {
@@ -81,7 +79,7 @@ body {
 }
 
 .login-container .forgot a {
-  color: var(--main-color);
+  color: var(--btn-color);
   text-decoration: none;
 }
 
@@ -89,7 +87,7 @@ body {
   text-decoration: underline;
 }
 
-/* Sidebar */
+/* ================== Sidebar ================== */
 .sidebar {
   width: 220px;
   background-color: var(--text-color);
@@ -103,9 +101,11 @@ body {
 }
 
 .sidebar .logo {
-  color: var(--orange-color);
+  color: var(--btn-color);
   font-size: 25px;
   font-weight: 900;
+  text-align: center;
+  padding: 15px 0;
 }
 
 .sidebar.closed {
@@ -128,13 +128,12 @@ body {
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-.sidebar h2,
-.login-container h1 {
+.sidebar h2 {
   text-align: center;
   padding: 10px 0;
   font-size: 20px;
   transition: opacity 0.3s;
-  color: var(--orange-color);
+  color: var(--btn-color);
 }
 
 .sidebar.closed h2 {
@@ -163,7 +162,7 @@ body {
   font-size: 18px;
   width: 30px;
   text-align: center;
-  color: var(--orange-color);
+  color: var(--btn-color);
 }
 
 .sidebar ul li span {
@@ -184,11 +183,7 @@ body {
   font-weight: 700;
 }
 
-.sidebar ul li a:hover {
-  background-color: var(--gray-color);
-}
-
-/* Logout button */
+/* ================== Logout ================== */
 .logout {
   display: flex;
   align-items: center;
@@ -219,7 +214,7 @@ body {
   opacity: 0;
 }
 
-/* Main content */
+/* ================== Main Content ================== */
 .main {
   flex: 1;
   padding: 20px;
@@ -227,83 +222,162 @@ body {
 
 .main h2 {
   color: #000;
-  background-color: #FFAA33;
-  padding: 10px;
+  background-color: var(--btn-color);
+  padding: 10px 20px;
   border-radius: 20px;
-  padding-right: 20px;
   font-size: 23px;
   font-weight: 800;
-  display: inline;
+  display: inline-block;
 }
 
 .main .add {
-
   display: inline-block;
   margin: 15px 0;
   padding: 10px 15px;
-  background: #ffcc00;
-  color: #000;
+  background: var(--btn-color);
+  color: #fff;
   text-decoration: none;
-  border-radius: 5px;
+  border-radius: 8px;
   font-weight: bold;
-
+  transition: background 0.3s;
 }
 
 .main .add:hover {
-  background-color: rgb(8, 139, 8);
-  ;
+  background-color: var(--btn-hover);
 }
 
+/* ================== Project Form ================== */
 #projectForm {
   display: none;
   margin-top: 20px;
-  background: #f9f9f9;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background: var(--light-gray);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease-in-out;
+}
+
+#projectForm h3 {
+  font-size: 22px;
+  margin-bottom: 20px;
+  font-weight: 800;
+  color: var(--btn-color);
+  text-align: center;
+}
+
+#projectForm .form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Desktop: 4 في الصف */
+  gap: 20px;
+}
+
+#projectForm label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+  color: var(--text-color);
 }
 
 #projectForm input,
-#projectForm input[type="number"] , 
 #projectForm select {
-  padding: 10px;
-  width: 90%;
-  margin-bottom: 10px;
-  border-radius: 5px;
+  padding: 12px 14px;
+  width: 100%;
+  border-radius: 8px;
   border: 1px solid #ccc;
+  font-size: 15px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+#projectForm input:focus,
+#projectForm select:focus {
+  border-color: var(--btn-color);
+  box-shadow: 0 0 5px rgba(255, 170, 51, 0.5);
+  outline: none;
 }
 
 #projectForm button {
-  padding: 10px 20px;
-  background: #ffcc00;
+  grid-column: span 4; /* زر ياخذ صف كامل */
+  padding: 14px;
+  background: var(--btn-color);
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 16px;
+  color: #fff;
+  transition: background 0.3s;
 }
 
-/* Reports Table */
-.table{
+#projectForm button:hover {
+  background-color: var(--btn-hover);
+}
+
+
+/* ================== Reports Table ================== */
+.table {
   width: 100%;
   text-align: right;
   font-weight: 500;
+  border-collapse: collapse;
 }
 
-.table thead .o{
-  background-color: #fce2be;
-}
-
-.table thead .t{
-  background-color: rgb(250, 250, 193);
-}
-
-.table thead tr th{
-  font-family: 'Arial';
+.table thead tr th {
   border-bottom: solid 2px black;
-  padding-right: 10px;
-  padding-bottom: 5px;
-  padding-top: 5px;
-  font-weight: 400;
+  padding: 10px;
+  font-weight: 700;
   color: black;
-  font-size: 20px;
+  font-size: 18px;
+}
+
+.table tbody tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* ================== Responsive Sidebar ================== */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -240px;
+    height: 100%;
+    z-index: 1000;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .main {
+    padding: 15px;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: var(--btn-color);
+    color: #fff;
+    border: none;
+    padding: 10px 12px;
+    font-size: 20px;
+    border-radius: 8px;
+    z-index: 1100;
+    cursor: pointer;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-menu-btn {
+    display: none;
+  }
 }

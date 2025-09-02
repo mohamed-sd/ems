@@ -1,8 +1,11 @@
+<button class="mobile-menu-btn" id="mobileMenuBtn">
+  <i class="fa fa-bars"></i>
+</button>
 <div class="sidebar closed" id="sidebar">
   <div>
     <div class="toggle-btn" id="toggleBtn"><i class="fa fa-bars"></i></div>
     <h2 class="logo">Equipation</h2>
-
+ 
     <ul>
       <li><a href="dashbourd.php"><i class="fa fa-home"></i> <span>الرئيسية</span></a></li>
       <li><a href="Projects/projects.php"><i class="fa fa-project-diagram"></i> <span>المشاريع</span></a></li>
@@ -25,14 +28,23 @@
   </a>
 </div>
 
-  <script>
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('toggleBtn');
+<script>
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 
-    toggleBtn.addEventListener('click', () => {
+  // للحاسوب
+  toggleBtn.addEventListener('click', () => {
+    if (window.innerWidth > 768) {
       sidebar.classList.toggle('closed');
-    });
-  </script>
+    }
+  });
+
+  // للموبايل
+  mobileMenuBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+  });
+</script>
 
 <!-- <script>
   const sidebar = document.getElementById('sidebar');

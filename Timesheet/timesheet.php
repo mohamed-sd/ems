@@ -21,7 +21,7 @@
     </a>
 
     <!-- فورم إضافة ساعات عمل -->
-    <form id="timesheetForm" action="" method="post" style="display:none; margin-top:20px;">
+    <form id="projectForm" action="" method="post" style="display:none; margin-top:20px;">
         <!-- اختيار المشغل (من جدول التشغيل) -->
         <label>المشغل</label>
         <select name="operator" required>
@@ -61,7 +61,7 @@
         <input type="text" name="jackhamr" placeholder="جاك هامر" />
 
         <label>ساعات الوردية</label>
-        <input type="number" name="shift_hours" value="0" readonly>
+        <input type="number" name="shift_hours" value="0">
 
         <label>
             <h5>⏱️ عداد البداية</h5>
@@ -236,7 +236,7 @@
     });
 
     const toggleFormBtn = document.getElementById('toggleForm');
-    const form = document.getElementById('timesheetForm');
+    const form = document.getElementById('projectForm');
 
     toggleFormBtn.addEventListener('click', function() {
         form.style.display = form.style.display === "none" ? "block" : "none";

@@ -28,12 +28,26 @@
 
     <!-- فورم إضافة مشروع -->
     <form id="projectForm" action="" method="post">
+        <h3>إضافة مشروع جديد</h3>
+    <div class="form-grid">
+    <div>
+        <label>اسم المشروع</label>
         <input type="text" name="name" placeholder="اسم المشروع" required />
+    </div>
+    <div>
+        <label>اسم العميل</label>
         <input type="text" name="client" placeholder="اسم العميل" required />
+    </div>
+    <div>
+        <label>موقع المشروع</label>
         <input type="text" name="location" placeholder="موقع المشروع" required />
+    </div>
+    <div>
+        <label>القيمة الإجمالية</label>
         <input type="number" name="total" placeholder="القيمة الإجمالية" required />
-        <br/>
-        <button type="submit">حفظ المشروع</button>
+    </div>
+    <button type="submit">حفظ المشروع</button>
+    </div>
     </form>
 
     <br/> <br/> <br/>
