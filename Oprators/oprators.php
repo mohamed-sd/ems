@@ -19,7 +19,7 @@
     </a>
 
     <!-- فورم إضافة تشغيل -->
-    <form id="operationForm" action="" method="post" style="display:none; margin-top:20px;">
+    <form id="projectForm" action="" method="post" style="display:none; margin-top:20px;">
         <!-- المعدة -->
         <select name="equipment" required>
             <option value="">-- اختر المعدة --</option>
@@ -43,10 +43,10 @@
             ?>
         </select>
 
-        <input type="datetime-local" name="start" required placeholder="تاريخ البداية" />
-        <input type="datetime-local" name="end" required placeholder="تاريخ النهاية" />
+        <input type="date" name="start" required placeholder="تاريخ البداية" />
+        <input type="date" name="end" required placeholder="تاريخ النهاية" />
         <input type="number" step="0.01" name="hours" placeholder="عدد الساعات" required />
-        <select name="status" required>
+        <select name="status" required >
             <option value="active">نشط</option>
             <option value="done">منتهي</option>
         </select>
@@ -136,7 +136,7 @@
 
     // التحكم في إظهار وإخفاء الفورم
     const toggleFormBtn = document.getElementById('toggleForm');
-    const form = document.getElementById('operationForm');
+    const form = document.getElementById('projectForm');
 
     toggleFormBtn.addEventListener('click', function() {
         form.style.display = form.style.display === "none" ? "block" : "none";

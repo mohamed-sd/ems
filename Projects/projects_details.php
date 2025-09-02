@@ -39,6 +39,20 @@
 
     $project = $_GET['id'];
 
+        $suppliers = mysqli_query( $conn , "SELECT COUNT(DISTINCT pm.suppliers) AS total_suppliers
+FROM equipments pm
+JOIN operations m ON pm.id = m.equipment
+WHERE m.project =  $project;");
+
+
+
+$rowsuppliers = mysqli_fetch_assoc($suppliers);
+$total_suppliers = $rowsuppliers['total_suppliers'];
+
+
+     
+
+
     $select = mysqli_query( $conn , "SELECT * FROM `projects` WHERE `id` = $project");
     while ($row = mysqli_fetch_array($select)) {
     ?>
@@ -53,6 +67,10 @@
     <tr class="o">
         <th> موقع المشروع </th>
         <th><?php echo $row['location']; ?></th>
+    </tr>
+    <tr class="t">
+        <th>  عدد الموردين </th>
+        <th><?php echo $total_suppliers; ?></th>
     </tr>
     <tr class="t">
         <th> اجمالي الساعات </th>
@@ -95,7 +113,6 @@
             }
 
 
-        
 
 
             // جلب المشاريع

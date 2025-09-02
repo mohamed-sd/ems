@@ -20,7 +20,7 @@
     </a>
 
     <!-- فورم إضافة معدة -->
-    <form id="equipmentForm" action="" method="post" style="display:none;">
+    <form id="projectForm" action="" method="post" style="display:none;">
         <?php if(isset($_GET['id'])){ ?>
         <input type="text" name="suppliers" value="<?php echo $_GET['id']; ?>" placeholder="المورد" required />
         <?php } ?>
@@ -33,6 +33,8 @@
             <option value="مشغولة">مشغولة</option>
             <option value="صيانة">صيانة</option>
         </select>
+
+     
         <br/>
         <button type="submit">حفظ المعدة</button>
     </form>
@@ -110,7 +112,7 @@
 
     // التحكم في إظهار وإخفاء الفورم
     const toggleFormBtn = document.getElementById('toggleForm');
-    const equipmentForm = document.getElementById('equipmentForm');
+    const equipmentForm = document.getElementById('projectForm');
 
     toggleFormBtn.addEventListener('click', function() {
         equipmentForm.style.display = equipmentForm.style.display === "none" ? "block" : "none";
