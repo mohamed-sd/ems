@@ -1,0 +1,308 @@
+/* Constants */
+:root {
+  --main-color: #FFFFDD;
+  /* Main Background Colors */
+  --text-color: #000022;
+  /* The Page Text Color */
+  --btn-color: #FFFF55;
+  /* Buttons and primary */
+  --orange-color: #FFAA33;
+  /* The orange color */
+  --gray-color: #915e07;
+  /* The grey Color */
+}
+
+/* Normal Design */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Cairo", sans-serif;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f2f2f2;
+}
+
+/* Login Screen */
+.login-container {
+  background-color: #fff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  color: var(--text-color);
+}
+
+.login-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  border-color: var(--text-color);
+}
+
+.login-container input:focus {
+  border-color: var(--orange-color);
+  outline: none;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--orange-color);
+  border: none;
+  color: var(--text-color);
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-weight: bold;
+}
+
+.login-container button:hover {
+  background-color: #FFBB00;
+}
+
+.login-container .forgot {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.login-container .forgot a {
+  color: var(--main-color);
+  text-decoration: none;
+}
+
+.login-container .forgot a:hover {
+  text-decoration: underline;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: var(--text-color);
+  color: white;
+  transition: width 0.3s;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar .logo {
+  color: var(--orange-color);
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.sidebar.closed {
+  width: 60px;
+}
+
+.sidebar .toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 15px 0;
+  cursor: pointer;
+  font-size: 20px;
+  background-color: rgba(0, 0, 0, 0.1);
+  transition: background 0.2s;
+}
+
+.sidebar .toggle-btn:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.sidebar h2,
+.login-container h1 {
+  text-align: center;
+  padding: 10px 0;
+  font-size: 20px;
+  transition: opacity 0.3s;
+  color: var(--orange-color);
+}
+
+.sidebar.closed h2 {
+  opacity: 0;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.sidebar ul li {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sidebar ul li:hover {
+  background-color: var(--gray-color);
+}
+
+.sidebar ul li i {
+  font-size: 18px;
+  width: 30px;
+  text-align: center;
+  color: var(--orange-color);
+}
+
+.sidebar ul li span {
+  margin-left: 10px;
+  transition: opacity 0.3s;
+}
+
+.sidebar.closed ul li span {
+  opacity: 0;
+}
+
+.sidebar ul li a {
+  display: flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  width: 100%;
+  font-weight: 700;
+}
+
+.sidebar ul li a:hover {
+  background-color: var(--gray-color);
+}
+
+/* Logout button */
+.logout {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  color: white;
+  transition: background 0.2s;
+}
+
+.logout:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.logout i {
+  font-size: 18px;
+  width: 30px;
+  text-align: center;
+}
+
+.logout span {
+  margin-left: 10px;
+  transition: opacity 0.3s;
+}
+
+.sidebar.closed .logout span {
+  opacity: 0;
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  padding: 20px;
+}
+
+.main h2 {
+  color: #000;
+  background-color: #FFAA33;
+  padding: 10px;
+  border-radius: 20px;
+  padding-right: 20px;
+  font-size: 23px;
+  font-weight: 800;
+  display: inline;
+}
+
+.main .add {
+
+  display: inline-block;
+  margin: 15px 0;
+  padding: 10px 15px;
+  background: #ffcc00;
+  color: #000;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+
+}
+
+.main .add:hover {
+  background-color: rgb(8, 139, 8);
+  ;
+}
+
+#projectForm {
+  display: none;
+  margin-top: 20px;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#projectForm input,
+#projectForm input[type="number"] {
+  padding: 10px;
+  width: 90%;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+#projectForm button {
+  padding: 10px 20px;
+  background: #ffcc00;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Reports Table */
+.table{
+  width: 100%;
+  text-align: right;
+  font-weight: 500;
+}
+
+.table thead .o{
+  background-color: #fce2be;
+}
+
+.table thead .t{
+  background-color: rgb(250, 250, 193);
+}
+
+.table thead tr th{
+  font-family: 'Arial';
+  border-bottom: solid 2px black;
+  padding-right: 10px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  font-weight: 400;
+  color: black;
+  font-size: 20px;
+}
