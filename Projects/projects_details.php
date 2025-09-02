@@ -73,12 +73,11 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th style="text-align: right;">اسم المشروع</th>
-                <th style="text-align: right;">العميل</th>
-                <th style="text-align: right;">الموقع</th>
-                <th style="text-align: right;">القيمة الإجمالية</th>
-                <th style="text-align: right;">تاريخ الإضافة</th>
-                <th style="text-align: right;">إجراءات</th>
+                <th style="text-align: right;">المورد</th>
+                <th style="text-align: right;">النوع</th>
+                 <th style="text-align: right;">اسم الالية</th>
+
+                <!-- <th style="text-align: right;">إجراءات</th> -->
             </tr>
         </thead>
         <tbody>
@@ -95,22 +94,28 @@
                 mysqli_query($conn, "INSERT INTO projects (name, client, location, total, create_at) VALUES ('$name', '$client', '$location', '$total', '$date')");
             }
 
+
+        
+
+
             // جلب المشاريع
-            $query = "SELECT `id`, `name`, `client`, `location`, `total`, `create_at` FROM `projects` ORDER BY id DESC";
+            $query = "SELECT m.id,m.suppliers,m.type,m.code
+FROM equipments m
+JOIN operations pm ON m.id = pm.equipment
+WHERE pm.project = 7";
             $result = mysqli_query($conn, $query);
             $i = 1;
             while($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>";
                 echo "<td>".$i++."</td>";
-                echo "<td>".$row['name']."</td>";
-                echo "<td>".$row['client']."</td>";
-                echo "<td>".$row['location']."</td>";
-                echo "<td>".$row['total']."</td>";
-                echo "<td>".$row['create_at']."</td>";
-                echo "<td>
-                        <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
-                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
-                      </td>";
+                echo "<td>".$row['suppliers']."</td>";
+                echo "<td>".$row['type']."</td>";
+                echo "<td>".$row['code']."</td>";
+        
+                // echo "<td>
+                //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
+                //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> 
+                //       </td>";
                 echo "</tr>";
             }
             ?>
