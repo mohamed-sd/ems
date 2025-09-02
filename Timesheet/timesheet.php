@@ -123,7 +123,7 @@
                 echo "<td>".$row['project_name']."</td>";
                 echo "<td>مشغل #".$row['operation_id']."</td>";
                 echo "<td>".$row['driver_name']."</td>";
-                echo "<td>".$row['shift']."</td>";
+                echo $row['shift'] == "D" ? "<td> صباحية </td>" : "<td> مسائية </td>";
                 echo "<td>".$row['work_hours']."</td>";
                 echo "<td>".$row['damage_hours']."</td>";
                 echo "<td>".$row['date']."</td>";

@@ -264,7 +264,8 @@ body {
 }
 
 #projectForm input,
-#projectForm input[type="number"] {
+#projectForm input[type="number"] , 
+#projectForm select {
   padding: 10px;
   width: 90%;
   margin-bottom: 10px;
