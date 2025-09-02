@@ -21,7 +21,7 @@
     </a>
 
     <!-- فورم إضافة مورد -->
-    <form id="supplierForm" action="" method="post" style="display:none;">
+    <form id="projectForm" action="" method="post" style="display:none;">
         <input type="text" name="name" placeholder="اسم المورد" required />
         <input type="text" name="phone" placeholder="رقم الهاتف" required />
         <select name="status" required>
@@ -104,7 +104,7 @@
 
     // التحكم في إظهار وإخفاء الفورم
     const toggleSupplierFormBtn = document.getElementById('toggleForm');
-    const supplierForm = document.getElementById('supplierForm');
+    const supplierForm = document.getElementById('projectForm');
 
     toggleSupplierFormBtn.addEventListener('click', function() {
         supplierForm.style.display = supplierForm.style.display === "none" ? "block" : "none";

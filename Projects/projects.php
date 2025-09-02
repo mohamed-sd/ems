@@ -46,10 +46,14 @@
             <tr>
                 <th>#</th>
                 <th style="text-align: right;">اسم المشروع</th>
+                 <th style="text-align: right;"> عدد الاليات </th>
+
                 <th style="text-align: right;"> العقود </th>
                 <th style="text-align: right;">العميل</th>
                 <th style="text-align: right;">الموقع</th>
                 <th style="text-align: right;">القيمة الإجمالية</th>
+                 <th style="text-align: right;"> عدد الموردين</th>
+
                 <th style="text-align: right;">تاريخ الإضافة</th>
                 <th style="text-align: right;">إجراءات</th>
             </tr>
@@ -69,20 +73,27 @@
             }
 
             // جلب المشاريع
-            $query = "SELECT `id`, `name`, `client`, `location`, `total`, `create_at`, (SELECT COUNT(*) FROM contracts WHERE contracts.project = projects.id) as 'contracts' FROM projects ORDER BY id DESC";
+            $query = "SELECT `id`, `name`, `client`, `location`, `total`, `create_at`, (SELECT COUNT(*) FROM contracts WHERE contracts.project = projects.id) as 'contracts' , (SELECT COUNT(*) FROM operations WHERE operations.project = projects.id) as 'operations',(SELECT COUNT(DISTINCT pm.suppliers) AS total_suppliers
+FROM equipments pm
+JOIN operations m ON pm.id = m.equipment
+WHERE m.project =   projects.id) as 'total_suppliers'   FROM projects ORDER BY id DESC";
             $result = mysqli_query($conn, $query);
             $i = 1;
             while($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>";
                 echo "<td>".$i++."</td>";
                 echo "<td>".$row['name']."</td>";
+                echo "<td>".$row['operations']."</td>";
                 echo "<td>".$row['contracts']."</td>";
+                
                 echo "<td>".$row['client']."</td>";
                 echo "<td>".$row['location']."</td>";
                 echo "<td>".$row['total']."</td>";
+                echo "<td>".$row['total_suppliers']."</td>";
+
                 echo "<td>".$row['create_at']."</td>";
                 echo "<td>
-                        <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
+                        <a href='edit.php?id=".$row['id']."' >تعديل</a> | 
                         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href='projects_details.php?id=".$row['id']."'> عرض </a>
                       </td>";
                 echo "</tr>";
