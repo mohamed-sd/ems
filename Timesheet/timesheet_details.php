@@ -32,22 +32,18 @@ include '../config.php';
 
 $project = intval($_GET['id']);
 
-$sql = "SELECT t.id,
+$sql = "SELECT  * , t.id,
                d.name AS driver_name,
-               e.name AS equipment_name,
+               e.code AS equipment_name,
                p.name AS project_name,
                t.shift,
-               t.work_hours,
-               t.damage_hours,
-               t.date,
-               t.movies,
-               t.jackhamr
+               t.date
         FROM timesheet t
         JOIN drivers d ON t.driver = d.id
         JOIN operations o ON t.operator = o.id
         JOIN equipments e ON o.equipment = e.id
         JOIN projects p ON o.project = p.id
-        WHERE p.id = $project
+        WHERE t.id = $project
         ORDER BY t.date DESC";
 
 $result = mysqli_query($conn, $sql);
@@ -83,25 +79,140 @@ while ($row = mysqli_fetch_assoc($result)) {
     <th><?php echo $row['project_name']; ?></th>
 </tr>
 <tr class="o"> 
-    <th> ساعات العمل </th>
-    <th><?php echo $row['work_hours'] ; ?></th>
-</tr>
-<tr class="t"> 
-    <th> ساعات التعطل </th>
-    <th><?php echo $row['damage_hours']; ?></th>
-</tr>
-<tr class="o"> 
     <th> التاريخ </th>
     <th><?php echo $row['date']; ?></th>
 </tr>
 <tr class="t"> 
-    <th> عدد النقلات ( قلام ) </th>
-    <th><?php echo $row['movies']; ?></th>
+    <th> ساعات الوردية </th>
+    <th><?php echo $row['shift_hours']; ?></th>
 </tr>
 <tr class="o"> 
-    <th> ساعات الجاكهمر ( حفار )  </th>
-    <th><?php echo $row['jackhamr']; ?></th>
+    <th> الساعات المنفذة  </th>
+    <th><?php echo $row['executed_hours']; ?></th>
 </tr>
+<tr class="t"> 
+    <th> ساعات الجردل </th>
+    <th><?php echo $row['bucket_hours']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> الساعات المنفذة  </th>
+    <th><?php echo $row['jackhammer_hours']; ?></th>
+</tr>
+
+<tr class="t"> 
+    <th> الساعات الاضافية </th>
+    <th><?php echo $row['extra_hours']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> مجموع الساعات الإضافة  </th>
+    <th><?php echo $row['extra_hours_total']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> ساعات الاستعداد (بسبب العميل() </th>
+    <th><?php echo $row['standby_hours']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> ساعات الاستعادا (اعتماد)  </th>
+    <th><?php echo $row['dependence_hours']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> مجموع ساعات العمل </th>
+    <th><?php echo $row['total_work_hours']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> ملاحظات ساعات العمل  </th>
+    <th><?php echo $row['work_notes']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> عطل HR </th>
+    <th><?php echo $row['hr_fault']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> عطل صيانة </th>
+    <th><?php echo $row['maintenance_fault']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> عطل تسويق </th>
+    <th><?php echo $row['marketing_fault']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> عطل اعتماد  </th>
+    <th><?php echo $row['approval_fault']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> ساعات أعطال أخرى </th>
+    <th><?php echo $row['other_fault_hours']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> مجموع ساعات التعطل  </th>
+    <th><?php echo $row['total_fault_hours']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> ملاحظات ساعات التعطل </th>
+    <th><?php echo $row['fault_notes']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> عداد البداية  </th>
+    <th><?php echo $row['start_hours'].":".$row['start_minutes'].":".$row['start_seconds']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> عداد النهاية </th>
+    <th><?php echo $row['end_hours'].":".$row['end_minutes'].":".$row['end_seconds']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> فرق العداد  </th>
+    <th><?php echo $row['counter_diff']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> نوع العطل </th>
+    <th><?php echo $row['fault_type']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> قسم العطل  </th>
+    <th><?php echo $row['fault_department']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> الجزء المعطل </th>
+    <th><?php echo $row['fault_part']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> تفاصيل العطل  </th>
+    <th><?php echo $row['fault_details']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> ملاحظات عامة </th>
+    <th><?php echo $row['general_notes']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> ساعات عمل المشغل </th>
+    <th><?php echo $row['operator_hours']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> ساعات استعداد الآليه </th>
+    <th><?php echo $row['machine_standby_hours']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> ساعات استعداد الجاك همر  </th>
+    <th><?php echo $row['jackhammer_standby_hours']; ?></th>
+</tr>
+
+<tr class="t"> 
+    <th> ساعات استعداد الجردل </th>
+    <th><?php echo $row['bucket_standby_hours']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> الساعات الاضافية للمشغل </th>
+    <th><?php echo $row['extra_operator_hours']; ?></th>
+</tr>
+<tr class="t"> 
+    <th>  ساعات استعداد المشغل </th>
+    <th><?php echo $row['operator_standby_hours']; ?></th>
+</tr>
+<tr class="o"> 
+    <th> ملاحظات المشغل  </th>
+    <th><?php echo $row['operator_notes']; ?></th>
+</tr>
+
 
 <?php } ?>
 </thead>

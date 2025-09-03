@@ -60,23 +60,9 @@
             <option value="N"> مسائية </option>
           </select>
         </div>
-        <div>
-            <label> ساعات العمل </label>
-          <input type="number" step="0.01" name="work_hours" placeholder="ساعات العمل" required />
-        </div>
-        <div>
-            <label>ساعات التوقف/الأعطال </label>
-          <input type="number" step="0.01" name="damage_hours" placeholder="ساعات التوقف/الأعطال" />
-      </div>
       <div>
           <input type="date" name="date" required />
       </div>
-      <div>
-          <input type="text" name="movies" placeholder="ملاحظات/أفلام" />
-      </div>
-      <div>
-          <input type="text" name="jackhamr" placeholder="جاك هامر" />
-        </div>
 
 
         <!-- ********************************************************** -->
@@ -268,39 +254,50 @@
     <table id="timesheetTable" class="display" style="width:100%; margin-top:20px;">
       <thead>
         <tr>
-          <th>#</th>
-          <th>المعدة</th>
-          <th>المشروع</th>
-          <th>المشغل</th>
-          <th>السائق</th>
-          <th>الوردية</th>
-          <th>ساعات العمل</th>
-          <th>ساعات التوقف</th>
-          <th>التاريخ</th>
-          <th>ملاحظات</th>
-          <th>جاك هامر</th>
+          <th style="text-align: right;"> # </th>
+          <th style="text-align: right;"> المعدة </th>
+          <th style="text-align: right;"> المشروع </th>
+          <th style="text-align: right;"> المالك </th>
+          <th style="text-align: right;"> التاريخ </th>
+          <th style="text-align: right;"> الوردية </th>
+          <th style="text-align: right;"> الساعات </th>
+          <th style="text-align: right;"> الاستعداد </th>
+          <th style="text-align: right;"> الاعطال </th>
+          <!-- <th>جاك هامر</th> -->
           <th>إجراءات</th>
         </tr>
       </thead>
       <tbody>
         <?php
-        // إضافة سجل جديد
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
-          $operator = intval($_POST['operator']);
-          $driver = mysqli_real_escape_string($conn, $_POST['driver']);
-          $shift = mysqli_real_escape_string($conn, $_POST['shift']);
-          $work_hours = floatval($_POST['work_hours']);
-          $damage_hours = floatval($_POST['damage_hours']);
-          $date = mysqli_real_escape_string($conn, $_POST['date']);
-          $movies = mysqli_real_escape_string($conn, $_POST['movies']);
-          $jackhamr = mysqli_real_escape_string($conn, $_POST['jackhamr']);
+       
 
-          mysqli_query($conn, "INSERT INTO timesheet (operator, driver, shift, work_hours, damage_hours, date, movies, jackhamr)
-                                     VALUES ('$operator', '$driver', '$shift', '$work_hours', '$damage_hours', '$date', '$movies', '$jackhamr')");
-        }
+       if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
+    // تأمين القيم من الفورم
+    $fields = [
+        "operator","driver","shift","date","shift_hours","executed_hours","bucket_hours","jackhammer_hours","extra_hours","extra_hours_total","standby_hours","dependence_hours","total_work_hours","work_notes","hr_fault","maintenance_fault","marketing_fault","approval_fault","other_fault_hours","total_fault_hours","fault_notes","start_seconds","start_minutes","start_hours","end_seconds","end_minutes","end_hours","counter_diff","fault_type","fault_department","fault_part","fault_details","general_notes","operator_hours","machine_standby_hours","jackhammer_standby_hours","bucket_standby_hours","extra_operator_hours","operator_standby_hours","operator_notes"
+    ];
+
+    $values = [];
+    foreach ($fields as $f) {
+        $val = isset($_POST[$f]) ? mysqli_real_escape_string($conn, $_POST[$f]) : '';
+        $values[$f] = $val;
+    }
+
+    // بناء الاستعلام
+    $sql = "INSERT INTO timesheet (" . implode(",", $fields) . ")
+            VALUES ('" . implode("','", $values) . "')";
+
+    if (mysqli_query($conn, $sql)) {
+        echo "<script>alert('✅ تم حفظ الساعات بنجاح');</script>";
+    } else {
+        echo "<script>alert('❌ خطأ في الحفظ: " . mysqli_error($conn) . "');</script>";
+    }
+}
+
 
         // عرض البيانات
-        $query = "SELECT t.id, t.shift, t.work_hours, t.damage_hours, t.date, t.movies, t.jackhamr,
+        $query = "SELECT t.id, t.shift, t.date, t.executed_hours ,
+        t.standby_hours , t.total_fault_hours ,
                  e.code AS eq_code, e.name AS eq_name,
                  p.name AS project_name,
                  o.id AS operation_id,
@@ -318,14 +315,12 @@
           echo "<td>" . $i++ . "</td>";
           echo "<td>" . $row['eq_code'] . " - " . $row['eq_name'] . "</td>";
           echo "<td>" . $row['project_name'] . "</td>";
-          echo "<td>مشغل #" . $row['operation_id'] . "</td>";
-          echo "<td>" . $row['driver_name'] . "</td>";
-          echo $row['shift'] == "D" ? "<td> صباحية </td>" : "<td> مسائية </td>";
-          echo "<td>" . $row['work_hours'] . "</td>";
-          echo "<td>" . $row['damage_hours'] . "</td>";
+          echo "<td> ... </td>";
           echo "<td>" . $row['date'] . "</td>";
-          echo "<td>" . $row['movies'] . "</td>";
-          echo "<td>" . $row['jackhamr'] . "</td>";
+          echo $row['shift'] == "D" ? "<td> صباحية </td>" : "<td> مسائية </td>";
+          echo "<td>" . $row['executed_hours'] . "</td>";
+          echo "<td>" . $row['standby_hours'] . "</td>";
+          echo "<td>" . $row['total_fault_hours'] . "</td>";
           echo "<td>
                         <a href='edit_timesheet.php?id=" . $row['id'] . "'>تعديل</a> | 
                         <a href='delete_timesheet.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href='timesheet_details.php?id=" . $row['id'] . "'> عرض </a>
