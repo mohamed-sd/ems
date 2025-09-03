@@ -48,6 +48,10 @@ $result = mysqli_query($conn, $sql);
     
 
   <a href="deliy.php"><i class="fa fa-clock"></i> <span>ساعات اليوم</span></a>
+  <a href="deriver.php"><i class="fa fa-clock"></i> <span>ساعات السائق</span></a>
+
+
+  
 <form method="GET">
     <label>المورد:</label>
     <select name="supplier">
