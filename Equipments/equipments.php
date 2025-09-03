@@ -19,6 +19,18 @@
         <input type="text" name="code" placeholder="كود المعدة" required />
         <input type="text" name="type" placeholder="نوع المعدة" required />
         <input type="text" name="name" placeholder="اسم المعدة" required />
+
+          <select name="suppliers" required>
+            <option value="">-- اختر المورد --</option>
+            <?php
+            include '../config.php';
+
+            $dr_res = mysqli_query($conn, "SELECT id, name FROM suppliers");
+            while ($dr = mysqli_fetch_assoc($dr_res)) {
+              echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
+            }
+            ?>
+          </select>
         <select name="status" required>
             <option value="">اختر الحالة</option>
             <option value="متاحة">متاحة</option>

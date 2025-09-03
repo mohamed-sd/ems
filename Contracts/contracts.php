@@ -279,8 +279,8 @@ $forecasted_contracted_hours  = $_POST['forecasted_contracted_hours'];
             while($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>";
                 echo "<td>".$row['contract_signing_date']."</td>";
-                echo "<td>".$row['project']."</td>";
-                              echo "<td>".$row['actual_start']."</td>";
+                echo "<td>".$row['contract_duration_months']."</td>";
+                 echo "<td>".$row['actual_start']."</td>";
                 echo "<td>".$row['actual_end']."</td>";
 
                 echo "<td>".$row['hours_monthly_target']."</td>";
