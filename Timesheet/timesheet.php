@@ -25,9 +25,9 @@
     <form id="projectForm" action="" method="post" style="display:none; margin-top:20px;">
       <div class="form-grid">
         <div>
-          <label>المشغل</label>
+          <label>الالية</label>
           <select name="operator" required>
-            <option value="">-- اختر المشغل --</option>
+            <option value="">-- اختر الالية --</option>
             <?php
             include '../config.php';
             $op_res = mysqli_query($conn, "SELECT o.id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name
@@ -35,7 +35,7 @@
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN projects p ON o.project = p.id");
             while ($op = mysqli_fetch_assoc($op_res)) {
-              echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . " | " . $op['project_name'] . "</option>";
+              echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] .  "</option>";
             }
             ?>
           </select>
@@ -251,7 +251,7 @@
     <!-- جدول ساعات العمل -->
     <h3>قائمة ساعات العمل</h3>
     <br />
-    <table id="timesheetTable" class="display" style="width:100%; margin-top:20px;">
+    <table id="timesheetTable" class="display"   style="width:100%; margin-top:20px;">
       <thead>
         <tr>
           <th style="text-align: right;"> # </th>
