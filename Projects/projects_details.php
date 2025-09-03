@@ -148,7 +148,7 @@ WHERE pm.project = $project";
                 <th>#</th>
                 <th style="text-align: right;">تاريخ البداية</th>
                 <th style="text-align: right;"> تاريخ النهاية </th>
-                <th style="text-align: right;">الحالة</th>
+                <th style="text-align: right;">المجموع</th>
                 <th style="text-align: right;">إجراءات</th>
             </tr>
         </thead>
@@ -162,9 +162,9 @@ WHERE pm.project = $project";
             while($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>";
                 echo "<td>".$i++."</td>";
-                echo "<td>".$row['start']."</td>";
-                echo "<td>".$row['end']."</td>";
-                echo "<td>".$row['status']."</td>";
+                echo "<td>".$row['contract_signing_date']."</td>";
+                echo "<td>".$row['hours_monthly_target']."</td>";
+                echo "<td>".$row['equip_total_contract']."</td>";
                 echo "<td>
                         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
                         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
