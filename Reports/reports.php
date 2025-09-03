@@ -47,7 +47,7 @@ $result = mysqli_query($conn, $sql);
   <h2> التقارير </h2>
     
 
-  
+  <a href="deliy.php"><i class="fa fa-clock"></i> <span>ساعات اليوم</span></a>
 <form method="GET">
     <label>المورد:</label>
     <select name="supplier">
