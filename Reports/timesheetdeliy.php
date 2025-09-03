@@ -92,6 +92,10 @@ $totals = mysqli_fetch_assoc($total_res);
   
    <h2>📊 تقرير التايم شيت</h2>
 
+   <br/>
+   <br/>
+   <hr/>
+
     <form method="GET">
         <label>📅 التاريخ:</label>
         <input type="date" name="date" value="<?php echo $date_filter; ?>">
@@ -120,7 +124,7 @@ $totals = mysqli_fetch_assoc($total_res);
             ?>
         </select>
 
-        <button type="submit">🔍 بحث</button>
+        <button class="add" type="submit">🔍 بحث</button>
     </form>
 
     <h3>✅ الإحصائيات:</h3>
@@ -131,7 +135,8 @@ $totals = mysqli_fetch_assoc($total_res);
 
     </ul>
 
-    <table border="1" cellpadding="5" cellspacing="0">
+    <table id="projectsTable" class="display" cellpadding="5" cellspacing="0">
+        <thead>
         <tr>
             <th>التاريخ</th>
             <th>المشروع</th>
@@ -146,6 +151,7 @@ $totals = mysqli_fetch_assoc($total_res);
             <th>📒 ملاحظات العمل</th>
             <th>📒 ملاحظات الأعطال</th>
         </tr>
+        </thead>
         <?php while($row = mysqli_fetch_assoc($result)) { ?>
         <tr>
             <td><?php echo $row['date']; ?></td>

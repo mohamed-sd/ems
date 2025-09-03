@@ -80,6 +80,10 @@ $total_hours = $total_row['total_hours'];
 
   
   <h2>📊 تقرير ساعات العمل اليومية</h2>
+
+  <br/>
+  <br/>
+  <hr/>
     
     <form method="GET">
         <label>📅 التاريخ:</label>
@@ -109,12 +113,13 @@ $total_hours = $total_row['total_hours'];
             ?>
         </select>
 
-        <button type="submit">🔍 بحث</button>
+        <button class="add" type="submit">🔍 بحث</button>
     </form>
 
     <br>
 
-    <table border="1" cellpadding="5" cellspacing="0">
+    <table id="projectsTable" class="display">
+        <thead>
         <tr>
             <th>المشروع</th>
             <th>الآلية</th>
@@ -125,6 +130,8 @@ $total_hours = $total_row['total_hours'];
             <th>⚠️ ساعات الأعطال</th>
             <th>⏸️ Standby</th>
         </tr>
+        <thead>
+        <tbody>
         <?php while($row = mysqli_fetch_assoc($result)) { ?>
         <tr>
             <td><?php echo $row['project_name']; ?></td>
@@ -137,6 +144,7 @@ $total_hours = $total_row['total_hours'];
             <td><?php echo $row['standby_hours']; ?></td>
         </tr>
         <?php } ?>
+        </tbody>
     </table>
 
     <h3>✅ مجموع ساعات العمل: <?php echo $total_hours ? $total_hours : 0; ?> ساعة</h3>

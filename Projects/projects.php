@@ -113,8 +113,9 @@ WHERE m.project =   projects.id) as 'total_suppliers'   FROM projects ORDER BY i
 
                 echo "<td>".$row['create_at']."</td>";
                 echo "<td>
-                        <a href='edit.php?id=".$row['id']."' >تعديل</a> | 
-                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href='projects_details.php?id=".$row['id']."'> عرض </a>
+                        <a href='edit.php?id=".$row['id']."' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
+                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
+                        <a href='projects_details.php?id=".$row['id']."' style='color: #28a745'> <i class='fa fa-eye'></i> </a>
                       </td>";
                 echo "</tr>";
             }

@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-	<meta charset="UTF-8">
-  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>  إيكوبيشن | التقارير </title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-	<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> إيكوبيشن | التقارير </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
 </head>
+
 <body>
 
-  <?php include('../includes/insidebar.php'); 
+    <?php include('../includes/insidebar.php');
 
-include '../config.php';
-$supplier_filter = isset($_GET['supplier']) ? $_GET['supplier'] : '';
-$project_filter = isset($_GET['project']) ? $_GET['project'] : '';
+    include '../config.php';
+    $supplier_filter = isset($_GET['supplier']) ? $_GET['supplier'] : '';
+    $project_filter = isset($_GET['project']) ? $_GET['project'] : '';
 
-$sql = "
+    $sql = "
 SELECT 
     s.name AS supplier_name,
     p.name AS project_name,
@@ -28,79 +31,87 @@ JOIN projects p ON o.project = p.id
 WHERE 1=1
 ";
 
-if (!empty($supplier_filter)) {
-    $sql .= " AND s.id = '$supplier_filter' ";
-}
-if (!empty($project_filter)) {
-    $sql .= " AND p.id = '$project_filter' ";
-}
+    if (!empty($supplier_filter)) {
+        $sql .= " AND s.id = '$supplier_filter' ";
+    }
+    if (!empty($project_filter)) {
+        $sql .= " AND p.id = '$project_filter' ";
+    }
 
-$sql .= " GROUP BY s.name, p.name ";
+    $sql .= " GROUP BY s.name, p.name ";
 
-$result = mysqli_query($conn, $sql);
- 
- 
- ?>
-
-  <div class="main">
-
-  <h2> التقارير </h2>
-    
-
-  <a href="deliy.php"><i class="fa fa-clock"></i> <span>ساعات اليوم</span></a>
-  <a href="deriver.php"><i class="fa fa-clock"></i> <span>ساعات السائق</span></a>
-  <a href="timesheetdeliy.php"><i class="fa fa-clock"></i> <span>ساعات العمل اليومية</span></a>
+    $result = mysqli_query($conn, $sql);
 
 
+    ?>
 
-  
+    <div class="main">
+        
+        <h2> التقارير </h2>
+        <br/>
+        <br/>
+        <hr/>
+        <br/>
 
 
-  
-<form method="GET">
-    <label>المورد:</label>
-    <select name="supplier">
-        <option value="">-- اختر المورد --</option>
-        <?php
-        $sup = mysqli_query($conn, "SELECT id, name FROM suppliers");
-        while($row = mysqli_fetch_assoc($sup)){
-            $selected = ($supplier_filter == $row['id']) ? "selected" : "";
-            echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
-        }
-        ?>
-    </select>
+        <button class="add"><a href="deliy.php"><i class="fa fa-clock"></i> <span>ساعات اليوم</span></a></button>
+        <button class="add"><a href="deriver.php"><i class="fa fa-clock"></i> <span>ساعات السائق</span></a></button>
+        <button class="add"><a href="timesheetdeliy.php"><i class="fa fa-clock"></i> <span>ساعات العمل اليومية</span></a></button>
 
-    <label>المشروع:</label>
-    <select name="project">
-        <option value="">-- اختر المشروع --</option>
-        <?php
-        $prj = mysqli_query($conn, "SELECT id, name FROM projects");
-        while($row = mysqli_fetch_assoc($prj)){
-            $selected = ($project_filter == $row['id']) ? "selected" : "";
-            echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
-        }
-        ?>
-    </select>
+        <br/>
+        <br/>
 
-    <button type="submit">عرض</button>
-</form>
+        <form  method="GET">
+            <label>المورد:</label>
+            <select name="supplier">
+                <option value="">-- اختر المورد --</option>
+                <?php
+                $sup = mysqli_query($conn, "SELECT id, name FROM suppliers");
+                while ($row = mysqli_fetch_assoc($sup)) {
+                    $selected = ($supplier_filter == $row['id']) ? "selected" : "";
+                    echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+                }
+                ?>
+            </select>
 
-<table border="1">
-    <tr>
-        <th>المورد</th>
-        <th>المشروع</th>
-        <th>إجمالي ساعات التشغيل</th>
-    </tr>
-    <?php while($row = mysqli_fetch_assoc($result)) { ?>
-    <tr>
-        <td><?php echo $row['supplier_name']; ?></td>
-        <td><?php echo $row['project_name']; ?></td>
-        <td><?php echo $row['total_hours']; ?></td>
-    </tr>
-    <?php } ?>
-</table>
+            <label>المشروع:</label>
+            <select name="project">
+                <option value="">-- اختر المشروع --</option>
+                <?php
+                $prj = mysqli_query($conn, "SELECT id, name FROM projects");
+                while ($row = mysqli_fetch_assoc($prj)) {
+                    $selected = ($project_filter == $row['id']) ? "selected" : "";
+                    echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+                }
+                ?>
+            </select>
 
-  </div>
+            <button type="submit">عرض</button>
+        </form>
+
+        <br/>
+
+        <table id="projectsTable" class="table">
+            <thead>
+            <tr>
+                <th>المورد</th>
+                <th>المشروع</th>
+                <th>إجمالي ساعات التشغيل</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                <tr>
+                    <td><?php echo $row['supplier_name']; ?></td>
+                    <td><?php echo $row['project_name']; ?></td>
+                    <td><?php echo $row['total_hours']; ?></td>
+                </tr>
+            <?php } ?>
+            </tbody>
+        </table>
+
+    </div>
 
 </body>
+
 </html>
