@@ -227,6 +227,7 @@ body {
 }
 
 .main h2 {
+  margin-right: 35px;
   color: #000;
   background-color: var(--btn-color);
   padding: 10px 20px;
@@ -246,6 +247,7 @@ body {
   border-radius: 8px;
   font-weight: bold;
   transition: background 0.3s;
+  margin-right: 40px;
 }
 
 .main .add:hover {
@@ -364,7 +366,7 @@ table {
   }
 
   .sidebar.active {
-    left: 0;
+    right: 0;
   }
 
   .main {
@@ -374,8 +376,8 @@ table {
   .mobile-menu-btn {
     display: block;
     position: fixed;
-    top: 15px;
-    left: 15px;
+    top: 30px;
+    right: 5px;
     background: var(--btn-color);
     color: #fff;
     border: none;

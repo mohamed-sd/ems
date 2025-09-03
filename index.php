@@ -2,6 +2,7 @@
 <html dir="rtl">
 <head>
 	<title> إيكوبيشن | تسجيل الدخول </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css"/>
 </head>
 <style type="text/css">
