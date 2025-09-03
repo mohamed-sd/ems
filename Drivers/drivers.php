@@ -1,20 +1,7 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-	<meta charset="UTF-8">
-  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>  إيكوبيشن | المشغلين </title>
-	
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
-    <!-- CSS الموقع -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-</head>
-<body>
+<?php 
+  $page_title = "إيكوبيشن | السائقين "; 
+  include("../includes/inheader.php"); 
+?>
 
 
  <?php include('../includes/insidebar.php'); ?>
@@ -74,8 +61,8 @@
                 echo "<td>".$row['phone']."</td>";
              
                 echo "<td>
-                        <a  href='edit.php?id=".$row['id']."'   id='toggleForm' class='add'>تعديل</a> | 
-                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")' id='toggleForm' class='add'>حذف</a> 
+                        <a  href='edit.php?id=".$row['id']."'   id='toggleForm' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
+                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> 
                       </td>";
                 echo "</tr>";
             }
@@ -89,12 +76,32 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
 
 <script>
 (function() {
     // تشغيل DataTable بالعربية
-    $(document).ready(function() {
+        $(document).ready(function() {
         $('#projectsTable').DataTable({
+                   responsive: true,
+             dom: 'Bfrtip', // Buttons + Search + Pagination
+        buttons: [
+            { extend: 'copy', text: 'نسخ' },
+            { extend: 'excel', text: 'تصدير Excel' },
+            { extend: 'csv', text: 'تصدير CSV' },
+            { extend: 'pdf', text: 'تصدير PDF' },
+            { extend: 'print', text: 'طباعة' }
+        ],
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
             }

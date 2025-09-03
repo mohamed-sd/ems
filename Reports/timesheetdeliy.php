@@ -125,9 +125,10 @@ $totals = mysqli_fetch_assoc($total_res);
 
     <h3>✅ الإحصائيات:</h3>
     <ul>
-        <li>⏱️ إجمالي ساعات العمل: <?php echo $totals['total_work'] ?? 0; ?> ساعة</li>
-        <li>⚠️ إجمالي ساعات الأعطال: <?php echo $totals['total_fault'] ?? 0; ?> ساعة</li>
-        <li>⏸️ إجمالي ساعات الاستعداد: <?php echo $totals['total_standby'] ?? 0; ?> ساعة</li>
+        <li>⏱️ إجمالي ساعات العمل: <?php echo !empty($totals['total_work']) ? $totals['total_work'] : 0; ?> ساعة</li>
+        <li>⚠️ إجمالي ساعات الأعطال: <?php echo !empty($totals['total_fault']) ? $totals['total_fault'] : 0; ?> ساعة</li>
+        <li>⏸️ إجمالي ساعات الاستعداد: <?php echo !empty($totals['total_standby']) ? $totals['total_standby'] : 0; ?> ساعة</li>
+
     </ul>
 
     <table border="1" cellpadding="5" cellspacing="0">

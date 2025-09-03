@@ -1,19 +1,7 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-	<meta charset="UTF-8">
-  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>  إيكوبيشن | الموردين </title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-        <!-- CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
-
-	<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-</head>
-<body>
+<?php 
+  $page_title = "إيكوبيشن | الموردين"; 
+  include("../includes/inheader.php"); 
+?>
 
 <?php include('../includes/insidebar.php'); ?>
 
@@ -77,9 +65,9 @@
                 echo "<td>".$row['phone']."</td>";
                 echo "<td>".$row['status']."</td>";
                 echo "<td>
-                        <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
-                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | 
-                        <a href='suppliers_details.php?id=".$row['id']."'>عرض</a>
+                        <a href='edit.php?id=".$row['id']."' style='color:#007bff'> <i class='fa fa-edit'></i></a> </a> | 
+                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
+                        <a href='suppliers_details.php?id=".$row['id']."' style='color: #28a745'><i class='fa fa-eye'></i></a>
                       </td>";
                 echo "</tr>";
             }
