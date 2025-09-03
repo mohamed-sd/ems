@@ -142,14 +142,14 @@ WHERE pm.project = $project";
     <br/>
     <h3> العقود </h3>
     <br/>
-    <table id="projectsTable1" class="display" style="width:100%; margin-top: 20px;">
+    <table id="projectsTable1"  class="projectsTable" style="width:100%; margin-top: 20px;">
         <thead>
             <tr>
                 <th>#</th>
                 <th style="text-align: right;">تاريخ البداية</th>
                 <th style="text-align: right;"> تاريخ النهاية </th>
                 <th style="text-align: right;">المجموع</th>
-                <th style="text-align: right;">إجراءات</th>
+                <!-- <th style="text-align: right;">إجراءات</th> -->
             </tr>
         </thead>
         <tbody>
@@ -165,10 +165,10 @@ WHERE pm.project = $project";
                 echo "<td>".$row['contract_signing_date']."</td>";
                 echo "<td>".$row['hours_monthly_target']."</td>";
                 echo "<td>".$row['equip_total_contract']."</td>";
-                echo "<td>
-                        <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
-                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
-                      </td>";
+                // echo "<td>
+                //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
+                //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
+                //       </td>";
                 echo "</tr>";
             }
             ?>

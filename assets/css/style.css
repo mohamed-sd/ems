@@ -410,7 +410,7 @@ table {
 
 
 /* خلفية الجدول */
-#projectsTable {
+#projectsTable , .projectsTable {
   background-color: #ffffff; /* أبيض */
   border: 2px solid #0d1b2a; /* كحلي غامق */
   border-radius: 8px;
@@ -418,7 +418,7 @@ table {
 }
 
 /* عناوين الأعمدة */
-#projectsTable thead th {
+#projectsTable thead th , .projectsTable thead th {
   background-color: #0d1b2a; /* كحلي */
   color: #ffcc00; /* أصفر */
   text-align: center;
@@ -427,10 +427,10 @@ table {
 }
 
 /* الصفوف */
-#projectsTable tbody tr:nth-child(even) {
+#projectsTable tbody tr:nth-child(even) , .projectsTable tbody tr:nth-child(even)  {
   background-color: #f8f9fa; /* رمادي فاتح */
 }
-#projectsTable tbody tr:nth-child(odd) {
+#projectsTable tbody tr:nth-child(odd) , .projectsTable tbody tr:nth-child(odd) {
   background-color: #ffffff; /* أبيض */
 }
 #projectsTable tbody tr:hover {

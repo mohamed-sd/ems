@@ -7,12 +7,15 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- DataTables CSS -->
 
-          <!-- CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-	<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+    <!-- CSS الموقع -->
+    <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
 </head>
 <body>
 
@@ -287,9 +290,9 @@ $forecasted_contracted_hours  = $_POST['forecasted_contracted_hours'];
                 echo "<td>".$row['equip_total_contract']."</td>";
               
                 echo "<td>
-                        <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
-                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | 
-                        <a href='contracts_details.php?id=".$row['id']."'>عرض</a>
+                        <a href='edit.php?id=".$row['id']."' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
+                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
+                        <a href='contracts_details.php?id=".$row['id']."' style='color: #28a745'><i class='fa fa-eye'></i></a>
                       </td>";
                 echo "</tr>";
             }
@@ -305,6 +308,7 @@ $forecasted_contracted_hours  = $_POST['forecasted_contracted_hours'];
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <!-- JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
@@ -315,12 +319,12 @@ $forecasted_contracted_hours  = $_POST['forecasted_contracted_hours'];
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
+
 <script>
 (function() {
     // تشغيل DataTable بالعربية
   
 
-      // تشغيل DataTable بالعربية
     $(document).ready(function() {
         $('#projectsTable').DataTable({
                    responsive: true,
@@ -350,26 +354,25 @@ $forecasted_contracted_hours  = $_POST['forecasted_contracted_hours'];
 
 </script>
 
-
 <script>
-  const $ = (sel) => document.querySelector(sel);
+  const $el = (sel) => document.querySelector(sel);
 
   const fields = {
-    contractMonths: $('#contract_duration_months'),
-    equipCount: $('#equip_count'),
-    equipTarget: $('#equip_target_per_month'),
-    equipTotalMonth: $('#equip_total_month'),
-    equipTotalContract: $('#equip_total_contract'),
-    machCount: $('#mach_count'),
-    machTarget: $('#mach_target_per_month'),
-    machTotalMonth: $('#mach_total_month'),
-    machTotalContract: $('#mach_total_contract'),
-    kpiMonthTotal: $('#kpi_month_total'),
-    kpiContractTotal: $('#kpi_contract_total'),
-    kpiEquipMonth: $('#kpi_equip_month'),
-    kpiMachMonth: $('#kpi_mach_month'),
-    hoursMonthlyTarget: $('#hours_monthly_target'),
-    forecastedContractedHours: $('#forecasted_contracted_hours'),
+    contractMonths: $el('#contract_duration_months'),
+    equipCount: $el('#equip_count'),
+    equipTarget: $el('#equip_target_per_month'),
+    equipTotalMonth: $el('#equip_total_month'),
+    equipTotalContract: $el('#equip_total_contract'),
+    machCount: $el('#mach_count'),
+    machTarget: $el('#mach_target_per_month'),
+    machTotalMonth: $el('#mach_total_month'),
+    machTotalContract: $el('#mach_total_contract'),
+    kpiMonthTotal: $el('#kpi_month_total'),
+    kpiContractTotal: $el('#kpi_contract_total'),
+    kpiEquipMonth: $el('#kpi_equip_month'),
+    kpiMachMonth: $el('#kpi_mach_month'),
+    hoursMonthlyTarget: $el('#hours_monthly_target'),
+    forecastedContractedHours: $el('#forecasted_contracted_hours'),
   };
 
   function num(v) {
@@ -397,10 +400,10 @@ $forecasted_contracted_hours  = $_POST['forecasted_contracted_hours'];
     const machContract = machMonth * months;
 
     // تحديث الحقول
-    fields.equipTotalMonth.value = Math.max(0, Math.round(equipMonth));
-    fields.equipTotalContract.value = Math.max(0, Math.round(equipContract));
-    fields.machTotalMonth.value = Math.max(0, Math.round(machMonth));
-    fields.machTotalContract.value = Math.max(0, Math.round(machContract));
+    fields.equipTotalMonth.value = equipMonth;
+    fields.equipTotalContract.value = equipContract;
+    fields.machTotalMonth.value = machMonth;
+    fields.machTotalContract.value = machContract;
 
     const monthTotal = equipMonth + machMonth;
     const contractTotal = equipContract + machContract;
@@ -410,32 +413,24 @@ $forecasted_contracted_hours  = $_POST['forecasted_contracted_hours'];
     fields.kpiMonthTotal.textContent = fmt(monthTotal);
     fields.kpiContractTotal.textContent = fmt(contractTotal);
 
-    fields.hoursMonthlyTarget.value = Math.max(0, Math.round(monthTotal));
-    fields.forecastedContractedHours.value = Math.max(0, Math.round(contractTotal));
+    fields.hoursMonthlyTarget.value = monthTotal;
+    fields.forecastedContractedHours.value = contractTotal;
   }
 
-  const inputs = document.querySelectorAll('input, select');
+  // تشغيل الحسبة عند تغيير أي مدخل
+  const inputs = document.querySelectorAll('#projectForm input, #projectForm select');
   inputs.forEach(el => el.addEventListener('input', recalc));
-  recalc();
 
-//   // عرض معاينة بيانات على شكل JSON عند الحفظ (يمكن استبدالها بإرسال للخادم)
-//   const form = document.getElementById('projectForm');
-//   form.addEventListener('submit', (e) => {
-//     e.preventDefault();
-//     const data = Object.fromEntries(new FormData(form).entries());
-//     alert('تم تجهيز البيانات للحفظ:\n\n' + JSON.stringify(data, null, 2));
-//     // TODO: إرسال البيانات إلى السيرفر عبر fetch
-//     // fetch('/api/projects', {method:'POST', body: JSON.stringify(data), headers:{'Content-Type':'application/json'}})
-//   });
-
-  form.addEventListener('reset', () => setTimeout(recalc, 0));
-
-  function toggleSidebar() {
-    document.getElementById("sidebar").classList.toggle("hide");
-    document.getElementById("main").classList.toggle("full");
+  // جلب الفورم
+  const contractForm = document.getElementById('projectForm');
+  if (contractForm) {
+    contractForm.addEventListener('reset', () => setTimeout(recalc, 0));
   }
 
+  // أول تشغيل
+  recalc();
 </script>
+
 
 </body>
 </html>

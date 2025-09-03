@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 02, 2025 at 04:08 PM
+-- Generation Time: Sep 03, 2025 at 09:56 PM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 5.6.21
 
@@ -23,27 +23,38 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `operations`
+-- Table structure for table `projects`
 --
 
-CREATE TABLE `operations` (
+CREATE TABLE `projects` (
   `id` int(11) NOT NULL,
-  `equipment` varchar(100) NOT NULL,
-  `equipment_type` varchar(100) NOT NULL,
-  `project` varchar(20) NOT NULL,
-  `start` varchar(50) NOT NULL,
-  `end` varchar(50) NOT NULL,
-  `hours` varchar(20) NOT NULL,
-  `status` varchar(20) NOT NULL
+  `name` varchar(150) NOT NULL,
+  `client` varchar(150) NOT NULL,
+  `location` varchar(200) NOT NULL,
+  `total` varchar(50) NOT NULL,
+  `status` varchar(10) NOT NULL,
+  `create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `operations`
+-- Indexes for dumped tables
 --
 
-INSERT INTO `operations` (`id`, `equipment`, `equipment_type`, `project`, `start`, `end`, `hours`, `status`) VALUES
-(0, '1', '', '1', '2025-09-01T17:01', '2025-09-29T17:01', '10', 'active');
+--
+-- Indexes for table `projects`
+--
+ALTER TABLE `projects`
+  ADD PRIMARY KEY (`id`);
 
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `projects`
+--
+ALTER TABLE `projects`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

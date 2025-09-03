@@ -47,6 +47,16 @@
         <label>القيمة الإجمالية</label>
         <input type="number" name="total" placeholder="القيمة الإجمالية" required />
     </div>
+
+    <div>
+        <label> حالة المشروع </label>
+        <select name="status">
+            <option value=""> -- حدد الحالة -- </option>
+            <option value="1">  نشط  </option>
+            <option value="0">  غير نشط  </option>
+        </select>
+    </div>
+
     <button type="submit">حفظ المشروع</button>
     </div>
 
@@ -71,10 +81,10 @@
                 <th style="text-align: right;"> العقود </th>
                 <th style="text-align: right;">العميل</th>
                 <th style="text-align: right;">الموقع</th>
-                <th style="text-align: right;">القيمة الإجمالية</th>
+                <!-- <th style="text-align: right;">القيمة الإجمالية</th> -->
                  <th style="text-align: right;"> عدد الموردين</th>
-
                 <th style="text-align: right;">تاريخ الإضافة</th>
+                <th style="text-align:right"> الحالة  </th>
                 <th style="text-align: right;">إجراءات</th>
             </tr>
         </thead>
@@ -89,11 +99,12 @@
                 $location = mysqli_real_escape_string($conn, $_POST['location']);
                 $total = floatval($_POST['total']);
                 $date = date('Y-m-d H:i:s');
-                mysqli_query($conn, "INSERT INTO projects (name, client, location, total, create_at) VALUES ('$name', '$client', '$location', '$total', '$date')");
+                $status = mysqli_real_escape_string($conn , $_POST['status']);
+                mysqli_query($conn, "INSERT INTO projects (name, client, location, total, status , create_at) VALUES ('$name', '$client', '$location', '$total' , '$status' , '$date')");
             }
 
             // جلب المشاريع
-            $query = "SELECT `id`, `name`, `client`, `location`, `total`, `create_at`, (SELECT COUNT(*) FROM contracts WHERE contracts.project = projects.id) as 'contracts' , (SELECT COUNT(*) FROM operations WHERE operations.project = projects.id) as 'operations',(SELECT COUNT(DISTINCT pm.suppliers) AS total_suppliers
+            $query = "SELECT `id`, `name`, `client`, `location`, `total` , `status` , `create_at`, (SELECT COUNT(*) FROM contracts WHERE contracts.project = projects.id) as 'contracts' , (SELECT COUNT(*) FROM operations WHERE operations.project = projects.id) as 'operations',(SELECT COUNT(DISTINCT pm.suppliers) AS total_suppliers
 FROM equipments pm
 JOIN operations m ON pm.id = m.equipment
 WHERE m.project =   projects.id) as 'total_suppliers'   FROM projects ORDER BY id DESC";
@@ -108,10 +119,12 @@ WHERE m.project =   projects.id) as 'total_suppliers'   FROM projects ORDER BY i
                 
                 echo "<td>".$row['client']."</td>";
                 echo "<td>".$row['location']."</td>";
-                echo "<td>".$row['total']."</td>";
+                // echo "<td>".$row['total']."</td>";
                 echo "<td>".$row['total_suppliers']."</td>";
 
                 echo "<td>".$row['create_at']."</td>";
+                echo $row['status'] == "1" ?  "<td style='color:green'>نشط</td>" : "<td style='color:red'>غير نشط</td>" ;
+                // echo "<td>".$row['status'] == "1" ? "نشطو"."</td>";
                 echo "<td>
                         <a href='edit.php?id=".$row['id']."' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
                         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 

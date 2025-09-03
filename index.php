@@ -24,7 +24,10 @@
 </style>
 <body>
   <div class="login-container">
-  	<h1 style="font-size: 30px;" class="logo">Equipation Panel</h2>
+  	<h1 style="font-size: 30px;text-align:center;font-size:30px;font-weight: 900;" class="logo">E.M.S</h2>
+    <br/>
+    <hr/>
+    <br/>
     <h2>تسجيل الدخول</h2>
     <form action="dashbourd.php">
       <input type="text" placeholder="اسم المستخدم" required>

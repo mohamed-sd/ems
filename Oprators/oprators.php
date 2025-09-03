@@ -13,12 +13,12 @@
 
     <!-- فورم إضافة تشغيل -->
     <form id="projectForm" action="" method="post" style="display:none; margin-top:20px;">
-        <!-- المعدة -->
+       <div class="form-grid">
         <select name="equipment" required>
             <option value="">-- اختر المعدة --</option>
             <?php
             include '../config.php';
-            $eq_res = mysqli_query($conn, "SELECT id, code, name FROM equipments");
+            $eq_res = mysqli_query($conn, "SELECT id, code, name FROM equipments WHERE id NOT IN ( SELECT operations.equipment FROM `operations` WHERE `status` LIKE '1' )");
             while($eq = mysqli_fetch_assoc($eq_res)){
                 echo "<option value='".$eq['id']."'>".$eq['code']." - ".$eq['name']."</option>";
             }
@@ -40,11 +40,12 @@
         <input type="date" name="end" required placeholder="تاريخ النهاية" />
         <input type="number" step="0.01" name="hours" placeholder="عدد الساعات" required />
         <select name="status" required >
-            <option value="active">نشط</option>
-            <option value="done">منتهي</option>
+            <option value="1">نشط</option>
+            <option value="0">منتهي</option>
         </select>
         <br/>
         <button type="submit">حفظ التشغيل</button>
+        </div>
     </form>
 
     <br/> <br/> <br/>
@@ -98,7 +99,7 @@
                 echo "<td>".$row['start']."</td>";
                 echo "<td>".$row['end']."</td>";
                 echo "<td>".$row['hours']."</td>";
-                echo "<td>".$row['status']."</td>";
+                echo $row['status'] == "1" ? "<td style='color:green'> نشطة </td>" : "<td style='color:red'> خاملة </td>" ;
                 echo "<td>
                         <a href='edit_operation.php?id=".$row['id']."' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
                         <a href='delete_operation.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a>

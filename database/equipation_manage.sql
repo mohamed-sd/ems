@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 02, 2025 at 04:50 AM
+-- Generation Time: Sep 03, 2025 at 09:56 PM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 5.6.21
 
@@ -28,25 +28,45 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `contracts` (
   `id` int(11) NOT NULL,
-  `project` varchar(10) NOT NULL,
-  `start` varchar(30) NOT NULL,
-  `end` varchar(30) NOT NULL,
-  `status` varchar(10) NOT NULL
+  `project` int(250) NOT NULL,
+  `contract_signing_date` date NOT NULL,
+  `grace_period_days` int(11) DEFAULT '0',
+  `contract_duration_months` int(11) DEFAULT '0',
+  `actual_start` date DEFAULT NULL,
+  `actual_end` date DEFAULT NULL,
+  `transportation` text,
+  `accommodation` text,
+  `place_for_living` text,
+  `workshop` text,
+  `equip_type` varchar(100) DEFAULT NULL,
+  `equip_size` int(11) DEFAULT NULL,
+  `equip_count` int(11) DEFAULT '0',
+  `equip_target_per_month` int(11) DEFAULT '0',
+  `equip_total_month` int(11) DEFAULT '0',
+  `equip_total_contract` int(11) DEFAULT '0',
+  `mach_type` varchar(100) DEFAULT NULL,
+  `mach_size` int(11) DEFAULT NULL,
+  `mach_count` int(11) DEFAULT '0',
+  `mach_target_per_month` int(11) DEFAULT '0',
+  `mach_total_month` int(11) DEFAULT '0',
+  `mach_total_contract` int(11) DEFAULT '0',
+  `hours_monthly_target` int(11) DEFAULT '0',
+  `forecasted_contracted_hours` int(11) DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `contracts`
+-- Table structure for table `drivers`
 --
 
-INSERT INTO `contracts` (`id`, `project`, `start`, `end`, `status`) VALUES
-(1, '1', '2025-09-01', '2025-09-10', 'Ù†Ø´Ø'),
-(2, '6', '2025-09-10', '2025-09-27', '1'),
-(3, '6', '2025-09-16', '2025-09-17', '1'),
-(4, '4', '2025-02-06', '2025-12-29', '1'),
-(5, '1', '2014-07-01', '2010-06-08', '1'),
-(6, '5', '2025-09-01', '2025-09-30', '1'),
-(7, '3', '2025-09-18', '2025-09-22', '1'),
-(8, '2', '2025-09-01', '2025-09-30', '1');
+CREATE TABLE `drivers` (
+  `id` int(100) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `phone` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -63,15 +83,22 @@ CREATE TABLE `equipments` (
   `status` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `equipments`
+-- Table structure for table `operations`
 --
 
-INSERT INTO `equipments` (`id`, `suppliers`, `code`, `type`, `name`, `status`) VALUES
-(1, '6', 'TQR12', 'Ø­ÙØ§Ø±', '23', 'Ù…ØªØ§Ø­Ø©'),
-(2, '6', 'TQR11', 'Ø­ÙØ§Ø±', '26', 'Ù…ØªØ§Ø­Ø©'),
-(3, '5', 'EX120', 'Ù‚Ù„Ø§Ø¨', '08', 'Ù…ØªØ§Ø­Ø©'),
-(4, '5', 'EX110', 'Ù‚Ù„Ø§Ø¨', '09', 'Ù…ØªØ§Ø­Ø©');
+CREATE TABLE `operations` (
+  `id` int(11) NOT NULL,
+  `equipment` varchar(100) NOT NULL,
+  `equipment_type` varchar(100) NOT NULL,
+  `project` varchar(20) NOT NULL,
+  `start` varchar(50) NOT NULL,
+  `end` varchar(50) NOT NULL,
+  `hours` varchar(20) NOT NULL,
+  `status` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -85,20 +112,9 @@ CREATE TABLE `projects` (
   `client` varchar(150) NOT NULL,
   `location` varchar(200) NOT NULL,
   `total` varchar(50) NOT NULL,
+  `status` varchar(10) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `projects`
---
-
-INSERT INTO `projects` (`id`, `name`, `client`, `location`, `total`, `create_at`) VALUES
-(1, 'Ø§Ù„Ø±ÙˆØ³ÙŠØ©', 'Ù…Ø­Ù…Ø¯ Ø³ÙŠØ¯', 'Ø§Ù„Ø®Ø±Ø·ÙˆÙ…', '4000', '2025-09-01 22:19:54'),
-(2, 'Ù…Ø´Ø±ÙˆØ¹ ÙˆØ§Ø¯ÙŠ Ø¯Ø¬Ù„Ø©', 'Ø­Ø³Ù† Ø³ÙŠØ¯', 'Ø¯Ø§Ø±ÙÙˆØ±', '3000', '2025-09-01 22:21:26'),
-(3, 'Ù…Ø´Ø±ÙˆØ¹ Ø³Ø§Ø¨ØªÙˆØ±', 'Ø§Ø³Ø­Ø§Ù‚ Ø³ÙŠØ¯', 'Ø§Ù„Ù‚Ø¶Ø§Ø±Ù', '5000', '2025-09-01 22:22:14'),
-(4, 'Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„Ù…Ù†Ø§Ù‚Ù„', 'Ø¨ÙƒØ±ÙŠ Ø­Ø³Ù† Ø§Ø­Ù…Ø¯', 'Ø§Ù„Ù…Ù†Ø§Ù‚Ù„', '4500', '2025-09-01 22:23:04'),
-(5, 'ÙˆØ§Ø¯ÙŠ Ø§Ù„Ø³ÙŠÙ„ÙƒÙˆÙ† ', 'Ø­Ø§ØªÙ… Ø§Ù„Ø­Ø§Ø¬ Ø§Ù„Ø·ÙˆÙŠÙ„', 'ÙƒØ³Ù„Ø§', '5400', '2025-09-01 22:23:54'),
-(6, 'Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„Ø±Ø§Ø¬Ø­', 'Ø®Ø§Ù„Ø¯ Ø¹ÙˆØ¶ Ø§Ù„Ù„Ù‡', 'Ø§Ù„Ø¬Ø²ÙŠØ±Ø©', '8000', '2025-09-01 22:32:46');
 
 -- --------------------------------------------------------
 
@@ -113,17 +129,72 @@ CREATE TABLE `suppliers` (
   `status` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `suppliers`
+-- Table structure for table `timesheet`
 --
 
-INSERT INTO `suppliers` (`id`, `name`, `phone`, `status`) VALUES
-(1, 'Ù…Ø­Ù…Ø¯', '01123475758', 'Ù†Ø´Ø·'),
-(2, 'Ø­Ø³Ù† Ø³ÙŠØ¯', '0987878787', 'Ù†Ø´Ø·'),
-(3, 'Ø±Ø§Ø´Ø¯ Ø§Ù„Ù…Ø§Ø¬Ø¯', '0928293983', 'Ù†Ø´Ø·'),
-(4, 'Ù…Ø­Ù…Ø¯ ÙØ¤Ø§Ø¯', '01123475758', 'Ù†Ø´Ø·'),
-(5, 'ØªØ§Ù…Ø± Ø¹ÙˆØ¶ Ø¹Ù…Ø±', '0915657579', 'Ù†Ø´Ø·'),
-(6, 'Ø³Ø§Ù…Ø­ Ø¨ÙƒØ±ÙŠ Ø§Ù„Ø¨Ù„Ø©', '0915657579', 'Ù†Ø´Ø·');
+CREATE TABLE `timesheet` (
+  `id` int(11) NOT NULL,
+  `operator` varchar(20) NOT NULL,
+  `driver` varchar(20) NOT NULL,
+  `shift` varchar(100) NOT NULL,
+  `date` varchar(30) NOT NULL,
+  `shift_hours` float DEFAULT '0',
+  `executed_hours` float DEFAULT '0',
+  `bucket_hours` float DEFAULT '0',
+  `jackhammer_hours` float DEFAULT '0',
+  `extra_hours` float DEFAULT '0',
+  `extra_hours_total` float DEFAULT '0',
+  `standby_hours` float DEFAULT '0',
+  `dependence_hours` float DEFAULT '0',
+  `total_work_hours` float DEFAULT '0',
+  `work_notes` text,
+  `hr_fault` float DEFAULT '0',
+  `maintenance_fault` float DEFAULT '0',
+  `marketing_fault` float DEFAULT '0',
+  `approval_fault` float DEFAULT '0',
+  `other_fault_hours` float DEFAULT '0',
+  `total_fault_hours` float DEFAULT '0',
+  `fault_notes` text,
+  `start_seconds` int(11) DEFAULT '0',
+  `start_minutes` int(11) DEFAULT '0',
+  `start_hours` int(11) DEFAULT '0',
+  `end_seconds` int(11) DEFAULT '0',
+  `end_minutes` int(11) DEFAULT '0',
+  `end_hours` int(11) DEFAULT '0',
+  `counter_diff` int(11) DEFAULT '0',
+  `fault_type` varchar(255) DEFAULT NULL,
+  `fault_department` varchar(255) DEFAULT NULL,
+  `fault_part` varchar(255) DEFAULT NULL,
+  `fault_details` text,
+  `general_notes` text,
+  `operator_hours` float DEFAULT '0',
+  `machine_standby_hours` float DEFAULT '0',
+  `jackhammer_standby_hours` float DEFAULT '0',
+  `bucket_standby_hours` float DEFAULT '0',
+  `extra_operator_hours` float DEFAULT '0',
+  `operator_standby_hours` float DEFAULT '0',
+  `operator_notes` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `username` varchar(150) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `role` varchar(30) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Indexes for dumped tables
@@ -136,9 +207,21 @@ ALTER TABLE `contracts`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `drivers`
+--
+ALTER TABLE `drivers`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `equipments`
 --
 ALTER TABLE `equipments`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `operations`
+--
+ALTER TABLE `operations`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -154,6 +237,19 @@ ALTER TABLE `suppliers`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `timesheet`
+--
+ALTER TABLE `timesheet`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -161,22 +257,42 @@ ALTER TABLE `suppliers`
 -- AUTO_INCREMENT for table `contracts`
 --
 ALTER TABLE `contracts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `drivers`
+--
+ALTER TABLE `drivers`
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `equipments`
 --
 ALTER TABLE `equipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `operations`
+--
+ALTER TABLE `operations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `suppliers`
 --
 ALTER TABLE `suppliers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `timesheet`
+--
+ALTER TABLE `timesheet`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
