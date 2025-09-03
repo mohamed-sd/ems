@@ -4,7 +4,7 @@
   /* Background base */
   --text-color: #000022;
   /* Text */
-  --btn-color: #FFAA33;
+  --btn-color: #ffcc00;
   /* Buttons */
   --btn-hover: #e69500;
   /* Darker button */
@@ -12,6 +12,7 @@
   /* Sidebar hover */
   --light-gray: #f9f9f9;
   /* Light backgrounds */
+  --equipation-gold : #ffcc00 ;
 }
 
 /* ================== Reset ================== */
@@ -241,8 +242,8 @@ body {
   display: inline-block;
   margin: 15px 0;
   padding: 10px 15px;
-  background: var(--btn-color);
-  color: #fff;
+  background: var(--equipation-gold);
+  color: #000;
   text-decoration: none;
   border-radius: 8px;
   font-weight: bold;
@@ -251,7 +252,7 @@ body {
 }
 
 .main .add:hover {
-  background-color: var(--btn-hover);
+  background-color: var(--equipation-gold);
 }
 
 /* ================== Project Form ================== */
@@ -378,7 +379,7 @@ table {
     position: fixed;
     top: 30px;
     right: 5px;
-    background: var(--btn-color);
+    background: var(--equipation-gold);
     color: #fff;
     border: none;
     padding: 10px 12px;
@@ -405,4 +406,85 @@ table {
   .mobile-menu-btn {
     display: none;
   }
+}
+
+
+/* خلفية الجدول */
+#projectsTable {
+  background-color: #ffffff; /* أبيض */
+  border: 2px solid #0d1b2a; /* كحلي غامق */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* عناوين الأعمدة */
+#projectsTable thead th {
+  background-color: #0d1b2a; /* كحلي */
+  color: #ffcc00; /* أصفر */
+  text-align: center;
+  font-weight: bold;
+  padding: 12px;
+}
+
+/* الصفوف */
+#projectsTable tbody tr:nth-child(even) {
+  background-color: #f8f9fa; /* رمادي فاتح */
+}
+#projectsTable tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* أبيض */
+}
+#projectsTable tbody tr:hover {
+  background-color: #fff3cd; /* أصفر فاتح عند hover */
+}
+
+/* نصوص الأعمدة */
+#projectsTable tbody td {
+  color: #0d1b2a; /* كحلي */
+  padding: 10px;
+}
+
+/* زرار DataTables (نسخ - تصدير - طباعة) */
+.dt-buttons .dt-button {
+  background-color: #ffcc00 !important; /* أصفر */
+  color: #0d1b2a !important; /* كحلي */
+  border: none !important;
+  padding: 8px 14px;
+  margin: 3px;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+.dt-buttons .dt-button:hover {
+  background-color: #0d1b2a !important; /* كحلي */
+  color: #ffffff !important; /* أبيض */
+}
+
+/* صندوق البحث + التصفية */
+.dataTables_filter input {
+  border: 2px solid #ffcc00;
+  border-radius: 5px;
+  padding: 6px;
+  outline: none;
+}
+.dataTables_filter input:focus {
+  border-color: #0d1b2a;
+}
+
+/* الصفحات (pagination) */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: #ffffff !important;
+  border: 1px solid #0d1b2a !important;
+  color: #0d1b2a !important;
+  border-radius: 4px;
+  margin: 2px;
+  padding: 4px 10px;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #ffcc00 !important;
+  color: #0d1b2a !important;
+  border: 1px solid #0d1b2a !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #0d1b2a !important;
+  color: #ffffff !important;
 }
