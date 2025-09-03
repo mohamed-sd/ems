@@ -49,6 +49,11 @@ $result = mysqli_query($conn, $sql);
 
   <a href="deliy.php"><i class="fa fa-clock"></i> <span>ساعات اليوم</span></a>
   <a href="deriver.php"><i class="fa fa-clock"></i> <span>ساعات السائق</span></a>
+  <a href="timesheetdeliy.php"><i class="fa fa-clock"></i> <span>ساعات العمل اليومية</span></a>
+
+
+
+  
 
 
   
