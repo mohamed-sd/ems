@@ -42,10 +42,7 @@
     <div>
         <label>موقع المشروع</label>
         <input type="text" name="location" placeholder="موقع المشروع" required />
-    </div>
-    <div>
-        <label>القيمة الإجمالية</label>
-        <input type="number" name="total" placeholder="القيمة الإجمالية" required />
+        <input type="hidden" name="total" placeholder="القيمة الإجمالية" value="100" required />
     </div>
 
     <div>

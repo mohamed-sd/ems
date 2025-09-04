@@ -22,9 +22,10 @@
 
     <!-- <h2>تفاصيل المشروع</h2> -->
 
-    <a href="#" id="toggleForm" class="add">
+    <!-- <a href="#" id="toggleForm" class="add">
         <i class="fa fa-plus"></i> اضافة آلية
-    </a>
+    </a> -->
+
     <a href="../Contracts/contracts.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
         <i class="fa fa-plus"></i> العقودات
     </a>
@@ -72,10 +73,10 @@ $total_suppliers = $rowsuppliers['total_suppliers'];
         <th>  عدد الموردين </th>
         <th><?php echo $total_suppliers; ?></th>
     </tr>
-    <tr class="t">
+    <!-- <tr class="t">
         <th> اجمالي الساعات </th>
         <th><?php echo $row['total']; ?></th>
-    </tr>
+    </tr> -->
     <?php
     } // end while loop
     ?>
@@ -91,9 +92,11 @@ $total_suppliers = $rowsuppliers['total_suppliers'];
         <thead>
             <tr>
                 <th>#</th>
+                 <th style="text-align: right;">اسم الالية</th>
+                 <th style="text-align: right;">تسمية  العميل</th>
                 <th style="text-align: right;">المورد</th>
                 <th style="text-align: right;">النوع</th>
-                 <th style="text-align: right;">اسم الالية</th>
+                
 
                 <!-- <th style="text-align: right;">إجراءات</th> -->
             </tr>
@@ -116,18 +119,21 @@ $total_suppliers = $rowsuppliers['total_suppliers'];
 
 
             // جلب المشاريع
-            $query = "SELECT m.id,m.suppliers,m.type,m.code
+$query = "SELECT m.id, s.name AS supplier_name, m.type, m.code, m.name AS equipment_name
 FROM equipments m
 JOIN operations pm ON m.id = pm.equipment
+JOIN suppliers s ON m.suppliers = s.id
 WHERE pm.project = $project";
             $result = mysqli_query($conn, $query);
             $i = 1;
             while($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>";
                 echo "<td>".$i++."</td>";
-                echo "<td>".$row['suppliers']."</td>";
-                echo "<td>".$row['type']."</td>";
                 echo "<td>".$row['code']."</td>";
+                echo "<td>".$row['equipment_name']."</td>";
+                echo "<td>".$row['supplier_name']."</td>";
+                echo "<td>".$row['type']."</td>";
+                
         
                 // echo "<td>
                 //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
