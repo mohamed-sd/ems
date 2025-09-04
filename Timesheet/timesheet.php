@@ -73,7 +73,7 @@
 
         <div>
           <label>ساعات الوردية</label>
-          <input type="number" name="shift_hours" value="0">
+          <input type="number" name="shift_hours" value="10">
         </div>
 
       <div></div>
@@ -86,9 +86,9 @@
 
         <div>
           <label> ⏱️ عداد البداية</label>
-          <input type="number" style="width: 30%" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="ثواني" required>
-          <input type="number" style="width: 30%" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="دقائق" required>
-          <input type="number" style="width: 30%" id="start_hours" name="start_hours" placeholder="ساعات" >
+          <input type="number" value="0" style="width: 30%" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="ثواني" required>
+          <input type="number"  value="0" style="width: 30%" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="دقائق" required>
+          <input type="number" value="0" style="width: 30%" id="start_hours" name="start_hours" placeholder="ساعات" >
         </div>
 
         <div>
@@ -166,9 +166,9 @@
 
       <div>
           <label> ⏱️ عداد النهاية </label>
-          <input style="width: 30%" type="number" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="ثواني">
-          <input style="width: 30%"  type="number" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="دقائق">
-          <input style="width: 30%"  type="number" id="end_hours" name="end_hours" placeholder="ساعات">
+          <input style="width: 30%" type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="ثواني">
+          <input style="width: 30%"  type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="دقائق">
+          <input style="width: 30%"  type="number" value="0" id="end_hours" name="end_hours" placeholder="ساعات">
       </div>
 
         <div>

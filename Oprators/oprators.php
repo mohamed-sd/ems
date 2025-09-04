@@ -58,7 +58,11 @@
             <tr>
                 <th>#</th>
                 <th style="text-align:right;">المعدة</th>
+
+                  <th style="text-align:right;">المورد</th>
                 <th style="text-align:right;">المشروع</th>
+                              
+
                 <th style="text-align:right;">تاريخ البداية</th>
                 <th style="text-align:right;">تاريخ النهاية</th>
                 <th style="text-align:right;">عدد الساعات</th>
@@ -84,10 +88,12 @@
             // جلب بيانات التشغيل
             $query = "SELECT o.id, o.start, o.end, o.hours, o.status, 
                              e.code AS equipment_code, e.name AS equipment_name,
-                             p.name AS project_name
+                             p.name AS project_name ,s.name AS suppliers_name
                       FROM operations o
                       LEFT JOIN equipments e ON o.equipment = e.id
                       LEFT JOIN projects p ON o.project = p.id
+
+                      LEFT JOIN suppliers s ON e.suppliers = s.id
                       ORDER BY o.id DESC";
             $result = mysqli_query($conn, $query);
             $i = 1;
@@ -95,7 +101,10 @@
                 echo "<tr>";
                 echo "<td>".$i++."</td>";
                 echo "<td>".$row['equipment_code']." - ".$row['equipment_name']."</td>";
+                                echo "<td>".$row['suppliers_name']."</td>";
+
                 echo "<td>".$row['project_name']."</td>";
+
                 echo "<td>".$row['start']."</td>";
                 echo "<td>".$row['end']."</td>";
                 echo "<td>".$row['hours']."</td>";
