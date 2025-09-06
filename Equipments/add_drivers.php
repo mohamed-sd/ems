@@ -80,7 +80,7 @@ while ($r = mysqli_fetch_assoc($res)) {
             </tr>";
             }
         } else {
-            echo "<tr><td colspan='2'>لا يوجد سائقين مرتبطين</td></tr>";
+            echo "<tr><td>لا يوجد سائقين مرتبطين</td><td>-</td></tr>";
         }
         ?>
         </tbody>
