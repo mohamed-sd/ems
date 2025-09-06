@@ -18,7 +18,15 @@
 <body>
 
 
-  <?php include('../includes/insidebar.php'); ?>
+  <?php include('../includes/insidebar.php');
+  
+  // تحديد النوع من الرابط (إن وجد)
+$type_filter = "";
+if (isset($_GET['type']) && $_GET['type'] != "") {
+    $type =  $_GET['type'];
+    $type_filter = " AND e.type = '$type' ";
+}
+  ?>
 
   <div class="main">
 
@@ -34,10 +42,13 @@
             <option value="">-- اختر الالية --</option>
             <?php
             include '../config.php';
-            $op_res = mysqli_query($conn, "SELECT o.id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name
+            $op_res = mysqli_query($conn, "SELECT o.id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN projects p ON o.project = p.id");
+                                            JOIN projects p ON o.project = p.id    WHERE 1 $type_filter");
+
+
+
             while ($op = mysqli_fetch_assoc($op_res)) {
               echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] .  "</option>";
             }
@@ -46,7 +57,7 @@
         </div>
         <div>
           <label>السائق</label>
-          <select name="driver"  required>
+          <!-- <select name="driver"  required>
             <option value="">-- اختر السائق --</option>
             <?php
             $dr_res = mysqli_query($conn, "SELECT id, name FROM drivers");
@@ -54,13 +65,13 @@
               echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
             }
             ?>
-          </select>
+          </select> -->
 
 
 
-        <select id="driver" name="driver">
-    <option value="">-- اختر السائق --</option>
-</select>
+         <select id="driver" name="driver">
+            <option value="">-- اختر السائق --</option>
+        </select>
 
 
         </div>
