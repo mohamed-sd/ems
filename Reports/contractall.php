@@ -19,7 +19,7 @@
 
 <body>
 
-    <?php include('../includes/insidebar.php');
+    <?php include('../insidebar.php');
 
     include '../config.php';
   // استقبال الفلتر

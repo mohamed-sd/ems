@@ -1,9 +1,9 @@
 <?php
 $page_title = "إيكوبيشن | اضافة سائق ";
-include("../includes/inheader.php");
+include("../inheader.php");
 ?>
 
-<?php include('../includes/insidebar.php');
+<?php include('../insidebar.php');
 
 include '../config.php';
 $equipment_id = intval($_GET['equipment_id']);

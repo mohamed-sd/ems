@@ -11,7 +11,7 @@
 
 <body>
 
-    <?php include('../includes/insidebar.php');
+    <?php include('../insidebar.php');
 
     include '../config.php';
     $project_filter = isset($_GET['project']) ? $_GET['project'] : '';
