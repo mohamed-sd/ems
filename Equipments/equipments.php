@@ -104,6 +104,7 @@ include("../includes/inheader.php");
                 echo "<td>" . $row['name'] . "</td>";
                 echo $row['status'] == "1" ? "<td style='color:green;'> متاحة </td>" : "<td style='color:red;'> مشغولة </td>"  ;
                 echo "<td>
+                <a href='add_drivers.php?equipment_id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a</a> | 
                         <a href='edit.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a</a> | 
                         <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
                         <a href='' style='color: #28a745'> <i class='fa fa-eye'></i> </a>
