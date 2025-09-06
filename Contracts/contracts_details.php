@@ -32,7 +32,9 @@
                     workshop, equip_type, equip_size, equip_count, equip_target_per_month, 
                     equip_total_month, equip_total_contract, mach_type, mach_size, mach_count, 
                     mach_target_per_month, mach_total_month, mach_total_contract, 
-                    hours_monthly_target, forecasted_contracted_hours, created_at, updated_at
+                    hours_monthly_target, forecasted_contracted_hours, created_at, updated_at ,
+                    daily_work_hours , daily_operators ,first_party ,second_party , witness_one , 
+                    witness_two
                 FROM contracts
                 WHERE id = $contract_id
                 LIMIT 1";
@@ -144,6 +146,30 @@
             <tr class="t">
                 <th> آخر تحديث </th>
                 <th><?php echo $row['updated_at']; ?></th>
+            </tr>
+            <tr class="o">
+                <th> عدد ساعات العمل اليومية</th>
+                <th><?php echo $row['daily_work_hours']; ?></th>
+            </tr>
+            <tr class="t">
+                <th> عدد المشغلين للساعات اليومية</th>
+                <th><?php echo $row['daily_operators']; ?></th>
+            </tr>
+             <tr class="o">
+                <th> الطرف الأول (ممثل الشركة) </th>
+                <th><?php echo $row['first_party']; ?></th>
+            </tr>
+            <tr class="t">
+                <th> الطرف الثاني (ممثل العميل)</th>
+                <th><?php echo $row['second_party']; ?></th>
+            </tr>
+             <tr class="o">
+                <th> الشاهد الأول </th>
+                <th><?php echo $row['witness_one']; ?></th>
+            </tr>
+            <tr class="t">
+                <th>الشاهد الثاني </th>
+                <th><?php echo $row['witness_two']; ?></th>
             </tr>
         <?php } ?>
         </thead>
