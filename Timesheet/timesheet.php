@@ -273,7 +273,15 @@
           <th style="text-align: right;"> التاريخ </th>
           <th style="text-align: right;"> الوردية </th>
           <th style="text-align: right;"> الساعات </th>
-          <th style="text-align: right;"> الاستعداد </th>
+          <th style="text-align: right;">  الجردل </th>
+          <th style="text-align: right;">  الجاكهمر </th>
+          <th style="text-align: right;">  الاضافية </th>
+          <th style="text-align: right;"> مجموع الاضافية</th>
+          <th style="text-align: right;"> استعداد العميل </th>
+          <th style="text-align: right;"> استعداد الاعتماد </th>
+          <th style="text-align: right;"> مجموع الساعات </th>
+          <th style="text-align: right;"> ملاحظات العمل </th>
+          <th style="text-align: right;"> عطل HR </th>
           <th style="text-align: right;"> الاعطال </th>
           <!-- <th>جاك هامر</th> -->
           <th>إجراءات</th>
@@ -309,7 +317,9 @@
 
         // عرض البيانات
         $query = "SELECT t.id, t.shift, t.date, t.executed_hours ,
-        t.standby_hours , t.total_fault_hours ,
+        t.standby_hours , t.total_fault_hours ,bucket_hours,jackhammer_hours,
+        extra_hours,extra_hours_total,dependence_hours,	total_work_hours,
+        work_notes,hr_fault,
                  e.code AS eq_code, e.name AS eq_name,
                  p.name AS project_name,
                  o.id AS operation_id,
@@ -331,7 +341,20 @@
           echo "<td>" . $row['date'] . "</td>";
           echo $row['shift'] == "D" ? "<td> صباحية </td>" : "<td> مسائية </td>";
           echo "<td>" . $row['executed_hours'] . "</td>";
+          echo "<td>" . $row['bucket_hours'] . "</td>";
+          echo "<td>" . $row['jackhammer_hours'] . "</td>";
+          echo "<td>" . $row['extra_hours'] . "</td>";
+          echo "<td>" . $row['extra_hours_total'] . "</td>";
           echo "<td>" . $row['standby_hours'] . "</td>";
+          echo "<td>" . $row['dependence_hours'] . "</td>";
+          echo "<td>" . $row['total_work_hours'] . "</td>";
+          echo "<td>" . $row['work_notes'] . "</td>";
+          echo "<td>" . $row['hr_fault'] . "</td>";
+
+          	
+
+
+
           echo "<td>" . $row['total_fault_hours'] . "</td>";
           echo "<td>
                         <a href='edit_timesheet.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
