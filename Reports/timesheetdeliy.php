@@ -34,9 +34,9 @@ SELECT
     t.fault_notes
 FROM timesheet t
 JOIN drivers d ON t.driver = d.id
-JOIN equipments e ON t.operator = e.id
+JOIN operations o ON t.operator = o.id        -- التايم شيت مرتبط بالتشغيل
+JOIN equipments e ON o.equipment = e.id 
 JOIN suppliers s ON e.suppliers = s.id
-JOIN operations o ON e.id = o.equipment
 JOIN projects p ON o.project = p.id
 WHERE 1=1
 ";

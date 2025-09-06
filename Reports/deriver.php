@@ -28,8 +28,8 @@ SELECT
     SUM(t.total_work_hours) AS total_hours
 FROM timesheet t
 JOIN drivers d ON t.driver = d.id
-JOIN equipments e ON t.operator = e.id
-JOIN operations o ON e.id = o.equipment
+JOIN operations o ON t.operator = o.id        -- التايم شيت مرتبط بالتشغيل
+JOIN equipments e ON o.equipment = e.id 
 JOIN projects p ON o.project = p.id
 WHERE 1=1
 ";

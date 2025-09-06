@@ -48,7 +48,7 @@ if (!empty($contract_filter)) {
     JOIN projects p ON c.project = p.id
     LEFT JOIN operations o ON o.project = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
-    LEFT JOIN timesheet t ON t.operator = e.id
+  LEFT JOIN timesheet t ON t.operator = o.id
     WHERE c.id = '$contract_filter'
     GROUP BY c.id, p.name";
     $contract_data = mysqli_fetch_assoc(mysqli_query($conn, $sql_info));
@@ -62,7 +62,7 @@ if (!empty($contract_filter)) {
     LEFT JOIN projects p ON c.project = p.id
     LEFT JOIN operations o ON o.project = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
-    LEFT JOIN timesheet t ON t.operator = e.id
+   LEFT JOIN timesheet t ON t.operator = o.id
     WHERE c.id = '$contract_filter'";
     $time_vs_progress = mysqli_fetch_assoc(mysqli_query($conn, $sql_time));
 
@@ -74,7 +74,7 @@ if (!empty($contract_filter)) {
     JOIN projects p ON c.project = p.id
     LEFT JOIN operations o ON o.project = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
-    LEFT JOIN timesheet t ON t.operator = e.id
+    LEFT JOIN timesheet t ON t.operator = o.id
     WHERE c.id = '$contract_filter'";
     $faults = mysqli_fetch_assoc(mysqli_query($conn, $sql_faults));
 
@@ -88,7 +88,7 @@ if (!empty($contract_filter)) {
     JOIN operations o ON o.project = p.id
     JOIN equipments e ON e.id = o.equipment
     JOIN suppliers s ON e.suppliers = s.id
-    LEFT JOIN timesheet t ON t.operator = e.id
+   LEFT JOIN timesheet t ON t.operator = o.id
     WHERE c.id = '$contract_filter'
     GROUP BY s.name";
     $suppliers = mysqli_query($conn, $sql_suppliers);
@@ -103,7 +103,7 @@ if (!empty($contract_filter)) {
     JOIN projects p ON c.project = p.id
     JOIN operations o ON o.project = p.id
     JOIN equipments e ON e.id = o.equipment
-    LEFT JOIN timesheet t ON t.operator = e.id
+   LEFT JOIN timesheet t ON t.operator = o.id
     WHERE c.id = '$contract_filter'
     GROUP BY e.name";
     $equipments = mysqli_query($conn, $sql_equipments);
@@ -117,7 +117,7 @@ if (!empty($contract_filter)) {
     JOIN projects p ON c.project = p.id
     JOIN operations o ON o.project = p.id
     JOIN equipments e ON e.id = o.equipment
-    JOIN timesheet t ON t.operator = e.id
+    LEFT JOIN timesheet t ON t.operator = o.id
     JOIN drivers d ON t.driver = d.id
     WHERE c.id = '$contract_filter'
     GROUP BY d.name";
@@ -133,7 +133,7 @@ if (!empty($contract_filter)) {
     JOIN projects p ON c.project = p.id
     LEFT JOIN operations o ON o.project = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
-    LEFT JOIN timesheet t ON t.operator = e.id
+    LEFT JOIN timesheet t ON t.operator = o.id
     WHERE c.id = '$contract_filter'
     GROUP BY c.id";
     $variance = mysqli_fetch_assoc(mysqli_query($conn, $sql_variance));

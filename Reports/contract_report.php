@@ -39,7 +39,7 @@ if (!empty($contract_filter)) {
     JOIN projects p ON c.project = p.id
     LEFT JOIN operations o ON o.project = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
-    LEFT JOIN timesheet t ON t.operator = e.id
+   LEFT JOIN timesheet t ON t.operator = o.id
     WHERE c.id = '$contract_filter'
     GROUP BY c.id, p.name, c.contract_signing_date, c.contract_duration_months";
     
@@ -56,8 +56,8 @@ if (!empty($contract_filter)) {
     JOIN projects p ON c.project = p.id
     LEFT JOIN operations o ON o.project = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
-    LEFT JOIN timesheet t ON t.operator = e.id
-    WHERE c.id = '$contract_filter'
+LEFT JOIN timesheet t ON t.operator = o.id
+WHERE c.id = '$contract_filter'
     GROUP BY YEAR(t.date), MONTH(t.date), c.hours_monthly_target
     ORDER BY year, month";
     

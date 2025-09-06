@@ -9,81 +9,80 @@
 </head>
 <body>
 
-  <?php include('../insidebar.php'); 
+  <?php 
+  include('../insidebar.php'); 
+  include '../config.php';
 
-include '../config.php';
-// استقبال الفلاتر
-$date_filter = isset($_GET['date']) ? $_GET['date'] : '';
-$equipment_filter = isset($_GET['equipment']) ? $_GET['equipment'] : '';
-$project_filter = isset($_GET['project']) ? $_GET['project'] : '';
+  // استقبال الفلاتر
+  $date_filter = isset($_GET['date']) ? $_GET['date'] : '';
+  $equipment_filter = isset($_GET['equipment']) ? $_GET['equipment'] : '';
+  $project_filter = isset($_GET['project']) ? $_GET['project'] : '';
 
-$sql = "
-SELECT 
-    p.name AS project_name,
-    e.name AS equipment_name,
-    d.name AS driver_name,
-    t.date,
-    t.shift,
-    t.total_work_hours,
-    t.total_fault_hours,
-    t.standby_hours
-FROM timesheet t
-JOIN equipments e ON t.operator = e.id
-JOIN drivers d ON t.driver = d.id
-JOIN operations o ON e.id = o.equipment
-JOIN projects p ON o.project = p.id
-WHERE 1=1
-";
+  $sql = "
+  SELECT 
+      p.name AS project_name,
+      e.name AS equipment_name,
+      d.name AS driver_name,
+      t.`date`,
+      t.shift,
+      t.total_work_hours,
+      t.total_fault_hours,
+      t.standby_hours
+  FROM timesheet t
+  JOIN equipments e ON t.operator = e.id
+  JOIN drivers d ON t.driver = d.id
+  JOIN operations o ON e.id = o.equipment
+  JOIN projects p ON o.project = p.id
+  WHERE 1=1
+  ";
 
-// تطبيق الفلاتر
-if (!empty($date_filter)) {
-    $sql .= " AND t.date = '$date_filter' ";
-}
-if (!empty($equipment_filter)) {
-    $sql .= " AND e.id = '$equipment_filter' ";
-}
-if (!empty($project_filter)) {
-    $sql .= " AND p.id = '$project_filter' ";
-}
+  // تطبيق الفلاتر
+  if (!empty($date_filter)) {
+      $sql .= " AND t.`date` = '$date_filter' ";
+  }
+  if (!empty($equipment_filter)) {
+      $sql .= " AND e.id = '$equipment_filter' ";
+  }
+  if (!empty($project_filter)) {
+      $sql .= " AND p.id = '$project_filter' ";
+  }
 
-$result = mysqli_query($conn, $sql);
+  // تنفيذ الاستعلام مع اظهار الأخطاء
+  $result = mysqli_query($conn, $sql) or die("خطأ في الاستعلام: " . mysqli_error($conn));
 
-// لحساب مجموع الساعات
-$total_sql = "SELECT SUM(t.total_work_hours) AS total_hours
-FROM timesheet t
-JOIN equipments e ON t.operator = e.id
-JOIN operations o ON e.id = o.equipment
-JOIN projects p ON o.project = p.id
-WHERE 1=1";
+  // طباعة الاستعلام للتجربة (احذف بعد التأكد)
+//   echo "<pre>$sql</pre>";
 
-if (!empty($date_filter)) {
-    $total_sql .= " AND t.date = '$date_filter' ";
-}
-if (!empty($equipment_filter)) {
-    $total_sql .= " AND e.id = '$equipment_filter' ";
-}
-if (!empty($project_filter)) {
-    $total_sql .= " AND p.id = '$project_filter' ";
-}
+  // استعلام المجموع
+  $total_sql = "SELECT SUM(t.total_work_hours) AS total_hours
+  FROM timesheet t
+  JOIN equipments e ON t.operator = e.id
+  JOIN operations o ON e.id = o.equipment
+  JOIN projects p ON o.project = p.id
+  WHERE 1=1";
 
-$total_result = mysqli_query($conn, $total_sql);
-$total_row = mysqli_fetch_assoc($total_result);
-$total_hours = $total_row['total_hours'];
- 
- 
- ?>
+  if (!empty($date_filter)) {
+      $total_sql .= " AND t.`date` = '$date_filter' ";
+  }
+  if (!empty($equipment_filter)) {
+      $total_sql .= " AND e.id = '$equipment_filter' ";
+  }
+  if (!empty($project_filter)) {
+      $total_sql .= " AND p.id = '$project_filter' ";
+  }
+
+  $total_result = mysqli_query($conn, $total_sql) or die("خطأ في استعلام المجموع: " . mysqli_error($conn));
+  $total_row = mysqli_fetch_assoc($total_result);
+  $total_hours = $total_row['total_hours'];
+
+  // طباعة استعلام المجموع للتجربة (احذف بعد التأكد)
+//   echo "<pre>$total_sql</pre>";
+  ?>
 
   <div class="main">
 
-
-    
-
-  
-  <h2>📊 تقرير ساعات العمل اليومية</h2>
-
-  <br/>
-  <br/>
-  <hr/>
+    <h2>📊 تقرير ساعات العمل اليومية</h2>
+    <br/><br/><hr/>
     
     <form method="GET">
         <label>📅 التاريخ:</label>
@@ -130,7 +129,7 @@ $total_hours = $total_row['total_hours'];
             <th>⚠️ ساعات الأعطال</th>
             <th>⏸️ Standby</th>
         </tr>
-        <thead>
+        </thead>
         <tbody>
         <?php while($row = mysqli_fetch_assoc($result)) { ?>
         <tr>
