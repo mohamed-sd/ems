@@ -338,8 +338,9 @@ table {
   color: var(--equipation-gold);
 }
 
-.table thead .t {
-  background-color: rgb(241, 247, 203);
+.table thead {
+  background-color: #0d1b2a;
+  color: var(--equipation-gold);
 }
 
 .table thead tr th {

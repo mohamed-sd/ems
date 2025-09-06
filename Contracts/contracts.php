@@ -18,7 +18,39 @@
   <!-- CSS الموقع -->
   <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
 </head>
+<style>
+    .totals {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+     .kpi {
+      /* background: linear-gradient(180deg, #fff, #fffaf0); */
+      border: 1px solid #ffcc00;
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+    }
 
+    .kpi .v {
+      font-weight: 900;
+      font-size: clamp(18px, 3vw, 24px);
+      color: #7a5a00;
+    }
+
+    .kpi .t {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .hr {
+      height: 1px;
+      /* background: linear-gradient(90deg, transparent, var(--yellow), transparent); */
+      margin: 18px 0;
+      border: none;
+    }
+  </style>
 <body>
 
   <?php include('../includes/insidebar.php'); ?>
