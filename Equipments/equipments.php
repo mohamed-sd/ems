@@ -39,8 +39,8 @@ include("../inheader.php");
             <label> نوع المعدة </label>
             <select name="type">
                 <option value=""> -- حدد نوع المعدة --- </option>
-                <option value="Exvactor"> حفار </option>
-                <option value="Tripple"> قلاب </option>
+                <option value="1"> حفار </option>
+                <option value="2"> قلاب </option>
             </select>
             </div>
             <div>
