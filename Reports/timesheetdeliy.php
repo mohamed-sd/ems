@@ -62,9 +62,9 @@ SELECT
     SUM(t.total_fault_hours) AS total_fault,
     SUM(t.standby_hours) AS total_standby
 FROM timesheet t
-JOIN equipments e ON t.operator = e.id
+JOIN operations o ON t.operator = o.id        -- التايم شيت مرتبط بالتشغيل
+JOIN equipments e ON o.equipment = e.id 
 JOIN suppliers s ON e.suppliers = s.id
-JOIN operations o ON e.id = o.equipment
 JOIN projects p ON o.project = p.id
 WHERE 1=1
 ";
