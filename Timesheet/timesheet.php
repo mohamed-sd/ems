@@ -55,6 +55,14 @@
             }
             ?>
           </select>
+
+
+
+          <!-- <select id="driver" name="driver">
+    <option value="">-- اختر السائق --</option>
+</select>
+ -->
+
         </div>
         <div>
           <label>الوردية</label>
@@ -480,7 +488,34 @@
 
     calculateDiff();
 
+
+
+
+//     $(document).ready(function() {
+//     $("#equipment").change(function() {
+//         var equipId = $(this).val();
+//         if (equipId !== "") {
+//             $.ajax({
+//                 url: "get_drivers.php",
+//                 type: "GET",
+//                 data: { equipment_id: equipId },
+//                 success: function(response) {
+//                     console.log("📌 Response:", response); // Debug
+//                     $("#driver").html(response);
+//                 },
+//                 error: function(xhr, status, error) {
+//                     console.error("❌ AJAX Error:", error);
+//                 }
+//             });
+//         } else {
+//             $("#driver").html("<option value=''>-- اختر السائق --</option>");
+//         }
+//     });
+// });
+
   </script>
+
+
 
 </body>
 
