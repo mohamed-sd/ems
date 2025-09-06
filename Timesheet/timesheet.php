@@ -30,7 +30,7 @@
       <div class="form-grid">
         <div>
           <label>الالية</label>
-          <select name="operator" required>
+          <select name="operator" id="operator" required>
             <option value="">-- اختر الالية --</option>
             <?php
             include '../config.php';
@@ -46,7 +46,7 @@
         </div>
         <div>
           <label>السائق</label>
-          <select name="driver" required>
+          <select name="driver"  required>
             <option value="">-- اختر السائق --</option>
             <?php
             $dr_res = mysqli_query($conn, "SELECT id, name FROM drivers");
@@ -58,10 +58,10 @@
 
 
 
-          <!-- <select id="driver" name="driver">
+        <select id="driver" name="driver">
     <option value="">-- اختر السائق --</option>
 </select>
- -->
+
 
         </div>
         <div>
@@ -81,7 +81,7 @@
 
         <div>
           <label>ساعات الوردية</label>
-          <input type="number" name="shift_hours" value="10">
+          <input type="number" name="shift_hours" id="shift_hours"  value="0">
         </div>
 
       <div></div>
@@ -491,27 +491,52 @@
 
 
 
-//     $(document).ready(function() {
-//     $("#equipment").change(function() {
-//         var equipId = $(this).val();
-//         if (equipId !== "") {
-//             $.ajax({
-//                 url: "get_drivers.php",
-//                 type: "GET",
-//                 data: { equipment_id: equipId },
-//                 success: function(response) {
-//                     console.log("📌 Response:", response); // Debug
-//                     $("#driver").html(response);
-//                 },
-//                 error: function(xhr, status, error) {
-//                     console.error("❌ AJAX Error:", error);
-//                 }
-//             });
-//         } else {
-//             $("#driver").html("<option value=''>-- اختر السائق --</option>");
-//         }
-//     });
-// });
+    $(document).ready(function() {
+    $("#operator").change(function() {
+        var equipId = $(this).val();
+        if (equipId !== "") {
+            $.ajax({
+                url: "get_drivers.php",
+                type: "GET",
+                data: { operation_id: equipId },
+                success: function(response) {
+                    console.log("📌 Response:", response); // Debug
+                    $("#driver").html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error("❌ AJAX Error:", error);
+                }
+            });
+        } else {
+            $("#driver").html("<option value=''>-- اختر السائق --</option>");
+        }
+    });
+});
+
+
+
+
+$(document).ready(function() {
+    $("#operator").change(function() {
+        var opId = $(this).val();
+        if (opId !== "") {
+            $.ajax({
+                url: "get_contract_hours.php",
+                type: "GET",
+                data: { operation_id: opId },
+                success: function(response) {
+                    $("#shift_hours").val(response); // عرض القيمة داخل input
+                },
+                error: function(xhr, status, error) {
+                    $("#contract_hours").val("خطأ ⚠️");
+                    console.error(error);
+                }
+            });
+        } else {
+            $("#shift_hours").val("");
+        }
+    });
+});
 
   </script>
 
