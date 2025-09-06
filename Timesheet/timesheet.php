@@ -1,7 +1,7 @@
 <?php
 $page_title = "إيكوبيشن | ساعات العمل ";
-include("../includes/inheader.php");
-include('../includes/insidebar.php');
+include("../inheader.php");
+include('../insidebar.php');
 // تحديد النوع من الرابط (إن وجد)
 $type_filter = "";
 if (isset($_GET['type']) && $_GET['type'] != "") {

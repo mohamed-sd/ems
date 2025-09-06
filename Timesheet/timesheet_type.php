@@ -1,7 +1,7 @@
 <?php
 $page_title = "إيكوبيشن | الآليات ";
-include("../includes/inheader.php");
-include('../includes/insidebar.php');
+include("../inheader.php");
+include('../insidebar.php');
 ?>
 
 <div class="main">

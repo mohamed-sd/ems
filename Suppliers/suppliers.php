@@ -22,9 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 ?>
 <?php 
   $page_title = "إيكوبيشن | الموردين"; 
-  include("../includes/inheader.php"); 
+  include("../inheader.php"); 
 ?>
-<?php include('../includes/insidebar.php'); ?>
+<?php include('../insidebar.php'); ?>
 
 <div class="main">
 

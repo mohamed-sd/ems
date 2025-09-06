@@ -18,7 +18,7 @@
 
 <body>
 
-    <?php include('includes/sidebar.php'); ?>
+    <?php include('sidebar.php'); ?>
 
     <div class="main">
 

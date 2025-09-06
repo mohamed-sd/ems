@@ -1,10 +1,10 @@
 <?php 
   $page_title = "إيكوبيشن | السائقين "; 
-  include("../includes/inheader.php"); 
+  include("../inheader.php"); 
 ?>
 
 
- <?php include('../includes/insidebar.php'); ?>
+ <?php include('../insidebar.php'); ?>
 
 <div class="main">
 
