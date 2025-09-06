@@ -14,7 +14,7 @@
       <li><a href="Equipments/equipments.php"><i class="fa fa-tools"></i> <span>الآليات</span></a></li>
       <li><a href="Drivers/drivers.php"><i class="fa fa-id-badge"></i> <span>المشغلين</span></a></li>
       <li><a href="Oprators/oprators.php"><i class="fa fa-play-circle"></i> <span>التشغيل</span></a></li>
-      <li><a href="Timesheet/timesheet.php"><i class="fa fa-clock"></i> <span>ساعات العمل</span></a></li>
+      <li><a href="Timesheet/timesheet_type.php"><i class="fa fa-clock"></i> <span>ساعات العمل</span></a></li>
       <li><a href="users.php"><i class="fa fa-users"></i> <span>المستخدمين</span></a></li>
       <li><a href="Reports/reports.php"><i class="fa fa-chart-line"></i> <span>التقارير</span></a></li>
       <li><a href="settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
