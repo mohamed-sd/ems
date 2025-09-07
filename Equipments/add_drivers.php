@@ -79,7 +79,10 @@ while ($r = mysqli_fetch_assoc($res)) {
                 </td>
             </tr>";
             }
-        } else {
+        } else {      
+
+
+            
             echo "<tr><td>لا يوجد سائقين مرتبطين</td><td>-</td></tr>";
         }
         ?>
