@@ -54,9 +54,10 @@
                 // mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
 
 
-                  if ($id > 0) {
+                  if ($id > 0) { 
         // تحديث
         mysqli_query($conn, "UPDATE drivers SET name='$name', phone='$phone' WHERE id=$id");
+        echo "<script>window.location.href='drivers.php';</script>";
         exit;
     } else {
         // إضافة
