@@ -93,12 +93,18 @@ include("../inheader.php");
 
             // جلب المعدات
             $query = "SELECT `id`, `suppliers`, `code`, `type`, `name`, `status` FROM `equipments` ORDER BY id DESC";
-            $result = mysqli_query($conn, $query);
+
+            $query2 = "SELECT m.id, s.name AS supplier_name, m.type, m.code, m.name , m.status 
+FROM equipments m
+
+JOIN suppliers s ON m.suppliers = s.id";
+
+            $result = mysqli_query($conn, $query2);
             $i = 1;
             while ($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>";
                 echo "<td>" . $i++ . "</td>";
-                echo "<td>" . $row['suppliers'] . "</td>";
+                echo "<td>" . $row['supplier_name'] . "</td>";
                 echo "<td>" . $row['code'] . "</td>";
                 echo "<td>" . $row['type'] . "</td>";
                 echo "<td>" . $row['name'] . "</td>";

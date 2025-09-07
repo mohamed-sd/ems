@@ -16,8 +16,10 @@
 
     <!-- فورم إضافة مشروع -->
     <form id="projectForm" action="" method="post">
-        <input type="text" name="name" placeholder="اسم السائق" required />
-        <input type="text" name="phone" placeholder="رقم الهاتف " required />
+                <input type="hidden" name="id" id="drivers_id" value="">
+
+        <input type="text" name="name"  id="name" placeholder="اسم السائق" required />
+        <input type="text" name="phone" id="phone" placeholder="رقم الهاتف " required />
         <br/>
         <button type="submit">حفظ السائق</button>
     </form>
@@ -43,11 +45,24 @@
             
             // إضافة سائق جديد عند إرسال الفورم
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
+                    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+
                 $name = mysqli_real_escape_string($conn, $_POST['name']);
                 $phone = mysqli_real_escape_string($conn, $_POST['phone']);
               
            
+                // mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
+
+
+                  if ($id > 0) {
+        // تحديث
+        mysqli_query($conn, "UPDATE drivers SET name='$name', phone='$phone' WHERE id=$id");
+        exit;
+    } else {
+        // إضافة
                 mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
+        exit;
+    }
             }
 
             // جلب المشاريع
@@ -61,7 +76,13 @@
                 echo "<td>".$row['phone']."</td>";
              
                 echo "<td>
-                        <a  href='edit.php?id=".$row['id']."'   id='toggleForm' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
+                         <a href='javascript:void(0)' 
+                           class='editBtn' 
+                           data-id='".$row['id']."' 
+                           data-name='".$row['name']."' 
+                           data-phone='".$row['phone']."' 
+    
+                           style='color:#007bff'><i class='fa fa-edit'></i></a>  | 
                         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> 
                       </td>";
                 echo "</tr>";
@@ -111,10 +132,25 @@
     // التحكم في إظهار وإخفاء الفورم
     const toggleProjectFormBtn = document.getElementById('toggleForm');
     const projectForm = document.getElementById('projectForm');
-
     toggleProjectFormBtn.addEventListener('click', function() {
         projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
+            // تنظيف الحقول عند الإضافة
+        $("#drivers_id").val("");
+        $("#name").val("");
+        $("#phone").val("");
     });
+
+      // عند الضغط على زر تعديل
+    $(document).on("click", ".editBtn", function() {
+        $("#drivers_id").val($(this).data("id"));
+        $("#name").val($(this).data("name"));
+        $("#phone").val($(this).data("phone"));
+
+        $("#projectForm").show();
+        $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
+    });
+
+
 })();
 </script>
 
