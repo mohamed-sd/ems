@@ -258,6 +258,9 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
             <label>📝 ملاحظات المشغل</label>
             <textarea name="operator_notes" class="form-control"></textarea>
           </div>
+
+          <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
+
           <button type="submit">حفظ الساعات</button>
 
         </div>
@@ -485,6 +488,10 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
             <label>📝 ملاحظات المشغل</label>
             <textarea name="operator_notes" class="form-control"></textarea>
           </div>
+          
+          <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
+          
+
           <button type="submit">حفظ الساعات</button>
 
         </div>
@@ -569,7 +576,8 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           "bucket_standby_hours",
           "extra_operator_hours",
           "operator_standby_hours",
-          "operator_notes"
+          "operator_notes",
+          "type"
         ];
 
         $values = [];
@@ -589,6 +597,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
         }
       }
 
+      $type = $_GET['type'];
 
       // عرض البيانات
       $query = "SELECT t.id, t.shift, t.date, t.executed_hours ,
@@ -604,6 +613,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           JOIN equipments e ON o.equipment = e.id
           JOIN projects p ON o.project = p.id
           JOIN drivers d ON t.driver = d.id
+          WHERE t.type LIKE '$type'
           ORDER BY t.id DESC";
       $result = mysqli_query($conn, $query);
       $i = 1;
