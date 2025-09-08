@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../index.php");
@@ -53,13 +53,15 @@ include 'config.php';
                     <label class="form-label">الدور / الصلاحية</label>
                     <select name="role" class="form-control" required>
                         <option value=""> -- حدد الصلاحية -- </option>
-                        <?php if(isset($_GET['id'])){ ?>
-                        <option value="2"> مدير موقع </option>
-                        <?php }else{ ?>
-                        <option value="1">مدير </option>
-                        <option value="3">مشرف موردين </option>
-                        <option value="4">مشرف ساعات </option>
-                        <option value="5">مشرف مشغلين </option>
+                        <?php if ($_SESSION['user']['role'] == "1") { ?>
+                            <option value="1"> مدير </option>
+                        <?php } ?>
+                        <?php if (isset($_GET['id'])) { ?>
+                            <option value="2"> مدير موقع </option>
+                        <?php } else { ?>
+                            <option value="3">مشرف موردين </option>
+                            <option value="4">مشرف ساعات </option>
+                            <option value="5">مشرف مشغلين </option>
                         <?php } ?>
                     </select>
                 </div>
@@ -84,6 +86,14 @@ include 'config.php';
                         </select>
                     </div>
                 <?php } ?>
+
+                <?php
+                if (!isset($_GET['id'])) {
+                    ?>
+                    <input type="text" name="uid" id="uid" value="<?php echo $_SESSION['user']['id']; ?>" />
+                    <?php
+                }
+                ?>
                 <br />
                 <button type="submit">حفظ المستخدم</button>
             </div>
@@ -107,6 +117,7 @@ include 'config.php';
                 </tr>
             </thead>
             <tbody>
+
                 <?php
                 include 'config.php';
 
@@ -117,16 +128,37 @@ include 'config.php';
                     $password = $_POST['password']; // يفضل تشفيره لاحقاً
                     $phone = $_POST['phone'];
                     $role = $_POST['role'];
-                    isset($_POST['project_id']) ? $project = $_POST['project_id'] : $project = "0";
-                    
 
-                    mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role , project , created_at, updated_at) 
-            VALUES ('$name', '$username', '$password', '$phone', '$role' , '$project' , NOW(), NOW())");
+                    isset($_POST['project_id']) ? $project = $_POST['project_id'] : $project = "0";
+                    isset($_POST['uid']) ? $uid = $_POST['uid'] : $uid = "0";
+
+
+                    mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role , project , uid , created_at, updated_at) 
+            VALUES ('$name', '$username', '$password', '$phone', '$role' , '$project' , '$uid' , NOW(), NOW())");
                 }
 
-                // جلب المستخدمين
-                $query = "SELECT id, name, username,password ,phone, role , created_at, updated_at FROM users ORDER BY id DESC";
+                $userid = $_SESSION['user']['id'];
+
+                if ($_SESSION['user']['role'] == "1") {
+                    $query = "SELECT id, name, username,password ,phone, role , created_at, updated_at FROM users ORDER BY id DESC";
+                } else {
+                    $query = "SELECT id, name, username,password ,phone, role , created_at, updated_at FROM users 
+                     Where uid = $userid ORDER BY id DESC";
+                }
+
+
+
                 $result = mysqli_query($conn, $query);
+
+
+                $roles = array(
+                    "1" => "مدير",
+                    "2" => "مدير موقع",
+                    "3" => "مشرف مورد",
+                    "4" => "مشرف ساعات",
+                    "5" => "مشرف مشغلين"
+                );
+
                 $i = 1;
                 while ($row = mysqli_fetch_assoc($result)) {
                     echo "<tr>";
@@ -134,7 +166,7 @@ include 'config.php';
                     echo "<td>" . $row['name'] . "</td>";
                     echo "<td>" . $row['username'] . "</td>";
                     echo "<td>" . $row['password'] . "</td>";
-                    echo "<td>" . $row['role'] . "</td>";
+                    echo "<td>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</td>";
                     echo "<td>" . $row['phone'] . "</td>";
                     echo "<td>
                         <a href='edit.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a> | 

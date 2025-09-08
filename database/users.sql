@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 08, 2025 at 02:33 PM
+-- Generation Time: Sep 08, 2025 at 03:51 PM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 5.6.21
 
@@ -34,9 +34,17 @@ CREATE TABLE `users` (
   `phone` varchar(20) DEFAULT NULL,
   `role` varchar(30) NOT NULL,
   `project` varchar(20) NOT NULL DEFAULT '0',
+  `uid` varchar(20) NOT NULL DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `username`, `password`, `phone`, `role`, `project`, `uid`, `created_at`, `updated_at`) VALUES
+(1, 'admin', 'admin', '2025', '09', '1', '0', '0', '2025-09-08 13:51:40', '2025-09-08 13:51:40');
 
 --
 -- Indexes for dumped tables
@@ -57,7 +65,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
