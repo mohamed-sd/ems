@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: ../index.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -29,6 +36,11 @@
     <a href="../Contracts/contracts.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
         <i class="fa fa-plus"></i> العقودات
     </a>
+    <?php if($_SESSION['user']['role'] == "1") { ?>
+    <a href="../users.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
+        <i class="fa fa-plus"></i> مدراء المشاريع
+    </a>
+    <?php } ?>
 
     <h3> تفاصير المشروع : </h3>
     <br/>

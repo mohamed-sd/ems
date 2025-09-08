@@ -1,24 +1,13 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | المشاريع</title>
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
-    <!-- CSS الموقع -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-</head>
-<body>
-
-<?php include('../insidebar.php'); ?>
-
+<?php 
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: ../index.php");
+    exit();
+}
+  $page_title = "إيكوبيشن | الموردين"; 
+  include("../inheader.php"); 
+  include('../insidebar.php');
+?>
 <div class="main">
 
     <a href="javascript:void(0)" id="toggleForm" class="add">

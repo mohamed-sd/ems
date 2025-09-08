@@ -1,3 +1,6 @@
+<?php 
+//session_start();
+?>
 <!-- زر القائمة في الموبايل -->
 <button class="mobile-menu-btn" id="mobileMenuBtn">
   <i class="fa fa-bars"></i>
@@ -10,20 +13,40 @@
 
     <ul>
       <li><a href="../dashbourd.php"><i class="fa fa-tachometer-alt"></i> <span>الرئيسية</span></a></li>
+      <?php if($_SESSION['user']['role'] == "1") { 
+      // المدير
+        ?>
       <li><a href="../Projects/projects.php"><i class="fa fa-folder-open"></i> <span>المشاريع</span></a></li>
+      <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
+      <li><a href="../users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
+      <?php }else{
+      // مدير الموقع
+         ?>
+      <?php if($_SESSION['user']['role'] == "3") { ?>
       <li><a href="../Suppliers/suppliers.php"><i class="fa fa-truck-loading"></i> <span>الموردين</span></a></li>
       <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
-      <li><a href="../Drivers/drivers.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li>
-      <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
+      <?php }  ?>
+      <?php if($_SESSION['user']['role'] == "4") { ?>
       <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a></li>
+      <?php } ?>
+
+      <?php if($_SESSION['user']['role'] == "5") { ?>
+      <li><a href="../Drivers/drivers.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li>
+       <?php }  ?>
+
+      <?php if($_SESSION['user']['role'] == "6") { ?>
       <li><a href="../users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
       <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
       <li><a href="../settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
+      <?php
+       }
+       ?>
+      <?php } ?>
     </ul>
   </div>
 
   <!-- زر تسجيل الخروج -->
-  <a href="../index.php" class="logout">
+  <a href="../logout.php" class="logout">
     <i class="fa fa-sign-out-alt"></i>
     <span>تسجيل الخروج</span>
   </a>

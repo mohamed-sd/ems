@@ -1,3 +1,10 @@
+<?php 
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: ../index.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -77,7 +84,7 @@
                 <th style="text-align: right;"> الاسم </th>
                 <th style="text-align: right;">نوع الآليه</th>
                 <th style="text-align: right;"> اسم العميل </th>
-                <th style="text-align: right;">إجراءات</th>
+                <!-- <th style="text-align: right;">إجراءات</th> -->
             </tr>
         </thead>
         <tbody>
@@ -94,10 +101,10 @@
                 echo "<td>".$row['name']."</td>";
                 echo "<td>".$row['type']."</td>";
                 echo "<td>".$row['status']."</td>";
-                echo "<td>
-                        <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
-                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
-                      </td>";
+                // echo "<td>
+                //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
+                //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
+                //       </td>";
                 echo "</tr>";
             }
             ?>

@@ -1,3 +1,11 @@
+<?php 
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: ../index.php");
+    exit();
+}
+include 'config.php';
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
@@ -26,7 +34,7 @@
             <i class="fa fa-plus"></i> إضافة مستخدم
         </a>
 
-        <!-- فورم إضافة مورد -->
+
         <form id="projectForm" action="" method="post" style="display:none;">
             <div class="form-grid">
                 <div>
@@ -44,15 +52,38 @@
                 <div>
                     <label class="form-label">الدور / الصلاحية</label>
                     <select name="role" class="form-control" required>
-                    <option value="admin">مدير (Admin)</option>
-                    <option value="user">مشرف (User)</option>
-                    <option value="user">مدخل (editor)</option>
+                        <option value=""> -- حدد الصلاحية -- </option>
+                        <?php if(isset($_GET['id'])){ ?>
+                        <option value="2"> مدير موقع </option>
+                        <?php }else{ ?>
+                        <option value="1">مدير </option>
+                        <option value="3">مشرف موردين </option>
+                        <option value="4">مشرف ساعات </option>
+                        <option value="5">مشرف مشغلين </option>
+                        <?php } ?>
                     </select>
                 </div>
                 <div>
                     <label>رقم الهاتف</label>
                     <input type="text" name="phone" placeholder="رقم الهاتف" required />
                 </div>
+                <?php if (isset($_GET['id'])) { ?>
+                    <?php
+                    $sql = "SELECT id, name FROM projects ORDER BY name ASC";
+                    $result = mysqli_query($conn, $sql);
+                    ?>
+                    <div>
+                        <label class="form-label">المشروع</label>
+                        <select id="project_id" name="project_id" class="form-control" required>
+                            <option value="0"> مدير الموقع </option>
+                            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                                <option value="<?php echo $row['id']; ?>">
+                                    <?php echo htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+                <?php } ?>
                 <br />
                 <button type="submit">حفظ المستخدم</button>
             </div>
@@ -71,8 +102,6 @@
                     <th style="text-align: right;">اسم المستخدم </th>
                     <th style="text-align: right;">كلمه المرور </th>
                     <th style="text-align: right;">الدور </th>
-
-
                     <th style="text-align: right;">رقم الهاتف</th>
                     <th style="text-align: right;">إجراءات</th>
                 </tr>
@@ -88,8 +117,11 @@
                     $password = $_POST['password']; // يفضل تشفيره لاحقاً
                     $phone = $_POST['phone'];
                     $role = $_POST['role'];
-                    mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role, created_at, updated_at) 
-            VALUES ('$name', '$username', '$password', '$phone', '$role', NOW(), NOW())");
+                    isset($_POST['project_id']) ? $project = $_POST['project_id'] : $project = "0";
+                    
+
+                    mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role , project , created_at, updated_at) 
+            VALUES ('$name', '$username', '$password', '$phone', '$role' , '$project' , NOW(), NOW())");
                 }
 
                 // جلب المستخدمين
@@ -103,7 +135,6 @@
                     echo "<td>" . $row['username'] . "</td>";
                     echo "<td>" . $row['password'] . "</td>";
                     echo "<td>" . $row['role'] . "</td>";
-
                     echo "<td>" . $row['phone'] . "</td>";
                     echo "<td>
                         <a href='edit.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a> | 

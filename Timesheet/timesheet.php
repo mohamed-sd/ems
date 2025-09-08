@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: ../index.php");
+    exit();
+}
 $page_title = "إيكوبيشن | ساعات العمل ";
 include("../inheader.php");
 include('../insidebar.php');

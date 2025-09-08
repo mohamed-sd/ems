@@ -1,90 +1,90 @@
-<?php 
-  $page_title = "إيكوبيشن | السائقين "; 
-  include("../inheader.php"); 
+<?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: ../index.php");
+    exit();
+}
+$page_title = "إيكوبيشن | السائقين ";
+include("../inheader.php");
 ?>
-
-
- <?php include('../insidebar.php'); ?>
-
+<?php include('../insidebar.php'); ?>
 <div class="main">
-
-   <!--  <h2>المشاريع</h2> -->
-
+    <!--  <h2>المشاريع</h2> -->
     <a href="javascript:void(0)" id="toggleForm" class="add">
         <i class="fa fa-plus"></i> اضافة سائق
     </a>
-
     <!-- فورم إضافة مشروع -->
     <form id="projectForm" action="" method="post">
-                <input type="hidden" name="id" id="drivers_id" value="">
+        <input type="hidden" name="id" id="drivers_id" value="">
 
-        <input type="text" name="name"  id="name" placeholder="اسم السائق" required />
+        <input type="text" name="name" id="name" placeholder="اسم السائق" required />
         <input type="text" name="phone" id="phone" placeholder="رقم الهاتف " required />
-        <br/>
+        <br />
         <button type="submit">حفظ السائق</button>
     </form>
 
-    <br/> <br/> <br/>
+    <br /> <br /> <br />
 
     <!-- جدول المشاريع -->
     <h3>قائمة السائقين</h3>
-    <br/>
+    <br />
     <table id="projectsTable" class="display" style="width:100%; margin-top: 20px;">
         <thead>
             <tr>
                 <th>#</th>
                 <th style="text-align: right;">اسم السائق</th>
                 <th style="text-align: right;"> الهاتف </th>
-            
+
                 <th style="text-align: right;">إجراءات</th>
             </tr>
         </thead>
         <tbody>
             <?php
             include '../config.php';
-            
+
             // إضافة سائق جديد عند إرسال الفورم
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
-                    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+                $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
 
                 $name = mysqli_real_escape_string($conn, $_POST['name']);
                 $phone = mysqli_real_escape_string($conn, $_POST['phone']);
-              
-           
+
+
                 // mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
+            
 
-
-                  if ($id > 0) { 
-        // تحديث
-        mysqli_query($conn, "UPDATE drivers SET name='$name', phone='$phone' WHERE id=$id");
-        echo "<script>window.location.href='drivers.php';</script>";
-        exit;
-    } else {
-        // إضافة
-                mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
-        exit;
-    }
+                if ($id > 0) {
+                    // تحديث
+                    mysqli_query($conn, "UPDATE drivers SET name='$name', phone='$phone' WHERE id=$id");
+                    echo "<script>window.location.href='drivers.php';</script>";
+                    exit;
+                } else {
+                    // إضافة
+                    mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
+                     echo "<script>window.location.href='drivers.php';</script>";
+                    exit;
+                }
             }
 
             // جلب المشاريع
             $query = "SELECT `id`, `name`, `phone` FROM drivers ORDER BY id DESC";
             $result = mysqli_query($conn, $query);
             $i = 1;
-            while($row = mysqli_fetch_assoc($result)) {
+            while ($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>";
-                echo "<td>".$i++."</td>";
-                echo "<td>".$row['name']."</td>";
-                echo "<td>".$row['phone']."</td>";
-             
+                echo "<td>" . $i++ . "</td>";
+                echo "<td>" . $row['name'] . "</td>";
+                echo "<td>" . $row['phone'] . "</td>";
+
                 echo "<td>
                          <a href='javascript:void(0)' 
                            class='editBtn' 
-                           data-id='".$row['id']."' 
-                           data-name='".$row['name']."' 
-                           data-phone='".$row['phone']."' 
+                           data-id='" . $row['id'] . "' 
+                           data-name='" . $row['name'] . "' 
+                           data-phone='" . $row['phone'] . "' 
     
                            style='color:#007bff'><i class='fa fa-edit'></i></a>  | 
-                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> 
+                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> 
                       </td>";
                 echo "</tr>";
             }
@@ -111,49 +111,50 @@
 
 
 <script>
-(function() {
-    // تشغيل DataTable بالعربية
-        $(document).ready(function() {
-        $('#projectsTable').DataTable({
-                   responsive: true,
-             dom: 'Bfrtip', // Buttons + Search + Pagination
-        buttons: [
-            { extend: 'copy', text: 'نسخ' },
-            { extend: 'excel', text: 'تصدير Excel' },
-            { extend: 'csv', text: 'تصدير CSV' },
-            { extend: 'pdf', text: 'تصدير PDF' },
-            { extend: 'print', text: 'طباعة' }
-        ],
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
-            }
+    (function () {
+        // تشغيل DataTable بالعربية
+        $(document).ready(function () {
+            $('#projectsTable').DataTable({
+                responsive: true,
+                dom: 'Bfrtip', // Buttons + Search + Pagination
+                buttons: [
+                    { extend: 'copy', text: 'نسخ' },
+                    { extend: 'excel', text: 'تصدير Excel' },
+                    { extend: 'csv', text: 'تصدير CSV' },
+                    { extend: 'pdf', text: 'تصدير PDF' },
+                    { extend: 'print', text: 'طباعة' }
+                ],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                }
+            });
         });
-    });
 
-    // التحكم في إظهار وإخفاء الفورم
-    const toggleProjectFormBtn = document.getElementById('toggleForm');
-    const projectForm = document.getElementById('projectForm');
-    toggleProjectFormBtn.addEventListener('click', function() {
-        projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
+        // التحكم في إظهار وإخفاء الفورم
+        const toggleProjectFormBtn = document.getElementById('toggleForm');
+        const projectForm = document.getElementById('projectForm');
+        toggleProjectFormBtn.addEventListener('click', function () {
+            projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
             // تنظيف الحقول عند الإضافة
-        $("#drivers_id").val("");
-        $("#name").val("");
-        $("#phone").val("");
-    });
+            $("#drivers_id").val("");
+            $("#name").val("");
+            $("#phone").val("");
+        });
 
-      // عند الضغط على زر تعديل
-    $(document).on("click", ".editBtn", function() {
-        $("#drivers_id").val($(this).data("id"));
-        $("#name").val($(this).data("name"));
-        $("#phone").val($(this).data("phone"));
+        // عند الضغط على زر تعديل
+        $(document).on("click", ".editBtn", function () {
+            $("#drivers_id").val($(this).data("id"));
+            $("#name").val($(this).data("name"));
+            $("#phone").val($(this).data("phone"));
 
-        $("#projectForm").show();
-        $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
-    });
+            $("#projectForm").show();
+            $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
+        });
 
 
-})();
+    })();
 </script>
 
 </body>
+
 </html>
