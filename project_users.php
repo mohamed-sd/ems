@@ -12,7 +12,7 @@ include 'config.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> إيكوبيشن | المستخدمين </title>
+    <title> إيكوبيشن | مستخدمين مدير الموقع </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
     <!-- DataTables CSS -->
@@ -31,7 +31,7 @@ include 'config.php';
     <div class="main">
 
         <a href="javascript:void(0)" id="toggleForm" class="add">
-            <i class="fa fa-plus"></i> إضافة مستخدم
+            <i class="fa fa-plus"></i> إضافة مشرف
         </a>
 
 
@@ -53,33 +53,18 @@ include 'config.php';
                     <label class="form-label">الدور / الصلاحية</label>
                     <select name="role" class="form-control" required>
                         <option value=""> -- حدد الصلاحية -- </option>
-                        <option value="1"> مدير المشاريع </option>
-                        <option value="2"> مدير الموردين </option>
-                        <option value="3"> مدير المشغلين </option>
-                        <option value="4"> مدير الاسطول </option>
-                        <option value="5"> مدير موقع </option>
+                        <option value="6"> مدخل ساعات عمل </option>
+                        <option value="7"> مراجع ساعات مورد </option>
+                        <option value="8"> مراجع ساعات مشغل</option>
+                        <option value="9"> مراجع الاعطال</option>
                     </select>
                 </div>
                 <div>
                     <label>رقم الهاتف</label>
                     <input type="text" name="phone" placeholder="رقم الهاتف" required />
-                </div>
 
-                <div id="projectDiv" style="display:none;">
-                    <label class="form-label">المشروع</label>
-                    <select id="project_id" name="project_id" class="form-control">
-                        <?php
-                        $sql = "SELECT id, name FROM projects ORDER BY name ASC";
-                        $result = mysqli_query($conn, $sql);
-                        ?>
-                        <div>
-                            <option value="">-- اختر المشروع --</option>
-                            <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                                <option value="<?php echo $row['id']; ?>">
-                                    <?php echo htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>
-                                </option>
-                            <?php endwhile; ?>
-                    </select>
+                    <input type="text" name="parent_id" value="<?php echo $_SESSION['user']['id']; ?>" />
+
                 </div>
 
                 <br />
@@ -117,20 +102,21 @@ include 'config.php';
                     $phone = $_POST['phone'];
                     $role = $_POST['role'];
                     $project = ($role == "5" && !empty($_POST['project_id'])) ? $_POST['project_id'] : 0;
+                    $parent_id = $_POST['parent_id'];
 
 
                     isset($_POST['uid']) ? $uid = $_POST['uid'] : $uid = "0";
 
 
                     mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role , project_id , parent_id , created_at, updated_at) 
-            VALUES ('$name', '$username', '$password', '$phone', '$role' , '$project' , '0' , NOW(), NOW())");
+            VALUES ('$name', '$username', '$password', '$phone', '$role' , '$project' , '$parent_id' , NOW(), NOW())");
                 }
 
                 $userid = $_SESSION['user']['id'];
 
 
                 $query = "SELECT id, name, username,password ,phone, role , created_at, updated_at
-                 FROM users where parent_id LIKE '0' ORDER BY id DESC";
+                 FROM users WHERE parent_id LIKE '$userid' ORDER BY id DESC";
 
 
 
@@ -139,11 +125,10 @@ include 'config.php';
 
 
                 $roles = array(
-                    "1" => "مدير المشاريع",
-                    "2" => "مدير الموردين",
-                    "3" => "مدير المشغلين",
-                    "4" => "مدير الاسطول",
-                    "5" => "مشرف موقع"
+                    "6" => " مدخل ساعات عمل ",
+                    "7" => "مراجع ساعات مورد",
+                    "8" => "مراجع ساعات مشغل",
+                    "9" => "مراجع اعطال ",
                 );
 
                 $i = 1;
@@ -185,41 +170,21 @@ include 'config.php';
 
 
     <script>
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const roleSelect = document.querySelector("select[name='role']");
-            const projectDiv = document.getElementById("projectDiv");
-            const projectSelect = document.getElementById("project_id");
-
-            roleSelect.addEventListener("change", function () {
-                if (this.value === "5") {
-                    projectDiv.style.display = "block";
-                    projectSelect.setAttribute("required", "required");
-                } else {
-                    projectDiv.style.display = "none";
-                    projectSelect.removeAttribute("required");
-                    projectSelect.value = ""; // يمسح أي اختيار سابق
-                }
-            });
-        });
-
-        (function () {
+        $(document).ready(function () {
             // تشغيل DataTable بالعربية
-            $(document).ready(function () {
-                $('#projectsTable').DataTable({
-                    responsive: true,
-                    dom: 'Bfrtip', // Buttons + Search + Pagination
-                    buttons: [
-                        { extend: 'copy', text: 'نسخ' },
-                        { extend: 'excel', text: 'تصدير Excel' },
-                        { extend: 'csv', text: 'تصدير CSV' },
-                        { extend: 'pdf', text: 'تصدير PDF' },
-                        { extend: 'print', text: 'طباعة' }
-                    ],
-                    "language": {
-                        "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
-                    }
-                });
+            $('#projectsTable').DataTable({
+                responsive: true,
+                dom: 'Bfrtip', // Buttons + Search + Pagination
+                buttons: [
+                    { extend: 'copy', text: 'نسخ' },
+                    { extend: 'excel', text: 'تصدير Excel' },
+                    { extend: 'csv', text: 'تصدير CSV' },
+                    { extend: 'pdf', text: 'تصدير PDF' },
+                    { extend: 'print', text: 'طباعة' }
+                ],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                }
             });
 
             // التحكم في إظهار وإخفاء الفورم
@@ -229,8 +194,9 @@ include 'config.php';
             toggleSupplierFormBtn.addEventListener('click', function () {
                 supplierForm.style.display = supplierForm.style.display === "none" ? "block" : "none";
             });
-        })();
+        });
     </script>
+
 
 
 </body>

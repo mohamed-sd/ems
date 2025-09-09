@@ -24,41 +24,41 @@ include("../inheader.php");
                 <input type="hidden" name="suppliers" value="<?php echo $_GET['id']; ?>" placeholder="المورد" required />
             <?php } ?>
             <div>
-            <label> المورد </label>
-             <select name="suppliers" required>
-                <option value="">-- اختر المورد --</option>
-                <?php
-                include '../config.php';
-                $dr_res = mysqli_query($conn, "SELECT id, name FROM suppliers");
-                while ($dr = mysqli_fetch_assoc($dr_res)) {
-                    echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
-                }
-                ?>
-            </select>
+                <label> المورد </label>
+                <select name="suppliers" required>
+                    <option value="">-- اختر المورد --</option>
+                    <?php
+                    include '../config.php';
+                    $dr_res = mysqli_query($conn, "SELECT id, name FROM suppliers");
+                    while ($dr = mysqli_fetch_assoc($dr_res)) {
+                        echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
+                    }
+                    ?>
+                </select>
             </div>
             <div>
-            <label> كود المعدة </label>
-            <input type="text" name="code" placeholder="كود المعدة" required />
+                <label> كود المعدة </label>
+                <input type="text" name="code" placeholder="كود المعدة" required />
             </div>
             <div>
-            <label> نوع المعدة </label>
-            <select name="type">
-                <option value=""> -- حدد نوع المعدة --- </option>
-                <option value="1"> حفار </option>
-                <option value="2"> قلاب </option>
-            </select>
+                <label> نوع المعدة </label>
+                <select name="type">
+                    <option value=""> -- حدد نوع المعدة --- </option>
+                    <option value="1"> حفار </option>
+                    <option value="2"> قلاب </option>
+                </select>
             </div>
             <div>
-            <label> اسم المعدة </label>
-            <input type="text" name="name" placeholder="اسم المعدة" required />
+                <label> اسم المعدة </label>
+                <input type="text" name="name" placeholder="اسم المعدة" required />
             </div>
             <div>
-            <label> الحالة </label>
-            <select name="status" required>
-                <option value=""> -- اختر الحالة -- </option>
-                <option value="1"> متاحة </option>
-                <option value="0"> مشغولة </option>
-            </select>
+                <label> الحالة </label>
+                <select name="status" required>
+                    <option value=""> -- اختر الحالة -- </option>
+                    <option value="1"> متاحة </option>
+                    <option value="0"> مشغولة </option>
+                </select>
             </div>
             <br />
             <button type="submit">حفظ المعدة</button>
@@ -113,13 +113,23 @@ JOIN suppliers s ON m.suppliers = s.id";
                 echo "<td>" . $row['code'] . "</td>";
                 echo "<td>" . $row['type'] . "</td>";
                 echo "<td>" . $row['name'] . "</td>";
-                echo $row['status'] == "1" ? "<td style='color:green;'> متاحة </td>" : "<td style='color:red;'> مشغولة </td>"  ;
-                echo "<td>
-                <a href='add_drivers.php?equipment_id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a</a> | 
+                echo $row['status'] == "1" ? "<td style='color:green;'> متاحة </td>" : "<td style='color:red;'> مشغولة </td>";
+                if ($_SESSION['user']['role'] == "3") {
+                    // في حالة صلاحية مدير مشغلين اظهر اسناد سائق
+                    echo "<td>
+                <a href='add_drivers.php?equipment_id=" . $row['id'] . "' style='color:#007bff'> مشغل </a> | 
                         <a href='edit.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a</a> | 
                         <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
                         <a href='' style='color: #28a745'> <i class='fa fa-eye'></i> </a>
                       </td>";
+                } else {
+                    echo "<td> 
+                        <a href='edit.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a</a> | 
+                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
+                        <a href='' style='color: #28a745'> <i class='fa fa-eye'></i> </a>
+                      </td>";
+                }
+
                 echo "</tr>";
             }
             ?>

@@ -41,7 +41,32 @@ include "config.php";
 
 <div class="main">
 
-<h2>لوحة التحكم الرئيسية</h2>
+<h2>لوحة التحكم الرئيسية</h2> 
+
+<br/> 
+<div style="margin-right: 40px;">
+<?php
+$roles = array(
+    "0" => "مدير",
+    "1" => "مدير المشاريع",
+    "2" => "مدير الموردين",
+    "3" => "مدير المشغلين",
+    "4" => "مدير الأسطول",
+    "5" => "مدير موقع",
+    "6" => "مدخل ساعات عمل",
+    "7" => "مراجع ساعات مورد",
+    "8" => "مراجع ساعات مشغل",
+    "9" => "مراجع الاعطال"
+);
+
+$userRole = $_SESSION['user']['role'];
+$userName = $_SESSION['user']['name'];
+
+echo "<br/> مرحبا بك " . 
+     (isset($roles[$userRole]) ? $roles[$userRole] : "غير معروف") . 
+     " " . htmlspecialchars($userName, ENT_QUOTES, 'UTF-8');
+?>
+</div>
 
 <br/><br/><br/>
 

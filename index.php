@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif (mb_strlen($username) > 50 || mb_strlen($password) > 128) {
                 $error = "المدخلات أكبر من الحد المسموح.";
             } else {
-                $sql = "SELECT id, name, username, password, phone, role, project, created_at, updated_at 
+                $sql = "SELECT id, name, username, password, phone, role, project_id, parent_id ,  created_at, updated_at 
                         FROM users WHERE username = ? LIMIT 1";
                 if ($stmt = mysqli_prepare($conn, $sql)) {
                     mysqli_stmt_bind_param($stmt, "s", $username);
@@ -96,7 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 'username' => $user['username'],
                                 'phone' => $user['phone'],
                                 'role' => $user['role'],
-                                'project' => $user['project'],
+                                'project' => $user['project_id'],
+                                'parent' => $user['parent_id'],
                                 'created_at' => $user['created_at'],
                                 'updated_at' => $user['updated_at'],
                                 'last_login' => date('Y-m-d H:i:s')

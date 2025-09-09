@@ -1,8 +1,8 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
-    exit();
+  header("Location: ../index.php");
+  exit();
 }
 $page_title = "إيكوبيشن | ساعات العمل ";
 include("../inheader.php");
@@ -493,9 +493,9 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
             <label>📝 ملاحظات المشغل</label>
             <textarea name="operator_notes" class="form-control"></textarea>
           </div>
-          
+
           <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
-          
+
 
           <button type="submit">حفظ الساعات</button>
 
@@ -620,6 +620,8 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           JOIN drivers d ON t.driver = d.id
           WHERE t.type LIKE '$type'
           ORDER BY t.id DESC";
+
+          
       $result = mysqli_query($conn, $query);
       $i = 1;
       while ($row = mysqli_fetch_assoc($result)) {
@@ -793,9 +795,9 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
     }
   } else {
     function calculateDiff() {
-      let start = document.getElementById("start_hours").value || 0 ; 
-      let end = document.getElementById("end_hours").value || 0 ; 
-       document.getElementById("counter_diff_display").value = end - start ;
+      let start = document.getElementById("start_hours").value || 0;
+      let end = document.getElementById("end_hours").value || 0;
+      document.getElementById("counter_diff_display").value = end - start;
     }
   }
   // شغل الحساب عند أي تغيير
