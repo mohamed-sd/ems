@@ -29,6 +29,9 @@ if (!isset($_SESSION['user'])) {
 
     <!-- <h2>تفاصيل المشروع</h2> -->
 
+    <a href="supplierscontracts.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
+        <i class="fa fa-plus"></i> العقودات
+    </a>
     <a href="../Equipments/equipments.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
         <i class="fa fa-plus"></i> اضافة آلية
     </a>

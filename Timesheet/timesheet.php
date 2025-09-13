@@ -50,6 +50,9 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
               ?>
             </select>
           </div>
+
+                  <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
+
           <div>
             <label>السائق</label>
             <!-- <select name="driver"  required>
@@ -582,7 +585,8 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           "extra_operator_hours",
           "operator_standby_hours",
           "operator_notes",
-          "type"
+          "type",
+          "user_id"
         ];
 
         $values = [];
