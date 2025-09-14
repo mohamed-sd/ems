@@ -25,7 +25,7 @@ include("../inheader.php");
             <?php } ?>
             <div>
                 <label> المورد </label>
-                <select name="suppliers" required>
+                <select name="suppliers required>
                     <option value="">-- اختر المورد --</option>
                     <?php
                     include '../config.php';
@@ -38,11 +38,11 @@ include("../inheader.php");
             </div>
             <div>
                 <label> كود المعدة </label>
-                <input type="text" name="code" placeholder="كود المعدة" required />
+                <input type="text" name="code" id="code" placeholder="كود المعدة" required />
             </div>
             <div>
                 <label> نوع المعدة </label>
-                <select name="type">
+                <select name="type" id="type">
                     <option value=""> -- حدد نوع المعدة --- </option>
                     <option value="1"> حفار </option>
                     <option value="2"> قلاب </option>
@@ -50,11 +50,11 @@ include("../inheader.php");
             </div>
             <div>
                 <label> اسم المعدة </label>
-                <input type="text" name="name" placeholder="اسم المعدة" required />
+                <input type="text" name="name" id="name" placeholder="اسم المعدة" required />
             </div>
             <div>
                 <label> الحالة </label>
-                <select name="status" required>
+                <select name="status" id="status" required>
                     <option value=""> -- اختر الحالة -- </option>
                     <option value="1"> متاحة </option>
                     <option value="0"> مشغولة </option>
@@ -124,7 +124,7 @@ JOIN suppliers s ON m.suppliers = s.id";
                       </td>";
                 } else {
                     echo "<td> 
-                        <a href='edit.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a</a> | 
+                        <a href='' style='color:#007bff'><i class='fa fa-edit'></i></a</a> | 
                         <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
                         <a href='' style='color: #28a745'> <i class='fa fa-eye'></i> </a>
                       </td>";
