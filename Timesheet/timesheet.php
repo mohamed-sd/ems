@@ -50,7 +50,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
               ?>
             </select>
           </div>
-
+<input type="hidden" name="id" id="timesheet_id" value="">
                   <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
 
           <div>
@@ -75,14 +75,14 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           </div>
           <div>
             <label>الوردية</label>
-            <select name="shift">
+            <select name="shift" id="shift">
               <option value=""> -- اختار الوردية -- </option>
               <option value="D"> صباحية </option>
               <option value="N"> مسائية </option>
             </select>
           </div>
           <div>
-            <input type="date" name="date" required />
+            <input type="date" name="date" id="date" required />
           </div>
 
 
@@ -112,35 +112,35 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
           <div>
             <label>الساعات المنفذة</label>
-            <input type="number" name="executed_hours" value="0">
+            <input type="number" name="executed_hours" id="executed_hours" value="0">
           </div>
           <div>
             <label>ساعات جردل</label>
-            <input type="number" name="bucket_hours" value="0">
+            <input type="number" name="bucket_hours" id="bucket_hours" value="0">
           </div>
           <div>
             <label>ساعات جاك همر</label>
-            <input type="number" name="jackhammer_hours" value="0">
+            <input type="number" name="jackhammer_hours" id="jackhammer_hours" value="0">
           </div>
           <div>
             <label>ساعات إضافية</label>
-            <input type="number" name="extra_hours" value="0">
+            <input type="number" name="extra_hours" id="extra_hours" value="0">
           </div>
           <div>
             <label>مجموع الساعات الإضافية</label>
-            <input type="number" name="extra_hours_total" value="0">
+            <input type="number" name="extra_hours_total" id="extra_hours_total" value="0">
           </div>
           <div>
             <label>ساعات الاستعداد (بسبب العميل)</label>
-            <input type="number" name="standby_hours" value="0">
+            <input type="number" name="standby_hours"  id="standby_hours" value="0">
           </div>
           <div>
             <label>ساعات الاستعداد ( اعتماد )</label>
-            <input type="number" name="dependence_hours" value="0">
+            <input type="number" name="dependence_hours"   id="dependence_hours" value="0">
           </div>
           <div>
             <label>مجموع ساعات العمل</label>
-            <input type="number" name="total_work_hours" value="0" readonly>
+            <input type="number" name="total_work_hours"  id="total_work_hours" value="0" readonly>
           </div>
           <div>
             <label>ملاحظات ساعات العمل</label>
@@ -156,27 +156,27 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
           <div>
             <label>عطل HR</label>
-            <input type="number" name="hr_fault" value="0">
+            <input type="number" name="hr_fault" id="hr_fault" value="0">
           </div>
           <div>
             <label>عطل صيانة</label>
-            <input type="number" name="maintenance_fault" value="0">
+            <input type="number" name="maintenance_fault"  id="maintenance_fault" value="0">
           </div>
           <div>
             <label>عطل تسويق</label>
-            <input type="number" name="marketing_fault" value="0">
+            <input type="number" name="marketing_fault"   id="marketing_fault" value="0">
           </div>
           <div>
             <label>عطل اعتماد</label>
-            <input type="number" name="approval_fault" value="0">
+            <input type="number" name="approval_fault"  id="approval_fault" value="0">
           </div>
           <div>
             <label>ساعات أعطال أخرى</label>
-            <input type="number" name="other_fault_hours" value="0">
+            <input type="number" name="other_fault_hours"  id="other_fault_hours" value="0">
           </div>
           <div>
             <label> مجموع ساعات التعطل</label>
-            <input type="number" name="total_fault_hours" value="0" readonly>
+            <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
           </div>
           <div>
             <label>ملاحظات ساعات الأعطال</label>
@@ -209,23 +209,23 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
           <div>
             <label>نوع العطل</label>
-            <input type="text" name="fault_type" />
+            <input type="text" name="fault_type" id="fault_type"  />
           </div>
           <div>
             <label>قسم العطل</label>
-            <input type="text" name="fault_department" />
+            <input type="text" name="fault_department" id="fault_department"  />
           </div>
           <div>
             <label>الجزء المعطل</label>
-            <input type="text" name="fault_part" />
+            <input type="text" name="fault_part" id="fault_part" />
           </div>
           <div>
             <label>تفاصيل العطل</label>
-            <textarea name="fault_details"></textarea>
+            <textarea name="fault_details" id="fault_details"></textarea>
           </div>
           <div>
             <label>ملاحظات عامة</label>
-            <textarea name="general_notes"></textarea>
+            <textarea name="general_notes" id="general_notes"></textarea>
           </div>
 
           <div></div>
@@ -240,31 +240,32 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
           <div>
             <label>⏱️ ساعات عمل المشغل</label>
-            <input type="text" name="operator_hours" value="0">
+            <input type="text" name="operator_hours" id="operator_hours" value="0">
           </div>
           <div>
             <label>⚙️ ساعات استعداد الآلية</label>
-            <input type="text" name="machine_standby_hours" value="0" readonly>
+            <input type="text" name="machine_standby_hours" id="machine_standby_hours" value="0" readonly>
           </div>
           <div>
             <label>⚙️ ساعات استعداد الجاك همر</label>
-            <input type="text" name="jackhammer_standby_hours" value="0">
+            <input type="text" name="jackhammer_standby_hours" id="jackhammer_standby_hours"  value="0">
           </div>
           <div>
             <label>⚙️ ساعات استعداد الجردل</label>
-            <input type="text" name="bucket_standby_hours" value="0">
+            <input type="text" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
           </div>
           <div>
             <label>➕ الساعات الإضافية</label>
-            <input type="text" name="extra_operator_hours" class="form-control" value="0">
+            <input type="text" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
           </div>
           <div>
             <label>👷 ساعات استعداد المشغل</label>
-            <input type="text" name="operator_standby_hours" class="form-control" value="0">
+            <input type="text" name="operator_standby_hours" id="operator_standby_hours" class="form-control" value="0">
           </div>
           <div>
             <label>📝 ملاحظات المشغل</label>
-            <textarea name="operator_notes" class="form-control"></textarea>
+            <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
+
           </div>
 
           <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
@@ -298,6 +299,9 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
               ?>
             </select>
           </div>
+
+          <input type="hidden" name="id" id="timesheet_id" value="">
+                  <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
           <div>
             <label>السائق</label>
             <!-- <select name="driver"  required>
@@ -320,7 +324,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           </div>
           <div>
             <label>الوردية</label>
-            <select name="shift">
+            <select name="shift" id="shift">
               <option value=""> -- اختار الوردية -- </option>
               <option value="D"> صباحية </option>
               <option value="N"> مسائية </option>
@@ -328,7 +332,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           </div>
           <div>
             <label> التاريخ </label>
-            <input type="date" name="date" required />
+            <input type="date" name="date" id="date" required />
           </div>
 
 
@@ -358,33 +362,33 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
           <div>
             <label>الساعات المنفذة</label>
-            <input type="number" name="executed_hours" value="0">
+            <input type="number" name="executed_hours" id="executed_hours" value="0">
           </div>
 
 
-          <input type="hidden" name="bucket_hours" value="0">
-          <input type="hidden" name="jackhammer_hours" value="0">
-          <input type="hidden" name="extra_hours" value="0">
+          <input type="hidden" name="bucket_hours" id="bucket_hours" value="0">
+          <input type="hidden" name="jackhammer_hours" id="jackhammer_hours" value="0">
+          <input type="hidden" name="extra_hours" id="extra_hours" value="0">
 
           <div>
             <label>مجموع الساعات الإضافية</label>
-            <input type="number" name="extra_hours_total" value="0">
+            <input type="number" name="extra_hours_total" id="extra_hours_total" value="0">
           </div>
           <div>
             <label>ساعات الاستعداد (بسبب العميل)</label>
-            <input type="number" name="standby_hours" value="0">
+            <input type="number" name="standby_hours" id="standby_hours" value="0">
           </div>
           <div>
             <label>ساعات الاستعداد ( اعتماد )</label>
-            <input type="number" name="dependence_hours" value="0">
+            <input type="number" name="dependence_hours" id="dependence_hours" value="0">
           </div>
           <div>
             <label>مجموع ساعات العمل</label>
-            <input type="number" name="total_work_hours" value="0" readonly>
+            <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
           </div>
           <div>
             <label>ملاحظات ساعات العمل</label>
-            <textarea name="work_notes"></textarea>
+            <textarea name="work_notes"  id="work_notes"></textarea>
           </div>
 
           <div></div>
@@ -395,31 +399,31 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
           <div>
             <label>عطل HR</label>
-            <input type="number" name="hr_fault" value="0">
+            <input type="number" name="hr_fault"  id="hr_fault" value="0">
           </div>
           <div>
             <label>عطل صيانة</label>
-            <input type="number" name="maintenance_fault" value="0">
+            <input type="number" name="maintenance_fault"  id="maintenance_fault" value="0">
           </div>
           <div>
             <label>عطل تسويق</label>
-            <input type="number" name="marketing_fault" value="0">
+            <input type="number" name="marketing_fault"  id="marketing_fault" value="0">
           </div>
           <div>
-            <label>عطل اعتماد</label>
-            <input type="number" name="approval_fault" value="0">
+            <label>عطل اعتماد</label> 
+            <input type="number" name="approval_fault" id="approval_fault" value="0">
           </div>
           <div>
             <label>ساعات أعطال أخرى</label>
-            <input type="number" name="other_fault_hours" value="0">
+            <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
           </div>
           <div>
             <label> مجموع ساعات التعطل</label>
-            <input type="number" name="total_fault_hours" value="0" readonly>
+            <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
           </div>
           <div>
             <label>ملاحظات ساعات الأعطال</label>
-            <textarea name="fault_notes"></textarea>
+            <textarea name="fault_notes" id="fault_notes"></textarea>
           </div>
 
           <div>
@@ -448,23 +452,23 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
           <div>
             <label>نوع العطل</label>
-            <input type="text" name="fault_type" />
+            <input type="text" name="fault_type" id="fault_type" />
           </div>
           <div>
-            <label>قسم العطل</label>
-            <input type="text" name="fault_department" />
+            <label>قسم العطل</label> 
+            <input type="text" name="fault_department" id="fault_department" />
           </div>
           <div>
             <label>الجزء المعطل</label>
-            <input type="text" name="fault_part" />
+            <input type="text" name="fault_part" id="fault_part" />
           </div>
           <div>
             <label>تفاصيل العطل</label>
-            <textarea name="fault_details"></textarea>
+            <textarea name="fault_details" id="fault_details"></textarea>
           </div>
           <div>
             <label>ملاحظات عامة</label>
-            <textarea name="general_notes"></textarea>
+            <textarea name="general_notes" id="general_notes"></textarea>
           </div>
 
           <div></div>
@@ -479,22 +483,22 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
           <div>
             <label>⏱️ ساعات عمل المشغل</label>
-            <input type="text" name="operator_hours" value="0">
+            <input type="text" name="operator_hours" id="operator_hours" value="0">
           </div>
           <div>
             <label>⚙️ ساعات استعداد الآلية</label>
-            <input type="text" name="machine_standby_hours" value="0" readonly>
+            <input type="text" name="machine_standby_hours"  value="0" readonly>
           </div>
-          <input type="hidden" name="jackhammer_standby_hours" value="0">
-          <input type="hidden" name="bucket_standby_hours" value="0">
-          <input type="hidden" name="extra_operator_hours" class="form-control" value="0">
+          <input type="hidden" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
+          <input type="hidden" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
+          <input type="hidden" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
           <div>
             <label>👷 ساعات استعداد المشغل</label>
             <input type="text" name="operator_standby_hours" class="form-control" value="0">
           </div>
           <div>
             <label>📝 ملاحظات المشغل</label>
-            <textarea name="operator_notes" class="form-control"></textarea>
+            <textarea name="operator_notes" id="operator_notes"  class="form-control"></textarea>
           </div>
 
           <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
@@ -543,6 +547,8 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
 
       if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
+
+            $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
         // تأمين القيم من الفورم
         $fields = [
           "operator",
@@ -595,15 +601,25 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           $values[$f] = $val;
         }
 
+ if ($id > 0) {
+        // UPDATE
+        $update_parts = [];
+        foreach ($fields as $f) {
+            $update_parts[] = "$f = '" . $values[$f] . "'";
+        }
+        $sql = "UPDATE timesheet SET " . implode(',', $update_parts) . " WHERE id = $id";
+    } else {
         // بناء الاستعلام
         $sql = "INSERT INTO timesheet (" . implode(",", $fields) . ")
             VALUES ('" . implode("','", $values) . "')";
+    }
 
-        if (mysqli_query($conn, $sql)) {
-          echo "<script>alert('✅ تم حفظ الساعات بنجاح');</script>";
-        } else {
-          echo "<script>alert('❌ خطأ في الحفظ: " . mysqli_error($conn) . "');</script>";
-        }
+       if (mysqli_query($conn, $sql)) {
+        echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='timesheet.php?type=" . urlencode($type) . "';</script>";
+        exit;
+    } else {
+        echo "<script>alert('❌ خطأ في الحفظ: " . mysqli_real_escape_string($conn, mysqli_error($conn)) . "');</script>";
+    }
       }
 
       $type = $_GET['type'];
@@ -648,7 +664,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
         // echo "<td>" . $row['hr_fault'] . "</td>";
         echo "<td>" . $row['total_fault_hours'] . "</td>";
         echo "<td>
-                        <a href='edit_timesheet.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
+                           <a href='javascript:void(0)' class='editBtn' data-id='".$row['id']."' style='color:#007bff'><i class='fa fa-edit'></i></a>  | 
                         <a href='delete_timesheet.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> |
                          <a href='timesheet_details.php?id=" . $row['id'] . "'  style='color: #28a745'> <i class='fa fa-eye'></i> </a>
                       </td>";
@@ -859,6 +875,77 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
       }
     });
   });
+
+
+  $(document).on("click", ".editBtn", function() {
+    var id = $(this).data("id");
+    if (!id) return;
+    $.getJSON("get_timesheet.php", { id: id }, function(data) {
+      if (!data || !data.id) {
+        alert("لم أستطع جلب بيانات السجل.");
+        return;
+      }
+
+      $("#timesheet_id").val(data.id);
+      $("#operator").val(data.operator).trigger('change');
+
+      // بعد تحميل السائقين من AJAX نضبط السائق المحدد (ننتظر قليلاً)
+      setTimeout(function(){
+        $("#driver").val(data.driver);
+      }, 300);
+
+      $("#shift").val(data.shift);
+      $("#date").val(data.date);
+      $("#shift_hours").val(data.shift_hours);
+      $("#executed_hours").val(data.executed_hours);
+      $("#bucket_hours").val(data.bucket_hours);
+      $("#jackhammer_hours").val(data.jackhammer_hours);
+      $("#extra_hours").val(data.extra_hours);
+      $("#extra_hours_total").val(data.extra_hours_total);
+      $("#standby_hours").val(data.standby_hours);
+      $("#dependence_hours").val(data.dependence_hours);
+      $("#total_work_hours").val(data.total_work_hours);
+      $("#work_notes").val(data.work_notes);
+
+      $("#hr_fault").val(data.hr_fault);
+      $("#maintenance_fault").val(data.maintenance_fault);
+      $("#marketing_fault").val(data.marketing_fault);
+      $("#approval_fault").val(data.approval_fault);
+      $("#other_fault_hours").val(data.other_fault_hours);
+      $("#total_fault_hours").val(data.total_fault_hours);
+      $("#fault_notes").val(data.fault_notes);
+
+      $("#start_hours").val(data.start_hours);
+      $("#start_minutes").val(data.start_minutes);
+      $("#start_seconds").val(data.start_seconds);
+      $("#end_hours").val(data.end_hours);
+      $("#end_minutes").val(data.end_minutes);
+      $("#end_seconds").val(data.end_seconds);
+      $("#counter_diff_display").val(data.counter_diff_display || "");
+      $("#counter_diff").val(data.counter_diff || 0);
+
+      $("#fault_type").val(data.fault_type);
+      $("#fault_department").val(data.fault_department);
+      $("#fault_part").val(data.fault_part);
+      $("#fault_details").val(data.fault_details);
+      $("#general_notes").val(data.general_notes);
+
+      $("#operator_hours").val(data.operator_hours);
+      $("#machine_standby_hours").val(data.machine_standby_hours);
+      $("#jackhammer_standby_hours").val(data.jackhammer_standby_hours);
+      $("#bucket_standby_hours").val(data.bucket_standby_hours);
+      $("#extra_operator_hours").val(data.extra_operator_hours);
+      $("#operator_standby_hours").val(data.operator_standby_hours);
+      $("#operator_notes").val(data.operator_notes);
+
+      $("#projectForm").show();
+      $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
+    })
+    .fail(function() {
+      alert("خطأ في جلب بيانات التايم شيت.");
+    });
+  });
+
 
 </script>
 

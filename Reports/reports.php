@@ -68,6 +68,9 @@ WHERE 1=1
                 <button class="add"><a href="contract_report.php"><i class="fa fa-clock"></i> <span>العقد  </span></a></button>
                                 <button class="add"><a href="contractall.php"><i class="fa fa-clock"></i> <span>احصائيات العقد  </span></a></button>
 
+                        <button class="add"><a href="driverAndsupplerscontract.php"><i class="fa fa-clock"></i> <span> احصائيات العقود</span></a></button>
+
+
 
 
         <br/>

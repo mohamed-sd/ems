@@ -85,6 +85,7 @@ include("../inheader.php");
     
                            style='color:#007bff'><i class='fa fa-edit'></i></a>  | 
                         <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> 
+                        <a href='drivercontracts.php?id=".$row['id']."' style='color: #28a745'><i class='fa fa-eye'></i></a>
                       </td>";
                 echo "</tr>";
             }
