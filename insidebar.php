@@ -17,6 +17,8 @@
       <?php // صلاحيات مدير المشاريع === 1
       if ($_SESSION['user']['role'] == "1") { ?>
         <li><a href="../Projects/projects.php"><i class="fa fa-folder-open"></i> <span>المشاريع</span></a></li>
+        <li><a href="../users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
+        <li><a href="../Reports/new_reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
       <?php } ?>
 
       <?php // صلاحيات مدير الموردين === 2
@@ -53,11 +55,13 @@
 
       <?php // صلاحيات مراجع ساعات المورد والمشغل === 7 8 
       if ($_SESSION['user']['role'] == "7" || $_SESSION['user']['role'] == "8") { ?>
-        <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
+        <!-- <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
+        <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a>
       <?php } ?>
 
       <?php // صلاحيات مراجع الاعطال === 9 
       if ($_SESSION['user']['role'] == "9") { ?>
+      <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a>
       <?php } ?>
 
       <li><a href="../settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
