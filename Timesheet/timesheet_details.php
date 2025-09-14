@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: ../index.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -211,6 +218,10 @@ while ($row = mysqli_fetch_assoc($result)) {
 <tr class="o"> 
     <th> ملاحظات المشغل  </th>
     <th><?php echo $row['operator_notes']; ?></th>
+</tr>
+<tr class="t"> 
+    <th> ملاحظات مشرفين الساعات  </th>
+    <th><?php echo $row['time_notes']; ?></th>
 </tr>
 
 

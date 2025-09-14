@@ -50,8 +50,8 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
               ?>
             </select>
           </div>
-<input type="hidden" name="id" id="timesheet_id" value="">
-                  <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
+          <input type="hidden" name="id" id="timesheet_id" value="">
+          <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
 
           <div>
             <label>السائق</label>
@@ -132,15 +132,15 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           </div>
           <div>
             <label>ساعات الاستعداد (بسبب العميل)</label>
-            <input type="number" name="standby_hours"  id="standby_hours" value="0">
+            <input type="number" name="standby_hours" id="standby_hours" value="0">
           </div>
           <div>
             <label>ساعات الاستعداد ( اعتماد )</label>
-            <input type="number" name="dependence_hours"   id="dependence_hours" value="0">
+            <input type="number" name="dependence_hours" id="dependence_hours" value="0">
           </div>
           <div>
             <label>مجموع ساعات العمل</label>
-            <input type="number" name="total_work_hours"  id="total_work_hours" value="0" readonly>
+            <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
           </div>
           <div>
             <label>ملاحظات ساعات العمل</label>
@@ -160,19 +160,19 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           </div>
           <div>
             <label>عطل صيانة</label>
-            <input type="number" name="maintenance_fault"  id="maintenance_fault" value="0">
+            <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
           </div>
           <div>
             <label>عطل تسويق</label>
-            <input type="number" name="marketing_fault"   id="marketing_fault" value="0">
+            <input type="number" name="marketing_fault" id="marketing_fault" value="0">
           </div>
           <div>
             <label>عطل اعتماد</label>
-            <input type="number" name="approval_fault"  id="approval_fault" value="0">
+            <input type="number" name="approval_fault" id="approval_fault" value="0">
           </div>
           <div>
             <label>ساعات أعطال أخرى</label>
-            <input type="number" name="other_fault_hours"  id="other_fault_hours" value="0">
+            <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
           </div>
           <div>
             <label> مجموع ساعات التعطل</label>
@@ -209,11 +209,11 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
           <div>
             <label>نوع العطل</label>
-            <input type="text" name="fault_type" id="fault_type"  />
+            <input type="text" name="fault_type" id="fault_type" />
           </div>
           <div>
             <label>قسم العطل</label>
-            <input type="text" name="fault_department" id="fault_department"  />
+            <input type="text" name="fault_department" id="fault_department" />
           </div>
           <div>
             <label>الجزء المعطل</label>
@@ -248,7 +248,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           </div>
           <div>
             <label>⚙️ ساعات استعداد الجاك همر</label>
-            <input type="text" name="jackhammer_standby_hours" id="jackhammer_standby_hours"  value="0">
+            <input type="text" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
           </div>
           <div>
             <label>⚙️ ساعات استعداد الجردل</label>
@@ -301,7 +301,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           </div>
 
           <input type="hidden" name="id" id="timesheet_id" value="">
-                  <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
+          <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
           <div>
             <label>السائق</label>
             <!-- <select name="driver"  required>
@@ -388,7 +388,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           </div>
           <div>
             <label>ملاحظات ساعات العمل</label>
-            <textarea name="work_notes"  id="work_notes"></textarea>
+            <textarea name="work_notes" id="work_notes"></textarea>
           </div>
 
           <div></div>
@@ -399,18 +399,18 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
           <div>
             <label>عطل HR</label>
-            <input type="number" name="hr_fault"  id="hr_fault" value="0">
+            <input type="number" name="hr_fault" id="hr_fault" value="0">
           </div>
           <div>
             <label>عطل صيانة</label>
-            <input type="number" name="maintenance_fault"  id="maintenance_fault" value="0">
+            <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
           </div>
           <div>
             <label>عطل تسويق</label>
-            <input type="number" name="marketing_fault"  id="marketing_fault" value="0">
+            <input type="number" name="marketing_fault" id="marketing_fault" value="0">
           </div>
           <div>
-            <label>عطل اعتماد</label> 
+            <label>عطل اعتماد</label>
             <input type="number" name="approval_fault" id="approval_fault" value="0">
           </div>
           <div>
@@ -455,7 +455,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
             <input type="text" name="fault_type" id="fault_type" />
           </div>
           <div>
-            <label>قسم العطل</label> 
+            <label>قسم العطل</label>
             <input type="text" name="fault_department" id="fault_department" />
           </div>
           <div>
@@ -487,7 +487,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           </div>
           <div>
             <label>⚙️ ساعات استعداد الآلية</label>
-            <input type="text" name="machine_standby_hours"  value="0" readonly>
+            <input type="text" name="machine_standby_hours" value="0" readonly>
           </div>
           <input type="hidden" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
           <input type="hidden" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
@@ -498,7 +498,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           </div>
           <div>
             <label>📝 ملاحظات المشغل</label>
-            <textarea name="operator_notes" id="operator_notes"  class="form-control"></textarea>
+            <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
           </div>
 
           <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
@@ -538,6 +538,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
         <!-- <th style="text-align: right;"> ملاحظات العمل </th> -->
         <!-- <th style="text-align: right;"> عطل HR </th> -->
         <th style="text-align: right;"> الاعطال </th>
+        <th style="text-align: right;"> الحالة </th>
         <!-- <th>جاك هامر</th> -->
         <th>إجراءات</th>
       </tr>
@@ -548,7 +549,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 
       if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
 
-            $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
         // تأمين القيم من الفورم
         $fields = [
           "operator",
@@ -601,25 +602,25 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           $values[$f] = $val;
         }
 
- if ($id > 0) {
-        // UPDATE
-        $update_parts = [];
-        foreach ($fields as $f) {
+        if ($id > 0) {
+          // UPDATE
+          $update_parts = [];
+          foreach ($fields as $f) {
             $update_parts[] = "$f = '" . $values[$f] . "'";
-        }
-        $sql = "UPDATE timesheet SET " . implode(',', $update_parts) . " WHERE id = $id";
-    } else {
-        // بناء الاستعلام
-        $sql = "INSERT INTO timesheet (" . implode(",", $fields) . ")
+          }
+          $sql = "UPDATE timesheet SET " . implode(',', $update_parts) . " WHERE id = $id";
+        } else {
+          // بناء الاستعلام
+          $sql = "INSERT INTO timesheet (" . implode(",", $fields) . ")
             VALUES ('" . implode("','", $values) . "')";
-    }
+        }
 
-       if (mysqli_query($conn, $sql)) {
-        echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='timesheet.php?type=" . urlencode($type) . "';</script>";
-        exit;
-    } else {
-        echo "<script>alert('❌ خطأ في الحفظ: " . mysqli_real_escape_string($conn, mysqli_error($conn)) . "');</script>";
-    }
+        if (mysqli_query($conn, $sql)) {
+          echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='timesheet.php?type=" . urlencode($type) . "';</script>";
+          exit;
+        } else {
+          echo "<script>alert('❌ خطأ في الحفظ: " . mysqli_real_escape_string($conn, mysqli_error($conn)) . "');</script>";
+        }
       }
 
       $type = $_GET['type'];
@@ -627,12 +628,12 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
       // عرض البيانات
       $query = "SELECT t.id, t.shift, t.date, t.executed_hours ,
         t.standby_hours , t.total_fault_hours ,bucket_hours,jackhammer_hours,
-        extra_hours,extra_hours_total,dependence_hours,	total_work_hours,
+        extra_hours,extra_hours_total,dependence_hours,	total_work_hours, t.status ,
         work_notes,hr_fault,
                  e.code AS eq_code, e.name AS eq_name,
                  p.name AS project_name,
                  o.id AS operation_id,
-                 d.name AS driver_name
+                 d.name AS driver_name 
           FROM timesheet t
           JOIN operations o ON t.operator = o.id
           JOIN equipments e ON o.equipment = e.id
@@ -641,10 +642,26 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           WHERE t.type LIKE '$type'
           ORDER BY t.id DESC";
 
-          
+
       $result = mysqli_query($conn, $query);
       $i = 1;
       while ($row = mysqli_fetch_assoc($result)) {
+
+        // The Variable that take the status value
+        switch ($row['status']) {
+          case "1":
+            $status = "<font color='grey'> تحت المراجعة </font>";
+            break;
+          case "2":
+            $status = "<font color='green'> تم الاعتماد </font>";
+            break;
+          case "3":
+            $status = "<font color='red'> تم الرفض </font>";
+            break;
+          default:
+            $status = "غير معروف";
+        }
+
         echo "<tr>";
         echo "<td>" . $i++ . "</td>";
         echo "<td>" . $row['eq_code'] . " - " . $row['eq_name'] . "</td>";
@@ -663,11 +680,14 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
         // echo "<td>" . $row['work_notes'] . "</td>";
         // echo "<td>" . $row['hr_fault'] . "</td>";
         echo "<td>" . $row['total_fault_hours'] . "</td>";
+        echo "<td>" . $status . "</td>";
         echo "<td>
-                           <a href='javascript:void(0)' class='editBtn' data-id='".$row['id']."' style='color:#007bff'><i class='fa fa-edit'></i></a>  | 
-                        <a href='delete_timesheet.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> |
-                         <a href='timesheet_details.php?id=" . $row['id'] . "'  style='color: #28a745'> <i class='fa fa-eye'></i> </a>
-                      </td>";
+        <a href='aprovment.php?t=".$type."&&type=1&&id=" . $row['id'] . "'  style='color: #28a745'> <i class='fa fa-check'></i> </a> |
+        <a href='aprovment.php?t=".$type."&&type=2&&id=" . $row['id'] . "'  style='color: #dc3545'> <i class='fa fa-close'></i> </a> |
+        <a href='javascript:void(0)' class='editBtn' data-id='" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a>  | 
+        <a href='delete_timesheet.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> |
+        <a href='timesheet_details.php?id=" . $row['id'] . "'  style='color: #28a745'> <i class='fa fa-eye'></i> </a>  
+        </td>";
         echo "</tr>";
       }
       ?>
@@ -877,10 +897,10 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
   });
 
 
-  $(document).on("click", ".editBtn", function() {
+  $(document).on("click", ".editBtn", function () {
     var id = $(this).data("id");
     if (!id) return;
-    $.getJSON("get_timesheet.php", { id: id }, function(data) {
+    $.getJSON("get_timesheet.php", { id: id }, function (data) {
       if (!data || !data.id) {
         alert("لم أستطع جلب بيانات السجل.");
         return;
@@ -890,7 +910,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
       $("#operator").val(data.operator).trigger('change');
 
       // بعد تحميل السائقين من AJAX نضبط السائق المحدد (ننتظر قليلاً)
-      setTimeout(function(){
+      setTimeout(function () {
         $("#driver").val(data.driver);
       }, 300);
 
@@ -941,9 +961,9 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
       $("#projectForm").show();
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
     })
-    .fail(function() {
-      alert("خطأ في جلب بيانات التايم شيت.");
-    });
+      .fail(function () {
+        alert("خطأ في جلب بيانات التايم شيت.");
+      });
   });
 
 
