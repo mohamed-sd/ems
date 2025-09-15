@@ -9,74 +9,89 @@ include("../inheader.php");
 ?>
 <?php include('../insidebar.php'); ?>
 <div class="main">
-    <!--  <h2>المشاريع</h2> -->
-    <a href="javascript:void(0)" id="toggleForm" class="add">
-        <i class="fa fa-plus"></i> اضافة سائق
-    </a>
+    <div class="aligin">
+        <a href="javascript:void(0)" id="toggleForm" class="add">
+            <i class="fa fa-plus"></i> اضافة مشغل
+        </a>
+    </div>
     <!-- فورم إضافة مشروع -->
     <form id="projectForm" action="" method="post">
-        <input type="hidden" name="id" id="drivers_id" value="">
-
-        <input type="text" name="name" id="name" placeholder="اسم السائق" required />
-        <input type="text" name="phone" id="phone" placeholder="رقم الهاتف " required />
-        <br />
-        <button type="submit">حفظ السائق</button>
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"> اضافة/ تعديل مشغل </h5>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
+                    <div>
+                        <input type="hidden" name="id" id="drivers_id" value="">
+                        <label for="name"> اسم المشغل </label>
+                        <input type="text" name="name" id="name" placeholder="اسم المشغل" required />
+                    </div>
+                    <div>
+                        <label for="phone"> رقم الهاتف </label>
+                        <input type="text" name="phone" id="phone" placeholder="رقم الهاتف " required />
+                    </div>
+                    <br />
+                    <button type="submit"> حفظ </button>
+                </div>
+            </div>
+        </div>
     </form>
 
-    <br /> <br /> <br />
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"> قائمة المشغلين</h5>
+        </div>
+        <div class="card-body">
+            <table id="projectsTable" class="display" style="width:100%; margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th style="text-align: right;">اسم السائق</th>
+                        <th style="text-align: right;"> الهاتف </th>
 
-    <!-- جدول المشاريع -->
-    <h3>قائمة السائقين</h3>
-    <br />
-    <table id="projectsTable" class="display" style="width:100%; margin-top: 20px;">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th style="text-align: right;">اسم السائق</th>
-                <th style="text-align: right;"> الهاتف </th>
+                        <th style="text-align: right;">إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    include '../config.php';
 
-                <th style="text-align: right;">إجراءات</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            include '../config.php';
+                    // إضافة سائق جديد عند إرسال الفورم
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
+                        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
 
-            // إضافة سائق جديد عند إرسال الفورم
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
-                $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-
-                $name = mysqli_real_escape_string($conn, $_POST['name']);
-                $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+                        $name = mysqli_real_escape_string($conn, $_POST['name']);
+                        $phone = mysqli_real_escape_string($conn, $_POST['phone']);
 
 
-                // mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
-            
+                        // mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
+                    
 
-                if ($id > 0) {
-                    // تحديث
-                    mysqli_query($conn, "UPDATE drivers SET name='$name', phone='$phone' WHERE id=$id");
-                    echo "<script>window.location.href='drivers.php';</script>";
-                    exit;
-                } else {
-                    // إضافة
-                    mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
-                     echo "<script>window.location.href='drivers.php';</script>";
-                    exit;
-                }
-            }
+                        if ($id > 0) {
+                            // تحديث
+                            mysqli_query($conn, "UPDATE drivers SET name='$name', phone='$phone' WHERE id=$id");
+                            echo "<script>window.location.href='drivers.php';</script>";
+                            exit;
+                        } else {
+                            // إضافة
+                            mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
+                            echo "<script>window.location.href='drivers.php';</script>";
+                            exit;
+                        }
+                    }
 
-            // جلب المشاريع
-            $query = "SELECT `id`, `name`, `phone` FROM drivers ORDER BY id DESC";
-            $result = mysqli_query($conn, $query);
-            $i = 1;
-            while ($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>";
-                echo "<td>" . $i++ . "</td>";
-                echo "<td>" . $row['name'] . "</td>";
-                echo "<td>" . $row['phone'] . "</td>";
+                    // جلب المشاريع
+                    $query = "SELECT `id`, `name`, `phone` FROM drivers ORDER BY id DESC";
+                    $result = mysqli_query($conn, $query);
+                    $i = 1;
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<tr>";
+                        echo "<td>" . $i++ . "</td>";
+                        echo "<td>" . $row['name'] . "</td>";
+                        echo "<td>" . $row['phone'] . "</td>";
 
-                echo "<td>
+                        echo "<td>
                          <a href='javascript:void(0)' 
                            class='editBtn' 
                            data-id='" . $row['id'] . "' 
@@ -85,13 +100,16 @@ include("../inheader.php");
     
                            style='color:#007bff'><i class='fa fa-edit'></i></a>  | 
                         <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> 
-                        <a href='drivercontracts.php?id=".$row['id']."' style='color: #28a745'><i class='fa fa-eye'></i></a>
+                        <a href='drivercontracts.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a>
                       </td>";
-                echo "</tr>";
-            }
-            ?>
-        </tbody>
-    </table>
+                        echo "</tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 
 </div>
 

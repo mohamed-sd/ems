@@ -238,9 +238,13 @@ body {
   display: inline-block;
 }
 
+.main .aligin{
+  text-align: end;
+}
+
 .main .add {
   display: inline-block;
-  margin: 15px 0;
+  margin: 18px 0;
   padding: 10px 15px;
   background: var(--equipation-gold);
   color: #000;
@@ -248,7 +252,6 @@ body {
   border-radius: 8px;
   font-weight: bold;
   transition: background 0.3s;
-  margin-right: 40px;
 }
 
 .main .add:hover {
@@ -258,9 +261,9 @@ body {
 /* ================== Project Form ================== */
 #projectForm {
   display: none;
-  margin-top: 20px;
+  margin-bottom: 10px;
   background: var(--light-gray);
-  padding: 25px;
+  /* padding: 25px; */
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.4s ease-in-out;
@@ -276,7 +279,7 @@ body {
 
 #projectForm .form-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   /* Desktop: 4 في الصف */
   gap: 20px;
 }
@@ -308,16 +311,16 @@ body {
 }
 
 #projectForm button {
-  grid-column: span 4;
+  grid-column: span 5;
   /* زر ياخذ صف كامل */
-  padding: 14px;
+  padding: 10px;
   background: var(--btn-color);
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
   font-size: 16px;
-  color: #fff;
+  color: #000;
   transition: background 0.3s;
 }
 

@@ -11,132 +11,142 @@ include("../inheader.php");
 <?php include('../insidebar.php'); ?>
 
 <div class="main">
-
-    <a href="javascript:void(0)" id="toggleForm" class="add">
-        <i class="fa fa-plus"></i> اضافة معدة
-    </a>
+    <div class="aligin">
+        <a href="javascript:void(0)" id="toggleForm" class="add">
+            <i class="fa fa-plus"></i> اضافة معدة
+        </a>
+    </div>
 
     <!-- فورم إضافة معدة -->
     <form id="projectForm" action="" method="post" style="display:none;">
-        <div class="form-grid">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"> اضافة/ تعديل آلية </h5>
+            </div>
+            <div class="card-body">
+                <div class="form-grid">
 
-            <?php if (isset($_GET['id'])) { ?>
-                <input type="hidden" name="suppliers" value="<?php echo $_GET['id']; ?>" placeholder="المورد" required />
-            <?php } ?>
-            <div>
-                <label> المورد </label>
-                <select name="suppliers" required>
-                    <option value="">-- اختر المورد --</option>
-                    <?php
-                    include '../config.php';
-                    $dr_res = mysqli_query($conn, "SELECT id, name FROM suppliers");
-                    while ($dr = mysqli_fetch_assoc($dr_res)) {
-                        echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
-                    }
-                    ?>
-                </select>
+                    <?php if (isset($_GET['id'])) { ?>
+                        <input type="hidden" name="suppliers" value="<?php echo $_GET['id']; ?>" placeholder="المورد"
+                            required />
+                    <?php } ?>
+                    <div>
+                        <label> المورد </label>
+                        <select name="suppliers" required>
+                            <option value="">-- اختر المورد --</option>
+                            <?php
+                            include '../config.php';
+                            $dr_res = mysqli_query($conn, "SELECT id, name FROM suppliers");
+                            while ($dr = mysqli_fetch_assoc($dr_res)) {
+                                echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label> كود المعدة </label>
+                        <input type="text" name="code" id="code" placeholder="كود المعدة" required />
+                    </div>
+                    <div>
+                        <label> نوع المعدة </label>
+                        <select name="type" id="type">
+                            <option value=""> -- حدد نوع المعدة --- </option>
+                            <option value="1"> حفار </option>
+                            <option value="2"> قلاب </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label> اسم المعدة </label>
+                        <input type="text" name="name" id="name" placeholder="اسم المعدة" required />
+                    </div>
+                    <div>
+                        <label> الحالة </label>
+                        <select name="status" id="status" required>
+                            <option value=""> -- اختر الحالة -- </option>
+                            <option value="1"> متاحة </option>
+                            <option value="0"> مشغولة </option>
+                        </select>
+                    </div>
+                    <button type="submit">حفظ المعدة</button>
+                </div>
             </div>
-            <div>
-                <label> كود المعدة </label>
-                <input type="text" name="code" id="code" placeholder="كود المعدة" required />
-            </div>
-            <div>
-                <label> نوع المعدة </label>
-                <select name="type" id="type">
-                    <option value=""> -- حدد نوع المعدة --- </option>
-                    <option value="1"> حفار </option>
-                    <option value="2"> قلاب </option>
-                </select>
-            </div>
-            <div>
-                <label> اسم المعدة </label>
-                <input type="text" name="name" id="name" placeholder="اسم المعدة" required />
-            </div>
-            <div>
-                <label> الحالة </label>
-                <select name="status" id="status" required>
-                    <option value=""> -- اختر الحالة -- </option>
-                    <option value="1"> متاحة </option>
-                    <option value="0"> مشغولة </option>
-                </select>
-            </div>
-            <br />
-            <button type="submit">حفظ المعدة</button>
         </div>
     </form>
 
-    <br /><br /><br />
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"> قائمة المعدات</h5>
+        </div>
+        <div class="card-body">
+            <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th style="text-align: right;">المورد</th>
+                        <th style="text-align: right;">كود المعدة</th>
+                        <th style="text-align: right;">النوع</th>
+                        <th style="text-align: right;">الاسم</th>
+                        <th style="text-align: right;">الحالة</th>
+                        <th style="text-align: right;">إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    include '../config.php';
 
-    <!-- جدول المعدات -->
-    <h3>قائمة المعدات</h3>
-    <br />
-    <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th style="text-align: right;">المورد</th>
-                <th style="text-align: right;">كود المعدة</th>
-                <th style="text-align: right;">النوع</th>
-                <th style="text-align: right;">الاسم</th>
-                <th style="text-align: right;">الحالة</th>
-                <th style="text-align: right;">إجراءات</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            include '../config.php';
+                    // إضافة معدة جديدة عند إرسال الفورم
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
+                        $suppliers = mysqli_real_escape_string($conn, $_POST['suppliers']);
+                        $code = mysqli_real_escape_string($conn, $_POST['code']);
+                        $type = mysqli_real_escape_string($conn, $_POST['type']);
+                        $name = mysqli_real_escape_string($conn, $_POST['name']);
+                        $status = mysqli_real_escape_string($conn, $_POST['status']);
+                        mysqli_query($conn, "INSERT INTO equipments (suppliers, code, type, name, status) VALUES ('$suppliers', '$code', '$type', '$name', '$status')");
+                    }
 
-            // إضافة معدة جديدة عند إرسال الفورم
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
-                $suppliers = mysqli_real_escape_string($conn, $_POST['suppliers']);
-                $code = mysqli_real_escape_string($conn, $_POST['code']);
-                $type = mysqli_real_escape_string($conn, $_POST['type']);
-                $name = mysqli_real_escape_string($conn, $_POST['name']);
-                $status = mysqli_real_escape_string($conn, $_POST['status']);
-                mysqli_query($conn, "INSERT INTO equipments (suppliers, code, type, name, status) VALUES ('$suppliers', '$code', '$type', '$name', '$status')");
-            }
+                    // جلب المعدات
+                    $query = "SELECT `id`, `suppliers`, `code`, `type`, `name`, `status` FROM `equipments` ORDER BY id DESC";
 
-            // جلب المعدات
-            $query = "SELECT `id`, `suppliers`, `code`, `type`, `name`, `status` FROM `equipments` ORDER BY id DESC";
-
-            $query2 = "SELECT m.id, s.name AS supplier_name, m.type, m.code, m.name , m.status 
+                    $query2 = "SELECT m.id, s.name AS supplier_name, m.type, m.code, m.name , m.status 
 FROM equipments m
 
 JOIN suppliers s ON m.suppliers = s.id";
 
-            $result = mysqli_query($conn, $query2);
-            $i = 1;
-            while ($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>";
-                echo "<td>" . $i++ . "</td>";
-                echo "<td>" . $row['supplier_name'] . "</td>";
-                echo "<td>" . $row['code'] . "</td>";
+                    $result = mysqli_query($conn, $query2);
+                    $i = 1;
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<tr>";
+                        echo "<td>" . $i++ . "</td>";
+                        echo "<td>" . $row['supplier_name'] . "</td>";
+                        echo "<td>" . $row['code'] . "</td>";
 
-                      echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:red;'> قلاب </td>";
+                        echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:red;'> قلاب </td>";
 
-                echo "<td>" . $row['name'] . "</td>";
-                echo $row['status'] == "1" ? "<td style='color:green;'> متاحة </td>" : "<td style='color:red;'> مشغولة </td>";
-                if ($_SESSION['user']['role'] == "3") {
-                    // في حالة صلاحية مدير مشغلين اظهر اسناد سائق
-                    echo "<td>
+                        echo "<td>" . $row['name'] . "</td>";
+                        echo $row['status'] == "1" ? "<td style='color:green;'> متاحة </td>" : "<td style='color:red;'> مشغولة </td>";
+                        if ($_SESSION['user']['role'] == "3") {
+                            // في حالة صلاحية مدير مشغلين اظهر اسناد سائق
+                            echo "<td>
                 <a href='add_drivers.php?equipment_id=" . $row['id'] . "' style='color:#007bff'> مشغل </a> | 
-                        <a href='edit.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a</a> | 
-                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
-                        <a href='' style='color: #28a745'> <i class='fa fa-eye'></i> </a>
+                        <a href='#' style='color:#007bff'><i class='fa fa-edit'></i></a</a> | 
+                        <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
+                        <a href='#' style='color: #28a745'> <i class='fa fa-eye'></i> </a>
                       </td>";
-                } else {
-                    echo "<td> 
-                        <a href='' style='color:#007bff'><i class='fa fa-edit'></i></a</a> | 
-                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
-                        <a href='' style='color: #28a745'> <i class='fa fa-eye'></i> </a>
+                        } else {
+                            echo "<td> 
+                        <a href='#' style='color:#007bff'><i class='fa fa-edit'></i></a</a> | 
+                        <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
+                        <a href='#' style='color: #28a745'> <i class='fa fa-eye'></i> </a>
                       </td>";
-                }
+                        }
 
-                echo "</tr>";
-            }
-            ?>
-        </tbody>
-    </table>
+                        echo "</tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 </div>
 

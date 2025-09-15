@@ -9,13 +9,14 @@ include("../inheader.php");
 include('../insidebar.php');
 ?>
 <div class="main">
-
-    <a href="javascript:void(0)" id="toggleForm" class="add">
-        <i class="fa fa-plus"></i> اضافة مشروع
-    </a>
+    <div class="aligin">
+        <a href="javascript:void(0)" id="toggleForm" class="add">
+            <i class="fa fa-plus"></i> اضافة مشروع
+        </a>
+    </div>
 
     <!-- فورم إضافة / تعديل مشروع -->
-    <form id="projectForm" action="" method="post" style="display:none;padding:0px;">
+    <form id="projectForm" action="" method="post" style="display:none;">
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
                 <h5 class="mb-0"> اضافة/ تعديل مشروع </h5>

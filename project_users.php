@@ -15,6 +15,8 @@ include 'config.php';
     <title> إيكوبيشن | مستخدمين مدير الموقع </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
+    <!-- Bootstrab 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
@@ -30,126 +32,132 @@ include 'config.php';
 
     <div class="main">
 
-        <a href="javascript:void(0)" id="toggleForm" class="add">
-            <i class="fa fa-plus"></i> إضافة مشرف
-        </a>
-
+        <div class="aligin">
+            <a href="javascript:void(0)" id="toggleForm" class="add">
+                <i class="fa fa-plus"></i> إضافة مشرف
+            </a>
+        </div>
 
         <form id="projectForm" action="" method="post" style="display:none;">
-            <div class="form-grid">
-                <div>
-                    <label> الاسم ثلاثي </label>
-                    <input type="text" name="name" placeholder=" الاسم ثلاثي" required />
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"> اضافة/ تعديل مشرف </h5>
                 </div>
-                <div>
-                    <label> اسم المستخدم </label>
-                    <input type="text" name="username" placeholder="اسم المستخدم" required />
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div>
+                            <label> الاسم ثلاثي </label>
+                            <input type="text" name="name" placeholder=" الاسم ثلاثي" required />
+                        </div>
+                        <div>
+                            <label> اسم المستخدم </label>
+                            <input type="text" name="username" placeholder="اسم المستخدم" required />
+                        </div>
+                        <div>
+                            <label> كلمة المرور </label>
+                            <input type="text" name="password" placeholder="كلمه المرور " required />
+                        </div>
+                        <div>
+                            <label class="form-label">الدور / الصلاحية</label>
+                            <select name="role" class="form-control" required>
+                                <option value=""> -- حدد الصلاحية -- </option>
+                                <option value="6"> مدخل ساعات عمل </option>
+                                <option value="7"> مراجع ساعات مورد </option>
+                                <option value="8"> مراجع ساعات مشغل</option>
+                                <option value="9"> مراجع الاعطال</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>رقم الهاتف</label>
+                            <input type="text" name="phone" placeholder="رقم الهاتف" required />
+                            <input type="hidden" name="parent_id" value="<?php echo $_SESSION['user']['id']; ?>" />
+                        </div>
+                        <button type="submit"> حفظ </button>
+                    </div>
                 </div>
-                <div>
-                    <label> كلمة المرور </label>
-                    <input type="text" name="password" placeholder="كلمه المرور " required />
-                </div>
-                <div>
-                    <label class="form-label">الدور / الصلاحية</label>
-                    <select name="role" class="form-control" required>
-                        <option value=""> -- حدد الصلاحية -- </option>
-                        <option value="6"> مدخل ساعات عمل </option>
-                        <option value="7"> مراجع ساعات مورد </option>
-                        <option value="8"> مراجع ساعات مشغل</option>
-                        <option value="9"> مراجع الاعطال</option>
-                    </select>
-                </div>
-                <div>
-                    <label>رقم الهاتف</label>
-                    <input type="text" name="phone" placeholder="رقم الهاتف" required />
-
-                    <input type="hidden" name="parent_id" value="<?php echo $_SESSION['user']['id']; ?>" />
-
-                </div>
-
-                <br />
-                <button type="submit">حفظ المستخدم</button>
             </div>
         </form>
 
-        <br /><br /><br />
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"> قائمة المشرفين</h5>
+            </div>
+            <div class="card-body">
+                <table id="projectsTable" class="display" style="width:100%; margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th style="text-align: right;">الاسم </th>
+                            <th style="text-align: right;">اسم المستخدم </th>
+                            <th style="text-align: right;">كلمه المرور </th>
+                            <th style="text-align: right;">الدور </th>
+                            <th style="text-align: right;">رقم الهاتف</th>
+                            <th style="text-align: right;">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-        <!-- جدول الموردين -->
-        <h3>قائمة المستخدمين</h3>
-        <br />
-        <table id="projectsTable" class="display" style="width:100%; margin-top: 20px;">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th style="text-align: right;">الاسم </th>
-                    <th style="text-align: right;">اسم المستخدم </th>
-                    <th style="text-align: right;">كلمه المرور </th>
-                    <th style="text-align: right;">الدور </th>
-                    <th style="text-align: right;">رقم الهاتف</th>
-                    <th style="text-align: right;">إجراءات</th>
-                </tr>
-            </thead>
-            <tbody>
+                        <?php
+                        include 'config.php';
 
-                <?php
-                include 'config.php';
-
-                // إضافة مورد جديد عند إرسال الفورم
-                if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
-                    $name = $_POST['name'];
-                    $username = $_POST['username'];
-                    $password = $_POST['password']; // يفضل تشفيره لاحقاً
-                    $phone = $_POST['phone'];
-                    $role = $_POST['role'];
-                    $project = ($role == "5" && !empty($_POST['project_id'])) ? $_POST['project_id'] : 0;
-                    $parent_id = $_POST['parent_id'];
-
-
-                    isset($_POST['uid']) ? $uid = $_POST['uid'] : $uid = "0";
+                        // إضافة مورد جديد عند إرسال الفورم
+                        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
+                            $name = $_POST['name'];
+                            $username = $_POST['username'];
+                            $password = $_POST['password']; // يفضل تشفيره لاحقاً
+                            $phone = $_POST['phone'];
+                            $role = $_POST['role'];
+                            $project = ($role == "5" && !empty($_POST['project_id'])) ? $_POST['project_id'] : 0;
+                            $parent_id = $_POST['parent_id'];
 
 
-                    mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role , project_id , parent_id , created_at, updated_at) 
+                            isset($_POST['uid']) ? $uid = $_POST['uid'] : $uid = "0";
+
+
+                            mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role , project_id , parent_id , created_at, updated_at) 
             VALUES ('$name', '$username', '$password', '$phone', '$role' , '$project' , '$parent_id' , NOW(), NOW())");
-                }
+                        }
 
-                $userid = $_SESSION['user']['id'];
+                        $userid = $_SESSION['user']['id'];
 
 
-                $query = "SELECT id, name, username,password ,phone, role , created_at, updated_at
+                        $query = "SELECT id, name, username,password ,phone, role , created_at, updated_at
                  FROM users WHERE parent_id LIKE '$userid' ORDER BY id DESC";
 
 
 
 
-                $result = mysqli_query($conn, $query);
+                        $result = mysqli_query($conn, $query);
 
 
-                $roles = array(
-                    "6" => " مدخل ساعات عمل ",
-                    "7" => "مراجع ساعات مورد",
-                    "8" => "مراجع ساعات مشغل",
-                    "9" => "مراجع اعطال ",
-                );
+                        $roles = array(
+                            "6" => " مدخل ساعات عمل ",
+                            "7" => "مراجع ساعات مورد",
+                            "8" => "مراجع ساعات مشغل",
+                            "9" => "مراجع اعطال ",
+                        );
 
-                $i = 1;
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<tr>";
-                    echo "<td>" . $i++ . "</td>";
-                    echo "<td>" . $row['name'] . "</td>";
-                    echo "<td>" . $row['username'] . "</td>";
-                    echo "<td>" . $row['password'] . "</td>";
-                    echo "<td>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</td>";
-                    echo "<td>" . $row['phone'] . "</td>";
-                    echo "<td>
-                        <a href='edit.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
-                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
-                        <a href='suppliers_details.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a>
+                        $i = 1;
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<tr>";
+                            echo "<td>" . $i++ . "</td>";
+                            echo "<td>" . $row['name'] . "</td>";
+                            echo "<td>" . $row['username'] . "</td>";
+                            echo "<td>" . $row['password'] . "</td>";
+                            echo "<td>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</td>";
+                            echo "<td>" . $row['phone'] . "</td>";
+                            echo "<td>
+                        <a href='#' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
+                        <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
+                        <a href='#' style='color: #28a745'><i class='fa fa-eye'></i></a>
                       </td>";
-                    echo "</tr>";
-                }
-                ?>
-            </tbody>
-        </table>
+                            echo "</tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     </div>
 
