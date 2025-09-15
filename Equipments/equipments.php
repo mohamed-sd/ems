@@ -25,7 +25,7 @@ include("../inheader.php");
             <?php } ?>
             <div>
                 <label> المورد </label>
-                <select name="suppliers required>
+                <select name="suppliers" required>
                     <option value="">-- اختر المورد --</option>
                     <?php
                     include '../config.php';
@@ -111,7 +111,9 @@ JOIN suppliers s ON m.suppliers = s.id";
                 echo "<td>" . $i++ . "</td>";
                 echo "<td>" . $row['supplier_name'] . "</td>";
                 echo "<td>" . $row['code'] . "</td>";
-                echo "<td>" . $row['type'] . "</td>";
+
+                      echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:red;'> قلاب </td>";
+
                 echo "<td>" . $row['name'] . "</td>";
                 echo $row['status'] == "1" ? "<td style='color:green;'> متاحة </td>" : "<td style='color:red;'> مشغولة </td>";
                 if ($_SESSION['user']['role'] == "3") {

@@ -32,9 +32,9 @@ if (!isset($_SESSION['user'])) {
     <a href="supplierscontracts.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
         <i class="fa fa-plus"></i> العقودات
     </a>
-    <a href="../Equipments/equipments.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
+    <!-- <a href="../Equipments/equipments.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
         <i class="fa fa-plus"></i> اضافة آلية
-    </a>
+    </a> -->
    <!--  <a href="../Contracts/contracts.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
         <i class="fa fa-plus"></i> العقودات
     </a> -->
@@ -115,46 +115,7 @@ if (!isset($_SESSION['user'])) {
     </table>
 
     <br/>
-    <h3> المشاريع </h3>
-    <br/>
-    <table id="projectsTable1" class="display" style="width:100%; margin-top: 20px;">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th style="text-align: right;">اسم المشروع</th>
-                <th style="text-align: right;"> الموقع </th>
-                <th style="text-align: right;"> القيمة الاجمالية </th>
-                <th style="text-align: right;"> التاريخ </th>
-                <th style="text-align: right;">إجراءات</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            include '../config.php';
-            $supplier = $_GET['id'];
-            $query = "SELECT DISTINCT * , p.name as 'project'
-            FROM projects p
-            JOIN operations o ON p.id = o.project
-            JOIN equipments e ON o.equipment = e.id
-            WHERE e.suppliers =$supplier;";
-            $result = mysqli_query($conn, $query);
-            $i = 1;
-            while($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>";
-                echo "<td>".$i++."</td>";
-                echo "<td>".$row['project']."</td>";
-                echo "<td>".$row['location']."</td>";
-                echo "<td>".$row['total']."</td>";
-                echo "<td>".$row['create_at']."</td>";
-                echo "<td>
-                        <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
-                        <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
-                      </td>";
-                echo "</tr>";
-            }
-            ?>
-        </tbody>
-    </table>
+    
 
 
 
