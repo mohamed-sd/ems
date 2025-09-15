@@ -39,11 +39,12 @@
         <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
       <?php } ?>
 
-      <?php // صلاحيات مدير المشورع === 5
+      <?php // صلاحيات مدير الموقع === 5
       if ($_SESSION['user']['role'] == "5") { ?>
         <li><a href="../project_users.php"><i class="fa fa-users-cog"></i> <span> مستخدمين المدير </span></a></li>
         <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a>
         </li>
+        <li><a href="../Timesheet/view_timesheet.php"><i class="fa fa-business-time"></i> <span>ساعات اليوم</span></a></li>
         <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
       <?php } ?>
 
@@ -51,6 +52,7 @@
       if ($_SESSION['user']['role'] == "6") { ?>
       <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a>
         </li>
+        <li><a href="../Timesheet/view_timesheet.php"><i class="fa fa-business-time"></i> <span>ساعات اليوم</span></a></li>
       <?php } ?>
 
       <?php // صلاحيات مراجع ساعات المورد والمشغل === 7 8 

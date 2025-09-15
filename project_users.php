@@ -63,7 +63,7 @@ include 'config.php';
                     <label>رقم الهاتف</label>
                     <input type="text" name="phone" placeholder="رقم الهاتف" required />
 
-                    <input type="text" name="parent_id" value="<?php echo $_SESSION['user']['id']; ?>" />
+                    <input type="hidden" name="parent_id" value="<?php echo $_SESSION['user']['id']; ?>" />
 
                 </div>
 
