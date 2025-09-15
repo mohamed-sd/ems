@@ -18,6 +18,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $end_date   = $_POST['end_date'];
   $equipment_type = $_POST['equipment_type'];
 
+
+  $shift_filter = isset($_POST['shift']) ? $_POST['shift'] : '';
+
+
   $where = "WHERE t.type = '$type' ";
 
   if (!empty($start_date) && !empty($end_date)) {
@@ -28,6 +32,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }else{
     $where .= " AND t.type = '1' ";
   }
+
+  if (!empty($shift_filter)) {
+    $where .= " AND t.shift = '$shift_filter' ";
+}
+
 
 } else {
   // ✅ أول مرة يفتح الصفحة: عرض سجلات اليوم فقط
@@ -141,15 +150,15 @@ $result = mysqli_query($conn, $query);
     </div>
     <div class="card-body">
       <form method="POST" class="row g-3 filter-form">
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label class="form-label">تاريخ البداية</label>
           <input type="date" name="start_date" class="form-control">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label class="form-label">تاريخ النهاية</label>
           <input type="date" name="end_date" class="form-control">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label class="form-label">نوع المعدة</label>
           <select name="equipment_type" class="form-select">
             <option value="">-- الكل --</option>
@@ -157,6 +166,16 @@ $result = mysqli_query($conn, $query);
             <option value="2">قلاب</option>
           </select>
         </div>
+
+          <div class="col-md-2">
+               <label class="form-label">🚛 الوردية:</label>
+
+                 <select class="form-select" name="shift">
+        <option value="">-- الكل --</option>
+        <option value="D" <?php if(($_GET['shift'] ?? '')=="صباحية") echo "selected"; ?>>صباحية</option>
+        <option value="N" <?php if(($_GET['shift'] ?? '')=="مسائية") echo "selected"; ?>>مسائية</option>
+    </select>
+                    </div>
         <div class="col-1 text-end">  </div>
         <div class="col-2 text-end">
           <br/>
