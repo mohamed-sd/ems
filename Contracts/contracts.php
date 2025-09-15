@@ -72,7 +72,9 @@ if (!isset($_SESSION['user'])) {
 
     <!-- فورم إضافة عقد -->
     <form id="projectForm" action="" method="post" style="display:none;">
-      <input type="text" name="project" placeholder="اسم المشروع" value="<?php echo $_GET['id'] ?>" required />
+    <input type="hidden" name="id" id="contract_id" value="">
+    
+    <input type="text" name="project" placeholder="اسم المشروع" value="<?php echo $_GET['id'] ?>" required />
 
 
 
@@ -82,11 +84,11 @@ if (!isset($_SESSION['user'])) {
 
         <div class="field md-3 sm-6">
           <label>تاريخ توقيع العقد (Contract signing date)</label>
-          <div class="control"><input name="contract_signing_date" type="date"></div>
+          <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
         </div>
         <div class="field md-3 sm-6">
           <label>فترة السماح بين التوقيع والتنفيذ (Grace period)</label>
-          <div class="control"><input name="grace_period_days" type="number" min="0" placeholder="عدد الأيام"></div>
+          <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0" placeholder="عدد الأيام"></div>
         </div>
         <div class="field md-3 sm-6">
           <label>مدة العقد بالشهور (Contract Per Month)</label>
@@ -95,16 +97,16 @@ if (!isset($_SESSION['user'])) {
         </div>
         <div class="field md-3 sm-6">
           <label>بداية التنفيذ الفعلي المتفق عليه</label>
-          <div class="control"><input name="actual_start" type="date"></div>
+          <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
         </div>
         <div class="field md-3 sm-6">
           <label>نهاية التنفيذ الفعلي المتفق عليه</label>
-          <div class="control"><input name="actual_end" type="date"></div>
+          <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
         </div>
         <div class="field md-3 sm-6">
           <label>الترحيل (Transportation)</label>
           <div class="control">
-            <select name="transportation">
+            <select name="transportation" id="transportation">
               <option value="">— اختر —</option>
               <option>مشمولة</option>
               <option>غير مشمولة</option>
@@ -114,7 +116,7 @@ if (!isset($_SESSION['user'])) {
         <div class="field md-3 sm-6">
           <label>الإعاشة (Accommodation)</label>
           <div class="control">
-            <select name="accommodation">
+            <select name="accommodation" id="accommodation">
               <option value="">— اختر —</option>
               <option>مشمولة</option>
               <option>غير مشمولة</option>
@@ -124,7 +126,7 @@ if (!isset($_SESSION['user'])) {
         <div class="field md-3 sm-6">
           <label>السكن (Place for Living)</label>
           <div class="control">
-            <select name="place_for_living">
+            <select name="place_for_living" id="place_for_living">
               <option value="">— اختر —</option>
               <option>مشمولة</option>
               <option>غير مشمولة</option>
@@ -134,7 +136,7 @@ if (!isset($_SESSION['user'])) {
         <div class="field md-3 sm-6">
           <label>الورشة (Workshop)</label>
           <div class="control">
-            <select name="workshop">
+            <select name="workshop" id="workshop">
               <option value="">— اختر —</option>
               <option>مشمولة</option>
               <option>غير مشمولة</option>
@@ -151,11 +153,11 @@ if (!isset($_SESSION['user'])) {
       <div class="form-grid">
         <div class="field md-4 sm-6">
           <label>نوع المعدة المطلوبة (Type of equipment)</label>
-          <div class="control"><input name="equip_type" type="text" placeholder="مثال: حفار" value="حفار"></div>
+          <div class="control"><input name="equip_type" id="equip_type"  type="text" placeholder="مثال: حفار" value="حفار"></div>
         </div>
         <div class="field md-4 sm-6">
           <label>حجم المعدة المطلوبة (Size)</label>
-          <div class="control"><input name="equip_size" type="number" placeholder="مثال: 340" value="340"></span></div>
+          <div class="control"><input name="equip_size" id="equip_size"  type="number" placeholder="مثال: 340" value="340" ></span></div>
         </div>
         <div class="field md-4 sm-6">
           <label>عدد المعدات المطلوبة</label>
@@ -186,11 +188,11 @@ if (!isset($_SESSION['user'])) {
       <div class="form-grid">
         <div class="field md-4 sm-6">
           <label>نوع الآلية المطلوبة</label>
-          <div class="control"><input name="mach_type" type="text" placeholder="مثال: قلاب" value="قلاب"></div>
+          <div class="control"><input name="mach_type" id="mach_type" type="text" placeholder="مثال: قلاب" value="قلاب"></div>
         </div>
         <div class="field md-4 sm-6">
           <label>حجم حمولة الآلية</label>
-          <div class="control"><input name="mach_size" type="number" placeholder="مثال: 340" value="340"></div>
+          <div class="control"><input name="mach_size" id="mach_size" type="number" placeholder="مثال: 340" value="340"></div>
         </div>
         <div class="field md-4 sm-6">
           <label>عدد الآليات المطلوبة</label>
@@ -218,27 +220,27 @@ if (!isset($_SESSION['user'])) {
       <div class="form-grid">
         <div class="field md-3 sm-6">
           <label>عدد ساعات العمل اليومية</label>
-          <div class="control"><input type="number" name="daily_work_hours" min="0" placeholder="مثال: 8"></div>
+          <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0" placeholder="مثال: 8"></div>
         </div>
         <div class="field md-3 sm-6">
           <label>عدد المشغلين للساعات اليومية</label>
-          <div class="control"><input type="number" name="daily_operators" min="0" placeholder="مثال: 3"></div>
+          <div class="control"><input type="number" name="daily_operators" id="daily_operators" min="0" placeholder="مثال: 3"></div>
         </div>
         <div class="field md-3 sm-6">
           <label>الطرف الأول (ممثل الشركة)</label>
-          <div class="control"><input type="text" name="first_party" placeholder="اسم ممثل الشركة"></div>
+          <div class="control"><input type="text" name="first_party" id="first_party" placeholder="اسم ممثل الشركة"></div>
         </div>
         <div class="field md-3 sm-6">
           <label>الطرف الثاني (ممثل العميل)</label>
-          <div class="control"><input type="text" name="second_party" placeholder="اسم ممثل العميل"></div>
+          <div class="control"><input type="text" name="second_party" id="second_party" placeholder="اسم ممثل العميل"></div>
         </div>
         <div class="field md-3 sm-6">
           <label>الشاهد الأول</label>
-          <div class="control"><input type="text" name="witness_one" placeholder="اسم الشاهد الأول"></div>
+          <div class="control"><input type="text" name="witness_one" id="witness_one" placeholder="اسم الشاهد الأول"></div>
         </div>
         <div class="field md-3 sm-6">
           <label>الشاهد الثاني</label>
-          <div class="control"><input type="text" name="witness_two" placeholder="اسم الشاهد الثاني"></div>
+          <div class="control"><input type="text" name="witness_two" id="witness_two" placeholder="اسم الشاهد الثاني"></div>
         </div>
       </div>
 
@@ -301,6 +303,8 @@ if (!isset($_SESSION['user'])) {
 
         // إضافة عقد جديد عند إرسال الفورم
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project'])) {
+
+                  $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
           // $project = mysqli_real_escape_string($conn, $_POST['project']);
           $project = $_GET['id'];
 
@@ -339,22 +343,60 @@ if (!isset($_SESSION['user'])) {
           $witness_two = $_POST['witness_two'];
 
 
-          mysqli_query($conn, "INSERT INTO contracts (
-    contract_signing_date, project, grace_period_days, contract_duration_months,
-    actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
-    equip_type, equip_size, equip_count, equip_target_per_month, equip_total_month, equip_total_contract,
-    mach_type, mach_size, mach_count, mach_target_per_month, mach_total_month, mach_total_contract,
-    hours_monthly_target, forecasted_contracted_hours,
-    daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two
-) VALUES (
-    '$contract_signing_date', '$project','$grace_period_days', '$contract_duration_months',
-    '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
-    '$equip_type','$equip_size','$equip_count','$equip_target_per_month', '$equip_total_month', '$equip_total_contract',
-    '$mach_type', '$mach_size','$mach_count','$mach_target_per_month','$mach_total_month','$mach_total_contract',
-    '$hours_monthly_target','$forecasted_contracted_hours',
-    '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two'
-)");
-
+     if ($id > 0) {
+        // تعديل
+        $sql = "UPDATE contracts SET 
+            contract_signing_date='$contract_signing_date',
+            grace_period_days='$grace_period_days',
+            contract_duration_months='$contract_duration_months',
+            actual_start='$actual_start',
+            actual_end='$actual_end',
+            transportation='$transportation',
+            accommodation='$accommodation',
+            place_for_living='$place_for_living',
+            workshop='$workshop',
+            equip_type='$equip_type',
+            equip_size='$equip_size',
+            equip_count='$equip_count',
+            equip_target_per_month='$equip_target_per_month',
+            equip_total_month='$equip_total_month',
+            equip_total_contract='$equip_total_contract',
+            mach_type='$mach_type',
+            mach_size='$mach_size',
+            mach_count='$mach_count',
+            mach_target_per_month='$mach_target_per_month',
+            mach_total_month='$mach_total_month',
+            mach_total_contract='$mach_total_contract',
+            hours_monthly_target='$hours_monthly_target',
+            forecasted_contracted_hours='$forecasted_contracted_hours',
+            daily_work_hours='$daily_work_hours',
+            daily_operators='$daily_operators',
+            first_party='$first_party',
+            second_party='$second_party',
+            witness_one='$witness_one',
+            witness_two='$witness_two'
+        WHERE id=$id";
+    } else {
+        // إضافة
+        $sql = "INSERT INTO contracts (
+            contract_signing_date, project, grace_period_days, contract_duration_months,
+            actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
+            equip_type, equip_size, equip_count, equip_target_per_month, equip_total_month, equip_total_contract,
+            mach_type, mach_size, mach_count, mach_target_per_month, mach_total_month, mach_total_contract,
+            hours_monthly_target, forecasted_contracted_hours,
+            daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two
+        ) VALUES (
+            '$contract_signing_date', '$project','$grace_period_days', '$contract_duration_months',
+            '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
+            '$equip_type','$equip_size','$equip_count','$equip_target_per_month', '$equip_total_month', '$equip_total_contract',
+            '$mach_type', '$mach_size','$mach_count','$mach_target_per_month','$mach_total_month','$mach_total_contract',
+            '$hours_monthly_target','$forecasted_contracted_hours',
+            '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two'
+        )";
+    }
+      mysqli_query($conn, $sql);
+    echo "<script>window.location.href='contracts.php?id=$project';</script>";
+    exit;
         }
 
         // جلب العقود
@@ -374,7 +416,37 @@ if (!isset($_SESSION['user'])) {
           echo "<td>" . $row['equip_total_contract'] . "</td>";
 
           echo "<td>
-                        <a href='edit.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
+                        <a href='javascript:void(0)' class='editBtn'
+             data-id='".$row['id']."'
+             data-contract_signing_date='".$row['contract_signing_date']."'
+             data-grace_period_days='".$row['grace_period_days']."'
+             data-contract_duration_months='".$row['contract_duration_months']."'
+             data-actual_start='".$row['actual_start']."'
+             data-actual_end='".$row['actual_end']."'
+             data-equip_type='".$row['equip_type']."'
+             data-equip_count='".$row['equip_count']."'
+             data-equip_target_per_month='".$row['equip_target_per_month']."'
+             data-equip_total_month='".$row['equip_total_month']."'
+             data-equip_total_contract='".$row['equip_total_contract']."'
+             data-mach_type='".$row['mach_type']."'
+             data-mach_count='".$row['mach_count']."'
+             data-mach_target_per_month='".$row['mach_target_per_month']."'
+             data-mach_total_month='".$row['mach_total_month']."'
+             data-mach_total_contract='".$row['mach_total_contract']."'
+             data-hours_monthly_target='".$row['hours_monthly_target']."'
+             daily_work_hours ='".$row['daily_work_hours']."'
+              daily_operators ='".$row['daily_operators']."'
+               first_party ='".$row['first_party']."'
+                second_party ='".$row['second_party']."'
+                 witness_one ='".$row['witness_one']."'
+                  witness_two ='".$row['witness_two']."'
+                  transportation ='".$row['transportation']."'
+                  accommodation ='".$row['accommodation']."'
+                  place_for_living ='".$row['place_for_living']."'
+                  workshop ='".$row['workshop']."'
+                  
+             data-forecasted_contracted_hours='".$row['forecasted_contracted_hours']."'
+             style='color:#007bff'><i class='fa fa-edit'></i></a> | 
                         <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
                         <a href='contracts_details.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a>
                       </td>";
@@ -513,6 +585,43 @@ if (!isset($_SESSION['user'])) {
 
     // أول تشغيل
     recalc();
+
+
+
+  // تعبئة الفورم عند التعديل
+$(document).on("click", ".editBtn", function() {
+  $("#projectForm").show();
+  $("#contract_id").val($(this).data("id"));
+  $("#projectForm [name='contract_signing_date']").val($(this).data("contract_signing_date"));
+  $("#projectForm [name='grace_period_days']").val($(this).data("grace_period_days"));
+  $("#projectForm [name='contract_duration_months']").val($(this).data("contract_duration_months"));
+  $("#projectForm [name='actual_start']").val($(this).data("actual_start"));
+  $("#projectForm [name='actual_end']").val($(this).data("actual_end"));
+  $("#projectForm [name='equip_type']").val($(this).data("equip_type"));
+  $("#projectForm [name='equip_count']").val($(this).data("equip_count"));
+  $("#projectForm [name='equip_target_per_month']").val($(this).data("equip_target_per_month"));
+  $("#projectForm [name='equip_total_month']").val($(this).data("equip_total_month"));
+  $("#projectForm [name='equip_total_contract']").val($(this).data("equip_total_contract"));
+  $("#projectForm [name='mach_type']").val($(this).data("mach_type"));
+  $("#projectForm [name='mach_count']").val($(this).data("mach_count"));
+  $("#projectForm [name='mach_target_per_month']").val($(this).data("mach_target_per_month"));
+  $("#projectForm [name='mach_total_month']").val($(this).data("mach_total_month"));
+  $("#projectForm [name='mach_total_contract']").val($(this).data("mach_total_contract"));
+  $("#projectForm [name='hours_monthly_target']").val($(this).data("hours_monthly_target"));
+  $("#projectForm [name='forecasted_contracted_hours']").val($(this).data("forecasted_contracted_hours"));
+  $("#projectForm [name='daily_work_hours']").val($(this).attr("daily_work_hours"));
+   $("#projectForm [name='daily_operators']").val($(this).attr("daily_operators"));
+    $("#projectForm [name='first_party']").val($(this).attr("first_party"));
+     $("#projectForm [name='second_party']").val($(this).attr("second_party"));
+      $("#projectForm [name='witness_one']").val($(this).attr("witness_one"));
+       $("#projectForm [name='witness_two']").val($(this).attr("witness_two"));
+        $("#projectForm [name='transportation']").val($(this).attr("transportation"));
+         $("#projectForm [name='accommodation']").val($(this).attr("accommodation"));
+          $("#projectForm [name='place_for_living']").val($(this).attr("place_for_living"));
+            $("#projectForm [name='workshop']").val($(this).attr("workshop"));
+
+  $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
+});
   </script>
 
 
