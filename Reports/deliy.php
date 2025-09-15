@@ -4,28 +4,14 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../index.php");
     exit();
 }
-?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-	<meta charset="UTF-8">
-  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>  إيكوبيشن | التقارير </title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-	<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-</head>
-<body>
+include '../config.php';
 
-  <?php 
-  include('../insidebar.php'); 
-  include '../config.php';
+// استقبال الفلاتر
+$date_filter      = isset($_GET['date']) ? $_GET['date'] : '';
+$equipment_filter = isset($_GET['equipment']) ? $_GET['equipment'] : '';
+$project_filter   = isset($_GET['project']) ? $_GET['project'] : '';
 
-  // استقبال الفلاتر
-  $date_filter = isset($_GET['date']) ? $_GET['date'] : '';
-  $equipment_filter = isset($_GET['equipment']) ? $_GET['equipment'] : '';
-  $project_filter = isset($_GET['project']) ? $_GET['project'] : '';
-
-  $sql = "
+$sql = "
   SELECT 
       p.name AS project_name,
       e.name AS equipment_name,
@@ -41,121 +27,152 @@ if (!isset($_SESSION['user'])) {
   JOIN operations o ON e.id = o.equipment
   JOIN projects p ON o.project = p.id
   WHERE 1=1
-  ";
+";
 
-  // تطبيق الفلاتر
-  if (!empty($date_filter)) {
-      $sql .= " AND t.`date` = '$date_filter' ";
-  }
-  if (!empty($equipment_filter)) {
-      $sql .= " AND e.id = '$equipment_filter' ";
-  }
-  if (!empty($project_filter)) {
-      $sql .= " AND p.id = '$project_filter' ";
-  }
+if (!empty($date_filter)) {
+    $sql .= " AND t.`date` = '$date_filter' ";
+}
+if (!empty($equipment_filter)) {
+    $sql .= " AND e.id = '$equipment_filter' ";
+}
+if (!empty($project_filter)) {
+    $sql .= " AND p.id = '$project_filter' ";
+}
 
-  // تنفيذ الاستعلام مع اظهار الأخطاء
-  $result = mysqli_query($conn, $sql) or die("خطأ في الاستعلام: " . mysqli_error($conn));
+$result = mysqli_query($conn, $sql) or die("خطأ في الاستعلام: " . mysqli_error($conn));
 
-  // طباعة الاستعلام للتجربة (احذف بعد التأكد)
-//   echo "<pre>$sql</pre>";
+// استعلام المجموع
+$total_sql = "SELECT SUM(t.total_work_hours) AS total_hours
+FROM timesheet t
+JOIN equipments e ON t.operator = e.id
+JOIN operations o ON e.id = o.equipment
+JOIN projects p ON o.project = p.id
+WHERE 1=1";
 
-  // استعلام المجموع
-  $total_sql = "SELECT SUM(t.total_work_hours) AS total_hours
-  FROM timesheet t
-  JOIN equipments e ON t.operator = e.id
-  JOIN operations o ON e.id = o.equipment
-  JOIN projects p ON o.project = p.id
-  WHERE 1=1";
+if (!empty($date_filter)) {
+    $total_sql .= " AND t.`date` = '$date_filter' ";
+}
+if (!empty($equipment_filter)) {
+    $total_sql .= " AND e.id = '$equipment_filter' ";
+}
+if (!empty($project_filter)) {
+    $total_sql .= " AND p.id = '$project_filter' ";
+}
 
-  if (!empty($date_filter)) {
-      $total_sql .= " AND t.`date` = '$date_filter' ";
-  }
-  if (!empty($equipment_filter)) {
-      $total_sql .= " AND e.id = '$equipment_filter' ";
-  }
-  if (!empty($project_filter)) {
-      $total_sql .= " AND p.id = '$project_filter' ";
-  }
+$total_result = mysqli_query($conn, $total_sql) or die("خطأ في استعلام المجموع: " . mysqli_error($conn));
+$total_row    = mysqli_fetch_assoc($total_result);
+$total_hours  = $total_row['total_hours'];
+?>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+	<meta charset="UTF-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>إيكوبيشن | التقارير</title>
+	
+	<!-- Bootstrap 5 -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+</head>
+<body class="bg-light">
 
-  $total_result = mysqli_query($conn, $total_sql) or die("خطأ في استعلام المجموع: " . mysqli_error($conn));
-  $total_row = mysqli_fetch_assoc($total_result);
-  $total_hours = $total_row['total_hours'];
+<?php include('../insidebar.php'); ?>
 
-  // طباعة استعلام المجموع للتجربة (احذف بعد التأكد)
-//   echo "<pre>$total_sql</pre>";
-  ?>
+<div class="main container py-4">
 
-  <div class="main">
+	<div class="card shadow-lg border-0 rounded-4">
+		<div class="card-body">
+			
+			<h2 class="mb-4 text-primary text-center">
+				<i class="fa-solid fa-chart-line"></i> تقرير ساعات العمل اليومية
+			</h2>
+			<hr class="mb-4">
 
-    <h2>📊 تقرير ساعات العمل اليومية</h2>
-    <br/><br/><hr/>
-    
-    <form method="GET">
-        <label>📅 التاريخ:</label>
-        <input type="date" name="date" value="<?php echo $date_filter; ?>">
+			<!-- فورم الفلاتر -->
+			<form method="GET" class="row g-3 mb-4">
+				<div class="col-md-4">
+					<label class="form-label">📅 التاريخ:</label>
+					<input type="date" name="date" value="<?php echo $date_filter; ?>" class="form-control">
+				</div>
 
-        <label>⚙️ الآلية:</label>
-        <select name="equipment">
-            <option value="">-- الكل --</option>
-            <?php
-            $eqs = mysqli_query($conn, "SELECT id, name FROM equipments");
-            while($row = mysqli_fetch_assoc($eqs)){
-                $selected = ($equipment_filter == $row['id']) ? "selected" : "";
-                echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
-            }
-            ?>
-        </select>
+				<div class="col-md-4">
+					<label class="form-label">⚙️ الآلية:</label>
+					<select name="equipment" class="form-select">
+						<option value="">-- الكل --</option>
+						<?php
+						$eqs = mysqli_query($conn, "SELECT id, name FROM equipments");
+						while($row = mysqli_fetch_assoc($eqs)){
+							$selected = ($equipment_filter == $row['id']) ? "selected" : "";
+							echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+						}
+						?>
+					</select>
+				</div>
 
-        <label>🏗️ المشروع:</label>
-        <select name="project">
-            <option value="">-- الكل --</option>
-            <?php
-            $prj = mysqli_query($conn, "SELECT id, name FROM projects");
-            while($row = mysqli_fetch_assoc($prj)){
-                $selected = ($project_filter == $row['id']) ? "selected" : "";
-                echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
-            }
-            ?>
-        </select>
+				<div class="col-md-4">
+					<label class="form-label">🏗️ المشروع:</label>
+					<select name="project" class="form-select">
+						<option value="">-- الكل --</option>
+						<?php
+						$prj = mysqli_query($conn, "SELECT id, name FROM projects");
+						while($row = mysqli_fetch_assoc($prj)){
+							$selected = ($project_filter == $row['id']) ? "selected" : "";
+							echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+						}
+						?>
+					</select>
+				</div>
 
-        <button class="add" type="submit">🔍 بحث</button>
-    </form>
+				<div class="col-12 text-center">
+					<button class="btn btn-primary px-5 mt-3" type="submit">
+						<i class="fa fa-search"></i> بحث
+					</button>
+				</div>
+			</form>
 
-    <br>
+			<!-- الجدول -->
+			<div class="table-responsive">
+				<table class="table table-striped table-hover align-middle text-center">
+					<thead class="table-primary">
+						<tr>
+							<th>المشروع</th>
+							<th>الآلية</th>
+							<th>السائق</th>
+							<th>التاريخ</th>
+							<th>الشفت</th>
+							<th>⏱️ ساعات العمل</th>
+							<th>⚠️ ساعات الأعطال</th>
+							<th>⏸️ Standby</th>
+						</tr>
+					</thead>
+					<tbody>
+					<?php while($row = mysqli_fetch_assoc($result)) { ?>
+						<tr>
+							<td><?php echo $row['project_name']; ?></td>
+							<td><?php echo $row['equipment_name']; ?></td>
+							<td><?php echo $row['driver_name']; ?></td>
+							<td><?php echo $row['date']; ?></td>
+							<td><?php echo $row['shift']; ?></td>
+							<td><span class="badge bg-success fs-6"><?php echo $row['total_work_hours']; ?></span></td>
+							<td><span class="badge bg-danger fs-6"><?php echo $row['total_fault_hours']; ?></span></td>
+							<td><span class="badge bg-secondary fs-6"><?php echo $row['standby_hours']; ?></span></td>
+						</tr>
+					<?php } ?>
+					</tbody>
+				</table>
+			</div>
 
-    <table id="projectsTable" class="display">
-        <thead>
-        <tr>
-            <th>المشروع</th>
-            <th>الآلية</th>
-            <th>السائق</th>
-            <th>التاريخ</th>
-            <th>الشفت</th>
-            <th>⏱️ ساعات العمل</th>
-            <th>⚠️ ساعات الأعطال</th>
-            <th>⏸️ Standby</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php while($row = mysqli_fetch_assoc($result)) { ?>
-        <tr>
-            <td><?php echo $row['project_name']; ?></td>
-            <td><?php echo $row['equipment_name']; ?></td>
-            <td><?php echo $row['driver_name']; ?></td>
-            <td><?php echo $row['date']; ?></td>
-            <td><?php echo $row['shift']; ?></td>
-            <td><?php echo $row['total_work_hours']; ?></td>
-            <td><?php echo $row['total_fault_hours']; ?></td>
-            <td><?php echo $row['standby_hours']; ?></td>
-        </tr>
-        <?php } ?>
-        </tbody>
-    </table>
+			<!-- المجموع -->
+			<div class="alert alert-info mt-4 fs-5 text-center">
+				✅ مجموع ساعات العمل: <strong><?php echo $total_hours ? $total_hours : 0; ?></strong> ساعة
+			</div>
 
-    <h3>✅ مجموع ساعات العمل: <?php echo $total_hours ? $total_hours : 0; ?> ساعة</h3>
+		</div>
+	</div>
+</div>
 
-  </div>
-
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
