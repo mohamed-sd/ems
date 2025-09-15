@@ -1,8 +1,8 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
-    exit();
+  header("Location: ../index.php");
+  exit();
 }
 ?>
 <!DOCTYPE html>
@@ -17,7 +17,8 @@ if (!isset($_SESSION['user'])) {
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+  <!-- Call bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- DataTables CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
@@ -26,38 +27,40 @@ if (!isset($_SESSION['user'])) {
   <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
 </head>
 <style>
-    .totals {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 10px;
-    }
-     .kpi {
-      /* background: linear-gradient(180deg, #fff, #fffaf0); */
-      border: 1px solid #ffcc00;
-      border-radius: 14px;
-      padding: 14px;
-      text-align: center;
-    }
+  .totals {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+  }
 
-    .kpi .v {
-      font-weight: 900;
-      font-size: clamp(18px, 3vw, 24px);
-      color: #7a5a00;
-    }
+  .kpi {
+    /* background: linear-gradient(180deg, #fff, #fffaf0); */
+    border: 1px solid #ffcc00;
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+  }
 
-    .kpi .t {
-      color: var(--muted);
-      font-size: 12px;
-    }
+  .kpi .v {
+    font-weight: 900;
+    font-size: clamp(18px, 3vw, 24px);
+    color: #7a5a00;
+  }
 
-    .hr {
-      height: 1px;
-      /* background: linear-gradient(90deg, transparent, var(--yellow), transparent); */
-      margin: 18px 0;
-      border: none;
-    }
-  </style>
+  .kpi .t {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .hr {
+    height: 1px;
+    /* background: linear-gradient(90deg, transparent, var(--yellow), transparent); */
+    margin: 18px 0;
+    border: none;
+  }
+</style>
+
 <body>
 
   <?php include('../insidebar.php'); ?>
@@ -65,306 +68,311 @@ if (!isset($_SESSION['user'])) {
   <div class="main">
 
     <!-- <h2>العقود</h2> -->
-
-    <a href="javascript:void(0)" id="toggleForm" class="add">
-      <i class="fa fa-plus"></i>  اضافة عقد سائق
-    </a>
+    <div class="aligin">
+      <a href="javascript:void(0)" id="toggleForm" class="add">
+        <i class="fa fa-plus"></i> اضافة عقد سائق
+      </a>
+    </div>
 
     <!-- فورم إضافة عقد -->
     <form id="projectForm" action="" method="post" style="display:none;">
-      <input type="text" name="driver_id" placeholder="اسم السائق" value="<?php echo $_GET['id'] ?>" required />
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0"> اضافة/ تعديل العقد </h5>
+        </div>
+        <div class="card-body">
 
+          <input type="hidden" name="driver_id" placeholder="اسم السائق" value="<?php echo $_GET['id'] ?>" required />
+          <div class="field md-3 sm-6">
+            <label class="form-label">المشروع</label>
+            <div class="control">
+              <select name="project_id">
 
+                <?php
+                include '../config.php';
 
-    <div class="field md-3 sm-6">
-        <label class="form-label">المشروع</label>
-          <div class="control">
-            <select name="project_id">
-
-             <?php
-                  include '../config.php';
-
-                  $sql = "SELECT id, name FROM projects ORDER BY name ASC";
-                  $result = mysqli_query($conn, $sql);
-                        ?>
-               <option value="">-- اختر المشروع --</option>
-                            <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                                <option value="<?php echo $row['id']; ?>">
-                                    <?php echo htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>
-                                </option>
-                            <?php endwhile; ?>
-            </select>
+                $sql = "SELECT id, name FROM projects ORDER BY name ASC";
+                $result = mysqli_query($conn, $sql);
+                ?>
+                <option value="">-- اختر المشروع --</option>
+                <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                  <option value="<?php echo $row['id']; ?>">
+                    <?php echo htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>
+                  </option>
+                <?php endwhile; ?>
+              </select>
+            </div>
           </div>
-        </div>
 
 
-      <div class="section-title"><span class="chip">1</span> البيانات الأساسية للسائق والعقد</div>
-      <div class="form-grid">
+          <div class="section-title"><span class="chip">1</span> البيانات الأساسية للسائق والعقد</div>
+          <div class="form-grid">
 
-        <div class="field md-3 sm-6">
-          <label>تاريخ توقيع العقد (Contract signing date)</label>
-          <div class="control"><input name="contract_signing_date" type="date"></div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>فترة السماح بين التوقيع والتنفيذ (Grace period)</label>
-          <div class="control"><input name="grace_period_days" type="number" min="0" placeholder="عدد الأيام"></div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>مدة العقد بالشهور (Contract Per Month)</label>
-          <div class="control"><input name="contract_duration_months" id="contract_duration_months" type="number"
-              min="0" placeholder="بالشهور"></div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>بداية التنفيذ الفعلي المتفق عليه</label>
-          <div class="control"><input name="actual_start" type="date"></div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>نهاية التنفيذ الفعلي المتفق عليه</label>
-          <div class="control"><input name="actual_end" type="date"></div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>الترحيل (Transportation)</label>
-          <div class="control">
-            <select name="transportation">
-              <option value="">— اختر —</option>
-              <option>مشمولة</option>
-              <option>غير مشمولة</option>
-            </select>
+            <div class="field md-3 sm-6">
+              <label>تاريخ توقيع العقد (Contract signing date)</label>
+              <div class="control"><input name="contract_signing_date" type="date"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>فترة السماح بين التوقيع والتنفيذ (Grace period)</label>
+              <div class="control"><input name="grace_period_days" type="number" min="0" placeholder="عدد الأيام"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>مدة العقد بالشهور (Contract Per Month)</label>
+              <div class="control"><input name="contract_duration_months" id="contract_duration_months" type="number"
+                  min="0" placeholder="بالشهور"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>بداية التنفيذ الفعلي المتفق عليه</label>
+              <div class="control"><input name="actual_start" type="date"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>نهاية التنفيذ الفعلي المتفق عليه</label>
+              <div class="control"><input name="actual_end" type="date"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>الترحيل (Transportation)</label>
+              <div class="control">
+                <select name="transportation">
+                  <option value="">— اختر —</option>
+                  <option>مشمولة</option>
+                  <option>غير مشمولة</option>
+                </select>
+              </div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>الإعاشة (Accommodation)</label>
+              <div class="control">
+                <select name="accommodation">
+                  <option value="">— اختر —</option>
+                  <option>مشمولة</option>
+                  <option>غير مشمولة</option>
+                </select>
+              </div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>السكن (Place for Living)</label>
+              <div class="control">
+                <select name="place_for_living">
+                  <option value="">— اختر —</option>
+                  <option>مشمولة</option>
+                  <option>غير مشمولة</option>
+                </select>
+              </div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>الورشة (Workshop)</label>
+              <div class="control">
+                <select name="workshop">
+                  <option value="">— اختر —</option>
+                  <option>مشمولة</option>
+                  <option>غير مشمولة</option>
+                </select>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>الإعاشة (Accommodation)</label>
-          <div class="control">
-            <select name="accommodation">
-              <option value="">— اختر —</option>
-              <option>مشمولة</option>
-              <option>غير مشمولة</option>
-            </select>
+
+          <hr class="hr" />
+
+          <!-- القسم 2: بيانات ساعات العمل المطلوبة للمعدات -->
+          <div class="section-title"><span class="chip">2</span> بيانات ساعات العمل المطلوبة <strong>للمعدات</strong>
           </div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>السكن (Place for Living)</label>
-          <div class="control">
-            <select name="place_for_living">
-              <option value="">— اختر —</option>
-              <option>مشمولة</option>
-              <option>غير مشمولة</option>
-            </select>
+          <div class="form-grid">
+            <div class="field md-4 sm-6">
+              <label>نوع المعدة المطلوبة (Type of equipment)</label>
+              <div class="control"><input name="equip_type" type="text" placeholder="مثال: حفار" value="حفار"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>حجم المعدة المطلوبة (Size)</label>
+              <div class="control"><input name="equip_size" type="number" placeholder="مثال: 340" value="340"></span>
+              </div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>عدد المعدات المطلوبة</label>
+              <div class="control"><input name="equip_count" id="equip_count" type="number" min="0" value="2"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>ساعات العمل المستهدفة للمعدة شهرياً</label>
+              <div class="control"><input name="equip_target_per_month" id="equip_target_per_month" type="number"
+                  min="0" value="600"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>إجمالي الساعات المستهدفة للمعدات شهرياً</label>
+              <div class="control"><input name="equip_total_month" id="equip_total_month" type="number" readonly
+                  placeholder="يُحتسب تلقائياً"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>إجمالي ساعات العقد المستهدفة للمعدات</label>
+              <div class="control"><input name="equip_total_contract" id="equip_total_contract" type="number" readonly
+                  placeholder="يُحتسب تلقائياً"></div>
+            </div>
           </div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>الورشة (Workshop)</label>
-          <div class="control">
-            <select name="workshop">
-              <option value="">— اختر —</option>
-              <option>مشمولة</option>
-              <option>غير مشمولة</option>
-            </select>
+
+          <hr class="hr" />
+
+          <!-- القسم 3: بيانات ساعات العمل المطلوبة للآليات -->
+          <div class="section-title"><span class="chip">3</span> بيانات ساعات العمل المطلوبة <strong>للآليات</strong>
           </div>
+          <div class="form-grid">
+            <div class="field md-4 sm-6">
+              <label>نوع الآلية المطلوبة</label>
+              <div class="control"><input name="mach_type" type="text" placeholder="مثال: قلاب" value="قلاب"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>حجم حمولة الآلية</label>
+              <div class="control"><input name="mach_size" type="number" placeholder="مثال: 340" value="340"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>عدد الآليات المطلوبة</label>
+              <div class="control"><input name="mach_count" id="mach_count" type="number" min="0" value="8"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>ساعات العمل المستهدفة للآلية شهرياً</label>
+              <div class="control"><input name="mach_target_per_month" id="mach_target_per_month" type="number" min="0"
+                  value="600"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>إجمالي الساعات المستهدفة للآليات شهرياً</label>
+              <div class="control"><input name="mach_total_month" id="mach_total_month" type="number" readonly
+                  placeholder="يُحتسب تلقائياً"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>إجمالي ساعات العقد المستهدفة للآليات</label>
+              <div class="control"><input name="mach_total_contract" id="mach_total_contract" type="number" readonly
+                  placeholder="يُحتسب تلقائياً"></div>
+            </div>
+          </div>
+
+          <hr class="hr" />
+          <div class="section-title"><span class="chip">5</span> بيانات إضافية</div>
+          <div class="form-grid">
+            <div class="field md-3 sm-6">
+              <label>عدد ساعات العمل اليومية</label>
+              <div class="control"><input type="number" name="daily_work_hours" min="0" placeholder="مثال: 8"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>عدد المشغلين للساعات اليومية</label>
+              <div class="control"><input type="number" name="daily_operators" min="0" placeholder="مثال: 3"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>الطرف الأول (ممثل الشركة)</label>
+              <div class="control"><input type="text" name="first_party" placeholder="اسم ممثل الشركة"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>الطرف الثاني (ممثل العميل)</label>
+              <div class="control"><input type="text" name="second_party" placeholder="اسم ممثل العميل"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>الشاهد الأول</label>
+              <div class="control"><input type="text" name="witness_one" placeholder="اسم الشاهد الأول"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>الشاهد الثاني</label>
+              <div class="control"><input type="text" name="witness_two" placeholder="اسم الشاهد الثاني"></div>
+            </div>
+          </div>
+
+
+          <hr class="hr" />
+
+          <!-- القسم 4: الإجماليات -->
+          <div class="section-title"><span class="chip">4</span> إجماليات الساعات (شهرياً وللعقد)</div>
+          <div class="totals">
+            <div class="kpi">
+              <div class="v" id="kpi_month_total">0</div>
+              <div class="t">الساعات المستهدفة شهرياً - معدات وآليات</div>
+              <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
+            </div>
+            <div class="kpi">
+              <div class="v" id="kpi_contract_total">0</div>
+              <div class="t">ساعات العقد المستهدفة - معدات وآليات</div>
+              <input type="hidden" name="forecasted_contracted_hours" id="forecasted_contracted_hours" value="0" />
+            </div>
+            <div class="kpi">
+              <div class="v" id="kpi_equip_month">0</div>
+              <div class="t">إجمالي معدات (شهري)</div>
+            </div>
+            <div class="kpi">
+              <div class="v" id="kpi_mach_month">0</div>
+              <div class="t">إجمالي آليات (شهري)</div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <button type="reset" class="ghost">تفريغ الحقول</button>
+          </div>
+
+          <p class="muted" style="margin-top:8px">* يتم احتساب الحقول الإجمالية تلقائياً بناءً على المدخلات.</p>
+          <button type="submit" class="primary">حفظ البيانات</button>
         </div>
       </div>
-
-      <hr class="hr" />
-
-      <!-- القسم 2: بيانات ساعات العمل المطلوبة للمعدات -->
-      <div class="section-title"><span class="chip">2</span> بيانات ساعات العمل المطلوبة <strong>للمعدات</strong>
-      </div>
-      <div class="form-grid">
-        <div class="field md-4 sm-6">
-          <label>نوع المعدة المطلوبة (Type of equipment)</label>
-          <div class="control"><input name="equip_type" type="text" placeholder="مثال: حفار" value="حفار"></div>
-        </div>
-        <div class="field md-4 sm-6">
-          <label>حجم المعدة المطلوبة (Size)</label>
-          <div class="control"><input name="equip_size" type="number" placeholder="مثال: 340" value="340"></span></div>
-        </div>
-        <div class="field md-4 sm-6">
-          <label>عدد المعدات المطلوبة</label>
-          <div class="control"><input name="equip_count" id="equip_count" type="number" min="0" value="2"></div>
-        </div>
-        <div class="field md-4 sm-6">
-          <label>ساعات العمل المستهدفة للمعدة شهرياً</label>
-          <div class="control"><input name="equip_target_per_month" id="equip_target_per_month" type="number" min="0"
-              value="600"></div>
-        </div>
-        <div class="field md-4 sm-6">
-          <label>إجمالي الساعات المستهدفة للمعدات شهرياً</label>
-          <div class="control"><input name="equip_total_month" id="equip_total_month" type="number" readonly
-              placeholder="يُحتسب تلقائياً"></div>
-        </div>
-        <div class="field md-4 sm-6">
-          <label>إجمالي ساعات العقد المستهدفة للمعدات</label>
-          <div class="control"><input name="equip_total_contract" id="equip_total_contract" type="number" readonly
-              placeholder="يُحتسب تلقائياً"></div>
-        </div>
-      </div>
-
-      <hr class="hr" />
-
-      <!-- القسم 3: بيانات ساعات العمل المطلوبة للآليات -->
-      <div class="section-title"><span class="chip">3</span> بيانات ساعات العمل المطلوبة <strong>للآليات</strong>
-      </div>
-      <div class="form-grid">
-        <div class="field md-4 sm-6">
-          <label>نوع الآلية المطلوبة</label>
-          <div class="control"><input name="mach_type" type="text" placeholder="مثال: قلاب" value="قلاب"></div>
-        </div>
-        <div class="field md-4 sm-6">
-          <label>حجم حمولة الآلية</label>
-          <div class="control"><input name="mach_size" type="number" placeholder="مثال: 340" value="340"></div>
-        </div>
-        <div class="field md-4 sm-6">
-          <label>عدد الآليات المطلوبة</label>
-          <div class="control"><input name="mach_count" id="mach_count" type="number" min="0" value="8"></div>
-        </div>
-        <div class="field md-4 sm-6">
-          <label>ساعات العمل المستهدفة للآلية شهرياً</label>
-          <div class="control"><input name="mach_target_per_month" id="mach_target_per_month" type="number" min="0"
-              value="600"></div>
-        </div>
-        <div class="field md-4 sm-6">
-          <label>إجمالي الساعات المستهدفة للآليات شهرياً</label>
-          <div class="control"><input name="mach_total_month" id="mach_total_month" type="number" readonly
-              placeholder="يُحتسب تلقائياً"></div>
-        </div>
-        <div class="field md-4 sm-6">
-          <label>إجمالي ساعات العقد المستهدفة للآليات</label>
-          <div class="control"><input name="mach_total_contract" id="mach_total_contract" type="number" readonly
-              placeholder="يُحتسب تلقائياً"></div>
-        </div>
-      </div>
-
-      <hr class="hr" />
-      <div class="section-title"><span class="chip">5</span> بيانات إضافية</div>
-      <div class="form-grid">
-        <div class="field md-3 sm-6">
-          <label>عدد ساعات العمل اليومية</label>
-          <div class="control"><input type="number" name="daily_work_hours" min="0" placeholder="مثال: 8"></div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>عدد المشغلين للساعات اليومية</label>
-          <div class="control"><input type="number" name="daily_operators" min="0" placeholder="مثال: 3"></div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>الطرف الأول (ممثل الشركة)</label>
-          <div class="control"><input type="text" name="first_party" placeholder="اسم ممثل الشركة"></div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>الطرف الثاني (ممثل العميل)</label>
-          <div class="control"><input type="text" name="second_party" placeholder="اسم ممثل العميل"></div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>الشاهد الأول</label>
-          <div class="control"><input type="text" name="witness_one" placeholder="اسم الشاهد الأول"></div>
-        </div>
-        <div class="field md-3 sm-6">
-          <label>الشاهد الثاني</label>
-          <div class="control"><input type="text" name="witness_two" placeholder="اسم الشاهد الثاني"></div>
-        </div>
-      </div>
-
-
-      <hr class="hr" />
-
-      <!-- القسم 4: الإجماليات -->
-      <div class="section-title"><span class="chip">4</span> إجماليات الساعات (شهرياً وللعقد)</div>
-      <div class="totals">
-        <div class="kpi">
-          <div class="v" id="kpi_month_total">0</div>
-          <div class="t">الساعات المستهدفة شهرياً - معدات وآليات</div>
-          <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
-        </div>
-        <div class="kpi">
-          <div class="v" id="kpi_contract_total">0</div>
-          <div class="t">ساعات العقد المستهدفة - معدات وآليات</div>
-          <input type="hidden" name="forecasted_contracted_hours" id="forecasted_contracted_hours" value="0" />
-        </div>
-        <div class="kpi">
-          <div class="v" id="kpi_equip_month">0</div>
-          <div class="t">إجمالي معدات (شهري)</div>
-        </div>
-        <div class="kpi">
-          <div class="v" id="kpi_mach_month">0</div>
-          <div class="t">إجمالي آليات (شهري)</div>
-        </div>
-      </div>
-
-      <div class="toolbar">
-        <button type="reset" class="ghost">تفريغ الحقول</button>
-      </div>
-
-      <p class="muted" style="margin-top:8px">* يتم احتساب الحقول الإجمالية تلقائياً بناءً على المدخلات.</p>
-      <button type="submit" class="primary">حفظ البيانات</button>
-
-
     </form>
-
-    <br /><br /><br />
-
     <!-- جدول العقود -->
-    <h3>قائمة العقود</h3>
-    <br />
-    <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
-      <thead>
-        <tr>
-          <th>تاريخ التوقيع</th>
-          <th>مدة العقد (شهور)</th>
-          <th>بداية التنفيذ</th>
-          <th>نهاية التنفيذ</th>
-          <th>ساعات الآليات/شهر</th>
-          <th>إجمالي ساعات الآليات</th>
-          <th>الإجمالي الشهري</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php
-        include '../config.php';
+    <div class="card shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"> قائمة العقودات </h5>
+      </div>
+      <div class="card-body">
+        <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
+          <thead>
+            <tr>
+              <th>تاريخ التوقيع</th>
+              <th>مدة العقد (شهور)</th>
+              <th>بداية التنفيذ</th>
+              <th>نهاية التنفيذ</th>
+              <th>ساعات الآليات/شهر</th>
+              <th>إجمالي ساعات الآليات</th>
+              <th>الإجمالي الشهري</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            include '../config.php';
 
-        // إضافة عقد جديد عند إرسال الفورم
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['driver_id'])) {
-          // $project = mysqli_real_escape_string($conn, $_POST['project']);
-          $driver_id = $_GET['id'];
-             $project_id = $_POST['project_id'];
-
-
-           	
-
-          $contract_signing_date = $_POST['contract_signing_date'];
-          $grace_period_days = $_POST['grace_period_days'];
-          $contract_duration_months = $_POST['contract_duration_months'];
-          $actual_start = $_POST['actual_start'];
-          $actual_end = $_POST['actual_end'];
-          $transportation = $_POST['transportation'];
-          $accommodation = $_POST['accommodation'];
-          $place_for_living = $_POST['place_for_living'];
-          $workshop = $_POST['workshop'];
-
-          $equip_type = $_POST['equip_type'];
-          $equip_size = $_POST['equip_size'];
-          $equip_count = $_POST['equip_count'];
-          $equip_target_per_month = $_POST['equip_target_per_month'];
-          $equip_total_month = $_POST['equip_total_month'];
-          $equip_total_contract = $_POST['equip_total_contract'];
-
-          $mach_type = $_POST['mach_type'];
-          $mach_size = $_POST['mach_size'];
-          $mach_count = $_POST['mach_count'];
-          $mach_target_per_month = $_POST['mach_target_per_month'];
-          $mach_total_month = $_POST['mach_total_month'];
-          $mach_total_contract = $_POST['mach_total_contract'];
-
-          $hours_monthly_target = $_POST['hours_monthly_target'];
-          $forecasted_contracted_hours = $_POST['forecasted_contracted_hours'];
-
-          $daily_work_hours = $_POST['daily_work_hours'];
-          $daily_operators = $_POST['daily_operators'];
-          $first_party = $_POST['first_party'];
-          $second_party = $_POST['second_party'];
-          $witness_one = $_POST['witness_one'];
-          $witness_two = $_POST['witness_two'];
+            // إضافة عقد جديد عند إرسال الفورم
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['driver_id'])) {
+              // $project = mysqli_real_escape_string($conn, $_POST['project']);
+              $driver_id = $_GET['id'];
+              $project_id = $_POST['project_id'];
 
 
-          mysqli_query($conn, "INSERT INTO drivercontracts (
+
+
+              $contract_signing_date = $_POST['contract_signing_date'];
+              $grace_period_days = $_POST['grace_period_days'];
+              $contract_duration_months = $_POST['contract_duration_months'];
+              $actual_start = $_POST['actual_start'];
+              $actual_end = $_POST['actual_end'];
+              $transportation = $_POST['transportation'];
+              $accommodation = $_POST['accommodation'];
+              $place_for_living = $_POST['place_for_living'];
+              $workshop = $_POST['workshop'];
+
+              $equip_type = $_POST['equip_type'];
+              $equip_size = $_POST['equip_size'];
+              $equip_count = $_POST['equip_count'];
+              $equip_target_per_month = $_POST['equip_target_per_month'];
+              $equip_total_month = $_POST['equip_total_month'];
+              $equip_total_contract = $_POST['equip_total_contract'];
+
+              $mach_type = $_POST['mach_type'];
+              $mach_size = $_POST['mach_size'];
+              $mach_count = $_POST['mach_count'];
+              $mach_target_per_month = $_POST['mach_target_per_month'];
+              $mach_total_month = $_POST['mach_total_month'];
+              $mach_total_contract = $_POST['mach_total_contract'];
+
+              $hours_monthly_target = $_POST['hours_monthly_target'];
+              $forecasted_contracted_hours = $_POST['forecasted_contracted_hours'];
+
+              $daily_work_hours = $_POST['daily_work_hours'];
+              $daily_operators = $_POST['daily_operators'];
+              $first_party = $_POST['first_party'];
+              $second_party = $_POST['second_party'];
+              $witness_one = $_POST['witness_one'];
+              $witness_two = $_POST['witness_two'];
+
+
+              mysqli_query($conn, "INSERT INTO drivercontracts (
     contract_signing_date, driver_id, grace_period_days, contract_duration_months,
     actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
     equip_type, equip_size, equip_count, equip_target_per_month, equip_total_month, equip_total_contract,
@@ -380,35 +388,36 @@ if (!isset($_SESSION['user'])) {
     '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two','$project_id'
 )");
 
-        }
-  $driver_id = $_GET['id'];
-        // جلب العقود
-        $query = "SELECT * FROM `drivercontracts` WHERE `driver_id` = $driver_id  ORDER BY id DESC";
-        $result = mysqli_query($conn, $query);
-        $i = 1;
+            }
+            $driver_id = $_GET['id'];
+            // جلب العقود
+            $query = "SELECT * FROM `drivercontracts` WHERE `driver_id` = $driver_id  ORDER BY id DESC";
+            $result = mysqli_query($conn, $query);
+            $i = 1;
 
 
-        while ($row = mysqli_fetch_assoc($result)) {
-          echo "<tr>";
-          echo "<td>" . $row['contract_signing_date'] . "</td>";
-          echo "<td>" . $row['contract_duration_months'] . "</td>";
-          echo "<td>" . $row['actual_start'] . "</td>";
-          echo "<td>" . $row['actual_end'] . "</td>";
+            while ($row = mysqli_fetch_assoc($result)) {
+              echo "<tr>";
+              echo "<td>" . $row['contract_signing_date'] . "</td>";
+              echo "<td>" . $row['contract_duration_months'] . "</td>";
+              echo "<td>" . $row['actual_start'] . "</td>";
+              echo "<td>" . $row['actual_end'] . "</td>";
 
-          echo "<td>" . $row['hours_monthly_target'] . "</td>";
-          echo "<td>" . $row['equip_total_contract'] . "</td>";
+              echo "<td>" . $row['hours_monthly_target'] . "</td>";
+              echo "<td>" . $row['equip_total_contract'] . "</td>";
 
-          echo "<td>
+              echo "<td>
                         <a href='edit.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
                         <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
                         <a href='contracts_details.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a>
                       </td>";
-          echo "</tr>";
-        }
-        ?>
-      </tbody>
-    </table>
-
+              echo "</tr>";
+            }
+            ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- jQuery -->
