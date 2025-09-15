@@ -523,7 +523,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
       <tr>
         <th style="text-align: right;"> # </th>
         <th style="text-align: right;"> المعدة </th>
-        <th style="text-align: right;"> المشروع </th>
+        <!-- <th style="text-align: right;"> المشروع </th> -->
         <!-- <th style="text-align: right;"> المالك </th> -->
         <th style="text-align: right;"> التاريخ </th>
         <th style="text-align: right;"> الوردية </th>
@@ -531,13 +531,18 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
         <th style="text-align: right;"> الجردل </th>
         <th style="text-align: right;"> الجاكهمر </th>
         <th style="text-align: right;"> الاضافية </th>
+
         <!-- <th style="text-align: right;"> مجموع الاضافية</th> -->
         <th style="text-align: right;"> الاستعداد </th>
+                <th style="text-align: right;"> الاعطال </th>
+
+                <th style="text-align: right;"> ساعات العمل </th>
+                <th style="text-align: right;">  اجمالي ساعات اليوم </th>
+
         <!-- <th style="text-align: right;"> استعداد الاعتماد </th> -->
         <!-- <th style="text-align: right;"> مجموع الساعات </th> -->
         <!-- <th style="text-align: right;"> ملاحظات العمل </th> -->
         <!-- <th style="text-align: right;"> عطل HR </th> -->
-        <th style="text-align: right;"> الاعطال </th>
         <th style="text-align: right;"> الحالة </th>
         <!-- <th>جاك هامر</th> -->
         <th>إجراءات</th>
@@ -647,6 +652,9 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
       $i = 1;
       while ($row = mysqli_fetch_assoc($result)) {
 
+        $totalwork=  $row['standby_hours']+ $row['bucket_hours'] + $row['jackhammer_hours'] + $row['extra_hours'] + $row['dependence_hours'];
+        $totalall=  $row['total_work_hours']+ $row['total_fault_hours'] ;
+
         // The Variable that take the status value
         switch ($row['status']) {
           case "1":
@@ -665,7 +673,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
         echo "<tr>";
         echo "<td>" . $i++ . "</td>";
         echo "<td>" . $row['eq_code'] . " - " . $row['eq_name'] . "</td>";
-        echo "<td>" . $row['project_name'] . "</td>";
+        // echo "<td>" . $row['project_name'] . "</td>";
         // echo "<td> ... </td>";
         echo "<td>" . $row['date'] . "</td>";
         echo $row['shift'] == "D" ? "<td> صباحية </td>" : "<td> مسائية </td>";
@@ -673,13 +681,19 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
         echo "<td>" . $row['bucket_hours'] . "</td>";
         echo "<td>" . $row['jackhammer_hours'] . "</td>";
         echo "<td>" . $row['extra_hours'] . "</td>";
+
         // echo "<td>" . $row['extra_hours_total'] . "</td>";
         echo "<td>" . $row['standby_hours'] . "</td>";
+                echo "<td>" . $row['total_fault_hours'] . "</td>";
+
+                  echo "<td>" .  $totalwork. "</td>";
+                  echo "<td>" .  $totalall. "</td>";
+
+
         // echo "<td>" . $row['dependence_hours'] . "</td>";
         // echo "<td>" . $row['total_work_hours'] . "</td>";
         // echo "<td>" . $row['work_notes'] . "</td>";
         // echo "<td>" . $row['hr_fault'] . "</td>";
-        echo "<td>" . $row['total_fault_hours'] . "</td>";
         echo "<td>" . $status . "</td>";
         echo "<td>
         <a href='aprovment.php?t=".$type."&&type=1&&id=" . $row['id'] . "'  style='color: #28a745'> <i class='fa fa-check'></i> </a> |
