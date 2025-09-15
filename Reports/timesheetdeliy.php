@@ -26,6 +26,9 @@ $date_filter     = isset($_GET['date']) ? $_GET['date'] : '';
 $project_filter  = isset($_GET['project']) ? $_GET['project'] : '';
 $supplier_filter = isset($_GET['supplier']) ? $_GET['supplier'] : '';
 
+$shift_filter = isset($_GET['shift']) ? $_GET['shift'] : '';
+
+
 $sql = "
 SELECT 
     t.id,
@@ -60,6 +63,10 @@ if (!empty($supplier_filter)) {
     $sql .= " AND s.id = '$supplier_filter' ";
 }
 
+if (!empty($shift_filter)) {
+    $sql .= " AND t.shift = '$shift_filter' ";
+}
+
 $sql .= " ORDER BY t.date, p.name, s.name ";
 $result = mysqli_query($conn, $sql);
 
@@ -87,6 +94,11 @@ if (!empty($supplier_filter)) {
     $total_sql .= " AND s.id = '$supplier_filter' ";
 }
 
+if (!empty($shift_filter)) {
+    $total_sql .= " AND t.shift = '$shift_filter' ";
+}
+
+
 $total_res = mysqli_query($conn, $total_sql);
 $totals = mysqli_fetch_assoc($total_res);
 ?>
@@ -106,7 +118,7 @@ $totals = mysqli_fetch_assoc($total_res);
                     <input type="date" class="form-control" name="date" value="<?php echo $date_filter; ?>">
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label">🏗️ المشروع:</label>
                     <select class="form-select" name="project">
                         <option value="">-- الكل --</option>
@@ -120,7 +132,7 @@ $totals = mysqli_fetch_assoc($total_res);
                     </select>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label">🚛 المورد:</label>
                     <select class="form-select" name="supplier">
                         <option value="">-- الكل --</option>
@@ -133,6 +145,16 @@ $totals = mysqli_fetch_assoc($total_res);
                         ?>
                     </select>
                 </div>
+                <div class="col-md-2">
+                    <label class="form-label">🚛 الوردية:</label>
+
+                 <select class="form-select" name="shift">
+        <option value="">-- الكل --</option>
+        <option value="D" <?php if(($_GET['shift'] ?? '')=="صباحية") echo "selected"; ?>>صباحية</option>
+        <option value="N" <?php if(($_GET['shift'] ?? '')=="مسائية") echo "selected"; ?>>مسائية</option>
+    </select>
+                    </div>
+
 
                 <div class="col-md-3">
                     <button class="btn btn-primary w-100"><i class="fa fa-search me-2"></i>بحث</button>
