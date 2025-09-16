@@ -13,31 +13,33 @@ include '../config.php';
 
 $type = "1";
 
+$where = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $start_date = $_POST['start_date'];
-  $end_date = $_POST['end_date'];
+  $start_date     = $_POST['start_date'];
+  $end_date       = $_POST['end_date'];
   $equipment_type = $_POST['equipment_type'];
-  $shift_filter = isset($_POST['shift']) ? $_POST['shift'] : '';
+  $shift_filter   = isset($_POST['shift']) ? $_POST['shift'] : '';
 
-  $where = "WHERE t.type = '$type' ";
+  // مصفوفة لتجميع الشروط
+  $whereParts = [];
 
   if (!empty($start_date) && !empty($end_date)) {
-    $where .= " AND t.date BETWEEN '$start_date' AND '$end_date' ";
+    $whereParts[] = "t.date BETWEEN '$start_date' AND '$end_date'";
   }
   if (!empty($equipment_type)) {
-    $where .= " AND t.type = '$equipment_type' ";
-  } else {
-    $where .= " AND t.type = '1' ";
+    $whereParts[] = "t.type = '$equipment_type'";
   }
-
   if (!empty($shift_filter)) {
-    $where .= " AND t.shift = '$shift_filter' ";
+    $whereParts[] = "t.shift = '$shift_filter'";
   }
 
+  if (count($whereParts) > 0) {
+    $where = "WHERE " . implode(" AND ", $whereParts);
+  }
 } else {
   // ✅ أول مرة يفتح الصفحة: عرض سجلات اليوم فقط
   $today = date("Y-m-d");
-  $where = "WHERE  t.date = '$today' ";
+  $where = "WHERE t.date = '$today'";
 }
 
 // --- إحصائيات ---
