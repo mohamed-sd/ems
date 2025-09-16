@@ -645,8 +645,17 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           JOIN equipments e ON o.equipment = e.id
           JOIN projects p ON o.project = p.id
           JOIN drivers d ON t.driver = d.id
-          WHERE t.type LIKE '$type'
-          ORDER BY t.id DESC";
+          WHERE t.type LIKE '$type' 
+         ";
+
+          if ($_SESSION['user']['role'] == "6") {
+            // If the user is a driver, filter by their user ID
+            $user_filter = $_SESSION['user']['id'];
+           $query .= " AND t.user_id = '$user_filter'  ORDER BY t.id DESC ";
+}else {
+  $query .= " ORDER BY t.id DESC ";
+}
+
 
 
           $result = mysqli_query($conn, $query);
@@ -717,6 +726,8 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
@@ -730,7 +741,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
   (function () {
     $(document).ready(function () {
       $('#projectsTable').DataTable({
-        responsive: true,
+        responsive: true, 
         dom: 'Bfrtip', // Buttons + Search + Pagination
         buttons: [
           { extend: 'copy', text: 'نسخ' },
@@ -744,6 +755,8 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
         }
       });
     });
+
+  
 
     const toggleFormBtn = document.getElementById('toggleForm');
     const form = document.getElementById('projectForm');

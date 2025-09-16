@@ -107,6 +107,7 @@ if (!isset($_SESSION['user'])) {
 
 
           <div class="section-title"><span class="chip">1</span> البيانات الأساسية للمورد والعقد</div>
+          <br>
           <div class="form-grid">
 
             <div class="field md-3 sm-6">
@@ -177,13 +178,15 @@ if (!isset($_SESSION['user'])) {
           <!-- القسم 2: بيانات ساعات العمل المطلوبة للمعدات -->
           <div class="section-title"><span class="chip">2</span> بيانات ساعات العمل المطلوبة <strong>للمعدات</strong>
           </div>
+                    <br>
+
           <div class="form-grid">
             <div class="field md-4 sm-6">
-              <label>نوع المعدة المطلوبة (Type of equipment)</label>
+              <label>نوع المعدة المطلوبة </label>
               <div class="control"><input name="equip_type" type="text" placeholder="مثال: حفار" value="حفار"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>حجم المعدة المطلوبة (Size)</label>
+              <label>حجم المعدة المطلوبة </label>
               <div class="control"><input name="equip_size" type="number" placeholder="مثال: 340" value="340"></span>
               </div>
             </div>
@@ -192,17 +195,17 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="equip_count" id="equip_count" type="number" min="0" value="2"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>ساعات العمل المستهدفة للمعدة شهرياً</label>
+              <label>ساعات العمل  للمعدة شهرياً</label>
               <div class="control"><input name="equip_target_per_month" id="equip_target_per_month" type="number"
                   min="0" value="600"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي الساعات المستهدفة للمعدات شهرياً</label>
+              <label>إجمالي الساعات  للمعدات شهرياً</label>
               <div class="control"><input name="equip_total_month" id="equip_total_month" type="number" readonly
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي ساعات العقد المستهدفة للمعدات</label>
+              <label>إجمالي ساعات العقد  للمعدات</label>
               <div class="control"><input name="equip_total_contract" id="equip_total_contract" type="number" readonly
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
@@ -213,6 +216,8 @@ if (!isset($_SESSION['user'])) {
           <!-- القسم 3: بيانات ساعات العمل المطلوبة للآليات -->
           <div class="section-title"><span class="chip">3</span> بيانات ساعات العمل المطلوبة <strong>للآليات</strong>
           </div>
+                    <br>
+
           <div class="form-grid">
             <div class="field md-4 sm-6">
               <label>نوع الآلية المطلوبة</label>
@@ -227,17 +232,17 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="mach_count" id="mach_count" type="number" min="0" value="8"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>ساعات العمل المستهدفة للآلية شهرياً</label>
+              <label>ساعات العمل  للآلية شهرياً</label>
               <div class="control"><input name="mach_target_per_month" id="mach_target_per_month" type="number" min="0"
                   value="600"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي الساعات المستهدفة للآليات شهرياً</label>
+              <label>إجمالي الساعات  للآليات شهرياً</label>
               <div class="control"><input name="mach_total_month" id="mach_total_month" type="number" readonly
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي ساعات العقد المستهدفة للآليات</label>
+              <label>إجمالي ساعات العقد  للآليات</label>
               <div class="control"><input name="mach_total_contract" id="mach_total_contract" type="number" readonly
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
@@ -245,6 +250,8 @@ if (!isset($_SESSION['user'])) {
 
           <hr class="hr" />
           <div class="section-title"><span class="chip">5</span> بيانات إضافية</div>
+                    <br>
+
           <div class="form-grid">
             <div class="field md-3 sm-6">
               <label>عدد ساعات العمل اليومية</label>
@@ -300,10 +307,11 @@ if (!isset($_SESSION['user'])) {
 
           <div class="toolbar">
             <button type="reset" class="ghost">تفريغ الحقول</button>
+                      <button type="submit" class="primary">حفظ البيانات</button>
+
           </div>
 
           <p class="muted" style="margin-top:8px">* يتم احتساب الحقول الإجمالية تلقائياً بناءً على المدخلات.</p>
-          <button type="submit" class="primary">حفظ البيانات</button>
         </div>
       </div>
     </form>

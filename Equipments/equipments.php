@@ -101,7 +101,16 @@ include("../inheader.php");
                         $type = mysqli_real_escape_string($conn, $_POST['type']);
                         $name = mysqli_real_escape_string($conn, $_POST['name']);
                         $status = mysqli_real_escape_string($conn, $_POST['status']);
-                        mysqli_query($conn, "INSERT INTO equipments (suppliers, code, type, name, status) VALUES ('$suppliers', '$code', '$type', '$name', '$status')");
+
+              $sql = "INSERT INTO equipments (suppliers, code, type, name, status) VALUES ('$suppliers', '$code', '$type', '$name', '$status')";
+
+                        
+            if (mysqli_query($conn, $sql)) {
+              echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='equipments.php';</script>";
+              exit;
+            } else {
+              echo "<script>alert('❌ خطأ في الحفظ: " . mysqli_real_escape_string($conn, mysqli_error($conn)) . "');</script>";
+            }
                     }
 
                     // جلب المعدات

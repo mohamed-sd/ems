@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 } else {
   // ✅ أول مرة يفتح الصفحة: عرض سجلات اليوم فقط
   $today = date("Y-m-d");
-  $where = "WHERE t.type = '$type' AND t.date = '$today' ";
+  $where = "WHERE  t.date = '$today' ";
 }
 
 // --- إحصائيات ---

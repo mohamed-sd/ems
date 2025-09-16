@@ -142,7 +142,9 @@ WHERE pm.project = $project";
                     echo "<td>" . $row['code'] . "</td>";
                     echo "<td>" . $row['equipment_name'] . "</td>";
                     echo "<td>" . $row['supplier_name'] . "</td>";
-                    echo "<td>" . $row['type'] . "</td>";
+
+                  echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:red;'> قلاب </td>";
+
 
 
                     // echo "<td>
@@ -163,7 +165,7 @@ WHERE pm.project = $project";
                 <tr>
                     <th>#</th>
                     <th style="text-align: right;">تاريخ البداية</th>
-                    <th style="text-align: right;"> تاريخ النهاية </th>
+                    <th style="text-align: right;"> المستهدف شهريا</th>
                     <th style="text-align: right;">المجموع</th>
                     <!-- <th style="text-align: right;">إجراءات</th> -->
                 </tr>

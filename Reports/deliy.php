@@ -22,9 +22,9 @@ $sql = "
       t.total_fault_hours,
       t.standby_hours
   FROM timesheet t
-  JOIN equipments e ON t.operator = e.id
+JOIN operations o ON t.operator = o.id
+JOIN equipments e ON o.equipment = e.id 
   JOIN drivers d ON t.driver = d.id
-  JOIN operations o ON e.id = o.equipment
   JOIN projects p ON o.project = p.id
   WHERE 1=1
 ";
@@ -44,8 +44,8 @@ $result = mysqli_query($conn, $sql) or die("خطأ في الاستعلام: " . 
 // استعلام المجموع
 $total_sql = "SELECT SUM(t.total_work_hours) AS total_hours
 FROM timesheet t
-JOIN equipments e ON t.operator = e.id
-JOIN operations o ON e.id = o.equipment
+JOIN operations o ON t.operator = o.id
+JOIN equipments e ON o.equipment = e.id 
 JOIN projects p ON o.project = p.id
 WHERE 1=1";
 

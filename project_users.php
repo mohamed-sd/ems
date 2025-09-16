@@ -116,9 +116,12 @@ include 'config.php';
 
                             mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role , project_id , parent_id , created_at, updated_at) 
             VALUES ('$name', '$username', '$password', '$phone', '$role' , '$project' , '$parent_id' , NOW(), NOW())");
+                            echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='project_users.php';</script>";
+
                         }
 
                         $userid = $_SESSION['user']['id'];
+                        
 
 
                         $query = "SELECT id, name, username,password ,phone, role , created_at, updated_at

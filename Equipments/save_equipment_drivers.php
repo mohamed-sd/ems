@@ -13,6 +13,6 @@ if (isset($_POST['equipment_id']) && isset($_POST['drivers'])) {
     }
 
     echo "✅ تم تحديث السائقين للآلية.";
-    echo "<br><a href='equipments.php'>🔙 الرجوع للآليات</a>";
+  echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='equipments.php';</script>";
 }
 ?>

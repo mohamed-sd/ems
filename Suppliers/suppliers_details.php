@@ -86,7 +86,7 @@ if (!isset($_SESSION['user'])) {
                 <th style="text-align: right;">كود المعدة</th>
                 <th style="text-align: right;"> الاسم </th>
                 <th style="text-align: right;">نوع الآليه</th>
-                <th style="text-align: right;"> اسم العميل </th>
+                <!-- <th style="text-align: right;"> اسم العميل </th> -->
                 <!-- <th style="text-align: right;">إجراءات</th> -->
             </tr>
         </thead>
@@ -102,8 +102,9 @@ if (!isset($_SESSION['user'])) {
                 echo "<td>".$i++."</td>";
                 echo "<td>".$row['code']."</td>";
                 echo "<td>".$row['name']."</td>";
-                echo "<td>".$row['type']."</td>";
-                echo "<td>".$row['status']."</td>";
+               echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:red;'> قلاب </td>";
+
+                // echo "<td>".$row['status']."</td>";
                 // echo "<td>
                 //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
                 //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>

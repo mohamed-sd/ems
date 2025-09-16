@@ -89,19 +89,21 @@ if (!isset($_SESSION['user'])) {
           <input type="hidden" name="project" placeholder="اسم المشروع" value="<?php echo $_GET['id'] ?>" required />
 
           <div class="section-title"><span class="chip">1</span> البيانات الأساسية للعميل والعقد</div>
+                    <br>
+
           <div class="form-grid">
 
             <div class="field md-3 sm-6">
-              <label>تاريخ توقيع العقد (Contract signing date)</label>
+              <label>تاريخ توقيع العقد </label>
               <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>فترة السماح بين التوقيع والتنفيذ (Grace period)</label>
+              <label>فترة السماح بين التوقيع والتنفيذ </label>
               <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0"
                   placeholder="عدد الأيام"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>مدة العقد بالشهور (Contract Per Month)</label>
+              <label>مدة العقد بالشهور </label>
               <div class="control"><input name="contract_duration_months" id="contract_duration_months" type="number"
                   min="0" placeholder="بالشهور"></div>
             </div>
@@ -160,9 +162,10 @@ if (!isset($_SESSION['user'])) {
           <!-- القسم 2: بيانات ساعات العمل المطلوبة للمعدات -->
           <div class="section-title"><span class="chip">2</span> بيانات ساعات العمل المطلوبة <strong>للمعدات</strong>
           </div>
+          <br>
           <div class="form-grid">
             <div class="field md-4 sm-6">
-              <label>نوع المعدة المطلوبة (Type of equipment)</label>
+              <label>نوع المعدة المطلوبة </label>
               <div class="control"><input name="equip_type" id="equip_type" type="text" placeholder="مثال: حفار"
                   value="حفار"></div>
             </div>
@@ -181,12 +184,12 @@ if (!isset($_SESSION['user'])) {
                   min="0" value="600"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي الساعات المستهدفة للمعدات شهرياً</label>
+              <label>إجمالي الساعات المستهدفة  شهرياً</label>
               <div class="control"><input name="equip_total_month" id="equip_total_month" type="number" readonly
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي ساعات العقد المستهدفة للمعدات</label>
+              <label>إجمالي ساعات العقد  للمعدات</label>
               <div class="control"><input name="equip_total_contract" id="equip_total_contract" type="number" readonly
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
@@ -196,7 +199,10 @@ if (!isset($_SESSION['user'])) {
 
           <!-- القسم 3: بيانات ساعات العمل المطلوبة للآليات -->
           <div class="section-title"><span class="chip">3</span> بيانات ساعات العمل المطلوبة <strong>للآليات</strong>
+
           </div>
+                              <br>
+
           <div class="form-grid">
             <div class="field md-4 sm-6">
               <label>نوع الآلية المطلوبة</label>
@@ -215,12 +221,12 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="mach_count" id="mach_count" type="number" min="0" value="8"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>ساعات العمل المستهدفة للآلية شهرياً</label>
+              <label>ساعات العمل  للآلية شهرياً</label>
               <div class="control"><input name="mach_target_per_month" id="mach_target_per_month" type="number" min="0"
                   value="600"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي الساعات المستهدفة للآليات شهرياً</label>
+              <label>إجمالي الساعات  للآليات شهرياً</label>
               <div class="control"><input name="mach_total_month" id="mach_total_month" type="number" readonly
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
@@ -233,6 +239,8 @@ if (!isset($_SESSION['user'])) {
 
           <hr class="hr" />
           <div class="section-title"><span class="chip">5</span> بيانات إضافية</div>
+                    <br>
+
           <div class="form-grid">
             <div class="field md-3 sm-6">
               <label>عدد ساعات العمل اليومية</label>
@@ -274,6 +282,8 @@ if (!isset($_SESSION['user'])) {
 
           <!-- القسم 4: الإجماليات -->
           <div class="section-title"><span class="chip">4</span> إجماليات الساعات (شهرياً وللعقد)</div>
+                    <br>
+
           <div class="totals">
             <div class="kpi">
               <div class="v" id="kpi_month_total">0</div>
