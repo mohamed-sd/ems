@@ -62,25 +62,16 @@ include('../insidebar.php');
                 <thead>
                     <tr>
                         <!-- <th>#</th> -->
-                        <th>Create Time <br/>
-                        تاريخ الإضافة
-                        </th>
-                        <th>Project Name <br/>
-                            اسم المشروع</th>
-                        <th>Equipments <br/>
-                            عدد الاليات</th>
-                        <th> Contracts <br/>
-                            العقود</th>
-                        <th> Clients <br/>
-                            العميل</th>
-                        <th> Location <br/>
-                            الموقع</th>
-                        <th> Suppliers <br/>
-                            عدد الموردين</th>
-                        <th> Status <br/>
-                            الحالة</th>
-                        <th> Actions <br/>
-                            إجراءات</th>
+                    
+                        <th> تاريخ الإضافة </th>
+                        <th> اسم المشروع</th>
+                        <th> عدد الاليات</th>
+                        <th>العقود</th>
+                        <th> العميل</th>
+                        <th>الموقع</th>
+                        <th> عدد الموردين</th>
+                        <th> الحالة</th>
+                        <th> إجراءات</th>
                     </tr>
                 </thead>
                 <tbody>

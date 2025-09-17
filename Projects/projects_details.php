@@ -18,7 +18,8 @@ if (!isset($_SESSION['user'])) {
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
+       <!-- Bootstrab 5 -->
+  <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
 </head>
@@ -41,57 +42,50 @@ if (!isset($_SESSION['user'])) {
         </div>
 
         <h3> تفاصير المشروع : </h3>
-        <br />
-        <table class="table">
-            <thead>
-                <tr>
-                    <?php
+
+                            <?php
                     include '../config.php';
-
                     $project = $_GET['id'];
-
                     $suppliers = mysqli_query($conn, "SELECT COUNT(DISTINCT pm.suppliers) AS total_suppliers
 FROM equipments pm
 JOIN operations m ON pm.id = m.equipment
 WHERE m.project =  $project;");
-
-
-
                     $rowsuppliers = mysqli_fetch_assoc($suppliers);
                     $total_suppliers = $rowsuppliers['total_suppliers'];
-
-
-
-
-
                     $select = mysqli_query($conn, "SELECT * FROM `projects` WHERE `id` = $project");
                     while ($row = mysqli_fetch_array($select)) {
                         ?>
-                    <tr class="o">
-                        <th> اسم المشروع </th>
-                        <th><?php echo $row['name']; ?></th>
-                    </tr>
-                    <tr class="t">
-                        <th> اسم العميل </th>
-                        <th><?php echo $row['client']; ?></th>
-                    </tr>
-                    <tr class="o">
-                        <th> موقع المشروع </th>
-                        <th><?php echo $row['location']; ?></th>
-                    </tr>
-                    <tr class="t">
-                        <th> عدد الموردين </th>
-                        <th><?php echo $total_suppliers; ?></th>
-                    </tr>
-                    <!-- <tr class="t">
-        <th> اجمالي الساعات </th>
-        <th><?php echo $row['total']; ?></th>
-    </tr> -->
-                    <?php
-                    } // end while loop
-                    ?>
-            </thead>
-        </table>
+    <div class="report">
+        <div class="row">
+            <div class="col-lg-2">
+                اسم المشروع 
+            </div>
+            <div class="col-lg-4">
+                <?php echo $row['name']; ?>
+            </div>
+            <div class="col-lg-2">
+                اسم العميل 
+            </div>
+            <div class="col-lg-4">
+                <?php echo $row['client']; ?>
+            </div>
+
+            <div class="col-lg-2">
+                موقع المشروع 
+            </div>
+            <div class="col-lg-4">
+                <?php echo $row['location']; ?>
+            </div>
+            <div class="col-lg-2">
+               عدد الموردين 
+            </div>
+            <div class="col-lg-4">
+               <?php echo $total_suppliers; ?>
+            </div>
+        </div>
+    </div>
+
+        <?php } ?>
 
         <br /> <br /> <br />
 
@@ -143,7 +137,7 @@ WHERE pm.project = $project";
                     echo "<td>" . $row['equipment_name'] . "</td>";
                     echo "<td>" . $row['supplier_name'] . "</td>";
 
-                  echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:red;'> قلاب </td>";
+                    echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:red;'> قلاب </td>";
 
 
 
