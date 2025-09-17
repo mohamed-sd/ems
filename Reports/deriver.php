@@ -10,6 +10,11 @@ $project_filter = isset($_GET['project']) ? $_GET['project'] : '';
 $driver_filter  = isset($_GET['driver']) ? $_GET['driver'] : '';
 $start_date     = isset($_GET['start_date']) ? $_GET['start_date'] : '';
 $end_date       = isset($_GET['end_date']) ? $_GET['end_date'] : '';
+$shift_filter = isset($_GET['shift']) ? $_GET['shift'] : '';
+
+$equipment_id = isset($_GET['equipment_id']) ? $_GET['equipment_id'] : '';
+
+
 
 $sql = "
 SELECT 
@@ -37,6 +42,14 @@ if (!empty($project_filter)) {
 if (!empty($driver_filter)) {
     $sql .= " AND d.id = '$driver_filter' ";
 }
+if (!empty($shift_filter)) {
+    $sql .= " AND t.shift = '$shift_filter' ";
+}
+
+if (!empty($equipment_id)) {
+    $sql  .= " AND e.id = '$equipment_id'";
+}
+
 
 $sql .= " GROUP BY d.name, p.name, e.name, t.date ORDER BY t.date, d.name";
 $result = mysqli_query($conn, $sql);
@@ -107,6 +120,36 @@ $result = mysqli_query($conn, $sql);
                     <input type="date" name="end_date" value="<?php echo $end_date; ?>" class="form-control">
                 </div>
 
+                     <div class="col-md-2">
+                    <label class="form-label">🚛 الوردية:</label>
+
+                 <select class="form-select" name="shift">
+        <option value="">-- الكل --</option>
+        <option value="D" <?php if(($_GET['shift'] ?? '')=="صباحية") echo "selected"; ?>>صباحية</option>
+        <option value="N" <?php if(($_GET['shift'] ?? '')=="مسائية") echo "selected"; ?>>مسائية</option>
+    </select>
+                    </div>
+
+
+<div class="col-md-2">
+    <label class="form-label">الآلية</label>
+    <select name="equipment_id" class="form-select">
+        <option value="">-- الكل --</option>
+        <?php
+        $res = mysqli_query($conn, "
+            SELECT DISTINCT e.id, e.name 
+            FROM operations o
+            JOIN equipments e ON o.equipment = e.id
+        ");
+        while ($row = mysqli_fetch_assoc($res)) {
+            $sel = (($_GET['equipment_id'] ?? '') == $row['id']) ? "selected" : "";
+            echo "<option value='{$row['id']}' $sel>{$row['name']}</option>";
+        }
+        ?>
+    </select>
+</div>
+                    
+
                 <div class="col-12 text-center">
                     <button class="btn btn-primary px-5 mt-3" type="submit">
                         <i class="fa fa-search"></i> بحث
@@ -119,10 +162,11 @@ $result = mysqli_query($conn, $sql);
                 <table class="table table-striped table-hover text-center align-middle">
                     <thead class="table-primary">
                         <tr>
-                            <th>👨‍🔧 السائق</th>
+                           <th>📅 التاريخ</th>
                             <th>🏗️ المشروع</th>
+
+                            <th>👨‍🔧 السائق</th>
                             <th>⚙️ الآلية</th>
-                            <th>📅 التاريخ</th>
                             <th>⏱️ مجموع الساعات</th>
                         </tr>
                     </thead>
@@ -133,10 +177,11 @@ $result = mysqli_query($conn, $sql);
                         $grand_total += $row['total_hours'];
                     ?>
                         <tr>
-                            <td><?php echo $row['driver_name']; ?></td>
+                             <td><?php echo $row['date']; ?></td>
                             <td><?php echo $row['project_name']; ?></td>
+
+                            <td><?php echo $row['driver_name']; ?></td>
                             <td><?php echo $row['equipment_name']; ?></td>
-                            <td><?php echo $row['date']; ?></td>
                             <td><span class="badge bg-success fs-6"><?php echo $row['total_hours']; ?></span></td>
                         </tr>
                     <?php } ?>
