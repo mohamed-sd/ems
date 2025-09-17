@@ -387,6 +387,7 @@ if (!isset($_SESSION['user'])) {
     '$hours_monthly_target','$forecasted_contracted_hours',
     '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two','$project_id'
 )");
+              echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='drivercontracts.php';</script>";
 
             }
             $driver_id = $_GET['id'];
@@ -407,9 +408,9 @@ if (!isset($_SESSION['user'])) {
               echo "<td>" . $row['equip_total_contract'] . "</td>";
 
               echo "<td>
-                        <a href='edit.php?id=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
+                        <a href='' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
                         <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
-                        <a href='contracts_details.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a>
+                        <a href='showcontractdriver.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a>
                       </td>";
               echo "</tr>";
             }
