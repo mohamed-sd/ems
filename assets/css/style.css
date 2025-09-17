@@ -54,12 +54,14 @@ body {
   border-radius: 8px;
   font-size: 16px;
   transition: all 0.3s;
+  text-align: center;
 }
 
 .login-container input:focus {
   border-color: var(--btn-color);
   box-shadow: 0 0 4px rgba(255, 170, 51, 0.5);
   outline: none;
+  text-align: center;
 }
 
 .login-container button {
@@ -300,6 +302,7 @@ body {
   border: 1px solid #ccc;
   font-size: 15px;
   transition: border 0.3s, box-shadow 0.3s;
+  text-align: center;
 }
 
 #projectForm input:focus,
@@ -308,6 +311,7 @@ body {
   border-color: var(--btn-color);
   box-shadow: 0 0 5px rgba(255, 170, 51, 0.5);
   outline: none;
+  text-align: center;
 }
 
 #projectForm button {
@@ -355,6 +359,7 @@ table {
   /* color: black; */
   font-size: 18px;
   padding: 10px;
+  text-align: center;
 }
 
 /* ================== Responsive Sidebar ================== */
@@ -429,6 +434,7 @@ table {
   text-align: center;
   font-weight: bold;
   padding: 12px;
+  text-align: center;
 }
 
 /* الصفوف */
@@ -446,6 +452,11 @@ table {
 #projectsTable tbody td {
   color: #0d1b2a; /* كحلي */
   padding: 10px;
+  text-align: center;
+}
+
+#projectsTable tbody th {
+  text-align: center;
 }
 
 /* زرار DataTables (نسخ - تصدير - طباعة) */
@@ -470,9 +481,11 @@ table {
   border-radius: 5px;
   padding: 6px;
   outline: none;
+  text-align: center;
 }
 .dataTables_filter input:focus {
   border-color: #0d1b2a;
+  text-align: center;
 }
 
 /* الصفحات (pagination) */
@@ -493,3 +506,10 @@ table {
   background: #0d1b2a !important;
   color: #ffffff !important;
 }
+
+/* General Desigin For All Tables */
+table {text-align: center;}
+table tr {text-align: center;}
+table tr th {text-align: center;}
+table tr td {text-align: center;}
+label{text-align: center;}
