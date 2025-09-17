@@ -14,7 +14,8 @@ if (!isset($_SESSION['user'])) {
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+           <!-- Bootstrab 5 -->
+  <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
 </head>
@@ -24,163 +25,105 @@ if (!isset($_SESSION['user'])) {
 
 <div class="main">
 
-    <h3> 📑 تفاصيل العقد </h3>
+    <h3> 📑 تفاصيل العقد المورد </h3>
     <br/>
-    <table class="table">
-        <thead>
-        <?php
-        include '../config.php';
 
-        $contract_id = intval($_GET['id']);
+<?php
+include '../config.php';
 
-        $sql = "SELECT 
-                    id, supplier_id, contract_signing_date, grace_period_days, contract_duration_months, 
-                    actual_start, actual_end, transportation, accommodation, place_for_living, 
-                    workshop, equip_type, equip_size, equip_count, equip_target_per_month, 
-                    equip_total_month, equip_total_contract, mach_type, mach_size, mach_count, 
-                    mach_target_per_month, mach_total_month, mach_total_contract, 
-                    hours_monthly_target, forecasted_contracted_hours, created_at, updated_at ,
-                    daily_work_hours , daily_operators ,first_party ,second_party , witness_one , 
-                    witness_two,project_id
-                FROM supplierscontracts
-                WHERE id = $contract_id
-                LIMIT 1";
+$contract_id = intval($_GET['id']);
 
-        $result = mysqli_query($conn, $sql);
+$sql = "SELECT 
+            id, supplier_id, contract_signing_date, grace_period_days, contract_duration_months, 
+            actual_start, actual_end, transportation, accommodation, place_for_living, 
+            workshop, equip_type, equip_size, equip_count, equip_target_per_month, 
+            equip_total_month, equip_total_contract, mach_type, mach_size, mach_count, 
+            mach_target_per_month, mach_total_month, mach_total_contract, 
+            hours_monthly_target, forecasted_contracted_hours, created_at, updated_at,
+            daily_work_hours, daily_operators, first_party, second_party, 
+            witness_one, witness_two, project_id
+        FROM supplierscontracts
+        WHERE id = $contract_id
+        LIMIT 1";
 
-        while ($row = mysqli_fetch_assoc($result)) {
-        ?>
-            <tr class="o">
-                <th> المشروع </th>
-                <th><?php echo $row['project_id']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> تاريخ توقيع العقد </th>
-                <th><?php echo $row['contract_signing_date']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> فترة السماح (أيام) </th>
-                <th><?php echo $row['grace_period_days']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> مدة العقد (شهور) </th>
-                <th><?php echo $row['contract_duration_months']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> تاريخ البدء الفعلي </th>
-                <th><?php echo $row['actual_start']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> تاريخ الانتهاء الفعلي </th>
-                <th><?php echo $row['actual_end']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> النقل </th>
-                <th><?php echo $row['transportation']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> السكن </th>
-                <th><?php echo $row['accommodation']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> مكان السكن </th>
-                <th><?php echo $row['place_for_living']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> الورشة </th>
-                <th><?php echo $row['workshop']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> نوع المعدات </th>
-                <th><?php echo $row['equip_type']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> حجم المعدات </th>
-                <th><?php echo $row['equip_size']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> عدد المعدات </th>
-                <th><?php echo $row['equip_count']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> هدف المعدات شهريًا </th>
-                <th><?php echo $row['equip_target_per_month']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> إجمالي المعدات شهريًا </th>
-                <th><?php echo $row['equip_total_month']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> إجمالي العقد للمعدات </th>
-                <th><?php echo $row['equip_total_contract']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> نوع الآلية </th>
-                <th><?php echo $row['mach_type']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> حجم الآلية </th>
-                <th><?php echo $row['mach_size']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> عدد الآليات </th>
-                <th><?php echo $row['mach_count']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> هدف الآليات شهريًا </th>
-                <th><?php echo $row['mach_target_per_month']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> إجمالي الآليات شهريًا </th>
-                <th><?php echo $row['mach_total_month']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> إجمالي العقد للآليات </th>
-                <th><?php echo $row['mach_total_contract']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> الهدف الشهري للساعات </th>
-                <th><?php echo $row['hours_monthly_target']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> الساعات التعاقدية المتوقعة </th>
-                <th><?php echo $row['forecasted_contracted_hours']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> تاريخ الإنشاء </th>
-                <th><?php echo $row['created_at']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> آخر تحديث </th>
-                <th><?php echo $row['updated_at']; ?></th>
-            </tr>
-            <tr class="o">
-                <th> عدد ساعات العمل اليومية</th>
-                <th><?php echo $row['daily_work_hours']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> عدد المشغلين للساعات اليومية</th>
-                <th><?php echo $row['daily_operators']; ?></th>
-            </tr>
-             <tr class="o">
-                <th> الطرف الأول (ممثل الشركة) </th>
-                <th><?php echo $row['first_party']; ?></th>
-            </tr>
-            <tr class="t">
-                <th> الطرف الثاني (ممثل العميل)</th>
-                <th><?php echo $row['second_party']; ?></th>
-            </tr>
-             <tr class="o">
-                <th> الشاهد الأول </th>
-                <th><?php echo $row['witness_one']; ?></th>
-            </tr>
-            <tr class="t">
-                <th>الشاهد الثاني </th>
-                <th><?php echo $row['witness_two']; ?></th>
-            </tr>
-        <?php } ?>
-        </thead>
-    </table>
+$result = mysqli_query($conn, $sql);
+
+while ($row = mysqli_fetch_assoc($result)) {
+?>
+    <div class="report">
+
+        <div class="row mb-2">
+            <div class="col-lg-2 col-5">المشروع</div>
+            <div class="col-lg-4 col-7"><?php echo $row['project_id']; ?></div>
+            <div class="col-lg-2 col-5">المورد</div>
+            <div class="col-lg-4 col-7"><?php echo $row['supplier_id']; ?></div>
+            <div class="col-lg-2 col-5">تاريخ توقيع العقد</div>
+            <div class="col-lg-4 col-7"><?php echo $row['contract_signing_date']; ?></div>
+            <div class="col-lg-2 col-5">فترة السماح (أيام)</div>
+            <div class="col-lg-4 col-7"><?php echo $row['grace_period_days']; ?></div>
+            <div class="col-lg-2 col-5">مدة العقد (شهور)</div>
+            <div class="col-lg-4 col-7"><?php echo $row['contract_duration_months']; ?></div>
+            <div class="col-lg-2 col-5">تاريخ البدء الفعلي</div>
+            <div class="col-lg-4 col-7"><?php echo $row['actual_start']; ?></div>
+            <div class="col-lg-2 col-5">تاريخ الانتهاء الفعلي</div>
+            <div class="col-lg-4 col-7"><?php echo $row['actual_end']; ?></div>
+            <div class="col-lg-2 col-5">النقل</div>
+            <div class="col-lg-4 col-7"><?php echo $row['transportation']; ?></div>
+            <div class="col-lg-2 col-5">السكن</div>
+            <div class="col-lg-4 col-7"><?php echo $row['accommodation']; ?></div>
+            <div class="col-lg-2 col-5">مكان السكن</div>
+            <div class="col-lg-4 col-7"><?php echo $row['place_for_living']; ?></div>
+            <div class="col-lg-2 col-5">الورشة</div>
+            <div class="col-lg-4 col-7"><?php echo $row['workshop']; ?></div>
+            <div class="col-lg-2 col-5">نوع المعدات</div>
+            <div class="col-lg-4 col-7"><?php echo $row['equip_type']; ?></div>
+            <div class="col-lg-2 col-5">حجم المعدات</div>
+            <div class="col-lg-4 col-7"><?php echo $row['equip_size']; ?></div>
+            <div class="col-lg-2 col-5">عدد المعدات</div>
+            <div class="col-lg-4 col-7"><?php echo $row['equip_count']; ?></div>
+            <div class="col-lg-2 col-5">هدف المعدات شهريًا</div>
+            <div class="col-lg-4 col-7"><?php echo $row['equip_target_per_month']; ?></div>
+            <div class="col-lg-2 col-5">إجمالي المعدات شهريًا</div>
+            <div class="col-lg-4 col-7"><?php echo $row['equip_total_month']; ?></div>
+            <div class="col-lg-2 col-5">إجمالي العقد للمعدات</div>
+            <div class="col-lg-4 col-7"><?php echo $row['equip_total_contract']; ?></div>
+            <div class="col-lg-2 col-5">نوع الآلية</div>
+            <div class="col-lg-4 col-7"><?php echo $row['mach_type']; ?></div>
+            <div class="col-lg-2 col-5">حجم الآلية</div>
+            <div class="col-lg-4 col-7"><?php echo $row['mach_size']; ?></div>
+            <div class="col-lg-2 col-5">عدد الآليات</div>
+            <div class="col-lg-4 col-7"><?php echo $row['mach_count']; ?></div>
+            <div class="col-lg-2 col-5">هدف الآليات شهريًا</div>
+            <div class="col-lg-4 col-7"><?php echo $row['mach_target_per_month']; ?></div>
+            <div class="col-lg-2 col-5">إجمالي الآليات شهريًا</div>
+            <div class="col-lg-4 col-7"><?php echo $row['mach_total_month']; ?></div>
+            <div class="col-lg-2 col-5">إجمالي العقد للآليات</div>
+            <div class="col-lg-4 col-7"><?php echo $row['mach_total_contract']; ?></div>
+            <div class="col-lg-2 col-5">الهدف الشهري للساعات</div>
+            <div class="col-lg-4 col-7"><?php echo $row['hours_monthly_target']; ?></div>
+            <div class="col-lg-2 col-5">الساعات التعاقدية المتوقعة</div>
+            <div class="col-lg-4 col-7"><?php echo $row['forecasted_contracted_hours']; ?></div>
+            <div class="col-lg-2 col-5">تاريخ الإنشاء</div>
+            <div class="col-lg-4 col-7"><?php echo $row['created_at']; ?></div>
+            <div class="col-lg-2 col-5">آخر تحديث</div>
+            <div class="col-lg-4 col-7"><?php echo $row['updated_at']; ?></div>
+            <div class="col-lg-2 col-5">عدد ساعات العمل اليومية</div>
+            <div class="col-lg-4 col-7"><?php echo $row['daily_work_hours']; ?></div>
+            <div class="col-lg-2 col-5">عدد المشغلين للساعات اليومية</div>
+            <div class="col-lg-4 col-7"><?php echo $row['daily_operators']; ?></div>
+            <div class="col-lg-2 col-5">الطرف الأول (ممثل الشركة)</div>
+            <div class="col-lg-4 col-7"><?php echo $row['first_party']; ?></div>
+            <div class="col-lg-2 col-5">الطرف الثاني (ممثل العميل)</div>
+            <div class="col-lg-4 col-7"><?php echo $row['second_party']; ?></div>
+            <div class="col-lg-2 col-5">الشاهد الأول</div>
+            <div class="col-lg-4 col-7"><?php echo $row['witness_one']; ?></div>
+            <div class="col-lg-2 col-5">الشاهد الثاني</div>
+            <div class="col-lg-4 col-7"><?php echo $row['witness_two']; ?></div>
+        </div>
+
+    </div>
+<?php } ?>
+
 
     <br/><br/><br/>
 
