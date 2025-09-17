@@ -524,11 +524,7 @@ label{text-align: center;}
 .report{
   background-color: #fff;
   /* border-radius: 20px; */
-  box-shadow: 2px 5px 7px gray;
-}
-
-.report .row{
-  padding: 5px;
+  box-shadow: 0px 2px 4px gray;
 }
 
 .report div{
@@ -545,4 +541,5 @@ label{text-align: center;}
 
 .report .col-lg-4{
 background-color: #fff;
+border-bottom: solid 1px #000022;
 }

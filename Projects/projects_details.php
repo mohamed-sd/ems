@@ -57,29 +57,29 @@ WHERE m.project =  $project;");
                         ?>
     <div class="report">
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-lg-2 col-5">
                 اسم المشروع 
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-4 col-7">
                 <?php echo $row['name']; ?>
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-2 col-5">
                 اسم العميل 
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-4 col-7">
                 <?php echo $row['client']; ?>
             </div>
 
-            <div class="col-lg-2">
+            <div class="col-lg-2 col-5">
                 موقع المشروع 
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-4 col-7">
                 <?php echo $row['location']; ?>
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-2 col-5">
                عدد الموردين 
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-4 col-7">
                <?php echo $total_suppliers; ?>
             </div>
         </div>
