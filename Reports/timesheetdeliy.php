@@ -27,6 +27,7 @@ $project_filter  = isset($_GET['project']) ? $_GET['project'] : '';
 $supplier_filter = isset($_GET['supplier']) ? $_GET['supplier'] : '';
 
 $shift_filter = isset($_GET['shift']) ? $_GET['shift'] : '';
+$type_filter = isset($_GET['type']) ? $_GET['type'] : '';
 
 
 $sql = "
@@ -65,6 +66,10 @@ if (!empty($supplier_filter)) {
 
 if (!empty($shift_filter)) {
     $sql .= " AND t.shift = '$shift_filter' ";
+}
+
+if (!empty($type_filter)) {
+    $sql .= " AND e.type = '$type_filter' ";
 }
 
 $sql .= " ORDER BY t.date, p.name, s.name ";
@@ -154,6 +159,17 @@ $totals = mysqli_fetch_assoc($total_res);
         <option value="N" <?php if(($_GET['shift'] ?? '')=="مسائية") echo "selected"; ?>>مسائية</option>
     </select>
                     </div>
+
+
+                    <div class="col-md-2">
+    <label class="form-label">⚙️ نوع الآلية:</label>
+    <select class="form-select" name="type">
+        <option value="">-- الكل --</option>
+        <option value="1" <?php if($type_filter=="1") echo "selected"; ?>>حفار</option>
+        <option value="2" <?php if($type_filter=="2") echo "selected"; ?>>قلاب</option>
+        <!-- ممكن تضيف أنواع أخرى حسب جدولك -->
+    </select>
+</div>
 
 
                 <div class="col-md-3">

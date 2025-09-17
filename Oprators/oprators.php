@@ -70,15 +70,17 @@ include("../inheader.php");
                         <th>#</th>
                         <th style="text-align:right;">المعدة</th>
 
+                        <th style="text-align:right;">السائقين</th>
+
                         <th style="text-align:right;">المورد</th>
                         <th style="text-align:right;">المشروع</th>
-
 
                         <th style="text-align:right;">تاريخ البداية</th>
                         <th style="text-align:right;">تاريخ النهاية</th>
                         <!-- <th style="text-align:right;">عدد الساعات</th> -->
                         <th style="text-align:right;">الحالة</th>
                         <th style="text-align:right;">إجراءات</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -94,17 +96,25 @@ include("../inheader.php");
 
                         mysqli_query($conn, "INSERT INTO operations (equipment, project, start, end, hours, status) 
                                      VALUES ('$equipment', '$project', '$start', '$end', '$hours', '$status')");
+
+                              echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='equipments.php';</script>";
+
+
+
                     }
 
                     // جلب بيانات التشغيل
                     $query = "SELECT o.id, o.start, o.end, o.hours, o.status, 
                              e.code AS equipment_code, e.name AS equipment_name,
-                             p.name AS project_name ,s.name AS suppliers_name
+                             p.name AS project_name ,s.name AS suppliers_name,
+                                 IFNULL(GROUP_CONCAT(DISTINCT d.name SEPARATOR ', '), '') AS driver_names
                       FROM operations o
                       LEFT JOIN equipments e ON o.equipment = e.id
                       LEFT JOIN projects p ON o.project = p.id
-
                       LEFT JOIN suppliers s ON e.suppliers = s.id
+                      LEFT JOIN equipment_drivers ed ON o.equipment = ed.equipment_id
+                      LEFT JOIN drivers d ON ed.driver_id = d.id
+                    GROUP BY o.id
                       ORDER BY o.id DESC";
                     $result = mysqli_query($conn, $query);
                     $i = 1;
@@ -112,6 +122,8 @@ include("../inheader.php");
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
                         echo "<td>" . $row['equipment_code'] . " - " . $row['equipment_name'] . "</td>";
+                        echo "<td>" . (!empty($row['driver_names']) ? $row['driver_names'] : "—") . "</td>";
+
                         echo "<td>" . $row['suppliers_name'] . "</td>";
 
                         echo "<td>" . $row['project_name'] . "</td>";
