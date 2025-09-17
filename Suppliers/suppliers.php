@@ -80,11 +80,11 @@ include("../inheader.php");
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th style="text-align: right;">اسم المورد</th>
-                        <th style="text-align: right;">عدد الآليات</th>
-                        <th style="text-align: right;">رقم الهاتف</th>
-                        <th style="text-align: right;">الحالة</th>
-                        <th style="text-align: right;">إجراءات</th>
+                        <th>اسم المورد</th>
+                        <th>عدد الآليات</th>
+                        <th>رقم الهاتف</th>
+                        <th>الحالة</th>
+                        <th>إجراءات</th>
                     </tr>
                 </thead>
                 <tbody>

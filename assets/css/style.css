@@ -12,7 +12,7 @@
   /* Sidebar hover */
   --light-gray: #f9f9f9;
   /* Light backgrounds */
-  --equipation-gold : #ffcc00 ;
+  --equipation-gold: #ffcc00;
 }
 
 /* ================== Reset ================== */
@@ -240,7 +240,7 @@ body {
   display: inline-block;
 }
 
-.main .aligin{
+.main .aligin {
   text-align: end;
 }
 
@@ -347,7 +347,7 @@ table {
 
 .table thead {
   background-color: #f9f9fa;
-  color:  #000;
+  color: #000;
 }
 
 .table thead tr th {
@@ -364,8 +364,8 @@ table {
 }
 
 .table thead tr td {
-background-color: #000022;
-color: #ffcc00;
+  background-color: #000022;
+  color: #ffcc00;
 }
 
 /* ================== Responsive Sidebar ================== */
@@ -426,17 +426,23 @@ color: #ffcc00;
 
 
 /* خلفية الجدول */
-#projectsTable , .projectsTable {
-  background-color: #ffffff; /* أبيض */
-  border: 2px solid #0d1b2a; /* كحلي غامق */
+#projectsTable,
+.projectsTable {
+  background-color: #ffffff;
+  /* أبيض */
+  border: 2px solid #0d1b2a;
+  /* كحلي غامق */
   border-radius: 8px;
   overflow: hidden;
 }
 
 /* عناوين الأعمدة */
-#projectsTable thead th , .projectsTable thead th {
-  background-color: #0d1b2a; /* كحلي */
-  color: #ffcc00; /* أصفر */
+#projectsTable thead th,
+.projectsTable thead th {
+  background-color: #0d1b2a;
+  /* كحلي */
+  color: #ffcc00;
+  /* أصفر */
   text-align: center;
   font-weight: bold;
   padding: 12px;
@@ -444,19 +450,27 @@ color: #ffcc00;
 }
 
 /* الصفوف */
-#projectsTable tbody tr:nth-child(even) , .projectsTable tbody tr:nth-child(even)  {
-  background-color: #f8f9fa; /* رمادي فاتح */
+#projectsTable tbody tr:nth-child(even),
+.projectsTable tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+  /* رمادي فاتح */
 }
-#projectsTable tbody tr:nth-child(odd) , .projectsTable tbody tr:nth-child(odd) {
-  background-color: #ffffff; /* أبيض */
+
+#projectsTable tbody tr:nth-child(odd),
+.projectsTable tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+  /* أبيض */
 }
+
 #projectsTable tbody tr:hover {
-  background-color: #fff3cd; /* أصفر فاتح عند hover */
+  background-color: #fff3cd;
+  /* أصفر فاتح عند hover */
 }
 
 /* نصوص الأعمدة */
 #projectsTable tbody td {
-  color: #0d1b2a; /* كحلي */
+  color: #0d1b2a;
+  /* كحلي */
   padding: 10px;
   text-align: center;
 }
@@ -467,8 +481,10 @@ color: #ffcc00;
 
 /* زرار DataTables (نسخ - تصدير - طباعة) */
 .dt-buttons .dt-button {
-  background-color: #ffcc00 !important; /* أصفر */
-  color: #0d1b2a !important; /* كحلي */
+  background-color: #ffcc00 !important;
+  /* أصفر */
+  color: #0d1b2a !important;
+  /* كحلي */
   border: none !important;
   padding: 8px 14px;
   margin: 3px;
@@ -476,9 +492,12 @@ color: #ffcc00;
   font-weight: bold;
   transition: 0.3s;
 }
+
 .dt-buttons .dt-button:hover {
-  background-color: #0d1b2a !important; /* كحلي */
-  color: #ffffff !important; /* أبيض */
+  background-color: #0d1b2a !important;
+  /* كحلي */
+  color: #ffffff !important;
+  /* أبيض */
 }
 
 /* صندوق البحث + التصفية */
@@ -489,6 +508,7 @@ color: #ffcc00;
   outline: none;
   text-align: center;
 }
+
 .dataTables_filter input:focus {
   border-color: #0d1b2a;
   text-align: center;
@@ -503,43 +523,60 @@ color: #ffcc00;
   margin: 2px;
   padding: 4px 10px;
 }
+
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
   background: #ffcc00 !important;
   color: #0d1b2a !important;
   border: 1px solid #0d1b2a !important;
 }
+
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
   background: #0d1b2a !important;
   color: #ffffff !important;
 }
 
 /* General Desigin For All Tables */
-table {text-align: center;}
-table tr {text-align: center;}
-table tr th {text-align: center;}
-table tr td {text-align: center;}
-label{text-align: center;}
+table {
+  text-align: center;
+}
+
+table tr {
+  text-align: center;
+}
+
+table tr th {
+  text-align: center;
+}
+
+table tr td {
+  text-align: center;
+}
+
+label {
+  text-align: center;
+}
 
 /* Report Details Divs */
-.report{
+.report {
   background-color: #fff;
   /* border-radius: 20px; */
   box-shadow: 0px 2px 4px gray;
 }
 
-.report div{
+.report div {
   text-align: center;
 }
 
-.report .col-lg-2{
+.report .col-lg-2 {
   font-weight: 600;
   border: solid 1px grey;
   background-color: #0d1b2a;
   color: #ffcc00;
-    padding: 2px;
+  padding: 2px;
+  font-size: 15px;
 }
 
-.report .col-lg-4{
-background-color: #fff;
-border-bottom: solid 1px #000022;
+.report .col-lg-4 {
+  background-color: #fff;
+  border-bottom: solid 1px #000022;
 }
