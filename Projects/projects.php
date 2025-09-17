@@ -11,7 +11,7 @@ include('../insidebar.php');
 <div class="main">
     <div class="aligin">
         <a href="javascript:void(0)" id="toggleForm" class="add">
-            <i class="fa fa-plus"></i> اضافة مشروع
+            <i class="fa fa-plus"></i> اضافة مشروع (Add Project)
         </a>
     </div>
 
@@ -19,33 +19,33 @@ include('../insidebar.php');
     <form id="projectForm" action="" method="post" style="display:none;">
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"> اضافة/ تعديل مشروع </h5>
+                <h5 class="mb-0"> اضافة/ تعديل مشروع (Add / Edit Project) </h5>
             </div>
             <div class="card-body">
                 <input type="hidden" name="id" id="project_id" value="">
                 <div class="form-grid">
                     <div>
-                        <label>اسم المشروع</label>
-                        <input type="text" name="name" id="project_name" required />
+                        <label>اسم المشروع (Project Name)</label>
+                        <input type="text" name="name" placeholder="ادخل اسم المشروع" id="project_name" required />
                     </div>
                     <div>
-                        <label>اسم العميل</label>
-                        <input type="text" name="client" id="project_client" required />
+                        <label>اسم العميل (Client Name)</label>
+                        <input type="text" name="client" placeholder="ادخل اسم العميل" id="project_client" required />
                     </div>
                     <div>
-                        <label>موقع المشروع</label>
-                        <input type="text" name="location" id="project_location" required />
+                        <label>موقع المشروع (Project location)</label>
+                        <input type="text" name="location" placeholder="ادخل موقع المشروع" id="project_location" required />
                         <input type="hidden" name="total" value="100" required />
                     </div>
                     <div>
-                        <label>حالة المشروع</label>
+                        <label>حالة المشروع (Project Status)</label>
                         <select name="status" id="project_status">
-                            <option value=""> -- حدد الحالة -- </option>
-                            <option value="1">نشط</option>
-                            <option value="0">غير نشط</option>
+                            <option value=""> -- حدد الحالة (Choose Status) -- </option>
+                            <option value="1">نشط (active)</option>
+                            <option value="0">غير نشط (dis active)</option>
                         </select>
                     </div>
-                    <button style="color:black;" type="submit">حفظ</button>
+                    <button style="color:black;" type="submit">حفظ ( Save ) </button>
                 </div>
             </div>
         </div>
@@ -55,22 +55,32 @@ include('../insidebar.php');
     <!-- جدول المشاريع -->
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
-            <h5 class="mb-0"> قائمة المشاريع</h5>
+            <h5 class="mb-0"> قائمة المشاريع (Project List )</h5>
         </div>
         <div class="card-body">
             <table id="projectsTable" class="display" style="width:100%; margin-top: 20px;">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th style="text-align: right;">اسم المشروع</th>
-                        <th style="text-align: right;">عدد الاليات</th>
-                        <th style="text-align: right;">العقود</th>
-                        <th style="text-align: right;">العميل</th>
-                        <th style="text-align: right;">الموقع</th>
-                        <th style="text-align: right;">عدد الموردين</th>
-                        <th style="text-align: right;">تاريخ الإضافة</th>
-                        <th style="text-align:right">الحالة</th>
-                        <th style="text-align: right;">إجراءات</th>
+                        <!-- <th>#</th> -->
+                        <th>Create Time <br/>
+                        تاريخ الإضافة
+                        </th>
+                        <th>Project Name <br/>
+                            اسم المشروع</th>
+                        <th>Equipments <br/>
+                            عدد الاليات</th>
+                        <th> Contracts <br/>
+                            العقود</th>
+                        <th> Clients <br/>
+                            العميل</th>
+                        <th> Location <br/>
+                            الموقع</th>
+                        <th> Suppliers <br/>
+                            عدد الموردين</th>
+                        <th> Status <br/>
+                            الحالة</th>
+                        <th> Actions <br/>
+                            إجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -121,14 +131,14 @@ include('../insidebar.php');
                     $i = 1;
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<tr>";
-                        echo "<td>" . $i++ . "</td>";
+                        // echo "<td>" . $i++ . "</td>";
+                        echo "<td>" . $row['create_at'] . "</td>";
                         echo "<td>" . $row['name'] . "</td>";
                         echo "<td>" . $row['operations'] . "</td>";
                         echo "<td>" . $row['contracts'] . "</td>";
                         echo "<td>" . $row['client'] . "</td>";
                         echo "<td>" . $row['location'] . "</td>";
                         echo "<td>" . $row['total_suppliers'] . "</td>";
-                        echo "<td>" . $row['create_at'] . "</td>";
                         echo $row['status'] == "1" ? "<td style='color:green'>نشط</td>" : "<td style='color:red'>غير نشط</td>";
                         echo "<td>
                         <a href='javascript:void(0)' 
@@ -171,11 +181,11 @@ include('../insidebar.php');
                 responsive: true,
                 dom: 'Bfrtip',
                 buttons: [
-                    { extend: 'copy', text: 'نسخ' },
+                    { extend: 'copy', text: 'نسخ (Copy)' },
                     { extend: 'excel', text: 'تصدير Excel' },
                     { extend: 'csv', text: 'تصدير CSV' },
                     { extend: 'pdf', text: 'تصدير PDF' },
-                    { extend: 'print', text: 'طباعة' }
+                    { extend: 'print', text: 'طباعة (Print)' }
                 ],
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
