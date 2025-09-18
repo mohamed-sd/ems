@@ -4,16 +4,69 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../index.php");
     exit();
 }
+
+include '../config.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
+    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $client = mysqli_real_escape_string($conn, $_POST['client']);
+    $location = mysqli_real_escape_string($conn, $_POST['location']);
+    $total = floatval($_POST['total']);
+    $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $date = date('Y-m-d H:i:s');
+
+    if ($id > 0) {
+        // تحديث
+        $sql = "UPDATE projects SET 
+            name='$name',
+            client='$client',
+            location='$location',
+            total='$total',
+            status='$status'
+        WHERE id=$id";
+        mysqli_query($conn, $sql);
+
+         header("Location: projects.php?msg=تم+تعديل+المشروع+بنجاح+✅");
+                exit;
+    } else {
+        // إضافة
+        $sql = "INSERT INTO projects (name, client, location, total, status, create_at) 
+        VALUES ('$name', '$client', '$location', '$total', '$status', '$date')";
+        mysqli_query($conn, $sql);
+         header("Location: projects.php?msg=تم+اضافه+المشروع+بنجاح+✅");
+          exit;
+    }
+}
+?>
+
+
+<?php
+
+
+
+
+
 $page_title = "إيكوبيشن | الموردين";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
+
+
+    
 <div class="main">
     <div class="aligin">
         <a href="javascript:void(0)" id="toggleForm" class="add">
             <i class="fa fa-plus"></i> اضافة مشروع (Add Project)
         </a>
     </div>
+
+    <?php if (!empty($_GET['msg'])): ?>
+        <div style="background:#d4edda; color:#155724; padding:10px; border-radius:6px; margin:10px 0; text-align:center;">
+            <?php echo htmlspecialchars($_GET['msg']); ?>
+        </div>
+    <?php endif; ?>
+
+
 
     <!-- فورم إضافة / تعديل مشروع -->
     <form id="projectForm" action="" method="post" style="display:none;">
@@ -77,37 +130,6 @@ include('../insidebar.php');
                 <tbody>
                     <?php
                     include '../config.php';
-
-                    // إضافة أو تعديل مشروع
-                    if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
-                        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-                        $name = mysqli_real_escape_string($conn, $_POST['name']);
-                        $client = mysqli_real_escape_string($conn, $_POST['client']);
-                        $location = mysqli_real_escape_string($conn, $_POST['location']);
-                        $total = floatval($_POST['total']);
-                        $status = mysqli_real_escape_string($conn, $_POST['status']);
-                        $date = date('Y-m-d H:i:s');
-
-                        if ($id > 0) {
-                            // تحديث
-                            $sql = "UPDATE projects SET 
-                                name='$name',
-                                client='$client',
-                                location='$location',
-                                total='$total',
-                                status='$status'
-                            WHERE id=$id";
-                            mysqli_query($conn, $sql);
-                        } else {
-                            // إضافة
-                            $sql = "INSERT INTO projects (name, client, location, total, status, create_at) 
-                            VALUES ('$name', '$client', '$location', '$total', '$status', '$date')";
-                            mysqli_query($conn, $sql);
-                        }
-
-                        echo "<script>window.location.href='projects.php';</script>";
-                        exit;
-                    }
 
                     // جلب المشاريع
                     $query = "SELECT `id`, `name`, `client`, `location`, `total` , `status` , `create_at`, 
