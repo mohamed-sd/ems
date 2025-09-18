@@ -84,7 +84,10 @@ if (!isset($_SESSION['user'])) {
 
           <input type="hidden" name="supplier_id" placeholder="اسم المورد" value="<?php echo $_GET['id'] ?>" required />
 
-          <div class="field md-3 sm-6">
+          <div class="section-title"><span class="chip">1</span> البيانات الأساسية للمورد والعقد</div>
+          <br>
+          <div class="form-grid">
+              <div class="field md-3 sm-6">
             <label class="form-label">المشروع</label>
             <div class="control">
               <select name="project_id">
@@ -104,22 +107,16 @@ if (!isset($_SESSION['user'])) {
               </select>
             </div>
           </div>
-
-
-          <div class="section-title"><span class="chip">1</span> البيانات الأساسية للمورد والعقد</div>
-          <br>
-          <div class="form-grid">
-
             <div class="field md-3 sm-6">
-              <label>تاريخ توقيع العقد (Contract signing date)</label>
+              <label>تاريخ توقيع العقد </label>
               <div class="control"><input name="contract_signing_date" type="date"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>فترة السماح بين التوقيع والتنفيذ (Grace period)</label>
+              <label>فترة السماح بين التوقيع والتنفيذ</label>
               <div class="control"><input name="grace_period_days" type="number" min="0" placeholder="عدد الأيام"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>مدة العقد بالشهور (Contract Per Month)</label>
+              <label>مدة العقد بالشهور </label>
               <div class="control"><input name="contract_duration_months" id="contract_duration_months" type="number"
                   min="0" placeholder="بالشهور"></div>
             </div>
@@ -132,7 +129,7 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="actual_end" type="date"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>الترحيل (Transportation)</label>
+              <label>الترحيل </label>
               <div class="control">
                 <select name="transportation">
                   <option value="">— اختر —</option>
@@ -142,7 +139,7 @@ if (!isset($_SESSION['user'])) {
               </div>
             </div>
             <div class="field md-3 sm-6">
-              <label>الإعاشة (Accommodation)</label>
+              <label>الإعاشة </label>
               <div class="control">
                 <select name="accommodation">
                   <option value="">— اختر —</option>
@@ -152,7 +149,7 @@ if (!isset($_SESSION['user'])) {
               </div>
             </div>
             <div class="field md-3 sm-6">
-              <label>السكن (Place for Living)</label>
+              <label>السكن </label>
               <div class="control">
                 <select name="place_for_living">
                   <option value="">— اختر —</option>
@@ -162,7 +159,7 @@ if (!isset($_SESSION['user'])) {
               </div>
             </div>
             <div class="field md-3 sm-6">
-              <label>الورشة (Workshop)</label>
+              <label>الورشة </label>
               <div class="control">
                 <select name="workshop">
                   <option value="">— اختر —</option>
@@ -194,6 +191,11 @@ if (!isset($_SESSION['user'])) {
               <label>عدد المعدات المطلوبة</label>
               <div class="control"><input name="equip_count" id="equip_count" type="number" min="0" value="2"></div>
             </div>
+
+            <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+
             <div class="field md-4 sm-6">
               <label>ساعات العمل  للمعدة شهرياً</label>
               <div class="control"><input name="equip_target_per_month" id="equip_target_per_month" type="number"
@@ -231,6 +233,11 @@ if (!isset($_SESSION['user'])) {
               <label>عدد الآليات المطلوبة</label>
               <div class="control"><input name="mach_count" id="mach_count" type="number" min="0" value="8"></div>
             </div>
+
+            <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+
             <div class="field md-4 sm-6">
               <label>ساعات العمل  للآلية شهرياً</label>
               <div class="control"><input name="mach_target_per_month" id="mach_target_per_month" type="number" min="0"
@@ -262,12 +269,17 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input type="number" name="daily_operators" min="0" placeholder="مثال: 3"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>الطرف الأول (ممثل الشركة)</label>
-              <div class="control"><input type="text" name="first_party" placeholder="اسم ممثل الشركة"></div>
+              <label> الطرف الأول </label>
+              <div class="control"><input type="text" name="first_party" placeholder="اسم الطرف الاول  "></div>
             </div>
+
+            <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+
             <div class="field md-3 sm-6">
-              <label>الطرف الثاني (ممثل العميل)</label>
-              <div class="control"><input type="text" name="second_party" placeholder="اسم ممثل العميل"></div>
+              <label> الطرف الثاني </label>
+              <div class="control"><input type="text" name="second_party" placeholder="اسم الطرف الثاني"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>الشاهد الأول</label>
@@ -330,7 +342,8 @@ if (!isset($_SESSION['user'])) {
               <th>نهاية التنفيذ</th>
               <th>ساعات الآليات/شهر</th>
               <th>إجمالي ساعات الآليات</th>
-              <th>الإجمالي الشهري</th>
+              <th> الحالة </th>
+              <th> الاجراءات </th>
             </tr>
           </thead>
           <tbody>
@@ -406,14 +419,18 @@ if (!isset($_SESSION['user'])) {
 
 
             while ($row = mysqli_fetch_assoc($result)) {
+
+               $status = $row['status']=="1" ? "<font color='green'>ساري</font>" : "
+                    <font color='red'>منتهي</font>";
+
               echo "<tr>";
               echo "<td>" . $row['contract_signing_date'] . "</td>";
               echo "<td>" . $row['contract_duration_months'] . "</td>";
               echo "<td>" . $row['actual_start'] . "</td>";
               echo "<td>" . $row['actual_end'] . "</td>";
-
               echo "<td>" . $row['hours_monthly_target'] . "</td>";
               echo "<td>" . $row['equip_total_contract'] . "</td>";
+              echo "<td>" . $status . "</td>";
 
               echo "<td>
                         <a href='' style='color:#007bff'><i class='fa fa-edit'></i></a> | 

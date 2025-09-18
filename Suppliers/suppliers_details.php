@@ -31,10 +31,11 @@ if (!isset($_SESSION['user'])) {
     <div class="main">
 
         <!-- <h2>تفاصيل المشروع</h2> -->
-
-        <a href="supplierscontracts.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
-            <i class="fa fa-plus"></i> العقودات
-        </a>
+        <div class="aligin">
+            <a href="supplierscontracts.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
+                <i class="fa fa-plus"></i> عقودات المورد
+            </a>
+        </div>
         <!-- <a href="../Equipments/equipments.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
         <i class="fa fa-plus"></i> اضافة آلية
     </a> -->
@@ -61,97 +62,139 @@ if (!isset($_SESSION['user'])) {
                     <div class="col-lg-4 col-7"><?php echo $row['name']; ?></div>
                     <div class="col-lg-2 col-5"> رقم الهاتف </div>
                     <div class="col-lg-4 col-7"><?php echo $row['phone']; ?></div>
-                       <div class="col-lg-2 col-5"> عدد الآليات </div>
+                    <div class="col-lg-2 col-5"> عدد الآليات </div>
                     <div class="col-lg-4 col-7"> <?php echo $row['equipments']; ?> </div>
                     <div class="col-lg-2 col-5"> الحالة </div>
-                    <div class="col-lg-4 col-7"><?php echo $row['status']=="1"?"نشط":"معلق"; ?></div>
+                    <div class="col-lg-4 col-7"><?php echo $row['status'] == "1" ? "نشط" : "معلق"; ?></div>
                 </div>
             </div>
-                <?php
+            <?php
         } // end while loop
         ?>
 
 
-            <br /> <br /> <br />
+        <br /> <br /> <br />
 
-            <!-- جدول المشاريع -->
-            <h3> الآليات </h3>
-            <br />
-            <table id="projectsTable" class="display" style="width:100%; margin-top: 20px;">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th style="text-align: right;">كود المعدة</th>
-                        <th style="text-align: right;"> الاسم </th>
-                        <th style="text-align: right;">نوع الآليه</th>
-                        <!-- <th style="text-align: right;"> اسم العميل </th> -->
-                        <!-- <th style="text-align: right;">إجراءات</th> -->
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
+        <!-- جدول المشاريع -->
+        <h3> الآليات </h3>
+        <br />
+        <table id="projectsTable" class="display" style="width:100%; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th style="text-align: right;">كود المعدة</th>
+                    <th style="text-align: right;"> الاسم </th>
+                    <th style="text-align: right;">نوع الآليه</th>
+                    <!-- <th style="text-align: right;"> اسم العميل </th> -->
+                    <!-- <th style="text-align: right;">إجراءات</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                <?php
 
-                    // جلب المشاريع
-                    $query = "SELECT `id`, `code`, `type`, `name`, `status` FROM `equipments` where suppliers = $project ORDER BY id DESC";
-                    $result = mysqli_query($conn, $query);
-                    $i = 1;
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<tr>";
-                        echo "<td>" . $i++ . "</td>";
-                        echo "<td>" . $row['code'] . "</td>";
-                        echo "<td>" . $row['name'] . "</td>";
-                        echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:red;'> قلاب </td>";
+                // جلب المشاريع
+                $query = "SELECT `id`, `code`, `type`, `name`, `status` FROM `equipments` where suppliers = $project ORDER BY id DESC";
+                $result = mysqli_query($conn, $query);
+                $i = 1;
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo "<tr>";
+                    echo "<td>" . $i++ . "</td>";
+                    echo "<td>" . $row['code'] . "</td>";
+                    echo "<td>" . $row['name'] . "</td>";
+                    echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:red;'> قلاب </td>";
 
-                        // echo "<td>".$row['status']."</td>";
-                        // echo "<td>
-                        //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
-                        //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
-                        //       </td>";
-                        echo "</tr>";
+                    // echo "<td>".$row['status']."</td>";
+                    // echo "<td>
+                    //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
+                    //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
+                    //       </td>";
+                    echo "</tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+
+        <br />
+
+         <br />
+        <h3> العقود </h3>
+        <br />
+        <table id="projectsTable1" class="projectsTable" style="width:100%; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th style="text-align: center;">تاريخ البداية</th>
+                    <th style="text-align: center;"> المستهدف شهريا</th>
+                    <th style="text-align: center;">المجموع</th>
+                    <th style="text-align: center;">الحالة</th>
+                    <th style="text-align: center;">إجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                include '../config.php';
+
+                $query = "SELECT * FROM `supplierscontracts` where supplier_id LIKE '$project' ORDER BY id DESC";
+                $result = mysqli_query($conn, $query);
+                $i = 1;
+                while ($row = mysqli_fetch_assoc($result)) {
+                     $status = $row['status']=="1" ? "<font color='green'>ساري</font>" : "
+                    <font color='red'>منتهي</font>";
+
+                    echo "<tr>";
+                    echo "<td>" . $i++ . "</td>";
+                    echo "<td>" . $row['contract_signing_date'] . "</td>";
+                    echo "<td>" . $row['hours_monthly_target'] . "</td>";
+                    echo "<td>" . $row['equip_total_contract'] . "</td>";
+                    echo "<td>" . $status . "</td>";
+                    // echo "<td>
+                    //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
+                    //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
+                    //       </td>";
+                    echo "<td><a href='../Contracts/contracts_details.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a></td>";
+                    echo "</tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+
+
+
+
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        (function () {
+            // تشغيل DataTable بالعربية
+            $(document).ready(function () {
+                $('#projectsTable').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
                     }
-                    ?>
-                </tbody>
-            </table>
-
-            <br />
-
-
-
-
-        </div>
-
-        <!-- jQuery -->
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-        <!-- DataTables JS -->
-        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-        <script>
-            (function () {
-                // تشغيل DataTable بالعربية
-                $(document).ready(function () {
-                    $('#projectsTable').DataTable({
-                        "language": {
-                            "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
-                        }
-                    });
                 });
-                $(document).ready(function () {
-                    $('#projectsTable1').DataTable({
-                        "language": {
-                            "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
-                        }
-                    });
+            });
+            $(document).ready(function () {
+                $('#projectsTable1').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                    }
                 });
+            });
 
-                // التحكم في إظهار وإخفاء الفورم
-                const toggleProjectFormBtn = document.getElementById('toggleForm');
-                const projectForm = document.getElementById('projectForm');
+            // التحكم في إظهار وإخفاء الفورم
+            const toggleProjectFormBtn = document.getElementById('toggleForm');
+            const projectForm = document.getElementById('projectForm');
 
-                toggleProjectFormBtn.addEventListener('click', function () {
-                    projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
-                });
-            })();
-        </script>
+            toggleProjectFormBtn.addEventListener('click', function () {
+                projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
+            });
+        })();
+    </script>
 
 </body>
 
