@@ -70,45 +70,54 @@ if (!isset($_SESSION['user'])) {
 
     <!-- <h2>العقود</h2> -->
     <div class="aligin">
+
       <a href="javascript:void(0)" id="toggleForm" class="add">
-        <i class="fa fa-plus"></i>  اضافة عقد جديد
+        <i class="fa fa-plus"></i> عقد جديد
       </a>
 
-       <a  class="add">
-        <i class="fa fa-plus"></i>  منتهي 
+      <a href="#" class="add">
+        <!-- <i class="fa fa-plus"></i>  -->
+        تجديد عقد
       </a>
 
-        <a  class="add">
-        <i class="fa fa-plus"></i>  متوقف 
+      <a href="#" class="add">
+        <i class="fa fa-plus"></i> تمديد عقد
       </a>
 
-        <a   class="add">
-        <i class="fa fa-plus"></i>  تعسر 
+      <a href="#" class="add">
+        <!-- <i class="fa fa-plus"></i>   -->
+        تعديل / تغيير بنود
       </a>
 
-      <a   class="add">
-        <i class="fa fa-plus"></i>  إلغاء  
+      <a href="#" class="add">
+        <!-- <i class="fa fa-plus"></i>    -->
+        دمج عقدين
       </a>
-      
-      <a   class="add">
-        <i class="fa fa-plus"></i>  تجديد  
+
+      <a href="#" class="add">
+        <!-- <i class="fa fa-plus"></i>   -->
+        انهاء ( رضائي)
       </a>
-      
-      <a   class="add">
-        <i class="fa fa-plus"></i>  تمديد  
+
+      <a href="#" class="add">
+        <!-- <i class="fa fa-plus"></i>    -->
+        انهاء بسبب التعسر
       </a>
-      
-      <a   class="add">
-        <i class="fa fa-plus"></i>  تغيير  
+
+      <a href="#" class="add">
+        <!-- <i class="fa fa-plus"></i>  -->
+        ايقاف مؤقت
       </a>
-       <a   class="add">
-        <i class="fa fa-plus"></i>  اضافة  
+      <a href="#" class="add">
+        <!-- <i class="fa fa-plus"></i>   -->
+        فسخ عقد
       </a>
-      
-        <a   class="add">
-        <i class="fa fa-plus"></i>  دمج 
+
+      <a href="#" class="add">
+        <!-- <i class="fa fa-plus"></i>  -->
+        الغاء عقد
       </a>
-      
+
     </div>
 
     <!-- فورم إضافة عقد -->
@@ -125,7 +134,7 @@ if (!isset($_SESSION['user'])) {
           <input type="hidden" name="project" placeholder="اسم المشروع" value="<?php echo $_GET['id'] ?>" required />
 
           <div class="section-title"><span class="chip">1</span> البيانات الأساسية للعميل والعقد</div>
-                    <br>
+          <br>
 
           <div class="form-grid">
 
@@ -143,6 +152,12 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="contract_duration_months" id="contract_duration_months" type="number"
                   min="0" placeholder="بالشهور"></div>
             </div>
+
+
+            <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+
             <div class="field md-3 sm-6">
               <label>بداية التنفيذ الفعلي المتفق عليه</label>
               <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
@@ -151,6 +166,8 @@ if (!isset($_SESSION['user'])) {
               <label>نهاية التنفيذ الفعلي المتفق عليه</label>
               <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
             </div>
+
+
             <div class="field md-3 sm-6">
               <label>الترحيل (Transportation)</label>
               <div class="control">
@@ -161,6 +178,13 @@ if (!isset($_SESSION['user'])) {
                 </select>
               </div>
             </div>
+
+
+
+            <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+
             <div class="field md-3 sm-6">
               <label>الإعاشة (Accommodation)</label>
               <div class="control">
@@ -214,18 +238,23 @@ if (!isset($_SESSION['user'])) {
               <label>عدد المعدات المطلوبة</label>
               <div class="control"><input name="equip_count" id="equip_count" type="number" min="0" value="2"></div>
             </div>
+
+            <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+
             <div class="field md-4 sm-6">
               <label>ساعات العمل المستهدفة للمعدة شهرياً</label>
               <div class="control"><input name="equip_target_per_month" id="equip_target_per_month" type="number"
                   min="0" value="600"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي الساعات المستهدفة  شهرياً</label>
+              <label>إجمالي الساعات المستهدفة شهرياً</label>
               <div class="control"><input name="equip_total_month" id="equip_total_month" type="number" readonly
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي ساعات العقد  للمعدات</label>
+              <label>إجمالي ساعات العقد للمعدات</label>
               <div class="control"><input name="equip_total_contract" id="equip_total_contract" type="number" readonly
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
@@ -237,7 +266,7 @@ if (!isset($_SESSION['user'])) {
           <div class="section-title"><span class="chip">3</span> بيانات ساعات العمل المطلوبة <strong>للآليات</strong>
 
           </div>
-                              <br>
+          <br>
 
           <div class="form-grid">
             <div class="field md-4 sm-6">
@@ -256,13 +285,18 @@ if (!isset($_SESSION['user'])) {
               <label>عدد الآليات المطلوبة</label>
               <div class="control"><input name="mach_count" id="mach_count" type="number" min="0" value="8"></div>
             </div>
+
+            <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+
             <div class="field md-4 sm-6">
-              <label>ساعات العمل  للآلية شهرياً</label>
+              <label>ساعات العمل للآلية شهرياً</label>
               <div class="control"><input name="mach_target_per_month" id="mach_target_per_month" type="number" min="0"
                   value="600"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي الساعات  للآليات شهرياً</label>
+              <label>إجمالي الساعات للآليات شهرياً</label>
               <div class="control"><input name="mach_total_month" id="mach_total_month" type="number" readonly
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
@@ -275,7 +309,7 @@ if (!isset($_SESSION['user'])) {
 
           <hr class="hr" />
           <div class="section-title"><span class="chip">5</span> بيانات إضافية</div>
-                    <br>
+          <br>
 
           <div class="form-grid">
             <div class="field md-3 sm-6">
@@ -289,14 +323,20 @@ if (!isset($_SESSION['user'])) {
                   placeholder="مثال: 3"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>الطرف الأول (ممثل الشركة)</label>
-              <div class="control"><input type="text" name="first_party" id="first_party" placeholder="اسم ممثل الشركة">
+              <label>الطرف الأول </label>
+              <div class="control"><input type="text" name="first_party" id="first_party"
+                  placeholder="اسم الطرف الاول ">
               </div>
             </div>
+
+            <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+
             <div class="field md-3 sm-6">
-              <label>الطرف الثاني (ممثل العميل)</label>
+              <label>الطرف الثاني </label>
               <div class="control"><input type="text" name="second_party" id="second_party"
-                  placeholder="اسم ممثل العميل">
+                  placeholder="اسم الطرف الثاني ">
               </div>
             </div>
             <div class="field md-3 sm-6">
@@ -318,7 +358,7 @@ if (!isset($_SESSION['user'])) {
 
           <!-- القسم 4: الإجماليات -->
           <div class="section-title"><span class="chip">4</span> إجماليات الساعات (شهرياً وللعقد)</div>
-                    <br>
+          <br>
 
           <div class="totals">
             <div class="kpi">
@@ -364,19 +404,21 @@ if (!isset($_SESSION['user'])) {
               <th>نهاية التنفيذ</th>
               <th>ساعات الآليات/شهر</th>
               <th>إجمالي ساعات الآليات</th>
-              <th>الإجمالي الشهري</th>
+              <th> الحالة </th>
+              <th> الاجراءات </th>
             </tr>
           </thead>
           <tbody>
             <?php
             include '../config.php';
+            $project = $_GET['id'];
 
             // إضافة عقد جديد عند إرسال الفورم
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project'])) {
 
               $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
               // $project = mysqli_real_escape_string($conn, $_POST['project']);
-              $project = $_GET['id'];
+            
 
               $contract_signing_date = $_POST['contract_signing_date'];
               $grace_period_days = $_POST['grace_period_days'];
@@ -470,12 +512,16 @@ if (!isset($_SESSION['user'])) {
             }
 
             // جلب العقود
-            $query = "SELECT * FROM `contracts` ORDER BY id DESC";
+            $query = "SELECT * FROM `contracts` WHERE project LIKE '$project' ORDER BY id DESC";
             $result = mysqli_query($conn, $query);
             $i = 1;
 
 
             while ($row = mysqli_fetch_assoc($result)) {
+
+              $status = $row['status'] == "1" ? "<font color='green'>ساري</font>" : "
+              <font color='red'>منتهي</font>";
+
               echo "<tr>";
               echo "<td>" . $row['contract_signing_date'] . "</td>";
               echo "<td>" . $row['contract_duration_months'] . "</td>";
@@ -484,6 +530,7 @@ if (!isset($_SESSION['user'])) {
 
               echo "<td>" . $row['hours_monthly_target'] . "</td>";
               echo "<td>" . $row['equip_total_contract'] . "</td>";
+              echo "<td>" . $status . "</td>";
 
               echo "<td>
                         <a href='javascript:void(0)' class='editBtn'
