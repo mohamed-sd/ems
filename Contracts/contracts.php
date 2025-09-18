@@ -244,7 +244,7 @@ if (!isset($_SESSION['user'])) {
             <div class="field md-3 sm-6"> </div>
 
             <div class="field md-4 sm-6">
-              <label>ساعات العمل المستهدفة للمعدة شهرياً</label>
+              <label style="font-size:13px;">ساعات العمل المستهدفة للمعدة شهرياً</label>
               <div class="control"><input name="equip_target_per_month" id="equip_target_per_month" type="number"
                   min="0" value="600"></div>
             </div>
@@ -301,7 +301,7 @@ if (!isset($_SESSION['user'])) {
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي ساعات العقد المستهدفة للآليات</label>
+              <label style="font-size:13px;">إجمالي ساعات العقد المستهدفة للآليات</label>
               <div class="control"><input name="mach_total_contract" id="mach_total_contract" type="number" readonly
                   placeholder="يُحتسب تلقائياً"></div>
             </div>
