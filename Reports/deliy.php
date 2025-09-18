@@ -132,7 +132,7 @@ $total_hours  = $total_row['total_hours'];
 			</form>
 
 			<!-- الجدول -->
-			<div class="table-responsive">
+			<div class="table-responsive"  id="projectsTable">
 				<table class="table table-striped table-hover align-middle text-center">
 					<thead class="table-primary">
 						<tr>

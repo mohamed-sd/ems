@@ -158,7 +158,7 @@ $result = mysqli_query($conn, $sql);
             </form>
 
             <!-- الجدول -->
-            <div class="table-responsive">
+            <div class="table-responsive" id="projectsTable">
                 <table class="table table-striped table-hover text-center align-middle">
                     <thead class="table-primary">
                         <tr>
