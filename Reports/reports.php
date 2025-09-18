@@ -65,18 +65,58 @@ $result = mysqli_query($conn, $sql);
                     </h2>
                     <hr class="mb-4">
 
+
+     
+
                     <!-- أزرار التنقل -->
                     <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+
+
+      <?php // صلاحيات مدير الموقع === 5
+      if ($_SESSION['user']['role'] == "5") { ?>
+
                         <a href="deliy.php" class="btn btn-primary"><i class="fa fa-clock"></i> ساعات اليوم</a>
                         <a href="deriver.php" class="btn btn-info"><i class="fa fa-clock"></i> ساعات السائق</a>
                         <a href="timesheetdeliy.php" class="btn btn-success"><i class="fa fa-clock"></i> ساعات العمل
                             اليومية</a>
-                        <a href="contract_report.php" class="btn btn-warning"><i class="fa fa-file-contract"></i>
+                  
+
+      
+      <?php } ?>
+
+                                           
+      <?php // صلاحيات مدير المشغلين === 3
+      if ($_SESSION['user']['role'] == "3") { ?>
+            <a href="deriver.php" class="btn btn-info"><i class="fa fa-clock"></i> ساعات السائق</a>
+
+      <?php } ?>
+
+      
+      <?php // صلاحيات مدير الموردين === 2
+      if ($_SESSION['user']['role'] == "2") { ?>
+   <a href="timesheetdeliy.php" class="btn btn-success"><i class="fa fa-clock"></i> ساعات العمل
+                            اليومية</a>
+      <?php } ?>
+
+      
+      <?php // صلاحيات مدير الاسطول === 4
+      if ($_SESSION['user']['role'] == "4") { ?>
+         <a href="deliy.php" class="btn btn-primary"><i class="fa fa-clock"></i> ساعات اليوم</a>
+
+      <?php } ?>
+
+
+      
+      <?php // صلاحيات مدير المشاريع === 1
+      if ($_SESSION['user']['role'] == "1") { ?>
+        <a href="contract_report.php" class="btn btn-warning"><i class="fa fa-file-contract"></i>
                             العقد</a>
                         <a href="contractall.php" class="btn btn-danger"><i class="fa fa-chart-pie"></i> إحصائيات
                             العقد</a>
                         <a href="driverAndsupplerscontract.php" class="btn btn-dark"><i class="fa fa-users"></i>
                             إحصائيات العقود</a>
+      <?php } ?>
+
                     </div>
 
                     <!-- الفلترة -->

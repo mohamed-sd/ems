@@ -71,8 +71,44 @@ if (!isset($_SESSION['user'])) {
     <!-- <h2>العقود</h2> -->
     <div class="aligin">
       <a href="javascript:void(0)" id="toggleForm" class="add">
-        <i class="fa fa-plus"></i> اضافة عقد
+        <i class="fa fa-plus"></i>  اضافة عقد جديد
       </a>
+
+       <a  class="add">
+        <i class="fa fa-plus"></i>  منتهي 
+      </a>
+
+        <a  class="add">
+        <i class="fa fa-plus"></i>  متوقف 
+      </a>
+
+        <a   class="add">
+        <i class="fa fa-plus"></i>  تعسر 
+      </a>
+
+      <a   class="add">
+        <i class="fa fa-plus"></i>  إلغاء  
+      </a>
+      
+      <a   class="add">
+        <i class="fa fa-plus"></i>  تجديد  
+      </a>
+      
+      <a   class="add">
+        <i class="fa fa-plus"></i>  تمديد  
+      </a>
+      
+      <a   class="add">
+        <i class="fa fa-plus"></i>  تغيير  
+      </a>
+       <a   class="add">
+        <i class="fa fa-plus"></i>  اضافة  
+      </a>
+      
+        <a   class="add">
+        <i class="fa fa-plus"></i>  دمج 
+      </a>
+      
     </div>
 
     <!-- فورم إضافة عقد -->
