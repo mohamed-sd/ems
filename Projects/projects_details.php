@@ -32,13 +32,13 @@ if (!isset($_SESSION['user'])) {
 
         <div class="aligin">
             <a href="../Contracts/contracts.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
-                <i class="fa fa-plus"></i> العقودات
+                <i class="fa fa-plus"></i> عقودات المشروع
             </a>
-            <?php if ($_SESSION['user']['role'] == "1") { ?>
+            <!-- <?php if ($_SESSION['user']['role'] == "1") { ?>
                 <a href="../users.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
                     <i class="fa fa-plus"></i> مدراء المشاريع
                 </a>
-            <?php } ?>
+            <?php } ?> -->
         </div>
 
         <h3> تفاصير المشروع : </h3>
@@ -96,12 +96,10 @@ WHERE m.project =  $project;");
             <thead>
                 <tr>
                     <th>#</th>
-                    <th style="text-align: right;">اسم الالية</th>
-                    <th style="text-align: right;">تسمية العميل</th>
-                    <th style="text-align: right;">المورد</th>
-                    <th style="text-align: right;">النوع</th>
-
-
+                    <th>اسم الالية</th>
+                    <th>تسمية العميل</th>
+                    <th>المورد</th>
+                    <th>النوع</th>
                     <!-- <th style="text-align: right;">إجراءات</th> -->
                 </tr>
             </thead>
@@ -158,10 +156,11 @@ WHERE pm.project = $project";
             <thead>
                 <tr>
                     <th>#</th>
-                    <th style="text-align: right;">تاريخ البداية</th>
-                    <th style="text-align: right;"> المستهدف شهريا</th>
-                    <th style="text-align: right;">المجموع</th>
-                    <!-- <th style="text-align: right;">إجراءات</th> -->
+                    <th style="text-align: center;">تاريخ البداية</th>
+                    <th style="text-align: center;"> المستهدف شهريا</th>
+                    <th style="text-align: center;">المجموع</th>
+                    <th style="text-align: center;">الحالة</th>
+                    <th style="text-align: center;">إجراءات</th>
                 </tr>
             </thead>
             <tbody>
@@ -172,15 +171,20 @@ WHERE pm.project = $project";
                 $result = mysqli_query($conn, $query);
                 $i = 1;
                 while ($row = mysqli_fetch_assoc($result)) {
+                     $status = $row['status']=="1" ? "<font color='green'>ساري</font>" : "
+                    <font color='red'>منتهي</font>";
+
                     echo "<tr>";
                     echo "<td>" . $i++ . "</td>";
                     echo "<td>" . $row['contract_signing_date'] . "</td>";
                     echo "<td>" . $row['hours_monthly_target'] . "</td>";
                     echo "<td>" . $row['equip_total_contract'] . "</td>";
+                    echo "<td>" . $status . "</td>";
                     // echo "<td>
                     //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
                     //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
                     //       </td>";
+                    echo "<td><a href='../Contracts/contracts_details.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a></td>";
                     echo "</tr>";
                 }
                 ?>

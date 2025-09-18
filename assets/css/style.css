@@ -568,15 +568,16 @@ label {
 }
 
 .report .col-lg-2 {
-  font-weight: 600;
+  font-weight: 400;
   border: solid 1px grey;
   background-color: #0d1b2a;
   color: #ffcc00;
-  padding: 2px;
+  padding: 3px;
   font-size: 15px;
 }
 
 .report .col-lg-4 {
   background-color: #fff;
   border-bottom: solid 1px #000022;
+  font-weight: 700;
 }

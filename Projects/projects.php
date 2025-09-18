@@ -35,7 +35,7 @@ include('../insidebar.php');
                     <div>
                         <label>موقع المشروع (Project location)</label>
                         <input type="text" name="location" placeholder="ادخل موقع المشروع" id="project_location" required />
-                        <input type="hidden" name="total" value="100" required />
+                        <input type="hidden" name="total" value="0" required />
                     </div>
                     <div>
                         <label>حالة المشروع (Project Status)</label>
@@ -140,7 +140,7 @@ include('../insidebar.php');
                            data-location='" . $row['location'] . "' 
                            data-status='" . $row['status'] . "'
                            style='color:#007bff'><i class='fa fa-edit'></i></a> | 
-                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
+                        <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
                         <a href='projects_details.php?id=" . $row['id'] . "' style='color: #28a745'> <i class='fa fa-eye'></i> </a>
                       </td>";
                         echo "</tr>";
