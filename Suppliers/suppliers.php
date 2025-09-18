@@ -82,6 +82,9 @@ include("../inheader.php");
                         <th>#</th>
                         <th>اسم المورد</th>
                         <th>عدد الآليات</th>
+                       <th>عدد العقود</th>
+
+                                            
                         <th>رقم الهاتف</th>
                         <th>الحالة</th>
                         <th>إجراءات</th>
@@ -91,7 +94,9 @@ include("../inheader.php");
                     <?php
                     // جلب الموردين
                     $query = "SELECT `id`, `name`, `phone`, `status` , 
-                      (SELECT COUNT(*) FROM equipments WHERE equipments.suppliers = suppliers.id ) as 'equipments' 
+                      (SELECT COUNT(*) FROM equipments WHERE equipments.suppliers = suppliers.id ) as 'equipments' ,
+                          (SELECT COUNT(*) FROM supplierscontracts WHERE supplierscontracts.supplier_id = suppliers.id ) as 'num_contracts'
+                          
                       FROM `suppliers` ORDER BY id DESC";
                     $result = mysqli_query($conn, $query);
                     $i = 1;
@@ -100,6 +105,7 @@ include("../inheader.php");
                         echo "<td>" . $i++ . "</td>";
                         echo "<td>" . $row['name'] . "</td>";
                         echo "<td>" . $row['equipments'] . "</td>";
+                        echo "<td>" . $row['num_contracts'] . "</td>";
                         echo "<td>" . $row['phone'] . "</td>";
 
                         // الحالة بالألوان
