@@ -189,6 +189,9 @@ include "config.php";
       <?php
       // ******************************** احصائيات مدير المشغلين ******************************************************
       if ($_SESSION['user']['role'] == "3") {
+        $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
+        echo "<div class='card'><i class='fa fa-tractor'></i><h3>$equipments</h3><p>المعدات</p></div>";
+
         $drivers = $conn->query("SELECT COUNT(*) AS total FROM drivers")->fetch_assoc()['total'];
         echo "<div class='card'><i class='fa fa-id-badge'></i><h3>$drivers</h3><p>السائقين</p></div>";
       }

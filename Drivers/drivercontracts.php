@@ -83,41 +83,41 @@ if (!isset($_SESSION['user'])) {
         <div class="card-body">
 
           <input type="hidden" name="driver_id" placeholder="اسم السائق" value="<?php echo $_GET['id'] ?>" required />
-          <div class="field md-3 sm-6">
-            <label class="form-label">المشروع</label>
-            <div class="control">
-              <select name="project_id">
 
-                <?php
-                include '../config.php';
-
-                $sql = "SELECT id, name FROM projects ORDER BY name ASC";
-                $result = mysqli_query($conn, $sql);
-                ?>
-                <option value="">-- اختر المشروع --</option>
-                <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                  <option value="<?php echo $row['id']; ?>">
-                    <?php echo htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>
-                  </option>
-                <?php endwhile; ?>
-              </select>
-            </div>
-          </div>
 
 
           <div class="section-title"><span class="chip">1</span> البيانات الأساسية للسائق والعقد</div>
           <div class="form-grid">
 
             <div class="field md-3 sm-6">
-              <label>تاريخ توقيع العقد (Contract signing date)</label>
+              <label class="form-label">المشروع</label>
+              <div class="control">
+                <select name="project_id">
+                  <?php
+                  include '../config.php';
+                  $sql = "SELECT id, name FROM projects where status = '1' ORDER BY name ASC  ";
+                  $result = mysqli_query($conn, $sql);
+                  ?>
+                  <option value="">-- اختر المشروع --</option>
+                  <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                    <option value="<?php echo $row['id']; ?>">
+                      <?php echo htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>
+                    </option>
+                  <?php endwhile; ?>
+                </select>
+              </div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label>تاريخ توقيع العقد </label>
               <div class="control"><input name="contract_signing_date" type="date"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>فترة السماح بين التوقيع والتنفيذ (Grace period)</label>
+              <label>فترة السماح بين التوقيع والتنفيذ </label>
               <div class="control"><input name="grace_period_days" type="number" min="0" placeholder="عدد الأيام"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>مدة العقد بالشهور (Contract Per Month)</label>
+              <label>مدة العقد بالشهور )</label>
               <div class="control"><input name="contract_duration_months" id="contract_duration_months" type="number"
                   min="0" placeholder="بالشهور"></div>
             </div>
@@ -178,11 +178,11 @@ if (!isset($_SESSION['user'])) {
           </div>
           <div class="form-grid">
             <div class="field md-4 sm-6">
-              <label>نوع المعدة المطلوبة (Type of equipment)</label>
+              <label>نوع المعدة المطلوبة </label>
               <div class="control"><input name="equip_type" type="text" placeholder="مثال: حفار" value="حفار"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>حجم المعدة المطلوبة (Size)</label>
+              <label>حجم المعدة المطلوبة </label>
               <div class="control"><input name="equip_size" type="number" placeholder="مثال: 340" value="340"></span>
               </div>
             </div>
@@ -190,6 +190,11 @@ if (!isset($_SESSION['user'])) {
               <label>عدد المعدات المطلوبة</label>
               <div class="control"><input name="equip_count" id="equip_count" type="number" min="0" value="2"></div>
             </div>
+
+            <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+
             <div class="field md-4 sm-6">
               <label>ساعات العمل المستهدفة للمعدة شهرياً</label>
               <div class="control"><input name="equip_target_per_month" id="equip_target_per_month" type="number"
@@ -225,6 +230,11 @@ if (!isset($_SESSION['user'])) {
               <label>عدد الآليات المطلوبة</label>
               <div class="control"><input name="mach_count" id="mach_count" type="number" min="0" value="8"></div>
             </div>
+
+            <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+
             <div class="field md-4 sm-6">
               <label>ساعات العمل المستهدفة للآلية شهرياً</label>
               <div class="control"><input name="mach_target_per_month" id="mach_target_per_month" type="number" min="0"
@@ -254,12 +264,17 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input type="number" name="daily_operators" min="0" placeholder="مثال: 3"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>الطرف الأول (ممثل الشركة)</label>
-              <div class="control"><input type="text" name="first_party" placeholder="اسم ممثل الشركة"></div>
+              <label>الطرف الأول </label>
+              <div class="control"><input type="text" name="first_party" placeholder="اسم الطرف الاول "></div>
             </div>
+
+            <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+
             <div class="field md-3 sm-6">
-              <label>الطرف الثاني (ممثل العميل)</label>
-              <div class="control"><input type="text" name="second_party" placeholder="اسم ممثل العميل"></div>
+              <label>الطرف الثاني </label>
+              <div class="control"><input type="text" name="second_party" placeholder="اسم الطرف الثاني"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>الشاهد الأول</label>
@@ -321,7 +336,8 @@ if (!isset($_SESSION['user'])) {
               <th>نهاية التنفيذ</th>
               <th>ساعات الآليات/شهر</th>
               <th>إجمالي ساعات الآليات</th>
-              <th>الإجمالي الشهري</th>
+              <th> الحالة </th>
+              <th> الاجراءات </th>
             </tr>
           </thead>
           <tbody>
@@ -387,7 +403,7 @@ if (!isset($_SESSION['user'])) {
     '$hours_monthly_target','$forecasted_contracted_hours',
     '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two','$project_id'
 )");
-              echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='drivercontracts.php';</script>";
+              echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='drivercontracts.php?id=$driver_id';</script>";
 
             }
             $driver_id = $_GET['id'];
@@ -398,6 +414,10 @@ if (!isset($_SESSION['user'])) {
 
 
             while ($row = mysqli_fetch_assoc($result)) {
+
+              $status = $row['status'] == "1" ? "<font color='green'>ساري</font>" : "
+              <font color='red'>منتهي</font>";
+
               echo "<tr>";
               echo "<td>" . $row['contract_signing_date'] . "</td>";
               echo "<td>" . $row['contract_duration_months'] . "</td>";
@@ -406,6 +426,7 @@ if (!isset($_SESSION['user'])) {
 
               echo "<td>" . $row['hours_monthly_target'] . "</td>";
               echo "<td>" . $row['equip_total_contract'] . "</td>";
+              echo "<td>" . $status . "</td>";
 
               echo "<td>
                         <a href='' style='color:#007bff'><i class='fa fa-edit'></i></a> | 

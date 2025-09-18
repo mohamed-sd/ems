@@ -31,6 +31,14 @@ include("../inheader.php");
                         <label for="phone"> رقم الهاتف </label>
                         <input type="text" name="phone" id="phone" placeholder="رقم الهاتف " required />
                     </div>
+                    <div>
+                        <label> الحالة </label>
+                        <select name="status" id="status">
+                            <option value=""> -- اختار الحالة -- </option>
+                            <option value="1"> يعمل </option>
+                            <option value="0"> عاطل </option>
+                        </select>
+                    </div>
                     <br />
                     <button type="submit"> حفظ </button>
                 </div>
@@ -47,10 +55,10 @@ include("../inheader.php");
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th style="text-align: right;">اسم السائق</th>
-                        <th style="text-align: right;"> الهاتف </th>
-
-                        <th style="text-align: right;">إجراءات</th>
+                        <th>اسم السائق</th>
+                        <th> الهاتف </th>
+                        <th> الحالة </th>
+                        <th> إجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,43 +71,49 @@ include("../inheader.php");
 
                         $name = mysqli_real_escape_string($conn, $_POST['name']);
                         $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+                        $status = mysqli_real_escape_string($conn, $_POST['status']);
 
 
                         // mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
-                    
 
                         if ($id > 0) {
                             // تحديث
-                            mysqli_query($conn, "UPDATE drivers SET name='$name', phone='$phone' WHERE id=$id");
+                            mysqli_query($conn, "UPDATE drivers SET name='$name', phone='$phone' , status='$status' WHERE id=$id");
                             echo "<script>window.location.href='drivers.php';</script>";
                             exit;
                         } else {
                             // إضافة
-                            mysqli_query($conn, "INSERT INTO drivers (name, phone) VALUES ('$name', '$phone')");
+                            mysqli_query($conn, "INSERT INTO drivers (name, phone , status) VALUES ('$name', '$phone' , '$status')");
                             echo "<script>window.location.href='drivers.php';</script>";
                             exit;
                         }
                     }
 
                     // جلب المشاريع
-                    $query = "SELECT `id`, `name`, `phone` FROM drivers ORDER BY id DESC";
+                    $query = "SELECT `id`, `name`, `phone` , `status` FROM drivers ORDER BY id DESC";
                     $result = mysqli_query($conn, $query);
                     $i = 1;
                     while ($row = mysqli_fetch_assoc($result)) {
+
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
                         echo "<td>" . $row['name'] . "</td>";
                         echo "<td>" . $row['phone'] . "</td>";
-
+                        if ($row['status'] == "1") {
+                            echo "<td style='color:green'>يعمل</td>";
+                        } else {
+                            echo "<td style='color:red'>عاطل</td>";
+                        }
                         echo "<td>
                          <a href='javascript:void(0)' 
                            class='editBtn' 
                            data-id='" . $row['id'] . "' 
                            data-name='" . $row['name'] . "' 
                            data-phone='" . $row['phone'] . "' 
+                           data-status='" . $row['status'] . "' 
     
                            style='color:#007bff'><i class='fa fa-edit'></i></a>  | 
-                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> 
+                        <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> 
                         <a href='drivercontracts.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a>
                       </td>";
                         echo "</tr>";
@@ -158,6 +172,7 @@ include("../inheader.php");
             $("#drivers_id").val("");
             $("#name").val("");
             $("#phone").val("");
+            $("#status").val("");
         });
 
         // عند الضغط على زر تعديل
@@ -165,6 +180,7 @@ include("../inheader.php");
             $("#drivers_id").val($(this).data("id"));
             $("#name").val($(this).data("name"));
             $("#phone").val($(this).data("phone"));
+            $("#status").val($(this).data("status"));
 
             $("#projectForm").show();
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
