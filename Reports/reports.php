@@ -154,8 +154,10 @@ $result = mysqli_query($conn, $sql);
                         </div>
                     </form>
 
+                    <div class="card-body">
+
                     <!-- جدول -->
-                    <div class="table-responsive">
+                    <div  id="projectsTable" class="display">
                         <table class="table table-bordered table-hover text-center align-middle">
                             <thead class="table-primary">
                                 <tr>
@@ -175,6 +177,7 @@ $result = mysqli_query($conn, $sql);
                             </tbody>
                         </table>
                     </div>
+                    </div>
 
                 </div>
             </div>
@@ -182,9 +185,39 @@ $result = mysqli_query($conn, $sql);
 
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+
+
+
     </div>
 
 </div>
+
+
+<script>
+  (function () {
+    $(document).ready(function () {
+      $('#projectsTable').DataTable({
+        responsive: true, 
+        dom: 'Bfrtip', // Buttons + Search + Pagination
+        buttons: [
+          { extend: 'copy', text: 'نسخ' },
+          { extend: 'excel', text: 'تصدير Excel' },
+          { extend: 'csv', text: 'تصدير CSV' },
+          { extend: 'pdf', text: 'تصدير PDF' },
+          { extend: 'print', text: 'طباعة' }
+        ],
+        "language": {
+          "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+        }
+      });
+    });
+    })();
+</script>
 </body>
 
 </html>

@@ -147,7 +147,7 @@ $projects = $conn->query("SELECT id, name, client, location, total, status, crea
             </div>
 
             <!-- الجدول -->
-            <table id="reportTable" class="table table-bordered table-striped">
+            <table id="reportTable" class="table table-bordered table-striped" id="projectsTable">
                 <thead>
                     <tr>
                         <th>#</th>

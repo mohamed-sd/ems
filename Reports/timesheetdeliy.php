@@ -179,6 +179,7 @@ $totals = mysqli_fetch_assoc($total_res);
         </div>
     </div>
 
+    
     <!-- كروت الاحصائيات -->
     <div class="row mb-4">
         <div class="col-md-4">
@@ -210,7 +211,7 @@ $totals = mysqli_fetch_assoc($total_res);
     <!-- جدول البيانات -->
     <div class="card shadow-sm">
         <div class="card-body table-responsive">
-            <table class="table table-bordered table-hover align-middle text-center">
+            <table class="table table-bordered table-hover align-middle text-center" id="projectsTable">
                 <thead class="table-dark">
                 <tr>
                     <th>التاريخ</th>
