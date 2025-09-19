@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             <select id="project_id" name="project_id" class="form-control">
                                 <option value="">-- اختر المشروع --</option>
                                 <?php
-                                $sql = "SELECT id, name FROM projects ORDER BY name ASC";
+                                $sql = "SELECT id, name FROM projects where status = '1' ORDER BY name ASC";
                                 $result = mysqli_query($conn, $sql);
                                 while ($row = mysqli_fetch_assoc($result)) {
                                     echo "<option value='{$row['id']}'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</option>";

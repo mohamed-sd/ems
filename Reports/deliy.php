@@ -101,10 +101,10 @@ $total_hours  = $total_row['total_hours'];
 					<select name="equipment" class="form-select">
 						<option value="">-- الكل --</option>
 						<?php
-						$eqs = mysqli_query($conn, "SELECT id, name FROM equipments");
+						$eqs = mysqli_query($conn, "SELECT id, name , code FROM equipments where status = '1' AND  id IN ( SELECT operations.equipment FROM `operations` WHERE `status` LIKE '1' ) ");
 						while($row = mysqli_fetch_assoc($eqs)){
 							$selected = ($equipment_filter == $row['id']) ? "selected" : "";
-							echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+							echo "<option value='{$row['id']}' $selected>{$row['name']} - {$row['code']} </option>";
 						}
 						?>
 					</select>
@@ -115,7 +115,7 @@ $total_hours  = $total_row['total_hours'];
 					<select name="project" class="form-select">
 						<option value="">-- الكل --</option>
 						<?php
-						$prj = mysqli_query($conn, "SELECT id, name FROM projects");
+						$prj = mysqli_query($conn, "SELECT id, name FROM projects where status = '1' ");
 						while($row = mysqli_fetch_assoc($prj)){
 							$selected = ($project_filter == $row['id']) ? "selected" : "";
 							echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";

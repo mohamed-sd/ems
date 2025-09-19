@@ -29,7 +29,7 @@ include("../inheader.php");
                         <option value="">-- اختر المعدة --</option>
                         <?php
                         include '../config.php';
-                        $eq_res = mysqli_query($conn, "SELECT id, code, name FROM equipments WHERE id NOT IN ( SELECT operations.equipment FROM `operations` WHERE `status` LIKE '1' )");
+                        $eq_res = mysqli_query($conn, "SELECT id, code, name FROM equipments WHERE id NOT IN ( SELECT operations.equipment FROM `operations` WHERE `status` LIKE '1' ) AND status = '1'");
                         while ($eq = mysqli_fetch_assoc($eq_res)) {
                             echo "<option value='" . $eq['id'] . "'>" . $eq['code'] . " - " . $eq['name'] . "</option>";
                         }
@@ -40,7 +40,7 @@ include("../inheader.php");
                     <select name="project" required>
                         <option value="">-- اختر المشروع --</option>
                         <?php
-                        $pr_res = mysqli_query($conn, "SELECT id, name FROM projects");
+                        $pr_res = mysqli_query($conn, "SELECT id, name FROM projects where status = '1' ");
                         while ($pr = mysqli_fetch_assoc($pr_res)) {
                             echo "<option value='" . $pr['id'] . "'>" . $pr['name'] . "</option>";
                         }
@@ -97,7 +97,7 @@ include("../inheader.php");
                         mysqli_query($conn, "INSERT INTO operations (equipment, project, start, end, hours, status) 
                                      VALUES ('$equipment', '$project', '$start', '$end', '$hours', '$status')");
 
-                              echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='equipments.php';</script>";
+                              echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='oprators.php';</script>";
 
 
 
