@@ -73,7 +73,8 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             <option value="">-- اختر المورد --</option>
                             <?php
                             $dr_res = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE status='1'");
-                            while ($dr = mysqli_fetch_assoc($dr_res)) {
+                            while ($dr = mysqli_fetch_assoc
+                            ($dr_res)) {
                                 $selected = (!empty($editData) && $editData['suppliers'] == $dr['id']) ? "selected" : "";
                                 echo "<option value='" . $dr['id'] . "' $selected>" . $dr['name'] . "</option>";
                             }
@@ -132,10 +133,30 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                 </thead>
                 <tbody>
                     <?php
-                    $query2 = "SELECT m.id, s.name AS supplier_name, m.type, m.code, m.name , m.status 
-                               FROM equipments m
-                               JOIN suppliers s ON m.suppliers = s.id
-                               ORDER BY m.id DESC";
+                    $query2 = "
+                        SELECT 
+                            m.id, 
+                            s.name AS supplier_name, 
+                            m.type, 
+                            m.code, 
+                            m.name , 
+                            m.status,
+                            o.project, 
+                            o.status AS operation_status,
+                            COUNT(DISTINCT d.id) AS drivers_count
+                        FROM equipments m
+                        JOIN suppliers s ON m.suppliers = s.id
+                        LEFT JOIN operations o 
+                            ON o.equipment = m.id 
+                            AND o.status = '1'
+                        LEFT JOIN equipment_drivers ed 
+                            ON ed.equipment_id = m.id
+                        LEFT JOIN drivers d 
+                            ON d.id = ed.driver_id 
+                            AND ed.status = '1'
+                        GROUP BY m.id
+                        ORDER BY m.id DESC
+                    ";
                     $result = mysqli_query($conn, $query2);
                     $i = 1;
                     while ($row = mysqli_fetch_assoc($result)) {
@@ -143,11 +164,40 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         echo "<td>" . $i++ . "</td>";
                         echo "<td>" . $row['supplier_name'] . "</td>";
                         echo "<td>" . $row['code'] . "</td>";
-                        echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:green;'> قلاب </td>";
-                        echo "<td>" . $row['name'] . "</td>";
-                        echo $row['status'] == "1" ? "<td style='color:green;'> متاحة </td>" : "<td style='color:red;'> مشغولة </td>";
 
-                        // روابط الإجراءات
+                        echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:green;'> قلاب </td>";
+
+                        // ✅ معلومات إضافية بجانب اسم المعدة
+                        $extra = "";
+
+                        // المشروع النشط
+                        if (!empty($row['project'])) {
+                            $p_res = mysqli_query($conn, "SELECT name FROM projects WHERE id='" . $row['project'] . "'");
+                            $p_name = "";
+                            if ($p_res && mysqli_num_rows($p_res) > 0) {
+                                $p = mysqli_fetch_assoc($p_res);
+                                $p_name = $p['name'];
+                            }
+                            $extra .= " <span style='color:blue;'>(تعمل في: $p_name)</span>";
+                        }
+
+                        // عدد السائقين النشطين
+                        if ($row['drivers_count'] > 0) {
+                            $extra .= " <span title='عدد السائقين'><i class='fa fa-user'></i> " . $row['drivers_count'] . "</span>";
+                        }
+
+                        echo "<td>" . $row['name'] . $extra . "</td>";
+
+                        // ✅ الحالة
+                        if (!empty($row['project']) && $row['operation_status'] == "1") {
+                            echo "<td style='color:orange;'> قيد التشغيل </td>";
+                        } else {
+                            echo $row['status'] == "1" 
+                                ? "<td style='color:green;'> متاحة </td>" 
+                                : "<td style='color:red;'> مشغولة </td>";
+                        }
+
+                        // الإجراءات
                         if ($_SESSION['user']['role'] == "3") {
                             echo "<td>
                                 <a href='add_drivers.php?equipment_id=" . $row['id'] . "' style='color:#007bff'> مشغل </a>
@@ -156,7 +206,6 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             echo "<td> 
                                 <a href='equipments.php?edit=" . $row['id'] . "' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
                                 <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> 
-                              
                               </td>";
                         }
 
