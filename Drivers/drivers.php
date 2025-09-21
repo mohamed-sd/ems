@@ -56,6 +56,8 @@ include("../inheader.php");
                     <tr>
                         <th>#</th>
                         <th>اسم السائق</th>
+                         <th> عدد العقود</th>
+
                         <th> الهاتف </th>
                         <th> الحالة </th>
                         <th> إجراءات</th>
@@ -90,7 +92,10 @@ include("../inheader.php");
                     }
 
                     // جلب المشاريع
-                    $query = "SELECT `id`, `name`, `phone` , `status` FROM drivers ORDER BY id DESC";
+                    $query = "SELECT `id`, `name`, `phone` , `status` , 
+                     (SELECT COUNT(*) FROM drivercontracts WHERE drivercontracts.driver_id = drivers.id) as 'numcontracts'
+                    
+                     FROM drivers ORDER BY id DESC";
                     $result = mysqli_query($conn, $query);
                     $i = 1;
                     while ($row = mysqli_fetch_assoc($result)) {
@@ -98,6 +103,7 @@ include("../inheader.php");
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
                         echo "<td>" . $row['name'] . "</td>";
+                        echo "<td>" . $row['numcontracts'] . "</td>";
                         echo "<td>" . $row['phone'] . "</td>";
                         if ($row['status'] == "1") {
                             echo "<td style='color:green'>يعمل</td>";
