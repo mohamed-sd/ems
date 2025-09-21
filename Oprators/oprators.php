@@ -36,15 +36,16 @@ if(isset($_GET['sid'])){
             </div>
             <div class="card-body">
                 <div class="form-grid">
-                    <select name="equipment" required>
+
+                      <select name="type" id="type">
+                            <option value=""> -- حدد نوع المعدة --- </option>
+                            <option value="1" > حفار </option>
+                            <option value="2" > قلاب </option>
+                        </select>
+
+                    <select name="equipment" id="equipment" required>
                         <option value="">-- اختر المعدة --</option>
-                        <?php
-                        
-                        $eq_res = mysqli_query($conn, "SELECT id, code, name FROM equipments WHERE id NOT IN ( SELECT operations.equipment FROM `operations` WHERE `status` LIKE '1' ) AND status = '1'");
-                        while ($eq = mysqli_fetch_assoc($eq_res)) {
-                            echo "<option value='" . $eq['id'] . "'>" . $eq['code'] . " - " . $eq['name'] . "</option>";
-                        }
-                        ?>
+                        <!-- سيتم ملؤها ديناميكيًا عبر AJAX -->
                     </select>
 
                     <!-- المشروع -->
@@ -100,13 +101,17 @@ if(isset($_GET['sid'])){
                     if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['equipment'])) {
                         $equipment = intval($_POST['equipment']);
                         $project = intval($_POST['project']);
+                            $equipment_type = intval($_POST['type']);
+
+
+                        
                         $start = mysqli_real_escape_string($conn, $_POST['start']);
                         $end = mysqli_real_escape_string($conn, $_POST['end']);
                         $hours = floatval($_POST['hours']);
                         $status = mysqli_real_escape_string($conn, $_POST['status']);
 
-                        mysqli_query($conn, "INSERT INTO operations (equipment, project, start, end, hours, status) 
-                                     VALUES ('$equipment', '$project', '$start', '$end', '$hours', '$status')");
+                        mysqli_query($conn, "INSERT INTO operations (equipment,equipment_type ,project, start, end, hours, status) 
+                                     VALUES ('$equipment', '$equipment_type','$project', '$start', '$end', '$hours', '$status')");
 
                               echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='oprators.php';</script>";
 
@@ -202,6 +207,29 @@ if(isset($_GET['sid'])){
             form.style.display = form.style.display === "none" ? "block" : "none";
         });
     })();
+
+    $(document).ready(function () {
+    $("#type").change(function () {
+      var type = $(this).val();
+      if (type !== "") {
+        $.ajax({
+          url: "getoprator.php",
+          type: "GET",
+          data: { type: type },
+          success: function (response) {
+            console.log("📌 Response:", response); // Debug
+            $("#equipment").html(response);
+          },
+          error: function (xhr, status, error) {
+            console.error("❌ AJAX Error:", error);
+          }
+        });
+      } else {
+        $("#equipment").html("<option value=''>-- اختر الالية --</option>");
+      }
+    });
+  });
+
 </script>
 
 </body>
