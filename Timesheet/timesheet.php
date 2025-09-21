@@ -38,10 +38,10 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
                   <option value="">-- اختر الالية --</option>
                   <?php
                   include '../config.php';
-                  $op_res = mysqli_query($conn, "SELECT o.id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
+                  $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN projects p ON o.project = p.id    WHERE 1 $type_filter");
+                                            JOIN projects p ON o.project = p.id    WHERE 1 $type_filter AND o.status = '1'");
 
 
 
@@ -281,10 +281,10 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
                   <option value="">-- اختر الالية --</option>
                   <?php
                   include '../config.php';
-                  $op_res = mysqli_query($conn, "SELECT o.id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
+                  $op_res = mysqli_query($conn, "SELECT o.id,o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN projects p ON o.project = p.id    WHERE 1 $type_filter");
+                                            JOIN projects p ON o.project = p.id    WHERE 1 $type_filter AND o.status = '1'");
 
 
 
