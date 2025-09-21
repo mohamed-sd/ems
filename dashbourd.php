@@ -206,7 +206,7 @@ include "config.php";
         $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
         echo "<div class='card'><i class='fa fa-tools'></i><h3>$equipments</h3><p>المعدات</p></div>";
 
-        $activeOps = $conn->query("SELECT COUNT(*) AS total FROM operations WHERE status='active'")->fetch_assoc()['total'];
+        $activeOps = $conn->query("SELECT COUNT(*) AS total FROM `operations` WHERE `status` LIKE '1'")->fetch_assoc()['total'];
         echo "<div class='card'><i class='fa fa-play-circle'></i><h3>$activeOps</h3><p>معدات تعمل الآن</p></div>";
       }
       ?>

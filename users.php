@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     </thead>
                     <tbody>
                         <?php
-                        $query = "SELECT id, name, username, password, phone, role FROM users WHERE parent_id='0' AND role!='-1' ORDER BY id DESC";
+                        $query = "SELECT id, name, username, password, phone, role , project_id FROM users WHERE parent_id='0' AND role!='-1' ORDER BY id DESC";
                         $result = mysqli_query($conn, $query);
 
                         $roles = array(
@@ -153,12 +153,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
                         $i = 1;
                         while ($row = mysqli_fetch_assoc($result)) {
+
+                            $project_id = $row['project_id'];
+                            $project_name = "";
+                            $select_project = mysqli_query($conn,"SELECT name FROM `projects` WHERE `id` = $project_id");
+                            while($project_row = mysqli_fetch_array($select_project)){
+                                $project_name = $project_row['name'];
+                            }
+
+                            if($row['role'] == "5"){
+                                $project = " (<font color='blue'>".$project_name."</font>)";
+                            }else{
+                                $project = "";
+                            }
+
                             echo "<tr>";
                             echo "<td>" . $i++ . "</td>";
                             echo "<td>" . $row['name'] . "</td>";
                             echo "<td>" . $row['username'] . "</td>";
                             echo "<td>" . $row['password'] . "</td>";
-                            echo "<td>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</td>";
+                            echo "<td>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") ."".$project."</td>";
                             echo "<td>" . $row['phone'] . "</td>";
                             echo "<td>
                                 <a href='javascript:void(0)' class='editBtn' data-id='{$row['id']}' data-name='{$row['name']}' data-username='{$row['username']}' data-password='{$row['password']}' data-phone='{$row['phone']}' data-role='{$row['role']}' style='color:#007bff'><i class='fa fa-edit'></i></a> | 

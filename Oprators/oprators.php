@@ -6,6 +6,17 @@ if (!isset($_SESSION['user'])) {
 }
 $page_title = "إيكوبيشن | التشغيل ";
 include("../inheader.php");
+include '../config.php';
+
+// كود انهاء خدمة
+if(isset($_GET['sid'])){
+    $id = $_GET['sid'];
+    $query = mysqli_query($conn, "UPDATE `operations` SET `status` = '0' WHERE `operations`.`id` = $id;");
+    if($query){
+
+    }
+}
+
 ?>
 
 <?php include('../insidebar.php'); ?>
@@ -28,7 +39,7 @@ include("../inheader.php");
                     <select name="equipment" required>
                         <option value="">-- اختر المعدة --</option>
                         <?php
-                        include '../config.php';
+                        
                         $eq_res = mysqli_query($conn, "SELECT id, code, name FROM equipments WHERE id NOT IN ( SELECT operations.equipment FROM `operations` WHERE `status` LIKE '1' ) AND status = '1'");
                         while ($eq = mysqli_fetch_assoc($eq_res)) {
                             echo "<option value='" . $eq['id'] . "'>" . $eq['code'] . " - " . $eq['name'] . "</option>";
@@ -122,7 +133,7 @@ include("../inheader.php");
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
                         echo "<td>" . $row['equipment_code'] . " - " . $row['equipment_name'] . "</td>";
-                        echo "<td>" . (!empty($row['driver_names']) ? $row['driver_names'] : "—") . "</td>";
+                        echo "<td>" . (!empty($row['driver_names']) ? $row['driver_names'] : "-") . "</td>";
 
                         echo "<td>" . $row['suppliers_name'] . "</td>";
 
@@ -134,7 +145,8 @@ include("../inheader.php");
                         echo $row['status'] == "1" ? "<td style='color:green'> نشطة </td>" : "<td style='color:red'> خاملة </td>";
                         echo "<td>
                         <a href='#' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
-                        <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a>
+                        <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
+                        <a href='oprators.php?sid=".$row['id']."'> إنهاء حدمة </a>
                       </td>";
                         echo "</tr>";
                     }
