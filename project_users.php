@@ -87,12 +87,12 @@ include 'config.php';
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th style="text-align: right;">الاسم </th>
-                            <th style="text-align: right;">اسم المستخدم </th>
-                            <th style="text-align: right;">كلمه المرور </th>
-                            <th style="text-align: right;">الدور </th>
-                            <th style="text-align: right;">رقم الهاتف</th>
-                            <th style="text-align: right;">إجراءات</th>
+                            <th>الاسم </th>
+                            <th>اسم المستخدم </th>
+                            <th>كلمه المرور </th>
+                            <th>الدور </th>
+                            <th>رقم الهاتف</th>
+                            <th>إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -107,21 +107,32 @@ include 'config.php';
                             $password = $_POST['password']; // يفضل تشفيره لاحقاً
                             $phone = $_POST['phone'];
                             $role = $_POST['role'];
-                            $project = ($role == "5" && !empty($_POST['project_id'])) ? $_POST['project_id'] : 0;
+                            $project = $_SESSION['user']['project'];
                             $parent_id = $_POST['parent_id'];
 
 
                             isset($_POST['uid']) ? $uid = $_POST['uid'] : $uid = "0";
 
 
-                            mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role , project_id , parent_id , created_at, updated_at) 
+                            $sql = mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role , project_id , parent_id , created_at, updated_at) 
             VALUES ('$name', '$username', '$password', '$phone', '$role' , '$project' , '$parent_id' , NOW(), NOW())");
-                            echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='project_users.php';</script>";
 
+                            if ($sql) {
+                                echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='project_users.php';</script>";
+                            } else {
+                                if (mysqli_errno($conn) == 1062) {
+                                    // 1062 = خطأ التكرار Duplicate entry
+                                    echo "<script>alert('⚠️ اسم المستخدم موجود مسبقاً!');</script>";
+                                } else {
+                                    echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
+                                }
+                            }
+                            //   echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='project_users.php';</script>";
+                        
                         }
 
                         $userid = $_SESSION['user']['id'];
-                        
+
 
 
                         $query = "SELECT id, name, username,password ,phone, role , created_at, updated_at

@@ -8,13 +8,13 @@ include 'config.php';
 
 // إضافة أو تعديل مستخدم
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
-    $name     = $_POST['name'];
+    $name = $_POST['name'];
     $username = $_POST['username'];
     $password = $_POST['password']; // بدون تشفير
-    $phone    = $_POST['phone'];
-    $role     = $_POST['role'];
-    $project  = ($role == "5" && !empty($_POST['project_id'])) ? $_POST['project_id'] : 0;
-    $uid      = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
+    $phone = $_POST['phone'];
+    $role = $_POST['role'];
+    $project = ($role == "5" && !empty($_POST['project_id'])) ? $_POST['project_id'] : 0;
+    $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
 
     if ($uid > 0) {
         // تعديل
@@ -24,9 +24,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         mysqli_query($conn, $sql);
     } else {
         // إضافة
-        $sql = "INSERT INTO users (name, username, password, phone, role, project_id, parent_id, created_at, updated_at) 
-                VALUES ('$name', '$username', '$password', '$phone', '$role', '$project', '0', NOW(), NOW())";
-        mysqli_query($conn, $sql);
+        $sql = mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role, project_id, parent_id, created_at, updated_at) 
+                VALUES ('$name', '$username', '$password', '$phone', '$role', '$project', '0', NOW(), NOW())");
+        if ($sql) {
+            echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='users.php';</script>";
+        } else {
+            if (mysqli_errno($conn) == 1062) {
+                // 1062 = خطأ التكرار Duplicate entry
+                echo "<script>alert('⚠️ اسم المستخدم موجود مسبقاً!');</script>";
+            } else {
+                echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
+            }
+        }
     }
 }
 
@@ -156,14 +165,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
                             $project_id = $row['project_id'];
                             $project_name = "";
-                            $select_project = mysqli_query($conn,"SELECT name FROM `projects` WHERE `id` = $project_id");
-                            while($project_row = mysqli_fetch_array($select_project)){
+                            $select_project = mysqli_query($conn, "SELECT name FROM `projects` WHERE `id` = $project_id");
+                            while ($project_row = mysqli_fetch_array($select_project)) {
                                 $project_name = $project_row['name'];
                             }
 
-                            if($row['role'] == "5"){
-                                $project = " (<font color='blue'>".$project_name."</font>)";
-                            }else{
+                            if ($row['role'] == "5") {
+                                $project = " (<font color='blue'>" . $project_name . "</font>)";
+                            } else {
                                 $project = "";
                             }
 
@@ -172,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             echo "<td>" . $row['name'] . "</td>";
                             echo "<td>" . $row['username'] . "</td>";
                             echo "<td>" . $row['password'] . "</td>";
-                            echo "<td>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") ."".$project."</td>";
+                            echo "<td>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "" . $project . "</td>";
                             echo "<td>" . $row['phone'] . "</td>";
                             echo "<td>
                                 <a href='javascript:void(0)' class='editBtn' data-id='{$row['id']}' data-name='{$row['name']}' data-username='{$row['username']}' data-password='{$row['password']}' data-phone='{$row['phone']}' data-role='{$row['role']}' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
@@ -255,4 +264,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     </script>
 
 </body>
+
 </html>
