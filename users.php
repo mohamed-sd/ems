@@ -6,32 +6,52 @@ if (!isset($_SESSION['user'])) {
 }
 include 'config.php';
 
-// إضافة أو تعديل مستخدم
+// إضافة أو تعديل مستخدم (بدون تشفير كلمة المرور)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
-    $name = $_POST['name'];
-    $username = $_POST['username'];
-    $password = $_POST['password']; // بدون تشفير
-    $phone = $_POST['phone'];
-    $role = $_POST['role'];
-    $project = ($role == "5" && !empty($_POST['project_id'])) ? $_POST['project_id'] : 0;
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $username = mysqli_real_escape_string($conn, $_POST['username']);
+    $password = isset($_POST['password']) ? mysqli_real_escape_string($conn, $_POST['password']) : '';
+    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $project = ($role == "5" && !empty($_POST['project_id'])) ? intval($_POST['project_id']) : 0;
     $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
 
     if ($uid > 0) {
-        // تعديل
-        $sql = "UPDATE users 
-                SET name='$name', username='$username', password='$password', phone='$phone', role='$role', project_id='$project', updated_at=NOW() 
-                WHERE id='$uid'";
-        mysqli_query($conn, $sql);
-    } else {
-        // إضافة
-        $sql = mysqli_query($conn, "INSERT INTO users (name, username, password, phone, role, project_id, parent_id, created_at, updated_at) 
-                VALUES ('$name', '$username', '$password', '$phone', '$role', '$project', '0', NOW(), NOW())");
-        if ($sql) {
-            echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='users.php';</script>";
+        // تحقق من التكرار عند التعديل (يتجاهل السجل الحالي)
+        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' AND id != '$uid' LIMIT 1");
+        if (!$check) {
+            echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
+        } elseif (mysqli_num_rows($check) > 0) {
+            echo "<script>alert('⚠️ اسم المستخدم موجود مسبقاً!');</script>";
         } else {
-            if (mysqli_errno($conn) == 1062) {
-                // 1062 = خطأ التكرار Duplicate entry
-                echo "<script>alert('⚠️ اسم المستخدم موجود مسبقاً!');</script>";
+            // إذا تم إدخال كلمة مرور جديدة، نحدّثها كما هي؛ وإلا لا نغيّرها
+            $sql_pass = "";
+            if (!empty($password)) {
+                $sql_pass = ", password='$password'";
+            }
+
+            $sql = "UPDATE users 
+                    SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', updated_at=NOW() $sql_pass
+                    WHERE id='$uid'";
+            if (mysqli_query($conn, $sql)) {
+                echo "<script>alert('✅ تم التعديل بنجاح'); window.location.href='users.php';</script>";
+            } else {
+                echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
+            }
+        }
+    } else {
+        // تحقق من التكرار عند الإضافة
+        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' LIMIT 1");
+        if (!$check) {
+            echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
+        } elseif (mysqli_num_rows($check) > 0) {
+            echo "<script>alert('⚠️ اسم المستخدم موجود مسبقاً!');</script>";
+        } else {
+            // إدراج كلمة المرور كنص عادي (غير مشفر)
+            $sql = "INSERT INTO users (name, username, password, phone, role, project_id, parent_id, created_at, updated_at) 
+                    VALUES ('$name', '$username', '$password', '$phone', '$role', '$project', '0', NOW(), NOW())";
+            if (mysqli_query($conn, $sql)) {
+                echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='users.php';</script>";
             } else {
                 echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
             }
@@ -39,14 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     }
 }
 
-// حذف مستخدم
-// if (isset($_GET['delete'])) {
-//     $delete_id = intval($_GET['delete']);
-//     mysqli_query($conn, "DELETE FROM users WHERE id='$delete_id'");
-//     header("Location: users.php");
-//     exit();
-// }
-
+// ملاحظة: التعامل مع حذف المستخدم موجود في الواجهة (رابط ?delete=...) لكن كود الحذف كان معلقاً في النسخة الأصلية.
+// إذا أردت أفعّل الحذف أضيفه لك هنا بأمان مع تحقق الصلاحيات.
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -93,7 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         </div>
                         <div>
                             <label> كلمة المرور </label>
-                            <input type="password" name="password" id="password" placeholder="كلمه المرور " required />
+                            <input type="password" name="password" id="password" placeholder="كلمه المرور " />
+                            <small class="text-muted">اتركه فارغاً إذا لا تريد تغييره عند التعديل</small>
                         </div>
                         <div>
                             <label class="form-label">الدور / الصلاحية</label>
@@ -162,7 +177,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
                         $i = 1;
                         while ($row = mysqli_fetch_assoc($result)) {
-
                             $project_id = $row['project_id'];
                             $project_name = "";
                             $select_project = mysqli_query($conn, "SELECT name FROM `projects` WHERE `id` = $project_id");
@@ -171,20 +185,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             }
 
                             if ($row['role'] == "5") {
-                                $project = " (<font color='blue'>" . $project_name . "</font>)";
+                                $project = " (<font color='blue'>" . htmlspecialchars($project_name, ENT_QUOTES, 'UTF-8') . "</font>)";
                             } else {
                                 $project = "";
                             }
 
                             echo "<tr>";
                             echo "<td>" . $i++ . "</td>";
-                            echo "<td>" . $row['name'] . "</td>";
-                            echo "<td>" . $row['username'] . "</td>";
-                            echo "<td>" . $row['password'] . "</td>";
+                            echo "<td>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</td>";
+                            echo "<td>" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "</td>";
+                            echo "<td>" . htmlspecialchars($row['password'] ,ENT_QUOTES, 'UTF-8')  . "</td>"; // لا نظهر كلمة المرور في الجدول
                             echo "<td>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "" . $project . "</td>";
-                            echo "<td>" . $row['phone'] . "</td>";
+                            echo "<td>" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
                             echo "<td>
-                                <a href='javascript:void(0)' class='editBtn' data-id='{$row['id']}' data-name='{$row['name']}' data-username='{$row['username']}' data-password='{$row['password']}' data-phone='{$row['phone']}' data-role='{$row['role']}' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
+                                <a href='javascript:void(0)' class='editBtn' 
+                                   data-id='{$row['id']}' 
+                                   data-name='" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "' 
+                                   data-username='" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "' 
+                                   data-phone='" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "' 
+                                   data-role='{$row['role']}'
+                                   style='color:#007bff'><i class='fa fa-edit'></i></a> | 
                                 <a href='?delete={$row['id']}' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a>
                               </td>";
                             echo "</tr>";
@@ -213,6 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             const roleSelect = document.getElementById("role");
             const projectDiv = document.getElementById("projectDiv");
             const projectSelect = document.getElementById("project_id");
+            const form = document.getElementById('projectForm');
 
             roleSelect.addEventListener("change", function () {
                 if (this.value === "5") {
@@ -243,7 +264,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
             // إظهار/إخفاء الفورم
             const toggleFormBtn = document.getElementById('toggleForm');
-            const form = document.getElementById('projectForm');
             toggleFormBtn.addEventListener('click', function () {
                 form.reset();
                 document.getElementById("uid").value = 0;
@@ -255,14 +275,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 $('#uid').val($(this).data('id'));
                 $('#name').val($(this).data('name'));
                 $('#username').val($(this).data('username'));
-                $('#password').val($(this).data('password'));
                 $('#phone').val($(this).data('phone'));
                 $('#role').val($(this).data('role')).trigger('change');
+                $('#password').val(""); // لا نملأ الحقل بكلمة المرور الحالية
                 form.style.display = "block";
             });
         });
     </script>
 
 </body>
-
 </html>

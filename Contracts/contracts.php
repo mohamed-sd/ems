@@ -313,9 +313,9 @@ if (!isset($_SESSION['user'])) {
 
           <div class="form-grid">
             <div class="field md-3 sm-6">
-              <label>عدد ساعات العمل اليومية</label>
+              <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
               <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
-                  placeholder="مثال: 8"></div>
+                  placeholder="مثال: 8" required></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المشغلين للساعات اليومية</label>
