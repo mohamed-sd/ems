@@ -167,7 +167,7 @@ include "config.php";
       if ($_SESSION['user']['role'] == "1") {
         // كارد المشاريع
         $projects = $conn->query("SELECT COUNT(*) AS total FROM projects")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-building'></i><h3>$projects</h3><p>المشاريع</p></div>";
+        echo "<a href='Projects/projects.php' style='text-decoration: none;'><div class='card'><i class='fa fa-building'></i><h3>$projects</h3><p>المشاريع</p></div></a>";
 
         // كارد العقود
         $contracts = $conn->query("SELECT COUNT(*) AS total FROM contracts")->fetch_assoc()['total'];

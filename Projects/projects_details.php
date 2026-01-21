@@ -178,7 +178,7 @@ WHERE pm.project = $project";
                     echo "<td>" . $i++ . "</td>";
                     echo "<td>" . $row['contract_signing_date'] . "</td>";
                     echo "<td>" . $row['hours_monthly_target'] . "</td>";
-                    echo "<td>" . $row['equip_total_contract'] . "</td>";
+                    echo "<td>" . $row['forecasted_contracted_hours'] . "</td>";
                     echo "<td>" . $status . "</td>";
                     // echo "<td>
                     //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
