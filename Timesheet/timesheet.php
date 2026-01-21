@@ -519,36 +519,46 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
       <h5 class="mb-0"> قائمة ساعات العمل </h5>
     </div>
     <div class="card-body">
+      <div style="margin-bottom:10px;">
+  <button id="toggleBasic" class="btn btn-sm btn-primary">البيانات الأساسية</button>
+  <button id="toggleHours" class="btn btn-sm btn-success">ساعات التشغيل</button>
+  <button id="toggleFaults" class="btn btn-sm btn-warning">الأعطال</button>
+  <button id="toggleTotals" class="btn btn-sm btn-danger">الإجماليات</button>
+</div>
+
       <table id="projectsTable" class="display nowrap" style="width:100%; margin-top:20px;">
-        <thead>
-          <tr>
-            <th style="text-align: right;"> # </th>
-            <th style="text-align: right;"> المعدة </th>
-            <!-- <th style="text-align: right;"> المشروع </th> -->
-            <!-- <th style="text-align: right;"> المالك </th> -->
-            <th style="text-align: right;"> التاريخ </th>
-            <th style="text-align: right;"> الوردية </th>
-            <th style="text-align: right;"> الساعات </th>
-            <th style="text-align: right;"> الجردل </th>
-            <th style="text-align: right;"> الجاكهمر </th>
-            <th style="text-align: right;"> الاضافية </th>
+       <thead>
+  <!-- صف المجموعات -->
+  <tr>
+    <th colspan="4" style="text-align:center;background:#d9edf7">البيانات الأساسية</th>
+    <th colspan="4" style="text-align:center;background:#dff0d8">ساعات التشغيل</th>
+    <th colspan="2" style="text-align:center;background:#fcf8e3">الأعطال</th>
+    <th colspan="2" style="text-align:center;background:#f2dede">الإجماليات</th>
+    <th colspan="2" style="text-align:center;background:#f5f5f5">التحكم</th>
+  </tr>
 
-            <!-- <th style="text-align: right;"> مجموع الاضافية</th> -->
-            <th style="text-align: right;"> الاستعداد </th>
-            <th style="text-align: right;"> الاعطال </th>
+  <!-- صف الأعمدة الفعلية -->
+  <tr>
+    <th>#</th>
+    <th>المعدة</th>
+    <th>التاريخ</th>
+    <th>الوردية</th>
 
-            <th style="text-align: right;"> ساعات العمل </th>
-            <th style="text-align: right;"> اجمالي ساعات اليوم </th>
+    <th>الساعات</th>
+    <th>الجردل</th>
+    <th>الجاكهمر</th>
+    <th>الإضافية</th>
 
-            <!-- <th style="text-align: right;"> استعداد الاعتماد </th> -->
-            <!-- <th style="text-align: right;"> مجموع الساعات </th> -->
-            <!-- <th style="text-align: right;"> ملاحظات العمل </th> -->
-            <!-- <th style="text-align: right;"> عطل HR </th> -->
-            <th style="text-align: right;"> الحالة </th>
-            <!-- <th>جاك هامر</th> -->
-            <th>إجراءات</th>
-          </tr>
-        </thead>
+    <th>الاستعداد</th>
+    <th>الأعطال</th>
+
+    <th>ساعات العمل</th>
+    <th>إجمالي ساعات اليوم</th>
+
+    <th>الحالة</th>
+    <th>إجراءات</th>
+  </tr>
+</thead>
         <tbody>
           <?php
 
@@ -740,8 +750,11 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
 <script>
   (function () {
     $(document).ready(function () {
-      $('#projectsTable').DataTable({
+     var table =  $('#projectsTable').DataTable({
         responsive: true, 
+        scrollX: true,
+        fixedHeader: true,
+      
         dom: 'Bfrtip', // Buttons + Search + Pagination
         buttons: [
           { extend: 'copy', text: 'نسخ' },
@@ -753,7 +766,14 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
         "language": {
           "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
         }
+
+        
       });
+        // أزرار Toggle للمجموعات
+    $('#toggleBasic').on('click', function(){ table.columns([0,1,2,3]).visible(!table.column(0).visible()); });
+    $('#toggleHours').on('click', function(){ table.columns([4,5,6,7]).visible(!table.column(4).visible()); });
+    $('#toggleFaults').on('click', function(){ table.columns([8,9]).visible(!table.column(8).visible()); });
+    $('#toggleTotals').on('click', function(){ table.columns([10,11]).visible(!table.column(10).visible()); });
     });
 
   

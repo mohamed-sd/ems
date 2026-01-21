@@ -19,7 +19,7 @@ include('../insidebar.php');
         <a href="timesheet.php?type=1" class="card-link">
             <div class="card-box">
                 <i class="fa-solid fa-digging fa-3x"></i>
-                <span>الحفارات</span>
+                <span>معدات  ثقيلة</span>
             </div>
         </a>
 
@@ -27,7 +27,17 @@ include('../insidebar.php');
         <a href="timesheet.php?type=2" class="card-link">
             <div class="card-box">
                 <i class="fa-solid fa-truck fa-3x"></i>
-                <span>القلابات</span>
+                <span>الشاحنات</span>
+            </div>
+        </a>
+
+
+        
+        <!-- كارد القلابات -->
+        <a href="timesheet.php?type=2" class="card-link">
+            <div class="card-box">
+                <i class="fa-solid fa-truck fa-3x"></i>
+                <span>مكنات التخريم</span>
             </div>
         </a>
 
