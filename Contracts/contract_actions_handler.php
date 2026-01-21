@@ -1,0 +1,243 @@
+<?php
+session_start();
+include '../config.php';
+
+// التحقق من أن الطلب من نفس الموقع
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
+}
+
+$action = isset($_POST['action']) ? $_POST['action'] : '';
+$contract_id = isset($_POST['contract_id']) ? intval($_POST['contract_id']) : 0;
+
+if (!$contract_id) {
+    die(json_encode(['success' => false, 'message' => 'معرف العقد غير صحيح']));
+}
+
+// دالة للحصول على بيانات العقد
+function getContractData($contract_id, $conn) {
+    $query = "SELECT * FROM contracts WHERE id = $contract_id LIMIT 1";
+    $result = mysqli_query($conn, $query);
+    return mysqli_fetch_assoc($result);
+}
+
+// دالة لإضافة ملاحظة
+function addNote($contract_id, $note, $conn) {
+    $note = mysqli_real_escape_string($conn, $note);
+    $query = "INSERT INTO contract_notes (contract_id, note, created_at) VALUES ($contract_id, '$note', NOW())";
+    return mysqli_query($conn, $query);
+}
+
+// 1. تجديد العقد
+if ($action === 'renewal') {
+    $new_duration = isset($_POST['new_duration']) ? intval($_POST['new_duration']) : 0;
+    $new_end_date = isset($_POST['new_end_date']) ? $_POST['new_end_date'] : '';
+    
+    if ($new_duration <= 0 || empty($new_end_date)) {
+        die(json_encode(['success' => false, 'message' => 'الرجاء إدخال المدة والتاريخ الجديد']));
+    }
+    
+    // التحقق من صيغة التاريخ
+    $date_validation = DateTime::createFromFormat('Y-m-d', $new_end_date);
+    if (!$date_validation) {
+        die(json_encode(['success' => false, 'message' => 'صيغة التاريخ غير صحيحة']));
+    }
+    
+    $new_end_date = mysqli_real_escape_string($conn, $new_end_date);
+    $query = "UPDATE contracts SET 
+        contract_duration_months = contract_duration_months + $new_duration,
+        actual_end = '$new_end_date',
+        status = 1,
+        updated_at = NOW()
+    WHERE id = $contract_id";
+    
+    if (mysqli_query($conn, $query)) {
+        $note_text = "تم تجديد العقد بمدة $new_duration شهور - تاريخ الانتهاء الجديد: $new_end_date";
+        $note_text = mysqli_real_escape_string($conn, $note_text);
+        addNote($contract_id, $note_text, $conn);
+        echo json_encode(['success' => true, 'message' => 'تم تجديد العقد بنجاح']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد']);
+    }
+}
+
+// 2. تسوية العقد (زيادة أو نقصان ساعات)
+else if ($action === 'settlement') {
+    $settlement_type = isset($_POST['settlement_type']) ? $_POST['settlement_type'] : ''; // increase أو decrease
+    $settlement_hours = isset($_POST['settlement_hours']) ? intval($_POST['settlement_hours']) : 0;
+    $settlement_reason = isset($_POST['settlement_reason']) ? $_POST['settlement_reason'] : '';
+    
+    if (empty($settlement_type) || $settlement_hours <= 0) {
+        die(json_encode(['success' => false, 'message' => 'الرجاء إدخال نوع التسوية وعدد الساعات']));
+    }
+    
+    // التحقق من نوع التسوية
+    if (!in_array($settlement_type, ['increase', 'decrease'])) {
+        die(json_encode(['success' => false, 'message' => 'نوع التسوية غير صحيح']));
+    }
+    
+    $contract = getContractData($contract_id, $conn);
+    if (!$contract) {
+        die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
+    }
+    
+    $current_hours = $contract['forecasted_contracted_hours'];
+    $new_hours = ($settlement_type === 'increase') ? 
+                 $current_hours + $settlement_hours : 
+                 $current_hours - $settlement_hours;
+    
+    if ($new_hours < 0) {
+        die(json_encode(['success' => false, 'message' => 'عدد الساعات المحسوبة أقل من صفر']));
+    }
+    
+    $settlement_type_ar = ($settlement_type === 'increase') ? 'زيادة' : 'نقصان';
+    $query = "UPDATE contracts SET 
+        forecasted_contracted_hours = $new_hours,
+        updated_at = NOW()
+    WHERE id = $contract_id";
+    
+    if (mysqli_query($conn, $query)) {
+        $note = "تم تسوية العقد: $settlement_type_ar $settlement_hours ساعة";
+        if (!empty($settlement_reason)) {
+            $settlement_reason = mysqli_real_escape_string($conn, $settlement_reason);
+            $note .= " - السبب: $settlement_reason";
+        }
+        $note = mysqli_real_escape_string($conn, $note);
+        addNote($contract_id, $note, $conn);
+        echo json_encode(['success' => true, 'message' => 'تم تسوية العقد بنجاح - الساعات الجديدة: ' . $new_hours]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد']);
+    }
+}
+
+// 3. إيقاف العقد
+else if ($action === 'pause') {
+    $pause_reason = isset($_POST['pause_reason']) ? $_POST['pause_reason'] : '';
+    
+    if (empty($pause_reason)) {
+        die(json_encode(['success' => false, 'message' => 'الرجاء إدخال سبب الإيقاف']));
+    }
+    
+    $pause_reason = mysqli_real_escape_string($conn, $pause_reason);
+    $query = "UPDATE contracts SET 
+        status = 0,
+        pause_reason = '$pause_reason',
+        updated_at = NOW()
+    WHERE id = $contract_id";
+    
+    if (mysqli_query($conn, $query)) {
+        $note = "تم إيقاف العقد - السبب: $pause_reason";
+        $note = mysqli_real_escape_string($conn, $note);
+        addNote($contract_id, $note, $conn);
+        echo json_encode(['success' => true, 'message' => 'تم إيقاف العقد بنجاح']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . mysqli_error($conn)]);
+    }
+}
+
+// 4. استئناف العقد
+else if ($action === 'resume') {
+    $resume_reason = isset($_POST['resume_reason']) ? $_POST['resume_reason'] : '';
+    
+    $resume_reason = mysqli_real_escape_string($conn, $resume_reason);
+    $query = "UPDATE contracts SET 
+        status = 1,
+        pause_reason = NULL,
+        updated_at = NOW()
+    WHERE id = $contract_id";
+    
+    if (mysqli_query($conn, $query)) {
+        $note = "تم استئناف العقد";
+        if (!empty($resume_reason)) {
+            $note .= " - الملاحظات: $resume_reason";
+        }
+        $note = mysqli_real_escape_string($conn, $note);
+        addNote($contract_id, $note, $conn);
+        echo json_encode(['success' => true, 'message' => 'تم استئناف العقد بنجاح']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد']);
+    }
+}
+
+// 5. إنهاء العقد
+else if ($action === 'terminate') {
+    $termination_type = isset($_POST['termination_type']) ? $_POST['termination_type'] : ''; // amicable أو hardship
+    $termination_reason = isset($_POST['termination_reason']) ? $_POST['termination_reason'] : '';
+    
+    if (empty($termination_type)) {
+        die(json_encode(['success' => false, 'message' => 'الرجاء اختيار نوع الإنهاء']));
+    }
+    
+    // التحقق من نوع الإنهاء
+    if (!in_array($termination_type, ['amicable', 'hardship'])) {
+        die(json_encode(['success' => false, 'message' => 'نوع الإنهاء غير صحيح']));
+    }
+    
+    $termination_reason = mysqli_real_escape_string($conn, $termination_reason);
+    $termination_type_ar = ($termination_type === 'amicable') ? 'رضائي' : 'بسبب التعسر';
+    $query = "UPDATE contracts SET 
+        status = 0,
+        termination_type = '$termination_type',
+        termination_reason = '$termination_reason',
+        updated_at = NOW()
+    WHERE id = $contract_id";
+    
+    if (mysqli_query($conn, $query)) {
+        $note = "تم إنهاء العقد ($termination_type_ar)";
+        if (!empty($termination_reason)) {
+            $note .= " - السبب: $termination_reason";
+        }
+        $note = mysqli_real_escape_string($conn, $note);
+        addNote($contract_id, $note, $conn);
+        echo json_encode(['success' => true, 'message' => 'تم إنهاء العقد بنجاح']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . mysqli_error($conn)]);
+    }
+}
+
+// 6. دمج عقدين
+else if ($action === 'merge') {
+    $merge_with_id = isset($_POST['merge_with_id']) ? intval($_POST['merge_with_id']) : 0;
+    
+    if ($merge_with_id <= 0 || $merge_with_id == $contract_id) {
+        die(json_encode(['success' => false, 'message' => 'الرجاء اختيار عقد آخر للدمج']));
+    }
+    
+    $contract_to_merge = getContractData($merge_with_id, $conn);
+    if (!$contract_to_merge) {
+        die(json_encode(['success' => false, 'message' => 'العقد المختار غير موجود']));
+    }
+    
+    // حساب المجموع
+    $merged_hours = $contract_to_merge['forecasted_contracted_hours'] + 
+                   getContractData($contract_id, $conn)['forecasted_contracted_hours'];
+    
+    // تحديث العقد الأول بالبيانات المدمجة
+    $query = "UPDATE contracts SET 
+        forecasted_contracted_hours = $merged_hours,
+        status = 0,
+        merged_with = $merge_with_id,
+        updated_at = NOW()
+    WHERE id = $contract_id";
+    
+    if (mysqli_query($conn, $query)) {
+        $merge_note_1 = "تم دمج العقد مع العقد رقم $merge_with_id - إجمالي الساعات: $merged_hours";
+        $merge_note_1 = mysqli_real_escape_string($conn, $merge_note_1);
+        addNote($contract_id, $merge_note_1, $conn);
+        
+        $merge_note_2 = "تم دمج هذا العقد مع العقد رقم $contract_id";
+        $merge_note_2 = mysqli_real_escape_string($conn, $merge_note_2);
+        addNote($merge_with_id, $merge_note_2, $conn);
+        
+        echo json_encode(['success' => true, 'message' => 'تم دمج العقود بنجاح']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'خطأ في دمج العقود']);
+    }
+}
+
+else {
+    die(json_encode(['success' => false, 'message' => 'الإجراء غير معروف']));
+}
+
+exit;
+?>

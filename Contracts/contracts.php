@@ -220,95 +220,55 @@ if (!isset($_SESSION['user'])) {
           <hr class="hr" />
 
           <!-- القسم 2: بيانات ساعات العمل المطلوبة للمعدات -->
-          <div class="section-title"><span class="chip">2</span> بيانات ساعات العمل المطلوبة <strong>للمعدات</strong>
+          <div id="equipmentSections">
+            <div class="section-title"><span class="chip">2</span> بيانات ساعات العمل المطلوبة <strong>للمعدات</strong>
+            </div>
+            <br>
+            <div class="equipment-section" data-index="1">
+              <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
+                <h6 style="margin: 0 0 15px 0;">المعدات رقم 1</h6>
+                <div class="form-grid">
+                  <div class="field md-4 sm-6">
+                    <label>نوع المعدة المطلوبة</label>
+                    <div class="control"><input name="equip_type_1" type="text" placeholder="مثال: حفار"></div>
+                  </div>
+                  <div class="field md-4 sm-6">
+                    <label>حجم المعدة المطلوبة (Size)</label>
+                    <div class="control"><input name="equip_size_1" type="number" placeholder="مثال: 340"></div>
+                  </div>
+                  <div class="field md-4 sm-6">
+                    <label>عدد المعدات المطلوبة</label>
+                    <div class="control"><input name="equip_count_1" type="number" min="0"></div>
+                  </div>
+
+                  <div class="field md-3 sm-6"> </div>
+                  <div class="field md-3 sm-6"> </div>
+
+                  <div class="field md-4 sm-6">
+                    <label style="font-size:13px;">ساعات العمل المستهدفة للمعدة شهرياً</label>
+                    <div class="control"><input name="equip_target_per_month_1" type="number" min="0"></div>
+                  </div>
+                  <div class="field md-4 sm-6">
+                    <label>إجمالي الساعات المستهدفة شهرياً</label>
+                    <div class="control"><input name="equip_total_month_1" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
+                  </div>
+                  <div class="field md-4 sm-6">
+                    <label>إجمالي ساعات العقد للمعدات</label>
+                    <div class="control"><input name="equip_total_contract_1" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <br>
-          <div class="form-grid">
-            <div class="field md-4 sm-6">
-              <label>نوع المعدة المطلوبة </label>
-              <div class="control"><input name="equip_type" id="equip_type" type="text" placeholder="مثال: حفار"
-                  value="حفار"></div>
-            </div>
-            <div class="field md-4 sm-6">
-              <label>حجم المعدة المطلوبة (Size)</label>
-              <div class="control"><input name="equip_size" id="equip_size" type="number" placeholder="مثال: 340"
-                  value="340"></span></div>
-            </div>
-            <div class="field md-4 sm-6">
-              <label>عدد المعدات المطلوبة</label>
-              <div class="control"><input name="equip_count" id="equip_count" type="number" min="0" value="2"></div>
-            </div>
 
-            <!-- Orgnization Break  -->
-            <div class="field md-3 sm-6"> </div>
-            <div class="field md-3 sm-6"> </div>
-
-            <div class="field md-4 sm-6">
-              <label style="font-size:13px;">ساعات العمل المستهدفة للمعدة شهرياً</label>
-              <div class="control"><input name="equip_target_per_month" id="equip_target_per_month" type="number"
-                  min="0" value="600"></div>
-            </div>
-            <div class="field md-4 sm-6">
-              <label>إجمالي الساعات المستهدفة شهرياً</label>
-              <div class="control"><input name="equip_total_month" id="equip_total_month" type="number" readonly
-                  placeholder="يُحتسب تلقائياً"></div>
-            </div>
-            <div class="field md-4 sm-6">
-              <label>إجمالي ساعات العقد للمعدات</label>
-              <div class="control"><input name="equip_total_contract" id="equip_total_contract" type="number" readonly
-                  placeholder="يُحتسب تلقائياً"></div>
-            </div>
+          <div style="margin: 15px 0; display: flex; gap: 10px;">
+            <button type="button" class="primary" id="addEquipmentBtn" style="padding: 8px 16px; font-size: 14px;">
+              <i class="fa fa-plus"></i> إضافة مزيد من المعدات
+            </button>
           </div>
 
           <hr class="hr" />
-
-          <!-- القسم 3: بيانات ساعات العمل المطلوبة للآليات -->
-          <div class="section-title"><span class="chip">3</span> بيانات ساعات العمل المطلوبة <strong>للآليات</strong>
-
-          </div>
-          <br>
-
-          <div class="form-grid">
-            <div class="field md-4 sm-6">
-              <label>نوع الآلية المطلوبة</label>
-              <div class="control"><input name="mach_type" id="mach_type" type="text" placeholder="مثال: قلاب"
-                  value="قلاب">
-              </div>
-            </div>
-            <div class="field md-4 sm-6">
-              <label>حجم حمولة الآلية</label>
-              <div class="control"><input name="mach_size" id="mach_size" type="number" placeholder="مثال: 340"
-                  value="340">
-              </div>
-            </div>
-            <div class="field md-4 sm-6">
-              <label>عدد الآليات المطلوبة</label>
-              <div class="control"><input name="mach_count" id="mach_count" type="number" min="0" value="8"></div>
-            </div>
-
-            <!-- Orgnization Break  -->
-            <div class="field md-3 sm-6"> </div>
-            <div class="field md-3 sm-6"> </div>
-
-            <div class="field md-4 sm-6">
-              <label>ساعات العمل للآلية شهرياً</label>
-              <div class="control"><input name="mach_target_per_month" id="mach_target_per_month" type="number" min="0"
-                  value="600"></div>
-            </div>
-            <div class="field md-4 sm-6">
-              <label>إجمالي الساعات للآليات شهرياً</label>
-              <div class="control"><input name="mach_total_month" id="mach_total_month" type="number" readonly
-                  placeholder="يُحتسب تلقائياً"></div>
-            </div>
-            <div class="field md-4 sm-6">
-              <label style="font-size:13px;">إجمالي ساعات العقد المستهدفة للآليات</label>
-              <div class="control"><input name="mach_total_contract" id="mach_total_contract" type="number" readonly
-                  placeholder="يُحتسب تلقائياً"></div>
-            </div>
-          </div>
-
-          <hr class="hr" />
-          <div class="section-title"><span class="chip">5</span> بيانات إضافية</div>
+          <div class="section-title"><span class="chip">3</span> بيانات إضافية</div>
           <br>
 
           <div class="form-grid">
@@ -363,21 +323,17 @@ if (!isset($_SESSION['user'])) {
           <div class="totals">
             <div class="kpi">
               <div class="v" id="kpi_month_total">0</div>
-              <div class="t">الساعات المستهدفة شهرياً - معدات وآليات</div>
+              <div class="t">الساعات المستهدفة شهرياً - معدات</div>
               <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
             </div>
             <div class="kpi">
               <div class="v" id="kpi_contract_total">0</div>
-              <div class="t">ساعات العقد المستهدفة - معدات وآليات</div>
+              <div class="t">ساعات العقد المستهدفة - معدات</div>
               <input type="hidden" name="forecasted_contracted_hours" id="forecasted_contracted_hours" value="0" />
             </div>
             <div class="kpi">
               <div class="v" id="kpi_equip_month">0</div>
               <div class="t">إجمالي معدات (شهري)</div>
-            </div>
-            <div class="kpi">
-              <div class="v" id="kpi_mach_month">0</div>
-              <div class="t">إجمالي آليات (شهري)</div>
             </div>
           </div>
 
@@ -398,6 +354,7 @@ if (!isset($_SESSION['user'])) {
         <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
           <thead>
             <tr>
+              <th> رقم العقد </th>
               <th>تاريخ التوقيع</th>
               <th>مدة العقد (شهور)</th>
               <th>بداية التنفيذ</th>
@@ -411,6 +368,7 @@ if (!isset($_SESSION['user'])) {
           <tbody>
             <?php
             include '../config.php';
+            include 'contractequipments_handler.php';
             $project = $_GET['id'];
 
             // إضافة عقد جديد عند إرسال الفورم
@@ -429,20 +387,6 @@ if (!isset($_SESSION['user'])) {
               $accommodation = $_POST['accommodation'];
               $place_for_living = $_POST['place_for_living'];
               $workshop = $_POST['workshop'];
-
-              $equip_type = $_POST['equip_type'];
-              $equip_size = $_POST['equip_size'];
-              $equip_count = $_POST['equip_count'];
-              $equip_target_per_month = $_POST['equip_target_per_month'];
-              $equip_total_month = $_POST['equip_total_month'];
-              $equip_total_contract = $_POST['equip_total_contract'];
-
-              $mach_type = $_POST['mach_type'];
-              $mach_size = $_POST['mach_size'];
-              $mach_count = $_POST['mach_count'];
-              $mach_target_per_month = $_POST['mach_target_per_month'];
-              $mach_total_month = $_POST['mach_total_month'];
-              $mach_total_contract = $_POST['mach_total_contract'];
 
               $hours_monthly_target = $_POST['hours_monthly_target'];
               $forecasted_contracted_hours = $_POST['forecasted_contracted_hours'];
@@ -467,18 +411,6 @@ if (!isset($_SESSION['user'])) {
             accommodation='$accommodation',
             place_for_living='$place_for_living',
             workshop='$workshop',
-            equip_type='$equip_type',
-            equip_size='$equip_size',
-            equip_count='$equip_count',
-            equip_target_per_month='$equip_target_per_month',
-            equip_total_month='$equip_total_month',
-            equip_total_contract='$equip_total_contract',
-            mach_type='$mach_type',
-            mach_size='$mach_size',
-            mach_count='$mach_count',
-            mach_target_per_month='$mach_target_per_month',
-            mach_total_month='$mach_total_month',
-            mach_total_contract='$mach_total_contract',
             hours_monthly_target='$hours_monthly_target',
             forecasted_contracted_hours='$forecasted_contracted_hours',
             daily_work_hours='$daily_work_hours',
@@ -493,20 +425,57 @@ if (!isset($_SESSION['user'])) {
                 $sql = "INSERT INTO contracts (
             contract_signing_date, project, grace_period_days, contract_duration_months,
             actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
-            equip_type, equip_size, equip_count, equip_target_per_month, equip_total_month, equip_total_contract,
-            mach_type, mach_size, mach_count, mach_target_per_month, mach_total_month, mach_total_contract,
             hours_monthly_target, forecasted_contracted_hours,
             daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two
         ) VALUES (
             '$contract_signing_date', '$project','$grace_period_days', '$contract_duration_months',
             '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
-            '$equip_type','$equip_size','$equip_count','$equip_target_per_month', '$equip_total_month', '$equip_total_contract',
-            '$mach_type', '$mach_size','$mach_count','$mach_target_per_month','$mach_total_month','$mach_total_contract',
             '$hours_monthly_target','$forecasted_contracted_hours',
             '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two'
         )";
               }
-              mysqli_query($conn, $sql);
+              $result = mysqli_query($conn, $sql);
+              
+              if ($result) {
+                // الحصول على معرف العقد المُضاف حديثاً أو معرف العقد المُحدّث
+                if ($id > 0) {
+                  $contract_id = $id;
+                } else {
+                  $contract_id = mysqli_insert_id($conn);
+                }
+
+                // جمع بيانات المعدات من الفورم
+                $equipment_array = [];
+                $i = 1;
+                // البحث عن أكبر index موجود
+                $max_index = 0;
+                foreach ($_POST as $key => $value) {
+                  if (preg_match('/equip_type_(\d+)/', $key, $matches)) {
+                    $max_index = max($max_index, (int)$matches[1]);
+                  }
+                }
+                
+                // جمع البيانات من جميع الأقسام
+                for ($i = 1; $i <= $max_index; $i++) {
+                  if (isset($_POST["equip_type_$i"]) && !empty($_POST["equip_type_$i"])) {
+                    $equipment_array[] = [
+                      'equip_type' => $_POST["equip_type_$i"],
+                      'equip_size' => isset($_POST["equip_size_$i"]) ? $_POST["equip_size_$i"] : 0,
+                      'equip_count' => isset($_POST["equip_count_$i"]) ? $_POST["equip_count_$i"] : 0,
+                      'equip_target_per_month' => isset($_POST["equip_target_per_month_$i"]) ? $_POST["equip_target_per_month_$i"] : 0,
+                      'equip_total_month' => isset($_POST["equip_total_month_$i"]) ? $_POST["equip_total_month_$i"] : 0,
+                      'equip_total_contract' => isset($_POST["equip_total_contract_$i"]) ? $_POST["equip_total_contract_$i"] : 0
+                    ];
+                  }
+                }
+
+                // إضافة بيانات المعدات الجديدة
+                if (!empty($equipment_array)) {
+                  include('contractequipments_handler.php');
+                  saveContractEquipments($contract_id, $equipment_array, $conn);
+                }
+              }
+              
               echo "<script>window.location.href='contracts.php?id=$project';</script>";
               exit;
             }
@@ -519,17 +488,28 @@ if (!isset($_SESSION['user'])) {
 
             while ($row = mysqli_fetch_assoc($result)) {
 
-              $status = $row['status'] == "1" ? "<font color='green'>ساري</font>" : "
-              <font color='red'>منتهي</font>";
+              // عرض حالة العقد من status
+              $contractStatus = isset($row['status']) ? $row['status'] : 1;
+              $statusColor = 'green';
+              $statusText = 'ساري';
+              if ($contractStatus == 1) {
+                $statusColor = 'green';
+                $statusText = 'ساري';
+              } else {
+                $statusColor = 'red';
+                $statusText = 'غير ساري';
+              }
+              $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
 
               echo "<tr>";
+              echo "<td>" . $row['id'] . "</td>";
               echo "<td>" . $row['contract_signing_date'] . "</td>";
               echo "<td>" . $row['contract_duration_months'] . "</td>";
               echo "<td>" . $row['actual_start'] . "</td>";
               echo "<td>" . $row['actual_end'] . "</td>";
 
               echo "<td>" . $row['hours_monthly_target'] . "</td>";
-              echo "<td>" . $row['equip_total_contract'] . "</td>";
+              echo "<td>" . $row['forecasted_contracted_hours'] . "</td>";
               echo "<td>" . $status . "</td>";
 
               echo "<td>
@@ -540,16 +520,6 @@ if (!isset($_SESSION['user'])) {
              data-contract_duration_months='" . $row['contract_duration_months'] . "'
              data-actual_start='" . $row['actual_start'] . "'
              data-actual_end='" . $row['actual_end'] . "'
-             data-equip_type='" . $row['equip_type'] . "'
-             data-equip_count='" . $row['equip_count'] . "'
-             data-equip_target_per_month='" . $row['equip_target_per_month'] . "'
-             data-equip_total_month='" . $row['equip_total_month'] . "'
-             data-equip_total_contract='" . $row['equip_total_contract'] . "'
-             data-mach_type='" . $row['mach_type'] . "'
-             data-mach_count='" . $row['mach_count'] . "'
-             data-mach_target_per_month='" . $row['mach_target_per_month'] . "'
-             data-mach_total_month='" . $row['mach_total_month'] . "'
-             data-mach_total_contract='" . $row['mach_total_contract'] . "'
              data-hours_monthly_target='" . $row['hours_monthly_target'] . "'
              daily_work_hours ='" . $row['daily_work_hours'] . "'
               daily_operators ='" . $row['daily_operators'] . "'
@@ -630,21 +600,13 @@ if (!isset($_SESSION['user'])) {
 
   <script>
     const $el = (sel) => document.querySelector(sel);
+    let equipmentIndex = 1;
 
     const fields = {
       contractMonths: $el('#contract_duration_months'),
-      equipCount: $el('#equip_count'),
-      equipTarget: $el('#equip_target_per_month'),
-      equipTotalMonth: $el('#equip_total_month'),
-      equipTotalContract: $el('#equip_total_contract'),
-      machCount: $el('#mach_count'),
-      machTarget: $el('#mach_target_per_month'),
-      machTotalMonth: $el('#mach_total_month'),
-      machTotalContract: $el('#mach_total_contract'),
       kpiMonthTotal: $el('#kpi_month_total'),
       kpiContractTotal: $el('#kpi_contract_total'),
       kpiEquipMonth: $el('#kpi_equip_month'),
-      kpiMachMonth: $el('#kpi_mach_month'),
       hoursMonthlyTarget: $el('#hours_monthly_target'),
       forecastedContractedHours: $el('#forecasted_contracted_hours'),
     };
@@ -658,32 +620,98 @@ if (!isset($_SESSION['user'])) {
       return new Intl.NumberFormat('ar-EG').format(Math.max(0, Math.round(n)));
     }
 
+    // إضافة قسم معدات جديد
+    function addEquipmentSection() {
+      equipmentIndex++;
+      const newSection = document.createElement('div');
+      newSection.className = 'equipment-section';
+      newSection.setAttribute('data-index', equipmentIndex);
+      newSection.innerHTML = `
+        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
+            <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}" 
+              style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+              <i class="fa fa-trash"></i> حذف
+            </button>
+          </div>
+          <div class="form-grid">
+            <div class="field md-4 sm-6">
+              <label>نوع المعدة المطلوبة</label>
+              <div class="control"><input name="equip_type_${equipmentIndex}" type="text" placeholder="مثال: حفار"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>حجم المعدة المطلوبة (Size)</label>
+              <div class="control"><input name="equip_size_${equipmentIndex}" type="number" placeholder="مثال: 340"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>عدد المعدات المطلوبة</label>
+              <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0"></div>
+            </div>
+
+            <div class="field md-3 sm-6"></div>
+            <div class="field md-3 sm-6"></div>
+
+            <div class="field md-4 sm-6">
+              <label style="font-size:13px;">ساعات العمل المستهدفة للمعدة شهرياً</label>
+              <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>إجمالي الساعات المستهدفة شهرياً</label>
+              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
+            </div>
+            <div class="field md-4 sm-6">
+              <label>إجمالي ساعات العقد للمعدات</label>
+              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('equipmentSections').appendChild(newSection);
+      
+      // إضافة event listeners للحقول الجديدة
+      newSection.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
+      
+      // إضافة event listener لزر الحذف
+      newSection.querySelector('.removeEquipmentBtn').addEventListener('click', function() {
+        newSection.remove();
+        recalc();
+      });
+    }
+
     function recalc() {
       const months = num(fields.contractMonths.value);
 
-      // معدات
-      const equipCount = num(fields.equipCount.value);
-      const equipTarget = num(fields.equipTarget.value);
-      const equipMonth = equipCount * equipTarget;
-      const equipContract = equipMonth * months;
+      // حساب إجمالي المعدات
+      let totalEquipMonth = 0;
+      let totalEquipContract = 0;
 
-      // آليات
-      const machCount = num(fields.machCount.value);
-      const machTarget = num(fields.machTarget.value);
-      const machMonth = machCount * machTarget;
-      const machContract = machMonth * months;
+      // حساب كل قسم معدات
+      document.querySelectorAll('.equipment-section').forEach(section => {
+        const index = section.getAttribute('data-index');
+        const countInput = section.querySelector(`input[name="equip_count_${index}"]`);
+        const targetInput = section.querySelector(`input[name="equip_target_per_month_${index}"]`);
+        const monthInput = section.querySelector(`input[name="equip_total_month_${index}"]`);
+        const contractInput = section.querySelector(`input[name="equip_total_contract_${index}"]`);
 
-      // تحديث الحقول
-      fields.equipTotalMonth.value = equipMonth;
-      fields.equipTotalContract.value = equipContract;
-      fields.machTotalMonth.value = machMonth;
-      fields.machTotalContract.value = machContract;
+        if (countInput && targetInput) {
+          const count = num(countInput.value);
+          const target = num(targetInput.value);
+          const sectionMonth = count * target;
+          const sectionContract = sectionMonth * months;
 
-      const monthTotal = equipMonth + machMonth;
-      const contractTotal = equipContract + machContract;
+          monthInput.value = sectionMonth;
+          contractInput.value = sectionContract;
 
-      fields.kpiEquipMonth.textContent = fmt(equipMonth);
-      fields.kpiMachMonth.textContent = fmt(machMonth);
+          totalEquipMonth += sectionMonth;
+          totalEquipContract += sectionContract;
+        }
+      });
+
+      const monthTotal = totalEquipMonth;
+      const contractTotal = totalEquipContract;
+
+      fields.kpiEquipMonth.textContent = fmt(totalEquipMonth);
       fields.kpiMonthTotal.textContent = fmt(monthTotal);
       fields.kpiContractTotal.textContent = fmt(contractTotal);
 
@@ -692,8 +720,17 @@ if (!isset($_SESSION['user'])) {
     }
 
     // تشغيل الحسبة عند تغيير أي مدخل
-    const inputs = document.querySelectorAll('#projectForm input, #projectForm select');
-    inputs.forEach(el => el.addEventListener('input', recalc));
+    document.addEventListener('input', function(e) {
+      if (e.target.closest('#projectForm')) {
+        recalc();
+      }
+    });
+
+    // زر إضافة المعدات
+    document.getElementById('addEquipmentBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      addEquipmentSection();
+    });
 
     // جلب الفورم
     const contractForm = document.getElementById('projectForm');
@@ -715,16 +752,6 @@ if (!isset($_SESSION['user'])) {
       $("#projectForm [name='contract_duration_months']").val($(this).data("contract_duration_months"));
       $("#projectForm [name='actual_start']").val($(this).data("actual_start"));
       $("#projectForm [name='actual_end']").val($(this).data("actual_end"));
-      $("#projectForm [name='equip_type']").val($(this).data("equip_type"));
-      $("#projectForm [name='equip_count']").val($(this).data("equip_count"));
-      $("#projectForm [name='equip_target_per_month']").val($(this).data("equip_target_per_month"));
-      $("#projectForm [name='equip_total_month']").val($(this).data("equip_total_month"));
-      $("#projectForm [name='equip_total_contract']").val($(this).data("equip_total_contract"));
-      $("#projectForm [name='mach_type']").val($(this).data("mach_type"));
-      $("#projectForm [name='mach_count']").val($(this).data("mach_count"));
-      $("#projectForm [name='mach_target_per_month']").val($(this).data("mach_target_per_month"));
-      $("#projectForm [name='mach_total_month']").val($(this).data("mach_total_month"));
-      $("#projectForm [name='mach_total_contract']").val($(this).data("mach_total_contract"));
       $("#projectForm [name='hours_monthly_target']").val($(this).data("hours_monthly_target"));
       $("#projectForm [name='forecasted_contracted_hours']").val($(this).data("forecasted_contracted_hours"));
       $("#projectForm [name='daily_work_hours']").val($(this).attr("daily_work_hours"));
@@ -737,6 +764,93 @@ if (!isset($_SESSION['user'])) {
       $("#projectForm [name='accommodation']").val($(this).attr("accommodation"));
       $("#projectForm [name='place_for_living']").val($(this).attr("place_for_living"));
       $("#projectForm [name='workshop']").val($(this).attr("workshop"));
+
+      // تحميل المعدات الخاصة بالعقد
+      const contractId = $(this).data("id");
+      $.ajax({
+        url: 'get_equipments.php',
+        type: 'POST',
+        data: { contract_id: contractId },
+        dataType: 'json',
+        success: function(equipments) {
+          // مسح الأقسام القديمة ما عدا الأول
+          $('#equipmentSections .equipment-section').not(':first').remove();
+          equipmentIndex = 1;
+
+          // تحميل المعدات
+          if (equipments.length > 0) {
+            equipments.forEach(function(equip, index) {
+              const sectionIndex = index + 1;
+              
+              if (sectionIndex === 1) {
+                // تحديث القسم الأول
+                $(`input[name="equip_type_1"]`).val(equip.equip_type);
+                $(`input[name="equip_size_1"]`).val(equip.equip_size);
+                $(`input[name="equip_count_1"]`).val(equip.equip_count);
+                $(`input[name="equip_target_per_month_1"]`).val(equip.equip_target_per_month);
+                equipmentIndex = 1;
+              } else {
+                // إضافة أقسام جديدة
+                equipmentIndex++;
+                const newSection = document.createElement('div');
+                newSection.className = 'equipment-section';
+                newSection.setAttribute('data-index', equipmentIndex);
+                newSection.innerHTML = `
+                  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                      <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
+                      <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}" 
+                        style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                        <i class="fa fa-trash"></i> حذف
+                      </button>
+                    </div>
+                    <div class="form-grid">
+                      <div class="field md-4 sm-6">
+                        <label>نوع المعدة المطلوبة</label>
+                        <div class="control"><input name="equip_type_${equipmentIndex}" type="text" placeholder="مثال: حفار" value="${equip.equip_type}"></div>
+                      </div>
+                      <div class="field md-4 sm-6">
+                        <label>حجم المعدة المطلوبة (Size)</label>
+                        <div class="control"><input name="equip_size_${equipmentIndex}" type="number" placeholder="مثال: 340" value="${equip.equip_size}"></div>
+                      </div>
+                      <div class="field md-4 sm-6">
+                        <label>عدد المعدات المطلوبة</label>
+                        <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
+                      </div>
+
+                      <div class="field md-3 sm-6"></div>
+                      <div class="field md-3 sm-6"></div>
+
+                      <div class="field md-4 sm-6">
+                        <label style="font-size:13px;">ساعات العمل المستهدفة للمعدة شهرياً</label>
+                        <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0" value="${equip.equip_target_per_month}"></div>
+                      </div>
+                      <div class="field md-4 sm-6">
+                        <label>إجمالي الساعات المستهدفة شهرياً</label>
+                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_month}"></div>
+                      </div>
+                      <div class="field md-4 sm-6">
+                        <label>إجمالي ساعات العقد للمعدات</label>
+                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_contract}"></div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+                document.getElementById('equipmentSections').appendChild(newSection);
+                
+                // إضافة event listeners
+                newSection.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
+                newSection.querySelector('.removeEquipmentBtn').addEventListener('click', function() {
+                  newSection.remove();
+                  recalc();
+                });
+              }
+            });
+          }
+          
+          recalc();
+        }
+      });
 
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
     });
