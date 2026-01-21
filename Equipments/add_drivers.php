@@ -15,7 +15,7 @@ $equipment_id = intval($_GET['equipment_id']);
 
 // جلب السائقين المرتبطين مسبقًا
 $current = [];
-$res = mysqli_query($conn, "SELECT ed.id, d.id AS driver_id, d.name 
+$res = mysqli_query($conn, "SELECT ed.id, d.id AS driver_id, d.name ,ed.status
                              FROM equipment_drivers ed
                              JOIN drivers d ON ed.driver_id = d.id
                              WHERE ed.equipment_id = $equipment_id");
@@ -47,9 +47,14 @@ while ($r = mysqli_fetch_assoc($res)) {
         <label>اختر المشغلين:</label><br>
         <select name="drivers[]" multiple size="6">
             <?php
-            $drivers = mysqli_query($conn, "SELECT id, name FROM drivers");
+            $drivers = mysqli_query($conn, "SELECT d.id, d.name
+FROM drivers d
+WHERE d.id NOT IN (
+    SELECT driver_id 
+    FROM equipment_drivers 
+    WHERE status = 1
+)");
             while ($d = mysqli_fetch_assoc($drivers)) {
-                $selected = in_array($d['id'], $current) ? "selected" : "";
                 echo "<option value='{$d['id']}' $selected>{$d['name']}</option>";
             }
             ?>
@@ -66,6 +71,9 @@ while ($r = mysqli_fetch_assoc($res)) {
         <thead>
         <tr>
             <th>الاسم</th>
+            <th>الحاله</th>
+
+
             <th>الإجراء</th>
         </tr>
         </thead>
@@ -76,20 +84,16 @@ while ($r = mysqli_fetch_assoc($res)) {
                 echo "
             <tr>
                 <td>{$row['name']}</td>
+                <td>" . ($row['status'] ? 'نشط' : 'غير نشط') . "</td>
                 <td>
                     <a href='delete_equipment_driver.php?id={$row['id']}&equipment_id=$equipment_id' 
-                       onclick='return confirm(\"هل أنت متأكد من الحذف؟\")'>
-                       ❌ حذف
+                       onclick='return confirm(\"هل أنت متأكد من الاجراء\")'>
+                          " . ($row['status'] ? 'تعطيل' : 'تفعيل') . "
                     </a>
                 </td>
             </tr>";
             }
-        } else {      
-
-
-            
-            echo "<tr><td>لا يوجد سائقين مرتبطين</td><td>-</td></tr>";
-        }
+        } 
         ?>
         </tbody>
     </table>
