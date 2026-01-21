@@ -208,6 +208,9 @@ $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
                     </tr>
                 </thead>
                 <tbody>
+
+
+                
                     <?php
                     $notes_query = "SELECT * FROM contract_notes WHERE contract_id = $contract_id ORDER BY created_at DESC";
                     $notes_result = mysqli_query($conn, $notes_query);
