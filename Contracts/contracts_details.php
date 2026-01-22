@@ -142,6 +142,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     </div>
 <?php 
 $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
+$project_id = $row['project'];
 } 
 ?>
 
@@ -208,9 +209,6 @@ $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
                     </tr>
                 </thead>
                 <tbody>
-
-
-                
                     <?php
                     $notes_query = "SELECT * FROM contract_notes WHERE contract_id = $contract_id ORDER BY created_at DESC";
                     $notes_result = mysqli_query($conn, $notes_query);
@@ -237,27 +235,25 @@ $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
 </div>
 
 <!-- Modal for Renewal -->
-<div class="modal fade" id="renewalModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="renewalModal" tabindex="-1" aria-labelledby="renewalModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">تجديد العقد</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <h5 class="modal-title" id="renewalModalLabel">تجديد العقد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>المدة الجديدة (بالشهور)</label>
+                <div class="mb-3">
+                    <label for="renewalDuration" class="form-label">المدة الجديدة (بالشهور)</label>
                     <input type="number" id="renewalDuration" class="form-control" min="1" placeholder="أدخل عدد الشهور">
                 </div>
-                <div class="form-group">
-                    <label>تاريخ الانتهاء الجديد</label>
+                <div class="mb-3">
+                    <label for="renewalEndDate" class="form-label">تاريخ الانتهاء الجديد</label>
                     <input type="date" id="renewalEndDate" class="form-control">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                 <button type="button" class="btn btn-primary" id="confirmRenewal">تجديد</button>
             </div>
         </div>
@@ -265,35 +261,33 @@ $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
 </div>
 
 <!-- Modal for Settlement -->
-<div class="modal fade" id="settlementModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="settlementModal" tabindex="-1" aria-labelledby="settlementModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">تسوية العقد</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <h5 class="modal-title" id="settlementModalLabel">تسوية العقد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>نوع التسوية</label>
+                <div class="mb-3">
+                    <label for="settlementType" class="form-label">نوع التسوية</label>
                     <select id="settlementType" class="form-control">
                         <option value="">-- اختر --</option>
                         <option value="increase">زيادة ساعات</option>
                         <option value="decrease">نقصان ساعات</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>عدد الساعات</label>
+                <div class="mb-3">
+                    <label for="settlementHours" class="form-label">عدد الساعات</label>
                     <input type="number" id="settlementHours" class="form-control" min="1" placeholder="أدخل عدد الساعات">
                 </div>
-                <div class="form-group">
-                    <label>السبب (اختياري)</label>
+                <div class="mb-3">
+                    <label for="settlementReason" class="form-label">السبب (اختياري)</label>
                     <textarea id="settlementReason" class="form-control" rows="3" placeholder="أدخل السبب"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                 <button type="button" class="btn btn-primary" id="confirmSettlement">تسوية</button>
             </div>
         </div>
@@ -301,23 +295,21 @@ $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
 </div>
 
 <!-- Modal for Pause -->
-<div class="modal fade" id="pauseModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="pauseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">إيقاف العقد</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <h5 class="modal-title" id="pauseModalLabel">إيقاف العقد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>سبب الإيقاف <span style="color: red;">*</span></label>
+                <div class="mb-3">
+                    <label for="pauseReason" class="form-label">سبب الإيقاف <span style="color: red;">*</span></label>
                     <textarea id="pauseReason" class="form-control" rows="4" placeholder="أدخل السبب المفصل"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                 <button type="button" class="btn btn-warning" id="confirmPause">إيقاف</button>
             </div>
         </div>
@@ -325,23 +317,21 @@ $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
 </div>
 
 <!-- Modal for Resume -->
-<div class="modal fade" id="resumeModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="resumeModal" tabindex="-1" aria-labelledby="resumeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">استئناف العقد</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <h5 class="modal-title" id="resumeModalLabel">استئناف العقد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>ملاحظات (اختياري)</label>
+                <div class="mb-3">
+                    <label for="resumeReason" class="form-label">ملاحظات (اختياري)</label>
                     <textarea id="resumeReason" class="form-control" rows="3" placeholder="أدخل أي ملاحظات"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                 <button type="button" class="btn btn-success" id="confirmResume">استئناف</button>
             </div>
         </div>
@@ -349,31 +339,29 @@ $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
 </div>
 
 <!-- Modal for Terminate -->
-<div class="modal fade" id="terminateModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="terminateModal" tabindex="-1" aria-labelledby="terminateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">إنهاء العقد</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <h5 class="modal-title" id="terminateModalLabel">إنهاء العقد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>نوع الإنهاء <span style="color: red;">*</span></label>
+                <div class="mb-3">
+                    <label for="terminationType" class="form-label">نوع الإنهاء <span style="color: red;">*</span></label>
                     <select id="terminationType" class="form-control">
                         <option value="">-- اختر --</option>
                         <option value="amicable">رضائي</option>
                         <option value="hardship">بسبب التعسر</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>السبب (اختياري)</label>
+                <div class="mb-3">
+                    <label for="terminationReason" class="form-label">السبب (اختياري)</label>
                     <textarea id="terminationReason" class="form-control" rows="3" placeholder="أدخل السبب"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                 <button type="button" class="btn btn-danger" id="confirmTerminate">إنهاء</button>
             </div>
         </div>
@@ -381,22 +369,19 @@ $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
 </div>
 
 <!-- Modal for Merge -->
-<div class="modal fade" id="mergeModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="mergeModal" tabindex="-1" aria-labelledby="mergeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">دمج العقود</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <h5 class="modal-title" id="mergeModalLabel">دمج العقود</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>اختر العقد للدمج معه <span style="color: red;">*</span></label>
+                <div class="mb-3">
+                    <label for="mergeWithId" class="form-label">اختر العقد للدمج معه <span style="color: red;">*</span></label>
                     <select id="mergeWithId" class="form-control">
                         <option value="">-- اختر عقد --</option>
                         <?php
-                        $project_id = $row['project'];
                         $merge_query = "SELECT id, contract_signing_date FROM contracts WHERE project = $project_id AND id != $contract_id ORDER BY id DESC";
                         $merge_result = mysqli_query($conn, $merge_query);
                         while ($m_row = mysqli_fetch_assoc($merge_result)) {
@@ -407,15 +392,18 @@ $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                 <button type="button" class="btn btn-primary" id="confirmMerge">دمج</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- jQuery (required for your AJAX calls) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap 5 Bundle (includes Popper) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 const contractId = <?php echo $contract_id; ?>;
 const contractStatus = <?php echo isset($contractStatusValue) ? $contractStatusValue : 1; ?>;
@@ -470,10 +458,10 @@ function canPerformAction(action) {
     return true;
 }
 
-// أزرار الإجراءات
+// أزرار الإجراءات - Bootstrap 5 syntax
 $('#renewalBtn').click(function() {
     if (!canPerformAction('renewal')) return;
-    const modal = new bootstrap.Modal(document.getElementById('renewalModal'), {});
+    const modal = new bootstrap.Modal(document.getElementById('renewalModal'));
     modal.show();
 });
 
@@ -492,13 +480,15 @@ $('#confirmRenewal').click(function() {
         new_duration: duration,
         new_end_date: endDate
     });
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById('renewalModal')).hide();
     $('#renewalDuration').val('');
     $('#renewalEndDate').val('');
 });
 
 $('#settlementBtn').click(function() {
     if (!canPerformAction('settlement')) return;
-    const modal = new bootstrap.Modal(document.getElementById('settlementModal'), {});
+    const modal = new bootstrap.Modal(document.getElementById('settlementModal'));
     modal.show();
 });
 
@@ -518,6 +508,8 @@ $('#confirmSettlement').click(function() {
         settlement_hours: hours,
         settlement_reason: $('#settlementReason').val()
     });
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById('settlementModal')).hide();
     $('#settlementType').val('');
     $('#settlementHours').val('');
     $('#settlementReason').val('');
@@ -525,7 +517,7 @@ $('#confirmSettlement').click(function() {
 
 $('#pauseBtn').click(function() {
     if (!canPerformAction('pause')) return;
-    const modal = new bootstrap.Modal(document.getElementById('pauseModal'), {});
+    const modal = new bootstrap.Modal(document.getElementById('pauseModal'));
     modal.show();
 });
 
@@ -538,11 +530,14 @@ $('#confirmPause').click(function() {
     performAction('pause', {
         pause_reason: reason
     });
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById('pauseModal')).hide();
+    $('#pauseReason').val('');
 });
 
 $('#resumeBtn').click(function() {
     if (!canPerformAction('resume')) return;
-    const modal = new bootstrap.Modal(document.getElementById('resumeModal'), {});
+    const modal = new bootstrap.Modal(document.getElementById('resumeModal'));
     modal.show();
 });
 
@@ -550,11 +545,14 @@ $('#confirmResume').click(function() {
     performAction('resume', {
         resume_reason: $('#resumeReason').val()
     });
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById('resumeModal')).hide();
+    $('#resumeReason').val('');
 });
 
 $('#terminateBtn').click(function() {
     if (!canPerformAction('terminate')) return;
-    const modal = new bootstrap.Modal(document.getElementById('terminateModal'), {});
+    const modal = new bootstrap.Modal(document.getElementById('terminateModal'));
     modal.show();
 });
 
@@ -568,13 +566,15 @@ $('#confirmTerminate').click(function() {
         termination_type: type,
         termination_reason: $('#terminationReason').val()
     });
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById('terminateModal')).hide();
     $('#terminationType').val('');
     $('#terminationReason').val('');
 });
 
 $('#mergeBtn').click(function() {
     if (!canPerformAction('merge')) return;
-    const modal = new bootstrap.Modal(document.getElementById('mergeModal'), {});
+    const modal = new bootstrap.Modal(document.getElementById('mergeModal'));
     modal.show();
 });
 
@@ -591,6 +591,8 @@ $('#confirmMerge').click(function() {
     performAction('merge', {
         merge_with_id: mergeId
     });
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById('mergeModal')).hide();
     $('#mergeWithId').val('');
 });
 </script>
