@@ -154,8 +154,8 @@ else if ($action === 'pause') {
 // 4. استئناف العقد
 else if ($action === 'resume') {
     $resume_reason = isset($_POST['resume_reason']) ? $_POST['resume_reason'] : '';
-    
     $resume_reason = mysqli_real_escape_string($conn, $resume_reason);
+    $resume_date = date('Y-m-d');
     $query = "UPDATE contracts SET 
         status = 1,
         pause_reason = NULL,
@@ -163,7 +163,7 @@ else if ($action === 'resume') {
     WHERE id = $contract_id";
     
     if (mysqli_query($conn, $query)) {
-        $note = "تم استئناف العقد";
+        $note = "تم استئناف العقد بتاريخ $resume_date";
         if (!empty($resume_reason)) {
             $note .= " - الملاحظات: $resume_reason";
         }
@@ -189,8 +189,15 @@ else if ($action === 'terminate') {
         die(json_encode(['success' => false, 'message' => 'نوع الإنهاء غير صحيح']));
     }
     
+    // الاحتفاظ بتاريخ الانتهاء الحالي قبل التحديث
+    $contract_before_termination = getContractData($contract_id, $conn);
+    $old_end_date = ($contract_before_termination && !empty($contract_before_termination['actual_end']))
+        ? $contract_before_termination['actual_end']
+        : 'غير محدد';
+
     $termination_reason = mysqli_real_escape_string($conn, $termination_reason);
     $termination_type_ar = ($termination_type === 'amicable') ? 'رضائي' : 'بسبب التعسر';
+    $termination_date = date('Y-m-d');
     $query = "UPDATE contracts SET 
         status = 0,
         termination_type = '$termination_type',
@@ -199,7 +206,7 @@ else if ($action === 'terminate') {
     WHERE id = $contract_id";
     
     if (mysqli_query($conn, $query)) {
-        $note = "تم إنهاء العقد ($termination_type_ar)";
+        $note = "تم إنهاء العقد ($termination_type_ar) بتاريخ $termination_date - تاريخ الانتهاء السابق: $old_end_date";
         if (!empty($termination_reason)) {
             $note .= " - السبب: $termination_reason";
         }
