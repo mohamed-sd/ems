@@ -229,9 +229,9 @@ else if ($action === 'merge') {
                    getContractData($contract_id, $conn)['forecasted_contracted_hours'];
     
     // تحديث العقد الأول بالبيانات المدمجة
+    // لا نغير حالة العقد عند الدمج؛ نحتفظ بالحالة الحالية
     $query = "UPDATE contracts SET 
         forecasted_contracted_hours = $merged_hours,
-        status = 0,
         merged_with = $merge_with_id,
         updated_at = NOW()
     WHERE id = $contract_id";
