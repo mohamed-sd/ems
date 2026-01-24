@@ -30,29 +30,45 @@ function addNote($contract_id, $note, $conn) {
 
 // 1. تجديد العقد
 if ($action === 'renewal') {
-    $new_duration = isset($_POST['new_duration']) ? intval($_POST['new_duration']) : 0;
+    $new_start_date = isset($_POST['new_start_date']) ? $_POST['new_start_date'] : '';
     $new_end_date = isset($_POST['new_end_date']) ? $_POST['new_end_date'] : '';
     
-    if ($new_duration <= 0 || empty($new_end_date)) {
-        die(json_encode(['success' => false, 'message' => 'الرجاء إدخال المدة والتاريخ الجديد']));
+    if (empty($new_start_date) || empty($new_end_date)) {
+        die(json_encode(['success' => false, 'message' => 'الرجاء إدخال تاريخي البدء والانتهاء']));
     }
     
     // التحقق من صيغة التاريخ
-    $date_validation = DateTime::createFromFormat('Y-m-d', $new_end_date);
-    if (!$date_validation) {
+    $start_validation = DateTime::createFromFormat('Y-m-d', $new_start_date);
+    $end_validation = DateTime::createFromFormat('Y-m-d', $new_end_date);
+    
+    if (!$start_validation || !$end_validation) {
         die(json_encode(['success' => false, 'message' => 'صيغة التاريخ غير صحيحة']));
     }
     
+    // التحقق من أن تاريخ البدء قبل تاريخ الانتهاء
+    if (strtotime($new_start_date) >= strtotime($new_end_date)) {
+        die(json_encode(['success' => false, 'message' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء']));
+    }
+    
+    $new_start_date = mysqli_real_escape_string($conn, $new_start_date);
     $new_end_date = mysqli_real_escape_string($conn, $new_end_date);
+    
+    // حساب المدة بالشهور
+    $start = new DateTime($new_start_date);
+    $end = new DateTime($new_end_date);
+    $interval = $start->diff($end);
+    $months = $interval->m + ($interval->y * 12);
+    
     $query = "UPDATE contracts SET 
-        contract_duration_months = contract_duration_months + $new_duration,
+        actual_start = '$new_start_date',
         actual_end = '$new_end_date',
+        contract_duration_months = $months,
         status = 1,
         updated_at = NOW()
     WHERE id = $contract_id";
     
     if (mysqli_query($conn, $query)) {
-        $note_text = "تم تجديد العقد بمدة $new_duration شهور - تاريخ الانتهاء الجديد: $new_end_date";
+        $note_text = "تم تجديد العقد من $new_start_date إلى $new_end_date (مدة: $months شهور)";
         $note_text = mysqli_real_escape_string($conn, $note_text);
         addNote($contract_id, $note_text, $conn);
         echo json_encode(['success' => true, 'message' => 'تم تجديد العقد بنجاح']);
@@ -221,6 +237,27 @@ else if ($action === 'merge') {
     WHERE id = $contract_id";
     
     if (mysqli_query($conn, $query)) {
+        // نسخ معدات العقد المدموج إلى العقد الحالي
+        $get_equipments_query = "SELECT equip_type, equip_size, equip_count, equip_target_per_month, equip_total_month, equip_total_contract FROM contractequipments WHERE contract_id = $merge_with_id";
+        $equipments_result = mysqli_query($conn, $get_equipments_query);
+        
+        if ($equipments_result) {
+            while ($equip = mysqli_fetch_assoc($equipments_result)) {
+                // إدراج المعدة في العقد الحالي
+                $equip_type = mysqli_real_escape_string($conn, $equip['equip_type']);
+                $equip_size = intval($equip['equip_size']);
+                $equip_count = intval($equip['equip_count']);
+                $equip_target = intval($equip['equip_target_per_month']);
+                $equip_total_month = intval($equip['equip_total_month']);
+                $equip_total_contract = intval($equip['equip_total_contract']);
+                
+                $insert_equip_query = "INSERT INTO contractequipments (contract_id, equip_type, equip_size, equip_count, equip_target_per_month, equip_total_month, equip_total_contract) 
+                    VALUES ($contract_id, '$equip_type', $equip_size, $equip_count, $equip_target, $equip_total_month, $equip_total_contract)";
+                
+                mysqli_query($conn, $insert_equip_query);
+            }
+        }
+        
         $merge_note_1 = "تم دمج العقد مع العقد رقم $merge_with_id - إجمالي الساعات: $merged_hours";
         $merge_note_1 = mysqli_real_escape_string($conn, $merge_note_1);
         addNote($contract_id, $merge_note_1, $conn);
@@ -229,7 +266,7 @@ else if ($action === 'merge') {
         $merge_note_2 = mysqli_real_escape_string($conn, $merge_note_2);
         addNote($merge_with_id, $merge_note_2, $conn);
         
-        echo json_encode(['success' => true, 'message' => 'تم دمج العقود بنجاح']);
+        echo json_encode(['success' => true, 'message' => 'تم دمج العقود ومعداتها بنجاح']);
     } else {
         echo json_encode(['success' => false, 'message' => 'خطأ في دمج العقود']);
     }

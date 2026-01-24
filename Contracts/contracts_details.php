@@ -143,13 +143,21 @@ while ($row = mysqli_fetch_assoc($result)) {
 <?php 
 $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
 $project_id = $row['project'];
+$actual_end_date = $row['actual_end'];
 } 
 ?>
 
-<!-- جدول معدات العقد -->
+<!-- جدول معدات العقد (بما فيها معدات العقد المدموج) -->
 <div class="card shadow-sm" style="margin-top: 30px;">
     <div class="card-header bg-dark text-white">
-        <h5 class="mb-0">معدات العقد</h5>
+        <h5 class="mb-0">
+            معدات العقد
+            <?php 
+            if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
+                echo " (العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")";
+            }
+            ?>
+        </h5>
     </div>
     <div class="card-body">
         <table class="display nowrap" style="width:100%; margin-top: 20px;">
@@ -162,6 +170,11 @@ $project_id = $row['project'];
                     <th>الساعات/الشهر</th>
                     <th>إجمالي الشهري</th>
                     <th>إجمالي العقد</th>
+                    <?php 
+                    if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
+                        echo "<th>المصدر</th>";
+                    }
+                    ?>
                 </tr>
             </thead>
             <tbody>
@@ -180,6 +193,22 @@ $project_id = $row['project'];
                         echo "<td>" . $equip['equip_target_per_month'] . "</td>";
                         echo "<td>" . $equip['equip_total_month'] . "</td>";
                         echo "<td>" . $equip['equip_total_contract'] . "</td>";
+                        if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
+                            // التحقق من هل هذه المعدة من العقد المدموج أم لا
+                            $merged_equipments = getContractEquipments(intval($row['merged_with']), $conn);
+                            $is_from_merged = false;
+                            foreach ($merged_equipments as $m_equip) {
+                                if ($m_equip['equip_type'] == $equip['equip_type'] && 
+                                    $m_equip['equip_size'] == $equip['equip_size'] &&
+                                    $m_equip['equip_count'] == $equip['equip_count']) {
+                                    $is_from_merged = true;
+                                    break;
+                                }
+                            }
+                            echo "<td><span class='badge " . ($is_from_merged ? "bg-success" : "bg-primary") . "'>" . 
+                                 ($is_from_merged ? "العقد #" . $row['merged_with'] : "العقد #" . $contract_id) . 
+                                 "</span></td>";
+                        }
                         echo "</tr>";
                         $i++;
                     }
@@ -191,6 +220,10 @@ $project_id = $row['project'];
         </table>
     </div>
 </div>
+
+<?php 
+// إزالة الجدول المنفصل للعقد المدموج (تم دمج معداته في الجدول الرئيسي)
+?>
 
     <br/><br/><br/>
 
@@ -244,11 +277,11 @@ $project_id = $row['project'];
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="renewalDuration" class="form-label">المدة الجديدة (بالشهور)</label>
-                    <input type="number" id="renewalDuration" class="form-control" min="1" placeholder="أدخل عدد الشهور">
+                    <label for="renewalStartDate" class="form-label">تاريخ بدء التجديد <span style="color: red;">*</span></label>
+                    <input type="date" id="renewalStartDate" class="form-control">
                 </div>
                 <div class="mb-3">
-                    <label for="renewalEndDate" class="form-label">تاريخ الانتهاء الجديد</label>
+                    <label for="renewalEndDate" class="form-label">تاريخ انتهاء التجديد <span style="color: red;">*</span></label>
                     <input type="date" id="renewalEndDate" class="form-control">
                 </div>
             </div>
@@ -370,7 +403,7 @@ $project_id = $row['project'];
 
 <!-- Modal for Merge -->
 <div class="modal fade" id="mergeModal" tabindex="-1" aria-labelledby="mergeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="mergeModalLabel">دمج العقود</h5>
@@ -390,6 +423,57 @@ $project_id = $row['project'];
                         ?>
                     </select>
                 </div>
+                
+                <!-- عرض المعدات الحالية والمعدات الخاصة بالعقد المختار -->
+                <div id="mergeEquipmentsContainer" style="margin-top: 20px;">
+                    <h6 class="mb-3">معدات العقود:</h6>
+                    
+                    <!-- معدات العقد الحالي -->
+                    <div class="mb-4">
+                        <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #0066cc;">
+                            <i class="fa fa-cube"></i> معدات العقد الحالي (#<?php echo $contract_id; ?>)
+                        </h6>
+                        <div id="currentContractEquipments">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>نوع المعدة</th>
+                                        <th>الحجم</th>
+                                        <th>العدد</th>
+                                        <th>الساعات/الشهر</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $current_equipments = getContractEquipments($contract_id, $conn);
+                                    if (!empty($current_equipments)) {
+                                        foreach ($current_equipments as $equip) {
+                                            echo "<tr>";
+                                            echo "<td>" . $equip['equip_type'] . "</td>";
+                                            echo "<td>" . $equip['equip_size'] . "</td>";
+                                            echo "<td>" . $equip['equip_count'] . "</td>";
+                                            echo "<td>" . $equip['equip_target_per_month'] . "</td>";
+                                            echo "</tr>";
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='4' style='text-align: center; color: #999;'>لا توجد معدات</td></tr>";
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- معدات العقد المختار -->
+                    <div class="mb-4">
+                        <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #28a745;">
+                            <i class="fa fa-cube"></i> معدات العقد المختار
+                        </h6>
+                        <div id="selectedContractEquipments" style="min-height: 100px;">
+                            <p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
@@ -407,6 +491,7 @@ $project_id = $row['project'];
 <script>
 const contractId = <?php echo $contract_id; ?>;
 const contractStatus = <?php echo isset($contractStatusValue) ? $contractStatusValue : 1; ?>;
+const actualEndDate = '<?php echo isset($actual_end_date) ? $actual_end_date : ''; ?>';  // تاريخ انتهاء العقد الفعلي
 
 // دالة عامة للإجراءات
 function performAction(action, data = {}) {
@@ -461,28 +546,32 @@ function canPerformAction(action) {
 // أزرار الإجراءات - Bootstrap 5 syntax
 $('#renewalBtn').click(function() {
     if (!canPerformAction('renewal')) return;
+    // تعيين تاريخ البدء الافتراضي لتاريخ انتهاء العقد الفعلي
+    if (actualEndDate) {
+        $('#renewalStartDate').val(actualEndDate);
+    }
     const modal = new bootstrap.Modal(document.getElementById('renewalModal'));
     modal.show();
 });
 
 $('#confirmRenewal').click(function() {
-    const duration = $('#renewalDuration').val();
+    const startDate = $('#renewalStartDate').val();
     const endDate = $('#renewalEndDate').val();
-    if (!duration || !endDate) {
+    if (!startDate || !endDate) {
         alert('الرجاء ملء جميع الحقول');
         return;
     }
-    if (parseInt(duration) <= 0) {
-        alert('المدة يجب أن تكون أكبر من صفر');
+    if (new Date(startDate) >= new Date(endDate)) {
+        alert('تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء');
         return;
     }
     performAction('renewal', {
-        new_duration: duration,
+        new_start_date: startDate,
         new_end_date: endDate
     });
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById('renewalModal')).hide();
-    $('#renewalDuration').val('');
+    $('#renewalStartDate').val('');
     $('#renewalEndDate').val('');
 });
 
@@ -578,6 +667,59 @@ $('#mergeBtn').click(function() {
     modal.show();
 });
 
+// تحميل معدات العقد المختار عند التغيير
+$('#mergeWithId').on('change', function() {
+    const selectedContractId = $(this).val();
+    
+    if (!selectedContractId) {
+        $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>');
+        return;
+    }
+    
+    // تحميل المعدات عبر AJAX
+    $.ajax({
+        url: 'get_contract_equipments.php',
+        type: 'GET',
+        data: { contract_id: selectedContractId },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                let html = '';
+                if (response.equipments.length > 0) {
+                    html = '<table class="table table-sm table-bordered">';
+                    html += '<thead class="table-light"><tr>';
+                    html += '<th>نوع المعدة</th>';
+                    html += '<th>الحجم</th>';
+                    html += '<th>العدد</th>';
+                    html += '<th>الساعات/الشهر</th>';
+                    html += '</tr></thead>';
+                    html += '<tbody>';
+                    
+                    response.equipments.forEach(function(equip) {
+                        html += '<tr>';
+                        html += '<td>' + equip.equip_type + '</td>';
+                        html += '<td>' + equip.equip_size + '</td>';
+                        html += '<td>' + equip.equip_count + '</td>';
+                        html += '<td>' + equip.equip_target_per_month + '</td>';
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table>';
+                } else {
+                    html = '<p style="text-align: center; color: #999;">لا توجد معدات لهذا العقد</p>';
+                }
+                $('#selectedContractEquipments').html(html);
+            } else {
+                $('#selectedContractEquipments').html('<p style="text-align: center; color: #c00;">خطأ: ' + response.message + '</p>');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('الخطأ:', error);
+            $('#selectedContractEquipments').html('<p style="text-align: center; color: #c00;">خطأ في تحميل المعدات</p>');
+        }
+    });
+});
+
 $('#confirmMerge').click(function() {
     const mergeId = $('#mergeWithId').val();
     if (!mergeId) {
@@ -594,6 +736,7 @@ $('#confirmMerge').click(function() {
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById('mergeModal')).hide();
     $('#mergeWithId').val('');
+    $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>');
 });
 </script>
 
