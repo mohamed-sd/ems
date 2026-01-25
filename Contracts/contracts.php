@@ -252,11 +252,12 @@ if (!isset($_SESSION['user'])) {
                     <div class="control"><input name="equip_count_1" type="number" min="0"></div>
                   </div>
 
-                  <div class="field md-3 sm-6">
-                  </div>
-                  <div class="field md-3 sm-6">
-                  </div>
+            
 
+                  <div class="field md-3 sm-6">
+                    <label>عدد الورديات</label>
+                    <div class="control"><input name="equip_shifts_1" type="number" min="0" placeholder="مثال: 2"></div>
+                  </div>
                   <div class="field md-3 sm-6">
                     <label>وحدة القياس</label>
                     <div class="control">
@@ -280,10 +281,7 @@ if (!isset($_SESSION['user'])) {
                     <div class="control"><input name="equip_total_month_1" type="number" readonly
                         placeholder="يُحتسب تلقائياً"></div>
                   </div>
-                  <div class="field md-3 sm-6">
-                  </div>
-                  <div class="field md-3 sm-6">
-                  </div>
+               
                   <div class="field md-3 sm-6">
                     <label>إجمالي ساعات العقد</label>
                     <div class="control"><input name="equip_total_contract_1" type="number" readonly
@@ -305,8 +303,7 @@ if (!isset($_SESSION['user'])) {
                     </div>
                   </div>
 
-                  <div class="field md-3 sm-6"></div>
-                  <div class="field md-3 sm-6"></div>
+                
                   
 
                   <div class="field md-3 sm-6">
@@ -322,8 +319,7 @@ if (!isset($_SESSION['user'])) {
                     <div class="control"><input name="equip_technicians_1" type="number" min="0"></div>
                   </div>
                   <!-- خانتان فارغتان للحفاظ على 3 خانات لكل صف -->
-                  <div class="field md-3 sm-6"></div>
-                  <div class="field md-3 sm-6"></div>
+                
                   <div class="field md-3 sm-6">
                     <label>عدد المساعدين</label>
                     <div class="control"><input name="equip_assistants_1" type="number" min="0"></div>
@@ -549,6 +545,7 @@ if (!isset($_SESSION['user'])) {
                       'equip_type' => $_POST["equip_type_$i"],
                       'equip_size' => isset($_POST["equip_size_$i"]) ? $_POST["equip_size_$i"] : 0,
                       'equip_count' => isset($_POST["equip_count_$i"]) ? $_POST["equip_count_$i"] : 0,
+                      'equip_shifts' => isset($_POST["equip_shifts_$i"]) ? $_POST["equip_shifts_$i"] : 0,
                       'equip_unit' => isset($_POST["equip_unit_$i"]) ? $_POST["equip_unit_$i"] : '',
                       'equip_target_per_month' => isset($_POST["equip_target_per_month_$i"]) ? $_POST["equip_target_per_month_$i"] : 0,
                       'equip_total_month' => isset($_POST["equip_total_month_$i"]) ? $_POST["equip_total_month_$i"] : 0,

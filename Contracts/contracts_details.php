@@ -188,6 +188,7 @@ $actual_end_date = $row['actual_end'];
                     <th>نوع المعدة</th>
                     <th>الحجم</th>
                     <th>العدد</th>
+                    <th>عدد الورديات</th>
                     <th>الساعات/اليوم</th>
                     <th>إجمالي الساعات</th>
                     <th> الوحدة </th>
@@ -217,6 +218,7 @@ $actual_end_date = $row['actual_end'];
                         echo "<td>" . htmlspecialchars($equip['equip_type']) . "</td>";
                         echo "<td>" . $equip['equip_size'] . "</td>";
                         echo "<td>" . $equip['equip_count'] . "</td>";
+                        echo "<td>" . (isset($equip['equip_shifts']) ? $equip['equip_shifts'] : 0) . "</td>";
                         echo "<td>" . $equip['equip_target_per_month'] . "</td>";
                         echo "<td>" . $equip['equip_total_month'] . "</td>";
                         echo "<td>" . $equip['equip_unit'] . "</td>";
