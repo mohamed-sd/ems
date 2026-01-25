@@ -28,37 +28,415 @@ if (!isset($_SESSION['user'])) {
   <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
 </head>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+  
+  * {
+    font-family: 'Cairo', sans-serif;
+  }
+  
+  body {
+    background: #f5f7fa;
+  }
+  
+  .main {
+    padding: 2rem;
+    background: #f5f7fa;
+  }
+  
+  /* Page Title */
+  .main h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 2rem;
+  }
+  
+  /* Action Buttons Container */
+  .aligin {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+  
+  /* Modern Action Buttons */
+  .aligin .add {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .aligin .add::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .aligin .add:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .aligin .add:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+  }
+  
+  .aligin .add:active {
+    transform: translateY(-1px);
+  }
+  
+  #toggleForm {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  }
+  
+  /* Form Styling */
+  #projectForm {
+    animation: fadeInUp 0.6s ease;
+  }
+  
+  .card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  
+  .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    padding: 1.5rem;
+    border: none;
+  }
+  
+  .card-header h5 {
+    color: white;
+    font-weight: 700;
+    margin: 0;
+  }
+  
+  .card-body {
+    padding: 2rem;
+  }
+  
+  /* Section Titles */
+  .section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #667eea;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+  
+  .chip {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+  }
+  
+  /* Form Fields */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .field label {
+    display: block;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+  
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+  
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  }
+  
+  .field input[readonly] {
+    background: #f8f9fa;
+    cursor: not-allowed;
+  }
+  
+  /* KPI Cards */
   .totals {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-    margin-top: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
   }
-
+  
   .kpi {
-    /* background: linear-gradient(180deg, #fff, #fffaf0); */
-    border: 1px solid #ffcc00;
-    border-radius: 14px;
-    padding: 14px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: none;
+    border-radius: 15px;
+    padding: 1.5rem;
     text-align: center;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    border-right: 5px solid #667eea;
   }
-
+  
+  .kpi:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+  
   .kpi .v {
     font-weight: 900;
-    font-size: clamp(18px, 3vw, 24px);
-    color: #7a5a00;
+    font-size: 2rem;
+    color: #667eea;
+    margin-bottom: 0.5rem;
   }
-
+  
   .kpi .t {
-    color: var(--muted);
-    font-size: 12px;
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 600;
   }
-
-  .hr {
-    height: 1px;
-    /* background: linear-gradient(90deg, transparent, var(--yellow), transparent); */
-    margin: 18px 0;
+  
+  /* Buttons */
+  button.primary,
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
     border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  
+  button.primary:hover,
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  }
+  
+  #addEquipmentBtn {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  }
+  
+  /* HR Separator */
+  .hr {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    margin: 2rem 0;
+    border: none;
+  }
+  
+  /* Equipment Sections */
+  .equipment-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
+    border: 2px solid #e9ecef;
+    position: relative;
+  }
+  
+  .equipment-section h4 {
+    color: #667eea;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .remove-equipment {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+  }
+  
+  .remove-equipment:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+  }
+  
+  /* DataTable Styling */
+  .dataTables_wrapper {
+    padding: 1rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+  }
+  
+  table.dataTable {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  table.dataTable thead th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 700;
+    padding: 1rem;
+    text-align: center;
+  }
+  
+  table.dataTable tbody tr {
+    transition: all 0.3s ease;
+  }
+  
+  table.dataTable tbody tr:hover {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    transform: scale(1.01);
+  }
+  
+  table.dataTable tbody td {
+    padding: 1rem;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  /* Action Buttons in Table */
+  .btn-action {
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0 0.2rem;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .btn-action i {
+    margin: 0;
+  }
+  
+  .btn-action-edit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+  
+  .btn-action-edit:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+  }
+  
+  .btn-action-delete {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+  }
+  
+  .btn-action-delete:hover {
+    background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+  }
+  
+  .btn-action-view {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+  }
+  
+  .btn-action-view:hover {
+    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+  }
+  
+  /* Animation */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .aligin {
+      justify-content: center;
+    }
+    
+    .aligin .add {
+      flex: 1 1 45%;
+    }
+    
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .totals {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 </style>
 
@@ -68,56 +446,39 @@ if (!isset($_SESSION['user'])) {
 
   <div class="main">
 
-    <!-- <h2>العقود</h2> -->
+    <h2><i class="fas fa-file-contract"></i> إدارة العقود</h2>
+    
     <div class="aligin">
-
       <a href="javascript:void(0)" id="toggleForm" class="add">
-        <i class="fa fa-plus"></i> عقد جديد
+        <i class="fas fa-plus-circle"></i> عقد جديد
       </a>
-
-      <a href="#" class="add">
-        <!-- <i class="fa fa-plus"></i>  -->
-        تجديد عقد
+      <a href="#" class="add" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+        <i class="fas fa-sync-alt"></i> تجديد عقد
       </a>
-
-      <a href="#" class="add">
-        <i class="fa fa-plus"></i> تمديد عقد
+      <a href="#" class="add" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
+        <i class="fas fa-expand-arrows-alt"></i> تمديد عقد
       </a>
-
-      <a href="#" class="add">
-        <!-- <i class="fa fa-plus"></i>   -->
-        تعديل / تغيير بنود
+      <a href="#" class="add" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);">
+        <i class="fas fa-edit"></i> تعديل بنود
       </a>
-
-      <a href="#" class="add">
-        <!-- <i class="fa fa-plus"></i>    -->
-        دمج عقدين
+      <a href="#" class="add" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+        <i class="fas fa-object-group"></i> دمج عقدين
       </a>
-
-      <a href="#" class="add">
-        <!-- <i class="fa fa-plus"></i>   -->
-        انهاء ( رضائي)
+      <a href="#" class="add" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+        <i class="fas fa-handshake"></i> إنهاء رضائي
       </a>
-
-      <a href="#" class="add">
-        <!-- <i class="fa fa-plus"></i>    -->
-        انهاء بسبب التعسر
+      <a href="#" class="add" style="background: linear-gradient(135deg, #fd7e14 0%, #e66a0a 100%);">
+        <i class="fas fa-exclamation-triangle"></i> إنهاء تعسر
       </a>
-
-      <a href="#" class="add">
-        <!-- <i class="fa fa-plus"></i>  -->
-        ايقاف مؤقت
+      <a href="#" class="add" style="background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);">
+        <i class="fas fa-pause-circle"></i> إيقاف مؤقت
       </a>
-      <a href="#" class="add">
-        <!-- <i class="fa fa-plus"></i>   -->
-        فسخ عقد
+      <a href="#" class="add" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+        <i class="fas fa-ban"></i> فسخ عقد
       </a>
-
-      <a href="#" class="add">
-        <!-- <i class="fa fa-plus"></i>  -->
-        الغاء عقد
+      <a href="#" class="add" style="background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);">
+        <i class="fas fa-times-circle"></i> إلغاء عقد
       </a>
-
     </div>
 
     <!-- فورم إضافة عقد -->
@@ -125,7 +486,9 @@ if (!isset($_SESSION['user'])) {
 
       <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
-          <h5 class="mb-0"> اضافة/ تعديل العقد </h5>
+          <h5 class="mb-0">
+            <i class="fas fa-file-signature"></i> إضافة / تعديل العقد
+          </h5>
         </div>
         <div class="card-body">
 
@@ -143,24 +506,29 @@ if (!isset($_SESSION['user'])) {
               <label>تاريخ توقيع العقد </label>
               <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
             </div>
+
+             <div class="field md-3 sm-6">
+              <label>بداية التنفيذ الفعلي المتفق عليه</label>
+              <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
+            </div>
+
+
+               <div class="field md-3 sm-6">
+              <label>نهاية التنفيذ الفعلي المتفق عليه</label>
+              <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
+            </div>
+
             <div class="field md-3 sm-6">
               <label>فترة السماح بين التوقيع والتنفيذ </label>
               <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0"
                   placeholder="عدد الأيام"></div>
             </div>
-            <div class="field md-3 sm-6">
-              <label>بداية التنفيذ الفعلي المتفق عليه</label>
-              <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
-            </div>
+           
             <!-- خانتان فارغتان -->
-            <div class="field md-3 sm-6"> </div>
-            <div class="field md-3 sm-6"> </div>
+           
 
             <!-- صف 2: 3 خانات -->
-            <div class="field md-3 sm-6">
-              <label>نهاية التنفيذ الفعلي المتفق عليه</label>
-              <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
-            </div>
+         
             <div class="field md-3 sm-6">
               <label>مدة العقد بالأيام </label>
               <div class="control"><input name="contract_duration_days" id="contract_duration_days" type="number"
@@ -177,10 +545,18 @@ if (!isset($_SESSION['user'])) {
                 </select>
               </div>
             </div>
-            <!-- خانتان فارغتان -->
-            <div class="field md-3 sm-6"> </div>
-            <div class="field md-3 sm-6"> </div>
-
+          
+    <div class="field md-3 sm-6">
+              <label>السكن (Place for Living)</label>
+              <div class="control">
+                <select name="place_for_living" id="place_for_living">
+                  <option value="">— اختر —</option>
+                  <option value="مالك المعدة">مالك المعدة</option>
+                  <option value="مالك المشروع">مالك المشروع</option>
+                  <option value="بدون">بدون</option>
+                </select>
+              </div>
+            </div>
             <!-- صف 3: 3 خانات -->
             <div class="field md-3 sm-6">
               <label>الإعاشة (Accommodation)</label>
@@ -193,17 +569,7 @@ if (!isset($_SESSION['user'])) {
                 </select>
               </div>
             </div>
-            <div class="field md-3 sm-6">
-              <label>السكن (Place for Living)</label>
-              <div class="control">
-                <select name="place_for_living" id="place_for_living">
-                  <option value="">— اختر —</option>
-                  <option value="مالك المعدة">مالك المعدة</option>
-                  <option value="مالك المشروع">مالك المشروع</option>
-                  <option value="بدون">بدون</option>
-                </select>
-              </div>
-            </div>
+        
             <div class="field md-3 sm-6">
               <label>الورشة (Workshop)</label>
               <div class="control">
@@ -333,8 +699,8 @@ if (!isset($_SESSION['user'])) {
           </div>
 
           <div style="margin: 15px 0; display: flex; gap: 10px;">
-            <button type="button" class="primary" id="addEquipmentBtn" style="padding: 8px 16px; font-size: 14px;">
-              <i class="fa fa-plus"></i> إضافة مزيد من المعدات
+            <button type="button" class="primary" id="addEquipmentBtn" style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
+              <i class="fas fa-plus-circle"></i> إضافة مزيد من المعدات
             </button>
           </div>
 
@@ -393,47 +759,61 @@ if (!isset($_SESSION['user'])) {
 
           <div class="totals">
             <div class="kpi">
+              <i class="fas fa-clock" style="font-size: 2rem; color: #667eea; margin-bottom: 0.5rem;"></i>
               <div class="v" id="kpi_month_total">0</div>
               <div class="t">الساعات المستهدفة يومياً - معدات</div>
               <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
             </div>
             <div class="kpi">
+              <i class="fas fa-calendar-alt" style="font-size: 2rem; color: #667eea; margin-bottom: 0.5rem;"></i>
               <div class="v" id="kpi_contract_total">0</div>
               <div class="t">ساعات العقد المستهدفة - معدات</div>
               <input type="hidden" name="forecasted_contracted_hours" id="forecasted_contracted_hours" value="0" />
             </div>
             <div class="kpi">
+              <i class="fas fa-boxes" style="font-size: 2rem; color: #667eea; margin-bottom: 0.5rem;"></i>
               <div class="v" id="kpi_equip_month">0</div>
               <div class="t">إجمالي معدات (يومي)</div>
             </div>
           </div>
 
-          <div class="toolbar">
-            <button type="reset" class="ghost">تفريغ الحقول</button>
+          <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px; border-right: 4px solid #667eea;">
+            <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+              <i class="fas fa-info-circle" style="margin-left: 0.5rem; color: #667eea;"></i>
+              <strong>ملاحظة:</strong> يتم احتساب الحقول الإجمالية تلقائياً بناءً على المدخلات.
+            </p>
           </div>
 
-          <p class="muted" style="margin-top:8px">* يتم احتساب الحقول الإجمالية تلقائياً بناءً على المدخلات.</p>
-          <button type="submit" class="primary">حفظ البيانات</button>
+          <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
+            <button type="reset" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+              <i class="fas fa-eraser"></i> تفريغ الحقول
+            </button>
+            <button type="submit" class="primary" style="padding: 0.75rem 3rem;">
+              <i class="fas fa-save"></i> حفظ البيانات
+            </button>
+          </div>
         </div>
       </div>
     </form>
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-white">
-        <h5 class="mb-0"> قائمة العقودات </h5>
+        <h5 class="mb-0">
+          <i class="fas fa-list-alt"></i> قائمة العقود
+        </h5>
       </div>
-      <div class="card-body">
+      <div class="card-body" style="padding: 2rem;">
         <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
           <thead>
             <tr>
-              <th> رقم العقد </th>
-              <th>تاريخ التوقيع</th>
-              <th>مدة العقد (أيام)</th>
-              <th>بداية التنفيذ</th>
-              <th>نهاية التنفيذ</th>
-              <th>ساعات الآليات/يوم</th>
-              <th>إجمالي ساعات الآليات</th>
-              <th> الحالة </th>
-              <th> الاجراءات </th>
+              <th><i class="fas fa-hashtag"></i> رقم العقد</th>
+              <th><i class="far fa-calendar"></i> تاريخ التوقيع</th>
+              <th><i class="fas fa-calendar-days"></i> مدة العقد (أيام)</th>
+              <th><i class="fas fa-play-circle"></i> بداية التنفيذ</th>
+              <th><i class="fas fa-stop-circle"></i> نهاية التنفيذ</th>
+              <th><i class="far fa-clock"></i> ساعات الآليات/يوم</th>
+              <th><i class="fas fa-clock"></i> إجمالي ساعات الآليات</th>
+              <th><i class="fas fa-info-circle"></i> الحالة</th>
+              <th><i class="fas fa-cogs"></i> الإجراءات</th>
             </tr>
           </thead>
           <tbody>
@@ -624,9 +1004,9 @@ if (!isset($_SESSION['user'])) {
                   workshop ='" . $row['workshop'] . "'
                   
              data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
-             style='color:#007bff'><i class='fa fa-edit'></i></a> | 
-                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
-                        <a href='contracts_details.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a>
+             class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>
+                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>
+                        <a href='contracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>
                       </td>";
               echo "</tr>";
             }
@@ -770,10 +1150,9 @@ if (!isset($_SESSION['user'])) {
             </div>
 
             <div class="field md-3 sm-6">
+              <label>عدد الورديات</label>
+              <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2"></div>
             </div>
-            <div class="field md-3 sm-6">
-            </div>
-
             <div class="field md-3 sm-6">
               <label>وحدة القياس</label>
               <div class="control">
@@ -796,11 +1175,7 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
             </div>
 
-              <div class="field md-3 sm-6">
-                  </div>
-                  <div class="field md-3 sm-6">
-                  </div>
-
+       
             <div class="field md-3 sm-6">
               <label>إجمالي ساعات العقد</label>
               <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
@@ -820,9 +1195,7 @@ if (!isset($_SESSION['user'])) {
               </div>
             </div>
 
-            <div class="field md-3 sm-6"></div>
-            <div class="field md-3 sm-6"></div>
-
+         
             <div class="field md-3 sm-6">
               <label>عدد المشغلين</label>
               <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0"></div>
@@ -836,15 +1209,12 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="equip_technicians_${equipmentIndex}" type="number" min="0"></div>
             </div>
             <!-- خانتان فارغتان للحفاظ على 3 خانات لكل صف -->
-            <div class="field md-3 sm-6"></div>
-            <div class="field md-3 sm-6"></div>
+           
             <div class="field md-3 sm-6">
               <label>عدد المساعدين</label>
               <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0"></div>
             </div>
-            <!-- إكمال الصف بثلاث خانات -->
-            <div class="field md-3 sm-6"></div>
-            <div class="field md-3 sm-6"></div>
+        
           </div>
         </div>
       `;
@@ -1017,6 +1387,10 @@ if (!isset($_SESSION['user'])) {
                         <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
                       </div>
                       <div class="field md-3 sm-6">
+                        <label>عدد الورديات</label>
+                        <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}"></div>
+                      </div>
+                      <div class="field md-3 sm-6">
                         <label>وحدة القياس</label>
                         <div class="control">
                           <select name="equip_unit_${equipmentIndex}" class="equip-unit">
@@ -1029,8 +1403,7 @@ if (!isset($_SESSION['user'])) {
                         </div>
                       </div>
 
-                      <div class="field md-3 sm-6"></div>
-                      <div class="field md-3 sm-6"></div>
+                  
 
                       <div class="field md-3 sm-6">
                         <label>ساعات العمل المستهدفة يومياً</label>
@@ -1059,7 +1432,6 @@ if (!isset($_SESSION['user'])) {
                         </div>
                       </div>
 
-                      <div class="field md-3 sm-6"></div>
 
                       <div class="field md-3 sm-6">
                         <label>عدد المشغلين</label>
