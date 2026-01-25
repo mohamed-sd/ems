@@ -32,6 +32,7 @@ function addNote($contract_id, $note, $conn) {
 if ($action === 'renewal') {
     $new_start_date = isset($_POST['new_start_date']) ? $_POST['new_start_date'] : '';
     $new_end_date = isset($_POST['new_end_date']) ? $_POST['new_end_date'] : '';
+    $contract_duration_days = isset($_POST['contract_duration_days']) ? intval($_POST['contract_duration_days']) : 0;
     
     if (empty($new_start_date) || empty($new_end_date)) {
         die(json_encode(['success' => false, 'message' => 'الرجاء إدخال تاريخي البدء والانتهاء']));
@@ -59,16 +60,22 @@ if ($action === 'renewal') {
     $interval = $start->diff($end);
     $months = $interval->m + ($interval->y * 12);
     
+    // إذا لم يتم إرسال contract_duration_days، نحسبه من التواريخ
+    if ($contract_duration_days <= 0) {
+        $contract_duration_days = $interval->days;
+    }
+    
     $query = "UPDATE contracts SET 
         actual_start = '$new_start_date',
         actual_end = '$new_end_date',
         contract_duration_months = $months,
+        contract_duration_days = $contract_duration_days,
         status = 1,
         updated_at = NOW()
     WHERE id = $contract_id";
     
     if (mysqli_query($conn, $query)) {
-        $note_text = "تم تجديد العقد من $new_start_date إلى $new_end_date (مدة: $months شهور)";
+        $note_text = "تم تجديد العقد من $new_start_date إلى $new_end_date (مدة: $months شهور / $contract_duration_days يوم)";
         $note_text = mysqli_real_escape_string($conn, $note_text);
         addNote($contract_id, $note_text, $conn);
         echo json_encode(['success' => true, 'message' => 'تم تجديد العقد بنجاح']);

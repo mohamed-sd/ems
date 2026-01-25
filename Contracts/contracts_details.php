@@ -819,6 +819,12 @@ $actual_end_date = $row['actual_end'];
                     </label>
                     <input type="date" id="renewalEndDate" class="form-control">
                 </div>
+                <div id="renewalDurationDisplay" style="display: none; padding: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600;">
+                        <i class="fas fa-calendar-days"></i>
+                        <span>مدة العقد الجديدة: <strong id="calculatedDays">0</strong> يوم</span>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -1172,6 +1178,37 @@ $('#renewalBtn').click(function() {
     modal.show();
 });
 
+// إعادة تعيين عرض المدة عند إغلاق المودال
+document.getElementById('renewalModal').addEventListener('hidden.bs.modal', function() {
+    $('#renewalDurationDisplay').hide();
+    $('#calculatedDays').text('0');
+});
+
+// حساب المدة تلقائياً عند تغيير التواريخ
+function calculateRenewalDuration() {
+    const startDate = $('#renewalStartDate').val();
+    const endDate = $('#renewalEndDate').val();
+    
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        if (start < end) {
+            const timeDiff = end.getTime() - start.getTime();
+            const durationDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            $('#calculatedDays').text(durationDays);
+            $('#renewalDurationDisplay').slideDown(300);
+        } else {
+            $('#renewalDurationDisplay').slideUp(300);
+        }
+    } else {
+        $('#renewalDurationDisplay').slideUp(300);
+    }
+}
+
+$('#renewalStartDate, #renewalEndDate').on('change', calculateRenewalDuration);
+
 $('#confirmRenewal').click(function() {
     const startDate = $('#renewalStartDate').val();
     const endDate = $('#renewalEndDate').val();
@@ -1183,14 +1220,24 @@ $('#confirmRenewal').click(function() {
         alert('تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء');
         return;
     }
+    
+    // حساب عدد الأيام بين التاريخين
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const timeDiff = end.getTime() - start.getTime();
+    const durationDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    
     performAction('renewal', {
         new_start_date: startDate,
-        new_end_date: endDate
+        new_end_date: endDate,
+        contract_duration_days: durationDays
     });
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById('renewalModal')).hide();
     $('#renewalStartDate').val('');
     $('#renewalEndDate').val('');
+    $('#renewalDurationDisplay').hide();
+    $('#calculatedDays').text('0');
 });
 
 $('#settlementBtn').click(function() {
