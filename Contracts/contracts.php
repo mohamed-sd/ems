@@ -338,6 +338,42 @@ if (!isset($_SESSION['user'])) {
     font-weight: 700;
     padding: 1rem;
     text-align: center;
+    border-left: 1px solid rgba(255,255,255,0.1);
+    white-space: nowrap;
+    font-size: 0.9rem;
+  }
+  
+  table.dataTable thead th:first-child {
+    border-left: none;
+  }
+  
+  /* Group column colors for better organization */
+  table.dataTable thead th.group-basic {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  table.dataTable thead th.group-dates {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  }
+  
+  table.dataTable thead th.group-hours {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+  }
+  
+  table.dataTable thead th.group-parties {
+    background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+  }
+  
+  table.dataTable thead th.group-services {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  }
+  
+  table.dataTable thead th.group-operations {
+    background: linear-gradient(135deg, #fd7e14 0%, #e66a0a 100%);
+  }
+  
+  table.dataTable thead th.group-status {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
   }
   
   table.dataTable tbody tr {
@@ -346,7 +382,8 @@ if (!isset($_SESSION['user'])) {
   
   table.dataTable tbody tr:hover {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    transform: scale(1.01);
+    transform: scale(1.005);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
   
   table.dataTable tbody td {
@@ -406,6 +443,78 @@ if (!isset($_SESSION['user'])) {
     background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+  }
+  
+  /* Group Toggle Buttons */
+  .btn-group-toggle {
+    padding: 0.5rem 1rem;
+    border: 2px solid #e0e0e0;
+    background: white;
+    color: #666;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .btn-group-toggle:hover {
+    border-color: #667eea;
+    color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
+  }
+  
+  .btn-group-toggle.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+  
+  .btn-group-toggle.active:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  }
+  
+  .btn-group-toggle-all {
+    padding: 0.5rem 1.2rem;
+    border: 2px solid #28a745;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .btn-group-toggle-all:hover {
+    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+  }
+  
+  /* Hidden columns */
+  .group-hidden {
+    display: none !important;
+  }
+  
+  /* Responsive table */
+  @media (max-width: 1400px) {
+    table.dataTable {
+      font-size: 0.85rem;
+    }
+    
+    table.dataTable thead th,
+    table.dataTable tbody td {
+      padding: 0.7rem 0.5rem;
+    }
   }
   
   /* Animation */
@@ -801,19 +910,77 @@ if (!isset($_SESSION['user'])) {
           <i class="fas fa-list-alt"></i> قائمة العقود
         </h5>
       </div>
-      <div class="card-body" style="padding: 2rem;">
+      
+      <!-- أزرار التحكم في المجموعات -->
+      <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0;">
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+          <span style="font-weight: 700; color: #667eea; margin-left: 10px;">
+            <i class="fas fa-filter"></i> عرض المجموعات:
+          </span>
+          <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
+            <i class="fas fa-info-circle"></i> أساسية
+          </button>
+          <button class="btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
+            <i class="far fa-calendar"></i> تواريخ
+          </button>
+          <button class="btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
+            <i class="fas fa-clock"></i> ساعات
+          </button>
+          <button class="btn-group-toggle" data-group="parties" title="أطراف العقد">
+            <i class="fas fa-users"></i> أطراف
+          </button>
+          <button class="btn-group-toggle" data-group="services" title="الخدمات المقدمة">
+            <i class="fas fa-hands-helping"></i> خدمات
+          </button>
+          <button class="btn-group-toggle" data-group="operations" title="التشغيل اليومي">
+            <i class="fas fa-cogs"></i> تشغيل
+          </button>
+          <button class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
+            <i class="fas fa-check-circle"></i> حالة
+          </button>
+          <button class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
+            <i class="fas fa-eye"></i> الكل
+          </button>
+        </div>
+      </div>
+      
+      <div class="card-body" style="padding: 2rem; overflow-x: auto;">
         <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
           <thead>
             <tr>
-              <th><i class="fas fa-hashtag"></i> رقم العقد</th>
-              <th><i class="far fa-calendar"></i> تاريخ التوقيع</th>
-              <th><i class="fas fa-calendar-days"></i> مدة العقد (أيام)</th>
-              <th><i class="fas fa-play-circle"></i> بداية التنفيذ</th>
-              <th><i class="fas fa-stop-circle"></i> نهاية التنفيذ</th>
-              <th><i class="far fa-clock"></i> ساعات الآليات/يوم</th>
-              <th><i class="fas fa-clock"></i> إجمالي ساعات الآليات</th>
-              <th><i class="fas fa-info-circle"></i> الحالة</th>
-              <th><i class="fas fa-cogs"></i> الإجراءات</th>
+              <!-- المعلومات الأساسية -->
+              <th class="group-basic"><i class="fas fa-hashtag"></i> رقم العقد</th>
+              
+              <!-- التواريخ والمدد -->
+              <th class="group-dates"><i class="far fa-calendar"></i> تاريخ التوقيع</th>
+              <th class="group-dates"><i class="fas fa-hourglass-half"></i> مدة السماح (أيام)</th>
+              <th class="group-dates"><i class="fas fa-calendar-days"></i> مدة العقد (أيام)</th>
+              <th class="group-dates"><i class="fas fa-play-circle"></i> بداية التنفيذ</th>
+              <th class="group-dates"><i class="fas fa-stop-circle"></i> نهاية التنفيذ</th>
+              
+              <!-- الساعات والأهداف -->
+              <th class="group-hours"><i class="far fa-clock"></i> هدف ساعات شهري</th>
+              <th class="group-hours"><i class="fas fa-clock"></i> إجمالي ساعات متوقعة</th>
+              
+              <!-- أطراف العقد -->
+              <th class="group-parties"><i class="fas fa-user-tie"></i> الطرف الأول</th>
+              <th class="group-parties"><i class="fas fa-user-check"></i> الطرف الثاني</th>
+              <th class="group-parties"><i class="fas fa-eye"></i> شاهد أول</th>
+              <th class="group-parties"><i class="fas fa-eye"></i> شاهد ثاني</th>
+              
+              <!-- الخدمات المقدمة -->
+              <th class="group-services"><i class="fas fa-truck"></i> النقل</th>
+              <th class="group-services"><i class="fas fa-bed"></i> السكن</th>
+              <th class="group-services"><i class="fas fa-home"></i> مكان المعيشة</th>
+              <th class="group-services"><i class="fas fa-wrench"></i> الورشة</th>
+              
+              <!-- التشغيل اليومي -->
+              <th class="group-operations"><i class="fas fa-business-time"></i> ساعات العمل يومياً</th>
+              <th class="group-operations"><i class="fas fa-users-cog"></i> عدد المشغلين يومياً</th>
+              
+              <!-- الحالة والإجراءات -->
+              <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
+              <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
             </tr>
           </thead>
           <tbody>
@@ -973,17 +1140,46 @@ if (!isset($_SESSION['user'])) {
               $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
 
               echo "<tr>";
-              echo "<td>" . $row['id'] . "</td>";
-              echo "<td>" . $row['contract_signing_date'] . "</td>";
-              echo "<td>" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "</td>";
-              echo "<td>" . $row['actual_start'] . "</td>";
-              echo "<td>" . $row['actual_end'] . "</td>";
+              
+              // المعلومات الأساسية
+              echo "<td class='group-basic'>" . $row['id'] . "</td>";
+              
+              // التواريخ والمدد
+              echo "<td class='group-dates'>" . $row['contract_signing_date'] . "</td>";
+              echo "<td class='group-dates'>" . (isset($row['grace_period_days']) ? $row['grace_period_days'] : 0) . "</td>";
+              echo "<td class='group-dates'>" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "</td>";
+              echo "<td class='group-dates'>" . $row['actual_start'] . "</td>";
+              echo "<td class='group-dates'>" . $row['actual_end'] . "</td>";
+              
+              // الساعات والأهداف
+              echo "<td class='group-hours'>" . $row['hours_monthly_target'] . "</td>";
+              echo "<td class='group-hours'>" . $row['forecasted_contracted_hours'] . "</td>";
+              
+              // أطراف العقد
+              echo "<td class='group-parties'>" . (isset($row['first_party']) ? $row['first_party'] : '-') . "</td>";
+              echo "<td class='group-parties'>" . (isset($row['second_party']) ? $row['second_party'] : '-') . "</td>";
+              echo "<td class='group-parties'>" . (isset($row['witness_one']) ? $row['witness_one'] : '-') . "</td>";
+              echo "<td class='group-parties'>" . (isset($row['witness_two']) ? $row['witness_two'] : '-') . "</td>";
+              
+              // الخدمات المقدمة
+              $transportationText = $row['transportation'] == 1 ? '<span style="color: green;">✓ متوفر</span>' : '<span style="color: red;">✗ غير متوفر</span>';
+              $accommodationText = $row['accommodation'] == 1 ? '<span style="color: green;">✓ متوفر</span>' : '<span style="color: red;">✗ غير متوفر</span>';
+              $place_for_livingText = isset($row['place_for_living']) && $row['place_for_living'] ? $row['place_for_living'] : '-';
+              $workshopText = isset($row['workshop']) && $row['workshop'] ? $row['workshop'] : '-';
+              
+              echo "<td class='group-services'>" . $transportationText . "</td>";
+              echo "<td class='group-services'>" . $accommodationText . "</td>";
+              echo "<td class='group-services'>" . $place_for_livingText . "</td>";
+              echo "<td class='group-services'>" . $workshopText . "</td>";
+              
+              // التشغيل اليومي
+              echo "<td class='group-operations'>" . (isset($row['daily_work_hours']) ? $row['daily_work_hours'] : '-') . "</td>";
+              echo "<td class='group-operations'>" . (isset($row['daily_operators']) ? $row['daily_operators'] : '-') . "</td>";
+              
+              // الحالة والإجراءات
+              echo "<td class='group-status'>" . $status . "</td>";
 
-              echo "<td>" . $row['hours_monthly_target'] . "</td>";
-              echo "<td>" . $row['forecasted_contracted_hours'] . "</td>";
-              echo "<td>" . $status . "</td>";
-
-              echo "<td>
+              echo "<td class='group-status'>
                         <a href='javascript:void(0)' class='editBtn'
              data-id='" . $row['id'] . "'
              data-contract_signing_date='" . $row['contract_signing_date'] . "'
@@ -1469,6 +1665,91 @@ if (!isset($_SESSION['user'])) {
       });
 
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
+    });
+    
+    // ==================== Group Toggle Functionality ====================
+    // حفظ حالة المجموعات في localStorage
+    const groupStates = JSON.parse(localStorage.getItem('contractGroupStates')) || {
+      basic: true,
+      dates: true,
+      hours: true,
+      parties: false,
+      services: false,
+      operations: false,
+      status: true
+    };
+    
+    // تطبيق الحالة المحفوظة عند تحميل الصفحة
+    function applyGroupStates() {
+      Object.keys(groupStates).forEach(group => {
+        const isActive = groupStates[group];
+        const btn = $(`.btn-group-toggle[data-group="${group}"]`);
+        const columns = $(`.group-${group}`);
+        
+        if (isActive) {
+          btn.addClass('active');
+          columns.removeClass('group-hidden');
+        } else {
+          btn.removeClass('active');
+          columns.addClass('group-hidden');
+        }
+      });
+    }
+    
+    // تطبيق الحالة عند تحميل الصفحة
+    applyGroupStates();
+    
+    // التحكم في إظهار/إخفاء المجموعات
+    $('.btn-group-toggle').on('click', function() {
+      const group = $(this).data('group');
+      const isActive = $(this).hasClass('active');
+      
+      if (isActive) {
+        // إخفاء المجموعة
+        $(this).removeClass('active');
+        $(`.group-${group}`).addClass('group-hidden');
+        groupStates[group] = false;
+      } else {
+        // إظهار المجموعة
+        $(this).addClass('active');
+        $(`.group-${group}`).removeClass('group-hidden');
+        groupStates[group] = true;
+      }
+      
+      // حفظ الحالة
+      localStorage.setItem('contractGroupStates', JSON.stringify(groupStates));
+    });
+    
+    // زر إظهار/إخفاء الكل
+    $('.btn-group-toggle-all').on('click', function() {
+      const allActive = Object.values(groupStates).every(state => state);
+      
+      if (allActive) {
+        // إخفاء الكل
+        $('.btn-group-toggle').removeClass('active');
+        $('[class*="group-"]').addClass('group-hidden');
+        Object.keys(groupStates).forEach(key => groupStates[key] = false);
+        $(this).html('<i class="fas fa-eye-slash"></i> إخفاء الكل');
+      } else {
+        // إظهار الكل
+        $('.btn-group-toggle').addClass('active');
+        $('[class*="group-"]').removeClass('group-hidden');
+        Object.keys(groupStates).forEach(key => groupStates[key] = true);
+        $(this).html('<i class="fas fa-eye"></i> الكل');
+      }
+      
+      // حفظ الحالة
+      localStorage.setItem('contractGroupStates', JSON.stringify(groupStates));
+    });
+    
+    // تحديث نص زر "الكل" عند التحميل
+    $(document).ready(function() {
+      const allActive = Object.values(groupStates).every(state => state);
+      if (allActive) {
+        $('.btn-group-toggle-all').html('<i class="fas fa-eye"></i> الكل');
+      } else {
+        $('.btn-group-toggle-all').html('<i class="fas fa-eye-slash"></i> إظهار الكل');
+      }
     });
   </script>
 
