@@ -55,7 +55,7 @@ include '../config.php';
 $contract_id = intval($_GET['id']);
 
 $sql = "SELECT 
-            id, project, contract_signing_date, grace_period_days, contract_duration_months, 
+            id, project, contract_signing_date, grace_period_days, contract_duration_months, contract_duration_days,
             actual_start, actual_end, transportation, accommodation, place_for_living, 
             workshop, hours_monthly_target, forecasted_contracted_hours, created_at, updated_at,
             daily_work_hours, daily_operators, first_party, second_party, 
@@ -71,6 +71,25 @@ if (!$result) {
 }
 
 while ($row = mysqli_fetch_assoc($result)) {
+
+    // حساب المدة المتبقية من العقد باعتماد تاريخ اليوم وتاريخ الانتهاء
+    $today = new DateTime();
+    $actual_end_date = new DateTime($row['actual_end']);
+    $interval = $today->diff($actual_end_date);
+    $remaining_days = (int)$interval->format('%r%a');  
+
+
+
+    // جلب اسم المشروع
+    $project_sql = "SELECT name FROM projects WHERE id = " . intval($row['project']) . " LIMIT 1";
+    $project_result = mysqli_query($conn, $project_sql);
+    if ($project_result && mysqli_num_rows($project_result) > 0) {
+        $project_row = mysqli_fetch_assoc($project_result);
+        $row['project'] = $project_row['name'];
+    } else {
+        $row['project'] = "غير معروف";
+    }
+
     // تحديد لون الحالة
     $status_color = 'green';
     $status_text = 'ساري';
@@ -96,12 +115,14 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="col-lg-4 col-7"><?php echo $row['contract_signing_date']; ?></div>
             <div class="col-lg-2 col-5">فترة السماح (أيام)</div>
             <div class="col-lg-4 col-7"><?php echo $row['grace_period_days']; ?></div>
-            <div class="col-lg-2 col-5">مدة العقد (شهور)</div>
-            <div class="col-lg-4 col-7"><?php echo $row['contract_duration_months']; ?></div>
             <div class="col-lg-2 col-5">تاريخ البدء الفعلي</div>
             <div class="col-lg-4 col-7"><?php echo $row['actual_start']; ?></div>
             <div class="col-lg-2 col-5">تاريخ الانتهاء الفعلي</div>
             <div class="col-lg-4 col-7"><?php echo $row['actual_end']; ?></div>
+            <div class="col-lg-2 col-5">مدة العقد (ايام)</div>
+            <div class="col-lg-4 col-7"><?php echo $row['contract_duration_days']; ?></div>
+            <div class="col-lg-2 col-5">الايام المتبقية للعقد</div>
+            <div class="col-lg-4 col-7"><?php echo $remaining_days; ?></div>
             <div class="col-lg-2 col-5">النقل</div>
             <div class="col-lg-4 col-7"><?php echo $row['transportation']; ?></div>
             <div class="col-lg-2 col-5">السكن</div>
@@ -111,7 +132,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="col-lg-2 col-5">الورشة</div>
             <div class="col-lg-4 col-7"><?php echo $row['workshop']; ?></div>
             <div class="col-lg-2 col-5">الهدف الشهري للساعات</div>
-            <div class="col-lg-4 col-7"><?php echo $row['hours_monthly_target']; ?></div>
+            <div class="col-lg-4 col-7"><?php echo $row['hours_monthly_target'] * 30; ?></div>
             <div class="col-lg-2 col-5">الساعات التعاقدية المتوقعة</div>
             <div class="col-lg-4 col-7"><?php echo $row['forecasted_contracted_hours']; ?></div>
             <?php if (isset($row['pause_reason']) && !empty($row['pause_reason'])): ?>
@@ -122,10 +143,6 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="col-lg-2 col-5">سبب الإنهاء</div>
             <div class="col-lg-4 col-7"><?php echo $row['termination_reason']; ?></div>
             <?php endif; ?>
-            <div class="col-lg-2 col-5">تاريخ الإنشاء</div>
-            <div class="col-lg-4 col-7"><?php echo $row['created_at']; ?></div>
-            <div class="col-lg-2 col-5">آخر تحديث</div>
-            <div class="col-lg-4 col-7"><?php echo $row['updated_at']; ?></div>
             <div class="col-lg-2 col-5">عدد ساعات العمل اليومية</div>
             <div class="col-lg-4 col-7"><?php echo $row['daily_work_hours']; ?></div>
             <div class="col-lg-2 col-5">عدد المشغلين للساعات اليومية</div>
@@ -138,6 +155,10 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="col-lg-4 col-7"><?php echo $row['witness_one']; ?></div>
             <div class="col-lg-2 col-5">الشاهد الثاني</div>
             <div class="col-lg-4 col-7"><?php echo $row['witness_two']; ?></div>
+             <div class="col-lg-2 col-5">تاريخ الإنشاء</div>
+            <div class="col-lg-4 col-7"><?php echo $row['created_at']; ?></div>
+            <div class="col-lg-2 col-5">آخر تحديث</div>
+            <div class="col-lg-4 col-7"><?php echo $row['updated_at']; ?></div>
         </div>
     </div>
 <?php 
@@ -167,9 +188,15 @@ $actual_end_date = $row['actual_end'];
                     <th>نوع المعدة</th>
                     <th>الحجم</th>
                     <th>العدد</th>
-                    <th>الساعات/الشهر</th>
-                    <th>إجمالي الشهري</th>
-                    <th>إجمالي العقد</th>
+                    <th>الساعات/اليوم</th>
+                    <th>إجمالي الساعات</th>
+                    <th> الوحدة </th>
+                    <th>إجمالي ساعات العقد</th>
+                    <th>السعر</th>
+                    <th> المشغلين </th>
+                    <th> المشرفين </th>
+                    <th> الفنيين </th>
+                    <th> المساعدين </th>
                     <?php 
                     if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
                         echo "<th>المصدر</th>";
@@ -192,7 +219,13 @@ $actual_end_date = $row['actual_end'];
                         echo "<td>" . $equip['equip_count'] . "</td>";
                         echo "<td>" . $equip['equip_target_per_month'] . "</td>";
                         echo "<td>" . $equip['equip_total_month'] . "</td>";
+                        echo "<td>" . $equip['equip_unit'] . "</td>";
                         echo "<td>" . $equip['equip_total_contract'] . "</td>";
+                        echo "<td>" . $equip['equip_price'] ."-". $equip['equip_price_currency'] . "</td>";
+                        echo "<td>" . $equip['equip_operators'] . "</td>";
+                        echo "<td>" . $equip['equip_supervisors'] . "</td>";
+                        echo "<td>" . $equip['equip_technicians'] . "</td>";
+                        echo "<td>" . $equip['equip_assistants'] . "</td>";
                         if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
                             // التحقق من هل هذه المعدة من العقد المدموج أم لا
                             $merged_equipments = getContractEquipments(intval($row['merged_with']), $conn);
