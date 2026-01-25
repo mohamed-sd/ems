@@ -80,15 +80,6 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 
 
-    // جلب اسم المشروع
-    $project_sql = "SELECT name FROM projects WHERE id = " . intval($row['project']) . " LIMIT 1";
-    $project_result = mysqli_query($conn, $project_sql);
-    if ($project_result && mysqli_num_rows($project_result) > 0) {
-        $project_row = mysqli_fetch_assoc($project_result);
-        $row['project'] = $project_row['name'];
-    } else {
-        $row['project'] = "غير معروف";
-    }
 
     // تحديد لون الحالة
     $status_color = 'green';
