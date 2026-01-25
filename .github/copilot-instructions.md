@@ -27,11 +27,15 @@ Each major entity has its own directory with consistent structure:
 - **[Projects/projects.php](Projects/projects.php)** - Projects CRUD with client, location, total cost
 - **[Equipments/equipments.php](Equipments/equipments.php)** - Equipment assignments to drivers
 - **[Timesheet/](Timesheet/)** - Work hour tracking; [timesheet.php](Timesheet/timesheet.php) creates entries linked to operators/projects
+- **[Contracts/](Contracts/)** - Contract lifecycle management with action handlers ([contract_actions_handler.php](Contracts/contract_actions_handler.php)), equipment assignments ([contractequipments](database/)), and audit trail via `contract_notes` table
 
 **Cross-module joins** (see [Reports/reports.php](Reports/reports.php#L13)):
 ```
 timesheet → operations → equipments → suppliers/projects
 ```
+
+**Contract lifecycle workflow:**
+- Create contract → Add equipment via [contractequipments_handler.php](Contracts/contractequipments_handler.php) → Perform actions (renewal, settlement, pause, resume, terminate, merge) → Track history in `contract_notes` table
 
 ### 4. Template & Header Includes
 - **Header:** [inheader.php](inheader.php) - HTML boilerplate + CSS (Bootstrap, DataTables, FontAwesome, custom style.css)
@@ -45,6 +49,15 @@ timesheet → operations → equipments → suppliers/projects
 - **Form editing:** Use `$.getJSON()` to load record data; see [Timesheet/timesheet.php](Timesheet/timesheet.php#L942) for pattern
 - **Data flow:** JavaScript triggers AJAX on `change()` event → PHP helper endpoint returns HTML/data → JavaScript injects into DOM
 - **Note:** Use inline `<script>` blocks in PHP files; jQuery included via CDN in [inheader.php](inheader.php)
+
+### 6. JSON API Endpoints (AJAX Handlers)
+- **Pattern:** POST-only endpoints that return JSON responses with `{'success': bool, 'message': string}`
+- **Example:** [Contracts/contract_actions_handler.php](Contracts/contract_actions_handler.php) - Handles contract actions (renewal, settlement, pause, resume, terminate, merge)
+- **Request validation:** Check `$_SERVER['REQUEST_METHOD'] === 'POST'` first, validate with `die(json_encode(...))` on error
+- **Action routing:** Use `if/else if` chain based on `$_POST['action']` parameter
+- **Response format:** Always `json_encode(['success' => true/false, 'message' => 'Arabic message'])` with `exit;` at end
+- **Header setting:** Set `header('Content-Type: application/json; charset=utf-8');` for JSON endpoints
+- **Client-side handling:** Use jQuery `$.ajax()` with `dataType: 'json'`, check `response.success` in callback
 
 ## Developer Workflows
 
@@ -77,6 +90,22 @@ timesheet → operations → equipments → suppliers/projects
 2. Add conditional menu link in [sidebar.php](sidebar.php): `if ($_SESSION['user']['role'] == "X") { ... }`
 3. Check role in page with: `if ($_SESSION['user']['role'] != "X") { die("Unauthorized"); }`
 
+### Creating JSON API Action Handlers
+Pattern for endpoints that handle multiple related actions (see [contract_actions_handler.php](Contracts/contract_actions_handler.php)):
+1. **Start with validation:**
+   ```php
+   if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+       die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
+   }
+   $action = isset($_POST['action']) ? $_POST['action'] : '';
+   ```
+2. **Route actions with if/elseif chain:** Each action block validates inputs, performs database operations, optionally logs to audit table
+3. **Use helper functions:** Define reusable functions at top (e.g., `getContractData()`, `addNote()`)
+4. **Always escape strings:** Use `mysqli_real_escape_string()` before any SQL insertion
+5. **Return JSON consistently:** Success returns `['success' => true, 'message' => '...']`, errors use `die(json_encode(['success' => false, 'message' => '...']))`
+6. **End with exit:** Always terminate with `exit;` after final response
+7. **Handle unknown actions:** Use `else` at end: `die(json_encode(['success' => false, 'message' => 'الإجراء غير معروف']));`
+
 ## Key Files Reference
 | File | Purpose |
 |------|---------|
@@ -92,6 +121,9 @@ timesheet → operations → equipments → suppliers/projects
 | [Equipments/equipments.php](Equipments/equipments.php) | Equipment-to-driver assignments |
 | [Timesheet/timesheet.php](Timesheet/timesheet.php) | Complex work-hour tracking (dependent dropdowns, AJAX patterns) |
 | [Timesheet/get_drivers.php](Timesheet/get_drivers.php) | AJAX helper for dependent dropdown (returns `<option>` HTML) |
+| [Contracts/contracts.php](Contracts/contracts.php) | Contract listing with status tracking |
+| [Contracts/contracts_details.php](Contracts/contracts_details.php) | Contract detail page with action buttons (renewal, settlement, pause, resume, terminate, merge) |
+| [Contracts/contract_actions_handler.php](Contracts/contract_actions_handler.php) | JSON API endpoint for all contract lifecycle operations - reference implementation for API handlers |
 | [database/*.sql](database/) | Schema dumps (users, contracts, timesheets) |
 | [assets/css/style.css](assets/css/style.css) | Custom styling (RTL adjustments, layout refinements) |
 
@@ -118,3 +150,5 @@ timesheet → operations → equipments → suppliers/projects
 - **Form toggle state:** Forms use `display:none` CSS (via JavaScript) - never reload the page for show/hide
 - **Time-dependent AJAX:** After loading dependent data, use `setTimeout(300)` before setting values from that data
 - **Role checking:** Always check `$_SESSION['user']['role']` before processing; fail early if unauthorized
+- **JSON API pattern:** For action handlers, use `die(json_encode(...))` for early returns on errors, `echo json_encode(...); exit;` for success
+- **Action routing in APIs:** Use `if/elseif` chains based on `$_POST['action']` parameter; validate action at end with `else { die(json_encode(['success' => false, 'message' => 'الإجراء غير معروف'])); }`
