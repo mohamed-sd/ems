@@ -508,60 +508,76 @@ while ($row = mysqli_fetch_assoc($result)) {
     <div class="info-cards-grid">
         <!-- معلومات المشروع -->
         <div class="info-card primary">
-            <h5><i class="fas fa-project-diagram"></i> معلومات المشروع</h5>
+            <h5>
+                <i class="fas fa-project-diagram"></i> معلومات المشروع
+                <button class="btn btn-sm btn-outline-primary ms-auto" id="editProjectInfoBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                    <i class="fas fa-edit"></i> تعديل
+                </button>
+            </h5>
             <div class="info-item">
                 <span class="info-label">المشروع</span>
-                <span class="info-value"><?php echo $row['project']; ?></span>
+                <span class="info-value" id="projectDisplay"><?php echo $row['project']; ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label">فترة السماح</span>
-                <span class="info-value"><?php echo $row['grace_period_days']; ?> يوم</span>
+                <span class="info-value" id="graceDisplay"><?php echo $row['grace_period_days']; ?> يوم</span>
             </div>
             <div class="info-item">
                 <span class="info-label">عدد المشغلين</span>
-                <span class="info-value"><?php echo $row['daily_operators']; ?></span>
+                <span class="info-value" id="operatorsDisplay"><?php echo $row['daily_operators']; ?></span>
             </div>
         </div>
 
+
         <!-- الخدمات -->
         <div class="info-card success">
-            <h5><i class="fas fa-concierge-bell"></i> الخدمات المقدمة</h5>
+            <h5>
+                <i class="fas fa-concierge-bell"></i> الخدمات المقدمة
+                <button class="btn btn-sm btn-outline-success ms-auto" id="editServicesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                    <i class="fas fa-edit"></i> تعديل
+                </button>
+            </h5>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-bus"></i> النقل</span>
-                <span class="info-value"><?php echo $row['transportation']; ?></span>
+                <span class="info-value" id="transportationDisplay"><?php echo $row['transportation']; ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-hotel"></i> السكن</span>
-                <span class="info-value"><?php echo $row['accommodation']; ?></span>
+                <span class="info-value" id="accommodationDisplay"><?php echo $row['accommodation']; ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-map-marker-alt"></i> مكان السكن</span>
-                <span class="info-value"><?php echo $row['place_for_living']; ?></span>
+                <span class="info-value" id="placeLivingDisplay"><?php echo $row['place_for_living']; ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-wrench"></i> الورشة</span>
-                <span class="info-value"><?php echo $row['workshop']; ?></span>
+                <span class="info-value" id="workshopDisplay"><?php echo $row['workshop']; ?></span>
             </div>
         </div>
 
         <!-- أطراف العقد -->
         <div class="info-card info">
-            <h5><i class="fas fa-users"></i> أطراف العقد</h5>
+            <h5>
+                <i class="fas fa-users"></i> أطراف العقد
+                <button class="btn btn-sm btn-outline-info ms-auto" id="editPartiesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                    <i class="fas fa-edit"></i> تعديل
+                </button>
+            </h5>
             <div class="info-item">
                 <span class="info-label">الطرف الأول</span>
-                <span class="info-value"><?php echo $row['first_party']; ?></span>
+                <span class="info-value" id="firstPartyDisplay"><?php echo $row['first_party']; ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label">الطرف الثاني</span>
-                <span class="info-value"><?php echo $row['second_party']; ?></span>
+                <span class="info-value" id="secondPartyDisplay"><?php echo $row['second_party']; ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label">الشاهد الأول</span>
-                <span class="info-value"><?php echo $row['witness_one']; ?></span>
+                <span class="info-value" id="witnessOneDisplay"><?php echo $row['witness_one']; ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label">الشاهد الثاني</span>
-                <span class="info-value"><?php echo $row['witness_two']; ?></span>
+                <span class="info-value" id="witnessTwoDisplay"><?php echo $row['witness_two']; ?></span>
             </div>
         </div>
 
@@ -603,6 +619,18 @@ $project_id = $row['project'];
 $actual_end_date = $row['actual_end'];
 $pause_date = isset($row['pause_date']) ? $row['pause_date'] : '';
 $pause_reason = isset($row['pause_reason']) ? $row['pause_reason'] : '';
+
+// حفظ بيانات العقد للتعديل
+$grace_period = $row['grace_period_days'];
+$daily_operators = $row['daily_operators'];
+$transportation = $row['transportation'];
+$accommodation = $row['accommodation'];
+$place_for_living = $row['place_for_living'];
+$workshop = $row['workshop'];
+$first_party = $row['first_party'];
+$second_party = $row['second_party'];
+$witness_one = $row['witness_one'];
+$witness_two = $row['witness_two'];
 } 
 ?>
 

@@ -27,6 +27,10 @@ function saveContractEquipments($contract_id, $equipment_data, $conn) {
         $equip_count = isset($equipment['equip_count']) ? intval($equipment['equip_count']) : 0;
         $equip_shifts = isset($equipment['equip_shifts']) ? intval($equipment['equip_shifts']) : 0;
         $equip_unit = isset($equipment['equip_unit']) ? mysqli_real_escape_string($conn, $equipment['equip_unit']) : '';
+        $shift1_start = isset($equipment['shift1_start']) ? mysqli_real_escape_string($conn, $equipment['shift1_start']) : NULL;
+        $shift1_end = isset($equipment['shift1_end']) ? mysqli_real_escape_string($conn, $equipment['shift1_end']) : NULL;
+        $shift2_start = isset($equipment['shift2_start']) ? mysqli_real_escape_string($conn, $equipment['shift2_start']) : NULL;
+        $shift2_end = isset($equipment['shift2_end']) ? mysqli_real_escape_string($conn, $equipment['shift2_end']) : NULL;
         $equip_target_per_month = isset($equipment['equip_target_per_month']) ? intval($equipment['equip_target_per_month']) : 0;
         $equip_total_month = isset($equipment['equip_total_month']) ? intval($equipment['equip_total_month']) : 0;
         $equip_total_contract = isset($equipment['equip_total_contract']) ? intval($equipment['equip_total_contract']) : 0;
@@ -44,6 +48,10 @@ function saveContractEquipments($contract_id, $equipment_data, $conn) {
             equip_count,
             equip_shifts,
             equip_unit,
+            shift1_start,
+            shift1_end,
+            shift2_start,
+            shift2_end,
             equip_target_per_month,
             equip_total_month,
             equip_total_contract,
@@ -60,6 +68,10 @@ function saveContractEquipments($contract_id, $equipment_data, $conn) {
             " . $equip_count . ",
             " . $equip_shifts . ",
             '" . $equip_unit . "',
+            " . ($shift1_start ? "'".$shift1_start."'" : "NULL") . ",
+            " . ($shift1_end ? "'".$shift1_end."'" : "NULL") . ",
+            " . ($shift2_start ? "'".$shift2_start."'" : "NULL") . ",
+            " . ($shift2_end ? "'".$shift2_end."'" : "NULL") . ",
             " . $equip_target_per_month . ",
             " . $equip_total_month . ",
             " . $equip_total_contract . ",

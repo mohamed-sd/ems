@@ -749,7 +749,24 @@ if (!isset($_SESSION['user'])) {
                       </select>
                     </div>
                   </div>
-
+                  
+                  <!-- أوقات الورديات -->
+                  <div class="field md-3 sm-6">
+                    <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
+                    <div class="control"><input name="shift1_start_1" type="time" placeholder="مثال: 08:00"></div>
+                  </div>
+                  <div class="field md-3 sm-6">
+                    <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
+                    <div class="control"><input name="shift1_end_1" type="time" placeholder="مثال: 16:00"></div>
+                  </div>
+                  <div class="field md-3 sm-6">
+                    <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
+                    <div class="control"><input name="shift2_start_1" type="time" placeholder="مثال: 16:00"></div>
+                  </div>
+                  <div class="field md-3 sm-6">
+                    <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
+                    <div class="control"><input name="shift2_end_1" type="time" placeholder="مثال: 00:00"></div>
+                  </div>
 
                   <div class="field md-3 sm-6">
                     <label>ساعات العمل المستهدفة يومياً</label>
@@ -1065,6 +1082,10 @@ if (!isset($_SESSION['user'])) {
                       'equip_count' => isset($_POST["equip_count_$i"]) ? $_POST["equip_count_$i"] : 0,
                       'equip_shifts' => isset($_POST["equip_shifts_$i"]) ? $_POST["equip_shifts_$i"] : 0,
                       'equip_unit' => isset($_POST["equip_unit_$i"]) ? $_POST["equip_unit_$i"] : '',
+                      'shift1_start' => isset($_POST["shift1_start_$i"]) ? $_POST["shift1_start_$i"] : '',
+                      'shift1_end' => isset($_POST["shift1_end_$i"]) ? $_POST["shift1_end_$i"] : '',
+                      'shift2_start' => isset($_POST["shift2_start_$i"]) ? $_POST["shift2_start_$i"] : '',
+                      'shift2_end' => isset($_POST["shift2_end_$i"]) ? $_POST["shift2_end_$i"] : '',
                       'equip_target_per_month' => isset($_POST["equip_target_per_month_$i"]) ? $_POST["equip_target_per_month_$i"] : 0,
                       'equip_total_month' => isset($_POST["equip_total_month_$i"]) ? $_POST["equip_total_month_$i"] : 0,
                       'equip_total_contract' => isset($_POST["equip_total_contract_$i"]) ? $_POST["equip_total_contract_$i"] : 0,
@@ -1332,6 +1353,24 @@ if (!isset($_SESSION['user'])) {
                 </select>
               </div>
             </div>
+            
+            <!-- أوقات الورديات -->
+            <div class="field md-3 sm-6">
+              <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
+              <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" placeholder="مثال: 08:00"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
+              <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" placeholder="مثال: 16:00"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
+              <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" placeholder="مثال: 16:00"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
+              <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" placeholder="مثال: 00:00"></div>
+            </div>
 
             <div class="field md-3 sm-6">
               <label>ساعات العمل المستهدفة يومياً</label>
@@ -1508,6 +1547,10 @@ if (!isset($_SESSION['user'])) {
                 $(`input[name="equip_size_1"]`).val(equip.equip_size);
                 $(`input[name="equip_count_1"]`).val(equip.equip_count);
                 $(`select[name="equip_unit_1"]`).val(equip.equip_unit);
+                $(`input[name="shift1_start_1"]`).val(equip.shift1_start);
+                $(`input[name="shift1_end_1"]`).val(equip.shift1_end);
+                $(`input[name="shift2_start_1"]`).val(equip.shift2_start);
+                $(`input[name="shift2_end_1"]`).val(equip.shift2_end);
                 $(`input[name="equip_target_per_month_1"]`).val(equip.equip_target_per_month);
                 $(`input[name="equip_total_month_1"]`).val(equip.equip_total_month);
                 $(`input[name="equip_total_contract_1"]`).val(equip.equip_total_contract);
@@ -1568,6 +1611,24 @@ if (!isset($_SESSION['user'])) {
                             <option value="متر مكعب" ${equip.equip_unit === 'متر مكعب' ? 'selected' : ''}>متر مكعب</option>
                           </select>
                         </div>
+                      </div>
+                      
+                      <!-- أوقات الورديات -->
+                      <div class="field md-3 sm-6">
+                        <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
+                        <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" value="${equip.shift1_start || ''}"></div>
+                      </div>
+                      <div class="field md-3 sm-6">
+                        <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
+                        <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" value="${equip.shift1_end || ''}"></div>
+                      </div>
+                      <div class="field md-3 sm-6">
+                        <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
+                        <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" value="${equip.shift2_start || ''}"></div>
+                      </div>
+                      <div class="field md-3 sm-6">
+                        <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
+                        <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" value="${equip.shift2_end || ''}"></div>
                       </div>
 
                   
