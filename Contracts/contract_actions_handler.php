@@ -136,20 +136,32 @@ else if ($action === 'settlement') {
 // 3. إيقاف العقد
 else if ($action === 'pause') {
     $pause_reason = isset($_POST['pause_reason']) ? $_POST['pause_reason'] : '';
+    $pause_date = isset($_POST['pause_date']) ? $_POST['pause_date'] : date('Y-m-d');
     
     if (empty($pause_reason)) {
         die(json_encode(['success' => false, 'message' => 'الرجاء إدخال سبب الإيقاف']));
     }
     
+    // التحقق من صيغة التاريخ
+    if (!empty($pause_date)) {
+        $date_validation = DateTime::createFromFormat('Y-m-d', $pause_date);
+        if (!$date_validation) {
+            die(json_encode(['success' => false, 'message' => 'صيغة التاريخ غير صحيحة']));
+        }
+    }
+    
     $pause_reason = mysqli_real_escape_string($conn, $pause_reason);
+    $pause_date = mysqli_real_escape_string($conn, $pause_date);
+    
     $query = "UPDATE contracts SET 
         status = 0,
         pause_reason = '$pause_reason',
+        pause_date = '$pause_date',
         updated_at = NOW()
     WHERE id = $contract_id";
     
     if (mysqli_query($conn, $query)) {
-        $note = "تم إيقاف العقد - السبب: $pause_reason";
+        $note = "تم إيقاف العقد بتاريخ $pause_date - السبب: $pause_reason";
         $note = mysqli_real_escape_string($conn, $note);
         addNote($contract_id, $note, $conn);
         echo json_encode(['success' => true, 'message' => 'تم إيقاف العقد بنجاح']);
@@ -161,16 +173,32 @@ else if ($action === 'pause') {
 // 4. استئناف العقد
 else if ($action === 'resume') {
     $resume_reason = isset($_POST['resume_reason']) ? $_POST['resume_reason'] : '';
+    $resume_date = isset($_POST['resume_date']) ? $_POST['resume_date'] : date('Y-m-d');
+    $pause_days = isset($_POST['pause_days']) ? intval($_POST['pause_days']) : 0;
+    
+    // التحقق من صيغة التاريخ
+    if (!empty($resume_date)) {
+        $date_validation = DateTime::createFromFormat('Y-m-d', $resume_date);
+        if (!$date_validation) {
+            die(json_encode(['success' => false, 'message' => 'صيغة التاريخ غير صحيحة']));
+        }
+    }
+    
     $resume_reason = mysqli_real_escape_string($conn, $resume_reason);
-    $resume_date = date('Y-m-d');
+    $resume_date = mysqli_real_escape_string($conn, $resume_date);
+    
     $query = "UPDATE contracts SET 
         status = 1,
         pause_reason = NULL,
+        resume_date = '$resume_date',
         updated_at = NOW()
     WHERE id = $contract_id";
     
     if (mysqli_query($conn, $query)) {
         $note = "تم استئناف العقد بتاريخ $resume_date";
+        if ($pause_days > 0) {
+            $note .= " - مدة الإيقاف: $pause_days يوم";
+        }
         if (!empty($resume_reason)) {
             $note .= " - الملاحظات: $resume_reason";
         }
@@ -178,7 +206,7 @@ else if ($action === 'resume') {
         addNote($contract_id, $note, $conn);
         echo json_encode(['success' => true, 'message' => 'تم استئناف العقد بنجاح']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد']);
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث العقد: ' . mysqli_error($conn)]);
     }
 }
 

@@ -96,6 +96,8 @@ CREATE TABLE `contracts` (
   `witness_two` varchar(255) DEFAULT NULL,
   `contract_status` text DEFAULT NULL,
   `pause_reason` text DEFAULT NULL,
+  `pause_date` date DEFAULT NULL COMMENT 'تاريخ إيقاف العقد',
+  `resume_date` date DEFAULT NULL COMMENT 'تاريخ استئناف العقد',
   `termination_type` varchar(50) DEFAULT NULL,
   `termination_reason` text DEFAULT NULL,
   `merged_with` int(11) DEFAULT NULL,
@@ -417,6 +419,8 @@ CREATE TABLE `supplierscontracts` (
   `project_id` int(255) NOT NULL DEFAULT 0,
   `status` tinyint(1) DEFAULT 1 COMMENT '1=نشط, 0=موقوف',
   `pause_reason` text DEFAULT NULL,
+  `pause_date` date DEFAULT NULL COMMENT 'تاريخ إيقاف العقد',
+  `resume_date` date DEFAULT NULL COMMENT 'تاريخ استئناف العقد',
   `termination_type` varchar(50) DEFAULT NULL COMMENT 'amicable أو hardship',
   `termination_reason` text DEFAULT NULL,
   `merged_with` int(11) DEFAULT NULL COMMENT 'معرف العقد المدموج معه'

@@ -405,7 +405,7 @@ $sql = "SELECT
             actual_start, actual_end, transportation, accommodation, place_for_living, 
             workshop, hours_monthly_target, forecasted_contracted_hours, created_at, updated_at,
             daily_work_hours, daily_operators, first_party, second_party, 
-            witness_one, witness_two, status, pause_reason, termination_type, termination_reason, merged_with
+            witness_one, witness_two, status, pause_reason, pause_date, resume_date, termination_type, termination_reason, merged_with
         FROM contracts
         WHERE id = $contract_id
         LIMIT 1";
@@ -601,6 +601,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
 $project_id = $row['project'];
 $actual_end_date = $row['actual_end'];
+$pause_date = isset($row['pause_date']) ? $row['pause_date'] : '';
+$pause_reason = isset($row['pause_reason']) ? $row['pause_reason'] : '';
 } 
 ?>
 
@@ -908,6 +910,13 @@ $actual_end_date = $row['actual_end'];
                     <i class="fas fa-exclamation-triangle"></i>
                     <strong>تنبيه:</strong> سيتم إيقاف العقد مؤقتاً. يمكنك استئنافه لاحقاً.
                 </div>
+                <div class="mb-4">
+                    <label for="pauseDate" class="form-label">
+                        <i class="far fa-calendar-alt" style="margin-left: 0.5rem;"></i>
+                        تاريخ الإيقاف <span style="color: red;">*</span>
+                    </label>
+                    <input type="date" id="pauseDate" class="form-control" value="<?php echo date('Y-m-d'); ?>">
+                </div>
                 <div class="mb-3">
                     <label for="pauseReason" class="form-label">
                         <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
@@ -944,6 +953,47 @@ $actual_end_date = $row['actual_end'];
                     <i class="fas fa-check-circle"></i>
                     <strong>تأكيد:</strong> سيتم استئناف العقد وإعادة تفعيله.
                 </div>
+                
+                <!-- عرض تاريخ الإيقاف تلقائياً -->
+                <div class="mb-4" style="padding: 1.25rem; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 12px; border-right: 5px solid #ffc107; box-shadow: 0 2px 10px rgba(255, 193, 7, 0.2);">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; color: #856404; font-weight: 700; margin-bottom: 0.75rem; font-size: 1.05rem;">
+                        <i class="fas fa-pause-circle" style="font-size: 1.3rem;"></i>
+                        <span>معلومات الإيقاف</span>
+                    </div>
+                    <div style="color: #856404; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="far fa-calendar-times"></i>
+                        <strong>تاريخ إيقاف العقد:</strong> 
+                        <span style="background: white; padding: 0.4rem 1rem; border-radius: 6px; font-weight: 700; color: #d39e00;">
+                            <?php echo !empty($pause_date) ? date('Y-m-d', strtotime($pause_date)) : 'غير محدد'; ?>
+                        </span>
+                    </div>
+                    <?php if (!empty($pause_reason)): ?>
+                    <div style="color: #856404; font-size: 0.95rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #ffc107;">
+                        <i class="fas fa-comment-dots"></i>
+                        <strong>سبب الإيقاف:</strong> <?php echo htmlspecialchars($pause_reason); ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- إدخال تاريخ الاستئناف -->
+                <div class="mb-4">
+                    <label for="resumeDate" class="form-label" style="font-weight: 700; font-size: 1.05rem;">
+                        <i class="far fa-calendar-check" style="margin-left: 0.5rem; color: #28a745;"></i>
+                        تاريخ استئناف العقد <span style="color: red;">*</span>
+                    </label>
+                    <input type="date" id="resumeDate" class="form-control" value="<?php echo date('Y-m-d'); ?>" style="font-size: 1.05rem; font-weight: 600;">
+                    <small class="form-text text-muted" style="display: block; margin-top: 0.5rem;">
+                        <i class="fas fa-info-circle"></i> التاريخ الافتراضي هو اليوم، يمكنك تعديله حسب الحاجة
+                    </small>
+                </div>
+                
+                <div id="pauseDurationDisplay" style="display: none; padding: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600;">
+                        <i class="fas fa-clock"></i>
+                        <span>مدة الإيقاف: <strong id="calculatedPauseDays">0</strong> يوم</span>
+                    </div>
+                </div>
+                
                 <div class="mb-3">
                     <label for="resumeReason" class="form-label">
                         <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
@@ -1277,31 +1327,87 @@ $('#pauseBtn').click(function() {
 
 $('#confirmPause').click(function() {
     const reason = $('#pauseReason').val();
+    const pauseDate = $('#pauseDate').val();
     if (!reason) {
         alert('الرجاء إدخال سبب الإيقاف');
         return;
     }
+    if (!pauseDate) {
+        alert('الرجاء تحديد تاريخ الإيقاف');
+        return;
+    }
     performAction('pause', {
-        pause_reason: reason
+        pause_reason: reason,
+        pause_date: pauseDate
     });
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById('pauseModal')).hide();
     $('#pauseReason').val('');
+    $('#pauseDate').val('<?php echo date('Y-m-d'); ?>');
 });
 
 $('#resumeBtn').click(function() {
     if (!canPerformAction('resume')) return;
     const modal = new bootstrap.Modal(document.getElementById('resumeModal'));
     modal.show();
+    
+    // حساب عدد أيام الإيقاف عند فتح الـ modal
+    calculatePauseDuration();
 });
 
+// دالة لحساب مدة الإيقاف
+function calculatePauseDuration() {
+    const resumeDate = $('#resumeDate').val();
+    const pauseDate = '<?php echo !empty($pause_date) ? $pause_date : ''; ?>';
+    
+    if (pauseDate && resumeDate) {
+        const pause = new Date(pauseDate);
+        const resume = new Date(resumeDate);
+        
+        if (resume >= pause) {
+            const timeDiff = resume.getTime() - pause.getTime();
+            const durationDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            
+            $('#calculatedPauseDays').text(durationDays);
+            $('#pauseDurationDisplay').slideDown(300);
+        } else {
+            $('#pauseDurationDisplay').slideUp(300);
+        }
+    } else {
+        $('#pauseDurationDisplay').slideUp(300);
+    }
+}
+
+$('#resumeDate').on('change', calculatePauseDuration);
+
 $('#confirmResume').click(function() {
+    const resumeDate = $('#resumeDate').val();
+    if (!resumeDate) {
+        alert('الرجاء تحديد تاريخ الاستئناف');
+        return;
+    }
+    
+    const pauseDate = '<?php echo !empty($pause_date) ? $pause_date : ''; ?>';
+    let pauseDays = 0;
+    
+    if (pauseDate && resumeDate) {
+        const pause = new Date(pauseDate);
+        const resume = new Date(resumeDate);
+        const timeDiff = resume.getTime() - pause.getTime();
+        pauseDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    }
+    
     performAction('resume', {
-        resume_reason: $('#resumeReason').val()
+        resume_reason: $('#resumeReason').val(),
+        resume_date: resumeDate,
+        pause_days: pauseDays
     });
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById('resumeModal')).hide();
     $('#resumeReason').val('');
+    $('#resumeDate').val('<?php echo date('Y-m-d'); ?>');
+    $('#pauseDurationDisplay').hide();
+    $('#calculatedPauseDays').text('0');
 });
 
 $('#terminateBtn').click(function() {
