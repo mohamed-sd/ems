@@ -1213,6 +1213,168 @@ $witness_two = $row['witness_two'];
     </div>
 </div>
 
+<!-- Modal لتعديل معلومات المشروع -->
+<div class="modal fade" id="editProjectInfoModal" tabindex="-1" aria-labelledby="editProjectInfoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h5 class="modal-title" id="editProjectInfoLabel">
+                    <i class="fas fa-edit"></i> تعديل معلومات المشروع
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="editGracePeriod" class="form-label">
+                        <i class="fas fa-calendar-alt" style="margin-left: 0.5rem;"></i>
+                        فترة السماح (بالأيام)
+                    </label>
+                    <input type="number" id="editGracePeriod" class="form-control" value="<?php echo $grace_period; ?>" min="0">
+                </div>
+                <div class="mb-3">
+                    <label for="editDailyOperators" class="form-label">
+                        <i class="fas fa-users-cog" style="margin-left: 0.5rem;"></i>
+                        عدد المشغلين اليومي
+                    </label>
+                    <input type="number" id="editDailyOperators" class="form-control" value="<?php echo $daily_operators; ?>" min="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+                <button type="button" class="btn btn-primary" id="saveProjectInfo">
+                    <i class="fas fa-save"></i> حفظ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal لتعديل الخدمات -->
+<div class="modal fade" id="editServicesModal" tabindex="-1" aria-labelledby="editServicesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                <h5 class="modal-title" id="editServicesLabel">
+                    <i class="fas fa-edit"></i> تعديل الخدمات
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="editTransportation" class="form-label">
+                        <i class="fas fa-bus" style="margin-left: 0.5rem;"></i>
+                        النقل (Transportation)
+                    </label>
+                    <select id="editTransportation" class="form-select">
+                        <option value="">— اختر —</option>
+                        <option value="مالك المعدة" <?php echo ($transportation == 'مالك المعدة') ? 'selected' : ''; ?>>مالك المعدة</option>
+                        <option value="مالك المشروع" <?php echo ($transportation == 'مالك المشروع') ? 'selected' : ''; ?>>مالك المشروع</option>
+                        <option value="بدون" <?php echo ($transportation == 'بدون') ? 'selected' : ''; ?>>بدون</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="editAccommodation" class="form-label">
+                        <i class="fas fa-hotel" style="margin-left: 0.5rem;"></i>
+                        الإعاشة (Accommodation)
+                    </label>
+                    <select id="editAccommodation" class="form-select">
+                        <option value="">— اختر —</option>
+                        <option value="مالك المعدة" <?php echo ($accommodation == 'مالك المعدة') ? 'selected' : ''; ?>>مالك المعدة</option>
+                        <option value="مالك المشروع" <?php echo ($accommodation == 'مالك المشروع') ? 'selected' : ''; ?>>مالك المشروع</option>
+                        <option value="بدون" <?php echo ($accommodation == 'بدون') ? 'selected' : ''; ?>>بدون</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="editPlaceLiving" class="form-label">
+                        <i class="fas fa-map-marker-alt" style="margin-left: 0.5rem;"></i>
+                        مكان السكن (Place for Living)
+                    </label>
+                    <select id="editPlaceLiving" class="form-select">
+                        <option value="">— اختر —</option>
+                        <option value="مالك المعدة" <?php echo ($place_for_living == 'مالك المعدة') ? 'selected' : ''; ?>>مالك المعدة</option>
+                        <option value="مالك المشروع" <?php echo ($place_for_living == 'مالك المشروع') ? 'selected' : ''; ?>>مالك المشروع</option>
+                        <option value="بدون" <?php echo ($place_for_living == 'بدون') ? 'selected' : ''; ?>>بدون</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="editWorkshop" class="form-label">
+                        <i class="fas fa-wrench" style="margin-left: 0.5rem;"></i>
+                        الورشة (Workshop)
+                    </label>
+                    <select id="editWorkshop" class="form-select">
+                        <option value="">— اختر —</option>
+                        <option value="مالك المعدة" <?php echo ($workshop == 'مالك المعدة') ? 'selected' : ''; ?>>مالك المعدة</option>
+                        <option value="مالك المشروع" <?php echo ($workshop == 'مالك المشروع') ? 'selected' : ''; ?>>مالك المشروع</option>
+                        <option value="بدون" <?php echo ($workshop == 'بدون') ? 'selected' : ''; ?>>بدون</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+                <button type="button" class="btn btn-success" id="saveServices">
+                    <i class="fas fa-save"></i> حفظ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal لتعديل أطراف العقد -->
+<div class="modal fade" id="editPartiesModal" tabindex="-1" aria-labelledby="editPartiesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+                <h5 class="modal-title" id="editPartiesLabel">
+                    <i class="fas fa-edit"></i> تعديل أطراف العقد
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="editFirstParty" class="form-label">
+                        <i class="fas fa-user-tie" style="margin-left: 0.5rem;"></i>
+                        الطرف الأول
+                    </label>
+                    <input type="text" id="editFirstParty" class="form-control" value="<?php echo htmlspecialchars($first_party); ?>" placeholder="اسم الطرف الأول">
+                </div>
+                <div class="mb-3">
+                    <label for="editSecondParty" class="form-label">
+                        <i class="fas fa-user-check" style="margin-left: 0.5rem;"></i>
+                        الطرف الثاني
+                    </label>
+                    <input type="text" id="editSecondParty" class="form-control" value="<?php echo htmlspecialchars($second_party); ?>" placeholder="اسم الطرف الثاني">
+                </div>
+                <div class="mb-3">
+                    <label for="editWitnessOne" class="form-label">
+                        <i class="fas fa-eye" style="margin-left: 0.5rem;"></i>
+                        الشاهد الأول
+                    </label>
+                    <input type="text" id="editWitnessOne" class="form-control" value="<?php echo htmlspecialchars($witness_one); ?>" placeholder="اسم الشاهد الأول">
+                </div>
+                <div class="mb-3">
+                    <label for="editWitnessTwo" class="form-label">
+                        <i class="fas fa-eye" style="margin-left: 0.5rem;"></i>
+                        الشاهد الثاني
+                    </label>
+                    <input type="text" id="editWitnessTwo" class="form-control" value="<?php echo htmlspecialchars($witness_two); ?>" placeholder="اسم الشاهد الثاني">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+                <button type="button" class="btn btn-info" id="saveParties">
+                    <i class="fas fa-save"></i> حفظ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- jQuery (required for your AJAX calls) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Bootstrap 5 Bundle (includes Popper) -->
@@ -1496,6 +1658,130 @@ $('#mergeBtn').click(function() {
     if (!canPerformAction('merge')) return;
     const modal = new bootstrap.Modal(document.getElementById('mergeModal'));
     modal.show();
+});
+
+// أزرار التعديل
+$('#editProjectInfoBtn').click(function() {
+    const modal = new bootstrap.Modal(document.getElementById('editProjectInfoModal'));
+    modal.show();
+});
+
+$('#editServicesBtn').click(function() {
+    const modal = new bootstrap.Modal(document.getElementById('editServicesModal'));
+    modal.show();
+});
+
+$('#editPartiesBtn').click(function() {
+    const modal = new bootstrap.Modal(document.getElementById('editPartiesModal'));
+    modal.show();
+});
+
+// حفظ معلومات المشروع
+$('#saveProjectInfo').click(function() {
+    const gracePeriod = $('#editGracePeriod').val();
+    const dailyOperators = $('#editDailyOperators').val();
+    
+    $.ajax({
+        url: 'update_contract_details.php',
+        type: 'POST',
+        data: {
+            action: 'update_project_info',
+            contract_id: contractId,
+            grace_period: gracePeriod,
+            daily_operators: dailyOperators
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                $('#graceDisplay').text(gracePeriod + ' يوم');
+                $('#operatorsDisplay').text(dailyOperators);
+                bootstrap.Modal.getInstance(document.getElementById('editProjectInfoModal')).hide();
+                alert(response.message);
+                location.reload();
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function() {
+            alert('حدث خطأ أثناء الحفظ');
+        }
+    });
+});
+
+// حفظ الخدمات
+$('#saveServices').click(function() {
+    const transportation = $('#editTransportation').val();
+    const accommodation = $('#editAccommodation').val();
+    const placeLiving = $('#editPlaceLiving').val();
+    const workshop = $('#editWorkshop').val();
+    
+    $.ajax({
+        url: 'update_contract_details.php',
+        type: 'POST',
+        data: {
+            action: 'update_services',
+            contract_id: contractId,
+            transportation: transportation,
+            accommodation: accommodation,
+            place_for_living: placeLiving,
+            workshop: workshop
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                $('#transportationDisplay').text(transportation);
+                $('#accommodationDisplay').text(accommodation);
+                $('#placeLivingDisplay').text(placeLiving);
+                $('#workshopDisplay').text(workshop);
+                bootstrap.Modal.getInstance(document.getElementById('editServicesModal')).hide();
+                alert(response.message);
+                location.reload();
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function() {
+            alert('حدث خطأ أثناء الحفظ');
+        }
+    });
+});
+
+// حفظ أطراف العقد
+$('#saveParties').click(function() {
+    const firstParty = $('#editFirstParty').val();
+    const secondParty = $('#editSecondParty').val();
+    const witnessOne = $('#editWitnessOne').val();
+    const witnessTwo = $('#editWitnessTwo').val();
+    
+    $.ajax({
+        url: 'update_contract_details.php',
+        type: 'POST',
+        data: {
+            action: 'update_parties',
+            contract_id: contractId,
+            first_party: firstParty,
+            second_party: secondParty,
+            witness_one: witnessOne,
+            witness_two: witnessTwo
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                $('#firstPartyDisplay').text(firstParty);
+                $('#secondPartyDisplay').text(secondParty);
+                $('#witnessOneDisplay').text(witnessOne);
+                $('#witnessTwoDisplay').text(witnessTwo);
+                bootstrap.Modal.getInstance(document.getElementById('editPartiesModal')).hide();
+                alert(response.message);
+                location.reload();
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function() {
+            alert('حدث خطأ أثناء الحفظ');
+        }
+    });
 });
 
 // تحميل معدات العقد المختار عند التغيير
