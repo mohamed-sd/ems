@@ -988,9 +988,37 @@ $pause_reason = isset($row['pause_reason']) ? $row['pause_reason'] : '';
                 </div>
                 
                 <div id="pauseDurationDisplay" style="display: none; padding: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; margin-bottom: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600; margin-bottom: 1rem;">
                         <i class="fas fa-clock"></i>
                         <span>مدة الإيقاف: <strong id="calculatedPauseDays">0</strong> يوم</span>
+                    </div>
+                    
+                    <!-- خيارات معالجة أيام الإيقاف -->
+                    <div style="background: white; padding: 1rem; border-radius: 8px; border: 2px solid #1976d2;">
+                        <div style="font-weight: 700; color: #1976d2; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-question-circle"></i>
+                            <span>كيف تريد معالجة أيام الإيقاف؟</span>
+                        </div>
+                        <div class="form-check mb-2" style="padding-right: 1.8rem;">
+                            <input class="form-check-input" type="radio" name="pauseHandling" id="extendContract" value="extend" checked style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
+                            <label class="form-check-label" for="extendContract" style="font-weight: 600; color: #495057; cursor: pointer;">
+                                <i class="fas fa-plus-circle" style="color: #28a745; margin-left: 0.5rem;"></i>
+                                تمديد العقد: إضافة أيام الإيقاف إلى تاريخ الانتهاء
+                                <small style="display: block; color: #6c757d; font-weight: normal; margin-top: 0.25rem; margin-right: 1.5rem;">
+                                    سيتم تأجيل تاريخ انتهاء العقد بعدد أيام الإيقاف
+                                </small>
+                            </label>
+                        </div>
+                        <div class="form-check" style="padding-right: 1.8rem;">
+                            <input class="form-check-input" type="radio" name="pauseHandling" id="deductFromContract" value="deduct" style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
+                            <label class="form-check-label" for="deductFromContract" style="font-weight: 600; color: #495057; cursor: pointer;">
+                                <i class="fas fa-minus-circle" style="color: #dc3545; margin-left: 0.5rem;"></i>
+                                خصم من العقد: تقليل مدة العقد بأيام الإيقاف
+                                <small style="display: block; color: #6c757d; font-weight: normal; margin-top: 0.25rem; margin-right: 1.5rem;">
+                                    سيتم تقليل تاريخ انتهاء العقد بعدد أيام الإيقاف
+                                </small>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 
@@ -1397,10 +1425,14 @@ $('#confirmResume').click(function() {
         pauseDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
     }
     
+    // الحصول على خيار معالجة أيام الإيقاف
+    const pauseHandling = $('input[name="pauseHandling"]:checked').val();
+    
     performAction('resume', {
         resume_reason: $('#resumeReason').val(),
         resume_date: resumeDate,
-        pause_days: pauseDays
+        pause_days: pauseDays,
+        pause_handling: pauseHandling
     });
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById('resumeModal')).hide();

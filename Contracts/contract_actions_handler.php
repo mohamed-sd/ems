@@ -175,6 +175,7 @@ else if ($action === 'resume') {
     $resume_reason = isset($_POST['resume_reason']) ? $_POST['resume_reason'] : '';
     $resume_date = isset($_POST['resume_date']) ? $_POST['resume_date'] : date('Y-m-d');
     $pause_days = isset($_POST['pause_days']) ? intval($_POST['pause_days']) : 0;
+    $pause_handling = isset($_POST['pause_handling']) ? $_POST['pause_handling'] : 'extend'; // extend أو deduct
     
     // التحقق من صيغة التاريخ
     if (!empty($resume_date)) {
@@ -187,17 +188,35 @@ else if ($action === 'resume') {
     $resume_reason = mysqli_real_escape_string($conn, $resume_reason);
     $resume_date = mysqli_real_escape_string($conn, $resume_date);
     
+    // حساب التاريخ الجديد للانتهاء بناءً على الخيار المحدد
+    $new_end_date_sql = '';
+    if ($pause_days > 0) {
+        if ($pause_handling === 'extend') {
+            // إضافة أيام الإيقاف إلى تاريخ الانتهاء (تمديد العقد)
+            $new_end_date_sql = ", actual_end = DATE_ADD(actual_end, INTERVAL $pause_days DAY)";
+        } else if ($pause_handling === 'deduct') {
+            // خصم أيام الإيقاف من تاريخ الانتهاء (تقليل مدة العقد)
+            $new_end_date_sql = ", actual_end = DATE_SUB(actual_end, INTERVAL $pause_days DAY)";
+        }
+    }
+    
     $query = "UPDATE contracts SET 
         status = 1,
         pause_reason = NULL,
         resume_date = '$resume_date',
         updated_at = NOW()
+        $new_end_date_sql
     WHERE id = $contract_id";
     
     if (mysqli_query($conn, $query)) {
         $note = "تم استئناف العقد بتاريخ $resume_date";
         if ($pause_days > 0) {
             $note .= " - مدة الإيقاف: $pause_days يوم";
+            if ($pause_handling === 'extend') {
+                $note .= " (تم تمديد العقد بإضافة $pause_days يوم إلى تاريخ الانتهاء)";
+            } else if ($pause_handling === 'deduct') {
+                $note .= " (تم خصم $pause_days يوم من تاريخ انتهاء العقد)";
+            }
         }
         if (!empty($resume_reason)) {
             $note .= " - الملاحظات: $resume_reason";
