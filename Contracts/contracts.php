@@ -561,33 +561,8 @@ if (!isset($_SESSION['user'])) {
       <a href="javascript:void(0)" id="toggleForm" class="add">
         <i class="fas fa-plus-circle"></i> عقد جديد
       </a>
-      <a href="#" class="add" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
-        <i class="fas fa-sync-alt"></i> تجديد عقد
-      </a>
-      <a href="#" class="add" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
-        <i class="fas fa-expand-arrows-alt"></i> تمديد عقد
-      </a>
-      <a href="#" class="add" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);">
-        <i class="fas fa-edit"></i> تعديل بنود
-      </a>
-      <a href="#" class="add" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
-        <i class="fas fa-object-group"></i> دمج عقدين
-      </a>
-      <a href="#" class="add" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
-        <i class="fas fa-handshake"></i> إنهاء رضائي
-      </a>
-      <a href="#" class="add" style="background: linear-gradient(135deg, #fd7e14 0%, #e66a0a 100%);">
-        <i class="fas fa-exclamation-triangle"></i> إنهاء تعسر
-      </a>
-      <a href="#" class="add" style="background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);">
-        <i class="fas fa-pause-circle"></i> إيقاف مؤقت
-      </a>
-      <a href="#" class="add" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
-        <i class="fas fa-ban"></i> فسخ عقد
-      </a>
-      <a href="#" class="add" style="background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);">
-        <i class="fas fa-times-circle"></i> إلغاء عقد
-      </a>
+     
+   
     </div>
 
     <!-- فورم إضافة عقد -->
@@ -605,7 +580,36 @@ if (!isset($_SESSION['user'])) {
 
           <input type="hidden" name="project" placeholder="اسم المشروع" value="<?php echo $_GET['id'] ?>" required />
 
-          <div class="section-title"><span class="chip">1</span> البيانات الأساسية للعميل والعقد</div>
+          <!-- القسم 1: إجماليات الساعات (يومياً وللعقد) -->
+          <div class="section-title"><span class="chip">1</span> إجماليات الساعات (يومياً وللعقد)</div>
+          <br>
+
+          <div class="totals">
+            <div class="kpi">
+              <div class="v" id="kpi_month_total">0</div>
+              <div class="t">الساعات الشهرية المطلوبة</div>
+              <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
+            </div>
+            <div class="kpi">
+              <div class="v" id="kpi_contract_total">0</div>
+              <div class="t">إجمالي ساعات العقد</div>
+              <input type="hidden" name="forecasted_contracted_hours" id="forecasted_contracted_hours" value="0" />
+            </div>
+            <div class="kpi">
+              <div class="v" id="kpi_equip_month">0</div>
+              <div class="t">معدات × ساعات الشهر</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px; border-right: 4px solid #667eea;">
+            <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على البيانات المدخلة في الأقسام التالية
+            </p>
+          </div>
+
+          <hr class="hr" />
+
+          <div class="section-title"><span class="chip">2</span> البيانات الأساسية للعميل والعقد</div>
           <br>
 
           <div class="form-grid">
@@ -697,9 +701,9 @@ if (!isset($_SESSION['user'])) {
 
           <hr class="hr" />
 
-          <!-- القسم 2: بيانات ساعات العمل المطلوبة للمعدات -->
+          <!-- القسم 3: بيانات ساعات العمل المطلوبة للمعدات -->
           <div id="equipmentSections">
-            <div class="section-title"><span class="chip">2</span> بيانات ساعات العمل المطلوبة <strong>للمعدات</strong>
+            <div class="section-title"><span class="chip">3</span> بيانات ساعات العمل المطلوبة <strong>للمعدات</strong>
             </div>
             <br>
             <div class="equipment-section" data-index="1">
@@ -814,7 +818,7 @@ if (!isset($_SESSION['user'])) {
           </div>
 
           <hr class="hr" />
-          <div class="section-title"><span class="chip">3</span> بيانات إضافية</div>
+          <div class="section-title"><span class="chip">4</span> بيانات إضافية</div>
           <br>
 
           <div class="form-grid">
@@ -859,39 +863,6 @@ if (!isset($_SESSION['user'])) {
             </div>
           </div>
 
-
-          <hr class="hr" />
-
-          <!-- القسم 4: الإجماليات -->
-          <div class="section-title"><span class="chip">4</span> إجماليات الساعات (يومياً وللعقد)</div>
-          <br>
-
-          <div class="totals">
-            <div class="kpi">
-              <i class="fas fa-clock" style="font-size: 2rem; color: #667eea; margin-bottom: 0.5rem;"></i>
-              <div class="v" id="kpi_month_total">0</div>
-              <div class="t">الساعات المستهدفة يومياً - معدات</div>
-              <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
-            </div>
-            <div class="kpi">
-              <i class="fas fa-calendar-alt" style="font-size: 2rem; color: #667eea; margin-bottom: 0.5rem;"></i>
-              <div class="v" id="kpi_contract_total">0</div>
-              <div class="t">ساعات العقد المستهدفة - معدات</div>
-              <input type="hidden" name="forecasted_contracted_hours" id="forecasted_contracted_hours" value="0" />
-            </div>
-            <div class="kpi">
-              <i class="fas fa-boxes" style="font-size: 2rem; color: #667eea; margin-bottom: 0.5rem;"></i>
-              <div class="v" id="kpi_equip_month">0</div>
-              <div class="t">إجمالي معدات (يومي)</div>
-            </div>
-          </div>
-
-          <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px; border-right: 4px solid #667eea;">
-            <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
-              <i class="fas fa-info-circle" style="margin-left: 0.5rem; color: #667eea;"></i>
-              <strong>ملاحظة:</strong> يتم احتساب الحقول الإجمالية تلقائياً بناءً على المدخلات.
-            </p>
-          </div>
 
           <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
             <button type="reset" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
