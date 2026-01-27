@@ -1511,10 +1511,15 @@ if (!isset($_SESSION['user'])) {
       $("#projectForm [name='contract_duration_days']").val($(this).data("contract_duration_days"));
       $("#projectForm [name='actual_start']").val($(this).data("actual_start"));
       $("#projectForm [name='actual_end']").val($(this).data("actual_end"));
+
+
       $("#projectForm [name='hours_monthly_target']").val($(this).data("hours_monthly_target"));
       $("#projectForm [name='forecasted_contracted_hours']").val($(this).data("forecasted_contracted_hours"));
+
       $("#projectForm [name='daily_work_hours']").val($(this).attr("daily_work_hours"));
+
       $("#projectForm [name='daily_operators']").val($(this).attr("daily_operators"));
+
       $("#projectForm [name='first_party']").val($(this).attr("first_party"));
       $("#projectForm [name='second_party']").val($(this).attr("second_party"));
       $("#projectForm [name='witness_one']").val($(this).attr("witness_one"));
@@ -1543,9 +1548,10 @@ if (!isset($_SESSION['user'])) {
 
               if (sectionIndex === 1) {
                 // تحديث القسم الأول
-                $(`input[name="equip_type_1"]`).val(equip.equip_type);
+                $(`select[name="equip_type_1"]`).val(equip.equip_type);
                 $(`input[name="equip_size_1"]`).val(equip.equip_size);
                 $(`input[name="equip_count_1"]`).val(equip.equip_count);
+                $(`input[name="equip_shifts_1"]`).val(equip.equip_shifts);
                 $(`select[name="equip_unit_1"]`).val(equip.equip_unit);
                 $(`input[name="shift1_start_1"]`).val(equip.shift1_start);
                 $(`input[name="shift1_end_1"]`).val(equip.shift1_end);

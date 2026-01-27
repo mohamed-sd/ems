@@ -20,25 +20,38 @@ include "config.php";
   <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+    
+    * {
+      font-family: 'Cairo', sans-serif;
+    }
+    
+    body {
+      background: #f5f7fa;
+    }
+    
+    .main {
+      padding: 2rem;
+    }
+    
     /* ====== رسالة الترحيب ====== */
     .welcome-container {
       text-align: center;
-      margin: 40px auto;
+      margin: 20px auto 40px;
       position: relative;
       overflow: hidden;
-      margin-top: 100px;
     }
 
     .welcome-message {
-      width: 550px;
+      max-width: 700px;
       display: inline-block;
-      font-size: 20px;
-      font-weight: 400;
-      color: #ffcc00;
-      padding: 10px 20px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #000022, #242435ff);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      font-size: 22px;
+      font-weight: 600;
+      color: white;
+      padding: 20px 30px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     }
 
     .welcome-message span {
@@ -58,71 +71,195 @@ include "config.php";
     /* النجوم المتطايرة */
     .star {
       position: absolute;
-      color: #f1c40f;
-      font-size: 14px;
+      color: #ffd700;
+      font-size: 16px;
       animation: fall 3s linear infinite;
-      opacity: 0.8;
+      opacity: 0.9;
     }
 
     @keyframes fall {
       0% {
-        transform: translateY(-20px) scale(1);
+        transform: translateY(-20px) scale(1) rotate(0deg);
         opacity: 1;
       }
-
       100% {
-        transform: translateY(100px) scale(0.5);
+        transform: translateY(100px) scale(0.5) rotate(360deg);
         opacity: 0;
       }
     }
 
-    @media (max-width: 768px) {
-      .welcome-message {
-        font-size: 18px;
-        padding: 8px 15px;
-         width: 350px;
-      }
+    /* ====== أزرار الوصول السريع ====== */
+    .quick-access {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .quick-btn {
+      background: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      text-align: center;
+      text-decoration: none;
+      color: #2c3e50;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .quick-btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+      color: #667eea;
+    }
+    
+    .quick-btn i {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: all 0.3s ease;
+    }
+    
+    .quick-btn:hover i {
+      transform: scale(1.1);
+    }
+    
+    .quick-btn span {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    /* ====== عنوان القسم ====== */
+    .section-title {
+      text-align: center;
+      margin: 3rem 0 2rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
     }
 
     /* ====== الكروت ====== */
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 280px));
-      gap: 20px;
-      justify-content: center;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
     .card {
-      background: #fff;
-      padding: 20px;
-      border-radius: 15px;
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
       text-align: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover::before {
+      transform: scaleX(1);
     }
 
     .card:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
     }
 
     .card i {
-      font-size: 34px;
-      color: #1976d2;
-      margin-bottom: 12px;
+      font-size: 3rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
     }
 
     .card h3 {
-      font-size: 26px;
-      margin: 8px 0;
+      font-size: 2.5rem;
+      margin: 0.5rem 0;
       color: #2c3e50;
+      font-weight: 700;
     }
 
     .card p {
-      color: #555;
+      color: #6c757d;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 1rem;
+      margin: 0;
+    }
+    
+    .card a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    /* Gradient variations for different cards */
+    .card:nth-child(1) i { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card:nth-child(2) i { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card:nth-child(3) i { background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card:nth-child(4) i { background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card:nth-child(5) i { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card:nth-child(6) i { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    @media (max-width: 768px) {
+      .main {
+        padding: 1rem;
+      }
+      
+      .welcome-message {
+        font-size: 18px;
+        padding: 15px 20px;
+        max-width: 90%;
+      }
+      
+      .cards {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+      }
+      
+      .card {
+        padding: 1.5rem 1rem;
+      }
+      
+      .card h3 {
+        font-size: 2rem;
+      }
+      
+      .quick-access {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+      
+      .section-title {
+        font-size: 1.4rem;
+      }
     }
   </style>
 </head>
@@ -158,20 +295,59 @@ include "config.php";
       <div class="welcome-message" id="welcome"></div>
     </div>
 
-    <br><br>
+    <?php if ($_SESSION['user']['role'] == "1") { ?>
+    <!-- أزرار الوصول السريع لمدير المشاريع -->
+    <h2 class="section-title">
+      <i class="fas fa-bolt"></i> الوصول السريع
+    </h2>
+    <div class="quick-access">
+      <a href="Projects/projects.php" class="quick-btn">
+        <i class="fas fa-project-diagram"></i>
+        <span>المشاريع</span>
+      </a>
+   
+      </a>
+      <a href="Reports/reports.php" class="quick-btn">
+        <i class="fas fa-chart-line"></i>
+        <span>التقارير</span>
+      </a>
+      <a href="users.php" class="quick-btn">
+        <i class="fas fa-user-shield"></i>
+        <span>المستخدمين</span>
+      </a>
+    </div>
+    <?php } ?>
 
-    <!-- الكروت -->
+    <!-- الإحصائيات -->
+    <h2 class="section-title">
+      <i class="fas fa-chart-bar"></i> الإحصائيات
+    </h2>
     <div class="cards">
       <?php
       // ******************************** احصائيات المدير ******************************************************
       if ($_SESSION['user']['role'] == "1") {
         // كارد المشاريع
         $projects = $conn->query("SELECT COUNT(*) AS total FROM projects")->fetch_assoc()['total'];
-        echo "<a href='Projects/projects.php' style='text-decoration: none;'><div class='card'><i class='fa fa-building'></i><h3>$projects</h3><p>المشاريع</p></div></a>";
+        echo "<a href='Projects/projects.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-project-diagram'></i>
+                  <h3>$projects</h3>
+                  <p>المشاريع</p>
+                </div>
+              </a>";
 
         // كارد العقود
         $contracts = $conn->query("SELECT COUNT(*) AS total FROM contracts")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-file-contract'></i><h3>$contracts</h3><p>العقود</p></div>";
+        echo "<a href='' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-file-contract'></i>
+                  <h3>$contracts</h3>
+                  <p>عقود المشاريع</p>
+                </div>
+              </a>";
+        
+        
+     
       }
       ?>
 
@@ -179,10 +355,22 @@ include "config.php";
       // ******************************** احصائيات مدير الموردين ******************************************************
       if ($_SESSION['user']['role'] == "2") {
         $suppliers = $conn->query("SELECT COUNT(*) AS total FROM suppliers")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-truck'></i><h3>$suppliers</h3><p>الموردين</p></div>";
+        echo "<a href='Suppliers/suppliers.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-truck'></i>
+                  <h3>$suppliers</h3>
+                  <p>الموردين</p>
+                </div>
+              </a>";
 
         $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-tools'></i><h3>$equipments</h3><p>المعدات</p></div>";
+        echo "<a href='Equipments/equipments.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-tools'></i>
+                  <h3>$equipments</h3>
+                  <p>المعدات</p>
+                </div>
+              </a>";
       }
       ?>
 
@@ -190,10 +378,22 @@ include "config.php";
       // ******************************** احصائيات مدير المشغلين ******************************************************
       if ($_SESSION['user']['role'] == "3") {
         $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-tractor'></i><h3>$equipments</h3><p>المعدات</p></div>";
+        echo "<a href='Equipments/equipments.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-tractor'></i>
+                  <h3>$equipments</h3>
+                  <p>المعدات</p>
+                </div>
+              </a>";
 
         $drivers = $conn->query("SELECT COUNT(*) AS total FROM drivers")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-id-badge'></i><h3>$drivers</h3><p>السائقين</p></div>";
+        echo "<a href='Drivers/drivers.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-id-badge'></i>
+                  <h3>$drivers</h3>
+                  <p>السائقين</p>
+                </div>
+              </a>";
       }
       ?>
 
@@ -201,13 +401,29 @@ include "config.php";
       // ******************************** احصائيات مدير الاسطول ******************************************************
       if ($_SESSION['user']['role'] == "4") {
         $projects = $conn->query("SELECT COUNT(*) AS total FROM projects")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-building'></i><h3>$projects</h3><p>المشاريع</p></div>";
+        echo "<a href='Projects/projects.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-building'></i>
+                  <h3>$projects</h3>
+                  <p>المشاريع</p>
+                </div>
+              </a>";
 
         $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-tools'></i><h3>$equipments</h3><p>المعدات</p></div>";
+        echo "<a href='Equipments/equipments.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-tools'></i>
+                  <h3>$equipments</h3>
+                  <p>المعدات</p>
+                </div>
+              </a>";
 
         $activeOps = $conn->query("SELECT COUNT(*) AS total FROM `operations` WHERE `status` LIKE '1'")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-play-circle'></i><h3>$activeOps</h3><p>معدات تعمل الآن</p></div>";
+        echo "<div class='card'>
+                <i class='fas fa-play-circle'></i>
+                <h3>$activeOps</h3>
+                <p>معدات تعمل الآن</p>
+              </div>";
       }
       ?>
 
@@ -215,10 +431,23 @@ include "config.php";
       // ******************************** احصائيات مدير الموقع ******************************************************
       if ($_SESSION['user']['role'] == "5") {
         $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-tools'></i><h3>$equipments</h3><p>المعدات</p></div>";
+        echo "<a href='Equipments/equipments.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-tools'></i>
+                  <h3>$equipments</h3>
+                  <p>المعدات</p>
+                </div>
+              </a>";
 
         $hours = $conn->query("SELECT SUM(total_work_hours) AS total FROM timesheet")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-clock'></i><h3>$hours</h3><p>إجمالي ساعات العمل</p></div>";
+        $hours = $hours ? number_format($hours, 0) : '0';
+        echo "<a href='Timesheet/timesheet.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-clock'></i>
+                  <h3>$hours</h3>
+                  <p>إجمالي ساعات العمل</p>
+                </div>
+              </a>";
       }
       ?>
 
@@ -226,7 +455,14 @@ include "config.php";
       // ******************************** احصائيات مشرفين ******************************************************
       if ($_SESSION['user']['role'] == "6" || $_SESSION['user']['role'] == "7" || $_SESSION['user']['role'] == "8" || $_SESSION['user']['role'] == "9") {
         $hours = $conn->query("SELECT SUM(total_work_hours) AS total FROM timesheet")->fetch_assoc()['total'];
-        echo "<div class='card'><i class='fa fa-clock'></i><h3>$hours</h3><p>إجمالي ساعات العمل</p></div>";
+        $hours = $hours ? number_format($hours, 0) : '0';
+        echo "<a href='Timesheet/timesheet.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-clock'></i>
+                  <h3>$hours</h3>
+                  <p>إجمالي ساعات العمل</p>
+                </div>
+              </a>";
       }
       ?>
     </div>
