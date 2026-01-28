@@ -124,6 +124,10 @@ if (!isset($_SESSION['user'])) {
             background: linear-gradient(135deg, #e83e8c 0%, #d63384 100%);
         }
         
+        #completeBtn {
+            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+        }
+        
         /* Report Container */
         .report {
             background: white;
@@ -393,6 +397,9 @@ if (!isset($_SESSION['user'])) {
         <button class="add" id="mergeBtn" title="دمج هذا العقد مع عقد آخر">
             <i class="fas fa-object-group"></i> دمج
         </button>
+        <button class="add" id="completeBtn" title="تسجيل انتهاء العقد">
+            <i class="fas fa-check-circle"></i> انتهاء العقد
+        </button>
     </div>
 
 <?php
@@ -405,7 +412,8 @@ $sql = "SELECT
             actual_start, actual_end, transportation, accommodation, place_for_living, 
             workshop, hours_monthly_target, forecasted_contracted_hours, created_at, updated_at,
             daily_work_hours, daily_operators, first_party, second_party, 
-            witness_one, witness_two, status, pause_reason, pause_date, resume_date, termination_type, termination_reason, merged_with
+            witness_one, witness_two, status, pause_reason, pause_date, resume_date, termination_type, termination_reason, merged_with,
+            equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units
         FROM contracts
         WHERE id = $contract_id
         LIMIT 1";
@@ -500,6 +508,31 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="info-item">
                 <span class="info-label">ساعات العمل اليومية</span>
                 <span class="info-value"><?php echo $row['daily_work_hours']; ?> ساعة</span>
+            </div>
+        </div>
+
+        <!-- بطاقة البيانات الإضافية للعقد -->
+        <div class="info-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <h5 style="color: white;"><i class="fas fa-file-contract"></i> بيانات العقد الإضافية</h5>
+            <div class="info-item">
+                <span class="info-label" style="color: rgba(255,255,255,0.9);">عدد الورديات</span>
+                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0; ?></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label" style="color: rgba(255,255,255,0.9);">ساعات الوردية</span>
+                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['shift_contract']) ? $row['shift_contract'] : 0; ?> ساعة</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label" style="color: rgba(255,255,255,0.9);">الوحدات يومياً</span>
+                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0; ?></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label" style="color: rgba(255,255,255,0.9);">وحدات الشهر</span>
+                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0; ?></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label" style="color: rgba(255,255,255,0.9);">إجمالي الوحدات</span>
+                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['total_contract_units']) ? $row['total_contract_units'] : 0; ?></span>
             </div>
         </div>
     </div>
@@ -656,6 +689,7 @@ $witness_two = $row['witness_two'];
                     <th>عدد الورديات</th>
                     <th>الساعات/اليوم</th>
                     <th>إجمالي الساعات</th>
+                    <th>وحدات العمل/الشهر</th>
                     <th>الوحدة</th>
                     <th>إجمالي ساعات العقد</th>
                     <th>السعر</th>
@@ -684,8 +718,9 @@ $witness_two = $row['witness_two'];
                         echo "<td>" . $equip['equip_size'] . "</td>";
                         echo "<td><span style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . $equip['equip_count'] . "</span></td>";
                         echo "<td><span style='background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . (isset($equip['equip_shifts']) ? $equip['equip_shifts'] : 0) . "</span></td>";
-                        echo "<td>" . $equip['equip_target_per_month'] . "</td>";
+                        echo "<td>" . $equip['shift_hours'] . "</td>";
                         echo "<td>" . $equip['equip_total_month'] . "</td>";
+                        echo "<td><strong style='color: #667eea;'>" . (isset($equip['equip_monthly_target']) ? $equip['equip_monthly_target'] : 0) . "</strong></td>";
                         echo "<td>" . $equip['equip_unit'] . "</td>";
                         echo "<td><strong style='color: #667eea;'>" . $equip['equip_total_contract'] . "</strong></td>";
                         echo "<td><strong style='color: #28a745;'>" . $equip['equip_price'] . " " . $equip['equip_price_currency'] . "</strong></td>";
@@ -1167,6 +1202,7 @@ $witness_two = $row['witness_two'];
                                         <th>الحجم</th>
                                         <th>العدد</th>
                                         <th>الساعات/الشهر</th>
+                                        <th>وحدات/الشهر</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1178,11 +1214,12 @@ $witness_two = $row['witness_two'];
                                             echo "<td>" . $equip['equip_type'] . "</td>";
                                             echo "<td>" . $equip['equip_size'] . "</td>";
                                             echo "<td>" . $equip['equip_count'] . "</td>";
-                                            echo "<td>" . $equip['equip_target_per_month'] . "</td>";
+                                            echo "<td>" . $equip['shift_hours'] . "</td>";
+                                            echo "<td>" . (isset($equip['equip_monthly_target']) ? $equip['equip_monthly_target'] : 0) . "</td>";
                                             echo "</tr>";
                                         }
                                     } else {
-                                        echo "<tr><td colspan='4' style='text-align: center; color: #999;'>لا توجد معدات</td></tr>";
+                                        echo "<tr><td colspan='5' style='text-align: center; color: #999;'>لا توجد معدات</td></tr>";
                                     }
                                     ?>
                                 </tbody>
@@ -1207,6 +1244,42 @@ $witness_two = $row['witness_two'];
                 </button>
                 <button type="button" class="btn" id="confirmMerge" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); color: white; border: none;">
                     <i class="fas fa-object-group"></i> دمج العقد
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Complete Contract -->
+<div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+                <h5 class="modal-title" id="completeModalLabel">
+                    <i class="fas fa-check-circle"></i>
+                    انتهاء العقد
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>ملاحظة:</strong> تسجيل انتهاء العقد بشكل طبيعي.
+                </div>
+                <div class="mb-3">
+                    <label for="completeNote" class="form-label">
+                        <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
+                        ملاحظات الانتهاء <span style="color: red;">*</span>
+                    </label>
+                    <textarea id="completeNote" class="form-control" rows="4" placeholder="أدخل ملاحظات حول انتهاء العقد" required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+                <button type="button" class="btn" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); color: white;" id="confirmComplete">
+                    <i class="fas fa-check-circle"></i> تسجيل الانتهاء
                 </button>
             </div>
         </div>
@@ -1660,6 +1733,26 @@ $('#mergeBtn').click(function() {
     modal.show();
 });
 
+// Complete Contract Button Handler
+$('#completeBtn').click(function() {
+    const modal = new bootstrap.Modal(document.getElementById('completeModal'));
+    modal.show();
+});
+
+$('#confirmComplete').click(function() {
+    const note = $('#completeNote').val().trim();
+    if (!note) {
+        alert('الرجاء إدخال ملاحظات الانتهاء');
+        return;
+    }
+    performAction('complete', {
+        complete_note: note
+    });
+    // Close modal
+    bootstrap.Modal.getInstance(document.getElementById('completeModal')).hide();
+    $('#completeNote').val('');
+});
+
 // أزرار التعديل
 $('#editProjectInfoBtn').click(function() {
     const modal = new bootstrap.Modal(document.getElementById('editProjectInfoModal'));
@@ -1809,6 +1902,7 @@ $('#mergeWithId').on('change', function() {
                     html += '<th>الحجم</th>';
                     html += '<th>العدد</th>';
                     html += '<th>الساعات/الشهر</th>';
+                    html += '<th>وحدات/الشهر</th>';
                     html += '</tr></thead>';
                     html += '<tbody>';
                     
@@ -1817,7 +1911,8 @@ $('#mergeWithId').on('change', function() {
                         html += '<td>' + equip.equip_type + '</td>';
                         html += '<td>' + equip.equip_size + '</td>';
                         html += '<td>' + equip.equip_count + '</td>';
-                        html += '<td>' + equip.equip_target_per_month + '</td>';
+                        html += '<td>' + equip.shift_hours + '</td>';
+                        html += '<td>' + (equip.equip_monthly_target || 0) + '</td>';
                         html += '</tr>';
                     });
                     

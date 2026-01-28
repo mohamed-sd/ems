@@ -299,7 +299,7 @@ else if ($action === 'merge') {
     
     if (mysqli_query($conn, $query)) {
         // نسخ معدات العقد المدموج إلى العقد الحالي
-        $get_equipments_query = "SELECT equip_type, equip_size, equip_count, equip_target_per_month, equip_total_month, equip_total_contract FROM contractequipments WHERE contract_id = $merge_with_id";
+        $get_equipments_query = "SELECT equip_type, equip_size, equip_count, shift_hours, equip_total_month, equip_total_contract FROM contractequipments WHERE contract_id = $merge_with_id";
         $equipments_result = mysqli_query($conn, $get_equipments_query);
         
         if ($equipments_result) {
@@ -308,12 +308,12 @@ else if ($action === 'merge') {
                 $equip_type = mysqli_real_escape_string($conn, $equip['equip_type']);
                 $equip_size = intval($equip['equip_size']);
                 $equip_count = intval($equip['equip_count']);
-                $equip_target = intval($equip['equip_target_per_month']);
+                $shift_hours = intval($equip['shift_hours']);
                 $equip_total_month = intval($equip['equip_total_month']);
                 $equip_total_contract = intval($equip['equip_total_contract']);
                 
-                $insert_equip_query = "INSERT INTO contractequipments (contract_id, equip_type, equip_size, equip_count, equip_target_per_month, equip_total_month, equip_total_contract) 
-                    VALUES ($contract_id, '$equip_type', $equip_size, $equip_count, $equip_target, $equip_total_month, $equip_total_contract)";
+$insert_equip_query = "INSERT INTO contractequipments (contract_id, equip_type, equip_size, equip_count, shift_hours, equip_total_month, equip_total_contract) 
+                VALUES ($contract_id, '$equip_type', $equip_size, $equip_count, $shift_hours, $equip_total_month, $equip_total_contract)";
                 
                 mysqli_query($conn, $insert_equip_query);
             }
@@ -330,6 +330,23 @@ else if ($action === 'merge') {
         echo json_encode(['success' => true, 'message' => 'تم دمج العقود ومعداتها بنجاح']);
     } else {
         echo json_encode(['success' => false, 'message' => 'خطأ في دمج العقود']);
+    }
+}
+
+// 6. انتهاء العقد
+elseif ($action === 'complete') {
+    $complete_note = isset($_POST['complete_note']) ? mysqli_real_escape_string($conn, $_POST['complete_note']) : '';
+    
+    if (empty($complete_note)) {
+        die(json_encode(['success' => false, 'message' => 'الرجاء إدخال ملاحظات الانتهاء']));
+    }
+    
+    // إضافة الملاحظة في جدول contract_notes
+    $note_text = "انتهاء العقد: " . $complete_note;
+    if (addNote($contract_id, $note_text, $conn)) {
+        echo json_encode(['success' => true, 'message' => 'تم تسجيل انتهاء العقد بنجاح']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'خطأ في تسجيل انتهاء العقد']);
     }
 }
 

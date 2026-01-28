@@ -587,7 +587,7 @@ if (!isset($_SESSION['user'])) {
           <div class="totals">
             <div class="kpi">
               <div class="v" id="kpi_month_total">0</div>
-              <div class="t">الساعات الشهرية المطلوبة</div>
+              <div class="t">الساعات اليومية المطلوبة</div>
               <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
             </div>
             <div class="kpi">
@@ -597,7 +597,7 @@ if (!isset($_SESSION['user'])) {
             </div>
             <div class="kpi">
               <div class="v" id="kpi_equip_month">0</div>
-              <div class="t">معدات × ساعات الشهر</div>
+              <div class="t">معدات × ساعات لليوم</div>
             </div>
           </div>
 
@@ -620,6 +620,12 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
             </div>
 
+                <div class="field md-3 sm-6">
+              <label>فترة السماح بين التوقيع والتنفيذ </label>
+              <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0"
+                  placeholder="عدد الأيام"></div>
+            </div>
+
              <div class="field md-3 sm-6">
               <label>بداية التنفيذ الفعلي المتفق عليه</label>
               <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
@@ -631,11 +637,7 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
             </div>
 
-            <div class="field md-3 sm-6">
-              <label>فترة السماح بين التوقيع والتنفيذ </label>
-              <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0"
-                  placeholder="عدد الأيام"></div>
-            </div>
+        
            
             <!-- خانتان فارغتان -->
            
@@ -647,6 +649,43 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="contract_duration_days" id="contract_duration_days" type="number"
                   min="0" placeholder="يُحتسب تلقائياً" readonly></div>
             </div>
+
+           
+        
+               <div class="field md-3 sm-6">
+                    <label>عدد الورديات للعقد </label>
+                    <div class="control"><input name="equip_shifts_contract" type="number" min="0" placeholder="مثال: 2"></div>
+                  </div>
+
+    <div class="field md-3 sm-6">
+                    <label> ساعات الوردية للعقد</label>
+                    <div class="control"><input name="shift_contract" type="number" min="0"></div>
+                  </div>
+            <div class="field md-3 sm-6">
+                    <label>إجمالي الوحدات يومياً للعقد </label>
+                    <div class="control"><input name="equip_total_contract" type="number" 
+                        placeholder=" "></div>
+                  </div>
+                     <div class="field md-3 sm-6">
+                    <label>وحدات العمل  في الشهر للعقد</label>
+                    <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
+                  </div>
+                
+               
+                  <div class="field md-3 sm-6">
+                    <label>إجمالي وحدات العقد للغقد </label>
+                    <div class="control"><input name="total_contract" type="number" 
+                        placeholder=" "></div>
+                  </div>
+
+                      <div class="field md-3 sm-6">
+              <label>مدراء الموقع   </label>
+              <div class="control"><input type="number" name="daily_operators" id="daily_operators" min="0"
+                  placeholder="مثال: 3"></div>
+            </div>
+
+
+
             <div class="field md-3 sm-6">
               <label>الترحيل (Transportation)</label>
               <div class="control">
@@ -733,23 +772,24 @@ if (!isset($_SESSION['user'])) {
 
             
 
+                
+
+                      <div class="field md-3 sm-6">
+                    <label>عدد المشغلين</label>
+                    <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
+                  </div>
+
+                  
                   <div class="field md-3 sm-6">
+                    <label>عدد المساعدين</label>
+                    <div class="control"><input name="equip_assistants_1" type="number" min="0"></div>
+                  </div>
+              
+             
+                    <div class="field md-3 sm-6">
                     <label>عدد الورديات</label>
                     <div class="control"><input name="equip_shifts_1" type="number" min="0" placeholder="مثال: 2"></div>
                   </div>
-                  <div class="field md-3 sm-6">
-                    <label>وحدة القياس</label>
-                    <div class="control">
-                      <select name="equip_unit_1" class="equip-unit">
-                        <option value="">— اختر —</option>
-                        <option value="ساعة">ساعة</option>
-                        <option value="طن">طن</option>
-                        <option value="متر طولي">متر طولي</option>
-                        <option value="متر مكعب">متر مكعب</option>
-                      </select>
-                    </div>
-                  </div>
-                  
                   <!-- أوقات الورديات -->
                   <div class="field md-3 sm-6">
                     <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
@@ -767,28 +807,42 @@ if (!isset($_SESSION['user'])) {
                     <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
                     <div class="control"><input name="shift2_end_1" type="time" placeholder="مثال: 00:00"></div>
                   </div>
+           <div class="field md-3 sm-6">
+                    <label>وحدة القياس</label>
+                    <div class="control">
+                      <select name="equip_unit_1" class="equip-unit">
+                        <option value="">— اختر —</option>
+                        <option value="ساعة">ساعة</option>
+                        <option value="طن">طن</option>
+                        <option value="متر طولي">متر طولي</option>
+                        <option value="متر مكعب">متر مكعب</option>
+                      </select>
+                    </div>
+                  </div>
 
                   <div class="field md-3 sm-6">
-                    <label>ساعات العمل المستهدفة يومياً</label>
-                    <div class="control"><input name="equip_target_per_month_1" type="number" min="0"></div>
+                    <label>ساعات الوردية</label>
+                    <div class="control"><input name="shift_hours_1" type="number" min="0"></div>
                   </div>
-                  <div class="field md-3 sm-6">
-                    <label>إجمالي الساعات يومياً</label>
+            <div class="field md-3 sm-6">
+                    <label>إجمالي الوحدات يومياً</label>
                     <div class="control"><input name="equip_total_month_1" type="number" readonly
                         placeholder="يُحتسب تلقائياً"></div>
                   </div>
+                     <div class="field md-3 sm-6">
+                    <label>وحدات العمل  في الشهر</label>
+                    <div class="control"><input name="equip_target_per_month_1" type="number" min="0"></div>
+                  </div>
+                
                
                   <div class="field md-3 sm-6">
-                    <label>إجمالي ساعات العقد</label>
+                    <label>إجمالي وحدات العقد</label>
                     <div class="control"><input name="equip_total_contract_1" type="number" readonly
                         placeholder="يُحتسب تلقائياً"></div>
                   </div>
-                  <div class="field md-3 sm-6">
-                    <label>السعر</label>
-                    <div class="control"><input name="equip_price_1" type="number" min="0" step="0.01"
-                        placeholder="0.00"></div>
-                  </div>
-                  <div class="field md-3 sm-6">
+
+                  
+                     <div class="field md-3 sm-6">
                     <label>العملة</label>
                     <div class="control">
                       <select name="equip_price_currency_1">
@@ -798,27 +852,30 @@ if (!isset($_SESSION['user'])) {
                       </select>
                     </div>
                   </div>
-
+                  <div class="field md-3 sm-6">
+                    <label>السعر\للوحدة</label>
+                    <div class="control"><input name="equip_price_1" type="number" min="0" step="0.01"
+                        placeholder="0.00"></div>
+                  </div>
+               
+                   <div class="field md-3 sm-6">
+                 
+                  </div>
                 
                   
 
-                  <div class="field md-3 sm-6">
-                    <label>عدد المشغلين</label>
-                    <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
-                  </div>
-                  <div class="field md-3 sm-6">
+              
+              
+                  <!-- خانتان فارغتان للحفاظ على 3 خانات لكل صف -->
+                
+                   <div class="field md-3 sm-6">
                     <label>عدد المشرفين</label>
                     <div class="control"><input name="equip_supervisors_1" type="number" min="0"></div>
                   </div>
-                  <div class="field md-3 sm-6">
+
+                      <div class="field md-3 sm-6">
                     <label>عدد الفنيين</label>
                     <div class="control"><input name="equip_technicians_1" type="number" min="0"></div>
-                  </div>
-                  <!-- خانتان فارغتان للحفاظ على 3 خانات لكل صف -->
-                
-                  <div class="field md-3 sm-6">
-                    <label>عدد المساعدين</label>
-                    <div class="control"><input name="equip_assistants_1" type="number" min="0"></div>
                   </div>
                   <!-- إكمال الصف بثلاث خانات -->
                   <div class="field md-3 sm-6"></div>
@@ -839,16 +896,18 @@ if (!isset($_SESSION['user'])) {
           <br>
 
           <div class="form-grid">
-            <div class="field md-3 sm-6">
+
+             <div class="field md-3 sm-6">
               <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
               <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
                   placeholder="مثال: 8" required></div>
             </div>
-            <div class="field md-3 sm-6">
-              <label>عدد المشغلين للساعات اليومية</label>
-              <div class="control"><input type="number" name="daily_operators" id="daily_operators" min="0"
-                  placeholder="مثال: 3"></div>
-            </div>
+             <!-- Orgnization Break  -->
+            <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
+                        <div class="field md-3 sm-6"> </div>
+
+            
             <div class="field md-3 sm-6">
               <label>الطرف الأول </label>
               <div class="control"><input type="text" name="first_party" id="first_party"
@@ -856,9 +915,7 @@ if (!isset($_SESSION['user'])) {
               </div>
             </div>
 
-            <!-- Orgnization Break  -->
-            <div class="field md-3 sm-6"> </div>
-            <div class="field md-3 sm-6"> </div>
+           
 
             <div class="field md-3 sm-6">
               <label>الطرف الثاني </label>
@@ -866,6 +923,9 @@ if (!isset($_SESSION['user'])) {
                   placeholder="اسم الطرف الثاني ">
               </div>
             </div>
+
+                                    <div class="field md-3 sm-6"> </div>
+
             <div class="field md-3 sm-6">
               <label>الشاهد الأول</label>
               <div class="control"><input type="text" name="witness_one" id="witness_one"
@@ -991,12 +1051,12 @@ if (!isset($_SESSION['user'])) {
               $actual_start = $_POST['actual_start'];
               $actual_end = $_POST['actual_end'];
 
-              // حساب الفرق بين التاريخين
+              // حساب عدد الأيام من تاريخ البداية إلى تاريخ الانتهاء (شامل يوم البداية ويوم النهاية)
               if (!empty($actual_start) && !empty($actual_end)) {
                 $start_date = new DateTime($actual_start);
                 $end_date = new DateTime($actual_end);
                 $interval = $start_date->diff($end_date);
-                $contract_duration_days = $interval->days;
+                $contract_duration_days = $interval->days + 1; // +1 لحساب يوم البداية ويوم النهاية معاً
               } else {
                 $contract_duration_days = 0;
               }
@@ -1016,6 +1076,13 @@ if (!isset($_SESSION['user'])) {
               $witness_one = $_POST['witness_one'];
               $witness_two = $_POST['witness_two'];
 
+              // الحقول الإضافية للعقد
+              $equip_shifts_contract = isset($_POST['equip_shifts_contract']) ? intval($_POST['equip_shifts_contract']) : 0;
+              $shift_contract = isset($_POST['shift_contract']) ? intval($_POST['shift_contract']) : 0;
+              $equip_total_contract_daily = isset($_POST['equip_total_contract']) ? intval($_POST['equip_total_contract']) : 0;
+              $total_contract_permonth = isset($_POST['total_contract_permonth']) ? intval($_POST['total_contract_permonth']) : 0;
+              $total_contract_units = isset($_POST['total_contract']) ? intval($_POST['total_contract']) : 0;
+
 
               if ($id > 0) {
                 // تعديل
@@ -1023,6 +1090,11 @@ if (!isset($_SESSION['user'])) {
             contract_signing_date='$contract_signing_date',
             grace_period_days='$grace_period_days',
             contract_duration_days='$contract_duration_days',
+            equip_shifts_contract='$equip_shifts_contract',
+            shift_contract='$shift_contract',
+            equip_total_contract_daily='$equip_total_contract_daily',
+            total_contract_permonth='$total_contract_permonth',
+            total_contract_units='$total_contract_units',
             actual_start='$actual_start',
             actual_end='$actual_end',
             transportation='$transportation',
@@ -1042,11 +1114,13 @@ if (!isset($_SESSION['user'])) {
                 // إضافة
                 $sql = "INSERT INTO contracts (
             contract_signing_date, project, grace_period_days, contract_duration_days,
+            equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
             actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
             hours_monthly_target, forecasted_contracted_hours,
             daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two
         ) VALUES (
             '$contract_signing_date', '$project','$grace_period_days', '$contract_duration_days',
+            '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
             '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
             '$hours_monthly_target','$forecasted_contracted_hours',
             '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two'
@@ -1086,8 +1160,9 @@ if (!isset($_SESSION['user'])) {
                       'shift1_end' => isset($_POST["shift1_end_$i"]) ? $_POST["shift1_end_$i"] : '',
                       'shift2_start' => isset($_POST["shift2_start_$i"]) ? $_POST["shift2_start_$i"] : '',
                       'shift2_end' => isset($_POST["shift2_end_$i"]) ? $_POST["shift2_end_$i"] : '',
-                      'equip_target_per_month' => isset($_POST["equip_target_per_month_$i"]) ? $_POST["equip_target_per_month_$i"] : 0,
+                      'shift_hours' => isset($_POST["shift_hours_$i"]) ? $_POST["shift_hours_$i"] : 0,
                       'equip_total_month' => isset($_POST["equip_total_month_$i"]) ? $_POST["equip_total_month_$i"] : 0,
+                      'equip_monthly_target' => isset($_POST["equip_target_per_month_$i"]) ? $_POST["equip_target_per_month_$i"] : 0,
                       'equip_total_contract' => isset($_POST["equip_total_contract_$i"]) ? $_POST["equip_total_contract_$i"] : 0,
                       'equip_price' => isset($_POST["equip_price_$i"]) ? $_POST["equip_price_$i"] : 0,
                       'equip_price_currency' => isset($_POST["equip_price_currency_$i"]) ? $_POST["equip_price_currency_$i"] : '',
@@ -1190,6 +1265,11 @@ if (!isset($_SESSION['user'])) {
                   accommodation ='" . $row['accommodation'] . "'
                   place_for_living ='" . $row['place_for_living'] . "'
                   workshop ='" . $row['workshop'] . "'
+                  equip_shifts_contract ='" . (isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0) . "'
+                  shift_contract ='" . (isset($row['shift_contract']) ? $row['shift_contract'] : 0) . "'
+                  equip_total_contract_daily ='" . (isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0) . "'
+                  total_contract_permonth ='" . (isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0) . "'
+                  total_contract_units ='" . (isset($row['total_contract_units']) ? $row['total_contract_units'] : 0) . "'
                   
              data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
              class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>
@@ -1373,12 +1453,16 @@ if (!isset($_SESSION['user'])) {
             </div>
 
             <div class="field md-3 sm-6">
-              <label>ساعات العمل المستهدفة يومياً</label>
-              <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0"></div>
+              <label>ساعات الوردية</label>
+              <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>إجمالي الساعات يومياً</label>
               <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>وحدات العمل في الشهر</label>
+              <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0"></div>
             </div>
 
        
@@ -1447,7 +1531,7 @@ if (!isset($_SESSION['user'])) {
       document.querySelectorAll('.equipment-section').forEach(section => {
         const index = section.getAttribute('data-index');
         const countInput = section.querySelector(`input[name="equip_count_${index}"]`);
-        const targetInput = section.querySelector(`input[name="equip_target_per_month_${index}"]`);
+        const targetInput = section.querySelector(`input[name="shift_hours_${index}"]`);
         const monthInput = section.querySelector(`input[name="equip_total_month_${index}"]`);
         const contractInput = section.querySelector(`input[name="equip_total_contract_${index}"]`);
 
@@ -1520,6 +1604,13 @@ if (!isset($_SESSION['user'])) {
 
       $("#projectForm [name='daily_operators']").val($(this).attr("daily_operators"));
 
+      // تحميل الحقول الإضافية للعقد
+      $("#projectForm [name='equip_shifts_contract']").val($(this).attr("equip_shifts_contract"));
+      $("#projectForm [name='shift_contract']").val($(this).attr("shift_contract"));
+      $("#projectForm [name='equip_total_contract']").val($(this).attr("equip_total_contract_daily"));
+      $("#projectForm [name='total_contract_permonth']").val($(this).attr("total_contract_permonth"));
+      $("#projectForm [name='total_contract']").val($(this).attr("total_contract_units"));
+
       $("#projectForm [name='first_party']").val($(this).attr("first_party"));
       $("#projectForm [name='second_party']").val($(this).attr("second_party"));
       $("#projectForm [name='witness_one']").val($(this).attr("witness_one"));
@@ -1557,7 +1648,7 @@ if (!isset($_SESSION['user'])) {
                 $(`input[name="shift1_end_1"]`).val(equip.shift1_end);
                 $(`input[name="shift2_start_1"]`).val(equip.shift2_start);
                 $(`input[name="shift2_end_1"]`).val(equip.shift2_end);
-                $(`input[name="equip_target_per_month_1"]`).val(equip.equip_target_per_month);
+                $(`input[name="shift_hours_1"]`).val(equip.shift_hours);
                 $(`input[name="equip_total_month_1"]`).val(equip.equip_total_month);
                 $(`input[name="equip_total_contract_1"]`).val(equip.equip_total_contract);
                 $(`input[name="equip_price_1"]`).val(equip.equip_price);
@@ -1640,12 +1731,16 @@ if (!isset($_SESSION['user'])) {
                   
 
                       <div class="field md-3 sm-6">
-                        <label>ساعات العمل المستهدفة يومياً</label>
-                        <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0" value="${equip.equip_target_per_month}"></div>
+                        <label>ساعات الوردية</label>
+                        <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0" value="${equip.shift_hours}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي الساعات يومياً</label>
                         <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_month}"></div>
+                      </div>
+                      <div class="field md-3 sm-6">
+                        <label>وحدات العمل في الشهر</label>
+                        <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0" value="${equip.equip_monthly_target || 0}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي ساعات العقد</label>

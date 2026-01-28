@@ -31,8 +31,9 @@ function saveContractEquipments($contract_id, $equipment_data, $conn) {
         $shift1_end = isset($equipment['shift1_end']) ? mysqli_real_escape_string($conn, $equipment['shift1_end']) : NULL;
         $shift2_start = isset($equipment['shift2_start']) ? mysqli_real_escape_string($conn, $equipment['shift2_start']) : NULL;
         $shift2_end = isset($equipment['shift2_end']) ? mysqli_real_escape_string($conn, $equipment['shift2_end']) : NULL;
-        $equip_target_per_month = isset($equipment['equip_target_per_month']) ? intval($equipment['equip_target_per_month']) : 0;
+        $shift_hours = isset($equipment['shift_hours']) ? intval($equipment['shift_hours']) : 0;
         $equip_total_month = isset($equipment['equip_total_month']) ? intval($equipment['equip_total_month']) : 0;
+        $equip_monthly_target = isset($equipment['equip_monthly_target']) ? intval($equipment['equip_monthly_target']) : 0;
         $equip_total_contract = isset($equipment['equip_total_contract']) ? intval($equipment['equip_total_contract']) : 0;
         $equip_price = isset($equipment['equip_price']) ? floatval($equipment['equip_price']) : 0;
         $equip_price_currency = isset($equipment['equip_price_currency']) ? mysqli_real_escape_string($conn, $equipment['equip_price_currency']) : '';
@@ -52,8 +53,9 @@ function saveContractEquipments($contract_id, $equipment_data, $conn) {
             shift1_end,
             shift2_start,
             shift2_end,
-            equip_target_per_month,
+            shift_hours,
             equip_total_month,
+            equip_monthly_target,
             equip_total_contract,
             equip_price,
             equip_price_currency,
@@ -72,8 +74,9 @@ function saveContractEquipments($contract_id, $equipment_data, $conn) {
             " . ($shift1_end ? "'".$shift1_end."'" : "NULL") . ",
             " . ($shift2_start ? "'".$shift2_start."'" : "NULL") . ",
             " . ($shift2_end ? "'".$shift2_end."'" : "NULL") . ",
-            " . $equip_target_per_month . ",
+            " . $shift_hours . ",
             " . $equip_total_month . ",
+            " . $equip_monthly_target . ",
             " . $equip_total_contract . ",
             " . $equip_price . ",
             '" . $equip_price_currency . "',
