@@ -413,7 +413,8 @@ $sql = "SELECT
             workshop, hours_monthly_target, forecasted_contracted_hours, created_at, updated_at,
             daily_work_hours, daily_operators, first_party, second_party, 
             witness_one, witness_two, status, pause_reason, pause_date, resume_date, termination_type, termination_reason, merged_with,
-            equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units
+            equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
+            price_currency_contract, paid_contract, payment_time, guarantees, payment_date
         FROM contracts
         WHERE id = $contract_id
         LIMIT 1";
@@ -512,7 +513,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
 
         <!-- بطاقة البيانات الإضافية للعقد -->
-        <div class="info-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <div class="info-card" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
             <h5 style="color: white;"><i class="fas fa-file-contract"></i> بيانات العقد الإضافية</h5>
             <div class="info-item">
                 <span class="info-label" style="color: rgba(255,255,255,0.9);">عدد الورديات</span>
@@ -614,6 +615,36 @@ while ($row = mysqli_fetch_assoc($result)) {
             </div>
         </div>
 
+        <!-- البيانات المالية -->
+        <div class="info-card warning">
+            <h5>
+                <i class="fas fa-money-bill-wave"></i> البيانات المالية
+                <button class="btn btn-sm btn-outline-warning ms-auto" id="editPaymentBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                    <i class="fas fa-edit"></i> تعديل
+                </button>
+            </h5>
+            <div class="info-item">
+                <span class="info-label"><i class="fas fa-dollar-sign"></i> العملة</span>
+                <span class="info-value" id="currencyDisplay"><?php echo !empty($row['price_currency_contract']) ? $row['price_currency_contract'] : '-'; ?></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label"><i class="fas fa-money-check-alt"></i> المبلغ المدفوع</span>
+                <span class="info-value" id="paidAmountDisplay"><?php echo !empty($row['paid_contract']) ? $row['paid_contract'] : '-'; ?></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label"><i class="fas fa-clock"></i> وقت الدفع</span>
+                <span class="info-value" id="paymentTimeDisplay"><?php echo !empty($row['payment_time']) ? $row['payment_time'] : '-'; ?></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label"><i class="fas fa-shield-alt"></i> الضمانات</span>
+                <span class="info-value" id="guaranteesDisplay"><?php echo !empty($row['guarantees']) ? $row['guarantees'] : '-'; ?></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label"><i class="fas fa-calendar-check"></i> تاريخ الدفع</span>
+                <span class="info-value" id="paymentDateDisplay"><?php echo !empty($row['payment_date']) ? $row['payment_date'] : '-'; ?></span>
+            </div>
+        </div>
+
         <!-- معلومات النظام -->
         <div class="info-card" style="border-right-color: #6c757d;">
             <h5><i class="fas fa-database"></i> معلومات النظام</h5>
@@ -664,6 +695,13 @@ $first_party = $row['first_party'];
 $second_party = $row['second_party'];
 $witness_one = $row['witness_one'];
 $witness_two = $row['witness_two'];
+
+// البيانات المالية
+$price_currency_contract = isset($row['price_currency_contract']) ? $row['price_currency_contract'] : '';
+$paid_contract = isset($row['paid_contract']) ? $row['paid_contract'] : '';
+$payment_time = isset($row['payment_time']) ? $row['payment_time'] : '';
+$guarantees = isset($row['guarantees']) ? $row['guarantees'] : '';
+$payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 } 
 ?>
 
@@ -1454,6 +1492,73 @@ $witness_two = $row['witness_two'];
     </div>
 </div>
 
+<!-- Modal لتعديل البيانات المالية -->
+<div class="modal fade" id="editPaymentModal" tabindex="-1" aria-labelledby="editPaymentLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
+                <h5 class="modal-title" id="editPaymentLabel">
+                    <i class="fas fa-edit"></i> تعديل البيانات المالية
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="editCurrency" class="form-label">
+                        <i class="fas fa-dollar-sign" style="margin-left: 0.5rem;"></i>
+                        العملة
+                    </label>
+                    <select id="editCurrency" class="form-select">
+                        <option value="">— اختر —</option>
+                        <option value="دولار" <?php echo ($price_currency_contract == 'دولار') ? 'selected' : ''; ?>>دولار</option>
+                        <option value="جنيه" <?php echo ($price_currency_contract == 'جنيه') ? 'selected' : ''; ?>>جنيه</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="editPaidAmount" class="form-label">
+                        <i class="fas fa-money-check-alt" style="margin-left: 0.5rem;"></i>
+                        المبلغ المدفوع
+                    </label>
+                    <input type="text" id="editPaidAmount" class="form-control" value="<?php echo htmlspecialchars($paid_contract); ?>" placeholder="أدخل المبلغ">
+                </div>
+                <div class="mb-3">
+                    <label for="editPaymentTime" class="form-label">
+                        <i class="fas fa-clock" style="margin-left: 0.5rem;"></i>
+                        وقت الدفع
+                    </label>
+                    <select id="editPaymentTime" class="form-select">
+                        <option value="">— اختر —</option>
+                        <option value="مقدم" <?php echo ($payment_time == 'مقدم') ? 'selected' : ''; ?>>مقدم</option>
+                        <option value="مؤخر" <?php echo ($payment_time == 'مؤخر' || $payment_time == ' مؤخر') ? 'selected' : ''; ?>>مؤخر</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="editGuarantees" class="form-label">
+                        <i class="fas fa-shield-alt" style="margin-left: 0.5rem;"></i>
+                        الضمانات
+                    </label>
+                    <textarea id="editGuarantees" class="form-control" rows="3" placeholder="تفاصيل الضمانات"><?php echo htmlspecialchars($guarantees); ?></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="editPaymentDate" class="form-label">
+                        <i class="fas fa-calendar-check" style="margin-left: 0.5rem;"></i>
+                        تاريخ الدفع
+                    </label>
+                    <input type="date" id="editPaymentDate" class="form-control" value="<?php echo htmlspecialchars($payment_date); ?>">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+                <button type="button" class="btn btn-warning" id="savePayment">
+                    <i class="fas fa-save"></i> حفظ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- jQuery (required for your AJAX calls) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Bootstrap 5 Bundle (includes Popper) -->
@@ -1871,6 +1976,53 @@ $('#saveParties').click(function() {
                 $('#witnessOneDisplay').text(witnessOne);
                 $('#witnessTwoDisplay').text(witnessTwo);
                 bootstrap.Modal.getInstance(document.getElementById('editPartiesModal')).hide();
+                alert(response.message);
+                location.reload();
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function() {
+            alert('حدث خطأ أثناء الحفظ');
+        }
+    });
+});
+
+// فتح modal البيانات المالية
+$('#editPaymentBtn').click(function() {
+    const modal = new bootstrap.Modal(document.getElementById('editPaymentModal'));
+    modal.show();
+});
+
+// حفظ البيانات المالية
+$('#savePayment').click(function() {
+    const currency = $('#editCurrency').val();
+    const paidAmount = $('#editPaidAmount').val();
+    const paymentTime = $('#editPaymentTime').val();
+    const guarantees = $('#editGuarantees').val();
+    const paymentDate = $('#editPaymentDate').val();
+    
+    $.ajax({
+        url: 'update_contract_details.php',
+        type: 'POST',
+        data: {
+            action: 'update_payment',
+            contract_id: contractId,
+            price_currency_contract: currency,
+            paid_contract: paidAmount,
+            payment_time: paymentTime,
+            guarantees: guarantees,
+            payment_date: paymentDate
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                $('#currencyDisplay').text(currency || '-');
+                $('#paidAmountDisplay').text(paidAmount || '-');
+                $('#paymentTimeDisplay').text(paymentTime || '-');
+                $('#guaranteesDisplay').text(guarantees || '-');
+                $('#paymentDateDisplay').text(paymentDate || '-');
+                bootstrap.Modal.getInstance(document.getElementById('editPaymentModal')).hide();
                 alert(response.message);
                 location.reload();
             } else {

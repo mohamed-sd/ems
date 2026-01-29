@@ -650,6 +650,55 @@ if (!isset($_SESSION['user'])) {
                   min="0" placeholder="يُحتسب تلقائياً" readonly></div>
             </div>
 
+
+
+
+        
+               <div class="field md-3 sm-6">
+                    <label>العملة</label>
+                    <div class="control">
+                      <select name="price_currency_contract" id="price_currency_contract">
+                        <option value="">— اختر —</option>
+                        <option value="دولار">دولار</option>
+                        <option value="جنيه">جنيه</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="field md-3 sm-6">
+                    <label>المبلغ المدفوع</label>
+                    <div class="control"><input name="paid_contract" type="text" ></div>
+                  </div>
+
+                    <div class="field md-3 sm-6">
+                    <label>وقت الدفع</label>
+                    <div class="control">
+                      <select name="payment_time" id="payment_time">
+                        <option value="">— اختر —</option>
+                        <option value="مقدم">مقدم</option>
+                        <option value=" مؤخر">مؤخر </option>
+  
+                      </select>
+                    </div>
+                  </div>
+           
+                     <div class="field md-3 sm-6">
+                    <label>  الضمانات</label>
+                    <div class="control"><input name="guarantees" type="text"></div>
+                  </div>
+                
+                      <div class="field md-3 sm-6">
+              <label>    تاريخ الدفع</label>
+              <div class="control"><input name="payment_date" id="payment_date" type="date"></div>
+            </div>
+
+
+
+
+
+
+
+
+
            
         
                <div class="field md-3 sm-6">
@@ -673,7 +722,7 @@ if (!isset($_SESSION['user'])) {
                 
                
                   <div class="field md-3 sm-6">
-                    <label>إجمالي وحدات العقد للغقد </label>
+                    <label>إجمالي وحدات العقد  </label>
                     <div class="control"><input name="total_contract" type="number" 
                         placeholder=" "></div>
                   </div>
@@ -897,15 +946,13 @@ if (!isset($_SESSION['user'])) {
 
           <div class="form-grid">
 
-             <div class="field md-3 sm-6">
+             <div class="field md-3 sm-6" style="display: none;">
               <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
               <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
-                  placeholder="مثال: 8" required></div>
+                  placeholder="مثال: 8" value="20"></div>
             </div>
              <!-- Orgnization Break  -->
-            <div class="field md-3 sm-6"> </div>
-            <div class="field md-3 sm-6"> </div>
-                        <div class="field md-3 sm-6"> </div>
+            
 
             
             <div class="field md-3 sm-6">
@@ -1026,6 +1073,13 @@ if (!isset($_SESSION['user'])) {
               <th class="group-operations"><i class="fas fa-business-time"></i> ساعات العمل يومياً</th>
               <th class="group-operations"><i class="fas fa-users-cog"></i> عدد المشغلين يومياً</th>
               
+              <!-- البيانات المالية -->
+              <th class="group-basic"><i class="fas fa-money-bill-wave"></i> العملة</th>
+              <th class="group-basic"><i class="fas fa-dollar-sign"></i> المبلغ المدفوع</th>
+              <th class="group-basic"><i class="fas fa-clock"></i> وقت الدفع</th>
+              <th class="group-basic"><i class="fas fa-shield-alt"></i> الضمانات</th>
+              <th class="group-basic"><i class="fas fa-calendar-check"></i> تاريخ الدفع</th>
+              
               <!-- الحالة والإجراءات -->
               <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
               <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
@@ -1076,6 +1130,13 @@ if (!isset($_SESSION['user'])) {
               $witness_one = $_POST['witness_one'];
               $witness_two = $_POST['witness_two'];
 
+              // الحقول المالية الجديدة
+              $price_currency_contract = isset($_POST['price_currency_contract']) ? mysqli_real_escape_string($conn, $_POST['price_currency_contract']) : '';
+              $paid_contract = isset($_POST['paid_contract']) ? mysqli_real_escape_string($conn, $_POST['paid_contract']) : '';
+              $payment_time = isset($_POST['payment_time']) ? mysqli_real_escape_string($conn, $_POST['payment_time']) : '';
+              $guarantees = isset($_POST['guarantees']) ? mysqli_real_escape_string($conn, $_POST['guarantees']) : '';
+              $payment_date = isset($_POST['payment_date']) ? mysqli_real_escape_string($conn, $_POST['payment_date']) : '';
+
               // الحقول الإضافية للعقد
               $equip_shifts_contract = isset($_POST['equip_shifts_contract']) ? intval($_POST['equip_shifts_contract']) : 0;
               $shift_contract = isset($_POST['shift_contract']) ? intval($_POST['shift_contract']) : 0;
@@ -1108,7 +1169,12 @@ if (!isset($_SESSION['user'])) {
             first_party='$first_party',
             second_party='$second_party',
             witness_one='$witness_one',
-            witness_two='$witness_two'
+            witness_two='$witness_two',
+            price_currency_contract='$price_currency_contract',
+            paid_contract='$paid_contract',
+            payment_time='$payment_time',
+            guarantees='$guarantees',
+            payment_date='$payment_date'
         WHERE id=$id";
               } else {
                 // إضافة
@@ -1117,13 +1183,15 @@ if (!isset($_SESSION['user'])) {
             equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
             actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
             hours_monthly_target, forecasted_contracted_hours,
-            daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two
+            daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two,
+            price_currency_contract, paid_contract, payment_time, guarantees, payment_date
         ) VALUES (
             '$contract_signing_date', '$project','$grace_period_days', '$contract_duration_days',
             '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
             '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
             '$hours_monthly_target','$forecasted_contracted_hours',
-            '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two'
+            '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two',
+            '$price_currency_contract','$paid_contract','$payment_time','$guarantees','$payment_date'
         )";
               }
               $result = mysqli_query($conn, $sql);
@@ -1229,8 +1297,8 @@ if (!isset($_SESSION['user'])) {
               echo "<td class='group-parties'>" . (isset($row['witness_two']) ? $row['witness_two'] : '-') . "</td>";
               
               // الخدمات المقدمة
-              $transportationText = $row['transportation'] == 1 ? '<span style="color: green;">✓ متوفر</span>' : '<span style="color: red;">✗ غير متوفر</span>';
-              $accommodationText = $row['accommodation'] == 1 ? '<span style="color: green;">✓ متوفر</span>' : '<span style="color: red;">✗ غير متوفر</span>';
+              $transportationText = isset($row['transportation']) && $row['transportation'] ? $row['transportation'] : '-';
+              $accommodationText = isset($row['accommodation']) && $row['accommodation'] ? $row['accommodation'] : '-';
               $place_for_livingText = isset($row['place_for_living']) && $row['place_for_living'] ? $row['place_for_living'] : '-';
               $workshopText = isset($row['workshop']) && $row['workshop'] ? $row['workshop'] : '-';
               
@@ -1242,6 +1310,13 @@ if (!isset($_SESSION['user'])) {
               // التشغيل اليومي
               echo "<td class='group-operations'>" . (isset($row['daily_work_hours']) ? $row['daily_work_hours'] : '-') . "</td>";
               echo "<td class='group-operations'>" . (isset($row['daily_operators']) ? $row['daily_operators'] : '-') . "</td>";
+              
+              // البيانات المالية
+              echo "<td class='group-basic'>" . (isset($row['price_currency_contract']) && $row['price_currency_contract'] ? $row['price_currency_contract'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . (isset($row['paid_contract']) && $row['paid_contract'] ? $row['paid_contract'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . (isset($row['payment_time']) && $row['payment_time'] ? $row['payment_time'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . (isset($row['guarantees']) && $row['guarantees'] ? $row['guarantees'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . (isset($row['payment_date']) && $row['payment_date'] ? $row['payment_date'] : '-') . "</td>";
               
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";
@@ -1270,6 +1345,11 @@ if (!isset($_SESSION['user'])) {
                   equip_total_contract_daily ='" . (isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0) . "'
                   total_contract_permonth ='" . (isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0) . "'
                   total_contract_units ='" . (isset($row['total_contract_units']) ? $row['total_contract_units'] : 0) . "'
+                  price_currency_contract ='" . (isset($row['price_currency_contract']) ? $row['price_currency_contract'] : '') . "'
+                  paid_contract ='" . (isset($row['paid_contract']) ? $row['paid_contract'] : '') . "'
+                  payment_time ='" . (isset($row['payment_time']) ? $row['payment_time'] : '') . "'
+                  guarantees ='" . (isset($row['guarantees']) ? $row['guarantees'] : '') . "'
+                  payment_date ='" . (isset($row['payment_date']) ? $row['payment_date'] : '') . "'
                   
              data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
              class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>
@@ -1617,6 +1697,13 @@ if (!isset($_SESSION['user'])) {
       $("#projectForm [name='accommodation']").val($(this).attr("accommodation"));
       $("#projectForm [name='place_for_living']").val($(this).attr("place_for_living"));
       $("#projectForm [name='workshop']").val($(this).attr("workshop"));
+
+      // البيانات المالية الجديدة
+      $("#projectForm [name='price_currency_contract']").val($(this).attr("price_currency_contract"));
+      $("#projectForm [name='paid_contract']").val($(this).attr("paid_contract"));
+      $("#projectForm [name='payment_time']").val($(this).attr("payment_time"));
+      $("#projectForm [name='guarantees']").val($(this).attr("guarantees"));
+      $("#projectForm [name='payment_date']").val($(this).attr("payment_date"));
 
       // تحميل المعدات الخاصة بالعقد
       const contractId = $(this).data("id");

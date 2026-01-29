@@ -79,6 +79,30 @@ else if ($action === 'update_parties') {
     }
 }
 
+// 4. تحديث البيانات المالية
+else if ($action === 'update_payment') {
+    $price_currency_contract = isset($_POST['price_currency_contract']) ? mysqli_real_escape_string($conn, $_POST['price_currency_contract']) : '';
+    $paid_contract = isset($_POST['paid_contract']) ? mysqli_real_escape_string($conn, $_POST['paid_contract']) : '';
+    $payment_time = isset($_POST['payment_time']) ? mysqli_real_escape_string($conn, $_POST['payment_time']) : '';
+    $guarantees = isset($_POST['guarantees']) ? mysqli_real_escape_string($conn, $_POST['guarantees']) : '';
+    $payment_date = isset($_POST['payment_date']) ? mysqli_real_escape_string($conn, $_POST['payment_date']) : '';
+    
+    $query = "UPDATE contracts SET 
+        price_currency_contract = '$price_currency_contract',
+        paid_contract = '$paid_contract',
+        payment_time = '$payment_time',
+        guarantees = '$guarantees',
+        payment_date = '$payment_date',
+        updated_at = NOW()
+    WHERE id = $contract_id";
+    
+    if (mysqli_query($conn, $query)) {
+        echo json_encode(['success' => true, 'message' => 'تم تحديث البيانات المالية بنجاح']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'خطأ في التحديث: ' . mysqli_error($conn)]);
+    }
+}
+
 else {
     die(json_encode(['success' => false, 'message' => 'الإجراء غير معروف']));
 }

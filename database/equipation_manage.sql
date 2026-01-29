@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 29, 2026 at 03:05 AM
+-- Generation Time: Jan 29, 2026 at 02:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -80,7 +80,8 @@ CREATE TABLE `company_project` (
 
 INSERT INTO `company_project` (`id`, `project_code`, `project_name`, `category`, `sub_sector`, `state`, `region`, `nearest_market`, `latitude`, `longitude`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
 (1, 'PRJ-2026-001', 'مشروع طريق الخرطوم - بورتسودان', 'طرق', 'الطرق السريعة', 'الخرطوم', 'الخرطوم بحري', 'سوق ليبيا', '15.5527', '32.5599', 'نشط', NULL, '2026-01-29 03:48:30', NULL),
-(2, 'PRJ-2026-002', 'مشروع محطة مياه النيل الأزرق', 'مياه', 'محطات المياه', 'النيل الأزرق', 'الدمازين', 'سوق الدمازين', '11.7891', '34.3592', 'نشط', NULL, '2026-01-29 03:48:30', NULL);
+(2, 'PRJ-2026-002', 'مشروع محطة مياه النيل الأزرق', 'مياه', 'محطات المياه', 'النيل الأزرق', 'الدمازين', 'سوق الدمازين', '11.7891', '34.3592', 'نشط', NULL, '2026-01-29 03:48:30', NULL),
+(3, 'PRJ-2026-071', 'مشروع الروسيه جديد', 'تعدين', 'الطرق السريعة', 'جنوب الجزيره', 'الاسكندرية', 'سوق دلتا', '90', '18', 'نشط', 1, '2026-01-29 14:46:22', NULL);
 
 -- --------------------------------------------------------
 
@@ -96,8 +97,13 @@ CREATE TABLE `contractequipments` (
   `equip_count` int(11) DEFAULT NULL COMMENT 'عدد المعدات',
   `equip_shifts` int(11) DEFAULT 0 COMMENT 'عدد الورديات',
   `equip_unit` varchar(50) DEFAULT 'ساعة' COMMENT 'الوحدة',
+  `shift1_start` time DEFAULT NULL COMMENT 'وقت بداية الوردية الأولى',
+  `shift1_end` time DEFAULT NULL COMMENT 'وقت نهاية الوردية الأولى',
+  `shift2_start` time DEFAULT NULL COMMENT 'وقت بداية الوردية الثانية',
+  `shift2_end` time DEFAULT NULL COMMENT 'وقت نهاية الوردية الثانية',
   `shift_hours` int(11) DEFAULT 0 COMMENT 'إجمالي ساعات الوردية',
   `equip_total_month` int(11) DEFAULT NULL COMMENT 'إجمالي الساعات اليومية ',
+  `equip_monthly_target` int(11) DEFAULT 0 COMMENT 'وحدات العمل في الشهر',
   `equip_total_contract` int(11) DEFAULT NULL COMMENT 'إجمالي ساعات العقد',
   `equip_price` decimal(10,2) DEFAULT 0.00 COMMENT 'السعر',
   `equip_operators` int(11) DEFAULT 0 COMMENT 'المشغلين',
@@ -112,19 +118,27 @@ CREATE TABLE `contractequipments` (
 -- Dumping data for table `contractequipments`
 --
 
-INSERT INTO `contractequipments` (`id`, `contract_id`, `equip_type`, `equip_size`, `equip_count`, `equip_shifts`, `equip_unit`, `shift_hours`, `equip_total_month`, `equip_total_contract`, `equip_price`, `equip_operators`, `equip_supervisors`, `equip_technicians`, `equip_assistants`, `equip_price_currency`, `created_at`) VALUES
-(1, 1, 'حفار', 340, 5, 0, 'ساعة', 20, 100, 3100, 20.00, 3, 3, 3, 2, 'دولار', '2026-01-25 05:13:48'),
-(2, 1, 'قلاب', 320, 3, 2, 'طن', 20, 60, 1860, 25.00, 3, 2, 1, 0, 'دولار', '2026-01-25 05:13:48'),
-(5, 3, 'حفار', 590, 5, 2, 'ساعة', 20, 100, 2600, 20.00, 1, 1, 1, 1, 'دولار', '2026-01-25 20:03:59'),
-(6, 3, 'حفار', 490, 2, 0, 'ساعة', 20, 40, 1200, 0.00, 0, 0, 0, 0, NULL, '2026-01-25 20:58:49'),
-(7, 3, 'قلاب', 56, 5, 0, 'ساعة', 20, 100, 3000, 0.00, 0, 0, 0, 0, NULL, '2026-01-25 20:58:49'),
-(8, 4, 'حفار', 989, 2, 2, 'ساعة', 10, 20, 280, 10.00, 0, 0, 0, 0, 'دولار', '2026-01-25 21:01:24'),
-(12, 5, 'حفار', 350, 2, 3, 'ساعة', 200, 400, 17200, 15.00, 1, 1, 1, 1, 'دولار', '2026-01-25 22:11:33'),
-(13, 5, 'قلاب', 120, 5, 0, 'طن', 10, 50, 2150, 15.00, 1, 1, 1, 1, 'دولار', '2026-01-25 22:11:33'),
-(14, 2, 'قلاب', 56, 5, 3, 'طن', 20, 100, 3000, 40.00, 1, 1, 1, 1, 'دولار', '2026-01-25 22:23:48'),
-(15, 2, 'حفار', 590, 5, 600, 'ساعة', 20, 100, 3000, 0.00, 0, 0, 0, 0, '', '2026-01-25 22:23:48'),
-(16, 2, 'حفار', 490, 2, 0, 'ساعة', 20, 40, 1200, 0.00, 0, 0, 0, 0, '', '2026-01-25 22:23:48'),
-(17, 2, 'قلاب', 56, 5, 0, 'ساعة', 20, 100, 3000, 0.00, 0, 0, 0, 0, '', '2026-01-25 22:23:48');
+INSERT INTO `contractequipments` (`id`, `contract_id`, `equip_type`, `equip_size`, `equip_count`, `equip_shifts`, `equip_unit`, `shift1_start`, `shift1_end`, `shift2_start`, `shift2_end`, `shift_hours`, `equip_total_month`, `equip_monthly_target`, `equip_total_contract`, `equip_price`, `equip_operators`, `equip_supervisors`, `equip_technicians`, `equip_assistants`, `equip_price_currency`, `created_at`) VALUES
+(1, 1, 'حفار', 340, 5, 0, 'ساعة', NULL, NULL, NULL, NULL, 20, 100, 0, 3100, 20.00, 3, 3, 3, 2, 'دولار', '2026-01-25 05:13:48'),
+(2, 1, 'قلاب', 320, 3, 2, 'طن', NULL, NULL, NULL, NULL, 20, 60, 0, 1860, 25.00, 3, 2, 1, 0, 'دولار', '2026-01-25 05:13:48'),
+(5, 3, 'حفار', 590, 5, 2, 'ساعة', NULL, NULL, NULL, NULL, 20, 100, 0, 2600, 20.00, 1, 1, 1, 1, 'دولار', '2026-01-25 20:03:59'),
+(6, 3, 'حفار', 490, 2, 0, 'ساعة', NULL, NULL, NULL, NULL, 20, 40, 0, 1200, 0.00, 0, 0, 0, 0, NULL, '2026-01-25 20:58:49'),
+(7, 3, 'قلاب', 56, 5, 0, 'ساعة', NULL, NULL, NULL, NULL, 20, 100, 0, 3000, 0.00, 0, 0, 0, 0, NULL, '2026-01-25 20:58:49'),
+(8, 4, 'حفار', 989, 2, 2, 'ساعة', NULL, NULL, NULL, NULL, 10, 20, 0, 280, 10.00, 0, 0, 0, 0, 'دولار', '2026-01-25 21:01:24'),
+(12, 5, 'حفار', 350, 2, 3, 'ساعة', NULL, NULL, NULL, NULL, 200, 400, 0, 17200, 15.00, 1, 1, 1, 1, 'دولار', '2026-01-25 22:11:33'),
+(13, 5, 'قلاب', 120, 5, 0, 'طن', NULL, NULL, NULL, NULL, 10, 50, 0, 2150, 15.00, 1, 1, 1, 1, 'دولار', '2026-01-25 22:11:33'),
+(14, 2, 'قلاب', 56, 5, 3, 'طن', NULL, NULL, NULL, NULL, 20, 100, 0, 3000, 40.00, 1, 1, 1, 1, 'دولار', '2026-01-25 22:23:48'),
+(15, 2, 'حفار', 590, 5, 600, 'ساعة', NULL, NULL, NULL, NULL, 20, 100, 0, 3000, 0.00, 0, 0, 0, 0, '', '2026-01-25 22:23:48'),
+(16, 2, 'حفار', 490, 2, 0, 'ساعة', NULL, NULL, NULL, NULL, 20, 40, 0, 1200, 0.00, 0, 0, 0, 0, '', '2026-01-25 22:23:48'),
+(17, 2, 'قلاب', 56, 5, 0, 'ساعة', NULL, NULL, NULL, NULL, 20, 100, 0, 3000, 0.00, 0, 0, 0, 0, '', '2026-01-25 22:23:48'),
+(18, 8, 'حفار', 44, 2, 2, '', '14:35:00', '14:37:00', '14:37:00', '14:38:00', 20, 40, 2000, 1200, 30.00, 44, 44, 44, 44, 'دولار', '2026-01-29 12:37:05'),
+(19, 9, 'حفار', 340, 2, 2, 'ساعة', '14:49:00', '14:50:00', '14:50:00', '14:50:00', 10, 20, 600, 600, 100.00, 1, 1, 1, 1, 'دولار', '2026-01-29 12:50:07'),
+(20, 9, 'قلاب', 11, 1, 2, 'ساعة', '14:51:00', '18:49:00', '14:51:00', '14:52:00', 10, 10, 300, 300, 30.00, 1, 1, 1, 1, 'دولار', '2026-01-29 12:50:07'),
+(26, 10, 'حفار', 33, 2, 0, '', '15:07:00', '15:08:00', '15:07:00', '15:03:00', 20, 40, 0, 3360, 20.00, 1, 0, 0, 0, 'دولار', '2026-01-29 13:36:07'),
+(27, 10, 'حفار', 340, 2, 0, 'ساعة', NULL, NULL, NULL, NULL, 10, 20, 22, 1680, 0.00, 0, 0, 0, 0, '', '2026-01-29 13:36:07'),
+(28, 10, 'قلاب', 11, 1, 0, 'ساعة', NULL, NULL, NULL, NULL, 10, 10, 0, 840, 0.00, 0, 0, 0, 0, '', '2026-01-29 13:36:07'),
+(29, 10, 'حفار', 340, 2, 0, 'ساعة', NULL, NULL, NULL, NULL, 10, 20, 0, 1680, 0.00, 0, 0, 0, 0, '', '2026-01-29 13:36:07'),
+(30, 10, 'قلاب', 11, 1, 0, 'ساعة', NULL, NULL, NULL, NULL, 10, 10, 0, 840, 0.00, 0, 0, 0, 0, '', '2026-01-29 13:36:07');
 
 -- --------------------------------------------------------
 
@@ -176,10 +190,15 @@ CREATE TABLE `contracts` (
 
 INSERT INTO `contracts` (`id`, `project`, `contract_signing_date`, `grace_period_days`, `contract_duration_months`, `contract_duration_days`, `equip_shifts_contract`, `shift_contract`, `equip_total_contract_daily`, `total_contract_permonth`, `total_contract_units`, `actual_start`, `actual_end`, `transportation`, `accommodation`, `place_for_living`, `workshop`, `hours_monthly_target`, `forecasted_contracted_hours`, `created_at`, `updated_at`, `daily_work_hours`, `daily_operators`, `first_party`, `second_party`, `witness_one`, `witness_two`, `contract_status`, `pause_reason`, `pause_date`, `resume_date`, `termination_type`, `termination_reason`, `merged_with`, `status`) VALUES
 (1, 4, '2026-01-01', 10, 0, 31, 0, 0, 0, 0, 0, '2026-01-10', '2026-02-10', 'مالك المعدة', 'مالك المشروع', 'مالك المعدة', 'مالك المعدة', 160, 4960, '2026-01-25 05:13:48', '2026-01-25 05:13:48', '20', '6', 'محمد سيد', 'مبارك عوض', 'سمير الليل', 'مبارك محمود', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(2, 1, '2026-01-01', 5, 4, 144, 0, 0, 0, 0, 0, '2026-02-28', '2026-07-22', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 380, 11400, '2026-01-25 14:13:43', '2026-01-25 23:37:56', '20', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, 3, 1),
+(2, 1, '2026-01-01', 5, 4, 126, 0, 0, 0, 0, 0, '2026-07-22', '2026-11-25', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 380, 11400, '2026-01-25 14:13:43', '2026-01-29 12:24:30', '20', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, 3, 1),
 (3, 1, '2026-01-25', 3, 7, 236, 0, 0, 0, 0, 0, '2026-03-27', '2026-11-18', 'مالك المعدة', 'مالك المشروع', 'مالك المعدة', 'بدون', 100, 6800, '2026-01-25 20:03:59', '2026-01-25 21:50:29', '20', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, 2, 1),
 (4, 1, '2026-01-07', 2, 0, 14, 0, 0, 0, 0, 0, '2026-01-01', '2026-01-15', 'مالك المعدة', 'مالك المعدة', 'بدون', 'مالك المشروع', 20, 280, '2026-01-25 21:01:24', '2026-01-25 21:01:24', '30', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(5, 1, '2026-01-01', 1, 0, 43, 0, 0, 0, 0, 0, '2026-01-15', '2026-02-27', 'مالك المعدة', 'مالك المعدة', 'مالك المشروع', 'مالك المعدة', 450, 19350, '2026-01-25 22:11:33', '2026-01-25 22:11:33', '20', '5', 'احمد', 'محمد', 'علي', 'يوسف', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
+(5, 1, '2026-01-01', 1, 0, 43, 0, 0, 0, 0, 0, '2026-01-15', '2026-02-27', 'مالك المعدة', 'مالك المعدة', 'مالك المشروع', 'مالك المعدة', 450, 19350, '2026-01-25 22:11:33', '2026-01-25 22:11:33', '20', '5', 'احمد', 'محمد', 'علي', 'يوسف', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(6, 2, '0000-00-00', 0, 0, 31, 0, 0, 0, 0, 0, '2026-01-01', '2026-01-31', '', '', '', '', 40, 1200, '2026-01-29 12:31:40', NULL, '44', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(7, 2, '0000-00-00', 44, 0, 31, 44, 4444, 44, 44, 44, '2026-01-01', '2026-01-31', '', '', 'بدون', '', 40, 1200, '2026-01-29 12:35:46', NULL, '20', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(8, 2, '0000-00-00', 44, 0, 31, 44, 4444, 44, 44, 44, '2026-01-01', '2026-02-05', '', '', 'بدون', '', 40, 1200, '2026-01-29 12:37:05', '2026-01-29 12:38:11', '20', '', '', '', '', '', NULL, NULL, '2026-01-15', '2026-01-20', NULL, NULL, NULL, 1),
+(9, 3, '2026-01-01', 5, 0, 27, 2, 10, 20, 700, 1200, '2026-01-31', '2026-02-27', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 30, 900, '2026-01-29 12:50:07', '2026-01-29 13:32:53', '11', '12', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(10, 3, '2025-12-10', 0, 0, 84, 1, 1, 1, 1, 1, '2026-01-09', '2026-04-02', '', '', '', '', 100, 8400, '2026-01-29 13:03:22', '2026-01-29 13:36:07', '1111', '', '', '', '', '', NULL, NULL, NULL, NULL, NULL, NULL, 9, 1);
 
 -- --------------------------------------------------------
 
@@ -234,7 +253,15 @@ INSERT INTO `contract_notes` (`id`, `contract_id`, `note`, `user_id`, `created_a
 (50, 3, 'تم تجديد العقد من 2026-02-28 إلى 2026-03-27 (مدة: 0 شهور / 27 يوم)', 0, '2026-01-25 21:48:47', NULL),
 (51, 3, 'تم تجديد العقد من 2026-03-27 إلى 2026-11-18 (مدة: 7 شهور / 236 يوم)', 0, '2026-01-25 21:50:29', NULL),
 (52, 2, 'تم إيقاف العقد - السبب: الال', 0, '2026-01-25 23:37:49', NULL),
-(53, 2, 'تم استئناف العقد بتاريخ 2026-01-26 - الملاحظات: تات', 0, '2026-01-25 23:37:56', NULL);
+(53, 2, 'تم استئناف العقد بتاريخ 2026-01-26 - الملاحظات: تات', 0, '2026-01-25 23:37:56', NULL),
+(54, 2, 'تم تجديد العقد من 2026-07-22 إلى 2026-11-25 (مدة: 4 شهور / 126 يوم)', 1, '2026-01-29 12:24:30', NULL),
+(55, 8, 'تم إيقاف العقد بتاريخ 2026-01-15 - السبب: ثيثي', 1, '2026-01-29 12:37:47', NULL),
+(56, 8, 'تم استئناف العقد بتاريخ 2026-01-20 - مدة الإيقاف: 5 يوم (تم تمديد العقد بإضافة 5 يوم إلى تاريخ الانتهاء) - الملاحظات: يي', 1, '2026-01-29 12:38:11', NULL),
+(57, 9, 'تم تجديد العقد من 2026-01-31 إلى 2026-02-27 (مدة: 0 شهور / 27 يوم)', 1, '2026-01-29 12:50:53', NULL),
+(58, 10, 'تم دمج العقد مع العقد رقم 9 - إجمالي الساعات: 4220 (العقد الحالي: 3320 + العقد المدموج: 900) - تم نسخ 2 معدة', 1, '2026-01-29 13:18:01', NULL),
+(59, 9, 'تم دمج هذا العقد مع العقد رقم 10', 1, '2026-01-29 13:18:01', NULL),
+(60, 10, 'تم دمج العقد مع العقد رقم 9 - إجمالي الساعات: 5120 (العقد الحالي: 4220 + العقد المدموج: 900) - تم نسخ 2 معدة', 1, '2026-01-29 13:32:53', NULL),
+(61, 9, 'تم دمج هذا العقد مع العقد رقم 10 - تم تحويل العقد إلى غير ساري', 1, '2026-01-29 13:32:53', NULL);
 
 -- --------------------------------------------------------
 
@@ -367,15 +394,7 @@ CREATE TABLE `operationproject` (
   `id` int(11) NOT NULL,
   `company_project_id` int(11) DEFAULT NULL COMMENT 'معرف المشروع من جدول company_project',
   `company_client_id` int(11) DEFAULT NULL COMMENT 'معرف العميل من جدول company_clients',
-  `project_code` varchar(50) DEFAULT NULL,
   `name` varchar(150) NOT NULL,
-  `category` varchar(100) DEFAULT NULL,
-  `sub_sector` varchar(200) DEFAULT NULL,
-  `state` varchar(100) DEFAULT NULL,
-  `region` varchar(100) DEFAULT NULL,
-  `nearest_market` varchar(100) DEFAULT NULL,
-  `latitude` varchar(50) DEFAULT NULL,
-  `longitude` varchar(50) DEFAULT NULL,
   `client` varchar(150) NOT NULL,
   `location` varchar(200) NOT NULL,
   `total` varchar(50) NOT NULL,
@@ -387,9 +406,10 @@ CREATE TABLE `operationproject` (
 -- Dumping data for table `operationproject`
 --
 
-INSERT INTO `operationproject` (`id`, `company_project_id`, `company_client_id`, `project_code`, `name`, `category`, `sub_sector`, `state`, `region`, `nearest_market`, `latitude`, `longitude`, `client`, `location`, `total`, `status`, `create_at`) VALUES
-(1, NULL, NULL, NULL, 'مشروع الروسية', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'شركه الياس', 'الخرطوم2', '0', 1, '2026-01-23 05:02:37'),
-(2, NULL, NULL, NULL, 'مشروع فاروس', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'احمد', 'الخرطوم', '0', 1, '2026-01-25 23:07:51');
+INSERT INTO `operationproject` (`id`, `company_project_id`, `company_client_id`, `name`, `client`, `location`, `total`, `status`, `create_at`) VALUES
+(1, 1, 1, 'مشروع الروسية', 'شركه الياس', 'الخرطوم2', '0', 1, '2026-01-23 05:02:37'),
+(2, 2, 2, 'مشروع فاروس', 'احمد', 'الخرطوم', '0', 1, '2026-01-25 23:07:51'),
+(3, 3, 3, 'مشروع الروسيه جديد', 'شركة الطرق السريعة', 'كم', '0', 1, '2026-01-29 11:46:42');
 
 -- --------------------------------------------------------
 
@@ -680,7 +700,6 @@ ALTER TABLE `equipment_drivers`
 --
 ALTER TABLE `operationproject`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_project_code` (`project_code`),
   ADD KEY `idx_company_project_id` (`company_project_id`),
   ADD KEY `idx_company_client_id` (`company_client_id`);
 
@@ -736,25 +755,25 @@ ALTER TABLE `company_clients`
 -- AUTO_INCREMENT for table `company_project`
 --
 ALTER TABLE `company_project`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `contractequipments`
 --
 ALTER TABLE `contractequipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `contracts`
 --
 ALTER TABLE `contracts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `contract_notes`
 --
 ALTER TABLE `contract_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `drivercontracts`
@@ -784,7 +803,7 @@ ALTER TABLE `equipment_drivers`
 -- AUTO_INCREMENT for table `operationproject`
 --
 ALTER TABLE `operationproject`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `operations`
