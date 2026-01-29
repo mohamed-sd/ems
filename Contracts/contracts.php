@@ -1418,22 +1418,19 @@ if (!isset($_SESSION['user'])) {
             </div>
 
             <div class="field md-3 sm-6">
+              <label>عدد المشغلين</label>
+              <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>عدد المساعدين</label>
+              <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0"></div>
+            </div>
+
+            <div class="field md-3 sm-6">
               <label>عدد الورديات</label>
               <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2"></div>
             </div>
-            <div class="field md-3 sm-6">
-              <label>وحدة القياس</label>
-              <div class="control">
-                <select name="equip_unit_${equipmentIndex}" class="equip-unit">
-                  <option value="">— اختر —</option>
-                  <option value="ساعة">ساعة</option>
-                  <option value="طن">طن</option>
-                  <option value="متر طولي">متر طولي</option>
-                  <option value="متر مكعب">متر مكعب</option>
-                </select>
-              </div>
-            </div>
-            
+
             <!-- أوقات الورديات -->
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
@@ -1453,6 +1450,19 @@ if (!isset($_SESSION['user'])) {
             </div>
 
             <div class="field md-3 sm-6">
+              <label>وحدة القياس</label>
+              <div class="control">
+                <select name="equip_unit_${equipmentIndex}" class="equip-unit">
+                  <option value="">— اختر —</option>
+                  <option value="ساعة">ساعة</option>
+                  <option value="طن">طن</option>
+                  <option value="متر طولي">متر طولي</option>
+                  <option value="متر مكعب">متر مكعب</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field md-3 sm-6">
               <label>ساعات الوردية</label>
               <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0"></div>
             </div>
@@ -1465,14 +1475,9 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0"></div>
             </div>
 
-       
             <div class="field md-3 sm-6">
               <label>إجمالي ساعات العقد</label>
               <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً"></div>
-            </div>
-            <div class="field md-3 sm-6">
-              <label>السعر</label>
-              <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>العملة</label>
@@ -1484,11 +1489,11 @@ if (!isset($_SESSION['user'])) {
                 </select>
               </div>
             </div>
-
-         
             <div class="field md-3 sm-6">
-              <label>عدد المشغلين</label>
-              <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0"></div>
+              <label>السعر</label>
+              <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00"></div>
+            </div>
+            <div class="field md-3 sm-6">
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المشرفين</label>
@@ -1498,13 +1503,6 @@ if (!isset($_SESSION['user'])) {
               <label>عدد الفنيين</label>
               <div class="control"><input name="equip_technicians_${equipmentIndex}" type="number" min="0"></div>
             </div>
-            <!-- خانتان فارغتان للحفاظ على 3 خانات لكل صف -->
-           
-            <div class="field md-3 sm-6">
-              <label>عدد المساعدين</label>
-              <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0"></div>
-            </div>
-        
           </div>
         </div>
       `;
@@ -1694,20 +1692,16 @@ if (!isset($_SESSION['user'])) {
                         <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
                       </div>
                       <div class="field md-3 sm-6">
-                        <label>عدد الورديات</label>
-                        <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}"></div>
+                        <label>عدد المشغلين</label>
+                        <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0" value="${equip.equip_operators}"></div>
                       </div>
                       <div class="field md-3 sm-6">
-                        <label>وحدة القياس</label>
-                        <div class="control">
-                          <select name="equip_unit_${equipmentIndex}" class="equip-unit">
-                            <option value="">— اختر —</option>
-                            <option value="ساعة" ${equip.equip_unit === 'ساعة' ? 'selected' : ''}>ساعة</option>
-                            <option value="طن" ${equip.equip_unit === 'طن' ? 'selected' : ''}>طن</option>
-                            <option value="متر طولي" ${equip.equip_unit === 'متر طولي' ? 'selected' : ''}>متر طولي</option>
-                            <option value="متر مكعب" ${equip.equip_unit === 'متر مكعب' ? 'selected' : ''}>متر مكعب</option>
-                          </select>
-                        </div>
+                        <label>عدد المساعدين</label>
+                        <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0" value="${equip.equip_assistants}"></div>
+                      </div>
+                      <div class="field md-3 sm-6">
+                        <label>عدد الورديات</label>
+                        <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}"></div>
                       </div>
                       
                       <!-- أوقات الورديات -->
@@ -1728,7 +1722,18 @@ if (!isset($_SESSION['user'])) {
                         <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" value="${equip.shift2_end || ''}"></div>
                       </div>
 
-                  
+                      <div class="field md-3 sm-6">
+                        <label>وحدة القياس</label>
+                        <div class="control">
+                          <select name="equip_unit_${equipmentIndex}" class="equip-unit">
+                            <option value="">— اختر —</option>
+                            <option value="ساعة" ${equip.equip_unit === 'ساعة' ? 'selected' : ''}>ساعة</option>
+                            <option value="طن" ${equip.equip_unit === 'طن' ? 'selected' : ''}>طن</option>
+                            <option value="متر طولي" ${equip.equip_unit === 'متر طولي' ? 'selected' : ''}>متر طولي</option>
+                            <option value="متر مكعب" ${equip.equip_unit === 'متر مكعب' ? 'selected' : ''}>متر مكعب</option>
+                          </select>
+                        </div>
+                      </div>
 
                       <div class="field md-3 sm-6">
                         <label>ساعات الوردية</label>
@@ -1747,10 +1752,6 @@ if (!isset($_SESSION['user'])) {
                         <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_contract}"></div>
                       </div>
                       <div class="field md-3 sm-6">
-                        <label>السعر</label>
-                        <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" value="${equip.equip_price}"></div>
-                      </div>
-                      <div class="field md-3 sm-6">
                         <label>العملة</label>
                         <div class="control">
                           <select name="equip_price_currency_${equipmentIndex}">
@@ -1760,11 +1761,11 @@ if (!isset($_SESSION['user'])) {
                           </select>
                         </div>
                       </div>
-
-
                       <div class="field md-3 sm-6">
-                        <label>عدد المشغلين</label>
-                        <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0" value="${equip.equip_operators}"></div>
+                        <label>السعر</label>
+                        <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" value="${equip.equip_price}"></div>
+                      </div>
+                       <div class="field md-3 sm-6">
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المشرفين</label>
@@ -1773,10 +1774,6 @@ if (!isset($_SESSION['user'])) {
                       <div class="field md-3 sm-6">
                         <label>عدد الفنيين</label>
                         <div class="control"><input name="equip_technicians_${equipmentIndex}" type="number" min="0" value="${equip.equip_technicians}"></div>
-                      </div>
-                      <div class="field md-3 sm-6">
-                        <label>عدد المساعدين</label>
-                        <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0" value="${equip.equip_assistants}"></div>
                       </div>
                     </div>
                   </div>
