@@ -24,7 +24,8 @@ function getContractData($contract_id, $conn) {
 // دالة لإضافة ملاحظة
 function addNote($contract_id, $note, $conn) {
     $note = mysqli_real_escape_string($conn, $note);
-    $query = "INSERT INTO contract_notes (contract_id, note, created_at) VALUES ($contract_id, '$note', NOW())";
+    $user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
+    $query = "INSERT INTO contract_notes (contract_id, note, user_id, created_at) VALUES ($contract_id, '$note', $user_id, NOW())";
     return mysqli_query($conn, $query);
 }
 

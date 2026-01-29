@@ -778,12 +778,17 @@ $witness_two = $row['witness_two'];
                         <th>#</th>
                         <th>نوع الإجراء</th>
                         <th>الملاحظة</th>
+                        <th>بواسطة</th>
                         <th>التاريخ والوقت</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    $notes_query = "SELECT * FROM contract_notes WHERE contract_id = $contract_id ORDER BY created_at DESC";
+                    $notes_query = "SELECT cn.*, u.name as user_name 
+                                    FROM contract_notes cn 
+                                    LEFT JOIN users u ON cn.user_id = u.id 
+                                    WHERE cn.contract_id = $contract_id 
+                                    ORDER BY cn.created_at DESC";
                     $notes_result = mysqli_query($conn, $notes_query);
                     
                     if ($notes_result && mysqli_num_rows($notes_result) > 0) {
@@ -836,12 +841,13 @@ $witness_two = $row['witness_two'];
                             echo "<td>" . $j . "</td>";
                             echo "<td><span style='" . $badge_colors[$action_badge] . " color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;'>" . $action_icon . " " . $action_type . "</span></td>";
                             echo "<td style='text-align: right;'>" . $note_text . "</td>";
+                            echo "<td><i class='fas fa-user' style='color:#667eea; margin-left:5px;'></i>" . ($note['user_name'] ?? 'غير محدد') . "</td>";
                             echo "<td><i class='far fa-clock' style='margin-left: 0.5rem;'></i>" . $note['created_at'] . "</td>";
                             echo "</tr>";
                             $j++;
                         }
                     } else {
-                        echo "<tr><td colspan='4' style='text-align: center; padding: 2rem;'>";
+                        echo "<tr><td colspan='5' style='text-align: center; padding: 2rem;'>";
                         echo "<i class='fas fa-inbox' style='font-size: 3rem; color: #e9ecef; margin-bottom: 1rem;'></i>";
                         echo "<p style='color: #999; font-size: 1.1rem;'>لا توجد ملاحظات لهذا العقد</p>";
                         echo "</td></tr>";

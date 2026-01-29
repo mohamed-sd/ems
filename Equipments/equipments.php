@@ -172,7 +172,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
 
                         // المشروع النشط
                         if (!empty($row['project'])) {
-                            $p_res = mysqli_query($conn, "SELECT name FROM projects WHERE id='" . $row['project'] . "'");
+                            $p_res = mysqli_query($conn, "SELECT name FROM operationproject WHERE id='" . $row['project'] . "'");
                             $p_name = "";
                             if ($p_res && mysqli_num_rows($p_res) > 0) {
                                 $p = mysqli_fetch_assoc($p_res);

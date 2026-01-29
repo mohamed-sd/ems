@@ -52,7 +52,7 @@ if(isset($_GET['sid'])){
                     <select name="project" required>
                         <option value="">-- اختر المشروع --</option>
                         <?php
-                        $pr_res = mysqli_query($conn, "SELECT id, name FROM projects where status = '1' ");
+                        $pr_res = mysqli_query($conn, "SELECT id, name FROM operationproject where status = '1' ");
                         while ($pr = mysqli_fetch_assoc($pr_res)) {
                             echo "<option value='" . $pr['id'] . "'>" . $pr['name'] . "</option>";
                         }
@@ -126,7 +126,7 @@ if(isset($_GET['sid'])){
                                  IFNULL(GROUP_CONCAT(DISTINCT d.name SEPARATOR ', '), '') AS driver_names
                       FROM operations o
                       LEFT JOIN equipments e ON o.equipment = e.id
-                      LEFT JOIN projects p ON o.project = p.id
+                      LEFT JOIN operationproject p ON o.project = p.id
                       LEFT JOIN suppliers s ON e.suppliers = s.id
                       LEFT JOIN equipment_drivers ed ON o.equipment = ed.equipment_id
                       LEFT JOIN drivers d ON ed.driver_id = d.id

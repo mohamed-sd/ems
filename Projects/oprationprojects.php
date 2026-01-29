@@ -6,10 +6,21 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['company_project_id'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-    $name = mysqli_real_escape_string($conn, $_POST['name']);
-    $client = mysqli_real_escape_string($conn, $_POST['client']);
+    $company_project_id = intval($_POST['company_project_id']);
+    $company_client_id = intval($_POST['company_client_id']);
+    
+    // جلب بيانات المشروع من جدول company_project
+    $project_data = mysqli_query($conn, "SELECT project_name FROM company_project WHERE id = $company_project_id");
+    $project_row = mysqli_fetch_assoc($project_data);
+    $name = $project_row['project_name'];
+    
+    // جلب بيانات العميل من جدول company_clients
+    $client_data = mysqli_query($conn, "SELECT client_name FROM company_clients WHERE id = $company_client_id");
+    $client_row = mysqli_fetch_assoc($client_data);
+    $client = $client_row['client_name'];
+    
     $location = mysqli_real_escape_string($conn, $_POST['location']);
     $total = floatval($_POST['total']);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
@@ -17,7 +28,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
     if ($id > 0) {
         // تحديث
-        $sql = "UPDATE projects SET 
+        // التحقق من عدم تكرار نفس المشروع والعميل (مع استثناء السجل الحالي)
+        $check_duplicate = mysqli_query($conn, "SELECT id FROM operationproject 
+            WHERE company_project_id = $company_project_id 
+            AND company_client_id = $company_client_id 
+            AND id != $id");
+        
+        if (mysqli_num_rows($check_duplicate) > 0) {
+            header("Location: oprationprojects.php?msg=هذا+المشروع+مع+هذا+العميل+موجود+بالفعل+❌");
+            exit;
+        }
+        
+        $sql = "UPDATE operationproject SET 
+            company_project_id='$company_project_id',
+            company_client_id='$company_client_id',
             name='$name',
             client='$client',
             location='$location',
@@ -26,14 +50,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         WHERE id=$id";
         mysqli_query($conn, $sql);
 
-         header("Location: projects.php?msg=تم+تعديل+المشروع+بنجاح+✅");
+         header("Location: oprationprojects.php?msg=تم+تعديل+المشروع+بنجاح+✅");
                 exit;
     } else {
+        // التحقق من عدم تكرار نفس المشروع والعميل عند الإضافة
+        $check_duplicate = mysqli_query($conn, "SELECT id FROM operationproject 
+            WHERE company_project_id = $company_project_id 
+            AND company_client_id = $company_client_id");
+        
+        if (mysqli_num_rows($check_duplicate) > 0) {
+            header("Location: oprationprojects.php?msg=هذا+المشروع+مع+هذا+العميل+موجود+بالفعل+❌");
+            exit;
+        }
+        
         // إضافة
-        $sql = "INSERT INTO projects (name, client, location, total, status, create_at) 
-        VALUES ('$name', '$client', '$location', '$total', '$status', '$date')";
+        $sql = "INSERT INTO operationproject (company_project_id, company_client_id, name, client, location, total, status, create_at) 
+        VALUES ('$company_project_id', '$company_client_id', '$name', '$client', '$location', '$total', '$status', '$date')";
         mysqli_query($conn, $sql);
-         header("Location: projects.php?msg=تم+اضافه+المشروع+بنجاح+✅");
+         header("Location: oprationprojects.php?msg=تم+اضافه+المشروع+بنجاح+✅");
           exit;
     }
 }
@@ -565,11 +599,27 @@ include('../insidebar.php');
                 <div class="form-grid">
                     <div>
                         <label><i class="fas fa-file-signature"></i> اسم المشروع</label>
-                        <input type="text" name="name" placeholder="أدخل اسم المشروع" id="project_name" required />
+                        <select name="company_project_id" id="company_project_id" required>
+                            <option value="">-- اختر المشروع --</option>
+                            <?php
+                            $projects_query = mysqli_query($conn, "SELECT id, project_code, project_name FROM company_project WHERE status = 'نشط' ORDER BY project_name ASC");
+                            while ($proj = mysqli_fetch_assoc($projects_query)) {
+                                echo "<option value='" . $proj['id'] . "'>[" . $proj['project_code'] . "] " . $proj['project_name'] . "</option>";
+                            }
+                            ?>
+                        </select>
                     </div>
                     <div>
                         <label><i class="fas fa-user-tie"></i> اسم العميل</label>
-                        <input type="text" name="client" placeholder="أدخل اسم العميل" id="project_client" required />
+                        <select name="company_client_id" id="company_client_id" required>
+                            <option value="">-- اختر العميل --</option>
+                            <?php
+                            $clients_query = mysqli_query($conn, "SELECT id, client_code, client_name FROM company_clients WHERE status = 'نشط' ORDER BY client_name ASC");
+                            while ($cli = mysqli_fetch_assoc($clients_query)) {
+                                echo "<option value='" . $cli['id'] . "'>[" . $cli['client_code'] . "] " . $cli['client_name'] . "</option>";
+                            }
+                            ?>
+                        </select>
                     </div>
                     <div>
                         <label><i class="fas fa-map-marker-alt"></i> موقع المشروع</label>
@@ -604,7 +654,6 @@ include('../insidebar.php');
                     <tr>
                         <th><i class="fas fa-calendar"></i> تاريخ الإضافة</th>
                         <th><i class="fas fa-project-diagram"></i> اسم المشروع</th>
-                        <th><i class="fas fa-tools"></i> عدد الآليات</th>
                         <th><i class="fas fa-file-contract"></i> العقود</th>
                         <th><i class="fas fa-user-tie"></i> العميل</th>
                         <th><i class="fas fa-map-marker-alt"></i> الموقع</th>
@@ -618,24 +667,27 @@ include('../insidebar.php');
                     <?php
                     include '../config.php';
 
-                    // جلب المشاريع
-                    $query = "SELECT `id`, `name`, `client`, `location`, `total` , `status` , `create_at`, 
-                      (SELECT COUNT(*) FROM contracts WHERE contracts.project = projects.id) as 'contracts',
-                      (SELECT COUNT(*) FROM operations WHERE operations.project = projects.id) as 'operations',
+                    // جلب المشاريع مع الموقع من جدول company_project واسم العميل من جدول company_clients
+                    $query = "SELECT op.`id`, op.`name`,cp.`project_name` , cc.`client_name`, op.`total`, op.`status`, op.`create_at`, 
+                      op.`company_project_id`, op.`company_client_id`,
+                      COALESCE(cp.`state`, op.`location`) as 'location',
+                      (SELECT COUNT(*) FROM contracts WHERE contracts.project = op.id) as 'contracts',
                       (SELECT COUNT(DISTINCT pm.suppliers) 
                           FROM equipments pm
                           JOIN operations m ON pm.id = m.equipment
-                          WHERE m.project = projects.id) as 'total_suppliers'
-                      FROM projects ORDER BY id DESC";
+                          WHERE m.project = op.id) as 'total_suppliers'
+                      FROM operationproject op
+                      LEFT JOIN company_project cp ON op.company_project_id = cp.id
+                      LEFT JOIN company_clients cc ON op.company_client_id = cc.id
+                      ORDER BY op.id DESC";
                     $result = mysqli_query($conn, $query);
                     $i = 1;
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<tr>";
                         echo "<td>" . $row['create_at'] . "</td>";
-                        echo "<td><strong>" . $row['name'] . "</strong></td>";
-                        echo "<td><span class='count-badge'>" . $row['operations'] . "</span></td>";
+                        echo "<td><strong>" . $row['project_name'] . "</strong></td>";
                         echo "<td><span class='count-badge'>" . $row['contracts'] . "</span></td>";
-                        echo "<td>" . $row['client'] . "</td>";
+                        echo "<td>" . ($row['client_name'] ?? $row['client']) . "</td>";
                         echo "<td><i class='fas fa-map-pin' style='color:#667eea; margin-left:5px;'></i>" . $row['location'] . "</td>";
                         echo "<td><span class='count-badge'>" . $row['total_suppliers'] . "</span></td>";
                         
@@ -658,8 +710,9 @@ include('../insidebar.php');
                                 <a href='javascript:void(0)' 
                                    class='action-btn edit editBtn' 
                                    data-id='" . $row['id'] . "' 
+                                   data-company-project-id='" . ($row['company_project_id'] ?? '') . "' 
+                                   data-company-client-id='" . ($row['company_client_id'] ?? '') . "' 
                                    data-name='" . $row['name'] . "' 
-                                   data-client='" . $row['client'] . "' 
                                    data-location='" . $row['location'] . "' 
                                    data-status='" . $row['status'] . "'
                                    title='تعديل'>
@@ -723,8 +776,8 @@ include('../insidebar.php');
             projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
             // تنظيف الحقول عند الإضافة
             $("#project_id").val("");
-            $("#project_name").val("");
-            $("#project_client").val("");
+            $("#company_project_id").val("");
+            $("#company_client_id").val("");
             $("#project_location").val("");
             $("#project_status").val("");
         });
@@ -732,8 +785,8 @@ include('../insidebar.php');
         // عند الضغط على زر تعديل
         $(document).on("click", ".editBtn", function () {
             $("#project_id").val($(this).data("id"));
-            $("#project_name").val($(this).data("name"));
-            $("#project_client").val($(this).data("client"));
+            $("#company_project_id").val($(this).data("company-project-id"));
+            $("#company_client_id").val($(this).data("company-client-id"));
             $("#project_location").val($(this).data("location"));
             $("#project_status").val($(this).data("status"));
 

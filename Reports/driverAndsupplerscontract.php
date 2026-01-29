@@ -46,7 +46,7 @@ FROM timesheet t
 JOIN drivers d ON t.driver = d.id
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id 
-JOIN projects p ON o.project = p.id
+JOIN operationproject p ON o.project = p.id
 WHERE 1=1
 ";
 
@@ -83,7 +83,7 @@ $result = mysqli_query($conn, $sql);
                 <select name="project" class="form-select">
                     <option value="">-- الكل --</option>
                     <?php
-                    $prj = mysqli_query($conn, "SELECT id, name FROM projects");
+                    $prj = mysqli_query($conn, "SELECT id, name FROM operationproject");
                     while ($row = mysqli_fetch_assoc($prj)) {
                         $selected = ($project_filter == $row['id']) ? "selected" : "";
                         echo "<option value='" . $row['id'] . "' $selected>" . $row['name'] . "</option>";

@@ -7,14 +7,14 @@ $userName = isset($_SESSION['user']['name']) ? $_SESSION['user']['name'] : "مس
 
 
 // إحصائيات عامة
-$totalProjects = $conn->query("SELECT COUNT(*) AS c FROM projects")->fetch_assoc()['c'];
-$completed = $conn->query("SELECT COUNT(*) AS c FROM projects WHERE status='منجز'")->fetch_assoc()['c'];
-$inProgress = $conn->query("SELECT COUNT(*) AS c FROM projects WHERE status='جاري'")->fetch_assoc()['c'];
-$totalAmount = $conn->query("SELECT SUM(total) AS s FROM projects")->fetch_assoc()['s'];
+$totalProjects = $conn->query("SELECT COUNT(*) AS c FROM operationproject")->fetch_assoc()['c'];
+$completed = $conn->query("SELECT COUNT(*) AS c FROM operationproject WHERE status='منجز'")->fetch_assoc()['c'];
+$inProgress = $conn->query("SELECT COUNT(*) AS c FROM operationproject WHERE status='جاري'")->fetch_assoc()['c'];
+$totalAmount = $conn->query("SELECT SUM(total) AS s FROM operationproject")->fetch_assoc()['s'];
 
 // جلب أول 50 مشروع
 $projects = $conn->query("SELECT id, name, client, location, total, status, create_at 
-                          FROM projects ORDER BY id DESC LIMIT 50");
+                          FROM operationproject ORDER BY id DESC LIMIT 50");
 ?>
 
 <!DOCTYPE html>

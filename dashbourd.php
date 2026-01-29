@@ -301,12 +301,22 @@ include "config.php";
       <i class="fas fa-bolt"></i> الوصول السريع
     </h2>
     <div class="quick-access">
-      <a href="Projects/projects.php" class="quick-btn">
+      <a href="Projects/oprationprojects.php" class="quick-btn">
         <i class="fas fa-project-diagram"></i>
+        <span>المشاريع التشغيلية</span>
+      </a>
+      <a href="Projects/view_projects.php" class="quick-btn">
+        <i class="fas fa-list-alt"></i>
         <span>المشاريع</span>
       </a>
-   
+      <a href="Projects/view_clients.php" class="quick-btn">
+        <i class="fas fa-users"></i>
+        <span>العملاء</span>
       </a>
+   
+   
+
+    
       <a href="Reports/reports.php" class="quick-btn">
         <i class="fas fa-chart-line"></i>
         <span>التقارير</span>
@@ -314,6 +324,10 @@ include "config.php";
       <a href="users.php" class="quick-btn">
         <i class="fas fa-user-shield"></i>
         <span>المستخدمين</span>
+      </a>
+      <a href="settings.php" class="quick-btn">
+        <i class="fas fa-cog"></i>
+        <span>الإعدادات</span>
       </a>
     </div>
     <?php } ?>
@@ -326,27 +340,50 @@ include "config.php";
       <?php
       // ******************************** احصائيات المدير ******************************************************
       if ($_SESSION['user']['role'] == "1") {
-        // كارد المشاريع
-        $projects = $conn->query("SELECT COUNT(*) AS total FROM projects")->fetch_assoc()['total'];
-        echo "<a href='Projects/projects.php' style='text-decoration: none;'>
+        // كارد المشاريع التشغيلية
+        $projects = $conn->query("SELECT COUNT(*) AS total FROM operationproject")->fetch_assoc()['total'];
+        echo "<a href='Projects/oprationprojects.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-project-diagram'></i>
                   <h3>$projects</h3>
-                  <p>المشاريع</p>
+                  <p>المشاريع التشغيلية</p>
                 </div>
               </a>";
 
-        // كارد العقود
-        $contracts = $conn->query("SELECT COUNT(*) AS total FROM contracts")->fetch_assoc()['total'];
-        echo "<a href='' style='text-decoration: none;'>
+        // كارد المشاريع الأساسية
+        $company_projects = $conn->query("SELECT COUNT(*) AS total FROM company_project WHERE status = 'نشط'")->fetch_assoc()['total'];
+        echo "<a href='Projects/view_projects.php' style='text-decoration: none;'>
                 <div class='card'>
-                  <i class='fas fa-file-contract'></i>
-                  <h3>$contracts</h3>
-                  <p>عقود المشاريع</p>
+                  <i class='fas fa-list-alt'></i>
+                  <h3>$company_projects</h3>
+                  <p>المشاريع النشطة</p>
                 </div>
               </a>";
-        
-        
+
+        // كارد العملاء
+        $clients = $conn->query("SELECT COUNT(*) AS total FROM company_clients WHERE status = 'نشط'")->fetch_assoc()['total'];
+        echo "<a href='Projects/view_clients.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-users'></i>
+                  <h3>$clients</h3>
+                  <p>العملاء النشطاء</p>
+                </div>
+              </a>";
+
+    
+    
+  
+     
+
+        // كارد المستخدمين
+        $users = $conn->query("SELECT COUNT(*) AS total FROM users")->fetch_assoc()['total'];
+        echo "<a href='users.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-user-shield'></i>
+                  <h3>$users</h3>
+                  <p>المستخدمين</p>
+                </div>
+              </a>";
      
       }
       ?>
@@ -400,7 +437,7 @@ include "config.php";
       <?php
       // ******************************** احصائيات مدير الاسطول ******************************************************
       if ($_SESSION['user']['role'] == "4") {
-        $projects = $conn->query("SELECT COUNT(*) AS total FROM projects")->fetch_assoc()['total'];
+        $projects = $conn->query("SELECT COUNT(*) AS total FROM operationproject")->fetch_assoc()['total'];
         echo "<a href='Projects/projects.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-building'></i>

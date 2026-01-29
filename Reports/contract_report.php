@@ -26,7 +26,7 @@ $contract_filter = isset($_GET['contract']) ? $_GET['contract'] : '';
 
 $sql_contracts = "SELECT c.id, p.name AS project_name 
                   FROM contracts c 
-                  JOIN projects p ON c.project = p.id";
+                  JOIN operationproject p ON c.project = p.id";
 $contracts = mysqli_query($conn, $sql_contracts);
 
 $contract_data = null;
@@ -45,7 +45,7 @@ if (!empty($contract_filter)) {
         IFNULL(SUM(t.total_work_hours),0) AS actual_hours,
         (c.forecasted_contracted_hours - IFNULL(SUM(t.total_work_hours),0)) AS remaining_hours
     FROM contracts c
-    JOIN projects p ON c.project = p.id
+    JOIN operationproject p ON c.project = p.id
     LEFT JOIN operations o ON o.project = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN timesheet t ON t.operator = o.id
@@ -62,7 +62,7 @@ if (!empty($contract_filter)) {
         SUM(t.total_work_hours) AS actual_hours,
         c.hours_monthly_target
     FROM contracts c
-    JOIN projects p ON c.project = p.id
+    JOIN operationproject p ON c.project = p.id
     LEFT JOIN operations o ON o.project = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN timesheet t ON t.operator = o.id

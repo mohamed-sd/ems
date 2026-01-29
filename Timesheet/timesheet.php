@@ -41,7 +41,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN projects p ON o.project = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project = '" . $_SESSION['user']['project'] . "'");
+                                            JOIN operationproject p ON o.project = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project = '" . $_SESSION['user']['project'] . "'");
 
 
 
@@ -284,7 +284,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
                   $op_res = mysqli_query($conn, "SELECT o.id,o.status,o.project ,e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN projects p ON o.project = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project = '" . $_SESSION['user']['project'] . "'");
+                                            JOIN operationproject p ON o.project = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project = '" . $_SESSION['user']['project'] . "'");
 
 
 
@@ -653,7 +653,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           FROM timesheet t
           JOIN operations o ON t.operator = o.id
           JOIN equipments e ON o.equipment = e.id
-          JOIN projects p ON o.project = p.id
+          JOIN operationproject p ON o.project = p.id
           JOIN drivers d ON t.driver = d.id
           WHERE t.type LIKE '$type' 
          ";

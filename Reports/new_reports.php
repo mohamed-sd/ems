@@ -8,7 +8,7 @@ if (!isset($_SESSION['user'])) {
 include("../config.php"); // ملف الاتصال بقاعدة البيانات
 
 // المشاريع
-$projects_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(id) AS c FROM projects"))['c'];
+$projects_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(id) AS c FROM operationproject"))['c'];
 
 // الموردين
 $suppliers_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(id) AS c FROM suppliers"))['c'];
