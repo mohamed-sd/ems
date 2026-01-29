@@ -2,6 +2,9 @@
 session_start();
 include '../config.php';
 
+// تعيين نوع المحتوى كـ JSON
+header('Content-Type: application/json; charset=utf-8');
+
 // التحقق من أن الطلب من نفس الموقع
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
@@ -281,17 +284,29 @@ else if ($action === 'merge') {
         die(json_encode(['success' => false, 'message' => 'الرجاء اختيار عقد آخر للدمج']));
     }
     
+    // الحصول على بيانات العقد المراد الدمج معه
     $contract_to_merge = getContractData($merge_with_id, $conn);
     if (!$contract_to_merge) {
         die(json_encode(['success' => false, 'message' => 'العقد المختار غير موجود']));
     }
     
-    // حساب المجموع
-    $merged_hours = $contract_to_merge['forecasted_contracted_hours'] + 
-                   getContractData($contract_id, $conn)['forecasted_contracted_hours'];
+    // الحصول على بيانات العقد الحالي
+    $current_contract = getContractData($contract_id, $conn);
+    if (!$current_contract) {
+        die(json_encode(['success' => false, 'message' => 'العقد الحالي غير موجود']));
+    }
     
-    // تحديث العقد الأول بالبيانات المدمجة
-    // لا نغير حالة العقد عند الدمج؛ نحتفظ بالحالة الحالية
+    // التحقق من أن العقدين في نفس المشروع
+    if ($contract_to_merge['project'] != $current_contract['project']) {
+        die(json_encode(['success' => false, 'message' => 'لا يمكن دمج عقود من مشاريع مختلفة']));
+    }
+    
+    // حساب المجموع
+    $current_hours = intval($current_contract['forecasted_contracted_hours']);
+    $merge_hours = intval($contract_to_merge['forecasted_contracted_hours']);
+    $merged_hours = $current_hours + $merge_hours;
+    
+    // تحديث العقد الحالي بالبيانات المدمجة
     $query = "UPDATE contracts SET 
         forecasted_contracted_hours = $merged_hours,
         merged_with = $merge_with_id,
@@ -299,11 +314,14 @@ else if ($action === 'merge') {
     WHERE id = $contract_id";
     
     if (mysqli_query($conn, $query)) {
+        // عداد للمعدات المنسوخة
+        $copied_equipments = 0;
+        
         // نسخ معدات العقد المدموج إلى العقد الحالي
         $get_equipments_query = "SELECT equip_type, equip_size, equip_count, shift_hours, equip_total_month, equip_total_contract FROM contractequipments WHERE contract_id = $merge_with_id";
         $equipments_result = mysqli_query($conn, $get_equipments_query);
         
-        if ($equipments_result) {
+        if ($equipments_result && mysqli_num_rows($equipments_result) > 0) {
             while ($equip = mysqli_fetch_assoc($equipments_result)) {
                 // إدراج المعدة في العقد الحالي
                 $equip_type = mysqli_real_escape_string($conn, $equip['equip_type']);
@@ -313,24 +331,49 @@ else if ($action === 'merge') {
                 $equip_total_month = intval($equip['equip_total_month']);
                 $equip_total_contract = intval($equip['equip_total_contract']);
                 
-$insert_equip_query = "INSERT INTO contractequipments (contract_id, equip_type, equip_size, equip_count, shift_hours, equip_total_month, equip_total_contract) 
-                VALUES ($contract_id, '$equip_type', $equip_size, $equip_count, $shift_hours, $equip_total_month, $equip_total_contract)";
+                $insert_equip_query = "INSERT INTO contractequipments (contract_id, equip_type, equip_size, equip_count, shift_hours, equip_total_month, equip_total_contract) 
+                    VALUES ($contract_id, '$equip_type', $equip_size, $equip_count, $shift_hours, $equip_total_month, $equip_total_contract)";
                 
-                mysqli_query($conn, $insert_equip_query);
+                if (mysqli_query($conn, $insert_equip_query)) {
+                    $copied_equipments++;
+                }
             }
         }
         
-        $merge_note_1 = "تم دمج العقد مع العقد رقم $merge_with_id - إجمالي الساعات: $merged_hours";
+        // تحويل العقد المدموج إلى غير ساري (status = 0)
+        $update_merged_contract = "UPDATE contracts SET 
+            status = 0,
+            updated_at = NOW()
+        WHERE id = $merge_with_id";
+        
+        if (!mysqli_query($conn, $update_merged_contract)) {
+            // في حالة فشل تحديث الحالة، نسجل ذلك في الملاحظات
+            $error_note = "تحذير: فشل تحديث حالة العقد المدموج إلى غير ساري";
+            addNote($contract_id, $error_note, $conn);
+        }
+        
+        // إضافة ملاحظة للعقد الحالي
+        $merge_note_1 = "تم دمج العقد مع العقد رقم $merge_with_id - إجمالي الساعات: $merged_hours (العقد الحالي: $current_hours + العقد المدموج: $merge_hours)";
+        if ($copied_equipments > 0) {
+            $merge_note_1 .= " - تم نسخ $copied_equipments معدة";
+        }
         $merge_note_1 = mysqli_real_escape_string($conn, $merge_note_1);
         addNote($contract_id, $merge_note_1, $conn);
         
-        $merge_note_2 = "تم دمج هذا العقد مع العقد رقم $contract_id";
+        // إضافة ملاحظة للعقد المدموج
+        $merge_note_2 = "تم دمج هذا العقد مع العقد رقم $contract_id - تم تحويل العقد إلى غير ساري";
         $merge_note_2 = mysqli_real_escape_string($conn, $merge_note_2);
         addNote($merge_with_id, $merge_note_2, $conn);
         
-        echo json_encode(['success' => true, 'message' => 'تم دمج العقود ومعداتها بنجاح']);
+        $success_message = 'تم دمج العقود بنجاح';
+        if ($copied_equipments > 0) {
+            $success_message .= " - تم نسخ $copied_equipments معدة";
+        }
+        $success_message .= " - إجمالي الساعات: $merged_hours";
+        
+        echo json_encode(['success' => true, 'message' => $success_message]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'خطأ في دمج العقود']);
+        echo json_encode(['success' => false, 'message' => 'خطأ في دمج العقود: ' . mysqli_error($conn)]);
     }
 }
 
@@ -356,4 +399,3 @@ else {
 }
 
 exit;
-?>

@@ -1,5 +1,9 @@
 <?php
 session_start();
+
+// تعيين نوع المحتوى كـ JSON
+header('Content-Type: application/json; charset=utf-8');
+
 if (!isset($_SESSION['user'])) {
     echo json_encode(['success' => false, 'message' => 'غير مصرح']);
     exit();
@@ -14,19 +18,39 @@ if (!$contract_id) {
     exit();
 }
 
-// جلب معدات العقد
-$sql = "SELECT equip_type, equip_size, equip_count, equip_target_per_month FROM contractequipments WHERE contract_id = $contract_id ORDER BY id ASC";
+// جلب معدات العقد مع جميع الحقول المطلوبة
+$sql = "SELECT 
+    equip_type, 
+    equip_size, 
+    equip_count, 
+    shift_hours, 
+    equip_total_month,
+    equip_total_contract,
+    equip_monthly_target
+FROM contractequipments 
+WHERE contract_id = $contract_id 
+ORDER BY id ASC";
+
 $result = mysqli_query($conn, $sql);
 
 if (!$result) {
-    echo json_encode(['success' => false, 'message' => 'خطأ في الاستعلام']);
+    echo json_encode(['success' => false, 'message' => 'خطأ في الاستعلام: ' . mysqli_error($conn)]);
     exit();
 }
 
 $equipments = [];
 while ($row = mysqli_fetch_assoc($result)) {
-    $equipments[] = $row;
+    // التأكد من وجود جميع الحقول مع قيم افتراضية
+    $equipments[] = [
+        'equip_type' => $row['equip_type'] ?? '',
+        'equip_size' => $row['equip_size'] ?? 0,
+        'equip_count' => $row['equip_count'] ?? 0,
+        'shift_hours' => $row['shift_hours'] ?? 0,
+        'equip_total_month' => $row['equip_total_month'] ?? 0,
+        'equip_total_contract' => $row['equip_total_contract'] ?? 0,
+        'equip_monthly_target' => $row['equip_monthly_target'] ?? 0
+    ];
 }
 
 echo json_encode(['success' => true, 'equipments' => $equipments]);
-?>
+exit;
