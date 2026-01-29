@@ -9,16 +9,61 @@ EMS is an Arabic-language equipment management system built with PHP, MySQL, and
 ## Architecture & Core Patterns
 
 ### 1. Session-Based Authentication & Authorization
-- **Auth entry point:** [index.php](index.php) - Login with brute-force protection (5 attempts, 15-min lockout)
+- **Auth entry point:** [index.php](index.php) - Login with brute-force protection (5 attempts, 15-min lockout), CSRF tokens, security headers
 - **Session check pattern:** All pages verify `$_SESSION['user']` exists; redirect to `index.php` if missing
-- **Role-based access:** Role IDs: `-1` (admin), `1` (project mgr), `2` (supplier mgr), `3` (operator mgr), `4` (fleet mgr), `5` (project user)
+- **Role-based access:** Role IDs: `-1` (admin), `1` (project mgr), `2` (supplier mgr), `3` (operator mgr), `4` (fleet mgr), `5` (project user), `6` (timesheet entry), `7`/`8` (supplier/operator reviewer), `9` (breakdown reviewer)
 - **Navigation filtering:** [sidebar.php](sidebar.php) - Conditionally shows menu items based on `$_SESSION['user']['role']`
+- **CSRF protection:** Login uses `$_SESSION['csrf_token']` generated with `bin2hex(openssl_random_pseudo_bytes(32))`
+- **Security headers:** CSP, X-Frame-Options (DENY), X-Content-Type-Options (nosniff), Referrer-Policy set in index.php
 
 ### 2. Database Interactions
 - **Connection:** [config.php](config.php) - Global `$conn` (MySQLi object) - Always `include` or `require_once` at page top
-- **Query pattern:** Direct SQL with `mysqli_real_escape_string()` for inputs (note: not prepared statements)
+- **Query pattern:** Direct SQL with `mysqli_real_escape_string()` for inputs (note: not prepared statements, except login page uses `mysqli_prepare()`)
 - **Data flow:** Fetch with `mysqli_query()`, iterate with `mysqli_fetch_assoc()` or `mysqli_num_rows()`
 - **CRUD operations:** Forms POST to same `.php` file; check `$_SERVER['REQUEST_METHOD'] === 'POST'` at top, then `header()` redirect on success
+- **Error handling:** Check query success with `if (!$result)` then log/display with `mysqli_error($conn)`
+- **Type casting:** Use `intval()` for numeric POST/GET data, `floatval()` for decimals before queries
+
+#### Database Schema Overview (equipation_manage)
+
+**Core Entity Tables:**
+- `company_clients` - العملاء (clients with code, name, sector, contact info)
+- `company_project` - المشاريع الرئيسية (main projects with location, coordinates, category)
+- `operationproject` - المشاريع التشغيلية (operational projects linking company_project + company_clients)
+- `suppliers` - الموردين (equipment suppliers)
+- `equipments` - المعدات (equipment/machinery linked to suppliers)
+- `drivers` - المشغلين (equipment operators)
+- `users` - المستخدمين (system users with roles and project assignments)
+
+**Contract Management:**
+- `contracts` - عقود المشاريع (project contracts with duration, dates, equipment hours)
+- `contractequipments` - معدات العقد (contract equipment details: type, count, shifts, pricing)
+- `contract_notes` - سجل التدقيق (audit trail for contract actions: renewal, settlement, pause, resume, terminate, merge)
+- `supplierscontracts` - عقود الموردين (supplier contracts)
+- `supplier_contract_notes` - ملاحظات عقود الموردين (supplier contract audit trail)
+- `drivercontracts` - عقود المشغلين (driver contracts)
+
+**Operations & Tracking:**
+- `operations` - التشغيل (equipment assignments to projects with start/end dates)
+- `equipment_drivers` - ربط المعدات بالسائقين (junction table: equipments ↔ drivers)
+- `timesheet` - ساعات العمل (work hours tracking per operation/driver with shift details, faults, notes)
+
+**Critical Relationships:**
+```
+company_clients ←→ operationproject ←→ company_project
+operationproject ← contracts ← contractequipments
+                            ← contract_notes
+suppliers ← equipments ← operations → operationproject
+equipments ← equipment_drivers → drivers
+operations ← timesheet → drivers
+users → operationproject (project_id assignment)
+```
+
+**Status Fields Pattern:**
+- Most tables have `status` TINYINT(1): `1` = active/valid, `0` = inactive/archived
+- `contracts.status`: `1` = نشط (active), `0` = غير ساري (invalid) - auto-set to `0` when merged
+- `contracts.contract_status`: tracks lifecycle (NULL/active/paused/terminated/merged)
+- Always check status in WHERE clauses for active records: `WHERE status = 1`
 
 ### 3. Module Organization
 Each major entity has its own directory with consistent structure:
@@ -42,6 +87,7 @@ timesheet → operations → equipments → suppliers/projects
 - **Sidebar:** [insidebar.php](insidebar.php) - Includes [sidebar.php](sidebar.php) for navigation
 - **Usage:** Include at top of page content, set `$page_title` before including
 - **Assets:** CSS in [assets/css/](assets/css/), FontAwesome webfonts in [assets/webfonts/](assets/webfonts/)
+- **CDN dependencies:** jQuery, DataTables (with responsive/buttons), Bootstrap 5 loaded via CDN in inheader.php
 
 ### 5. AJAX & Dynamic Data Loading
 - **Pattern:** jQuery `$.ajax()` for dependent dropdowns and form pre-loading
@@ -79,6 +125,20 @@ timesheet → operations → equipments → suppliers/projects
 - DataTables initialized with `$('#tableId').DataTable()` after table renders
 - Common features: Export to PDF/Excel (via pdfmake/jszip), responsive columns, search/sort built-in
 - Action buttons (Edit/Delete) added in table rows; use `data-id` to pass record ID to handlers
+- Arabic language support: Set `language.url` to `"//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"`
+
+### Date/Time Handling
+- **Validation:** Use `DateTime::createFromFormat('Y-m-d', $date)` to validate date format
+- **Calculation:** Create `DateTime` objects and use `diff()` for intervals (see [contract_actions_handler.php](Contracts/contract_actions_handler.php#L70))
+- **Duration:** Calculate months with `$interval->m + ($interval->y * 12)`, days with `$interval->days`
+- **Comparison:** Use `strtotime()` for date comparison: `if (strtotime($start) >= strtotime($end))`
+
+### PHP Helper Functions Pattern
+- **Reusable functions:** Define helper functions at top of PHP files (e.g., `getContractData()`, `addNote()`, `saveContractEquipments()`)
+- **Function checks:** Wrap with `if (!function_exists('functionName'))` to prevent redeclaration errors when file is included multiple times
+- **Parameter pattern:** Pass `$conn` as last parameter to all database-related functions
+- **Return values:** Boolean for success/fail, or associative array for data fetches
+- **Example:** See [contractequipments_handler.php](Contracts/contractequipments_handler.php) for complete pattern
 
 ### Modifying Database Queries
 - Always use `mysqli_real_escape_string()` for user inputs in WHERE/INSERT/UPDATE clauses
@@ -152,3 +212,38 @@ Pattern for endpoints that handle multiple related actions (see [contract_action
 - **Role checking:** Always check `$_SESSION['user']['role']` before processing; fail early if unauthorized
 - **JSON API pattern:** For action handlers, use `die(json_encode(...))` for early returns on errors, `echo json_encode(...); exit;` for success
 - **Action routing in APIs:** Use `if/elseif` chains based on `$_POST['action']` parameter; validate action at end with `else { die(json_encode(['success' => false, 'message' => 'الإجراء غير معروف'])); }`
+- **Status field filtering:** Always add `AND status = 1` to WHERE clauses when querying active records
+- **Foreign key references:** Use field names as documented (e.g., `company_project_id` in operationproject, not `project_id`)
+
+### Common Query Patterns
+
+**Get timesheet with full details (cross-module join):**
+```sql
+SELECT t.*, o.*, e.code, e.name AS eq_name, s.name AS supplier_name, 
+       p.name AS project_name, d.name AS driver_name
+FROM timesheet t
+JOIN operations o ON t.operator = o.id
+JOIN equipments e ON o.equipment = e.id
+JOIN suppliers s ON e.suppliers = s.id
+JOIN operationproject p ON o.project = p.id
+JOIN drivers d ON t.driver = d.id
+WHERE t.status = 1
+```
+
+**Get contract with equipment details:**
+```sql
+SELECT c.*, ce.*, op.name AS project_name, op.client, op.location
+FROM contracts c
+LEFT JOIN contractequipments ce ON c.id = ce.contract_id
+JOIN operationproject op ON c.project = op.id
+WHERE c.id = $contract_id
+```
+
+**Get operational project with client and company project:**
+```sql
+SELECT op.*, cc.client_name, cp.project_name AS company_project_name
+FROM operationproject op
+LEFT JOIN company_clients cc ON op.company_client_id = cc.id
+LEFT JOIN company_project cp ON op.company_project_id = cp.id
+WHERE op.status = 1
+```
