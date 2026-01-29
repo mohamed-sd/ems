@@ -6,7 +6,7 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 
-// استقبال الفلاتر
+// استقبال الفلاhتر
 $date_filter      = isset($_GET['date']) ? $_GET['date'] : '';
 $equipment_filter = isset($_GET['equipment']) ? $_GET['equipment'] : '';
 $project_filter   = isset($_GET['project']) ? $_GET['project'] : '';
