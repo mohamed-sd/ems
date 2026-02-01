@@ -26,33 +26,51 @@ if (!isset($_SESSION['user'])) {
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
   <!-- CSS الموقع -->
   <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/admin-style.css">
+
 </head>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
-  
-  * {
-    font-family: 'Cairo', sans-serif;
+
+  :root {
+    --primary-color: #1a1a2e;
+    --secondary-color: #16213e;
+    --gold-color: #ffcc00;
+    --text-color: #010326;
+    --light-color: #f5f5f5;
+    --border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
   }
-  
-  body {
-    background: #f5f7fa;
-  }
-  
+
   .main {
-    padding: 2rem;
-    background: #f5f7fa;
+    width: calc(100% - 250px);
+    background: var(--border-color);
+    padding: 30px;
   }
-  
+
   /* Page Title */
   .main h2 {
     font-size: 2rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 2rem;
+    animation: slideDown 0.6s ease-out;
   }
-  
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* Action Buttons Container */
   .aligin {
     display: flex;
@@ -60,11 +78,20 @@ if (!isset($_SESSION['user'])) {
     flex-wrap: wrap;
     margin-bottom: 2rem;
     padding: 1rem;
-    background: white;
     border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    animation: fadeIn 0.6s ease-out 0.1s both;
   }
-  
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
   /* Modern Action Buttons */
   .aligin .add {
     padding: 0.75rem 1.5rem;
@@ -75,13 +102,13 @@ if (!isset($_SESSION['user'])) {
     color: white;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px var(--shadow-color);
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   }
-  
+
   .aligin .add::before {
     content: '';
     position: absolute;
@@ -90,71 +117,72 @@ if (!isset($_SESSION['user'])) {
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.3);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
   }
-  
+
   .aligin .add:hover::before {
     width: 300px;
     height: 300px;
   }
-  
+
   .aligin .add:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 25px var(--shadow-color);
   }
-  
+
   .aligin .add:active {
     transform: translateY(-1px);
   }
-  
+
   #toggleForm {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, var(--gold-color) 0%, var(--secondary-color) 100%);
   }
-  
+
   /* Form Styling */
   #projectForm {
     animation: fadeInUp 0.6s ease;
   }
-  
+
   .card {
     border: none;
     border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 20px var(--shadow-color);
     overflow: hidden;
     margin-bottom: 2rem;
+    animation: fadeIn 0.8s ease-out 0.2s both;
   }
-  
+
   .card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
     padding: 1.5rem;
     border: none;
   }
-  
+
   .card-header h5 {
     color: white;
     font-weight: 700;
     margin: 0;
   }
-  
+
   .card-body {
     padding: 2rem;
   }
-  
+
   /* Section Titles */
   .section-title {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #667eea;
+    color: var(--primary-color);
     display: flex;
     align-items: center;
     gap: 0.75rem;
     margin: 1.5rem 0;
   }
-  
+
   .chip {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     width: 35px;
     height: 35px;
@@ -164,9 +192,9 @@ if (!isset($_SESSION['user'])) {
     justify-content: center;
     font-weight: 700;
     font-size: 1.1rem;
-    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 3px 10px var(--shadow-color);
   }
-  
+
   /* Form Fields */
   .form-grid {
     display: grid;
@@ -174,7 +202,7 @@ if (!isset($_SESSION['user'])) {
     gap: 1.5rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .field label {
     display: block;
     font-weight: 600;
@@ -182,7 +210,7 @@ if (!isset($_SESSION['user'])) {
     margin-bottom: 0.5rem;
     font-size: 0.95rem;
   }
-  
+
   .field input,
   .field select,
   .field textarea {
@@ -194,20 +222,20 @@ if (!isset($_SESSION['user'])) {
     transition: all 0.3s ease;
     font-weight: 500;
   }
-  
+
   .field input:focus,
   .field select:focus,
   .field textarea:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    border-color: var(--gold-color);
+    box-shadow: 0 0 0 0.2rem rgba(255, 204, 0, 0.25);
   }
-  
+
   .field input[readonly] {
     background: #f8f9fa;
     cursor: not-allowed;
   }
-  
+
   /* KPI Cards */
   .totals {
     display: grid;
@@ -215,80 +243,106 @@ if (!isset($_SESSION['user'])) {
     gap: 1.5rem;
     margin: 2rem 0;
   }
-  
+
   .kpi {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    background: linear-gradient(135deg, #ffffff 0%, var(--light-color) 100%);
     border: none;
     border-radius: 15px;
     padding: 1.5rem;
     text-align: center;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 3px 15px var(--shadow-color);
     transition: all 0.3s ease;
-    border-right: 5px solid #667eea;
+    border-right: 5px solid var(--gold-color);
+    animation: popIn 0.4s ease-out;
   }
-  
+
+  @keyframes popIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
   .kpi:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 25px var(--shadow-color);
   }
-  
+
   .kpi .v {
     font-weight: 900;
     font-size: 2rem;
-    color: #667eea;
+    color: var(--primary-color);
     margin-bottom: 0.5rem;
   }
-  
+
   .kpi .t {
     color: #6c757d;
     font-size: 0.9rem;
     font-weight: 600;
   }
-  
+
   /* Buttons */
   button.primary,
   .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px var(--shadow-color);
   }
-  
+
   button.primary:hover,
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 20px var(--shadow-color);
   }
-  
+
   #addEquipmentBtn {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    background: linear-gradient(135deg, var(--gold-color) 0%, var(--gold-color) 100%);
   }
-  
+
   /* HR Separator */
   .hr {
     height: 2px;
-    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
     margin: 2rem 0;
     border: none;
   }
-  
+
   /* Equipment Sections */
   .equipment-section {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);
     padding: 1.5rem;
     border-radius: 15px;
     margin-bottom: 1.5rem;
-    border: 2px solid #e9ecef;
+    border: 2px solid var(--border-color);
     position: relative;
+    animation: fadeInUp 0.5s ease-out;
   }
-  
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .equipment-section h4 {
-    color: #667eea;
+    color: var(--primary-color);
     font-weight: 700;
     font-size: 1.1rem;
     margin-bottom: 1.5rem;
@@ -296,9 +350,9 @@ if (!isset($_SESSION['user'])) {
     align-items: center;
     gap: 0.5rem;
   }
-  
+
   .remove-equipment {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    background: linear-gradient(135deg, #d64545 0%, #b03a3a 100%);
     color: white;
     border: none;
     padding: 0.5rem 1rem;
@@ -311,87 +365,88 @@ if (!isset($_SESSION['user'])) {
     top: 1rem;
     left: 1rem;
   }
-  
+
   .remove-equipment:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
   }
-  
+
   /* DataTable Styling */
   .dataTables_wrapper {
     padding: 1rem;
     background: white;
     border-radius: 15px;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 3px 15px var(--shadow-color);
   }
-  
+
   table.dataTable {
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 10px;
     overflow: hidden;
   }
-  
+
   table.dataTable thead th {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     font-weight: 700;
     padding: 1rem;
     text-align: center;
-    border-left: 1px solid rgba(255,255,255,0.1);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
     white-space: nowrap;
     font-size: 0.9rem;
   }
-  
+
   table.dataTable thead th:first-child {
     border-left: none;
   }
-  
+
   /* Group column colors for better organization */
   table.dataTable thead th.group-basic {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   }
-  
+
   table.dataTable thead th.group-dates {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
   }
-  
+
   table.dataTable thead th.group-hours {
-    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    background: linear-gradient(135deg, var(--gold-color) 0%, #d4a600 100%);
   }
-  
+
   table.dataTable thead th.group-parties {
-    background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
   }
-  
+
   table.dataTable thead th.group-services {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #20c997 0%, #16a34a 100%);
   }
-  
+
   table.dataTable thead th.group-operations {
-    background: linear-gradient(135deg, #fd7e14 0%, #e66a0a 100%);
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
   }
-  
+
   table.dataTable thead th.group-status {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
   }
-  
+
   table.dataTable tbody tr {
     transition: all 0.3s ease;
   }
-  
+
   table.dataTable tbody tr:hover {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     transform: scale(1.005);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px var(--shadow-color);
   }
-  
+
   table.dataTable tbody td {
     padding: 1rem;
     text-align: center;
     font-weight: 500;
   }
-  
+
   /* Action Buttons in Table */
   .btn-action {
     padding: 0.4rem 0.8rem;
@@ -405,52 +460,52 @@ if (!isset($_SESSION['user'])) {
     margin: 0 0.2rem;
     transition: all 0.3s ease;
     border: none;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px var(--shadow-color);
   }
-  
+
   .btn-action i {
     margin: 0;
   }
-  
+
   .btn-action-edit {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
   }
-  
+
   .btn-action-edit:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 8px rgba(26, 26, 46, 0.3);
   }
-  
+
   .btn-action-delete {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
     color: white;
   }
-  
+
   .btn-action-delete:hover {
     background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
   }
-  
+
   .btn-action-view {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
   }
-  
+
   .btn-action-view:hover {
     background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
   }
-  
+
   /* Group Toggle Buttons */
   .btn-group-toggle {
     padding: 0.5rem 1rem;
-    border: 2px solid #e0e0e0;
+    border: 2px solid var(--border-color);
     background: white;
-    color: #666;
+    color: var(--text-color);
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.85rem;
@@ -460,25 +515,25 @@ if (!isset($_SESSION['user'])) {
     align-items: center;
     gap: 6px;
   }
-  
+
   .btn-group-toggle:hover {
-    border-color: #667eea;
-    color: #667eea;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 10px rgba(26, 26, 46, 0.2);
   }
-  
+
   .btn-group-toggle.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     border-color: transparent;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(26, 26, 46, 0.3);
   }
-  
+
   .btn-group-toggle.active:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
   }
-  
+
   .btn-group-toggle-all {
     padding: 0.5rem 1.2rem;
     border: 2px solid #28a745;
@@ -493,60 +548,99 @@ if (!isset($_SESSION['user'])) {
     align-items: center;
     gap: 6px;
   }
-  
+
   .btn-group-toggle-all:hover {
     background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
   }
-  
+
   /* Hidden columns */
   .group-hidden {
     display: none !important;
   }
-  
+
   /* Responsive table */
   @media (max-width: 1400px) {
     table.dataTable {
       font-size: 0.85rem;
     }
-    
+
     table.dataTable thead th,
     table.dataTable tbody td {
       padding: 0.7rem 0.5rem;
     }
   }
-  
+
   /* Animation */
   @keyframes fadeInUp {
     from {
       opacity: 0;
       transform: translateY(30px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
-  
+
   /* Responsive */
   @media (max-width: 768px) {
     .aligin {
       justify-content: center;
     }
-    
+
     .aligin .add {
       flex: 1 1 45%;
     }
-    
+
     .form-grid {
       grid-template-columns: 1fr;
     }
-    
+
     .totals {
       grid-template-columns: repeat(2, 1fr);
     }
   }
+      /* Page Header */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .page-header h1 {
+        color: var(--primary-color);
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+    .btn-add {
+        background: var(--gold-color);
+        color: var(--primary-color);
+        padding: 12px 30px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        font-family: 'Cairo', sans-serif;
+    }
+
+    .btn-add:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-add{
+      background-color: red;
+    }
 </style>
 
 <body>
@@ -555,14 +649,12 @@ if (!isset($_SESSION['user'])) {
 
   <div class="main">
 
-    <h2><i class="fas fa-file-contract"></i> إدارة العقود</h2>
-    
-    <div class="aligin">
-      <a href="javascript:void(0)" id="toggleForm" class="add">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1><i class="fas fa-file-contract"></i> إدارة العقود</h1>
+      <a href="javascript:void(0)" id="toggleForm" class="btn-add">
         <i class="fas fa-plus-circle"></i> عقد جديد
       </a>
-     
-   
     </div>
 
     <!-- فورم إضافة عقد -->
@@ -601,9 +693,11 @@ if (!isset($_SESSION['user'])) {
             </div>
           </div>
 
-          <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px; border-right: 4px solid #667eea;">
+          <div
+            style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px; border-right: 4px solid #667eea;">
             <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
-              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على البيانات المدخلة في الأقسام التالية
+              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
+              البيانات المدخلة في الأقسام التالية
             </p>
           </div>
 
@@ -620,30 +714,30 @@ if (!isset($_SESSION['user'])) {
               <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
             </div>
 
-                <div class="field md-3 sm-6">
+            <div class="field md-3 sm-6">
               <label>فترة السماح بين التوقيع والتنفيذ </label>
               <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0"
                   placeholder="عدد الأيام"></div>
             </div>
 
-             <div class="field md-3 sm-6">
+            <div class="field md-3 sm-6">
               <label>بداية التنفيذ الفعلي المتفق عليه</label>
               <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
             </div>
 
 
-               <div class="field md-3 sm-6">
+            <div class="field md-3 sm-6">
               <label>نهاية التنفيذ الفعلي المتفق عليه</label>
               <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
             </div>
 
-        
-           
+
+
             <!-- خانتان فارغتان -->
-           
+
 
             <!-- صف 2: 3 خانات -->
-         
+
             <div class="field md-3 sm-6">
               <label>مدة العقد بالأيام </label>
               <div class="control"><input name="contract_duration_days" id="contract_duration_days" type="number"
@@ -653,41 +747,41 @@ if (!isset($_SESSION['user'])) {
 
 
 
-        
-               <div class="field md-3 sm-6">
-                    <label>العملة</label>
-                    <div class="control">
-                      <select name="price_currency_contract" id="price_currency_contract">
-                        <option value="">— اختر —</option>
-                        <option value="دولار">دولار</option>
-                        <option value="جنيه">جنيه</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label>المبلغ المدفوع</label>
-                    <div class="control"><input name="paid_contract" type="text" ></div>
-                  </div>
 
-                    <div class="field md-3 sm-6">
-                    <label>وقت الدفع</label>
-                    <div class="control">
-                      <select name="payment_time" id="payment_time">
-                        <option value="">— اختر —</option>
-                        <option value="مقدم">مقدم</option>
-                        <option value=" مؤخر">مؤخر </option>
-  
-                      </select>
-                    </div>
-                  </div>
-           
-                     <div class="field md-3 sm-6">
-                    <label>  الضمانات</label>
-                    <div class="control"><input name="guarantees" type="text"></div>
-                  </div>
-                
-                      <div class="field md-3 sm-6">
-              <label>    تاريخ الدفع</label>
+            <div class="field md-3 sm-6">
+              <label>العملة</label>
+              <div class="control">
+                <select name="price_currency_contract" id="price_currency_contract">
+                  <option value="">— اختر —</option>
+                  <option value="دولار">دولار</option>
+                  <option value="جنيه">جنيه</option>
+                </select>
+              </div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>المبلغ المدفوع</label>
+              <div class="control"><input name="paid_contract" type="text"></div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label>وقت الدفع</label>
+              <div class="control">
+                <select name="payment_time" id="payment_time">
+                  <option value="">— اختر —</option>
+                  <option value="مقدم">مقدم</option>
+                  <option value=" مؤخر">مؤخر </option>
+
+                </select>
+              </div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label> الضمانات</label>
+              <div class="control"><input name="guarantees" type="text"></div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label> تاريخ الدفع</label>
               <div class="control"><input name="payment_date" id="payment_date" type="date"></div>
             </div>
 
@@ -699,36 +793,35 @@ if (!isset($_SESSION['user'])) {
 
 
 
-           
-        
-               <div class="field md-3 sm-6">
-                    <label>عدد الورديات للعقد </label>
-                    <div class="control"><input name="equip_shifts_contract" type="number" min="0" placeholder="مثال: 2"></div>
-                  </div>
 
-    <div class="field md-3 sm-6">
-                    <label> ساعات الوردية للعقد</label>
-                    <div class="control"><input name="shift_contract" type="number" min="0"></div>
-                  </div>
+
             <div class="field md-3 sm-6">
-                    <label>إجمالي الوحدات يومياً للعقد </label>
-                    <div class="control"><input name="equip_total_contract" type="number" 
-                        placeholder=" "></div>
-                  </div>
-                     <div class="field md-3 sm-6">
-                    <label>وحدات العمل  في الشهر للعقد</label>
-                    <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
-                  </div>
-                
-               
-                  <div class="field md-3 sm-6">
-                    <label>إجمالي وحدات العقد  </label>
-                    <div class="control"><input name="total_contract" type="number" 
-                        placeholder=" "></div>
-                  </div>
+              <label>عدد الورديات للعقد </label>
+              <div class="control"><input name="equip_shifts_contract" type="number" min="0" placeholder="مثال: 2">
+              </div>
+            </div>
 
-                      <div class="field md-3 sm-6">
-              <label>مدراء الموقع   </label>
+            <div class="field md-3 sm-6">
+              <label> ساعات الوردية للعقد</label>
+              <div class="control"><input name="shift_contract" type="number" min="0"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>إجمالي الوحدات يومياً للعقد </label>
+              <div class="control"><input name="equip_total_contract" type="number" placeholder=" "></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>وحدات العمل في الشهر للعقد</label>
+              <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
+            </div>
+
+
+            <div class="field md-3 sm-6">
+              <label>إجمالي وحدات العقد </label>
+              <div class="control"><input name="total_contract" type="number" placeholder=" "></div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label>مدراء الموقع </label>
               <div class="control"><input type="number" name="daily_operators" id="daily_operators" min="0"
                   placeholder="مثال: 3"></div>
             </div>
@@ -746,8 +839,8 @@ if (!isset($_SESSION['user'])) {
                 </select>
               </div>
             </div>
-          
-    <div class="field md-3 sm-6">
+
+            <div class="field md-3 sm-6">
               <label>السكن (Place for Living)</label>
               <div class="control">
                 <select name="place_for_living" id="place_for_living">
@@ -770,7 +863,7 @@ if (!isset($_SESSION['user'])) {
                 </select>
               </div>
             </div>
-        
+
             <div class="field md-3 sm-6">
               <label>الورشة (Workshop)</label>
               <div class="control">
@@ -819,23 +912,23 @@ if (!isset($_SESSION['user'])) {
                     <div class="control"><input name="equip_count_1" type="number" min="0"></div>
                   </div>
 
-            
 
-                
 
-                      <div class="field md-3 sm-6">
+
+
+                  <div class="field md-3 sm-6">
                     <label>عدد المشغلين</label>
                     <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
                   </div>
 
-                  
+
                   <div class="field md-3 sm-6">
                     <label>عدد المساعدين</label>
                     <div class="control"><input name="equip_assistants_1" type="number" min="0"></div>
                   </div>
-              
-             
-                    <div class="field md-3 sm-6">
+
+
+                  <div class="field md-3 sm-6">
                     <label>عدد الورديات</label>
                     <div class="control"><input name="equip_shifts_1" type="number" min="0" placeholder="مثال: 2"></div>
                   </div>
@@ -856,7 +949,7 @@ if (!isset($_SESSION['user'])) {
                     <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
                     <div class="control"><input name="shift2_end_1" type="time" placeholder="مثال: 00:00"></div>
                   </div>
-           <div class="field md-3 sm-6">
+                  <div class="field md-3 sm-6">
                     <label>وحدة القياس</label>
                     <div class="control">
                       <select name="equip_unit_1" class="equip-unit">
@@ -873,25 +966,25 @@ if (!isset($_SESSION['user'])) {
                     <label>ساعات الوردية</label>
                     <div class="control"><input name="shift_hours_1" type="number" min="0"></div>
                   </div>
-            <div class="field md-3 sm-6">
+                  <div class="field md-3 sm-6">
                     <label>إجمالي الوحدات يومياً</label>
                     <div class="control"><input name="equip_total_month_1" type="number" readonly
                         placeholder="يُحتسب تلقائياً"></div>
                   </div>
-                     <div class="field md-3 sm-6">
-                    <label>وحدات العمل  في الشهر</label>
+                  <div class="field md-3 sm-6">
+                    <label>وحدات العمل في الشهر</label>
                     <div class="control"><input name="equip_target_per_month_1" type="number" min="0"></div>
                   </div>
-                
-               
+
+
                   <div class="field md-3 sm-6">
                     <label>إجمالي وحدات العقد</label>
                     <div class="control"><input name="equip_total_contract_1" type="number" readonly
                         placeholder="يُحتسب تلقائياً"></div>
                   </div>
 
-                  
-                     <div class="field md-3 sm-6">
+
+                  <div class="field md-3 sm-6">
                     <label>العملة</label>
                     <div class="control">
                       <select name="equip_price_currency_1">
@@ -906,23 +999,23 @@ if (!isset($_SESSION['user'])) {
                     <div class="control"><input name="equip_price_1" type="number" min="0" step="0.01"
                         placeholder="0.00"></div>
                   </div>
-               
-                   <div class="field md-3 sm-6">
-                 
-                  </div>
-                
-                  
 
-              
-              
+                  <div class="field md-3 sm-6">
+
+                  </div>
+
+
+
+
+
                   <!-- خانتان فارغتان للحفاظ على 3 خانات لكل صف -->
-                
-                   <div class="field md-3 sm-6">
+
+                  <div class="field md-3 sm-6">
                     <label>عدد المشرفين</label>
                     <div class="control"><input name="equip_supervisors_1" type="number" min="0"></div>
                   </div>
 
-                      <div class="field md-3 sm-6">
+                  <div class="field md-3 sm-6">
                     <label>عدد الفنيين</label>
                     <div class="control"><input name="equip_technicians_1" type="number" min="0"></div>
                   </div>
@@ -935,7 +1028,8 @@ if (!isset($_SESSION['user'])) {
           </div>
 
           <div style="margin: 15px 0; display: flex; gap: 10px;">
-            <button type="button" class="primary" id="addEquipmentBtn" style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
+            <button type="button" class="primary" id="addEquipmentBtn"
+              style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
               <i class="fas fa-plus-circle"></i> إضافة مزيد من المعدات
             </button>
           </div>
@@ -946,15 +1040,15 @@ if (!isset($_SESSION['user'])) {
 
           <div class="form-grid">
 
-             <div class="field md-3 sm-6" style="display: none;">
+            <div class="field md-3 sm-6" style="display: none;">
               <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
               <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
                   placeholder="مثال: 8" value="20"></div>
             </div>
-             <!-- Orgnization Break  -->
-            
+            <!-- Orgnization Break  -->
 
-            
+
+
             <div class="field md-3 sm-6">
               <label>الطرف الأول </label>
               <div class="control"><input type="text" name="first_party" id="first_party"
@@ -962,7 +1056,7 @@ if (!isset($_SESSION['user'])) {
               </div>
             </div>
 
-           
+
 
             <div class="field md-3 sm-6">
               <label>الطرف الثاني </label>
@@ -971,7 +1065,7 @@ if (!isset($_SESSION['user'])) {
               </div>
             </div>
 
-                                    <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
 
             <div class="field md-3 sm-6">
               <label>الشاهد الأول</label>
@@ -989,7 +1083,8 @@ if (!isset($_SESSION['user'])) {
 
 
           <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
-            <button type="reset" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <button type="reset"
+              style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
               <i class="fas fa-eraser"></i> تفريغ الحقول
             </button>
             <button type="submit" class="primary" style="padding: 0.75rem 3rem;">
@@ -1005,7 +1100,7 @@ if (!isset($_SESSION['user'])) {
           <i class="fas fa-list-alt"></i> قائمة العقود
         </h5>
       </div>
-      
+
       <!-- أزرار التحكم في المجموعات -->
       <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0;">
         <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
@@ -1038,48 +1133,48 @@ if (!isset($_SESSION['user'])) {
           </button>
         </div>
       </div>
-      
+
       <div class="card-body" style="padding: 2rem; overflow-x: auto;">
         <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
           <thead>
             <tr>
               <!-- المعلومات الأساسية -->
               <th class="group-basic"><i class="fas fa-hashtag"></i> رقم العقد</th>
-              
+
               <!-- التواريخ والمدد -->
               <th class="group-dates"><i class="far fa-calendar"></i> تاريخ التوقيع</th>
               <th class="group-dates"><i class="fas fa-hourglass-half"></i> مدة السماح (أيام)</th>
               <th class="group-dates"><i class="fas fa-calendar-days"></i> مدة العقد (أيام)</th>
               <th class="group-dates"><i class="fas fa-play-circle"></i> بداية التنفيذ</th>
               <th class="group-dates"><i class="fas fa-stop-circle"></i> نهاية التنفيذ</th>
-              
+
               <!-- الساعات والأهداف -->
               <th class="group-hours"><i class="far fa-clock"></i> هدف ساعات شهري</th>
               <th class="group-hours"><i class="fas fa-clock"></i> إجمالي ساعات متوقعة</th>
-              
+
               <!-- أطراف العقد -->
               <th class="group-parties"><i class="fas fa-user-tie"></i> الطرف الأول</th>
               <th class="group-parties"><i class="fas fa-user-check"></i> الطرف الثاني</th>
               <th class="group-parties"><i class="fas fa-eye"></i> شاهد أول</th>
               <th class="group-parties"><i class="fas fa-eye"></i> شاهد ثاني</th>
-              
+
               <!-- الخدمات المقدمة -->
               <th class="group-services"><i class="fas fa-truck"></i> النقل</th>
               <th class="group-services"><i class="fas fa-bed"></i> السكن</th>
               <th class="group-services"><i class="fas fa-home"></i> مكان المعيشة</th>
               <th class="group-services"><i class="fas fa-wrench"></i> الورشة</th>
-              
+
               <!-- التشغيل اليومي -->
               <th class="group-operations"><i class="fas fa-business-time"></i> ساعات العمل يومياً</th>
               <th class="group-operations"><i class="fas fa-users-cog"></i> عدد المشغلين يومياً</th>
-              
+
               <!-- البيانات المالية -->
               <th class="group-basic"><i class="fas fa-money-bill-wave"></i> العملة</th>
               <th class="group-basic"><i class="fas fa-dollar-sign"></i> المبلغ المدفوع</th>
               <th class="group-basic"><i class="fas fa-clock"></i> وقت الدفع</th>
               <th class="group-basic"><i class="fas fa-shield-alt"></i> الضمانات</th>
               <th class="group-basic"><i class="fas fa-calendar-check"></i> تاريخ الدفع</th>
-              
+
               <!-- الحالة والإجراءات -->
               <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
               <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
@@ -1275,49 +1370,49 @@ if (!isset($_SESSION['user'])) {
               $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
 
               echo "<tr>";
-              
+
               // المعلومات الأساسية
               echo "<td class='group-basic'>" . $row['id'] . "</td>";
-              
+
               // التواريخ والمدد
               echo "<td class='group-dates'>" . $row['contract_signing_date'] . "</td>";
               echo "<td class='group-dates'>" . (isset($row['grace_period_days']) ? $row['grace_period_days'] : 0) . "</td>";
               echo "<td class='group-dates'>" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "</td>";
               echo "<td class='group-dates'>" . $row['actual_start'] . "</td>";
               echo "<td class='group-dates'>" . $row['actual_end'] . "</td>";
-              
+
               // الساعات والأهداف
               echo "<td class='group-hours'>" . $row['hours_monthly_target'] . "</td>";
               echo "<td class='group-hours'>" . $row['forecasted_contracted_hours'] . "</td>";
-              
+
               // أطراف العقد
               echo "<td class='group-parties'>" . (isset($row['first_party']) ? $row['first_party'] : '-') . "</td>";
               echo "<td class='group-parties'>" . (isset($row['second_party']) ? $row['second_party'] : '-') . "</td>";
               echo "<td class='group-parties'>" . (isset($row['witness_one']) ? $row['witness_one'] : '-') . "</td>";
               echo "<td class='group-parties'>" . (isset($row['witness_two']) ? $row['witness_two'] : '-') . "</td>";
-              
+
               // الخدمات المقدمة
               $transportationText = isset($row['transportation']) && $row['transportation'] ? $row['transportation'] : '-';
               $accommodationText = isset($row['accommodation']) && $row['accommodation'] ? $row['accommodation'] : '-';
               $place_for_livingText = isset($row['place_for_living']) && $row['place_for_living'] ? $row['place_for_living'] : '-';
               $workshopText = isset($row['workshop']) && $row['workshop'] ? $row['workshop'] : '-';
-              
+
               echo "<td class='group-services'>" . $transportationText . "</td>";
               echo "<td class='group-services'>" . $accommodationText . "</td>";
               echo "<td class='group-services'>" . $place_for_livingText . "</td>";
               echo "<td class='group-services'>" . $workshopText . "</td>";
-              
+
               // التشغيل اليومي
               echo "<td class='group-operations'>" . (isset($row['daily_work_hours']) ? $row['daily_work_hours'] : '-') . "</td>";
               echo "<td class='group-operations'>" . (isset($row['daily_operators']) ? $row['daily_operators'] : '-') . "</td>";
-              
+
               // البيانات المالية
               echo "<td class='group-basic'>" . (isset($row['price_currency_contract']) && $row['price_currency_contract'] ? $row['price_currency_contract'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['paid_contract']) && $row['paid_contract'] ? $row['paid_contract'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['payment_time']) && $row['payment_time'] ? $row['payment_time'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['guarantees']) && $row['guarantees'] ? $row['guarantees'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['payment_date']) && $row['payment_date'] ? $row['payment_date'] : '-') . "</td>";
-              
+
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";
 
@@ -1883,7 +1978,7 @@ if (!isset($_SESSION['user'])) {
 
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
     });
-    
+
     // ==================== Group Toggle Functionality ====================
     // حفظ حالة المجموعات في localStorage
     const groupStates = JSON.parse(localStorage.getItem('contractGroupStates')) || {
@@ -1895,14 +1990,14 @@ if (!isset($_SESSION['user'])) {
       operations: false,
       status: true
     };
-    
+
     // تطبيق الحالة المحفوظة عند تحميل الصفحة
     function applyGroupStates() {
       Object.keys(groupStates).forEach(group => {
         const isActive = groupStates[group];
         const btn = $(`.btn-group-toggle[data-group="${group}"]`);
         const columns = $(`.group-${group}`);
-        
+
         if (isActive) {
           btn.addClass('active');
           columns.removeClass('group-hidden');
@@ -1912,15 +2007,15 @@ if (!isset($_SESSION['user'])) {
         }
       });
     }
-    
+
     // تطبيق الحالة عند تحميل الصفحة
     applyGroupStates();
-    
+
     // التحكم في إظهار/إخفاء المجموعات
-    $('.btn-group-toggle').on('click', function() {
+    $('.btn-group-toggle').on('click', function () {
       const group = $(this).data('group');
       const isActive = $(this).hasClass('active');
-      
+
       if (isActive) {
         // إخفاء المجموعة
         $(this).removeClass('active');
@@ -1932,15 +2027,15 @@ if (!isset($_SESSION['user'])) {
         $(`.group-${group}`).removeClass('group-hidden');
         groupStates[group] = true;
       }
-      
+
       // حفظ الحالة
       localStorage.setItem('contractGroupStates', JSON.stringify(groupStates));
     });
-    
+
     // زر إظهار/إخفاء الكل
-    $('.btn-group-toggle-all').on('click', function() {
+    $('.btn-group-toggle-all').on('click', function () {
       const allActive = Object.values(groupStates).every(state => state);
-      
+
       if (allActive) {
         // إخفاء الكل
         $('.btn-group-toggle').removeClass('active');
@@ -1954,13 +2049,13 @@ if (!isset($_SESSION['user'])) {
         Object.keys(groupStates).forEach(key => groupStates[key] = true);
         $(this).html('<i class="fas fa-eye"></i> الكل');
       }
-      
+
       // حفظ الحالة
       localStorage.setItem('contractGroupStates', JSON.stringify(groupStates));
     });
-    
+
     // تحديث نص زر "الكل" عند التحميل
-    $(document).ready(function() {
+    $(document).ready(function () {
       const allActive = Object.values(groupStates).every(state => state);
       if (allActive) {
         $('.btn-group-toggle-all').html('<i class="fas fa-eye"></i> الكل');

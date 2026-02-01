@@ -17,5 +17,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+    <link rel="stylesheet" href="../assets/css/admin-style.css">
+
 </head>
 <body>

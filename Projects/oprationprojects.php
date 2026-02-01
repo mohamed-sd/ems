@@ -6,6 +6,20 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+
+// معالجة حذف المشروع
+if (isset($_GET['delete_id'])) {
+    $delete_id = intval($_GET['delete_id']);
+    $delete_query = "DELETE FROM operationproject WHERE id = $delete_id";
+    if (mysqli_query($conn, $delete_query)) {
+        header("Location: oprationprojects.php?msg=تم+حذف+المشروع+بنجاح+✅");
+        exit();
+    } else {
+        header("Location: oprationprojects.php?msg=حدث+خطأ+أثناء+الحذف+❌");
+        exit();
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['company_project_id'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $company_project_id = intval($_POST['company_project_id']);
@@ -81,13 +95,23 @@ include('../insidebar.php');
 ?>
 
 <style>
+:root {
+    --primary-color: #1a1a2e;
+    --secondary-color: #16213e;
+    --gold-color: #ffcc00;
+    --text-color: #010326;
+    --light-color: #f5f5f5;
+    --border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
 /* Modern Projects Page Styling */
 .main {
     margin-right: 10px;
     padding: 30px;
     transition: margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+    background: var(--border-color);
     max-width: 100vw;
     overflow-x: hidden;
 }
@@ -138,55 +162,15 @@ include('../insidebar.php');
 }
 
 .page-title {
-    font-size: 32px;
-    font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-size: 28px;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 0;
     font-family: 'Cairo', sans-serif;
-}
-
-/* Add Button */
-.add {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 28px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    text-decoration: none;
-    border-radius: 12px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-    border: none;
-    cursor: pointer;
-    font-size: 15px;
-}
-
-.add:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-    color: white;
-}
-
-.add i {
-    font-size: 16px;
-}
-
-/* Success Message */
-.success-message {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    color: white;
-    padding: 15px 20px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    text-align: center;
-    border-left: 4px solid #11998e;
-    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
-    animation: slideDown 0.5s ease;
-    font-weight: 600;
+    animation: slideDown 0.6s ease-out;
 }
 
 @keyframes slideDown {
@@ -198,6 +182,57 @@ include('../insidebar.php');
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Add Button */
+.add {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px var(--shadow-color);
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    animation: fadeIn 0.6s ease-out 0.1s both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.add:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px var(--shadow-color);
+    color: white;
+}
+
+.add i {
+    font-size: 16px;
+}
+
+/* Success Message */
+.success-message {
+    background: linear-gradient(135deg, #63ce7c 0%, #218838 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    text-align: center;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    animation: slideDown 0.5s ease;
+    font-weight: 600;
 }
 
 /* Form Card */
@@ -220,13 +255,14 @@ include('../insidebar.php');
     border: none;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 30px var(--shadow-color);
     background: white;
     margin-bottom: 25px;
+    animation: fadeIn 0.8s ease-out 0.2s both;
 }
 
 .card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     padding: 20px 25px;
     border: none;
@@ -283,29 +319,29 @@ include('../insidebar.php');
 .form-grid input:focus,
 .form-grid select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--gold-color);
     background: white;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 4px rgba(255, 204, 0, 0.1);
 }
 
 .form-grid button[type="submit"] {
     grid-column: 1 / -1;
     padding: 14px 28px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     border: none;
     border-radius: 12px;
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px var(--shadow-color);
     font-family: 'Cairo', sans-serif;
 }
 
 .form-grid button[type="submit"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px var(--shadow-color);
 }
 
 /* Table Container */
@@ -337,7 +373,7 @@ include('../insidebar.php');
 }
 
 #projectsTable thead th {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     padding: 16px 12px;
     font-weight: 700;
@@ -353,9 +389,9 @@ include('../insidebar.php');
 }
 
 #projectsTable tbody tr:hover {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.03) 0%, rgba(22, 33, 62, 0.03) 100%);
     transform: scale(1.01);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 15px var(--shadow-color);
 }
 
 #projectsTable tbody td {
@@ -436,46 +472,55 @@ include('../insidebar.php');
     font-size: 16px;
 }
 
-.action-btn.edit {
-    background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(247, 183, 51, 0.4);
-}
-
-.action-btn.edit:hover {
-    transform: translateY(-2px) scale(1.1);
-    box-shadow: 0 4px 12px rgba(247, 183, 51, 0.6);
-}
-
-.action-btn.delete {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
-}
-
-.action-btn.delete:hover {
-    transform: translateY(-2px) scale(1.1);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.6);
-}
-
 .action-btn.view {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    background: linear-gradient(135deg, var(--gold-color) 0%, var(--secondary-color) 100%);
     color: white;
-    box-shadow: 0 2px 8px rgba(17, 153, 142, 0.4);
 }
 
 .action-btn.view:hover {
-    transform: translateY(-2px) scale(1.1);
-    box-shadow: 0 4px 12px rgba(17, 153, 142, 0.6);
+    transform: translateY(-2px) scale(1.15);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.action-btn.edit {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+}
+
+.action-btn.edit:hover {
+    transform: translateY(-2px) scale(1.15);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.action-btn.delete {
+    background: linear-gradient(135deg, #d64545 0%, #b03a3a 100%);
+    color: white;
+}
+
+.action-btn.delete:hover {
+    transform: translateY(-2px) scale(1.15);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.action-btn.view {
+    background: linear-gradient(135deg, var(--gold-color) 0%, var(--secondary-color) 100%);
+    color: white;
+}
+
+.action-btn.view:hover {
+    transform: translateY(-2px) scale(1.15);
+    box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .action-btn.contracts {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--gold-color) 100%);
     color: white;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
 }
 
 .action-btn.contracts:hover {
+    transform: translateY(-2px) scale(1.15);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
     transform: translateY(-2px) scale(1.1);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.6);
 }
@@ -570,6 +615,251 @@ include('../insidebar.php');
         font-size: 14px;
     }
 }
+
+/* Animations for table rows */
+#projectsTable tbody tr {
+    animation: popIn 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+#projectsTable tbody tr:nth-child(1) { animation-delay: 0.05s; }
+#projectsTable tbody tr:nth-child(2) { animation-delay: 0.1s; }
+#projectsTable tbody tr:nth-child(3) { animation-delay: 0.15s; }
+#projectsTable tbody tr:nth-child(4) { animation-delay: 0.2s; }
+#projectsTable tbody tr:nth-child(5) { animation-delay: 0.25s; }
+#projectsTable tbody tr:nth-child(6) { animation-delay: 0.3s; }
+#projectsTable tbody tr:nth-child(7) { animation-delay: 0.35s; }
+#projectsTable tbody tr:nth-child(8) { animation-delay: 0.4s; }
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    margin: 3% auto;
+    padding: 0;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 900px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    color: white;
+    padding: 20px 25px;
+    border-radius: 16px 16px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h5 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+}
+
+.close-modal {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 30px 25px;
+}
+
+.view-modal-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.view-item {
+    padding: 16px;
+    background: var(--light-color);
+    border-radius: 10px;
+    border-right: 4px solid var(--gold-color);
+    animation: slideInRight 0.4s ease-out;
+}
+
+.view-item:nth-child(1) { animation-delay: 0.05s; }
+.view-item:nth-child(2) { animation-delay: 0.1s; }
+.view-item:nth-child(3) { animation-delay: 0.15s; }
+.view-item:nth-child(4) { animation-delay: 0.2s; }
+.view-item:nth-child(5) { animation-delay: 0.25s; }
+.view-item:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.view-item-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-color);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.view-item-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-color);
+    word-break: break-all;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 15px;
+    padding: 20px 25px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-modal {
+    flex: 1;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Cairo', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-modal-save {
+    background: linear-gradient(135deg, var(--gold-color) 0%, var(--primary-color) 100%);
+    color: white;
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.btn-modal-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--shadow-color);
+}
+
+.btn-modal-cancel {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+    color: white;
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.btn-modal-cancel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--shadow-color);
+}
+
+@media (max-width: 768px) {
+    .view-modal-body {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+}
+
+/* أزرار DataTables */
+.dt-buttons .dt-button {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 8px 18px !important;
+    font-weight: 700 !important;
+    font-family: 'Cairo', sans-serif !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Hover */
+.dt-buttons .dt-button:hover {
+    color: var(--gold-color) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+/* عند الضغط */
+.dt-buttons .dt-button:active {
+    transform: scale(0.96);
+}
+
 </style>
 
 <div class="main">
@@ -656,7 +946,6 @@ include('../insidebar.php');
                         <th><i class="fas fa-project-diagram"></i> اسم المشروع</th>
                         <th><i class="fas fa-file-contract"></i> العقود</th>
                         <th><i class="fas fa-user-tie"></i> العميل</th>
-                        <th><i class="fas fa-map-marker-alt"></i> الموقع</th>
                         <th><i class="fas fa-truck"></i> عدد الموردين</th>
                         <th><i class="fas fa-toggle-on"></i> الحالة</th>
                         <th><i class="fas fa-file-contract"></i> عقود المشروع</th>
@@ -688,7 +977,6 @@ include('../insidebar.php');
                         echo "<td><strong>" . $row['project_name'] . "</strong></td>";
                         echo "<td><span class='count-badge'>" . $row['contracts'] . "</span></td>";
                         echo "<td>" . ($row['client_name'] ?? $row['client']) . "</td>";
-                        echo "<td><i class='fas fa-map-pin' style='color:#667eea; margin-left:5px;'></i>" . $row['location'] . "</td>";
                         echo "<td><span class='count-badge'>" . $row['total_suppliers'] . "</span></td>";
                         
                         if ($row['status'] == "1") {
@@ -708,6 +996,18 @@ include('../insidebar.php');
                         echo "<td>
                             <div class='action-btns'>
                                 <a href='javascript:void(0)' 
+                                   class='action-btn view viewBtn' 
+                                   data-id='" . $row['id'] . "' 
+                                   data-project-name='" . htmlspecialchars($row['project_name']) . "' 
+                                   data-client-name='" . htmlspecialchars($row['client_name'] ?? $row['client']) . "' 
+                                   data-location='" . htmlspecialchars($row['location']) . "' 
+                                   data-status='" . $row['status'] . "' 
+                                   data-contracts='" . $row['contracts'] . "' 
+                                   data-suppliers='" . $row['total_suppliers'] . "'
+                                   title='عرض التفاصيل'>
+                                   <i class='fas fa-eye'></i>
+                                </a>
+                                <a href='javascript:void(0)' 
                                    class='action-btn edit editBtn' 
                                    data-id='" . $row['id'] . "' 
                                    data-company-project-id='" . ($row['company_project_id'] ?? '') . "' 
@@ -718,7 +1018,7 @@ include('../insidebar.php');
                                    title='تعديل'>
                                    <i class='fas fa-edit'></i>
                                 </a>
-                                <a href='#' 
+                                <a href='oprationprojects.php?delete_id=" . $row['id'] . "' 
                                    class='action-btn delete' 
                                    onclick='return confirm(\"هل أنت متأكد من حذف هذا المشروع؟\")'
                                    title='حذف'>
@@ -733,6 +1033,57 @@ include('../insidebar.php');
                 </tbody>
             </table>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal عرض تفاصيل المشروع -->
+<div id="viewProjectModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);">
+            <h5><i class="fas fa-eye"></i> عرض تفاصيل المشروع</h5>
+            <button class="close-modal" onclick="closeViewModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="view-modal-body">
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-project-diagram"></i> اسم المشروع</div>
+                    <div class="view-item-value" id="view_project_name">-</div>
+                </div>
+
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-user-tie"></i> اسم العميل</div>
+                    <div class="view-item-value" id="view_client_name">-</div>
+                </div>
+
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-map-marker-alt"></i> موقع المشروع</div>
+                    <div class="view-item-value" id="view_location">-</div>
+                </div>
+
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-file-contract"></i> عدد العقود</div>
+                    <div class="view-item-value" id="view_contracts">-</div>
+                </div>
+
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-truck"></i> عدد الموردين</div>
+                    <div class="view-item-value" id="view_suppliers">-</div>
+                </div>
+
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> حالة المشروع</div>
+                    <div class="view-item-value" id="view_status">-</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-modal btn-modal-save editBtn" id="viewEditBtn" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--gold-color) 100%);">
+                <i class="fas fa-edit"></i> تعديل المشروع
+            </button>
+            <button type="button" class="btn-modal btn-modal-cancel" onclick="closeViewModal()">
+                <i class="fas fa-times"></i> إغلاق
+            </button>
         </div>
     </div>
 </div>
@@ -782,8 +1133,82 @@ include('../insidebar.php');
             $("#project_status").val("");
         });
 
-        // عند الضغط على زر تعديل
-        $(document).on("click", ".editBtn", function () {
+        // عرض Modal عند الضغط على زر العرض
+        $(document).on("click", ".viewBtn", function () {
+            const projectData = {
+                id: $(this).data('id'),
+                projectName: $(this).data('project-name'),
+                clientName: $(this).data('client-name'),
+                location: $(this).data('location'),
+                status: $(this).data('status'),
+                contracts: $(this).data('contracts'),
+                suppliers: $(this).data('suppliers')
+            };
+
+            // ملء بيانات العرض
+            $('#view_project_name').text(projectData.projectName || '-');
+            $('#view_client_name').text(projectData.clientName || '-');
+            $('#view_location').text(projectData.location || '-');
+            $('#view_contracts').text(projectData.contracts || '0');
+            $('#view_suppliers').text(projectData.suppliers || '0');
+
+            // عرض الحالة بألوان
+            let statusHtml = '<span style="padding: 4px 12px; border-radius: 20px; color: white;';
+            if (projectData.status === '1' || projectData.status === 1) {
+                statusHtml += ' background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);';
+            } else {
+                statusHtml += ' background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);';
+            }
+            statusHtml += ' display: inline-block;">';
+            statusHtml += '<i class="fas fa-circle" style="margin-left: 6px; font-size: 8px;"></i> ' + (projectData.status === '1' || projectData.status === 1 ? 'نشط' : 'غير نشط') + '</span>';
+            $('#view_status').html(statusHtml);
+
+            // تحضير زر التعديل
+            const editBtn = $('#viewEditBtn');
+            editBtn.data('id', projectData.id);
+            editBtn.data('company-project-id', $(this).data('company-project-id'));
+            editBtn.data('company-client-id', $(this).data('company-client-id'));
+            editBtn.data('name', $(this).data('name'));
+            editBtn.data('location', projectData.location);
+            editBtn.data('status', projectData.status);
+
+            $('#viewProjectModal').fadeIn(300);
+        });
+
+        // إغلاق Modal عرض المشروع
+        function closeViewModal() {
+            $('#viewProjectModal').fadeOut(300);
+        }
+
+        // إغلاق عند الضغط خارج Modal
+        $(window).on('click', function (e) {
+            if (e.target.id === 'viewProjectModal') {
+                closeViewModal();
+            }
+        });
+
+        // إغلاق عند الضغط على ESC
+        $(document).on('keydown', function (e) {
+            if (e.key === 'Escape' && $('#viewProjectModal').is(':visible')) {
+                closeViewModal();
+            }
+        });
+
+        // التعامل مع زر التعديل من Modal العرض
+        $('#viewEditBtn').on('click', function () {
+            $("#project_id").val($(this).data('id'));
+            $("#company_project_id").val($(this).data('company-project-id'));
+            $("#company_client_id").val($(this).data('company-client-id'));
+            $("#project_location").val($(this).data('location'));
+            $("#project_status").val($(this).data('status'));
+
+            closeViewModal();
+            $("#projectForm").show();
+            $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
+        });
+
+        // عند الضغط على زر تعديل من الجدول
+        $(document).on("click", ".editBtn:not(#viewEditBtn)", function () {
             $("#project_id").val($(this).data("id"));
             $("#company_project_id").val($(this).data("company-project-id"));
             $("#company_client_id").val($(this).data("company-client-id"));
