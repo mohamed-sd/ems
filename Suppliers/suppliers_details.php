@@ -52,7 +52,9 @@ if (!isset($_SESSION['user'])) {
         $project = $_GET['id'];
 
         $select = mysqli_query($conn, "SELECT * , 
-                      (SELECT COUNT(*) FROM equipments WHERE equipments.suppliers = suppliers.id ) as 'equipments' 
+                      (SELECT COUNT(*) FROM equipments WHERE equipments.suppliers = suppliers.id ) as 'equipments',
+                      (SELECT COUNT(*) FROM supplierscontracts WHERE supplierscontracts.supplier_id = suppliers.id ) as 'num_contracts',
+                      (SELECT COALESCE(SUM(forecasted_contracted_hours), 0) FROM supplierscontracts WHERE supplierscontracts.supplier_id = suppliers.id ) as 'total_hours'
                       FROM `suppliers` WHERE `id` = $project ORDER BY id DESC");
         while ($row = mysqli_fetch_array($select)) {
             ?>
@@ -64,6 +66,10 @@ if (!isset($_SESSION['user'])) {
                     <div class="col-lg-4 col-7"><?php echo $row['phone']; ?></div>
                     <div class="col-lg-2 col-5"> عدد الآليات </div>
                     <div class="col-lg-4 col-7"> <?php echo $row['equipments']; ?> </div>
+                    <div class="col-lg-2 col-5"> عدد العقود </div>
+                    <div class="col-lg-4 col-7" style="font-weight: 600;"> <?php echo $row['num_contracts']; ?> </div>
+                    <div class="col-lg-2 col-5"> إجمالي الساعات المتعاقد عليها </div>
+                    <div class="col-lg-4 col-7" style="font-weight: 700; color: #667eea; font-size: 1.1rem;"> <?php echo number_format($row['total_hours']); ?> ساعة </div>
                     <div class="col-lg-2 col-5"> الحالة </div>
                     <div class="col-lg-4 col-7"><?php echo $row['status'] == "1" ? "نشط" : "معلق"; ?></div>
                 </div>
@@ -123,9 +129,10 @@ if (!isset($_SESSION['user'])) {
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>المشروع</th>
                     <th style="text-align: center;">تاريخ البداية</th>
-                    <th style="text-align: center;"> المستهدف شهريا</th>
-                    <th style="text-align: center;">المجموع</th>
+                    <th style="text-align: center;">المستهدف شهرياً</th>
+                    <th style="text-align: center;">إجمالي ساعات العقد</th>
                     <th style="text-align: center;">الحالة</th>
                     <th style="text-align: center;">إجراءات</th>
                 </tr>
@@ -134,7 +141,11 @@ if (!isset($_SESSION['user'])) {
                 <?php
                 include '../config.php';
 
-                $query = "SELECT * FROM `supplierscontracts` where supplier_id LIKE '$project' ORDER BY id DESC";
+                $query = "SELECT sc.*, op.name as project_name 
+                          FROM `supplierscontracts` sc
+                          LEFT JOIN operationproject op ON sc.project_id = op.id
+                          WHERE sc.supplier_id = '$project' 
+                          ORDER BY sc.id DESC";
                 $result = mysqli_query($conn, $query);
                 $i = 1;
                 while ($row = mysqli_fetch_assoc($result)) {
@@ -143,9 +154,10 @@ if (!isset($_SESSION['user'])) {
 
                     echo "<tr>";
                     echo "<td>" . $i++ . "</td>";
+                    echo "<td><strong>" . ($row['project_name'] ?? 'غير محدد') . "</strong></td>";
                     echo "<td>" . $row['contract_signing_date'] . "</td>";
-                    echo "<td>" . $row['hours_monthly_target'] . "</td>";
-                    echo "<td>" . $row['equip_total_contract'] . "</td>";
+                    echo "<td style='font-weight: 600; color: #28a745;'>" . number_format($row['hours_monthly_target']) . " ساعة</td>";
+                    echo "<td style='font-weight: 700; color: #667eea; font-size: 1.05rem;'>" . number_format($row['forecasted_contracted_hours']) . " ساعة</td>";
                     echo "<td>" . $status . "</td>";
                     // echo "<td>
                     //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 

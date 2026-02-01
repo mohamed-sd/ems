@@ -507,9 +507,20 @@ include('../insidebar.php');
 <div class="main">
     <div class="page-header">
         <h1 class="page-title"><i class="fas fa-users"></i> قائمة العملاء</h1>
-        <a href="javascript:void(0)" id="openAddModal" class="add-btn">
-            <i class="fas fa-plus-circle"></i> إضافة عميل جديد
-        </a>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="javascript:void(0)" id="openAddModal" class="add-btn">
+                <i class="fas fa-plus-circle"></i> إضافة عميل جديد
+            </a>
+            <a href="javascript:void(0)" id="openImportModal" class="add-btn" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                <i class="fas fa-file-excel"></i> استيراد من Excel
+            </a>
+            <a href="download_clients_template.php" class="add-btn" style="background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%);">
+                <i class="fas fa-download"></i> تحميل نموذج Excel
+            </a>
+            <a href="download_clients_template_csv.php" class="add-btn" style="background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);">
+                <i class="fas fa-file-csv"></i> تحميل نموذج CSV
+            </a>
+        </div>
     </div>
 
     <?php if (!empty($_GET['msg'])): ?>
@@ -596,6 +607,57 @@ include('../insidebar.php');
                 </table>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Modal استيراد من Excel -->
+<div id="importExcelModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+            <h5><i class="fas fa-file-excel"></i> استيراد عملاء من Excel</h5>
+            <button class="close-modal" onclick="closeImportModal()">&times;</button>
+        </div>
+        <form id="importExcelForm" enctype="multipart/form-data">
+            <div class="modal-body">
+                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-right: 4px solid #2196f3;">
+                    <h6 style="color: #1976d2; font-weight: 700; margin-bottom: 10px;">
+                        <i class="fas fa-info-circle"></i> تعليمات الاستيراد:
+                    </h6>
+                    <ul style="color: #0d47a1; line-height: 2; margin: 0; padding-right: 20px;">
+                        <li>قم بتحميل نموذج Excel أو CSV أولاً</li>
+                        <li>املأ البيانات حسب الأعمدة المحددة</li>
+                        <li>كود العميل يجب أن يكون فريداً</li>
+                        <li>الحقول المطلوبة: كود العميل، اسم العميل، الحالة</li>
+                        <li>صيغة الملف المدعومة: .xlsx, .xls, .csv</li>
+                        <li><strong>ملاحظة:</strong> إذا لم تكن مكتبة PhpSpreadsheet مثبتة، استخدم ملف CSV</li>
+                    </ul>
+                </div>
+                
+                <div class="form-group-modal">
+                    <label><i class="fas fa-file-upload"></i> اختر ملف Excel أو CSV (.xlsx, .xls, .csv) *</label>
+                    <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" required 
+                           style="padding: 15px; border: 3px dashed #11998e; border-radius: 12px; background: #f0fdf4;">
+
+                </div>
+                
+                <div id="importProgress" style="display: none; margin-top: 20px;">
+                    <div style="background: #e3f2fd; border-radius: 10px; padding: 15px; text-align: center;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; color: #2196f3;"></i>
+                        <p style="margin: 10px 0 0 0; color: #1976d2; font-weight: 600;">جاري الاستيراد...</p>
+                    </div>
+                </div>
+                
+                <div id="importResult" style="display: none; margin-top: 20px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn-modal btn-modal-save" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                    <i class="fas fa-upload"></i> رفع واستيراد
+                </button>
+                <button type="button" class="btn-modal btn-modal-cancel" onclick="closeImportModal()">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -948,21 +1010,21 @@ $(document).on('click', '.editClientBtn', function() {
     $('#editClientModal').fadeIn(300);
 });
 
-// إغلاق Modal
+// إغلاق Modal التعديل
 function closeEditModal() {
     $('#editClientModal').fadeOut(300);
 }
 
-// إغلاق عند الضغط خارج Modal
+// إغلاق عند الضغط خارج Modal التعديل
 $(window).on('click', function(e) {
     if (e.target.id === 'editClientModal') {
         closeEditModal();
     }
 });
 
-// إغلاق عند الضغط على ESC
+// إغلاق عند الضغط على ESC للتعديل
 $(document).on('keydown', function(e) {
-    if (e.key === 'Escape') {
+    if (e.key === 'Escape' && $('#editClientModal').is(':visible')) {
         closeEditModal();
     }
 });
@@ -992,6 +1054,121 @@ $('#editClientForm').on('submit', function(e) {
         }
     });
 });
+</script>
+
+<script>
+// فتح Modal الاستيراد
+$('#openImportModal').on('click', function() {
+    $('#importExcelModal').fadeIn(300);
+});
+
+// إغلاق Modal الاستيراد
+function closeImportModal() {
+    $('#importExcelModal').fadeOut(300);
+    $('#importExcelForm')[0].reset();
+    $('#importProgress').hide();
+    $('#importResult').hide();
+}
+
+// إغلاق عند الضغط خارج Modal
+$(window).on('click', function(e) {
+    if (e.target.id === 'importExcelModal') {
+        closeImportModal();
+    }
+});
+
+// معالجة رفع ملف Excel
+$('#importExcelForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const fileInput = $('#excel_file')[0];
+    if (!fileInput.files.length) {
+        alert('الرجاء اختيار ملف Excel');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('excel_file', fileInput.files[0]);
+    formData.append('action', 'import_excel');
+    
+    $('#importProgress').show();
+    $('#importResult').hide();
+    
+    $.ajax({
+        url: 'import_clients_excel.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function(response) {
+            $('#importProgress').hide();
+            
+            let resultHtml = '<div style="padding: 20px; border-radius: 12px; ';
+            
+            if (response.success) {
+                resultHtml += 'background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-right: 4px solid #28a745;">';
+                resultHtml += '<h6 style="color: #155724; font-weight: 700; margin-bottom: 10px;"><i class="fas fa-check-circle"></i> تم الاستيراد بنجاح!</h6>';
+                resultHtml += '<p style="color: #155724; margin: 5px 0;">✅ تم إضافة: <strong>' + response.added + '</strong> عميل</p>';
+                if (response.skipped > 0) {
+                    resultHtml += '<p style="color: #856404; margin: 5px 0;">⚠️ تم تخطي: <strong>' + response.skipped + '</strong> عميل (مكرر)</p>';
+                }
+                if (response.errors.length > 0) {
+                    resultHtml += '<p style="color: #721c24; margin: 10px 0 5px 0;"><strong>الأخطاء:</strong></p><ul style="margin: 0; padding-right: 20px;">';
+                    response.errors.forEach(function(error) {
+                        resultHtml += '<li style="color: #721c24;">' + error + '</li>';
+                    });
+                    resultHtml += '</ul>';
+                }
+                resultHtml += '</div>';
+                
+                setTimeout(function() {
+                    location.reload();
+                }, 3000);
+            } else {
+                resultHtml += 'background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-right: 4px solid #dc3545;">';
+                resultHtml += '<h6 style="color: #721c24; font-weight: 700; margin-bottom: 10px;"><i class="fas fa-times-circle"></i> فشل الاستيراد</h6>';
+                resultHtml += '<p style="color: #721c24; margin: 0;">' + response.message + '</p>';
+                resultHtml += '</div>';
+            }
+            
+            $('#importResult').html(resultHtml).fadeIn(300);
+        },
+        error: function(xhr, status, error) {
+            $('#importProgress').hide();
+            
+            let errorMsg = 'حدث خطأ أثناء رفع الملف. الرجاء المحاولة مرة أخرى.';
+            
+            // محاولة استخراج رسالة الخطأ من الاستجابة
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            } else if (xhr.responseText) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.message) {
+                        errorMsg = response.message;
+                    }
+                } catch(e) {
+                    // إذا لم يكن JSON، استخدم الرسالة الافتراضية
+                    errorMsg += '<br><small>تفاصيل الخطأ: ' + status + '</small>';
+                }
+            }
+            
+            const errorHtml = '<div style="padding: 20px; border-radius: 12px; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-right: 4px solid #dc3545;">' +
+                             '<h6 style="color: #721c24; font-weight: 700;"><i class="fas fa-times-circle"></i> حدث خطأ</h6>' +
+                             '<p style="color: #721c24; margin: 0;">' + errorMsg + '</p>' +
+                             '<p style="color: #721c24; margin: 10px 0 0 0; font-size: 12px;"><strong>نصائح:</strong></p>' +
+                             '<ul style="color: #721c24; font-size: 12px; margin: 5px 0; padding-right: 20px;">' +
+                             '<li>تأكد من أن الملف بصيغة .xlsx, .xls أو .csv</li>' +
+                             '<li>تأكد من أن حجم الملف أقل من 5 ميجا</li>' +
+                             '<li>تأكد من أن الملف يحتوي على بيانات صحيحة</li>' +
+                             '<li>إذا كنت تستخدم Excel، جرب حفظ الملف كـ CSV</li>' +
+                             '</ul></div>';
+            $('#importResult').html(errorHtml).fadeIn(300);
+        }
+    });
+});
+
 </script>
 
 </body>

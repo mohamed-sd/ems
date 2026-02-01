@@ -48,6 +48,13 @@ EMS is an Arabic-language equipment management system built with PHP, MySQL, and
 - `equipment_drivers` - ربط المعدات بالسائقين (junction table: equipments ↔ drivers)
 - `timesheet` - ساعات العمل (work hours tracking per operation/driver with shift details, faults, notes)
 
+**Payment & Financial Fields (added to contracts table):**
+- `price_currency_contract` - عملة العقد (currency: دولار/جنيه)
+- `paid_contract` - المبلغ المدفوع (paid amount)
+- `payment_time` - وقت الدفع (payment timing: مقدم/مؤخر)
+- `guarantees` - الضمانات (guarantee details)
+- `payment_date` - تاريخ الدفع (payment date)
+
 **Critical Relationships:**
 ```
 company_clients ←→ operationproject ←→ company_project
@@ -69,8 +76,11 @@ users → operationproject (project_id assignment)
 Each major entity has its own directory with consistent structure:
 - **[Drivers/drivers.php](Drivers/drivers.php)** - List/edit, form toggles with `<form>` POST handling
 - **[Suppliers/suppliers.php](Suppliers/suppliers.php)** - Suppliers CRUD
-- **[Projects/projects.php](Projects/projects.php)** - Projects CRUD with client, location, total cost
+- **[Projects/oprationprojects.php](Projects/oprationprojects.php)** - Operational projects CRUD (links `company_project` + `company_clients`)
+- **[Projects/view_projects.php](Projects/view_projects.php)** - Company projects CRUD (JSON API pattern with `action` parameter)
+- **[Projects/view_clients.php](Projects/view_clients.php)** - Company clients CRUD (JSON API pattern with `action` parameter)
 - **[Equipments/equipments.php](Equipments/equipments.php)** - Equipment assignments to drivers
+- **[Oprators/oprators.php](Oprators/oprators.php)** - Operations (equipment-to-project assignments) with dependent dropdown pattern for equipment type filtering
 - **[Timesheet/](Timesheet/)** - Work hour tracking; [timesheet.php](Timesheet/timesheet.php) creates entries linked to operators/projects
 - **[Contracts/](Contracts/)** - Contract lifecycle management with action handlers ([contract_actions_handler.php](Contracts/contract_actions_handler.php)), equipment assignments ([contractequipments](database/)), and audit trail via `contract_notes` table
 
@@ -81,6 +91,23 @@ timesheet → operations → equipments → suppliers/projects
 
 **Contract lifecycle workflow:**
 - Create contract → Add equipment via [contractequipments_handler.php](Contracts/contractequipments_handler.php) → Perform actions (renewal, settlement, pause, resume, terminate, merge) → Track history in `contract_notes` table
+
+**Supplier Contracts Workflow (عقود الموردين):**
+- **Entry Point:** [Suppliers/supplierscontracts.php](Suppliers/supplierscontracts.php?id=SUPPLIER_ID) - accessed from supplier details page
+- **Key Difference:** Supplier contracts mirror project contract structure but add `project_id` field - each supplier can have multiple contracts (one per project)
+- **Required Fields:** `supplier_id` (from URL), `project_id` (selected from operationproject dropdown), all standard contract fields
+- **Contract Fields:** contract_signing_date, grace_period_days, contract_duration_months, actual_start, actual_end, transportation, accommodation, place_for_living, workshop, equip_type, equip_size, equip_count, equip_target_per_month, mach_type, mach_size, mach_count, daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two, hours_monthly_target, forecasted_contracted_hours
+- **Hours Tracking System:**
+  - `hours_monthly_target` - الساعات المستهدفة شهرياً (monthly target hours for equipment + machinery)
+  - `forecasted_contracted_hours` - ساعات العقد المستهدفة (total contracted hours for entire contract duration)
+  - **Display Pattern:** Shows project's total hours, then displays supplier's contracted portion from that total
+  - **Calculation:** System auto-calculates based on equipment/machinery counts, targets, and contract duration
+  - **Aggregation:** Suppliers page shows sum of all contracted hours across all supplier contracts for a project
+- **View Details:** [Suppliers/showcontractsuppliers.php](Suppliers/showcontractsuppliers.php?id=CONTRACT_ID) - displays full contract information
+- **Pattern:** One supplier → many contracts (across different projects) vs. One project → one contract
+
+**Operational projects workflow (linking company projects + clients):**
+- Select from `company_project` (main projects) → Select from `company_clients` (clients) → Auto-populate `name` and `client` fields from selected IDs → Duplicate prevention checks (`company_project_id` + `company_client_id` combination must be unique)
 
 ### 4. Template & Header Includes
 - **Header:** [inheader.php](inheader.php) - HTML boilerplate + CSS (Bootstrap, DataTables, FontAwesome, custom style.css)
@@ -177,7 +204,11 @@ Pattern for endpoints that handle multiple related actions (see [contract_action
 | [insidebar.php](insidebar.php) | Includes both header and sidebar (template wrapper) |
 | [Drivers/drivers.php](Drivers/drivers.php) | Driver CRUD (form toggle pattern + DataTable list) |
 | [Suppliers/suppliers.php](Suppliers/suppliers.php) | Supplier CRUD with contract management |
-| [Projects/projects.php](Projects/projects.php) | Project CRUD (client, location, cost tracking) |
+| [Suppliers/supplierscontracts.php](Suppliers/supplierscontracts.php) | Supplier contracts CRUD - accessed via supplier details, requires project_id |
+| [Suppliers/showcontractsuppliers.php](Suppliers/showcontractsuppliers.php) | Supplier contract details view |
+| [Projects/oprationprojects.php](Projects/oprationprojects.php) | Operational projects CRUD (links company_project + company_clients) |
+| [Projects/view_projects.php](Projects/view_projects.php) | Company projects CRUD (JSON API pattern with `action` parameter) |
+| [Projects/view_clients.php](Projects/view_clients.php) | Company clients CRUD (JSON API pattern with `action` parameter) |
 | [Equipments/equipments.php](Equipments/equipments.php) | Equipment-to-driver assignments |
 | [Timesheet/timesheet.php](Timesheet/timesheet.php) | Complex work-hour tracking (dependent dropdowns, AJAX patterns) |
 | [Timesheet/get_drivers.php](Timesheet/get_drivers.php) | AJAX helper for dependent dropdown (returns `<option>` HTML) |
@@ -214,6 +245,8 @@ Pattern for endpoints that handle multiple related actions (see [contract_action
 - **Action routing in APIs:** Use `if/elseif` chains based on `$_POST['action']` parameter; validate action at end with `else { die(json_encode(['success' => false, 'message' => 'الإجراء غير معروف'])); }`
 - **Status field filtering:** Always add `AND status = 1` to WHERE clauses when querying active records
 - **Foreign key references:** Use field names as documented (e.g., `company_project_id` in operationproject, not `project_id`)
+- **Duplicate prevention:** Check for unique combinations before INSERT (e.g., `company_project_id` + `company_client_id` in operationproject)
+- **Equipment type filtering:** Use dependent dropdowns where equipment list depends on selected type (e.g., حفار/قلاب in operations)
 
 ### Common Query Patterns
 
@@ -246,4 +279,34 @@ FROM operationproject op
 LEFT JOIN company_clients cc ON op.company_client_id = cc.id
 LEFT JOIN company_project cp ON op.company_project_id = cp.id
 WHERE op.status = 1
+```
+
+**Get supplier contracts for a specific project:**
+```sql
+SELECT sc.*, s.name AS supplier_name, op.name AS project_name
+FROM supplierscontracts sc
+JOIN suppliers s ON sc.supplier_id = s.id
+JOIN operationproject op ON sc.project_id = op.id
+WHERE sc.project_id = $project_id
+```
+
+**Get all contracts for a supplier (across multiple projects):**
+```sql
+SELECT sc.*, op.name AS project_name
+FROM supplierscontracts sc
+JOIN operationproject op ON sc.project_id = op.id
+WHERE sc.supplier_id = $supplier_id
+ORDER BY sc.contract_signing_date DESC
+```
+
+**Get total contracted hours for a project (sum all supplier contracts):**
+```sql
+SELECT 
+    op.name AS project_name,
+    SUM(sc.forecasted_contracted_hours) AS total_supplier_hours,
+    COUNT(sc.id) AS supplier_contracts_count
+FROM supplierscontracts sc
+JOIN operationproject op ON sc.project_id = op.id
+WHERE sc.project_id = $project_id
+GROUP BY op.id
 ```
