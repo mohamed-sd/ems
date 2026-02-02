@@ -39,7 +39,8 @@ EMS is an Arabic-language equipment management system built with PHP, MySQL, and
 - `contracts` - عقود المشاريع (project contracts with duration, dates, equipment hours)
 - `contractequipments` - معدات العقد (contract equipment details: type, count, shifts, pricing)
 - `contract_notes` - سجل التدقيق (audit trail for contract actions: renewal, settlement, pause, resume, terminate, merge)
-- `supplierscontracts` - عقود الموردين (supplier contracts)
+- `supplierscontracts` - عقود الموردين (supplier contracts with project_id field)
+- `suppliercontractequipments` - معدات عقد المورد (supplier contract equipment details: mirrors contractequipments structure)
 - `supplier_contract_notes` - ملاحظات عقود الموردين (supplier contract audit trail)
 - `drivercontracts` - عقود المشغلين (driver contracts)
 
@@ -95,6 +96,8 @@ timesheet → operations → equipments → suppliers/projects
 **Supplier Contracts Workflow (عقود الموردين):**
 - **Entry Point:** [Suppliers/supplierscontracts.php](Suppliers/supplierscontracts.php?id=SUPPLIER_ID) - accessed from supplier details page
 - **Key Difference:** Supplier contracts mirror project contract structure but add `project_id` field - each supplier can have multiple contracts (one per project)
+- **Equipment Management:** Uses `suppliercontractequipments` table (mirrors `contractequipments` structure) for tracking equipment assigned to supplier contracts
+- **Action Handler:** [Suppliers/supplier_contract_actions_handler.php](Suppliers/supplier_contract_actions_handler.php) - handles all supplier contract lifecycle operations (renewal, settlement, pause, resume, terminate, merge)
 - **Required Fields:** `supplier_id` (from URL), `project_id` (selected from operationproject dropdown), all standard contract fields
 - **Contract Fields:** contract_signing_date, grace_period_days, contract_duration_months, actual_start, actual_end, transportation, accommodation, place_for_living, workshop, equip_type, equip_size, equip_count, equip_target_per_month, mach_type, mach_size, mach_count, daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two, hours_monthly_target, forecasted_contracted_hours
 - **Hours Tracking System:**
@@ -104,6 +107,7 @@ timesheet → operations → equipments → suppliers/projects
   - **Calculation:** System auto-calculates based on equipment/machinery counts, targets, and contract duration
   - **Aggregation:** Suppliers page shows sum of all contracted hours across all supplier contracts for a project
 - **View Details:** [Suppliers/showcontractsuppliers.php](Suppliers/showcontractsuppliers.php?id=CONTRACT_ID) - displays full contract information
+- **View/Edit Details:** [Suppliers/supplierscontracts_details.php](Suppliers/supplierscontracts_details.php?id=CONTRACT_ID) - full contract details page with action buttons
 - **Pattern:** One supplier → many contracts (across different projects) vs. One project → one contract
 
 **Operational projects workflow (linking company projects + clients):**
@@ -206,9 +210,13 @@ Pattern for endpoints that handle multiple related actions (see [contract_action
 | [Suppliers/suppliers.php](Suppliers/suppliers.php) | Supplier CRUD with contract management |
 | [Suppliers/supplierscontracts.php](Suppliers/supplierscontracts.php) | Supplier contracts CRUD - accessed via supplier details, requires project_id |
 | [Suppliers/showcontractsuppliers.php](Suppliers/showcontractsuppliers.php) | Supplier contract details view |
+| [Suppliers/supplierscontracts_details.php](Suppliers/supplierscontracts_details.php) | Supplier contract full details page with action buttons |
+| [Suppliers/supplier_contract_actions_handler.php](Suppliers/supplier_contract_actions_handler.php) | JSON API endpoint for supplier contract lifecycle operations (mirrors contract_actions_handler.php) |
 | [Projects/oprationprojects.php](Projects/oprationprojects.php) | Operational projects CRUD (links company_project + company_clients) |
 | [Projects/view_projects.php](Projects/view_projects.php) | Company projects CRUD (JSON API pattern with `action` parameter) |
 | [Projects/view_clients.php](Projects/view_clients.php) | Company clients CRUD (JSON API pattern with `action` parameter) |
+| [Projects/import_clients_excel.php](Projects/import_clients_excel.php) | Excel/CSV import handler for bulk client import (requires PHPSpreadsheet via Composer) |
+| [Projects/download_clients_template.php](Projects/download_clients_template.php) | Excel template generator for client import |
 | [Equipments/equipments.php](Equipments/equipments.php) | Equipment-to-driver assignments |
 | [Timesheet/timesheet.php](Timesheet/timesheet.php) | Complex work-hour tracking (dependent dropdowns, AJAX patterns) |
 | [Timesheet/get_drivers.php](Timesheet/get_drivers.php) | AJAX helper for dependent dropdown (returns `<option>` HTML) |
@@ -233,6 +241,7 @@ Pattern for endpoints that handle multiple related actions (see [contract_action
 - Sessions: Check `$_SESSION['user']` structure after login (at least `['role']` key)
 - Queries: Use `mysqli_error()` to debug SQL issues
 - Redirects: Verify no output before `header()` calls
+- Composer: Run `composer install` in project root to install dependencies (PHPSpreadsheet for Excel import/export)
 
 ## Common Pitfalls & Patterns
 - **Include ordering:** Always `include '../config.php'` AFTER session checks but BEFORE any SQL queries

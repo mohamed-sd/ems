@@ -8,27 +8,33 @@ include '../config.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_id'])) {
-    $project_id = intval($_POST['project_id']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id'])) {
+    $project_contract_id = intval($_POST['project_contract_id']); // معرف العقد من جدول contracts
+    $supplier_contract_id = isset($_POST['supplier_contract_id']) ? intval($_POST['supplier_contract_id']) : 0;
     
-    // جلب إجمالي ساعات المشروع من جدول contracts
-    $project_query = "SELECT 
-        COALESCE(SUM(forecasted_contracted_hours), 0) as project_total_hours
+    // جلب إجمالي ساعات العقد المحدد من جدول contracts
+    $contract_query = "SELECT 
+        forecasted_contracted_hours as contract_total_hours,
+        project
         FROM contracts 
-        WHERE project = $project_id";
-    $project_result = mysqli_query($conn, $project_query);
-    $project_data = mysqli_fetch_assoc($project_result);
+        WHERE id = $project_contract_id
+        LIMIT 1";
+    $contract_result = mysqli_query($conn, $contract_query);
+    $contract_data = mysqli_fetch_assoc($contract_result);
     
-    // جلب تفصيل ساعات المعدات حسب النوع
+    if (!$contract_data) {
+        die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
+    }
+    
+    // جلب تفصيل ساعات المعدات حسب النوع للعقد المحدد
     $equipment_details_query = "SELECT 
-        ce.equip_type,
-        COALESCE(SUM(ce.equip_total_contract), 0) as total_hours,
-        COUNT(DISTINCT ce.id) as equipment_count
-        FROM contractequipments ce
-        INNER JOIN contracts c ON ce.contract_id = c.id
-        WHERE c.project = $project_id
-        GROUP BY ce.equip_type
-        ORDER BY ce.equip_type";
+        equip_type,
+        COALESCE(SUM(equip_total_contract), 0) as total_hours,
+        COUNT(DISTINCT id) as equipment_count
+        FROM contractequipments
+        WHERE contract_id = $project_contract_id
+        GROUP BY equip_type
+        ORDER BY equip_type";
     $equipment_result = mysqli_query($conn, $equipment_details_query);
     $equipment_breakdown = [];
     while ($row = mysqli_fetch_assoc($equipment_result)) {
@@ -39,21 +45,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_id'])) {
         ];
     }
     
-    // جلب مجموع ساعات عقود الموردين لهذا المشروع
+    // جلب مجموع ساعات عقود الموردين لهذا العقد المحدد (باستثناء العقد الحالي عند التعديل)
     $suppliers_query = "SELECT 
         COALESCE(SUM(forecasted_contracted_hours), 0) as suppliers_contracted_hours
         FROM supplierscontracts 
-        WHERE project_id = $project_id";
+        WHERE project_contract_id = $project_contract_id";
+    
+    // استثناء عقد المورد الحالي عند التعديل
+    if ($supplier_contract_id > 0) {
+        $suppliers_query .= " AND id != $supplier_contract_id";
+    }
+    
     $suppliers_result = mysqli_query($conn, $suppliers_query);
     $suppliers_data = mysqli_fetch_assoc($suppliers_result);
     
-    $project_hours = floatval($project_data['project_total_hours']);
+    $contract_hours = floatval($contract_data['contract_total_hours']);
     $suppliers_hours = floatval($suppliers_data['suppliers_contracted_hours']);
-    $remaining = $project_hours - $suppliers_hours;
+    $remaining = $contract_hours - $suppliers_hours;
     
     echo json_encode([
         'success' => true,
-        'project_total_hours' => $project_hours,
+        'contract_total_hours' => $contract_hours,
         'equipment_breakdown' => $equipment_breakdown,
         'suppliers_contracted_hours' => $suppliers_hours,
         'remaining_hours' => $remaining

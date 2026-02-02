@@ -593,7 +593,7 @@ $supplier_id = intval($_GET['id']);
           <br>
           
           <div class="form-grid">
-            <div class="field">
+            <div class="field md-6">
               <label>اسم المشروع <font color="red">*</font></label>
               <div class="control">
                 <select name="project_id" id="project_id" required>
@@ -609,16 +609,25 @@ $supplier_id = intval($_GET['id']);
                 </select>
               </div>
             </div>
+            
+            <div class="field md-6">
+              <label>عقد المشروع <font color="red">*</font></label>
+              <div class="control">
+                <select name="project_contract_id" id="project_contract_id" required disabled>
+                  <option value="">— اختر المشروع أولاً —</option>
+                </select>
+              </div>
+            </div>
           </div>
           
-          <!-- عرض معلومات ساعات المشروع -->
+          <!-- عرض معلومات ساعات العقد -->
           <div id="projectHoursInfo" style="display:none; margin: 1rem 0; padding: 1.5rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 15px; border-right: 4px solid #2196f3; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
               <div style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <strong style="color: #1976d2; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
-                  <i class="fas fa-clock"></i> إجمالي ساعات المشروع
+                  <i class="fas fa-clock"></i> إجمالي ساعات العقد
                 </strong>
-                <div style="font-size: 2rem; color: #0d47a1; font-weight: 700;" id="projectTotalHours">0</div>
+                <div style="font-size: 2rem; color: #0d47a1; font-weight: 700;" id="contractTotalHours">0</div>
                 <div id="equipmentBreakdown" style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 2px dashed #e3f2fd; font-size: 0.85rem;">
                   <!-- سيتم ملء التفصيل هنا -->
                 </div>
@@ -1151,11 +1160,12 @@ $supplier_id = intval($_GET['id']);
             include '../config.php';
 
             // إضافة عقد جديد عند إرسال الفورم
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['supplier_id']) && !empty($_POST['project_id'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['supplier_id']) && !empty($_POST['project_id']) && !empty($_POST['project_contract_id'])) {
 
               $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
               $supplier_id_post = intval($_POST['supplier_id']);
               $project_id = intval($_POST['project_id']);
+              $project_contract_id = intval($_POST['project_contract_id']);
             
 
               $contract_signing_date = mysqli_real_escape_string($conn, $_POST['contract_signing_date']);
@@ -1208,7 +1218,8 @@ $supplier_id = intval($_GET['id']);
               if ($id > 0) {
                 // تعديل
                 $sql = "UPDATE supplierscontracts SET 
-            project_id='$project_id', 
+            project_id='$project_id',
+            project_contract_id='$project_contract_id',
             contract_signing_date='$contract_signing_date',
             grace_period_days='$grace_period_days',
             contract_duration_days='$contract_duration_days',
@@ -1240,14 +1251,14 @@ $supplier_id = intval($_GET['id']);
               } else {
                 // إضافة
                 $sql = "INSERT INTO supplierscontracts (
-            supplier_id, project_id, contract_signing_date, grace_period_days, contract_duration_days,
+            supplier_id, project_id, project_contract_id, contract_signing_date, grace_period_days, contract_duration_days,
             equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
             actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
             hours_monthly_target, forecasted_contracted_hours,
             daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two,
             price_currency_contract, paid_contract, payment_time, guarantees, payment_date
         ) VALUES (
-            '$supplier_id_post', '$project_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days',
+            '$supplier_id_post', '$project_id', '$project_contract_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days',
             '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
             '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
             '$hours_monthly_target','$forecasted_contracted_hours',
@@ -1412,6 +1423,7 @@ $supplier_id = intval($_GET['id']);
                         <a href='javascript:void(0)' class='editBtn'
              data-id='" . $row['id'] . "'
              data-project_id='" . $row['project_id'] . "'
+             data-project_contract_id='" . (isset($row['project_contract_id']) ? $row['project_contract_id'] : '') . "'
              data-contract_signing_date='" . $row['contract_signing_date'] . "'
              data-grace_period_days='" . $row['grace_period_days'] . "'
              data-contract_duration_days='" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "'
@@ -1750,18 +1762,54 @@ $supplier_id = intval($_GET['id']);
     // أول تشغيل
     recalc();
 
-    // جلب بيانات ساعات المشروع عند تغيير المشروع
+    // جلب عقود المشروع عند تغيير المشروع
     $('#project_id').on('change', function() {
       const projectId = $(this).val();
+      $('#project_contract_id').prop('disabled', true).html('<option value="">— جاري التحميل... —</option>');
+      $('#projectHoursInfo').fadeOut();
+      
       if (projectId) {
         $.ajax({
-          url: 'get_project_hours.php',
+          url: 'get_project_contracts.php',
           type: 'POST',
           data: { project_id: projectId },
           dataType: 'json',
           success: function(response) {
+            if (response.success && response.contracts.length > 0) {
+              let options = '<option value="">— اختر العقد —</option>';
+              response.contracts.forEach(function(contract) {
+                options += `<option value="${contract.id}">${contract.display_name}</option>`;
+              });
+              $('#project_contract_id').html(options).prop('disabled', false);
+            } else {
+              $('#project_contract_id').html('<option value="">— لا توجد عقود لهذا المشروع —</option>').prop('disabled', true);
+            }
+          },
+          error: function() {
+            $('#project_contract_id').html('<option value="">— خطأ في التحميل —</option>').prop('disabled', true);
+          }
+        });
+      } else {
+        $('#project_contract_id').html('<option value="">— اختر المشروع أولاً —</option>').prop('disabled', true);
+      }
+    });
+
+    // جلب بيانات ساعات العقد عند تغيير العقد
+    $('#project_contract_id').on('change', function() {
+      const contractId = $(this).val();
+      const supplierContractId = $('#contract_id').val();
+      if (contractId) {
+        $.ajax({
+          url: 'get_project_hours.php',
+          type: 'POST',
+          data: { 
+            project_contract_id: contractId,
+            supplier_contract_id: supplierContractId || 0
+          },
+          dataType: 'json',
+          success: function(response) {
             if (response.success) {
-              $('#projectTotalHours').text(new Intl.NumberFormat('ar-EG').format(response.project_total_hours));
+              $('#contractTotalHours').text(new Intl.NumberFormat('ar-EG').format(response.contract_total_hours));
               $('#suppliersContractedHours').text(new Intl.NumberFormat('ar-EG').format(response.suppliers_contracted_hours));
               $('#remainingHours').text(new Intl.NumberFormat('ar-EG').format(response.remaining_hours));
               
@@ -1773,7 +1821,7 @@ $supplier_id = intval($_GET['id']);
                 var breakdownHtml = '<div style="color: #555;"><strong style="color: #1976d2; display: block; margin-bottom: 0.5rem;">تفصيل الساعات:</strong>';
                 
                 response.equipment_breakdown.forEach(function(item) {
-                  var percentage = ((item.hours / response.project_total_hours) * 100).toFixed(1);
+                  var percentage = ((item.hours / response.contract_total_hours) * 100).toFixed(1);
                   breakdownHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; padding: 0.3rem 0;">';
                   breakdownHtml += '<span><i class="fas fa-tools" style="color: #1976d2; margin-left: 0.3rem;"></i>' + item.type + '</span>';
                   breakdownHtml += '<span style="font-weight: 600; color: #0d47a1;">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
@@ -1783,7 +1831,7 @@ $supplier_id = intval($_GET['id']);
                 breakdownHtml += '</div>';
                 breakdownDiv.html(breakdownHtml);
               } else {
-                breakdownDiv.html('<span style="color: #999; font-style: italic;">لا توجد معدات مسجلة لهذا المشروع</span>');
+                breakdownDiv.html('<span style="color: #999; font-style: italic;">لا توجد معدات مسجلة لهذا العقد</span>');
               }
               
               $('#projectHoursInfo').fadeIn();
@@ -1804,7 +1852,38 @@ $supplier_id = intval($_GET['id']);
     $(document).on("click", ".editBtn", function () {
       $("#projectForm").show();
       $("#contract_id").val($(this).data("id"));
-      $("#project_id").val($(this).data("project_id")).trigger('change');
+      
+      // تحميل المشروع أولاً
+      const projectId = $(this).data("project_id");
+      const projectContractId = $(this).data("project_contract_id");
+      
+      $("#project_id").val(projectId);
+      
+      // تحميل عقود المشروع ثم اختيار العقد المحدد
+      if (projectId) {
+        $.ajax({
+          url: 'get_project_contracts.php',
+          type: 'POST',
+          data: { project_id: projectId },
+          dataType: 'json',
+          success: function(response) {
+            if (response.success && response.contracts.length > 0) {
+              let options = '<option value="">— اختر العقد —</option>';
+              response.contracts.forEach(function(contract) {
+                const selected = contract.id == projectContractId ? 'selected' : '';
+                options += `<option value="${contract.id}" ${selected}>${contract.display_name}</option>`;
+              });
+              $('#project_contract_id').html(options).prop('disabled', false);
+              
+              // تفعيل تحميل بيانات الساعات
+              if (projectContractId) {
+                $('#project_contract_id').trigger('change');
+              }
+            }
+          }
+        });
+      }
+      
       $("#projectForm [name='contract_signing_date']").val($(this).data("contract_signing_date"));
       $("#projectForm [name='grace_period_days']").val($(this).data("grace_period_days"));
       $("#projectForm [name='contract_duration_days']").val($(this).data("contract_duration_days"));
