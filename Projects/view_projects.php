@@ -104,8 +104,11 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     exit;
 }
 
-// جلب المشاريع
-$query = "SELECT * FROM company_project ORDER BY id DESC";
+// جلب المشاريع مع عدد المناجم
+$query = "SELECT cp.*, 
+         (SELECT COUNT(*) FROM mines WHERE project_id = cp.id) as mines_count 
+         FROM company_project cp 
+         ORDER BY cp.id DESC";
 $result = mysqli_query($conn, $query);
 
 $page_title = "إيكوبيشن | قائمة المشاريع التشغيلية";
@@ -355,6 +358,39 @@ include('../insidebar.php');
     .action-btn.delete:hover {
         transform: translateY(-2px) scale(1.15);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Mines Count Link */
+    .mines-count-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+        color: white;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(142, 68, 173, 0.3);
+    }
+
+    .mines-count-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(142, 68, 173, 0.5);
+        color: white;
+    }
+
+    .mines-count-badge {
+        background: rgba(255, 255, 255, 0.3);
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .mines-count-link i {
+        font-size: 16px;
     }
 
     /* Responsive */
@@ -653,6 +689,7 @@ include('../insidebar.php');
                             <th>القطاع الفرعي</th>
                             <th>الولاية</th>
                             <th>المنطقة</th>
+                            <th>عدد المناجم</th>
                             <th>الحالة</th>
                             <th>الإجراءات</th>
                         </tr>
@@ -676,6 +713,14 @@ include('../insidebar.php');
                                 <td><?php echo htmlspecialchars($row['sub_sector']); ?></td>
                                 <td><?php echo htmlspecialchars($row['state']); ?></td>
                                 <td><?php echo htmlspecialchars($row['region']); ?></td>
+                                <td>
+                                    <a href="project_mines.php?project_id=<?php echo $row['id']; ?>" 
+                                       class="mines-count-link" 
+                                       title="عرض المناجم">
+                                        <i class="fas fa-mountain"></i>
+                                        <span class="mines-count-badge"><?php echo $row['mines_count']; ?></span>
+                                    </a>
+                                </td>
                                 <td>
                                     <span class="status-badge <?php echo $status_class; ?>">
                                         <?php echo $status_text; ?>
@@ -736,6 +781,7 @@ include('../insidebar.php');
             <button class="close-modal" onclick="closeViewModal()">&times;</button>
         </div>
         <div class="modal-body">
+            <input type="hidden" id="view_project_id" value="">
             <div class="view-modal-body">
                 <div class="view-item">
                     <div class="view-item-label"><i class="fas fa-barcode"></i> كود المشروع</div>
@@ -789,6 +835,9 @@ include('../insidebar.php');
             </div>
         </div>
         <div class="modal-footer">
+            <button type="button" class="btn-modal" onclick="window.location.href='project_mines.php?project_id=' + document.getElementById('view_project_id').value" style="background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);">
+                <i class="fas fa-mountain"></i> إدارة المناجم
+            </button>
             <button type="button" class="btn-modal btn-modal-save editProjectBtn" id="viewEditBtn" style="background: linear-gradient(135deg, #1a1a2e 0%, #ffcc00 100%);">
                 <i class="fas fa-edit"></i> تعديل البيانات
             </button>
@@ -1050,6 +1099,9 @@ include('../insidebar.php');
             longitude: $(this).data('longitude'),
             status: $(this).data('status')
         };
+
+        // حفظ معرف المشروع في حقل مخفي
+        $('#view_project_id').val(projectData.id);
 
         // ملء بيانات العرض
         $('#view_project_code').text(projectData.code || '-');
