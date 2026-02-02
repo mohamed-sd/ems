@@ -1,11 +1,11 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-  header("Location: index.php");
+  header("Location: ../index.php");
   exit();
 }
-include "config.php";
-?>
+include "../config.php";
+?>  
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -16,8 +16,8 @@ include "config.php";
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Font awsome -->
-  <link rel="stylesheet" href="assets/css/all.min.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/all.min.css">
+  <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
@@ -367,7 +367,7 @@ include "config.php";
 
 <body>
 
-  <?php include('sidebar.php'); ?>
+  <?php include('../insidebar.php'); ?>
 
   <div class="main">
 
@@ -401,27 +401,27 @@ include "config.php";
         <i class="fas fa-bolt"></i> الوصول السريع
       </h2>
       <div class="quick-access">
-        <a href="Clients/clients.php" class="quick-btn">
+        <a href="../Clients/clients.php" class="quick-btn">
           <i class="fas fa-users"></i>
           <span>العملاء</span>
         </a>
-        <a href="Projects/view_projects.php" class="quick-btn">
+        <a href="../Projects/view_projects.php" class="quick-btn">
           <i class="fas fa-list-alt"></i>
           <span>مشاريع الشركة</span>
         </a>
-        <a href="Projects/oprationprojects.php" class="quick-btn">
+        <a href="../Projects/oprationprojects.php" class="quick-btn">
           <i class="fas fa-project-diagram"></i>
           <span>المشاريع التشغيلية</span>
         </a>
-        <a href="Reports/reports.php" class="quick-btn">
+        <a href="../Reports/reports.php" class="quick-btn">
           <i class="fas fa-chart-line"></i>
           <span>التقارير</span>
         </a>
-        <a href="users.php" class="quick-btn">
+        <a href="../users.php" class="quick-btn">
           <i class="fas fa-user-shield"></i>
           <span>المستخدمين</span>
         </a>
-        <a href="settings.php" class="quick-btn">
+        <a href="../settings.php" class="quick-btn">
           <i class="fas fa-cog"></i>
           <span>الإعدادات</span>
         </a>
@@ -439,7 +439,7 @@ include "config.php";
 
         // كارد العملاء
         $clients = $conn->query("SELECT COUNT(*) AS total FROM clients WHERE status = 'نشط'")->fetch_assoc()['total'];
-        echo "<a href='Clients/clients.php' style='text-decoration: none;'>
+        echo "<a href='../Clients/clients.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-users'></i>
                   <h3>$clients</h3>
@@ -449,7 +449,7 @@ include "config.php";
 
         // كارد المشاريع التشغيلية
         $projects = $conn->query("SELECT COUNT(*) AS total FROM operationproject")->fetch_assoc()['total'];
-        echo "<a href='Projects/oprationprojects.php' style='text-decoration: none;'>
+        echo "<a href='../Projects/oprationprojects.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-project-diagram'></i>
                   <h3>$projects</h3>
@@ -459,7 +459,7 @@ include "config.php";
 
         // كارد المشاريع الأساسية
         $company_projects = $conn->query("SELECT COUNT(*) AS total FROM company_project WHERE status = 'نشط'")->fetch_assoc()['total'];
-        echo "<a href='Projects/view_projects.php' style='text-decoration: none;'>
+        echo "<a href='../Projects/view_projects.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-list-alt'></i>
                   <h3>$company_projects</h3>
@@ -470,7 +470,7 @@ include "config.php";
 
         // كارد المستخدمين
         $users = $conn->query("SELECT COUNT(*) AS total FROM users")->fetch_assoc()['total'];
-        echo "<a href='users.php' style='text-decoration: none;'>
+        echo "<a href='../users.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-user-shield'></i>
                   <h3>$users</h3>
@@ -485,7 +485,7 @@ include "config.php";
       // ******************************** احصائيات مدير الموردين ******************************************************
       if ($_SESSION['user']['role'] == "2") {
         $suppliers = $conn->query("SELECT COUNT(*) AS total FROM suppliers")->fetch_assoc()['total'];
-        echo "<a href='Suppliers/suppliers.php' style='text-decoration: none;'>
+        echo "<a href='../Suppliers/suppliers.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-truck'></i>
                   <h3>$suppliers</h3>
@@ -494,7 +494,7 @@ include "config.php";
               </a>";
 
         $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<a href='Equipments/equipments.php' style='text-decoration: none;'>
+        echo "<a href='../Equipments/equipments.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-tools'></i>
                   <h3>$equipments</h3>
@@ -508,7 +508,7 @@ include "config.php";
       // ******************************** احصائيات مدير المشغلين ******************************************************
       if ($_SESSION['user']['role'] == "3") {
         $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<a href='Equipments/equipments.php' style='text-decoration: none;'>
+        echo "<a href='../Equipments/equipments.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-tractor'></i>
                   <h3>$equipments</h3>
@@ -517,7 +517,7 @@ include "config.php";
               </a>";
 
         $drivers = $conn->query("SELECT COUNT(*) AS total FROM drivers")->fetch_assoc()['total'];
-        echo "<a href='Drivers/drivers.php' style='text-decoration: none;'>
+        echo "<a href='../Drivers/drivers.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-id-badge'></i>
                   <h3>$drivers</h3>
@@ -531,7 +531,7 @@ include "config.php";
       // ******************************** احصائيات مدير الاسطول ******************************************************
       if ($_SESSION['user']['role'] == "4") {
         $projects = $conn->query("SELECT COUNT(*) AS total FROM operationproject")->fetch_assoc()['total'];
-        echo "<a href='Projects/projects.php' style='text-decoration: none;'>
+        echo "<a href='../Projects/projects.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-building'></i>
                   <h3>$projects</h3>
@@ -540,7 +540,7 @@ include "config.php";
               </a>";
 
         $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<a href='Equipments/equipments.php' style='text-decoration: none;'>
+        echo "<a href='../Equipments/equipments.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-tools'></i>
                   <h3>$equipments</h3>
@@ -561,7 +561,7 @@ include "config.php";
       // ******************************** احصائيات مدير الموقع ******************************************************
       if ($_SESSION['user']['role'] == "5") {
         $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<a href='Equipments/equipments.php' style='text-decoration: none;'>
+        echo "<a href='../Equipments/equipments.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-tools'></i>
                   <h3>$equipments</h3>
@@ -571,7 +571,7 @@ include "config.php";
 
         $hours = $conn->query("SELECT SUM(total_work_hours) AS total FROM timesheet")->fetch_assoc()['total'];
         $hours = $hours ? number_format($hours, 0) : '0';
-        echo "<a href='Timesheet/timesheet.php' style='text-decoration: none;'>
+        echo "<a href='../Timesheet/timesheet.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-clock'></i>
                   <h3>$hours</h3>
@@ -586,7 +586,7 @@ include "config.php";
       if ($_SESSION['user']['role'] == "6" || $_SESSION['user']['role'] == "7" || $_SESSION['user']['role'] == "8" || $_SESSION['user']['role'] == "9") {
         $hours = $conn->query("SELECT SUM(total_work_hours) AS total FROM timesheet")->fetch_assoc()['total'];
         $hours = $hours ? number_format($hours, 0) : '0';
-        echo "<a href='Timesheet/timesheet.php' style='text-decoration: none;'>
+        echo "<a href='../Timesheet/timesheet.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-clock'></i>
                   <h3>$hours</h3>

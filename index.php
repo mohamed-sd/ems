@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 'last_login' => date('Y-m-d H:i:s')
                             );
 
-                            header("Location: dashbourd.php");
+                            header("Location: main/dashboard.php");
                             exit();
                         } else {
                             $_SESSION['login_attempts'] = (isset($_SESSION['login_attempts']) ? $_SESSION['login_attempts'] : 0) + 1;

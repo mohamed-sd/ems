@@ -11,7 +11,7 @@
     <h2 class="logo">Equipation</h2>
 
     <ul>
-      <li><a href="dashbourd.php"><i class="fa fa-tachometer-alt"></i> <span>الرئيسية</span></a></li>
+      <li><a href="main/dashboard.php"><i class="fa fa-tachometer-alt"></i> <span>الرئيسية</span></a></li>
 
       <?php // صلاحيات الادارة العليا == -1
       if ($_SESSION['user']['role'] == "-1") {

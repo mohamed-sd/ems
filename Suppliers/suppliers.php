@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     <title>إيكوبيشن | الموردين</title>
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/all.min.css">
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- DataTables CSS -->
@@ -42,31 +42,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../assets/css/admin-style.css" />
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
-        
-        * {
-            font-family: 'Cairo', sans-serif;
+
+        :root {
+            --primary-color: #01072a;
+            --secondary-color: #e2ae03;
+            --dark-color: #2d2b22;
+            --light-color: #f5f5f5;
+            --border-color: #e0e0e0;
+            --text-color: #010326;
+            --gold-color: #debf0f;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --accent-color: #1a1a2e;
         }
         
         body {
-            background: #f5f7fa;
+            background: var(--light-color);
         }
         
         .main {
             padding: 2rem;
-            background: #f5f7fa;
+            background: var(--light-color);
+            width: calc(100% - 250px);
+        }
+
+        @media (max-width: 768px) {
+            .main {
+                margin-right: 0;
+                padding: 15px 10px;
+            }
         }
         
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
         /* Page Title */
         .main h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary-color);
+            font-size: 20px;
+            font-weight: 900;
             margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .main h2 i {
+            color: var(--secondary-color);
+            font-size: 24px;
         }
         
         /* Action Buttons Container */
@@ -75,15 +108,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             gap: 0.75rem;
             flex-wrap: wrap;
             margin-bottom: 2rem;
-            padding: 1rem;
+            padding: 1.5rem;
             background: white;
             border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 15px var(--shadow-color);
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
         
         /* Modern Action Buttons */
         .aligin .add {
-            padding: 0.75rem 1.5rem;
+            padding: 12px 30px;
             border: none;
             border-radius: 10px;
             font-weight: 600;
@@ -92,10 +137,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             text-decoration: none;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px var(--shadow-color);
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: var(--gold-color);
+            color: var(--primary-color);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .aligin .add::before {
@@ -118,32 +167,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         
         .aligin .add:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
         }
         
         /* Success Message */
         .success-message {
             background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
             color: #155724;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            margin: 1rem 0;
-            text-align: center;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
             font-weight: 600;
             border-right: 4px solid #28a745;
-            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.2);
-            animation: slideInDown 0.5s ease;
-        }
-        
-        @keyframes slideInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            animation: slideDown 0.4s ease;
         }
         
         /* Form Styling */
@@ -165,21 +206,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         .card {
             border: none;
             border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px var(--shadow-color);
             overflow: hidden;
-            margin-bottom: 2rem;
+            margin-bottom: 30px;
         }
         
         .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
             padding: 1.5rem;
             border: none;
         }
         
         .card-header h5 {
             color: white;
-            font-weight: 700;
+            font-weight: 600;
             margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h5 i {
+            color: var(--secondary-color);
+            font-size: 18px;
         }
         
         .card-body {
@@ -197,60 +246,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         .form-grid input,
         .form-grid select {
             width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e9ecef;
+            padding: 12px;
+            border: 2px solid var(--border-color);
             border-radius: 10px;
             font-size: 0.95rem;
             transition: all 0.3s ease;
             font-weight: 500;
+            background: white;
+            color: var(--text-color);
         }
         
         .form-grid input:focus,
         .form-grid select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(226, 174, 3, 0.15);
             outline: none;
         }
         
         .form-grid button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: var(--secondary-color);
+            color: var(--primary-color);
             border: none;
-            padding: 0.75rem 2rem;
+            padding: 12px 30px;
             border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 15px var(--shadow-color);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .form-grid button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px var(--shadow-color);
         }
         
         /* DataTable Styling */
+        .dataTables_wrapper {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        table.dataTable {
+            width: 100% !important;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
         table.dataTable thead th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
             color: white;
             font-weight: 600;
-            padding: 1rem;
+            padding: 15px;
+            text-align: center;
             border: none;
+            font-size: 15px;
+        }
+
+        table.dataTable thead th:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+
+        table.dataTable thead th:last-child {
+            border-radius: 0 10px 10px 0;
+        }
+
+        table.dataTable thead th i {
+            color: var(--secondary-color);
+            margin-left: 8px;
         }
         
         table.dataTable tbody tr {
+            background: rgba(255, 255, 255, 0.8);
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
         
         table.dataTable tbody tr:hover {
-            background: linear-gradient(135deg, #f8f9ff 0%, #f0f0ff 100%);
+            background: rgba(226, 174, 3, 0.08);
             transform: scale(1.01);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px var(--shadow-color);
         }
         
         table.dataTable tbody td {
-            padding: 1rem;
+            padding: 15px;
             vertical-align: middle;
+            text-align: center;
+            border: none;
+            font-size: 14px;
         }
         
         /* Action Buttons */
@@ -260,82 +344,173 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             justify-content: center;
             width: 35px;
             height: 35px;
-            border-radius: 50%;
-            margin: 0 0.25rem;
+            border-radius: 8px;
+            margin: 0 4px;
             transition: all 0.3s ease;
             text-decoration: none;
+            font-size: 15px;
+            color: white;
         }
         
         .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: translateY(-2px) scale(1.15);
+            box-shadow: 0 4px 12px var(--shadow-color);
         }
         
         .btn-edit {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-            color: white !important;
-        }
-        
-        .btn-delete {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white !important;
-        }
-        
-        .btn-view {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
             color: white !important;
         }
         
         .btn-contracts {
-            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #b89302 100%);
             color: white !important;
         }
         
         /* Status Badge */
         .status-badge {
             display: inline-block;
-            padding: 0.5rem 1rem;
+            padding: 6px 16px;
             border-radius: 20px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 13px;
         }
         
         .status-active {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            background: rgba(40, 167, 69, 0.2);
             color: #155724;
         }
         
         .status-inactive {
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            background: rgba(220, 53, 69, 0.2);
             color: #721c24;
         }
         
         /* Stats in Table */
         .stat-cell {
-            font-weight: 600;
-            color: #667eea;
-            font-size: 1.05rem;
+            background-color: var(--accent-color);
+            padding: 4px 14px;
+            border-radius: 30px;
+            width: fit-content;
+            font-weight: 800;
+            color: var(--secondary-color);
+            font-size: 1rem;
         }
         
         /* DataTables Buttons */
         .dt-buttons {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         
         .dt-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            color: white !important;
+            background: var(--secondary-color) !important;
+            color: var(--primary-color) !important;
             border: none !important;
-            padding: 0.5rem 1rem !important;
+            padding: 10px 20px !important;
             border-radius: 8px !important;
             font-weight: 600 !important;
-            margin-left: 0.5rem !important;
             transition: all 0.3s ease !important;
+            box-shadow: 0 4px 12px var(--shadow-color) !important;
+            font-family: 'Cairo', sans-serif !important;
         }
         
         .dt-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+            box-shadow: 0 6px 15px var(--shadow-color) !important;
+        }
+
+        .dt-button.active {
+            background: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        /* Pagination */
+        .dataTables_paginate .paginate_button {
+            padding: 8px 12px;
+            margin: 2px;
+            border-radius: 6px;
+            background: white;
+            border: 1px solid var(--border-color);
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .dataTables_paginate .paginate_button:hover {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .dataTables_paginate .paginate_button.current {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            border-color: var(--secondary-color);
+        }
+
+        /* Search Box */
+        .dataTables_filter input {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .dataTables_filter input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(226, 174, 3, 0.15);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main {
+                padding: 1rem;
+            }
+
+            .main h2 {
+                font-size: 18px;
+                margin-bottom: 1rem;
+            }
+
+            .aligin {
+                padding: 1rem;
+            }
+
+            .aligin .add {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            table.dataTable {
+                font-size: 12px;
+            }
+
+            table.dataTable thead th {
+                padding: 10px 5px;
+            }
+
+            table.dataTable tbody td {
+                padding: 10px 5px;
+            }
+
+            .action-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 13px;
+            }
         }
     </style>
 </head>
@@ -346,23 +521,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     <h2><i class="fas fa-truck-loading"></i> إدارة الموردين</h2>
     <div class="aligin">
         <a href="javascript:void(0)" id="toggleForm" class="add">
-            <i class="fa fa-plus"></i> إضافة مورد
+            <i class="fa fa-plus"></i> إضافة مورد جديد
         </a>
     </div>
 
     
     <?php if (!empty($_GET['msg'])): ?>
         <div class="success-message">
-            <i class="fas fa-check-circle" style="margin-left: 0.5rem;"></i>
+            <i class="fas fa-check-circle"></i>
             <?php echo htmlspecialchars($_GET['msg']); ?>
         </div>
     <?php endif; ?>
 
     <!-- فورم إضافة / تعديل مورد -->
     <form id="projectForm" action="" method="post" style="display:none;">
-        <div class="card shadow-sm">
+        <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">
+                <h5>
                     <i class="fas fa-edit"></i> إضافة / تعديل مورد
                 </h5>
             </div>
@@ -372,12 +547,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     <input type="text" name="name" id="supplier_name" placeholder="اسم المورد" required />
                     <input type="text" name="phone" id="supplier_phone" placeholder="رقم الهاتف" required />
                     <select name="status" id="supplier_status" required>
-                        <option value="">حالة المورد</option>
+                        <option value="">اختر الحالة</option>
                         <option value="1">نشط</option>
                         <option value="0">معلق</option>
                     </select>
                     <button type="submit">
-                        <i class="fas fa-save" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-save"></i>
                         حفظ المورد
                     </button>
                 </div>
@@ -385,24 +560,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         </div>
     </form>
     
-    <div class="card shadow-sm">
+    <div class="card">
         <div class="card-header">
-            <h5 class="mb-0">
+            <h5>
                 <i class="fas fa-list-alt"></i> قائمة الموردين
             </h5>
         </div>
         <div class="card-body">
-            <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
+            <table id="projectsTable" class="display nowrap" style="width:100%;">
                 <thead>
                     <tr>
                         <th><i class="fas fa-hashtag"></i> #</th>
                         <th><i class="fas fa-truck-loading"></i> اسم المورد</th>
-                        <th><i class="fas fa-hard-hat"></i> عدد الآليات</th>
+                        <th><i class="fas fa-cogs"></i> عدد الآليات</th>
                         <th><i class="fas fa-file-contract"></i> عدد العقود</th>
-                        <th><i class="fas fa-clock"></i> إجمالي الساعات المتعاقد عليها</th>
+                        <th><i class="fas fa-clock"></i> الساعات المتعاقد عليها</th>
                         <th><i class="fas fa-phone"></i> رقم الهاتف</th>
                         <th><i class="fas fa-info-circle"></i> الحالة</th>
-                        <th><i class="fas fa-cogs"></i> إجراءات</th>
+                        <th><i class="fas fa-sliders-h"></i> الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -418,24 +593,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<tr>";
                         echo "<td><strong>" . $i++ . "</strong></td>";
-                        echo "<td><strong style='color:#667eea'>" . $row['name'] . "</strong></td>";
+                        echo "<td><strong style='color:var(--primary-color)'>" . $row['name'] . "</strong></td>";
                         echo "<td><span class='stat-cell'>" . $row['equipments'] . "</span></td>";
                         echo "<td><span class='stat-cell'>" . $row['num_contracts'] . "</span></td>";
-                        echo "<td><strong style='color:#28a745; font-size:1.1rem'>" . number_format($row['total_hours']) . " ساعة</strong></td>";
-                        echo "<td><i class='fas fa-phone-alt' style='color:#667eea; margin-left:0.3rem;'></i>" . $row['phone'] . "</td>";
+                        echo "<td><strong style='color:#28a745; font-size:1rem'>" . number_format($row['total_hours']) . " ساعة</strong></td>";
+                        echo "<td><i class='fas fa-phone' style='color:var(--secondary-color); margin-left:6px;'></i>" . $row['phone'] . "</td>";
 
                         // الحالة بالألوان
                         if ($row['status'] == "1") {
-                            echo "<td><span class='status-badge status-active'><i class='fas fa-check-circle' style='margin-left:0.3rem;'></i>نشط</span></td>";
+                            echo "<td><span class='status-badge status-active'><i class='fas fa-check-circle' style='margin-left:6px;'></i>نشط</span></td>";
                         } else {
-                            echo "<td><span class='status-badge status-inactive'><i class='fas fa-times-circle' style='margin-left:0.3rem;'></i>معلق</span></td>";
+                            echo "<td><span class='status-badge status-inactive'><i class='fas fa-times-circle' style='margin-left:6px;'></i>معلق</span></td>";
                         }
 
-                        echo "<td style='white-space:nowrap;'>
+                        echo "<td>
                         <a href='javascript:void(0)' 
                            class='editBtn action-btn btn-edit' 
                            data-id='" . $row['id'] . "' 
-                           data-name='" . $row['name'] . "' 
+                           data-name='" . addslashes($row['name']) . "' 
                            data-phone='" . $row['phone'] . "' 
                            data-status='" . $row['status'] . "' 
                            title='تعديل'><i class='fas fa-edit'></i></a>
@@ -470,11 +645,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 responsive: true,
                 dom: 'Bfrtip',
                 buttons: [
-                    { extend: 'copy', text: 'نسخ' },
-                    { extend: 'excel', text: 'تصدير Excel' },
-                    { extend: 'csv', text: 'تصدير CSV' },
-                    { extend: 'pdf', text: 'تصدير PDF' },
-                    { extend: 'print', text: 'طباعة' }
+                    { extend: 'copy', text: '📋 نسخ' },
+                    { extend: 'excel', text: '📊 Excel' },
+                    { extend: 'csv', text: '📄 CSV' },
+                    { extend: 'pdf', text: '📕 PDF' },
+                    { extend: 'print', text: '🖨️ طباعة' }
                 ],
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
