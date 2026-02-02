@@ -1,8 +1,8 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: index.php");
-    exit();
+  header("Location: index.php");
+  exit();
 }
 include "config.php";
 ?>
@@ -31,19 +31,19 @@ include "config.php";
       --shadow-color: rgba(0, 0, 0, 0.1);
       --gold-color: #ffcc00;
     }
-    
+
     * {
       font-family: 'Cairo', sans-serif;
     }
-    
-  
-    
+
+
+
     .main {
       padding: 1rem;
       width: 100%;
       background-color: white;
     }
-    
+
     /* ====== رسالة الترحيب ====== */
     .welcome-container {
       text-align: center;
@@ -70,6 +70,7 @@ include "config.php";
         opacity: 0;
         transform: translateY(-20px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -106,6 +107,7 @@ include "config.php";
         transform: translateY(-20px) scale(1) rotate(0deg);
         opacity: 1;
       }
+
       100% {
         transform: translateY(100px) scale(0.5) rotate(360deg);
         opacity: 0;
@@ -128,11 +130,12 @@ include "config.php";
       from {
         opacity: 0;
       }
+
       to {
         opacity: 1;
       }
     }
-    
+
     .quick-btn {
       background: white;
       border-radius: 15px;
@@ -141,7 +144,7 @@ include "config.php";
       text-decoration: none;
       color: var(--text-color);
       transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -154,25 +157,43 @@ include "config.php";
         opacity: 0;
         transform: scale(0.9);
       }
+
       to {
         opacity: 1;
         transform: scale(1);
       }
     }
 
-    .quick-btn:nth-child(1) { animation-delay: 0.3s; }
-    .quick-btn:nth-child(2) { animation-delay: 0.35s; }
-    .quick-btn:nth-child(3) { animation-delay: 0.4s; }
-    .quick-btn:nth-child(4) { animation-delay: 0.45s; }
-    .quick-btn:nth-child(5) { animation-delay: 0.5s; }
-    .quick-btn:nth-child(6) { animation-delay: 0.55s; }
-    
+    .quick-btn:nth-child(1) {
+      animation-delay: 0.3s;
+    }
+
+    .quick-btn:nth-child(2) {
+      animation-delay: 0.35s;
+    }
+
+    .quick-btn:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    .quick-btn:nth-child(4) {
+      animation-delay: 0.45s;
+    }
+
+    .quick-btn:nth-child(5) {
+      animation-delay: 0.5s;
+    }
+
+    .quick-btn:nth-child(6) {
+      animation-delay: 0.55s;
+    }
+
     .quick-btn:hover {
       transform: translateY(-5px);
       box-shadow: 0 8px 25px var(--shadow-color);
       color: var(--gold-color);
     }
-    
+
     .quick-btn i {
       font-size: 2.5rem;
       background: linear-gradient(135deg, var(--gold-color) 50%, var(--primary-color) 50%);
@@ -180,11 +201,11 @@ include "config.php";
       -webkit-text-fill-color: transparent;
       transition: all 0.3s ease;
     }
-    
+
     .quick-btn:hover i {
       transform: scale(1.1) rotate(5deg);
     }
-    
+
     .quick-btn span {
       font-weight: 600;
       font-size: 1rem;
@@ -232,17 +253,29 @@ include "config.php";
         opacity: 0;
         transform: scale(0.8);
       }
+
       to {
         opacity: 1;
         transform: scale(1);
       }
     }
 
-    .card:nth-child(1) { animation-delay: 0.1s; }
-    .card:nth-child(2) { animation-delay: 0.15s; }
-    .card:nth-child(3) { animation-delay: 0.2s; }
-    .card:nth-child(4) { animation-delay: 0.25s; }
-    
+    .card:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .card:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .card:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+
+    .card:nth-child(4) {
+      animation-delay: 0.25s;
+    }
+
     .card::before {
       content: '';
       position: absolute;
@@ -254,7 +287,7 @@ include "config.php";
       transform: scaleX(0);
       transition: transform 0.3s ease;
     }
-    
+
     .card:hover::before {
       transform: scaleX(1);
     }
@@ -290,7 +323,7 @@ include "config.php";
       font-size: 1rem;
       margin: 0;
     }
-    
+
     .card a {
       text-decoration: none;
       color: inherit;
@@ -301,30 +334,30 @@ include "config.php";
       .main {
         padding: 1rem;
       }
-      
+
       .welcome-message {
         font-size: 18px;
         padding: 15px 20px;
         max-width: 90%;
       }
-      
+
       .cards {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 1rem;
       }
-      
+
       .card {
         padding: 1.5rem 1rem;
       }
-      
+
       .card h3 {
         font-size: 2rem;
       }
-      
+
       .quick-access {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       }
-      
+
       .section-title {
         font-size: 1.4rem;
       }
@@ -355,7 +388,7 @@ include "config.php";
     $userRole = $_SESSION['user']['role'];
     $userName = $_SESSION['user']['name'];
     $roleText = isset($roles[$userRole]) ? $roles[$userRole] : "غير معروف";
-    $welcomeText = " مرحباً بك ".$roleText." ".$userName." في نظام إيكوبيشن 🚀 نتمنى لك يوماً مليئاً بالإنجازات!";
+    $welcomeText = " مرحباً بك " . $roleText . " " . $userName . " في نظام إيكوبيشن 🚀 نتمنى لك يوماً مليئاً بالإنجازات!";
     ?>
 
     <!-- رسالة ترحيب متحركة -->
@@ -363,36 +396,36 @@ include "config.php";
       <div class="welcome-message" id="welcome"></div>
     </div>
     <?php if ($_SESSION['user']['role'] == "1") { ?>
-    <!-- أزرار الوصول السريع لمدير المشاريع -->
-    <h2 class="section-title">
-      <i class="fas fa-bolt"></i> الوصول السريع
-    </h2>
-    <div class="quick-access">
-       <a href="Projects/view_clients.php" class="quick-btn">
-        <i class="fas fa-users"></i>
-        <span>العملاء</span>
-      </a>
-      <a href="Projects/view_projects.php" class="quick-btn">
-        <i class="fas fa-list-alt"></i>
-        <span>مشاريع الشركة</span>
-      </a>
-      <a href="Projects/oprationprojects.php" class="quick-btn">
-        <i class="fas fa-project-diagram"></i>
-        <span>المشاريع التشغيلية</span>
-      </a>
-      <a href="Reports/reports.php" class="quick-btn">
-        <i class="fas fa-chart-line"></i>
-        <span>التقارير</span>
-      </a>
-      <a href="users.php" class="quick-btn">
-        <i class="fas fa-user-shield"></i>
-        <span>المستخدمين</span>
-      </a>
-      <a href="settings.php" class="quick-btn">
-        <i class="fas fa-cog"></i>
-        <span>الإعدادات</span>
-      </a>
-    </div>
+      <!-- أزرار الوصول السريع لمدير المشاريع -->
+      <h2 class="section-title">
+        <i class="fas fa-bolt"></i> الوصول السريع
+      </h2>
+      <div class="quick-access">
+        <a href="Clients/clients.php" class="quick-btn">
+          <i class="fas fa-users"></i>
+          <span>العملاء</span>
+        </a>
+        <a href="Projects/view_projects.php" class="quick-btn">
+          <i class="fas fa-list-alt"></i>
+          <span>مشاريع الشركة</span>
+        </a>
+        <a href="Projects/oprationprojects.php" class="quick-btn">
+          <i class="fas fa-project-diagram"></i>
+          <span>المشاريع التشغيلية</span>
+        </a>
+        <a href="Reports/reports.php" class="quick-btn">
+          <i class="fas fa-chart-line"></i>
+          <span>التقارير</span>
+        </a>
+        <a href="users.php" class="quick-btn">
+          <i class="fas fa-user-shield"></i>
+          <span>المستخدمين</span>
+        </a>
+        <a href="settings.php" class="quick-btn">
+          <i class="fas fa-cog"></i>
+          <span>الإعدادات</span>
+        </a>
+      </div>
     <?php } ?>
 
     <!-- الإحصائيات -->
@@ -403,6 +436,17 @@ include "config.php";
       <?php
       // ******************************** احصائيات المدير ******************************************************
       if ($_SESSION['user']['role'] == "1") {
+
+        // كارد العملاء
+        $clients = $conn->query("SELECT COUNT(*) AS total FROM clients WHERE status = 'نشط'")->fetch_assoc()['total'];
+        echo "<a href='Clients/clients.php' style='text-decoration: none;'>
+                <div class='card'>
+                  <i class='fas fa-users'></i>
+                  <h3>$clients</h3>
+                  <p> عملاء الشركة </p>
+                </div>
+              </a>";
+
         // كارد المشاريع التشغيلية
         $projects = $conn->query("SELECT COUNT(*) AS total FROM operationproject")->fetch_assoc()['total'];
         echo "<a href='Projects/oprationprojects.php' style='text-decoration: none;'>
@@ -423,20 +467,6 @@ include "config.php";
                 </div>
               </a>";
 
-        // كارد العملاء
-        $clients = $conn->query("SELECT COUNT(*) AS total FROM company_clients WHERE status = 'نشط'")->fetch_assoc()['total'];
-        echo "<a href='Projects/view_clients.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-users'></i>
-                  <h3>$clients</h3>
-                  <p> عملاء الشركة </p>
-                </div>
-              </a>";
-
-    
-    
-  
-     
 
         // كارد المستخدمين
         $users = $conn->query("SELECT COUNT(*) AS total FROM users")->fetch_assoc()['total'];
@@ -447,7 +477,7 @@ include "config.php";
                   <p>المستخدمين</p>
                 </div>
               </a>";
-     
+
       }
       ?>
 

@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $created_by = $_SESSION['user']['id'];
 
     // التحقق من عدم تكرار كود العميل
-    $check_query = "SELECT id FROM company_clients WHERE client_code = '$client_code'";
+    $check_query = "SELECT id FROM clients WHERE client_code = '$client_code'";
     $check_result = mysqli_query($conn, $check_query);
 
     if (mysqli_num_rows($check_result) > 0) {
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit();
     }
 
-    $insert_query = "INSERT INTO company_clients 
+    $insert_query = "INSERT INTO clients 
         (client_code, client_name, entity_type, sector_category, phone, email, whatsapp, status, created_by) 
         VALUES 
         ('$client_code', '$client_name', '$entity_type', '$sector_category', '$phone', '$email', '$whatsapp', '$status', '$created_by')";
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $status = mysqli_real_escape_string($conn, $_POST['status']);
 
     // التحقق من عدم تكرار كود العميل (مع استثناء العميل الحالي)
-    $check_query = "SELECT id FROM company_clients WHERE client_code = '$client_code' AND id != $client_id";
+    $check_query = "SELECT id FROM clients WHERE client_code = '$client_code' AND id != $client_id";
     $check_result = mysqli_query($conn, $check_query);
 
     if (mysqli_num_rows($check_result) > 0) {
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit();
     }
 
-    $update_query = "UPDATE company_clients SET 
+    $update_query = "UPDATE clients SET 
         client_code = '$client_code',
         client_name = '$client_name',
         entity_type = '$entity_type',
@@ -88,24 +88,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // معالجة حذف العميل
 if (isset($_GET['delete_id'])) {
     $delete_id = intval($_GET['delete_id']);
-
+    header("Location: clients.php?msg=تم+تعطيل+الحذف+مؤقتا❌");
+    //************************************* ازل التعليق لتفعيل عملية الحذف ***************************** */
     // التحقق من عدم استخدام العميل في جدول operationproject
-    $check_usage = mysqli_query($conn, "SELECT COUNT(*) as count FROM operationproject WHERE company_client_id = $delete_id");
-    $usage = mysqli_fetch_assoc($check_usage);
+    // $check_usage = mysqli_query($conn, "SELECT COUNT(*) as count FROM operationproject WHERE company_client_id = $delete_id");
+    // $usage = mysqli_fetch_assoc($check_usage);
 
-    if ($usage['count'] > 0) {
-        header("Location: view_clients.php?msg=لا+يمكن+حذف+العميل+لأنه+مستخدم+في+مشاريع+موجودة+❌");
-        exit();
-    } else {
-        $delete_query = "DELETE FROM company_clients WHERE id = $delete_id";
-        if (mysqli_query($conn, $delete_query)) {
-            header("Location: view_clients.php?msg=تم+حذف+العميل+بنجاح+✅");
-            exit();
-        } else {
-            header("Location: view_clients.php?msg=حدث+خطأ+أثناء+الحذف+❌");
-            exit();
-        }
-    }
+    // if ($usage['count'] > 0) {
+    //     header("Location: clients.php?msg=لا+يمكن+حذف+العميل+لأنه+مستخدم+في+مشاريع+موجودة+❌");
+    //     exit();
+    // } else {
+    //     $delete_query = "DELETE FROM clients WHERE id = $delete_id";
+    //     if (mysqli_query($conn, $delete_query)) {
+    //         header("Location: clients.php?msg=تم+حذف+العميل+بنجاح+✅");
+    //         exit();
+    //     } else {
+    //         header("Location: clients.php?msg=حدث+خطأ+أثناء+الحذف+❌");
+    //         exit();
+    //     }
+    // }
 }
 
 $page_title = "قائمة العملاء";
@@ -127,6 +128,7 @@ include('../insidebar.php');
         --text-color: #010326;
         --light-color: #f5f5f5;
         --gold-color: #ffcc00;
+        --link-color: #a68503;
         --shadow-color: rgba(0, 0, 0, 0.1);
     }
 
@@ -762,7 +764,7 @@ include('../insidebar.php');
                     <tbody>
                         <?php
                         $query = "SELECT cc.*, u.name as creator_name 
-                                  FROM company_clients cc 
+                                  FROM clients cc 
                                   LEFT JOIN users u ON cc.created_by = u.id 
                                   ORDER BY cc.id DESC";
                         $result = mysqli_query($conn, $query);
@@ -771,7 +773,7 @@ include('../insidebar.php');
                         while ($row = mysqli_fetch_assoc($result)) {
                             echo "<tr>";
                             echo "<td><strong>" . htmlspecialchars($row['client_code']) . "</strong></td>";
-                            echo "<td>" . htmlspecialchars($row['client_name']) . "</td>";
+                            echo "<td><b><a style='text-decoration:none;color:var(--link-color);' href='../Projects/oprationprojects.php?client_id=" . urlencode($row['id']) . "'>" . htmlspecialchars($row['client_name']) . "</a></b></td>";
                             echo "<td>" . htmlspecialchars($row['entity_type']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['sector_category']) . "</td>";
                             echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
@@ -1284,7 +1286,7 @@ include('../insidebar.php');
         const formData = $(this).serialize() + '&action=create';
 
         $.ajax({
-            url: 'view_clients.php',
+            url: 'clients.php',
             type: 'POST',
             data: formData,
             dataType: 'json',
@@ -1356,7 +1358,7 @@ include('../insidebar.php');
         const formData = $(this).serialize() + '&action=update';
 
         $.ajax({
-            url: 'view_clients.php',
+            url: 'clients.php',
             type: 'POST',
             data: formData,
             dataType: 'json',

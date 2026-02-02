@@ -16,7 +16,7 @@
       <?php // صلاحيات الادارة العليا == -1
       if ($_SESSION['user']['role'] == "-1") {
         ?>
-        <li><a href="Projects/view_clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li>
+        <li><a href="Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li>
         <li><a href="Projects/view_projects.php"><i class="fa fa-list-alt"></i> <span>قائمة المشاريع</span></a></li>
         <li><a href="Projects/oprationprojects.php"><i class="fa fa-folder-open"></i> <span>المشاريع</span></a></li>
         <li><a href="Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
@@ -28,7 +28,7 @@
 
       <?php // صلاحيات مدير المشاريع === 1
       if ($_SESSION['user']['role'] == "1") { ?>
-      <li><a href="Projects/view_clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li>
+        <li><a href="Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li>
         <li><a href="Projects/view_projects.php"><i class="fa fa-list-alt"></i> <span>قائمة المشاريع</span></a></li>
         <li><a href="Projects/oprationprojects.php"><i class="fa fa-folder-open"></i> <span>المشاريع</span></a></li>
         <li><a href="users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
