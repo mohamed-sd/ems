@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 02, 2026 at 06:47 PM
+-- Generation Time: Feb 03, 2026 at 01:24 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,10 +24,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `company_clients`
+-- Table structure for table `clients`
 --
 
-CREATE TABLE `company_clients` (
+CREATE TABLE `clients` (
   `id` int(11) NOT NULL,
   `client_code` varchar(50) NOT NULL COMMENT 'كود العميل',
   `client_name` varchar(255) NOT NULL COMMENT 'اسم العميل',
@@ -43,10 +43,10 @@ CREATE TABLE `company_clients` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول العملاء';
 
 --
--- Dumping data for table `company_clients`
+-- Dumping data for table `clients`
 --
 
-INSERT INTO `company_clients` (`id`, `client_code`, `client_name`, `entity_type`, `sector_category`, `phone`, `email`, `whatsapp`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
+INSERT INTO `clients` (`id`, `client_code`, `client_name`, `entity_type`, `sector_category`, `phone`, `email`, `whatsapp`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
 (1, 'C001', 'شركة النفط الوطنية', 'شركة حكومية', 'النفط والغاز', '0912345678', 'oil@example.com', '0912345678', 'نشط', 1, '2026-01-29 01:49:27', '2026-01-29 01:49:27'),
 (2, 'C002', 'وزارة البنية التحتية', 'جهة حكومية', 'البنية التحتية', '0923456789', 'infrastructure@gov.sd', '0923456789', 'نشط', 1, '2026-01-29 01:49:27', '2026-01-29 01:49:27'),
 (3, 'C003', 'شركة الطرق السريعة', 'شركة خاصة', 'الطرق والجسور', '0934567890', 'highways@example.com', '0934567890', 'نشط', 1, '2026-01-29 01:49:27', '2026-01-29 01:49:27'),
@@ -366,7 +366,8 @@ INSERT INTO `equipments` (`id`, `suppliers`, `code`, `type`, `name`, `status`) V
 (13, '1', 'Qs11', '1', 'Qs11', 1),
 (14, '2', 'Qa1001', '1', 'Qa1001', 1),
 (15, '2', 'EQ10', '1', '01', 1),
-(16, '1', 'TM02', '2', '02', 1);
+(16, '1', 'TM02', '2', '02', 1),
+(17, '3', 'EQ001', '1', '09', 1);
 
 -- --------------------------------------------------------
 
@@ -441,9 +442,19 @@ CREATE TABLE `operationproject` (
   `name` varchar(150) NOT NULL,
   `client` varchar(150) NOT NULL,
   `location` varchar(200) NOT NULL,
+  `project_code` varchar(50) DEFAULT NULL COMMENT 'كود المشروع',
+  `category` varchar(100) DEFAULT NULL COMMENT 'الفئة',
+  `sub_sector` varchar(100) DEFAULT NULL COMMENT 'القطاع الفرعي',
+  `state` varchar(100) DEFAULT NULL COMMENT 'الولاية',
+  `region` varchar(100) DEFAULT NULL COMMENT 'المنطقة',
+  `nearest_market` varchar(100) DEFAULT NULL COMMENT 'أقرب سوق',
+  `latitude` varchar(50) DEFAULT NULL COMMENT 'خط العرض',
+  `longitude` varchar(50) DEFAULT NULL COMMENT 'خط الطول',
   `total` varchar(50) NOT NULL,
   `status` tinyint(1) DEFAULT 1,
-  `create_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_by` int(11) DEFAULT NULL COMMENT 'معرف المستخدم المنشئ',
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT 'تاريخ آخر تحديث'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
@@ -482,7 +493,9 @@ CREATE TABLE `operations` (
 INSERT INTO `operations` (`id`, `equipment`, `equipment_type`, `project`, `start`, `end`, `hours`, `status`) VALUES
 (1, '13', '1', '1', '2026-01-12', '2026-01-31', '0', 1),
 (2, '10', '1', '1', '2026-01-14', '2026-01-24', '0', 1),
-(3, '12', '2', '1', '2026-01-06', '2026-01-31', '0', 1);
+(3, '12', '2', '1', '2026-01-06', '2026-01-31', '0', 1),
+(4, '17', '1', '5', '2026-02-01', '2026-02-28', '0', 0),
+(5, '17', '1', '6', '2026-02-01', '2026-02-28', '0', 1);
 
 -- --------------------------------------------------------
 
@@ -541,8 +554,10 @@ CREATE TABLE `suppliers` (
 --
 
 INSERT INTO `suppliers` (`id`, `name`, `phone`, `status`) VALUES
-(1, 'اكوبيشن', '8569', 1),
-(2, 'محمد علي', '1111111111', 1);
+(1, 'اكوبيشن', '0992990920', 1),
+(2, 'محمد علي احمد', '092882930', 0),
+(3, 'محمد سيد حسن', '0115667710', 1),
+(4, 'حسن سيد حسن', '0115667710', 0);
 
 -- --------------------------------------------------------
 
@@ -731,16 +746,16 @@ INSERT INTO `users` (`id`, `name`, `username`, `password`, `phone`, `role`, `pro
 (6, 'محمد', 'q', 'q', '098098', '6', '1', '5', '2025-09-09 16:53:20', '2025-09-09 17:30:33'),
 (7, 'w', 'w', 'w', '909', '7', '0', '5', '2025-09-09 16:54:07', '2025-09-09 16:54:07'),
 (8, 't', 't', 't', '09090', '6', '0', '5', '2025-09-09 17:27:25', '2025-09-09 17:27:25'),
-(10, 'Ù…Ø¯Ø±ÙŠØ± Ù…ÙˆÙ‚Ø¹ Ø¬Ø¯ÙŠØ¯', 'n', 'n', '9999', '5', '3', '0', '2025-09-21 13:27:53', '2025-09-21 13:27:53');
+(10, 'احمد عبد الوهاب', 'n', 'n', '9999', '5', '3', '0', '2025-09-21 13:27:53', '2026-02-02 11:44:31');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `company_clients`
+-- Indexes for table `clients`
 --
-ALTER TABLE `company_clients`
+ALTER TABLE `clients`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `unique_client_code` (`client_code`),
   ADD KEY `idx_client_name` (`client_name`),
@@ -873,9 +888,9 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `company_clients`
+-- AUTO_INCREMENT for table `clients`
 --
-ALTER TABLE `company_clients`
+ALTER TABLE `clients`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
@@ -918,7 +933,7 @@ ALTER TABLE `drivers`
 -- AUTO_INCREMENT for table `equipments`
 --
 ALTER TABLE `equipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `equipment_drivers`
@@ -942,7 +957,7 @@ ALTER TABLE `operationproject`
 -- AUTO_INCREMENT for table `operations`
 --
 ALTER TABLE `operations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `suppliercontractequipments`
@@ -954,7 +969,7 @@ ALTER TABLE `suppliercontractequipments`
 -- AUTO_INCREMENT for table `suppliers`
 --
 ALTER TABLE `suppliers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `supplierscontracts`

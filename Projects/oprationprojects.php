@@ -20,66 +20,65 @@ if (isset($_GET['delete_id'])) {
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['company_project_id'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-    $company_project_id = intval($_POST['company_project_id']);
-    $company_client_id = intval($_POST['company_client_id']);
+    $company_client_id = !empty($_POST['company_client_id']) ? intval($_POST['company_client_id']) : 0;
 
-    // جلب بيانات المشروع من جدول company_project
-    $project_data = mysqli_query($conn, "SELECT project_name FROM company_project WHERE id = $company_project_id");
-    $project_row = mysqli_fetch_assoc($project_data);
-    $name = $project_row['project_name'];
+    // جلب البيانات المدخولة يدويًا
+    $name = mysqli_real_escape_string($conn, $_POST['project_name']);
+    $project_code = mysqli_real_escape_string($conn, $_POST['project_code'] ?? '');
+    $category = mysqli_real_escape_string($conn, $_POST['category'] ?? '');
+    $sub_sector = mysqli_real_escape_string($conn, $_POST['sub_sector'] ?? '');
+    $state = mysqli_real_escape_string($conn, $_POST['state'] ?? '');
+    $region = mysqli_real_escape_string($conn, $_POST['region'] ?? '');
+    $nearest_market = mysqli_real_escape_string($conn, $_POST['nearest_market'] ?? '');
+    $latitude = mysqli_real_escape_string($conn, $_POST['latitude'] ?? '');
+    $longitude = mysqli_real_escape_string($conn, $_POST['longitude'] ?? '');
+    $location = mysqli_real_escape_string($conn, $_POST['location'] ?? '');
 
-    // جلب بيانات العميل من جدول clients
-    $client_data = mysqli_query($conn, "SELECT client_name FROM clients WHERE id = $company_client_id");
-    $client_row = mysqli_fetch_assoc($client_data);
-    $client = $client_row['client_name'];
+    // جلب اسم العميل إذا تم اختياره
+    $client = '';
+    if ($company_client_id > 0) {
+        $client_data = mysqli_query($conn, "SELECT client_name FROM clients WHERE id = $company_client_id");
+        if ($client_row = mysqli_fetch_assoc($client_data)) {
+            $client = mysqli_real_escape_string($conn, $client_row['client_name']);
+        }
+    } else {
+        $client = mysqli_real_escape_string($conn, $_POST['client_name'] ?? '');
+    }
 
-    $location = mysqli_real_escape_string($conn, $_POST['location']);
-    $total = floatval($_POST['total']);
+    $total = floatval($_POST['total'] ?? 0);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $created_by = $_SESSION['user']['id'] ?? 1;
     $date = date('Y-m-d H:i:s');
 
     if ($id > 0) {
         // تحديث
-        // التحقق من عدم تكرار نفس المشروع والعميل (مع استثناء السجل الحالي)
-        $check_duplicate = mysqli_query($conn, "SELECT id FROM operationproject 
-            WHERE company_project_id = $company_project_id 
-            AND company_client_id = $company_client_id 
-            AND id != $id");
-
-        if (mysqli_num_rows($check_duplicate) > 0) {
-            header("Location: oprationprojects.php?msg=هذا+المشروع+مع+هذا+العميل+موجود+بالفعل+❌");
-            exit;
-        }
-
         $sql = "UPDATE operationproject SET 
-            company_project_id='$company_project_id',
             company_client_id='$company_client_id',
             name='$name',
             client='$client',
             location='$location',
+            project_code='$project_code',
+            category='$category',
+            sub_sector='$sub_sector',
+            state='$state',
+            region='$region',
+            nearest_market='$nearest_market',
+            latitude='$latitude',
+            longitude='$longitude',
             total='$total',
-            status='$status'
+            status='$status',
+            updated_at=NOW()
         WHERE id=$id";
         mysqli_query($conn, $sql);
 
         header("Location: oprationprojects.php?msg=تم+تعديل+المشروع+بنجاح+✅");
         exit;
     } else {
-        // التحقق من عدم تكرار نفس المشروع والعميل عند الإضافة
-        $check_duplicate = mysqli_query($conn, "SELECT id FROM operationproject 
-            WHERE company_project_id = $company_project_id 
-            AND company_client_id = $company_client_id");
-
-        if (mysqli_num_rows($check_duplicate) > 0) {
-            header("Location: oprationprojects.php?msg=هذا+المشروع+مع+هذا+العميل+موجود+بالفعل+❌");
-            exit;
-        }
-
         // إضافة
-        $sql = "INSERT INTO operationproject (company_project_id, company_client_id, name, client, location, total, status, create_at) 
-        VALUES ('$company_project_id', '$company_client_id', '$name', '$client', '$location', '$total', '$status', '$date')";
+        $sql = "INSERT INTO operationproject (company_client_id, name, client, location, project_code, category, sub_sector, state, region, nearest_market, latitude, longitude, total, status, created_by, create_at) 
+        VALUES ('$company_client_id', '$name', '$client', '$location', '$project_code', '$category', '$sub_sector', '$state', '$region', '$nearest_market', '$latitude', '$longitude', '$total', '$status', '$created_by', '$date')";
         mysqli_query($conn, $sql);
         header("Location: oprationprojects.php?msg=تم+اضافه+المشروع+بنجاح+✅");
         exit;
@@ -907,6 +906,40 @@ include('../insidebar.php');
     .dt-buttons .dt-button:active {
         transform: scale(0.96);
     }
+
+      /* Mines Count Link */
+    .mines-count-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+        color: white;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(142, 68, 173, 0.3);
+    }
+
+    .mines-count-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(142, 68, 173, 0.5);
+        color: white;
+    }
+
+    .mines-count-badge {
+        background: rgba(255, 255, 255, 0.3);
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .mines-count-link i {
+        font-size: 16px;
+    }
+
 </style>
 
 <div class="main">
@@ -935,40 +968,58 @@ include('../insidebar.php');
                 <input type="hidden" name="id" id="project_id" value="">
                 <div class="form-grid">
                     <div>
-                        <label><i class="fas fa-file-signature"></i> اسم المشروع</label>
-                        <select name="company_project_id" id="company_project_id" required>
-                            <option value="">-- اختر المشروع --</option>
+                        <label><i class="fas fa-user-tie"></i> اسم العميل (اختياري)</label>
+                        <select name="company_client_id" id="company_client_id" required>
+                            <option value="">-- اختر العميل  --</option>
                             <?php
-                            $projects_query = mysqli_query($conn, "SELECT id, project_code, project_name FROM company_project WHERE status = 'نشط' ORDER BY project_name ASC");
-                            while ($proj = mysqli_fetch_assoc($projects_query)) {
-                                echo "<option value='" . $proj['id'] . "'>[" . $proj['project_code'] . "] " . $proj['project_name'] . "</option>";
+                            $clients_query = mysqli_query($conn, "SELECT id, client_code, client_name FROM clients WHERE status = 'نشط' ORDER BY client_name ASC");
+                            while ($cli = mysqli_fetch_assoc($clients_query)) {
+                                echo "<option value='" . $cli['id'] . "'>[" . $cli['client_code'] . "] " . $cli['client_name'] . "</option>";
                             }
                             ?>
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-user-tie"></i> اسم العميل</label>
-                        <select name="company_client_id" id="company_client_id" required>
-                            <option value="">-- اختر العميل --</option>
-                            <?php
-                            // التقاط client_id من الـ URL إذا تم تمريره
-                            $selected_client_id = isset($_GET['client_id']) ? $_GET['client_id'] : '';
-
-                            // استعلام العملاء النشطين
-                            $clients_query = mysqli_query($conn, "SELECT id, client_code, client_name FROM clients WHERE status = 'نشط' ORDER BY client_name ASC");
-                            while ($cli = mysqli_fetch_assoc($clients_query)) {
-                                // التحقق إذا كان هذا العميل هو المحدد
-                                $selected = ($cli['id'] == $selected_client_id) ? 'selected' : '';
-                                echo "<option value='" . $cli['id'] . "' $selected>[" . $cli['client_code'] . "] " . $cli['client_name'] . "</option>";
-                            }
-                            ?>
-                        </select>
+                        <label><i class="fas fa-barcode"></i> كود المشروع</label>
+                        <input type="text" name="project_code" placeholder="كود المشروع" id="project_code" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-file-signature"></i> اسم المشروع</label>
+                        <input type="text" name="project_name" id="project_name" placeholder="أدخل اسم المشروع"
+                            required />
                     </div>
                     <div>
                         <label><i class="fas fa-map-marker-alt"></i> موقع المشروع</label>
-                        <input type="text" name="location" placeholder="أدخل موقع المشروع" id="project_location"
-                            required />
-                        <input type="hidden" name="total" value="0" required />
+                        <input type="text" name="location" placeholder="أدخل موقع المشروع" id="project_location" />
+                        <input type="hidden" name="total" value="0" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-layer-group"></i> الفئة</label>
+                        <input type="text" name="category" placeholder="الفئة" id="project_category" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-industry"></i> القطاع الفرعي</label>
+                        <input type="text" name="sub_sector" placeholder="القطاع الفرعي" id="project_sub_sector" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-map-marked-alt"></i> الولاية</label>
+                        <input type="text" name="state" placeholder="الولاية" id="project_state" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-map-pin"></i> المنطقة</label>
+                        <input type="text" name="region" placeholder="المنطقة" id="project_region" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-store"></i> أقرب سوق</label>
+                        <input type="text" name="nearest_market" placeholder="أقرب سوق" id="project_nearest_market" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-map-marker"></i> خط العرض</label>
+                        <input type="text" name="latitude" placeholder="خط العرض" id="project_latitude" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-map-marker"></i> خط الطول</label>
+                        <input type="text" name="longitude" placeholder="خط الطول" id="project_longitude" />
                     </div>
                     <div>
                         <label><i class="fas fa-toggle-on"></i> حالة المشروع</label>
@@ -988,8 +1039,8 @@ include('../insidebar.php');
 
     <!-- جدول المشاريع -->
     <div class="card shadow-sm">
-        <div class="card-header">
-            <h5><i class="fas fa-list"></i> قائمة المشاريع 
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h5 style="margin: 0;"><i class="fas fa-list"></i> قائمة المشاريع
 
                 <?php
 
@@ -1004,6 +1055,14 @@ include('../insidebar.php');
                 ?>
 
             </h5>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-sm btn-success" id="exportBtn" title="تحميل النموذج">
+                    <i class="fas fa-download"></i> تحميل النموذج
+                </button>
+                <button class="btn btn-sm btn-info" id="importBtn" title="استيراد ملف">
+                    <i class="fas fa-upload"></i> استيراد من Excel
+                </button>
+            </div>
         </div>
         <div class="card-body">
             <div class="table-container">
@@ -1012,11 +1071,12 @@ include('../insidebar.php');
                         <tr>
                             <th><i class="fas fa-calendar"></i> تاريخ الإضافة</th>
                             <th><i class="fas fa-user-tie"></i> العميل</th>
-                            <th><i class="fas fa-project-diagram"></i> اسم المشروع</th>
-                            <th><i class="fas fa-file-contract"></i> العقود</th>
+                            <th><i class="fas fa-file-contract"></i> كود المشروع</th>
+                            <th><i class="fas fa-project-diagram"></i> المشروع</th>
                             <th><i class="fas fa-truck"></i> عدد الموردين</th>
                             <th><i class="fas fa-toggle-on"></i> الحالة</th>
-                            <th><i class="fas fa-file-contract"></i> عقود المشروع</th>
+                            <!-- <th><i class="fas fa-file-contract"></i> عقود المشروع</th> -->
+                            <th> المناجم</th>
                             <th><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
@@ -1031,31 +1091,30 @@ include('../insidebar.php');
                             $client_filter = " WHERE op.company_client_id = $client_id ";
                         }
 
-                        // جلب المشاريع مع الموقع من جدول company_project واسم العميل من جدول clients
-                        $query = "SELECT op.`id`, op.`name`,cp.`project_name` , cc.`client_name`, op.`total`, op.`status`, op.`create_at`, 
-                      op.`company_project_id`, op.`company_client_id`,
-                      COALESCE(cp.`state`, op.`location`) as 'location',
+                        // جلب جميع المشاريع من جدول operationproject مع البيانات المدخولة يدويًا
+                        $query = "SELECT op.`id`, op.`name`, op.`client`, op.`location`, op.`total`, op.`status`, op.`create_at`, 
+                      op.`project_code`, op.`category`, op.`sub_sector`, op.`state`, op.`region`, 
+                      op.`nearest_market`, op.`latitude`, op.`longitude`, op.`company_client_id`,
+                      cc.`client_name`,
                       (SELECT COUNT(*) FROM contracts WHERE contracts.project = op.id) as 'contracts',
                       (SELECT COUNT(DISTINCT pm.suppliers) 
                           FROM equipments pm
                           JOIN operations m ON pm.id = m.equipment
-                          WHERE m.project = op.id) as 'total_suppliers'
+                          WHERE m.project = op.id) as 'total_suppliers',
+                          (SELECT COUNT(*) FROM mines WHERE project_id = op.id) as mines_count
                       FROM operationproject op
-                      LEFT JOIN company_project cp ON op.company_project_id = cp.id
                       LEFT JOIN clients cc ON op.company_client_id = cc.id
                       $client_filter
                       ORDER BY op.id DESC";
 
                         $result = mysqli_query($conn, $query);
-                        $i = 1;
                         while ($row = mysqli_fetch_assoc($result)) {
                             echo "<tr>";
                             echo "<td>" . $row['create_at'] . "</td>";
                             echo "<td>" . ($row['client_name'] ?? $row['client']) . "</td>";
-                            echo "<td><strong>" . $row['project_name'] . "</strong></td>";
-                            echo "<td><span class='count-badge'>" . $row['contracts'] . "</span></td>";
+                            echo "<td>" . ($row['project_code'] ?? '-') . "</td>";
+                            echo "<td><strong>" . $row['name'] . "</strong></td>";
                             echo "<td><span class='count-badge'>" . $row['total_suppliers'] . "</span></td>";
-
                             if ($row['status'] == "1") {
                                 echo "<td><span class='status-active'><i class='fas fa-check-circle'></i> نشط</span></td>";
                             } else {
@@ -1063,11 +1122,15 @@ include('../insidebar.php');
                             }
 
                             echo "<td>
-                            <a href='../Contracts/contracts.php?id=" . $row['id'] . "' 
-                               class='action-btn contracts'
-                               title='عرض عقود المشروع'>
-                               <i class='fas fa-file-contract'></i>
-                            </a>
+                           
+
+                             <a href='project_mines.php?project_id=" . $row['id'] . "' 
+                                       class='mines-count-link' 
+                                       title='عرض المناجم'>
+                                        <i class='fas fa-mountain'></i>
+                                        <span class='mines-count-badge'>" . $row['mines_count'] . "</span>
+                             </a>
+
                         </td>";
 
                             echo "<td>
@@ -1075,9 +1138,17 @@ include('../insidebar.php');
                                 <a href='javascript:void(0)' 
                                    class='action-btn view viewBtn' 
                                    data-id='" . $row['id'] . "' 
-                                   data-project-name='" . htmlspecialchars($row['project_name']) . "' 
+                                   data-project-name='" . htmlspecialchars($row['name']) . "' 
                                    data-client-name='" . htmlspecialchars($row['client_name'] ?? $row['client']) . "' 
                                    data-location='" . htmlspecialchars($row['location']) . "' 
+                                   data-project-code='" . htmlspecialchars($row['project_code'] ?? '') . "' 
+                                   data-category='" . htmlspecialchars($row['category'] ?? '') . "' 
+                                   data-sub-sector='" . htmlspecialchars($row['sub_sector'] ?? '') . "' 
+                                   data-state='" . htmlspecialchars($row['state'] ?? '') . "' 
+                                   data-region='" . htmlspecialchars($row['region'] ?? '') . "' 
+                                   data-nearest-market='" . htmlspecialchars($row['nearest_market'] ?? '') . "' 
+                                   data-latitude='" . htmlspecialchars($row['latitude'] ?? '') . "' 
+                                   data-longitude='" . htmlspecialchars($row['longitude'] ?? '') . "' 
                                    data-status='" . $row['status'] . "' 
                                    data-contracts='" . $row['contracts'] . "' 
                                    data-suppliers='" . $row['total_suppliers'] . "'
@@ -1087,10 +1158,17 @@ include('../insidebar.php');
                                 <a href='javascript:void(0)' 
                                    class='action-btn edit editBtn' 
                                    data-id='" . $row['id'] . "' 
-                                   data-company-project-id='" . ($row['company_project_id'] ?? '') . "' 
                                    data-company-client-id='" . ($row['company_client_id'] ?? '') . "' 
-                                   data-name='" . $row['name'] . "' 
-                                   data-location='" . $row['location'] . "' 
+                                   data-project-name='" . htmlspecialchars($row['name']) . "' 
+                                   data-location='" . htmlspecialchars($row['location']) . "' 
+                                   data-project-code='" . htmlspecialchars($row['project_code'] ?? '') . "' 
+                                   data-category='" . htmlspecialchars($row['category'] ?? '') . "' 
+                                   data-sub-sector='" . htmlspecialchars($row['sub_sector'] ?? '') . "' 
+                                   data-state='" . htmlspecialchars($row['state'] ?? '') . "' 
+                                   data-region='" . htmlspecialchars($row['region'] ?? '') . "' 
+                                   data-nearest-market='" . htmlspecialchars($row['nearest_market'] ?? '') . "' 
+                                   data-latitude='" . htmlspecialchars($row['latitude'] ?? '') . "' 
+                                   data-longitude='" . htmlspecialchars($row['longitude'] ?? '') . "' 
                                    data-status='" . $row['status'] . "'
                                    title='تعديل'>
                                    <i class='fas fa-edit'></i>
@@ -1125,18 +1203,51 @@ include('../insidebar.php');
         <div class="modal-body">
             <div class="view-modal-body">
                 <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-user-tie"></i> اسم العميل</div>
+                    <div class="view-item-value" id="view_client_name">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-barcode"></i> كود المشروع</div>
+                    <div class="view-item-value" id="view_project_code">-</div>
+                </div>
+                <div class="view-item">
                     <div class="view-item-label"><i class="fas fa-project-diagram"></i> اسم المشروع</div>
                     <div class="view-item-value" id="view_project_name">-</div>
                 </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-layer-group"></i> الفئة</div>
+                    <div class="view-item-value" id="view_category">-</div>
+                </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-user-tie"></i> اسم العميل</div>
-                    <div class="view-item-value" id="view_client_name">-</div>
+                    <div class="view-item-label"><i class="fas fa-industry"></i> القطاع الفرعي</div>
+                    <div class="view-item-value" id="view_sub_sector">-</div>
+                </div>
+
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-map-marked-alt"></i> الولاية</div>
+                    <div class="view-item-value" id="view_state">-</div>
+                </div>
+
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-map-pin"></i> المنطقة</div>
+                    <div class="view-item-value" id="view_region">-</div>
                 </div>
 
                 <div class="view-item">
                     <div class="view-item-label"><i class="fas fa-map-marker-alt"></i> موقع المشروع</div>
                     <div class="view-item-value" id="view_location">-</div>
+                </div>
+
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-store"></i> أقرب سوق</div>
+                    <div class="view-item-value" id="view_nearest_market">-</div>
+                </div>
+
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-map-marker"></i> الإحداثيات (خط العرض / خط الطول)
+                    </div>
+                    <div class="view-item-value" id="view_coordinates">-</div>
                 </div>
 
                 <div class="view-item">
@@ -1156,6 +1267,10 @@ include('../insidebar.php');
             </div>
         </div>
         <div class="modal-footer">
+            <a id="viewMinesBtn" class="btn-modal btn-modal-save"
+                style="background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%); text-decoration: none;">
+                <i class="fas fa-mountain"></i> مناجم المشروع
+            </a>
             <button type="button" class="btn-modal btn-modal-save editBtn" id="viewEditBtn"
                 style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--gold-color) 100%);">
                 <i class="fas fa-edit"></i> تعديل المشروع
@@ -1169,6 +1284,8 @@ include('../insidebar.php');
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Bootstrap JS (Bundle includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
@@ -1180,6 +1297,11 @@ include('../insidebar.php');
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
 <script>
+    // إغلاق Modal عرض المشروع - تعريف عام
+    function closeViewModal() {
+        $('#viewProjectModal').fadeOut(300);
+    }
+
     (function () {
         // تشغيل DataTable
         $(document).ready(function () {
@@ -1206,9 +1328,17 @@ include('../insidebar.php');
             projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
             // تنظيف الحقول عند الإضافة
             $("#project_id").val("");
-            $("#company_project_id").val("");
+            $("#project_name").val("");
             $("#company_client_id").val("");
             $("#project_location").val("");
+            $("#project_code").val("");
+            $("#project_category").val("");
+            $("#project_sub_sector").val("");
+            $("#project_state").val("");
+            $("#project_region").val("");
+            $("#project_nearest_market").val("");
+            $("#project_latitude").val("");
+            $("#project_longitude").val("");
             $("#project_status").val("");
         });
 
@@ -1219,6 +1349,14 @@ include('../insidebar.php');
                 projectName: $(this).data('project-name'),
                 clientName: $(this).data('client-name'),
                 location: $(this).data('location'),
+                projectCode: $(this).data('project-code'),
+                category: $(this).data('category'),
+                subSector: $(this).data('sub-sector'),
+                state: $(this).data('state'),
+                region: $(this).data('region'),
+                nearestMarket: $(this).data('nearest-market'),
+                latitude: $(this).data('latitude'),
+                longitude: $(this).data('longitude'),
                 status: $(this).data('status'),
                 contracts: $(this).data('contracts'),
                 suppliers: $(this).data('suppliers')
@@ -1227,7 +1365,21 @@ include('../insidebar.php');
             // ملء بيانات العرض
             $('#view_project_name').text(projectData.projectName || '-');
             $('#view_client_name').text(projectData.clientName || '-');
+            $('#view_project_code').text(projectData.projectCode || '-');
+            $('#view_category').text(projectData.category || '-');
+            $('#view_sub_sector').text(projectData.subSector || '-');
+            $('#view_state').text(projectData.state || '-');
+            $('#view_region').text(projectData.region || '-');
             $('#view_location').text(projectData.location || '-');
+            $('#view_nearest_market').text(projectData.nearestMarket || '-');
+
+            // عرض الإحداثيات
+            let coordsText = '-';
+            if (projectData.latitude && projectData.longitude) {
+                coordsText = projectData.latitude + ' / ' + projectData.longitude;
+            }
+            $('#view_coordinates').text(coordsText);
+
             $('#view_contracts').text(projectData.contracts || '0');
             $('#view_suppliers').text(projectData.suppliers || '0');
 
@@ -1251,13 +1403,11 @@ include('../insidebar.php');
             editBtn.data('location', projectData.location);
             editBtn.data('status', projectData.status);
 
+            // تحضير زر مناجم المشروع
+            $('#viewMinesBtn').attr('href', 'project_mines.php?project_id=' + projectData.id);
+
             $('#viewProjectModal').fadeIn(300);
         });
-
-        // إغلاق Modal عرض المشروع
-        function closeViewModal() {
-            $('#viewProjectModal').fadeOut(300);
-        }
 
         // إغلاق عند الضغط خارج Modal
         $(window).on('click', function (e) {
@@ -1289,9 +1439,17 @@ include('../insidebar.php');
         // عند الضغط على زر تعديل من الجدول
         $(document).on("click", ".editBtn:not(#viewEditBtn)", function () {
             $("#project_id").val($(this).data("id"));
-            $("#company_project_id").val($(this).data("company-project-id"));
+            $("#project_name").val($(this).data("project-name"));
             $("#company_client_id").val($(this).data("company-client-id"));
             $("#project_location").val($(this).data("location"));
+            $("#project_code").val($(this).data("project-code"));
+            $("#project_category").val($(this).data("category"));
+            $("#project_sub_sector").val($(this).data("sub-sector"));
+            $("#project_state").val($(this).data("state"));
+            $("#project_region").val($(this).data("region"));
+            $("#project_nearest_market").val($(this).data("nearest-market"));
+            $("#project_latitude").val($(this).data("latitude"));
+            $("#project_longitude").val($(this).data("longitude"));
             $("#project_status").val($(this).data("status"));
 
             $("#projectForm").show();
@@ -1306,13 +1464,93 @@ include('../insidebar.php');
 
             if (clientId) {
                 $('#projectForm').show();
-                // يمكن وضع التركيز على الحقول إذا أردت
                 $('#company_client_id').val(clientId);
             }
         });
 
+        // ===== معالجات الاستيراد والتصدير =====
+        
+        // زر تحميل النموذج
+        $('#exportBtn').on('click', function() {
+            window.location.href = 'download_projects_template.php';
+        });
+
+        // زر الاستيراد من Excel
+        $('#importBtn').on('click', function() {
+            $('#importModal').modal('show');
+        });
+
+        // معالج رفع الملف
+        $('#importFileForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const fileInput = $('#projectFile')[0];
+            if (!fileInput.files.length) {
+                alert('يرجى اختيار ملف');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            $.ajax({
+                url: 'import_projects_excel.php',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        alert('تم استيراد ' + response.imported_count + ' مشروع بنجاح!');
+                        $('#importModal').modal('hide');
+                        $('#projectsTable').DataTable().ajax.reload();
+                        location.reload(); // إعادة تحميل الصفحة لتحديث الجدول
+                    } else {
+                        let errorMsg = 'حدث خطأ أثناء الاستيراد:\n\n';
+                        if (response.errors && response.errors.length > 0) {
+                            response.errors.forEach(function(error) {
+                                errorMsg += error + '\n';
+                            });
+                        }
+                        alert(errorMsg);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('حدث خطأ في الاتصال: ' + error);
+                }
+            });
+        });
+
     })();
 </script>
+
+<!-- Modal لاستيراد الملفات -->
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel"><i class="fas fa-upload"></i> استيراد المشاريع من ملف Excel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <div class="modal-body">
+                <form id="importFileForm">
+                    <div class="form-group">
+                        <label for="projectFile">اختر ملف Excel:</label>
+                        <input type="file" class="form-control" id="projectFile" name="file" accept=".xlsx,.xls" required>
+                        <small class="form-text text-muted">الملفات المقبولة: Excel (.xlsx, .xls)</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                <button type="submit" form="importFileForm" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> استيراد
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 

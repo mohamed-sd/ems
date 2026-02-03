@@ -405,7 +405,7 @@ include "../config.php";
           <i class="fas fa-users"></i>
           <span>العملاء</span>
         </a>
-        <a href="../Projects/view_projects.php" class="quick-btn">
+        <a href="../Projects/oprationprojects.php" class="quick-btn">
           <i class="fas fa-list-alt"></i>
           <span>مشاريع الشركة</span>
         </a>
@@ -458,8 +458,8 @@ include "../config.php";
               </a>";
 
         // كارد المشاريع الأساسية
-        $company_projects = $conn->query("SELECT COUNT(*) AS total FROM company_project WHERE status = 'نشط'")->fetch_assoc()['total'];
-        echo "<a href='../Projects/view_projects.php' style='text-decoration: none;'>
+        $company_projects = $conn->query("SELECT COUNT(*) AS total FROM operationproject WHERE status = '1'")->fetch_assoc()['total'];
+        echo "<a href='../Projects/oprationprojects.php' style='text-decoration: none;'>
                 <div class='card'>
                   <i class='fas fa-list-alt'></i>
                   <h3>$company_projects</h3>

@@ -717,7 +717,7 @@ include('../insidebar.php');
 
 <div class="main">
     <div class="page-header">
-        <h1 class="page-title"><i class="fas fa-users"></i> قائمة العملاء</h1>
+        <h1 class="page-title"><i class="fas fa-users"></i> إدارة العملاء</h1>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="javascript:void(0)" id="openAddModal" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة عميل جديد
