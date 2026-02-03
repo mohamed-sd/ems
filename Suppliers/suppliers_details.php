@@ -143,7 +143,7 @@ if (!isset($_SESSION['user'])) {
 
                 $query = "SELECT sc.*, op.name as project_name 
                           FROM `supplierscontracts` sc
-                          LEFT JOIN operationproject op ON sc.project_id = op.id
+                          LEFT JOIN project op ON sc.project_id = op.id
                           WHERE sc.supplier_id = '$project' 
                           ORDER BY sc.id DESC";
                 $result = mysqli_query($conn, $query);

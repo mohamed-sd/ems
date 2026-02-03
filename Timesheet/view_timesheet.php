@@ -74,7 +74,7 @@ $query = "SELECT t.id, t.shift, t.date, t.executed_hours,
     FROM timesheet t
     JOIN operations o ON t.operator = o.id
     JOIN equipments e ON o.equipment = e.id
-    JOIN operationproject p ON o.project = p.id
+    JOIN project p ON o.project = p.id
     JOIN drivers d ON t.driver = d.id
     $where
     ORDER BY t.id DESC";

@@ -21,7 +21,7 @@ if ($project_id <= 0) {
 }
 
 // جلب بيانات المشروع
-$project_query = "SELECT * FROM operationproject WHERE id = $project_id LIMIT 1";
+$project_query = "SELECT * FROM project WHERE id = $project_id LIMIT 1";
 $project_result = mysqli_query($conn, $project_query);
 $project = mysqli_fetch_assoc($project_result);
 

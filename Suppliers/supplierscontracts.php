@@ -600,7 +600,7 @@ $supplier_id = intval($_GET['id']);
                   <option value="">— اختر المشروع —</option>
                   <?php
                   include '../config.php';
-                  $projects_query = "SELECT id, name FROM operationproject WHERE status = 1 ORDER BY name ASC";
+                  $projects_query = "SELECT id, name FROM project WHERE status = 1 ORDER BY name ASC";
                   $projects_result = mysqli_query($conn, $projects_query);
                   while ($project = mysqli_fetch_assoc($projects_result)) {
                     echo "<option value='" . $project['id'] . "'>" . $project['name'] . "</option>";
@@ -1349,7 +1349,7 @@ $supplier_id = intval($_GET['id']);
             // جلب العقود للمورد
             $query = "SELECT sc.*, op.name AS project_name 
                       FROM supplierscontracts sc 
-                      LEFT JOIN operationproject op ON sc.project_id = op.id 
+                      LEFT JOIN project op ON sc.project_id = op.id 
                       WHERE sc.supplier_id = $supplier_id 
                       ORDER BY sc.id DESC";
             $result = mysqli_query($conn, $query);

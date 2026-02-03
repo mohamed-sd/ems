@@ -419,7 +419,7 @@ $sql = "SELECT
             op.name AS project_name
         FROM supplierscontracts sc
         LEFT JOIN suppliers s ON sc.supplier_id = s.id
-        LEFT JOIN operationproject op ON sc.project_id = op.id
+        LEFT JOIN project op ON sc.project_id = op.id
         WHERE sc.id = $contract_id
         LIMIT 1";
 

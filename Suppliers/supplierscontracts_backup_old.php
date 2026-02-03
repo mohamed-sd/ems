@@ -140,7 +140,7 @@ if (!isset($_SESSION['user'])) {
                 <?php
                 include '../config.php';
 
-                $sql = "SELECT id, name FROM operationproject ORDER BY name ASC";
+                $sql = "SELECT id, name FROM project ORDER BY name ASC";
                 $result = mysqli_query($conn, $sql);
                 ?>
                 <option value="">-- اختر المشروع --</option>
@@ -530,7 +530,7 @@ if (!isset($_SESSION['user'])) {
             // جلب العقود مع أسماء المشاريع
             $query = "SELECT sc.*, op.name as project_name 
                       FROM `supplierscontracts` sc
-                      LEFT JOIN operationproject op ON sc.project_id = op.id
+                      LEFT JOIN project op ON sc.project_id = op.id
                       WHERE sc.supplier_id = $supplier_id  
                       ORDER BY sc.id DESC";
             $result = mysqli_query($conn, $query);

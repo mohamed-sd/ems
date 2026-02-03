@@ -478,7 +478,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             <select id="project_id" name="project_id" class="form-control">
                                 <option value="">-- اختر المشروع --</option>
                                 <?php
-                                $sql = "SELECT id, name FROM operationproject where status = '1' ORDER BY name ASC";
+                                $sql = "SELECT id, name FROM project where status = '1' ORDER BY name ASC";
                                 $result = mysqli_query($conn, $sql);
                                 while ($row = mysqli_fetch_assoc($result)) {
                                     echo "<option value='{$row['id']}'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</option>";
@@ -533,7 +533,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         while ($row = mysqli_fetch_assoc($result)) {
                             $project_id = $row['project_id'];
                             $project_name = "";
-                            $select_project = mysqli_query($conn, "SELECT name FROM `operationproject` WHERE `id` = $project_id");
+                            $select_project = mysqli_query($conn, "SELECT name FROM `project` WHERE `id` = $project_id");
                             while ($project_row = mysqli_fetch_array($select_project)) {
                                 $project_name = $project_row['name'];
                             }

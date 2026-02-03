@@ -52,7 +52,7 @@ JOIN operations m ON pm.id = m.equipment
 WHERE m.project =  $project;");
                     $rowsuppliers = mysqli_fetch_assoc($suppliers);
                     $total_suppliers = $rowsuppliers['total_suppliers'];
-                    $select = mysqli_query($conn, "SELECT * FROM `operationproject` WHERE `id` = $project");
+                    $select = mysqli_query($conn, "SELECT * FROM `project` WHERE `id` = $project");
                     while ($row = mysqli_fetch_array($select)) {
                         ?>
     <div class="report">
@@ -114,7 +114,7 @@ WHERE m.project =  $project;");
                     $location = mysqli_real_escape_string($conn, $_POST['location']);
                     $total = floatval($_POST['total']);
                     $date = date('Y-m-d H:i:s');
-                    mysqli_query($conn, "INSERT INTO operationproject (name, client, location, total, create_at) VALUES ('$name', '$client', '$location', '$total', '$date')");
+                    mysqli_query($conn, "INSERT INTO project (name, client, location, total, create_at) VALUES ('$name', '$client', '$location', '$total', '$date')");
                 }
 
 

@@ -27,9 +27,9 @@ EMS is an Arabic-language equipment management system built with PHP, MySQL, and
 #### Database Schema Overview (equipation_manage)
 
 **Core Entity Tables:**
-- `company_clients` - العملاء (clients with code, name, sector, contact info)
-- `company_project` - المشاريع الرئيسية (main projects with location, coordinates, category)
-- `operationproject` - المشاريع التشغيلية (operational projects linking company_project + company_clients)
+- `clients` - العملاء (clients with client_code, client_name, entity_type, sector_category, contact info)
+- `project` - المشاريع (all projects with client info, location, coordinates, category)
+- `mines` - المناجم (mines linked to project with mine details, manager, mineral type, ownership)
 - `suppliers` - الموردين (equipment suppliers)
 - `equipments` - المعدات (equipment/machinery linked to suppliers)
 - `drivers` - المشغلين (equipment operators)
@@ -49,6 +49,13 @@ EMS is an Arabic-language equipment management system built with PHP, MySQL, and
 - `equipment_drivers` - ربط المعدات بالسائقين (junction table: equipments ↔ drivers)
 - `timesheet` - ساعات العمل (work hours tracking per operation/driver with shift details, faults, notes)
 
+**Mines Management (إدارة المناجم):**
+- `mines` - المناجم المرتبطة بالمشاريع (mines table with 19 fields)
+- **Fields:** mine_code (UNIQUE), mine_name, manager_name, mineral_type (ذهب/فضة/نحاس), mine_type (ENUM: حفرة مفتوحة/تحت أرضي/آبار/مهجور/مجمع معالجة/موقع تخزين/أخرى), mine_type_other, ownership_type (ENUM: تعدين أهلي/شركة خاصة/حكومية/أجنبية/مشترك/أخرى), ownership_type_other, mine_area (decimal), mine_area_unit (هكتار/كم²), mining_depth (متر), contract_nature (موظف مباشر/مقاول), status, notes
+- **Relationship:** Each mine linked to one project via `project_id` field
+- **Management Interface:** [Projects/project_mines.php](Projects/project_mines.php) - Modal-based CRUD with DataTables
+- **Display Integration:** Projects table shows mines count with clickable link to mines page
+
 **Payment & Financial Fields (added to contracts table):**
 - `price_currency_contract` - عملة العقد (currency: دولار/جنيه)
 - `paid_contract` - المبلغ المدفوع (paid amount)
@@ -58,13 +65,16 @@ EMS is an Arabic-language equipment management system built with PHP, MySQL, and
 
 **Critical Relationships:**
 ```
-company_clients ←→ operationproject ←→ company_project
-operationproject ← contracts ← contractequipments
-                            ← contract_notes
-suppliers ← equipments ← operations → operationproject
+clients ←→ project → mines
+project ← contracts ← contractequipments
+                    ← contract_notes
+suppliers ← equipments ← operations → project
 equipments ← equipment_drivers → drivers
 operations ← timesheet → drivers
-users → operationproject (project_id assignment)
+users → project (project_id assignment)
+supplierscontracts → project (project_id)
+                  → suppliers (supplier_id)
+                  ← suppliercontractequipments
 ```
 
 **Status Fields Pattern:**
@@ -77,7 +87,7 @@ users → operationproject (project_id assignment)
 Each major entity has its own directory with consistent structure:
 - **[Drivers/drivers.php](Drivers/drivers.php)** - List/edit, form toggles with `<form>` POST handling
 - **[Suppliers/suppliers.php](Suppliers/suppliers.php)** - Suppliers CRUD
-- **[Projects/oprationprojects.php](Projects/oprationprojects.php)** - Operational projects CRUD (links `company_project` + `company_clients`)
+- **[Projects/oprationprojects.php](Projects/oprationprojects.php)** - Projects CRUD (all project data including client links)
 - **[Projects/view_projects.php](Projects/view_projects.php)** - Company projects CRUD (JSON API pattern with `action` parameter)
 - **[Projects/view_clients.php](Projects/view_clients.php)** - Company clients CRUD (JSON API pattern with `action` parameter)
 - **[Equipments/equipments.php](Equipments/equipments.php)** - Equipment assignments to drivers
@@ -98,7 +108,7 @@ timesheet → operations → equipments → suppliers/projects
 - **Key Difference:** Supplier contracts mirror project contract structure but add `project_id` field - each supplier can have multiple contracts (one per project)
 - **Equipment Management:** Uses `suppliercontractequipments` table (mirrors `contractequipments` structure) for tracking equipment assigned to supplier contracts
 - **Action Handler:** [Suppliers/supplier_contract_actions_handler.php](Suppliers/supplier_contract_actions_handler.php) - handles all supplier contract lifecycle operations (renewal, settlement, pause, resume, terminate, merge)
-- **Required Fields:** `supplier_id` (from URL), `project_id` (selected from operationproject dropdown), all standard contract fields
+- **Required Fields:** `supplier_id` (from URL), `project_id` (selected from project dropdown), all standard contract fields
 - **Contract Fields:** contract_signing_date, grace_period_days, contract_duration_months, actual_start, actual_end, transportation, accommodation, place_for_living, workshop, equip_type, equip_size, equip_count, equip_target_per_month, mach_type, mach_size, mach_count, daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two, hours_monthly_target, forecasted_contracted_hours
 - **Hours Tracking System:**
   - `hours_monthly_target` - الساعات المستهدفة شهرياً (monthly target hours for equipment + machinery)
@@ -110,8 +120,20 @@ timesheet → operations → equipments → suppliers/projects
 - **View/Edit Details:** [Suppliers/supplierscontracts_details.php](Suppliers/supplierscontracts_details.php?id=CONTRACT_ID) - full contract details page with action buttons
 - **Pattern:** One supplier → many contracts (across different projects) vs. One project → one contract
 
-**Operational projects workflow (linking company projects + clients):**
-- Select from `company_project` (main projects) → Select from `company_clients` (clients) → Auto-populate `name` and `client` fields from selected IDs → Duplicate prevention checks (`company_project_id` + `company_client_id` combination must be unique)
+**Projects workflow:**
+- Direct project creation with all data (name, client, location, coordinates, category)
+- Link to `clients` table via `company_client_id` field
+- Project code auto-generation or manual entry
+- Location data includes state, region, nearest market, latitude/longitude
+
+**Mines Management Workflow (إدارة المناجم):**
+- **Entry Point:** [Projects/project_mines.php](Projects/project_mines.php?project_id=X) - Manage mines for a specific project
+- **Access:** Accessible from projects table via mines count column (⛰️ icon with count badge)
+- **Required Fields:** mine_code (must be unique), mine_name, mine_type, ownership_type
+- **Optional Fields:** manager_name, mineral_type, mine_area, mining_depth, contract_nature, notes
+- **Conditional Fields:** mine_type_other (shows when mine_type = "أخرى"), ownership_type_other (shows when ownership_type = "أخرى")
+- **CRUD Operations:** Modal-based add/edit forms, inline delete with confirmation, DataTables display
+- **Integration:** Projects table displays live mines count using sub-query: `(SELECT COUNT(*) FROM mines WHERE project_id = cp.id)`
 
 ### 4. Template & Header Includes
 - **Header:** [inheader.php](inheader.php) - HTML boilerplate + CSS (Bootstrap, DataTables, FontAwesome, custom style.css)
@@ -212,9 +234,10 @@ Pattern for endpoints that handle multiple related actions (see [contract_action
 | [Suppliers/showcontractsuppliers.php](Suppliers/showcontractsuppliers.php) | Supplier contract details view |
 | [Suppliers/supplierscontracts_details.php](Suppliers/supplierscontracts_details.php) | Supplier contract full details page with action buttons |
 | [Suppliers/supplier_contract_actions_handler.php](Suppliers/supplier_contract_actions_handler.php) | JSON API endpoint for supplier contract lifecycle operations (mirrors contract_actions_handler.php) |
-| [Projects/oprationprojects.php](Projects/oprationprojects.php) | Operational projects CRUD (links company_project + company_clients) |
-| [Projects/view_projects.php](Projects/view_projects.php) | Company projects CRUD (JSON API pattern with `action` parameter) |
+| [Projects/oprationprojects.php](Projects/oprationprojects.php) | Projects CRUD - all project data with client linking |
+| [Projects/view_projects.php](Projects/view_projects.php) | Company projects CRUD (JSON API pattern with `action` parameter) with mines count column |
 | [Projects/view_clients.php](Projects/view_clients.php) | Company clients CRUD (JSON API pattern with `action` parameter) |
+| [Projects/project_mines.php](Projects/project_mines.php) | Mines management CRUD - Modal-based forms with DataTables, accessed from projects table |
 | [Projects/import_clients_excel.php](Projects/import_clients_excel.php) | Excel/CSV import handler for bulk client import (requires PHPSpreadsheet via Composer) |
 | [Projects/download_clients_template.php](Projects/download_clients_template.php) | Excel template generator for client import |
 | [Equipments/equipments.php](Equipments/equipments.php) | Equipment-to-driver assignments |
@@ -223,7 +246,8 @@ Pattern for endpoints that handle multiple related actions (see [contract_action
 | [Contracts/contracts.php](Contracts/contracts.php) | Contract listing with status tracking |
 | [Contracts/contracts_details.php](Contracts/contracts_details.php) | Contract detail page with action buttons (renewal, settlement, pause, resume, terminate, merge) |
 | [Contracts/contract_actions_handler.php](Contracts/contract_actions_handler.php) | JSON API endpoint for all contract lifecycle operations - reference implementation for API handlers |
-| [database/*.sql](database/) | Schema dumps (users, contracts, timesheets) |
+| [database/equipation_manage.sql](database/equipation_manage.sql) | Complete database schema - latest export with all tables including mines |
+| [database/*.sql](database/) | Schema dumps and migration scripts (users, contracts, timesheets, mines) |
 | [assets/css/style.css](assets/css/style.css) | Custom styling (RTL adjustments, layout refinements) |
 
 ## Important Conventions
@@ -253,8 +277,8 @@ Pattern for endpoints that handle multiple related actions (see [contract_action
 - **JSON API pattern:** For action handlers, use `die(json_encode(...))` for early returns on errors, `echo json_encode(...); exit;` for success
 - **Action routing in APIs:** Use `if/elseif` chains based on `$_POST['action']` parameter; validate action at end with `else { die(json_encode(['success' => false, 'message' => 'الإجراء غير معروف'])); }`
 - **Status field filtering:** Always add `AND status = 1` to WHERE clauses when querying active records
-- **Foreign key references:** Use field names as documented (e.g., `company_project_id` in operationproject, not `project_id`)
-- **Duplicate prevention:** Check for unique combinations before INSERT (e.g., `company_project_id` + `company_client_id` in operationproject)
+- **Foreign key references:** Use field names as documented (e.g., `project_id` for linking to project)
+- **Duplicate prevention:** Check for unique combinations before INSERT (e.g., `project_code` in project should be unique)
 - **Equipment type filtering:** Use dependent dropdowns where equipment list depends on selected type (e.g., حفار/قلاب in operations)
 
 ### Common Query Patterns
@@ -267,35 +291,51 @@ FROM timesheet t
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id
 JOIN suppliers s ON e.suppliers = s.id
-JOIN operationproject p ON o.project = p.id
+JOIN project p ON o.project = p.id
 JOIN drivers d ON t.driver = d.id
 WHERE t.status = 1
 ```
 
 **Get contract with equipment details:**
 ```sql
-SELECT c.*, ce.*, op.name AS project_name, op.client, op.location
+SELECT c.*, ce.*, p.name AS project_name, p.client, p.location
 FROM contracts c
 LEFT JOIN contractequipments ce ON c.id = ce.contract_id
-JOIN operationproject op ON c.project = op.id
+JOIN project p ON c.project = p.id
 WHERE c.id = $contract_id
 ```
 
-**Get operational project with client and company project:**
+**Get project with client info:**
 ```sql
-SELECT op.*, cc.client_name, cp.project_name AS company_project_name
-FROM operationproject op
-LEFT JOIN company_clients cc ON op.company_client_id = cc.id
-LEFT JOIN company_project cp ON op.company_project_id = cp.id
-WHERE op.status = 1
+SELECT p.*, c.client_name
+FROM project p
+LEFT JOIN clients c ON p.company_client_id = c.id
+WHERE p.status = 1
+```
+
+**Get project with mines count:**
+```sql
+SELECT p.*, 
+       (SELECT COUNT(*) FROM mines WHERE project_id = p.id AND status = 1) as mines_count
+FROM project p
+WHERE p.status = 1
+```
+
+**Get mines for a specific project:**
+```sql
+SELECT m.*, p.name AS project_name
+FROM mines m
+JOIN project p ON m.project_id = p.id
+WHERE m.project_id = $project_id AND m.status = 1
+ORDER BY m.created_at DESC
 ```
 
 **Get supplier contracts for a specific project:**
 ```sql
-SELECT sc.*, s.name AS supplier_name, op.name AS project_name
+SELECT sc.*, s.name AS supplier_name, p.name AS project_name
 FROM supplierscontracts sc
 JOIN suppliers s ON sc.supplier_id = s.id
-JOIN operationproject op ON sc.project_id = op.id
+JOIN project p ON sc.project_id = p.id
 WHERE sc.project_id = $project_id
 ```
 

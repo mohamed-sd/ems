@@ -25,7 +25,7 @@ $sql = "
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id 
   JOIN drivers d ON t.driver = d.id
-  JOIN operationproject p ON o.project = p.id
+  JOIN project p ON o.project = p.id
   WHERE 1=1
 ";
 
@@ -115,7 +115,7 @@ $total_hours  = $total_row['total_hours'];
 					<select name="project" class="form-select">
 						<option value="">-- الكل --</option>
 						<?php
-						$prj = mysqli_query($conn, "SELECT id, name FROM operationproject where status = '1' ");
+						$prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
 						while($row = mysqli_fetch_assoc($prj)){
 							$selected = ($project_filter == $row['id']) ? "selected" : "";
 							echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";

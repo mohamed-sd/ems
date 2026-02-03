@@ -10,7 +10,7 @@ include '../config.php';
 // معالجة حذف المشروع
 if (isset($_GET['delete_id'])) {
     $delete_id = intval($_GET['delete_id']);
-    $delete_query = "DELETE FROM operationproject WHERE id = $delete_id";
+    $delete_query = "DELETE FROM project WHERE id = $delete_id";
     if (mysqli_query($conn, $delete_query)) {
         header("Location: oprationprojects.php?msg=تم+حذف+المشروع+بنجاح+✅");
         exit();
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
 
     if ($id > 0) {
         // تحديث
-        $sql = "UPDATE operationproject SET 
+        $sql = "UPDATE project SET 
             company_client_id='$company_client_id',
             name='$name',
             client='$client',
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
         exit;
     } else {
         // إضافة
-        $sql = "INSERT INTO operationproject (company_client_id, name, client, location, project_code, category, sub_sector, state, region, nearest_market, latitude, longitude, total, status, created_by, create_at) 
+        $sql = "INSERT INTO project (company_client_id, name, client, location, project_code, category, sub_sector, state, region, nearest_market, latitude, longitude, total, status, created_by, create_at) 
         VALUES ('$company_client_id', '$name', '$client', '$location', '$project_code', '$category', '$sub_sector', '$state', '$region', '$nearest_market', '$latitude', '$longitude', '$total', '$status', '$created_by', '$date')";
         mysqli_query($conn, $sql);
         header("Location: oprationprojects.php?msg=تم+اضافه+المشروع+بنجاح+✅");
@@ -1091,7 +1091,7 @@ include('../insidebar.php');
                             $client_filter = " WHERE op.company_client_id = $client_id ";
                         }
 
-                        // جلب جميع المشاريع من جدول operationproject مع البيانات المدخولة يدويًا
+                        // جلب جميع المشاريع من جدول project مع البيانات المدخولة يدويًا
                         $query = "SELECT op.`id`, op.`name`, op.`client`, op.`location`, op.`total`, op.`status`, op.`create_at`, 
                       op.`project_code`, op.`category`, op.`sub_sector`, op.`state`, op.`region`, 
                       op.`nearest_market`, op.`latitude`, op.`longitude`, op.`company_client_id`,
@@ -1102,7 +1102,7 @@ include('../insidebar.php');
                           JOIN operations m ON pm.id = m.equipment
                           WHERE m.project = op.id) as 'total_suppliers',
                           (SELECT COUNT(*) FROM mines WHERE project_id = op.id) as mines_count
-                      FROM operationproject op
+                      FROM project op
                       LEFT JOIN clients cc ON op.company_client_id = cc.id
                       $client_filter
                       ORDER BY op.id DESC";

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 03, 2026 at 01:24 PM
+-- Generation Time: Feb 03, 2026 at 08:17 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -51,39 +51,6 @@ INSERT INTO `clients` (`id`, `client_code`, `client_name`, `entity_type`, `secto
 (2, 'C002', 'وزارة البنية التحتية', 'جهة حكومية', 'البنية التحتية', '0923456789', 'infrastructure@gov.sd', '0923456789', 'نشط', 1, '2026-01-29 01:49:27', '2026-01-29 01:49:27'),
 (3, 'C003', 'شركة الطرق السريعة', 'شركة خاصة', 'الطرق والجسور', '0934567890', 'highways@example.com', '0934567890', 'نشط', 1, '2026-01-29 01:49:27', '2026-01-29 01:49:27'),
 (4, 'CL-2301', 'شركة  نور', 'شركة', 'التعدين', '9909090', 'info@noor-co.com', '88888', 'نشط', 1, '2026-01-31 12:26:19', '2026-01-31 12:26:19');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `company_project`
---
-
-CREATE TABLE `company_project` (
-  `id` int(11) NOT NULL,
-  `project_code` varchar(50) NOT NULL COMMENT 'كود المشروع',
-  `project_name` varchar(200) NOT NULL COMMENT 'اسم المشروع',
-  `category` varchar(100) NOT NULL COMMENT 'تصنيف المشروع',
-  `sub_sector` varchar(200) NOT NULL COMMENT 'القطاع الفرعي',
-  `state` varchar(100) NOT NULL COMMENT 'الولاية',
-  `region` varchar(100) NOT NULL COMMENT 'المنطقة',
-  `nearest_market` varchar(100) NOT NULL COMMENT 'أقرب سوق',
-  `latitude` varchar(50) NOT NULL COMMENT 'خط العرض',
-  `longitude` varchar(50) NOT NULL COMMENT 'خط الطول',
-  `status` enum('نشط','متوقف','مكتمل') DEFAULT 'نشط' COMMENT 'حالة المشروع',
-  `created_by` int(11) DEFAULT NULL COMMENT 'المستخدم الذي أضاف المشروع',
-  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'تاريخ الإنشاء',
-  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT 'تاريخ آخر تحديث'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول المشاريع التشغيلية';
-
---
--- Dumping data for table `company_project`
---
-
-INSERT INTO `company_project` (`id`, `project_code`, `project_name`, `category`, `sub_sector`, `state`, `region`, `nearest_market`, `latitude`, `longitude`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'PRJ-2026-001', 'مشروع طريق الخرطوم - بورتسودان', 'طرق وجسور', 'الطرق السريعة', 'الخرطوم2', 'الخرطوم بحري', 'سوق ليبيا', '15.5527', '32.5599', 'نشط', NULL, '2026-01-29 03:48:30', '2026-01-29 16:44:32'),
-(2, 'PRJ-2026-002', 'مشروع محطة مياه النيل الأزرق', 'مياه', 'محطات المياه', 'النيل الأزرق', 'الدمازين', 'سوق الدمازين', '11.7891', '34.3592', 'نشط', NULL, '2026-01-29 03:48:30', NULL),
-(3, 'PRJ-2026-071', 'مشروع الروسيه جديد', 'تعدين', 'الطرق السريعة', 'جنوب الجزيره', 'الاسكندرية', 'سوق دلتا', '90', '18', 'نشط', 1, '2026-01-29 14:46:22', NULL),
-(4, 'P4001', 'مشروع الطريق الدائري', 'بنية تحتية', 'الطرق والجسور', 'القاهرة', 'مدينة نصر', 'سوق العبور', '30.0444', '31.2357', 'نشط', 1, '2026-01-31 14:46:39', NULL);
 
 -- --------------------------------------------------------
 
@@ -366,8 +333,7 @@ INSERT INTO `equipments` (`id`, `suppliers`, `code`, `type`, `name`, `status`) V
 (13, '1', 'Qs11', '1', 'Qs11', 1),
 (14, '2', 'Qa1001', '1', 'Qa1001', 1),
 (15, '2', 'EQ10', '1', '01', 1),
-(16, '1', 'TM02', '2', '02', 1),
-(17, '3', 'EQ001', '1', '09', 1);
+(16, '1', 'TM02', '2', '02', 1);
 
 -- --------------------------------------------------------
 
@@ -402,7 +368,7 @@ INSERT INTO `equipment_drivers` (`id`, `equipment_id`, `driver_id`, `status`) VA
 
 CREATE TABLE `mines` (
   `id` int(11) NOT NULL,
-  `project_id` int(11) NOT NULL COMMENT 'معرف المشروع من جدول company_project',
+  `project_id` int(11) NOT NULL COMMENT 'معرف المشروع من جدول project',
   `mine_name` varchar(255) NOT NULL COMMENT 'اسم المنجم',
   `mine_code` varchar(50) NOT NULL COMMENT 'كود/رمز المنجم (فريد)',
   `manager_name` varchar(255) DEFAULT NULL COMMENT 'اسم مدير المنجم',
@@ -427,18 +393,18 @@ CREATE TABLE `mines` (
 --
 
 INSERT INTO `mines` (`id`, `project_id`, `mine_name`, `mine_code`, `manager_name`, `mineral_type`, `mine_type`, `mine_type_other`, `ownership_type`, `ownership_type_other`, `mine_area`, `mine_area_unit`, `mining_depth`, `contract_nature`, `status`, `notes`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 1, 'منجم احمد', 'eca', 'سامبا', 'ذهب', 'مهجور', '', 'تعدين أهلي/تقليدي', '', 20.00, 'كم²', 500.00, 'موظف مباشر لدى المالك', 1, '', 1, '2026-02-02 17:43:48', '2026-02-02 17:43:48');
+(1, 1, 'منجم احمد', 'eca', 'سامبا', 'ذهب', 'مهجور', '', 'تعدين أهلي/تقليدي', '', 20.00, 'كم²', 500.00, 'موظف مباشر لدى المالك', 1, '', 1, '2026-02-02 17:43:48', '2026-02-02 17:43:48'),
+(2, 2, 'hh', 'hh', 'hh', 'ذهب', 'موقع تخزين/مستودع', '', 'تعدين أهلي/تقليدي', '', 20.00, 'كم²', 32.00, 'موظف مباشر لدى المالك', 1, '', 1, '2026-02-03 15:36:38', '2026-02-03 15:36:38');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `operationproject`
+-- Table structure for table `project`
 --
 
-CREATE TABLE `operationproject` (
+CREATE TABLE `project` (
   `id` int(11) NOT NULL,
-  `company_project_id` int(11) DEFAULT NULL COMMENT 'معرف المشروع من جدول company_project',
-  `company_client_id` int(11) DEFAULT NULL COMMENT 'معرف العميل من جدول company_clients',
+  `company_client_id` int(11) DEFAULT NULL COMMENT 'معرف العميل من جدول clients',
   `name` varchar(150) NOT NULL,
   `client` varchar(150) NOT NULL,
   `location` varchar(200) NOT NULL,
@@ -458,16 +424,15 @@ CREATE TABLE `operationproject` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Dumping data for table `operationproject`
+-- Dumping data for table `project`
 --
 
-INSERT INTO `operationproject` (`id`, `company_project_id`, `company_client_id`, `name`, `client`, `location`, `total`, `status`, `create_at`) VALUES
-(1, 1, 1, 'مشروع الروسية', 'شركه الياس', 'الخرطوم2', '0', 1, '2026-01-23 05:02:37'),
-(2, 2, 2, 'مشروع فاروس', 'احمد', 'الخرطوم', '0', 1, '2026-01-25 23:07:51'),
-(3, 3, 3, 'مشروع الروسيه جديد', 'شركة الطرق السريعة', 'كم', '0', 1, '2026-01-29 11:46:42'),
-(4, 1, 2, 'مشروع طريق الخرطوم - بورتسودان', 'وزارة البنية التحتية', 'كم', '0', 1, '2026-01-29 13:47:24'),
-(5, 4, 4, 'مشروع الطريق الدائري', 'شركة  نور', 'نن', '0', 1, '2026-01-31 11:55:29'),
-(6, 3, 4, 'مشروع الروسيه جديد', 'شركة  نور', 'jj', '0', 1, '2026-02-02 15:38:36');
+INSERT INTO `project` (`id`, `company_client_id`, `name`, `client`, `location`, `project_code`, `category`, `sub_sector`, `state`, `region`, `nearest_market`, `latitude`, `longitude`, `total`, `status`, `created_by`, `create_at`, `updated_at`) VALUES
+(1, 1, 'مشروع الروسية', 'شركه الياس', 'الخرطوم2', 'PRJ-2026-001', 'طرق وجسور', 'الطرق السريعة', 'الخرطوم2', 'الخرطوم بحري', 'سوق ليبيا', '15.5527', '32.5599', '0', 1, NULL, '2026-01-23 05:02:37', '2026-02-03 17:34:16'),
+(2, 2, 'مشروع فاروس', 'احمد', 'الخرطوم', 'PRJ-2026-002', 'مياه', 'محطات المياه', 'النيل الأزرق', 'الدمازين', 'سوق الدمازين', '11.7891', '34.3592', '0', 1, NULL, '2026-01-25 23:07:51', '2026-02-03 17:34:16'),
+(3, 3, 'مشروع الروسيه جديد', 'شركة الطرق السريعة', 'كم', 'PRJ-2026-071', 'تعدين', 'الطرق السريعة', 'جنوب الجزيره', 'الاسكندرية', 'سوق دلتا', '90', '18', '0', 1, NULL, '2026-01-29 11:46:42', '2026-02-03 17:34:16'),
+(4, 2, 'مشروع طريق الخرطوم - بورتسودان', 'وزارة البنية التحتية', 'كم', 'PRJ-2026-001', 'طرق وجسور', 'الطرق السريعة', 'الخرطوم2', 'الخرطوم بحري', 'سوق ليبيا', '15.5527', '32.5599', '0', 1, NULL, '2026-01-29 13:47:24', '2026-02-03 17:34:16'),
+(5, 4, 'مشروع الطريق الدائري', 'شركة  نور', 'نن', 'P4001', 'بنية تحتية', 'الطرق والجسور', 'القاهرة', 'مدينة نصر', 'سوق العبور', '30.0444', '31.2357', '0', 1, NULL, '2026-01-31 11:55:29', '2026-02-03 17:34:16');
 
 -- --------------------------------------------------------
 
@@ -493,9 +458,7 @@ CREATE TABLE `operations` (
 INSERT INTO `operations` (`id`, `equipment`, `equipment_type`, `project`, `start`, `end`, `hours`, `status`) VALUES
 (1, '13', '1', '1', '2026-01-12', '2026-01-31', '0', 1),
 (2, '10', '1', '1', '2026-01-14', '2026-01-24', '0', 1),
-(3, '12', '2', '1', '2026-01-06', '2026-01-31', '0', 1),
-(4, '17', '1', '5', '2026-02-01', '2026-02-28', '0', 0),
-(5, '17', '1', '6', '2026-02-01', '2026-02-28', '0', 1);
+(3, '12', '2', '1', '2026-01-06', '2026-01-31', '0', 1);
 
 -- --------------------------------------------------------
 
@@ -554,10 +517,8 @@ CREATE TABLE `suppliers` (
 --
 
 INSERT INTO `suppliers` (`id`, `name`, `phone`, `status`) VALUES
-(1, 'اكوبيشن', '0992990920', 1),
-(2, 'محمد علي احمد', '092882930', 0),
-(3, 'محمد سيد حسن', '0115667710', 1),
-(4, 'حسن سيد حسن', '0115667710', 0);
+(1, 'اكوبيشن', '8569', 1),
+(2, 'محمد علي', '1111111111', 1);
 
 -- --------------------------------------------------------
 
@@ -746,7 +707,7 @@ INSERT INTO `users` (`id`, `name`, `username`, `password`, `phone`, `role`, `pro
 (6, 'محمد', 'q', 'q', '098098', '6', '1', '5', '2025-09-09 16:53:20', '2025-09-09 17:30:33'),
 (7, 'w', 'w', 'w', '909', '7', '0', '5', '2025-09-09 16:54:07', '2025-09-09 16:54:07'),
 (8, 't', 't', 't', '09090', '6', '0', '5', '2025-09-09 17:27:25', '2025-09-09 17:27:25'),
-(10, 'احمد عبد الوهاب', 'n', 'n', '9999', '5', '3', '0', '2025-09-21 13:27:53', '2026-02-02 11:44:31');
+(10, 'Ù…Ø¯Ø±ÙŠØ± Ù…ÙˆÙ‚Ø¹ Ø¬Ø¯ÙŠØ¯', 'n', 'n', '9999', '5', '3', '0', '2025-09-21 13:27:53', '2025-09-21 13:27:53');
 
 --
 -- Indexes for dumped tables
@@ -760,17 +721,6 @@ ALTER TABLE `clients`
   ADD UNIQUE KEY `unique_client_code` (`client_code`),
   ADD KEY `idx_client_name` (`client_name`),
   ADD KEY `idx_status` (`status`);
-
---
--- Indexes for table `company_project`
---
-ALTER TABLE `company_project`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_project_code` (`project_code`),
-  ADD KEY `idx_category` (`category`),
-  ADD KEY `idx_state` (`state`),
-  ADD KEY `idx_status` (`status`),
-  ADD KEY `idx_created_by` (`created_by`);
 
 --
 -- Indexes for table `contractequipments`
@@ -830,11 +780,10 @@ ALTER TABLE `mines`
   ADD KEY `idx_status` (`status`);
 
 --
--- Indexes for table `operationproject`
+-- Indexes for table `project`
 --
-ALTER TABLE `operationproject`
+ALTER TABLE `project`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_company_project_id` (`company_project_id`),
   ADD KEY `idx_company_client_id` (`company_client_id`);
 
 --
@@ -894,12 +843,6 @@ ALTER TABLE `clients`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `company_project`
---
-ALTER TABLE `company_project`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
 -- AUTO_INCREMENT for table `contractequipments`
 --
 ALTER TABLE `contractequipments`
@@ -933,7 +876,7 @@ ALTER TABLE `drivers`
 -- AUTO_INCREMENT for table `equipments`
 --
 ALTER TABLE `equipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `equipment_drivers`
@@ -945,19 +888,19 @@ ALTER TABLE `equipment_drivers`
 -- AUTO_INCREMENT for table `mines`
 --
 ALTER TABLE `mines`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT for table `operationproject`
+-- AUTO_INCREMENT for table `project`
 --
-ALTER TABLE `operationproject`
+ALTER TABLE `project`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `operations`
 --
 ALTER TABLE `operations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `suppliercontractequipments`
@@ -969,7 +912,7 @@ ALTER TABLE `suppliercontractequipments`
 -- AUTO_INCREMENT for table `suppliers`
 --
 ALTER TABLE `suppliers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `supplierscontracts`

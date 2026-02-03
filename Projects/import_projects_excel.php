@@ -120,7 +120,7 @@ try {
             $longitude_escaped = mysqli_real_escape_string($conn, $longitude);
             $location_escaped = mysqli_real_escape_string($conn, $location);
 
-            $query = "INSERT INTO operationproject 
+            $query = "INSERT INTO project 
                 (name, client, project_code, category, sub_sector, state, region, nearest_market, latitude, longitude, location, status, created_by, updated_at) 
                 VALUES 
                 ('$name_escaped', '$client_escaped', '$project_code_escaped', '$category_escaped', '$sub_sector_escaped', '$state_escaped', '$region_escaped', '$nearest_market_escaped', '$latitude_escaped', '$longitude_escaped', '$location_escaped', $status_value, $created_by, '$created_at')";

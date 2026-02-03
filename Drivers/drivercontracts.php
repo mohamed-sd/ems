@@ -95,7 +95,7 @@ if (!isset($_SESSION['user'])) {
                 <select name="project_id">
                   <?php
                   include '../config.php';
-                  $sql = "SELECT id, name FROM operationproject where status = '1' ORDER BY name ASC  ";
+                  $sql = "SELECT id, name FROM project where status = '1' ORDER BY name ASC  ";
                   $result = mysqli_query($conn, $sql);
                   ?>
                   <option value="">-- اختر المشروع --</option>

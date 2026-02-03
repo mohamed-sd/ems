@@ -36,7 +36,7 @@ if (!isset($_SESSION['user'])) {
 
     $sql_contracts = "SELECT c.id, p.name AS project_name 
                       FROM contracts c 
-                      JOIN operationproject p ON c.project = p.id";
+                      JOIN project p ON c.project = p.id";
     $contracts = mysqli_query($conn, $sql_contracts);
 
     $contract_data = $time_vs_progress = $faults = $suppliers = $equipments = $drivers = $variance = null;
@@ -53,7 +53,7 @@ if (!isset($_SESSION['user'])) {
             c.forecasted_contracted_hours,
             IFNULL(SUM(t.total_work_hours),0) AS actual_hours
         FROM contracts c
-        JOIN operationproject p ON c.project = p.id
+        JOIN project p ON c.project = p.id
         LEFT JOIN operations o ON o.project = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
@@ -67,7 +67,7 @@ if (!isset($_SESSION['user'])) {
             (TIMESTAMPDIFF(MONTH, c.contract_signing_date, CURDATE()) / c.contract_duration_months) * 100 AS time_progress,
             (IFNULL(SUM(t.total_work_hours),0) / c.forecasted_contracted_hours) * 100 AS work_progress
         FROM contracts c
-        LEFT JOIN operationproject p ON c.project = p.id
+        LEFT JOIN project p ON c.project = p.id
         LEFT JOIN operations o ON o.project = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
@@ -78,7 +78,7 @@ if (!isset($_SESSION['user'])) {
         $sql_faults = "
         SELECT SUM(t.total_fault_hours) AS total_fault_hours
         FROM contracts c
-        JOIN operationproject p ON c.project = p.id
+        JOIN project p ON c.project = p.id
         LEFT JOIN operations o ON o.project = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
@@ -89,7 +89,7 @@ if (!isset($_SESSION['user'])) {
         $sql_suppliers = "
         SELECT s.name AS supplier_name, SUM(t.total_work_hours) AS total_work_hours
         FROM contracts c
-        JOIN operationproject p ON c.project = p.id
+        JOIN project p ON c.project = p.id
         JOIN operations o ON o.project = p.id
         JOIN equipments e ON e.id = o.equipment
         JOIN suppliers s ON e.suppliers = s.id
@@ -104,7 +104,7 @@ if (!isset($_SESSION['user'])) {
                SUM(t.total_work_hours) AS work_hours,
                SUM(t.total_fault_hours) AS fault_hours
         FROM contracts c
-        JOIN operationproject p ON c.project = p.id
+        JOIN project p ON c.project = p.id
         JOIN operations o ON o.project = p.id
         JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
@@ -116,7 +116,7 @@ if (!isset($_SESSION['user'])) {
         $sql_drivers = "
         SELECT d.name AS driver_name, SUM(t.total_work_hours) AS driver_hours
         FROM contracts c
-        JOIN operationproject p ON c.project = p.id
+        JOIN project p ON c.project = p.id
         JOIN operations o ON o.project = p.id
         JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
@@ -131,7 +131,7 @@ if (!isset($_SESSION['user'])) {
                IFNULL(SUM(t.total_work_hours),0) AS actual_hours,
                (IFNULL(SUM(t.total_work_hours),0) - c.forecasted_contracted_hours) AS variance
         FROM contracts c
-        JOIN operationproject p ON c.project = p.id
+        JOIN project p ON c.project = p.id
         LEFT JOIN operations o ON o.project = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
