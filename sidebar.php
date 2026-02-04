@@ -30,7 +30,7 @@
       if ($_SESSION['user']['role'] == "1") { ?>
         <li><a href="Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li>
         <li><a href="Projects/oprationprojects.php"><i class="fa fa-list-alt"></i> <span> المشاريع</span></a></li>
-        <li><a href="users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
+        <li><a href="main/users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
         <!-- <li><a href="Reports/new_reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
         <li><a href="Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>تقارير العقود</span></a></li>
 

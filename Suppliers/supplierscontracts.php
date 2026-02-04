@@ -37,30 +37,34 @@ $supplier_id = intval($_GET['id']);
 </head>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
-  
-  * {
-    font-family: 'Cairo', sans-serif;
+
+  :root {
+    --primary-color: #1a1a2e;
+    --secondary-color: #1a1a2e;
+    --gold-color: #ffcc00;
+    --text-color: #010326;
+    --light-color: #fff9e6;
+    --border-color: #f1e3a3;
+    --shadow-color: rgba(0, 0, 0, 0.12);
   }
-  
-  body {
-    background: #f5f7fa;
-  }
-  
+
+
+
   .main {
-    padding: 2rem;
-    background: #f5f7fa;
+    width: calc(100% - 250px);
+    padding: 30px;
   }
-  
+
   /* Page Title */
   .main h2 {
     font-size: 2rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 2rem;
   }
-  
+
   /* Action Buttons Container */
   .aligin {
     display: flex;
@@ -68,11 +72,9 @@ $supplier_id = intval($_GET['id']);
     flex-wrap: wrap;
     margin-bottom: 2rem;
     padding: 1rem;
-    background: white;
     border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
   }
-  
+
   /* Modern Action Buttons */
   .aligin .add {
     padding: 0.75rem 1.5rem;
@@ -80,16 +82,16 @@ $supplier_id = intval($_GET['id']);
     border-radius: 10px;
     font-weight: 600;
     font-size: 0.9rem;
-    color: white;
+    color: #fff;
     text-decoration: none;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px var(--shadow-color);
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   }
-  
+
   .aligin .add::before {
     content: '';
     position: absolute;
@@ -98,72 +100,72 @@ $supplier_id = intval($_GET['id']);
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.3);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
   }
-  
+
   .aligin .add:hover::before {
     width: 300px;
     height: 300px;
   }
-  
+
   .aligin .add:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
   }
-  
+
   .aligin .add:active {
     transform: translateY(-1px);
   }
-  
+
   #toggleForm {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, var(--gold-color) 0%, var(--secondary-color) 100%);
   }
-  
+
   /* Form Styling */
   #projectForm {
     animation: fadeInUp 0.6s ease;
   }
-  
+
   .card {
     border: none;
     border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 20px var(--shadow-color);
     overflow: hidden;
     margin-bottom: 2rem;
   }
-  
+
   .card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
     padding: 1.5rem;
     border: none;
   }
-  
+
   .card-header h5 {
     color: white;
     font-weight: 700;
     margin: 0;
   }
-  
+
   .card-body {
     padding: 2rem;
   }
-  
+
   /* Section Titles */
   .section-title {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #667eea;
+    color: var(--gold-color);
     display: flex;
     align-items: center;
     gap: 0.75rem;
     margin: 1.5rem 0;
   }
-  
+
   .chip {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: var(--text-color);
     width: 35px;
     height: 35px;
     border-radius: 50%;
@@ -172,9 +174,9 @@ $supplier_id = intval($_GET['id']);
     justify-content: center;
     font-weight: 700;
     font-size: 1.1rem;
-    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 3px 10px var(--shadow-color);
   }
-  
+
   /* Form Fields */
   .form-grid {
     display: grid;
@@ -182,15 +184,15 @@ $supplier_id = intval($_GET['id']);
     gap: 1.5rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .field label {
     display: block;
     font-weight: 600;
-    color: #495057;
+    color: var(--text-color);
     margin-bottom: 0.5rem;
     font-size: 0.95rem;
   }
-  
+
   .field input,
   .field select,
   .field textarea {
@@ -202,20 +204,20 @@ $supplier_id = intval($_GET['id']);
     transition: all 0.3s ease;
     font-weight: 500;
   }
-  
+
   .field input:focus,
   .field select:focus,
   .field textarea:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(255, 204, 0, 0.25);
   }
-  
+
   .field input[readonly] {
     background: #f8f9fa;
     cursor: not-allowed;
   }
-  
+
   /* KPI Cards */
   .totals {
     display: grid;
@@ -223,80 +225,80 @@ $supplier_id = intval($_GET['id']);
     gap: 1.5rem;
     margin: 2rem 0;
   }
-  
+
   .kpi {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    background: linear-gradient(135deg, #ffffff 0%, var(--light-color) 100%);
     border: none;
     border-radius: 15px;
     padding: 1.5rem;
     text-align: center;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 3px 15px var(--shadow-color);
     transition: all 0.3s ease;
-    border-right: 5px solid #667eea;
+    border-right: 5px solid var(--primary-color);
   }
-  
+
   .kpi:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
-  
+
   .kpi .v {
     font-weight: 900;
     font-size: 2rem;
-    color: #667eea;
+    color: var(--gold-color);
     margin-bottom: 0.5rem;
   }
-  
+
   .kpi .t {
     color: #6c757d;
     font-size: 0.9rem;
     font-weight: 600;
   }
-  
+
   /* Buttons */
   button.primary,
   .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: var(--text-color);
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 15px var(--shadow-color);
   }
-  
+
   button.primary:hover,
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   }
-  
+
   #addEquipmentBtn {
     background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
   }
-  
+
   /* HR Separator */
   .hr {
     height: 2px;
-    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
     margin: 2rem 0;
     border: none;
   }
-  
+
   /* Equipment Sections */
   .equipment-section {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);
     padding: 1.5rem;
     border-radius: 15px;
     margin-bottom: 1.5rem;
-    border: 2px solid #e9ecef;
+    border: 2px solid var(--border-color);
     position: relative;
   }
-  
+
   .equipment-section h4 {
-    color: #667eea;
+    color: var(--gold-color);
     font-weight: 700;
     font-size: 1.1rem;
     margin-bottom: 1.5rem;
@@ -304,7 +306,7 @@ $supplier_id = intval($_GET['id']);
     align-items: center;
     gap: 0.5rem;
   }
-  
+
   .remove-equipment {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
     color: white;
@@ -319,87 +321,87 @@ $supplier_id = intval($_GET['id']);
     top: 1rem;
     left: 1rem;
   }
-  
+
   .remove-equipment:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
   }
-  
+
   /* DataTable Styling */
   .dataTables_wrapper {
     padding: 1rem;
     background: white;
     border-radius: 15px;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 3px 15px var(--shadow-color);
   }
-  
+
   table.dataTable {
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 10px;
     overflow: hidden;
   }
-  
+
   table.dataTable thead th {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     font-weight: 700;
     padding: 1rem;
     text-align: center;
-    border-left: 1px solid rgba(255,255,255,0.1);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
     white-space: nowrap;
     font-size: 0.9rem;
   }
-  
+
   table.dataTable thead th:first-child {
     border-left: none;
   }
-  
+
   /* Group column colors for better organization */
   table.dataTable thead th.group-basic {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   }
-  
+
   table.dataTable thead th.group-dates {
     background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
   }
-  
+
   table.dataTable thead th.group-hours {
     background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
   }
-  
+
   table.dataTable thead th.group-parties {
     background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
   }
-  
+
   table.dataTable thead th.group-services {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
   }
-  
+
   table.dataTable thead th.group-operations {
     background: linear-gradient(135deg, #fd7e14 0%, #e66a0a 100%);
   }
-  
+
   table.dataTable thead th.group-status {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
   }
-  
+
   table.dataTable tbody tr {
     transition: all 0.3s ease;
   }
-  
+
   table.dataTable tbody tr:hover {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, #fef7d6 0%, var(--light-color) 100%);
     transform: scale(1.005);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-  
+
   table.dataTable tbody td {
     padding: 1rem;
     text-align: center;
     font-weight: 500;
   }
-  
+
   /* Action Buttons in Table */
   .btn-action {
     padding: 0.4rem 0.8rem;
@@ -413,46 +415,46 @@ $supplier_id = intval($_GET['id']);
     margin: 0 0.2rem;
     transition: all 0.3s ease;
     border: none;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
-  
+
   .btn-action i {
     margin: 0;
   }
-  
+
   .btn-action-edit {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: var(--text-color);
   }
-  
+
   .btn-action-edit:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 8px rgba(255, 204, 0, 0.3);
   }
-  
+
   .btn-action-delete {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
     color: white;
   }
-  
+
   .btn-action-delete:hover {
     background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
   }
-  
+
   .btn-action-view {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
   }
-  
+
   .btn-action-view:hover {
     background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
   }
-  
+
   /* Group Toggle Buttons */
   .btn-group-toggle {
     padding: 0.5rem 1rem;
@@ -468,25 +470,25 @@ $supplier_id = intval($_GET['id']);
     align-items: center;
     gap: 6px;
   }
-  
+
   .btn-group-toggle:hover {
-    border-color: #667eea;
-    color: #667eea;
+    border-color: var(--primary-color);
+    color: var(--gold-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 10px rgba(255, 204, 0, 0.2);
   }
-  
+
   .btn-group-toggle.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     border-color: transparent;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
   }
-  
+
   .btn-group-toggle.active:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
   }
-  
+
   .btn-group-toggle-all {
     padding: 0.5rem 1.2rem;
     border: 2px solid #28a745;
@@ -501,59 +503,64 @@ $supplier_id = intval($_GET['id']);
     align-items: center;
     gap: 6px;
   }
-  
+
   .btn-group-toggle-all:hover {
     background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
   }
-  
+
   /* Hidden columns */
   .group-hidden {
     display: none !important;
   }
-  
+
   /* Responsive table */
   @media (max-width: 1400px) {
     table.dataTable {
       font-size: 0.85rem;
     }
-    
+
     table.dataTable thead th,
     table.dataTable tbody td {
       padding: 0.7rem 0.5rem;
     }
   }
-  
+
   /* Animation */
   @keyframes fadeInUp {
     from {
       opacity: 0;
       transform: translateY(30px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
-  
+
   /* Responsive */
   @media (max-width: 768px) {
     .aligin {
       justify-content: center;
     }
-    
+
     .aligin .add {
       flex: 1 1 45%;
     }
-    
+
     .form-grid {
       grid-template-columns: 1fr;
     }
-    
+
     .totals {
       grid-template-columns: repeat(2, 1fr);
     }
+  }
+
+  table.dataTable thead th {
+    color: #ffffff !important;
   }
 </style>
 
@@ -562,9 +569,6 @@ $supplier_id = intval($_GET['id']);
   <?php include('../insidebar.php'); ?>
 
   <div class="main">
-
-    <h2><i class="fas fa-file-contract"></i> إدارة عقود المورد</h2>
-    
     <div class="aligin">
       <a href="javascript:void(0)" id="toggleForm" class="add">
         <i class="fas fa-plus-circle"></i> عقد جديد
@@ -591,7 +595,7 @@ $supplier_id = intval($_GET['id']);
           <!-- القسم 1: اختيار المشروع والمنجم والعقد -->
           <div class="section-title"><span class="chip">1</span> اختيار المشروع والمنجم والعقد</div>
           <br>
-          
+
           <div class="form-grid">
             <div class="field md-4">
               <label>اسم المشروع <font color="red">*</font></label>
@@ -609,7 +613,7 @@ $supplier_id = intval($_GET['id']);
                 </select>
               </div>
             </div>
-            
+
             <div class="field md-4">
               <label>المنجم <font color="red">*</font></label>
               <div class="control">
@@ -618,7 +622,7 @@ $supplier_id = intval($_GET['id']);
                 </select>
               </div>
             </div>
-            
+
             <div class="field md-4">
               <label>عقد المنجم <font color="red">*</font></label>
               <div class="control">
@@ -628,26 +632,31 @@ $supplier_id = intval($_GET['id']);
               </div>
             </div>
           </div>
-          
+
           <!-- عرض معلومات ساعات العقد -->
-          <div id="projectHoursInfo" style="display:none; margin: 1rem 0; padding: 1.5rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 15px; border-right: 4px solid #2196f3; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+          <div id="projectHoursInfo"
+            style="display:none; margin: 1rem 0; padding: 1.5rem; background: linear-gradient(135deg, #fff7d1 0%, #ffe8a3 100%); border-radius: 15px; border-right: 4px solid var(--primary-color); box-shadow: 0 3px 10px var(--shadow-color);">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-              <div style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div
+                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <strong style="color: #1976d2; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
                   <i class="fas fa-clock"></i> إجمالي ساعات العقد
                 </strong>
                 <div style="font-size: 2rem; color: #0d47a1; font-weight: 700;" id="contractTotalHours">0</div>
-                <div id="equipmentBreakdown" style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 2px dashed #e3f2fd; font-size: 0.85rem;">
+                <div id="equipmentBreakdown"
+                  style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 2px dashed #e3f2fd; font-size: 0.85rem;">
                   <!-- سيتم ملء التفصيل هنا -->
                 </div>
               </div>
-              <div style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div
+                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <strong style="color: #d32f2f; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
                   <i class="fas fa-handshake"></i> المتعاقد عليه مع موردين
                 </strong>
                 <div style="font-size: 2rem; color: #c62828; font-weight: 700;" id="suppliersContractedHours">0</div>
               </div>
-              <div style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div
+                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <strong style="color: #388e3c; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
                   <i class="fas fa-chart-line"></i> الساعات المتبقية
                 </strong>
@@ -679,9 +688,11 @@ $supplier_id = intval($_GET['id']);
             </div>
           </div>
 
-          <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px; border-right: 4px solid #667eea;">
+          <div
+            style="margin-top: 2rem; padding: 1rem; background: var(--light-color); border-radius: 10px; border-right: 4px solid var(--primary-color);">
             <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
-              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على البيانات المدخلة في الأقسام التالية
+              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
+              البيانات المدخلة في الأقسام التالية
             </p>
           </div>
 
@@ -698,30 +709,30 @@ $supplier_id = intval($_GET['id']);
               <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
             </div>
 
-                <div class="field md-3 sm-6">
+            <div class="field md-3 sm-6">
               <label>فترة السماح بين التوقيع والتنفيذ </label>
               <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0"
                   placeholder="عدد الأيام"></div>
             </div>
 
-             <div class="field md-3 sm-6">
+            <div class="field md-3 sm-6">
               <label>بداية التنفيذ الفعلي المتفق عليه</label>
               <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
             </div>
 
 
-               <div class="field md-3 sm-6">
+            <div class="field md-3 sm-6">
               <label>نهاية التنفيذ الفعلي المتفق عليه</label>
               <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
             </div>
 
-        
-           
+
+
             <!-- خانتان فارغتان -->
-           
+
 
             <!-- صف 2: 3 خانات -->
-         
+
             <div class="field md-3 sm-6">
               <label>مدة العقد بالأيام </label>
               <div class="control"><input name="contract_duration_days" id="contract_duration_days" type="number"
@@ -731,41 +742,41 @@ $supplier_id = intval($_GET['id']);
 
 
 
-        
-               <div class="field md-3 sm-6">
-                    <label>العملة</label>
-                    <div class="control">
-                      <select name="price_currency_contract" id="price_currency_contract">
-                        <option value="">— اختر —</option>
-                        <option value="دولار">دولار</option>
-                        <option value="جنيه">جنيه</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label>المبلغ المدفوع</label>
-                    <div class="control"><input name="paid_contract" type="text" ></div>
-                  </div>
 
-                    <div class="field md-3 sm-6">
-                    <label>وقت الدفع</label>
-                    <div class="control">
-                      <select name="payment_time" id="payment_time">
-                        <option value="">— اختر —</option>
-                        <option value="مقدم">مقدم</option>
-                        <option value=" مؤخر">مؤخر </option>
-  
-                      </select>
-                    </div>
-                  </div>
-           
-                     <div class="field md-3 sm-6">
-                    <label>  الضمانات</label>
-                    <div class="control"><input name="guarantees" type="text"></div>
-                  </div>
-                
-                      <div class="field md-3 sm-6">
-              <label>    تاريخ الدفع</label>
+            <div class="field md-3 sm-6">
+              <label>العملة</label>
+              <div class="control">
+                <select name="price_currency_contract" id="price_currency_contract">
+                  <option value="">— اختر —</option>
+                  <option value="دولار">دولار</option>
+                  <option value="جنيه">جنيه</option>
+                </select>
+              </div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>المبلغ المدفوع</label>
+              <div class="control"><input name="paid_contract" type="text"></div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label>وقت الدفع</label>
+              <div class="control">
+                <select name="payment_time" id="payment_time">
+                  <option value="">— اختر —</option>
+                  <option value="مقدم">مقدم</option>
+                  <option value=" مؤخر">مؤخر </option>
+
+                </select>
+              </div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label> الضمانات</label>
+              <div class="control"><input name="guarantees" type="text"></div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label> تاريخ الدفع</label>
               <div class="control"><input name="payment_date" id="payment_date" type="date"></div>
             </div>
 
@@ -777,36 +788,35 @@ $supplier_id = intval($_GET['id']);
 
 
 
-           
-        
-               <div class="field md-3 sm-6">
-                    <label>عدد الورديات للعقد </label>
-                    <div class="control"><input name="equip_shifts_contract" type="number" min="0" placeholder="مثال: 2"></div>
-                  </div>
 
-    <div class="field md-3 sm-6">
-                    <label> ساعات الوردية للعقد</label>
-                    <div class="control"><input name="shift_contract" type="number" min="0"></div>
-                  </div>
+
             <div class="field md-3 sm-6">
-                    <label>إجمالي الوحدات يومياً للعقد </label>
-                    <div class="control"><input name="equip_total_contract" type="number" 
-                        placeholder=" "></div>
-                  </div>
-                     <div class="field md-3 sm-6">
-                    <label>وحدات العمل  في الشهر للعقد</label>
-                    <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
-                  </div>
-                
-               
-                  <div class="field md-3 sm-6">
-                    <label>إجمالي وحدات العقد  </label>
-                    <div class="control"><input name="total_contract" type="number" 
-                        placeholder=" "></div>
-                  </div>
+              <label>عدد الورديات للعقد </label>
+              <div class="control"><input name="equip_shifts_contract" type="number" min="0" placeholder="مثال: 2">
+              </div>
+            </div>
 
-                      <div class="field md-3 sm-6">
-              <label>مدراء الموقع   </label>
+            <div class="field md-3 sm-6">
+              <label> ساعات الوردية للعقد</label>
+              <div class="control"><input name="shift_contract" type="number" min="0"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>إجمالي الوحدات يومياً للعقد </label>
+              <div class="control"><input name="equip_total_contract" type="number" placeholder=" "></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>وحدات العمل في الشهر للعقد</label>
+              <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
+            </div>
+
+
+            <div class="field md-3 sm-6">
+              <label>إجمالي وحدات العقد </label>
+              <div class="control"><input name="total_contract" type="number" placeholder=" "></div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label>مدراء الموقع </label>
               <div class="control"><input type="number" name="daily_operators" id="daily_operators" min="0"
                   placeholder="مثال: 3"></div>
             </div>
@@ -824,8 +834,8 @@ $supplier_id = intval($_GET['id']);
                 </select>
               </div>
             </div>
-          
-    <div class="field md-3 sm-6">
+
+            <div class="field md-3 sm-6">
               <label>السكن (Place for Living)</label>
               <div class="control">
                 <select name="place_for_living" id="place_for_living">
@@ -848,7 +858,7 @@ $supplier_id = intval($_GET['id']);
                 </select>
               </div>
             </div>
-        
+
             <div class="field md-3 sm-6">
               <label>الورشة (Workshop)</label>
               <div class="control">
@@ -897,23 +907,23 @@ $supplier_id = intval($_GET['id']);
                     <div class="control"><input name="equip_count_1" type="number" min="0"></div>
                   </div>
 
-            
 
-                
 
-                      <div class="field md-3 sm-6">
+
+
+                  <div class="field md-3 sm-6">
                     <label>عدد المشغلين</label>
                     <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
                   </div>
 
-                  
+
                   <div class="field md-3 sm-6">
                     <label>عدد المساعدين</label>
                     <div class="control"><input name="equip_assistants_1" type="number" min="0"></div>
                   </div>
-              
-             
-                    <div class="field md-3 sm-6">
+
+
+                  <div class="field md-3 sm-6">
                     <label>عدد الورديات</label>
                     <div class="control"><input name="equip_shifts_1" type="number" min="0" placeholder="مثال: 2"></div>
                   </div>
@@ -934,7 +944,7 @@ $supplier_id = intval($_GET['id']);
                     <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
                     <div class="control"><input name="shift2_end_1" type="time" placeholder="مثال: 00:00"></div>
                   </div>
-           <div class="field md-3 sm-6">
+                  <div class="field md-3 sm-6">
                     <label>وحدة القياس</label>
                     <div class="control">
                       <select name="equip_unit_1" class="equip-unit">
@@ -951,25 +961,25 @@ $supplier_id = intval($_GET['id']);
                     <label>ساعات الوردية</label>
                     <div class="control"><input name="shift_hours_1" type="number" min="0"></div>
                   </div>
-            <div class="field md-3 sm-6">
+                  <div class="field md-3 sm-6">
                     <label>إجمالي الوحدات يومياً</label>
                     <div class="control"><input name="equip_total_month_1" type="number" readonly
                         placeholder="يُحتسب تلقائياً"></div>
                   </div>
-                     <div class="field md-3 sm-6">
-                    <label>وحدات العمل  في الشهر</label>
+                  <div class="field md-3 sm-6">
+                    <label>وحدات العمل في الشهر</label>
                     <div class="control"><input name="equip_target_per_month_1" type="number" min="0"></div>
                   </div>
-                
-               
+
+
                   <div class="field md-3 sm-6">
                     <label>إجمالي وحدات العقد</label>
                     <div class="control"><input name="equip_total_contract_1" type="number" readonly
                         placeholder="يُحتسب تلقائياً"></div>
                   </div>
 
-                  
-                     <div class="field md-3 sm-6">
+
+                  <div class="field md-3 sm-6">
                     <label>العملة</label>
                     <div class="control">
                       <select name="equip_price_currency_1">
@@ -984,23 +994,23 @@ $supplier_id = intval($_GET['id']);
                     <div class="control"><input name="equip_price_1" type="number" min="0" step="0.01"
                         placeholder="0.00"></div>
                   </div>
-               
-                   <div class="field md-3 sm-6">
-                 
-                  </div>
-                
-                  
 
-              
-              
+                  <div class="field md-3 sm-6">
+
+                  </div>
+
+
+
+
+
                   <!-- خانتان فارغتان للحفاظ على 3 خانات لكل صف -->
-                
-                   <div class="field md-3 sm-6">
+
+                  <div class="field md-3 sm-6">
                     <label>عدد المشرفين</label>
                     <div class="control"><input name="equip_supervisors_1" type="number" min="0"></div>
                   </div>
 
-                      <div class="field md-3 sm-6">
+                  <div class="field md-3 sm-6">
                     <label>عدد الفنيين</label>
                     <div class="control"><input name="equip_technicians_1" type="number" min="0"></div>
                   </div>
@@ -1013,7 +1023,8 @@ $supplier_id = intval($_GET['id']);
           </div>
 
           <div style="margin: 15px 0; display: flex; gap: 10px;">
-            <button type="button" class="primary" id="addEquipmentBtn" style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
+            <button type="button" class="primary" id="addEquipmentBtn"
+              style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
               <i class="fas fa-plus-circle"></i> إضافة مزيد من المعدات
             </button>
           </div>
@@ -1024,15 +1035,15 @@ $supplier_id = intval($_GET['id']);
 
           <div class="form-grid">
 
-             <div class="field md-3 sm-6" style="display: none;">
+            <div class="field md-3 sm-6" style="display: none;">
               <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
               <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
                   placeholder="مثال: 8" value="20"></div>
             </div>
-             <!-- Orgnization Break  -->
-            
+            <!-- Orgnization Break  -->
 
-            
+
+
             <div class="field md-3 sm-6">
               <label>الطرف الأول </label>
               <div class="control"><input type="text" name="first_party" id="first_party"
@@ -1040,7 +1051,7 @@ $supplier_id = intval($_GET['id']);
               </div>
             </div>
 
-           
+
 
             <div class="field md-3 sm-6">
               <label>الطرف الثاني </label>
@@ -1049,7 +1060,7 @@ $supplier_id = intval($_GET['id']);
               </div>
             </div>
 
-                                    <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
 
             <div class="field md-3 sm-6">
               <label>الشاهد الأول</label>
@@ -1067,7 +1078,8 @@ $supplier_id = intval($_GET['id']);
 
 
           <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
-            <button type="reset" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <button type="reset"
+              style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
               <i class="fas fa-eraser"></i> تفريغ الحقول
             </button>
             <button type="submit" class="primary" style="padding: 0.75rem 3rem;">
@@ -1083,11 +1095,11 @@ $supplier_id = intval($_GET['id']);
           <i class="fas fa-list-alt"></i> قائمة العقود
         </h5>
       </div>
-      
+
       <!-- أزرار التحكم في المجموعات -->
       <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0;">
         <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-          <span style="font-weight: 700; color: #667eea; margin-left: 10px;">
+          <span style="font-weight: 700; color: var(--primary-color ); margin-left: 10px;">
             <i class="fas fa-filter"></i> عرض المجموعات:
           </span>
           <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
@@ -1116,7 +1128,7 @@ $supplier_id = intval($_GET['id']);
           </button>
         </div>
       </div>
-      
+
       <div class="card-body" style="padding: 2rem; overflow-x: auto;">
         <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
           <thead>
@@ -1126,41 +1138,41 @@ $supplier_id = intval($_GET['id']);
               <th class="group-basic"><i class="fas fa-project-diagram"></i> المشروع</th>
               <th class="group-basic"><i class="fas fa-mountain"></i> المنجم</th>
               <th class="group-basic"><i class="fas fa-file-contract"></i> رقم عقد المنجم</th>
-              
+
               <!-- التواريخ والمدد -->
               <th class="group-dates"><i class="far fa-calendar"></i> تاريخ التوقيع</th>
               <th class="group-dates"><i class="fas fa-hourglass-half"></i> مدة السماح (أيام)</th>
               <th class="group-dates"><i class="fas fa-calendar-days"></i> مدة العقد (أيام)</th>
               <th class="group-dates"><i class="fas fa-play-circle"></i> بداية التنفيذ</th>
               <th class="group-dates"><i class="fas fa-stop-circle"></i> نهاية التنفيذ</th>
-              
+
               <!-- الساعات والأهداف -->
               <th class="group-hours"><i class="far fa-clock"></i> هدف ساعات شهري</th>
               <th class="group-hours"><i class="fas fa-clock"></i> إجمالي ساعات متوقعة</th>
-              
+
               <!-- أطراف العقد -->
               <th class="group-parties"><i class="fas fa-user-tie"></i> الطرف الأول</th>
               <th class="group-parties"><i class="fas fa-user-check"></i> الطرف الثاني</th>
               <th class="group-parties"><i class="fas fa-eye"></i> شاهد أول</th>
               <th class="group-parties"><i class="fas fa-eye"></i> شاهد ثاني</th>
-              
+
               <!-- الخدمات المقدمة -->
               <th class="group-services"><i class="fas fa-truck"></i> النقل</th>
               <th class="group-services"><i class="fas fa-bed"></i> السكن</th>
               <th class="group-services"><i class="fas fa-home"></i> مكان المعيشة</th>
               <th class="group-services"><i class="fas fa-wrench"></i> الورشة</th>
-              
+
               <!-- التشغيل اليومي -->
               <th class="group-operations"><i class="fas fa-business-time"></i> ساعات العمل يومياً</th>
               <th class="group-operations"><i class="fas fa-users-cog"></i> عدد المشغلين يومياً</th>
-              
+
               <!-- البيانات المالية -->
               <th class="group-basic"><i class="fas fa-money-bill-wave"></i> العملة</th>
               <th class="group-basic"><i class="fas fa-dollar-sign"></i> المبلغ المدفوع</th>
               <th class="group-basic"><i class="fas fa-clock"></i> وقت الدفع</th>
               <th class="group-basic"><i class="fas fa-shield-alt"></i> الضمانات</th>
               <th class="group-basic"><i class="fas fa-calendar-check"></i> تاريخ الدفع</th>
-              
+
               <!-- الحالة والإجراءات -->
               <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
               <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
@@ -1178,7 +1190,7 @@ $supplier_id = intval($_GET['id']);
               $project_id = intval($_POST['project_id']);
               $mine_id = isset($_POST['mine_id']) ? intval($_POST['mine_id']) : 0;
               $project_contract_id = intval($_POST['project_contract_id']);
-            
+
 
               $contract_signing_date = mysqli_real_escape_string($conn, $_POST['contract_signing_date']);
               $grace_period_days = intval($_POST['grace_period_days']);
@@ -1391,52 +1403,52 @@ $supplier_id = intval($_GET['id']);
               $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
 
               echo "<tr>";
-              
+
               // المعلومات الأساسية
               echo "<td class='group-basic'>" . $row['id'] . "</td>";
               echo "<td class='group-basic'>" . (isset($row['project_name']) ? $row['project_name'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['mine_name']) ? $row['mine_name'] . ' (' . $row['mine_code'] . ')' : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['project_contract_id']) ? 'عقد #' . $row['project_contract_id'] : '-') . "</td>";
-              
+
               // التواريخ والمدد
               echo "<td class='group-dates'>" . $row['contract_signing_date'] . "</td>";
               echo "<td class='group-dates'>" . (isset($row['grace_period_days']) ? $row['grace_period_days'] : 0) . "</td>";
               echo "<td class='group-dates'>" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "</td>";
               echo "<td class='group-dates'>" . $row['actual_start'] . "</td>";
               echo "<td class='group-dates'>" . $row['actual_end'] . "</td>";
-              
+
               // الساعات والأهداف
               echo "<td class='group-hours'>" . $row['hours_monthly_target'] . "</td>";
               echo "<td class='group-hours'>" . $row['forecasted_contracted_hours'] . "</td>";
-              
+
               // أطراف العقد
               echo "<td class='group-parties'>" . (isset($row['first_party']) ? $row['first_party'] : '-') . "</td>";
               echo "<td class='group-parties'>" . (isset($row['second_party']) ? $row['second_party'] : '-') . "</td>";
               echo "<td class='group-parties'>" . (isset($row['witness_one']) ? $row['witness_one'] : '-') . "</td>";
               echo "<td class='group-parties'>" . (isset($row['witness_two']) ? $row['witness_two'] : '-') . "</td>";
-              
+
               // الخدمات المقدمة
               $transportationText = isset($row['transportation']) && $row['transportation'] ? $row['transportation'] : '-';
               $accommodationText = isset($row['accommodation']) && $row['accommodation'] ? $row['accommodation'] : '-';
               $place_for_livingText = isset($row['place_for_living']) && $row['place_for_living'] ? $row['place_for_living'] : '-';
               $workshopText = isset($row['workshop']) && $row['workshop'] ? $row['workshop'] : '-';
-              
+
               echo "<td class='group-services'>" . $transportationText . "</td>";
               echo "<td class='group-services'>" . $accommodationText . "</td>";
               echo "<td class='group-services'>" . $place_for_livingText . "</td>";
               echo "<td class='group-services'>" . $workshopText . "</td>";
-              
+
               // التشغيل اليومي
               echo "<td class='group-operations'>" . (isset($row['daily_work_hours']) ? $row['daily_work_hours'] : '-') . "</td>";
               echo "<td class='group-operations'>" . (isset($row['daily_operators']) ? $row['daily_operators'] : '-') . "</td>";
-              
+
               // البيانات المالية
               echo "<td class='group-basic'>" . (isset($row['price_currency_contract']) && $row['price_currency_contract'] ? $row['price_currency_contract'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['paid_contract']) && $row['paid_contract'] ? $row['paid_contract'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['payment_time']) && $row['payment_time'] ? $row['payment_time'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['guarantees']) && $row['guarantees'] ? $row['guarantees'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['payment_date']) && $row['payment_date'] ? $row['payment_date'] : '-') . "</td>";
-              
+
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";
 
@@ -1512,7 +1524,6 @@ $supplier_id = intval($_GET['id']);
 
       $(document).ready(function () {
         $('#projectsTable').DataTable({
-          responsive: true,
           dom: 'Bfrtip', // Buttons + Search + Pagination
           buttons: [
             { extend: 'copy', text: 'نسخ' },
@@ -1785,22 +1796,22 @@ $supplier_id = intval($_GET['id']);
     recalc();
 
     // جلب مناجم المشروع عند تغيير المشروع
-    $('#project_id').on('change', function() {
+    $('#project_id').on('change', function () {
       const projectId = $(this).val();
       $('#mine_id').prop('disabled', true).html('<option value="">— جاري التحميل... —</option>');
       $('#project_contract_id').prop('disabled', true).html('<option value="">— اختر المنجم أولاً —</option>');
       $('#projectHoursInfo').fadeOut();
-      
+
       if (projectId) {
         $.ajax({
           url: 'get_project_mines.php',
           type: 'POST',
           data: { project_id: projectId },
           dataType: 'json',
-          success: function(response) {
+          success: function (response) {
             if (response.success && response.mines.length > 0) {
               let options = '<option value="">— اختر المنجم —</option>';
-              response.mines.forEach(function(mine) {
+              response.mines.forEach(function (mine) {
                 options += `<option value="${mine.id}">${mine.display_name}</option>`;
               });
               $('#mine_id').html(options).prop('disabled', false);
@@ -1808,7 +1819,7 @@ $supplier_id = intval($_GET['id']);
               $('#mine_id').html('<option value="">— لا توجد مناجم لهذا المشروع —</option>').prop('disabled', true);
             }
           },
-          error: function() {
+          error: function () {
             $('#mine_id').html('<option value="">— خطأ في التحميل —</option>').prop('disabled', true);
           }
         });
@@ -1819,21 +1830,21 @@ $supplier_id = intval($_GET['id']);
     });
 
     // جلب عقود المنجم عند تغيير المنجم
-    $('#mine_id').on('change', function() {
+    $('#mine_id').on('change', function () {
       const mineId = $(this).val();
       $('#project_contract_id').prop('disabled', true).html('<option value="">— جاري التحميل... —</option>');
       $('#projectHoursInfo').fadeOut();
-      
+
       if (mineId) {
         $.ajax({
           url: 'get_mine_contracts.php',
           type: 'POST',
           data: { mine_id: mineId },
           dataType: 'json',
-          success: function(response) {
+          success: function (response) {
             if (response.success && response.contracts.length > 0) {
               let options = '<option value="">— اختر العقد —</option>';
-              response.contracts.forEach(function(contract) {
+              response.contracts.forEach(function (contract) {
                 options += `<option value="${contract.id}">${contract.display_name}</option>`;
               });
               $('#project_contract_id').html(options).prop('disabled', false);
@@ -1841,7 +1852,7 @@ $supplier_id = intval($_GET['id']);
               $('#project_contract_id').html('<option value="">— لا توجد عقود لهذا المنجم —</option>').prop('disabled', true);
             }
           },
-          error: function() {
+          error: function () {
             $('#project_contract_id').html('<option value="">— خطأ في التحميل —</option>').prop('disabled', true);
           }
         });
@@ -1851,51 +1862,51 @@ $supplier_id = intval($_GET['id']);
     });
 
     // جلب بيانات ساعات العقد عند تغيير العقد
-    $('#project_contract_id').on('change', function() {
+    $('#project_contract_id').on('change', function () {
       const contractId = $(this).val();
       const supplierContractId = $('#contract_id').val();
       if (contractId) {
         $.ajax({
           url: 'get_project_hours.php',
           type: 'POST',
-          data: { 
+          data: {
             project_contract_id: contractId,
             supplier_contract_id: supplierContractId || 0
           },
           dataType: 'json',
-          success: function(response) {
+          success: function (response) {
             if (response.success) {
               $('#contractTotalHours').text(new Intl.NumberFormat('ar-EG').format(response.contract_total_hours));
               $('#suppliersContractedHours').text(new Intl.NumberFormat('ar-EG').format(response.suppliers_contracted_hours));
               $('#remainingHours').text(new Intl.NumberFormat('ar-EG').format(response.remaining_hours));
-              
+
               // عرض تفصيل المعدات
               var breakdownDiv = $('#equipmentBreakdown');
               breakdownDiv.empty();
-              
+
               if (response.equipment_breakdown && response.equipment_breakdown.length > 0) {
                 var breakdownHtml = '<div style="color: #555;"><strong style="color: #1976d2; display: block; margin-bottom: 0.5rem;">تفصيل الساعات:</strong>';
-                
-                response.equipment_breakdown.forEach(function(item) {
+
+                response.equipment_breakdown.forEach(function (item) {
                   var percentage = ((item.hours / response.contract_total_hours) * 100).toFixed(1);
                   breakdownHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; padding: 0.3rem 0;">';
                   breakdownHtml += '<span><i class="fas fa-tools" style="color: #1976d2; margin-left: 0.3rem;"></i>' + item.type + '</span>';
                   breakdownHtml += '<span style="font-weight: 600; color: #0d47a1;">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
                   breakdownHtml += '</div>';
                 });
-                
+
                 breakdownHtml += '</div>';
                 breakdownDiv.html(breakdownHtml);
               } else {
                 breakdownDiv.html('<span style="color: #999; font-style: italic;">لا توجد معدات مسجلة لهذا العقد</span>');
               }
-              
+
               $('#projectHoursInfo').fadeIn();
             } else {
               $('#projectHoursInfo').fadeOut();
             }
           },
-          error: function() {
+          error: function () {
             $('#projectHoursInfo').fadeOut();
           }
         });
@@ -1908,14 +1919,14 @@ $supplier_id = intval($_GET['id']);
     $(document).on("click", ".editBtn", function () {
       $("#projectForm").show();
       $("#contract_id").val($(this).data("id"));
-      
+
       // تحميل المشروع والمنجم والعقد
       const projectId = $(this).data("project_id");
       const mineId = $(this).data("mine_id");
       const projectContractId = $(this).data("project_contract_id");
-      
+
       $("#project_id").val(projectId);
-      
+
       // تحميل مناجم المشروع أولاً
       if (projectId) {
         $.ajax({
@@ -1923,15 +1934,15 @@ $supplier_id = intval($_GET['id']);
           type: 'POST',
           data: { project_id: projectId },
           dataType: 'json',
-          success: function(response) {
+          success: function (response) {
             if (response.success && response.mines.length > 0) {
               let mineOptions = '<option value="">— اختر المنجم —</option>';
-              response.mines.forEach(function(mine) {
+              response.mines.forEach(function (mine) {
                 const selected = mine.id == mineId ? 'selected' : '';
                 mineOptions += `<option value="${mine.id}" ${selected}>${mine.display_name}</option>`;
               });
               $('#mine_id').html(mineOptions).prop('disabled', false);
-              
+
               // تحميل عقود المنجم
               if (mineId) {
                 $.ajax({
@@ -1939,15 +1950,15 @@ $supplier_id = intval($_GET['id']);
                   type: 'POST',
                   data: { mine_id: mineId },
                   dataType: 'json',
-                  success: function(contractResponse) {
+                  success: function (contractResponse) {
                     if (contractResponse.success && contractResponse.contracts.length > 0) {
                       let options = '<option value="">— اختر العقد —</option>';
-                      contractResponse.contracts.forEach(function(contract) {
+                      contractResponse.contracts.forEach(function (contract) {
                         const selected = contract.id == projectContractId ? 'selected' : '';
                         options += `<option value="${contract.id}" ${selected}>${contract.display_name}</option>`;
                       });
                       $('#project_contract_id').html(options).prop('disabled', false);
-                      
+
                       // تفعيل تحميل بيانات الساعات
                       if (projectContractId) {
                         $('#project_contract_id').trigger('change');
@@ -1960,7 +1971,7 @@ $supplier_id = intval($_GET['id']);
           }
         });
       }
-      
+
       $("#projectForm [name='contract_signing_date']").val($(this).data("contract_signing_date"));
       $("#projectForm [name='grace_period_days']").val($(this).data("grace_period_days"));
       $("#projectForm [name='contract_duration_days']").val($(this).data("contract_duration_days"));
@@ -2176,7 +2187,7 @@ $supplier_id = intval($_GET['id']);
 
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
     });
-    
+
     // ==================== Group Toggle Functionality ====================
     // حفظ حالة المجموعات في localStorage
     const groupStates = JSON.parse(localStorage.getItem('supplierContractGroupStates')) || {
@@ -2188,14 +2199,14 @@ $supplier_id = intval($_GET['id']);
       operations: false,
       status: true
     };
-    
+
     // تطبيق الحالة المحفوظة عند تحميل الصفحة
     function applyGroupStates() {
       Object.keys(groupStates).forEach(group => {
         const isActive = groupStates[group];
         const btn = $(`.btn-group-toggle[data-group="${group}"]`);
         const columns = $(`.group-${group}`);
-        
+
         if (isActive) {
           btn.addClass('active');
           columns.removeClass('group-hidden');
@@ -2205,15 +2216,15 @@ $supplier_id = intval($_GET['id']);
         }
       });
     }
-    
+
     // تطبيق الحالة عند تحميل الصفحة
     applyGroupStates();
-    
+
     // التحكم في إظهار/إخفاء المجموعات
-    $('.btn-group-toggle').on('click', function() {
+    $('.btn-group-toggle').on('click', function () {
       const group = $(this).data('group');
       const isActive = $(this).hasClass('active');
-      
+
       if (isActive) {
         // إخفاء المجموعة
         $(this).removeClass('active');
@@ -2225,15 +2236,15 @@ $supplier_id = intval($_GET['id']);
         $(`.group-${group}`).removeClass('group-hidden');
         groupStates[group] = true;
       }
-      
+
       // حفظ الحالة
       localStorage.setItem('supplierContractGroupStates', JSON.stringify(groupStates));
     });
-    
+
     // زر إظهار/إخفاء الكل
-    $('.btn-group-toggle-all').on('click', function() {
+    $('.btn-group-toggle-all').on('click', function () {
       const allActive = Object.values(groupStates).every(state => state);
-      
+
       if (allActive) {
         // إخفاء الكل
         $('.btn-group-toggle').removeClass('active');
@@ -2247,13 +2258,13 @@ $supplier_id = intval($_GET['id']);
         Object.keys(groupStates).forEach(key => groupStates[key] = true);
         $(this).html('<i class="fas fa-eye"></i> الكل');
       }
-      
+
       // حفظ الحالة
       localStorage.setItem('supplierContractGroupStates', JSON.stringify(groupStates));
     });
-    
+
     // تحديث نص زر "الكل" عند التحميل
-    $(document).ready(function() {
+    $(document).ready(function () {
       const allActive = Object.values(groupStates).every(state => state);
       if (allActive) {
         $('.btn-group-toggle-all').html('<i class="fas fa-eye"></i> الكل');
