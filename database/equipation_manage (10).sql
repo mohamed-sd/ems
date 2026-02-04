@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 04, 2026 at 12:34 PM
+-- Generation Time: Feb 04, 2026 at 04:21 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -236,6 +236,45 @@ INSERT INTO `contract_notes` (`id`, `contract_id`, `note`, `user_id`, `created_a
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `drivercontractequipments`
+--
+
+CREATE TABLE `drivercontractequipments` (
+  `id` int(11) NOT NULL,
+  `contract_id` int(11) NOT NULL COMMENT 'معرف عقد السائق من جدول drivercontracts',
+  `equip_type` varchar(100) DEFAULT NULL COMMENT 'نوع المعدة (حفار، قلاب، خرامة)',
+  `equip_size` int(11) DEFAULT NULL COMMENT 'حجم المعدة',
+  `equip_count` int(11) DEFAULT NULL COMMENT 'عدد المعدات',
+  `equip_shifts` int(11) DEFAULT NULL COMMENT 'عدد الورديات',
+  `equip_unit` varchar(50) DEFAULT NULL COMMENT 'وحدة القياس (ساعة، طن، متر)',
+  `shift1_start` time DEFAULT NULL COMMENT 'بداية الوردية الأولى',
+  `shift1_end` time DEFAULT NULL COMMENT 'نهاية الوردية الأولى',
+  `shift2_start` time DEFAULT NULL COMMENT 'بداية الوردية الثانية',
+  `shift2_end` time DEFAULT NULL COMMENT 'نهاية الوردية الثانية',
+  `shift_hours` decimal(10,2) DEFAULT NULL COMMENT 'ساعات الوردية',
+  `equip_total_month` decimal(10,2) DEFAULT NULL COMMENT 'إجمالي الوحدات يومياً',
+  `equip_monthly_target` decimal(10,2) DEFAULT NULL COMMENT 'وحدات العمل في الشهر',
+  `equip_total_contract` decimal(10,2) DEFAULT NULL COMMENT 'إجمالي وحدات العقد',
+  `equip_price` decimal(10,2) DEFAULT NULL COMMENT 'السعر للوحدة',
+  `equip_price_currency` varchar(20) DEFAULT NULL COMMENT 'العملة (دولار، جنيه)',
+  `equip_operators` int(11) DEFAULT NULL COMMENT 'عدد المشغلين',
+  `equip_supervisors` int(11) DEFAULT NULL COMMENT 'عدد المشرفين',
+  `equip_technicians` int(11) DEFAULT NULL COMMENT 'عدد الفنيين',
+  `equip_assistants` int(11) DEFAULT NULL COMMENT 'عدد المساعدين',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='معدات عقود السائقين';
+
+--
+-- Dumping data for table `drivercontractequipments`
+--
+
+INSERT INTO `drivercontractequipments` (`id`, `contract_id`, `equip_type`, `equip_size`, `equip_count`, `equip_shifts`, `equip_unit`, `shift1_start`, `shift1_end`, `shift2_start`, `shift2_end`, `shift_hours`, `equip_total_month`, `equip_monthly_target`, `equip_total_contract`, `equip_price`, `equip_price_currency`, `equip_operators`, `equip_supervisors`, `equip_technicians`, `equip_assistants`, `created_at`) VALUES
+(1, 3, 'حفار', 340, 3, 0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 10.00, 30.00, 0.00, 750.00, 0.00, '', 0, 0, 0, 0, '2026-02-04 14:33:08'),
+(2, 4, 'خرامة', 3409, 2, 0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 10.00, 20.00, 0.00, 660.00, 0.00, '', 0, 0, 0, 0, '2026-02-04 15:16:16');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `drivercontracts`
 --
 
@@ -246,6 +285,11 @@ CREATE TABLE `drivercontracts` (
   `grace_period_days` int(11) DEFAULT 0,
   `contract_duration_months` int(11) DEFAULT 0,
   `contract_duration_days` int(11) DEFAULT 0,
+  `equip_shifts_contract` int(11) DEFAULT 0 COMMENT 'عدد ورديات المعدات في العقد',
+  `shift_contract` int(11) DEFAULT 0 COMMENT 'الوردية',
+  `equip_total_contract_daily` decimal(10,2) DEFAULT 0.00 COMMENT 'إجمالي الوحدات اليومية للعقد',
+  `total_contract_permonth` decimal(10,2) DEFAULT 0.00 COMMENT 'إجمالي وحدات العمل في الشهر',
+  `total_contract_units` decimal(10,2) DEFAULT 0.00 COMMENT 'إجمالي وحدات العمل للعقد',
   `actual_start` date DEFAULT NULL,
   `actual_end` date DEFAULT NULL,
   `transportation` text DEFAULT NULL,
@@ -274,9 +318,29 @@ CREATE TABLE `drivercontracts` (
   `second_party` varchar(255) DEFAULT NULL,
   `witness_one` varchar(255) DEFAULT NULL,
   `witness_two` varchar(255) DEFAULT NULL,
+  `price_currency_contract` varchar(50) DEFAULT NULL COMMENT 'عملة العقد',
+  `paid_contract` decimal(10,2) DEFAULT 0.00 COMMENT 'المبلغ المدفوع',
+  `payment_time` varchar(50) DEFAULT NULL COMMENT 'وقت الدفع (مقدم/مؤخر)',
+  `guarantees` text DEFAULT NULL COMMENT 'الضمانات',
+  `payment_date` date DEFAULT NULL COMMENT 'تاريخ الدفع',
+  `pause_reason` text DEFAULT NULL COMMENT 'سبب الإيقاف',
+  `pause_date` date DEFAULT NULL COMMENT 'تاريخ الإيقاف',
+  `resume_date` date DEFAULT NULL COMMENT 'تاريخ الاستئناف',
+  `termination_type` varchar(50) DEFAULT NULL COMMENT 'نوع الإنهاء',
+  `termination_reason` text DEFAULT NULL COMMENT 'سبب الإنهاء',
+  `merged_with` int(11) DEFAULT NULL COMMENT 'دمج مع عقد آخر',
   `project_id` int(255) NOT NULL DEFAULT 0,
+  `mine_id` int(11) DEFAULT NULL COMMENT 'معرف المنجم',
+  `project_contract_id` int(11) DEFAULT NULL COMMENT 'معرف عقد المشروع',
   `status` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `drivercontracts`
+--
+
+INSERT INTO `drivercontracts` (`id`, `driver_id`, `contract_signing_date`, `grace_period_days`, `contract_duration_months`, `contract_duration_days`, `equip_shifts_contract`, `shift_contract`, `equip_total_contract_daily`, `total_contract_permonth`, `total_contract_units`, `actual_start`, `actual_end`, `transportation`, `accommodation`, `place_for_living`, `workshop`, `equip_type`, `equip_size`, `equip_count`, `equip_target_per_month`, `equip_total_month`, `equip_total_contract`, `mach_type`, `mach_size`, `mach_count`, `mach_target_per_month`, `mach_total_month`, `mach_total_contract`, `hours_monthly_target`, `forecasted_contracted_hours`, `created_at`, `updated_at`, `daily_work_hours`, `daily_operators`, `first_party`, `second_party`, `witness_one`, `witness_two`, `price_currency_contract`, `paid_contract`, `payment_time`, `guarantees`, `payment_date`, `pause_reason`, `pause_date`, `resume_date`, `termination_type`, `termination_reason`, `merged_with`, `project_id`, `mine_id`, `project_contract_id`, `status`) VALUES
+(4, 12, '2026-02-02', 0, 0, 34, 0, 0, 0.00, 0.00, 0.00, '2026-02-02', '2026-03-07', '', '', '', '', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 20, 660, '2026-02-04 15:16:16', NULL, '20', '0', '', '', '', '', '', 0.00, '', '', '0000-00-00', NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, 11, 1);
 
 -- --------------------------------------------------------
 
@@ -300,6 +364,27 @@ INSERT INTO `drivers` (`id`, `name`, `phone`, `status`) VALUES
 (10, 'omer', '0000000000000', 1),
 (11, 'ali', '00000000000', 1),
 (12, 'Ahmed', '09239', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `driver_contract_notes`
+--
+
+CREATE TABLE `driver_contract_notes` (
+  `id` int(11) NOT NULL,
+  `contract_id` int(11) NOT NULL COMMENT 'معرف عقد السائق',
+  `note` text NOT NULL COMMENT 'الملاحظة أو الإجراء المتخذ',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'تاريخ الإضافة'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجل التدقيق لإجراءات عقود السائقين';
+
+--
+-- Dumping data for table `driver_contract_notes`
+--
+
+INSERT INTO `driver_contract_notes` (`id`, `contract_id`, `note`, `created_at`) VALUES
+(1, 1, 'ØªÙ… ØªØ¬Ø¯ÙŠØ¯ Ø§Ù„Ø¹Ù‚Ø¯ Ù…Ù† 2026-02-28 Ø¥Ù„Ù‰ 2026-03-20 (Ù…Ø¯Ø©: 0 Ø´Ù‡ÙˆØ± / 20 ÙŠÙˆÙ…)', '2026-02-04 14:41:26'),
+(2, 1, 'تم تجديد العقد من 2026-03-20 إلى 2026-04-15 (مدة: 0 شهور / 26 يوم)', '2026-02-04 14:43:24');
 
 -- --------------------------------------------------------
 
@@ -740,16 +825,32 @@ ALTER TABLE `contract_notes`
   ADD KEY `idx_user_id` (`user_id`);
 
 --
+-- Indexes for table `drivercontractequipments`
+--
+ALTER TABLE `drivercontractequipments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `contract_id` (`contract_id`);
+
+--
 -- Indexes for table `drivercontracts`
 --
 ALTER TABLE `drivercontracts`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_drivercontracts_mine_id` (`mine_id`),
+  ADD KEY `idx_drivercontracts_project_contract_id` (`project_contract_id`);
 
 --
 -- Indexes for table `drivers`
 --
 ALTER TABLE `drivers`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `driver_contract_notes`
+--
+ALTER TABLE `driver_contract_notes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_driver_contract_notes_contract_id` (`contract_id`);
 
 --
 -- Indexes for table `equipments`
@@ -859,16 +960,28 @@ ALTER TABLE `contract_notes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
+-- AUTO_INCREMENT for table `drivercontractequipments`
+--
+ALTER TABLE `drivercontractequipments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `drivercontracts`
 --
 ALTER TABLE `drivercontracts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `drivers`
 --
 ALTER TABLE `drivers`
   MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `driver_contract_notes`
+--
+ALTER TABLE `driver_contract_notes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `equipments`
