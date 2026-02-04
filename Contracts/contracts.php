@@ -388,13 +388,13 @@ if (!isset($_SESSION['user'])) {
 
   table.dataTable thead th {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
     font-weight: 700;
     padding: 1rem;
     text-align: center;
     border-left: 1px solid rgba(255, 255, 255, 0.1);
     white-space: nowrap;
     font-size: 0.9rem;
+    color: white;
   }
 
   table.dataTable thead th:first-child {
@@ -413,6 +413,7 @@ if (!isset($_SESSION['user'])) {
 
   table.dataTable thead th.group-hours {
     background: linear-gradient(135deg, var(--gold-color) 0%, #d4a600 100%);
+    color : #010326 !important;
   }
 
   table.dataTable thead th.group-parties {
@@ -603,44 +604,49 @@ if (!isset($_SESSION['user'])) {
       grid-template-columns: repeat(2, 1fr);
     }
   }
-      /* Page Header */
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 20px;
-    }
 
-    .page-header h1 {
-        color: var(--primary-color);
-        font-size: 20px;
-        font-weight: 900;
-    }
+  /* Page Header */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
 
-    .btn-add {
-        background: var(--gold-color);
-        color: var(--primary-color);
-        padding: 12px 30px;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s ease;
-        font-family: 'Cairo', sans-serif;
-    }
+  .page-header h1 {
+    color: var(--primary-color);
+    font-size: 20px;
+    font-weight: 900;
+  }
 
-    .btn-add:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
-    }
+  .btn-add {
+    background: var(--gold-color);
+    color: var(--primary-color);
+    padding: 12px 30px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-family: 'Cairo', sans-serif;
+  }
 
-    .btn-add{
-      background-color: red;
-    }
+  .btn-add:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+  }
+
+  .btn-add {
+    background-color: red;
+  }
+
+  table.dataTable thead th {
+    color: #ffffff !important;
+  }
 </style>
 
 <body>
@@ -670,7 +676,8 @@ if (!isset($_SESSION['user'])) {
 
           <input type="hidden" name="id" id="contract_id" value="">
 
-          <input type="hidden" name="mine_id" placeholder="معرف المنجم" value="<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>" required />
+          <input type="hidden" name="mine_id" placeholder="معرف المنجم"
+            value="<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>" required />
 
           <!-- القسم 1: إجماليات الساعات (يومياً وللعقد) -->
           <div class="section-title"><span class="chip">1</span> إجماليات الساعات (يومياً وللعقد)</div>
@@ -1191,7 +1198,7 @@ if (!isset($_SESSION['user'])) {
 
               $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
               $mine_id = intval($_POST['mine_id']);
-            
+
 
               $contract_signing_date = $_POST['contract_signing_date'];
               $grace_period_days = $_POST['grace_period_days'];
@@ -1490,7 +1497,6 @@ if (!isset($_SESSION['user'])) {
 
       $(document).ready(function () {
         $('#projectsTable').DataTable({
-          responsive: true,
           dom: 'Bfrtip', // Buttons + Search + Pagination
           buttons: [
             { extend: 'copy', text: 'نسخ' },

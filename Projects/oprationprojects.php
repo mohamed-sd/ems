@@ -1309,7 +1309,6 @@ include('../insidebar.php');
         // تشغيل DataTable
         $(document).ready(function () {
             $('#projectsTable').DataTable({
-                responsive: true,
                 dom: 'Bfrtip',
                 buttons: [
                     { extend: 'copy', text: 'نسخ (Copy)' },

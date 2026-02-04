@@ -651,11 +651,10 @@ include '../insidebar.php';
         <i class="fas fa-plus-circle"></i> إضافة منجم جديد
     </button>
 
-    <div id="alertContainer"></div>
-
-    <div class="table-container">
-        <table id="minesTable" class="display responsive nowrap" style="width:100%">
-            <thead>
+    <div id="table-container" style="background-color: #fff;;">
+      <div class="card-body" style="padding: 2rem; overflow-x: auto;">
+        <table id="minesTable" class="display nowrap" style="width:100%; margin-top: 20px;">
+          <thead>
                 <tr>
                     <th>#</th>
                     <th>كود المنجم</th>
@@ -663,12 +662,10 @@ include '../insidebar.php';
                     <th>المدير</th>
                     <th>المعدن</th>
                     <th>نوع المنجم</th>
-                    <th>نوع الملكية</th>
                     <th>المساحة</th>
                     <th>العمق (م)</th>
                     <th> عدد العقود </th>
-                    <th> عقود المنجم </th>
-                    <th>طبيعة التعاقد</th>
+                    <th> العقود </th>
                     <th>الحالة</th>
                     <th>الإجراءات</th>
                 </tr>
@@ -699,7 +696,6 @@ include '../insidebar.php';
                     echo "<td>" . ($mine['manager_name'] ?: '-') . "</td>";
                     echo "<td>" . ($mine['mineral_type'] ?: '-') . "</td>";
                     echo "<td>{$mine['mine_type']}</td>";
-                    echo "<td>{$mine['ownership_type']}</td>";
                     echo "<td>{$area_display}</td>";
                     echo "<td>{$depth_display}</td>";
                     // جلب عدد العقود المرتبطة بالمنجم  
@@ -714,7 +710,6 @@ include '../insidebar.php';
                                <i class='fas fa-file-contract'></i>
                             </a>
                     </td>";
-                    echo "<td>" . ($mine['contract_nature'] ?: '-') . "</td>";
                     echo "<td>{$status_badge}</td>";
                     echo "<td>
                             <button class='btn-action btn-view' onclick='openViewModal(" . json_encode($mine) . ")'>
@@ -947,7 +942,6 @@ include '../insidebar.php';
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -955,7 +949,6 @@ include '../insidebar.php';
             language: {
                 url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json'
             },
-            responsive: true,
             order: [[0, 'desc']]
         });
     });
