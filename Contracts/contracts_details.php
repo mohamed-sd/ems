@@ -432,15 +432,18 @@ if (!isset($_SESSION['user'])) {
         $contract_id = intval($_GET['id']);
 
         $sql = "SELECT 
-            id, project, contract_signing_date, grace_period_days, contract_duration_months, contract_duration_days,
-            actual_start, actual_end, transportation, accommodation, place_for_living, 
-            workshop, hours_monthly_target, forecasted_contracted_hours, created_at, updated_at,
-            daily_work_hours, daily_operators, first_party, second_party, 
-            witness_one, witness_two, status, pause_reason, pause_date, resume_date, termination_type, termination_reason, merged_with,
-            equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
-            price_currency_contract, paid_contract, payment_time, guarantees, payment_date
-        FROM contracts
-        WHERE id = $contract_id
+            c.id, c.mine_id, c.contract_signing_date, c.grace_period_days, c.contract_duration_months, c.contract_duration_days,
+            c.actual_start, c.actual_end, c.transportation, c.accommodation, c.place_for_living, 
+            c.workshop, c.hours_monthly_target, c.forecasted_contracted_hours, c.created_at, c.updated_at,
+            c.daily_work_hours, c.daily_operators, c.first_party, c.second_party, 
+            c.witness_one, c.witness_two, c.status, c.pause_reason, c.pause_date, c.resume_date, c.termination_type, c.termination_reason, c.merged_with,
+            c.equip_shifts_contract, c.shift_contract, c.equip_total_contract_daily, c.total_contract_permonth, c.total_contract_units,
+            c.price_currency_contract, c.paid_contract, c.payment_time, c.guarantees, c.payment_date,
+            m.mine_name, m.mine_code, p.name AS project_name
+        FROM contracts c
+        LEFT JOIN mines m ON c.mine_id = m.id
+        LEFT JOIN project p ON m.project_id = p.id
+        WHERE c.id = $contract_id
         LIMIT 1";
 
         $result = mysqli_query($conn, $sql);
@@ -572,18 +575,22 @@ if (!isset($_SESSION['user'])) {
 
             <!-- بطاقات تفاصيل العقد -->
             <div class="info-cards-grid">
-                <!-- معلومات المشروع -->
+                <!-- معلومات المنجم -->
                 <div class="info-card primary">
                     <h5>
-                        <i class="fas fa-project-diagram"></i> معلومات المشروع
+                        <i class="fas fa-mountain"></i> معلومات المنجم
                         <button class="btn btn-sm btn-outline-primary ms-auto" id="editProjectInfoBtn"
                             style="padding: 0.25rem 0.75rem; border-radius: 8px;">
                             <i class="fas fa-edit"></i> تعديل
                         </button>
                     </h5>
                     <div class="info-item">
+                        <span class="info-label">المنجم</span>
+                        <span class="info-value" id="mineDisplay"><?php echo $row['mine_name'] . ' (' . $row['mine_code'] . ')'; ?></span>
+                    </div>
+                    <div class="info-item">
                         <span class="info-label">المشروع</span>
-                        <span class="info-value" id="projectDisplay"><?php echo $row['project']; ?></span>
+                        <span class="info-value"><?php echo $row['project_name']; ?></span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">فترة السماح</span>
@@ -720,7 +727,7 @@ if (!isset($_SESSION['user'])) {
             <?php endif; ?>
             <?php
             $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
-            $project_id = $row['project'];
+            $mine_id = $row['mine_id'];
             $actual_end_date = $row['actual_end'];
             $pause_date = isset($row['pause_date']) ? $row['pause_date'] : '';
             $pause_reason = isset($row['pause_reason']) ? $row['pause_reason'] : '';
@@ -1294,7 +1301,11 @@ if (!isset($_SESSION['user'])) {
                         <select id="mergeWithId" class="form-select">
                             <option value="">-- اختر عقد --</option>
                             <?php
-                            $merge_query = "SELECT id, contract_signing_date FROM contracts WHERE project = $project_id AND id != $contract_id ORDER BY id DESC";
+                            $merge_query = "SELECT c.id, c.contract_signing_date, m.mine_name 
+                                            FROM contracts c
+                                            LEFT JOIN mines m ON c.mine_id = m.id
+                                            WHERE c.mine_id = $mine_id AND c.id != $contract_id 
+                                            ORDER BY c.id DESC";
                             $merge_result = mysqli_query($conn, $merge_query);
                             while ($m_row = mysqli_fetch_assoc($merge_result)) {
                                 echo "<option value='" . $m_row['id'] . "'>العقد #" . $m_row['id'] . " - " . $m_row['contract_signing_date'] . "</option>";

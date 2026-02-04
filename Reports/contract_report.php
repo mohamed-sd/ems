@@ -37,6 +37,9 @@ if (!empty($contract_filter)) {
     $sql_info = "
     SELECT 
         c.id AS contract_id,
+        c.id AS contract_id,
+        m.mine_name,
+        m.mine_code,
         p.name AS project_name,
         c.contract_signing_date,
         c.contract_duration_months,
@@ -45,12 +48,13 @@ if (!empty($contract_filter)) {
         IFNULL(SUM(t.total_work_hours),0) AS actual_hours,
         (c.forecasted_contracted_hours - IFNULL(SUM(t.total_work_hours),0)) AS remaining_hours
     FROM contracts c
-    JOIN operationproject p ON c.project = p.id
+    LEFT JOIN mines m ON c.mine_id = m.id
+    LEFT JOIN project p ON m.project_id = p.id
     LEFT JOIN operations o ON o.project = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN timesheet t ON t.operator = o.id
     WHERE c.id = '$contract_filter'
-    GROUP BY c.id, p.name, c.contract_signing_date, c.contract_duration_months";
+    GROUP BY c.id, m.mine_name, p.name, c.contract_signing_date, c.contract_duration_months";
     
     $contract_data = mysqli_fetch_assoc(mysqli_query($conn, $sql_info));
 
@@ -62,7 +66,8 @@ if (!empty($contract_filter)) {
         SUM(t.total_work_hours) AS actual_hours,
         c.hours_monthly_target
     FROM contracts c
-    JOIN project p ON c.project = p.id
+    LEFT JOIN mines m ON c.mine_id = m.id
+    LEFT JOIN project p ON m.project_id = p.id
     LEFT JOIN operations o ON o.project = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN timesheet t ON t.operator = o.id

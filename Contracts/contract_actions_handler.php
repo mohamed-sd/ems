@@ -296,9 +296,9 @@ else if ($action === 'merge') {
         die(json_encode(['success' => false, 'message' => 'العقد الحالي غير موجود']));
     }
     
-    // التحقق من أن العقدين في نفس المشروع
-    if ($contract_to_merge['project'] != $current_contract['project']) {
-        die(json_encode(['success' => false, 'message' => 'لا يمكن دمج عقود من مشاريع مختلفة']));
+    // التحقق من أن العقدين في نفس المنجم
+    if ($contract_to_merge['mine_id'] != $current_contract['mine_id']) {
+        die(json_encode(['success' => false, 'message' => 'لا يمكن دمج عقود من مناجم مختلفة']));
     }
     
     // حساب المجموع

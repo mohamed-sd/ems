@@ -670,7 +670,7 @@ if (!isset($_SESSION['user'])) {
 
           <input type="hidden" name="id" id="contract_id" value="">
 
-          <input type="hidden" name="project" placeholder="اسم المشروع" value="<?php echo $_GET['id'] ?>" required />
+          <input type="hidden" name="mine_id" placeholder="معرف المنجم" value="<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>" required />
 
           <!-- القسم 1: إجماليات الساعات (يومياً وللعقد) -->
           <div class="section-title"><span class="chip">1</span> إجماليات الساعات (يومياً وللعقد)</div>
@@ -1184,13 +1184,13 @@ if (!isset($_SESSION['user'])) {
             <?php
             include '../config.php';
             include 'contractequipments_handler.php';
-            $project = $_GET['id'];
+            $mine_id = $_GET['id'];
 
             // إضافة عقد جديد عند إرسال الفورم
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project'])) {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_id'])) {
 
               $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-              // $project = mysqli_real_escape_string($conn, $_POST['project']);
+              $mine_id = intval($_POST['mine_id']);
             
 
               $contract_signing_date = $_POST['contract_signing_date'];
@@ -1274,14 +1274,14 @@ if (!isset($_SESSION['user'])) {
               } else {
                 // إضافة
                 $sql = "INSERT INTO contracts (
-            contract_signing_date, project, grace_period_days, contract_duration_days,
+            contract_signing_date, mine_id, grace_period_days, contract_duration_days,
             equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
             actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
             hours_monthly_target, forecasted_contracted_hours,
             daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two,
             price_currency_contract, paid_contract, payment_time, guarantees, payment_date
         ) VALUES (
-            '$contract_signing_date', '$project','$grace_period_days', '$contract_duration_days',
+            '$contract_signing_date', '$mine_id','$grace_period_days', '$contract_duration_days',
             '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
             '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
             '$hours_monthly_target','$forecasted_contracted_hours',
@@ -1344,12 +1344,17 @@ if (!isset($_SESSION['user'])) {
                 }
               }
 
-              echo "<script>window.location.href='contracts.php?id=$project';</script>";
+              echo "<script>window.location.href='contracts.php?id=$mine_id';</script>";
               exit;
             }
 
-            // جلب العقود
-            $query = "SELECT * FROM `contracts` WHERE project LIKE '$project' ORDER BY id DESC";
+            // جلب العقود مع بيانات المنجم والمشروع
+            $query = "SELECT c.*, m.mine_name, m.mine_code, p.name AS project_name 
+                      FROM `contracts` c
+                      LEFT JOIN mines m ON c.mine_id = m.id
+                      LEFT JOIN project p ON m.project_id = p.id
+                      WHERE c.mine_id = '$mine_id' 
+                      ORDER BY c.id DESC";
             $result = mysqli_query($conn, $query);
             $i = 1;
 

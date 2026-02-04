@@ -408,7 +408,7 @@ include '../config.php';
 $contract_id = intval($_GET['id']);
 
 $sql = "SELECT 
-            sc.id, sc.supplier_id, sc.project_id, sc.contract_signing_date, sc.grace_period_days, sc.contract_duration_months, sc.contract_duration_days,
+            sc.id, sc.supplier_id, sc.project_id, sc.mine_id, sc.project_contract_id, sc.contract_signing_date, sc.grace_period_days, sc.contract_duration_months, sc.contract_duration_days,
             sc.actual_start, sc.actual_end, sc.transportation, sc.accommodation, sc.place_for_living, 
             sc.workshop, sc.hours_monthly_target, sc.forecasted_contracted_hours, sc.created_at, sc.updated_at,
             sc.daily_work_hours, sc.daily_operators, sc.first_party, sc.second_party, 
@@ -416,10 +416,14 @@ $sql = "SELECT
             sc.equip_shifts_contract, sc.shift_contract, sc.equip_total_contract_daily, sc.total_contract_permonth, sc.total_contract_units,
             sc.price_currency_contract, sc.paid_contract, sc.payment_time, sc.guarantees, sc.payment_date,
             s.name AS supplier_name,
-            op.name AS project_name
+            op.name AS project_name,
+            m.mine_name,
+            m.mine_code
         FROM supplierscontracts sc
         LEFT JOIN suppliers s ON sc.supplier_id = s.id
         LEFT JOIN project op ON sc.project_id = op.id
+        LEFT JOIN contracts c ON sc.project_contract_id = c.id
+        LEFT JOIN mines m ON c.mine_id = m.id
         WHERE sc.id = $contract_id
         LIMIT 1";
 
@@ -465,8 +469,20 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <span class="info-value"><?php echo htmlspecialchars($row['supplier_name']); ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label">المشروع</span>
-                <span class="info-value"><?php echo htmlspecialchars($row['project_name']); ?></span>
+                <span class="info-value">
+                    <?php 
+                    echo htmlspecialchars($row['project_name']);
+                    if (!empty($row['mine_name'])) {
+                        echo ' - ' . htmlspecialchars($row['mine_name']);
+                        if (!empty($row['mine_code'])) {
+                            echo ' (' . htmlspecialchars($row['mine_code']) . ')';
+                        }
+                    }
+                    if (!empty($row['project_contract_id'])) {
+                        echo ' - عقد #' . htmlspecialchars($row['project_contract_id']);
+                    }
+                    ?>
+                </span>
             </div>
         </div>
 

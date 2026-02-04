@@ -1096,7 +1096,10 @@ include('../insidebar.php');
                       op.`project_code`, op.`category`, op.`sub_sector`, op.`state`, op.`region`, 
                       op.`nearest_market`, op.`latitude`, op.`longitude`, op.`company_client_id`,
                       cc.`client_name`,
-                      (SELECT COUNT(*) FROM contracts WHERE contracts.project = op.id) as 'contracts',
+                      (SELECT COUNT(*) 
+                       FROM contracts c 
+                       INNER JOIN mines m ON c.mine_id = m.id 
+                       WHERE m.project_id = op.id) as 'contracts',
                       (SELECT COUNT(DISTINCT pm.suppliers) 
                           FROM equipments pm
                           JOIN operations m ON pm.id = m.equipment

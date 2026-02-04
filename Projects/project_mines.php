@@ -703,14 +703,14 @@ include '../insidebar.php';
                     echo "<td>{$area_display}</td>";
                     echo "<td>{$depth_display}</td>";
                     // جلب عدد العقود المرتبطة بالمنجم  
-                    $contracts_count_query = "SELECT COUNT(*) AS contract_count FROM contracts WHERE project = " . $mine['id'];
+                    $contracts_count_query = "SELECT COUNT(*) AS contract_count FROM contracts WHERE mine_id = " . $mine['id'];
                     $contracts_count_result = mysqli_query($conn, $contracts_count_query);
                     $contracts_count = mysqli_fetch_assoc($contracts_count_result)['contract_count'];
                     echo "<td>{$contracts_count}</td>"; 
                     echo "<td> 
                      <a href='../Contracts/contracts.php?id=" . $mine['id'] . "' 
                                class='action-btn contracts'
-                               title='عرض عقود المشروع'>
+                               title='عرض عقود المنجم'>
                                <i class='fas fa-file-contract'></i>
                             </a>
                     </td>";
