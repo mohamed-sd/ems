@@ -595,6 +595,19 @@ include '../insidebar.php';
         border-radius: 10px;
         margin-bottom: 1.5rem;
         font-weight: 600;
+        animation: slideDown 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .alert-success {
@@ -650,6 +663,9 @@ include '../insidebar.php';
     <button class="btn-add-mine" onclick="openModal()">
         <i class="fas fa-plus-circle"></i> إضافة منجم جديد
     </button>
+
+    <!-- Alert Container -->
+    <div id="alertContainer" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; min-width: 300px;"></div>
 
     <div id="table-container" style="background-color: #fff;;">
       <div class="card-body" style="padding: 2rem; overflow-x: auto;">
@@ -1057,24 +1073,41 @@ include '../insidebar.php';
         e.preventDefault();
 
         const formData = new FormData(this);
+        
+        console.log('Form data being sent:');
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
 
         fetch('project_mines.php?project_id=<?php echo $project_id; ?>', {
             method: 'POST',
             body: formData
         })
-            .then(response => response.json())
-            .then(data => {
-                showAlert(data.message, data.success ? 'success' : 'error');
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Response text:', text);
+                try {
+                    const data = JSON.parse(text);
+                    showAlert(data.message, data.success ? 'success' : 'error');
 
-                if (data.success) {
-                    closeModal();
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
+                    if (data.success) {
+                        closeModal();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    }
+                } catch (error) {
+                    console.error('JSON parse error:', error);
+                    showAlert('خطأ في معالجة الاستجابة: ' + text.substring(0, 100), 'error');
                 }
             })
             .catch(error => {
-                showAlert('حدث خطأ في الاتصال', 'error');
+                console.error('Fetch error:', error);
+                showAlert('حدث خطأ في الاتصال: ' + error.message, 'error');
             });
     });
 
