@@ -20,16 +20,18 @@ if (!$contract_id) {
 
 // جلب معدات العقد مع جميع الحقول المطلوبة
 $sql = "SELECT 
-    equip_type, 
-    equip_size, 
-    equip_count, 
-    shift_hours, 
-    equip_total_month,
-    equip_total_contract,
-    equip_monthly_target
-FROM contractequipments 
-WHERE contract_id = $contract_id 
-ORDER BY id ASC";
+    ce.equip_type, 
+    et.type AS equip_type_name,
+    ce.equip_size, 
+    ce.equip_count, 
+    ce.shift_hours, 
+    ce.equip_total_month,
+    ce.equip_total_contract,
+    ce.equip_monthly_target
+FROM contractequipments ce
+LEFT JOIN equipments_types et ON ce.equip_type = et.id
+WHERE ce.contract_id = $contract_id 
+ORDER BY ce.id ASC";
 
 $result = mysqli_query($conn, $sql);
 
@@ -43,6 +45,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     // التأكد من وجود جميع الحقول مع قيم افتراضية
     $equipments[] = [
         'equip_type' => $row['equip_type'] ?? '',
+        'equip_type_name' => $row['equip_type_name'] ?? '',
         'equip_size' => $row['equip_size'] ?? 0,
         'equip_count' => $row['equip_count'] ?? 0,
         'shift_hours' => $row['shift_hours'] ?? 0,

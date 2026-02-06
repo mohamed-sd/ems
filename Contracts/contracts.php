@@ -4,6 +4,24 @@ if (!isset($_SESSION['user'])) {
   header("Location: ../index.php");
   exit();
 }
+
+require_once '../config.php';
+
+$equipmentTypes = [];
+$equipmentTypesQuery = "SELECT id, type FROM equipments_types WHERE status = 'active' ORDER BY type ASC";
+$equipmentTypesResult = mysqli_query($conn, $equipmentTypesQuery);
+if ($equipmentTypesResult) {
+  while ($row = mysqli_fetch_assoc($equipmentTypesResult)) {
+    $equipmentTypes[] = $row;
+  }
+}
+
+$equipmentTypeOptionsHtml = '<option value="">— اختر —</option>';
+foreach ($equipmentTypes as $equipmentType) {
+  $typeId = (int) $equipmentType['id'];
+  $typeName = htmlspecialchars($equipmentType['type'], ENT_QUOTES, 'UTF-8');
+  $equipmentTypeOptionsHtml .= '<option value="' . $typeId . '">' . $typeName . '</option>';
+}
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -903,10 +921,7 @@ if (!isset($_SESSION['user'])) {
                     <label>نوع المعدة</label>
                     <div class="control">
                       <select name="equip_type_1" class="equip-type">
-                        <option value="">— اختر —</option>
-                        <option value="حفار">حفار</option>
-                        <option value="قلاب">قلاب</option>
-                        <option value="خرامة">خرامة</option>
+                        <?php echo $equipmentTypeOptionsHtml; ?>
                       </select>
                     </div>
                   </div>
@@ -1189,7 +1204,6 @@ if (!isset($_SESSION['user'])) {
           </thead>
           <tbody>
             <?php
-            include '../config.php';
             include 'contractequipments_handler.php';
             $mine_id = $_GET['id'];
 
@@ -1321,7 +1335,7 @@ if (!isset($_SESSION['user'])) {
                 for ($i = 1; $i <= $max_index; $i++) {
                   if (isset($_POST["equip_type_$i"]) && !empty($_POST["equip_type_$i"])) {
                     $equipment_array[] = [
-                      'equip_type' => $_POST["equip_type_$i"],
+                      'equip_type' => intval($_POST["equip_type_$i"]),
                       'equip_size' => isset($_POST["equip_size_$i"]) ? $_POST["equip_size_$i"] : 0,
                       'equip_count' => isset($_POST["equip_count_$i"]) ? $_POST["equip_count_$i"] : 0,
                       'equip_shifts' => isset($_POST["equip_shifts_$i"]) ? $_POST["equip_shifts_$i"] : 0,
@@ -1547,6 +1561,40 @@ if (!isset($_SESSION['user'])) {
       return new Intl.NumberFormat('ar-EG').format(Math.max(0, Math.round(n)));
     }
 
+    function updateEquipmentTypeOptions() {
+      const selectedValues = new Set();
+      document.querySelectorAll('.equip-type').forEach(select => {
+        if (select.value) {
+          selectedValues.add(select.value);
+        }
+      });
+
+      document.querySelectorAll('.equip-type').forEach(select => {
+        const currentValue = select.value;
+        Array.from(select.options).forEach(option => {
+          if (!option.value) {
+            option.hidden = false;
+            option.disabled = false;
+            return;
+          }
+
+          if (option.value === currentValue) {
+            option.hidden = false;
+            option.disabled = false;
+            return;
+          }
+
+          if (selectedValues.has(option.value)) {
+            option.hidden = true;
+            option.disabled = true;
+          } else {
+            option.hidden = false;
+            option.disabled = false;
+          }
+        });
+      });
+    }
+
     // حساب مدة العقد بالأيام من التاريخين
     function calculateDaysFromDates() {
       const startDate = fields.actualStart.value;
@@ -1583,14 +1631,13 @@ if (!isset($_SESSION['user'])) {
             </button>
           </div>
           <div class="form-grid">
+
+          
             <div class="field md-3 sm-6">
               <label>نوع المعدة</label>
               <div class="control">
                 <select name="equip_type_${equipmentIndex}" class="equip-type">
-                  <option value="">— اختر —</option>
-                  <option value="حفار">حفار</option>
-                  <option value="قلاب">قلاب</option>
-                  <option value="خرامة">خرامة</option>
+                  <?php echo $equipmentTypeOptionsHtml; ?>
                 </select>
               </div>
             </div>
@@ -1696,12 +1743,16 @@ if (!isset($_SESSION['user'])) {
 
       // إضافة event listeners للحقول الجديدة
       newSection.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
+      newSection.querySelectorAll('.equip-type').forEach(el => el.addEventListener('change', updateEquipmentTypeOptions));
 
       // إضافة event listener لزر الحذف
       newSection.querySelector('.removeEquipmentBtn').addEventListener('click', function () {
         newSection.remove();
         recalc();
+        updateEquipmentTypeOptions();
       });
+
+      updateEquipmentTypeOptions();
     }
 
     function recalc() {
@@ -1753,6 +1804,12 @@ if (!isset($_SESSION['user'])) {
       }
     });
 
+    document.addEventListener('change', function (e) {
+      if (e.target.classList && e.target.classList.contains('equip-type')) {
+        updateEquipmentTypeOptions();
+      }
+    });
+
     // زر إضافة المعدات
     document.getElementById('addEquipmentBtn').addEventListener('click', function (e) {
       e.preventDefault();
@@ -1762,11 +1819,15 @@ if (!isset($_SESSION['user'])) {
     // جلب الفورم
     const contractForm = document.getElementById('projectForm');
     if (contractForm) {
-      contractForm.addEventListener('reset', () => setTimeout(recalc, 0));
+      contractForm.addEventListener('reset', () => setTimeout(() => {
+        recalc();
+        updateEquipmentTypeOptions();
+      }, 0));
     }
 
     // أول تشغيل
     recalc();
+    updateEquipmentTypeOptions();
 
 
 
@@ -1849,6 +1910,7 @@ if (!isset($_SESSION['user'])) {
                 $(`input[name="equip_technicians_1"]`).val(equip.equip_technicians);
                 $(`input[name="equip_assistants_1"]`).val(equip.equip_assistants);
                 equipmentIndex = 1;
+                updateEquipmentTypeOptions();
               } else {
                 // إضافة أقسام جديدة
                 equipmentIndex++;
@@ -1865,14 +1927,13 @@ if (!isset($_SESSION['user'])) {
                       </button>
                     </div>
                     <div class="form-grid">
+
+                    
                       <div class="field md-3 sm-6">
                         <label>نوع المعدة</label>
                         <div class="control">
                           <select name="equip_type_${equipmentIndex}" class="equip-type">
-                            <option value="">— اختر —</option>
-                            <option value="حفار" ${equip.equip_type === 'حفار' ? 'selected' : ''}>حفار</option>
-                            <option value="قلاب" ${equip.equip_type === 'قلاب' ? 'selected' : ''}>قلاب</option>
-                            <option value="خرامة" ${equip.equip_type === 'خرامة' ? 'selected' : ''}>خرامة</option>
+                            <?php echo $equipmentTypeOptionsHtml; ?>
                           </select>
                         </div>
                       </div>
@@ -1973,17 +2034,25 @@ if (!isset($_SESSION['user'])) {
                 `;
                 document.getElementById('equipmentSections').appendChild(newSection);
 
+                const newSelect = newSection.querySelector(`select[name="equip_type_${equipmentIndex}"]`);
+                if (newSelect) {
+                  newSelect.value = equip.equip_type;
+                }
+
                 // إضافة event listeners
                 newSection.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
+                newSection.querySelectorAll('.equip-type').forEach(el => el.addEventListener('change', updateEquipmentTypeOptions));
                 newSection.querySelector('.removeEquipmentBtn').addEventListener('click', function () {
                   newSection.remove();
                   recalc();
+                  updateEquipmentTypeOptions();
                 });
               }
             });
           }
 
           recalc();
+          updateEquipmentTypeOptions();
         }
       });
 

@@ -19,32 +19,35 @@ if (!isset($_SESSION['user'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/admin-style.css">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
 
-        * {
-            font-family: 'Cairo', sans-serif;
-        }
-
-        body {
-            background: #f5f7fa;
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #16213e;
+            --gold-color: #ffcc00;
+            --text-color: #010326;
+            --light-color: #f5f5f5;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
         }
 
         .main {
             padding: 2rem;
-            background: #f5f7fa;
+            background: var(--border-color);
+            width: calc(100% - 250px);
         }
 
         /* Page Title */
         .main h3 {
             font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         /* Action Buttons Container */
@@ -54,9 +57,9 @@ if (!isset($_SESSION['user'])) {
             flex-wrap: wrap;
             margin-bottom: 2rem;
             padding: 1rem;
-            background: white;
+            background: var(--light-color);
             border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 10px var(--shadow-color);
         }
 
         /* Modern Action Buttons */
@@ -69,7 +72,7 @@ if (!isset($_SESSION['user'])) {
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 15px var(--shadow-color);
             position: relative;
             overflow: hidden;
         }
@@ -94,7 +97,7 @@ if (!isset($_SESSION['user'])) {
 
         .aligin .add:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 6px 25px var(--shadow-color);
         }
 
         .aligin .add:active {
@@ -134,14 +137,14 @@ if (!isset($_SESSION['user'])) {
             background: white;
             padding: 2rem;
             border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px var(--shadow-color);
             margin-bottom: 2rem;
         }
 
         /* Info Cards Grid */
         .info-cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -151,7 +154,7 @@ if (!isset($_SESSION['user'])) {
             border-radius: 15px;
             padding: 1.5rem;
             border-right: 5px solid;
-            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 3px 15px var(--shadow-color);
             transition: all 0.3s ease;
         }
 
@@ -161,7 +164,7 @@ if (!isset($_SESSION['user'])) {
         }
 
         .info-card.primary {
-            border-right-color: #667eea;
+            border-right-color: var(--primary-color);
         }
 
         .info-card.success {
@@ -169,7 +172,7 @@ if (!isset($_SESSION['user'])) {
         }
 
         .info-card.warning {
-            border-right-color: #ffc107;
+            border-right-color: var(--gold-color);
         }
 
         .info-card.danger {
@@ -197,7 +200,7 @@ if (!isset($_SESSION['user'])) {
             display: flex;
             justify-content: space-between;
             padding: 0.75rem 0;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .info-item:last-child {
@@ -206,7 +209,7 @@ if (!isset($_SESSION['user'])) {
 
         .info-label {
             font-weight: 600;
-            color: #495057;
+            color: var(--text-color);
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -214,7 +217,7 @@ if (!isset($_SESSION['user'])) {
 
         .info-value {
             font-weight: 500;
-            color: #212529;
+            color: var(--text-color);
         }
 
         /* Status Badge */
@@ -246,12 +249,12 @@ if (!isset($_SESSION['user'])) {
             border-spacing: 0;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 3px 15px var(--shadow-color);
             margin-bottom: 2rem;
         }
 
         .modern-table thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
         }
 
@@ -268,15 +271,15 @@ if (!isset($_SESSION['user'])) {
         }
 
         .modern-table tbody tr:hover {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: linear-gradient(135deg, #f8f9fa 0%, var(--light-color) 100%);
             transform: scale(1.01);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px var(--shadow-color);
         }
 
         .modern-table tbody td {
             padding: 1rem;
             text-align: center;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid var(--border-color);
             font-weight: 500;
         }
 
@@ -284,12 +287,12 @@ if (!isset($_SESSION['user'])) {
         .modal-content {
             border: none;
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 40px var(--shadow-color);
             overflow: hidden;
         }
 
         .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
             border: none;
             padding: 1.5rem;
@@ -311,7 +314,7 @@ if (!isset($_SESSION['user'])) {
         .modal-footer {
             border: none;
             padding: 1.5rem;
-            background: #f8f9fa;
+            background: var(--light-color);
         }
 
         .form-label {
@@ -322,7 +325,7 @@ if (!isset($_SESSION['user'])) {
 
         .form-control,
         .form-select {
-            border: 2px solid #e9ecef;
+            border: 2px solid var(--border-color);
             border-radius: 10px;
             padding: 0.75rem;
             transition: all 0.3s ease;
@@ -331,8 +334,8 @@ if (!isset($_SESSION['user'])) {
 
         .form-control:focus,
         .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            border-color: var(--gold-color);
+            box-shadow: 0 0 0 0.2rem rgba(255, 204, 0, 0.25);
         }
 
         .btn {
@@ -344,7 +347,7 @@ if (!isset($_SESSION['user'])) {
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px var(--shadow-color);
         }
 
         .alert {
@@ -428,6 +431,15 @@ if (!isset($_SESSION['user'])) {
 
         <?php
         include '../config.php';
+
+        $equipmentTypeMap = [];
+        $equipmentTypesQuery = "SELECT id, type FROM equipments_types ORDER BY type ASC";
+        $equipmentTypesResult = mysqli_query($conn, $equipmentTypesQuery);
+        if ($equipmentTypesResult) {
+            while ($typeRow = mysqli_fetch_assoc($equipmentTypesResult)) {
+                $equipmentTypeMap[(int) $typeRow['id']] = $typeRow['type'];
+            }
+        }
 
         $contract_id = intval($_GET['id']);
 
@@ -755,9 +767,9 @@ if (!isset($_SESSION['user'])) {
 
         <!-- جدول معدات العقد (بما فيها معدات العقد المدموج) -->
         <div
-            style="background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-top: 2rem;">
+            style="background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 5px 20px var(--shadow-color); margin-top: 2rem;">
             <h4
-                style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: #667eea; font-weight: 700;">
+                style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: var(--primary-color); font-weight: 700;">
                 <i class="fas fa-boxes"></i>
                 معدات العقد
                 <?php
@@ -802,15 +814,18 @@ if (!isset($_SESSION['user'])) {
                             foreach ($equipments as $equip) {
                                 echo "<tr>";
                                 echo "<td>" . $i . "</td>";
-                                echo "<td><strong>" . htmlspecialchars($equip['equip_type']) . "</strong></td>";
+                                $equipTypeLabel = isset($equipmentTypeMap[(int) $equip['equip_type']])
+                                    ? $equipmentTypeMap[(int) $equip['equip_type']]
+                                    : $equip['equip_type'];
+                                echo "<td><strong>" . htmlspecialchars($equipTypeLabel) . "</strong></td>";
                                 echo "<td>" . $equip['equip_size'] . "</td>";
-                                echo "<td><span style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . $equip['equip_count'] . "</span></td>";
+                                echo "<td><span style='background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . $equip['equip_count'] . "</span></td>";
                                 echo "<td><span style='background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . (isset($equip['equip_shifts']) ? $equip['equip_shifts'] : 0) . "</span></td>";
                                 echo "<td>" . $equip['shift_hours'] . "</td>";
                                 echo "<td>" . $equip['equip_total_month'] . "</td>";
-                                echo "<td><strong style='color: #667eea;'>" . (isset($equip['equip_monthly_target']) ? $equip['equip_monthly_target'] : 0) . "</strong></td>";
+                                echo "<td><strong style='color: var(--primary-color);'>" . (isset($equip['equip_monthly_target']) ? $equip['equip_monthly_target'] : 0) . "</strong></td>";
                                 echo "<td>" . $equip['equip_unit'] . "</td>";
-                                echo "<td><strong style='color: #667eea;'>" . $equip['equip_total_contract'] . "</strong></td>";
+                                echo "<td><strong style='color: var(--primary-color);'>" . $equip['equip_total_contract'] . "</strong></td>";
                                 echo "<td><strong style='color: #28a745;'>" . $equip['equip_price'] . " " . $equip['equip_price_currency'] . "</strong></td>";
                                 echo "<td>" . $equip['equip_operators'] . "</td>";
                                 echo "<td>" . $equip['equip_supervisors'] . "</td>";
@@ -1339,8 +1354,11 @@ if (!isset($_SESSION['user'])) {
                                         $current_equipments = getContractEquipments($contract_id, $conn);
                                         if (!empty($current_equipments)) {
                                             foreach ($current_equipments as $equip) {
+                                                $equipTypeLabel = isset($equipmentTypeMap[(int) $equip['equip_type']])
+                                                    ? $equipmentTypeMap[(int) $equip['equip_type']]
+                                                    : $equip['equip_type'];
                                                 echo "<tr>";
-                                                echo "<td>" . $equip['equip_type'] . "</td>";
+                                                echo "<td>" . htmlspecialchars($equipTypeLabel) . "</td>";
                                                 echo "<td>" . $equip['equip_size'] . "</td>";
                                                 echo "<td>" . $equip['equip_count'] . "</td>";
                                                 echo "<td>" . $equip['shift_hours'] . "</td>";
@@ -2171,7 +2189,7 @@ if (!isset($_SESSION['user'])) {
 
                             response.equipments.forEach(function (equip) {
                                 html += '<tr>';
-                                html += '<td>' + equip.equip_type + '</td>';
+                                html += '<td>' + (equip.equip_type_name || equip.equip_type) + '</td>';
                                 html += '<td>' + equip.equip_size + '</td>';
                                 html += '<td>' + equip.equip_count + '</td>';
                                 html += '<td>' + equip.shift_hours + '</td>';

@@ -29,18 +29,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
     
     // جلب تفصيل ساعات المعدات حسب النوع للعقد المحدد
     $equipment_details_query = "SELECT 
-        equip_type,
-        COALESCE(SUM(equip_total_contract), 0) as total_hours,
-        COUNT(DISTINCT id) as equipment_count
-        FROM contractequipments
-        WHERE contract_id = $project_contract_id
-        GROUP BY equip_type
-        ORDER BY equip_type";
+        ce.equip_type,
+        et.type AS equip_type_name,
+        COALESCE(SUM(ce.equip_total_contract), 0) as total_hours,
+        COALESCE(SUM(ce.equip_count), 0) as equipment_count
+        FROM contractequipments ce
+        LEFT JOIN equipments_types et ON ce.equip_type = et.id
+        WHERE ce.contract_id = $project_contract_id
+        GROUP BY ce.equip_type, et.type
+        ORDER BY et.type";
     $equipment_result = mysqli_query($conn, $equipment_details_query);
     $equipment_breakdown = [];
     while ($row = mysqli_fetch_assoc($equipment_result)) {
         $equipment_breakdown[] = [
-            'type' => $row['equip_type'],
+            'type' => $row['equip_type_name'] ? $row['equip_type_name'] : $row['equip_type'],
             'hours' => floatval($row['total_hours']),
             'count' => intval($row['equipment_count'])
         ];

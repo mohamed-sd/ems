@@ -5,6 +5,24 @@ if (!isset($_SESSION['user'])) {
   exit();
 }
 
+require_once '../config.php';
+
+$equipmentTypes = [];
+$equipmentTypesQuery = "SELECT id, type FROM equipments_types ORDER BY type ASC";
+$equipmentTypesResult = mysqli_query($conn, $equipmentTypesQuery);
+if ($equipmentTypesResult) {
+  while ($row = mysqli_fetch_assoc($equipmentTypesResult)) {
+    $equipmentTypes[] = $row;
+  }
+}
+
+$equipmentTypeOptionsHtml = '<option value="">— اختر —</option>';
+foreach ($equipmentTypes as $equipmentType) {
+  $typeId = (int) $equipmentType['id'];
+  $typeName = htmlspecialchars($equipmentType['type'], ENT_QUOTES, 'UTF-8');
+  $equipmentTypeOptionsHtml .= '<option value="' . $typeId . '">' . $typeName . '</option>';
+}
+
 // التحقق من وجود معرف المورد
 if (!isset($_GET['id'])) {
   header("Location: suppliers.php");
@@ -603,7 +621,7 @@ $supplier_id = intval($_GET['id']);
                 <select name="project_id" id="project_id" required>
                   <option value="">— اختر المشروع —</option>
                   <?php
-                  include '../config.php';
+                  
                   $projects_query = "SELECT id, name FROM project WHERE status = 1 ORDER BY name ASC";
                   $projects_result = mysqli_query($conn, $projects_query);
                   while ($project = mysqli_fetch_assoc($projects_result)) {
@@ -891,10 +909,7 @@ $supplier_id = intval($_GET['id']);
                     <label>نوع المعدة</label>
                     <div class="control">
                       <select name="equip_type_1" class="equip-type">
-                        <option value="">— اختر —</option>
-                        <option value="حفار">حفار</option>
-                        <option value="قلاب">قلاب</option>
-                        <option value="خرامة">خرامة</option>
+                        <?php echo $equipmentTypeOptionsHtml; ?>
                       </select>
                     </div>
                   </div>
@@ -1180,7 +1195,7 @@ $supplier_id = intval($_GET['id']);
           </thead>
           <tbody>
             <?php
-            include '../config.php';
+            
 
             // إضافة عقد جديد عند إرسال الفورم
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['supplier_id']) && !empty($_POST['project_id']) && !empty($_POST['project_contract_id'])) {
@@ -1316,7 +1331,7 @@ $supplier_id = intval($_GET['id']);
                 for ($i = 1; $i <= $max_index; $i++) {
                   if (isset($_POST["equip_type_$i"]) && !empty($_POST["equip_type_$i"])) {
                     $equipment_array[] = [
-                      'equip_type' => mysqli_real_escape_string($conn, $_POST["equip_type_$i"]),
+                      'equip_type' => intval($_POST["equip_type_$i"]),
                       'equip_size' => isset($_POST["equip_size_$i"]) ? intval($_POST["equip_size_$i"]) : 0,
                       'equip_count' => isset($_POST["equip_count_$i"]) ? intval($_POST["equip_count_$i"]) : 0,
                       'equip_shifts' => isset($_POST["equip_shifts_$i"]) ? intval($_POST["equip_shifts_$i"]) : 0,
@@ -1354,7 +1369,7 @@ $supplier_id = intval($_GET['id']);
                       equip_price, equip_price_currency, equip_operators, equip_supervisors,
                       equip_technicians, equip_assistants
                     ) VALUES (
-                      $contract_id, '{$equip['equip_type']}', {$equip['equip_size']}, {$equip['equip_count']},
+                      $contract_id, {$equip['equip_type']}, {$equip['equip_size']}, {$equip['equip_count']},
                       {$equip['equip_shifts']}, '{$equip['equip_unit']}', '{$equip['shift1_start']}',
                       '{$equip['shift1_end']}', '{$equip['shift2_start']}', '{$equip['shift2_end']}',
                       {$equip['shift_hours']}, {$equip['equip_total_month']}, {$equip['equip_monthly_target']},
@@ -1614,10 +1629,7 @@ $supplier_id = intval($_GET['id']);
               <label>نوع المعدة</label>
               <div class="control">
                 <select name="equip_type_${equipmentIndex}" class="equip-type">
-                  <option value="">— اختر —</option>
-                  <option value="حفار">حفار</option>
-                  <option value="قلاب">قلاب</option>
-                  <option value="خرامة">خرامة</option>
+                  <?php echo $equipmentTypeOptionsHtml; ?>
                 </select>
               </div>
             </div>
@@ -1890,7 +1902,7 @@ $supplier_id = intval($_GET['id']);
                 response.equipment_breakdown.forEach(function (item) {
                   var percentage = ((item.hours / response.contract_total_hours) * 100).toFixed(1);
                   breakdownHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; padding: 0.3rem 0;">';
-                  breakdownHtml += '<span><i class="fas fa-tools" style="color: #1976d2; margin-left: 0.3rem;"></i>' + item.type + '</span>';
+                  breakdownHtml += '<span><i class="fas fa-tools" style="color: #1976d2; margin-left: 0.3rem;"></i>' + item.type + ' (العدد: ' + item.count + ')' + '</span>';
                   breakdownHtml += '<span style="font-weight: 600; color: #0d47a1;">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
                   breakdownHtml += '</div>';
                 });
@@ -2067,10 +2079,7 @@ $supplier_id = intval($_GET['id']);
                         <label>نوع المعدة</label>
                         <div class="control">
                           <select name="equip_type_${equipmentIndex}" class="equip-type">
-                            <option value="">— اختر —</option>
-                            <option value="حفار" ${equip.equip_type === 'حفار' ? 'selected' : ''}>حفار</option>
-                            <option value="قلاب" ${equip.equip_type === 'قلاب' ? 'selected' : ''}>قلاب</option>
-                            <option value="خرامة" ${equip.equip_type === 'خرامة' ? 'selected' : ''}>خرامة</option>
+                            <?php echo $equipmentTypeOptionsHtml; ?>
                           </select>
                         </div>
                       </div>
@@ -2170,6 +2179,11 @@ $supplier_id = intval($_GET['id']);
                   </div>
                 `;
                 document.getElementById('equipmentSections').appendChild(newSection);
+
+                const newSelect = newSection.querySelector(`select[name="equip_type_${equipmentIndex}"]`);
+                if (newSelect) {
+                  newSelect.value = equip.equip_type;
+                }
 
                 // إضافة event listeners
                 newSection.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
