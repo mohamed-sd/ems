@@ -45,6 +45,8 @@
         <li><a href="../main/users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
         <!-- <li><a href="../Reports/new_reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
         <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>تقارير العقد</span></a></li>
+        <li><a href="../Equipments/equipments_types.php"><i class="fa-solid fa-screwdriver-wrench"></i> <span>  انواع المعدات</span></a></li>
+        <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span> الصلاحيات </span></a></li>
       <?php } ?>
 
       <?php // صلاحيات مدير الموردين === 2
