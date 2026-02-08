@@ -1733,14 +1733,21 @@ $supplier_id = intval($_GET['id']);
       `;
       document.getElementById('equipmentSections').appendChild(newSection);
 
-      // إضافة event listeners للحقول الجديدة
-      newSection.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
+      // إضافة event listeners للحقول الجديدة المهمة للحسبة
+      const countInput = newSection.querySelector(`input[name="equip_count_${equipmentIndex}"]`);
+      const shiftHoursInput = newSection.querySelector(`input[name="shift_hours_${equipmentIndex}"]`);
+      
+      if (countInput) countInput.addEventListener('input', recalc);
+      if (shiftHoursInput) shiftHoursInput.addEventListener('input', recalc);
 
       // إضافة event listener لزر الحذف
       newSection.querySelector('.removeEquipmentBtn').addEventListener('click', function () {
         newSection.remove();
         recalc();
       });
+
+      // تشغيل الحسبة فوراً بعد إضافة القسم الجديد
+      recalc();
     }
 
     function recalc() {
@@ -1806,6 +1813,16 @@ $supplier_id = intval($_GET['id']);
 
     // أول تشغيل
     recalc();
+
+    // إضافة event listeners للقسم الأول من المعدات
+    document.querySelectorAll('.equipment-section').forEach(section => {
+      const index = section.getAttribute('data-index') || '1';
+      const countInput = section.querySelector(`input[name="equip_count_${index}"]`);
+      const shiftHoursInput = section.querySelector(`input[name="shift_hours_${index}"]`);
+      
+      if (countInput) countInput.addEventListener('input', recalc);
+      if (shiftHoursInput) shiftHoursInput.addEventListener('input', recalc);
+    });
 
     // جلب مناجم المشروع عند تغيير المشروع
     $('#project_id').on('change', function () {
