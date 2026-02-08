@@ -4,13 +4,18 @@ if (!isset($_SESSION['user'])) {
   header("Location: ../index.php");
   exit();
 }
+include '../config.php';
+$type = isset($_GET['type']) ? $_GET['type'] : "";
+if ($type !== "1" && $type !== "2") {
+  header("Location: timesheet_type.php");
+  exit();
+}
 $page_title = "إيكوبيشن | ساعات العمل ";
 include("../inheader.php");
 include('../insidebar.php');
 // تحديد النوع من الرابط (إن وجد)
 $type_filter = "";
-if (isset($_GET['type']) && $_GET['type'] != "") {
-  $type = $_GET['type'];
+if ($type != "") {
   $type_filter = " AND e.type = '$type' ";
 }
 ?>
@@ -37,11 +42,10 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
                 <select name="operator" id="operator" required>
                   <option value="">-- اختر الالية --</option>
                   <?php
-                  include '../config.php';
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN project p ON o.project = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project = '" . $_SESSION['user']['project'] . "'");
+                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project'] . "'");
 
 
 
@@ -281,10 +285,10 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
                   <option value="">-- اختر الالية --</option>
                   <?php
                   include '../config.php';
-                  $op_res = mysqli_query($conn, "SELECT o.id,o.status,o.project ,e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
+                  $op_res = mysqli_query($conn, "SELECT o.id, o.status, o.project_id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN project p ON o.project = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project = '" . $_SESSION['user']['project'] . "'");
+                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project'] . "'");
 
 
 
@@ -639,8 +643,6 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
             }
           }
 
-          $type = $_GET['type'];
-
           // عرض البيانات
           $query = "SELECT t.id, t.shift, t.date, t.executed_hours ,
         t.standby_hours , t.total_fault_hours ,bucket_hours,jackhammer_hours,
@@ -653,7 +655,7 @@ if (isset($_GET['type']) && $_GET['type'] != "") {
           FROM timesheet t
           JOIN operations o ON t.operator = o.id
           JOIN equipments e ON o.equipment = e.id
-          JOIN project p ON o.project = p.id
+          JOIN project p ON o.project_id = p.id
           JOIN drivers d ON t.driver = d.id
           WHERE t.type LIKE '$type' 
          ";

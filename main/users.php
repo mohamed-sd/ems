@@ -544,8 +544,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                 <option value="">-- حدد الصلاحية --</option>
                                 <option value="1">👨‍💼 مدير المشاريع</option>
                                 <option value="2">🏢 مدير الموردين</option>
-                                <option value="3">👷 مدير المشغلين</option>
                                 <option value="4">🚚 مدير الأسطول</option>
+                                <option value="3">👷 مدير المشغلين</option>
                                 <option value="5">📍 مدير موقع</option>
                             </select>
                         </div>
@@ -620,17 +620,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             }
 
                             if ($row['role'] == "5") {
-                                $project = " (<span style='color: var(--accent-color); font-weight: 700;'>" . htmlspecialchars($project_name, ENT_QUOTES, 'UTF-8') . "</span>)";
+                                $project = " ( <span style='color: var(--primary-color); font-weight: 400;font-size:16px;'>" . htmlspecialchars($project_name, ENT_QUOTES, 'UTF-8') . "</span> )";
                             } else {
                                 $project = "";
                             }
 
                             echo "<tr>";
                             echo "<td><strong>" . $i++ . "</strong></td>";
-                            echo "<td>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</td>";
+                            echo "<td>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "" . $project . "</td>";
                             echo "<td><strong>" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "</strong></td>";
                             echo "<td><span class='password-cell'>" . htmlspecialchars($row['password'] ,ENT_QUOTES, 'UTF-8')  . "</span></td>";
-                            echo "<td><span class='role-badge role-" . $row['role'] . "'>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</span>" . $project . "</td>";
+                            echo "<td><span class='role-badge role-" . $row['role'] . "'>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</span></td>";
                             echo "<td><i class='fas fa-phone'></i>" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
                             echo "<td>
                                 <a href='javascript:void(0)' class='editBtn' 

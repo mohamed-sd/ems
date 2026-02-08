@@ -7,24 +7,42 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 
-// التحقق من وجود معرف المشروع
-if (!isset($_GET['project_id']) || !is_numeric($_GET['project_id'])) {
-    header("Location: select_project.php");
+$selected_project_id = 0;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_project_id'])) {
+    $selected_project_id = intval($_POST['selected_project_id']);
+    if ($selected_project_id > 0) {
+        $_SESSION['equipments_project_id'] = $selected_project_id;
+    } else {
+        unset($_SESSION['equipments_project_id']);
+    }
+    header("Location: equipments.php");
     exit();
 }
 
-$selected_project_id = intval($_GET['project_id']);
-
-// التحقق من صحة المشروع
-$project_check_query = "SELECT id, name, project_code FROM project WHERE id = $selected_project_id AND status = '1'";
-$project_check_result = mysqli_query($conn, $project_check_query);
-
-if (!$project_check_result || mysqli_num_rows($project_check_result) == 0) {
-    header("Location: select_project.php");
+if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
+    $_SESSION['equipments_project_id'] = intval($_GET['project_id']);
+    header("Location: equipments.php");
     exit();
 }
 
-$selected_project = mysqli_fetch_assoc($project_check_result);
+if (isset($_SESSION['equipments_project_id'])) {
+    $selected_project_id = intval($_SESSION['equipments_project_id']);
+}
+
+$selected_project = null;
+if ($selected_project_id > 0) {
+    $project_check_query = "SELECT id, name, project_code FROM project WHERE id = $selected_project_id AND status = '1'";
+    $project_check_result = mysqli_query($conn, $project_check_query);
+    if ($project_check_result && mysqli_num_rows($project_check_result) > 0) {
+        $selected_project = mysqli_fetch_assoc($project_check_result);
+    } else {
+        unset($_SESSION['equipments_project_id']);
+        $selected_project_id = 0;
+    }
+}
+
+$projects_result = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name");
 
 $page_title = "إيكوبيشن | الآليات ";
 include("../inheader.php");
@@ -98,15 +116,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     } else {
         // إضافة
         $sql = "INSERT INTO equipments 
-                (project_id, mine_id, contract_id, suppliers, code, type, name, status) 
+                ( suppliers, code, type, name, status) 
                 VALUES 
-                ($project_id_sql, $mine_id_sql, $contract_id_sql, 
-                 '$suppliers', '$code', '$type', '$name', '$status')";
+                ( '$suppliers', '$code', '$type', '$name', '$status')";
         $msg = "تمت+إضافة+المعدة+بنجاح+✅";
     }
 
     if (mysqli_query($conn, $sql)) {
-        header("Location: equipments.php?project_id=$selected_project_id&msg=$msg");
+        header("Location: equipments.php?msg=$msg");
         exit;
     } else {
         $success_msg = "خطأ في الحفظ: " . mysqli_error($conn);
@@ -656,6 +673,28 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
         background: rgba(0, 123, 255, 0.2);
         transform: scale(1.05);
     }
+
+    .project-picker {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 6px 20px var(--shadow-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .project-picker label {
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .project-picker select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+    }
     
     /* Contract Stats Section */
     .contract-stats {
@@ -871,27 +910,50 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
 </style>
 
 <div class="main">
-    <!-- عنوان المشروع المحدد -->
-    <div class="project-header">
-        <div class="project-header-content">
-            <div>
-                <h1 class="project-title">
-                    <i class="fas fa-hard-hat"></i>
-                    <?php echo htmlspecialchars($selected_project['name']); ?>
-                </h1>
-                <?php if (!empty($selected_project['project_code'])) { ?>
-                    <p class="project-code-display">
-                        <i class="fas fa-barcode"></i>
-                        كود المشروع: <?php echo htmlspecialchars($selected_project['project_code']); ?>
-                    </p>
-                <?php } ?>
-            </div>
-            <a href="select_project.php" class="btn-back-to-projects">
-                <i class="fas fa-arrow-right"></i>
-                العودة للمشاريع
-            </a>
-        </div>
+    <div class="project-picker">
+        <form method="post" id="projectSelectForm">
+            <label for="selected_project_id">اختر المشروع</label>
+            <select name="selected_project_id" id="selected_project_id" required>
+                <option value="">-- اختر المشروع --</option>
+                <?php
+                if ($projects_result) {
+                    while ($project_row = mysqli_fetch_assoc($projects_result)) {
+                        $selected = ($selected_project_id == $project_row['id']) ? 'selected' : '';
+                        $project_label = htmlspecialchars($project_row['name']);
+                        if (!empty($project_row['project_code'])) {
+                            $project_label .= ' (' . htmlspecialchars($project_row['project_code']) . ')';
+                        }
+                        echo "<option value='" . intval($project_row['id']) . "' $selected>" . $project_label . "</option>";
+                    }
+                }
+                ?>
+            </select>
+        </form>
     </div>
+
+    <?php if (!empty($selected_project)) { ?>
+        <!-- عنوان المشروع المحدد -->
+        <div class="project-header">
+            <div class="project-header-content">
+                <div>
+                    <h1 class="project-title">
+                        <i class="fas fa-hard-hat"></i>
+                        <?php echo htmlspecialchars($selected_project['name']); ?>
+                    </h1>
+                    <?php if (!empty($selected_project['project_code'])) { ?>
+                        <p class="project-code-display">
+                            <i class="fas fa-barcode"></i>
+                            كود المشروع: <?php echo htmlspecialchars($selected_project['project_code']); ?>
+                        </p>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+    <?php } else { ?>
+        <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+            <strong>يرجى اختيار مشروع لعرض البيانات.</strong>
+        </div>
+    <?php } ?>
     
     <h2>
         <i class="fas fa-cogs"></i>
@@ -904,6 +966,20 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
             <?php echo $success_msg; ?>
         </div>
     <?php endif; ?>
+
+    <?php if (empty($selected_project)) { ?>
+        </div>
+        <script>
+            document.getElementById('selected_project_id').addEventListener('change', function () {
+                if (this.value) {
+                    document.getElementById('projectSelectForm').submit();
+                }
+            });
+        </script>
+        </body>
+        </html>
+        <?php exit; ?>
+    <?php } ?>
 
     <!-- قسم الإحصائيات -->
     <div id="contractStats" class="contract-stats">
@@ -1121,7 +1197,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             m.code, 
                             m.name , 
                             m.status,
-                            o.project, 
+                            o.project_id, 
                             o.status AS operation_status,
                             COUNT(DISTINCT d.id) AS drivers_count
                         FROM equipments m
@@ -1134,7 +1210,6 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         LEFT JOIN drivers d 
                             ON d.id = ed.driver_id 
                             AND ed.status = '1'
-                        WHERE m.project_id = $selected_project_id
                         GROUP BY m.id
                         ORDER BY m.id DESC
                     ";
@@ -1184,11 +1259,11 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         // الإجراءات
                         echo "<td>";
                         if ($_SESSION['user']['role'] == "3") {
-                            echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "&project_id=$selected_project_id' class='action-btn btn-driver' title='إدارة المشغلين'>
+                                                        echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-driver' title='إدارة المشغلين'>
                                     <i class='fas fa-user-cog'></i>
                                   </a>";
                         } else {
-                            echo "<a href='equipments.php?project_id=$selected_project_id&edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
+                                                        echo "<a href='equipments.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
                                     <i class='fas fa-edit'></i>
                                   </a>";
                             // يمكن إضافة زر حذف هنا إذا لزم الأمر
@@ -1237,10 +1312,19 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
 
         const toggleFormBtn = document.getElementById('toggleForm');
         const equipmentForm = document.getElementById('projectForm');
+        const projectSelect = document.getElementById('selected_project_id');
 
         toggleFormBtn.addEventListener('click', function () {
             equipmentForm.style.display = equipmentForm.style.display === "none" ? "block" : "none";
         });
+
+        if (projectSelect) {
+            projectSelect.addEventListener('change', function () {
+                if (this.value) {
+                    document.getElementById('projectSelectForm').submit();
+                }
+            });
+        }
         
         // تحميل بيانات التعديل عند تحميل الصفحة
         <?php if (!empty($editData)) { ?>

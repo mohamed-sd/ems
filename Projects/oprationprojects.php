@@ -1103,7 +1103,7 @@ include('../insidebar.php');
                       (SELECT COUNT(DISTINCT pm.suppliers) 
                           FROM equipments pm
                           JOIN operations m ON pm.id = m.equipment
-                          WHERE m.project = op.id) as 'total_suppliers',
+                          WHERE m.project_id = op.id) as 'total_suppliers',
                           (SELECT COUNT(*) FROM mines WHERE project_id = op.id) as mines_count
                       FROM project op
                       LEFT JOIN clients cc ON op.company_client_id = cc.id

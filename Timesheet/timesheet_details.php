@@ -47,7 +47,7 @@ $sql = "SELECT  * , t.id,
         JOIN drivers d ON t.driver = d.id
         JOIN operations o ON t.operator = o.id
         JOIN equipments e ON o.equipment = e.id
-        JOIN project p ON o.project = p.id
+        JOIN project p ON o.project_id = p.id
         WHERE t.id = $project
         ORDER BY t.date DESC";
 

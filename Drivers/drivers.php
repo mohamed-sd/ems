@@ -35,8 +35,8 @@ include("../inheader.php");
                         <label> الحالة </label>
                         <select name="status" id="status">
                             <option value=""> -- اختار الحالة -- </option>
-                            <option value="1"> يعمل </option>
-                            <option value="0"> عاطل </option>
+                            <option value="1"> نشط </option>
+                            <option value="0"> غير نشط </option>
                         </select>
                     </div>
                     <br />
@@ -106,9 +106,9 @@ include("../inheader.php");
                         echo "<td>" . $row['numcontracts'] . "</td>";
                         echo "<td>" . $row['phone'] . "</td>";
                         if ($row['status'] == "1") {
-                            echo "<td style='color:green'>يعمل</td>";
+                            echo "<td style='color:green'>نشط</td>";
                         } else {
-                            echo "<td style='color:red'>عاطل</td>";
+                            echo "<td style='color:red'>غير نشط</td>";
                         }
                         echo "<td>
                          <a href='javascript:void(0)' 

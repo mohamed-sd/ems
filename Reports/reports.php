@@ -13,12 +13,12 @@ $sql = "
 SELECT 
     s.name AS supplier_name,
     p.name AS project_name,
-    SUM(t.total_work_hours) AS total_hours
+    SUM(t.executed_hours) AS total_hours
 FROM timesheet t
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id   
 JOIN suppliers s ON e.suppliers = s.id
-JOIN project p ON o.project = p.id
+JOIN project p ON o.project_id = p.id
 WHERE 1=1
 ";
 

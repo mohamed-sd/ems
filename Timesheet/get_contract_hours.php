@@ -6,11 +6,11 @@ if (isset($_GET['operation_id'])) {
 
     // جلب المشروع المرتبط من التشغيل
     $op = mysqli_fetch_assoc(mysqli_query($conn, "
-        SELECT project FROM operations WHERE id = $operation_id
+        SELECT project_id FROM operations WHERE id = $operation_id
     "));
 
     if ($op) {
-        $project_id = $op['project'];
+        $project_id = $op['project_id'];
 
         // جلب إجمالي ساعات العقد للمشروع
         $contract = mysqli_fetch_assoc(mysqli_query($conn, "

@@ -52,7 +52,7 @@ JOIN drivers d ON t.driver = d.id
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id 
 JOIN suppliers s ON e.suppliers = s.id
-JOIN project p ON o.project = p.id
+JOIN project p ON o.project_id = p.id
 WHERE 1=1
 ";
 
@@ -87,7 +87,7 @@ FROM timesheet t
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id 
 JOIN suppliers s ON e.suppliers = s.id
-JOIN project p ON o.project = p.id
+JOIN project p ON o.project_id = p.id
 WHERE 1=1
 ";
 

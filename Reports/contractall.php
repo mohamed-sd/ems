@@ -53,11 +53,11 @@ if (!isset($_SESSION['user'])) {
             c.contract_duration_months,
             c.hours_monthly_target,
             c.forecasted_contracted_hours,
-            IFNULL(SUM(t.total_work_hours),0) AS actual_hours
+            IFNULL(SUM(t.executed_hours),0) AS actual_hours
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        LEFT JOIN operations o ON o.project = p.id
+        LEFT JOIN operations o ON o.project_id = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
         WHERE c.id = '$contract_filter'
@@ -68,11 +68,11 @@ if (!isset($_SESSION['user'])) {
         $sql_time = "
         SELECT 
             (TIMESTAMPDIFF(MONTH, c.contract_signing_date, CURDATE()) / c.contract_duration_months) * 100 AS time_progress,
-            (IFNULL(SUM(t.total_work_hours),0) / c.forecasted_contracted_hours) * 100 AS work_progress
+            (IFNULL(SUM(t.executed_hours),0) / c.forecasted_contracted_hours) * 100 AS work_progress
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        LEFT JOIN operations o ON o.project = p.id
+        LEFT JOIN operations o ON o.project_id = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
         WHERE c.id = '$contract_filter'";
@@ -84,7 +84,7 @@ if (!isset($_SESSION['user'])) {
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        LEFT JOIN operations o ON o.project = p.id
+        LEFT JOIN operations o ON o.project_id = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
         WHERE c.id = '$contract_filter'";
@@ -92,11 +92,11 @@ if (!isset($_SESSION['user'])) {
 
         // الموردين
         $sql_suppliers = "
-        SELECT s.name AS supplier_name, SUM(t.total_work_hours) AS total_work_hours
+        SELECT s.name AS supplier_name, SUM(t.executed_hours) AS total_work_hours
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        JOIN operations o ON o.project = p.id
+        JOIN operations o ON o.project_id = p.id
         JOIN equipments e ON e.id = o.equipment
         JOIN suppliers s ON e.suppliers = s.id
         LEFT JOIN timesheet t ON t.operator = o.id
@@ -107,12 +107,12 @@ if (!isset($_SESSION['user'])) {
         // الآليات
         $sql_equipments = "
         SELECT e.name AS equipment_name,
-               SUM(t.total_work_hours) AS work_hours,
+               SUM(t.executed_hours) AS work_hours,
                SUM(t.total_fault_hours) AS fault_hours
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        JOIN operations o ON o.project = p.id
+        JOIN operations o ON o.project_id = p.id
         JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
         WHERE c.id = '$contract_filter'
@@ -121,11 +121,11 @@ if (!isset($_SESSION['user'])) {
 
         // السائقين
         $sql_drivers = "
-        SELECT d.name AS driver_name, SUM(t.total_work_hours) AS driver_hours
+        SELECT d.name AS driver_name, SUM(t.executed_hours) AS driver_hours
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        JOIN operations o ON o.project = p.id
+        JOIN operations o ON o.project_id = p.id
         JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
         JOIN drivers d ON t.driver = d.id
@@ -136,12 +136,12 @@ if (!isset($_SESSION['user'])) {
         // الانحراف
         $sql_variance = "
         SELECT c.forecasted_contracted_hours AS planned_hours,
-               IFNULL(SUM(t.total_work_hours),0) AS actual_hours,
-               (IFNULL(SUM(t.total_work_hours),0) - c.forecasted_contracted_hours) AS variance
+               IFNULL(SUM(t.executed_hours),0) AS actual_hours,
+               (IFNULL(SUM(t.executed_hours),0) - c.forecasted_contracted_hours) AS variance
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        LEFT JOIN operations o ON o.project = p.id
+        LEFT JOIN operations o ON o.project_id = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
         WHERE c.id = '$contract_filter'
