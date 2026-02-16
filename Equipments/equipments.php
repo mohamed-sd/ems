@@ -56,9 +56,7 @@ if (isset($_GET['msg'])) {
 
 // معالجة الحفظ أو التعديل
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
-    $project_id = isset($_POST['project_id']) ? intval($_POST['project_id']) : null;
-    $mine_id = isset($_POST['mine_id']) ? intval($_POST['mine_id']) : null;
-    $contract_id = isset($_POST['contract_id']) ? intval($_POST['contract_id']) : null;
+    
     $suppliers = mysqli_real_escape_string($conn, $_POST['suppliers']);
     $code      = mysqli_real_escape_string($conn, trim($_POST['code']));
     $type      = mysqli_real_escape_string($conn, $_POST['type']);
@@ -66,18 +64,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     $status    = mysqli_real_escape_string($conn, $_POST['status']);
     $edit_id   = isset($_POST['edit_id']) ? intval($_POST['edit_id']) : 0;
 
-    $project_id_sql = $project_id ? $project_id : 'NULL';
-    $mine_id_sql = $mine_id ? $mine_id : 'NULL';
-    $contract_id_sql = $contract_id ? $contract_id : 'NULL';
+
 
     // التحقق من عدم تجاوز العدد المتعاقد عليه (فقط عند الإضافة)
-    if ($edit_id == 0 && $project_id && $suppliers && $type) {
+    if ($edit_id == 0  && $suppliers && $type) {
         // الحصول على عدد المعدات المتعاقد عليها لهذا المورد ونوع المعدة
         $supplier_contract_query = "SELECT sc.id, sce.equip_count
                                    FROM supplierscontracts sc
                                    JOIN suppliercontractequipments sce ON sc.id = sce.contract_id
                                    WHERE sc.supplier_id = $suppliers 
-                                   AND sc.project_id = $project_id
                                    AND sce.equip_type = '$type'
                                    AND sc.status = 1
                                    LIMIT 1";
@@ -91,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
             $added_count_query = "SELECT COUNT(*) as added_count 
                                  FROM equipments 
                                  WHERE suppliers = $suppliers 
-                                 AND project_id = $project_id
                                  AND type = '$type'
                                  AND status = 1";
             $added_count_result = mysqli_query($conn, $added_count_query);
@@ -109,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     if ($edit_id > 0) {
         // تعديل
         $sql = "UPDATE equipments 
-                SET project_id=$project_id_sql, mine_id=$mine_id_sql, contract_id=$contract_id_sql, 
+                SET  
                     suppliers='$suppliers', code='$code', type='$type', name='$name', status='$status' 
                 WHERE id='$edit_id'";
         $msg = "تم+تعديل+المعدة+بنجاح+✅";
@@ -1001,14 +995,12 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             <th>المورد</th>
                             <th>الساعات المتعاقد عليها</th>
                             <th>عدد المعدات المتعاقد عليها</th>
-                            <th>المعدات المضافة</th>
-                            <th>المتبقي للإضافة</th>
                             <th>توزيع المعدات والساعات</th>
                         </tr>
                     </thead>
                     <tbody id="suppliersTableBody">
                         <tr>
-                            <td colspan="7" style="text-align: center; color: #6c757d; padding: 2rem;">
+                            <td colspan="5" style="text-align: center; color: #6c757d; padding: 2rem;">
                                 <i class="fas fa-info-circle"></i> لا توجد بيانات
                             </td>
                         </tr>
@@ -1018,8 +1010,6 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             <td colspan="2" style="text-align: right; padding: 12px;">الإجمالي</td>
                             <td id="total_supplier_hours" style="text-align: center;">0</td>
                             <td id="total_supplier_equipment" style="text-align: center;">0</td>
-                            <td id="total_added_equipment" style="text-align: center;">0</td>
-                            <td id="total_remaining_equipment" style="text-align: center;">0</td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -1072,7 +1062,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             <i class="fas fa-mountain"></i>
                             المنجم <span class="required-indicator">*</span>
                         </label>
-                        <select name="mine_id" id="mine_id" required>
+                        <select name="mine_id" id="mine_id" >
                             <option value="">-- اختر المنجم --</option>
                             <?php
                             $mines_query = "SELECT id, mine_name FROM mines WHERE project_id = $selected_project_id AND status='1' ORDER BY mine_name";
@@ -1091,7 +1081,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             <i class="fas fa-file-signature"></i>
                             عقد المشروع <span class="required-indicator">*</span>
                         </label>
-                        <select name="contract_id" id="contract_id" required disabled>
+                        <select name="contract_id" id="contract_id"  disabled>
                             <option value="">-- اختر العقد --</option>
                         </select>
                         <span class="dropdown-hint">يتم تحميله بعد اختيار المنجم</span>
@@ -1434,37 +1424,15 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         tbody.empty();
                         
                         if (response.suppliers && response.suppliers.length > 0) {
-                            let totalAdded = 0;
-                            let totalRemaining = 0;
-                            
                             response.suppliers.forEach(function(supplier, index) {
-                                // بناء نص التوزيع مع حالة الإضافة
+                                // بناء نص التوزيع
                                 let breakdownHtml = '';
                                 if (supplier.equipment_breakdown && supplier.equipment_breakdown.length > 0) {
                                     const breakdownList = supplier.equipment_breakdown.map(item => {
-                                        const addedCount = item.added_count || 0;
-                                        const remaining = item.remaining || 0;
-                                        let statusIcon = '';
-                                        let statusColor = '';
-                                        
-                                        if (remaining === 0) {
-                                            statusIcon = '<i class="fas fa-check-circle" style="color: #28a745;"></i>';
-                                            statusColor = 'background: rgba(40, 167, 69, 0.1); border-right: 3px solid #28a745;';
-                                        } else if (addedCount > 0) {
-                                            statusIcon = '<i class="fas fa-exclamation-circle" style="color: #ffc107;"></i>';
-                                            statusColor = 'background: rgba(255, 193, 7, 0.1); border-right: 3px solid #ffc107;';
-                                        } else {
-                                            statusIcon = '<i class="fas fa-times-circle" style="color: #dc3545;"></i>';
-                                            statusColor = 'background: rgba(220, 53, 69, 0.1); border-right: 3px solid #dc3545;';
-                                        }
-                                        
-                                        return `<div style="margin: 3px 0; padding: 8px; ${statusColor} border-radius: 4px;">
-                                                    ${statusIcon}
+                                        return `<div style="margin: 3px 0; padding: 8px; background: rgba(226, 174, 3, 0.1); border-right: 3px solid #e2ae03; border-radius: 4px;">
                                                     <i class="fas fa-tools" style="color: #e2ae03;"></i> 
                                                     <strong>${item.type || 'غير محدد'}</strong>: 
-                                                    ${item.count} متعاقد | 
-                                                    <span style="color: #28a745; font-weight: bold;">${addedCount} مضاف</span> | 
-                                                    <span style="color: #dc3545; font-weight: bold;">${remaining} متبقي</span> | 
+                                                    ${item.count} معدة | 
                                                     <i class="fas fa-clock"></i> ${parseFloat(item.hours).toLocaleString()} ساعة
                                                 </div>`;
                                     }).join('');
@@ -1473,39 +1441,12 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                     breakdownHtml = '<span style="color: #6c757d;">لا توجد تفاصيل</span>';
                                 }
                                 
-                                const addedEquipment = supplier.added_to_equipments || 0;
-                                const remainingEquipment = supplier.remaining_to_add || 0;
-                                totalAdded += addedEquipment;
-                                totalRemaining += remainingEquipment;
-                                
-                                // تحديد لون حالة الإضافة
-                                let addedBadgeClass = 'badge-available';
-                                let remainingBadgeClass = 'badge-busy';
-                                
-                                if (remainingEquipment === 0) {
-                                    addedBadgeClass = 'badge-available';
-                                    remainingBadgeClass = 'badge-available';
-                                } else if (addedEquipment > 0) {
-                                    addedBadgeClass = 'badge-working';
-                                    remainingBadgeClass = 'badge-working';
-                                }
-                                
                                 const row = `
                                     <tr>
                                         <td style="text-align: center;">${index + 1}</td>
                                         <td><strong>${supplier.supplier_name}</strong></td>
                                         <td style="text-align: center;">${parseFloat(supplier.hours).toLocaleString()}</td>
                                         <td style="text-align: center;">${supplier.equipment_count}</td>
-                                        <td style="text-align: center;">
-                                            <span class="${addedBadgeClass}">
-                                                <i class="fas fa-check"></i> ${addedEquipment}
-                                            </span>
-                                        </td>
-                                        <td style="text-align: center;">
-                                            <span class="${remainingBadgeClass}">
-                                                <i class="fas fa-${remainingEquipment === 0 ? 'check-circle' : 'exclamation-triangle'}"></i> ${remainingEquipment}
-                                            </span>
-                                        </td>
                                         <td style="text-align: right; font-size: 0.9rem;">${breakdownHtml}</td>
                                     </tr>
                                 `;
@@ -1515,8 +1456,6 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             // تحديث الإجماليات
                             $('#total_supplier_hours').text(parseFloat(response.summary.total_supplier_hours).toLocaleString());
                             $('#total_supplier_equipment').text(response.summary.total_supplier_equipment);
-                            $('#total_added_equipment').text(totalAdded);
-                            $('#total_remaining_equipment').text(totalRemaining);
                             
                             $('#suppliersSection').fadeIn();
                         } else {

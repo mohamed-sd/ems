@@ -8,6 +8,37 @@ $page_title = "إيكوبيشن | التشغيل ";
 include("../inheader.php");
 include '../config.php';
 
+// التحقق من وجود مشروع محدد
+$selected_project_id = 0;
+$selected_project = null;
+
+// التحقق من GET parameter أو SESSION
+if (isset($_GET['project_id']) && !empty($_GET['project_id'])) {
+    $selected_project_id = intval($_GET['project_id']);
+    $_SESSION['operations_project_id'] = $selected_project_id;
+} elseif (isset($_SESSION['operations_project_id'])) {
+    $selected_project_id = intval($_SESSION['operations_project_id']);
+}
+
+// إذا لم يتم تحديد مشروع، إعادة التوجيه لصفحة الاختيار
+if ($selected_project_id == 0) {
+    header("Location: select_project.php");
+    exit();
+}
+
+// جلب بيانات المشروع المحدد
+$project_query = "SELECT id, name, project_code, location FROM project WHERE id = $selected_project_id AND status = 1";
+$project_result = mysqli_query($conn, $project_query);
+
+if (mysqli_num_rows($project_result) > 0) {
+    $selected_project = mysqli_fetch_assoc($project_result);
+} else {
+    // المشروع غير موجود أو غير نشط
+    unset($_SESSION['operations_project_id']);
+    header("Location: select_project.php");
+    exit();
+}
+
 // انهاء خدمة من الموديل
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'end_service') {
     $operation_id = intval($_POST['operation_id']);
@@ -36,7 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         );
     }
 
-    echo "<script>window.location.href='oprators.php';</script>";
+    // الحفاظ على المشروع المحدد بعد إنهاء الخدمة
+    $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
+    echo "<script>window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
     exit();
 }
 
@@ -232,9 +265,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         gap: 6px;
         border: 2px solid #ffc107;
     }
+    
+    .project-header {
+        background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        border: 2px solid #e2ae03;
+    }
+    
+    .project-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .project-title {
+        color: #fff;
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .project-title i {
+        color: #e2ae03;
+    }
+    
+    .project-code-display {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        margin: 0.5rem 0 0 0;
+        font-family: monospace;
+    }
+    
+    .change-project-btn {
+        background: linear-gradient(135deg, #e2ae03 0%, #debf0f 100%);
+        color: #01072a;
+        padding: 0.7rem 1.2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(226, 174, 3, 0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .change-project-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(226, 174, 3, 0.5);
+        text-decoration: none;
+        color: #01072a;
+    }
 </style>
 
 <div class="main">
+    <!-- عنوان المشروع المحدد -->
+    <div class="project-header">
+        <div class="project-header-content">
+            <div>
+                <h1 class="project-title">
+                    <i class="fas fa-hard-hat"></i>
+                    <?php echo htmlspecialchars($selected_project['name']); ?>
+                </h1>
+                <?php if (!empty($selected_project['project_code'])) { ?>
+                    <p class="project-code-display">
+                        <i class="fas fa-barcode"></i>
+                        كود المشروع: <?php echo htmlspecialchars($selected_project['project_code']); ?>
+                    </p>
+                <?php } ?>
+            </div>
+            <a href="select_project.php" class="change-project-btn">
+                <i class="fas fa-exchange-alt"></i>
+                تغيير المشروع
+            </a>
+        </div>
+    </div>
+    
     <div class="page-header">
         <div>
             <h1 class="page-title"><i class="fas fa-cogs"></i> إدارة التشغيل</h1>
@@ -256,20 +370,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <div class="card-body">
                 <div class="form-grid">
 
-                    <!-- المشروع -->
-                    <select name="project_id" id="project_id" required>
-                        <option value="">-- اختر المشروع --</option>
-                        <?php
-                        $pr_res = mysqli_query($conn, "SELECT id, name FROM project WHERE status = '1'");
-                        while ($pr = mysqli_fetch_assoc($pr_res)) {
-                            echo "<option value='" . $pr['id'] . "'>" . $pr['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
+                    <!-- المشروع مخفي لأنه محدد مسبقاً -->
+                    <input type="hidden" name="project_id" id="project_id" value="<?php echo $selected_project_id; ?>">
 
                     <!-- المناجم -->
                     <select name="mine_id" id="mine_id" required>
                         <option value="">-- اختر المنجم --</option>
+                        <?php
+                        // تحميل المناجم للمشروع المحدد مباشرة
+                        $mines_query = "SELECT id, mine_name FROM mines WHERE project_id = $selected_project_id AND status='1' ORDER BY mine_name";
+                        $mines_result = mysqli_query($conn, $mines_query);
+                        while ($mine = mysqli_fetch_assoc($mines_result)) {
+                            echo "<option value='" . $mine['id'] . "'>" . htmlspecialchars($mine['mine_name']) . "</option>";
+                        }
+                        ?>
                     </select>
 
                     <!-- العقود -->
@@ -377,7 +491,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <th style="text-align:right;">السائقين</th>
 
                         <th style="text-align:right;">المورد</th>
-                        <th style="text-align:right;">المشروع</th>
 
                         <th style="text-align:right;">تاريخ البداية</th>
                         <th style="text-align:right;">تاريخ النهاية</th>
@@ -408,24 +521,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, project_id, mine_id, contract_id, supplier_id, start, end, days, status) 
                                      VALUES ('$equipment', '$equipment_type', '$project_id', '$mine_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$status')");
 
-                              echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='oprators.php';</script>";
-
-
-
+                        echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                     }
 
-                    // جلب بيانات التشغيل
+                    // جلب بيانات التشغيل للمشروع المحدد فقط
                     $query = "SELECT o.id, o.start, o.end, o.days , o.status, 
                              e.code AS equipment_code, e.name AS equipment_name,
                              p.name AS project_name ,s.name AS suppliers_name,
-                                 IFNULL(GROUP_CONCAT(DISTINCT d.name SEPARATOR ', '), '') AS driver_names
+                             IFNULL(GROUP_CONCAT(DISTINCT d.name SEPARATOR ', '), '') AS driver_names
                       FROM operations o
                       LEFT JOIN equipments e ON o.equipment = e.id
-                                            LEFT JOIN project p ON o.project_id = p.id
+                      LEFT JOIN project p ON o.project_id = p.id
                       LEFT JOIN suppliers s ON e.suppliers = s.id
                       LEFT JOIN equipment_drivers ed ON o.equipment = ed.equipment_id
                       LEFT JOIN drivers d ON ed.driver_id = d.id
-                    GROUP BY o.id
+                      WHERE o.project_id = $selected_project_id
+                      GROUP BY o.id
                       ORDER BY o.id DESC";
                     $result = mysqli_query($conn, $query);
                     $i = 1;
@@ -436,8 +547,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         echo "<td>" . (!empty($row['driver_names']) ? $row['driver_names'] : "-") . "</td>";
 
                         echo "<td>" . $row['suppliers_name'] . "</td>";
-
-                        echo "<td>" . $row['project_name'] . "</td>";
 
                         echo "<td>" . $row['start'] . "</td>";
                         echo "<td>" . $row['end'] . "</td>";
@@ -666,35 +775,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
         }
 
-        $("#project_id").change(function () {
-            var projectId = $(this).val();
-            $("#mine_id").html("<option value=''>-- اختر المنجم --</option>");
-            $("#contract_id").html("<option value=''>-- اختر العقد --</option>");
-            resetSupplier();
-            $("#type").val("");
-            resetEquipment();
-            resetStats();
-            $("#end_date").val("");
-
-            if (projectId !== "") {
-                $.ajax({
-                    url: "get_project_mines.php",
-                    type: "POST",
-                    dataType: "json",
-                    data: { project_id: projectId },
-                    success: function (response) {
-                        if (response.success) {
-                            var options = "<option value=''>-- اختر المنجم --</option>";
-                            response.mines.forEach(function (mine) {
-                                options += "<option value='" + mine.id + "'>" + mine.display_name + "</option>";
-                            });
-                            $("#mine_id").html(options);
-                        }
-                    }
-                });
-            }
-        });
-
+        // لم نعد بحاجة لـ event listener للمشروع لأنه محدد مسبقاً من الصفحة السابقة
+        
         $("#mine_id").change(function () {
             var mineId = $(this).val();
             $("#contract_id").html("<option value=''>-- اختر العقد --</option>");

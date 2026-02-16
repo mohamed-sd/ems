@@ -67,33 +67,13 @@ if ($suppliers_result) {
         $equip_details_result = mysqli_query($conn, $equip_details_query);
         
         $equipment_breakdown = [];
-        $total_added_to_equipments = 0;
         
         while ($equip = mysqli_fetch_assoc($equip_details_result)) {
-            $equip_type_id = $equip['equip_type'];
-            $contracted_count = intval($equip['total_count']);
-            
-            // حساب عدد المعدات المضافة فعلياً في جدول equipments لهذا المورد
-            $added_query = "SELECT COUNT(*) as added_count 
-                           FROM equipments 
-                           WHERE suppliers = " . $row['supplier_id'] . " 
-                           AND project_id = $project_id
-                           AND type = '$equip_type_id'
-                           AND status = 1";
-            $added_result = mysqli_query($conn, $added_query);
-            $added_row = mysqli_fetch_assoc($added_result);
-            $added_count = intval($added_row['added_count']);
-            $total_added_to_equipments += $added_count;
-            
-            $remaining = $contracted_count - $added_count;
-            
             $equipment_breakdown[] = [
                 'type' => $equip['type_name'] ?: 'غير محدد',
-                'type_id' => $equip_type_id,
-                'count' => $contracted_count,
-                'hours' => floatval($equip['total_hours']),
-                'added_count' => $added_count,
-                'remaining' => $remaining
+                'type_id' => $equip['equip_type'],
+                'count' => intval($equip['total_count']),
+                'hours' => floatval($equip['total_hours'])
             ];
         }
         
@@ -103,8 +83,6 @@ if ($suppliers_result) {
             'supplier_name' => $row['supplier_name'] ?: 'غير محدد',
             'hours' => floatval($row['forecasted_contracted_hours']),
             'equipment_count' => intval($row['equipment_count']),
-            'added_to_equipments' => $total_added_to_equipments,
-            'remaining_to_add' => intval($row['equipment_count']) - $total_added_to_equipments,
             'equipment_breakdown' => $equipment_breakdown
         ];
         $total_supplier_hours += floatval($row['forecasted_contracted_hours']);
