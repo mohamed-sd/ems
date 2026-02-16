@@ -1874,6 +1874,12 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             m.code, 
                             m.name, 
                             m.status,
+                            m.serial_number,
+                            m.model,
+                            m.manufacturing_year,
+                            m.equipment_condition,
+                            m.actual_owner_name,
+                            m.availability_status,
                             o.project_id, 
                             o.status AS operation_status,
                             COUNT(DISTINCT d.id) AS drivers_count
@@ -1908,8 +1914,8 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         $type_text = $row['type'] == "1" ? "حفار" : "قلاب";
                         echo "<td><span class='badge-type'><i class='fas $type_icon'></i> $type_text</span></td>";
 
-                        // اسم المعدة
-                        echo "<td><strong>" . htmlspecialchars($row['name']) . "</strong></td>";
+                        // اسم المعدة (تهيئة المتغير)
+                        $name_display = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
                         
                         // المشروع النشط
                         if (!empty($row['project'])) {
@@ -1926,6 +1932,26 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         }
 
                         echo "<td>" . $name_display . "</td>";
+
+                        // الموديل
+                        $model = !empty($row['model']) ? htmlspecialchars($row['model']) : "<span style='color: #999;'>غير محدد</span>";
+                        echo "<td>" . $model . "</td>";
+                        
+                        // سنة الصنع
+                        $manufacturing_year = !empty($row['manufacturing_year']) ? $row['manufacturing_year'] : "<span style='color: #999;'>غير محدد</span>";
+                        echo "<td>" . $manufacturing_year . "</td>";
+                        
+                        // حالة المعدة
+                        $equipment_condition = !empty($row['equipment_condition']) ? htmlspecialchars($row['equipment_condition']) : "<span style='color: #999;'>غير محدد</span>";
+                        echo "<td>" . $equipment_condition . "</td>";
+                        
+                        // المالك
+                        $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span style='color: #999;'>غير محدد</span>";
+                        echo "<td>" . $owner . "</td>";
+                        
+                        // التوفر
+                        $availability = !empty($row['availability_status']) ? htmlspecialchars($row['availability_status']) : "متاحة للعمل";
+                        echo "<td>" . $availability . "</td>";
 
                         // الحالة
                         if (!empty($row['project_id']) && $row['operation_status'] == "1") {
