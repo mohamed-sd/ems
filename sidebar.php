@@ -1,6 +1,3 @@
-<?php
-// session_start();
-?>
 <button class="mobile-menu-btn" id="mobileMenuBtn">
   <i class="fa fa-bars"></i>
 </button>
@@ -86,7 +83,7 @@
         <li><a href="Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a></li>
       <?php } ?>
 
-      <li><a href="settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
+      <li><a href="Settings/settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
 
 
 

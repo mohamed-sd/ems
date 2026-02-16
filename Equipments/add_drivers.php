@@ -18,7 +18,7 @@ $current = [];
 $res = mysqli_query($conn, "SELECT ed.id, d.id AS driver_id, d.name ,ed.status
                              FROM equipment_drivers ed
                              JOIN drivers d ON ed.driver_id = d.id
-                             WHERE ed.equipment_id = $equipment_id");
+                             WHERE ed.equipment_id = $equipment_id AND d.status = 1");
 while ($r = mysqli_fetch_assoc($res)) {
     $current[] = $r['driver_id'];
     $linked[] = $r; // نخزن البيانات للعرض في الجدول
@@ -44,6 +44,13 @@ while ($r = mysqli_fetch_assoc($res)) {
     <form id="projectForm" method="POST" action="save_equipment_drivers.php">
         <input type="hidden" name="equipment_id" value="<?php echo $equipment_id; ?>">
 
+        <label>تاريخ بداية القيادة:</label><br>
+        <input type="date" name="start_date" required>
+
+        <br><br>
+        <label>تاريخ نهاية القيادة (اختياري):</label><br>
+        <input type="date" name="end_date">
+
         <label>اختر المشغلين:</label><br>
         <select name="drivers[]" multiple size="6">
             <?php
@@ -53,7 +60,7 @@ WHERE d.id NOT IN (
     SELECT driver_id 
     FROM equipment_drivers 
     WHERE status = 1
-)");
+) and d.status = 1");
             while ($d = mysqli_fetch_assoc($drivers)) {
                 echo "<option value='{$d['id']}' $selected>{$d['name']}</option>";
             }

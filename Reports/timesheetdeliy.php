@@ -42,7 +42,7 @@ SELECT
     e.code AS equipment_code,
     s.name AS supplier_name,
     p.name AS project_name,
-    t.total_work_hours,
+    t.executed_hours,
     t.total_fault_hours,
     t.standby_hours,
     t.work_notes,
@@ -80,7 +80,7 @@ WHERE 1=1
     // إجمالي الإحصائيات
     $total_sql = "
 SELECT 
-    SUM(t.total_work_hours) AS total_work,
+    SUM(t.executed_hours) AS executed_hours,
     SUM(t.total_fault_hours) AS total_fault,
     SUM(t.standby_hours) AS total_standby
 FROM timesheet t
@@ -193,7 +193,7 @@ WHERE 1=1
                 <div class="card text-center shadow-sm border-success">
                     <div class="card-body">
                         <h5 class="card-title text-success">⏱️ إجمالي ساعات العمل</h5>
-                        <p class="fs-4 fw-bold"><?php echo !empty($totals['total_work']) ? $totals['total_work'] : 0; ?>
+                        <p class="fs-4 fw-bold"><?php echo !empty($totals['executed_hours']) ? $totals['executed_hours'] : 0; ?>
                             ساعة</p>
                     </div>
                 </div>
@@ -248,7 +248,7 @@ WHERE 1=1
                                 <td><?php echo $row['equipment_code']; ?></td>
                                 <td><?php echo $row['driver_name']; ?></td>
                                 <td><?php echo $row['shift']; ?></td>
-                                <td class="text-success fw-bold"><?php echo $row['total_work_hours']; ?></td>
+                                <td class="text-success fw-bold"><?php echo $row['executed_hours']; ?></td>
                                 <td class="text-danger fw-bold"><?php echo $row['total_fault_hours']; ?></td>
                                 <td class="text-warning fw-bold"><?php echo $row['standby_hours']; ?></td>
                                 <td><?php echo $row['work_notes']; ?></td>

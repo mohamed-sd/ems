@@ -8,11 +8,14 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 
 $selected_project_id = 0;
+$show_all_projects = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_project_id'])) {
-    $selected_project_id = intval($_POST['selected_project_id']);
-    if ($selected_project_id > 0) {
-        $_SESSION['equipments_project_id'] = $selected_project_id;
+    $selected_project_value = trim($_POST['selected_project_id']);
+    if ($selected_project_value === 'all') {
+        $_SESSION['equipments_project_id'] = 'all';
+    } elseif (is_numeric($selected_project_value) && intval($selected_project_value) > 0) {
+        $_SESSION['equipments_project_id'] = intval($selected_project_value);
     } else {
         unset($_SESSION['equipments_project_id']);
     }
@@ -27,7 +30,12 @@ if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
 }
 
 if (isset($_SESSION['equipments_project_id'])) {
-    $selected_project_id = intval($_SESSION['equipments_project_id']);
+    if ($_SESSION['equipments_project_id'] === 'all') {
+        $show_all_projects = true;
+        $selected_project_id = 0;
+    } else {
+        $selected_project_id = intval($_SESSION['equipments_project_id']);
+    }
 }
 
 $selected_project = null;
@@ -909,6 +917,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
             <label for="selected_project_id">اختر المشروع</label>
             <select name="selected_project_id" id="selected_project_id" required>
                 <option value="">-- اختر المشروع --</option>
+                <option value="all" <?php echo $show_all_projects ? 'selected' : ''; ?>>الكل</option>
                 <?php
                 if ($projects_result) {
                     while ($project_row = mysqli_fetch_assoc($projects_result)) {
@@ -925,7 +934,18 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
         </form>
     </div>
 
-    <?php if (!empty($selected_project)) { ?>
+    <?php if ($show_all_projects) { ?>
+        <div class="project-header">
+            <div class="project-header-content">
+                <div>
+                    <h1 class="project-title">
+                        <i class="fas fa-layer-group"></i>
+                        عرض جميع المشاريع
+                    </h1>
+                </div>
+            </div>
+        </div>
+    <?php } elseif (!empty($selected_project)) { ?>
         <!-- عنوان المشروع المحدد -->
         <div class="project-header">
             <div class="project-header-content">
@@ -961,7 +981,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
         </div>
     <?php endif; ?>
 
-    <?php if (empty($selected_project)) { ?>
+    <?php if (empty($selected_project) && !$show_all_projects) { ?>
         </div>
         <script>
             document.getElementById('selected_project_id').addEventListener('change', function () {
@@ -1121,8 +1141,16 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         </label>
                         <select name="type" id="type" required>
                             <option value="">-- حدد نوع المعدة --</option>
-                            <option value="1" <?php echo (!empty($editData) && $editData['type']=="1") ? "selected" : ""; ?>>حفار</option>
-                            <option value="2" <?php echo (!empty($editData) && $editData['type']=="2") ? "selected" : ""; ?>>قلاب</option>
+                            <?php
+                            $type_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
+                            $type_result = mysqli_query($conn, $type_query);
+                            if ($type_result) {
+                                while($type_row = mysqli_fetch_assoc($type_result)) {
+                                    $selected = (!empty($editData) && $editData['type'] == $type_row['id']) ? 'selected' : '';
+                                    echo "<option value='" . intval($type_row['id']) . "' $selected>" . htmlspecialchars($type_row['type']) . "</option>";
+                                }
+                            }
+                            ?>
                         </select>
                     </div>
                     
@@ -1179,6 +1207,11 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                 </thead>
                 <tbody>
                     <?php
+                    $project_filter_where = '';
+                    if ($selected_project_id > 0) {
+                        $project_filter_where = "WHERE o.project_id = $selected_project_id";
+                    }
+
                     $query2 = "
                         SELECT 
                             m.id, 
@@ -1187,7 +1220,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             m.code, 
                             m.name , 
                             m.status,
-                            o.project_id, 
+                            o.project_id AS project_id, 
                             o.status AS operation_status,
                             COUNT(DISTINCT d.id) AS drivers_count
                         FROM equipments m
@@ -1200,6 +1233,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         LEFT JOIN drivers d 
                             ON d.id = ed.driver_id 
                             AND ed.status = '1'
+                        $project_filter_where
                         GROUP BY m.id
                         ORDER BY m.id DESC
                     ";
@@ -1220,8 +1254,8 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         $name_display = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
                         
                         // المشروع النشط
-                        if (!empty($row['project'])) {
-                            $p_res = mysqli_query($conn, "SELECT name FROM project WHERE id='" . $row['project'] . "'");
+                        if (!empty($row['project_id'])) {
+                            $p_res = mysqli_query($conn, "SELECT name FROM project WHERE id='" . $row['project_id'] . "'");
                             if ($p_res && mysqli_num_rows($p_res) > 0) {
                                 $p = mysqli_fetch_assoc($p_res);
                                 $name_display .= "<br><span class='project-link'><i class='fas fa-project-diagram'></i> " . htmlspecialchars($p['name']) . "</span>";
@@ -1236,7 +1270,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         echo "<td>" . $name_display . "</td>";
 
                         // الحالة
-                        if (!empty($row['project']) && $row['operation_status'] == "1") {
+                        if (!empty($row['project_id']) && $row['operation_status'] == "1") {
                             echo "<td><span class='badge-working'><i class='fas fa-spinner fa-spin'></i> قيد التشغيل</span></td>";
                         } else {
                             if ($row['status'] == "1") {
@@ -1248,11 +1282,13 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
 
                         // الإجراءات
                         echo "<td>";
-                        if ($_SESSION['user']['role'] == "3") {
-                                                        echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-driver' title='إدارة المشغلين'>
-                                    <i class='fas fa-user-cog'></i>
-                                  </a>";
-                        } else {
+                                                if ($_SESSION['user']['role'] == "3") {
+                                                        if (!empty($row['project_id'])) {
+                                                                echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-driver' title='إدارة المشغلين'>
+                                                                        <i class='fas fa-user-cog'></i>
+                                                                    </a>";
+                                                        }
+                                                } else {
                                                         echo "<a href='equipments.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
                                     <i class='fas fa-edit'></i>
                                   </a>";
@@ -1295,7 +1331,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                     { extend: 'print', text: 'طباعة' }
                 ],
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                    "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
                 }
             });
         });
@@ -1304,9 +1340,11 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
         const equipmentForm = document.getElementById('projectForm');
         const projectSelect = document.getElementById('selected_project_id');
 
-        toggleFormBtn.addEventListener('click', function () {
-            equipmentForm.style.display = equipmentForm.style.display === "none" ? "block" : "none";
-        });
+        if (toggleFormBtn && equipmentForm) {
+            toggleFormBtn.addEventListener('click', function () {
+                equipmentForm.style.display = equipmentForm.style.display === "none" ? "block" : "none";
+            });
+        }
 
         if (projectSelect) {
             projectSelect.addEventListener('change', function () {
@@ -1429,10 +1467,14 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                 let breakdownHtml = '';
                                 if (supplier.equipment_breakdown && supplier.equipment_breakdown.length > 0) {
                                     const breakdownList = supplier.equipment_breakdown.map(item => {
+                                        const operatingColor = item.operating_count > 0 ? '#28a745' : '#6c757d';
+                                        const remainingColor = item.remaining_count > 0 ? '#ffc107' : '#6c757d';
                                         return `<div style="margin: 3px 0; padding: 8px; background: rgba(226, 174, 3, 0.1); border-right: 3px solid #e2ae03; border-radius: 4px;">
                                                     <i class="fas fa-tools" style="color: #e2ae03;"></i> 
                                                     <strong>${item.type || 'غير محدد'}</strong>: 
-                                                    ${item.count} معدة | 
+                                                    المتعاقد ${item.count} | 
+                                                    <span style="color: ${operatingColor}; font-weight: bold;">المشغّل ${item.operating_count || 0}</span> | 
+                                                    <span style="color: ${remainingColor}; font-weight: bold;">المتبقي ${item.remaining_count || 0}</span> | 
                                                     <i class="fas fa-clock"></i> ${parseFloat(item.hours).toLocaleString()} ساعة
                                                 </div>`;
                                     }).join('');

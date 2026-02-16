@@ -104,47 +104,33 @@ include('../insidebar.php');
         --shadow-color: rgba(0, 0, 0, 0.1);
     }
 
-    /* Modern Projects Page Styling */
-    .main {
-        margin-right: 10px;
-        padding: 30px;
-        transition: margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        min-height: 100vh;
-        background: var(--border-color);
-        max-width: 100vw;
-        overflow-x: hidden;
-    }
-
-    .sidebar.closed~.main {
-        margin-right: 5px;
-    }
 
     /* Laptop screens */
     @media (max-width: 1366px) {
         .main {
-            margin-right: 280px;
+            /* margin-right: 280px; */
             padding: 20px 15px;
         }
 
         .sidebar.closed~.main {
-            margin-right: 75px;
+            /* margin-right: 75px; */
         }
     }
 
     @media (max-width: 1024px) {
         .main {
-            margin-right: 280px;
+            /* margin-right: 280px; */
             padding: 15px 10px;
         }
 
         .sidebar.closed~.main {
-            margin-right: 75px;
+            /* margin-right: 75px; */
         }
     }
 
     @media (max-width: 768px) {
         .main {
-            margin-right: 0 !important;
+            /* margin-right: 0 !important; */
             padding: 20px 15px;
             padding-top: 80px;
         }

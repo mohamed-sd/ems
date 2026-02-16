@@ -69,10 +69,27 @@ if ($suppliers_result) {
         $equipment_breakdown = [];
         
         while ($equip = mysqli_fetch_assoc($equip_details_result)) {
+            // حساب عدد الآليات المشغّلة فعليًا من جدول operations
+            $operating_count_query = "SELECT COUNT(DISTINCT o.equipment) as operating_count
+                                      FROM operations o
+                                      JOIN equipments e ON o.equipment = e.id
+                                      WHERE e.suppliers = " . $row['supplier_id'] . "
+                                        AND e.type = " . intval($equip['equip_type']) . "
+                                        AND o.project_id = $project_id
+                                        AND o.status = 1";
+            $operating_result = mysqli_query($conn, $operating_count_query);
+            $operating_row = mysqli_fetch_assoc($operating_result);
+            $operating_count = intval($operating_row['operating_count']);
+            
+            $contracted_count = intval($equip['total_count']);
+            $remaining_count = max(0, $contracted_count - $operating_count);
+            
             $equipment_breakdown[] = [
                 'type' => $equip['type_name'] ?: 'غير محدد',
                 'type_id' => $equip['equip_type'],
-                'count' => intval($equip['total_count']),
+                'count' => $contracted_count,
+                'operating_count' => $operating_count,
+                'remaining_count' => $remaining_count,
                 'hours' => floatval($equip['total_hours'])
             ];
         }
