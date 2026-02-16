@@ -171,7 +171,7 @@ include '../insidebar.php';
     }
 
     .main {
-        margin-right: 10px;
+        /* margin-right: 10px; */
         padding: 30px;
         transition: margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         min-height: 100vh;
@@ -181,28 +181,28 @@ include '../insidebar.php';
     }
 
     .sidebar.closed~.main {
-        margin-right: 5px;
+        /* margin-right: 5px; */
     }
 
     @media (max-width: 1366px) {
         .main {
-            margin-right: 280px;
+            /* margin-right: 280px; */
             padding: 20px 15px;
         }
 
         .sidebar.closed~.main {
-            margin-right: 75px;
+            /* margin-right: 75px; */
         }
     }
 
     @media (max-width: 1024px) {
         .main {
-            margin-right: 280px;
+            /* margin-right: 280px; */
             padding: 15px 10px;
         }
 
         .sidebar.closed~.main {
-            margin-right: 75px;
+            /* margin-right: 75px; */
         }
     }
 

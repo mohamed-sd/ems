@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 08, 2026 at 09:01 PM
+-- Generation Time: Feb 16, 2026 at 09:36 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,26 +24,24 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `equipments`
+-- Table structure for table `roles`
 --
 
-CREATE TABLE `equipments` (
+CREATE TABLE `roles` (
   `id` int(11) NOT NULL,
-  `suppliers` varchar(10) NOT NULL,
-  `code` varchar(100) NOT NULL,
-  `type` varchar(100) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `status` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `status` varchar(10) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `equipments`
+-- Indexes for table `roles`
 --
-ALTER TABLE `equipments`
+ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -51,9 +49,9 @@ ALTER TABLE `equipments`
 --
 
 --
--- AUTO_INCREMENT for table `equipments`
+-- AUTO_INCREMENT for table `roles`
 --
-ALTER TABLE `equipments`
+ALTER TABLE `roles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 

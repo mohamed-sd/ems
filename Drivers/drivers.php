@@ -110,7 +110,7 @@ include("../inheader.php");
                         } else {
                             echo "<td style='color:red'>غير نشط</td>";
                         }
-                        echo "<td>
+                                                echo "<td>
                          <a href='javascript:void(0)' 
                            class='editBtn' 
                            data-id='" . $row['id'] . "' 
@@ -120,7 +120,8 @@ include("../inheader.php");
     
                            style='color:#007bff'><i class='fa fa-edit'></i></a>  | 
                         <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> 
-                        <a href='drivercontracts.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a>
+                                                <a href='drivercontracts.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a> |
+                                                <a href='driver_truck_history.php?id=" . $row['id'] . "' style='color: #6f42c1' title='تاريخ قيادة الشاحنات'><i class='fa fa-history'></i></a>
                       </td>";
                         echo "</tr>";
                     }

@@ -398,8 +398,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                     <select name="type" id="type" required>
                         <option value=""> -- حدد نوع المعدة --- </option>
-                        <option value="1"> حفار </option>
-                        <option value="2"> قلاب </option>
+                        <?php
+                        $type_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
+                        $type_result = mysqli_query($conn, $type_query);
+                        if ($type_result) {
+                            while($type_row = mysqli_fetch_assoc($type_result)) {
+                                echo "<option value='" . intval($type_row['id']) . "'> " . htmlspecialchars($type_row['type']) . " </option>";
+                            }
+                        }
+                        ?>
                     </select>
 
                     <select name="equipment" id="equipment" required>

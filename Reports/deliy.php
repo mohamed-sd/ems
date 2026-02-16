@@ -18,14 +18,14 @@ $sql = "
       d.name AS driver_name,
       t.`date`,
       t.shift,
-      t.total_work_hours,
+      t.executed_hours,
       t.total_fault_hours,
       t.standby_hours
   FROM timesheet t
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id 
   JOIN drivers d ON t.driver = d.id
-  JOIN project p ON o.project = p.id
+  JOIN project p ON o.project_id = p.id
   WHERE 1=1
 ";
 
@@ -42,11 +42,11 @@ if (!empty($project_filter)) {
 $result = mysqli_query($conn, $sql) or die("خطأ في الاستعلام: " . mysqli_error($conn));
 
 // استعلام المجموع
-$total_sql = "SELECT SUM(t.total_work_hours) AS total_hours
+$total_sql = "SELECT SUM(t.executed_hours) AS executed_hours
 FROM timesheet t
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id 
-JOIN operationproject p ON o.project = p.id
+JOIN operations p ON o.project_id = p.id
 WHERE 1=1";
 
 if (!empty($date_filter)) {
@@ -61,7 +61,7 @@ if (!empty($project_filter)) {
 
 $total_result = mysqli_query($conn, $total_sql) or die("خطأ في استعلام المجموع: " . mysqli_error($conn));
 $total_row    = mysqli_fetch_assoc($total_result);
-$total_hours  = $total_row['total_hours'];
+$executed_hours  = $total_row['executed_hours'];
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -154,7 +154,7 @@ $total_hours  = $total_row['total_hours'];
 							<td><?php echo $row['driver_name']; ?></td>
 							<td><?php echo $row['date']; ?></td>
 							<td><?php echo $row['shift']; ?></td>
-							<td><span class="badge bg-success fs-6"><?php echo $row['total_work_hours']; ?></span></td>
+							<td><span class="badge bg-success fs-6"><?php echo $row['executed_hours']; ?></span></td>
 							<td><span class="badge bg-danger fs-6"><?php echo $row['total_fault_hours']; ?></span></td>
 							<td><span class="badge bg-secondary fs-6"><?php echo $row['standby_hours']; ?></span></td>
 						</tr>
@@ -165,7 +165,7 @@ $total_hours  = $total_row['total_hours'];
 
 			<!-- المجموع -->
 			<div class="alert alert-info mt-4 fs-5 text-center">
-				✅ مجموع ساعات العمل: <strong><?php echo $total_hours ? $total_hours : 0; ?></strong> ساعة
+				✅ مجموع ساعات العمل: <strong><?php echo $executed_hours ? $executed_hours : 0; ?></strong> ساعة
 			</div>
 
 		</div>

@@ -530,14 +530,7 @@ include "../config.php";
       <?php
       // ******************************** احصائيات مدير الاسطول ******************************************************
       if ($_SESSION['user']['role'] == "4") {
-        $projects = $conn->query("SELECT COUNT(*) AS total FROM project")->fetch_assoc()['total'];
-        echo "<a href='../Projects/projects.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-building'></i>
-                  <h3>$projects</h3>
-                  <p>المشاريع</p>
-                </div>
-              </a>";
+      
 
         $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
         echo "<a href='../Equipments/equipments.php' style='text-decoration: none;'>
@@ -560,14 +553,14 @@ include "../config.php";
       <?php
       // ******************************** احصائيات مدير الموقع ******************************************************
       if ($_SESSION['user']['role'] == "5") {
-        $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<a href='../Equipments/equipments.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-tools'></i>
-                  <h3>$equipments</h3>
-                  <p>المعدات</p>
-                </div>
-              </a>";
+        // $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
+        // echo "<a href='../Equipments/equipments.php' style='text-decoration: none;'>
+        //         <div class='card'>
+        //           <i class='fas fa-tools'></i>
+        //           <h3>$equipments</h3>
+        //           <p>المعدات</p>
+        //         </div>
+        //       </a>";
 
         $hours = $conn->query("SELECT SUM(total_work_hours) AS total FROM timesheet")->fetch_assoc()['total'];
         $hours = $hours ? number_format($hours, 0) : '0';
