@@ -61,16 +61,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
         }
 
-        mysqli_query(
-            $conn,
-            "UPDATE operations SET status = 0, `end` = '$end_date', reason = '$reason', days = $days_value WHERE id = $operation_id"
-        );
+        $update_sql = "UPDATE operations SET status = 0, `end` = '$end_date', reason = '$reason', days = $days_value WHERE id = $operation_id";
+        $update_result = mysqli_query($conn, $update_sql);
+        
+        if ($update_result) {
+            // الحفاظ على المشروع المحدد بعد إنهاء الخدمة
+            $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
+            echo "<script>alert('✅ تم إنهاء الخدمة بنجاح'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+            exit();
+        } else {
+            echo "<script>alert('❌ خطأ في إنهاء الخدمة: " . mysqli_error($conn) . "');</script>";
+        }
+    } else {
+        echo "<script>alert('❌ يرجى إدخال جميع البيانات المطلوبة');</script>";
     }
-
-    // الحفاظ على المشروع المحدد بعد إنهاء الخدمة
-    $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-    echo "<script>window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
-    exit();
 }
 
 ?>
@@ -324,6 +328,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         text-decoration: none;
         color: #01072a;
     }
+    
+    /* تحسين أيقونات الإجراءات */
+    #projectsTable tbody td a {
+        display: inline-block;
+        padding: 6px;
+        margin: 0 2px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    #projectsTable tbody td a:hover {
+        transform: scale(1.1);
+        background: rgba(0, 0, 0, 0.05);
+    }
+    
+    #projectsTable tbody td a i {
+        font-size: 1rem;
+    }
 </style>
 
 <div class="main">
@@ -365,10 +388,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <form id="projectForm" action="" method="post" style="display:none; margin-top:20px;">
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"> اضافة/ تعديل تشغيل آلية </h5>
+                <h5 class="mb-0" id="formTitle">
+                    <i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد
+                </h5>
             </div>
             <div class="card-body">
                 <div class="form-grid">
+                    <!-- ID للتعديل -->
+                    <input type="hidden" name="operation_id" id="operation_id" value="">
 
                     <!-- المشروع مخفي لأنه محدد مسبقاً -->
                     <input type="hidden" name="project_id" id="project_id" value="<?php echo $selected_project_id; ?>">
@@ -414,10 +441,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <!-- سيتم ملؤها ديناميكيًا عبر AJAX -->
                     </select>
 
-                    <input type="date" name="start" required placeholder="تاريخ البداية" />
+                    <input type="date" name="start" id="start_date" required placeholder="تاريخ البداية" />
                     <input type="date" name="end" id="end_date" required placeholder="تاريخ النهاية" />
                     <input type="hidden" step="0.01" name="hours" placeholder="عدد الساعات" value="0" />
-                    <select name="status" required>
+                    
+                    <div>
+                        <label><i class="fa fa-clock"></i> عدد ساعات العمل  للآلية</label>
+                        <input type="number" name="total_equipment_hours" id="total_equipment_hours" step="0.01" placeholder="إجمالي ساعات العمل" value="0" required />
+                    </div>
+                    
+                    <div>
+                        <label><i class="fa fa-hourglass-half"></i> عدد ساعات الوردية</label>
+                        <input type="number" name="shift_hours" id="shift_hours" step="0.01" placeholder="ساعات الوردية" value="0" required />
+                    </div>
+                    
+                    <select name="status" id="status" required>
                         <option value="1">نشط</option>
                         <option value="0">منتهي</option>
                     </select>
@@ -498,6 +536,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <th style="text-align:right;">السائقين</th>
 
                         <th style="text-align:right;">المورد</th>
+                        <th style="text-align:right;">ساعات العمل الكلية</th>
+                        <th style="text-align:right;">ساعات الوردية</th>
 
                         <th style="text-align:right;">تاريخ البداية</th>
                         <th style="text-align:right;">تاريخ النهاية</th>
@@ -509,32 +549,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </thead>
                 <tbody>
                     <?php
-                    // إضافة تشغيل جديد
+                    // إضافة أو تعديل تشغيل
                     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_operation' && !empty($_POST['equipment'])) {
+                        $operation_id = isset($_POST['operation_id']) ? intval($_POST['operation_id']) : 0;
                         $equipment = intval($_POST['equipment']);
                         $project_id = intval($_POST['project_id']);
                         $mine_id = intval($_POST['mine_id']);
                         $contract_id = intval($_POST['contract_id']);
                         $supplier_id = intval($_POST['supplier_id']);
                         $equipment_type = intval($_POST['type']);
-
-
                         
                         $start = mysqli_real_escape_string($conn, $_POST['start']);
                         $end = mysqli_real_escape_string($conn, $_POST['end']);
                         $hours = floatval($_POST['hours']);
+                        $total_equipment_hours = floatval($_POST['total_equipment_hours']);
+                        $shift_hours = floatval($_POST['shift_hours']);
                         $status = mysqli_real_escape_string($conn, $_POST['status']);
 
-                        mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, project_id, mine_id, contract_id, supplier_id, start, end, days, status) 
-                                     VALUES ('$equipment', '$equipment_type', '$project_id', '$mine_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$status')");
-
-                        echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                        if ($operation_id > 0) {
+                            // تعديل سجل موجود
+                            $sql = "UPDATE operations SET 
+                                    equipment = '$equipment',
+                                    equipment_type = '$equipment_type',
+                                    mine_id = '$mine_id',
+                                    contract_id = '$contract_id',
+                                    supplier_id = '$supplier_id',
+                                    start = '$start',
+                                    end = '$end',
+                                    days = '$hours',
+                                    total_equipment_hours = '$total_equipment_hours',
+                                    shift_hours = '$shift_hours',
+                                    status = '$status'
+                                    WHERE id = $operation_id";
+                            mysqli_query($conn, $sql);
+                            echo "<script>alert('✅ تم التحديث بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                        } else {
+                            // إضافة سجل جديد
+                            mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, project_id, mine_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, status) 
+                                         VALUES ('$equipment', '$equipment_type', '$project_id', '$mine_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$status')");
+                            echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                        }
                     }
 
                     // جلب بيانات التشغيل للمشروع المحدد فقط
-                    $query = "SELECT o.id, o.start, o.end, o.days , o.status, 
+                    $query = "SELECT o.id, o.equipment, o.equipment_type, o.mine_id, o.contract_id, o.supplier_id,
+                             o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.status, 
                              e.code AS equipment_code, e.name AS equipment_name,
-                             p.name AS project_name ,s.name AS suppliers_name,
+                             p.name AS project_name, s.name AS suppliers_name,
                              IFNULL(GROUP_CONCAT(DISTINCT d.name SEPARATOR ', '), '') AS driver_names
                       FROM operations o
                       LEFT JOIN equipments e ON o.equipment = e.id
@@ -555,15 +616,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                         echo "<td>" . $row['suppliers_name'] . "</td>";
 
+                        echo "<td>" . (!empty($row['total_equipment_hours']) ? $row['total_equipment_hours'] : '0') . "</td>";
+                        echo "<td>" . (!empty($row['shift_hours']) ? $row['shift_hours'] : '0') . "</td>";
                         echo "<td>" . $row['start'] . "</td>";
                         echo "<td>" . $row['end'] . "</td>";
                         // echo "<td>" . $row['hours'] . "</td>";
                         echo $row['status'] == "1" ? "<td style='color:green'> تعمل </td>" : "<td style='color:red'> متوقفة </td>";
-                                                echo "<td>
-                                                                                                <a href='#' style='color:#007bff'><i class='fa fa-edit'></i></a> | 
-                                                                                                <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
-                                                                                                <a href='#' class='end-service-btn' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a>
-                                            </td>";
+                        echo "<td>
+                                <a href='javascript:void(0)' class='editOperationBtn' 
+                                   data-id='" . $row['id'] . "'
+                                   data-equipment='" . $row['equipment'] . "'
+                                   data-equipment-type='" . $row['equipment_type'] . "'
+                                   data-mine='" . $row['mine_id'] . "'
+                                   data-contract='" . $row['contract_id'] . "'
+                                   data-supplier='" . $row['supplier_id'] . "'
+                                   data-start='" . $row['start'] . "'
+                                   data-end='" . $row['end'] . "'
+                                   data-total-hours='" . $row['total_equipment_hours'] . "'
+                                   data-shift-hours='" . $row['shift_hours'] . "'
+                                   data-status='" . $row['status'] . "'
+                                   style='color:#007bff' title='تعديل'><i class='fa fa-edit'></i></a> | 
+                                <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545' title='حذف'><i class='fa fa-trash'></i></a> | 
+                                <a href='#' class='end-service-btn' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a>
+                              </td>";
                         echo "</tr>";
                     }
                     ?>
@@ -584,7 +659,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="action" value="end_service" />
-                    <input type="hidden" name="operation_id" id="operation_id" />
+                    <input type="hidden" name="operation_id" id="modal_operation_id" />
                     <div class="mb-3">
                         <label for="service_end_date" class="form-label">تاريخ الإنهاء</label>
                         <input type="date" class="form-control" name="end_date" id="service_end_date" required />
@@ -647,7 +722,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         const form = document.getElementById('projectForm');
 
         toggleFormBtn.addEventListener('click', function () {
-            form.style.display = form.style.display === "none" ? "block" : "none";
+            // إعادة تعيين النموذج عند فتحه كإضافة جديدة
+            if (form.style.display === "none") {
+                $('#formTitle').html('<i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد');
+                $('#operation_id').val('');
+                $('#mine_id').val('');
+                $('#contract_id').html('<option value="">-- اختر العقد --</option>');
+                $('#supplier_id').html('<option value="">-- اختر المورد --</option>');
+                $('#type').val('');
+                $('#equipment').html('<option value="">-- اختر المعدة --</option>');
+                $('#start_date').val('');
+                $('#end_date').val('');
+                $('#total_equipment_hours').val('0');
+                $('#shift_hours').val('0');
+                $('#status').val('1');
+                
+                form.style.display = "block";
+            } else {
+                form.style.display = "none";
+            }
         });
     })();
 
@@ -865,15 +958,145 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         $(document).on("click", ".end-service-btn", function (e) {
             e.preventDefault();
+            var opId = $(this).data('id');
+            console.log('🔴 زر إنهاء الخدمة - ID:', opId);
         });
 
         $("#endServiceModal").on("show.bs.modal", function (event) {
             var button = $(event.relatedTarget);
             var opId = button.data("id") || "";
-            $("#operation_id").val(opId);
+            console.log('🚨 إنهاء خدمة التشغيل رقم:', opId);
+            $("#modal_operation_id").val(opId);
             $("#service_end_date").val("");
             $("#service_reason").val("");
         });
+        
+        // وظيفة التعديل
+        $(document).on('click', '.editOperationBtn', function() {
+            var btn = $(this);
+            
+            console.log('🔧 بدء التعديل - ID:', btn.data('id'));
+            
+            // تغيير عنوان النموذج
+            $('#formTitle').html('<i class="fa fa-edit"></i> تعديل بيانات التشغيل');
+            
+            // إظهار النموذج
+            $('#projectForm').show();
+            $('html, body').animate({scrollTop: $('#projectForm').offset().top - 100}, 500);
+            
+            // ملء البيانات الأساسية
+            $('#operation_id').val(btn.data('id'));
+            $('#start_date').val(btn.data('start'));
+            $('#end_date').val(btn.data('end'));
+            $('#total_equipment_hours').val(btn.data('total-hours'));
+            $('#shift_hours').val(btn.data('shift-hours'));
+            $('#status').val(btn.data('status'));
+            
+            console.log('✅ تم ملء البيانات الأساسية');
+            
+            // تحميل المنجم
+            var mineId = btn.data('mine');
+            $('#mine_id').val(mineId);
+            
+            console.log('📍 تحميل العقود للمنجم:', mineId);
+            
+            // تحميل العقود للمنجم المحدد
+            setTimeout(function() {
+                $.ajax({
+                    url: "get_mine_contracts.php",
+                    type: "POST",
+                    dataType: "json",
+                    data: { mine_id: mineId },
+                    success: function (response) {
+                        console.log('📋 استجابة العقود:', response);
+                        if (response.success) {
+                            var options = "<option value=''>-- اختر العقد --</option>";
+                            response.contracts.forEach(function (contract) {
+                                var selected = (contract.id == btn.data('contract')) ? 'selected' : '';
+                                options += "<option value='" + contract.id + "' data-end='" + contract.end_date + "' " + selected + ">" + contract.display_name + "</option>";
+                            });
+                            $('#contract_id').html(options);
+                            
+                            console.log('✅ تم تحميل العقود');
+                            
+                            // تحميل الموردين للعقد المحدد
+                            setTimeout(function() {
+                                var contractId = btn.data('contract');
+                                console.log('🏢 تحميل الموردين للعقد:', contractId);
+                                
+                                $.ajax({
+                                    url: "get_contract_suppliers.php",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: { contract_id: contractId },
+                                    success: function (response) {
+                                        console.log('🏪 استجابة الموردين:', response);
+                                        if (response.success) {
+                                            var options = "<option value=''>-- اختر المورد --</option>";
+                                            response.suppliers.forEach(function (supplier) {
+                                                var selected = (supplier.id == btn.data('supplier')) ? 'selected' : '';
+                                                options += "<option value='" + supplier.id + "' " + selected + ">" + supplier.name + "</option>";
+                                            });
+                                            $('#supplier_id').html(options);
+                                            
+                                            console.log('✅ تم تحميل الموردين');
+                                            
+                                            // تحديد نوع المعدة
+                                            $('#type').val(btn.data('equipment-type'));
+                                            
+                                            console.log('🔧 نوع المعدة:', btn.data('equipment-type'));
+                                            
+                                            // تحميل المعدات
+                                            setTimeout(function() {
+                                                console.log('🚜 تحميل المعدات...');
+                                                loadEquipmentsForEdit(btn.data('equipment'));
+                                            }, 300);
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('❌ خطأ في تحميل الموردين:', error);
+                                    }
+                                });
+                            }, 300);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('❌ خطأ في تحميل العقود:', error);
+                    }
+                });
+            }, 300);
+        });
+        
+        // دالة تحميل المعدات مع تحديد المعدة المختارة
+        function loadEquipmentsForEdit(selectedEquipmentId) {
+            var typeId = $("#type").val();
+            var supplierId = $("#supplier_id").val();
+            
+            console.log('🚜 تحميل المعدات - النوع:', typeId, '| المورد:', supplierId, '| المعدة المختارة:', selectedEquipmentId);
+            
+            if (typeId && supplierId) {
+                $.ajax({
+                    url: "getoprator.php",
+                    type: "POST",
+                    data: { 
+                        type: typeId,
+                        supplier_id: supplierId
+                    },
+                    success: function (data) {
+                        console.log('✅ تم تحميل المعدات بنجاح');
+                        $("#equipment").html(data);
+                        $("#equipment").val(selectedEquipmentId);
+                        console.log('✅ تم تحديد المعدة:', selectedEquipmentId);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("❌ خطأ في تحميل المعدات:", error);
+                        $("#equipment").html("<option value=''>خطأ في التحميل</option>");
+                    }
+                });
+            } else {
+                console.warn('⚠️ النوع أو المورد غير محدد');
+            }
+        }
     });
 
 </script>

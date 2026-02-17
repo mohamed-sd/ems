@@ -19,6 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $phone = mysqli_real_escape_string($conn, $_POST['phone']);
     $role = mysqli_real_escape_string($conn, $_POST['role']);
     $project = ($role == "5" && !empty($_POST['project_id'])) ? intval($_POST['project_id']) : 0;
+    $mine = ($role == "5" && !empty($_POST['mine_id'])) ? intval($_POST['mine_id']) : 0;
+    $contract = ($role == "5" && !empty($_POST['contract_id'])) ? intval($_POST['contract_id']) : 0;
     $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
 
     if ($uid > 0) {
@@ -36,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             }
 
             $sql = "UPDATE users 
-                    SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', updated_at=NOW() $sql_pass
+                    SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', mine_id='$mine', contract_id='$contract', updated_at=NOW() $sql_pass
                     WHERE id='$uid'";
             if (mysqli_query($conn, $sql)) {
                 echo "<script>alert('✅ تم التعديل بنجاح'); window.location.href='users.php';</script>";
@@ -53,8 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             echo "<script>alert('⚠️ اسم المستخدم موجود مسبقاً!');</script>";
         } else {
             // إدراج كلمة المرور كنص عادي (غير مشفر)
-            $sql = "INSERT INTO users (name, username, password, phone, role, project_id, parent_id, created_at, updated_at) 
-                    VALUES ('$name', '$username', '$password', '$phone', '$role', '$project', '0', NOW(), NOW())";
+            $sql = "INSERT INTO users (name, username, password, phone, role, project_id, mine_id, contract_id, parent_id, created_at, updated_at) 
+                    VALUES ('$name', '$username', '$password', '$phone', '$role', '$project', '$mine', '$contract', '0', NOW(), NOW())";
             if (mysqli_query($conn, $sql)) {
                 echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='users.php';</script>";
             } else {
@@ -548,16 +550,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         </div>
 
                         <div id="projectDiv" style="display:none;">
-                            <label><i class="fas fa-project-diagram"></i> المشروع</label>
+                            <label><i class="fas fa-project-diagram"></i> المشروع <span style="color: red;">*</span></label>
                             <select id="project_id" name="project_id" class="form-control">
                                 <option value="">-- اختر المشروع --</option>
                                 <?php
-                                $sql = "SELECT id, name FROM project where status = '1' ORDER BY name ASC";
+                                $sql = "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name ASC";
                                 $result = mysqli_query($conn, $sql);
                                 while ($row = mysqli_fetch_assoc($result)) {
-                                    echo "<option value='{$row['id']}'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</option>";
+                                    echo "<option value='{$row['id']}'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . " ({$row['project_code']})</option>";
                                 }
                                 ?>
+                            </select>
+                        </div>
+
+                        <div id="mineDiv" style="display:none;">
+                            <label><i class="fas fa-mountain"></i> المنجم <span style="color: red;">*</span></label>
+                            <select id="mine_id" name="mine_id" class="form-control">
+                                <option value="">-- اختر المنجم --</option>
+                            </select>
+                        </div>
+
+                        <div id="contractDiv" style="display:none;">
+                            <label><i class="fas fa-file-contract"></i> العقد <span style="color: red;">*</span></label>
+                            <select id="contract_id" name="contract_id" class="form-control">
+                                <option value="">-- اختر العقد --</option>
                             </select>
                         </div>
                     </div>
@@ -592,7 +608,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     </thead>
                     <tbody>
                         <?php
-                        $query = "SELECT id, name, username, password, phone, role , project_id FROM users WHERE parent_id='0' AND role!='-1' ORDER BY id DESC";
+                        $query = "SELECT id, name, username, password, phone, role, project_id, mine_id, contract_id FROM users WHERE parent_id='0' AND role!='-1' ORDER BY id DESC";
                         $result = mysqli_query($conn, $query);
 
                         $roles = array(
@@ -606,21 +622,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         $i = 1;
                         while ($row = mysqli_fetch_assoc($result)) {
                             $project_id = $row['project_id'];
-                            $project_name = "";
-                            $select_project = mysqli_query($conn, "SELECT name FROM `project` WHERE `id` = $project_id");
-                            while ($project_row = mysqli_fetch_array($select_project)) {
-                                $project_name = $project_row['name'];
-                            }
-
+                            $mine_id = $row['mine_id'];
+                            $contract_id = $row['contract_id'];
+                            
+                            $project_info = "";
+                            
                             if ($row['role'] == "5") {
-                                $project = " ( <span style='color: var(--primary-color); font-weight: 400;font-size:16px;'>" . htmlspecialchars($project_name, ENT_QUOTES, 'UTF-8') . "</span> )";
-                            } else {
-                                $project = "";
+                                // جلب اسم المشروع
+                                if ($project_id > 0) {
+                                    $select_project = mysqli_query($conn, "SELECT name, project_code FROM `project` WHERE `id` = $project_id");
+                                    if ($project_row = mysqli_fetch_array($select_project)) {
+                                        $project_info = "<div style='margin-top: 5px;'><i class='fas fa-project-diagram' style='color: var(--accent-color);'></i> " . htmlspecialchars($project_row['name'], ENT_QUOTES, 'UTF-8') . " (" . $project_row['project_code'] . ")";
+                                    }
+                                }
+                                
+                                // جلب اسم المنجم
+                                if ($mine_id > 0) {
+                                    $select_mine = mysqli_query($conn, "SELECT mine_name, mine_code FROM `mines` WHERE `id` = $mine_id");
+                                    if ($mine_row = mysqli_fetch_array($select_mine)) {
+                                        $project_info .= "<br><i class='fas fa-mountain' style='color: var(--accent-color);'></i> " . htmlspecialchars($mine_row['mine_name'], ENT_QUOTES, 'UTF-8') . " (" . $mine_row['mine_code'] . ")";
+                                    }
+                                }
+                                
+                                // جلب تاريخ العقد
+                                if ($contract_id > 0) {
+                                    $select_contract = mysqli_query($conn, "SELECT contract_signing_date FROM `contracts` WHERE `id` = $contract_id");
+                                    if ($contract_row = mysqli_fetch_array($select_contract)) {
+                                        $project_info .= "<br><i class='fas fa-file-contract' style='color: var(--accent-color);'></i> عقد #" . $contract_id . " - " . $contract_row['contract_signing_date'];
+                                    }
+                                }
+                                
+                                if (!empty($project_info)) {
+                                    $project_info = "<div style='font-size: 0.85rem; color: #6c757d; margin-top: 5px;'>" . $project_info . "</div></div>";
+                                }
                             }
 
                             echo "<tr>";
                             echo "<td><strong>" . $i++ . "</strong></td>";
-                            echo "<td>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "" . $project . "</td>";
+                            echo "<td>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . $project_info . "</td>";
                             echo "<td><strong>" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "</strong></td>";
                             echo "<td><span class='password-cell'>" . htmlspecialchars($row['password'], ENT_QUOTES, 'UTF-8') . "</span></td>";
                             echo "<td><span class='role-badge role-" . $row['role'] . "'>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</span></td>";
@@ -633,6 +672,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                    data-phone='" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "' 
                                    data-role='{$row['role']}'
                                    data-project='{$row['project_id']}'
+                                   data-mine='{$row['mine_id']}'
+                                   data-contract='{$row['contract_id']}'
                                    title='تعديل'><i class='fas fa-edit'></i></a> | 
                                 <a href='?delete={$row['id']}' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>
                               </td>";
@@ -661,17 +702,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         document.addEventListener("DOMContentLoaded", function () {
             const roleSelect = document.getElementById("role");
             const projectDiv = document.getElementById("projectDiv");
+            const mineDiv = document.getElementById("mineDiv");
+            const contractDiv = document.getElementById("contractDiv");
             const projectSelect = document.getElementById("project_id");
+            const mineSelect = document.getElementById("mine_id");
+            const contractSelect = document.getElementById("contract_id");
             const form = document.getElementById('projectForm');
 
             roleSelect.addEventListener("change", function () {
                 if (this.value === "5") {
                     projectDiv.style.display = "block";
                     projectSelect.setAttribute("required", "required");
+                    mineDiv.style.display = "block";
+                    mineSelect.setAttribute("required", "required");
+                    contractDiv.style.display = "block";
+                    contractSelect.setAttribute("required", "required");
                 } else {
                     projectDiv.style.display = "none";
                     projectSelect.removeAttribute("required");
                     projectSelect.value = "";
+                    mineDiv.style.display = "none";
+                    mineSelect.removeAttribute("required");
+                    mineSelect.innerHTML = '<option value="">-- اختر المنجم --</option>';
+                    contractDiv.style.display = "none";
+                    contractSelect.removeAttribute("required");
+                    contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+                }
+            });
+
+            // تحميل المناجم عند اختيار المشروع
+            projectSelect.addEventListener("change", function() {
+                const projectId = this.value;
+                
+                console.log('تم اختيار المشروع:', projectId);
+                
+                // إعادة تعيين قائمة المناجم والعقود
+                mineSelect.innerHTML = '<option value="">-- اختر المنجم --</option>';
+                contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+                
+                if (projectId) {
+                    // جلب المناجم
+                    console.log('جاري تحميل المناجم...');
+                    fetch(`../Projects/get_project_mines_ajax.php?project_id=${projectId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('استجابة المناجم:', data);
+                            if (data.success && data.mines && data.mines.length > 0) {
+                                data.mines.forEach(mine => {
+                                    const option = document.createElement('option');
+                                    option.value = mine.id;
+                                    option.textContent = `${mine.mine_name} (${mine.mine_code})`;
+                                    mineSelect.appendChild(option);
+                                });
+                                console.log('تم تحميل', data.mines.length, 'منجم');
+                            } else {
+                                console.log('لا توجد مناجم لهذا المشروع');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('خطأ في تحميل المناجم:', error);
+                        });
+                }
+            });
+
+            // تحميل العقود عند اختيار المنجم
+            mineSelect.addEventListener("change", function() {
+                const mineId = this.value;
+                
+                console.log('تم اختيار المنجم:', mineId);
+                
+                // إعادة تعيين قائمة العقود
+                contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+                
+                if (mineId) {
+                    // جلب العقود
+                    console.log('جاري تحميل العقود...');
+                    fetch(`../Contracts/get_mine_contracts_ajax.php?mine_id=${mineId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('استجابة العقود:', data);
+                            if (data.success && data.contracts && data.contracts.length > 0) {
+                                data.contracts.forEach(contract => {
+                                    const option = document.createElement('option');
+                                    option.value = contract.id;
+                                    option.textContent = `عقد #${contract.id} - ${contract.contract_signing_date}`;
+                                    contractSelect.appendChild(option);
+                                });
+                                console.log('تم تحميل', data.contracts.length, 'عقد');
+                            } else {
+                                console.log('لا توجد عقود لهذا المنجم');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('خطأ في تحميل العقود:', error);
+                        });
                 }
             });
 
@@ -707,13 +831,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 $('#phone').val($(this).data('phone'));
                 $('#role').val($(this).data('role')).trigger('change');
 
-                // تعبئة المشروع إذا كان الدور = 5
-                setTimeout(function () {
-                    var projectId = $('.editBtn:focus').data('project');
-                    if (projectId) {
-                        $('#project_id').val(projectId);
-                    }
-                }, 300);
+                const projectId = $(this).data('project');
+                const mineId = $(this).data('mine');
+                const contractId = $(this).data('contract');
+
+                // تعبئة المشروع والمنجم والعقد إذا كان الدور = 5
+                if ($(this).data('role') == "5") {
+                    setTimeout(function () {
+                        // تعبئة المشروع
+                        if (projectId) {
+                            $('#project_id').val(projectId).trigger('change');
+                            
+                            // تحميل المناجم ثم تحديد المنجم
+                            setTimeout(function() {
+                                if (mineId) {
+                                    $('#mine_id').val(mineId).trigger('change');
+                                    
+                                    // تحميل العقود ثم تحديد العقد
+                                    setTimeout(function() {
+                                        if (contractId) {
+                                            $('#contract_id').val(contractId);
+                                        }
+                                    }, 500);
+                                }
+                            }, 500);
+                        }
+                    }, 300);
+                }
 
                 $('#password').val(""); // لا نملأ الحقل بكلمة المرور الحالية
                 form.style.display = "block";
