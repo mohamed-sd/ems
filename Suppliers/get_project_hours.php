@@ -32,7 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
         ce.equip_type,
         et.type AS equip_type_name,
         COALESCE(SUM(ce.equip_total_contract), 0) as total_hours,
-        COALESCE(SUM(ce.equip_count), 0) as equipment_count
+        COALESCE(SUM(ce.equip_count), 0) as equipment_count,
+        COALESCE(SUM(ce.equip_count_basic), 0) as equipment_count_basic,
+        COALESCE(SUM(ce.equip_count_backup), 0) as equipment_count_backup
         FROM contractequipments ce
         LEFT JOIN equipments_types et ON ce.equip_type = et.id
         WHERE ce.contract_id = $project_contract_id
@@ -44,7 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
         $equipment_breakdown[] = [
             'type' => $row['equip_type_name'] ? $row['equip_type_name'] : $row['equip_type'],
             'hours' => floatval($row['total_hours']),
-            'count' => intval($row['equipment_count'])
+            'count' => intval($row['equipment_count']),
+            'count_basic' => intval($row['equipment_count_basic']) ?: 0,
+            'count_backup' => intval($row['equipment_count_backup']) ?: 0
         ];
     }
     

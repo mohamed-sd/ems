@@ -8,8 +8,15 @@ include '../config.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
+$is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
+$user_contract_id = $is_role10 ? intval($_SESSION['user']['contract_id']) : 0;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contract_id'])) {
     $contract_id = intval($_POST['contract_id']);
+
+    if ($is_role10 && $user_contract_id > 0 && $contract_id !== $user_contract_id) {
+        die(json_encode(['success' => false, 'message' => 'لا توجد صلاحية لهذا العقد']));
+    }
 
     $contract_check = mysqli_query($conn, "SELECT id FROM contracts WHERE id = $contract_id AND status = 1");
     if (!$contract_check || mysqli_num_rows($contract_check) === 0) {

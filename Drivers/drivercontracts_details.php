@@ -758,6 +758,8 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     <th>نوع المعدة</th>
                     <th>الحجم</th>
                     <th>العدد</th>
+                    <th><span style="color: #007bff; font-weight: 600;">■</span> أساسية</th>
+                    <th><span style="color: #ffc107; font-weight: 600;">■</span> احتياطية</th>
                     <th>عدد الورديات</th>
                     <th>الساعات/اليوم</th>
                     <th>إجمالي الساعات</th>
@@ -803,6 +805,8 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         echo "<td><strong>" . htmlspecialchars($equip['equip_type']) . "</strong></td>";
                         echo "<td>" . $equip['equip_size'] . "</td>";
                         echo "<td><span style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . $equip['equip_count'] . "</span></td>";
+                        echo "<td><span style='background: #e3f2fd; color: #007bff; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600; border-right: 3px solid #007bff;'>" . (isset($equip['equip_count_basic']) ? $equip['equip_count_basic'] : 0) . "</span></td>";
+                        echo "<td><span style='background: #fffde7; color: #f57f17; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600; border-right: 3px solid #ffc107;'>" . (isset($equip['equip_count_backup']) ? $equip['equip_count_backup'] : 0) . "</span></td>";
                         echo "<td><span style='background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . (isset($equip['equip_shifts']) ? $equip['equip_shifts'] : 0) . "</span></td>";
                         echo "<td>" . $equip['shift_hours'] . "</td>";
                         echo "<td>" . $equip['equip_total_month'] . "</td>";
@@ -834,7 +838,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         $i++;
                     }
                 } else {
-                    echo "<tr><td colspan='14' style='text-align: center; padding: 2rem;'>";
+                    echo "<tr><td colspan='17' style='text-align: center; padding: 2rem;'>";
                     echo "<i class='fas fa-inbox' style='font-size: 3rem; color: #e9ecef; margin-bottom: 1rem;'></i>";
                     echo "<p style='color: #999; font-size: 1.1rem;'>لا توجد معدات لهذا العقد</p>";
                     echo "</td></tr>";

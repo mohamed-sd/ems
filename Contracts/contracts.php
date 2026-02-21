@@ -934,10 +934,15 @@ foreach ($equipmentTypes as $equipmentType) {
                     <div class="control"><input name="equip_count_1" type="number" min="0"></div>
                   </div>
 
+                  <div class="field md-3 sm-6">
+                    <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+                    <div class="control"><input name="equip_count_basic_1" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+                  </div>
 
-
-
-
+                  <div class="field md-3 sm-6">
+                    <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+                    <div class="control"><input name="equip_count_backup_1" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+                  </div>
                   <div class="field md-3 sm-6">
                     <label>عدد المشغلين</label>
                     <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
@@ -1338,6 +1343,8 @@ foreach ($equipmentTypes as $equipmentType) {
                       'equip_type' => intval($_POST["equip_type_$i"]),
                       'equip_size' => isset($_POST["equip_size_$i"]) ? $_POST["equip_size_$i"] : 0,
                       'equip_count' => isset($_POST["equip_count_$i"]) ? $_POST["equip_count_$i"] : 0,
+                      'equip_count_basic' => isset($_POST["equip_count_basic_$i"]) ? intval($_POST["equip_count_basic_$i"]) : 0,
+                      'equip_count_backup' => isset($_POST["equip_count_backup_$i"]) ? intval($_POST["equip_count_backup_$i"]) : 0,
                       'equip_shifts' => isset($_POST["equip_shifts_$i"]) ? $_POST["equip_shifts_$i"] : 0,
                       'equip_unit' => isset($_POST["equip_unit_$i"]) ? $_POST["equip_unit_$i"] : '',
                       'shift1_start' => isset($_POST["shift1_start_$i"]) ? $_POST["shift1_start_$i"] : '',
@@ -1648,6 +1655,14 @@ foreach ($equipmentTypes as $equipmentType) {
             <div class="field md-3 sm-6">
               <label>عدد المعدات</label>
               <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
             </div>
 
             <div class="field md-3 sm-6">

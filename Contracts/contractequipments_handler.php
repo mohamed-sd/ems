@@ -25,6 +25,8 @@ function saveContractEquipments($contract_id, $equipment_data, $conn) {
         $equip_type = mysqli_real_escape_string($conn, $equipment['equip_type']);
         $equip_size = isset($equipment['equip_size']) ? intval($equipment['equip_size']) : 0;
         $equip_count = isset($equipment['equip_count']) ? intval($equipment['equip_count']) : 0;
+        $equip_count_basic = isset($equipment['equip_count_basic']) ? intval($equipment['equip_count_basic']) : 0;
+        $equip_count_backup = isset($equipment['equip_count_backup']) ? intval($equipment['equip_count_backup']) : 0;
         $equip_shifts = isset($equipment['equip_shifts']) ? intval($equipment['equip_shifts']) : 0;
         $equip_unit = isset($equipment['equip_unit']) ? mysqli_real_escape_string($conn, $equipment['equip_unit']) : '';
         $shift1_start = isset($equipment['shift1_start']) ? mysqli_real_escape_string($conn, $equipment['shift1_start']) : NULL;
@@ -47,6 +49,8 @@ function saveContractEquipments($contract_id, $equipment_data, $conn) {
             equip_type,
             equip_size,
             equip_count,
+            equip_count_basic,
+            equip_count_backup,
             equip_shifts,
             equip_unit,
             shift1_start,
@@ -68,6 +72,8 @@ function saveContractEquipments($contract_id, $equipment_data, $conn) {
             '" . $equip_type . "',
             " . $equip_size . ",
             " . $equip_count . ",
+            " . $equip_count_basic . ",
+            " . $equip_count_backup . ",
             " . $equip_shifts . ",
             '" . $equip_unit . "',
             " . ($shift1_start ? "'".$shift1_start."'" : "NULL") . ",

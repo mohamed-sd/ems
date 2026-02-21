@@ -897,11 +897,15 @@ $driver_id = intval($_GET['id']);
                     <div class="control"><input name="equip_count_1" type="number" min="0"></div>
                   </div>
 
-            
+                  <div class="field md-3 sm-6">
+                    <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+                    <div class="control"><input name="equip_count_basic_1" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+                  </div>
 
-                
-
-                      <div class="field md-3 sm-6">
+                  <div class="field md-3 sm-6">
+                    <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+                    <div class="control"><input name="equip_count_backup_1" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+                  </div>
                     <label>عدد المشغلين</label>
                     <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
                   </div>
@@ -1307,6 +1311,8 @@ $driver_id = intval($_GET['id']);
                       'equip_type' => mysqli_real_escape_string($conn, $_POST["equip_type_$i"]),
                       'equip_size' => isset($_POST["equip_size_$i"]) ? intval($_POST["equip_size_$i"]) : 0,
                       'equip_count' => isset($_POST["equip_count_$i"]) ? intval($_POST["equip_count_$i"]) : 0,
+                      'equip_count_basic' => isset($_POST["equip_count_basic_$i"]) ? intval($_POST["equip_count_basic_$i"]) : 0,
+                      'equip_count_backup' => isset($_POST["equip_count_backup_$i"]) ? intval($_POST["equip_count_backup_$i"]) : 0,
                       'equip_shifts' => isset($_POST["equip_shifts_$i"]) ? intval($_POST["equip_shifts_$i"]) : 0,
                       'equip_unit' => isset($_POST["equip_unit_$i"]) ? mysqli_real_escape_string($conn, $_POST["equip_unit_$i"]) : '',
                       'shift1_start' => isset($_POST["shift1_start_$i"]) ? mysqli_real_escape_string($conn, $_POST["shift1_start_$i"]) : '',
@@ -1336,13 +1342,14 @@ $driver_id = intval($_GET['id']);
                   // إضافة المعدات الجديدة
                   foreach ($equipment_array as $equip) {
                     $insert_equip_sql = "INSERT INTO drivercontractequipments (
-                      contract_id, equip_type, equip_size, equip_count, equip_shifts, equip_unit,
+                      contract_id, equip_type, equip_size, equip_count, equip_count_basic, equip_count_backup, equip_shifts, equip_unit,
                       shift1_start, shift1_end, shift2_start, shift2_end, shift_hours,
                       equip_total_month, equip_monthly_target, equip_total_contract,
                       equip_price, equip_price_currency, equip_operators, equip_supervisors,
                       equip_technicians, equip_assistants
                     ) VALUES (
                       $contract_id, '{$equip['equip_type']}', {$equip['equip_size']}, {$equip['equip_count']},
+                      {$equip['equip_count_basic']}, {$equip['equip_count_backup']},
                       {$equip['equip_shifts']}, '{$equip['equip_unit']}', '{$equip['shift1_start']}',
                       '{$equip['shift1_end']}', '{$equip['shift2_start']}', '{$equip['shift2_end']}',
                       {$equip['shift_hours']}, {$equip['equip_total_month']}, {$equip['equip_monthly_target']},
@@ -1617,6 +1624,14 @@ $driver_id = intval($_GET['id']);
             <div class="field md-3 sm-6">
               <label>عدد المعدات</label>
               <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -2020,6 +2035,8 @@ $driver_id = intval($_GET['id']);
                 $(`select[name="equip_type_1"]`).val(equip.equip_type);
                 $(`input[name="equip_size_1"]`).val(equip.equip_size);
                 $(`input[name="equip_count_1"]`).val(equip.equip_count);
+                $(`input[name="equip_count_basic_1"]`).val(equip.equip_count_basic || 0);
+                $(`input[name="equip_count_backup_1"]`).val(equip.equip_count_backup || 0);
                 $(`input[name="equip_shifts_1"]`).val(equip.equip_shifts);
                 $(`select[name="equip_unit_1"]`).val(equip.equip_unit);
                 $(`input[name="shift1_start_1"]`).val(equip.shift1_start);
@@ -2072,8 +2089,12 @@ $driver_id = intval($_GET['id']);
                         <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
                       </div>
                       <div class="field md-3 sm-6">
-                        <label>عدد المشغلين</label>
-                        <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0" value="${equip.equip_operators}"></div>
+                        <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" value="${equip.equip_count_basic || 0}" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+                      </div>
+                      <div class="field md-3 sm-6">
+                        <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" value="${equip.equip_count_backup || 0}" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المساعدين</label>

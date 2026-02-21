@@ -13,7 +13,9 @@ if ($contract_id <= 0) {
 
 // جلب بيانات العقد مع عدد المعدات من contractequipments
 $contract_query = "SELECT c.*, m.mine_name, m.project_id, p.name as project_name,
-                   (SELECT COALESCE(SUM(ce.equip_count), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count
+                   (SELECT COALESCE(SUM(ce.equip_count), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count,
+                   (SELECT COALESCE(SUM(ce.equip_count_basic), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count_basic,
+                   (SELECT COALESCE(SUM(ce.equip_count_backup), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count_backup
                    FROM contracts c 
                    LEFT JOIN mines m ON c.mine_id = m.id
                    LEFT JOIN project p ON m.project_id = p.id
@@ -41,7 +43,9 @@ $suppliers_query = "SELECT
     sc.supplier_id,
     s.name as supplier_name,
     sc.forecasted_contracted_hours,
-    (SELECT COALESCE(SUM(sce.equip_count), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count
+    (SELECT COALESCE(SUM(sce.equip_count), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count,
+    (SELECT COALESCE(SUM(sce.equip_count_basic), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count_basic,
+    (SELECT COALESCE(SUM(sce.equip_count_backup), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count_backup
 FROM supplierscontracts sc
 LEFT JOIN suppliers s ON sc.supplier_id = s.id
 WHERE sc.project_id = $project_id AND sc.status = 1
@@ -59,6 +63,8 @@ if ($suppliers_result) {
                                         et.type as type_name,
                                         sce.equip_type,
                                         SUM(sce.equip_count) as total_count,
+                                        SUM(sce.equip_count_basic) as total_count_basic,
+                                        SUM(sce.equip_count_backup) as total_count_backup,
                                         SUM(sce.equip_total_contract) as total_hours
                                  FROM suppliercontractequipments sce
                                  LEFT JOIN equipments_types et ON sce.equip_type = et.id
@@ -88,6 +94,8 @@ if ($suppliers_result) {
                 'type' => $equip['type_name'] ?: 'غير محدد',
                 'type_id' => $equip['equip_type'],
                 'count' => $contracted_count,
+                'count_basic' => intval($equip['total_count_basic']) ?: 0,
+                'count_backup' => intval($equip['total_count_backup']) ?: 0,
                 'operating_count' => $operating_count,
                 'remaining_count' => $remaining_count,
                 'hours' => floatval($equip['total_hours'])
@@ -100,6 +108,8 @@ if ($suppliers_result) {
             'supplier_name' => $row['supplier_name'] ?: 'غير محدد',
             'hours' => floatval($row['forecasted_contracted_hours']),
             'equipment_count' => intval($row['equipment_count']),
+            'equipment_count_basic' => intval($row['equipment_count_basic']) ?: 0,
+            'equipment_count_backup' => intval($row['equipment_count_backup']) ?: 0,
             'equipment_breakdown' => $equipment_breakdown
         ];
         $total_supplier_hours += floatval($row['forecasted_contracted_hours']);
@@ -114,6 +124,8 @@ $response = [
         'duration' => $contract['contract_duration_months'] . ' شهر',
         'total_hours' => floatval($contract['forecasted_contracted_hours']),
         'equipment_count' => intval($contract['equipment_count']),
+        'equipment_count_basic' => intval($contract['equipment_count_basic']) ?: 0,
+        'equipment_count_backup' => intval($contract['equipment_count_backup']) ?: 0,
         'project_name' => $contract['project_name'],
         'mine_name' => $contract['mine_name']
     ],

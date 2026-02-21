@@ -47,7 +47,7 @@ if ($type != "") {
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project'] . "'");
+                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project_id'] . "'");
 
 
 

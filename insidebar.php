@@ -72,6 +72,13 @@
 
       <?php } ?>
 
+      <?php // صلاحيات مدير الحركة والتشغيل === 10
+      if ($_SESSION['user']['role'] == "10") { ?>
+        <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
+        <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
+
+      <?php } ?>
+
       <?php // صلاحيات مدير الموقع === 5
       if ($_SESSION['user']['role'] == "5") { ?>
         <li><a href="../project_users.php"><i class="fa fa-users-cog"></i> <span> مستخدمين المدير </span></a></li>

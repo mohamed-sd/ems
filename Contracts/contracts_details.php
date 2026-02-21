@@ -786,6 +786,8 @@ if (!isset($_SESSION['user'])) {
                             <th>نوع المعدة</th>
                             <th>الحجم</th>
                             <th>العدد</th>
+                            <th>أساسية</th>
+                            <th>احتياطية</th>
                             <th>عدد الورديات</th>
                             <th>الساعات/اليوم</th>
                             <th>إجمالي الساعات</th>
@@ -820,6 +822,8 @@ if (!isset($_SESSION['user'])) {
                                 echo "<td><strong>" . htmlspecialchars($equipTypeLabel) . "</strong></td>";
                                 echo "<td>" . $equip['equip_size'] . "</td>";
                                 echo "<td><span style='background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . $equip['equip_count'] . "</span></td>";
+                                echo "<td><span style='background: #007bff; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . (isset($equip['equip_count_basic']) ? $equip['equip_count_basic'] : 0) . "</span></td>";
+                                echo "<td><span style='background: #ffc107; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . (isset($equip['equip_count_backup']) ? $equip['equip_count_backup'] : 0) . "</span></td>";
                                 echo "<td><span style='background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . (isset($equip['equip_shifts']) ? $equip['equip_shifts'] : 0) . "</span></td>";
                                 echo "<td>" . $equip['shift_hours'] . "</td>";
                                 echo "<td>" . $equip['equip_total_month'] . "</td>";

@@ -7,10 +7,17 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 
+$is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
+$user_project_id = $is_role10 ? intval($_SESSION['user']['project_id']) : 0;
+
 $selected_project_id = 0;
 $show_all_projects = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_project_id'])) {
+    if ($is_role10) {
+        header("Location: equipments.php");
+        exit();
+    }
     $selected_project_value = trim($_POST['selected_project_id']);
     if ($selected_project_value === 'all') {
         $_SESSION['equipments_project_id'] = 'all';
@@ -24,6 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_project_id']
 }
 
 if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
+    if ($is_role10) {
+        header("Location: equipments.php");
+        exit();
+    }
     $_SESSION['equipments_project_id'] = intval($_GET['project_id']);
     header("Location: equipments.php");
     exit();
@@ -36,6 +47,11 @@ if (isset($_SESSION['equipments_project_id'])) {
     } else {
         $selected_project_id = intval($_SESSION['equipments_project_id']);
     }
+}
+
+if ($is_role10) {
+    $show_all_projects = false;
+    $selected_project_id = $user_project_id;
 }
 
 $selected_project = null;
@@ -64,6 +80,10 @@ if (isset($_GET['msg'])) {
 
 // معالجة الحفظ أو التعديل
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
+    if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10") {
+        $success_msg = "❌ ليس لديك صلاحية لتعديل أو إضافة المعدات";
+        goto skip_save;
+    }
     
     // الحقول الأساسية
     $suppliers = mysqli_real_escape_string($conn, $_POST['suppliers']);
@@ -227,7 +247,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
 
 // في حالة تعديل تجهيز البيانات
 $editData = [];
-if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
+if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && isset($_GET['edit'])) {
+    $success_msg = "❌ ليس لديك صلاحية لتعديل المعدات";
+} elseif (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     $editId = intval($_GET['edit']);
     $res = mysqli_query($conn, "SELECT * FROM equipments WHERE id='$editId'");
     if ($res && mysqli_num_rows($res) > 0) {
@@ -1197,6 +1219,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
 </style>
 
 <div class="main">
+    <?php if (!$is_role10) { ?>
     <div class="project-picker">
         <form method="post" id="projectSelectForm">
             <label for="selected_project_id">اختر المشروع</label>
@@ -1218,6 +1241,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
             </select>
         </form>
     </div>
+    <?php } ?>
 
     <?php if ($show_all_projects) { ?>
         <div class="project-header">
@@ -1299,7 +1323,9 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             <th>#</th>
                             <th>المورد</th>
                             <th>الساعات المتعاقد عليها</th>
-                            <th>عدد المعدات المتعاقد عليها</th>
+                            <th>عدد المعدات</th>
+                            <th><span style="color: #007bff; font-weight: 600;">■</span> أساسية</th>
+                            <th><span style="color: #ffc107; font-weight: 600;">■</span> احتياطية</th>
                             <th>توزيع المعدات والساعات</th>
                         </tr>
                     </thead>
@@ -1315,6 +1341,8 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             <td colspan="2" style="text-align: right; padding: 12px;">الإجمالي</td>
                             <td id="total_supplier_hours" style="text-align: center;">0</td>
                             <td id="total_supplier_equipment" style="text-align: center;">0</td>
+                            <td id="total_supplier_basic" style="text-align: center;">0</td>
+                            <td id="total_supplier_backup" style="text-align: center;">0</td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -1344,6 +1372,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
         </a>
     </div>
     <?php } ?>
+    <?php if ($_SESSION['user']['role'] != "10") { ?>
     <!-- فورم إضافة / تعديل معدة -->
     <form id="projectForm" action="" method="post" style="display:<?php echo !empty($editData) ? 'block' : 'none'; ?>;">
         <div class="card">
@@ -1806,6 +1835,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
             </div>
         </div>
     </form>
+    <?php } ?>
 
     <!-- جدول المعدات -->
     <div class="card">
@@ -1864,6 +1894,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                     $project_filter_where = '';
                     if ($selected_project_id > 0) {
                         $project_filter_where = "WHERE o.project_id = $selected_project_id";
+                      
                     }
 
                     $query2 = "
@@ -1965,18 +1996,18 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                         }
 
                         // الإجراءات
-                        echo "<td>";
-                        if ($_SESSION['user']['role'] == "3") {
-                                                        echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-driver' title='إدارة المشغلين'>
-                                    <i class='fas fa-user-cog'></i>
-                                  </a>";
-                        } else {
-                                                        echo "<a href='equipments.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
-                                    <i class='fas fa-edit'></i>
-                                  </a>";
-                            // يمكن إضافة زر حذف هنا إذا لزم الأمر
-                        }
-                        echo "</td>";
+                                                echo "<td>";
+                                                if ($_SESSION['user']['role'] == "3" || $_SESSION['user']['role'] == "10") {
+                                                                                                                echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-driver' title='إدارة المشغلين'>
+                                                                        <i class='fas fa-user-cog'></i>
+                                                                    </a>";
+                                                } else {
+                                                                                                                echo "<a href='equipments.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
+                                                                        <i class='fas fa-edit'></i>
+                                                                    </a>";
+                                                        // يمكن إضافة زر حذف هنا إذا لزم الأمر
+                                                }
+                                                echo "</td>";
 
                         echo "</tr>";
                     }
@@ -2236,10 +2267,12 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                     const breakdownList = supplier.equipment_breakdown.map(item => {
                                         const operatingColor = item.operating_count > 0 ? '#28a745' : '#6c757d';
                                         const remainingColor = item.remaining_count > 0 ? '#ffc107' : '#6c757d';
+                                        const basicInfo = item.count_basic > 0 ? `<span style="color: #007bff; font-weight: bold;"> أساسي:${item.count_basic}</span>` : '';
+                                        const backupInfo = item.count_backup > 0 ? `<span style="color: #ffc107; font-weight: bold;"> احتياطي:${item.count_backup}</span>` : '';
                                         return `<div style="margin: 3px 0; padding: 8px; background: rgba(226, 174, 3, 0.1); border-right: 3px solid #e2ae03; border-radius: 4px;">
                                                     <i class="fas fa-tools" style="color: #e2ae03;"></i> 
                                                     <strong>${item.type || 'غير محدد'}</strong>: 
-                                                    المتعاقد ${item.count} | 
+                                                    المتعاقد ${item.count} ${basicInfo} ${backupInfo} | 
                                                     <span style="color: ${operatingColor}; font-weight: bold;">المشغّل ${item.operating_count || 0}</span> | 
                                                     <span style="color: ${remainingColor}; font-weight: bold;">المتبقي ${item.remaining_count || 0}</span> | 
                                                     <i class="fas fa-clock"></i> ${parseFloat(item.hours).toLocaleString()} ساعة
@@ -2256,6 +2289,8 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                                         <td><strong>${supplier.supplier_name}</strong></td>
                                         <td style="text-align: center;">${parseFloat(supplier.hours).toLocaleString()}</td>
                                         <td style="text-align: center;">${supplier.equipment_count}</td>
+                                        <td style="text-align: center; background: #e3f2fd; font-weight: bold; color: #007bff;">${supplier.equipment_count_basic || 0}</td>
+                                        <td style="text-align: center; background: #fffde7; font-weight: bold; color: #f57f17;">${supplier.equipment_count_backup || 0}</td>
                                         <td style="text-align: right; font-size: 0.9rem;">${breakdownHtml}</td>
                                     </tr>
                                 `;
@@ -2263,20 +2298,29 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
                             });
                             
                             // تحديث الإجماليات
+                            let totalBasic = 0, totalBackup = 0;
+                            response.suppliers.forEach(supplier => {
+                                totalBasic += supplier.equipment_count_basic || 0;
+                                totalBackup += supplier.equipment_count_backup || 0;
+                            });
                             $('#total_supplier_hours').text(parseFloat(response.summary.total_supplier_hours).toLocaleString());
                             $('#total_supplier_equipment').text(response.summary.total_supplier_equipment);
+                            $('#total_supplier_basic').text(totalBasic);
+                            $('#total_supplier_backup').text(totalBackup);
                             
                             $('#suppliersSection').fadeIn();
                         } else {
                             tbody.html(`
                                 <tr>
-                                    <td colspan="7" style="text-align: center; color: #6c757d; padding: 2rem;">
+                                    <td colspan="8" style="text-align: center; color: #6c757d; padding: 2rem;">
                                         <i class="fas fa-info-circle"></i> لا توجد عقود موردين لهذا المشروع
                                     </td>
                                 </tr>
                             `);
                             $('#total_supplier_hours').text('0');
                             $('#total_supplier_equipment').text('0');
+                            $('#total_supplier_basic').text('0');
+                            $('#total_supplier_backup').text('0');
                             $('#total_added_equipment').text('0');
                             $('#total_remaining_equipment').text('0');
                             $('#suppliersSection').fadeIn();

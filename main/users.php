@@ -18,9 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $password = isset($_POST['password']) ? mysqli_real_escape_string($conn, $_POST['password']) : '';
     $phone = mysqli_real_escape_string($conn, $_POST['phone']);
     $role = mysqli_real_escape_string($conn, $_POST['role']);
-    $project = ($role == "5" && !empty($_POST['project_id'])) ? intval($_POST['project_id']) : 0;
-    $mine = ($role == "5" && !empty($_POST['mine_id'])) ? intval($_POST['mine_id']) : 0;
-    $contract = ($role == "5" && !empty($_POST['contract_id'])) ? intval($_POST['contract_id']) : 0;
+    $project = (($role == "5" || $role == "10") && !empty($_POST['project_id'])) ? intval($_POST['project_id']) : 0;
+    $mine = (($role == "5" || $role == "10") && !empty($_POST['mine_id'])) ? intval($_POST['mine_id']) : 0;
+    $contract = (($role == "5" || $role == "10") && !empty($_POST['contract_id'])) ? intval($_POST['contract_id']) : 0;
     $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
 
     if ($uid > 0) {
@@ -497,7 +497,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             "6" => "مدخل ساعات عمل",
             "7" => "مراجع ساعات مورد",
             "8" => "مراجع ساعات مشغل",
-            "9" => "مراجع الاعطال"
+            "9" => "مراجع الاعطال",
+            "10" => "حركة وتشغيل"
         );
 
         $userRole = $_SESSION['user']['role'];
@@ -542,6 +543,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                 <option value="4">🚚 مدير الأسطول</option>
                                 <option value="3">👷 مدير المشغلين</option>
                                 <option value="5">📍 مدير موقع</option>
+                                <option value="10">📍 حركة وتشغيل </option>
                             </select>
                         </div>
                         <div>
@@ -616,7 +618,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             "2" => "مدير الموردين",
                             "3" => "مدير المشغلين",
                             "4" => "مدير الاسطول",
-                            "5" => "مدير موقع"
+                            "5" => "مدير موقع",
+                            "10" => "حركة وتشغيل"
                         );
 
                         $i = 1;
@@ -627,7 +630,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             
                             $project_info = "";
                             
-                            if ($row['role'] == "5") {
+                            if ($row['role'] == "5" || $row['role']== "10") {
                                 // جلب اسم المشروع
                                 if ($project_id > 0) {
                                     $select_project = mysqli_query($conn, "SELECT name, project_code FROM `project` WHERE `id` = $project_id");
@@ -710,7 +713,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             const form = document.getElementById('projectForm');
 
             roleSelect.addEventListener("change", function () {
-                if (this.value === "5") {
+                if (this.value === "5" || this.value === "10") {
                     projectDiv.style.display = "block";
                     projectSelect.setAttribute("required", "required");
                     mineDiv.style.display = "block";
@@ -835,8 +838,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 const mineId = $(this).data('mine');
                 const contractId = $(this).data('contract');
 
-                // تعبئة المشروع والمنجم والعقد إذا كان الدور = 5
-                if ($(this).data('role') == "5") {
+                // تعبئة المشروع والمنجم والعقد إذا كان الدور = 5 أو 10
+                if ($(this).data('role') == "5" || $(this).data('role') == "10") {
                     setTimeout(function () {
                         // تعبئة المشروع
                         if (projectId) {

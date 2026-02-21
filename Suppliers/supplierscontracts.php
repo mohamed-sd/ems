@@ -922,10 +922,15 @@ $supplier_id = intval($_GET['id']);
                     <div class="control"><input name="equip_count_1" type="number" min="0"></div>
                   </div>
 
+                  <div class="field md-3 sm-6">
+                    <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+                    <div class="control"><input name="equip_count_basic_1" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+                  </div>
 
-
-
-
+                  <div class="field md-3 sm-6">
+                    <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+                    <div class="control"><input name="equip_count_backup_1" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+                  </div>
                   <div class="field md-3 sm-6">
                     <label>عدد المشغلين</label>
                     <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
@@ -1334,6 +1339,8 @@ $supplier_id = intval($_GET['id']);
                       'equip_type' => intval($_POST["equip_type_$i"]),
                       'equip_size' => isset($_POST["equip_size_$i"]) ? intval($_POST["equip_size_$i"]) : 0,
                       'equip_count' => isset($_POST["equip_count_$i"]) ? intval($_POST["equip_count_$i"]) : 0,
+                      'equip_count_basic' => isset($_POST["equip_count_basic_$i"]) ? intval($_POST["equip_count_basic_$i"]) : 0,
+                      'equip_count_backup' => isset($_POST["equip_count_backup_$i"]) ? intval($_POST["equip_count_backup_$i"]) : 0,
                       'equip_shifts' => isset($_POST["equip_shifts_$i"]) ? intval($_POST["equip_shifts_$i"]) : 0,
                       'equip_unit' => isset($_POST["equip_unit_$i"]) ? mysqli_real_escape_string($conn, $_POST["equip_unit_$i"]) : '',
                       'shift1_start' => isset($_POST["shift1_start_$i"]) ? mysqli_real_escape_string($conn, $_POST["shift1_start_$i"]) : '',
@@ -1363,14 +1370,14 @@ $supplier_id = intval($_GET['id']);
                   // إضافة المعدات الجديدة
                   foreach ($equipment_array as $equip) {
                     $insert_equip_sql = "INSERT INTO suppliercontractequipments (
-                      contract_id, equip_type, equip_size, equip_count, equip_shifts, equip_unit,
+                      contract_id, equip_type, equip_size, equip_count, equip_count_basic, equip_count_backup, equip_shifts, equip_unit,
                       shift1_start, shift1_end, shift2_start, shift2_end, shift_hours,
                       equip_total_month, equip_monthly_target, equip_total_contract,
                       equip_price, equip_price_currency, equip_operators, equip_supervisors,
                       equip_technicians, equip_assistants
                     ) VALUES (
                       $contract_id, {$equip['equip_type']}, {$equip['equip_size']}, {$equip['equip_count']},
-                      {$equip['equip_shifts']}, '{$equip['equip_unit']}', '{$equip['shift1_start']}',
+                      {$equip['equip_count_basic']}, {$equip['equip_count_backup']}, {$equip['equip_shifts']}, '{$equip['equip_unit']}', '{$equip['shift1_start']}',
                       '{$equip['shift1_end']}', '{$equip['shift2_start']}', '{$equip['shift2_end']}',
                       {$equip['shift_hours']}, {$equip['equip_total_month']}, {$equip['equip_monthly_target']},
                       {$equip['equip_total_contract']}, {$equip['equip_price']}, '{$equip['equip_price_currency']}',
@@ -1643,8 +1650,13 @@ $supplier_id = intval($_GET['id']);
             </div>
 
             <div class="field md-3 sm-6">
-              <label>عدد المشغلين</label>
-              <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0"></div>
+              <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المساعدين</label>
@@ -1918,9 +1930,16 @@ $supplier_id = intval($_GET['id']);
 
                 response.equipment_breakdown.forEach(function (item) {
                   var percentage = ((item.hours / response.contract_total_hours) * 100).toFixed(1);
-                  breakdownHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; padding: 0.3rem 0;">';
-                  breakdownHtml += '<span><i class="fas fa-tools" style="color: #1976d2; margin-left: 0.3rem;"></i>' + item.type + ' (العدد: ' + item.count + ')' + '</span>';
+                  breakdownHtml += '<div style="display: flex; flex-direction: column; margin-bottom: 0.6rem; padding: 0.5rem; background: #f8f9fa; border-radius: 6px;">';
+                  breakdownHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">';
+                  breakdownHtml += '<span><i class="fas fa-tools" style="color: #1976d2; margin-left: 0.3rem;"></i>' + item.type + '</span>';
                   breakdownHtml += '<span style="font-weight: 600; color: #0d47a1;">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
+                  breakdownHtml += '</div>';
+                  breakdownHtml += '<div style="display: flex; gap: 1rem; font-size: 0.85rem; padding-top: 0.3rem; border-top: 1px dashed #ddd;">';
+                  breakdownHtml += '<span><span style="background: #007bff; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">أساسية</span> ' + item.count_basic + '</span>';
+                  breakdownHtml += '<span><span style="background: #ffc107; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">احتياطية</span> ' + item.count_backup + '</span>';
+                  breakdownHtml += '<span><span style="background: #667eea; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">إجمالي</span> ' + item.count + '</span>';
+                  breakdownHtml += '</div>';
                   breakdownHtml += '</div>';
                 });
 
@@ -2108,9 +2127,15 @@ $supplier_id = intval($_GET['id']);
                         <label>عدد المعدات</label>
                         <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
                       </div>
+
                       <div class="field md-3 sm-6">
-                        <label>عدد المشغلين</label>
-                        <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0" value="${equip.equip_operators}"></div>
+                        <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;" value="${equip.equip_count_basic || 0}"></div>
+                      </div>
+
+                      <div class="field md-3 sm-6">
+                        <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;" value="${equip.equip_count_backup || 0}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المساعدين</label>

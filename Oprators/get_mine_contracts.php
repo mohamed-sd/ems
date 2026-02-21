@@ -8,8 +8,21 @@ include '../config.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
+$is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
+$user_mine_id = $is_role10 ? intval($_SESSION['user']['mine_id']) : 0;
+$user_contract_id = $is_role10 ? intval($_SESSION['user']['contract_id']) : 0;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mine_id'])) {
     $mine_id = intval($_POST['mine_id']);
+
+    if ($is_role10 && $user_mine_id > 0 && $mine_id !== $user_mine_id) {
+        die(json_encode(['success' => false, 'message' => 'لا توجد صلاحية لهذا المنجم']));
+    }
+
+    $contract_filter = '';
+    if ($is_role10 && $user_contract_id > 0) {
+        $contract_filter = " AND c.id = $user_contract_id";
+    }
 
     $contracts_query = "SELECT
             c.id,
@@ -17,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mine_id'])) {
             DATE_FORMAT(c.actual_end, '%Y-%m-%d') AS end_date,
             c.forecasted_contracted_hours
         FROM contracts c
-        WHERE c.mine_id = $mine_id AND c.status = 1
+        WHERE c.mine_id = $mine_id AND c.status = 1$contract_filter
         ORDER BY c.actual_start DESC";
 
     $result = mysqli_query($conn, $contracts_query);

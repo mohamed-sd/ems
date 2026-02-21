@@ -8,12 +8,21 @@ $page_title = "إيكوبيشن | التشغيل ";
 include("../inheader.php");
 include '../config.php';
 
+$is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
+$user_project_id = $is_role10 ? intval($_SESSION['user']['project_id']) : 0;
+$user_mine_id = $is_role10 ? intval($_SESSION['user']['mine_id']) : 0;
+$user_contract_id = $is_role10 ? intval($_SESSION['user']['contract_id']) : 0;
 // التحقق من وجود مشروع محدد
 $selected_project_id = 0;
 $selected_project = null;
 
 // التحقق من GET parameter أو SESSION
-if (isset($_GET['project_id']) && !empty($_GET['project_id'])) {
+if ($is_role10) {
+    $selected_project_id = $user_project_id;
+    if ($selected_project_id > 0) {
+        $_SESSION['operations_project_id'] = $selected_project_id;
+    }
+} elseif (isset($_GET['project_id']) && !empty($_GET['project_id'])) {
     $selected_project_id = intval($_GET['project_id']);
     $_SESSION['operations_project_id'] = $selected_project_id;
 } elseif (isset($_SESSION['operations_project_id'])) {
@@ -22,6 +31,10 @@ if (isset($_GET['project_id']) && !empty($_GET['project_id'])) {
 
 // إذا لم يتم تحديد مشروع، إعادة التوجيه لصفحة الاختيار
 if ($selected_project_id == 0) {
+    if ($is_role10) {
+        echo "<script>alert('❌ لا يوجد مشروع محدد لهذا المستخدم'); window.location.href='../main/dashboard.php';</script>";
+        exit();
+    }
     header("Location: select_project.php");
     exit();
 }
@@ -39,8 +52,36 @@ if (mysqli_num_rows($project_result) > 0) {
     exit();
 }
 
+// تغيير حالة التشغيل (إيقاف/تعطل/استئناف)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_status') {
+    $operation_id = intval($_POST['operation_id']);
+    $new_status = intval($_POST['new_status']);
+    $allowed_statuses = [1, 3, 4];
+
+    if (!empty($operation_id) && in_array($new_status, $allowed_statuses, true)) {
+        $update_sql = "UPDATE operations SET status = $new_status WHERE id = $operation_id";
+        $update_result = mysqli_query($conn, $update_sql);
+
+        if ($update_result) {
+            $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
+            echo "<script>alert('✅ تم تحديث الحالة بنجاح'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+            exit();
+        }
+
+        echo "<script>alert('❌ خطأ في تحديث الحالة: " . mysqli_error($conn) . "');</script>";
+    } else {
+        echo "<script>alert('❌ بيانات غير صحيحة لتحديث الحالة');</script>";
+    }
+}
+
 // انهاء خدمة من الموديل
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'end_service') {
+    if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10") {
+        $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
+        echo "<script>alert('❌ ليس لديك صلاحية لإنهاء الخدمة'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+        exit();
+    }
+
     $operation_id = intval($_POST['operation_id']);
     $end_date = mysqli_real_escape_string($conn, $_POST['end_date']);
     $reason = mysqli_real_escape_string($conn, $_POST['reason']);
@@ -365,10 +406,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </p>
                 <?php } ?>
             </div>
+            <?php if($_SESSION['user']['role'] != "10") { ?>
             <a href="select_project.php" class="change-project-btn">
                 <i class="fas fa-exchange-alt"></i>
                 تغيير المشروع
             </a>
+            <?php } ?>
         </div>
     </div>
     
@@ -405,10 +448,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <option value="">-- اختر المنجم --</option>
                         <?php
                         // تحميل المناجم للمشروع المحدد مباشرة
-                        $mines_query = "SELECT id, mine_name FROM mines WHERE project_id = $selected_project_id AND status='1' ORDER BY mine_name";
+                        $mines_filter = $is_role10 && $user_mine_id > 0 ? " AND id = $user_mine_id" : "";
+                        $mines_query = "SELECT id, mine_name FROM mines WHERE project_id = $selected_project_id AND status='1'$mines_filter ORDER BY mine_name";
                         $mines_result = mysqli_query($conn, $mines_query);
                         while ($mine = mysqli_fetch_assoc($mines_result)) {
-                            echo "<option value='" . $mine['id'] . "'>" . htmlspecialchars($mine['mine_name']) . "</option>";
+                            $selected_mine = $is_role10 && $user_mine_id > 0 && $user_mine_id == $mine['id'] ? "selected" : "";
+                            echo "<option value='" . $mine['id'] . "' $selected_mine>" . htmlspecialchars($mine['mine_name']) . "</option>";
                         }
                         ?>
                     </select>
@@ -441,6 +486,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <!-- سيتم ملؤها ديناميكيًا عبر AJAX -->
                     </select>
 
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <label style="display: block; margin-bottom: 0.5rem;"><i class="fas fa-check-circle"></i> نوع المعدة</label>
+                            <select name="equipment_category" id="equipment_category" required>
+                                <option value="">-- أساسي / احتياطي --</option>
+                                <option value="أساسي">🔵 أساسي</option>
+                                <option value="احتياطي">🟡 احتياطي</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <input type="date" name="start" id="start_date" required placeholder="تاريخ البداية" />
                     <input type="date" name="end" id="end_date" required placeholder="تاريخ النهاية" />
                     <input type="hidden" step="0.01" name="hours" placeholder="عدد الساعات" value="0" />
@@ -456,8 +512,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </div>
                     
                     <select name="status" id="status" required>
-                        <option value="1">نشط</option>
-                        <option value="0">منتهي</option>
+                        <option value="1">تعمل</option>
+                        <option value="0">متاحة</option>
+                        <option value="3">متوقفة</option>
+                        <option value="4">معطلة</option>
                     </select>
                     <input type="hidden" name="action" value="save_operation" />
                     <button type="submit">حفظ التشغيل</button>
@@ -482,6 +540,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <th>المورد</th>
                             <th>الساعات المتعاقد عليها</th>
                             <th>عدد المعدات المتعاقد عليها</th>
+                            <th><span style="color: #007bff; font-weight: 600;">■</span> أساسية</th>
+                            <th><span style="color: #ffc107; font-weight: 600;">■</span> احتياطية</th>
                             <th>المعدات المضافة</th>
                             <th>المتبقي للإضافة</th>
                             <th>توزيع المعدات والساعات</th>
@@ -489,7 +549,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </thead>
                     <tbody id="suppliersTableBody">
                         <tr>
-                            <td colspan="7" style="text-align: center; color: #6c757d; padding: 2rem;">
+                            <td colspan="9" style="text-align: center; color: #6c757d; padding: 2rem;">
                                 <i class="fas fa-info-circle"></i> لا توجد بيانات
                             </td>
                         </tr>
@@ -499,6 +559,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <td colspan="2" style="text-align: right; padding: 12px;">الإجمالي</td>
                             <td id="total_supplier_hours" style="text-align: center;">0</td>
                             <td id="total_supplier_equipment" style="text-align: center;">0</td>
+                            <td id="total_supplier_basic" style="text-align: center;">0</td>
+                            <td id="total_supplier_backup" style="text-align: center;">0</td>
                             <td id="total_added_equipment" style="text-align: center;">0</td>
                             <td id="total_remaining_equipment" style="text-align: center;">0</td>
                             <td></td>
@@ -541,6 +603,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                         <th style="text-align:right;">تاريخ البداية</th>
                         <th style="text-align:right;">تاريخ النهاية</th>
+                        <th style="text-align:right;"><span style="color: #007bff; font-weight: 600;">■</span> النوع</th>
                         <!-- <th style="text-align:right;">عدد الساعات</th> -->
                         <th style="text-align:right;">الحالة</th>
                         <th style="text-align:right;">إجراءات</th>
@@ -558,6 +621,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         $contract_id = intval($_POST['contract_id']);
                         $supplier_id = intval($_POST['supplier_id']);
                         $equipment_type = intval($_POST['type']);
+                        $equipment_category = mysqli_real_escape_string($conn, $_POST['equipment_category']);
                         
                         $start = mysqli_real_escape_string($conn, $_POST['start']);
                         $end = mysqli_real_escape_string($conn, $_POST['end']);
@@ -571,6 +635,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             $sql = "UPDATE operations SET 
                                     equipment = '$equipment',
                                     equipment_type = '$equipment_type',
+                                    equipment_category = '$equipment_category',
                                     mine_id = '$mine_id',
                                     contract_id = '$contract_id',
                                     supplier_id = '$supplier_id',
@@ -585,14 +650,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             echo "<script>alert('✅ تم التحديث بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                         } else {
                             // إضافة سجل جديد
-                            mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, project_id, mine_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, status) 
-                                         VALUES ('$equipment', '$equipment_type', '$project_id', '$mine_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$status')");
+                            mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, mine_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, status) 
+                                         VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$mine_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$status')");
                             echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                         }
                     }
 
                     // جلب بيانات التشغيل للمشروع المحدد فقط
-                    $query = "SELECT o.id, o.equipment, o.equipment_type, o.mine_id, o.contract_id, o.supplier_id,
+                    $role10_filters = '';
+                  
+
+                    $query = "SELECT o.id, o.equipment, o.equipment_type, o.equipment_category, o.mine_id, o.contract_id, o.supplier_id,
                              o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.status, 
                              e.code AS equipment_code, e.name AS equipment_name,
                              p.name AS project_name, s.name AS suppliers_name,
@@ -603,7 +671,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                       LEFT JOIN suppliers s ON e.suppliers = s.id
                       LEFT JOIN equipment_drivers ed ON o.equipment = ed.equipment_id
                       LEFT JOIN drivers d ON ed.driver_id = d.id
-                      WHERE o.project_id = $selected_project_id
+                      WHERE o.project_id = $selected_project_id$role10_filters
                       GROUP BY o.id
                       ORDER BY o.id DESC";
                     $result = mysqli_query($conn, $query);
@@ -620,13 +688,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         echo "<td>" . (!empty($row['shift_hours']) ? $row['shift_hours'] : '0') . "</td>";
                         echo "<td>" . $row['start'] . "</td>";
                         echo "<td>" . $row['end'] . "</td>";
+                        
+                        // عرض نوع المعدة (أساسي/احتياطي)
+                        $categoryColor = ($row['equipment_category'] === 'أساسي') ? '#007bff' : '#ffc107';
+                        $categoryBg = ($row['equipment_category'] === 'أساسي') ? '#e3f2fd' : '#fffde7';
+                        $categoryText = ($row['equipment_category'] === 'أساسي') ? 'أساسي' : 'احتياطي';
+                        echo "<td style='background: $categoryBg; color: $categoryColor; font-weight: bold; border-right: 3px solid $categoryColor;'>$categoryText</td>";
+                        
                         // echo "<td>" . $row['hours'] . "</td>";
-                        echo $row['status'] == "1" ? "<td style='color:green'> تعمل </td>" : "<td style='color:red'> متوقفة </td>";
+                        $status_value = intval($row['status']);
+                        if ($status_value === 1) {
+                            $status_label = 'تعمل';
+                            $status_color = '#28a745';
+                        } elseif ($status_value === 0) {
+                            $status_label = 'متاحة';
+                            $status_color = '#6c757d';
+                        } elseif ($status_value === 3) {
+                            $status_label = 'متوقفة';
+                            $status_color = '#dc3545';
+                        } else {
+                            $status_label = 'معطلة';
+                            $status_color = '#f57f17';
+                        }
+
+                        $status_cell = "<td style='color: $status_color; font-weight: bold;'>$status_label</td>";
+
+                        $action_buttons = "";
+                        if ($status_value === 1) {
+                            $action_buttons .= "<form method='post' style='display:inline;'>
+                                    <input type='hidden' name='action' value='change_status'>
+                                    <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
+                                    <input type='hidden' name='new_status' value='3'>
+                                    <button type='submit' class='btn btn-sm btn-warning' onclick='return confirm(\"تأكيد إيقاف الآلية؟\")'>إيقاف</button>
+                                </form> ";
+                            $action_buttons .= "<form method='post' style='display:inline;'>
+                                    <input type='hidden' name='action' value='change_status'>
+                                    <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
+                                    <input type='hidden' name='new_status' value='4'>
+                                    <button type='submit' class='btn btn-sm btn-danger' onclick='return confirm(\"تأكيد تعطل الآلية؟\")'>تعطلت</button>
+                                </form> ";
+                        } elseif ($status_value === 3 || $status_value === 4) {
+                            $action_buttons .= "<form method='post' style='display:inline;'>
+                                    <input type='hidden' name='action' value='change_status'>
+                                    <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
+                                    <input type='hidden' name='new_status' value='1'>
+                                    <button type='submit' class='btn btn-sm btn-success' onclick='return confirm(\"تأكيد استئناف العمل؟\")'>استئناف</button>
+                                </form> ";
+                        }
+
+                        if ($status_value !== 0 && $_SESSION['user']['role'] != "10") {
+                            $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-outline-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
+                        }
+
+                        echo $status_cell;
                         echo "<td>
                                 <a href='javascript:void(0)' class='editOperationBtn' 
                                    data-id='" . $row['id'] . "'
                                    data-equipment='" . $row['equipment'] . "'
                                    data-equipment-type='" . $row['equipment_type'] . "'
+                                   data-equipment-category='" . $row['equipment_category'] . "'
                                    data-mine='" . $row['mine_id'] . "'
                                    data-contract='" . $row['contract_id'] . "'
                                    data-supplier='" . $row['supplier_id'] . "'
@@ -636,8 +756,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                    data-shift-hours='" . $row['shift_hours'] . "'
                                    data-status='" . $row['status'] . "'
                                    style='color:#007bff' title='تعديل'><i class='fa fa-edit'></i></a> | 
-                                <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545' title='حذف'><i class='fa fa-trash'></i></a> | 
-                                <a href='#' class='end-service-btn' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a>
+                                <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545' title='حذف'><i class='fa fa-trash'></i></a> |
+                                " . $action_buttons . "
                               </td>";
                         echo "</tr>";
                     }
@@ -756,11 +876,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         function resetStats() {
             $("#contractStats").hide();
             $("#suppliersSection").hide();
-            $("#suppliersTableBody").html("<tr><td colspan='7' style='text-align: center; color: #6c757d; padding: 2rem;'><i class='fas fa-info-circle'></i> لا توجد بيانات</td></tr>");
+            $("#suppliersTableBody").html("<tr><td colspan='9' style='text-align: center; color: #6c757d; padding: 2rem;'><i class='fas fa-info-circle'></i> لا توجد بيانات</td></tr>");
             $("#stat_total_hours").text("0");
             $("#stat_equipment_count").text("0");
             $("#total_supplier_hours").text("0");
             $("#total_supplier_equipment").text("0");
+            $("#total_supplier_basic").text("0");
+            $("#total_supplier_backup").text("0");
             $("#total_added_equipment").text("0");
             $("#total_remaining_equipment").text("0");
         }
@@ -780,6 +902,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 var rows = "";
                 var totalAdded = 0;
                 var totalRemaining = 0;
+                var totalBasic = 0;
+                var totalBackup = 0;
 
                 response.suppliers.forEach(function (supplier, index) {
                     var breakdownHtml = "";
@@ -816,8 +940,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                     var addedEquipment = supplier.added_to_equipments || 0;
                     var remainingEquipment = supplier.remaining_to_add || 0;
+                    var supplierBasic = supplier.equipment_count_basic || 0;
+                    var supplierBackup = supplier.equipment_count_backup || 0;
+                    
                     totalAdded += addedEquipment;
                     totalRemaining += remainingEquipment;
+                    totalBasic += supplierBasic;
+                    totalBackup += supplierBackup;
 
                     var addedBadgeClass = 'badge-available';
                     var remainingBadgeClass = 'badge-busy';
@@ -835,6 +964,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         '<td><strong>' + (supplier.supplier_name || '-') + '</strong></td>' +
                         '<td style="text-align: center;">' + parseFloat(supplier.hours || 0).toLocaleString() + '</td>' +
                         '<td style="text-align: center;">' + (supplier.equipment_count || 0) + '</td>' +
+                        '<td style="text-align: center; background: #e3f2fd; color: #007bff; font-weight: bold; border-right: 3px solid #007bff;">' + supplierBasic + '</td>' +
+                        '<td style="text-align: center; background: #fffde7; color: #f57f17; font-weight: bold; border-right: 3px solid #ffc107;">' + supplierBackup + '</td>' +
                         '<td style="text-align: center;">' +
                         '<span class="' + addedBadgeClass + '"><i class="fas fa-check"></i> ' + addedEquipment + '</span>' +
                         '</td>' +
@@ -848,6 +979,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $("#suppliersTableBody").html(rows);
                 $("#total_supplier_hours").text(parseFloat(response.summary.total_supplier_hours || 0).toLocaleString());
                 $("#total_supplier_equipment").text(response.summary.total_supplier_equipment || 0);
+                $("#total_supplier_basic").text(totalBasic);
+                $("#total_supplier_backup").text(totalBackup);
                 $("#total_added_equipment").text(totalAdded);
                 $("#total_remaining_equipment").text(totalRemaining);
             } else {
@@ -991,6 +1124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $('#total_equipment_hours').val(btn.data('total-hours'));
             $('#shift_hours').val(btn.data('shift-hours'));
             $('#status').val(btn.data('status'));
+            $('#equipment_category').val(btn.data('equipment-category'));
             
             console.log('✅ تم ملء البيانات الأساسية');
             
