@@ -9,7 +9,7 @@ if (!isset($_SESSION['user'])) {
 
 $page_title = "إيكوبيشن | أنواع الآليات";
 include("../inheader.php");
-include("../insidebar.php");
+// include("../insidebar.php");
 
 /* منع الحذف مؤقتاً (Backend) */
 if (isset($_GET['delete_id'])) {
@@ -52,28 +52,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
+<link rel="stylesheet" href="../assets/css/main_admin_style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
 .delete-disabled {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #6c757d;
-    font-size: 16px;
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 .delete-disabled:hover {
-    color: #dc3545;
+    opacity: 0.6;
 }
 </style>
 
 <div class="main">
 
-    <h2>إدارة أنواع الآليات</h2>
-
-    <button id="toggleForm" style="float:left;" class="btn btn-warning mb-3">
-        <i class="fa-solid fa-plus"></i> إضافة نوع جديد
-    </button>
+    <div class="page-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="title-icon"><i class="fas fa-cubes"></i></div>
+            <h1 class="page-title">إدارة أنواع الآليات</h1>
+        </div>
+        <div>
+            <a href="../main/dashboard.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+            <button id="toggleForm" class="add">
+                <i class="fa-solid fa-plus-circle"></i> إضافة نوع جديد
+            </button>
+        </div>
+    </div>
 
     <!-- رسالة الحذف (مخفية) -->
     <div id="deleteAlert" class="alert alert-warning text-center" style="display:none;">
@@ -85,9 +92,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form id="projectForm" method="post"
           style="display:<?= !empty($editData) ? 'block' : 'none'; ?>">
 
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">
+        <div class="card">
+            <div class="card-header">
+                <h5>
                     <?= !empty($editData) ? 'تعديل نوع الآلية' : 'إضافة نوع آلية جديدة'; ?>
                 </h5>
             </div>
@@ -129,13 +136,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <!-- جدول الأنواع -->
-    <div class="card shadow-sm mt-4">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">قائمة أنواع الآليات</h5>
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-list"></i> قائمة أنواع الآليات</h5>
         </div>
 
         <div class="card-body">
-            <table id="projectsTable" class="display nowrap" style="width:100%">
+            <div class="table-container">
+            <table id="projectsTable" class="display" style="width:100%">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -156,21 +164,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <td><?= htmlspecialchars($row['type'], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td>
                             <?= $row['status'] === 'active'
-                                ? "<span style='color:green'>نشط</span>"
-                                : "<span style='color:red'>غير نشط</span>"; ?>
+                                ? "<span class='status-active'>نشط</span>"
+                                : "<span class='status-inactive'>غير نشط</span>"; ?>
                         </td>
                         <td class="text-center">
 
-                            <!-- تعديل -->
-                            <a href="equipments_types.php?edit_id=<?= $row['id']; ?>"
-                               class="text-primary me-2" title="تعديل">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </a>
+                            <div class="action-btns">
+                                <a href="equipments_types.php?edit_id=<?= $row['id']; ?>"
+                                   class="action-btn edit" title="تعديل">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
 
-                            <!-- حذف (موقوف) -->
-                            <button type="button" class="delete-disabled" title="حذف">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                                <button type="button" class="action-btn delete delete-disabled" title="حذف">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
 
                         </td>
                     </tr>
@@ -178,6 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>

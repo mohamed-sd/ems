@@ -120,318 +120,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 ?>
 
-<?php include('../insidebar.php'); ?>
+<?php 
+// include('../insidebar.php'); 
+?>
 
-<style>
-    .page-header {
-        background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%);
-        padding: 1.5rem;
-        border-radius: 18px;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .page-title {
-        color: #fff;
-        font-size: 1.6rem;
-        font-weight: 800;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .page-title i {
-        color: #e2ae03;
-        font-size: 1.8rem;
-    }
-
-    .page-subtitle {
-        color: rgba(255, 255, 255, 0.75);
-        margin: 0.25rem 0 0 0;
-        font-size: 0.95rem;
-        font-weight: 600;
-    }
-
-    .page-actions {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-    }
-
-    .page-actions .add {
-        background: linear-gradient(135deg, #e2ae03 0%, #debf0f 100%);
-        color: #01072a;
-        padding: 0.7rem 1.2rem;
-        border-radius: 12px;
-        font-weight: 700;
-        text-decoration: none;
-        box-shadow: 0 4px 15px rgba(226, 174, 3, 0.4);
-        transition: all 0.3s ease;
-    }
-
-    .page-actions .add:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(226, 174, 3, 0.5);
-    }
-
-    .contract-stats {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 1.5rem;
-        border-radius: 15px;
-        margin-top: 1.5rem;
-        border: 2px solid #e2ae03;
-        display: none;
-        animation: fadeInUp 0.5s ease;
-    }
-
-    .stats-title {
-        color: #01072a;
-        font-weight: 700;
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.8rem;
-        border-bottom: 3px solid #e2ae03;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .stat-card {
-        background: #fff;
-        padding: 1.2rem;
-        border-radius: 12px;
-        text-align: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        border: 2px solid transparent;
-        transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-        border-color: #e2ae03;
-        transform: translateY(-4px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    }
-
-    .stat-card-value {
-        font-size: 2rem;
-        font-weight: 900;
-        color: #01072a;
-        margin: 0.5rem 0;
-    }
-
-    .stat-card-label {
-        font-size: 0.9rem;
-        color: #6c757d;
-        font-weight: 600;
-    }
-
-    .stat-card-icon {
-        font-size: 2.5rem;
-        color: #e2ae03;
-        margin-bottom: 0.5rem;
-    }
-
-    .suppliers-table {
-        width: 100%;
-        margin-top: 1rem;
-        border-collapse: separate;
-        border-spacing: 0 8px;
-    }
-
-    .suppliers-table thead th {
-        background: #01072a;
-        color: #fff;
-        padding: 12px;
-        text-align: center;
-        font-weight: 600;
-        border: none;
-    }
-
-    .suppliers-table tbody tr {
-        background: #fff;
-        transition: all 0.3s ease;
-    }
-
-    .suppliers-table tbody td {
-        padding: 12px;
-        text-align: center;
-        border: none;
-        font-weight: 500;
-    }
-
-    .badge-available {
-        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-        color: #155724;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        border: 2px solid #28a745;
-    }
-
-    .badge-busy {
-        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-        color: #721c24;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        border: 2px solid #dc3545;
-    }
-
-    .badge-working {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-        color: #856404;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        border: 2px solid #ffc107;
-    }
-    
-    .project-header {
-        background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%);
-        padding: 1.5rem;
-        border-radius: 15px;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        border: 2px solid #e2ae03;
-    }
-    
-    .project-header-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    
-    .project-title {
-        color: #fff;
-        font-size: 1.8rem;
-        font-weight: 800;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    
-    .project-title i {
-        color: #e2ae03;
-    }
-    
-    .project-code-display {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 1rem;
-        margin: 0.5rem 0 0 0;
-        font-family: monospace;
-    }
-    
-    .change-project-btn {
-        background: linear-gradient(135deg, #e2ae03 0%, #debf0f 100%);
-        color: #01072a;
-        padding: 0.7rem 1.2rem;
-        border-radius: 12px;
-        font-weight: 700;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 15px rgba(226, 174, 3, 0.4);
-        transition: all 0.3s ease;
-    }
-    
-    .change-project-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(226, 174, 3, 0.5);
-        text-decoration: none;
-        color: #01072a;
-    }
-    
-    /* تحسين أيقونات الإجراءات */
-    #projectsTable tbody td a {
-        display: inline-block;
-        padding: 6px;
-        margin: 0 2px;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-        text-decoration: none;
-    }
-    
-    #projectsTable tbody td a:hover {
-        transform: scale(1.1);
-        background: rgba(0, 0, 0, 0.05);
-    }
-    
-    #projectsTable tbody td a i {
-        font-size: 1rem;
-    }
-</style>
+<link rel="stylesheet" href="../assets/css/main_admin_style.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
 <div class="main">
-    <!-- عنوان المشروع المحدد -->
-    <div class="project-header">
-        <div class="project-header-content">
+    <div class="page-header">
+        <h1 class="page-title">
+            <div class="title-icon"><i class="fas fa-hard-hat"></i></div>
             <div>
-                <h1 class="project-title">
-                    <i class="fas fa-hard-hat"></i>
-                    <?php echo htmlspecialchars($selected_project['name']); ?>
-                </h1>
+                <div><?php echo htmlspecialchars($selected_project['name']); ?></div>
                 <?php if (!empty($selected_project['project_code'])) { ?>
-                    <p class="project-code-display">
+                    <small class="page-subtitle">
                         <i class="fas fa-barcode"></i>
                         كود المشروع: <?php echo htmlspecialchars($selected_project['project_code']); ?>
-                    </p>
+                    </small>
                 <?php } ?>
+                <small class="page-subtitle">
+                    <i class="fas fa-cogs"></i>
+                    تنظيم تشغيل المعدات وربطها بالمشاريع والمناجم والعقود
+                </small>
             </div>
+        </h1>
+        <div class="page-header-actions">
+             <a href="../main/dashboard.php" class="back-btn">
+                    <i class="fas fa-arrow-right"></i> رجوع
+                </a>
             <?php if($_SESSION['user']['role'] != "10") { ?>
-            <a href="select_project.php" class="change-project-btn">
+            <a href="select_project.php" class="back-btn">
                 <i class="fas fa-exchange-alt"></i>
                 تغيير المشروع
             </a>
             <?php } ?>
-        </div>
-    </div>
-    
-    <div class="page-header">
-        <div>
-            <h1 class="page-title"><i class="fas fa-cogs"></i> إدارة التشغيل</h1>
-            <p class="page-subtitle">تنظيم تشغيل المعدات وربطها بالمشاريع والمناجم والعقود</p>
-        </div>
-        <div class="page-actions">
-            <a href="javascript:void(0)" id="toggleForm" class="add">
+            <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fa fa-plus"></i> اضافة تشغيل
             </a>
         </div>
     </div>
 
+    <h2 class="section-title">
+        <i class="fas fa-cogs"></i>
+        إدارة التشغيل
+    </h2>
+
     <!-- فورم إضافة تشغيل -->
-    <form id="projectForm" action="" method="post" style="display:none; margin-top:20px;">
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0" id="formTitle">
+    <form id="projectForm" action="" method="post" class="form-hidden">
+        <div class="card">
+            <div class="card-header">
+                <h5 id="formTitle">
                     <i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد
                 </h5>
             </div>
@@ -486,9 +225,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <!-- سيتم ملؤها ديناميكيًا عبر AJAX -->
                     </select>
 
-                    <div style="display: flex; gap: 1rem;">
-                        <div style="flex: 1;">
-                            <label style="display: block; margin-bottom: 0.5rem;"><i class="fas fa-check-circle"></i> نوع المعدة</label>
+                    <div class="form-grid-full">
+                        <div>
+                            <label><i class="fas fa-check-circle"></i> نوع المعدة</label>
                             <select name="equipment_category" id="equipment_category" required>
                                 <option value="">-- أساسي / احتياطي --</option>
                                 <option value="أساسي">🔵 أساسي</option>
@@ -518,21 +257,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <option value="4">معطلة</option>
                     </select>
                     <input type="hidden" name="action" value="save_operation" />
-                    <button type="submit">حفظ التشغيل</button>
+                    <button type="submit" name="save_operation_submit" id="save_operation_submit">حفظ التشغيل</button>
                 </div>
             </div>
         </div>
     </form>
 
     <!-- قسم الإحصائيات -->
-    <div id="contractStats" class="contract-stats">
+    <div id="contractStats" class="contract-stats is-hidden">
         <h5 class="stats-title">
             <i class="fas fa-chart-line"></i>
             إحصائيات عقد المنجم
         </h5>
 
-        <div id="suppliersSection" style="display: none;">
-            <div style="overflow-x: auto;">
+        <div id="suppliersSection" class="suppliers-section">
+            <div class="table-scroll">
                 <table class="suppliers-table">
                     <thead>
                         <tr>
@@ -540,8 +279,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <th>المورد</th>
                             <th>الساعات المتعاقد عليها</th>
                             <th>عدد المعدات المتعاقد عليها</th>
-                            <th><span style="color: #007bff; font-weight: 600;">■</span> أساسية</th>
-                            <th><span style="color: #ffc107; font-weight: 600;">■</span> احتياطية</th>
+                            <th><span class="legend-dot legend-basic">■</span> أساسية</th>
+                            <th><span class="legend-dot legend-backup">■</span> احتياطية</th>
                             <th>المعدات المضافة</th>
                             <th>المتبقي للإضافة</th>
                             <th>توزيع المعدات والساعات</th>
@@ -549,20 +288,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </thead>
                     <tbody id="suppliersTableBody">
                         <tr>
-                            <td colspan="9" style="text-align: center; color: #6c757d; padding: 2rem;">
+                            <td colspan="9" class="suppliers-empty">
                                 <i class="fas fa-info-circle"></i> لا توجد بيانات
                             </td>
                         </tr>
                     </tbody>
                     <tfoot>
-                        <tr style="background: linear-gradient(135deg, #e2ae03 0%, #debf0f 100%); font-weight: bold; color: #01072a;">
-                            <td colspan="2" style="text-align: right; padding: 12px;">الإجمالي</td>
-                            <td id="total_supplier_hours" style="text-align: center;">0</td>
-                            <td id="total_supplier_equipment" style="text-align: center;">0</td>
-                            <td id="total_supplier_basic" style="text-align: center;">0</td>
-                            <td id="total_supplier_backup" style="text-align: center;">0</td>
-                            <td id="total_added_equipment" style="text-align: center;">0</td>
-                            <td id="total_remaining_equipment" style="text-align: center;">0</td>
+                        <tr class="suppliers-total-row">
+                            <td colspan="2" class="suppliers-total-label">الإجمالي</td>
+                            <td id="total_supplier_hours" class="suppliers-total-value">0</td>
+                            <td id="total_supplier_equipment" class="suppliers-total-value">0</td>
+                            <td id="total_supplier_basic" class="suppliers-total-value">0</td>
+                            <td id="total_supplier_backup" class="suppliers-total-value">0</td>
+                            <td id="total_added_equipment" class="suppliers-total-value">0</td>
+                            <td id="total_remaining_equipment" class="suppliers-total-value">0</td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -570,7 +309,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
         </div>
 
-        <div class="stats-grid" style="margin-top: 2rem;">
+        <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-card-icon"><i class="fas fa-clock"></i></div>
                 <div class="stat-card-value" id="stat_total_hours">0</div>
@@ -584,29 +323,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
         </div>
     </div>
-    <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0"> قائمة التشغيل</h5>
+    <div class="card">
+        <div class="card-header">
+            <h5> قائمة التشغيل</h5>
         </div>
         <div class="card-body">
-            <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
+            <table id="projectsTable" class="display nowrap">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th style="text-align:right;">المعدة</th>
+                        <th>المعدة</th>
 
-                        <th style="text-align:right;">السائقين</th>
+                        <th>السائقين</th>
 
-                        <th style="text-align:right;">المورد</th>
-                        <th style="text-align:right;">ساعات العمل الكلية</th>
-                        <th style="text-align:right;">ساعات الوردية</th>
+                        <th>المورد</th>
+                        <th>ساعات العمل الكلية</th>
+                        <th>ساعات الوردية</th>
 
-                        <th style="text-align:right;">تاريخ البداية</th>
-                        <th style="text-align:right;">تاريخ النهاية</th>
-                        <th style="text-align:right;"><span style="color: #007bff; font-weight: 600;">■</span> النوع</th>
+                        <th>تاريخ البداية</th>
+                        <th>تاريخ النهاية</th>
+                        <th>النوع</th>
                         <!-- <th style="text-align:right;">عدد الساعات</th> -->
-                        <th style="text-align:right;">الحالة</th>
-                        <th style="text-align:right;">إجراءات</th>
+                        <th>الحالة</th>
+                        <th>إجراءات</th>
 
                     </tr>
                 </thead>
@@ -690,49 +429,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         echo "<td>" . $row['end'] . "</td>";
                         
                         // عرض نوع المعدة (أساسي/احتياطي)
-                        $categoryColor = ($row['equipment_category'] === 'أساسي') ? '#007bff' : '#ffc107';
-                        $categoryBg = ($row['equipment_category'] === 'أساسي') ? '#e3f2fd' : '#fffde7';
                         $categoryText = ($row['equipment_category'] === 'أساسي') ? 'أساسي' : 'احتياطي';
-                        echo "<td style='background: $categoryBg; color: $categoryColor; font-weight: bold; border-right: 3px solid $categoryColor;'>$categoryText</td>";
+                        $categoryClass = ($row['equipment_category'] === 'أساسي') ? 'basic' : 'backup';
+                        echo "<td><span class='category-badge $categoryClass'>$categoryText</span></td>";
                         
                         // echo "<td>" . $row['hours'] . "</td>";
                         $status_value = intval($row['status']);
                         if ($status_value === 1) {
                             $status_label = 'تعمل';
-                            $status_color = '#28a745';
+                            $status_class = 'status-running';
                         } elseif ($status_value === 0) {
                             $status_label = 'متاحة';
-                            $status_color = '#6c757d';
+                            $status_class = 'status-idle';
                         } elseif ($status_value === 3) {
                             $status_label = 'متوقفة';
-                            $status_color = '#dc3545';
+                            $status_class = 'status-stopped';
                         } else {
                             $status_label = 'معطلة';
-                            $status_color = '#f57f17';
+                            $status_class = 'status-down';
                         }
 
-                        $status_cell = "<td style='color: $status_color; font-weight: bold;'>$status_label</td>";
+                        $status_cell = "<td><span class='status-pill $status_class'>$status_label</span></td>";
 
                         $action_buttons = "";
                         if ($status_value === 1) {
-                            $action_buttons .= "<form method='post' style='display:inline;'>
+                                $action_buttons .= "<form method='post' style='display:inline;'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='3'>
-                                    <button type='submit' class='btn btn-sm btn-warning' onclick='return confirm(\"تأكيد إيقاف الآلية؟\")'>إيقاف</button>
+                                    <button type='submit' name='status_stop_submit' class='btn btn-sm btn-warning' onclick='return confirm(\"تأكيد إيقاف الآلية؟\")'>إيقاف</button>
                                 </form> ";
                             $action_buttons .= "<form method='post' style='display:inline;'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='4'>
-                                    <button type='submit' class='btn btn-sm btn-danger' onclick='return confirm(\"تأكيد تعطل الآلية؟\")'>تعطلت</button>
+                                    <button type='submit' name='status_down_submit' class='btn btn-sm btn-danger' onclick='return confirm(\"تأكيد تعطل الآلية؟\")'>تعطلت</button>
                                 </form> ";
                         } elseif ($status_value === 3 || $status_value === 4) {
                             $action_buttons .= "<form method='post' style='display:inline;'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='1'>
-                                    <button type='submit' class='btn btn-sm btn-success' onclick='return confirm(\"تأكيد استئناف العمل؟\")'>استئناف</button>
+                                    <button type='submit' name='status_resume_submit' class='btn btn-sm btn-success' onclick='return confirm(\"تأكيد استئناف العمل؟\")'>استئناف</button>
                                 </form> ";
                         }
 
@@ -740,25 +478,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-outline-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
                         }
 
-                        echo $status_cell;
-                        echo "<td>
-                                <a href='javascript:void(0)' class='editOperationBtn' 
-                                   data-id='" . $row['id'] . "'
-                                   data-equipment='" . $row['equipment'] . "'
-                                   data-equipment-type='" . $row['equipment_type'] . "'
-                                   data-equipment-category='" . $row['equipment_category'] . "'
-                                   data-mine='" . $row['mine_id'] . "'
-                                   data-contract='" . $row['contract_id'] . "'
-                                   data-supplier='" . $row['supplier_id'] . "'
-                                   data-start='" . $row['start'] . "'
-                                   data-end='" . $row['end'] . "'
-                                   data-total-hours='" . $row['total_equipment_hours'] . "'
-                                   data-shift-hours='" . $row['shift_hours'] . "'
-                                   data-status='" . $row['status'] . "'
-                                   style='color:#007bff' title='تعديل'><i class='fa fa-edit'></i></a> | 
-                                <a href='#' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545' title='حذف'><i class='fa fa-trash'></i></a> |
-                                " . $action_buttons . "
-                              </td>";
+                                                echo $status_cell;
+                                                echo "<td>
+                                                                <div class='action-btns'>
+                                                                        <a href='javascript:void(0)' class='action-btn edit editOperationBtn' 
+                                                                             data-id='" . $row['id'] . "'
+                                                                             data-equipment='" . $row['equipment'] . "'
+                                                                             data-equipment-type='" . $row['equipment_type'] . "'
+                                                                             data-equipment-category='" . $row['equipment_category'] . "'
+                                                                             data-mine='" . $row['mine_id'] . "'
+                                                                             data-contract='" . $row['contract_id'] . "'
+                                                                             data-supplier='" . $row['supplier_id'] . "'
+                                                                             data-start='" . $row['start'] . "'
+                                                                             data-end='" . $row['end'] . "'
+                                                                             data-total-hours='" . $row['total_equipment_hours'] . "'
+                                                                             data-shift-hours='" . $row['shift_hours'] . "'
+                                                                             data-status='" . $row['status'] . "'
+                                                                             title='تعديل'><i class='fa fa-edit'></i></a>
+                                                                        <a href='#' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد؟\")' title='حذف'>
+                                                                                <i class='fa fa-trash'></i>
+                                                                        </a>
+                                                                </div>
+                                                                " . $action_buttons . "
+                                                            </td>";
                         echo "</tr>";
                     }
                     ?>
@@ -767,6 +509,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         </div>
     </div>
 </div>
+
+<!-- jQuery (Required first) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Bootstrap Bundle (Includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <!-- موديل إنهاء الخدمة -->
 <div class="modal fade" id="endServiceModal" tabindex="-1" aria-labelledby="endServiceLabel" aria-hidden="true">
@@ -790,24 +539,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-                    <button type="submit" class="btn btn-danger">تأكيد الإنهاء</button>
+                    <button type="button" name="end_service_cancel" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="submit" name="end_service_submit" class="btn btn-danger">تأكيد الإنهاء</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<!-- Bootstrap Bundle (Modal يحتاج هذا الملف) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<!-- DataTables Responsive & Buttons -->
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
@@ -817,6 +557,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
 <script>
+    function toggleOperationForm(event) {
+        if (event) {
+            event.preventDefault();
+        }
+
+        const form = document.getElementById('projectForm');
+        if (!form) {
+            return false;
+        }
+
+        if (form.classList.contains('form-hidden')) {
+            const formTitle = document.getElementById('formTitle');
+            if (formTitle) {
+                formTitle.innerHTML = '<i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد';
+            }
+
+            const operationId = document.getElementById('operation_id');
+            const mineId = document.getElementById('mine_id');
+            const contractId = document.getElementById('contract_id');
+            const supplierId = document.getElementById('supplier_id');
+            const typeId = document.getElementById('type');
+            const equipmentId = document.getElementById('equipment');
+            const startDate = document.getElementById('start_date');
+            const endDate = document.getElementById('end_date');
+            const totalEquipmentHours = document.getElementById('total_equipment_hours');
+            const shiftHours = document.getElementById('shift_hours');
+            const status = document.getElementById('status');
+
+            if (operationId) operationId.value = '';
+            if (mineId) mineId.value = '';
+            if (contractId) contractId.innerHTML = '<option value="">-- اختر العقد --</option>';
+            if (supplierId) supplierId.innerHTML = '<option value="">-- اختر المورد --</option>';
+            if (typeId) typeId.value = '';
+            if (equipmentId) equipmentId.innerHTML = '<option value="">-- اختر المعدة --</option>';
+            if (startDate) startDate.value = '';
+            if (endDate) endDate.value = '';
+            if (totalEquipmentHours) totalEquipmentHours.value = '0';
+            if (shiftHours) shiftHours.value = '0';
+            if (status) status.value = '1';
+
+            form.classList.remove('form-hidden');
+            form.style.display = 'block';
+        } else {
+            form.classList.add('form-hidden');
+            form.style.display = 'none';
+        }
+
+        return false;
+    }
+
     (function () {
         // تشغيل DataTable بالعربية
         // تشغيل DataTable بالعربية
@@ -832,37 +622,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     { extend: 'print', text: 'طباعة' }
                 ],
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                    "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
                 }
             });
         });
 
-        // التحكم في إظهار وإخفاء الفورم
-        const toggleFormBtn = document.getElementById('toggleForm');
-        const form = document.getElementById('projectForm');
-
-        toggleFormBtn.addEventListener('click', function () {
-            // إعادة تعيين النموذج عند فتحه كإضافة جديدة
-            if (form.style.display === "none") {
-                $('#formTitle').html('<i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد');
-                $('#operation_id').val('');
-                $('#mine_id').val('');
-                $('#contract_id').html('<option value="">-- اختر العقد --</option>');
-                $('#supplier_id').html('<option value="">-- اختر المورد --</option>');
-                $('#type').val('');
-                $('#equipment').html('<option value="">-- اختر المعدة --</option>');
-                $('#start_date').val('');
-                $('#end_date').val('');
-                $('#total_equipment_hours').val('0');
-                $('#shift_hours').val('0');
-                $('#status').val('1');
-                
-                form.style.display = "block";
-            } else {
-                form.style.display = "none";
-            }
-        });
     })();
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleFormBtn = document.getElementById('toggleForm');
+        if (!toggleFormBtn) {
+            return;
+        }
+
+        toggleFormBtn.addEventListener('click', function (event) {
+            toggleOperationForm(event);
+        });
+    });
 
     $(document).ready(function () {
         function resetEquipment() {
@@ -876,7 +652,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         function resetStats() {
             $("#contractStats").hide();
             $("#suppliersSection").hide();
-            $("#suppliersTableBody").html("<tr><td colspan='9' style='text-align: center; color: #6c757d; padding: 2rem;'><i class='fas fa-info-circle'></i> لا توجد بيانات</td></tr>");
+            $("#suppliersTableBody").html("<tr><td colspan='9' class='suppliers-empty'><i class='fas fa-info-circle'></i> لا توجد بيانات</td></tr>");
             $("#stat_total_hours").text("0");
             $("#stat_equipment_count").text("0");
             $("#total_supplier_hours").text("0");
@@ -911,31 +687,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         breakdownHtml = supplier.equipment_breakdown.map(function (item) {
                             var addedCount = item.added_count || 0;
                             var remaining = item.remaining || 0;
-                            var statusIcon = '';
-                            var statusStyle = '';
+                            var statusClass = remaining === 0 ? 'is-active' : (addedCount > 0 ? 'is-warning' : 'is-muted');
+                            var basicInfo = item.count_basic > 0 ? '<span class="breakdown-tag is-basic">أساسي:' + item.count_basic + '</span>' : '';
+                            var backupInfo = item.count_backup > 0 ? '<span class="breakdown-tag is-backup">احتياطي:' + item.count_backup + '</span>' : '';
 
-                            if (remaining === 0) {
-                                statusIcon = '<i class="fas fa-check-circle" style="color: #28a745;"></i>';
-                                statusStyle = 'background: rgba(40, 167, 69, 0.1); border-right: 3px solid #28a745;';
-                            } else if (addedCount > 0) {
-                                statusIcon = '<i class="fas fa-exclamation-circle" style="color: #ffc107;"></i>';
-                                statusStyle = 'background: rgba(255, 193, 7, 0.1); border-right: 3px solid #ffc107;';
-                            } else {
-                                statusIcon = '<i class="fas fa-times-circle" style="color: #dc3545;"></i>';
-                                statusStyle = 'background: rgba(220, 53, 69, 0.1); border-right: 3px solid #dc3545;';
-                            }
-
-                            return '<div style="margin: 3px 0; padding: 8px; ' + statusStyle + ' border-radius: 4px;">' +
-                                statusIcon +
-                                ' <i class="fas fa-tools" style="color: #e2ae03;"></i> <strong>' + (item.type || 'غير محدد') + '</strong>: ' +
-                                item.count + ' متعاقد | ' +
-                                '<span style="color: #28a745; font-weight: bold;">' + addedCount + ' مضاف</span> | ' +
-                                '<span style="color: #dc3545; font-weight: bold;">' + remaining + ' متبقي</span> | ' +
+                            return '<div class="breakdown-item">' +
+                                '<i class="fas fa-tools"></i> <strong>' + (item.type || 'غير محدد') + '</strong>: ' +
+                                item.count + ' متعاقد ' + basicInfo + ' ' + backupInfo + ' | ' +
+                                '<span class="breakdown-count ' + statusClass + '">' + addedCount + ' مضاف</span> | ' +
+                                '<span class="breakdown-count ' + (remaining === 0 ? 'is-active' : 'is-warning') + '">' + remaining + ' متبقي</span> | ' +
                                 '<i class="fas fa-clock"></i> ' + parseFloat(item.hours || 0).toLocaleString() + ' ساعة' +
                                 '</div>';
                         }).join('');
                     } else {
-                        breakdownHtml = '<span style="color: #6c757d;">لا توجد تفاصيل</span>';
+                        breakdownHtml = '<span class="breakdown-empty">لا توجد تفاصيل</span>';
                     }
 
                     var addedEquipment = supplier.added_to_equipments || 0;
@@ -960,19 +725,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     }
 
                     rows += '<tr>' +
-                        '<td style="text-align: center;">' + (index + 1) + '</td>' +
+                        '<td class="text-center">' + (index + 1) + '</td>' +
                         '<td><strong>' + (supplier.supplier_name || '-') + '</strong></td>' +
-                        '<td style="text-align: center;">' + parseFloat(supplier.hours || 0).toLocaleString() + '</td>' +
-                        '<td style="text-align: center;">' + (supplier.equipment_count || 0) + '</td>' +
-                        '<td style="text-align: center; background: #e3f2fd; color: #007bff; font-weight: bold; border-right: 3px solid #007bff;">' + supplierBasic + '</td>' +
-                        '<td style="text-align: center; background: #fffde7; color: #f57f17; font-weight: bold; border-right: 3px solid #ffc107;">' + supplierBackup + '</td>' +
-                        '<td style="text-align: center;">' +
+                        '<td class="text-center">' + parseFloat(supplier.hours || 0).toLocaleString() + '</td>' +
+                        '<td class="text-center">' + (supplier.equipment_count || 0) + '</td>' +
+                        '<td class="suppliers-basic-count">' + supplierBasic + '</td>' +
+                        '<td class="suppliers-backup-count">' + supplierBackup + '</td>' +
+                        '<td class="text-center">' +
                         '<span class="' + addedBadgeClass + '"><i class="fas fa-check"></i> ' + addedEquipment + '</span>' +
                         '</td>' +
-                        '<td style="text-align: center;">' +
+                        '<td class="text-center">' +
                         '<span class="' + remainingBadgeClass + '"><i class="fas fa-' + (remainingEquipment === 0 ? 'check-circle' : 'exclamation-triangle') + '"></i> ' + remainingEquipment + '</span>' +
                         '</td>' +
-                        '<td style="text-align: right; font-size: 0.9rem;">' + breakdownHtml + '</td>' +
+                        '<td class="suppliers-breakdown">' + breakdownHtml + '</td>' +
                         '</tr>';
                 });
 
@@ -1114,7 +879,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $('#formTitle').html('<i class="fa fa-edit"></i> تعديل بيانات التشغيل');
             
             // إظهار النموذج
-            $('#projectForm').show();
+            $('#projectForm').removeClass('form-hidden').show();
             $('html, body').animate({scrollTop: $('#projectForm').offset().top - 100}, 500);
             
             // ملء البيانات الأساسية

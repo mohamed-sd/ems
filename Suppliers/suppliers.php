@@ -96,755 +96,265 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
     <link rel="stylesheet" type="text/css" href="../assets/css/admin-style.css" />
+    <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
-
-        :root {
-            --primary-color: #01072a;
-            --secondary-color: #e2ae03;
-            --dark-color: #2d2b22;
-            --light-color: #f5f5f5;
-            --border-color: #e0e0e0;
-            --text-color: #010326;
-            --gold-color: #debf0f;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-            --accent-color: #1a1a2e;
-        }
-        
-        body {
-            background: var(--light-color);
-        }
-        
-        .main {
-            padding: 2rem;
-            background: var(--light-color);
-            width: calc(100% - 250px);
+        .form-section {
+            background: var(--bg);
+            padding: 1.2rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.2rem;
+            border: 1.5px solid var(--border);
         }
 
-        @media (max-width: 768px) {
-            .main {
-                margin-right: 0;
-                padding: 15px 10px;
-            }
-        }
-        
-        /* Page Header */
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* Page Title */
-        .main h2 {
-            color: var(--primary-color);
-            font-size: 20px;
-            font-weight: 900;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .main h2 i {
-            color: var(--secondary-color);
-            font-size: 24px;
-        }
-        
-        /* Action Buttons Container */
-        .aligin {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px var(--shadow-color);
-            animation: slideDown 0.4s ease;
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        
-        /* Modern Action Buttons */
-        .aligin .add {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: white;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px var(--shadow-color);
-            position: relative;
-            overflow: hidden;
-            background: var(--gold-color);
-            color: var(--primary-color);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .aligin .add::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        
-        .aligin .add:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-        
-        .aligin .add:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
-        }
-        
-        /* Success Message */
-        .success-message {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            color: #155724;
-            padding: 15px 20px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 4px 15px var(--shadow-color);
-            font-weight: 600;
-            border-right: 4px solid #28a745;
-            animation: slideDown 0.4s ease;
-        }
-        
-        /* Form Styling */
-        #projectForm {
-            animation: fadeInUp 0.6s ease;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px var(--shadow-color);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-        
-        .card-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
-            padding: 1.5rem;
-            border: none;
-        }
-        
-        .card-header h5 {
-            color: white;
-            font-weight: 600;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-header h5 i {
-            color: var(--secondary-color);
-            font-size: 18px;
-        }
-        
-        .card-body {
-            padding: 2rem;
-        }
-        
-        /* Form Fields */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-grid input,
-        .form-grid select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            background: white;
-            color: var(--text-color);
-        }
-        
-        .form-grid input:focus,
-        .form-grid select:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 0.2rem rgba(226, 174, 3, 0.15);
-            outline: none;
-        }
-        
-        .form-grid button {
-            background: var(--secondary-color);
-            color: var(--primary-color);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px var(--shadow-color);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .form-grid button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px var(--shadow-color);
-        }
-        
-        /* DataTable Styling */
-        .dataTables_wrapper {
-            font-family: 'Cairo', sans-serif;
-        }
-
-        table.dataTable {
-            width: 100% !important;
-            border-collapse: separate;
-            border-spacing: 0 10px;
-        }
-
-        table.dataTable thead th {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
-            color: white;
-            font-weight: 600;
-            padding: 15px;
-            text-align: center;
-            border: none;
-            font-size: 15px;
-        }
-
-        table.dataTable thead th:first-child {
-            border-radius: 10px 0 0 10px;
-        }
-
-        table.dataTable thead th:last-child {
-            border-radius: 0 10px 10px 0;
-        }
-
-        table.dataTable thead th i {
-            color: var(--secondary-color);
-            margin-left: 8px;
-        }
-        
-        table.dataTable tbody tr {
-            background: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-        
-        table.dataTable tbody tr:hover {
-            background: rgba(226, 174, 3, 0.08);
-            transform: scale(1.01);
-            box-shadow: 0 4px 15px var(--shadow-color);
-        }
-        
-        table.dataTable tbody td {
-            padding: 15px;
-            vertical-align: middle;
-            text-align: center;
-            border: none;
-            font-size: 14px;
-        }
-        
-        /* Action Buttons */
-        .action-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 35px;
-            height: 35px;
-            border-radius: 8px;
-            margin: 0 4px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            font-size: 15px;
-            color: white;
-        }
-        
-        .action-btn:hover {
-            transform: translateY(-2px) scale(1.15);
-            box-shadow: 0 4px 12px var(--shadow-color);
-        }
-        
-        .btn-edit {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
-            color: white !important;
-        }
-        
-        .btn-contracts {
-            background: linear-gradient(135deg, var(--secondary-color) 0%, #b89302 100%);
-            color: white !important;
-        }
-        
-        /* Status Badge */
-        .status-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 13px;
-        }
-        
-        .status-active {
-            background: rgba(40, 167, 69, 0.2);
-            color: #155724;
-        }
-        
-        .status-inactive {
-            background: rgba(220, 53, 69, 0.2);
-            color: #721c24;
-        }
-        
-        /* Stats in Table */
-        .stat-cell {
-            background-color: var(--accent-color);
-            padding: 4px 14px;
-            border-radius: 30px;
-            width: fit-content;
+        .form-section h6 {
+            color: var(--txt);
             font-weight: 800;
-            color: var(--secondary-color);
+            font-size: .95rem;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-section h6 i {
+            color: var(--gold);
             font-size: 1rem;
         }
-        
-        /* DataTables Buttons */
-        .dt-buttons {
-            margin-bottom: 1.5rem;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .dt-button {
-            background: var(--secondary-color) !important;
-            color: var(--primary-color) !important;
-            border: none !important;
-            padding: 10px 20px !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
-            transition: all 0.3s ease !important;
-            box-shadow: 0 4px 12px var(--shadow-color) !important;
-            font-family: 'Cairo', sans-serif !important;
-        }
-        
-        .dt-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px var(--shadow-color) !important;
-        }
 
-        .dt-button.active {
-            background: var(--primary-color) !important;
-            color: white !important;
-        }
-
-        /* Pagination */
-        .dataTables_paginate .paginate_button {
-            padding: 8px 12px;
-            margin: 2px;
-            border-radius: 6px;
-            background: white;
-            border: 1px solid var(--border-color);
-            color: var(--primary-color);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .dataTables_paginate .paginate_button:hover {
-            background: var(--secondary-color);
-            color: var(--primary-color);
-            border-color: var(--secondary-color);
-        }
-
-        .dataTables_paginate .paginate_button.current {
-            background: var(--secondary-color);
-            color: var(--primary-color);
-            border-color: var(--secondary-color);
-        }
-
-        /* Search Box */
-        .dataTables_filter input {
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin: 0 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .dataTables_filter input:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 0.2rem rgba(226, 174, 3, 0.15);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main {
-                padding: 1rem;
-            }
-
-            .main h2 {
-                font-size: 18px;
-                margin-bottom: 1rem;
-            }
-
-            .aligin {
-                padding: 1rem;
-            }
-
-            .aligin .add {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .card-body {
-                padding: 1rem;
-            }
-
-            table.dataTable {
-                font-size: 12px;
-            }
-
-            table.dataTable thead th {
-                padding: 10px 5px;
-            }
-
-            table.dataTable tbody td {
-                padding: 10px 5px;
-            }
-
-            .action-btn {
-                width: 30px;
-                height: 30px;
-                font-size: 13px;
-            }
-        }
-        
-        /* Form Sections */
-        .form-section {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            border: 2px solid var(--border-color);
-        }
-        
-        .form-section h6 {
-            color: var(--primary-color);
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 1.2rem;
-            padding-bottom: 0.8rem;
-            border-bottom: 3px solid var(--secondary-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .form-section h6 i {
-            color: var(--secondary-color);
-            font-size: 1.2rem;
-        }
-        
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
-        
+
         .form-group label {
-            font-weight: 600;
-            color: var(--text-color);
-            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--sub);
+            font-size: .8rem;
         }
-        
+
         .form-group label .required {
-            color: #dc3545;
-            font-weight: bold;
+            color: var(--red);
+            font-weight: 700;
         }
-        
+
         .form-group input,
         .form-group select,
         .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            font-size: .88rem;
             font-weight: 500;
-            background: white;
-            color: var(--text-color);
+            color: var(--txt);
+            background: var(--bg);
+            transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
+            outline: none;
+            font-family: 'Cairo', sans-serif;
         }
-        
+
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 0.2rem rgba(226, 174, 3, 0.15);
-            outline: none;
+            border-color: var(--gold);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(232,184,0,.14);
         }
-        
+
         .form-group textarea {
             resize: vertical;
             min-height: 80px;
         }
-        
-        /* Checkbox Grid */
+
         .checkbox-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-            border: 2px solid var(--border-color);
+            gap: 10px;
+            padding: 12px;
+            background: #fff;
+            border-radius: var(--radius);
+            border: 1.5px solid var(--border);
         }
-        
+
         .checkbox-label {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 15px;
-            background: var(--light-color);
-            border-radius: 8px;
+            gap: 8px;
+            padding: 8px 10px;
+            background: var(--bg);
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+            transition: all var(--ease);
+            border: 1.5px solid transparent;
         }
-        
+
         .checkbox-label:hover {
-            background: rgba(226, 174, 3, 0.1);
-            border-color: var(--secondary-color);
+            border-color: rgba(232,184,0,.3);
         }
-        
+
         .checkbox-label input[type="checkbox"] {
             width: 18px;
             height: 18px;
             cursor: pointer;
-            accent-color: var(--secondary-color);
+            accent-color: var(--gold);
         }
-        
+
         .checkbox-label span {
             font-weight: 500;
-            color: var(--text-color);
+            color: var(--txt);
         }
-        
-        /* Form Actions */
+
         .form-actions {
             display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 2px solid var(--border-color);
-        }
-        
-        .btn-save {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            border: none;
-            padding: 14px 35px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .btn-save:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
-        }
-        
-        .btn-cancel {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 14px 35px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .btn-cancel:hover {
-            background: #5a6268;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(108, 117, 125, 0.4);
-        }
-        
-        /* Modal Styles */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
+            gap: 12px;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
+            margin-top: 18px;
+            padding-top: 12px;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s ease;
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .info-section {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            border: 2px solid var(--border-color);
-        }
-        
-        .section-title {
-            color: var(--primary-color);
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--navy), var(--navy-l));
+            color: #fff;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 50px;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: .9rem;
+            cursor: pointer;
+            transition: all var(--ease);
+            box-shadow: 0 4px 16px rgba(12,28,62,.22);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 22px rgba(12,28,62,.28);
+        }
+
+        .btn-cancel {
+            background: rgba(100,116,139,.12);
+            color: var(--sub);
+            border: none;
+            padding: 12px 26px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: .9rem;
+            cursor: pointer;
+            transition: all var(--ease);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cancel:hover {
+            background: var(--sub);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .info-section {
+            background: var(--bg);
+            padding: 1.2rem;
+            border-radius: var(--radius);
             margin-bottom: 1.2rem;
-            padding-bottom: 0.8rem;
-            border-bottom: 3px solid var(--secondary-color);
+            border: 1.5px solid var(--border);
+        }
+
+        .section-title {
+            color: var(--txt);
+            font-weight: 800;
+            font-size: .95rem;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--gold);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
-        
+
         .section-title i {
-            color: var(--secondary-color);
+            color: var(--gold);
         }
-        
+
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
         }
-        
+
         .info-item {
             display: flex;
             flex-direction: column;
             gap: 6px;
             padding: 12px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            background: #fff;
+            border-radius: var(--radius);
+            border: 1.5px solid var(--border);
         }
-        
+
         .info-label {
-            font-weight: 600;
-            color: #6c757d;
-            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--sub);
+            font-size: .75rem;
             text-transform: uppercase;
         }
-        
+
         .info-value {
-            font-weight: 600;
-            color: var(--text-color);
-            font-size: 1rem;
+            font-weight: 700;
+            color: var(--txt);
+            font-size: .9rem;
         }
-        
-        .btn-view {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+
+        .stat-cell {
+            background: var(--navy);
+            padding: 4px 12px;
+            border-radius: 50px;
+            width: fit-content;
+            font-weight: 800;
+            color: var(--gold);
+            font-size: .85rem;
         }
-        
-        .btn-view:hover {
-            transform: translateY(-2px) scale(1.1);
-            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
+
+        .phone-icon {
+            color: var(--gold);
+            margin-left: 6px;
+        }
+
+        @media (max-width: 768px) {
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-<?php include('../insidebar.php'); ?>
+<?php 
+// include('../insidebar.php'); 
+?>
 
 <div class="main">
-    <h2><i class="fas fa-truck-loading"></i> إدارة الموردين</h2>
-    <div class="aligin">
-        <a href="javascript:void(0)" id="toggleForm" class="add">
-            <i class="fa fa-plus"></i> إضافة مورد جديد
-        </a>
+    <div class="page-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="title-icon"><i class="fas fa-truck-loading"></i></div>
+            <h1 class="page-title">إدارة الموردين</h1>
+        </div>
+        <div>
+            <a href="../main/dashboard.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+            <a href="javascript:void(0)" id="toggleForm" class="add">
+                <i class="fa fa-plus-circle"></i> إضافة مورد جديد
+            </a>
+        </div>
     </div>
 
     
@@ -1050,7 +560,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             </h5>
         </div>
         <div class="card-body">
-            <table id="projectsTable" class="display nowrap" style="width:100%;">
+            <div class="table-container">
+            <table id="projectsTable" class="display" style="width:100%;">
                 <thead>
                     <tr>
                         <th><i class="fas fa-hashtag"></i> #</th>
@@ -1096,49 +607,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         
                         echo "<tr>";
                         echo "<td><strong>" . $i++ . "</strong></td>";
-                        echo "<td><strong style='color:var(--primary-color)'>" . htmlspecialchars($row['name']) . "</strong></td>";
+                        echo "<td><span class='client-name-link'>" . htmlspecialchars($row['name']) . "</span></td>";
                         echo "<td><span class='stat-cell'>" . $row['equipments'] . "</span></td>";
                         echo "<td><span class='stat-cell'>" . $row['num_contracts'] . "</span></td>";
-                        echo "<td><strong style='color:#28a745; font-size:1rem'>" . number_format($row['total_hours']) . " ساعة</strong></td>";
-                        echo "<td><i class='fas fa-phone' style='color:var(--secondary-color); margin-left:6px;'></i>" . htmlspecialchars($row['phone']) . "</td>";
+                        echo "<td><span class='status-active'>" . number_format($row['total_hours']) . " ساعة</span></td>";
+                        echo "<td><i class='fas fa-phone phone-icon'></i>" . htmlspecialchars($row['phone']) . "</td>";
 
                         // الحالة بالألوان
                         if ($row['status'] == "1") {
-                            echo "<td><span class='status-badge status-active'><i class='fas fa-check-circle' style='margin-left:6px;'></i>نشط</span></td>";
+                                     echo "<td><span class='status-active'><i class='fas fa-check-circle' style='margin-left:6px;'></i>نشط</span></td>";
                         } else {
-                            echo "<td><span class='status-badge status-inactive'><i class='fas fa-times-circle' style='margin-left:6px;'></i>معلق</span></td>";
+                                     echo "<td><span class='status-inactive'><i class='fas fa-times-circle' style='margin-left:6px;'></i>معلق</span></td>";
                         }
 
-                        echo "<td>
-                        <a href='javascript:void(0)' 
-                           class='viewBtn action-btn btn-view' 
-                           $data_attrs
-                           title='عرض التفاصيل'><i class='fas fa-eye'></i></a>
-                        <a href='javascript:void(0)' 
-                           class='editBtn action-btn btn-edit' 
-                           $data_attrs
-                           title='تعديل'><i class='fas fa-edit'></i></a>
-                        <a href='supplierscontracts.php?id=" . $row['id'] . "' class='action-btn btn-contracts' title='العقود'><i class='fas fa-file-contract'></i></a>
-                      </td>";
+                                echo "<td>
+                                <div class='action-btns'>
+                                <a href='javascript:void(0)' 
+                                    class='viewBtn action-btn view' 
+                                    $data_attrs
+                                    title='عرض التفاصيل'><i class='fas fa-eye'></i></a>
+                                <a href='javascript:void(0)' 
+                                    class='editBtn action-btn edit' 
+                                    $data_attrs
+                                    title='تعديل'><i class='fas fa-edit'></i></a>
+                                <a href='supplierscontracts.php?id=" . $row['id'] . "' class='action-btn contracts' title='العقود'><i class='fas fa-file-contract'></i></a>
+                                </div>
+                             </td>";
                         echo "</tr>";
                     }
                     ?>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
     
     <!-- Modal عرض تفاصيل المورد -->
-    <div id="viewSupplierModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
-            <div class="modal-header" style="background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%); color: white; padding: 1.5rem; border-radius: 15px 15px 0 0;">
-                <h3 style="margin: 0; display: flex; align-items: center; gap: 12px;">
-                    <i class="fas fa-truck-loading" style="color: #debf0f;"></i>
-                    <span>تفاصيل المورد</span>
-                </h3>
-                <button onclick="closeViewModal()" style="background: rgba(255,255,255,0.2); border: none; color: white; font-size: 28px; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</button>
+    <div id="viewSupplierModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>
+                    <i class="fas fa-truck-loading"></i>
+                    تفاصيل المورد
+                </h5>
+                <button class="close-modal" onclick="closeViewModal()">&times;</button>
             </div>
-            <div class="modal-body" style="padding: 2rem;">
+            <div class="modal-body">
                 <!-- المعلومات الأساسية -->
                 <div class="info-section">
                     <h5 class="section-title"><i class="fas fa-info-circle"></i> المعلومات الأساسية</h5>

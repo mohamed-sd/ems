@@ -7,7 +7,7 @@ $page_title = 'Equipation | المستخدمين';
 // تضمين الهيدر
 include '../inheader.php';
 // تضمين الشريط الجانبي
-include '../insidebar.php';
+// include '../insidebar.php';
 
 include '../config.php';
 
@@ -70,423 +70,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 // إذا أردت أفعّل الحذف أضيفه لك هنا بأمان مع تحقق الصلاحيات.
 ?>
 
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="../assets/css/admin-style.css">
+<link rel="stylesheet" href="../assets/css/main_admin_style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
-
-    :root {
-        --primary-color: #1a1a2e;
-        --secondary-color: #16213e;
-        --accent-color: #d8ae02;
-        --text-color: #010326;
-        --light-color: #f5f5f5;
-        --shadow-color: rgba(0, 0, 0, 0.1);
-        --gold-color: #ffcc00;
-    }
-
-    * {
-        font-family: 'Cairo', sans-serif;
-    }
-
-    body {
-        background: white;
-    }
-
-    .main {
-        padding: 1rem;
-        width: 100%;
-        background-color: white;
-    }
-
-    /* عنوان القسم */
-    .section-title {
-        text-align: center;
-        font-size: 1.8rem;
-        font-weight: 500;
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.30rem;
-        animation: fadeIn 0.8s ease-out 0.1s both;
-        margin: 2rem 0 1rem 0;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-
-        to {
-            opacity: 1;
-        }
-    }
-
-    /* Action Buttons */
-    .aligin {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        margin: 2rem auto;
-        max-width: 1200px;
-        justify-content: center;
-    }
-
-    .aligin .add {
-        padding: 1rem 2rem;
-        border: none;
-        border-radius: 15px;
-        font-weight: 600;
-        font-size: 1rem;
-        color: white;
-        cursor: pointer;
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px var(--shadow-color);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .aligin .add:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px var(--shadow-color);
-        color: var(--gold-color);
-    }
-
-    .aligin .add i {
-        transition: all 0.3s ease;
-    }
-
-    .aligin .add:hover i {
-        transform: scale(1.1) rotate(5deg);
-    }
-
-    /* Card Styling */
-    .card {
-        border: none;
-        border-radius: 20px;
-        box-shadow: 0 5px 20px var(--shadow-color);
-        margin: 2rem auto;
-        max-width: 1200px;
-        overflow: hidden;
-        animation: popIn 0.6s ease-out backwards;
-        position: relative;
-    }
-
-    @keyframes popIn {
-        from {
-            opacity: 0;
-            transform: scale(0.8);
-        }
-
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-
-    .card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(135deg, var(--secondary-color) 50%, var(--gold-color) 50%);
-    }
-
-    .card-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: white;
-        border: none;
-        padding: 1.5rem;
-    }
-
-    .card-header h5 {
-        margin: 0;
-        font-weight: 700;
-        font-size: 1.3rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .card-body {
-        padding: 2rem;
-        background: white;
-    }
-
-    /* Form Styling */
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .form-grid>div {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .form-grid label {
-        font-weight: 600;
-        color: var(--text-color);
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .form-grid label i {
-        color: var(--accent-color);
-    }
-
-    .form-grid input,
-    .form-grid select {
-        border: 2px solid #e9ecef;
-        border-radius: 10px;
-        padding: 0.75rem;
-        transition: all 0.3s ease;
-        font-weight: 500;
-        font-size: 0.95rem;
-        background: white;
-    }
-
-    .form-grid input:focus,
-    .form-grid select:focus {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 0 0.2rem rgba(216, 174, 2, 0.25);
-        outline: none;
-    }
-
-    .form-grid input::placeholder {
-        color: #adb5bd;
-    }
-
-    /* Buttons */
-    .btn {
-        border-radius: 10px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-success {
-        background: linear-gradient(135deg, var(--accent-color) 0%, var(--gold-color) 100%);
-        color: var(--text-color);
-    }
-
-    .btn-success:hover {
-        background: linear-gradient(135deg, var(--gold-color) 0%, var(--accent-color) 100%);
-    }
-
-    .btn-secondary {
-        background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
-        color: white;
-    }
-
-    /* DataTable Custom Styling */
-    #projectsTable {
-        border-collapse: separate;
-        border-spacing: 0;
-        border-radius: 15px;
-        overflow: hidden;
-    }
-
-    #projectsTable thead {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: white;
-    }
-
-    #projectsTable thead th {
-        padding: 1rem;
-        font-weight: 700;
-        text-align: center;
-        border: none;
-        font-size: 1rem;
-    }
-
-    #projectsTable tbody tr {
-        transition: all 0.3s ease;
-        background: white;
-    }
-
-    #projectsTable tbody tr:hover {
-        background: linear-gradient(135deg, #fefefe 0%, #f8f9fa 100%);
-        transform: scale(1.01);
-        box-shadow: 0 2px 8px var(--shadow-color);
-    }
-
-    #projectsTable tbody td {
-        padding: 1rem;
-        text-align: center;
-        border-bottom: 1px solid #e9ecef;
-        font-weight: 500;
-        vertical-align: middle;
-    }
-
-    #projectsTable tbody td .fa-phone {
-        color: var(--accent-color);
-        margin-left: 5px;
-    }
-
-    /* Action Links */
-    #projectsTable a {
-        text-decoration: none;
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
-        display: inline-block;
-        padding: 0.3rem;
-    }
-
-    #projectsTable a:hover {
-        transform: scale(1.2);
-    }
-
-    #projectsTable a.editBtn {
-        color: var(--accent-color);
-    }
-
-    #projectsTable a.editBtn:hover {
-        color: var(--gold-color);
-    }
-
-    #projectsTable a[href*='delete'] {
-        color: #dc3545;
-    }
-
-    #projectsTable a[href*='delete']:hover {
-        color: #bd2130;
-    }
-
-    /* Role Badge */
+    /* أنماط الأدوار بألوان مختلفة */
     .role-badge {
         display: inline-block;
-        padding: 0.4rem 0.8rem;
+        padding: 8px 14px;
         border-radius: 20px;
-        font-weight: 600;
+        font-weight: 700;
         font-size: 0.85rem;
-    }
-
-    .role-badge.role-1 {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: white;
-    }
-
-    .role-badge.role-2 {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        color: white;
-    }
-
-    .role-badge.role-3 {
-        background: linear-gradient(135deg, var(--accent-color) 0%, var(--gold-color) 100%);
-        color: var(--text-color);
-    }
-
-    .role-badge.role-4 {
-        background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-        color: white;
-    }
-
-    .role-badge.role-5 {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-    }
-
-    /* Small Text */
-    .text-muted {
-        font-size: 0.85rem;
-        color: #6c757d;
-        margin-top: 0.25rem;
-    }
-
-    .text-muted i {
-        color: var(--accent-color);
-    }
-
-    /* Alert Styling */
-    .alert {
-        border: none;
-        border-radius: 10px;
-        padding: 1rem;
-        font-weight: 500;
-    }
-
-    /* DataTables Buttons */
-    .dt-buttons {
-        margin-bottom: 1rem;
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-
-    .dt-button {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: white !important;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
+        text-align: center;
         transition: all 0.3s ease;
     }
 
-    .dt-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px var(--shadow-color);
-        background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+    /* مدير المشاريع */
+    .role-badge.role-1 {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border-left: 3px solid #1d4ed8;
     }
 
-    /* Password Display */
-    .password-cell {
-        font-family: monospace;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 0.4rem 0.8rem;
-        border-radius: 8px;
-        color: var(--text-color);
-        font-weight: 600;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    /* مدير الموردين */
+    .role-badge.role-2 {
+        background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        color: white;
+        border-left: 3px solid #6d28d9;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .main {
-            padding: 1rem;
-        }
+    /* مدير المشغلين */
+    .role-badge.role-3 {
+        background: linear-gradient(135deg, #ec4899, #be185d);
+        color: white;
+        border-left: 3px solid #be185d;
+    }
 
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
+    /* مدير الاسطول */
+    .role-badge.role-4 {
+        background: linear-gradient(135deg, #f97316, #c2410c);
+        color: white;
+        border-left: 3px solid #c2410c;
+    }
 
-        .aligin {
-            justify-content: center;
-        }
+    /* مدير الموقع / حركة وتشغيل */
+    .role-badge.role-5,
+    .role-badge.role-10 {
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        color: white;
+        border-left: 3px solid #0891b2;
+    }
 
-        .section-title {
-            font-size: 1.4rem;
-        }
+    /* إضافة اللون أيضاً للصفوف عند التمرير */
+    tr:hover .role-badge {
+        transform: translateX(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 </style>
-</head>
 
 <body>
 
     <div class="main">
 
+        <div class="page-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="title-icon"><i class="fas fa-users-cog"></i></div>
+                <h1 class="page-title">إدارة المستخدمين</h1>
+            </div>
+            <div>
+                <a href="dashboard.php" class="back-btn">
+                    <i class="fas fa-arrow-right"></i> رجوع
+                </a>
+                <button id="toggleForm" class="add">
+                    <i class="fas fa-plus-circle"></i> إضافة مستخدم
+                </button>
+            </div>
+        </div>
+
         <?php
+
         $roles = array(
             "0" => "مدير",
             "1" => "مدير المشاريع",
@@ -506,15 +173,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $roleText = isset($roles[$userRole]) ? $roles[$userRole] : "غير معروف";
         ?>
 
-        <div class="aligin">
-            <a href="javascript:void(0)" id="toggleForm" class="add">
-                <i class="fas fa-user-plus"></i> إضافة مستخدم جديد
-            </a>
-        </div>
-
         <form id="projectForm" action="" method="post" style="display:none;">
             <input type="hidden" name="uid" id="uid" value="0" />
-            <div class="card shadow-sm">
+            <div class="card">
                 <div class="card-header">
                     <h5><i class="fas fa-user-edit"></i> إضافة / تعديل مستخدم</h5>
                 </div>
@@ -526,7 +187,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         </div>
                         <div>
                             <label><i class="fas fa-id-badge"></i> اسم المستخدم</label>
-                            <input type="text" name="username" id="username" placeholder="اسم المستخدم" required />
+                            <input type="text" name="username" id="username" placeholder="اسم المستخدم (الحد الأدنى 3 أحرف)" required autocomplete="off" />
+                            <small id="usernameFeedback" style="display:block; margin-top:5px; min-height:20px;"></small>
                         </div>
                         <div>
                             <label><i class="fas fa-lock"></i> كلمة المرور</label>
@@ -552,7 +214,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         </div>
 
                         <div id="projectDiv" style="display:none;">
-                            <label><i class="fas fa-project-diagram"></i> المشروع <span style="color: red;">*</span></label>
+                            <label><i class="fas fa-project-diagram"></i> المشروع <span
+                                    style="color: red;">*</span></label>
                             <select id="project_id" name="project_id" class="form-control">
                                 <option value="">-- اختر المشروع --</option>
                                 <?php
@@ -591,12 +254,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             </div>
         </form>
 
-        <div class="card shadow-sm">
+        <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-list"></i> إدارة المستخدمين</h5>
+                <h5><i class="fas fa-list"></i> قائمة المستخدمين</h5>
             </div>
             <div class="card-body">
-                <table id="projectsTable" class="display" style="width:100%; margin-top: 20px;">
+                <div class="table-container">
+                <table id="projectsTable" class="display" style="width:100%;">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -627,10 +291,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             $project_id = $row['project_id'];
                             $mine_id = $row['mine_id'];
                             $contract_id = $row['contract_id'];
-                            
+
                             $project_info = "";
-                            
-                            if ($row['role'] == "5" || $row['role']== "10") {
+
+                            if ($row['role'] == "5" || $row['role'] == "10") {
                                 // جلب اسم المشروع
                                 if ($project_id > 0) {
                                     $select_project = mysqli_query($conn, "SELECT name, project_code FROM `project` WHERE `id` = $project_id");
@@ -638,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                         $project_info = "<div style='margin-top: 5px;'><i class='fas fa-project-diagram' style='color: var(--accent-color);'></i> " . htmlspecialchars($project_row['name'], ENT_QUOTES, 'UTF-8') . " (" . $project_row['project_code'] . ")";
                                     }
                                 }
-                                
+
                                 // جلب اسم المنجم
                                 if ($mine_id > 0) {
                                     $select_mine = mysqli_query($conn, "SELECT mine_name, mine_code FROM `mines` WHERE `id` = $mine_id");
@@ -646,7 +310,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                         $project_info .= "<br><i class='fas fa-mountain' style='color: var(--accent-color);'></i> " . htmlspecialchars($mine_row['mine_name'], ENT_QUOTES, 'UTF-8') . " (" . $mine_row['mine_code'] . ")";
                                     }
                                 }
-                                
+
                                 // جلب تاريخ العقد
                                 if ($contract_id > 0) {
                                     $select_contract = mysqli_query($conn, "SELECT contract_signing_date FROM `contracts` WHERE `id` = $contract_id");
@@ -654,7 +318,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                         $project_info .= "<br><i class='fas fa-file-contract' style='color: var(--accent-color);'></i> عقد #" . $contract_id . " - " . $contract_row['contract_signing_date'];
                                     }
                                 }
-                                
+
                                 if (!empty($project_info)) {
                                     $project_info = "<div style='font-size: 0.85rem; color: #6c757d; margin-top: 5px;'>" . $project_info . "</div></div>";
                                 }
@@ -668,7 +332,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             echo "<td><span class='role-badge role-" . $row['role'] . "'>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</span></td>";
                             echo "<td><i class='fas fa-phone'></i>" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
                             echo "<td>
-                                <a href='javascript:void(0)' class='editBtn' 
+                                <div class='action-btns'>
+                                <a href='javascript:void(0)' class='editBtn action-btn edit' 
                                    data-id='{$row['id']}' 
                                    data-name='" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "' 
                                    data-username='" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "' 
@@ -677,14 +342,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                    data-project='{$row['project_id']}'
                                    data-mine='{$row['mine_id']}'
                                    data-contract='{$row['contract_id']}'
-                                   title='تعديل'><i class='fas fa-edit'></i></a> | 
+                                   title='تعديل'><i class='fas fa-edit'></i></a> 
                                 <a href='?delete={$row['id']}' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>
+                                </div>
                               </td>";
                             echo "</tr>";
                         }
                         ?>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 
@@ -702,176 +369,289 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const roleSelect = document.getElementById("role");
-            const projectDiv = document.getElementById("projectDiv");
-            const mineDiv = document.getElementById("mineDiv");
-            const contractDiv = document.getElementById("contractDiv");
-            const projectSelect = document.getElementById("project_id");
-            const mineSelect = document.getElementById("mine_id");
-            const contractSelect = document.getElementById("contract_id");
-            const form = document.getElementById('projectForm');
+document.addEventListener("DOMContentLoaded", function () {
 
-            roleSelect.addEventListener("change", function () {
-                if (this.value === "5" || this.value === "10") {
-                    projectDiv.style.display = "block";
-                    projectSelect.setAttribute("required", "required");
-                    mineDiv.style.display = "block";
-                    mineSelect.setAttribute("required", "required");
-                    contractDiv.style.display = "block";
-                    contractSelect.setAttribute("required", "required");
-                } else {
-                    projectDiv.style.display = "none";
-                    projectSelect.removeAttribute("required");
-                    projectSelect.value = "";
-                    mineDiv.style.display = "none";
-                    mineSelect.removeAttribute("required");
-                    mineSelect.innerHTML = '<option value="">-- اختر المنجم --</option>';
-                    contractDiv.style.display = "none";
-                    contractSelect.removeAttribute("required");
-                    contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+    const roleSelect = document.getElementById("role");
+    const projectDiv = document.getElementById("projectDiv");
+    const mineDiv = document.getElementById("mineDiv");
+    const contractDiv = document.getElementById("contractDiv");
+
+    const projectSelect = document.getElementById("project_id");
+    const mineSelect = document.getElementById("mine_id");
+    const contractSelect = document.getElementById("contract_id");
+
+    const form = document.getElementById('projectForm');
+    const usernameInput = document.getElementById("username");
+    const usernameFeedback = document.getElementById("usernameFeedback");
+
+    let usernameValid = true;
+
+    /* =============================
+       إظهار الحقول حسب الدور
+    ============================== */
+    roleSelect.addEventListener("change", function () {
+
+        if (this.value === "5" || this.value === "10") {
+
+            projectDiv.style.display = "block";
+            mineDiv.style.display = "block";
+            contractDiv.style.display = "block";
+
+            projectSelect.required = true;
+            mineSelect.required = true;
+            contractSelect.required = true;
+
+        } else {
+
+            projectDiv.style.display = "none";
+            mineDiv.style.display = "none";
+            contractDiv.style.display = "none";
+
+            projectSelect.required = false;
+            mineSelect.required = false;
+            contractSelect.required = false;
+
+            projectSelect.value = "";
+            mineSelect.innerHTML = '<option value="">-- اختر المنجم --</option>';
+            contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+        }
+    });
+
+    /* =============================
+       تحميل المناجم
+    ============================== */
+    async function loadMines(projectId, selectedMine = null) {
+
+        mineSelect.innerHTML = '<option value="">-- اختر المنجم --</option>';
+        contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+
+        if (!projectId) return;
+
+        try {
+            const response = await fetch(`../Projects/get_project_mines_ajax.php?project_id=${projectId}`);
+            const data = await response.json();
+
+            if (data.success && data.mines.length > 0) {
+                data.mines.forEach(mine => {
+                    const option = document.createElement('option');
+                    option.value = mine.id;
+                    option.textContent = `${mine.mine_name} (${mine.mine_code})`;
+                    mineSelect.appendChild(option);
+                });
+
+                if (selectedMine) {
+                    mineSelect.value = selectedMine;
                 }
-            });
+            }
 
-            // تحميل المناجم عند اختيار المشروع
-            projectSelect.addEventListener("change", function() {
-                const projectId = this.value;
-                
-                console.log('تم اختيار المشروع:', projectId);
-                
-                // إعادة تعيين قائمة المناجم والعقود
-                mineSelect.innerHTML = '<option value="">-- اختر المنجم --</option>';
-                contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
-                
-                if (projectId) {
-                    // جلب المناجم
-                    console.log('جاري تحميل المناجم...');
-                    fetch(`../Projects/get_project_mines_ajax.php?project_id=${projectId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('استجابة المناجم:', data);
-                            if (data.success && data.mines && data.mines.length > 0) {
-                                data.mines.forEach(mine => {
-                                    const option = document.createElement('option');
-                                    option.value = mine.id;
-                                    option.textContent = `${mine.mine_name} (${mine.mine_code})`;
-                                    mineSelect.appendChild(option);
-                                });
-                                console.log('تم تحميل', data.mines.length, 'منجم');
-                            } else {
-                                console.log('لا توجد مناجم لهذا المشروع');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('خطأ في تحميل المناجم:', error);
-                        });
+        } catch (error) {
+            console.error("خطأ في تحميل المناجم:", error);
+        }
+    }
+
+    /* =============================
+       تحميل العقود
+    ============================== */
+    async function loadContracts(mineId, selectedContract = null) {
+
+        contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+
+        if (!mineId) return;
+
+        try {
+            const response = await fetch(`../Contracts/get_mine_contracts_ajax.php?mine_id=${mineId}`);
+            const data = await response.json();
+
+            if (data.success && data.contracts.length > 0) {
+                data.contracts.forEach(contract => {
+                    const option = document.createElement('option');
+                    option.value = contract.id;
+                    option.textContent = `عقد #${contract.id} - ${contract.contract_signing_date}`;
+                    contractSelect.appendChild(option);
+                });
+
+                if (selectedContract) {
+                    contractSelect.value = selectedContract;
                 }
-            });
+            }
 
-            // تحميل العقود عند اختيار المنجم
-            mineSelect.addEventListener("change", function() {
-                const mineId = this.value;
-                
-                console.log('تم اختيار المنجم:', mineId);
-                
-                // إعادة تعيين قائمة العقود
-                contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
-                
+        } catch (error) {
+            console.error("خطأ في تحميل العقود:", error);
+        }
+    }
+
+    /* =============================
+       عند تغيير المشروع
+    ============================== */
+    projectSelect.addEventListener("change", async function () {
+        await loadMines(this.value);
+    });
+
+    /* =============================
+       عند تغيير المنجم
+    ============================== */
+    mineSelect.addEventListener("change", async function () {
+        await loadContracts(this.value);
+    });
+
+    /* =============================
+       DataTable
+    ============================== */
+    $('#projectsTable').DataTable({
+        responsive: true,
+        dom: 'Bfrtip',
+        buttons: [
+            { extend: 'copy', text: 'نسخ' },
+            { extend: 'excel', text: 'تصدير Excel' },
+            { extend: 'csv', text: 'تصدير CSV' },
+            { extend: 'pdf', text: 'تصدير PDF' },
+            { extend: 'print', text: 'طباعة' }
+        ],
+        language: {
+            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+        }
+    });
+
+    /* =============================
+       إظهار / إخفاء النموذج
+    ============================== */
+    document.getElementById('toggleForm').addEventListener('click', function () {
+        form.reset();
+        document.getElementById("uid").value = 0;
+        usernameFeedback.innerHTML = "";
+        usernameInput.style.borderColor = "#e9ecef";
+        usernameInput.style.boxShadow = "";
+        usernameValid = true;
+        form.style.display = (form.style.display === "none") ? "block" : "none";
+    });
+
+    /* =============================
+       تعبئة الفورم عند التعديل
+    ============================== */
+    $(document).on('click', '.editBtn', async function () {
+
+        const id = $(this).data('id');
+        const name = $(this).data('name');
+        const username = $(this).data('username');
+        const phone = $(this).data('phone');
+        const role = $(this).data('role');
+
+        const projectId = $(this).data('project');
+        const mineId = $(this).data('mine');
+        const contractId = $(this).data('contract');
+
+        $('#uid').val(id);
+        $('#name').val(name);
+        $('#username').val(username);
+        $('#phone').val(phone);
+        $('#role').val(role).trigger('change');
+
+        // إعادة تعيين حالة التحقق من اسم المستخدم
+        usernameFeedback.innerHTML = '<span style="color: #28a745;"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';
+        usernameInput.style.borderColor = "#e9ecef";
+        usernameInput.style.boxShadow = "";
+        usernameValid = true;
+
+        if (role == "5" || role == "10") {
+
+            if (projectId) {
+                $('#project_id').val(projectId);
+                await loadMines(projectId, mineId);
+
                 if (mineId) {
-                    // جلب العقود
-                    console.log('جاري تحميل العقود...');
-                    fetch(`../Contracts/get_mine_contracts_ajax.php?mine_id=${mineId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('استجابة العقود:', data);
-                            if (data.success && data.contracts && data.contracts.length > 0) {
-                                data.contracts.forEach(contract => {
-                                    const option = document.createElement('option');
-                                    option.value = contract.id;
-                                    option.textContent = `عقد #${contract.id} - ${contract.contract_signing_date}`;
-                                    contractSelect.appendChild(option);
-                                });
-                                console.log('تم تحميل', data.contracts.length, 'عقد');
-                            } else {
-                                console.log('لا توجد عقود لهذا المنجم');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('خطأ في تحميل العقود:', error);
-                        });
+                    await loadContracts(mineId, contractId);
                 }
+            }
+        }
+
+        $('#password').val("");
+        form.style.display = "block";
+
+        $('html, body').animate({
+            scrollTop: $(form).offset().top - 20
+        }, 500);
+    });
+
+    /* =============================
+       تحقق Ajax من اسم المستخدم أثناء الكتابة
+    ============================== */
+    usernameInput.addEventListener("input", async function () {
+        const username = this.value.trim();
+        const uid = document.getElementById("uid").value;
+
+        // إعادة تعيين الحالة إذا كان المدخل فارغاً
+        if (username === "") {
+            usernameFeedback.innerHTML = "";
+            usernameInput.style.borderColor = "#e9ecef";
+            usernameInput.style.boxShadow = "";
+            usernameValid = true;
+            return;
+        }
+
+        // التحقق من الطول الأدنى
+        if (username.length < 3) {
+            usernameFeedback.innerHTML = '<span style="color: #ffc107;"><i class="fas fa-info-circle"></i> الحد الأدنى 3 أحرف</span>';
+            usernameInput.style.borderColor = "#ffc107";
+            usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(255, 193, 7, 0.25)";
+            usernameValid = false;
+            return;
+        }
+
+        // إظهار رسالة التحميل
+        usernameFeedback.innerHTML = '<span style="color: #17a2b8;"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>';
+
+        try {
+            const response = await fetch("check_username_availability.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `username=${encodeURIComponent(username)}&uid=${uid}`
             });
 
-            // DataTable
-            $('#projectsTable').DataTable({
-                responsive: true,
-                dom: 'Bfrtip',
-                buttons: [
-                    { extend: 'copy', text: 'نسخ' },
-                    { extend: 'excel', text: 'تصدير Excel' },
-                    { extend: 'csv', text: 'تصدير CSV' },
-                    { extend: 'pdf', text: 'تصدير PDF' },
-                    { extend: 'print', text: 'طباعة' }
-                ],
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
-                }
-            });
+            const data = await response.json();
 
-            // إظهار/إخفاء الفورم
-            const toggleFormBtn = document.getElementById('toggleForm');
-            toggleFormBtn.addEventListener('click', function () {
-                form.reset();
-                document.getElementById("uid").value = 0;
-                form.style.display = (form.style.display === "none") ? "block" : "none";
-            });
+            if (data.available) {
+                usernameFeedback.innerHTML = `<span style="color: #28a745;"><i class="fas fa-check-circle"></i> ${data.message}</span>`;
+                usernameValid = true;
+                usernameInput.style.borderColor = "#28a745";
+                usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(40, 167, 69, 0.25)";
+            } else {
+                usernameFeedback.innerHTML = `<span style="color: #dc3545;"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
+                usernameValid = false;
+                usernameInput.style.borderColor = "#dc3545";
+                usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(220, 53, 69, 0.25)";
+            }
+        } catch (error) {
+            usernameFeedback.innerHTML = '<span style="color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> خطأ في التحقق</span>';
+            console.error("خطأ:", error);
+            usernameValid = false;
+        }
+    });
 
-            // تعبئة الفورم عند التعديل
-            $(document).on('click', '.editBtn', function () {
-                $('#uid').val($(this).data('id'));
-                $('#name').val($(this).data('name'));
-                $('#username').val($(this).data('username'));
-                $('#phone').val($(this).data('phone'));
-                $('#role').val($(this).data('role')).trigger('change');
+    /* =============================
+       منع الإرسال إذا كان اسم المستخدم غير متاح
+    ============================== */
+    document.getElementById('projectForm').addEventListener('submit', function (e) {
+        const username = usernameInput.value.trim();
+        
+        if (username !== "" && !usernameValid) {
+            e.preventDefault();
+            alert("⚠️ اسم المستخدم غير متاح، يرجى اختيار اسم آخر");
+            usernameInput.focus();
+            return false;
+        }
 
-                const projectId = $(this).data('project');
-                const mineId = $(this).data('mine');
-                const contractId = $(this).data('contract');
+        if (username === "") {
+            e.preventDefault();
+            alert("⚠️ يرجى إدخال اسم المستخدم");
+            usernameInput.focus();
+            return false;
+        }
+    });
 
-                // تعبئة المشروع والمنجم والعقد إذا كان الدور = 5 أو 10
-                if ($(this).data('role') == "5" || $(this).data('role') == "10") {
-                    setTimeout(function () {
-                        // تعبئة المشروع
-                        if (projectId) {
-                            $('#project_id').val(projectId).trigger('change');
-                            
-                            // تحميل المناجم ثم تحديد المنجم
-                            setTimeout(function() {
-                                if (mineId) {
-                                    $('#mine_id').val(mineId).trigger('change');
-                                    
-                                    // تحميل العقود ثم تحديد العقد
-                                    setTimeout(function() {
-                                        if (contractId) {
-                                            $('#contract_id').val(contractId);
-                                        }
-                                    }, 500);
-                                }
-                            }, 500);
-                        }
-                    }, 300);
-                }
-
-                $('#password').val(""); // لا نملأ الحقل بكلمة المرور الحالية
-                form.style.display = "block";
-
-                // التمرير إلى النموذج
-                $('html, body').animate({
-                    scrollTop: $(form).offset().top - 20
-                }, 500);
-            });
-        });
-    </script>
+});
+</script>
 
 </body>
 

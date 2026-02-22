@@ -143,12 +143,12 @@
   // للحاسوب
   toggleBtn.addEventListener('click', () => {
     if (window.innerWidth > 768) {
-      sidebar.classList.toggle('closed');
+      sidebar.classList.toggle('active');
     }
   });
 
   // للموبايل
   mobileMenuBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
+    sidebar.classList.toggle('closed');
   });
 </script>

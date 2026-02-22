@@ -29,60 +29,9 @@ if (!$project) {
     die("المشروع غير موجود");
 }
 
-// معالجة إضافة منجم جديد
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create') {
-    header('Content-Type: application/json; charset=utf-8');
-
-    $mine_code = mysqli_real_escape_string($conn, trim($_POST['mine_code']));
-    $mine_name = mysqli_real_escape_string($conn, trim($_POST['mine_name']));
-    $manager_name = mysqli_real_escape_string($conn, trim($_POST['manager_name']));
-    $mineral_type = mysqli_real_escape_string($conn, trim($_POST['mineral_type']));
-    $mine_type = mysqli_real_escape_string($conn, $_POST['mine_type']);
-    $mine_type_other = mysqli_real_escape_string($conn, trim($_POST['mine_type_other']));
-    $ownership_type = mysqli_real_escape_string($conn, $_POST['ownership_type']);
-    $ownership_type_other = mysqli_real_escape_string($conn, trim($_POST['ownership_type_other']));
-    $mine_area = !empty($_POST['mine_area']) ? floatval($_POST['mine_area']) : null;
-    $mine_area_unit = mysqli_real_escape_string($conn, $_POST['mine_area_unit']);
-    $mining_depth = !empty($_POST['mining_depth']) ? floatval($_POST['mining_depth']) : null;
-    $contract_nature = mysqli_real_escape_string($conn, $_POST['contract_nature']);
-    $status = intval($_POST['status']);
-    $notes = mysqli_real_escape_string($conn, trim($_POST['notes']));
-    $created_by = $_SESSION['user']['id'];
-
-    // التحقق من عدم تكرار كود المنجم
-    $check_query = "SELECT id FROM mines WHERE mine_code = '$mine_code'";
-    $check_result = mysqli_query($conn, $check_query);
-
-    if (mysqli_num_rows($check_result) > 0) {
-        echo json_encode(['success' => false, 'message' => 'كود المنجم موجود مسبقاً']);
-        exit();
-    }
-
-    $mine_area_value = $mine_area !== null ? "'$mine_area'" : "NULL";
-    $mining_depth_value = $mining_depth !== null ? "'$mining_depth'" : "NULL";
-
-    $insert_query = "INSERT INTO mines 
-        (project_id, mine_code, mine_name, manager_name, mineral_type, mine_type, mine_type_other, 
-         ownership_type, ownership_type_other, mine_area, mine_area_unit, mining_depth, contract_nature, 
-         status, notes, created_by) 
-        VALUES 
-        ($project_id, '$mine_code', '$mine_name', '$manager_name', '$mineral_type', '$mine_type', 
-         '$mine_type_other', '$ownership_type', '$ownership_type_other', $mine_area_value, '$mine_area_unit', 
-         $mining_depth_value, '$contract_nature', $status, '$notes', $created_by)";
-
-    if (mysqli_query($conn, $insert_query)) {
-        echo json_encode(['success' => true, 'message' => 'تم إضافة المنجم بنجاح ✅']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'حدث خطأ: ' . mysqli_error($conn)]);
-    }
-    exit();
-}
-
-// معالجة تعديل منجم
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update') {
-    header('Content-Type: application/json; charset=utf-8');
-
-    $mine_id = intval($_POST['mine_id']);
+// معالجة إضافة/تعديل منجم عبر POST (بدون AJAX)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
+    $mine_id = isset($_POST['mine_id']) ? intval($_POST['mine_id']) : 0;
     $mine_code = mysqli_real_escape_string($conn, trim($_POST['mine_code']));
     $mine_name = mysqli_real_escape_string($conn, trim($_POST['mine_name']));
     $manager_name = mysqli_real_escape_string($conn, trim($_POST['manager_name']));
@@ -98,41 +47,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $status = intval($_POST['status']);
     $notes = mysqli_real_escape_string($conn, trim($_POST['notes']));
 
-    // التحقق من عدم تكرار كود المنجم
-    $check_query = "SELECT id FROM mines WHERE mine_code = '$mine_code' AND id != $mine_id";
-    $check_result = mysqli_query($conn, $check_query);
+    if ($mine_id > 0) {
+        // تعديل منجم موجود
+        $check_query = "SELECT id FROM mines WHERE mine_code = '$mine_code' AND id != $mine_id";
+        $check_result = mysqli_query($conn, $check_query);
 
-    if (mysqli_num_rows($check_result) > 0) {
-        echo json_encode(['success' => false, 'message' => 'كود المنجم موجود مسبقاً']);
-        exit();
-    }
+        if (mysqli_num_rows($check_result) > 0) {
+            header("Location: project_mines.php?project_id=$project_id&msg=كود+المنجم+موجود+مسبقاً❌");
+            exit();
+        }
 
-    $mine_area_value = $mine_area !== null ? "'$mine_area'" : "NULL";
-    $mining_depth_value = $mining_depth !== null ? "'$mining_depth'" : "NULL";
+        $mine_area_value = $mine_area !== null ? $mine_area : "NULL";
+        $mining_depth_value = $mining_depth !== null ? $mining_depth : "NULL";
 
-    $update_query = "UPDATE mines SET 
-        mine_code = '$mine_code',
-        mine_name = '$mine_name',
-        manager_name = '$manager_name',
-        mineral_type = '$mineral_type',
-        mine_type = '$mine_type',
-        mine_type_other = '$mine_type_other',
-        ownership_type = '$ownership_type',
-        ownership_type_other = '$ownership_type_other',
-        mine_area = $mine_area_value,
-        mine_area_unit = '$mine_area_unit',
-        mining_depth = $mining_depth_value,
-        contract_nature = '$contract_nature',
-        status = $status,
-        notes = '$notes'
-        WHERE id = $mine_id AND project_id = $project_id";
-
-    if (mysqli_query($conn, $update_query)) {
-        echo json_encode(['success' => true, 'message' => 'تم تعديل المنجم بنجاح ✅']);
+        $update_query = "UPDATE mines SET 
+            mine_code = '$mine_code',
+            mine_name = '$mine_name',
+            manager_name = '$manager_name',
+            mineral_type = '$mineral_type',
+            mine_type = '$mine_type',
+            mine_type_other = '$mine_type_other',
+            ownership_type = '$ownership_type',
+            ownership_type_other = '$ownership_type_other',
+            mine_area = $mine_area_value,
+            mine_area_unit = '$mine_area_unit',
+            mining_depth = $mining_depth_value,
+            contract_nature = '$contract_nature',
+            status = $status,
+            notes = '$notes'
+            WHERE id = $mine_id AND project_id = $project_id";
+        
+        if (mysqli_query($conn, $update_query)) {
+            header("Location: project_mines.php?project_id=$project_id&msg=تم+تعديل+المنجم+بنجاح+✅");
+            exit();
+        } else {
+            header("Location: project_mines.php?project_id=$project_id&msg=حدث+خطأ+أثناء+التعديل+❌");
+            exit();
+        }
     } else {
-        echo json_encode(['success' => false, 'message' => 'حدث خطأ: ' . mysqli_error($conn)]);
+        // إضافة منجم جديد
+        $check_query = "SELECT id FROM mines WHERE mine_code = '$mine_code'";
+        $check_result = mysqli_query($conn, $check_query);
+
+        if (mysqli_num_rows($check_result) > 0) {
+            header("Location: project_mines.php?project_id=$project_id&msg=كود+المنجم+موجود+مسبقاً❌");
+            exit();
+        }
+
+        $mine_area_value = $mine_area !== null ? $mine_area : "NULL";
+        $mining_depth_value = $mining_depth !== null ? $mining_depth : "NULL";
+        $created_by = $_SESSION['user']['id'];
+
+        $insert_query = "INSERT INTO mines 
+            (project_id, mine_code, mine_name, manager_name, mineral_type, mine_type, mine_type_other, 
+             ownership_type, ownership_type_other, mine_area, mine_area_unit, mining_depth, contract_nature, 
+             status, notes, created_by) 
+            VALUES 
+            ($project_id, '$mine_code', '$mine_name', '$manager_name', '$mineral_type', '$mine_type', 
+             '$mine_type_other', '$ownership_type', '$ownership_type_other', $mine_area_value, '$mine_area_unit', 
+             $mining_depth_value, '$contract_nature', $status, '$notes', $created_by)";
+
+        if (mysqli_query($conn, $insert_query)) {
+            header("Location: project_mines.php?project_id=$project_id&msg=تم+إضافة+المنجم+بنجاح+✅");
+            exit();
+        } else {
+            header("Location: project_mines.php?project_id=$project_id&msg=حدث+خطأ+أثناء+الإضافة+❌");
+            exit();
+        }
     }
-    exit();
 }
 
 // حذف منجم
@@ -150,117 +132,12 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 
 $page_title = "المناجم - " . $project['name'];
 include '../inheader.php';
-include '../insidebar.php';
+// include '../insidebar.php';
 ?>
 
+<link rel="stylesheet" href="../assets/css/main_admin_style.css" />
+
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
-
-    * {
-        font-family: 'Cairo', sans-serif;
-    }
-
-    :root {
-        --primary-color: #1a1a2e;
-        --secondary-color: #16213e;
-        --gold-color: #ffcc00;
-        --text-color: #010326;
-        --light-color: #f5f5f5;
-        --border-color: #e0e0e0;
-        --shadow-color: rgba(0, 0, 0, 0.1);
-    }
-
-    .main {
-        /* margin-right: 10px; */
-        padding: 30px;
-        transition: margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        min-height: 100vh;
-        background: var(--border-color);
-        max-width: 100vw;
-        overflow-x: hidden;
-    }
-
-    .sidebar.closed~.main {
-        /* margin-right: 5px; */
-    }
-
-    @media (max-width: 1366px) {
-        .main {
-            /* margin-right: 280px; */
-            padding: 20px 15px;
-        }
-
-        .sidebar.closed~.main {
-            /* margin-right: 75px; */
-        }
-    }
-
-    @media (max-width: 1024px) {
-        .main {
-            /* margin-right: 280px; */
-            padding: 15px 10px;
-        }
-
-        .sidebar.closed~.main {
-            /* margin-right: 75px; */
-        }
-    }
-
-    @media (max-width: 768px) {
-        .main {
-            margin-right: 0 !important;
-            padding: 20px 15px;
-            padding-top: 80px;
-        }
-    }
-
-    .mines-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        padding: 2rem;
-        border-radius: 15px;
-        color: white;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 15px var(--shadow-color);
-    }
-
-    .mines-header h2 {
-        margin: 0 0 0.5rem 0;
-        font-size: 1.8rem;
-    }
-
-    .project-info {
-        display: flex;
-        gap: 2rem;
-        flex-wrap: wrap;
-        margin-top: 1rem;
-        font-size: 0.95rem;
-    }
-
-    .project-info-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .btn-add-mine {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: white;
-        padding: 0.8rem 2rem;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 15px var(--shadow-color);
-        transition: all 0.3s ease;
-    }
-
-    .btn-add-mine:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px var(--shadow-color);
-    }
-
     .modal {
         display: none;
         position: fixed;
@@ -269,288 +146,45 @@ include '../insidebar.php';
         top: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(5px);
+        background-color: rgba(3, 16, 39, 0.6);
+        backdrop-filter: blur(4px);
     }
 
     .modal-content {
-        background-color: #fff;
+        background-color: var(--surface);
         margin: 2% auto;
         padding: 0;
-        border-radius: 20px;
-        width: 90%;
+        border-radius: var(--radius-lg);
+        width: 92%;
         max-width: 900px;
         max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
-        animation: slideDown 0.3s ease;
-    }
-
-    @keyframes slideDown {
-        from {
-            transform: translateY(-50px);
-            opacity: 0;
-        }
-
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
+        box-shadow: var(--shadow-lg);
     }
 
     .modal-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: white;
-        padding: 1.5rem 2rem;
-        border-radius: 20px 20px 0 0;
+        background: linear-gradient(135deg, var(--navy), var(--navy-l));
+        color: #fff;
+        padding: 16px 20px;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
-    .modal-header h3 {
+    .modal-header h3,
+    .modal-header h5 {
         margin: 0;
-        font-size: 1.5rem;
-    }
-
-    .close {
-        color: white;
-        font-size: 2rem;
-        font-weight: bold;
-        cursor: pointer;
-        line-height: 1;
-        transition: transform 0.2s;
-    }
-
-    .close:hover {
-        transform: scale(1.2);
-    }
-
-    .modal-body {
-        padding: 2rem;
-    }
-
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .form-group label {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #333;
-        font-size: 0.95rem;
-    }
-
-    .form-group label .required {
-        color: #e74c3c;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        padding: 0.75rem;
-        border: 2px solid #e0e0e0;
-        border-radius: 10px;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        font-family: 'Cairo', sans-serif;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
-    }
-
-    .form-group textarea {
-        resize: vertical;
-        min-height: 100px;
-    }
-
-    .btn-submit {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: white;
-        padding: 1rem 2.5rem;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
         font-size: 1.1rem;
-        font-weight: 600;
-        width: 100%;
-        margin-top: 1rem;
-        transition: all 0.3s ease;
+        font-weight: 800;
     }
 
-    .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px var(--shadow-color);
-    }
-
-    .table-container {
-        background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 10px var(--shadow-color);
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    table thead {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: white;
-    }
-
-    table th {
-        padding: 1rem;
-        text-align: right;
-        font-weight: 600;
-    }
-
-    table td {
-        padding: 1rem;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    table tbody tr:hover {
-        background-color: #f8f9ff;
-    }
-
-    .badge {
-        padding: 0.4rem 0.8rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .badge-active {
-        background: #d4edda;
-        color: #155724;
-    }
-
-    .badge-inactive {
-        background: #f8d7da;
-        color: #721c24;
-    }
-
-    .btn-action {
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        margin: 0 0.25rem;
-        transition: all 0.2s ease;
-    }
-
-    .btn-view {
-        background: #292802;
-        color: #fff;
-    }
-
-    .btn-edit {
-        background: #3498db;
-        color: white;
-    }
-
-    .btn-delete {
-        background: #e74c3c;
-        color: white;
-    }
-
-    .btn-action:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    /* ================== View Modal ================== */
-    .view-modal-body {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 16px;
-    }
-
-    .view-item {
-        padding: 14px 16px;
-        background: var(--light-color);
-        border-radius: 12px;
-        border-right: 3px solid var(--gold-color);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-        animation: fadeSlide 0.4s ease-out both;
-    }
-
-    @keyframes fadeSlide {
-        from {
-            opacity: 0;
-            transform: translateY(8px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .view-item:nth-child(1) {
-        animation-delay: 0.05s;
-    }
-
-    .view-item:nth-child(2) {
-        animation-delay: 0.1s;
-    }
-
-    .view-item:nth-child(3) {
-        animation-delay: 0.15s;
-    }
-
-    .view-item:nth-child(4) {
-        animation-delay: 0.2s;
-    }
-
-    .view-item:nth-child(5) {
-        animation-delay: 0.25s;
-    }
-
-    .view-item-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: #8a8a8a;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        letter-spacing: 0.5px;
-    }
-
-    .view-item-value {
-        font-size: 15px;
-        font-weight: 600;
-        color: var(--primary-color);
-        word-break: break-word;
-    }
-
-    .view-item:hover {
-        transform: translateY(-2px);
-        transition: transform 0.2s ease;
-    }
-
+    .close,
     .close-modal {
         background: rgba(255, 255, 255, 0.2);
         border: none;
-        color: white;
-        font-size: 28px;
+        color: #fff;
+        font-size: 26px;
         font-weight: bold;
         cursor: pointer;
         width: 40px;
@@ -559,117 +193,285 @@ include '../insidebar.php';
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
+        transition: transform var(--ease), background var(--ease);
     }
 
+    .close:hover,
     .close-modal:hover {
         background: rgba(255, 255, 255, 0.3);
         transform: rotate(90deg);
     }
 
-    .btn-back {
-        background: #95a5a6;
-        color: white;
-        padding: 0.7rem 1.5rem;
+    .modal-body {
+        padding: 20px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: var(--sub);
+        font-size: .9rem;
+    }
+
+    .form-group label .required { color: var(--red); }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 12px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius);
+        font-size: .95rem;
+        transition: border-color var(--ease), box-shadow var(--ease);
+        font-family: 'Cairo', sans-serif;
+        background: var(--bg);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(232,184,0,.14);
+        background: #fff;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, var(--navy), var(--navy-l));
+        color: #fff;
+        padding: 12px 20px;
         border: none;
-        border-radius: 10px;
+        border-radius: var(--radius);
         cursor: pointer;
         font-size: 1rem;
-        margin-bottom: 1rem;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
+        font-weight: 800;
+        width: 100%;
+        margin-top: 8px;
+        transition: transform var(--ease), box-shadow var(--ease);
     }
 
-    .btn-back:hover {
-        background: #7f8c8d;
+    .btn-submit:hover {
         transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
 
-    .conditional-field {
-        display: none;
+    .view-modal-body {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
     }
+
+    .view-item {
+        padding: 12px 14px;
+        background: var(--bg);
+        border-radius: var(--radius);
+        border-right: 3px solid var(--gold);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .view-item-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--sub);
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        letter-spacing: 0.3px;
+    }
+
+    .view-item-value {
+        font-size: .95rem;
+        font-weight: 800;
+        color: var(--navy);
+        word-break: break-word;
+    }
+
+    .conditional-field { display: none; }
 
     .alert {
-        padding: 1rem 1.5rem;
-        border-radius: 10px;
-        margin-bottom: 1.5rem;
-        font-weight: 600;
-        animation: slideDown 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        padding: 12px 16px;
+        border-radius: var(--radius);
+        margin-bottom: 14px;
+        font-weight: 700;
+        box-shadow: var(--shadow-sm);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .alert-success {
-        background: #d4edda;
-        color: #155724;
-        border-right: 4px solid #28a745;
+        background: var(--green-soft);
+        color: var(--green);
+        border-right: 4px solid var(--green);
     }
 
     .alert-error {
-        background: #f8d7da;
-        color: #721c24;
-        border-right: 4px solid #dc3545;
+        background: var(--red-soft);
+        color: var(--red);
+        border-right: 4px solid var(--red);
     }
 
-    .action-btn.contracts {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--gold-color) 100%);
-        color: white;
-    }
-
-    .action-btn.contracts:hover {
-        transform: translateY(-2px) scale(1.15);
-        box-shadow: 0 4px 12px var(--shadow-color);
+    .modal-footer .action-btn {
+        width: auto;
+        height: auto;
+        padding: 8px 14px;
+        border-radius: 10px;
+        gap: 6px;
     }
 </style>
 
 <div class="main">
-    <a href="oprationprojects.php" class="btn-back">
-        <i class="fas fa-arrow-right"></i> العودة للمشاريع
-    </a>
-
-    <div class="mines-header">
-        <h2><i class="fas fa-mountain"></i> إدارة المناجم</h2>
-        <div class="project-info">
-            <div class="project-info-item">
-                <i class="fas fa-id-badge"></i>
-                <strong> العميل:</strong> <?php echo $project['client']; ?>
-            </div>
-            <div class="project-info-item">
-                <i class="fas fa-project-diagram"></i>
-                <strong>المشروع:</strong> <?php echo $project['name']; ?>
-            </div>
-            <div class="project-info-item">
-                <i class="fas fa-code"></i>
-                <strong>الكود:</strong> <?php echo $project['project_code']; ?>
-            </div>
-            <div class="project-info-item">
-                <i class="fas fa-map-marker-alt"></i>
-                <strong>الموقع:</strong> <?php echo $project['region'] . ' - ' . $project['state']; ?>
-            </div>
+    <div class="page-header">
+        <h1 class="page-title">
+            <div class="title-icon"><i class="fas fa-mountain"></i></div>
+            إدارة المناجم - <?php echo htmlspecialchars($project['name']); ?>
+        </h1>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="oprationprojects.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+            <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+                <i class="fas fa-plus-circle"></i> إضافة منجم جديد
+            </a>
         </div>
     </div>
 
-    <button class="btn-add-mine" onclick="openModal()">
-        <i class="fas fa-plus-circle"></i> إضافة منجم جديد
-    </button>
+    <?php if (!empty($_GET['msg'])):
+        $isSuccess = strpos($_GET['msg'], '✅') !== false;
+    ?>
+        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
+            <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
+            <?php echo htmlspecialchars($_GET['msg']); ?>
+        </div>
+    <?php endif; ?>
 
-    <!-- Alert Container -->
-    <div id="alertContainer" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; min-width: 300px;"></div>
-
-    <div id="table-container" style="background-color: #fff;;">
-      <div class="card-body" style="padding: 2rem; overflow-x: auto;">
-        <table id="minesTable" class="display nowrap" style="width:100%; margin-top: 20px;">
+    <!-- فورم إضافة / تعديل منجم -->
+    <form id="mineForm" action="" method="post" style="display:none; margin-bottom:20px;">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة منجم جديد</span></h5>
+            </div>
+            <div class="card-body">
+                <input type="hidden" name="mine_id" id="mine_id" value="">
+                <div class="form-grid">
+                    <div>
+                        <label><i class="fas fa-barcode"></i> كود المنجم *</label>
+                        <input type="text" name="mine_code" id="mine_code" placeholder="مثال: MINE-001" required />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-mountain"></i> اسم المنجم *</label>
+                        <input type="text" name="mine_name" id="mine_name" placeholder="أدخل اسم المنجم" required />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-user-tie"></i> اسم مدير المنجم</label>
+                        <input type="text" name="manager_name" id="manager_name" placeholder="أدخل اسم المدير" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-gem"></i> نوع المعدن</label>
+                        <input type="text" name="mineral_type" id="mineral_type" placeholder="مثال: ذهب، فضة، نحاس" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-industry"></i> نوع المنجم *</label>
+                        <select name="mine_type" id="mine_type" required onchange="toggleOtherField('mine_type')">
+                            <option value="">-- اختر --</option>
+                            <option value="حفرة مفتوحة">حفرة مفتوحة</option>
+                            <option value="تحت أرضي">تحت أرضي</option>
+                            <option value="آبار">آبار</option>
+                            <option value="مهجور">مهجور</option>
+                            <option value="مجمع معالجة/تركيز">مجمع معالجة/تركيز</option>
+                            <option value="موقع تخزين/مستودع">موقع تخزين/مستودع</option>
+                            <option value="أخرى">أخرى</option>
+                        </select>
+                    </div>
+                    <div id="mine_type_other_div" style="display: none;">
+                        <label><i class="fas fa-info-circle"></i> تفاصيل نوع المنجم</label>
+                        <input type="text" name="mine_type_other" id="mine_type_other" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-building"></i> نوع الملكية *</label>
+                        <select name="ownership_type" id="ownership_type" required onchange="toggleOtherField('ownership_type')">
+                            <option value="">-- اختر --</option>
+                            <option value="تعدين أهلي/تقليدي">تعدين أهلي/تقليدي</option>
+                            <option value="شركة سودانية خاصة">شركة سودانية خاصة</option>
+                            <option value="شركة حكومية/قطاع عام">شركة حكومية/قطاع عام</option>
+                            <option value="شركة أجنبية">شركة أجنبية</option>
+                            <option value="مشروع مشترك (سوداني-أجنبي)">مشروع مشترك (سوداني-أجنبي)</option>
+                            <option value="أخرى">أخرى</option>
+                        </select>
+                    </div>
+                    <div id="ownership_type_other_div" style="display: none;">
+                        <label><i class="fas fa-info-circle"></i> تفاصيل نوع الملكية</label>
+                        <input type="text" name="ownership_type_other" id="ownership_type_other" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-ruler-combined"></i> مساحة المنجم</label>
+                        <input type="number" step="0.01" name="mine_area" id="mine_area" placeholder="0.00" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-arrows-alt-v"></i> وحدة قياس المساحة</label>
+                        <select name="mine_area_unit" id="mine_area_unit">
+                            <option value="هكتار">هكتار</option>
+                            <option value="كم²">كم²</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label><i class="fas fa-height"></i> عمق التعدين (متر)</label>
+                        <input type="number" step="0.01" name="mining_depth" id="mining_depth" placeholder="0.00" />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-file-signature"></i> طبيعة التعاقد</label>
+                        <select name="contract_nature" id="contract_nature">
+                            <option value="">-- اختر --</option>
+                            <option value="موظف مباشر لدى المالك">موظف مباشر لدى المالك</option>
+                            <option value="مقاول/شركة مقاولات">مقاول/شركة مقاولات</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label><i class="fas fa-toggle-on"></i> الحالة *</label>
+                        <select name="status" id="status" required>
+                            <option value="1">نشط ✅</option>
+                            <option value="0">غير نشط</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label><i class="fas fa-sticky-note"></i> ملاحظات إضافية</label>
+                    <textarea name="notes" id="notes" placeholder="أي معلومات إضافية عن المنجم..." style="width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: var(--radius); font-family: 'Cairo', sans-serif; resize: vertical; min-height: 100px;"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button type="submit" style="background: linear-gradient(135deg, var(--navy), var(--navy-l)); color: #fff; padding: 12px 20px; border: none; border-radius: var(--radius); cursor: pointer; font-size: 1rem; font-weight: 800; flex: 1;">
+                        <i class="fas fa-save"></i> حفظ البيانات
+                    </button>
+                    <button type="button" onclick="toggleForm()" style="background: #dc3545; color: #fff; padding: 12px 20px; border: none; border-radius: var(--radius); cursor: pointer; font-size: 1rem; font-weight: 800;">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+            <div class="card-header">
+                <h5><i class="fas fa-list-alt"></i> قائمة المناجم</h5>
+            </div>
+            <div class="card-body" style="overflow-x: auto;">
+                <table id="minesTable" class="display nowrap" style="width:100%; margin-top: 10px;">
           <thead>
                 <tr>
                     <th>#</th>
@@ -694,8 +496,8 @@ include '../insidebar.php';
 
                 while ($mine = mysqli_fetch_assoc($mines_result)) {
                     $status_badge = $mine['status'] == 1 ?
-                        '<span class="badge badge-active">نشط</span>' :
-                        '<span class="badge badge-inactive">غير نشط</span>';
+                        '<span class="status-active">نشط</span>' :
+                        '<span class="status-inactive">غير نشط</span>';
 
                     $area_display = $mine['mine_area'] ?
                         number_format($mine['mine_area'], 2) . ' ' . $mine['mine_area_unit'] :
@@ -728,15 +530,17 @@ include '../insidebar.php';
                     </td>";
                     echo "<td>{$status_badge}</td>";
                     echo "<td>
-                            <button class='btn-action btn-view' onclick='openViewModal(" . json_encode($mine) . ")'>
-                                <i class='fas fa-eye'></i> 
-                            </button>
-                            <button class='btn-action btn-edit' onclick='editMine(" . json_encode($mine) . ")'>
-                                <i class='fas fa-edit'></i> 
-                            </button>
-                            <button class='btn-action btn-delete' onclick='deleteMine({$mine['id']})'>
-                                <i class='fas fa-trash'></i> 
-                            </button>
+                            <div class='action-btns'>
+                                <a href='javascript:void(0)' class='action-btn view' onclick='openViewModal(" . json_encode($mine) . ")' title='عرض'>
+                                    <i class='fas fa-eye'></i>
+                                </a>
+                                <a href='javascript:void(0)' class='action-btn edit' onclick='editMine(" . json_encode($mine) . ")' title='تعديل'>
+                                    <i class='fas fa-edit'></i>
+                                </a>
+                                <a href='javascript:void(0)' class='action-btn delete' onclick='deleteMine({$mine['id']})' title='حذف'>
+                                    <i class='fas fa-trash-alt'></i>
+                                </a>
+                            </div>
                           </td>";
                     echo "</tr>";
                     $counter++;
@@ -744,13 +548,13 @@ include '../insidebar.php';
                 ?>
             </tbody>
         </table>
-    </div>
-</div>
+            </div>
+        </div>
 
 <!-- Modal عرض المنجم -->
 <div id="viewMineModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header" style="background: linear-gradient(135deg, #292802 0%, #031027 100%);">
+        <div class="modal-header">
             <h5><i class="fas fa-eye"></i> عرض بيانات المنجم</h5>
             <button class="close-modal" onclick="closeViewModal()">&times;</button>
         </div>
@@ -822,14 +626,14 @@ include '../insidebar.php';
                 </div>
             </div>
         </div>
-        <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end; padding: 0 25px 25px;">
-            <a id="view_contracts_btn" class="btn-action" style="background: #1a1a2e; color: #fff; text-decoration: none;">
+        <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end; padding: 0 20px 20px;">
+            <a id="view_contracts_btn" class="action-btn contracts" style="text-decoration: none;">
                 <i class="fas fa-file-contract"></i> عقودات المنجم
             </a>
-            <button type="button" class="btn-action btn-edit" onclick="openEditFromView()">
+            <button type="button" class="action-btn edit" onclick="openEditFromView()">
                 <i class="fas fa-edit"></i> تعديل المنجم
             </button>
-            <button type="button" class="btn-action btn-delete" onclick="closeViewModal()">
+            <button type="button" class="action-btn delete" onclick="closeViewModal()">
                 <i class="fas fa-times"></i> إغلاق
             </button>
         </div>
@@ -967,74 +771,87 @@ include '../insidebar.php';
             },
             order: [[0, 'desc']]
         });
+
+        // Toggle Form
+        $('#toggleForm').click(function() {
+            resetForm();
+            $('#mineForm').slideDown(400);
+            $('html, body').animate({
+                scrollTop: $('#mineForm').offset().top - 100
+            }, 500);
+        });
     });
 
-    function openModal() {
-        document.getElementById('mineModal').style.display = 'block';
-        document.getElementById('modalTitle').textContent = 'إضافة منجم جديد';
-        document.getElementById('mineForm').reset();
-        document.getElementById('action').value = 'create';
-        document.getElementById('mine_id').value = '';
-        hideConditionalFields();
+    // Toggle Form Show/Hide
+    function toggleForm() {
+        $('#mineForm').slideUp(300);
     }
 
-    function closeModal() {
-        document.getElementById('mineModal').style.display = 'none';
+    // Reset Form
+    function resetForm() {
+        $('#mineForm')[0].reset();
+        $('#mine_id').val('');
+        $('#formTitle').text('إضافة منجم جديد');
+        document.querySelectorAll('[id*="_other_div"]').forEach(field => {
+            field.style.display = 'none';
+        });
     }
 
+    // Edit Mine - Load data and show form
     function editMine(mine) {
-        document.getElementById('mineModal').style.display = 'block';
-        document.getElementById('modalTitle').textContent = 'تعديل بيانات المنجم';
-        document.getElementById('action').value = 'update';
-
-        document.getElementById('mine_id').value = mine.id;
-        document.getElementById('mine_code').value = mine.mine_code;
-        document.getElementById('mine_name').value = mine.mine_name;
-        document.getElementById('manager_name').value = mine.manager_name || '';
-        document.getElementById('mineral_type').value = mine.mineral_type || '';
-        document.getElementById('mine_type').value = mine.mine_type;
-        document.getElementById('mine_type_other').value = mine.mine_type_other || '';
-        document.getElementById('ownership_type').value = mine.ownership_type;
-        document.getElementById('ownership_type_other').value = mine.ownership_type_other || '';
-        document.getElementById('mine_area').value = mine.mine_area || '';
-        document.getElementById('mine_area_unit').value = mine.mine_area_unit;
-        document.getElementById('mining_depth').value = mine.mining_depth || '';
-        document.getElementById('contract_nature').value = mine.contract_nature || '';
-        document.getElementById('status').value = mine.status;
-        document.getElementById('notes').value = mine.notes || '';
+        $('#mine_id').val(mine.id);
+        $('#mine_code').val(mine.mine_code);
+        $('#mine_name').val(mine.mine_name);
+        $('#manager_name').val(mine.manager_name || '');
+        $('#mineral_type').val(mine.mineral_type || '');
+        $('#mine_type').val(mine.mine_type);
+        $('#mine_type_other').val(mine.mine_type_other || '');
+        $('#ownership_type').val(mine.ownership_type);
+        $('#ownership_type_other').val(mine.ownership_type_other || '');
+        $('#mine_area').val(mine.mine_area || '');
+        $('#mine_area_unit').val(mine.mine_area_unit);
+        $('#mining_depth').val(mine.mining_depth || '');
+        $('#contract_nature').val(mine.contract_nature || '');
+        $('#status').val(mine.status);
+        $('#notes').val(mine.notes || '');
 
         toggleOtherField('mine_type');
         toggleOtherField('ownership_type');
+
+        $('#formTitle').text('تعديل بيانات المنجم');
+        closeViewModal();
+        $('#mineForm').slideDown(400);
+        $('html, body').animate({
+            scrollTop: $('#mineForm').offset().top - 100
+        }, 500);
     }
 
+    // Open View Modal
     function openViewModal(mine) {
         window.currentViewMine = mine;
-        document.getElementById('view_mine_code').textContent = mine.mine_code || '-';
-        document.getElementById('view_mine_name').textContent = mine.mine_name || '-';
-        document.getElementById('view_manager_name').textContent = mine.manager_name || '-';
-        document.getElementById('view_mineral_type').textContent = mine.mineral_type || '-';
-        document.getElementById('view_mine_type').textContent = mine.mine_type || '-';
-        document.getElementById('view_mine_type_other').textContent = mine.mine_type_other || '-';
-        document.getElementById('view_ownership_type').textContent = mine.ownership_type || '-';
-        document.getElementById('view_ownership_type_other').textContent = mine.ownership_type_other || '-';
+        $('#view_mine_code').text(mine.mine_code || '-');
+        $('#view_mine_name').text(mine.mine_name || '-');
+        $('#view_manager_name').text(mine.manager_name || '-');
+        $('#view_mineral_type').text(mine.mineral_type || '-');
+        $('#view_mine_type').text(mine.mine_type || '-');
+        $('#view_mine_type_other').text(mine.mine_type_other || '-');
+        $('#view_ownership_type').text(mine.ownership_type || '-');
+        $('#view_ownership_type_other').text(mine.ownership_type_other || '-');
 
         const areaText = mine.mine_area ? `${parseFloat(mine.mine_area).toFixed(2)} ${mine.mine_area_unit || ''}` : '-';
         const depthText = mine.mining_depth ? `${parseFloat(mine.mining_depth).toFixed(2)} م` : '-';
 
-        document.getElementById('view_mine_area').textContent = areaText.trim() || '-';
-        document.getElementById('view_mining_depth').textContent = depthText;
-        document.getElementById('view_contract_nature').textContent = mine.contract_nature || '-';
-        document.getElementById('view_status').textContent = (String(mine.status) === '1') ? 'نشط' : 'غير نشط';
-        document.getElementById('view_notes').textContent = mine.notes || '-';
+        $('#view_mine_area').text(areaText.trim() || '-');
+        $('#view_mining_depth').text(depthText);
+        $('#view_contract_nature').text(mine.contract_nature || '-');
+        $('#view_status').text((String(mine.status) === '1') ? 'نشط' : 'غير نشط');
+        $('#view_notes').text(mine.notes || '-');
 
-        const contractsBtn = document.getElementById('view_contracts_btn');
-        if (contractsBtn) {
-            contractsBtn.href = '../Contracts/contracts.php?id=' + mine.id;
-        }
-
+        $('#view_contracts_btn').attr('href', '../Contracts/contracts.php?id=' + mine.id);
         $('#viewMineModal').fadeIn(300);
     }
 
+    // Edit from View Modal
     function openEditFromView() {
         if (window.currentViewMine) {
             closeViewModal();
@@ -1042,16 +859,19 @@ include '../insidebar.php';
         }
     }
 
+    // Close View Modal
     function closeViewModal() {
         $('#viewMineModal').fadeOut(300);
     }
 
+    // Delete Mine
     function deleteMine(id) {
         if (confirm('هل أنت متأكد من حذف هذا المنجم؟')) {
             window.location.href = 'project_mines.php?project_id=<?php echo $project_id; ?>&delete=' + id;
         }
     }
 
+    // Toggle Conditional Fields
     function toggleOtherField(fieldType) {
         const select = document.getElementById(fieldType);
         const otherDiv = document.getElementById(fieldType + '_other_div');
@@ -1063,74 +883,9 @@ include '../insidebar.php';
         }
     }
 
-    function hideConditionalFields() {
-        document.querySelectorAll('.conditional-field').forEach(field => {
-            field.style.display = 'none';
-        });
-    }
-
-    document.getElementById('mineForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-        
-        console.log('Form data being sent:');
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
-
-        fetch('project_mines.php?project_id=<?php echo $project_id; ?>', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
-                return response.text();
-            })
-            .then(text => {
-                console.log('Response text:', text);
-                try {
-                    const data = JSON.parse(text);
-                    showAlert(data.message, data.success ? 'success' : 'error');
-
-                    if (data.success) {
-                        closeModal();
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
-                    }
-                } catch (error) {
-                    console.error('JSON parse error:', error);
-                    showAlert('خطأ في معالجة الاستجابة: ' + text.substring(0, 100), 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                showAlert('حدث خطأ في الاتصال: ' + error.message, 'error');
-            });
-    });
-
-    function showAlert(message, type) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type}`;
-        alertDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
-
-        const container = document.getElementById('alertContainer');
-        container.innerHTML = '';
-        container.appendChild(alertDiv);
-
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 5000);
-    }
-
+    // Close modal when clicking outside
     window.onclick = function (event) {
-        const modal = document.getElementById('mineModal');
         const viewModal = document.getElementById('viewMineModal');
-        if (event.target == modal) {
-            closeModal();
-        }
         if (event.target == viewModal) {
             closeViewModal();
         }

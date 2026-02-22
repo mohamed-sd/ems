@@ -59,166 +59,165 @@ $result = mysqli_query($conn, $sql);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 </head>
 
 
 <body>
 
     <?php
-    include('../insidebar.php');
+    // include('../insidebar.php');
     ?>
 
     <div class="main">
+        <div class="page-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <h1 class="page-title">التقارير</h1>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                 <a href="../main/dashboard.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+                <?php // صلاحيات مدير الموقع === 5
+                if ($_SESSION['user']['role'] == "5") { ?>
+                    <a href="deliy.php" class="add-btn"><i class="fa fa-clock"></i> ساعات اليوم</a>
+                    <a href="deriver.php" class="add-btn"><i class="fa fa-clock"></i> ساعات السائق</a>
+                    <a href="timesheetdeliy.php" class="add-btn"><i class="fa fa-clock"></i> ساعات العمل اليومية</a>
+                <?php } ?>
+                <?php // صلاحيات مدير المشغلين === 3
+                if ($_SESSION['user']['role'] == "3") { ?>
+                    <a href="deriver.php" class="add-btn"><i class="fa fa-clock"></i> ساعات السائق</a>
+                <?php } ?>
+                <?php // صلاحيات مدير الموردين === 2
+                if ($_SESSION['user']['role'] == "2") { ?>
+                    <a href="timesheetdeliy.php" class="add-btn"><i class="fa fa-clock"></i> ساعات العمل اليومية</a>
+                <?php } ?>
+                <?php // صلاحيات مدير الاسطول === 4
+                if ($_SESSION['user']['role'] == "4") { ?>
+                    <a href="deliy.php" class="add-btn"><i class="fa fa-clock"></i> ساعات اليوم</a>
+                <?php } ?>
+                <?php // صلاحيات مدير المشاريع === 1
+                if ($_SESSION['user']['role'] == "1") { ?>
+                    <a href="contract_report.php" class="add-btn"><i class="fa fa-file-contract"></i> العقد</a>
+                    <a href="contractall.php" class="add-btn"><i class="fa fa-chart-pie"></i> إحصائيات العقد</a>
+                    <a href="driverAndsupplerscontract.php" class="add-btn"><i class="fa fa-users"></i> إحصائيات العقود</a>
+                <?php } ?>
+            </div>
+        </div>
 
-        <div class="bg-light">
-
-            <div class="container py-5">
-                <div class="card shadow-lg border-0 rounded-4">
-                    <div class="card-body">
-                        <h2 class="text-center mb-4 text-primary">
-                            <i class="fa-solid fa-chart-line"></i> التقارير
-                        </h2>
-                        <hr class="mb-4">
-                        <!-- أزرار التنقل -->
-                        <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
-                            <?php // صلاحيات مدير الموقع === 5
-                            if ($_SESSION['user']['role'] == "5") { ?>
-                                <a href="deliy.php" class="btn btn-primary"><i class="fa fa-clock"></i> ساعات اليوم</a>
-                                <a href="deriver.php" class="btn btn-info"><i class="fa fa-clock"></i> ساعات السائق</a>
-                                <a href="timesheetdeliy.php" class="btn btn-success"><i class="fa fa-clock"></i> ساعات العمل
-                                    اليومية</a>
-                            <?php } ?>
-                            <?php // صلاحيات مدير المشغلين === 3
-                            if ($_SESSION['user']['role'] == "3") { ?>
-                                <a href="deriver.php" class="btn btn-info"><i class="fa fa-clock"></i> ساعات السائق</a>
-                            <?php } ?>
-                            <?php // صلاحيات مدير الموردين === 2
-                            if ($_SESSION['user']['role'] == "2") { ?>
-                                <a href="timesheetdeliy.php" class="btn btn-success"><i class="fa fa-clock"></i> ساعات العمل
-                                    اليومية</a>
-                            <?php } ?>
-                            <?php // صلاحيات مدير الاسطول === 4
-                            if ($_SESSION['user']['role'] == "4") { ?>
-                                <a href="deliy.php" class="btn btn-primary"><i class="fa fa-clock"></i> ساعات اليوم</a>
-                            <?php } ?>
-                            <?php // صلاحيات مدير المشاريع === 1
-                            if ($_SESSION['user']['role'] == "1") { ?>
-                                <a href="contract_report.php" class="btn btn-warning"><i class="fa fa-file-contract"></i>
-                                    العقد</a>
-                                <a href="contractall.php" class="btn btn-danger"><i class="fa fa-chart-pie"></i> إحصائيات
-                                    العقد</a>
-                                <a href="driverAndsupplerscontract.php" class="btn btn-dark"><i class="fa fa-users"></i>
-                                    إحصائيات العقود</a>
-                            <?php } ?>
-                        </div>
-
-                        <!-- الفلترة -->
-                        <form method="GET" class="row g-3 mb-4">
-                            <div class="col-md-3">
-                                <label class="form-label"><i class="fas fa-truck-loading"></i> المورد</label>
-                                <select name="supplier" class="form-select">
-                                    <option value="">-- الكل --</option>
-                                    <?php
-                                    $sup = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE status = '1' ORDER BY name");
-                                    while ($row = mysqli_fetch_assoc($sup)) {
-                                        $selected = ($supplier_filter == $row['id']) ? "selected" : "";
-                                        echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label"><i class="fas fa-project-diagram"></i> المشروع</label>
-                                <select name="project" id="projectSelect" class="form-select">
-                                    <option value="">-- الكل --</option>
-                                    <?php
-                                    $prj = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name");
-                                    while ($row = mysqli_fetch_assoc($prj)) {
-                                        $selected = ($project_filter == $row['id']) ? "selected" : "";
-                                        echo "<option value='{$row['id']}' $selected>{$row['name']} ({$row['project_code']})</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label"><i class="fas fa-mountain"></i> المنجم</label>
-                                <select name="mine" id="mineSelect" class="form-select">
-                                    <option value="">-- الكل --</option>
-                                    <?php
-                                    if (!empty($project_filter)) {
-                                        $mines = mysqli_query($conn, "SELECT id, mine_name, mine_code FROM mines WHERE project_id = '$project_filter' AND status = 1 ORDER BY mine_name");
-                                        while ($row = mysqli_fetch_assoc($mines)) {
-                                            $selected = ($mine_filter == $row['id']) ? "selected" : "";
-                                            echo "<option value='{$row['id']}' $selected>{$row['mine_name']} ({$row['mine_code']})</option>";
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label"><i class="fas fa-file-contract"></i> العقد</label>
-                                <select name="contract" id="contractSelect" class="form-select">
-                                    <option value="">-- الكل --</option>
-                                    <?php
-                                    if (!empty($mine_filter)) {
-                                        $contracts = mysqli_query($conn, "SELECT id, contract_signing_date FROM contracts WHERE mine_id = '$mine_filter' AND status = 1 ORDER BY contract_signing_date DESC");
-                                        while ($row = mysqli_fetch_assoc($contracts)) {
-                                            $selected = ($contract_filter == $row['id']) ? "selected" : "";
-                                            echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['contract_signing_date']}</option>";
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="col-md-12 d-flex justify-content-center gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fa fa-filter"></i> تطبيق الفلتر
-                                </button>
-                                <a href="reports.php" class="btn btn-secondary">
-                                    <i class="fa fa-redo"></i> إعادة تعيين
-                                </a>
-                            </div>
-                        </form>
-
-                        <div class="card-body">
-
-                            <!-- جدول -->
-                            <div id="projectsTable" class="display">
-                                <table class="table table-bordered table-hover text-center align-middle">
-                                    <thead class="table-primary">
-                                        <tr>
-                                            <th><i class="fas fa-hashtag"></i> #</th>
-                                            <th><i class="fas fa-project-diagram"></i> المشروع</th>
-                                            <th><i class="fas fa-mountain"></i> المنجم</th>
-                                            <th><i class="fas fa-file-contract"></i> العقد</th>
-                                            <th><i class="fas fa-truck-loading"></i> المورد</th>
-                                            <th><i class="fas fa-clock"></i> إجمالي ساعات التشغيل</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php 
-                                        $i = 1;
-                                        while ($row = mysqli_fetch_assoc($result)) { 
-                                            $mine_display = !empty($row['mine_name']) ? $row['mine_name'] . ' (' . $row['mine_code'] . ')' : '<span class="text-muted">غير محدد</span>';
-                                            $contract_display = !empty($row['contract_id']) ? 'عقد #' . $row['contract_id'] . ' - ' . $row['contract_signing_date'] : '<span class="text-muted">غير محدد</span>';
-                                        ?>
-                                            <tr>
-                                                <td><strong><?= $i++; ?></strong></td>
-                                                <td><strong class="text-primary"><?= htmlspecialchars($row['project_name']); ?></strong></td>
-                                                <td><?= $mine_display; ?></td>
-                                                <td><?= $contract_display; ?></td>
-                                                <td><?= htmlspecialchars($row['supplier_name']); ?></td>
-                                                <td><span class="badge bg-success fs-6"><?= number_format($row['total_hours'], 2); ?> ساعة</span></td>
-                                            </tr>
-                                        <?php } ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-filter"></i> فلاتر التقارير</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" class="form-grid" style="margin-bottom: 18px;">
+                    <div>
+                        <label><i class="fas fa-truck-loading"></i> المورد</label>
+                        <select name="supplier">
+                            <option value="">-- الكل --</option>
+                            <?php
+                            $sup = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE status = '1' ORDER BY name");
+                            while ($row = mysqli_fetch_assoc($sup)) {
+                                $selected = ($supplier_filter == $row['id']) ? "selected" : "";
+                                echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+                            }
+                            ?>
+                        </select>
                     </div>
+                    <div>
+                        <label><i class="fas fa-project-diagram"></i> المشروع</label>
+                        <select name="project" id="projectSelect">
+                            <option value="">-- الكل --</option>
+                            <?php
+                            $prj = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name");
+                            while ($row = mysqli_fetch_assoc($prj)) {
+                                $selected = ($project_filter == $row['id']) ? "selected" : "";
+                                echo "<option value='{$row['id']}' $selected>{$row['name']} ({$row['project_code']})</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label><i class="fas fa-mountain"></i> المنجم</label>
+                        <select name="mine" id="mineSelect">
+                            <option value="">-- الكل --</option>
+                            <?php
+                            if (!empty($project_filter)) {
+                                $mines = mysqli_query($conn, "SELECT id, mine_name, mine_code FROM mines WHERE project_id = '$project_filter' AND status = 1 ORDER BY mine_name");
+                                while ($row = mysqli_fetch_assoc($mines)) {
+                                    $selected = ($mine_filter == $row['id']) ? "selected" : "";
+                                    echo "<option value='{$row['id']}' $selected>{$row['mine_name']} ({$row['mine_code']})</option>";
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label><i class="fas fa-file-contract"></i> العقد</label>
+                        <select name="contract" id="contractSelect">
+                            <option value="">-- الكل --</option>
+                            <?php
+                            if (!empty($mine_filter)) {
+                                $contracts = mysqli_query($conn, "SELECT id, contract_signing_date FROM contracts WHERE mine_id = '$mine_filter' AND status = 1 ORDER BY contract_signing_date DESC");
+                                while ($row = mysqli_fetch_assoc($contracts)) {
+                                    $selected = ($contract_filter == $row['id']) ? "selected" : "";
+                                    echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['contract_signing_date']}</option>";
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div style="grid-column: 1 / -1; display: flex; justify-content: center; gap: 10px;">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-filter"></i> تطبيق الفلتر
+                        </button>
+                        <a href="reports.php" class="btn btn-secondary">
+                            <i class="fa fa-redo"></i> إعادة تعيين
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-table"></i> نتائج التقارير</h5>
+            </div>
+            <div class="card-body">
+                <div id="projectsTable" class="table-container">
+                    <table class="display" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-hashtag"></i> #</th>
+                                <th><i class="fas fa-project-diagram"></i> المشروع</th>
+                                <th><i class="fas fa-mountain"></i> المنجم</th>
+                                <th><i class="fas fa-file-contract"></i> العقد</th>
+                                <th><i class="fas fa-truck-loading"></i> المورد</th>
+                                <th><i class="fas fa-clock"></i> إجمالي ساعات التشغيل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $i = 1;
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                $mine_display = !empty($row['mine_name']) ? $row['mine_name'] . ' (' . $row['mine_code'] . ')' : '<span class="text-muted">غير محدد</span>';
+                                $contract_display = !empty($row['contract_id']) ? 'عقد #' . $row['contract_id'] . ' - ' . $row['contract_signing_date'] : '<span class="text-muted">غير محدد</span>';
+                            ?>
+                                <tr>
+                                    <td><strong><?= $i++; ?></strong></td>
+                                    <td><span class="client-name-link"><?= htmlspecialchars($row['project_name']); ?></span></td>
+                                    <td><?= $mine_display; ?></td>
+                                    <td><?= $contract_display; ?></td>
+                                    <td><?= htmlspecialchars($row['supplier_name']); ?></td>
+                                    <td><span class="status-active"><?= number_format($row['total_hours'], 2); ?> ساعة</span></td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
 
             <!-- jQuery (يجب أن يكون أولاً) -->
             <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -232,11 +231,6 @@ $result = mysqli_query($conn, $sql);
             <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
             <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
             <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-
-
-
-        </div>
-
     </div>
 
 

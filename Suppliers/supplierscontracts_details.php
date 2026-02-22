@@ -18,388 +18,55 @@ if (!isset($_SESSION['user'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
-        
-        * {
-            font-family: 'Cairo', sans-serif;
-        }
-        
-        body {
-            background: #f5f7fa;
-        }
-        
-        .main {
-            padding: 2rem;
-            background: #f5f7fa;
-        }
-        
-        /* Page Title */
-        .main h3 {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        /* Action Buttons Container */
-        .aligin {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        
-        /* Modern Action Buttons */
-        .aligin .add {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .aligin .add::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        
-        .aligin .add:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-        
-        .aligin .add:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 25px rgba(0,0,0,0.25);
-        }
-        
-        .aligin .add:active {
-            transform: translateY(-1px);
-        }
-        
-        #renewalBtn {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-        }
-        
-        #settlementBtn {
-            background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
-        }
-        
-        #pauseBtn {
-            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
-        }
-        
-        #resumeBtn {
-            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-        }
-        
-        #terminateBtn {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        }
-        
-        #mergeBtn {
-            background: linear-gradient(135deg, #e83e8c 0%, #d63384 100%);
-        }
-        
-        #completeBtn {
-            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
-        }
-        
-        /* Report Container */
-        .report {
-            background: white;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-        
-        /* Info Cards Grid */
-        .info-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .info-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border-radius: 15px;
-            padding: 1.5rem;
-            border-right: 5px solid;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-        }
-        
-        .info-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .info-card.primary { border-right-color: #667eea; }
-        .info-card.success { border-right-color: #28a745; }
-        .info-card.warning { border-right-color: #ffc107; }
-        .info-card.danger { border-right-color: #dc3545; }
-        .info-card.info { border-right-color: #17a2b8; }
-        
-        .info-card h5 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .info-card h5 i {
-            font-size: 1.3rem;
-        }
-        
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .info-item:last-child {
-            border-bottom: none;
-        }
-        
-        .info-label {
-            font-weight: 600;
-            color: #495057;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .info-value {
-            font-weight: 500;
-            color: #212529;
-        }
-        
-        /* Status Badge */
-        .status-badge {
-            display: inline-block;
-            padding: 0.5rem 1.2rem;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-        }
-        
-        .status-badge.active {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-        }
-        
-        .status-badge.inactive {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-        }
-        
-        /* Tables */
-        .modern-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
-            margin-bottom: 2rem;
-        }
-        
-        .modern-table thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .modern-table thead th {
-            padding: 1rem;
-            font-weight: 700;
-            text-align: center;
-            font-size: 1rem;
-        }
-        
-        .modern-table tbody tr {
-            transition: all 0.3s ease;
-            background: white;
-        }
-        
-        .modern-table tbody tr:hover {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            transform: scale(1.01);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .modern-table tbody td {
-            padding: 1rem;
-            text-align: center;
-            border-bottom: 1px solid #e9ecef;
-            font-weight: 500;
-        }
-        
-        /* Modals Enhancement */
-        .modal-content {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        
-        .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 1.5rem;
-        }
-        
-        .modal-header .modal-title {
-            font-weight: 700;
-            font-size: 1.3rem;
-        }
-        
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1);
-        }
-        
-        .modal-body {
-            padding: 2rem;
-        }
-        
-        .modal-footer {
-            border: none;
-            padding: 1.5rem;
-            background: #f8f9fa;
-        }
-        
-        .form-label {
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 0.5rem;
-        }
-        
-        .form-control, .form-select {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 0.75rem;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-        
-        .btn {
-            border-radius: 10px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .alert {
-            border: none;
-            border-radius: 10px;
-            padding: 1rem;
-            font-weight: 500;
-        }
-        
-        /* Animation */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .info-card, .modern-table {
-            animation: fadeInUp 0.6s ease;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .aligin {
-                justify-content: center;
-            }
-            
-            .aligin .add {
-                flex: 1 1 45%;
-            }
-            
-            .info-cards-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
 </head>
 <body>
 
-<?php include('../insidebar.php'); ?>
+<?php 
+// include('../insidebar.php'); 
+?>
 
 <div class="main">
 
-    <h3><i class="fas fa-file-contract"></i> تفاصيل عقد المورد</h3>
+    <div class="page-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="title-icon"><i class="fas fa-file-contract"></i></div>
+            <h1 class="page-title">تفاصيل عقد المورد</h1>
+        </div>
+        <a href="javascript:history.back()" class="back-btn">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </a>
+    </div>
 
-    <!-- أزرار الإجراءات -->
-    <div class="aligin">
-        <button class="add" id="renewalBtn" title="تجديد مدة العقد">
-            <i class="fas fa-sync-alt"></i> تجديد العقد
-        </button>
-        <button class="add" id="settlementBtn" title="تسوية الساعات المتبقية">
-            <i class="fas fa-balance-scale"></i> تسوية
-        </button>
-        <button class="add" id="pauseBtn" title="إيقاف مؤقت للعقد">
-            <i class="fas fa-pause-circle"></i> إيقاف
-        </button>
-        <button class="add" id="resumeBtn" title="استئناف العقد المتوقف">
-            <i class="fas fa-play-circle"></i> استئناف
-        </button>
-        <button class="add" id="terminateBtn" title="إنهاء العقد">
-            <i class="fas fa-times-circle"></i> إنهاء
-        </button>
-        <button class="add" id="mergeBtn" title="دمج هذا العقد مع عقد آخر">
-            <i class="fas fa-object-group"></i> دمج
-        </button>
-        <button class="add" id="completeBtn" title="تسجيل انتهاء العقد">
-            <i class="fas fa-check-circle"></i> انتهاء العقد
-        </button>
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-cogs"></i> إجراءات العقد</h5>
+        </div>
+        <div class="card-body">
+            <div class="action-bar">
+                <button class="add-btn" id="renewalBtn" title="تجديد مدة العقد" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+                    <i class="fas fa-sync-alt"></i> تجديد العقد
+                </button>
+                <button class="add-btn" id="settlementBtn" title="تسوية الساعات المتبقية" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);">
+                    <i class="fas fa-balance-scale"></i> تسوية
+                </button>
+                <button class="add-btn" id="pauseBtn" title="إيقاف مؤقت للعقد" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
+                    <i class="fas fa-pause-circle"></i> إيقاف
+                </button>
+                <button class="add-btn" id="resumeBtn" title="استئناف العقد المتوقف" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%);">
+                    <i class="fas fa-play-circle"></i> استئناف
+                </button>
+                <button class="add-btn" id="terminateBtn" title="إنهاء العقد" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                    <i class="fas fa-times-circle"></i> إنهاء
+                </button>
+                <button class="add-btn" id="mergeBtn" title="دمج هذا العقد مع عقد آخر" style="background: linear-gradient(135deg, #e83e8c 0%, #d63384 100%);">
+                    <i class="fas fa-object-group"></i> دمج
+                </button>
+                <button class="add-btn" id="completeBtn" title="تسجيل انتهاء العقد" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+                    <i class="fas fa-check-circle"></i> انتهاء العقد
+                </button>
+            </div>
+        </div>
     </div>
 
 <?php
@@ -569,10 +236,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['total_contract_units']) ? $row['total_contract_units'] : 0; ?></span>
             </div>
         </div>
-    </div>
-
     <!-- بطاقات تفاصيل العقد -->
-    <div class="info-cards-grid">
         <!-- معلومات المشروع -->
         <div class="info-card primary">
             <h5>

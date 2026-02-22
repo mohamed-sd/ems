@@ -17,416 +17,935 @@ if (!isset($_SESSION['user'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- CSS الموقع -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
-    <link rel="stylesheet" href="../assets/css/admin-style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
-
         :root {
-            --primary-color: #1a1a2e;
-            --secondary-color: #16213e;
-            --gold-color: #ffcc00;
-            --text-color: #010326;
-            --light-color: #f5f5f5;
-            --border-color: #e0e0e0;
-            --shadow-color: rgba(0, 0, 0, 0.1);
+            --primary: #0f2444;
+            --primary-light: #1a3a6e;
+            --accent: #e8b84b;
+            --accent-light: #f5d080;
+            --surface: #f8f9fc;
+            --surface-2: #ffffff;
+            --text-primary: #0f1a2e;
+            --text-secondary: #5a6a82;
+            --text-muted: #9aa5b4;
+            --border: #e2e8f4;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --warning: #d97706;
+            --warning-bg: #fffbeb;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --info: #0369a1;
+            --info-bg: #eff6ff;
+            --purple: #7c3aed;
+            --purple-bg: #f5f3ff;
+            --shadow-sm: 0 1px 3px rgba(15,36,68,0.08), 0 1px 2px rgba(15,36,68,0.04);
+            --shadow-md: 0 4px 16px rgba(15,36,68,0.10), 0 2px 6px rgba(15,36,68,0.06);
+            --shadow-lg: 0 10px 40px rgba(15,36,68,0.14), 0 4px 12px rgba(15,36,68,0.08);
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
         }
 
-        .main {
-            padding: 2rem;
-            background: var(--border-color);
-            width: calc(100% - 250px);
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--surface);
+            color: var(--text-primary);
+            direction: rtl;
+            font-size: 15px;
+            line-height: 1.6;
         }
 
-        /* Page Title */
-        .main h3 {
-            font-size: 2rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 2rem;
+        /* ========== LAYOUT ========== */
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 20px;
         }
 
-        /* Action Buttons Container */
-        .aligin {
+        /* ========== PAGE HEADER ========== */
+        .page-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, #2a5298 100%);
+            border-radius: var(--radius-lg);
+            padding: 32px 40px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; left: -60px;
+            width: 220px; height: 220px;
+            background: rgba(232,184,75,0.12);
+            border-radius: 50%;
+        }
+
+        .page-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: 120px;
+            width: 300px; height: 300px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+
+        .page-hero-inner {
             display: flex;
-            gap: 0.75rem;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
             flex-wrap: wrap;
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background: var(--light-color);
-            border-radius: 15px;
-            box-shadow: 0 2px 10px var(--shadow-color);
         }
 
-        /* Modern Action Buttons */
-        .aligin .add {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 10px;
+        .hero-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hero-icon {
+            width: 64px; height: 64px;
+            background: rgba(232,184,75,0.2);
+            border: 2px solid rgba(232,184,75,0.4);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .hero-title {
+            color: #fff;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            color: rgba(255,255,255,0.65);
+            font-size: 14px;
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 14px;
             font-weight: 600;
-            font-size: 0.95rem;
-            color: white;
+            transition: all 0.2s;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.22);
+            color: #fff;
+            transform: translateX(3px);
+        }
+
+        /* ========== ACTIONS BAR ========== */
+        .actions-section {
+            background: var(--surface-2);
+            border-radius: var(--radius-lg);
+            padding: 24px 28px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+        }
+
+        .actions-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .actions-header-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent);
+            font-size: 15px;
+        }
+
+        .actions-header h5 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .add-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: none;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: all 0.22s;
+            color: #fff;
+            letter-spacing: 0.2px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+            filter: brightness(1.08);
+        }
+
+        .add-btn:active { transform: translateY(0); }
+
+        /* ========== SUMMARY CARDS ========== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .summary-card {
+            background: var(--surface-2);
+            border-radius: var(--radius-md);
+            padding: 22px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.25s;
             position: relative;
             overflow: hidden;
         }
 
-        .aligin .add::before {
+        .summary-card::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+            top: 0; right: 0;
+            width: 4px;
+            height: 100%;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
         }
 
-        .aligin .add:hover::before {
-            width: 300px;
-            height: 300px;
+        .summary-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
-        .aligin .add:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 25px var(--shadow-color);
-        }
+        .summary-card.card-success::before { background: var(--success); }
+        .summary-card.card-primary::before { background: var(--primary); }
+        .summary-card.card-info::before { background: var(--info); }
+        .summary-card.card-warning::before { background: var(--warning); }
+        .summary-card.card-danger::before { background: var(--danger); }
 
-        .aligin .add:active {
-            transform: translateY(-1px);
-        }
-
-        #renewalBtn {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-        }
-
-        #settlementBtn {
-            background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
-        }
-
-        #pauseBtn {
-            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
-        }
-
-        #resumeBtn {
-            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-        }
-
-        #terminateBtn {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        }
-
-        #mergeBtn {
-            background: linear-gradient(135deg, #e83e8c 0%, #d63384 100%);
-        }
-
-        #completeBtn {
-            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
-        }
-
-        /* Report Container */
-        .report {
-            background: white;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px var(--shadow-color);
-            margin-bottom: 2rem;
-        }
-
-        /* Info Cards Grid */
-        .info-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .info-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border-radius: 15px;
-            padding: 1.5rem;
-            border-right: 5px solid;
-            box-shadow: 0 3px 15px var(--shadow-color);
-            transition: all 0.3s ease;
-        }
-
-        .info-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .info-card.primary {
-            border-right-color: var(--primary-color);
-        }
-
-        .info-card.success {
-            border-right-color: #28a745;
-        }
-
-        .info-card.warning {
-            border-right-color: var(--gold-color);
-        }
-
-        .info-card.danger {
-            border-right-color: #dc3545;
-        }
-
-        .info-card.info {
-            border-right-color: #17a2b8;
-        }
-
-        .info-card h5 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
+        .card-head {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
-        .info-card h5 i {
-            font-size: 1.3rem;
+        .card-head-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
         }
 
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
+        .card-head-icon.success { background: var(--success-bg); color: var(--success); }
+        .card-head-icon.primary { background: #eef2ff; color: var(--primary); }
+        .card-head-icon.info { background: var(--info-bg); color: var(--info); }
+        .card-head-icon.warning { background: var(--warning-bg); color: var(--warning); }
+        .card-head-icon.danger { background: var(--danger-bg); color: var(--danger); }
 
-        .info-item:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: var(--text-color);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .info-value {
-            font-weight: 500;
-            color: var(--text-color);
-        }
-
-        /* Status Badge */
-        .status-badge {
-            display: inline-block;
-            padding: 0.5rem 1.2rem;
-            border-radius: 50px;
+        .card-head h5 {
+            font-size: 14px;
             font-weight: 700;
-            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 15px;
         }
 
         .status-badge.active {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1.5px solid #6ee7b7;
         }
 
         .status-badge.inactive {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1.5px solid #fca5a5;
         }
 
-        /* Tables */
+        .status-badge::before {
+            content: '';
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-badge.active::before { background: var(--success); box-shadow: 0 0 0 3px #a7f3d0; animation: pulse-green 2s infinite; }
+        .status-badge.inactive::before { background: var(--danger); }
+
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 0 3px #a7f3d0; }
+            50% { box-shadow: 0 0 0 6px #d1fae5; }
+        }
+
+        /* Info rows inside cards */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border);
+            gap: 12px;
+        }
+
+        .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .info-row:first-of-type { padding-top: 0; }
+
+        .info-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: left;
+        }
+
+        .remaining-positive { color: var(--success) !important; }
+        .remaining-warning { color: var(--warning) !important; }
+        .remaining-danger { color: var(--danger) !important; }
+
+        /* ========== SECTION WRAPPER ========== */
+        .section-wrapper {
+            background: var(--surface-2);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header-icon {
+            width: 40px; height: 40px;
+            background: rgba(232,184,75,0.2);
+            border: 1.5px solid rgba(232,184,75,0.4);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent);
+            font-size: 17px;
+        }
+
+        .section-header h4 {
+            color: #fff;
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .section-header .badge-pill {
+            margin-right: auto;
+            background: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.9);
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ========== DETAIL CARDS GRID ========== */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 28px;
+        }
+
+        .detail-card {
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: all 0.25s;
+        }
+
+        .detail-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+        .detail-card-header {
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-card-icon {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+        }
+
+        .detail-card-icon.primary { background: #eef2ff; color: var(--primary); }
+        .detail-card-icon.success { background: var(--success-bg); color: var(--success); }
+        .detail-card-icon.info { background: var(--info-bg); color: var(--info); }
+        .detail-card-icon.warning { background: var(--warning-bg); color: var(--warning); }
+        .detail-card-icon.system { background: #f1f5f9; color: #64748b; }
+
+        .detail-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .edit-btn-small {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: transparent;
+            border: 1.5px solid var(--border);
+            color: var(--text-secondary);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .edit-btn-small:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #eef2ff;
+        }
+
+        .detail-card-body { padding: 16px 18px; }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 7px 0;
+            border-bottom: 1px dashed var(--border);
+            gap: 10px;
+        }
+
+        .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+        .detail-label {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: left;
+            word-break: break-word;
+        }
+
+        /* ========== ALERT CARDS ========== */
+        .alert-section {
+            margin: 0 28px 28px;
+            background: var(--danger-bg);
+            border: 1.5px solid #fca5a5;
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        .alert-section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            color: var(--danger);
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        /* ========== TABLE ========== */
+        .table-section {
+            background: var(--surface-2);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+
+        .table-responsive-wrapper { overflow-x: auto; }
+
         .modern-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 3px 15px var(--shadow-color);
-            margin-bottom: 2rem;
+            border-collapse: collapse;
+            font-size: 13px;
         }
 
-        .modern-table thead {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
+        .modern-table thead tr {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         }
 
         .modern-table thead th {
-            padding: 1rem;
+            color: rgba(255,255,255,0.9);
+            padding: 13px 14px;
+            text-align: right;
             font-weight: 700;
-            text-align: center;
-            font-size: 1rem;
+            font-size: 12.5px;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            border: none;
         }
 
         .modern-table tbody tr {
-            transition: all 0.3s ease;
-            background: white;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
         }
 
-        .modern-table tbody tr:hover {
-            background: linear-gradient(135deg, #f8f9fa 0%, var(--light-color) 100%);
-            transform: scale(1.01);
-            box-shadow: 0 2px 10px var(--shadow-color);
-        }
+        .modern-table tbody tr:last-child { border-bottom: none; }
+        .modern-table tbody tr:hover { background: #f0f4ff; }
 
         .modern-table tbody td {
-            padding: 1rem;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            font-weight: 500;
+            padding: 12px 14px;
+            color: var(--text-primary);
+            vertical-align: middle;
         }
 
-        /* Modals Enhancement */
+        .badge-count {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: #fff;
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .badge-basic {
+            background: var(--info-bg);
+            color: var(--info);
+            border: 1px solid #bae6fd;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .badge-backup {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border: 1px solid #fde68a;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .badge-shifts {
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid #a7f3d0;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .price-chip {
+            background: var(--success-bg);
+            color: var(--success);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 42px;
+            color: var(--border);
+            display: block;
+            margin-bottom: 14px;
+        }
+
+        .empty-state p {
+            font-size: 15px;
+            margin: 0;
+        }
+
+        /* ========== NOTES TABLE ========== */
+        .action-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        /* ========== MODALS ========== */
         .modal-content {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px var(--shadow-color);
+            border-radius: var(--radius-lg) !important;
+            border: none !important;
+            box-shadow: var(--shadow-lg) !important;
+            font-family: 'Tajawal', sans-serif;
             overflow: hidden;
         }
 
         .modal-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            border: none;
-            padding: 1.5rem;
+            padding: 20px 24px !important;
+            border-bottom: none !important;
         }
 
-        .modal-header .modal-title {
-            font-weight: 700;
-            font-size: 1.3rem;
-        }
-
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1);
+        .modal-title {
+            font-size: 17px !important;
+            font-weight: 800 !important;
+            color: #fff !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .modal-body {
-            padding: 2rem;
+            padding: 24px !important;
         }
 
         .modal-footer {
-            border: none;
-            padding: 1.5rem;
-            background: var(--light-color);
+            padding: 16px 24px !important;
+            border-top: 1px solid var(--border) !important;
+            background: var(--surface) !important;
+            gap: 10px;
         }
 
         .form-label {
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 0.5rem;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .form-control,
-        .form-select {
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            padding: 0.75rem;
-            transition: all 0.3s ease;
-            font-weight: 500;
+        .form-control, .form-select {
+            border: 1.5px solid var(--border) !important;
+            border-radius: 10px !important;
+            padding: 10px 14px !important;
+            font-size: 14px !important;
+            font-family: 'Tajawal', sans-serif !important;
+            color: var(--text-primary) !important;
+            background: var(--surface-2) !important;
+            transition: all 0.2s !important;
         }
 
-        .form-control:focus,
-        .form-select:focus {
-            border-color: var(--gold-color);
-            box-shadow: 0 0 0 0.2rem rgba(255, 204, 0, 0.25);
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(15,36,68,0.1) !important;
+            outline: none !important;
         }
 
         .btn {
-            border-radius: 10px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-family: 'Tajawal', sans-serif !important;
+            font-weight: 700 !important;
+            border-radius: 10px !important;
+            padding: 10px 20px !important;
+            font-size: 14px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 7px !important;
+            transition: all 0.2s !important;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px var(--shadow-color);
+        .btn:hover { transform: translateY(-1px); }
+
+        .btn-secondary {
+            background: var(--surface) !important;
+            border: 1.5px solid var(--border) !important;
+            color: var(--text-secondary) !important;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border) !important;
         }
 
         .alert {
-            border: none;
-            border-radius: 10px;
-            padding: 1rem;
-            font-weight: 500;
+            border-radius: 12px !important;
+            border: none !important;
+            padding: 14px 18px !important;
+            font-size: 13.5px !important;
+            font-weight: 500 !important;
+            display: flex !important;
+            align-items: flex-start !important;
+            gap: 10px !important;
         }
 
-        /* Animation */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
+        .alert i { margin-top: 2px; flex-shrink: 0; }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .alert-info { background: var(--info-bg) !important; color: var(--info) !important; }
+        .alert-warning { background: var(--warning-bg) !important; color: var(--warning) !important; }
+        .alert-danger { background: var(--danger-bg) !important; color: var(--danger) !important; }
+        .alert-success { background: var(--success-bg) !important; color: var(--success) !important; }
+
+        /* ========== RADIO BUTTONS ========== */
+        .pause-option {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .info-card,
-        .modern-table {
-            animation: fadeInUp 0.6s ease;
+        .pause-option:hover { border-color: var(--primary); }
+        .pause-option.selected { border-color: var(--primary); background: #eef2ff; }
+
+        .form-check-input:checked { background-color: var(--primary) !important; border-color: var(--primary) !important; }
+
+        /* ========== DURATION DISPLAY ========== */
+        .duration-display {
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            border: 1.5px solid #c7d2fe;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-light);
+            font-weight: 700;
         }
 
-        /* Responsive */
+        /* ========== PAUSE INFO ========== */
+        .pause-info-box {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1.5px solid #fde68a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .pause-info-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #92400e;
+            font-weight: 800;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .pause-info-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #92400e;
+            font-size: 13px;
+        }
+
+        .pause-info-date span {
+            background: #fff;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #d97706;
+        }
+
+        .pause-info-reason {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #fde68a;
+            font-size: 12.5px;
+            color: #92400e;
+        }
+
+        /* ========== MERGE CONTRACT EQUIPMENTS ========== */
+        .equip-section-title {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .equip-section-title.current { background: #eef2ff; color: var(--primary); border-right: 3px solid var(--primary); }
+        .equip-section-title.selected { background: var(--success-bg); color: var(--success); border-right: 3px solid var(--success); }
+
+        /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
-            .aligin {
-                justify-content: center;
-            }
-
-            .aligin .add {
-                flex: 1 1 45%;
-            }
-
-            .info-cards-grid {
-                grid-template-columns: 1fr;
-            }
+            .page-wrapper { padding: 16px 12px; }
+            .page-hero { padding: 24px 20px; border-radius: var(--radius-md); }
+            .hero-title { font-size: 20px; }
+            .hero-icon { width: 50px; height: 50px; font-size: 20px; }
+            .page-hero-inner { gap: 14px; }
+            .actions-section { padding: 18px 16px; }
+            .action-bar { gap: 8px; }
+            .add-btn { padding: 9px 14px; font-size: 13px; }
+            .cards-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .detail-grid { padding: 16px; gap: 14px; }
+            .section-header { padding: 16px 18px; }
+            .table-section { border-radius: var(--radius-md); }
+            .modern-table thead th { padding: 10px 10px; font-size: 11.5px; }
+            .modern-table tbody td { padding: 10px 10px; font-size: 12.5px; }
         }
+
+        @media (max-width: 480px) {
+            .cards-grid { grid-template-columns: 1fr; }
+            .detail-grid { grid-template-columns: 1fr; padding: 14px; }
+            .back-btn { padding: 8px 14px; font-size: 13px; }
+            .hero-title { font-size: 18px; }
+            .add-btn { padding: 8px 12px; font-size: 12.5px; }
+        }
+
+        @media (min-width: 1200px) {
+            .cards-grid { grid-template-columns: repeat(4, 1fr); }
+            .detail-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* ========== SCROLLBAR ========== */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--surface); }
+        ::-webkit-scrollbar-thumb { background: #c1cfe0; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 
 <body>
 
-    <?php include('../insidebar.php'); ?>
+    <?php 
+    // include('../insidebar.php');
+    ?>
 
-    <div class="main">
+    <div class="page-wrapper">
 
-        <h3><i class="fas fa-file-contract"></i> تفاصيل العقد</h3>
+        <!-- ===== PAGE HERO ===== -->
+        <div class="page-hero">
+            <div class="page-hero-inner">
+                <div class="hero-left">
+                    <div class="hero-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <div>
+                        <h1 class="hero-title">تفاصيل العقد</h1>
+                        <p class="hero-subtitle">عرض وإدارة بيانات العقد والمعدات المرتبطة</p>
+                    </div>
+                </div>
+                <a href="javascript:history.back()" class="back-btn">
+                    <i class="fas fa-arrow-right"></i> رجوع
+                </a>
+            </div>
+        </div>
 
-        <!-- أزرار الإجراءات -->
-        <div class="aligin">
-            <button class="add" id="renewalBtn" title="تجديد مدة العقد">
-                <i class="fas fa-sync-alt"></i> تجديد العقد
-            </button>
-            <button class="add" id="settlementBtn" title="تسوية الساعات المتبقية">
-                <i class="fas fa-balance-scale"></i> تسوية
-            </button>
-            <button class="add" id="pauseBtn" title="إيقاف مؤقت للعقد">
-                <i class="fas fa-pause-circle"></i> إيقاف
-            </button>
-            <button class="add" id="resumeBtn" title="استئناف العقد المتوقف">
-                <i class="fas fa-play-circle"></i> استئناف
-            </button>
-            <button class="add" id="terminateBtn" title="إنهاء العقد">
-                <i class="fas fa-times-circle"></i> إنهاء
-            </button>
-            <button class="add" id="mergeBtn" title="دمج هذا العقد مع عقد آخر">
-                <i class="fas fa-object-group"></i> دمج
-            </button>
-            <button class="add" id="completeBtn" title="تسجيل انتهاء العقد">
-                <i class="fas fa-check-circle"></i> انتهاء العقد
-            </button>
-            <button class="add" style="background-color: red;" onclick="goBack()">
-                رجوع
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
+        <!-- ===== ACTIONS SECTION ===== -->
+        <div class="actions-section">
+            <div class="actions-header">
+                <div class="actions-header-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h5>إجراءات العقد</h5>
+            </div>
+            <div class="action-bar">
+                <button class="add-btn" id="renewalBtn" title="تجديد مدة العقد" style="background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);">
+                    <i class="fas fa-sync-alt"></i> تجديد العقد
+                </button>
+                <button class="add-btn" id="settlementBtn" title="تسوية الساعات المتبقية" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);">
+                    <i class="fas fa-balance-scale"></i> تسوية
+                </button>
+                <button class="add-btn" id="pauseBtn" title="إيقاف مؤقت للعقد" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
+                    <i class="fas fa-pause-circle"></i> إيقاف
+                </button>
+                <button class="add-btn" id="resumeBtn" title="استئناف العقد المتوقف" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                    <i class="fas fa-play-circle"></i> استئناف
+                </button>
+                <button class="add-btn" id="terminateBtn" title="إنهاء العقد" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+                    <i class="fas fa-times-circle"></i> إنهاء
+                </button>
+                <button class="add-btn" id="mergeBtn" title="دمج هذا العقد مع عقد آخر" style="background: linear-gradient(135deg, #db2777 0%, #be185d 100%);">
+                    <i class="fas fa-object-group"></i> دمج
+                </button>
+                <button class="add-btn" id="completeBtn" title="تسجيل انتهاء العقد" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
+                    <i class="fas fa-check-circle"></i> انتهاء العقد
+                </button>
+            </div>
         </div>
 
         <?php
@@ -466,16 +985,11 @@ if (!isset($_SESSION['user'])) {
 
         while ($row = mysqli_fetch_assoc($result)) {
 
-            // حساب المدة المتبقية من العقد باعتماد تاريخ اليوم وتاريخ الانتهاء
             $today = new DateTime();
             $actual_end_date = new DateTime($row['actual_end']);
             $interval = $today->diff($actual_end_date);
             $remaining_days = (int) $interval->format('%r%a');
 
-
-
-
-            // تحديد لون الحالة
             $status_color = 'green';
             $status_text = 'ساري';
             if (isset($row['status'])) {
@@ -489,254 +1003,276 @@ if (!isset($_SESSION['user'])) {
             } else {
                 $row['status'] = 1;
             }
+
+            $remaining_class = $remaining_days > 30 ? 'remaining-positive' : ($remaining_days > 0 ? 'remaining-warning' : 'remaining-danger');
             ?>
-            <!-- بطاقات ملخص العقد -->
-            <div class="info-cards-grid">
-                <!-- بطاقة الحالة -->
-                <div class="info-card <?php echo ($row['status'] == 1) ? 'success' : 'danger'; ?>">
-                    <h5><i class="fas fa-info-circle"></i> حالة العقد</h5>
-                    <div class="text-center py-3">
+
+            <!-- ===== SUMMARY CARDS ===== -->
+            <div class="cards-grid">
+
+                <!-- حالة العقد -->
+                <div class="summary-card <?php echo ($row['status'] == 1) ? 'card-success' : 'card-danger'; ?>">
+                    <div class="card-head">
+                        <div class="card-head-icon <?php echo ($row['status'] == 1) ? 'success' : 'danger'; ?>">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h5>حالة العقد</h5>
+                    </div>
+                    <div style="padding: 10px 0 4px; display: flex; justify-content: center;">
                         <span class="status-badge <?php echo ($row['status'] == 1) ? 'active' : 'inactive'; ?>">
                             <?php echo $status_text; ?>
                         </span>
                     </div>
                 </div>
 
-                <!-- بطاقة المدة -->
-                <div class="info-card primary">
-                    <h5><i class="fas fa-calendar-alt"></i> مدة العقد</h5>
-                    <div class="info-item">
-                        <span class="info-label">إجمالي المدة</span>
+                <!-- مدة العقد -->
+                <div class="summary-card card-primary">
+                    <div class="card-head">
+                        <div class="card-head-icon primary">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h5>مدة العقد</h5>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-ruler-horizontal"></i> إجمالي المدة</span>
                         <span class="info-value"><?php echo $row['contract_duration_days']; ?> يوم</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-row">
                         <span class="info-label"><i class="fas fa-hourglass-half"></i> المتبقي</span>
-                        <span class="info-value"
-                            style="color: <?php echo $remaining_days > 30 ? '#28a745' : ($remaining_days > 0 ? '#ffc107' : '#dc3545'); ?>; font-weight: 700;">
-                            <?php echo $remaining_days; ?> يوم
-                        </span>
+                        <span class="info-value <?php echo $remaining_class; ?>"><?php echo $remaining_days; ?> يوم</span>
                     </div>
                 </div>
 
-                <!-- بطاقة التواريخ -->
-                <div class="info-card info">
-                    <h5><i class="fas fa-calendar-check"></i> التواريخ الأساسية</h5>
-                    <div class="info-item">
-                        <span class="info-label">التوقيع</span>
+                <!-- التواريخ -->
+                <div class="summary-card card-info">
+                    <div class="card-head">
+                        <div class="card-head-icon info">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h5>التواريخ الأساسية</h5>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-pen-nib"></i> التوقيع</span>
                         <span class="info-value"><?php echo $row['contract_signing_date']; ?></span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">البدء الفعلي</span>
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-play"></i> البدء الفعلي</span>
                         <span class="info-value"><?php echo $row['actual_start']; ?></span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">الانتهاء المتوقع</span>
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-flag-checkered"></i> الانتهاء</span>
                         <span class="info-value"><?php echo $row['actual_end']; ?></span>
                     </div>
                 </div>
 
-                <!-- بطاقة الساعات -->
-                <div class="info-card warning">
-                    <h5><i class="fas fa-clock"></i> الساعات التعاقدية</h5>
-                    <div class="info-item">
-                        <span class="info-label">الهدف الشهري</span>
+                <!-- الساعات -->
+                <div class="summary-card card-warning">
+                    <div class="card-head">
+                        <div class="card-head-icon warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h5>الساعات التعاقدية</h5>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-bullseye"></i> الهدف الشهري</span>
                         <span class="info-value"><?php echo $row['hours_monthly_target'] * 30; ?> ساعة</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">الساعات المتوقعة</span>
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-chart-line"></i> المتوقعة</span>
                         <span class="info-value"><?php echo $row['forecasted_contracted_hours']; ?> ساعة</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">ساعات العمل اليومية</span>
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-sun"></i> اليومية</span>
                         <span class="info-value"><?php echo $row['daily_work_hours']; ?> ساعة</span>
                     </div>
                 </div>
 
-                <!-- بطاقة البيانات الإضافية للعقد -->
-                <div class="info-card"
-                    style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                    <h5 style="color: white;"><i class="fas fa-file-contract"></i> بيانات العقد الإضافية</h5>
-                    <div class="info-item">
-                        <span class="info-label" style="color: rgba(255,255,255,0.9);">عدد الورديات</span>
-                        <span class="info-value"
-                            style="color: white; font-weight: 700;"><?php echo isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label" style="color: rgba(255,255,255,0.9);">ساعات الوردية</span>
-                        <span class="info-value"
-                            style="color: white; font-weight: 700;"><?php echo isset($row['shift_contract']) ? $row['shift_contract'] : 0; ?>
-                            ساعة</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label" style="color: rgba(255,255,255,0.9);">الوحدات يومياً</span>
-                        <span class="info-value"
-                            style="color: white; font-weight: 700;"><?php echo isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label" style="color: rgba(255,255,255,0.9);">وحدات الشهر</span>
-                        <span class="info-value"
-                            style="color: white; font-weight: 700;"><?php echo isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label" style="color: rgba(255,255,255,0.9);">إجمالي الوحدات</span>
-                        <span class="info-value"
-                            style="color: white; font-weight: 700;"><?php echo isset($row['total_contract_units']) ? $row['total_contract_units'] : 0; ?></span>
-                    </div>
-                </div>
             </div>
 
-            <!-- بطاقات تفاصيل العقد -->
-            <div class="info-cards-grid">
-                <!-- معلومات المنجم -->
-                <div class="info-card primary">
-                    <h5>
-                        <i class="fas fa-mountain"></i> معلومات المنجم
-                        <button class="btn btn-sm btn-outline-primary ms-auto" id="editProjectInfoBtn"
-                            style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                            <i class="fas fa-edit"></i> تعديل
-                        </button>
-                    </h5>
-                    <div class="info-item">
-                        <span class="info-label">المنجم</span>
-                        <span class="info-value" id="mineDisplay"><?php echo $row['mine_name'] . ' (' . $row['mine_code'] . ')'; ?></span>
+            <!-- ===== DETAIL CARDS ===== -->
+            <div class="section-wrapper">
+                <div class="section-header">
+                    <div class="section-header-icon">
+                        <i class="fas fa-layer-group"></i>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">المشروع</span>
-                        <span class="info-value"><?php echo $row['project_name']; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">فترة السماح</span>
-                        <span class="info-value" id="graceDisplay"><?php echo $row['grace_period_days']; ?> يوم</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">عدد المشغلين</span>
-                        <span class="info-value" id="operatorsDisplay"><?php echo $row['daily_operators']; ?></span>
-                    </div>
+                    <h4>بيانات العقد التفصيلية</h4>
                 </div>
 
+                <div class="detail-grid">
 
-                <!-- الخدمات -->
-                <div class="info-card success">
-                    <h5>
-                        <i class="fas fa-concierge-bell"></i> الخدمات المقدمة
-                        <button class="btn btn-sm btn-outline-success ms-auto" id="editServicesBtn"
-                            style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                            <i class="fas fa-edit"></i> تعديل
-                        </button>
-                    </h5>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-bus"></i> النقل</span>
-                        <span class="info-value" id="transportationDisplay"><?php echo $row['transportation']; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-hotel"></i> السكن</span>
-                        <span class="info-value" id="accommodationDisplay"><?php echo $row['accommodation']; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-map-marker-alt"></i> مكان السكن</span>
-                        <span class="info-value" id="placeLivingDisplay"><?php echo $row['place_for_living']; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-wrench"></i> الورشة</span>
-                        <span class="info-value" id="workshopDisplay"><?php echo $row['workshop']; ?></span>
-                    </div>
-                </div>
-
-                <!-- أطراف العقد -->
-                <div class="info-card info">
-                    <h5>
-                        <i class="fas fa-users"></i> أطراف العقد
-                        <button class="btn btn-sm btn-outline-info ms-auto" id="editPartiesBtn"
-                            style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                            <i class="fas fa-edit"></i> تعديل
-                        </button>
-                    </h5>
-                    <div class="info-item">
-                        <span class="info-label">الطرف الأول</span>
-                        <span class="info-value" id="firstPartyDisplay"><?php echo $row['first_party']; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">الطرف الثاني</span>
-                        <span class="info-value" id="secondPartyDisplay"><?php echo $row['second_party']; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">الشاهد الأول</span>
-                        <span class="info-value" id="witnessOneDisplay"><?php echo $row['witness_one']; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">الشاهد الثاني</span>
-                        <span class="info-value" id="witnessTwoDisplay"><?php echo $row['witness_two']; ?></span>
-                    </div>
-                </div>
-
-                <!-- البيانات المالية -->
-                <div class="info-card warning">
-                    <h5>
-                        <i class="fas fa-money-bill-wave"></i> البيانات المالية
-                        <button class="btn btn-sm btn-outline-warning ms-auto" id="editPaymentBtn"
-                            style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                            <i class="fas fa-edit"></i> تعديل
-                        </button>
-                    </h5>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-dollar-sign"></i> العملة</span>
-                        <span class="info-value"
-                            id="currencyDisplay"><?php echo !empty($row['price_currency_contract']) ? $row['price_currency_contract'] : '-'; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-money-check-alt"></i> المبلغ المدفوع</span>
-                        <span class="info-value"
-                            id="paidAmountDisplay"><?php echo !empty($row['paid_contract']) ? $row['paid_contract'] : '-'; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-clock"></i> وقت الدفع</span>
-                        <span class="info-value"
-                            id="paymentTimeDisplay"><?php echo !empty($row['payment_time']) ? $row['payment_time'] : '-'; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-shield-alt"></i> الضمانات</span>
-                        <span class="info-value"
-                            id="guaranteesDisplay"><?php echo !empty($row['guarantees']) ? $row['guarantees'] : '-'; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-calendar-check"></i> تاريخ الدفع</span>
-                        <span class="info-value"
-                            id="paymentDateDisplay"><?php echo !empty($row['payment_date']) ? $row['payment_date'] : '-'; ?></span>
-                    </div>
-                </div>
-
-                <!-- معلومات النظام -->
-                <div class="info-card" style="border-right-color: #6c757d;">
-                    <h5><i class="fas fa-database"></i> معلومات النظام</h5>
-                    <div class="info-item">
-                        <span class="info-label">تاريخ الإنشاء</span>
-                        <span class="info-value"><?php echo $row['created_at']; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">آخر تحديث</span>
-                        <span class="info-value"><?php echo $row['updated_at']; ?></span>
-                    </div>
-                </div>
-            </div>
-
-            <?php if ((isset($row['pause_reason']) && !empty($row['pause_reason'])) || (isset($row['termination_reason']) && !empty($row['termination_reason']))): ?>
-                <!-- بطاقة التحذيرات والملاحظات -->
-                <div class="info-card danger" style="margin-bottom: 2rem;">
-                    <h5><i class="fas fa-exclamation-triangle"></i> تحذيرات وملاحظات هامة</h5>
-                    <?php if (isset($row['pause_reason']) && !empty($row['pause_reason'])): ?>
-                        <div class="info-item">
-                            <span class="info-label">سبب الإيقاف</span>
-                            <span class="info-value"><?php echo $row['pause_reason']; ?></span>
+                    <!-- معلومات المنجم -->
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-header-left">
+                                <div class="detail-card-icon primary"><i class="fas fa-mountain"></i></div>
+                                <span class="detail-card-title">معلومات المنجم</span>
+                            </div>
+                            <button class="edit-btn-small" id="editProjectInfoBtn">
+                                <i class="fas fa-pen"></i> تعديل
+                            </button>
                         </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-mountain"></i> المنجم</span>
+                                <span class="detail-value" id="mineDisplay"><?php echo $row['mine_name'] . ' (' . $row['mine_code'] . ')'; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-project-diagram"></i> المشروع</span>
+                                <span class="detail-value"><?php echo $row['project_name']; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-calendar-day"></i> فترة السماح</span>
+                                <span class="detail-value" id="graceDisplay"><?php echo $row['grace_period_days']; ?> يوم</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-users-cog"></i> عدد المشغلين</span>
+                                <span class="detail-value" id="operatorsDisplay"><?php echo $row['daily_operators']; ?></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- الخدمات -->
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-header-left">
+                                <div class="detail-card-icon success"><i class="fas fa-concierge-bell"></i></div>
+                                <span class="detail-card-title">الخدمات المقدمة</span>
+                            </div>
+                            <button class="edit-btn-small" id="editServicesBtn">
+                                <i class="fas fa-pen"></i> تعديل
+                            </button>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-bus"></i> النقل</span>
+                                <span class="detail-value" id="transportationDisplay"><?php echo $row['transportation']; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-hotel"></i> السكن</span>
+                                <span class="detail-value" id="accommodationDisplay"><?php echo $row['accommodation']; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-map-marker-alt"></i> مكان السكن</span>
+                                <span class="detail-value" id="placeLivingDisplay"><?php echo $row['place_for_living']; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-wrench"></i> الورشة</span>
+                                <span class="detail-value" id="workshopDisplay"><?php echo $row['workshop']; ?></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- أطراف العقد -->
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-header-left">
+                                <div class="detail-card-icon info"><i class="fas fa-users"></i></div>
+                                <span class="detail-card-title">أطراف العقد</span>
+                            </div>
+                            <button class="edit-btn-small" id="editPartiesBtn">
+                                <i class="fas fa-pen"></i> تعديل
+                            </button>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-user-tie"></i> الطرف الأول</span>
+                                <span class="detail-value" id="firstPartyDisplay"><?php echo $row['first_party']; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-user-check"></i> الطرف الثاني</span>
+                                <span class="detail-value" id="secondPartyDisplay"><?php echo $row['second_party']; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-eye"></i> الشاهد الأول</span>
+                                <span class="detail-value" id="witnessOneDisplay"><?php echo $row['witness_one']; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-eye"></i> الشاهد الثاني</span>
+                                <span class="detail-value" id="witnessTwoDisplay"><?php echo $row['witness_two']; ?></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- البيانات المالية -->
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-header-left">
+                                <div class="detail-card-icon warning"><i class="fas fa-money-bill-wave"></i></div>
+                                <span class="detail-card-title">البيانات المالية</span>
+                            </div>
+                            <button class="edit-btn-small" id="editPaymentBtn">
+                                <i class="fas fa-pen"></i> تعديل
+                            </button>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-dollar-sign"></i> العملة</span>
+                                <span class="detail-value" id="currencyDisplay"><?php echo !empty($row['price_currency_contract']) ? $row['price_currency_contract'] : '-'; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-money-check-alt"></i> المبلغ المدفوع</span>
+                                <span class="detail-value" id="paidAmountDisplay"><?php echo !empty($row['paid_contract']) ? $row['paid_contract'] : '-'; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-clock"></i> وقت الدفع</span>
+                                <span class="detail-value" id="paymentTimeDisplay"><?php echo !empty($row['payment_time']) ? $row['payment_time'] : '-'; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-shield-alt"></i> الضمانات</span>
+                                <span class="detail-value" id="guaranteesDisplay"><?php echo !empty($row['guarantees']) ? $row['guarantees'] : '-'; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-calendar-check"></i> تاريخ الدفع</span>
+                                <span class="detail-value" id="paymentDateDisplay"><?php echo !empty($row['payment_date']) ? $row['payment_date'] : '-'; ?></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- معلومات النظام -->
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-header-left">
+                                <div class="detail-card-icon system"><i class="fas fa-database"></i></div>
+                                <span class="detail-card-title">معلومات النظام</span>
+                            </div>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-plus-circle"></i> تاريخ الإنشاء</span>
+                                <span class="detail-value"><?php echo $row['created_at']; ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-edit"></i> آخر تحديث</span>
+                                <span class="detail-value"><?php echo $row['updated_at']; ?></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <?php if ((isset($row['pause_reason']) && !empty($row['pause_reason'])) || (isset($row['termination_reason']) && !empty($row['termination_reason']))): ?>
+                <div class="alert-section">
+                    <div class="alert-section-header">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        تحذيرات وملاحظات هامة
+                    </div>
+                    <?php if (isset($row['pause_reason']) && !empty($row['pause_reason'])): ?>
+                    <div class="detail-row" style="padding: 8px 0;">
+                        <span class="detail-label" style="color: var(--danger);"><i class="fas fa-pause-circle"></i> سبب الإيقاف</span>
+                        <span class="detail-value"><?php echo $row['pause_reason']; ?></span>
+                    </div>
                     <?php endif; ?>
                     <?php if (isset($row['termination_reason']) && !empty($row['termination_reason'])): ?>
-                        <div class="info-item">
-                            <span class="info-label">سبب الإنهاء</span>
-                            <span class="info-value"><?php echo $row['termination_reason']; ?></span>
-                        </div>
+                    <div class="detail-row" style="padding: 8px 0;">
+                        <span class="detail-label" style="color: var(--danger);"><i class="fas fa-times-circle"></i> سبب الإنهاء</span>
+                        <span class="detail-value"><?php echo $row['termination_reason']; ?></span>
+                    </div>
                     <?php endif; ?>
                 </div>
-            <?php endif; ?>
+                <?php endif; ?>
+
+            </div>
+
             <?php
             $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
             $mine_id = $row['mine_id'];
@@ -744,7 +1280,6 @@ if (!isset($_SESSION['user'])) {
             $pause_date = isset($row['pause_date']) ? $row['pause_date'] : '';
             $pause_reason = isset($row['pause_reason']) ? $row['pause_reason'] : '';
 
-            // حفظ بيانات العقد للتعديل
             $grace_period = $row['grace_period_days'];
             $daily_operators = $row['daily_operators'];
             $transportation = $row['transportation'];
@@ -756,7 +1291,6 @@ if (!isset($_SESSION['user'])) {
             $witness_one = $row['witness_one'];
             $witness_two = $row['witness_two'];
 
-            // البيانات المالية
             $price_currency_contract = isset($row['price_currency_contract']) ? $row['price_currency_contract'] : '';
             $paid_contract = isset($row['paid_contract']) ? $row['paid_contract'] : '';
             $payment_time = isset($row['payment_time']) ? $row['payment_time'] : '';
@@ -765,20 +1299,22 @@ if (!isset($_SESSION['user'])) {
         }
         ?>
 
-        <!-- جدول معدات العقد (بما فيها معدات العقد المدموج) -->
-        <div
-            style="background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 5px 20px var(--shadow-color); margin-top: 2rem;">
-            <h4
-                style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: var(--primary-color); font-weight: 700;">
-                <i class="fas fa-boxes"></i>
-                معدات العقد
-                <?php
-                if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
-                    echo "<span style='font-size: 0.9rem; color: #6c757d;'>(العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")</span>";
-                }
-                ?>
-            </h4>
-            <div style="overflow-x: auto;">
+        <!-- ===== EQUIPMENTS TABLE ===== -->
+        <div class="table-section">
+            <div class="section-header">
+                <div class="section-header-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <h4>
+                    معدات العقد
+                    <?php
+                    if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
+                        echo "<span style='font-size: 13px; opacity: 0.75; font-weight: 500;'>(العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")</span>";
+                    }
+                    ?>
+                </h4>
+            </div>
+            <div class="table-responsive-wrapper">
                 <table class="modern-table">
                     <thead>
                         <tr>
@@ -788,17 +1324,17 @@ if (!isset($_SESSION['user'])) {
                             <th>العدد</th>
                             <th>أساسية</th>
                             <th>احتياطية</th>
-                            <th>عدد الورديات</th>
-                            <th>الساعات/اليوم</th>
-                            <th>إجمالي الساعات</th>
-                            <th>وحدات العمل/الشهر</th>
+                            <th>ورديات</th>
+                            <th>ساعات/يوم</th>
+                            <th>إجمالي ساعات</th>
+                            <th>وحدات/شهر</th>
                             <th>الوحدة</th>
-                            <th>إجمالي ساعات العقد</th>
+                            <th>ساعات العقد</th>
                             <th>السعر</th>
-                            <th>المشغلين</th>
-                            <th>المشرفين</th>
-                            <th>الفنيين</th>
-                            <th>المساعدين</th>
+                            <th>مشغلين</th>
+                            <th>مشرفين</th>
+                            <th>فنيين</th>
+                            <th>مساعدين</th>
                             <?php
                             if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
                                 echo "<th>المصدر</th>";
@@ -815,28 +1351,27 @@ if (!isset($_SESSION['user'])) {
                             $i = 1;
                             foreach ($equipments as $equip) {
                                 echo "<tr>";
-                                echo "<td>" . $i . "</td>";
+                                echo "<td><strong style='color:var(--text-muted);'>" . $i . "</strong></td>";
                                 $equipTypeLabel = isset($equipmentTypeMap[(int) $equip['equip_type']])
                                     ? $equipmentTypeMap[(int) $equip['equip_type']]
                                     : $equip['equip_type'];
                                 echo "<td><strong>" . htmlspecialchars($equipTypeLabel) . "</strong></td>";
                                 echo "<td>" . $equip['equip_size'] . "</td>";
-                                echo "<td><span style='background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . $equip['equip_count'] . "</span></td>";
-                                echo "<td><span style='background: #007bff; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . (isset($equip['equip_count_basic']) ? $equip['equip_count_basic'] : 0) . "</span></td>";
-                                echo "<td><span style='background: #ffc107; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . (isset($equip['equip_count_backup']) ? $equip['equip_count_backup'] : 0) . "</span></td>";
-                                echo "<td><span style='background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . (isset($equip['equip_shifts']) ? $equip['equip_shifts'] : 0) . "</span></td>";
+                                echo "<td><span class='badge-count'>" . $equip['equip_count'] . "</span></td>";
+                                echo "<td><span class='badge-basic'>" . (isset($equip['equip_count_basic']) ? $equip['equip_count_basic'] : 0) . "</span></td>";
+                                echo "<td><span class='badge-backup'>" . (isset($equip['equip_count_backup']) ? $equip['equip_count_backup'] : 0) . "</span></td>";
+                                echo "<td><span class='badge-shifts'>" . (isset($equip['equip_shifts']) ? $equip['equip_shifts'] : 0) . "</span></td>";
                                 echo "<td>" . $equip['shift_hours'] . "</td>";
                                 echo "<td>" . $equip['equip_total_month'] . "</td>";
-                                echo "<td><strong style='color: var(--primary-color);'>" . (isset($equip['equip_monthly_target']) ? $equip['equip_monthly_target'] : 0) . "</strong></td>";
+                                echo "<td><strong style='color:var(--primary);'>" . (isset($equip['equip_monthly_target']) ? $equip['equip_monthly_target'] : 0) . "</strong></td>";
                                 echo "<td>" . $equip['equip_unit'] . "</td>";
-                                echo "<td><strong style='color: var(--primary-color);'>" . $equip['equip_total_contract'] . "</strong></td>";
-                                echo "<td><strong style='color: #28a745;'>" . $equip['equip_price'] . " " . $equip['equip_price_currency'] . "</strong></td>";
+                                echo "<td><strong style='color:var(--primary);'>" . $equip['equip_total_contract'] . "</strong></td>";
+                                echo "<td><span class='price-chip'>" . $equip['equip_price'] . " " . $equip['equip_price_currency'] . "</span></td>";
                                 echo "<td>" . $equip['equip_operators'] . "</td>";
                                 echo "<td>" . $equip['equip_supervisors'] . "</td>";
                                 echo "<td>" . $equip['equip_technicians'] . "</td>";
                                 echo "<td>" . $equip['equip_assistants'] . "</td>";
                                 if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
-                                    // التحقق من هل هذه المعدة من العقد المدموج أم لا
                                     $merged_equipments = getContractEquipments(intval($row['merged_with']), $conn);
                                     $is_from_merged = false;
                                     foreach ($merged_equipments as $m_equip) {
@@ -857,10 +1392,7 @@ if (!isset($_SESSION['user'])) {
                                 $i++;
                             }
                         } else {
-                            echo "<tr><td colspan='14' style='text-align: center; padding: 2rem;'>";
-                            echo "<i class='fas fa-inbox' style='font-size: 3rem; color: #e9ecef; margin-bottom: 1rem;'></i>";
-                            echo "<p style='color: #999; font-size: 1.1rem;'>لا توجد معدات لهذا العقد</p>";
-                            echo "</td></tr>";
+                            echo "<tr><td colspan='17'><div class='empty-state'><i class='fas fa-inbox'></i><p>لا توجد معدات لهذا العقد</p></div></td></tr>";
                         }
                         ?>
                     </tbody>
@@ -868,21 +1400,15 @@ if (!isset($_SESSION['user'])) {
             </div>
         </div>
 
-        <?php
-        // إزالة الجدول المنفصل للعقد المدموج (تم دمج معداته في الجدول الرئيسي)
-        ?>
-
-        <br /><br /><br />
-
-        <!-- جدول الملاحظات -->
-        <div
-            style="background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-top: 2rem; margin-bottom: 3rem;">
-            <h4
-                style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: #667eea; font-weight: 700;">
-                <i class="fas fa-history"></i>
-                سجل الملاحظات والتغييرات
-            </h4>
-            <div style="overflow-x: auto;">
+        <!-- ===== NOTES TABLE ===== -->
+        <div class="table-section">
+            <div class="section-header">
+                <div class="section-header-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h4>سجل الملاحظات والتغييرات</h4>
+            </div>
+            <div class="table-responsive-wrapper">
                 <table class="modern-table">
                     <thead>
                         <tr>
@@ -905,7 +1431,6 @@ if (!isset($_SESSION['user'])) {
                         if ($notes_result && mysqli_num_rows($notes_result) > 0) {
                             $j = 1;
                             while ($note = mysqli_fetch_assoc($notes_result)) {
-                                // تحديد نوع الإجراء من النص
                                 $note_text = htmlspecialchars($note['note']);
                                 $action_icon = '<i class="fas fa-sticky-note"></i>';
                                 $action_badge = 'info';
@@ -939,29 +1464,26 @@ if (!isset($_SESSION['user'])) {
                                 }
 
                                 $badge_colors = [
-                                    'primary' => 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);',
-                                    'secondary' => 'background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);',
-                                    'warning' => 'background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);',
-                                    'success' => 'background: linear-gradient(135deg, #28a745 0%, #20c997 100%);',
-                                    'danger' => 'background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);',
-                                    'purple' => 'background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);',
-                                    'info' => 'background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);'
+                                    'primary'   => 'background: linear-gradient(135deg, #1a3a6e 0%, #2a5298 100%);',
+                                    'secondary' => 'background: linear-gradient(135deg, #475569 0%, #334155 100%);',
+                                    'warning'   => 'background: linear-gradient(135deg, #d97706 0%, #b45309 100%);',
+                                    'success'   => 'background: linear-gradient(135deg, #059669 0%, #047857 100%);',
+                                    'danger'    => 'background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);',
+                                    'purple'    => 'background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);',
+                                    'info'      => 'background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);'
                                 ];
 
                                 echo "<tr>";
-                                echo "<td>" . $j . "</td>";
-                                echo "<td><span style='" . $badge_colors[$action_badge] . " color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;'>" . $action_icon . " " . $action_type . "</span></td>";
-                                echo "<td style='text-align: right;'>" . $note_text . "</td>";
-                                echo "<td><i class='fas fa-user' style='color:#667eea; margin-left:5px;'></i>" . ($note['user_name'] ?? 'غير محدد') . "</td>";
-                                echo "<td><i class='far fa-clock' style='margin-left: 0.5rem;'></i>" . $note['created_at'] . "</td>";
+                                echo "<td><strong style='color:var(--text-muted);'>" . $j . "</strong></td>";
+                                echo "<td><span class='action-badge-pill' style='" . $badge_colors[$action_badge] . "'>" . $action_icon . " " . $action_type . "</span></td>";
+                                echo "<td style='text-align: right; max-width: 300px;'>" . $note_text . "</td>";
+                                echo "<td><i class='fas fa-user' style='color:var(--primary); margin-left:5px;'></i>" . ($note['user_name'] ?? 'غير محدد') . "</td>";
+                                echo "<td><i class='far fa-clock' style='margin-left: 0.5rem; color:var(--text-muted);'></i>" . $note['created_at'] . "</td>";
                                 echo "</tr>";
                                 $j++;
                             }
                         } else {
-                            echo "<tr><td colspan='5' style='text-align: center; padding: 2rem;'>";
-                            echo "<i class='fas fa-inbox' style='font-size: 3rem; color: #e9ecef; margin-bottom: 1rem;'></i>";
-                            echo "<p style='color: #999; font-size: 1.1rem;'>لا توجد ملاحظات لهذا العقد</p>";
-                            echo "</td></tr>";
+                            echo "<tr><td colspan='5'><div class='empty-state'><i class='fas fa-clipboard-list'></i><p>لا توجد ملاحظات لهذا العقد</p></div></td></tr>";
                         }
                         ?>
                     </tbody>
@@ -969,18 +1491,19 @@ if (!isset($_SESSION['user'])) {
             </div>
         </div>
 
-    </div>
+    </div><!-- end page-wrapper -->
+
+    <!-- ============================================================ MODALS ============================================================ -->
 
     <!-- Modal for Renewal -->
     <div class="modal fade" id="renewalModal" tabindex="-1" aria-labelledby="renewalModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);">
                     <h5 class="modal-title" id="renewalModalLabel">
-                        <i class="fas fa-sync-alt"></i>
-                        تجديد العقد
+                        <i class="fas fa-sync-alt"></i> تجديد العقد
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info" role="alert">
@@ -989,32 +1512,29 @@ if (!isset($_SESSION['user'])) {
                     </div>
                     <div class="mb-4">
                         <label for="renewalStartDate" class="form-label">
-                            <i class="far fa-calendar-alt" style="margin-left: 0.5rem;"></i>
-                            تاريخ بدء التجديد <span style="color: red;">*</span>
+                            <i class="far fa-calendar-alt"></i> تاريخ بدء التجديد <span style="color: red;">*</span>
                         </label>
                         <input type="date" id="renewalStartDate" class="form-control">
                     </div>
                     <div class="mb-3">
                         <label for="renewalEndDate" class="form-label">
-                            <i class="far fa-calendar-check" style="margin-left: 0.5rem;"></i>
-                            تاريخ انتهاء التجديد <span style="color: red;">*</span>
+                            <i class="far fa-calendar-check"></i> تاريخ انتهاء التجديد <span style="color: red;">*</span>
                         </label>
                         <input type="date" id="renewalEndDate" class="form-control">
                     </div>
-                    <div id="renewalDurationDisplay"
-                        style="display: none; padding: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; margin-top: 1rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600;">
-                            <i class="fas fa-calendar-days"></i>
+                    <div id="renewalDurationDisplay" style="display: none;">
+                        <div class="duration-display">
+                            <i class="fas fa-calendar-days" style="font-size: 18px;"></i>
                             <span>مدة العقد الجديدة: <strong id="calculatedDays">0</strong> يوم</span>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times"></i> الغاء
+                        <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmRenewal"
-                        style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; border: none;">
+                        style="background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%); color: white; border: none;">
                         <i class="fas fa-check"></i> تجديد
                     </button>
                 </div>
@@ -1023,16 +1543,14 @@ if (!isset($_SESSION['user'])) {
     </div>
 
     <!-- Modal for Settlement -->
-    <div class="modal fade" id="settlementModal" tabindex="-1" aria-labelledby="settlementModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="settlementModal" tabindex="-1" aria-labelledby="settlementModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);">
                     <h5 class="modal-title" id="settlementModalLabel">
-                        <i class="fas fa-balance-scale"></i>
-                        تسوية العقد
+                        <i class="fas fa-balance-scale"></i> تسوية العقد
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info" role="alert">
@@ -1041,8 +1559,7 @@ if (!isset($_SESSION['user'])) {
                     </div>
                     <div class="mb-4">
                         <label for="settlementType" class="form-label">
-                            <i class="fas fa-exchange-alt" style="margin-left: 0.5rem;"></i>
-                            نوع التسوية <span style="color: red;">*</span>
+                            <i class="fas fa-exchange-alt"></i> نوع التسوية <span style="color: red;">*</span>
                         </label>
                         <select id="settlementType" class="form-select">
                             <option value="">-- اختر --</option>
@@ -1052,19 +1569,15 @@ if (!isset($_SESSION['user'])) {
                     </div>
                     <div class="mb-4">
                         <label for="settlementHours" class="form-label">
-                            <i class="far fa-clock" style="margin-left: 0.5rem;"></i>
-                            عدد الساعات <span style="color: red;">*</span>
+                            <i class="far fa-clock"></i> عدد الساعات <span style="color: red;">*</span>
                         </label>
-                        <input type="number" id="settlementHours" class="form-control" min="1"
-                            placeholder="أدخل عدد الساعات">
+                        <input type="number" id="settlementHours" class="form-control" min="1" placeholder="أدخل عدد الساعات">
                     </div>
                     <div class="mb-3">
                         <label for="settlementReason" class="form-label">
-                            <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                            السبب (اختياري)
+                            <i class="fas fa-comment-alt"></i> السبب (اختياري)
                         </label>
-                        <textarea id="settlementReason" class="form-control" rows="3"
-                            placeholder="أدخل السبب"></textarea>
+                        <textarea id="settlementReason" class="form-control" rows="3" placeholder="أدخل السبب"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1072,7 +1585,7 @@ if (!isset($_SESSION['user'])) {
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmSettlement"
-                        style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none;">
+                        style="background: linear-gradient(135deg, #475569 0%, #334155 100%); color: white; border: none;">
                         <i class="fas fa-check"></i> تسوية
                     </button>
                 </div>
@@ -1084,12 +1597,11 @@ if (!isset($_SESSION['user'])) {
     <div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="pauseModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
                     <h5 class="modal-title" id="pauseModalLabel">
-                        <i class="fas fa-pause-circle"></i>
-                        إيقاف العقد
+                        <i class="fas fa-pause-circle"></i> إيقاف العقد
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-warning" role="alert">
@@ -1098,18 +1610,15 @@ if (!isset($_SESSION['user'])) {
                     </div>
                     <div class="mb-4">
                         <label for="pauseDate" class="form-label">
-                            <i class="far fa-calendar-alt" style="margin-left: 0.5rem;"></i>
-                            تاريخ الإيقاف <span style="color: red;">*</span>
+                            <i class="far fa-calendar-alt"></i> تاريخ الإيقاف <span style="color: red;">*</span>
                         </label>
                         <input type="date" id="pauseDate" class="form-control" value="<?php echo date('Y-m-d'); ?>">
                     </div>
                     <div class="mb-3">
                         <label for="pauseReason" class="form-label">
-                            <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                            سبب الإيقاف <span style="color: red;">*</span>
+                            <i class="fas fa-comment-alt"></i> سبب الإيقاف <span style="color: red;">*</span>
                         </label>
-                        <textarea id="pauseReason" class="form-control" rows="4"
-                            placeholder="أدخل السبب المفصل للإيقاف"></textarea>
+                        <textarea id="pauseReason" class="form-control" rows="4" placeholder="أدخل السبب المفصل للإيقاف"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1117,7 +1626,7 @@ if (!isset($_SESSION['user'])) {
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmPause"
-                        style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white; border: none;">
+                        style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%); color: white; border: none;">
                         <i class="fas fa-pause-circle"></i> إيقاف
                     </button>
                 </div>
@@ -1129,12 +1638,11 @@ if (!isset($_SESSION['user'])) {
     <div class="modal fade" id="resumeModal" tabindex="-1" aria-labelledby="resumeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
                     <h5 class="modal-title" id="resumeModalLabel">
-                        <i class="fas fa-play-circle"></i>
-                        استئناف العقد
+                        <i class="fas fa-play-circle"></i> استئناف العقد
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-success" role="alert">
@@ -1142,97 +1650,69 @@ if (!isset($_SESSION['user'])) {
                         <strong>تأكيد:</strong> سيتم استئناف العقد وإعادة تفعيله.
                     </div>
 
-                    <!-- عرض تاريخ الإيقاف تلقائياً -->
-                    <div class="mb-4"
-                        style="padding: 1.25rem; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 12px; border-right: 5px solid #ffc107; box-shadow: 0 2px 10px rgba(255, 193, 7, 0.2);">
-                        <div
-                            style="display: flex; align-items: center; gap: 0.75rem; color: #856404; font-weight: 700; margin-bottom: 0.75rem; font-size: 1.05rem;">
-                            <i class="fas fa-pause-circle" style="font-size: 1.3rem;"></i>
-                            <span>معلومات الإيقاف</span>
+                    <div class="pause-info-box">
+                        <div class="pause-info-title">
+                            <i class="fas fa-pause-circle"></i> معلومات الإيقاف
                         </div>
-                        <div style="color: #856404; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <div class="pause-info-date">
                             <i class="far fa-calendar-times"></i>
                             <strong>تاريخ إيقاف العقد:</strong>
-                            <span
-                                style="background: white; padding: 0.4rem 1rem; border-radius: 6px; font-weight: 700; color: #d39e00;">
-                                <?php echo !empty($pause_date) ? date('Y-m-d', strtotime($pause_date)) : 'غير محدد'; ?>
-                            </span>
+                            <span><?php echo !empty($pause_date) ? date('Y-m-d', strtotime($pause_date)) : 'غير محدد'; ?></span>
                         </div>
                         <?php if (!empty($pause_reason)): ?>
-                            <div
-                                style="color: #856404; font-size: 0.95rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #ffc107;">
-                                <i class="fas fa-comment-dots"></i>
-                                <strong>سبب الإيقاف:</strong> <?php echo htmlspecialchars($pause_reason); ?>
-                            </div>
+                        <div class="pause-info-reason">
+                            <i class="fas fa-comment-dots"></i>
+                            <strong>سبب الإيقاف:</strong> <?php echo htmlspecialchars($pause_reason); ?>
+                        </div>
                         <?php endif; ?>
                     </div>
 
-                    <!-- إدخال تاريخ الاستئناف -->
                     <div class="mb-4">
-                        <label for="resumeDate" class="form-label" style="font-weight: 700; font-size: 1.05rem;">
-                            <i class="far fa-calendar-check" style="margin-left: 0.5rem; color: #28a745;"></i>
+                        <label for="resumeDate" class="form-label">
+                            <i class="far fa-calendar-check" style="color: var(--success);"></i>
                             تاريخ استئناف العقد <span style="color: red;">*</span>
                         </label>
-                        <input type="date" id="resumeDate" class="form-control" value="<?php echo date('Y-m-d'); ?>"
-                            style="font-size: 1.05rem; font-weight: 600;">
-                        <small class="form-text text-muted" style="display: block; margin-top: 0.5rem;">
+                        <input type="date" id="resumeDate" class="form-control" value="<?php echo date('Y-m-d'); ?>">
+                        <small class="text-muted" style="font-size: 12px; margin-top: 5px; display: block;">
                             <i class="fas fa-info-circle"></i> التاريخ الافتراضي هو اليوم، يمكنك تعديله حسب الحاجة
                         </small>
                     </div>
 
-                    <div id="pauseDurationDisplay"
-                        style="display: none; padding: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; margin-bottom: 1rem;">
-                        <div
-                            style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600; margin-bottom: 1rem;">
-                            <i class="fas fa-clock"></i>
+                    <div id="pauseDurationDisplay" style="display: none;">
+                        <div class="duration-display" style="margin-bottom: 14px;">
+                            <i class="fas fa-clock" style="font-size: 18px;"></i>
                             <span>مدة الإيقاف: <strong id="calculatedPauseDays">0</strong> يوم</span>
                         </div>
-
-                        <!-- خيارات معالجة أيام الإيقاف -->
-                        <div style="background: white; padding: 1rem; border-radius: 8px; border: 2px solid #1976d2;">
-                            <div
-                                style="font-weight: 700; color: #1976d2; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fas fa-question-circle"></i>
-                                <span>كيف تريد معالجة أيام الإيقاف؟</span>
+                        <div style="background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 16px;">
+                            <div style="font-weight: 700; color: var(--primary); margin-bottom: 12px; font-size: 14px;">
+                                <i class="fas fa-question-circle"></i> كيف تريد معالجة أيام الإيقاف؟
                             </div>
-                            <div class="form-check mb-2" style="padding-right: 1.8rem;">
-                                <input class="form-check-input" type="radio" name="pauseHandling" id="extendContract"
-                                    value="extend" checked
-                                    style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
-                                <label class="form-check-label" for="extendContract"
-                                    style="font-weight: 600; color: #495057; cursor: pointer;">
-                                    <i class="fas fa-plus-circle" style="color: #28a745; margin-left: 0.5rem;"></i>
-                                    تمديد العقد: إضافة أيام الإيقاف إلى تاريخ الانتهاء
-                                    <small
-                                        style="display: block; color: #6c757d; font-weight: normal; margin-top: 0.25rem; margin-right: 1.5rem;">
-                                        سيتم تأجيل تاريخ انتهاء العقد بعدد أيام الإيقاف
-                                    </small>
-                                </label>
+                            <div class="pause-option" onclick="selectPauseOption(this, 'extend')">
+                                <div class="form-check" style="padding-right: 1.8rem; pointer-events: none;">
+                                    <input class="form-check-input" type="radio" name="pauseHandling" id="extendContract" value="extend" checked style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
+                                    <label class="form-check-label" for="extendContract" style="cursor: pointer;">
+                                        <span style="color: var(--success); font-weight: 700;"><i class="fas fa-plus-circle"></i> تمديد العقد</span>
+                                        <small style="display: block; color: var(--text-muted); font-weight: normal; margin-top: 3px;">سيتم تأجيل تاريخ انتهاء العقد بعدد أيام الإيقاف</small>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="form-check" style="padding-right: 1.8rem;">
-                                <input class="form-check-input" type="radio" name="pauseHandling"
-                                    id="deductFromContract" value="deduct"
-                                    style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
-                                <label class="form-check-label" for="deductFromContract"
-                                    style="font-weight: 600; color: #495057; cursor: pointer;">
-                                    <i class="fas fa-minus-circle" style="color: #dc3545; margin-left: 0.5rem;"></i>
-                                    خصم من العقد: تقليل مدة العقد بأيام الإيقاف
-                                    <small
-                                        style="display: block; color: #6c757d; font-weight: normal; margin-top: 0.25rem; margin-right: 1.5rem;">
-                                        سيتم تقليل تاريخ انتهاء العقد بعدد أيام الإيقاف
-                                    </small>
-                                </label>
+                            <div class="pause-option" onclick="selectPauseOption(this, 'deduct')">
+                                <div class="form-check" style="padding-right: 1.8rem; pointer-events: none;">
+                                    <input class="form-check-input" type="radio" name="pauseHandling" id="deductFromContract" value="deduct" style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
+                                    <label class="form-check-label" for="deductFromContract" style="cursor: pointer;">
+                                        <span style="color: var(--danger); font-weight: 700;"><i class="fas fa-minus-circle"></i> خصم من العقد</span>
+                                        <small style="display: block; color: var(--text-muted); font-weight: normal; margin-top: 3px;">سيتم تقليل تاريخ انتهاء العقد بعدد أيام الإيقاف</small>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-3 mt-3">
                         <label for="resumeReason" class="form-label">
-                            <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                            ملاحظات (اختياري)
+                            <i class="fas fa-comment-alt"></i> ملاحظات (اختياري)
                         </label>
-                        <textarea id="resumeReason" class="form-control" rows="3"
-                            placeholder="أدخل أي ملاحظات"></textarea>
+                        <textarea id="resumeReason" class="form-control" rows="3" placeholder="أدخل أي ملاحظات"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1240,7 +1720,7 @@ if (!isset($_SESSION['user'])) {
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmResume"
-                        style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none;">
+                        style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; border: none;">
                         <i class="fas fa-play-circle"></i> استئناف
                     </button>
                 </div>
@@ -1252,12 +1732,11 @@ if (!isset($_SESSION['user'])) {
     <div class="modal fade" id="terminateModal" tabindex="-1" aria-labelledby="terminateModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
                     <h5 class="modal-title" id="terminateModalLabel">
-                        <i class="fas fa-times-circle"></i>
-                        إنهاء العقد
+                        <i class="fas fa-times-circle"></i> إنهاء العقد
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-danger" role="alert">
@@ -1266,8 +1745,7 @@ if (!isset($_SESSION['user'])) {
                     </div>
                     <div class="mb-4">
                         <label for="terminationType" class="form-label">
-                            <i class="fas fa-list-ul" style="margin-left: 0.5rem;"></i>
-                            نوع الإنهاء <span style="color: red;">*</span>
+                            <i class="fas fa-list-ul"></i> نوع الإنهاء <span style="color: red;">*</span>
                         </label>
                         <select id="terminationType" class="form-select">
                             <option value="">-- اختر النوع --</option>
@@ -1277,11 +1755,9 @@ if (!isset($_SESSION['user'])) {
                     </div>
                     <div class="mb-3">
                         <label for="terminationReason" class="form-label">
-                            <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                            السبب المفصل <span style="color: red;">*</span>
+                            <i class="fas fa-comment-alt"></i> السبب المفصل <span style="color: red;">*</span>
                         </label>
-                        <textarea id="terminationReason" class="form-control" rows="4"
-                            placeholder="أدخل السبب المفصل لإنهاء العقد" required></textarea>
+                        <textarea id="terminationReason" class="form-control" rows="4" placeholder="أدخل السبب المفصل لإنهاء العقد" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1300,12 +1776,11 @@ if (!isset($_SESSION['user'])) {
     <div class="modal fade" id="mergeModal" tabindex="-1" aria-labelledby="mergeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
                     <h5 class="modal-title" id="mergeModalLabel">
-                        <i class="fas fa-object-group"></i>
-                        دمج العقود
+                        <i class="fas fa-object-group"></i> دمج العقود
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info" role="alert">
@@ -1314,8 +1789,7 @@ if (!isset($_SESSION['user'])) {
                     </div>
                     <div class="mb-4">
                         <label for="mergeWithId" class="form-label">
-                            <i class="fas fa-file-contract" style="margin-left: 0.5rem;"></i>
-                            اختر العقد للدمج معه <span style="color: red;">*</span>
+                            <i class="fas fa-file-contract"></i> اختر العقد للدمج معه <span style="color: red;">*</span>
                         </label>
                         <select id="mergeWithId" class="form-select">
                             <option value="">-- اختر عقد --</option>
@@ -1333,24 +1807,18 @@ if (!isset($_SESSION['user'])) {
                         </select>
                     </div>
 
-                    <!-- عرض المعدات الحالية والمعدات الخاصة بالعقد المختار -->
                     <div id="mergeEquipmentsContainer" style="margin-top: 20px;">
-                        <h6 class="mb-3">معدات العقود:</h6>
+                        <h6 style="font-weight: 700; color: var(--text-primary); margin-bottom: 14px;">معدات العقود:</h6>
 
-                        <!-- معدات العقد الحالي -->
                         <div class="mb-4">
-                            <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #0066cc;">
+                            <div class="equip-section-title current">
                                 <i class="fa fa-cube"></i> معدات العقد الحالي (#<?php echo $contract_id; ?>)
-                            </h6>
+                            </div>
                             <div id="currentContractEquipments">
-                                <table class="table table-sm table-bordered">
+                                <table class="table table-sm table-bordered" style="font-size: 13px;">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>نوع المعدة</th>
-                                            <th>الحجم</th>
-                                            <th>العدد</th>
-                                            <th>الساعات/الشهر</th>
-                                            <th>وحدات/الشهر</th>
+                                            <th>نوع المعدة</th><th>الحجم</th><th>العدد</th><th>الساعات/الشهر</th><th>وحدات/الشهر</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1378,13 +1846,12 @@ if (!isset($_SESSION['user'])) {
                             </div>
                         </div>
 
-                        <!-- معدات العقد المختار -->
                         <div class="mb-4">
-                            <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #28a745;">
+                            <div class="equip-section-title selected">
                                 <i class="fa fa-cube"></i> معدات العقد المختار
-                            </h6>
-                            <div id="selectedContractEquipments" style="min-height: 100px;">
-                                <p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>
+                            </div>
+                            <div id="selectedContractEquipments" style="min-height: 80px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;">
+                                اختر عقداً لعرض معداته
                             </div>
                         </div>
                     </div>
@@ -1394,7 +1861,7 @@ if (!isset($_SESSION['user'])) {
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmMerge"
-                        style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); color: white; border: none;">
+                        style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; border: none;">
                         <i class="fas fa-object-group"></i> دمج العقد
                     </button>
                 </div>
@@ -1406,12 +1873,11 @@ if (!isset($_SESSION['user'])) {
     <div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
                     <h5 class="modal-title" id="completeModalLabel">
-                        <i class="fas fa-check-circle"></i>
-                        انتهاء العقد
+                        <i class="fas fa-check-circle"></i> انتهاء العقد
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-success" role="alert">
@@ -1420,20 +1886,17 @@ if (!isset($_SESSION['user'])) {
                     </div>
                     <div class="mb-3">
                         <label for="completeNote" class="form-label">
-                            <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                            ملاحظات الانتهاء <span style="color: red;">*</span>
+                            <i class="fas fa-comment-alt"></i> ملاحظات الانتهاء <span style="color: red;">*</span>
                         </label>
-                        <textarea id="completeNote" class="form-control" rows="4"
-                            placeholder="أدخل ملاحظات حول انتهاء العقد" required></textarea>
+                        <textarea id="completeNote" class="form-control" rows="4" placeholder="أدخل ملاحظات حول انتهاء العقد" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
-                    <button type="button" class="btn"
-                        style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); color: white;"
-                        id="confirmComplete">
+                    <button type="button" class="btn" id="confirmComplete"
+                        style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; border: none;">
                         <i class="fas fa-check-circle"></i> تسجيل الانتهاء
                     </button>
                 </div>
@@ -1442,32 +1905,27 @@ if (!isset($_SESSION['user'])) {
     </div>
 
     <!-- Modal لتعديل معلومات المشروع -->
-    <div class="modal fade" id="editProjectInfoModal" tabindex="-1" aria-labelledby="editProjectInfoLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="editProjectInfoModal" tabindex="-1" aria-labelledby="editProjectInfoLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a6e 0%, #2a5298 100%);">
                     <h5 class="modal-title" id="editProjectInfoLabel">
                         <i class="fas fa-edit"></i> تعديل معلومات المشروع
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="editGracePeriod" class="form-label">
-                            <i class="fas fa-calendar-alt" style="margin-left: 0.5rem;"></i>
-                            فترة السماح (بالأيام)
+                            <i class="fas fa-calendar-alt"></i> فترة السماح (بالأيام)
                         </label>
-                        <input type="number" id="editGracePeriod" class="form-control"
-                            value="<?php echo $grace_period; ?>" min="0">
+                        <input type="number" id="editGracePeriod" class="form-control" value="<?php echo $grace_period; ?>" min="0">
                     </div>
                     <div class="mb-3">
                         <label for="editDailyOperators" class="form-label">
-                            <i class="fas fa-users-cog" style="margin-left: 0.5rem;"></i>
-                            عدد المشغلين اليومي
+                            <i class="fas fa-users-cog"></i> عدد المشغلين اليومي
                         </label>
-                        <input type="number" id="editDailyOperators" class="form-control"
-                            value="<?php echo $daily_operators; ?>" min="0">
+                        <input type="number" id="editDailyOperators" class="form-control" value="<?php echo $daily_operators; ?>" min="0">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1486,30 +1944,27 @@ if (!isset($_SESSION['user'])) {
     <div class="modal fade" id="editServicesModal" tabindex="-1" aria-labelledby="editServicesLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
                     <h5 class="modal-title" id="editServicesLabel">
                         <i class="fas fa-edit"></i> تعديل الخدمات
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="editTransportation" class="form-label">
-                            <i class="fas fa-bus" style="margin-left: 0.5rem;"></i>
-                            النقل (Transportation)
+                            <i class="fas fa-bus"></i> النقل (Transportation)
                         </label>
                         <select id="editTransportation" class="form-select">
                             <option value="">— اختر —</option>
                             <option value="مالك المعدة" <?php echo ($transportation == 'مالك المعدة') ? 'selected' : ''; ?>>مالك المعدة</option>
                             <option value="مالك المشروع" <?php echo ($transportation == 'مالك المشروع') ? 'selected' : ''; ?>>مالك المشروع</option>
-                            <option value="بدون" <?php echo ($transportation == 'بدون') ? 'selected' : ''; ?>>بدون
-                            </option>
+                            <option value="بدون" <?php echo ($transportation == 'بدون') ? 'selected' : ''; ?>>بدون</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="editAccommodation" class="form-label">
-                            <i class="fas fa-hotel" style="margin-left: 0.5rem;"></i>
-                            الإعاشة (Accommodation)
+                            <i class="fas fa-hotel"></i> الإعاشة (Accommodation)
                         </label>
                         <select id="editAccommodation" class="form-select">
                             <option value="">— اختر —</option>
@@ -1520,28 +1975,23 @@ if (!isset($_SESSION['user'])) {
                     </div>
                     <div class="mb-3">
                         <label for="editPlaceLiving" class="form-label">
-                            <i class="fas fa-map-marker-alt" style="margin-left: 0.5rem;"></i>
-                            مكان السكن (Place for Living)
+                            <i class="fas fa-map-marker-alt"></i> مكان السكن (Place for Living)
                         </label>
                         <select id="editPlaceLiving" class="form-select">
                             <option value="">— اختر —</option>
                             <option value="مالك المعدة" <?php echo ($place_for_living == 'مالك المعدة') ? 'selected' : ''; ?>>مالك المعدة</option>
                             <option value="مالك المشروع" <?php echo ($place_for_living == 'مالك المشروع') ? 'selected' : ''; ?>>مالك المشروع</option>
-                            <option value="بدون" <?php echo ($place_for_living == 'بدون') ? 'selected' : ''; ?>>بدون
-                            </option>
+                            <option value="بدون" <?php echo ($place_for_living == 'بدون') ? 'selected' : ''; ?>>بدون</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="editWorkshop" class="form-label">
-                            <i class="fas fa-wrench" style="margin-left: 0.5rem;"></i>
-                            الورشة (Workshop)
+                            <i class="fas fa-wrench"></i> الورشة (Workshop)
                         </label>
                         <select id="editWorkshop" class="form-select">
                             <option value="">— اختر —</option>
-                            <option value="مالك المعدة" <?php echo ($workshop == 'مالك المعدة') ? 'selected' : ''; ?>>مالك
-                                المعدة</option>
-                            <option value="مالك المشروع" <?php echo ($workshop == 'مالك المشروع') ? 'selected' : ''; ?>>
-                                مالك المشروع</option>
+                            <option value="مالك المعدة" <?php echo ($workshop == 'مالك المعدة') ? 'selected' : ''; ?>>مالك المعدة</option>
+                            <option value="مالك المشروع" <?php echo ($workshop == 'مالك المشروع') ? 'selected' : ''; ?>>مالك المشروع</option>
                             <option value="بدون" <?php echo ($workshop == 'بدون') ? 'selected' : ''; ?>>بدون</option>
                         </select>
                     </div>
@@ -1562,44 +2012,36 @@ if (!isset($_SESSION['user'])) {
     <div class="modal fade" id="editPartiesModal" tabindex="-1" aria-labelledby="editPartiesLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);">
                     <h5 class="modal-title" id="editPartiesLabel">
                         <i class="fas fa-edit"></i> تعديل أطراف العقد
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="editFirstParty" class="form-label">
-                            <i class="fas fa-user-tie" style="margin-left: 0.5rem;"></i>
-                            الطرف الأول
+                            <i class="fas fa-user-tie"></i> الطرف الأول
                         </label>
-                        <input type="text" id="editFirstParty" class="form-control"
-                            value="<?php echo htmlspecialchars($first_party); ?>" placeholder="اسم الطرف الأول">
+                        <input type="text" id="editFirstParty" class="form-control" value="<?php echo htmlspecialchars($first_party); ?>" placeholder="اسم الطرف الأول">
                     </div>
                     <div class="mb-3">
                         <label for="editSecondParty" class="form-label">
-                            <i class="fas fa-user-check" style="margin-left: 0.5rem;"></i>
-                            الطرف الثاني
+                            <i class="fas fa-user-check"></i> الطرف الثاني
                         </label>
-                        <input type="text" id="editSecondParty" class="form-control"
-                            value="<?php echo htmlspecialchars($second_party); ?>" placeholder="اسم الطرف الثاني">
+                        <input type="text" id="editSecondParty" class="form-control" value="<?php echo htmlspecialchars($second_party); ?>" placeholder="اسم الطرف الثاني">
                     </div>
                     <div class="mb-3">
                         <label for="editWitnessOne" class="form-label">
-                            <i class="fas fa-eye" style="margin-left: 0.5rem;"></i>
-                            الشاهد الأول
+                            <i class="fas fa-eye"></i> الشاهد الأول
                         </label>
-                        <input type="text" id="editWitnessOne" class="form-control"
-                            value="<?php echo htmlspecialchars($witness_one); ?>" placeholder="اسم الشاهد الأول">
+                        <input type="text" id="editWitnessOne" class="form-control" value="<?php echo htmlspecialchars($witness_one); ?>" placeholder="اسم الشاهد الأول">
                     </div>
                     <div class="mb-3">
                         <label for="editWitnessTwo" class="form-label">
-                            <i class="fas fa-eye" style="margin-left: 0.5rem;"></i>
-                            الشاهد الثاني
+                            <i class="fas fa-eye"></i> الشاهد الثاني
                         </label>
-                        <input type="text" id="editWitnessTwo" class="form-control"
-                            value="<?php echo htmlspecialchars($witness_two); ?>" placeholder="اسم الشاهد الثاني">
+                        <input type="text" id="editWitnessTwo" class="form-control" value="<?php echo htmlspecialchars($witness_two); ?>" placeholder="اسم الشاهد الثاني">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1618,38 +2060,32 @@ if (!isset($_SESSION['user'])) {
     <div class="modal fade" id="editPaymentModal" tabindex="-1" aria-labelledby="editPaymentLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
                     <h5 class="modal-title" id="editPaymentLabel">
                         <i class="fas fa-edit"></i> تعديل البيانات المالية
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="editCurrency" class="form-label">
-                            <i class="fas fa-dollar-sign" style="margin-left: 0.5rem;"></i>
-                            العملة
+                            <i class="fas fa-dollar-sign"></i> العملة
                         </label>
                         <select id="editCurrency" class="form-select">
                             <option value="">— اختر —</option>
-                            <option value="دولار" <?php echo ($price_currency_contract == 'دولار') ? 'selected' : ''; ?>>
-                                دولار</option>
-                            <option value="جنيه" <?php echo ($price_currency_contract == 'جنيه') ? 'selected' : ''; ?>>
-                                جنيه</option>
+                            <option value="دولار" <?php echo ($price_currency_contract == 'دولار') ? 'selected' : ''; ?>>دولار</option>
+                            <option value="جنيه" <?php echo ($price_currency_contract == 'جنيه') ? 'selected' : ''; ?>>جنيه</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="editPaidAmount" class="form-label">
-                            <i class="fas fa-money-check-alt" style="margin-left: 0.5rem;"></i>
-                            المبلغ المدفوع
+                            <i class="fas fa-money-check-alt"></i> المبلغ المدفوع
                         </label>
-                        <input type="text" id="editPaidAmount" class="form-control"
-                            value="<?php echo htmlspecialchars($paid_contract); ?>" placeholder="أدخل المبلغ">
+                        <input type="text" id="editPaidAmount" class="form-control" value="<?php echo htmlspecialchars($paid_contract); ?>" placeholder="أدخل المبلغ">
                     </div>
                     <div class="mb-3">
                         <label for="editPaymentTime" class="form-label">
-                            <i class="fas fa-clock" style="margin-left: 0.5rem;"></i>
-                            وقت الدفع
+                            <i class="fas fa-clock"></i> وقت الدفع
                         </label>
                         <select id="editPaymentTime" class="form-select">
                             <option value="">— اختر —</option>
@@ -1659,19 +2095,15 @@ if (!isset($_SESSION['user'])) {
                     </div>
                     <div class="mb-3">
                         <label for="editGuarantees" class="form-label">
-                            <i class="fas fa-shield-alt" style="margin-left: 0.5rem;"></i>
-                            الضمانات
+                            <i class="fas fa-shield-alt"></i> الضمانات
                         </label>
-                        <textarea id="editGuarantees" class="form-control" rows="3"
-                            placeholder="تفاصيل الضمانات"><?php echo htmlspecialchars($guarantees); ?></textarea>
+                        <textarea id="editGuarantees" class="form-control" rows="3" placeholder="تفاصيل الضمانات"><?php echo htmlspecialchars($guarantees); ?></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="editPaymentDate" class="form-label">
-                            <i class="fas fa-calendar-check" style="margin-left: 0.5rem;"></i>
-                            تاريخ الدفع
+                            <i class="fas fa-calendar-check"></i> تاريخ الدفع
                         </label>
-                        <input type="date" id="editPaymentDate" class="form-control"
-                            value="<?php echo htmlspecialchars($payment_date); ?>">
+                        <input type="date" id="editPaymentDate" class="form-control" value="<?php echo htmlspecialchars($payment_date); ?>">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1686,15 +2118,15 @@ if (!isset($_SESSION['user'])) {
         </div>
     </div>
 
-    <!-- jQuery (required for your AJAX calls) -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap 5 Bundle (includes Popper) -->
+    <!-- Bootstrap 5 Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         const contractId = <?php echo $contract_id; ?>;
         const contractStatus = <?php echo isset($contractStatusValue) ? $contractStatusValue : 1; ?>;
-        const actualEndDate = '<?php echo isset($actual_end_date) ? $actual_end_date : ''; ?>';  // تاريخ انتهاء العقد الفعلي
+        const actualEndDate = '<?php echo isset($actual_end_date) ? $actual_end_date : ''; ?>';
 
         // دالة عامة للإجراءات
         function performAction(action, data = {}) {
@@ -1746,10 +2178,16 @@ if (!isset($_SESSION['user'])) {
             return true;
         }
 
-        // أزرار الإجراءات - Bootstrap 5 syntax
+        // Helper for pause option selection
+        function selectPauseOption(el, value) {
+            document.querySelectorAll('.pause-option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            document.querySelector('input[name="pauseHandling"][value="' + value + '"]').checked = true;
+        }
+
+        // أزرار الإجراءات
         $('#renewalBtn').click(function () {
             if (!canPerformAction('renewal')) return;
-            // تعيين تاريخ البدء الافتراضي لتاريخ انتهاء العقد الفعلي
             if (actualEndDate) {
                 $('#renewalStartDate').val(actualEndDate);
             }
@@ -1757,13 +2195,11 @@ if (!isset($_SESSION['user'])) {
             modal.show();
         });
 
-        // إعادة تعيين عرض المدة عند إغلاق المودال
         document.getElementById('renewalModal').addEventListener('hidden.bs.modal', function () {
             $('#renewalDurationDisplay').hide();
             $('#calculatedDays').text('0');
         });
 
-        // حساب المدة تلقائياً عند تغيير التواريخ
         function calculateRenewalDuration() {
             const startDate = $('#renewalStartDate').val();
             const endDate = $('#renewalEndDate').val();
@@ -1800,7 +2236,6 @@ if (!isset($_SESSION['user'])) {
                 return;
             }
 
-            // حساب عدد الأيام بين التاريخين
             const start = new Date(startDate);
             const end = new Date(endDate);
             const timeDiff = end.getTime() - start.getTime();
@@ -1811,7 +2246,6 @@ if (!isset($_SESSION['user'])) {
                 new_end_date: endDate,
                 contract_duration_days: durationDays
             });
-            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('renewalModal')).hide();
             $('#renewalStartDate').val('');
             $('#renewalEndDate').val('');
@@ -1841,7 +2275,6 @@ if (!isset($_SESSION['user'])) {
                 settlement_hours: hours,
                 settlement_reason: $('#settlementReason').val()
             });
-            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('settlementModal')).hide();
             $('#settlementType').val('');
             $('#settlementHours').val('');
@@ -1869,7 +2302,6 @@ if (!isset($_SESSION['user'])) {
                 pause_reason: reason,
                 pause_date: pauseDate
             });
-            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('pauseModal')).hide();
             $('#pauseReason').val('');
             $('#pauseDate').val('<?php echo date('Y-m-d'); ?>');
@@ -1879,12 +2311,9 @@ if (!isset($_SESSION['user'])) {
             if (!canPerformAction('resume')) return;
             const modal = new bootstrap.Modal(document.getElementById('resumeModal'));
             modal.show();
-
-            // حساب عدد أيام الإيقاف عند فتح الـ modal
             calculatePauseDuration();
         });
 
-        // دالة لحساب مدة الإيقاف
         function calculatePauseDuration() {
             const resumeDate = $('#resumeDate').val();
             const pauseDate = '<?php echo !empty($pause_date) ? $pause_date : ''; ?>';
@@ -1926,7 +2355,6 @@ if (!isset($_SESSION['user'])) {
                 pauseDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
             }
 
-            // الحصول على خيار معالجة أيام الإيقاف
             const pauseHandling = $('input[name="pauseHandling"]:checked').val();
 
             performAction('resume', {
@@ -1935,7 +2363,6 @@ if (!isset($_SESSION['user'])) {
                 pause_days: pauseDays,
                 pause_handling: pauseHandling
             });
-            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('resumeModal')).hide();
             $('#resumeReason').val('');
             $('#resumeDate').val('<?php echo date('Y-m-d'); ?>');
@@ -1959,7 +2386,6 @@ if (!isset($_SESSION['user'])) {
                 termination_type: type,
                 termination_reason: $('#terminationReason').val()
             });
-            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('terminateModal')).hide();
             $('#terminationType').val('');
             $('#terminationReason').val('');
@@ -1971,7 +2397,6 @@ if (!isset($_SESSION['user'])) {
             modal.show();
         });
 
-        // Complete Contract Button Handler
         $('#completeBtn').click(function () {
             const modal = new bootstrap.Modal(document.getElementById('completeModal'));
             modal.show();
@@ -1986,7 +2411,6 @@ if (!isset($_SESSION['user'])) {
             performAction('complete', {
                 complete_note: note
             });
-            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('completeModal')).hide();
             $('#completeNote').val('');
         });
@@ -2171,7 +2595,6 @@ if (!isset($_SESSION['user'])) {
                 return;
             }
 
-            // تحميل المعدات عبر AJAX
             $.ajax({
                 url: 'get_contract_equipments.php',
                 type: 'GET',
@@ -2181,7 +2604,7 @@ if (!isset($_SESSION['user'])) {
                     if (response.success) {
                         let html = '';
                         if (response.equipments.length > 0) {
-                            html = '<table class="table table-sm table-bordered">';
+                            html = '<table class="table table-sm table-bordered" style="font-size:13px;">';
                             html += '<thead class="table-light"><tr>';
                             html += '<th>نوع المعدة</th>';
                             html += '<th>الحجم</th>';
@@ -2230,7 +2653,6 @@ if (!isset($_SESSION['user'])) {
             performAction('merge', {
                 merge_with_id: mergeId
             });
-            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('mergeModal')).hide();
             $('#mergeWithId').val('');
             $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>');
@@ -2240,10 +2662,9 @@ if (!isset($_SESSION['user'])) {
             if (document.referrer !== '') {
                 window.history.back();
             } else {
-                window.location.href = 'index.html'; // صفحة افتراضية عند عدم وجود سجل
+                window.location.href = 'index.html';
             }
         }
-
     </script>
 
 </body>

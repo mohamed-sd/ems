@@ -1,623 +1,524 @@
 <?php
 session_start();
-if (!isset($_SESSION['user'])) {
-  header("Location: ../index.php");
-  exit();
-}
+if (!isset($_SESSION['user'])) { header("Location: ../index.php"); exit(); }
 include "../config.php";
-?>  
 
+/* ══════════════════════════════
+   DATA LAYER
+══════════════════════════════ */
+$roles = [
+  "0"=>"مدير النظام","1"=>"مدير المشاريع","2"=>"مدير الموردين",
+  "3"=>"مدير المشغلين","4"=>"مدير الأسطول","5"=>"مدير موقع",
+  "6"=>"مدخل ساعات","7"=>"مراجع مورد","8"=>"مراجع مشغل",
+  "9"=>"مراجع الأعطال","10"=>"مدير حركة وتشغيل",
+];
+$role     = $_SESSION['user']['role'];
+$userName = $_SESSION['user']['name'];
+$roleText = $roles[$role] ?? "غير معروف";
+
+/* Quick links */
+$allLinks = [
+  "0"  => [['../Clients/clients.php','fa-users','العملاء'],['../Projects/oprationprojects.php','fa-project-diagram','المشاريع'],['../main/users.php','fa-user-shield','المستخدمين'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Settings/settings.php','fa-cog','الإعدادات']],
+  "1"  => [['../Clients/clients.php','fa-users','العملاء'],['../Projects/oprationprojects.php','fa-project-diagram','المشاريع'],['../main/users.php','fa-user-shield','المستخدمين'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Equipments/equipments_types.php','fa-screwdriver-wrench','الأنواع'],['../Settings/settings.php','fa-cog','الإعدادات']],
+  "2"  => [['../Suppliers/suppliers.php','fa-truck','الموردين'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Settings/settings.php','fa-cog','الإعدادات']],
+  "3"  => [['../Equipments/equipments.php','fa-tractor','المعدات'],['../Drivers/drivers.php','fa-id-badge','المشغلين'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Settings/settings.php','fa-cog','الإعدادات']],
+  "4"  => [['../Equipments/equipments.php','fa-tools','المعدات'],['../Oprators/oprators.php','fa-cogs','التشغيل'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Settings/settings.php','fa-cog','الإعدادات']],
+  "5"  => [['../main/project_users.php','fa-users-cog','المشرفين'],['../Timesheet/timesheet.php','fa-clock','الساعات'],['../Timesheet/view_timesheet.php','fa-clock','ساعات اليوم'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Settings/settings.php','fa-cog','الإعدادات']],
+  "10" => [['../Oprators/oprators.php','fa-play-circle','التشغيل'],['../Equipments/equipments.php','fa-tools','المعدات'],['../Settings/settings.php','fa-cog','الإعدادات']],
+];
+$links = $allLinks[$role] ?? [];
+
+/* Stat cards — [icon, raw_value, label, accent] */
+$stats = [];
+if ($role=="0"||$role=="1") {
+  $c=$conn->query("SELECT COUNT(*) AS t FROM clients WHERE status='نشط'")->fetch_assoc()['t'];
+  $p=$conn->query("SELECT COUNT(*) AS t FROM project WHERE status='1'")->fetch_assoc()['t'];
+  $m=$conn->query("SELECT COUNT(*) AS t FROM mines WHERE status='1'")->fetch_assoc()['t'];
+  $u=$conn->query("SELECT COUNT(*) AS t FROM users WHERE parent_id='0' AND role!='-1'")->fetch_assoc()['t'];
+  $stats=[['fa-users',$c,'العملاء','gold'],['fa-project-diagram',$p,'المشاريع','blue'],['fa-mountain',$m,'المناجم','teal'],['fa-user-shield',$u,'المستخدمين','purple']];
+} elseif ($role=="2") {
+  $s=$conn->query("SELECT COUNT(*) AS t FROM suppliers WHERE status='1'")->fetch_assoc()['t'];
+  $e=$conn->query("SELECT COUNT(*) AS t FROM equipments WHERE status='1'")->fetch_assoc()['t'];
+  $co=$conn->query("SELECT COUNT(*) AS t FROM supplierscontracts WHERE status='1'")->fetch_assoc()['t'];
+  $stats=[['fa-truck',$s,'الموردين','gold'],['fa-tools',$e,'الآليات','blue'],['fa-file-contract',$co,'العقود','teal']];
+} elseif ($role=="4") {
+  $eq=$conn->query("SELECT COUNT(*) AS t FROM equipments WHERE status='1'")->fetch_assoc()['t'];
+  $ao=$conn->query("SELECT COUNT(*) AS t FROM operations WHERE status='1'")->fetch_assoc()['t'];
+  $bo=$conn->query("SELECT COUNT(*) AS t FROM operations WHERE status='0'")->fetch_assoc()['t'];
+  $stats=[['fa-tools',$eq,'إجمالي المعدات','gold'],['fa-play-circle',$ao,'تعمل الآن','blue'],['fa-exclamation-triangle',$bo,'معطلة','orange']];
+} elseif ($role=="3") {
+  $dr=$conn->query("SELECT COUNT(*) AS t FROM drivers WHERE status='1'")->fetch_assoc()['t'];
+  $ad=$conn->query("SELECT COUNT(DISTINCT d.id) AS t FROM drivers d JOIN timesheet t ON d.id=t.driver WHERE t.status='1'")->fetch_assoc()['t'];
+  $stats=[['fa-id-badge',$dr,'المشغلين','gold'],['fa-user-check',$ad,'يعملون الآن','blue'],['fa-user-clock',$dr-$ad,'خاملين','orange']];
+} elseif ($role=="5") {
+  $sv=$conn->query("SELECT COUNT(*) AS t FROM users WHERE role IN ('6','7','8','9')")->fetch_assoc()['t'];
+  $h=$conn->query("SELECT SUM(total_work_hours) AS t FROM timesheet")->fetch_assoc()['t'];
+  $ah=$conn->query("SELECT SUM(total_work_hours) AS t FROM timesheet WHERE status='1'")->fetch_assoc()['t'];
+  $stats=[['fa-users-cog',$sv,'المشرفين','gold'],['fa-clock',(int)$h,'ساعات العمل','blue'],['fa-check-circle',(int)$ah,'الساعات المعتمدة','teal']];
+} elseif ($role=="10") {
+  $eq=$conn->query("SELECT COUNT(*) AS t FROM equipments WHERE status='1'")->fetch_assoc()['t'];
+  $dr=$conn->query("SELECT COUNT(*) AS t FROM drivers WHERE status='1'")->fetch_assoc()['t'];
+  $h=$conn->query("SELECT SUM(total_work_hours) AS t FROM timesheet")->fetch_assoc()['t'];
+  $stats=[['fa-tools',$eq,'الآليات','gold'],['fa-id-badge',$dr,'المشغلين','blue'],['fa-clock',(int)$h,'الساعات','teal']];
+}
+
+$statCount = count($stats);
+$linkCount = count($links);
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
   <meta charset="UTF-8">
   <title>إيكوبيشن | الرئيسية</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Font awsome -->
   <link rel="stylesheet" href="../assets/css/all.min.css">
-  <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
-
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+/* ════════════════════════════════════════════════════
+   TOKENS
+════════════════════════════════════════════════════ */
+:root{
+  --navy:      #0c1c3e;
+  --navy-m:    #132050;
+  --navy-l:    #1b2f6e;
+  --gold:      #e8b800;
+  --gold-l:    #ffd740;
+  --gold-d:    rgba(232,184,0,.13);
+  --blue:      #2563eb;
+  --blue-d:    rgba(37,99,235,.12);
+  --teal:      #0d9488;
+  --teal-d:    rgba(13,148,136,.12);
+  --purple:    #7c3aed;
+  --purple-d:  rgba(124,58,237,.12);
+  --orange:    #ea6f00;
+  --orange-d:  rgba(234,111,0,.12);
+  --bg:        #f0f2f8;
+  --card:      #ffffff;
+  --bdr:       rgba(12,28,62,.07);
+  --txt:       #0c1c3e;
+  --sub:       #64748b;
+  --danger:    #dc2626;
+  --danger-d:  rgba(220,38,38,.09);
+  --r:  14px;
+  --rl: 20px;
+  --rx: 26px;
+  --s1: 0 1px 5px rgba(12,28,62,.06);
+  --s2: 0 5px 20px rgba(12,28,62,.09);
+  --s3: 0 14px 44px rgba(12,28,62,.13);
+  --ease:.22s cubic-bezier(.4,0,.2,1);
+  --font:'Cairo',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font);color:var(--txt);background:var(--bg)}
+a{text-decoration:none;color:inherit}
 
-    :root {
-      --primary-color: #1a1a2e;
-      --secondary-color: #16213e;
-      --accent-color: #d8ae02;
-      --text-color: #010326;
-      --light-color: #f5f5f5;
-      --shadow-color: rgba(0, 0, 0, 0.1);
-      --gold-color: #ffcc00;
-    }
+/* ════════════════════════════════════════════════════
+   LAYOUT — 3-row grid that fills 100vh exactly
+   row1: topbar   (auto)
+   row2: hero     (auto)
+   row3: stats    (1fr — grows to fill all remaining)
+════════════════════════════════════════════════════ */
+.main{
+  display:grid;
+  grid-template-rows:auto auto 1fr;
+  height:100vh;
+  padding:16px 20px 16px;
+  gap:13px;
+  overflow:hidden;
+  width:100%;
+}
 
-    * {
-      font-family: 'Cairo', sans-serif;
-    }
+/* ════════════════════════════════════════════════════
+   TOP BAR
+════════════════════════════════════════════════════ */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
 
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{
+  width:40px;height:40px;border-radius:11px;
+  background:linear-gradient(135deg,var(--navy),var(--navy-l));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--s2);flex-shrink:0;
+}
+.brand-icon i{color:var(--gold);font-size:1rem}
+.brand-info .sys{font-size:.67rem;font-weight:600;color:var(--sub);letter-spacing:.07em;text-transform:uppercase}
+.brand-info .greet{font-size:1rem;font-weight:800;line-height:1.2}
 
+.topbar-r{display:flex;align-items:center;gap:8px}
+.clock{
+  display:flex;align-items:center;gap:5px;
+  padding:6px 14px;background:var(--card);
+  border:1px solid var(--bdr);border-radius:50px;
+  font-size:.78rem;font-weight:700;color:var(--sub);box-shadow:var(--s1);
+}
+.clock i{color:var(--gold);font-size:.72rem}
+.btn-out{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 16px;background:var(--danger-d);color:var(--danger);
+  border-radius:50px;font-weight:700;font-size:.82rem;
+  transition:background var(--ease),box-shadow var(--ease),color var(--ease);
+}
+.btn-out:hover{background:var(--danger);color:#fff;box-shadow:0 5px 16px rgba(220,38,38,.3)}
 
-    .main {
-      padding: 1rem;
-      width: 100%;
-      background-color: white;
-    }
+/* ════════════════════════════════════════════════════
+   HERO ROW — banner + quick links side by side
+════════════════════════════════════════════════════ */
+.hero-row{
+  display:grid;
+  grid-template-columns:1fr 230px;
+  gap:13px;
+  flex-shrink:0;
+}
 
-    /* ====== رسالة الترحيب ====== */
-    .welcome-container {
-      text-align: center;
-      margin: 10px auto 10px;
-      position: relative;
-      overflow: hidden;
-    }
+/* ── Banner ── */
+.banner{
+  position:relative;overflow:hidden;
+  border-radius:var(--rx);
+  background:linear-gradient(125deg,var(--navy) 0%,var(--navy-m) 50%,var(--navy-l) 100%);
+  padding:20px 26px;
+  box-shadow:var(--s3);
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  animation:fadeUp .45s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 
-    .welcome-message {
-      width: 100%;
-      display: inline-block;
-      font-size: 20px;
-      font-weight: 700;
-      color: white;
-      padding: 20px 30px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-      box-shadow: 0 10px 30px var(--shadow-color);
-      animation: slideIn 0.6s ease-out;
-    }
+.banner::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.055) 1px,transparent 1px);
+  background-size:20px 20px;pointer-events:none;
+}
+.banner::after{
+  content:'';position:absolute;
+  right:-55px;top:-55px;width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,184,0,.26) 0%,transparent 68%);
+  pointer-events:none;
+}
 
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
+.banner-body{position:relative;z-index:1}
+.banner-role{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(232,184,0,.15);border:1px solid rgba(232,184,0,.3);
+  color:var(--gold-l);font-size:.66rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 10px;border-radius:50px;margin-bottom:7px;
+}
+.banner-role i{font-size:.38rem}
+.banner-name{font-size:1.4rem;font-weight:900;color:#fff;line-height:1.2;min-height:1.7rem}
+.cursor{
+  display:inline-block;width:2px;height:1.1rem;
+  background:var(--gold);border-radius:2px;
+  animation:blink .75s step-end infinite;vertical-align:middle;margin-right:2px;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.banner-sub{margin-top:4px;font-size:.8rem;color:rgba(255,255,255,.5)}
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+.banner-emoji{
+  position:relative;z-index:1;font-size:2.8rem;flex-shrink:0;
+  animation:bob 4s ease-in-out infinite;
+  filter:drop-shadow(0 3px 10px rgba(232,184,0,.35));
+}
+@keyframes bob{0%,100%{transform:translateY(0)rotate(-4deg)}50%{transform:translateY(-8px)rotate(4deg)}}
 
-    .welcome-message span {
-      opacity: 0;
-      display: inline-block;
-      transform: translateY(20px);
-      animation: fadeInUp 0.6s forwards;
-      margin: 0 0.2em;
-      white-space: nowrap;
-    }
+/* star particles */
+.sfx{position:absolute;color:var(--gold-l);pointer-events:none;z-index:0;animation:drift 3s linear forwards}
+@keyframes drift{0%{opacity:.85;transform:translateY(0)scale(1)rotate(0)}100%{opacity:0;transform:translateY(70px)scale(.2)rotate(330deg)}}
 
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+/* ── Quick Links Panel ── */
+.ql-panel{
+  background:var(--card);
+  border:1.5px solid var(--bdr);
+  border-radius:var(--rx);
+  padding:13px 11px;
+  box-shadow:var(--s1);
+  display:flex;flex-direction:column;gap:6px;
+  animation:fadeUp .45s .05s cubic-bezier(.4,0,.2,1) both;
+}
+.ql-title{
+  font-size:.64rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--sub);display:flex;align-items:center;gap:5px;
+  padding-bottom:6px;border-bottom:1px solid var(--bdr);white-space:nowrap;
+}
+.ql-title i{color:var(--gold)}
 
-    /* النجوم المتطايرة */
-    .star {
-      position: absolute;
-      color: var(--gold-color);
-      font-size: 16px;
-      animation: fall 3s linear infinite;
-      opacity: 0.9;
-    }
+/* 2-col icon grid — never overflows vertically */
+.ql-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;flex:1}
+.ql-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:7px 3px;border-radius:var(--r);
+  border:1.5px solid transparent;transition:all var(--ease);text-align:center;
+}
+.ql-btn i{
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--gold-d);color:var(--gold);
+  font-size:.82rem;transition:all var(--ease);
+}
+.ql-btn span{font-size:.68rem;font-weight:700;color:var(--sub);white-space:nowrap;transition:color var(--ease)}
+.ql-btn:hover{background:var(--gold-d);border-color:rgba(232,184,0,.24)}
+.ql-btn:hover i{background:var(--gold);color:#fff}
+.ql-btn:hover span{color:var(--navy)}
+.ql-btn:last-child:nth-child(odd){grid-column:1/-1}
 
-    @keyframes fall {
-      0% {
-        transform: translateY(-20px) scale(1) rotate(0deg);
-        opacity: 1;
-      }
+/* ════════════════════════════════════════════════════
+   STATS SECTION — fills ALL remaining vertical space
+   Cards stretch to fill via flex + min-height:0
+════════════════════════════════════════════════════ */
+.stats-wrap{
+  display:flex;flex-direction:column;gap:8px;
+  min-height:0; /* let it shrink */
+}
 
-      100% {
-        transform: translateY(100px) scale(0.5) rotate(360deg);
-        opacity: 0;
-      }
-    }
+.stats-label{
+  display:flex;align-items:center;gap:7px;
+  font-size:.66rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--sub);flex-shrink:0;
+}
+.stats-label::before{
+  content:'';width:3px;height:13px;
+  background:linear-gradient(180deg,var(--gold),var(--navy));
+  border-radius:3px;display:block;
+}
+.stats-label i{color:var(--gold)}
 
-    /* ====== أزرار الوصول السريع ====== */
-    .quick-access {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 1rem;
-      margin: 2rem 0;
-      max-width: 1200px;
-      margin-left: auto;
-      margin-right: auto;
-      animation: fadeIn 0.8s ease-out 0.2s both;
-    }
+/* The grid stretches to fill remaining height */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(<?= $statCount ?>,1fr);
+  gap:12px;
+  flex:1;
+  min-height:0;
+}
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
+/* ── Stat Card ── */
+.scard{
+  background:var(--card);
+  border-radius:var(--rl);
+  border:1.5px solid var(--bdr);
+  box-shadow:var(--s1);
+  padding:0;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  position:relative;
+  transition:transform var(--ease),box-shadow var(--ease),border-color var(--ease);
+  animation:popCard .45s cubic-bezier(.4,0,.2,1) both;
+  cursor:default;
+  height: 200px;
+}
+@keyframes popCard{from{opacity:0;transform:scale(.93)translateY(6px)}to{opacity:1;transform:scale(1)translateY(0)}}
+.scard:nth-child(1){animation-delay:.07s}
+.scard:nth-child(2){animation-delay:.12s}
+.scard:nth-child(3){animation-delay:.17s}
+.scard:nth-child(4){animation-delay:.22s}
+.scard:hover{transform:translateY(-4px);box-shadow:var(--s2)}
 
-      to {
-        opacity: 1;
-      }
-    }
+/* coloured top-band */
+.scard-band{height:4px;width:100%;flex-shrink:0;border-radius:var(--rl) var(--rl) 0 0}
 
-    .quick-btn {
-      background: white;
-      border-radius: 15px;
-      padding: 1.5rem;
-      text-align: center;
-      text-decoration: none;
-      color: var(--text-color);
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-      animation: scaleIn 0.5s ease-out backwards;
-    }
+/* accent colours */
+.scard.gold  .scard-band{background:linear-gradient(90deg,var(--gold),var(--gold-l))}
+.scard.gold:hover{border-color:rgba(232,184,0,.3)}
+.scard.gold  .scard-icon{background:var(--gold-d);color:var(--gold)}
+.scard.gold:hover .scard-icon{background:var(--gold);color:#fff}
 
-    @keyframes scaleIn {
-      from {
-        opacity: 0;
-        transform: scale(0.9);
-      }
+.scard.blue  .scard-band{background:linear-gradient(90deg,var(--blue),#60a5fa)}
+.scard.blue:hover{border-color:rgba(37,99,235,.22)}
+.scard.blue  .scard-icon{background:var(--blue-d);color:var(--blue)}
+.scard.blue:hover .scard-icon{background:var(--blue);color:#fff}
 
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
+.scard.teal  .scard-band{background:linear-gradient(90deg,var(--teal),#2dd4bf)}
+.scard.teal:hover{border-color:rgba(13,148,136,.22)}
+.scard.teal  .scard-icon{background:var(--teal-d);color:var(--teal)}
+.scard.teal:hover .scard-icon{background:var(--teal);color:#fff}
 
-    .quick-btn:nth-child(1) {
-      animation-delay: 0.3s;
-    }
+.scard.purple .scard-band{background:linear-gradient(90deg,var(--purple),#a78bfa)}
+.scard.purple:hover{border-color:rgba(124,58,237,.22)}
+.scard.purple .scard-icon{background:var(--purple-d);color:var(--purple)}
+.scard.purple:hover .scard-icon{background:var(--purple);color:#fff}
 
-    .quick-btn:nth-child(2) {
-      animation-delay: 0.35s;
-    }
+.scard.orange .scard-band{background:linear-gradient(90deg,var(--orange),#fb923c)}
+.scard.orange:hover{border-color:rgba(234,111,0,.22)}
+.scard.orange .scard-icon{background:var(--orange-d);color:var(--orange)}
+.scard.orange:hover .scard-icon{background:var(--orange);color:#fff}
 
-    .quick-btn:nth-child(3) {
-      animation-delay: 0.4s;
-    }
+/* card inner layout — centred, grows to fill height */
+.scard-inner{
+  flex:1;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:20px 16px;
+  text-align:center;
+  gap:14px;
+  position:relative;z-index:1;
+}
 
-    .quick-btn:nth-child(4) {
-      animation-delay: 0.45s;
-    }
+.scard-icon{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;
+  transition:all var(--ease);
+  flex-shrink:0;
+}
 
-    .quick-btn:nth-child(5) {
-      animation-delay: 0.5s;
-    }
+.scard-value{
+  font-size:clamp(2rem,4vw,3.2rem);
+  font-weight:900;line-height:1;color:var(--txt);
+  font-variant-numeric:tabular-nums;
+}
+.scard-label{
+  font-size:.82rem;font-weight:600;color:var(--sub);margin-top:2px;
+}
 
-    .quick-btn:nth-child(6) {
-      animation-delay: 0.55s;
-    }
+/* large ghost number — decorative */
+.scard-ghost{
+  position:absolute;
+  bottom:50px;left:76%;transform:translateX(-50%);
+  font-size:clamp(4rem,9vw,7rem);font-weight:900;line-height:1;
+  color:rgba(12,28,62,.04);pointer-events:none;user-select:none;white-space:nowrap;
+}
 
-    .quick-btn:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px var(--shadow-color);
-      color: var(--gold-color);
-    }
+/* ════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════ */
+@media(max-width:980px){
+  .main{height:auto;overflow:visible;padding-bottom:28px}
+  .hero-row{grid-template-columns:1fr}
+  .ql-panel{display:none}
+  /* show links as horizontal pills under banner */
+  .mobile-links{display:flex;flex-wrap:wrap;gap:8px;padding-top:2px}
+  .ml-btn{
+    display:inline-flex;align-items:center;gap:7px;
+    padding:8px 14px;background:var(--card);
+    border:1.5px solid var(--bdr);border-radius:50px;
+    font-size:.82rem;font-weight:700;color:var(--txt);
+    box-shadow:var(--s1);transition:all var(--ease);
+  }
+  .ml-btn i{color:var(--gold)}
+  .ml-btn:hover{border-color:var(--gold);background:var(--gold-d)}
+  .cards-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px}
+  .scard-value{font-size:2rem!important}
+}
+@media(min-width:981px){.mobile-links{display:none}}
 
-    .quick-btn i {
-      font-size: 2.5rem;
-      background: linear-gradient(135deg, var(--gold-color) 50%, var(--primary-color) 50%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      transition: all 0.3s ease;
-    }
-
-    .quick-btn:hover i {
-      transform: scale(1.1) rotate(5deg);
-    }
-
-    .quick-btn span {
-      font-weight: 600;
-      font-size: 1rem;
-    }
-
-    /* ====== عنوان القسم ====== */
-    .section-title {
-      text-align: center;
-      font-size: 1.8rem;
-      font-weight: 500;
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.30rem;
-      animation: fadeIn 0.8s ease-out 0.1s both;
-    }
-
-    /* ====== الكروت ====== */
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.5rem;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .card {
-      background: white;
-      padding: 1rem;
-      border-radius: 20px;
-      text-align: center;
-      box-shadow: 0 5px 20px var(--shadow-color);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      animation: popIn 0.6s ease-out backwards;
-    }
-
-    @keyframes popIn {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .card:nth-child(1) {
-      animation-delay: 0.1s;
-    }
-
-    .card:nth-child(2) {
-      animation-delay: 0.15s;
-    }
-
-    .card:nth-child(3) {
-      animation-delay: 0.2s;
-    }
-
-    .card:nth-child(4) {
-      animation-delay: 0.25s;
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(135deg, var(--secondary-color) 50%, var(--gold-color) 50%);
-      transform: scaleX(0);
-      transition: transform 0.3s ease;
-    }
-
-    .card:hover::before {
-      transform: scaleX(1);
-    }
-
-    .card:hover {
-      transform: translateY(-10px) scale(1.03);
-      box-shadow: 0 15px 40px var(--shadow-color);
-    }
-
-    .card i {
-      font-size: 2rem;
-      background: linear-gradient(135deg, var(--secondary-color) 50%, var(--accent-color) 50%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 0rem;
-      transition: all 0.3s ease;
-    }
-
-    .card:hover i {
-      transform: scale(1.15) rotate(-5deg);
-    }
-
-    .card h3 {
-      font-size: 2rem;
-      margin: 0.5rem 0;
-      color: var(--primary-color);
-      font-weight: 500;
-    }
-
-    .card p {
-      color: #6c757d;
-      font-weight: 600;
-      font-size: 1rem;
-      margin: 0;
-    }
-
-    .card a {
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-
-    @media (max-width: 768px) {
-      .main {
-        padding: 1rem;
-      }
-
-      .welcome-message {
-        font-size: 18px;
-        padding: 15px 20px;
-        max-width: 90%;
-      }
-
-      .cards {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-      }
-
-      .card {
-        padding: 1.5rem 1rem;
-      }
-
-      .card h3 {
-        font-size: 2rem;
-      }
-
-      .quick-access {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      }
-
-      .section-title {
-        font-size: 1.4rem;
-      }
-    }
+@media(max-width:600px){
+  .main{padding:11px 12px 18px;gap:9px}
+  .brand-info .greet{font-size:.9rem}
+  .clock{display:none}
+  .banner-name{font-size:1.15rem}
+  .banner-emoji{font-size:2rem}
+  .cards-grid{grid-template-columns:1fr 1fr!important}
+}
   </style>
 </head>
-
 <body>
+<?php include('../insidebar.php'); ?>
 
-  <?php include('../insidebar.php'); ?>
+<div class="main">
 
-  <div class="main">
-
-    <?php
-    $roles = array(
-      "0" => "مدير",
-      "1" => "مدير المشاريع",
-      "2" => "مدير الموردين",
-      "3" => "مدير المشغلين",
-      "4" => "مدير الأسطول",
-      "5" => "مدير موقع",
-      "6" => "مدخل ساعات عمل",
-      "7" => "مراجع ساعات مورد",
-      "8" => "مراجع ساعات مشغل",
-      "9" => "مراجع الاعطال",
-      "10" => "مدير حركة وتشغيل"
-    );
-
-    $userRole = $_SESSION['user']['role'];
-    $userName = $_SESSION['user']['name'];
-    $roleText = isset($roles[$userRole]) ? $roles[$userRole] : "غير معروف";
-    $welcomeText = " مرحباً بك " . $roleText . " " . $userName . " في نظام إيكوبيشن 🚀 نتمنى لك يوماً مليئاً بالإنجازات!";
-    ?>
-
-    <!-- رسالة ترحيب متحركة -->
-    <div class="welcome-container">
-      <div class="welcome-message" id="welcome"></div>
-    </div>
-    <?php if ($_SESSION['user']['role'] == "1") { ?>
-      <!-- أزرار الوصول السريع لمدير المشاريع -->
-      <h2 class="section-title">
-        <i class="fas fa-bolt"></i> الوصول السريع
-      </h2>
-      <div class="quick-access">
-        <a href="../Clients/clients.php" class="quick-btn">
-          <i class="fas fa-users"></i>
-          <span>العملاء</span>
-        </a>
-        <a href="../Projects/oprationprojects.php" class="quick-btn">
-          <i class="fas fa-list-alt"></i>
-          <span>مشاريع الشركة</span>
-        </a>
-        <a href="../Projects/oprationprojects.php" class="quick-btn">
-          <i class="fas fa-project-diagram"></i>
-          <span>المشاريع التشغيلية</span>
-        </a>
-        <a href="../Reports/reports.php" class="quick-btn">
-          <i class="fas fa-chart-line"></i>
-          <span>التقارير</span>
-        </a>
-        <a href="../users.php" class="quick-btn">
-          <i class="fas fa-user-shield"></i>
-          <span>المستخدمين</span>
-        </a>
-        <a href="../settings.php" class="quick-btn">
-          <i class="fas fa-cog"></i>
-          <span>الإعدادات</span>
-        </a>
+  <!-- ▌TOP BAR ▌-->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon"><i class="fas fa-layer-group"></i></div>
+      <div class="brand-info">
+        <div class="sys">إيكوبيشن EPS</div>
+        <div class="greet">مرحباً، <?= htmlspecialchars($userName) ?> 👋</div>
       </div>
-    <?php } ?>
-
-    <!-- الإحصائيات -->
-    <h2 class="section-title">
-      <i class="fas fa-chart-bar"></i> الإحصائيات
-    </h2>
-    <div class="cards">
-      <?php
-      // ******************************** احصائيات المدير ******************************************************
-      if ($_SESSION['user']['role'] == "1") {
-
-        // كارد العملاء
-        $clients = $conn->query("SELECT COUNT(*) AS total FROM clients WHERE status = 'نشط'")->fetch_assoc()['total'];
-        echo "<a href='../Clients/clients.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-users'></i>
-                  <h3>$clients</h3>
-                  <p> عملاء الشركة </p>
-                </div>
-              </a>";
-
-        // كارد المشاريع التشغيلية
-        $projects = $conn->query("SELECT COUNT(*) AS total FROM project")->fetch_assoc()['total'];
-        echo "<a href='../Projects/oprationprojects.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-project-diagram'></i>
-                  <h3>$projects</h3>
-                  <p>المشاريع التشغيلية</p>
-                </div>
-              </a>";
-
-        // كارد المشاريع الأساسية
-        $company_projects = $conn->query("SELECT COUNT(*) AS total FROM project WHERE status = '1'")->fetch_assoc()['total'];
-        echo "<a href='../Projects/oprationprojects.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-list-alt'></i>
-                  <h3>$company_projects</h3>
-                  <p>المشاريع النشطة</p>
-                </div>
-              </a>";
-
-
-        // كارد المستخدمين
-        $users = $conn->query("SELECT COUNT(*) AS total FROM users")->fetch_assoc()['total'];
-        echo "<a href='../users.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-user-shield'></i>
-                  <h3>$users</h3>
-                  <p>المستخدمين</p>
-                </div>
-              </a>";
-
-      }
-      ?>
-
-      <?php
-      // ******************************** احصائيات مدير الموردين ******************************************************
-      if ($_SESSION['user']['role'] == "2") {
-        $suppliers = $conn->query("SELECT COUNT(*) AS total FROM suppliers")->fetch_assoc()['total'];
-        echo "<a href='../Suppliers/suppliers.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-truck'></i>
-                  <h3>$suppliers</h3>
-                  <p>الموردين</p>
-                </div>
-              </a>";
-
-        $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<a href='../Equipments/equipments.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-tools'></i>
-                  <h3>$equipments</h3>
-                  <p>المعدات</p>
-                </div>
-              </a>";
-      }
-      ?>
-
-      <?php
-      // ******************************** احصائيات مدير المشغلين ******************************************************
-      if ($_SESSION['user']['role'] == "3") {
-        $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<a href='../Equipments/equipments.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-tractor'></i>
-                  <h3>$equipments</h3>
-                  <p>المعدات</p>
-                </div>
-              </a>";
-
-        $drivers = $conn->query("SELECT COUNT(*) AS total FROM drivers")->fetch_assoc()['total'];
-        echo "<a href='../Drivers/drivers.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-id-badge'></i>
-                  <h3>$drivers</h3>
-                  <p>السائقين</p>
-                </div>
-              </a>";
-      }
-      ?>
-
-      <?php
-      // ******************************** احصائيات مدير الاسطول ******************************************************
-      if ($_SESSION['user']['role'] == "4") {
-      
-
-        $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        echo "<a href='../Equipments/equipments.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-tools'></i>
-                  <h3>$equipments</h3>
-                  <p>المعدات</p>
-                </div>
-              </a>";
-
-        $activeOps = $conn->query("SELECT COUNT(*) AS total FROM `operations` WHERE `status` LIKE '1'")->fetch_assoc()['total'];
-        echo "<div class='card'>
-                <i class='fas fa-play-circle'></i>
-                <h3>$activeOps</h3>
-                <p>معدات تعمل الآن</p>
-              </div>";
-      }
-      ?>
-
-      <?php
-      // ******************************** احصائيات مدير الموقع ******************************************************
-      if ($_SESSION['user']['role'] == "5") {
-        // $equipments = $conn->query("SELECT COUNT(*) AS total FROM equipments")->fetch_assoc()['total'];
-        // echo "<a href='../Equipments/equipments.php' style='text-decoration: none;'>
-        //         <div class='card'>
-        //           <i class='fas fa-tools'></i>
-        //           <h3>$equipments</h3>
-        //           <p>المعدات</p>
-        //         </div>
-        //       </a>";
-
-        $hours = $conn->query("SELECT SUM(total_work_hours) AS total FROM timesheet")->fetch_assoc()['total'];
-        $hours = $hours ? number_format($hours, 0) : '0';
-        echo "<a href='../Timesheet/timesheet.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-clock'></i>
-                  <h3>$hours</h3>
-                  <p>إجمالي ساعات العمل</p>
-                </div>
-              </a>";
-      }
-      ?>
-
-      <?php
-      // ******************************** احصائيات مشرفين ******************************************************
-      if ($_SESSION['user']['role'] == "6" || $_SESSION['user']['role'] == "7" || $_SESSION['user']['role'] == "8" || $_SESSION['user']['role'] == "9") {
-        $hours = $conn->query("SELECT SUM(total_work_hours) AS total FROM timesheet")->fetch_assoc()['total'];
-        $hours = $hours ? number_format($hours, 0) : '0';
-        echo "<a href='../Timesheet/timesheet.php' style='text-decoration: none;'>
-                <div class='card'>
-                  <i class='fas fa-clock'></i>
-                  <h3>$hours</h3>
-                  <p>إجمالي ساعات العمل</p>
-                </div>
-              </a>";
-      }
-      ?>
+    </div>
+    <div class="topbar-r">
+      <div class="clock"><i class="fas fa-clock"></i><span id="clk">--:--</span></div>
+      <a href="../logout.php" class="btn-out"><i class="fas fa-sign-out-alt"></i><span>خروج</span></a>
     </div>
   </div>
 
-  <script>
-    // كتابة الرسالة كلمة كلمة
-    const text = "<?php echo $welcomeText; ?>".trim().split(" ");
-    const container = document.getElementById("welcome");
+  <!-- ▌HERO ROW ▌-->
+  <div class="hero-row">
 
-    text.forEach((word, index) => {
-      const span = document.createElement("span");
-      span.textContent = word + " ";
-      span.style.animationDelay = (index * 0.25) + "s";
-      container.appendChild(span);
-    });
+    <!-- Banner -->
+    <div class="banner" id="bannerEl">
+      <div class="banner-body">
+        <div class="banner-role"><i class="fas fa-circle"></i><?= htmlspecialchars($roleText) ?></div>
+        <div class="banner-name"><span id="typed"></span><span class="cursor"></span></div>
+        <div class="banner-sub">نتمنى لك يوماً مليئاً بالإنجازات 🚀</div>
+      </div>
+      <div class="banner-emoji">🏆</div>
+    </div>
 
-    // توليد نجوم عشوائية
-    function createStar() {
-      const star = document.createElement("i");
-      star.classList.add("fa-solid", "fa-star", "star");
-      star.style.left = Math.random() * 100 + "%";
-      star.style.top = Math.random() * 30 + "px";
-      star.style.animationDuration = (2 + Math.random() * 2) + "s";
-      document.querySelector(".welcome-container").appendChild(star);
+    <!-- Desktop quick links panel -->
+    <div class="ql-panel">
+      <div class="ql-title"><i class="fas fa-bolt"></i>الوصول السريع</div>
+      <div class="ql-grid">
+        <?php foreach ($links as $i=>[$href,$ico,$lbl]): ?>
+        <a href="<?=$href?>" class="ql-btn" style="animation:popCard .4s <?=$i*.06?>s cubic-bezier(.4,0,.2,1) both">
+          <i class="fas <?=$ico?>"></i><span><?=$lbl?></span>
+        </a>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </div>
 
-      setTimeout(() => star.remove(), 3000);
-    }
+  <!-- Mobile quick links (below banner, horizontal pills) -->
+  <div class="mobile-links">
+    <?php foreach ($links as [$href,$ico,$lbl]): ?>
+    <a href="<?=$href?>" class="ml-btn"><i class="fas <?=$ico?>"></i><?=$lbl?></a>
+    <?php endforeach; ?>
+  </div>
 
-    setInterval(createStar, 600);
-  </script>
+  <!-- ▌STATS ▌-->
+  <div class="stats-wrap">
+    <div class="stats-label"><i class="fas fa-chart-bar"></i>الإحصائيات الحالية</div>
+    <div class="cards-grid">
+      <?php foreach ($stats as [$ico,$val,$lbl,$accent]):
+        $num = (int) str_replace(',','',$val);
+        $display = number_format($num);
+      ?>
+      <div class="scard <?=$accent?>">
+        <div class="scard-band"></div>
+        <div class="scard-inner">
+          <div class="scard-icon"><i class="fas <?=$ico?>"></i></div>
+          <div>
+            <div class="scard-value" data-to="<?=$num?>"><?=$display?></div>
+            <div class="scard-label"><?=$lbl?></div>
+          </div>
+        </div>
+        <div class="scard-ghost"><?=$display?></div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+
+</div><!-- .main -->
+
+<script>
+/* Clock */
+const clkEl=document.getElementById('clk');
+(function tick(){const n=new Date();clkEl.textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');setTimeout(tick,15000);})();
+
+/* Typewriter */
+const typedEl=document.getElementById('typed');
+const name=<?=json_encode($userName)?>;
+let ci=0;
+(function t(){typedEl.textContent=name.slice(0,ci++);if(ci<=name.length)setTimeout(t,65);})();
+
+/* Count-up */
+document.querySelectorAll('.scard-value[data-to]').forEach(el=>{
+  const target=parseInt(el.dataset.to);if(!target)return;
+  const steps=30,dur=900;let i=0;
+  const iv=setInterval(()=>{
+    i++;const v=Math.round(target*Math.min(i/steps,1));
+    el.textContent=v.toLocaleString('ar-EG');
+    if(i>=steps){el.textContent=target.toLocaleString('ar-EG');clearInterval(iv);}
+  },dur/steps);
+});
+
+/* Stars */
+const bEl=document.getElementById('bannerEl');
+function star(){
+  const s=document.createElement('i');
+  s.className='fas fa-star sfx';
+  s.style.cssText=`left:${4+Math.random()*92}%;top:${4+Math.random()*58}%;font-size:${6+Math.random()*8}px;animation-duration:${2+Math.random()*2}s`;
+  bEl.appendChild(s);setTimeout(()=>s.remove(),3500);
+}
+setInterval(star,900);
+</script>
 </body>
-
 </html>

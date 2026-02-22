@@ -68,15 +68,27 @@ if ($selected_project_id > 0) {
 
 $projects_result = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name");
 
-$page_title = "إيكوبيشن | الآليات ";
+$page_title = "إدارة المعدات";
 include("../inheader.php");
-include("../insidebar.php");
+// include("../insidebar.php");
 
 // معالجة رسالة النجاح
 $success_msg = '';
 if (isset($_GET['msg'])) {
     $success_msg = htmlspecialchars($_GET['msg']);
 }
+?>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="../assets/css/admin-style.css">
+<link rel="stylesheet" href="../assets/css/main_admin_style.css">
+<!-- Font Awesome من CDN لضمان ظهور الأيقونات بشكل صحيح -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+
+<?php
 
 // معالجة الحفظ أو التعديل
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
@@ -258,966 +270,6 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 }
 ?>
 
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
-
-    :root {
-        --primary-color: #01072a;
-        --secondary-color: #e2ae03;
-        --dark-color: #2d2b22;
-        --light-color: #f5f5f5;
-        --border-color: #e0e0e0;
-        --text-color: #010326;
-        --gold-color: #debf0f;
-        --shadow-color: rgba(0, 0, 0, 0.1);
-        --accent-color: #1a1a2e;
-    }
-    
-    * {
-        font-family: 'Cairo', sans-serif;
-    }
-    
-    body {
-        background: var(--light-color);
-    }
-
-    /* Project Header */
-    .project-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
-        padding: 2rem;
-        border-radius: 20px;
-        margin-bottom: 2rem;
-        box-shadow: 0 10px 40px var(--shadow-color);
-        animation: slideDown 0.5s ease;
-    }
-    
-    .project-header-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-    }
-    
-    .project-title {
-        color: white;
-        font-size: 2rem;
-        font-weight: 900;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-    
-    .project-title i {
-        color: var(--secondary-color);
-        font-size: 2.2rem;
-    }
-    
-    .project-code-display {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 1rem;
-        margin: 0.5rem 0 0 0;
-        font-family: monospace;
-        font-weight: 600;
-    }
-    
-    .project-code-display i {
-        color: var(--secondary-color);
-    }
-    
-    .btn-back-to-projects {
-        background: var(--secondary-color);
-        color: var(--primary-color);
-        padding: 12px 30px;
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 1rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(226, 174, 3, 0.4);
-    }
-    
-    .btn-back-to-projects:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(226, 174, 3, 0.6);
-        background: var(--gold-color);
-    }
-
-    @media (max-width: 768px) {
-        .project-header-content {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .project-title {
-            font-size: 1.5rem;
-        }
-        
-        .btn-back-to-projects {
-            width: 100%;
-            justify-content: center;
-        }
-    }
-    
-    /* Page Title */
-    .main h2 {
-        color: var(--primary-color);
-        font-size: 20px;
-        font-weight: 900;
-        margin-bottom: 2rem;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .main h2 i {
-        color: var(--secondary-color);
-        font-size: 24px;
-    }
-    
-    /* Action Buttons Container */
-    .aligin {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px var(--shadow-color);
-        animation: slideDown 0.4s ease;
-    }
-
-    @keyframes slideDown {
-        from {
-            transform: translateY(-20px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-    
-    /* Modern Action Buttons */
-    .aligin .add {
-        padding: 12px 30px;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: white;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px var(--shadow-color);
-        position: relative;
-        overflow: hidden;
-        background: var(--gold-color);
-        color: var(--primary-color);
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .aligin .add::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.3);
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
-    }
-    
-    .aligin .add:hover::before {
-        width: 300px;
-        height: 300px;
-    }
-    
-    .aligin .add:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
-    }
-    
-    /* Success Message */
-    .success-message {
-        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-        color: #155724;
-        padding: 15px 20px;
-        border-radius: 15px;
-        margin-bottom: 25px;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        box-shadow: 0 4px 15px var(--shadow-color);
-        font-weight: 600;
-        border-right: 4px solid #28a745;
-        animation: slideDown 0.4s ease;
-    }
-    
-    /* Error/Warning Message */
-    .error-message, .warning-message {
-        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-        color: #721c24;
-        padding: 15px 20px;
-        border-radius: 15px;
-        margin-bottom: 25px;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        box-shadow: 0 4px 15px var(--shadow-color);
-        font-weight: 600;
-        border-right: 4px solid #dc3545;
-        animation: slideDown 0.4s ease;
-    }
-    
-    .warning-message {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-        color: #856404;
-        border-right-color: #ffc107;
-    }
-    
-    /* Form Styling */
-    #projectForm {
-        animation: fadeInUp 0.6s ease;
-    }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .card {
-        border: none;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px var(--shadow-color);
-        overflow: hidden;
-        margin-bottom: 30px;
-        background: white;
-    }
-    
-    .card-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
-        padding: 1.5rem;
-        border: none;
-    }
-    
-    .card-header h5 {
-        color: white;
-        font-weight: 600;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .card-header h5 i {
-        color: var(--secondary-color);
-        font-size: 18px;
-    }
-    
-    .card-body {
-        padding: 2rem;
-    }
-    
-    /* Form Fields */
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-grid > div {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-    
-    .form-grid label {
-        font-weight: 600;
-        color: var(--text-color);
-        font-size: 0.95rem;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    
-    .form-grid label i {
-        color: var(--secondary-color);
-    }
-    
-    .form-grid input,
-    .form-grid select {
-        width: 100%;
-        padding: 12px;
-        border: 2px solid var(--border-color);
-        border-radius: 10px;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-        font-weight: 500;
-        background: white;
-        color: var(--text-color);
-    }
-    
-    .form-grid input:focus,
-    .form-grid select:focus {
-        border-color: var(--secondary-color);
-        box-shadow: 0 0 0 0.2rem rgba(226, 174, 3, 0.15);
-        outline: none;
-    }
-    
-    .form-grid button {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
-        border: none;
-        padding: 14px 30px;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        justify-content: center;
-    }
-    
-    .form-grid button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
-    }
-    
-    .form-grid button i {
-        font-size: 1.1rem;
-    }
-    
-    /* DataTable Styling */
-    .dataTables_wrapper {
-        font-family: 'Cairo', sans-serif;
-    }
-
-    table.dataTable {
-        width: 100% !important;
-        border-collapse: separate;
-        border-spacing: 0 10px;
-    }
-
-    table.dataTable thead th {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
-        color: white;
-        font-weight: 600;
-        padding: 15px;
-        text-align: center;
-        border: none;
-        font-size: 15px;
-    }
-
-    table.dataTable thead th:first-child {
-        border-radius: 10px 0 0 10px;
-    }
-
-    table.dataTable thead th:last-child {
-        border-radius: 0 10px 10px 0;
-    }
-
-    table.dataTable thead th i {
-        color: var(--secondary-color);
-        margin-left: 8px;
-    }
-    
-    table.dataTable tbody tr {
-        background: rgba(255, 255, 255, 0.8);
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-    
-    table.dataTable tbody tr:hover {
-        background: rgba(226, 174, 3, 0.08);
-        transform: scale(1.01);
-        box-shadow: 0 4px 15px var(--shadow-color);
-    }
-    
-    table.dataTable tbody td {
-        padding: 15px;
-        vertical-align: middle;
-        text-align: center;
-        border: none;
-        font-size: 14px;
-        font-weight: 500;
-    }
-    
-    /* Status Badges */
-    .badge-available {
-        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-        color: #155724;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        border: 2px solid #28a745;
-    }
-    
-    .badge-busy {
-        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-        color: #721c24;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        border: 2px solid #dc3545;
-    }
-    
-    .badge-working {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-        color: #856404;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        border: 2px solid #ffc107;
-    }
-    
-    .badge-type {
-        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
-        color: #0c5460;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        border: 2px solid #17a2b8;
-    }
-    
-    /* Action Buttons */
-    .action-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 35px;
-        height: 35px;
-        border-radius: 8px;
-        margin: 0 4px;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        color: white;
-        font-size: 14px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    }
-    
-    .action-btn:hover {
-        transform: translateY(-2px) scale(1.1);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    }
-    
-    .btn-edit {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    }
-    
-    .btn-delete {
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    }
-    
-    .btn-driver {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    }
-    
-    .btn-view {
-        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-    }
-    
-    .extra-info {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-right: 8px;
-        color: #6c757d;
-        font-size: 0.85rem;
-    }
-    
-    .extra-info i {
-        color: var(--secondary-color);
-    }
-    
-    .project-link {
-        color: #007bff;
-        font-weight: 600;
-        text-decoration: none;
-        padding: 4px 10px;
-        background: rgba(0, 123, 255, 0.1);
-        border-radius: 6px;
-        transition: all 0.3s ease;
-    }
-    
-    .project-link:hover {
-        background: rgba(0, 123, 255, 0.2);
-        transform: scale(1.05);
-    }
-
-    .project-picker {
-        background: #fff;
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 6px 20px var(--shadow-color);
-        margin-bottom: 1.5rem;
-    }
-
-    .project-picker label {
-        font-weight: 700;
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-        display: block;
-    }
-
-    .project-picker select {
-        width: 100%;
-        padding: 10px 12px;
-        border-radius: 10px;
-        border: 1px solid var(--border-color);
-    }
-    
-    /* Contract Stats Section */
-    .contract-stats {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 1.5rem;
-        border-radius: 15px;
-        margin-top: 1.5rem;
-        border: 2px solid var(--secondary-color);
-        display: none;
-        animation: fadeInUp 0.5s ease;
-    }
-    
-    .stats-title {
-        color: var(--primary-color);
-        font-weight: 700;
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.8rem;
-        border-bottom: 3px solid var(--secondary-color);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .stats-title i {
-        color: var(--secondary-color);
-    }
-    
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .stat-card {
-        background: white;
-        padding: 1.2rem;
-        border-radius: 12px;
-        text-align: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        border: 2px solid transparent;
-        transition: all 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        border-color: var(--secondary-color);
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-    
-    .stat-card-value {
-        font-size: 2rem;
-        font-weight: 900;
-        color: var(--primary-color);
-        margin: 0.5rem 0;
-    }
-    
-    .stat-card-label {
-        font-size: 0.9rem;
-        color: #6c757d;
-        font-weight: 600;
-    }
-    
-    .stat-card-icon {
-        font-size: 2.5rem;
-        color: var(--secondary-color);
-        margin-bottom: 0.5rem;
-    }
-    
-    .suppliers-table {
-        width: 100%;
-        margin-top: 1rem;
-        border-collapse: separate;
-        border-spacing: 0 8px;
-    }
-    
-    .suppliers-table thead th {
-        background: var(--primary-color);
-        color: white;
-        padding: 12px;
-        text-align: center;
-        font-weight: 600;
-        border: none;
-    }
-    
-    .suppliers-table thead th:first-child {
-        border-radius: 8px 0 0 8px;
-    }
-    
-    .suppliers-table thead th:last-child {
-        border-radius: 0 8px 8px 0;
-    }
-    
-    .suppliers-table tbody tr {
-        background: white;
-        transition: all 0.3s ease;
-    }
-    
-    .suppliers-table tbody tr:hover {
-        background: rgba(226, 174, 3, 0.1);
-        transform: scale(1.02);
-    }
-    
-    .suppliers-table tbody td {
-        padding: 12px;
-        text-align: center;
-        border: none;
-        font-weight: 500;
-    }
-    
-    .supplier-select-highlight {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffe5a3 100%) !important;
-        border-right: 4px solid #e2ae03 !important;
-        font-weight: bold !important;
-        animation: pulseHighlight 1s ease-in-out;
-    }
-    
-    @keyframes pulseHighlight {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.02); }
-    }
-    
-    /* Loading State for Dropdowns */
-    select.loading {
-        background: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="%23e2ae03" stroke-width="4"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"/><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"/></circle></svg>') no-repeat left 10px center;
-        background-size: 20px;
-    }
-    
-    /* Cascading Dropdown Hints */
-    .dropdown-hint {
-        font-size: 0.85rem;
-        color: #6c757d;
-        margin-top: 4px;
-        font-style: italic;
-    }
-    
-    .required-indicator {
-        color: #dc3545;
-        font-weight: bold;
-        margin-right: 3px;
-    }
-    
-    .loading-spinner {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        border: 3px solid rgba(226, 174, 3, 0.3);
-        border-radius: 50%;
-        border-top-color: var(--secondary-color);
-        animation: spin 1s linear infinite;
-        margin-right: 8px;
-    }
-    
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-    
-    /* DataTables Buttons */
-    .dt-buttons {
-        margin-bottom: 1rem;
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-    
-    .dt-button {
-        background: linear-gradient(135deg, var(--secondary-color) 0%, var(--gold-color) 100%) !important;
-        color: var(--primary-color) !important;
-        border: 2px solid var(--primary-color) !important;
-        padding: 10px 20px !important;
-        border-radius: 10px !important;
-        font-family: 'Cairo', sans-serif !important;
-        font-weight: 700 !important;
-        font-size: 0.95rem !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-        text-shadow: none !important;
-    }
-    
-    .dt-button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(226, 174, 3, 0.4) !important;
-        background: linear-gradient(135deg, var(--gold-color) 0%, var(--secondary-color) 100%) !important;
-    }
-    
-    .dt-button span {
-        color: var(--primary-color) !important;
-        font-weight: 700 !important;
-    }
-    
-    /* Column Groups Toggle Buttons */
-    .column-groups-toggle {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    
-    .toggle-group-btn,
-    .toggle-all-btn {
-        padding: 10px 18px;
-        border: 2px solid var(--primary-color);
-        background: white;
-        color: var(--primary-color);
-        border-radius: 10px;
-        font-family: 'Cairo', sans-serif;
-        font-weight: 700;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .toggle-group-btn:hover,
-    .toggle-all-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(1, 7, 42, 0.2);
-    }
-    
-    .toggle-group-btn.active {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
-        color: white;
-        border-color: var(--secondary-color);
-    }
-    
-    .toggle-all-btn {
-        background: linear-gradient(135deg, var(--secondary-color) 0%, var(--gold-color) 100%);
-        border-color: var(--secondary-color);
-        color: var(--primary-color);
-        margin-right: auto;
-    }
-    
-    .toggle-all-btn:hover {
-        box-shadow: 0 4px 12px rgba(226, 174, 3, 0.4);
-    }
-    
-    .toggle-group-btn i,
-    .toggle-all-btn i {
-        font-size: 1rem;
-    }
-    
-    /* Equipment Details Modal */
-    .equipment-modal {
-        display: none;
-        position: fixed;
-        z-index: 10000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.6);
-        animation: fadeIn 0.3s;
-    }
-    
-    .equipment-modal-content {
-        background: white;
-        margin: 3% auto;
-        padding: 0;
-        border-radius: 20px;
-        width: 90%;
-        max-width: 1000px;
-        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
-        animation: slideDown 0.3s;
-    }
-    
-    .equipment-modal-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
-        color: white;
-        padding: 20px 30px;
-        border-radius: 20px 20px 0 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .equipment-modal-header h3 {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-    
-    .equipment-modal-close {
-        color: white;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
-    }
-    
-    .equipment-modal-close:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: rotate(90deg);
-    }
-    
-    .equipment-modal-body {
-        padding: 30px;
-        max-height: 70vh;
-        overflow-y: auto;
-    }
-    
-    .equipment-details-section {
-        margin-bottom: 25px;
-        padding: 20px;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border-radius: 15px;
-        border-right: 5px solid var(--secondary-color);
-    }
-    
-    .equipment-details-section h4 {
-        color: var(--primary-color);
-        font-weight: 700;
-        margin-bottom: 15px;
-        font-size: 1.2rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .equipment-details-section h4 i {
-        color: var(--secondary-color);
-    }
-    
-    .equipment-details-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 15px;
-    }
-    
-    .equipment-detail-item {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .equipment-detail-label {
-        font-weight: 700;
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-    
-    .equipment-detail-value {
-        color: var(--primary-color);
-        font-size: 1rem;
-        font-weight: 500;
-        padding: 8px 12px;
-        background: white;
-        border-radius: 8px;
-        border: 1px solid var(--border-color);
-    }
-    
-    .equipment-detail-value.empty {
-        color: #999;
-        font-style: italic;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-    
-    @keyframes slideDown {
-        from { 
-            opacity: 0;
-            transform: translateY(-50px);
-        }
-        to { 
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        table.dataTable thead th {
-            font-size: 12px;
-            padding: 10px 5px;
-        }
-        
-        table.dataTable tbody td {
-            font-size: 12px;
-            padding: 10px 5px;
-        }
-        
-        .action-btn {
-            width: 30px;
-            height: 30px;
-            font-size: 12px;
-        }
-        
-        .column-groups-toggle {
-            justify-content: center;
-        }
-        
-        .toggle-group-btn,
-        .toggle-all-btn {
-            padding: 8px 12px;
-            font-size: 0.8rem;
-        }
-    }
-</style>
-
 <div class="main">
     <?php if (!$is_role10) { ?>
     <div class="project-picker">
@@ -1244,53 +296,60 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
     <?php } ?>
 
     <?php if ($show_all_projects) { ?>
-        <div class="project-header">
-            <div class="project-header-content">
-                <div>
-                    <h1 class="project-title">
-                        <i class="fas fa-layer-group"></i>
-                        عرض جميع المشاريع
-                    </h1>
-                </div>
+        <div class="page-header">
+            <h1 class="page-title">
+                <div class="title-icon"><i class="fas fa-layer-group"></i></div>
+                عرض جميع المشاريع
+            </h1>
+            <div class="page-header-actions">
+                <a href="../main/dashboard.php" class="back-btn">
+                    <i class="fas fa-arrow-right"></i> رجوع
+                </a>
             </div>
         </div>
     <?php } elseif (!empty($selected_project)) { ?>
         <!-- عنوان المشروع المحدد -->
-        <div class="project-header">
-            <div class="project-header-content">
+        <div class="page-header">
+            <h1 class="page-title">
+                <div class="title-icon"><i class="fas fa-hard-hat"></i></div>
                 <div>
-                    <h1 class="project-title">
-                        <i class="fas fa-hard-hat"></i>
-                        <?php echo htmlspecialchars($selected_project['name']); ?>
-                    </h1>
+                    <div><?php echo htmlspecialchars($selected_project['name']); ?></div>
                     <?php if (!empty($selected_project['project_code'])) { ?>
-                        <p class="project-code-display">
+                        <small class="page-subtitle">
                             <i class="fas fa-barcode"></i>
                             كود المشروع: <?php echo htmlspecialchars($selected_project['project_code']); ?>
-                        </p>
+                        </small>
                     <?php } ?>
                 </div>
+            </h1>
+            <div class="page-header-actions">
+                <a href="../main/dashboard.php" class="back-btn">
+                    <i class="fas fa-arrow-right"></i> رجوع
+                </a>
+                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+                    <i class="fas fa-plus-circle"></i> إضافة معدة جديدة
+                </a>
             </div>
         </div>
     <?php } else { ?>
-        <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+        <div class="card notice-card">
             <strong>يرجى اختيار مشروع لعرض البيانات.</strong>
         </div>
     <?php } ?>
-    
-    <h2>
-        <i class="fas fa-cogs"></i>
-        إدارة الآليات والمعدات
-    </h2>
 
-    <?php if (!empty($success_msg)): ?>
-        <div class="<?php echo (strpos($success_msg, '⚠️') !== false || strpos($success_msg, 'تحذير') !== false) ? 'warning-message' : (strpos($success_msg, 'خطأ') !== false ? 'error-message' : 'success-message'); ?>">
-            <i class="fas fa-<?php echo (strpos($success_msg, '⚠️') !== false || strpos($success_msg, 'تحذير') !== false) ? 'exclamation-triangle' : (strpos($success_msg, 'خطأ') !== false ? 'times-circle' : 'check-circle'); ?>"></i>
+
+    <?php if (!empty($success_msg)): 
+        $isSuccess = strpos($success_msg, '✅') !== false;
+    ?>
+        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
+            <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
             <?php echo $success_msg; ?>
         </div>
     <?php endif; ?>
 
     <?php if (empty($selected_project) && !$show_all_projects) { ?>
+        <div class="card notice-card">
+            <strong>يرجى اختيار مشروع لعرض البيانات.</strong>
         </div>
         <script>
             document.getElementById('selected_project_id').addEventListener('change', function () {
@@ -1299,9 +358,6 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 }
             });
         </script>
-        </body>
-        </html>
-        <?php exit; ?>
     <?php } ?>
 
     <!-- قسم الإحصائيات -->
@@ -1312,11 +368,11 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
         </h5>
         
         <!-- جدول الموردين -->
-        <div id="suppliersSection" style="display: none;">
-            <h6 style="color: var(--primary-color); font-weight: 700; margin-bottom: 1rem;">
+        <div id="suppliersSection" class="suppliers-section">
+            <h6 class="suppliers-title">
                 <i class="fas fa-users"></i> عقود الموردين في هذا المشروع
             </h6>
-            <div style="overflow-x: auto;">
+            <div class="table-scroll">
                 <table class="suppliers-table">
                     <thead>
                         <tr>
@@ -1324,25 +380,25 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <th>المورد</th>
                             <th>الساعات المتعاقد عليها</th>
                             <th>عدد المعدات</th>
-                            <th><span style="color: #007bff; font-weight: 600;">■</span> أساسية</th>
-                            <th><span style="color: #ffc107; font-weight: 600;">■</span> احتياطية</th>
+                            <th><span class="legend-dot legend-basic">■</span> أساسية</th>
+                            <th><span class="legend-dot legend-backup">■</span> احتياطية</th>
                             <th>توزيع المعدات والساعات</th>
                         </tr>
                     </thead>
                     <tbody id="suppliersTableBody">
                         <tr>
-                            <td colspan="5" style="text-align: center; color: #6c757d; padding: 2rem;">
+                            <td colspan="7" class="suppliers-empty">
                                 <i class="fas fa-info-circle"></i> لا توجد بيانات
                             </td>
                         </tr>
                     </tbody>
                     <tfoot>
-                        <tr style="background: linear-gradient(135deg, #e2ae03 0%, #debf0f 100%); font-weight: bold; color: #01072a;">
-                            <td colspan="2" style="text-align: right; padding: 12px;">الإجمالي</td>
-                            <td id="total_supplier_hours" style="text-align: center;">0</td>
-                            <td id="total_supplier_equipment" style="text-align: center;">0</td>
-                            <td id="total_supplier_basic" style="text-align: center;">0</td>
-                            <td id="total_supplier_backup" style="text-align: center;">0</td>
+                        <tr class="suppliers-total-row">
+                            <td colspan="2" class="suppliers-total-label">الإجمالي</td>
+                            <td id="total_supplier_hours" class="suppliers-total-value">0</td>
+                            <td id="total_supplier_equipment" class="suppliers-total-value">0</td>
+                            <td id="total_supplier_basic" class="suppliers-total-value">0</td>
+                            <td id="total_supplier_backup" class="suppliers-total-value">0</td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -1350,7 +406,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
             </div>
         </div>
         
-        <div class="stats-grid" style="margin-top: 2rem;">
+        <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-card-icon"><i class="fas fa-clock"></i></div>
                 <div class="stat-card-value" id="stat_total_hours">0</div>
@@ -1365,13 +421,6 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
         </div>
     </div>
 
-    <?php if($_SESSION['user']['role'] == "4"){?>
-    <div class="aligin">
-        <a href="javascript:void(0)" id="toggleForm" class="add">
-            <i class="fa fa-plus"></i> <?php echo !empty($editData) ? "تعديل معدة" : "إضافة معدة جديدة"; ?>
-        </a>
-    </div>
-    <?php } ?>
     <?php if ($_SESSION['user']['role'] != "10") { ?>
     <!-- فورم إضافة / تعديل معدة -->
     <form id="projectForm" action="" method="post" style="display:<?php echo !empty($editData) ? 'block' : 'none'; ?>;">
@@ -1480,8 +529,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <!-- ================================= -->
                     <!-- قسم: المعلومات الأساسية والتعريفية -->
                     <!-- ================================= -->
-                    <div style="grid-column: 1 / -1; background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%); color: white; padding: 10px 15px; border-radius: 8px; margin-top: 15px;">
-                        <h6 style="margin: 0; font-weight: 700;"><i class="fas fa-id-card"></i> المعلومات الأساسية والتعريفية</h6>
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-id-card"></i> المعلومات الأساسية والتعريفية</h6>
                     </div>
                     
                     <div>
@@ -1505,8 +554,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <!-- ================================= -->
                     <!-- قسم: بيانات الصنع والموديل -->
                     <!-- ================================= -->
-                    <div style="grid-column: 1 / -1; background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%); color: white; padding: 10px 15px; border-radius: 8px; margin-top: 15px;">
-                        <h6 style="margin: 0; font-weight: 700;"><i class="fas fa-industry"></i> بيانات الصنع والموديل</h6>
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-industry"></i> بيانات الصنع والموديل</h6>
                     </div>
                     
                     <div>
@@ -1548,8 +597,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <!-- ================================= -->
                     <!-- قسم: الحالة الفنية والمواصفات -->
                     <!-- ================================= -->
-                    <div style="grid-column: 1 / -1; background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%); color: white; padding: 10px 15px; border-radius: 8px; margin-top: 15px;">
-                        <h6 style="margin: 0; font-weight: 700;"><i class="fas fa-wrench"></i> الحالة الفنية والمواصفات</h6>
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-wrench"></i> الحالة الفنية والمواصفات</h6>
                     </div>
                     
                     <div>
@@ -1609,8 +658,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <!-- ================================= -->
                     <!-- قسم: بيانات الملكية -->
                     <!-- ================================= -->
-                    <div style="grid-column: 1 / -1; background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%); color: white; padding: 10px 15px; border-radius: 8px; margin-top: 15px;">
-                        <h6 style="margin: 0; font-weight: 700;"><i class="fas fa-user-tie"></i> بيانات الملكية</h6>
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-user-tie"></i> بيانات الملكية</h6>
                     </div>
                     
                     <div>
@@ -1662,8 +711,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <!-- ================================= -->
                     <!-- قسم: الوثائق والتسجيلات -->
                     <!-- ================================= -->
-                    <div style="grid-column: 1 / -1; background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%); color: white; padding: 10px 15px; border-radius: 8px; margin-top: 15px;">
-                        <h6 style="margin: 0; font-weight: 700;"><i class="fas fa-file-contract"></i> الوثائق والتسجيلات</h6>
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-file-contract"></i> الوثائق والتسجيلات</h6>
                     </div>
                     
                     <div>
@@ -1714,8 +763,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <!-- ================================= -->
                     <!-- قسم: الموقع والتوفر -->
                     <!-- ================================= -->
-                    <div style="grid-column: 1 / -1; background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%); color: white; padding: 10px 15px; border-radius: 8px; margin-top: 15px;">
-                        <h6 style="margin: 0; font-weight: 700;"><i class="fas fa-map-marker-alt"></i> الموقع والتوفر</h6>
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-map-marker-alt"></i> الموقع والتوفر</h6>
                     </div>
                     
                     <div>
@@ -1746,8 +795,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <!-- ================================= -->
                     <!-- قسم: البيانات المالية والقيمة -->
                     <!-- ================================= -->
-                    <div style="grid-column: 1 / -1; background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%); color: white; padding: 10px 15px; border-radius: 8px; margin-top: 15px;">
-                        <h6 style="margin: 0; font-weight: 700;"><i class="fas fa-dollar-sign"></i> البيانات المالية والقيمة</h6>
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-dollar-sign"></i> البيانات المالية والقيمة</h6>
                     </div>
                     
                     <div>
@@ -1794,11 +843,11 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <!-- ================================= -->
                     <!-- قسم: ملاحظات وسجل الصيانة -->
                     <!-- ================================= -->
-                    <div style="grid-column: 1 / -1; background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%); color: white; padding: 10px 15px; border-radius: 8px; margin-top: 15px;">
-                        <h6 style="margin: 0; font-weight: 700;"><i class="fas fa-tools"></i> ملاحظات وسجل الصيانة</h6>
+                    <div class="form-section-header">
+                        <h6><i class="fas fa-tools"></i> ملاحظات وسجل الصيانة</h6>
                     </div>
                     
-                    <div style="grid-column: 1 / -1;">
+                    <div class="form-grid-full">
                         <label>
                             <i class="fas fa-comment-alt"></i>
                             ملاحظات عامة
@@ -1827,10 +876,16 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         </select>
                     </div>
                     
-                    <button type="submit" style="grid-column: 1 / -1;">
-                        <i class="fas fa-save"></i>
-                        <?php echo !empty($editData) ? "تحديث المعدة" : "حفظ المعدة"; ?>
-                    </button>
+                    <div class="form-actions">
+                        <button type="submit">
+                            <i class="fas fa-save"></i>
+                            <?php echo !empty($editData) ? "تحديث المعدة" : "حفظ المعدة"; ?>
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="document.getElementById('projectForm').style.display='none'; document.getElementById('projectForm').reset();">
+                            <i class="fas fa-times"></i>
+                            إلغاء
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1847,7 +902,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
         </div>
         <div class="card-body">
             <!-- أزرار إظهار/إخفاء المجموعات -->
-            <div class="column-groups-toggle" style="margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 12px; border: 2px solid var(--border-color);">
+            <div class="column-groups-toggle">
                 <button type="button" class="toggle-group-btn active" data-group="basic" title="المعلومات الأساسية">
                     <i class="fas fa-info-circle"></i> أساسية
                 </button>
@@ -1871,7 +926,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 </button>
             </div>
             
-            <table id="projectsTable" class="display nowrap" style="width:100%;">
+            <table id="projectsTable" class="display nowrap">
                 <thead>
                     <tr>
                         <th data-group="basic"><i class="fas fa-hashtag"></i> #</th>
@@ -1933,12 +988,14 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<tr>";
                         echo "<td><strong>" . $i++ . "</strong></td>";
-                        echo "<td><strong style='color:var(--primary-color)'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
-                        echo "<td><span style='font-family: monospace; font-weight: 600;'>" . htmlspecialchars($row['code']) . "</span></td>";
+                        echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
+                        echo "<td><span class='mono code-badge'>" . htmlspecialchars($row['code']) . "</span></td>";
                         
                         // رقم تسلسلي
-                        $serial = !empty($row['serial_number']) ? htmlspecialchars($row['serial_number']) : "<span style='color: #999;'>غير محدد</span>";
-                        echo "<td><span style='font-family: monospace;'>" . $serial . "</span></td>";
+                        $serial = !empty($row['serial_number'])
+                            ? "<span class='mono'>" . htmlspecialchars($row['serial_number']) . "</span>"
+                            : "<span class='text-muted'>غير محدد</span>";
+                        echo "<td>" . $serial . "</td>";
 
                         // نوع المعدة
                         $type_icon = $row['type'] == "1" ? "fa-tractor" : "fa-truck-moving";
@@ -1965,19 +1022,19 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         echo "<td>" . $name_display . "</td>";
 
                         // الموديل
-                        $model = !empty($row['model']) ? htmlspecialchars($row['model']) : "<span style='color: #999;'>غير محدد</span>";
+                        $model = !empty($row['model']) ? htmlspecialchars($row['model']) : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $model . "</td>";
                         
                         // سنة الصنع
-                        $manufacturing_year = !empty($row['manufacturing_year']) ? $row['manufacturing_year'] : "<span style='color: #999;'>غير محدد</span>";
+                        $manufacturing_year = !empty($row['manufacturing_year']) ? $row['manufacturing_year'] : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $manufacturing_year . "</td>";
                         
                         // حالة المعدة
-                        $equipment_condition = !empty($row['equipment_condition']) ? htmlspecialchars($row['equipment_condition']) : "<span style='color: #999;'>غير محدد</span>";
+                        $equipment_condition = !empty($row['equipment_condition']) ? htmlspecialchars($row['equipment_condition']) : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $equipment_condition . "</td>";
                         
                         // المالك
-                        $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span style='color: #999;'>غير محدد</span>";
+                        $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $owner . "</td>";
                         
                         // التوفر
@@ -1997,6 +1054,9 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 
                         // الإجراءات
                                                 echo "<td>";
+                                                echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
+                                                        <i class='fas fa-eye'></i>
+                                                    </a>";
                                                 if ($_SESSION['user']['role'] == "3" || $_SESSION['user']['role'] == "10") {
                                                                                                                 echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-driver' title='إدارة المشغلين'>
                                                                         <i class='fas fa-user-cog'></i>
@@ -2016,20 +1076,163 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
             </table>
         </div>
     </div>
-</div>
 
-<!-- Equipment Details Modal -->
-<div id="equipmentModal" class="equipment-modal">
-    <div class="equipment-modal-content">
-        <div class="equipment-modal-header">
-            <h3><i class="fas fa-tractor"></i> تفاصيل المعدة</h3>
-            <span class="equipment-modal-close">&times;</span>
+<!-- Modal عرض تفاصيل المعدة -->
+<div id="viewEquipmentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5><i class="fas fa-eye"></i> عرض بيانات المعدة</h5>
+            <button class="close-modal" id="closeEquipmentModal">&times;</button>
         </div>
-        <div class="equipment-modal-body" id="equipmentModalBody">
-            <div style="text-align: center; padding: 40px;">
-                <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--secondary-color);"></i>
-                <p style="margin-top: 20px; color: #6c757d;">جاري تحميل البيانات...</p>
+        <div class="modal-body">
+            <div class="view-modal-body">
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-barcode"></i> كود المعدة</div>
+                    <div class="view-item-value" id="view_eq_code">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-tag"></i> اسم المعدة</div>
+                    <div class="view-item-value" id="view_eq_name">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-tools"></i> نوع المعدة</div>
+                    <div class="view-item-value" id="view_eq_type">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-truck-loading"></i> المورد</div>
+                    <div class="view-item-value" id="view_eq_supplier">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-project-diagram"></i> المشروع</div>
+                    <div class="view-item-value" id="view_eq_project">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-mountain"></i> المنجم</div>
+                    <div class="view-item-value" id="view_eq_mine">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-hashtag"></i> الرقم التسلسلي</div>
+                    <div class="view-item-value" id="view_eq_serial">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-car"></i> رقم الهيكل</div>
+                    <div class="view-item-value" id="view_eq_chassis">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-industry"></i> الشركة المصنعة</div>
+                    <div class="view-item-value" id="view_eq_manufacturer">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-car-side"></i> الموديل</div>
+                    <div class="view-item-value" id="view_eq_model">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar"></i> سنة الصنع</div>
+                    <div class="view-item-value" id="view_eq_year">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar-plus"></i> سنة الاستيراد</div>
+                    <div class="view-item-value" id="view_eq_import_year">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-cogs"></i> حالة المعدة</div>
+                    <div class="view-item-value" id="view_eq_condition">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-clock"></i> ساعات التشغيل</div>
+                    <div class="view-item-value" id="view_eq_hours">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-car-crash"></i> حالة المحرك</div>
+                    <div class="view-item-value" id="view_eq_engine">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-circle-notch"></i> حالة الإطارات</div>
+                    <div class="view-item-value" id="view_eq_tires">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-user"></i> اسم المالك</div>
+                    <div class="view-item-value" id="view_eq_owner">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-briefcase"></i> نوع المالك</div>
+                    <div class="view-item-value" id="view_eq_owner_type">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-phone"></i> هاتف المالك</div>
+                    <div class="view-item-value" id="view_eq_owner_phone">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-handshake"></i> علاقة المالك بالمورد</div>
+                    <div class="view-item-value" id="view_eq_owner_relation">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-address-card"></i> رقم الترخيص</div>
+                    <div class="view-item-value" id="view_eq_license">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-landmark"></i> جهة الترخيص</div>
+                    <div class="view-item-value" id="view_eq_license_authority">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar-times"></i> انتهاء الترخيص</div>
+                    <div class="view-item-value" id="view_eq_license_expiry">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-certificate"></i> رقم شهادة الفحص</div>
+                    <div class="view-item-value" id="view_eq_inspection">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar-check"></i> آخر فحص</div>
+                    <div class="view-item-value" id="view_eq_last_inspection">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-map-marker-alt"></i> الموقع الحالي</div>
+                    <div class="view-item-value" id="view_eq_location">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-traffic-light"></i> حالة التوفر</div>
+                    <div class="view-item-value" id="view_eq_availability">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-money-bill-wave"></i> القيمة المقدرة</div>
+                    <div class="view-item-value" id="view_eq_value">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar-day"></i> سعر التأجير اليومي</div>
+                    <div class="view-item-value" id="view_eq_daily">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-calendar-alt"></i> سعر التأجير الشهري</div>
+                    <div class="view-item-value" id="view_eq_monthly">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-shield-alt"></i> التأمين/الضمان</div>
+                    <div class="view-item-value" id="view_eq_insurance">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-comment-alt"></i> ملاحظات عامة</div>
+                    <div class="view-item-value" id="view_eq_notes">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-wrench"></i> آخر صيانة</div>
+                    <div class="view-item-value" id="view_eq_last_maintenance">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> الحالة</div>
+                    <div class="view-item-value" id="view_eq_status">-</div>
+                </div>
             </div>
+        </div>
+        <div class="modal-footer">
+            <?php if ($_SESSION['user']['role'] != "3" && $_SESSION['user']['role'] != "10") { ?>
+            <a id="viewEquipmentEditBtn" class="btn-modal btn-modal-save" style="text-decoration: none;">
+                <i class="fas fa-edit"></i> تعديل المعدة
+            </a>
+            <?php } ?>
+            <button type="button" class="btn-modal btn-modal-cancel" id="closeEquipmentModalFooter">
+                <i class="fas fa-times"></i> إغلاق
+            </button>
         </div>
     </div>
 </div>
@@ -2265,33 +1468,33 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                                 let breakdownHtml = '';
                                 if (supplier.equipment_breakdown && supplier.equipment_breakdown.length > 0) {
                                     const breakdownList = supplier.equipment_breakdown.map(item => {
-                                        const operatingColor = item.operating_count > 0 ? '#28a745' : '#6c757d';
-                                        const remainingColor = item.remaining_count > 0 ? '#ffc107' : '#6c757d';
-                                        const basicInfo = item.count_basic > 0 ? `<span style="color: #007bff; font-weight: bold;"> أساسي:${item.count_basic}</span>` : '';
-                                        const backupInfo = item.count_backup > 0 ? `<span style="color: #ffc107; font-weight: bold;"> احتياطي:${item.count_backup}</span>` : '';
-                                        return `<div style="margin: 3px 0; padding: 8px; background: rgba(226, 174, 3, 0.1); border-right: 3px solid #e2ae03; border-radius: 4px;">
-                                                    <i class="fas fa-tools" style="color: #e2ae03;"></i> 
-                                                    <strong>${item.type || 'غير محدد'}</strong>: 
-                                                    المتعاقد ${item.count} ${basicInfo} ${backupInfo} | 
-                                                    <span style="color: ${operatingColor}; font-weight: bold;">المشغّل ${item.operating_count || 0}</span> | 
-                                                    <span style="color: ${remainingColor}; font-weight: bold;">المتبقي ${item.remaining_count || 0}</span> | 
+                                        const operatingClass = item.operating_count > 0 ? 'is-active' : 'is-muted';
+                                        const remainingClass = item.remaining_count > 0 ? 'is-warning' : 'is-muted';
+                                        const basicInfo = item.count_basic > 0 ? `<span class="breakdown-tag is-basic">أساسي:${item.count_basic}</span>` : '';
+                                        const backupInfo = item.count_backup > 0 ? `<span class="breakdown-tag is-backup">احتياطي:${item.count_backup}</span>` : '';
+                                        return `<div class="breakdown-item">
+                                                    <i class="fas fa-tools"></i>
+                                                    <strong>${item.type || 'غير محدد'}</strong>:
+                                                    المتعاقد ${item.count} ${basicInfo} ${backupInfo} |
+                                                    <span class="breakdown-count ${operatingClass}">المشغّل ${item.operating_count || 0}</span> |
+                                                    <span class="breakdown-count ${remainingClass}">المتبقي ${item.remaining_count || 0}</span> |
                                                     <i class="fas fa-clock"></i> ${parseFloat(item.hours).toLocaleString()} ساعة
                                                 </div>`;
                                     }).join('');
                                     breakdownHtml = breakdownList;
                                 } else {
-                                    breakdownHtml = '<span style="color: #6c757d;">لا توجد تفاصيل</span>';
+                                    breakdownHtml = '<span class="breakdown-empty">لا توجد تفاصيل</span>';
                                 }
                                 
                                 const row = `
                                     <tr>
-                                        <td style="text-align: center;">${index + 1}</td>
+                                        <td class="text-center">${index + 1}</td>
                                         <td><strong>${supplier.supplier_name}</strong></td>
-                                        <td style="text-align: center;">${parseFloat(supplier.hours).toLocaleString()}</td>
-                                        <td style="text-align: center;">${supplier.equipment_count}</td>
-                                        <td style="text-align: center; background: #e3f2fd; font-weight: bold; color: #007bff;">${supplier.equipment_count_basic || 0}</td>
-                                        <td style="text-align: center; background: #fffde7; font-weight: bold; color: #f57f17;">${supplier.equipment_count_backup || 0}</td>
-                                        <td style="text-align: right; font-size: 0.9rem;">${breakdownHtml}</td>
+                                        <td class="text-center">${parseFloat(supplier.hours).toLocaleString()}</td>
+                                        <td class="text-center">${supplier.equipment_count}</td>
+                                        <td class="suppliers-basic-count">${supplier.equipment_count_basic || 0}</td>
+                                        <td class="suppliers-backup-count">${supplier.equipment_count_backup || 0}</td>
+                                        <td class="suppliers-breakdown">${breakdownHtml}</td>
                                     </tr>
                                 `;
                                 tbody.append(row);
@@ -2312,7 +1515,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         } else {
                             tbody.html(`
                                 <tr>
-                                    <td colspan="8" style="text-align: center; color: #6c757d; padding: 2rem;">
+                                    <td colspan="7" class="suppliers-empty">
                                         <i class="fas fa-info-circle"></i> لا توجد عقود موردين لهذا المشروع
                                     </td>
                                 </tr>
@@ -2341,158 +1544,138 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 }
             });
         });
-        
-        // Equipment Details Modal
-        var modal = document.getElementById('equipmentModal');
-        var modalBody = document.getElementById('equipmentModalBody');
-        var closeBtn = document.getElementsByClassName('equipment-modal-close')[0];
-        
-        // فتح الـ modal عند النقر على زر العرض
-        $(document).on('click', '.view-equipment-btn', function() {
-            var equipmentId = $(this).data('id');
-            modal.style.display = 'block';
-            
-            // جلب بيانات المعدة
+
+        // Equipment view modal
+        const viewEquipmentModal = document.getElementById('viewEquipmentModal');
+        const closeEquipmentModalBtn = document.getElementById('closeEquipmentModal');
+        const closeEquipmentModalFooter = document.getElementById('closeEquipmentModalFooter');
+
+        function setViewValue(elementId, value) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const safeValue = (value !== null && value !== undefined && value !== '') ? value : 'غير محدد';
+            el.textContent = safeValue;
+        }
+
+        function formatCurrency(value) {
+            if (value === null || value === undefined || value === '') return 'غير محدد';
+            const num = parseFloat(value);
+            if (Number.isNaN(num)) return value;
+            return '$' + num.toLocaleString();
+        }
+
+        function formatType(value) {
+            if (!value) return 'غير محدد';
+            return String(value) === '1' ? 'حفار' : 'قلاب';
+        }
+
+        function formatStatus(value) {
+            if (value === null || value === undefined || value === '') return 'غير محدد';
+            return String(value) === '1' ? 'متاحة' : 'مشغولة';
+        }
+
+        $(document).on('click', '.viewEquipmentBtn', function() {
+            const equipmentId = $(this).data('id');
+            if (!equipmentId || !viewEquipmentModal) return;
+
+            viewEquipmentModal.style.display = 'flex';
+
+            const loadingText = 'جار التحميل...';
+            [
+                'view_eq_code','view_eq_name','view_eq_type','view_eq_supplier','view_eq_project','view_eq_mine',
+                'view_eq_serial','view_eq_chassis','view_eq_manufacturer','view_eq_model','view_eq_year',
+                'view_eq_import_year','view_eq_condition','view_eq_hours','view_eq_engine','view_eq_tires',
+                'view_eq_owner','view_eq_owner_type','view_eq_owner_phone','view_eq_owner_relation',
+                'view_eq_license','view_eq_license_authority','view_eq_license_expiry','view_eq_inspection',
+                'view_eq_last_inspection','view_eq_location','view_eq_availability','view_eq_value',
+                'view_eq_daily','view_eq_monthly','view_eq_insurance','view_eq_notes','view_eq_last_maintenance',
+                'view_eq_status'
+            ].forEach(id => setViewValue(id, loadingText));
+
+            const editBtn = document.getElementById('viewEquipmentEditBtn');
+            if (editBtn) {
+                editBtn.setAttribute('href', 'equipments.php?edit=' + equipmentId);
+            }
+
             $.ajax({
                 url: 'get_equipment_details.php',
                 type: 'GET',
                 data: { id: equipmentId },
                 dataType: 'json',
                 success: function(response) {
-                    if (response.success) {
-                        displayEquipmentDetails(response.data);
-                    } else {
-                        modalBody.innerHTML = '<div style="text-align: center; padding: 40px; color: #dc3545;"><i class="fas fa-exclamation-triangle" style="font-size: 3rem;"></i><p style="margin-top: 20px;">حدث خطأ في تحميل البيانات</p></div>';
+                    if (!response.success || !response.data) {
+                        setViewValue('view_eq_name', 'تعذر تحميل البيانات');
+                        return;
                     }
+
+                    const data = response.data;
+                    setViewValue('view_eq_code', data.code);
+                    setViewValue('view_eq_name', data.name);
+                    setViewValue('view_eq_type', formatType(data.type));
+                    setViewValue('view_eq_supplier', data.supplier_name);
+                    setViewValue('view_eq_project', data.project_name);
+                    setViewValue('view_eq_mine', data.mine_name);
+                    setViewValue('view_eq_serial', data.serial_number);
+                    setViewValue('view_eq_chassis', data.chassis_number);
+                    setViewValue('view_eq_manufacturer', data.manufacturer);
+                    setViewValue('view_eq_model', data.model);
+                    setViewValue('view_eq_year', data.manufacturing_year);
+                    setViewValue('view_eq_import_year', data.import_year);
+                    setViewValue('view_eq_condition', data.equipment_condition);
+                    setViewValue('view_eq_hours', data.operating_hours ? data.operating_hours + ' ساعة' : 'غير محدد');
+                    setViewValue('view_eq_engine', data.engine_condition);
+                    setViewValue('view_eq_tires', data.tires_condition);
+                    setViewValue('view_eq_owner', data.actual_owner_name);
+                    setViewValue('view_eq_owner_type', data.owner_type);
+                    setViewValue('view_eq_owner_phone', data.owner_phone);
+                    setViewValue('view_eq_owner_relation', data.owner_supplier_relation);
+                    setViewValue('view_eq_license', data.license_number);
+                    setViewValue('view_eq_license_authority', data.license_authority);
+                    setViewValue('view_eq_license_expiry', data.license_expiry_date);
+                    setViewValue('view_eq_inspection', data.inspection_certificate_number);
+                    setViewValue('view_eq_last_inspection', data.last_inspection_date);
+                    setViewValue('view_eq_location', data.current_location);
+                    setViewValue('view_eq_availability', data.availability_status);
+                    setViewValue('view_eq_value', formatCurrency(data.estimated_value));
+                    setViewValue('view_eq_daily', formatCurrency(data.daily_rental_price));
+                    setViewValue('view_eq_monthly', formatCurrency(data.monthly_rental_price));
+                    setViewValue('view_eq_insurance', data.insurance_status);
+                    setViewValue('view_eq_notes', data.general_notes);
+                    setViewValue('view_eq_last_maintenance', data.last_maintenance_date);
+                    setViewValue('view_eq_status', formatStatus(data.status));
                 },
                 error: function() {
-                    modalBody.innerHTML = '<div style="text-align: center; padding: 40px; color: #dc3545;"><i class="fas fa-exclamation-triangle" style="font-size: 3rem;"></i><p style="margin-top: 20px;">فشل الاتصال بالخادم</p></div>';
+                    setViewValue('view_eq_name', 'تعذر الاتصال بالخادم');
                 }
             });
         });
-        
-        // إغلاق الـ modal
-        closeBtn.onclick = function() {
-            modal.style.display = 'none';
-        }
-        
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
+
+        function closeEquipmentModal() {
+            if (viewEquipmentModal) {
+                viewEquipmentModal.style.display = 'none';
             }
         }
-        
-        // وظيفة عرض تفاصيل المعدة
-        function displayEquipmentDetails(data) {
-            var html = '';
-            
-            // المعلومات الأساسية (دائماً تظهر)
-            html += '<div class="equipment-details-section">';
-            html += '<h4><i class="fas fa-info-circle"></i> المعلومات الأساسية</h4>';
-            html += '<div class="equipment-details-grid">';
-            html += createDetailItem('المورد', data.supplier_name);
-            html += createDetailItem('كود المعدة', data.code);
-            html += createDetailItem('نوع المعدة', data.type == '1' ? 'حفار' : 'قلاب');
-            html += createDetailItem('اسم المعدة', data.name);
-            html += createDetailItem('الحالة', data.status == '1' ? '✅ متاحة' : '❌ مشغولة');
-            html += '</div></div>';
-            
-            // المعلومات التعريفية (دائماً تظهر)
-            html += '<div class="equipment-details-section">';
-            html += '<h4><i class="fas fa-id-card"></i> المعلومات التعريفية</h4>';
-            html += '<div class="equipment-details-grid">';
-            html += createDetailItem('رقم المعدة/الرقم التسلسلي', data.serial_number);
-            html += createDetailItem('رقم الهيكل', data.chassis_number);
-            html += '</div></div>';
-            
-            // بيانات الصنع والموديل (دائماً تظهر)
-            html += '<div class="equipment-details-section">';
-            html += '<h4><i class="fas fa-industry"></i> بيانات الصنع والموديل</h4>';
-            html += '<div class="equipment-details-grid">';
-            html += createDetailItem('الشركة المصنعة', data.manufacturer);
-            html += createDetailItem('الموديل/الطراز', data.model);
-            html += createDetailItem('سنة الصنع', data.manufacturing_year);
-            html += createDetailItem('سنة الاستيراد/البدء', data.import_year);
-            html += '</div></div>';
-            
-            // الحالة الفنية والمواصفات (دائماً تظهر)
-            html += '<div class="equipment-details-section">';
-            html += '<h4><i class="fas fa-wrench"></i> الحالة الفنية والمواصفات</h4>';
-            html += '<div class="equipment-details-grid">';
-            html += createDetailItem('حالة المعدة', data.equipment_condition);
-            html += createDetailItem('ساعات التشغيل', data.operating_hours ? data.operating_hours + ' ساعة' : null);
-            html += createDetailItem('حالة المحرك', data.engine_condition);
-            html += createDetailItem('حالة الإطارات', data.tires_condition);
-            html += '</div></div>';
-            
-            // بيانات الملكية (دائماً تظهر)
-            html += '<div class="equipment-details-section">';
-            html += '<h4><i class="fas fa-user-tie"></i> بيانات الملكية</h4>';
-            html += '<div class="equipment-details-grid">';
-            html += createDetailItem('اسم المالك الفعلي', data.actual_owner_name);
-            html += createDetailItem('نوع المالك', data.owner_type);
-            html += createDetailItem('رقم هاتف المالك', data.owner_phone);
-            html += createDetailItem('علاقة المالك بالمورد', data.owner_supplier_relation);
-            html += '</div></div>';
-            
-            // الوثائق والتسجيلات (دائماً تظهر)
-            html += '<div class="equipment-details-section">';
-            html += '<h4><i class="fas fa-file-contract"></i> الوثائق والتسجيلات</h4>';
-            html += '<div class="equipment-details-grid">';
-            html += createDetailItem('رقم الترخيص', data.license_number);
-            html += createDetailItem('جهة الترخيص', data.license_authority);
-            html += createDetailItem('تاريخ انتهاء الترخيص', data.license_expiry_date);
-            html += createDetailItem('رقم شهادة الفحص', data.inspection_certificate_number);
-            html += createDetailItem('تاريخ آخر فحص', data.last_inspection_date);
-            html += '</div></div>';
-            
-            // الموقع والتوفر (دائماً تظهر)
-            html += '<div class="equipment-details-section">';
-            html += '<h4><i class="fas fa-map-marker-alt"></i> الموقع والتوفر</h4>';
-            html += '<div class="equipment-details-grid">';
-            html += createDetailItem('الموقع الحالي', data.current_location);
-            html += createDetailItem('حالة التوفر', data.availability_status);
-            html += '</div></div>';
-            
-            // البيانات المالية (دائماً تظهر)
-            html += '<div class="equipment-details-section">';
-            html += '<h4><i class="fas fa-dollar-sign"></i> البيانات المالية والقيمة</h4>';
-            html += '<div class="equipment-details-grid">';
-            html += createDetailItem('القيمة المقدرة', data.estimated_value ? '$' + parseFloat(data.estimated_value).toLocaleString() : null);
-            html += createDetailItem('سعر التأجير اليومي', data.daily_rental_price ? '$' + parseFloat(data.daily_rental_price).toLocaleString() : null);
-            html += createDetailItem('سعر التأجير الشهري', data.monthly_rental_price ? '$' + parseFloat(data.monthly_rental_price).toLocaleString() : null);
-            html += createDetailItem('التأمين/الضمان', data.insurance_status);
-            html += '</div></div>';
-            
-            // ملاحظات وسجل الصيانة (دائماً تظهر)
-            html += '<div class="equipment-details-section">';
-            html += '<h4><i class="fas fa-tools"></i> ملاحظات وسجل الصيانة</h4>';
-            html += '<div class="equipment-details-grid">';
-            if (data.general_notes) {
-                html += '<div class="equipment-detail-item" style="grid-column: 1 / -1;">';
-                html += '<span class="equipment-detail-label">ملاحظات عامة</span>';
-                html += '<div class="equipment-detail-value">' + data.general_notes + '</div>';
-                html += '</div>';
-            } else {
-                html += '<div class="equipment-detail-item" style="grid-column: 1 / -1;">';
-                html += '<span class="equipment-detail-label">ملاحظات عامة</span>';
-                html += '<div class="equipment-detail-value empty">غير محدد</div>';
-                html += '</div>';
-            }
-            html += createDetailItem('تاريخ آخر صيانة', data.last_maintenance_date);
-            html += '</div></div>';
-            
-            modalBody.innerHTML = html;
+
+        if (closeEquipmentModalBtn) {
+            closeEquipmentModalBtn.addEventListener('click', closeEquipmentModal);
+        }
+
+        if (closeEquipmentModalFooter) {
+            closeEquipmentModalFooter.addEventListener('click', closeEquipmentModal);
+        }
+
+        if (viewEquipmentModal) {
+            viewEquipmentModal.addEventListener('click', function(event) {
+                if (event.target === viewEquipmentModal) {
+                    closeEquipmentModal();
+                }
+            });
         }
         
-        function createDetailItem(label, value) {
-            if (!value || value === '' || value === 'N/A') {
-                return '<div class="equipment-detail-item"><span class="equipment-detail-label">' + label + '</span><div class="equipment-detail-value empty">غير محدد</div></div>';
-            }
-            return '<div class="equipment-detail-item"><span class="equipment-detail-label">' + label + '</span><div class="equipment-detail-value">' + value + '</div></div>';
-        }
+        // Toggle Form Functionality
     })();
 </script>
 
+</div> <!-- closing main div -->
 </body>
 </html>

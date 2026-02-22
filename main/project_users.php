@@ -4,38 +4,39 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../index.php");
     exit();
 }
-
 include '../config.php';
 
-$page_title = "إيكوبيشن | المشغلين";
+$page_title = "إيكوبيشن | المستخدمين";
 
-// معالجة إضافة/تعديل مشغل عند إرسال الفورم
+// معالجة إضافة/تعديل مستخدم عند إرسال الفورم
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
-    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $name = mysqli_real_escape_string($conn, trim($_POST['name']));
+    $username = mysqli_real_escape_string($conn, trim($_POST['username']));
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
     $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
-    $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $project = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
+    $parent_id = intval($_SESSION['user']['id']);
 
-    if ($id > 0) {
-        // تحديث
-        $update_query = "UPDATE drivers SET name='$name', phone='$phone', status='$status' WHERE id=$id";
-        if (mysqli_query($conn, $update_query)) {
-            header("Location: drivers.php?msg=تم+تعديل+المشغل+بنجاح+✅");
-            exit;
-        } else {
-            header("Location: drivers.php?msg=حدث+خطأ+أثناء+التعديل+❌");
-            exit;
-        }
+    // تحقق من تكرار اسم المستخدم
+    $check_query = "SELECT id FROM users WHERE username = '$username'";
+    $check_result = mysqli_query($conn, $check_query);
+
+    if (mysqli_num_rows($check_result) > 0) {
+        header("Location: project_users.php?msg=اسم+المستخدم+موجود+مسبقاً+❌");
+        exit;
+    }
+
+    // إضافة مستخدم جديد
+    $sql = "INSERT INTO users (name, username, password, phone, role, project_id, parent_id, created_at, updated_at) 
+            VALUES ('$name', '$username', '$password', '$phone', '$role', '$project', '$parent_id', NOW(), NOW())";
+    
+    if (mysqli_query($conn, $sql)) {
+        header("Location: project_users.php?msg=تم+إضافة+المستخدم+بنجاح+✅");
+        exit;
     } else {
-        // إضافة
-        $insert_query = "INSERT INTO drivers (name, phone, status) VALUES ('$name', '$phone', '$status')";
-        if (mysqli_query($conn, $insert_query)) {
-            header("Location: drivers.php?msg=تم+إضافة+المشغل+بنجاح+✅");
-            exit;
-        } else {
-            header("Location: drivers.php?msg=حدث+خطأ+أثناء+الإضافة+❌");
-            exit;
-        }
+        header("Location: project_users.php?msg=حدث+خطأ+أثناء+الإضافة+❌");
+        exit;
     }
 }
 
@@ -47,21 +48,21 @@ include("../inheader.php");
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 
 <?php 
-// include('../insidebar.php'); 
-?>
+// include('../insidebar.php');
+ ?>
 
 <div class="main">
     <div class="page-header">
         <h1 class="page-title">
-            <div class="title-icon"><i class="fas fa-id-card"></i></div>
-            إدارة المشغلين
+            <div class="title-icon"><i class="fas fa-users-cog"></i></div>
+            إدارة المستخدمين
         </h1>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fas fa-plus-circle"></i> إضافة مشغل جديد
+                <i class="fas fa-plus-circle"></i> إضافة مستخدم جديد
             </a>
         </div>
     </div>
@@ -75,35 +76,44 @@ include("../inheader.php");
         </div>
     <?php endif; ?>
 
-    <!-- فورم إضافة / تعديل مشغل -->
+    <!-- فورم إضافة / تعديل مستخدم -->
     <form id="projectForm" action="" method="post" style="display:none; margin-bottom:20px;">
         <div class="card shadow-sm">
             <div class="card-header">
-                <h5><i class="fas fa-edit"></i> إضافة / تعديل مشغل</h5>
+                <h5><i class="fas fa-edit"></i> إضافة / تعديل مستخدم</h5>
             </div>
             <div class="card-body">
-                <input type="hidden" name="id" id="drivers_id" value="">
                 <div class="form-grid">
                     <div>
-                        <label><i class="fas fa-user"></i> اسم المشغل *</label>
-                        <input type="text" name="name" id="name" placeholder="أدخل اسم المشغل" required />
+                        <label><i class="fas fa-user"></i> الاسم ثلاثي *</label>
+                        <input type="text" name="name" id="name" placeholder="أدخل الاسم ثلاثي" required />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-at"></i> اسم المستخدم *</label>
+                        <input type="text" name="username" id="username" placeholder="أدخل اسم المستخدم" required />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-lock"></i> كلمة المرور *</label>
+                        <input type="password" name="password" id="password" placeholder="أدخل كلمة المرور" required />
                     </div>
                     <div>
                         <label><i class="fas fa-phone"></i> رقم الهاتف *</label>
                         <input type="tel" name="phone" id="phone" placeholder="مثال: +249123456789" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-toggle-on"></i> الحالة</label>
-                        <select name="status" id="status" required>
-                            <option value="">-- اختر الحالة --</option>
-                            <option value="1">🟢 نشط</option>
-                            <option value="0">🔴 غير نشط</option>
+                        <label><i class="fas fa-shield-alt"></i> الصلاحية / الدور *</label>
+                        <select name="role" id="role" required>
+                            <option value="">-- اختر الصلاحية --</option>
+                            <option value="6">📝 مدخل ساعات عمل</option>
+                            <option value="7">✓ مراجع ساعات مورد</option>
+                            <option value="8">✓ مراجع ساعات مشغل</option>
+                            <option value="9">🔧 مراجع الأعطال</option>
                         </select>
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <button type="submit" class="btn-submit">
-                        <i class="fas fa-save"></i> حفظ المشغل
+                        <i class="fas fa-save"></i> حفظ المستخدم
                     </button>
                     <button type="button" class="btn-cancel" onclick="document.getElementById('projectForm').style.display='none';">
                         <i class="fas fa-times"></i> إلغاء
@@ -115,62 +125,60 @@ include("../inheader.php");
 
     <div class="card">
         <div class="card-header">
-            <h5><i class="fas fa-list-alt"></i> قائمة المشغلين</h5>
+            <h5><i class="fas fa-list-alt"></i> قائمة المستخدمين</h5>
         </div>
         <div class="card-body">
-            <table id="driversTable" class="display nowrap">
+            <table id="usersTable" class="display nowrap">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>اسم المشغل</th>
+                        <th>الاسم</th>
+                        <th>اسم المستخدم</th>
                         <th>رقم الهاتف</th>
-                        <th>عدد العقود</th>
-                        <th>الحالة</th>
+                        <th>الصلاحية</th>
+                        <th>تاريخ الإنشاء</th>
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    // جلب المشغلين
-                    $query = "SELECT id, name, phone, status,
-                             (SELECT COUNT(*) FROM drivercontracts WHERE driver_id = drivers.id) as numcontracts
-                             FROM drivers ORDER BY id DESC";
+                    // جلب المستخدمين
+                    $userid = $_SESSION['user']['id'];
+
+                    $roles = array(
+                        "6" => "📝 مدخل ساعات عمل",
+                        "7" => "✓ مراجع ساعات مورد",
+                        "8" => "✓ مراجع ساعات مشغل",
+                        "9" => "🔧 مراجع الأعطال",
+                    );
+
+                    $query = "SELECT id, name, username, phone, role, created_at
+                             FROM users WHERE parent_id = '$userid' ORDER BY id DESC";
+                    
                     $result = mysqli_query($conn, $query);
                     $i = 1;
-                    
+
                     while ($row = mysqli_fetch_assoc($result)) {
-                        $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">🟢 نشط</span>' : '<span class="status-pill status-inactive">🔴 غير نشط</span>';
-                        
+                        $roleText = isset($roles[$row['role']]) ? $roles[$row['role']] : '<span style="color: #999;">غير معروف</span>';
+                        $createdDate = date('Y-m-d', strtotime($row['created_at']));
+
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
                         echo "<td><strong>" . htmlspecialchars($row['name']) . "</strong></td>";
+                        echo "<td><code style=\"background: #f0f2f8; padding: 4px 8px; border-radius: 6px;\">" . htmlspecialchars($row['username']) . "</code></td>";
                         echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
-                        echo "<td><span class='badge badge-info'>" . $row['numcontracts'] . " عقد</span></td>";
-                        echo "<td>" . $statusBadge . "</td>";
+                        echo "<td>" . $roleText . "</td>";
+                        echo "<td>" . $createdDate . "</td>";
                         echo "<td>
                                 <div class='action-btns'>
                                     <a href='javascript:void(0)' 
-                                       class='action-btn edit editBtn' 
-                                       data-id='" . $row['id'] . "' 
-                                       data-name='" . htmlspecialchars($row['name']) . "' 
-                                       data-phone='" . htmlspecialchars($row['phone']) . "' 
-                                       data-status='" . $row['status'] . "'
+                                       class='action-btn edit' 
                                        title='تعديل'>
                                         <i class='fas fa-edit'></i>
                                     </a>
-                                    <a href='drivercontracts.php?id=" . $row['id'] . "' 
-                                       class='action-btn view' 
-                                       title='عرض العقود'>
-                                        <i class='fas fa-eye'></i>
-                                    </a>
-                                    <a href='driver_truck_history.php?id=" . $row['id'] . "' 
-                                       class='action-btn history' 
-                                       title='تاريخ القيادة'>
-                                        <i class='fas fa-history'></i>
-                                    </a>
                                     <a href='javascript:void(0)' 
                                        class='action-btn delete' 
-                                       onclick=\"return confirm('هل أنت متأكد من حذف هذا المشغل؟')\"
+                                       onclick=\"return confirm('هل أنت متأكد من حذف هذا المستخدم؟')\"
                                        title='حذف'>
                                         <i class='fas fa-trash'></i>
                                     </a>
@@ -204,7 +212,7 @@ include("../inheader.php");
     (function () {
         // تشغيل DataTable بالعربية
         $(document).ready(function () {
-            $('#driversTable').DataTable({
+            $('#usersTable').DataTable({
                 responsive: true,
                 dom: 'Bfrtip', // Buttons + Search + Pagination
                 buttons: [
@@ -223,42 +231,22 @@ include("../inheader.php");
         // التحكم في إظهار وإخفاء الفورم
         const toggleFormBtn = document.getElementById('toggleForm');
         const projectForm = document.getElementById('projectForm');
-        
+
         if (toggleFormBtn) {
             toggleFormBtn.addEventListener('click', function () {
                 projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
                 // تنظيف الحقول عند الإضافة
                 if (projectForm.style.display === "block") {
-                    $("#drivers_id").val("");
                     $("#name").val("");
+                    $("#username").val("");
+                    $("#password").val("");
                     $("#phone").val("");
-                    $("#status").val("");
-                    // التركيز على حقل الاسم
+                    $("#role").val("");
                     $("#name").focus();
-                    // التمرير للأعلى
                     $("html, body").animate({ scrollTop: $("#projectForm").offset().top - 100 }, 500);
                 }
             });
         }
-
-        // عند الضغط على زر تعديل
-        $(document).on("click", ".editBtn", function () {
-            const id = $(this).data("id");
-            const name = $(this).data("name");
-            const phone = $(this).data("phone");
-            const status = $(this).data("status");
-
-            $("#drivers_id").val(id);
-            $("#name").val(name);
-            $("#phone").val(phone);
-            $("#status").val(status);
-
-            // عرض الفورم والتمرير له
-            projectForm.style.display = "block";
-            $("html, body").animate({ scrollTop: $("#projectForm").offset().top - 100 }, 500);
-            $("#name").focus();
-        });
-
     })();
 </script>
 

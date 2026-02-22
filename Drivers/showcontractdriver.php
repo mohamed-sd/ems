@@ -18,6 +18,7 @@ if (!isset($_SESSION['user'])) {
   <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+    <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
 </head>
 <body>
 
@@ -25,8 +26,15 @@ if (!isset($_SESSION['user'])) {
 
 <div class="main">
 
-    <h3> 📑 تفاصيل عقد السائق </h3>
-    <br/>
+    <div class="page-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="title-icon"><i class="fas fa-id-card"></i></div>
+            <h1 class="page-title">تفاصيل عقد السائق</h1>
+        </div>
+        <a href="javascript:history.back()" class="back-btn">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </a>
+    </div>
 
 <?php
 include '../config.php';

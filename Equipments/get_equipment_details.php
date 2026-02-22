@@ -18,9 +18,14 @@ $equipment_id = intval($_GET['id']);
 $query = "
     SELECT 
         e.*,
-        s.name AS supplier_name
+        s.name AS supplier_name,
+        p.name AS project_name,
+        m.mine_name AS mine_name
     FROM equipments e
     LEFT JOIN suppliers s ON e.suppliers = s.id
+    LEFT JOIN operations o ON o.equipment = e.id AND o.status = 1
+    LEFT JOIN project p ON o.project_id = p.id
+    LEFT JOIN mines m ON o.mine_id = m.id
     WHERE e.id = $equipment_id
     LIMIT 1
 ";

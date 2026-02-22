@@ -6,7 +6,7 @@
     <title><?php echo $page_title ; ?></title>
 
     <!-- Font awsome icon link مكتبة الايقونات -->
-    <link rel="stylesheet" href="../assets/css/all.min.css">
+    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 
     <!-- Call bootstrap 5 -->
     <link href="../assets/css/bootstrap.min.css" rel="stylesheet">

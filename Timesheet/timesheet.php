@@ -12,32 +12,114 @@ if ($type !== "1" && $type !== "2") {
 }
 $page_title = "إيكوبيشن | ساعات العمل ";
 include("../inheader.php");
-include('../insidebar.php');
+// include('../insidebar.php');
 // تحديد النوع من الرابط (إن وجد)
 $type_filter = "";
 if ($type != "") {
   $type_filter = " AND e.type = '$type' ";
 }
 ?>
-<div class="main">
 
-  <div class="aligin" style="margin-bottom: 20px;">
-    <a href="javascript:void(0)" id="toggleForm" class="add" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 25px; border-radius: 8px; display: inline-block; transition: transform 0.3s ease;">
-      <i class="fa fa-plus-circle"></i> إضافة ساعات عمل جديدة
-    </a>
-  </div>
-  <form id="projectForm" action="" method="post" style="display:none; margin-top:20px;">
-    <?php if ($_GET['type'] == "1") {
-      // نوع المعدة كان حفار 
-      ?>
-      <div>
-        <div class="card shadow-lg" style="border: none; border-radius: 15px; overflow: hidden; margin-bottom: 30px;">
-          <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px;">
-            <h5 class="mb-0" style="font-size: 1.3rem; font-weight: 600;">
-              <i class="fa fa-edit"></i> إضافة / تعديل حفار
-            </h5>
-          </div>
-          <div class="card-body" style="padding: 25px; background: #fafafa;">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="../assets/css/admin-style.css">
+<link rel="stylesheet" href="../assets/css/main_admin_style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+
+<style>
+/* Counter Input Group Styling */
+.counter-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  width: 100%;
+  max-width: 400px;
+}
+
+.counter-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.counter-field input {
+  width: 100%;
+  padding: 8px 6px;
+  text-align: center;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0c1c3e;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.counter-field input:focus {
+  outline: none;
+  border-color: var(--gold, #e8b800);
+  box-shadow: 0 0 0 3px rgba(232, 184, 0, 0.1);
+}
+
+.counter-field span {
+  font-size: 11px;
+  color: #6c757d;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.counter-separator {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--navy, #0c1c3e);
+  margin: 0 4px;
+  padding-bottom: 18px;
+}
+
+/* Remove spinner arrows for counter inputs */
+.counter-field input[type="number"]::-webkit-inner-spin-button,
+.counter-field input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.counter-field input[type="number"] {
+  -moz-appearance: textfield;
+}
+</style>
+
+<div class="main">
+    <div class="page-header">
+        <h1 class="page-title">
+            <div class="title-icon"><i class="fas fa-clock"></i></div>
+            إدارة ساعات العمل
+        </h1>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="../main/dashboard.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+            <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+                <i class="fas fa-plus-circle"></i> إضافة ساعات عمل جديدة
+            </a>
+        </div>
+    </div>
+    <form id="projectForm" action="" method="post" style="display:none;">
+        <?php if ($_GET['type'] == "1") {
+          // نوع المعدة كان حفار 
+          ?>
+          <div class="card">
+              <div class="card-header">
+                  <h5><i class="fas fa-edit"></i> إضافة / تعديل حفار</h5>
+              </div>
+          <div class="card-body">
             <div class="form-grid">
               <div>
                 <label>الالية</label>
@@ -89,23 +171,25 @@ if ($type != "") {
 
               <div>
                 <label> ⏱️ عداد البداية</label>
-                <input type="number" value="0" style="width: 30%" id="start_seconds" name="start_seconds" min="0" max="59"
-                  placeholder="ثواني" required>
-                <input type="number" value="0" style="width: 30%" id="start_minutes" name="start_minutes" min="0" max="59"
-                  placeholder="دقائق" required>
-                <input type="number" value="0" style="width: 30%" id="start_hours" name="start_hours" placeholder="ساعات">
+                <div class="counter-input-group">
+                  <div class="counter-field">
+                    <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
+                    <span>ساعات</span>
+                  </div>
+                  <span class="counter-separator">:</span>
+                  <div class="counter-field">
+                    <input type="number" value="0" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="00" required>
+                    <span>دقائق</span>
+                  </div>
+                  <span class="counter-separator">:</span>
+                  <div class="counter-field">
+                    <input type="number" value="0" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="00" required>
+                    <span>ثواني</span>
+                  </div>
+                </div>
               </div>
 
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-
-              <h3 style="text-align: right;"> ساعات العمل </h3>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات العمل </h3>
 
               <div>
                 <label>الساعات المنفذة</label>
@@ -143,12 +227,7 @@ if ($type != "") {
                 <label>ملاحظات ساعات العمل</label>
                 <textarea name="work_notes"></textarea>
               </div>
-              <div></div>
-              <h3 style="text-align: right;"> ساعات الاعطال </h3>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات الاعطال </h3>
 
               <div>
                 <label>عطل HR</label>
@@ -182,11 +261,22 @@ if ($type != "") {
 
               <div>
                 <label> ⏱️ عداد النهاية </label>
-                <input style="width: 30%" type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59"
-                  placeholder="ثواني">
-                <input style="width: 30%" type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59"
-                  placeholder="دقائق">
-                <input style="width: 30%" type="number" value="0" id="end_hours" name="end_hours" placeholder="ساعات">
+                <div class="counter-input-group">
+                  <div class="counter-field">
+                    <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
+                    <span>ساعات</span>
+                  </div>
+                  <span class="counter-separator">:</span>
+                  <div class="counter-field">
+                    <input type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="00">
+                    <span>دقائق</span>
+                  </div>
+                  <span class="counter-separator">:</span>
+                  <div class="counter-field">
+                    <input type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="00">
+                    <span>ثواني</span>
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -194,10 +284,7 @@ if ($type != "") {
                 <input type="text" name="counter_diff" id="counter_diff_display" readonly>
                 <input type="hidden" id="counter_diff" />
               </div>
-              <div></div>
-              <h3 style="text-align: right;"> الاعطال </h3>
-              <div></div>
-              <div></div>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>
 
 
               <div></div>
@@ -225,12 +312,7 @@ if ($type != "") {
                 <textarea name="general_notes" id="general_notes"></textarea>
               </div>
 
-              <h3 style="text-align: right;"> ساعات عمل المشغل </h3>
-
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات عمل المشغل </h3>
 
               <div>
                 <label>⏱️ ساعات عمل المشغل</label>
@@ -265,35 +347,21 @@ if ($type != "") {
 
               <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
 
-              <button type="submit" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 35px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); display: block; margin: 20px auto 0;">
-                <i class="fa fa-save"></i> حفظ الساعات
+              <button type="submit" style="margin-top: 20px;">
+                <i class="fas fa-save"></i> حفظ الساعات
               </button>
-
-              <style>
-                button[type="submit"]:hover {
-                  transform: translateY(-3px);
-                  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-                }
-                button[type="submit"]:active {
-                  transform: translateY(-1px);
-                }
-              </style>
 
             </div>
           </div>
         </div>
-      </div>
-    <?php } else {
-      // نوع المهدةطلع قلاب
-      ?>
-      <div>
-        <div class="card shadow-lg" style="border: none; border-radius: 15px; overflow: hidden; margin-bottom: 30px;">
-          <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 20px;">
-            <h5 class="mb-0" style="font-size: 1.3rem; font-weight: 600;">
-              <i class="fa fa-edit"></i> إضافة / تعديل قلاب
-            </h5>
-          </div>
-          <div class="card-body" style="padding: 25px; background: #fafafa;">
+        <?php } else {
+          // نوع المهدةطلع قلاب
+          ?>
+          <div class="card">
+              <div class="card-header">
+                  <h5><i class="fas fa-edit"></i> إضافة / تعديل قلاب</h5>
+              </div>
+              <div class="card-body">
             <div class="form-grid">
               <div>
                 <label>الالية</label>
@@ -360,11 +428,14 @@ if ($type != "") {
 
               <div>
                 <label> ⏱️ عداد البداية</label>
-                <input type="hidden" value="0" style="width: 30%" id="start_seconds" name="start_seconds" min="0" max="59"
-                  placeholder="ثواني" required>
-                <input type="hidden" value="0" style="width: 30%" id="start_minutes" name="start_minutes" min="0" max="59"
-                  placeholder="دقائق" required>
-                <input type="number" value="0" id="start_hours" name="start_hours" placeholder="ساعات">
+                <div class="counter-input-group">
+                  <div class="counter-field">
+                    <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
+                    <span>ساعات</span>
+                  </div>
+                </div>
+                <input type="hidden" value="0" id="start_minutes" name="start_minutes" min="0" max="59" required>
+                <input type="hidden" value="0" id="start_seconds" name="start_seconds" min="0" max="59" required>
               </div>
 
               <div></div>
@@ -372,15 +443,7 @@ if ($type != "") {
               <div></div>
               <div></div>
 
-              <h3 style="text-align: right;"> الساعات </h3>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-
-
-
-
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الساعات </h3>
               <div>
                 <label>الساعات المنفذة</label>
                 <input type="number" name="executed_hours" id="executed_hours" value="0">
@@ -412,16 +475,7 @@ if ($type != "") {
                 <textarea name="work_notes" id="work_notes"></textarea>
               </div>
 
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-
-              <h3 style="text-align: right;"> ساعات الاعطال </h3>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات الاعطال </h3>
 
               <div>
                 <label>عطل HR</label>
@@ -454,11 +508,14 @@ if ($type != "") {
 
               <div>
                 <label> ⏱️ عداد النهاية </label>
-                <input style="width: 30%" type="hidden" value="0" id="end_seconds" name="end_seconds" min="0" max="59"
-                  placeholder="ثواني">
-                <input style="width: 30%" type="hidden" value="0" id="end_minutes" name="end_minutes" min="0" max="59"
-                  placeholder="دقائق">
-                <input type="number" value="0" id="end_hours" name="end_hours" placeholder="ساعات">
+                <div class="counter-input-group">
+                  <div class="counter-field">
+                    <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
+                    <span>ساعات</span>
+                  </div>
+                </div>
+                <input type="hidden" value="0" id="end_minutes" name="end_minutes" min="0" max="59">
+                <input type="hidden" value="0" id="end_seconds" name="end_seconds" min="0" max="59">
               </div>
 
               <div>
@@ -469,13 +526,7 @@ if ($type != "") {
               <div></div>
 
 
-              <h3 style="text-align: right;"> الاعطال </h3>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-
-              <div>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>              <div>
                 <label>نوع العطل</label>
                 <input type="text" name="fault_type" id="fault_type" />
               </div>
@@ -497,7 +548,7 @@ if ($type != "") {
               </div>
 
 
-              <h3 style="text-align: right;"> ساعات عمل المشغل </h3>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات عمل المشغل </h3>
               <div></div>
               <div></div>
               <div></div>
@@ -525,161 +576,37 @@ if ($type != "") {
 
               <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
 
-              <button type="submit" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 35px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); display: block; margin: 20px auto 0;">
-                <i class="fa fa-save"></i> حفظ الساعات
+              <button type="submit" style="margin-top: 20px;">
+                <i class="fas fa-save"></i> حفظ الساعات
               </button>
-
-              <style>
-                button[type="submit"]:hover {
-                  transform: translateY(-3px);
-                  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-                }
-                button[type="submit"]:active {
-                  transform: translateY(-1px);
-                }
-              </style>
 
             </div>
           </div>
         </div>
-      </div>
     <?php } ?>
   </form>
-  <div class="card shadow-lg" style="border: none; border-radius: 15px;">
-    <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px;">
-      <h5 class="mb-0" style="font-size: 1.4rem; font-weight: 600;">
-        <i class="fa fa-list-alt"></i> قائمة ساعات العمل
-      </h5>
-    </div>
-    <div class="card-body" style="padding: 25px; overflow-x: auto;">
-      <!-- أزرار التحكم في المجموعات -->
-      <div class="group-controls" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-        <button id="toggleBasic" class="btn-group-toggle" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);">
-          <i class="fa fa-info-circle"></i> البيانات الأساسية
-        </button>
-        <button id="toggleHours" class="btn-group-toggle" style="background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);">
-          <i class="fa fa-clock-o"></i> ساعات التشغيل
-        </button>
-        <button id="toggleFaults" class="btn-group-toggle" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);">
-          <i class="fa fa-exclamation-triangle"></i> الأعطال
-        </button>
-        <button id="toggleTotals" class="btn-group-toggle" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);">
-          <i class="fa fa-calculator"></i> الإجماليات
-        </button>
-      </div>
-
-      <style>
-        .btn-group-toggle:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
-        }
-        .btn-group-toggle:active {
-          transform: translateY(-1px);
-        }
-        .btn-group-toggle.active {
-          opacity: 0.6;
-          box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.2) !important;
-        }
-      </style>
-
-      <style>
-        /* تحسين تصميم الجدول */
-        #projectsTable {
-          border-collapse: separate;
-          border-spacing: 0;
-          border-radius: 10px;
-          overflow: hidden;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        #projectsTable thead tr:first-child th {
-          font-size: 1.1rem;
-          font-weight: 700;
-          padding: 15px 10px;
-          border: none;
-          color: white;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        
-        #projectsTable thead tr:last-child th {
-          font-weight: 600;
-          padding: 12px 8px;
-          font-size: 0.95rem;
-          border-bottom: 3px solid #ddd;
-          background: #f8f9fa;
-          color: #333;
-        }
-        
-        #projectsTable tbody tr {
-          transition: all 0.3s ease;
-        }
-        
-        #projectsTable tbody tr:hover {
-          background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%);
-          transform: scale(1.01);
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        #projectsTable tbody td {
-          padding: 12px 8px;
-          border-bottom: 1px solid #e9ecef;
-          font-size: 0.9rem;
-        }
-        
-        /* ألوان المجموعات */
-        .group-basic { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); }
-        .group-hours { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); }
-        .group-faults { background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); }
-        .group-totals { background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); }
-        .group-actions { background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%); }
-      </style>
-
-      <table id="projectsTable" class="display nowrap" style="width:100%; margin-top:20px;">
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-list-alt"></i> قائمة ساعات العمل</h5>
+        </div>
+        <div class="card-body table-container">
+      <table id="projectsTable" class="display">
         <thead>
-          <!-- صف المجموعات -->
           <tr>
-            <th colspan="4" class="group-basic" style="text-align:center;">
-              <i class="fa fa-info-circle" style="margin-left: 5px;"></i>
-              البيانات الأساسية
-            </th>
-            <th colspan="4" class="group-hours" style="text-align:center;">
-              <i class="fa fa-clock-o" style="margin-left: 5px;"></i>
-              ساعات التشغيل
-            </th>
-            <th colspan="2" class="group-faults" style="text-align:center;">
-              <i class="fa fa-exclamation-triangle" style="margin-left: 5px;"></i>
-              الأعطال
-            </th>
-            <th colspan="2" class="group-totals" style="text-align:center;">
-              <i class="fa fa-calculator" style="margin-left: 5px;"></i>
-              الإجماليات
-            </th>
-            <th colspan="2" class="group-actions" style="text-align:center;">
-              <i class="fa fa-cogs" style="margin-left: 5px;"></i>
-              التحكم
-            </th>
-          </tr>
-
-          <!-- صف الأعمدة الفعلية -->
-          <tr>
-            <th><i class="fa fa-hashtag"></i> #</th>
-            <th><i class="fa fa-truck"></i> المعدة</th>
-            <th><i class="fa fa-calendar"></i> التاريخ</th>
-            <th><i class="fa fa-sun-o"></i> الوردية</th>
-
-            <th><i class="fa fa-hourglass-half"></i> الساعات</th>
-            <th><i class="fa fa-cube"></i> الجردل</th>
-            <th><i class="fa fa-gavel"></i> الجاكهمر</th>
-            <th><i class="fa fa-plus-circle"></i> الإضافية</th>
-
-            <th><i class="fa fa-pause-circle"></i> الاستعداد</th>
-            <th><i class="fa fa-wrench"></i> الأعطال</th>
-
-            <th><i class="fa fa-briefcase"></i> ساعات العمل</th>
-            <th><i class="fa fa-chart-bar"></i> إجمالي اليوم</th>
-
-            <th><i class="fa fa-flag"></i> الحالة</th>
-            <th><i class="fa fa-cog"></i> إجراءات</th>
+            <th><i class="fas fa-hashtag"></i> #</th>
+            <th><i class="fas fa-tool"></i> المعدة</th>
+            <th><i class="fas fa-calendar"></i> التاريخ</th>
+            <th><i class="fas fa-sun"></i> الوردية</th>
+            <th><i class="fas fa-hourglass"></i> الساعات المنفذة</th>
+            <th><i class="fas fa-cube"></i> الجردل</th>
+            <th><i class="fas fa-gavel"></i> الجاكهمر</th>
+            <th><i class="fas fa-plus-circle"></i> الإضافية</th>
+            <th><i class="fas fa-pause"></i> الاستعداد</th>
+            <th><i class="fas fa-wrench"></i> الأعطال</th>
+            <th><i class="fas fa-briefcase"></i> ساعات العمل</th>
+            <th><i class="fas fa-chart-bar"></i> الإجمالي</th>
+            <th><i class="fas fa-toggle-on"></i> الحالة</th>
+            <th><i class="fas fa-cogs"></i> إجراءات</th>
           </tr>
         </thead>
         <tbody>
@@ -817,7 +744,7 @@ if ($type != "") {
             // echo "<td>" . $row['project_name'] . "</td>";
             // echo "<td> ... </td>";
             echo "<td>" . $row['date'] . "</td>";
-            echo $row['shift'] == "D" ? "<td><span style='background: #ffeaa7; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #2d3436;'><i class='fa fa-sun-o'></i> صباحية</span></td>" : "<td><span style='background: #2d3436; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #fff;'><i class='fa fa-moon-o'></i> مسائية</span></td>";
+            echo $row['shift'] == "D" ? "<td><span style='background: #ffeaa7; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #2d3436;'><i class='fas fa-sun'></i> صباحية</span></td>" : "<td><span style='background: #2d3436; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #fff;'><i class='fas fa-moon'></i> مسائية</span></td>";
             echo "<td style='background: #e8f5e9; font-weight: 600;'>" . $row['executed_hours'] . "</td>";
             echo "<td style='background: #e8f5e9;'>" . $row['bucket_hours'] . "</td>";
             echo "<td style='background: #e8f5e9;'>" . $row['jackhammer_hours'] . "</td>";
@@ -837,11 +764,11 @@ if ($type != "") {
             // echo "<td>" . $row['hr_fault'] . "</td>";
             echo "<td style='text-align: center;'>" . $status . "</td>";
             echo "<td style='white-space: nowrap; text-align: center;'>
-        <a href='aprovment.php?t=" . $type . "&&type=1&&id=" . $row['id'] . "' title='قبول' style='color: #27ae60; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'> <i class='fa fa-check-circle'></i> </a>
-        <a href='aprovment.php?t=" . $type . "&&type=2&&id=" . $row['id'] . "' title='رفض' style='color: #e74c3c; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'> <i class='fa fa-times-circle'></i> </a>
-        <a href='javascript:void(0)' class='editBtn' data-id='" . $row['id'] . "' title='تعديل' style='color:#3498db; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'><i class='fa fa-edit'></i></a>
-        <a href='delete_timesheet.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' title='حذف' style='color: #e74c3c; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'><i class='fa fa-trash'></i></a>
-        <a href='timesheet_details.php?id=" . $row['id'] . "' title='عرض التفاصيل' style='color: #8e44ad; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'> <i class='fa fa-eye'></i> </a>  
+        <a href='aprovment.php?t=" . $type . "&&type=1&&id=" . $row['id'] . "' title='قبول' style='color: #27ae60; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'> <i class='fas fa-check-circle'></i> </a>
+        <a href='aprovment.php?t=" . $type . "&&type=2&&id=" . $row['id'] . "' title='رفض' style='color: #e74c3c; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'> <i class='fas fa-times-circle'></i> </a>
+        <a href='javascript:void(0)' class='editBtn' data-id='" . $row['id'] . "' title='تعديل' style='color:#3498db; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'><i class='fas fa-edit'></i></a>
+        <a href='delete_timesheet.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' title='حذف' style='color: #e74c3c; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'><i class='fas fa-trash'></i></a>
+        <a href='timesheet_details.php?id=" . $row['id'] . "' title='عرض التفاصيل' style='color: #8e44ad; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'> <i class='fas fa-eye'></i> </a>  
         </td>";
             echo "</tr>";
           }
@@ -849,91 +776,6 @@ if ($type != "") {
         </tbody>
       </table>
       
-      <style>
-        /* إصلاح مشكلة عرض الصفحة */
-        body {
-          display: flex;
-          overflow-x: hidden; /* منع التمرير الأفقي للجسم */
-        }
-        
-        .main {
-          flex: 1;
-          padding: 20px;
-          overflow-x: auto;
-          width: calc(100vw - 280px); /* عرض الشاشة - عرض الـ sidebar المفتوح */
-          max-width: calc(100vw - 280px);
-          min-width: 0; /* مهم جداً للـ flex */
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        /* عند إغلاق الـ sidebar */
-        body:has(.sidebar.closed) .main {
-          width: calc(100vw - 80px); /* عرض الشاشة - عرض الـ sidebar المغلق */
-          max-width: calc(100vw - 80px);
-        }
-        
-        /* للشاشات الصغيرة */
-        @media (max-width: 768px) {
-          .main {
-            max-width: 100vw;
-            width: 100vw;
-            padding: 15px;
-          }
-        }
-        
-        /* تحسين أيقونات الإجراءات */
-        #projectsTable tbody td a {
-          display: inline-block;
-          padding: 5px;
-          border-radius: 50%;
-          transition: all 0.3s ease;
-        }
-        
-        #projectsTable tbody td a:hover {
-          transform: scale(1.3);
-          background: rgba(0, 0, 0, 0.05);
-        }
-        
-        /* تحسين زر إضافة ساعات عمل */
-        .add:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
-        }
-        
-        .add:active {
-          transform: translateY(-1px);
-        }
-        
-        /* تحسين الجدول للشاشات الكبيرة */
-        .card-body {
-          overflow-x: auto;
-          position: relative;
-        }
-        
-        #projectsTable_wrapper {
-          overflow-x: auto;
-          width: 100%;
-        }
-        
-        #projectsTable {
-          width: 100% !important;
-          max-width: 100%;
-        }
-        
-        /* تحسين DataTables buttons */
-        .dt-buttons {
-          margin-bottom: 15px;
-          display: flex;
-          gap: 8px;
-          flex-wrap: wrap;
-        }
-        
-        /* عرض صحيح للبطاقات */
-        .card {
-          width: 100%;
-          max-width: 100%;
-        }
-      </style>
     </div>
   </div>
 </div>
@@ -941,10 +783,6 @@ if ($type != "") {
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
@@ -955,9 +793,8 @@ if ($type != "") {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
 <script>
-  (function () {
-    $(document).ready(function () {
-     var table =  $('#projectsTable').DataTable({
+  $(document).ready(function () {
+    var table = $('#projectsTable').DataTable({
         responsive: true, 
         scrollX: true,
         fixedHeader: true,
@@ -971,50 +808,43 @@ if ($type != "") {
           { extend: 'print', text: 'طباعة' }
         ],
         "language": {
-          "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+          "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
         }
-
-        
       });
-        // أزرار Toggle للمجموعات مع تأثيرات بصرية
-    $('#toggleBasic').on('click', function(){ 
-      table.columns([0,1,2,3]).visible(!table.column(0).visible()); 
-      $(this).toggleClass('active');
-    });
-    $('#toggleHours').on('click', function(){ 
-      table.columns([4,5,6,7]).visible(!table.column(4).visible()); 
-      $(this).toggleClass('active');
-    });
-    $('#toggleFaults').on('click', function(){ 
-      table.columns([8,9]).visible(!table.column(8).visible()); 
-      $(this).toggleClass('active');
-    });
-    $('#toggleTotals').on('click', function(){ 
-      table.columns([10,11]).visible(!table.column(10).visible()); 
-      $(this).toggleClass('active');
-    });
-    
-    // تحديث الجدول عند تغيير حجم sidebar
-    const sidebarToggle = document.getElementById('toggleBtn');
-    if (sidebarToggle) {
-      sidebarToggle.addEventListener('click', function() {
-        setTimeout(function() {
-          table.columns.adjust().draw();
-        }, 400); // تأخير بسيط للسماح بانتهاء انيميشن الـ sidebar
-      });
-    }
-    });
 
-  
+      // Update table when sidebar toggles
+      const sidebarToggle = document.getElementById('toggleBtn');
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+          setTimeout(function() {
+            table.columns.adjust().draw();
+          }, 400);
+        });
+      }
 
-    const toggleFormBtn = document.getElementById('toggleForm');
-    const form = document.getElementById('projectForm');
+      // Toggle form visibility
+      const toggleFormBtn = document.getElementById('toggleForm');
+      const form = document.getElementById('projectForm');
 
-    toggleFormBtn.addEventListener('click', function () {
-      form.style.display = form.style.display === "none" ? "block" : "none";
+      console.log('Toggle button:', toggleFormBtn);
+      console.log('Form element:', form);
+
+      if (toggleFormBtn && form) {
+        toggleFormBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          console.log('Toggle clicked, current display:', form.style.display);
+          if (form.style.display === "none" || form.style.display === "") {
+            form.style.display = "block";
+            console.log('Form shown');
+          } else {
+            form.style.display = "none";
+            console.log('Form hidden');
+          }
+        });
+      } else {
+        console.error('Toggle button or form not found!');
+      }
     });
-  })();
-
 
   function loadMachineData() {
     let id = document.getElementById("cost_code").value;
