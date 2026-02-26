@@ -99,27 +99,28 @@ body {
 /* ================== Sidebar ================== */
 .sidebar {
   width: 280px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  color: white;
+  background: linear-gradient(180deg, var(--navy, #0c1c3e) 0%, var(--navy-l, #1b2f6e) 100%);
+  color: #f8fafc;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
+  border-left: 1px solid rgba(12, 28, 62, 0.18);
+  box-shadow: 0 14px 44px rgba(12, 28, 62, 0.18);
 }
 
 .sidebar .logo {
-  color: var(--btn-color);
-  font-size: 28px;
+  color: var(--gold, #e8b800);
+  font-size: 22px;
   font-weight: 900;
   text-align: center;
-  padding: 25px 15px;
-  border-bottom: 3px solid var(--btn-color);
-  background: linear-gradient(135deg, rgba(255, 204, 0, 0.1) 0%, rgba(255, 204, 0, 0.05) 100%);
-  letter-spacing: 1px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  padding: 18px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, rgba(12, 28, 62, 0.9) 0%, rgba(27, 47, 110, 0.9) 100%);
+  letter-spacing: 0.4px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .sidebar.closed {
@@ -131,28 +132,28 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 18px 0;
+  padding: 12px 0;
   cursor: pointer;
-  font-size: 22px;
-  background: linear-gradient(135deg, rgba(255, 204, 0, 0.15) 0%, rgba(255, 204, 0, 0.05) 100%);
+  font-size: 18px;
+  background: rgba(255, 255, 255, 0.08);
   transition: all 0.3s ease;
-  border-bottom: 1px solid rgba(255, 204, 0, 0.2);
-  color: var(--btn-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--gold, #e8b800);
 }
 
 .sidebar .toggle-btn:hover {
-  background: linear-gradient(135deg, rgba(255, 204, 0, 0.25) 0%, rgba(255, 204, 0, 0.15) 100%);
-  transform: scale(1.05);
+  background: rgba(232, 184, 0, 0.18);
+  transform: scale(1.03);
 }
 
 .sidebar h2 {
   text-align: center;
-  padding: 15px 12px;
-  font-size: 18px;
+  padding: 12px 12px;
+  font-size: 15px;
   transition: all 0.3s ease;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(248, 250, 252, 0.9);
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.2px;
 }
 
 .sidebar.closed h2 {
@@ -162,12 +163,12 @@ body {
 
 .sidebar ul {
   list-style: none;
-  padding: 15px 0;
+  padding: 10px 0 16px;
   margin: 0;
   flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 204, 0, 0.3) transparent;
+  scrollbar-color: rgba(232, 184, 0, 0.45) transparent;
 }
 
 .sidebar ul::-webkit-scrollbar {
@@ -179,24 +180,25 @@ body {
 }
 
 .sidebar ul::-webkit-scrollbar-thumb {
-  background: rgba(255, 204, 0, 0.3);
+  background: rgba(232, 184, 0, 0.45);
   border-radius: 3px;
 }
 
 .sidebar ul::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 204, 0, 0.5);
+  background: rgba(232, 184, 0, 0.7);
 }
 
 .sidebar ul li {
   display: flex;
   align-items: center;
-  padding: 14px 20px;
+  padding: 11px 16px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  margin: 0 10px;
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.85);
+  margin: 4px 12px;
+  border-radius: 10px;
+  color: rgba(248, 250, 252, 0.92);
+  background: transparent;
 }
 
 .sidebar ul li::before {
@@ -207,15 +209,26 @@ body {
   transform: translateY(-50%);
   width: 4px;
   height: 0;
-  background: linear-gradient(135deg, var(--btn-color) 0%, #ffdd33 100%);
+  background: var(--gold, #e8b800);
   border-radius: 2px;
   transition: height 0.3s ease;
 }
 
 .sidebar ul li:hover {
-  background: linear-gradient(135deg, rgba(255, 204, 0, 0.2) 0%, rgba(255, 204, 0, 0.1) 100%);
+  background: rgba(232, 184, 0, 0.18);
   padding-right: 16px;
-  color: var(--btn-color);
+  color: #ffffff;
+}
+
+.sidebar ul li.active,
+.sidebar ul li.active:hover {
+  background: rgba(232, 184, 0, 0.28);
+  color: #ffffff;
+  padding-right: 16px;
+}
+
+.sidebar ul li.active::before {
+  height: 34px;
 }
 
 .sidebar ul li:hover::before {
@@ -227,24 +240,24 @@ body {
 }
 
 .sidebar ul li i {
-  font-size: 20px;
-  width: 30px;
+  font-size: 18px;
+  width: 26px;
   text-align: center;
-  color: var(--btn-color);
+  color: var(--gold, #e8b800);
   transition: all 0.3s ease;
   margin-left: 10px;
 }
 
 .sidebar ul li:hover i {
-  transform: scale(1.2) rotate(5deg);
+  transform: scale(1.1) rotate(4deg);
 }
 
 .sidebar ul li span {
   margin-left: 12px;
   transition: all 0.3s ease;
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.3px;
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: 0.2px;
 }
 
 .sidebar.closed ul li span {
@@ -267,21 +280,21 @@ body {
 .logout {
   display: flex;
   align-items: center;
-  padding: 16px 20px;
+  padding: 12px 16px;
   cursor: pointer;
-  background: linear-gradient(135deg, rgba(220, 53, 69, 0.15) 0%, rgba(220, 53, 69, 0.05) 100%);
+  background: rgba(220, 38, 38, 0.12);
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.9);
+  color: #fee2e2;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-top: 1px solid rgba(255, 204, 0, 0.1);
-  margin: 15px 10px 0 10px;
-  border-radius: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin: 10px 12px 14px;
+  border-radius: 10px;
   font-weight: 600;
 }
 
 .logout:hover {
-  background: linear-gradient(135deg, rgba(220, 53, 69, 0.25) 0%, rgba(220, 53, 69, 0.15) 100%);
-  color: #ff6b6b;
+  background: rgba(220, 38, 38, 0.2);
+  color: #ffffff;
   transform: translateX(-3px);
 }
 
