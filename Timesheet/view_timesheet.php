@@ -86,7 +86,7 @@ $result = mysqli_query($conn, $query);
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 
 <?php 
-// include('../insidebar.php'); 
+include('../insidebar.php'); 
 ?>
 
 <div class="main">

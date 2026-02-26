@@ -7,7 +7,7 @@ $page_title = 'Equipation | المستخدمين';
 // تضمين الهيدر
 include '../inheader.php';
 // تضمين الشريط الجانبي
-// include '../insidebar.php';
+include '../insidebar.php';
 
 include '../config.php';
 

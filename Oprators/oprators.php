@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 ?>
 
 <?php 
-// include('../insidebar.php'); 
+include('../insidebar.php'); 
 ?>
 
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
@@ -225,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <!-- سيتم ملؤها ديناميكيًا عبر AJAX -->
                     </select>
 
-                    <div class="form-grid-full">
+                    <div>
                         <div>
                             <label><i class="fas fa-check-circle"></i> نوع المعدة</label>
                             <select name="equipment_category" id="equipment_category" required>

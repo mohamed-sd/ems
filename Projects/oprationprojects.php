@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
 <?php
 $page_title = "إيكوبيشن | المشاريع";
 include("../inheader.php");
-// include('../insidebar.php');
+include('../insidebar.php');
 ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

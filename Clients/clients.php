@@ -95,7 +95,7 @@ if (isset($_GET['delete_id'])) {
 
 $page_title = "قائمة العملاء";
 include("../inheader.php");
-// include('../insidebar.php');
+include('../insidebar.php');
 ?>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">

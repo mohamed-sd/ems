@@ -66,7 +66,7 @@ $result = mysqli_query($conn, $sql);
 <body>
 
     <?php
-    // include('../insidebar.php');
+    include('../insidebar.php');
     ?>
 
     <div class="main">

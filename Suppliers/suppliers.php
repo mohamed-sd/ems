@@ -338,7 +338,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 </head>
 <body>
 <?php 
-// include('../insidebar.php'); 
+include('../insidebar.php'); 
 ?>
 
 <div class="main">
@@ -347,7 +347,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             <div class="title-icon"><i class="fas fa-truck-loading"></i></div>
             <h1 class="page-title">إدارة الموردين</h1>
         </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div>
             <a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>

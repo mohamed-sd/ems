@@ -9,7 +9,7 @@ if (!isset($_SESSION['user'])) {
 
 $page_title = "إيكوبيشن | أنواع الآليات";
 include("../inheader.php");
-// include("../insidebar.php");
+include("../insidebar.php");
 
 /* منع الحذف مؤقتاً (Backend) */
 if (isset($_GET['delete_id'])) {

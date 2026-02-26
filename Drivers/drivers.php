@@ -246,7 +246,7 @@ include("../inheader.php");
 </style>
 
 <?php 
-// include('../insidebar.php'); 
+include('../insidebar.php'); 
 ?>
 
 <div class="main">
