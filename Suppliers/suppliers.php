@@ -347,12 +347,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             <div class="title-icon"><i class="fas fa-truck-loading"></i></div>
             <h1 class="page-title">إدارة الموردين</h1>
         </div>
-        <div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
             <a href="javascript:void(0)" id="toggleForm" class="add">
                 <i class="fa fa-plus-circle"></i> إضافة مورد جديد
+            </a>
+            <a href="javascript:void(0)" id="openImportModal" class="add"
+                style="background:linear-gradient(135deg,#064e3b,#065f46);color:#fff;border-color:transparent;">
+                <i class="fas fa-file-excel"></i> استيراد من Excel
+            </a>
+            <a href="download_suppliers_template.php" class="add"
+                style="background:linear-gradient(135deg,var(--orange),#f59e0b);color:#fff;border-color:transparent;">
+                <i class="fas fa-download"></i> تحميل نموذج Excel
+            </a>
+            <a href="download_suppliers_template_csv.php" class="add"
+                style="background:linear-gradient(135deg,var(--blue),#3b82f6);color:#fff;border-color:transparent;">
+                <i class="fas fa-file-csv"></i> تحميل نموذج CSV
             </a>
         </div>
     </div>
@@ -749,7 +761,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             </div>
         </div>
     </div>
+    
+    <!-- Modal استيراد من Excel -->
+    <div id="importExcelModal" class="modal">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h5><i class="fas fa-file-excel"></i> استيراد موردين من Excel</h5>
+                <button class="close-modal" onclick="closeImportModal()">&times;</button>
+            </div>
+            <form id="importExcelForm" enctype="multipart/form-data">
+            <div class="modal-body">
+                <div style="background:linear-gradient(135deg,rgba(102,126,234,.06),rgba(118,75,162,.06));padding:18px;border-radius:var(--radius);margin-bottom:18px;border:1.5px solid rgba(102,126,234,.18);">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <i class="fas fa-info-circle" style="color:var(--navy);font-size:1.2rem;"></i>
+                        <strong style="color:var(--navy);font-size:.92rem;">تعليمات الاستيراد:</strong>
+                    </div>
+                    <ul style="margin:0;padding-right:28px;color:var(--sub);font-size:.84rem;line-height:1.8;">
+                        <li>قم بتحميل نموذج Excel أو CSV أولاً</li>
+                        <li>املأ البيانات في النموذج (كود المورد، الاسم، رقم الهاتف مطلوبة)</li>
+                        <li>احفظ الملف ثم قم برفعه هنا</li>
+                        <li>الصيغ المدعومة: .xlsx, .xls, .csv</li>
+                        <li>الحد الأقصى: 1000 صف، 5 ميجا</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-bottom:18px;">
+                    <label style="display:block;font-weight:700;color:var(--txt);margin-bottom:8px;font-size:.88rem;">
+                        <i class="fas fa-file-upload"></i> اختر ملف Excel أو CSV
+                    </label>
+                    <input type="file" name="excel_file" id="excelFileInput" accept=".xlsx,.xls,.csv" 
+                        style="width:100%;padding:12px;border:2px dashed var(--border);border-radius:var(--radius);background:var(--bg);cursor:pointer;font-family:'Cairo',sans-serif;" required>
+                </div>
+                
+                <div id="importProgress" style="display: none; margin-top: 18px;">
+                    <div style="background:linear-gradient(90deg,var(--navy),var(--gold));height:6px;border-radius:50px;overflow:hidden;animation:progressAnim 1.5s ease-in-out infinite;">
+                    </div>
+                    <p style="margin:10px 0 0;color:var(--blue);font-weight:700;">جاري الاستيراد...</p>
+                </div>
+                
+                <div id="importResult" style="display: none; margin-top: 18px;"></div>
+            </div>
+            <div class="modal-footer" style="display:flex;gap:10px;justify-content:flex-end;padding:1.5rem;border-top:2px solid #e0e0e0;">
+                <button type="submit" class="btn-save" 
+                    style="background:linear-gradient(135deg,#064e3b,#059669)!important;">
+                    <i class="fas fa-upload"></i> رفع واستيراد
+                </button>
+                <button type="button" class="btn-cancel" onclick="closeImportModal()">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<style>
+@keyframes progressAnim {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+</style>
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -906,6 +977,109 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
             }
         };
+        
+        // فتح Modal الاستيراد
+        $('#openImportModal').on('click', function () {
+            $('#importExcelModal').fadeIn(300);
+            $('#importResult').hide();
+            $('#excelFileInput').val('');
+        });
+        
+        // إغلاق Modal الاستيراد
+        window.closeImportModal = function() {
+            $('#importExcelModal').fadeOut(300);
+            $('#importExcelForm')[0].reset();
+            $('#importProgress').hide();
+            $('#importResult').hide();
+        };
+        
+        // إغلاق Modal عند الضغط خارج المحتوى
+        $(document).on('click', '#importExcelModal', function(e) {
+            if (e.target.id === 'importExcelModal') {
+                closeImportModal();
+            }
+        });
+        
+        // معالجة رفع واستيراد الملف
+        $('#importExcelForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('excelFileInput');
+            if (!fileInput.files.length) {
+                alert('الرجاء اختيار ملف أولاً');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('excel_file', fileInput.files[0]);
+            formData.append('action', 'import_excel');
+
+            $('#importProgress').show();
+            $('#importResult').hide();
+
+            $.ajax({
+                url: 'import_suppliers_excel.php',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (response) {
+                    $('#importProgress').hide();
+
+                    let resultHtml = '<div style="padding:16px;border-radius:var(--radius);border:1.5px solid;';
+
+                    if (response.success) {
+                        resultHtml += 'border-color:#10b981;background:rgba(16,185,129,.06);">';
+                        resultHtml += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">';
+                        resultHtml += '<i class="fas fa-check-circle" style="color:#10b981;font-size:1.4rem;"></i>';
+                        resultHtml += '<strong style="color:#059669;font-size:1rem;">' + response.message + '</strong>';
+                        resultHtml += '</div>';
+                        resultHtml += '<div style="color:#047857;font-size:.88rem;line-height:1.6;">';
+                        resultHtml += '<p style="margin:6px 0;"><strong>✅ تمت الإضافة:</strong> ' + response.added + ' مورد</p>';
+                        if (response.skipped > 0) {
+                            resultHtml += '<p style="margin:6px 0;"><strong>⏭️ تم التخطي:</strong> ' + response.skipped + ' مورد</p>';
+                        }
+                        if (response.errors && response.errors.length > 0) {
+                            resultHtml += '<details style="margin-top:12px;padding:10px;background:#fff;border-radius:8px;">';
+                            resultHtml += '<summary style="cursor:pointer;font-weight:700;color:#dc2626;">عرض الأخطاء (' + response.errors.length + ')</summary>';
+                            resultHtml += '<ul style="margin:10px 0 0;padding-right:20px;">';
+                            response.errors.forEach(function (error) {
+                                resultHtml += '<li style="margin:4px 0;color:#b91c1c;font-size:.82rem;">' + error + '</li>';
+                            });
+                            resultHtml += '</ul></details>';
+                        }
+                        resultHtml += '</div>';
+                        resultHtml += '<button onclick="location.reload()" style="margin-top:14px;padding:10px 20px;background:#10b981;color:#fff;border:none;border-radius:50px;cursor:pointer;font-weight:700;font-family:Cairo,sans-serif;">تحديث الصفحة</button>';
+                    } else {
+                        resultHtml += 'border-color:#ef4444;background:rgba(239,68,68,.06);">';
+                        resultHtml += '<div style="display:flex;align-items:center;gap:10px;">';
+                        resultHtml += '<i class="fas fa-exclamation-circle" style="color:#ef4444;font-size:1.4rem;"></i>';
+                        resultHtml += '<div><strong style="color:#dc2626;font-size:1rem;display:block;margin-bottom:6px;">فشل الاستيراد</strong>';
+                        resultHtml += '<p style="color:#b91c1c;font-size:.88rem;margin:0;">' + response.message + '</p></div>';
+                        resultHtml += '</div>';
+                    }
+
+                    resultHtml += '</div>';
+                    $('#importResult').html(resultHtml).fadeIn();
+                },
+                error: function (xhr, status, error) {
+                    $('#importProgress').hide();
+                    let errorMsg = 'حدث خطأ غير متوقع';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    $('#importResult').html(
+                        '<div style="padding:16px;border-radius:var(--radius);border:1.5px solid #ef4444;background:rgba(239,68,68,.06);">' +
+                        '<div style="display:flex;align-items:center;gap:10px;">' +
+                        '<i class="fas fa-times-circle" style="color:#ef4444;font-size:1.4rem;"></i>' +
+                        '<div><strong style="color:#dc2626;">خطأ في الاتصال</strong>' +
+                        '<p style="color:#b91c1c;margin:6px 0 0;font-size:.88rem;">' + errorMsg + '</p></div>' +
+                        '</div></div>'
+                    ).fadeIn();
+                }
+            });
+        });
     })();
 </script>
 
