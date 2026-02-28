@@ -13,8 +13,53 @@ if (!isset($_SESSION['user'])) {
 	<title>إيكوبيشن | تقرير العقود</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+    <link rel="stylesheet" href="../assets/css/admin-style.css">
+    <link rel="stylesheet" href="../assets/css/main_admin_style.css">
+    <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .main { font-family: 'Cairo', sans-serif; }
+        .report-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .summary-item {
+            background: rgba(12, 28, 62, 0.03);
+            border: 1px solid rgba(12, 28, 62, 0.08);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+        .summary-item .label {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .summary-item .value {
+            font-size: 16px;
+            color: #0c1c3e;
+            font-weight: 800;
+        }
+        .report-progress .progress,
+        .progress.report-progress {
+            height: 20px;
+            border-radius: 999px;
+            background: #eef2f7;
+        }
+        .report-progress .progress-bar {
+            font-weight: 700;
+            font-size: 12px;
+        }
+        .card-header h5 { margin: 0; }
+        .table thead th {
+            background: #f8fafc;
+            color: #0c1c3e;
+            font-weight: 800;
+        }
+    </style>
 </head>
 <body>
 
@@ -79,48 +124,58 @@ if (!empty($contract_filter)) {
 }
 ?>
 
-<div class="main container-fluid py-4">
+<div class="main">
+    <div class="page-header">
+        <h1 class="page-title">
+            <div class="title-icon"><i class="fa-solid fa-file-contract"></i></div>
+            تقرير إحصائية العقود
+        </h1>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="reports.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+        </div>
+    </div>
 
-    <h2 class="fw-bold mb-4"><i class="fa-solid fa-file-contract text-primary me-2"></i> تقرير إحصائية العقود</h2>
-
-    <!-- فورم اختيار العقد -->
-    <div class="card shadow-sm mb-4">
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-filter"></i> اختيار العقد</h5>
+        </div>
         <div class="card-body">
-            <form method="GET" class="row g-3 align-items-end">
-                <div class="col-md-6">
-                    <label class="form-label">اختر العقد:</label>
-                    <select name="contract" class="form-select">
+            <form method="GET" class="form-grid" style="align-items:end;">
+                <div>
+                    <label><i class="fas fa-file-signature"></i> اختر العقد</label>
+                    <select name="contract">
                         <option value="">-- اختر --</option>
-                        <?php while($row = mysqli_fetch_assoc($contracts)) { 
+                        <?php while($row = mysqli_fetch_assoc($contracts)) {
                             $selected = ($contract_filter == $row['id']) ? "selected" : "";
                             echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['project_name']}</option>";
                         } ?>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary w-100"><i class="fa fa-eye me-2"></i>عرض</button>
-                </div>
+                <button type="submit"><i class="fa fa-eye"></i> عرض التقرير</button>
             </form>
         </div>
     </div>
 
     <?php if ($contract_data) { ?>
         <!-- تفاصيل العقد -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white fw-bold">
-                📌 تفاصيل العقد
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-thumbtack"></i> تفاصيل العقد</h5>
             </div>
             <div class="card-body">
-                <ul class="list-unstyled">
-                    <li><b>المشروع:</b> <?php echo $contract_data['project_name']; ?></li>
-                    <li><b>تاريخ التوقيع:</b> <?php echo $contract_data['contract_signing_date']; ?></li>
-                    <li><b>مدة العقد:</b> <?php echo $contract_data['contract_duration_months']; ?> شهور</li>
-                    <li><b>الهدف الشهري للساعات:</b> <?php echo $contract_data['hours_monthly_target']; ?></li>
-                    <li><b>إجمالي الساعات المتوقعة:</b> <?php echo $contract_data['forecasted_contracted_hours']; ?></li>
-                    <li><b>الساعات المنفذة فعليًا:</b> <?php echo $contract_data['actual_hours']; ?></li>
-                    <li><b>المتبقي:</b> <?php echo $contract_data['remaining_hours']; ?></li>
-                    <li class="mt-3">
-                        <b>نسبة الإنجاز الكلية:</b>
+                <div class="report-summary">
+                    <div class="summary-item"><div class="label">المشروع</div><div class="value"><?php echo $contract_data['project_name']; ?></div></div>
+                    <div class="summary-item"><div class="label">تاريخ التوقيع</div><div class="value"><?php echo $contract_data['contract_signing_date']; ?></div></div>
+                    <div class="summary-item"><div class="label">مدة العقد</div><div class="value"><?php echo $contract_data['contract_duration_months']; ?> شهور</div></div>
+                    <div class="summary-item"><div class="label">الهدف الشهري</div><div class="value"><?php echo $contract_data['hours_monthly_target']; ?></div></div>
+                    <div class="summary-item"><div class="label">إجمالي الساعات المتوقعة</div><div class="value"><?php echo $contract_data['forecasted_contracted_hours']; ?></div></div>
+                    <div class="summary-item"><div class="label">المنفذ فعلياً</div><div class="value"><?php echo $contract_data['actual_hours']; ?></div></div>
+                    <div class="summary-item"><div class="label">المتبقي</div><div class="value"><?php echo $contract_data['remaining_hours']; ?></div></div>
+                </div>
+                <div class="report-progress">
+                    <div style="font-weight:700; margin-bottom:8px; color:#0c1c3e;">نسبة الإنجاز الكلية</div>
                         <?php 
                         $overall_percent = ($contract_data['forecasted_contracted_hours'] > 0) 
                             ? round(($contract_data['actual_hours'] / $contract_data['forecasted_contracted_hours']) * 100, 2) 
@@ -133,25 +188,24 @@ if (!empty($contract_filter)) {
                             $color = "bg-warning";
                         }
                         ?>
-                        <div class="progress mt-2" style="max-width:400px;">
+                        <div class="progress" style="max-width:480px;">
                             <div class="progress-bar <?php echo $color; ?>" 
                                  role="progressbar" style="width: <?php echo $overall_percent; ?>%;">
                                 <?php echo $overall_percent; ?> %
                             </div>
                         </div>
-                    </li>
-                </ul>
+                </div>
             </div>
         </div>
 
         <!-- الأداء الشهري -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-dark text-white fw-bold">
-                📊 الأداء الشهري
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-column"></i> الأداء الشهري</h5>
             </div>
             <div class="card-body table-responsive">
                 <table class="table table-bordered text-center align-middle">
-                    <thead class="table-secondary">
+                    <thead>
                         <tr>
                             <th>السنة</th>
                             <th>الشهر</th>
@@ -191,7 +245,7 @@ if (!empty($contract_filter)) {
                             <td><?php echo $row['actual_hours']; ?></td>
                             <td><?php echo $row['hours_monthly_target']; ?></td>
                             <td>
-                                <div class="progress" style="height: 20px;">
+                                <div class="progress report-progress">
                                     <div class="progress-bar <?php echo $color; ?>" role="progressbar" 
                                          style="width: <?php echo $percent; ?>%;">
                                         <?php echo $percent; ?> %
@@ -206,7 +260,10 @@ if (!empty($contract_filter)) {
         </div>
 
         <!-- الرسم البياني -->
-        <div class="card shadow-sm">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-line"></i> الرسم البياني</h5>
+            </div>
             <div class="card-body">
                 <canvas id="chart" height="100"></canvas>
             </div>
@@ -222,18 +279,18 @@ if (!empty($contract_filter)) {
                     {
                         label: 'المنفذ',
                         data: <?php echo json_encode($actual); ?>,
-                        backgroundColor: 'rgba(75, 192, 192, 0.7)'
+                        backgroundColor: 'rgba(37, 99, 235, 0.75)'
                     },
                     {
                         label: 'الهدف الشهري',
                         data: <?php echo json_encode($target); ?>,
-                        backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                        backgroundColor: 'rgba(232, 184, 0, 0.75)'
                     },
                     {
                         label: 'نسبة الإنجاز (%)',
                         data: <?php echo json_encode($percentages); ?>,
                         type: 'line',
-                        borderColor: 'blue',
+                        borderColor: '#0c1c3e',
                         backgroundColor: 'transparent',
                         yAxisID: 'percentage'
                     }

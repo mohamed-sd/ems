@@ -108,6 +108,32 @@ if (!isset($_SESSION['user'])) {
             gap: 20px;
             position: relative;
             z-index: 1;
+            justify-content: space-between;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            border: 1.5px solid rgba(255,255,255,0.28);
+            border-radius: 12px;
+            padding: 9px 20px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .btn-back:hover {
+            background: rgba(232,184,75,0.22);
+            border-color: rgba(232,184,75,0.55);
+            color: #fff;
         }
 
         .hero-icon {
@@ -425,13 +451,18 @@ if (!isset($_SESSION['user'])) {
     <!-- ===== PAGE HERO ===== -->
     <div class="page-hero">
         <div class="page-hero-inner">
-            <div class="hero-icon">
-                <i class="fas fa-clock"></i>
+            <div style="display:flex; align-items:center; gap:20px;">
+                <div class="hero-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>
+                    <h1 class="hero-title">تفاصيل ساعات العمل</h1>
+                    <p class="hero-subtitle">عرض تقرير مفصّل لجميع ساعات التشغيل والأعطال والمشغل</p>
+                </div>
             </div>
-            <div>
-                <h1 class="hero-title">تفاصيل ساعات العمل</h1>
-                <p class="hero-subtitle">عرض تقرير مفصّل لجميع ساعات التشغيل والأعطال والمشغل</p>
-            </div>
+            <a href="javascript:history.back()" class="btn-back">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
         </div>
     </div>
 

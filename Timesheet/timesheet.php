@@ -16,7 +16,7 @@ include("../inheader.php");
 // تحديد النوع من الرابط (إن وجد)
 $type_filter = "";
 if ($type != "") {
-  $type_filter = " AND e.type = '$type' ";
+  $type_filter = " AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE '$type' AND status = 'active') ";
 }
 ?>
 
@@ -103,7 +103,7 @@ if ($type != "") {
             إدارة ساعات العمل
         </h1>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="../main/dashboard.php" class="back-btn">
+            <a href="timesheet_type.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
@@ -372,7 +372,7 @@ if ($type != "") {
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, o.project_id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project'] . "'");
+                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project_id'] . "'");
 
 
 
@@ -795,7 +795,6 @@ if ($type != "") {
 <script>
   $(document).ready(function () {
     var table = $('#projectsTable').DataTable({
-        responsive: true, 
         scrollX: true,
         fixedHeader: true,
       

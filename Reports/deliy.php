@@ -73,32 +73,71 @@ $executed_hours  = $total_row['executed_hours'];
 	<!-- Bootstrap 5 -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	<link rel="stylesheet" href="../assets/css/admin-style.css">
+	<link rel="stylesheet" href="../assets/css/main_admin_style.css">
 	<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+	<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+
+	<style>
+		.main { font-family: 'Cairo', sans-serif; }
+
+		.report-table thead th {
+			background: #f8fafc;
+			color: #0c1c3e;
+			font-weight: 800;
+			border-color: rgba(12, 28, 62, 0.1);
+		}
+
+		.report-table td {
+			border-color: rgba(12, 28, 62, 0.08);
+			color: #0c1c3e;
+		}
+
+		.stats-box {
+			background: linear-gradient(135deg, rgba(13, 148, 136, 0.12), rgba(13, 148, 136, 0.06));
+			border: 1px solid rgba(13, 148, 136, 0.25);
+			border-radius: 14px;
+			padding: 16px 18px;
+			color: #0f766e;
+			font-weight: 800;
+			box-shadow: 0 4px 14px rgba(15, 118, 110, 0.12);
+		}
+
+		.form-grid { align-items: end; }
+	</style>
 </head>
 <body class="bg-light">
 
 <?php include('../insidebar.php'); ?>
 
-<div class="main container py-4">
+<div class="main">
 
-	<div class="card shadow-lg border-0 rounded-4">
+	<div class="page-header">
+		<h1 class="page-title">
+			<div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
+			تقرير ساعات العمل اليومية
+		</h1>
+		<div style="display: flex; gap: 10px; flex-wrap: wrap;">
+			<a href="reports.php" class="back-btn">
+				<i class="fas fa-arrow-right"></i> رجوع
+			</a>
+		</div>
+	</div>
+
+	<div class="card mb-4">
+		<div class="card-header">
+			<h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
+		</div>
 		<div class="card-body">
-			
-			<h2 class="mb-4 text-primary text-center">
-				<i class="fa-solid fa-chart-line"></i> تقرير ساعات العمل اليومية
-			</h2>
-			<hr class="mb-4">
-
-			<!-- فورم الفلاتر -->
-			<form method="GET" class="row g-3 mb-4">
-				<div class="col-md-4">
-					<label class="form-label">📅 التاريخ:</label>
-					<input type="date" name="date" value="<?php echo $date_filter; ?>" class="form-control">
+			<form method="GET" class="form-grid">
+				<div>
+					<label><i class="fas fa-calendar-day"></i> التاريخ</label>
+					<input type="date" name="date" value="<?php echo $date_filter; ?>">
 				</div>
 
-				<div class="col-md-4">
-					<label class="form-label">⚙️ الآلية:</label>
-					<select name="equipment" class="form-select">
+				<div>
+					<label><i class="fas fa-cogs"></i> الآلية</label>
+					<select name="equipment">
 						<option value="">-- الكل --</option>
 						<?php
 						$eqs = mysqli_query($conn, "SELECT id, name , code FROM equipments where status = '1' AND  id IN ( SELECT operations.equipment FROM `operations` WHERE `status` LIKE '1' ) ");
@@ -110,9 +149,9 @@ $executed_hours  = $total_row['executed_hours'];
 					</select>
 				</div>
 
-				<div class="col-md-4">
-					<label class="form-label">🏗️ المشروع:</label>
-					<select name="project" class="form-select">
+				<div>
+					<label><i class="fas fa-diagram-project"></i> المشروع</label>
+					<select name="project">
 						<option value="">-- الكل --</option>
 						<?php
 						$prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
@@ -124,17 +163,19 @@ $executed_hours  = $total_row['executed_hours'];
 					</select>
 				</div>
 
-				<div class="col-12 text-center">
-					<button class="btn btn-primary px-5 mt-3" type="submit">
-						<i class="fa fa-search"></i> بحث
-					</button>
-				</div>
+				<button type="submit"><i class="fa fa-search"></i> بحث</button>
 			</form>
+		</div>
+	</div>
 
-			<!-- الجدول -->
-			<div class="table-responsive"  id="projectsTable">
-				<table class="table table-striped table-hover align-middle text-center">
-					<thead class="table-primary">
+	<div class="card">
+		<div class="card-header">
+			<h5><i class="fas fa-table"></i> جدول البيانات</h5>
+		</div>
+		<div class="card-body table-container">
+			<div class="table-responsive" id="projectsTable">
+				<table class="table table-striped table-hover align-middle report-table">
+					<thead>
 						<tr>
 							<th>المشروع</th>
 							<th>الآلية</th>
@@ -154,20 +195,19 @@ $executed_hours  = $total_row['executed_hours'];
 							<td><?php echo $row['driver_name']; ?></td>
 							<td><?php echo $row['date']; ?></td>
 							<td><?php echo $row['shift']; ?></td>
-							<td><span class="badge bg-success fs-6"><?php echo $row['executed_hours']; ?></span></td>
-							<td><span class="badge bg-danger fs-6"><?php echo $row['total_fault_hours']; ?></span></td>
-							<td><span class="badge bg-secondary fs-6"><?php echo $row['standby_hours']; ?></span></td>
+						<td style="color:#0d9488; font-weight:700;"><?php echo $row['executed_hours']; ?></td>
+						<td style="color:#dc2626; font-weight:700;"><?php echo $row['total_fault_hours']; ?></td>
+						<td style="color:#e8b800; font-weight:700;"><?php echo $row['standby_hours']; ?></td>
 						</tr>
 					<?php } ?>
 					</tbody>
 				</table>
 			</div>
 
-			<!-- المجموع -->
-			<div class="alert alert-info mt-4 fs-5 text-center">
-				✅ مجموع ساعات العمل: <strong><?php echo $executed_hours ? $executed_hours : 0; ?></strong> ساعة
+			<div class="stats-box mt-3">
+				<i class="fas fa-check-circle"></i>
+			مجموع ساعات العمل: <?php echo $executed_hours ? $executed_hours : 0; ?> ساعة
 			</div>
-
 		</div>
 	</div>
 </div>

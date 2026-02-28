@@ -74,7 +74,7 @@ $result = mysqli_query($conn, $sql);
         <h1 class="page-title">تقرير ساعات عمل السائقين</h1>
       </div>
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <a href="../main/dashboard.php" class="back-btn">
+        <a href="reports.php" class="back-btn">
           <i class="fas fa-arrow-right"></i> رجوع
         </a>
       </div>

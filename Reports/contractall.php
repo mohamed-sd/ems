@@ -19,12 +19,74 @@ if (!isset($_SESSION['user'])) {
     <!-- أيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+    <link rel="stylesheet" href="../assets/css/admin-style.css">
+    <link rel="stylesheet" href="../assets/css/main_admin_style.css">
     <!-- استايلك القديم -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: Tahoma, Arial; }
-        .nav-pills .nav-link.active { background-color: #0d6efd; }
+        .main {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .report-tabs {
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .report-tabs .nav-link {
+            border-radius: 999px;
+            border: 1px solid rgba(12, 28, 62, 0.12);
+            color: #0c1c3e;
+            background: #fff;
+            font-weight: 700;
+            padding: 8px 14px;
+            transition: all 0.2s ease;
+        }
+
+        .report-tabs .nav-link:hover {
+            border-color: rgba(232, 184, 0, 0.45);
+            background: rgba(232, 184, 0, 0.12);
+            color: #0c1c3e;
+        }
+
+        .report-tabs .nav-link.active {
+            background: linear-gradient(135deg, #0c1c3e, #1b2f6e);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 8px 22px rgba(12, 28, 62, 0.22);
+        }
+
+        .tab-card {
+            border: 1px solid rgba(12, 28, 62, 0.08);
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 4px 14px rgba(12, 28, 62, 0.08);
+            padding: 18px;
+        }
+
+        .report-table thead th {
+            background: #f8fafc;
+            color: #0c1c3e;
+            font-weight: 800;
+        }
+
+        .summary-list .list-group-item {
+            border-color: rgba(12, 28, 62, 0.08);
+            font-weight: 600;
+            color: #0c1c3e;
+        }
+
+        .metric-box {
+            border: 1px solid rgba(12, 28, 62, 0.09);
+            background: rgba(12, 28, 62, 0.03);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: #0c1c3e;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 
@@ -150,42 +212,56 @@ if (!isset($_SESSION['user'])) {
     }
     ?>
 
-    <div class="main container mt-4">
-
-        <h2 class="mb-4"><i class="fa-solid fa-chart-line"></i> تقارير تفصيلية للعقد</h2>
-
-        <form method="GET" class="row g-3 mb-4">
-            <div class="col-md-6">
-                <label class="form-label">اختر العقد:</label>
-                <select name="contract" class="form-select">
-                    <option value="">-- اختر --</option>
-                    <?php while($row = mysqli_fetch_assoc($contracts)) { 
-                        $selected = ($contract_filter == $row['id']) ? "selected" : "";
-                        echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['mine_name']} ({$row['project_name']})</option>";
-                    } ?>
-                </select>
+    <div class="main">
+        <div class="page-header">
+            <h1 class="page-title">
+                <div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
+                تقارير تفصيلية للعقد
+            </h1>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="reports.php" class="back-btn">
+                    <i class="fas fa-arrow-right"></i> رجوع
+                </a>
             </div>
-            <div class="col-md-3 align-self-end">
-                <button type="submit" class="btn btn-primary w-100">عرض</button>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-filter"></i> اختيار العقد</h5>
             </div>
-        </form>
+            <div class="card-body">
+                <form method="GET" class="form-grid" style="align-items:end;">
+                    <div>
+                        <label><i class="fas fa-file-contract"></i> اختر العقد</label>
+                        <select name="contract">
+                            <option value="">-- اختر --</option>
+                            <?php while($row = mysqli_fetch_assoc($contracts)) {
+                                $selected = ($contract_filter == $row['id']) ? "selected" : "";
+                                echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['mine_name']} ({$row['project_name']})</option>";
+                            } ?>
+                        </select>
+                    </div>
+                    <button type="submit"><i class="fa fa-eye"></i> عرض التقرير</button>
+                </form>
+            </div>
+        </div>
 
         <?php if ($contract_data) { ?>
-        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#basic">📝 التفاصيل الأساسية</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#time">⏳ الزمن مقابل الإنجاز</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#faults">⚠️ الأعطال</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#suppliers">🚛 الموردين</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#equipments">🏗️ الآليات</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#drivers">👷 السائقين</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#variance">📉 الانحراف</button></li>
+        <ul class="nav nav-pills report-tabs mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#basic"><i class="fas fa-file-lines"></i> التفاصيل الأساسية</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#time"><i class="fas fa-hourglass-half"></i> الزمن مقابل الإنجاز</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#faults"><i class="fas fa-triangle-exclamation"></i> الأعطال</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#suppliers"><i class="fas fa-truck"></i> الموردين</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#equipments"><i class="fas fa-tractor"></i> الآليات</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#drivers"><i class="fas fa-helmet-safety"></i> السائقين</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#variance"><i class="fas fa-chart-line"></i> الانحراف</button></li>
         </ul>
 
         <div class="tab-content">
             <!-- التفاصيل الأساسية -->
             <div class="tab-pane fade show active" id="basic">
-                <div class="card card-body">
-                    <ul class="list-group">
+                <div class="tab-card">
+                    <ul class="list-group summary-list">
                         <li class="list-group-item">المشروع: <?= $contract_data['project_name'] ?></li>
                         <li class="list-group-item">تاريخ التوقيع: <?= $contract_data['contract_signing_date'] ?></li>
                         <li class="list-group-item">مدة العقد: <?= $contract_data['contract_duration_months'] ?> شهور</li>
@@ -198,23 +274,24 @@ if (!isset($_SESSION['user'])) {
 
             <!-- الزمن مقابل الإنجاز -->
             <div class="tab-pane fade" id="time">
-                <div class="alert alert-info">
-                    التقدم الزمني: <?= round($time_vs_progress['time_progress'], 2) ?> % <br>
-                    التقدم الفعلي: <?= round($time_vs_progress['work_progress'], 2) ?> %
+                <div class="tab-card">
+                    <div class="metric-box">التقدم الزمني: <?= round($time_vs_progress['time_progress'], 2) ?> %</div>
+                    <div class="metric-box">التقدم الفعلي: <?= round($time_vs_progress['work_progress'], 2) ?> %</div>
                 </div>
             </div>
 
             <!-- الأعطال -->
             <div class="tab-pane fade" id="faults">
-                <div class="alert alert-warning">
+                <div class="tab-card">
                    <p><?php echo isset($faults['total_fault_hours']) ? $faults['total_fault_hours'] : 0; ?> ساعة</p>
                 </div>
             </div>
 
             <!-- الموردين -->
             <div class="tab-pane fade" id="suppliers">
-                <table class="table table-striped">
-                    <thead class="table-light">
+                <div class="tab-card table-responsive">
+                <table class="table table-striped report-table">
+                    <thead>
                         <tr><th>المورد</th><th>إجمالي الساعات</th></tr>
                     </thead>
                     <tbody>
@@ -226,12 +303,14 @@ if (!isset($_SESSION['user'])) {
                     <?php } ?>
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <!-- الآليات -->
             <div class="tab-pane fade" id="equipments">
-                <table class="table table-bordered">
-                    <thead class="table-light">
+                <div class="tab-card table-responsive">
+                <table class="table table-bordered report-table">
+                    <thead>
                         <tr><th>الآلية</th><th>ساعات العمل</th><th>ساعات الأعطال</th></tr>
                     </thead>
                     <tbody>
@@ -244,12 +323,14 @@ if (!isset($_SESSION['user'])) {
                     <?php } ?>
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <!-- السائقين -->
             <div class="tab-pane fade" id="drivers">
-                <table class="table table-hover">
-                    <thead class="table-light">
+                <div class="tab-card table-responsive">
+                <table class="table table-hover report-table">
+                    <thead>
                         <tr><th>السائق</th><th>إجمالي الساعات</th></tr>
                     </thead>
                     <tbody>
@@ -261,14 +342,15 @@ if (!isset($_SESSION['user'])) {
                     <?php } ?>
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <!-- الانحراف -->
             <div class="tab-pane fade" id="variance">
-                <div class="card card-body">
-                    <p>المخطط: <?= $variance['planned_hours'] ?> ساعة</p>
-                    <p>المنفذ: <?= $variance['actual_hours'] ?> ساعة</p>
-                    <p>الانحراف: <?= $variance['variance'] ?> ساعة</p>
+                <div class="tab-card">
+                    <div class="metric-box">المخطط: <?= $variance['planned_hours'] ?> ساعة</div>
+                    <div class="metric-box">المنفذ: <?= $variance['actual_hours'] ?> ساعة</div>
+                    <div class="metric-box">الانحراف: <?= $variance['variance'] ?> ساعة</div>
                 </div>
             </div>
         </div>

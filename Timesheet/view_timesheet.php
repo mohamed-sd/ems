@@ -148,8 +148,8 @@ include('../insidebar.php');
                     <label><i class="fas fa-cogs"></i> نوع المعدة</label>
                     <select name="equipment_type" class="form-control">
                         <option value="">-- الكل --</option>
-                        <option value="1">🔧 حفار</option>
-                        <option value="2">🚛 قلاب</option>
+                        <option value="1"> معدات ثقيبلة </option>
+                        <option value="2"> شاحنات </option>
                     </select>
                 </div>
                 <div>

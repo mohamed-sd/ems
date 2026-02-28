@@ -14,7 +14,72 @@ if (!isset($_SESSION['user'])) {
     <title> إيكوبيشن | التقارير </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/admin-style.css">
+    <link rel="stylesheet" href="../assets/css/main_admin_style.css">
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        .main { font-family: 'Cairo', sans-serif; }
+
+        .report-table thead th {
+            background: #f8fafc;
+            color: #0c1c3e;
+            font-weight: 800;
+            border-color: rgba(12, 28, 62, 0.1);
+        }
+
+        .report-table td {
+            border-color: rgba(12, 28, 62, 0.08);
+            color: #0c1c3e;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .stat-card {
+            border-radius: 14px;
+            border: 1px solid rgba(12, 28, 62, 0.08);
+            background: #fff;
+            padding: 16px 18px;
+            text-align: center;
+            box-shadow: 0 4px 14px rgba(12, 28, 62, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(12, 28, 62, 0.14);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 22px;
+            font-weight: 900;
+            color: #0c1c3e;
+        }
+
+        .stat-card.executed { border-top: 3px solid #0d9488; }
+        .stat-card.fault { border-top: 3px solid #dc2626; }
+        .stat-card.standby { border-top: 3px solid #e8b800; }
+
+        .form-grid { align-items: end; }
+    </style>
 </head>
 
 <body>
@@ -110,24 +175,34 @@ WHERE 1=1
     $totals = mysqli_fetch_assoc($total_res);
     ?>
 
-    <div class="main container-fluid py-4">
+    <div class="main">
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold"><i class="fa-solid fa-chart-column me-2 text-primary"></i> تقرير التايم شيت</h2>
+        <div class="page-header">
+            <h1 class="page-title">
+                <div class="title-icon"><i class="fa-solid fa-chart-column"></i></div>
+                تقرير التايم شيت اليومي
+            </h1>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="reports.php" class="back-btn">
+                    <i class="fas fa-arrow-right"></i> رجوع
+                </a>
+            </div>
         </div>
 
-        <!-- فورم الفلترة -->
-        <div class="card shadow-sm mb-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
+            </div>
             <div class="card-body">
-                <form method="GET" class="row g-3 align-items-end">
-                    <div class="col-md-2">
+                <form method="GET" class="form-grid">
+                    <div class="">
                         <label class="form-label">📅 التاريخ:</label>
                         <input type="date" class="form-control" name="date" value="<?php echo $date_filter; ?>">
                     </div>
 
-                    <div class="col-md-2">
-                        <label class="form-label">🏗️ المشروع:</label>
-                        <select class="form-select" name="project">
+                    <div>
+                        <label><i class="fas fa-diagram-project"></i> المشروع</label>
+                        <select name="project">
                             <option value="">-- الكل --</option>
                             <?php
                             $prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
@@ -139,9 +214,9 @@ WHERE 1=1
                         </select>
                     </div>
 
-                    <div class="col-md-2">
-                        <label class="form-label">🚛 المورد:</label>
-                        <select class="form-select" name="supplier">
+                    <div>
+                        <label><i class="fas fa-truck"></i> المورد</label>
+                        <select name="supplier">
                             <option value="">-- الكل --</option>
                             <?php
                             $sup = mysqli_query($conn, "SELECT id, name FROM suppliers where status = '1' ");
@@ -152,77 +227,58 @@ WHERE 1=1
                             ?>
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label">🚛 الوردية:</label>
 
-                        <select class="form-select" name="shift">
+                    <div>
+                        <label><i class="fas fa-clock"></i> الوردية</label>
+                        <select name="shift">
                             <option value="">-- الكل --</option>
-                            <option value="D" <?php if (isset($_GET['shift']) && $_GET['shift'] == "صباحية")
-                                echo "selected"; ?>>صباحية</option>
-                            <option value="N" <?php if (isset($_GET['shift']) && $_GET['shift'] == "مسائية")
-                                echo "selected"; ?>>مسائية</option>
-
+                            <option value="D" <?php if (isset($_GET['shift']) && $_GET['shift'] == "صباحية") echo "selected"; ?>>صباحية</option>
+                            <option value="N" <?php if (isset($_GET['shift']) && $_GET['shift'] == "مسائية") echo "selected"; ?>>مسائية</option>
                         </select>
                     </div>
 
-
-                    <div class="col-md-2">
-                        <label class="form-label">⚙️ نوع الآلية:</label>
-                        <select class="form-select" name="type">
+                    <div>
+                        <label><i class="fas fa-cogs"></i> نوع الآلية</label>
+                        <select name="type">
                             <option value="">-- الكل --</option>
-                            <option value="1" <?php if ($type_filter == "1")
-                                echo "selected"; ?>>حفار</option>
-                            <option value="2" <?php if ($type_filter == "2")
-                                echo "selected"; ?>>قلاب</option>
-                            <!-- ممكن تضيف أنواع أخرى حسب جدولك -->
+                            <option value="1" <?php if ($type_filter == "1") echo "selected"; ?>>حفار</option>
+                            <option value="2" <?php if ($type_filter == "2") echo "selected"; ?>>قلاب</option>
                         </select>
                     </div>
 
-
-                    <div class="col-md-2">
-                        <button class="btn btn-primary w-100"><i class="fa fa-search me-2"></i>بحث</button>
-                    </div>
+                    <button type="submit"><i class="fa fa-search"></i> بحث</button>
                 </form>
             </div>
         </div>
 
 
-        <!-- كروت الاحصائيات -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card text-center shadow-sm border-success">
-                    <div class="card-body">
-                        <h5 class="card-title text-success">⏱️ إجمالي ساعات العمل</h5>
-                        <p class="fs-4 fw-bold"><?php echo !empty($totals['executed_hours']) ? $totals['executed_hours'] : 0; ?>
-                            ساعة</p>
-                    </div>
-                </div>
+        <!-- بطاقات الإحصائيات -->
+        <div class="stats-grid">
+            <div class="stat-card executed">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-label">إجمالي ساعات العمل</div>
+                <div class="stat-value"><?php echo !empty($totals['executed_hours']) ? $totals['executed_hours'] : 0; ?></div>
             </div>
-            <div class="col-md-4">
-                <div class="card text-center shadow-sm border-danger">
-                    <div class="card-body">
-                        <h5 class="card-title text-danger">⚠️ إجمالي ساعات الأعطال</h5>
-                        <p class="fs-4 fw-bold">
-                            <?php echo !empty($totals['total_fault']) ? $totals['total_fault'] : 0; ?> ساعة</p>
-                    </div>
-                </div>
+            <div class="stat-card fault">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-label">إجمالي ساعات الأعطال</div>
+                <div class="stat-value"><?php echo !empty($totals['total_fault']) ? $totals['total_fault'] : 0; ?></div>
             </div>
-            <div class="col-md-4">
-                <div class="card text-center shadow-sm border-warning">
-                    <div class="card-body">
-                        <h5 class="card-title text-warning">⏸️ إجمالي ساعات الاستعداد</h5>
-                        <p class="fs-4 fw-bold">
-                            <?php echo !empty($totals['total_standby']) ? $totals['total_standby'] : 0; ?> ساعة</p>
-                    </div>
-                </div>
+            <div class="stat-card standby">
+                <div class="stat-icon">⏸️</div>
+                <div class="stat-label">إجمالي ساعات الاستعداد</div>
+                <div class="stat-value"><?php echo !empty($totals['total_standby']) ? $totals['total_standby'] : 0; ?></div>
             </div>
         </div>
 
-        <!-- جدول البيانات -->
         <div class="card shadow-sm">
-            <div class="card-body table-responsive">
-                <table class="table table-bordered table-hover align-middle text-center" id="projectsTable">
-                    <thead class="table-dark">
+            <div class="card-header">
+                <h5><i class="fas fa-table"></i> تفاصيل التايم شيت</h5>
+            </div>
+            <div class="card-body table-container">
+                <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle report-table" id="projectsTable">
+                    <thead>
                         <tr>
                             <th>التاريخ</th>
                             <th>المشروع</th>
@@ -248,15 +304,16 @@ WHERE 1=1
                                 <td><?php echo $row['equipment_code']; ?></td>
                                 <td><?php echo $row['driver_name']; ?></td>
                                 <td><?php echo $row['shift']; ?></td>
-                                <td class="text-success fw-bold"><?php echo $row['executed_hours']; ?></td>
-                                <td class="text-danger fw-bold"><?php echo $row['total_fault_hours']; ?></td>
-                                <td class="text-warning fw-bold"><?php echo $row['standby_hours']; ?></td>
+                                <td style="color:#0d9488; font-weight:700;"><?php echo $row['executed_hours']; ?></td>
+                                <td style="color:#dc2626; font-weight:700;"><?php echo $row['total_fault_hours']; ?></td>
+                                <td style="color:#e8b800; font-weight:700;"><?php echo $row['standby_hours']; ?></td>
                                 <td><?php echo $row['work_notes']; ?></td>
                                 <td><?php echo $row['fault_notes']; ?></td>
                             </tr>
                         <?php } ?>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 
