@@ -1076,6 +1076,41 @@ $supplier_id = intval($_GET['id']);
       return new Intl.NumberFormat('ar-EG').format(Math.max(0, Math.round(n)));
     }
 
+    // تحديث خيارات نوع المعدة لإخفاء الأنواع المختارة
+    function updateEquipmentTypeOptions() {
+      const selectedValues = new Set();
+      document.querySelectorAll('.equip-type').forEach(select => {
+        if (select.value) {
+          selectedValues.add(select.value);
+        }
+      });
+
+      document.querySelectorAll('.equip-type').forEach(select => {
+        const currentValue = select.value;
+        Array.from(select.options).forEach(option => {
+          if (!option.value) {
+            option.hidden = false;
+            option.disabled = false;
+            return;
+          }
+
+          if (option.value === currentValue) {
+            option.hidden = false;
+            option.disabled = false;
+            return;
+          }
+
+          if (selectedValues.has(option.value)) {
+            option.hidden = true;
+            option.disabled = true;
+          } else {
+            option.hidden = false;
+            option.disabled = false;
+          }
+        });
+      });
+    }
+
     // حساب مدة العقد بالأيام من التاريخين
     function calculateDaysFromDates() {
       const startDate = fields.actualStart.value;
@@ -1232,11 +1267,18 @@ $supplier_id = intval($_GET['id']);
       if (countInput) countInput.addEventListener('input', recalc);
       if (shiftHoursInput) shiftHoursInput.addEventListener('input', recalc);
 
+      // إضافة event listener لتحديث خيارات نوع المعدة عند التغيير
+      newSection.querySelectorAll('.equip-type').forEach(el => el.addEventListener('change', updateEquipmentTypeOptions));
+
       // إضافة event listener لزر الحذف
       newSection.querySelector('.removeEquipmentBtn').addEventListener('click', function () {
         newSection.remove();
         recalc();
+        updateEquipmentTypeOptions();
       });
+
+      // تحديث خيارات نوع المعدة بعد إضافة القسم
+      updateEquipmentTypeOptions();
 
       // تشغيل الحسبة فوراً بعد إضافة القسم الجديد
       recalc();
@@ -1291,6 +1333,13 @@ $supplier_id = intval($_GET['id']);
       }
     });
 
+    // تحديث خيارات نوع المعدة عند التغيير
+    document.addEventListener('change', function (e) {
+      if (e.target.classList && e.target.classList.contains('equip-type')) {
+        updateEquipmentTypeOptions();
+      }
+    });
+
     // زر إضافة المعدات
     document.getElementById('addEquipmentBtn').addEventListener('click', function (e) {
       e.preventDefault();
@@ -1300,20 +1349,26 @@ $supplier_id = intval($_GET['id']);
     // جلب الفورم
     const contractForm = document.getElementById('projectForm');
     if (contractForm) {
-      contractForm.addEventListener('reset', () => setTimeout(recalc, 0));
+      contractForm.addEventListener('reset', () => setTimeout(() => {
+        recalc();
+        updateEquipmentTypeOptions();
+      }, 0));
     }
 
     // أول تشغيل
     recalc();
+    updateEquipmentTypeOptions();
 
     // إضافة event listeners للقسم الأول من المعدات
     document.querySelectorAll('.equipment-section').forEach(section => {
       const index = section.getAttribute('data-index') || '1';
       const countInput = section.querySelector(`input[name="equip_count_${index}"]`);
       const shiftHoursInput = section.querySelector(`input[name="shift_hours_${index}"]`);
+      const equipTypeSelect = section.querySelector(`select[name="equip_type_${index}"]`);
       
       if (countInput) countInput.addEventListener('input', recalc);
       if (shiftHoursInput) shiftHoursInput.addEventListener('input', recalc);
+      if (equipTypeSelect) equipTypeSelect.addEventListener('change', updateEquipmentTypeOptions);
     });
 
     // جلب مناجم المشروع عند تغيير المشروع
@@ -1559,6 +1614,9 @@ $supplier_id = intval($_GET['id']);
                 $(`select[name="equip_type_1"]`).val(equip.equip_type);
                 $(`input[name="equip_size_1"]`).val(equip.equip_size);
                 $(`input[name="equip_count_1"]`).val(equip.equip_count);
+                $(`input[name="equip_count_basic_1"]`).val(equip.equip_count_basic || 0);
+                $(`input[name="equip_count_backup_1"]`).val(equip.equip_count_backup || 0);
+                $(`input[name="equip_assistants_1"]`).val(equip.equip_assistants);
                 $(`input[name="equip_shifts_1"]`).val(equip.equip_shifts);
                 $(`select[name="equip_unit_1"]`).val(equip.equip_unit);
                 $(`input[name="shift1_start_1"]`).val(equip.shift1_start);
@@ -1567,13 +1625,12 @@ $supplier_id = intval($_GET['id']);
                 $(`input[name="shift2_end_1"]`).val(equip.shift2_end);
                 $(`input[name="shift_hours_1"]`).val(equip.shift_hours);
                 $(`input[name="equip_total_month_1"]`).val(equip.equip_total_month);
+                $(`input[name="equip_target_per_month_1"]`).val(equip.equip_target_per_month);
                 $(`input[name="equip_total_contract_1"]`).val(equip.equip_total_contract);
                 $(`input[name="equip_price_1"]`).val(equip.equip_price);
                 $(`select[name="equip_price_currency_1"]`).val(equip.equip_price_currency);
-                $(`input[name="equip_operators_1"]`).val(equip.equip_operators);
                 $(`input[name="equip_supervisors_1"]`).val(equip.equip_supervisors);
                 $(`input[name="equip_technicians_1"]`).val(equip.equip_technicians);
-                $(`input[name="equip_assistants_1"]`).val(equip.equip_assistants);
                 equipmentIndex = 1;
               } else {
                 // إضافة أقسام جديدة
@@ -1709,15 +1766,18 @@ $supplier_id = intval($_GET['id']);
 
                 // إضافة event listeners
                 newSection.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
+                newSection.querySelectorAll('.equip-type').forEach(el => el.addEventListener('change', updateEquipmentTypeOptions));
                 newSection.querySelector('.removeEquipmentBtn').addEventListener('click', function () {
                   newSection.remove();
                   recalc();
+                  updateEquipmentTypeOptions();
                 });
               }
             });
           }
 
           recalc();
+          updateEquipmentTypeOptions();
         }
       });
 

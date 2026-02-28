@@ -755,6 +755,71 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
             </h5>
         </div>
         <div class="card-body">
+            <!-- نظام الفلاتر -->
+            <div class="filters-container">
+                <div class="filters-header">
+                    <h6><i class="fas fa-filter"></i> فلترة المعدات</h6>
+                    <button type="button" class="btn-clear-filters" id="clearFiltersBtn">
+                        <i class="fas fa-times-circle"></i> إلغاء الفلاتر
+                    </button>
+                </div>
+                
+                <div class="filters-grid">
+                    <div class="filter-item">
+                        <label><i class="fas fa-truck-loading"></i> فلترة بالمورد</label>
+                        <select id="filterSupplier" class="filter-select">
+                            <option value="">— جميع الموردين —</option>
+                            <?php
+                            $supplier_filter_query = "SELECT id, name FROM suppliers WHERE status = 1 ORDER BY name";
+                            $supplier_filter_result = mysqli_query($conn, $supplier_filter_query);
+                            while($supplier = mysqli_fetch_assoc($supplier_filter_result)) {
+                                echo "<option value='" . htmlspecialchars($supplier['name']) . "'>" . htmlspecialchars($supplier['name']) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label><i class="fas fa-list-alt"></i> فلترة بالنوع</label>
+                        <select id="filterType" class="filter-select">
+                            <option value="">— جميع الأنواع —</option>
+                            <?php
+                            $type_filter_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
+                            $type_filter_result = mysqli_query($conn, $type_filter_query);
+                            while($type_row = mysqli_fetch_assoc($type_filter_result)) {
+                                echo "<option value='" . htmlspecialchars($type_row['type']) . "'>" . htmlspecialchars($type_row['type']) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
+                        <select id="filterStatus" class="filter-select">
+                            <option value="">— جميع الحالات —</option>
+                            <option value="نشط">نشط</option>
+                            <option value="غير نشط">غير نشط</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label><i class="fas fa-traffic-light"></i> فلترة بالتوفر</label>
+                        <select id="filterAvailability" class="filter-select">
+                            <option value="">— جميع حالات التوفر —</option>
+                            <option value="متاحة للعمل">متاحة للعمل</option>
+                            <option value="مشغولة حالياً">مشغولة حالياً</option>
+                            <option value="تحت الصيانة">تحت الصيانة</option>
+                            <option value="معطلة مؤقتاً">معطلة مؤقتاً</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filters-summary" id="filtersSummary" style="display: none;">
+                    <span class="summary-icon"><i class="fas fa-check-circle"></i></span>
+                    <span class="summary-text"></span>
+                </div>
+            </div>
+            
             <!-- أزرار إظهار/إخفاء المجموعات -->
             <div class="column-groups-toggle">
                 <button type="button" class="toggle-group-btn active" data-group="basic" title="المعلومات الأساسية">
@@ -1142,6 +1207,119 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 table.column(colIndex).visible(false);
             });
             
+            // نظام الفلترة الاحترافي
+            var activeFilters = {
+                supplier: '',
+                type: '',
+                status: '',
+                availability: ''
+            };
+            
+            // تهيئة الفلاتر
+            $('#filterSupplier, #filterType, #filterStatus, #filterAvailability').on('change', function() {
+                var filterType = $(this).attr('id').replace('filter', '').toLowerCase();
+                activeFilters[filterType] = $(this).val();
+                applyFilters();
+                updateFiltersSummary();
+            });
+            
+            // تطبيق الفلاتر
+            function applyFilters() {
+                $.fn.dataTable.ext.search.push(
+                    function(settings, data, dataIndex) {
+                        // data[1] = المورد
+                        // data[4] = النوع (يحتوي على نص مثل "حفار" أو "قلاب")
+                        // data[11] = الحالة (يحتوي على "نشط" أو "غير نشط")
+                        // data[10] = التوفر
+                        
+                        var supplierMatch = true;
+                        var typeMatch = true;
+                        var statusMatch = true;
+                        var availabilityMatch = true;
+                        
+                        // فلترة المورد
+                        if (activeFilters.supplier !== '') {
+                            supplierMatch = data[1].indexOf(activeFilters.supplier) !== -1;
+                        }
+                        
+                        // فلترة النوع
+                        if (activeFilters.type !== '') {
+                            typeMatch = data[4].indexOf(activeFilters.type) !== -1;
+                        }
+                        
+                        // فلترة الحالة
+                        if (activeFilters.status !== '') {
+                            statusMatch = data[11].indexOf(activeFilters.status) !== -1;
+                        }
+                        
+                        // فلترة التوفر
+                        if (activeFilters.availability !== '') {
+                            availabilityMatch = data[10].indexOf(activeFilters.availability) !== -1;
+                        }
+                        
+                        return supplierMatch && typeMatch && statusMatch && availabilityMatch;
+                    }
+                );
+                
+                table.draw();
+                
+                // إزالة دالة البحث بعد التطبيق لتجنب التكرار
+                $.fn.dataTable.ext.search.pop();
+            }
+            
+            // تحديث ملخص الفلاتر
+            function updateFiltersSummary() {
+                var activeCount = 0;
+                var summaryParts = [];
+                
+                if (activeFilters.supplier) {
+                    activeCount++;
+                    summaryParts.push('المورد: ' + activeFilters.supplier);
+                }
+                if (activeFilters.type) {
+                    activeCount++;
+                    summaryParts.push('النوع: ' + activeFilters.type);
+                }
+                if (activeFilters.status) {
+                    activeCount++;
+                    summaryParts.push('الحالة: ' + activeFilters.status);
+                }
+                if (activeFilters.availability) {
+                    activeCount++;
+                    summaryParts.push('التوفر: ' + activeFilters.availability);
+                }
+                
+                var $summary = $('#filtersSummary');
+                if (activeCount > 0) {
+                    $summary.find('.summary-text').text(
+                        'تم تطبيق ' + activeCount + ' فلتر: ' + summaryParts.join(' | ')
+                    );
+                    $summary.slideDown(300);
+                } else {
+                    $summary.slideUp(300);
+                }
+            }
+            
+            // إلغاء جميع الفلاتر
+            $('#clearFiltersBtn').on('click', function() {
+                activeFilters = {
+                    supplier: '',
+                    type: '',
+                    status: '',
+                    availability: ''
+                };
+                
+                $('#filterSupplier, #filterType, #filterStatus, #filterAvailability').val('');
+                applyFilters();
+                updateFiltersSummary();
+                
+                // تأثير بصري
+                $(this).addClass('btn-clear-active');
+                setTimeout(function() {
+                    $('#clearFiltersBtn').removeClass('btn-clear-active');
+                }, 300);
+            });
+            
             // وظيفة إظهار/إخفاء مجموعة
             function toggleGroup(groupName) {
                 var columns = columnGroups[groupName];
@@ -1421,6 +1599,173 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 </div>
 
 <style>
+/* نظام الفلترة الاحترافي */
+.filters-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow-sm);
+}
+
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+}
+
+.filters-header h6 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filters-header h6 i {
+    color: var(--gold);
+    font-size: 1.2rem;
+}
+
+.btn-clear-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 18px;
+    background: var(--red-soft);
+    color: var(--red);
+    border: 1.5px solid rgba(220,38,38,.18);
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all var(--ease);
+    font-family: 'Cairo', sans-serif;
+}
+
+.btn-clear-filters:hover {
+    background: var(--red);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 16px rgba(220,38,38,.35);
+}
+
+.btn-clear-active {
+    animation: btnClearPulse 0.3s ease;
+}
+
+@keyframes btnClearPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-item label {
+    font-weight: 700;
+    color: var(--txt);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+}
+
+.filter-item label i {
+    color: var(--gold);
+}
+
+.filter-select {
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.92rem;
+    font-family: 'Cairo', sans-serif;
+    transition: all var(--ease);
+    background: var(--surface);
+    color: var(--txt);
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+.filter-select:hover {
+    border-color: var(--navy);
+}
+
+.filters-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--blue-soft);
+    border: 1.5px solid rgba(37,99,235,.25);
+    border-radius: var(--radius);
+    margin-top: 16px;
+    animation: slideDown 0.3s ease;
+}
+
+.filters-summary .summary-icon {
+    flex-shrink: 0;
+    color: var(--blue);
+    font-size: 1.1rem;
+}
+
+.filters-summary .summary-text {
+    color: var(--blue);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        transform: translateY(-10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filters-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .btn-clear-filters {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 @keyframes modalSlideIn {
     from {
         opacity: 0;

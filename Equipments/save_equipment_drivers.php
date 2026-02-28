@@ -1,9 +1,23 @@
 <?php
 include '../config.php';
 
-if (isset($_POST['equipment_id']) && isset($_POST['drivers'])) {
+if (isset($_POST['equipment_id'])) {
     $equipment_id = intval($_POST['equipment_id']);
-    $drivers = $_POST['drivers'];
+    
+    // دعم كلاً من النظام الجديد والقديم
+    $drivers = [];
+    if (isset($_POST['drivers']) && is_array($_POST['drivers'])) {
+        // النظام القديم (select multiple)
+        $drivers = $_POST['drivers'];
+    } elseif (isset($_POST['drivers_selected']) && !empty($_POST['drivers_selected'])) {
+        // النظام الجديد (cards with checkboxes)
+        $drivers = explode(',', $_POST['drivers_selected']);
+    }
+    
+    if (empty($drivers)) {
+        echo "❌ يجب اختيار مشغل واحد على الأقل.";
+        exit;
+    }
 
   $start_date = isset($_POST['start_date']) ? trim($_POST['start_date']) : '';
   $end_date = isset($_POST['end_date']) ? trim($_POST['end_date']) : '';
@@ -36,7 +50,9 @@ if (isset($_POST['equipment_id']) && isset($_POST['drivers'])) {
   }
 
   $start_sql = "'" . mysqli_real_escape_string($conn, $start_date) . "'";
-  $end_sql = $end_date !== '' ? "'" . mysqli_real_escape_string($conn, $end_date) . "'" : "NULL";
+  // إذا لم يتم تحديد تاريخ نهاية، استخدم تاريخ مستقبلي بعيد (ربط مستمر)
+  // ملاحظة: يمكن تغيير البديل إلى NULL بعد تشغيل: database/fix_equipment_drivers_end_date_nullable.sql
+  $end_sql = $end_date !== '' ? "'" . mysqli_real_escape_string($conn, $end_date) . "'" : "'2099-12-31'";
 
     
     // سجل الجديد

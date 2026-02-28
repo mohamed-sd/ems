@@ -60,26 +60,39 @@ $result = mysqli_query($conn, $sql);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+    <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
 </head>
-<body class="bg-light">
+<body>
 
 <?php include('../insidebar.php'); ?>
 
-<div class="main container py-4">
+<div class="main">
 
-    <div class="card shadow-lg border-0 rounded-4">
+    <div class="page-header">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="title-icon"><i class="fas fa-user-clock"></i></div>
+        <h1 class="page-title">تقرير ساعات عمل السائقين</h1>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="../main/dashboard.php" class="back-btn">
+          <i class="fas fa-arrow-right"></i> رجوع
+        </a>
+      </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>
+                <i class="fas fa-filter"></i> فلاتر البحث
+            </h5>
+        </div>
         <div class="card-body">
-            
-            <h2 class="mb-4 text-center text-primary">
-                🚚 تقرير ساعات عمل السائقين
-            </h2>
-            <hr class="mb-4">
 
             <!-- فورم الفلاتر -->
-            <form method="GET" class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <label class="form-label">🏗️ المشروع:</label>
-                    <select name="project" class="form-select">
+            <form method="GET" class="form-grid" style="margin-bottom: 2rem;">
+                <div class="field md-3 sm-6">
+                    <label><i class="fas fa-project-diagram" style="margin-left: 5px;"></i> المشروع</label>
+                    <div class="control"><select name="project">
                         <option value="">-- الكل --</option>
                         <?php
                         $prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
@@ -88,12 +101,12 @@ $result = mysqli_query($conn, $sql);
                             echo "<option value='{$prjRow['id']}' $selected>{$prjRow['name']}</option>";
                         }
                         ?>
-                    </select>
+                    </select></div>
                 </div>
 
-                <div class="col-md-3">
-                    <label class="form-label">👨‍🔧 السائق:</label>
-                    <select name="driver" class="form-select">
+                <div class="field md-3 sm-6">
+                    <label><i class="fas fa-user-tie" style="margin-left: 5px;"></i> السائق</label>
+                    <div class="control"><select name="driver">
                         <option value="">-- الكل --</option>
                         <?php
                         $drv = mysqli_query($conn, "SELECT id, name FROM drivers where status = '1' ");
@@ -102,31 +115,31 @@ $result = mysqli_query($conn, $sql);
                             echo "<option value='{$drvRow['id']}' $selected>{$drvRow['name']}</option>";
                         }
                         ?>
-                    </select>
+                    </select></div>
                 </div>
 
-                <div class="col-md-3">
-                    <label class="form-label">📅 من:</label>
-                    <input type="date" name="start_date" value="<?php echo $start_date; ?>" class="form-control">
+                <div class="field md-3 sm-6">
+                    <label><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> من تاريخ</label>
+                    <div class="control"><input type="date" name="start_date" value="<?php echo $start_date; ?>"></div>
                 </div>
 
-                <div class="col-md-3">
-                    <label class="form-label">📅 إلى:</label>
-                    <input type="date" name="end_date" value="<?php echo $end_date; ?>" class="form-control">
+                <div class="field md-3 sm-6">
+                    <label><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> إلى تاريخ</label>
+                    <div class="control"><input type="date" name="end_date" value="<?php echo $end_date; ?>"></div>
                 </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">🚛 الوردية:</label>
-                    <select class="form-select" name="shift">
+                <div class="field md-3 sm-6">
+                    <label><i class="fas fa-moon" style="margin-left: 5px;"></i> الوردية</label>
+                    <div class="control"><select name="shift">
                         <option value="">-- الكل --</option>
                         <option value="D" <?php if ($shift_filter == "D") echo "selected"; ?>>صباحية</option>
                         <option value="N" <?php if ($shift_filter == "N") echo "selected"; ?>>مسائية</option>
-                    </select>
+                    </select></div>
                 </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">الآلية</label>
-                    <select name="equipment_id" class="form-select">
+                <div class="field md-3 sm-6">
+                    <label><i class="fas fa-cogs" style="margin-left: 5px;"></i> الآلية</label>
+                    <div class="control"><select name="equipment_id">
                         <option value="">-- الكل --</option>
                         <?php
                         $res = mysqli_query($conn, "
@@ -139,56 +152,162 @@ $result = mysqli_query($conn, $sql);
                             echo "<option value='{$equipRow['id']}' $sel>{$equipRow['name']}</option>";
                         }
                         ?>
-                    </select>
+                    </select></div>
                 </div>
-                    
-                <div class="col-12 text-center">
-                    <button class="btn btn-primary px-5 mt-3" type="submit">
+
+                <div class="field md-12" style="text-align: center; margin-top: 1rem;">
+                    <button class="primary" type="submit" style="padding: 10px 40px;">
                         <i class="fa fa-search"></i> بحث
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
 
-            <!-- الجدول -->
-            <div class="table-responsive" id="projectsTable">
-                <table class="table table-striped table-hover text-center align-middle">
-                    <thead class="table-primary">
-                        <tr>
-                           <th>📅 التاريخ</th>
-                            <th>🏗️ المشروع</th>
-                            <th>👨‍🔧 السائق</th>
-                            <th>⚙️ الآلية</th>
-                            <th>⏱️ مجموع الساعات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                    $grand_total = 0;
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        $grand_total += $row['total_hours'];
-                    ?>
-                        <tr>
-                            <td><?php echo $row['date']; ?></td>
-                            <td><?php echo $row['project_name']; ?></td>
-                            <td><?php echo $row['driver_name']; ?></td>
-                            <td><?php echo $row['equipment_name']; ?></td>
-                            <td><span class="badge bg-success fs-6"><?php echo $row['total_hours']; ?></span></td>
-                        </tr>
-                    <?php } ?>
-                    </tbody>
-                </table>
+    <div class="card">
+        <div class="card-header">
+            <h5>
+                <i class="fas fa-table"></i> نتائج التقرير
+            </h5>
+        </div>
+        <div class="card-body" style="padding: 2rem; overflow-x: auto;">
+            <table id="projectsTable" class="display nowrap" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-calendar"></i> التاريخ</th>
+                        <th><i class="fas fa-project-diagram"></i> المشروع</th>
+                        <th><i class="fas fa-user-tie"></i> السائق</th>
+                        <th><i class="fas fa-cogs"></i> الآلية</th>
+                        <th><i class="fas fa-clock"></i> مجموع الساعات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php
+                $grand_total = 0;
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $grand_total += $row['total_hours'];
+                ?>
+                    <tr>
+                        <td><?php echo $row['date']; ?></td>
+                        <td><?php echo $row['project_name']; ?></td>
+                        <td><?php echo $row['driver_name']; ?></td>
+                        <td><?php echo $row['equipment_name']; ?></td>
+                        <td><span class="status-active"><?php echo $row['total_hours']; ?> ساعة</span></td>
+                    </tr>
+                <?php } ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- المجموع -->
+    <div class="card" style="margin-top: 1.5rem;">
+        <div class="card-body">
+            <div class="totals">
+                <div class="kpi">
+                    <div class="v"><?php echo $grand_total; ?></div>
+                    <div class="t">إجمالي ساعات العمل</div>
+                </div>
             </div>
-
-            <!-- المجموع -->
-            <div class="alert alert-info mt-4 fs-5 text-center">
-                ✅ إجمالي الساعات: <strong><?php echo $grand_total; ?></strong> ساعة
-            </div>
-
         </div>
     </div>
 </div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+  /* Form Grid */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .field.md-12 {
+    grid-column: 1 / -1;
+  }
+
+  /* DataTable styling */
+  table.dataTable {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  
+  table.dataTable thead th {
+    background: linear-gradient(125deg, var(--navy) 0%, var(--navy-l) 100%);
+    color: white;
+    font-weight: 700;
+    padding: 1rem;
+    text-align: center;
+    border-left: 1px solid rgba(255,255,255,0.1);
+    white-space: nowrap;
+    font-size: 0.9rem;
+  }
+  
+  table.dataTable thead th:first-child {
+    border-left: none;
+  }
+  
+  table.dataTable tbody tr {
+    transition: all 0.3s ease;
+  }
+  
+  table.dataTable tbody tr:hover {
+    background: var(--gold-soft);
+    transform: scale(1.002);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  table.dataTable tbody td {
+    padding: 12px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: .83rem;
+    color: var(--txt);
+    border: none;
+  }
+
+  /* Totals KPI */
+  .totals {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .kpi {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    border-right: 5px solid var(--gold);
+    min-width: 250px;
+  }
+  
+  .kpi:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .kpi .v {
+    font-weight: 900;
+    font-size: 2.5rem;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+  }
+  
+  .kpi .t {
+    color: var(--sub);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+</style>
+
 </body>
 </html>

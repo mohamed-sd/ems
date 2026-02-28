@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 25, 2026 at 07:53 PM
+-- Generation Time: Feb 28, 2026 at 01:43 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -89,7 +89,10 @@ CREATE TABLE `contractequipments` (
 
 INSERT INTO `contractequipments` (`id`, `contract_id`, `equip_type`, `equip_size`, `equip_count`, `equip_count_basic`, `equip_count_backup`, `equip_shifts`, `equip_unit`, `shift1_start`, `shift1_end`, `shift2_start`, `shift2_end`, `shift_hours`, `equip_total_month`, `equip_monthly_target`, `equip_total_contract`, `equip_price`, `equip_operators`, `equip_supervisors`, `equip_technicians`, `equip_assistants`, `equip_price_currency`, `created_at`) VALUES
 (1, 1, '1', 240, 4, 0, 0, 0, '', NULL, NULL, NULL, NULL, 10, 40, 0, 1200, 0.00, 0, 0, 0, 0, '', '2026-02-16 22:17:51'),
-(2, 1, '2', 240, 2, 0, 0, 0, '', NULL, NULL, NULL, NULL, 10, 20, 0, 600, 0.00, 1, 0, 0, 1, '', '2026-02-16 22:17:51');
+(2, 1, '2', 240, 2, 0, 0, 0, '', NULL, NULL, NULL, NULL, 10, 20, 0, 600, 0.00, 1, 0, 0, 1, '', '2026-02-16 22:17:51'),
+(3, 2, '1', 120, 2, 2, 2, 0, '', NULL, NULL, NULL, NULL, 10, 20, 0, 600, 0.00, 0, 0, 0, 0, '', '2026-02-27 23:44:25'),
+(4, 2, '2', 340, 2, 1, 1, 0, '', NULL, NULL, NULL, NULL, 10, 20, 0, 600, 0.00, 0, 0, 0, 0, '', '2026-02-27 23:44:25'),
+(5, 2, '3', 120, 3, 1, 1, 0, '', NULL, NULL, NULL, NULL, 10, 30, 0, 900, 0.00, 0, 0, 0, 0, '', '2026-02-27 23:44:25');
 
 -- --------------------------------------------------------
 
@@ -145,7 +148,8 @@ CREATE TABLE `contracts` (
 --
 
 INSERT INTO `contracts` (`id`, `mine_id`, `contract_signing_date`, `grace_period_days`, `contract_duration_months`, `contract_duration_days`, `equip_shifts_contract`, `shift_contract`, `equip_total_contract_daily`, `total_contract_permonth`, `total_contract_units`, `actual_start`, `actual_end`, `transportation`, `accommodation`, `place_for_living`, `workshop`, `hours_monthly_target`, `forecasted_contracted_hours`, `created_at`, `updated_at`, `daily_work_hours`, `daily_operators`, `first_party`, `second_party`, `witness_one`, `witness_two`, `price_currency_contract`, `paid_contract`, `payment_time`, `guarantees`, `payment_date`, `contract_status`, `pause_reason`, `pause_date`, `resume_date`, `termination_type`, `termination_reason`, `merged_with`, `status`) VALUES
-(1, 1, '2026-02-01', 3, 0, 31, 1, 1, 1, 1, 1, '2026-02-01', '2026-03-03', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 60, 1800, '2026-02-16 22:17:51', NULL, '20', '2', '', '', '', '', 'دولار', '2000', 'مقدم', 'شيك', '2026-02-03', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
+(1, 1, '2026-02-01', 3, 0, 31, 1, 1, 1, 1, 1, '2026-02-01', '2026-03-03', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 60, 1800, '2026-02-16 22:17:51', NULL, '20', '2', '', '', '', '', 'دولار', '2000', 'مقدم', 'شيك', '2026-02-03', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(2, 2, '2026-02-01', 5, 0, 31, 2, 10, 10, 0, 0, '2026-02-01', '2026-03-03', '', '', '', '', 70, 2100, '2026-02-27 23:44:25', NULL, '20', '', '', '', '', '', 'دولار', '2000', ' مؤخر', 'شيك', '2026-02-01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -267,7 +271,42 @@ CREATE TABLE `drivercontracts` (
 CREATE TABLE `drivers` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `driver_code` varchar(50) DEFAULT NULL COMMENT 'الرمز/الكود الفريد للمشغل',
+  `nickname` varchar(255) DEFAULT NULL COMMENT 'اسم الشهرة/الكنية',
+  `identity_type` varchar(50) DEFAULT NULL COMMENT 'نوع الهوية',
+  `identity_number` varchar(100) DEFAULT NULL COMMENT 'رقم الهوية',
+  `identity_expiry_date` date DEFAULT NULL COMMENT 'تاريخ انتهاء الهوية',
+  `license_number` varchar(100) DEFAULT NULL COMMENT 'رقم رخصة القيادة',
+  `license_type` varchar(100) DEFAULT NULL COMMENT 'نوع رخصة القيادة',
+  `license_expiry_date` date DEFAULT NULL COMMENT 'تاريخ انتهاء رخصة القيادة',
+  `license_issuer` varchar(255) DEFAULT NULL COMMENT 'جهة إصدار الرخصة',
+  `specialized_equipment` text DEFAULT NULL COMMENT 'نوع المعدة المتخصص فيها (متعدد)',
+  `years_in_field` int(11) DEFAULT NULL COMMENT 'سنوات العمل في المجال',
+  `years_on_equipment` int(11) DEFAULT NULL COMMENT 'سنوات العمل على هذا النوع من المعدات',
+  `skill_level` varchar(50) DEFAULT NULL COMMENT 'مستوى الكفاءة المهنية',
+  `certificates` text DEFAULT NULL COMMENT 'الشهادات والتدريبات',
+  `owner_supervisor` varchar(255) DEFAULT NULL COMMENT 'اسم المالك/المشرف المباشر',
+  `supplier_id` int(11) DEFAULT NULL COMMENT 'المورد الذي يعمل معه',
+  `employment_affiliation` varchar(100) DEFAULT NULL COMMENT 'تبعية المشغل',
+  `salary_type` varchar(50) DEFAULT NULL COMMENT 'نوع الراتب/الأجر',
+  `monthly_salary` decimal(10,2) DEFAULT NULL COMMENT 'المبلغ الشهري التقريبي',
+  `email` varchar(255) DEFAULT NULL COMMENT 'البريد الإلكتروني',
+  `address` text DEFAULT NULL COMMENT 'العنوان',
+  `performance_rating` varchar(50) DEFAULT NULL COMMENT 'تقييم الكفاءة التشغيلية',
+  `behavior_record` varchar(50) DEFAULT NULL COMMENT 'سجل السلوك والانضباط',
+  `accident_record` varchar(50) DEFAULT NULL COMMENT 'سجل الحوادث والأعطال',
+  `health_status` varchar(50) DEFAULT NULL COMMENT 'الحالة الصحية',
+  `health_issues` text DEFAULT NULL COMMENT 'المشاكل الصحية المعروفة',
+  `vaccinations_status` varchar(50) DEFAULT NULL COMMENT 'التطعيمات والفحوصات',
+  `previous_employer` varchar(255) DEFAULT NULL COMMENT 'اسم جهة التوظيف السابقة',
+  `employment_duration` varchar(100) DEFAULT NULL COMMENT 'مدة العمل معهم',
+  `reference_contact` varchar(255) DEFAULT NULL COMMENT 'مرجع للاتصال',
+  `general_notes` text DEFAULT NULL COMMENT 'ملاحظات عامة',
+  `driver_status` varchar(50) DEFAULT 'نشط' COMMENT 'حالة المشغل',
+  `start_date` date DEFAULT NULL COMMENT 'تاريخ البدء الفعلي',
+  `created_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'تاريخ التسجيل في النظام',
   `phone` varchar(255) NOT NULL,
+  `phone_alternative` varchar(50) DEFAULT NULL COMMENT 'رقم هاتف بديل',
   `status` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
@@ -275,9 +314,10 @@ CREATE TABLE `drivers` (
 -- Dumping data for table `drivers`
 --
 
-INSERT INTO `drivers` (`id`, `name`, `phone`, `status`) VALUES
-(1, 'jj', 'jjj', 1),
-(2, 'ahmed', '98', 1);
+INSERT INTO `drivers` (`id`, `name`, `driver_code`, `nickname`, `identity_type`, `identity_number`, `identity_expiry_date`, `license_number`, `license_type`, `license_expiry_date`, `license_issuer`, `specialized_equipment`, `years_in_field`, `years_on_equipment`, `skill_level`, `certificates`, `owner_supervisor`, `supplier_id`, `employment_affiliation`, `salary_type`, `monthly_salary`, `email`, `address`, `performance_rating`, `behavior_record`, `accident_record`, `health_status`, `health_issues`, `vaccinations_status`, `previous_employer`, `employment_duration`, `reference_contact`, `general_notes`, `driver_status`, `start_date`, `created_at`, `phone`, `phone_alternative`, `status`) VALUES
+(1, 'محمد سيد', '', '', '', '', NULL, '', '', NULL, '', '', NULL, NULL, '', '', '', NULL, '', '', NULL, '', '', '', '', '', '', '', '', '', '', '', '', 'نشط', NULL, '2026-02-25 20:54:22', '01923329', '', 1),
+(2, 'ahmed', 'ad', '', '', '', NULL, '', '', NULL, '', '', NULL, NULL, '', '', '', NULL, '', '', NULL, '', '', '', '', '', '', '', '', '', '', '', '', 'نشط', NULL, '2026-02-25 20:54:22', '98', '', 1),
+(3, 'محمد أحمد علي', 'OPR-001-2026', 'أبو محمد', 'بطاقة هوية وطنية', '123456789123', '2028-12-31', 'DL-2024-456789', 'فئة د (شاحنات ثقيلة)', '2027-06-30', 'إدارة المرور - الخرطوم', 'حفارة (Excavator), شاحنة قلابة (Dump Truck)', 8, 5, 'خبير (5-10 سنوات)', 'شهادة تشغيل حفارات من معهد التعدين', 'محمد علي', 3, 'تابع لمالك المعدة مباشرة', 'شهري', 3500.00, 'mohammed@example.com', 'شارع النيل، الخرطوم', 'ممتاز', 'ممتاز (لا توجد شكاوى)', 'نظيف (لا توجد حوادث)', 'سليم تماماً', '', 'محدثة', 'شركة الذهب للتعدين', '3 سنوات', 'محمود أحمد - مدير الأسطول (09-123-4567)', 'مشغل موثوق وذو كفاءة عالية', 'نشط', '2024-01-15', '2026-02-25 20:58:52', '+249-9-123-4567', '+249-9-765-4321', 1);
 
 -- --------------------------------------------------------
 
@@ -341,7 +381,14 @@ CREATE TABLE `equipments` (
 INSERT INTO `equipments` (`id`, `suppliers`, `code`, `type`, `name`, `serial_number`, `chassis_number`, `manufacturer`, `model`, `manufacturing_year`, `import_year`, `equipment_condition`, `operating_hours`, `engine_condition`, `tires_condition`, `actual_owner_name`, `owner_type`, `owner_phone`, `owner_supplier_relation`, `license_number`, `license_authority`, `license_expiry_date`, `inspection_certificate_number`, `last_inspection_date`, `current_location`, `availability_status`, `estimated_value`, `daily_rental_price`, `monthly_rental_price`, `insurance_status`, `general_notes`, `last_maintenance_date`, `status`) VALUES
 (1, '1', 'fr-FR', '1', 'tq1', '1212389', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1),
 (2, '2', 'Wq1', '1', 'Wq1', '1111', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1),
-(3, '2', 'swd', '1', 'swd', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1);
+(3, '2', 'swd', '1', 'swd', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1),
+(4, '2', 'EQ-001', '1', 'حفار كاتربيلر 320', 'EXC-2024-001', 'CAT320-ABC123456', 'كاتربيلر', '320D', 2018, 2020, 'في حالة جيدة', 5400, 'جيدة', 'N/A', 'محمد علي أحمد', 'مالك فردي', '+249-912345678', 'تابع للمورد (مملوكة للمورد نفسه)', 'VEH-2024-12345', 'المرور', '2025-12-31', 'INS-2024-001', '2024-06-15', 'منجم الذهب الشرقي', 'متاحة للعمل', 150000.00, 500.00, 10000.00, 'مؤمن بالكامل', 'معدة موثوقة، تحتاج صيانة دورية كل 3 أشهر', '2024-05-10', 1),
+(5, '2', 'EQ-002', '2', 'شاحنة قلاب هيونداي', 'TRK-2024-002', 'HYN-DEF789012', 'هيونداي', 'HD270', 2019, 2021, 'جديدة نسبياً (أقل من سنة استخدام)', 2800, 'ممتازة', 'جيدة', 'أحمد محمد علي', 'شركة متخصصة', '+249-923456789', 'مالك مباشر (يتعاقد معنا مباشرة)', 'VEH-2024-67890', 'وزارة النقل', '2026-03-15', 'INS-2024-002', '2024-07-20', 'مستودع الخرطوم', 'قيد الاستخدام', 80000.00, 300.00, 7000.00, 'مؤمن جزئياً', 'شاحنة جديدة بحالة ممتازة', '2024-06-01', 1),
+(6, '1', 'TQ-001', '1', 'حفار كاتر', 'EXC-2024-001', 'CAT320-ABC123456', 'كاتربيلر', '320D', 2018, 2020, 'في حالة جيدة', 5400, 'جيدة', 'N/A', 'محمد علي أحمد', 'مالك فردي', '+249-912345678', 'تابع للمورد (مملوكة للمورد نفسه)', 'VEH-2024-12345', 'المرور', '2025-12-31', 'INS-2024-001', '2024-06-15', 'منجم الذهب الشرقي', 'متاحة للعمل', 150000.00, 500.00, 10000.00, 'مؤمن بالكامل', 'معدة موثوقة، تحتاج صيانة دورية كل 3 أشهر', '2024-05-10', 1),
+(7, '1', 'TQ-002', '1', 'هيونداي', 'TRK-2024-002', 'HYN-DEF789012', 'هيونداي', 'HD270', 2019, 2021, 'جديدة نسبياً (أقل من سنة استخدام)', 2800, 'ممتازة', 'جيدة', 'أحمد محمد علي', 'شركة متخصصة', '+249-923456789', 'مالك مباشر (يتعاقد معنا مباشرة)', 'VEH-2024-67890', 'وزارة النقل', '2026-03-15', 'INS-2024-002', '2024-07-20', 'مستودع الخرطوم', 'قيد الاستخدام', 80000.00, 300.00, 7000.00, 'مؤمن جزئياً', 'شاحنة جديدة بحالة ممتازة', '2024-06-01', 1),
+(8, '4', 'm1', '1', 'm1', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1),
+(9, '4', 'm130', '2', 'm130', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1),
+(10, '4', 'mg120', '3', 'mg120', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -362,8 +409,10 @@ CREATE TABLE `equipments_types` (
 --
 
 INSERT INTO `equipments_types` (`id`, `type`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'حفار', 'active', '2026-02-16 22:15:19', '2026-02-16 22:15:19'),
-(2, 'قلاب', 'active', '2026-02-16 22:15:28', '2026-02-16 22:15:28');
+(1, 'حفار120', 'active', '2026-02-27 23:39:11', '2026-02-27 23:39:11'),
+(2, 'حفار130', 'active', '2026-02-27 23:39:26', '2026-02-27 23:39:26'),
+(3, 'قلاب120', 'active', '2026-02-27 23:39:38', '2026-02-27 23:39:38'),
+(4, 'قلاب130', 'active', '2026-02-27 23:39:50', '2026-02-27 23:39:50');
 
 -- --------------------------------------------------------
 
@@ -376,7 +425,7 @@ CREATE TABLE `equipment_drivers` (
   `equipment_id` int(11) NOT NULL,
   `driver_id` int(11) NOT NULL,
   `start_date` varchar(50) NOT NULL,
-  `end_date` varchar(50) NOT NULL,
+  `end_date` varchar(50) DEFAULT NULL,
   `status` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
@@ -385,7 +434,10 @@ CREATE TABLE `equipment_drivers` (
 --
 
 INSERT INTO `equipment_drivers` (`id`, `equipment_id`, `driver_id`, `start_date`, `end_date`, `status`) VALUES
-(23, 2, 2, '2026-02-01', '2026-02-28', 1);
+(23, 2, 2, '2026-02-01', '2026-02-28', 1),
+(24, 7, 1, '2026-02-04', '2026-02-06', 0),
+(25, 7, 3, '2026-02-10', '2099-12-31', 1),
+(26, 7, 1, '2026-02-10', '2099-12-31', 1);
 
 -- --------------------------------------------------------
 
@@ -420,7 +472,8 @@ CREATE TABLE `mines` (
 --
 
 INSERT INTO `mines` (`id`, `project_id`, `mine_name`, `mine_code`, `manager_name`, `mineral_type`, `mine_type`, `mine_type_other`, `ownership_type`, `ownership_type_other`, `mine_area`, `mine_area_unit`, `mining_depth`, `contract_nature`, `status`, `notes`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 1, 'منجم احمد', 'منجم', 'سامبا', 'ذهب', 'حفرة مفتوحة', '', 'تعدين أهلي/تقليدي', '', NULL, 'هكتار', NULL, '', 1, '', 1, '2026-02-16 22:14:04', '2026-02-16 22:14:04');
+(1, 1, 'منجم احمد', 'منجم', 'سامبا', 'ذهب', 'حفرة مفتوحة', '', 'تعدين أهلي/تقليدي', '', NULL, 'هكتار', NULL, '', 1, '', 1, '2026-02-16 22:14:04', '2026-02-16 22:14:04'),
+(2, 2, 'منجم اليونان', 'rox230', 'سامبا', 'ذهب', 'تحت أرضي', '', 'تعدين أهلي/تقليدي', '', NULL, 'هكتار', NULL, 'موظف مباشر لدى المالك', 1, '', 1, '2026-02-27 23:42:13', '2026-02-27 23:42:13');
 
 -- --------------------------------------------------------
 
@@ -451,7 +504,10 @@ CREATE TABLE `operations` (
 --
 
 INSERT INTO `operations` (`id`, `equipment`, `equipment_type`, `equipment_category`, `project_id`, `mine_id`, `contract_id`, `supplier_id`, `start`, `end`, `reason`, `days`, `total_equipment_hours`, `shift_hours`, `status`) VALUES
-(4, '2', '1', 'أساسي', '1', '1', '1', '2', '2026-02-02', '2026-03-03', '', '0', 100.00, 10.00, 1);
+(4, '2', '1', 'أساسي', '1', '1', '1', '2', '2026-02-02', '2026-03-03', '', '0', 100.00, 10.00, 1),
+(5, '8', '1', 'أساسي', '2', '2', '2', '4', '2026-02-01', '2026-03-03', '', '0', 200.00, 10.00, 1),
+(6, '9', '2', 'أساسي', '2', '2', '2', '4', '2026-02-01', '2026-03-03', '', '0', 200.00, 10.00, 1),
+(7, '10', '3', 'أساسي', '2', '2', '2', '4', '2026-02-01', '2026-03-03', '', '0', 100.00, 10.00, 1);
 
 -- --------------------------------------------------------
 
@@ -485,7 +541,8 @@ CREATE TABLE `project` (
 --
 
 INSERT INTO `project` (`id`, `company_client_id`, `name`, `client`, `location`, `project_code`, `category`, `sub_sector`, `state`, `region`, `nearest_market`, `latitude`, `longitude`, `total`, `status`, `created_by`, `create_at`, `updated_at`) VALUES
-(1, 1, 'مشروع الروسيه جديد', 'وزارة البنية التحتية', 'الخرطوم2', 'PRJ-2026-001', '', 'التعدين', 'الخرطوم', 'الكويت', 'سوق بحري', '15.5527', '32.5599', '0', 1, 1, '2026-02-16 21:13:41', NULL);
+(1, 1, 'مشروع الروسيه جديد', 'وزارة البنية التحتية', 'الخرطوم2', 'PRJ-2026-001', '', 'التعدين', 'الخرطوم', 'الكويت', 'سوق بحري', '15.5527', '32.5599', '0', 1, 1, '2026-02-16 21:13:41', NULL),
+(2, 2, 'مشروع اليونان', 'شركة المستقبل للمقاولات', 'الخرطوم2', 'PRJ-2026-071', '', 'التعدين', 'الخرطوم', '', '', '', '', '0', 1, 1, '2026-02-27 22:41:15', NULL);
 
 -- --------------------------------------------------------
 
@@ -538,7 +595,10 @@ CREATE TABLE `suppliercontractequipments` (
 --
 
 INSERT INTO `suppliercontractequipments` (`id`, `contract_id`, `equip_type`, `equip_size`, `equip_count`, `equip_count_basic`, `equip_count_backup`, `equip_shifts`, `equip_unit`, `shift1_start`, `shift1_end`, `shift2_start`, `shift2_end`, `shift_hours`, `equip_total_month`, `equip_monthly_target`, `equip_total_contract`, `equip_price`, `equip_price_currency`, `equip_operators`, `equip_supervisors`, `equip_technicians`, `equip_assistants`, `created_at`) VALUES
-(1, 1, '1', 340, 2, 0, 0, 0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 10.00, 20.00, 0.00, 600.00, 0.00, '', 0, 0, 0, 0, '2026-02-16 22:22:09');
+(1, 1, '1', 340, 2, 0, 0, 0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 10.00, 20.00, 0.00, 600.00, 0.00, '', 0, 0, 0, 0, '2026-02-16 22:22:09'),
+(2, 2, '1', 122, 1, 1, 0, 0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 5.00, 5.00, 0.00, 260.00, 0.00, '', 0, 0, 0, 0, '2026-02-27 23:57:27'),
+(3, 2, '2', 130, 1, 1, 0, 0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 5.00, 5.00, 0.00, 260.00, 0.00, '', 0, 0, 0, 0, '2026-02-27 23:57:27'),
+(4, 2, '3', 120, 1, 0, 0, 0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 5.00, 5.00, 0.00, 260.00, 0.00, '', 0, 0, 0, 0, '2026-02-27 23:57:27');
 
 -- --------------------------------------------------------
 
@@ -575,7 +635,9 @@ CREATE TABLE `suppliers` (
 
 INSERT INTO `suppliers` (`id`, `name`, `supplier_code`, `supplier_type`, `dealing_nature`, `equipment_types`, `commercial_registration`, `identity_type`, `identity_number`, `identity_expiry_date`, `email`, `phone_alternative`, `full_address`, `contact_person_name`, `contact_person_phone`, `financial_registration_status`, `created_at`, `updated_at`, `phone`, `status`) VALUES
 (1, 'اكوبيشن', '123', 'شركة', 'متعاقد مباشر', 'حفارات, مكنات تخريم, دوازر', '234', 'جواز سفر', '1234', NULL, 'infotelecomwasla@gmail.com', '', '', '', '', 'مسجل رسميا', '2026-02-16 22:20:14', '2026-02-16 22:20:14', '76887534', 1),
-(2, 'احمد', '1234', 'فرد', 'مورد معدات مباشر (مالك)', 'حفارات, معدات معالجة', '765', 'بطاقة هوية وطنية', '', NULL, 'a.samba12@gmail.com', '', '', '', '', '', '2026-02-16 22:20:56', '2026-02-16 22:20:56', '0920045986', 1);
+(2, 'احمد', '1234', 'فرد', 'مورد معدات مباشر (مالك)', 'حفارات, معدات معالجة', '765', 'بطاقة هوية وطنية', '', NULL, 'a.samba12@gmail.com', '', '', '', '', '', '2026-02-16 22:20:56', '2026-02-16 22:20:56', '0920045986', 1),
+(3, 'شركة النيل للمعدات الثقيلة', 'SUP-001', '', 'مباشر', 'حفار, قلاب, لودر', 'CR-123456', 'بطاقة شخصية', '123456789', '2027-12-31', 'info@nile-equip.com', '249987654321', 'الخرطوم - شارع النيل', 'أحمد محمد', '249123456789', '', '2026-02-25 19:37:15', '2026-02-25 19:37:15', '249123456789', 1),
+(4, 'مؤسسة المستقبل للآليات', 'SUP-002', 'فرد', 'وسيط', '', 'CR-789012', 'جواز سفر', 'P987654321', '2028-06-30', 'contact@mustaqbal.sd', '249444555666', 'أم درمان - الموردة', 'محمد أحمد', '249111222333', 'غير مسجل', '2026-02-25 19:37:15', '2026-02-25 19:38:38', '249111222333', 1);
 
 -- --------------------------------------------------------
 
@@ -645,7 +707,8 @@ CREATE TABLE `supplierscontracts` (
 --
 
 INSERT INTO `supplierscontracts` (`id`, `supplier_id`, `contract_signing_date`, `grace_period_days`, `contract_duration_months`, `contract_duration_days`, `equip_shifts_contract`, `shift_contract`, `equip_total_contract_daily`, `total_contract_permonth`, `total_contract_units`, `actual_start`, `actual_end`, `transportation`, `accommodation`, `place_for_living`, `workshop`, `equip_type`, `equip_size`, `equip_count`, `equip_target_per_month`, `equip_total_month`, `equip_total_contract`, `mach_type`, `mach_size`, `mach_count`, `mach_target_per_month`, `mach_total_month`, `mach_total_contract`, `hours_monthly_target`, `forecasted_contracted_hours`, `created_at`, `updated_at`, `daily_work_hours`, `daily_operators`, `first_party`, `second_party`, `witness_one`, `witness_two`, `price_currency_contract`, `paid_contract`, `payment_time`, `guarantees`, `payment_date`, `project_id`, `mine_id`, `project_contract_id`, `status`, `pause_reason`, `pause_date`, `resume_date`, `termination_type`, `termination_reason`, `merged_with`) VALUES
-(1, 2, '2026-02-01', 5, 0, 31, 0, 0, 0, 0, 0, '2026-03-01', '2026-03-31', '', '', '', '', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 20, 600, '2026-02-16 22:22:09', NULL, '20', '0', '', '', '', '', 'جنيه', '', '', '', '0000-00-00', 1, 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL);
+(1, 2, '2026-02-01', 5, 0, 31, 0, 0, 0, 0, 0, '2026-03-01', '2026-03-31', '', '', '', '', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 20, 600, '2026-02-16 22:22:09', NULL, '20', '0', '', '', '', '', 'جنيه', '', '', '', '0000-00-00', 1, 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 4, '2026-02-01', 4, 0, 53, 0, 0, 0, 0, 0, '2026-02-01', '2026-03-25', '', '', '', '', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 15, 780, '2026-02-27 23:57:27', NULL, '20', '0', '', '', '', '', 'دولار', '', '', '', '0000-00-00', 2, 2, 2, 1, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -754,7 +817,8 @@ INSERT INTO `users` (`id`, `name`, `username`, `password`, `phone`, `role`, `pro
 (4, 'm', 'm', 'm', '0', '3', '0', 0, 0, '0', '2026-02-16 22:37:21', '2026-02-16 22:37:21'),
 (5, 'q', 'q', 'q', '5', '5', '1', 1, 1, '0', '2026-02-16 22:40:08', '2026-02-17 14:13:01'),
 (6, 'x', 'x', 'x', '6', '5', '1', 1, 1, '0', '2026-02-17 14:07:51', '2026-02-17 14:07:51'),
-(7, 't', 't', 't', '0', '10', '1', 1, 1, '0', '2026-02-22 15:06:10', '2026-02-22 15:06:10');
+(7, 't', 't', 't', '0', '10', '1', 1, 1, '0', '2026-02-22 15:06:10', '2026-02-22 15:06:10'),
+(8, 'موقع يونان', 'yyy', 'y', '989', '5', '2', 2, 2, '0', '2026-02-28 00:29:07', '2026-02-28 00:29:07');
 
 --
 -- Indexes for dumped tables
@@ -815,7 +879,11 @@ ALTER TABLE `drivercontracts`
 -- Indexes for table `drivers`
 --
 ALTER TABLE `drivers`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_driver_code` (`driver_code`),
+  ADD KEY `idx_driver_name` (`name`),
+  ADD KEY `idx_driver_status` (`driver_status`),
+  ADD KEY `idx_supplier_id` (`supplier_id`);
 
 --
 -- Indexes for table `driver_contract_notes`
@@ -943,13 +1011,13 @@ ALTER TABLE `clients`
 -- AUTO_INCREMENT for table `contractequipments`
 --
 ALTER TABLE `contractequipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `contracts`
 --
 ALTER TABLE `contracts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `contract_notes`
@@ -973,7 +1041,7 @@ ALTER TABLE `drivercontracts`
 -- AUTO_INCREMENT for table `drivers`
 --
 ALTER TABLE `drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `driver_contract_notes`
@@ -985,37 +1053,37 @@ ALTER TABLE `driver_contract_notes`
 -- AUTO_INCREMENT for table `equipments`
 --
 ALTER TABLE `equipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `equipments_types`
 --
 ALTER TABLE `equipments_types`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `equipment_drivers`
 --
 ALTER TABLE `equipment_drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `mines`
 --
 ALTER TABLE `mines`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `operations`
 --
 ALTER TABLE `operations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `project`
 --
 ALTER TABLE `project`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -1027,19 +1095,19 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `suppliercontractequipments`
 --
 ALTER TABLE `suppliercontractequipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `suppliers`
 --
 ALTER TABLE `suppliers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `supplierscontracts`
 --
 ALTER TABLE `supplierscontracts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `supplier_contract_notes`
@@ -1057,7 +1125,7 @@ ALTER TABLE `timesheet`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
@@ -1099,6 +1167,12 @@ ALTER TABLE `drivercontracts`
   ADD CONSTRAINT `fk_drivercontracts_mine` FOREIGN KEY (`mine_id`) REFERENCES `mines` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_drivercontracts_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_drivercontracts_project_contract` FOREIGN KEY (`project_contract_id`) REFERENCES `contracts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Constraints for table `drivers`
+--
+ALTER TABLE `drivers`
+  ADD CONSTRAINT `fk_drivers_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `driver_contract_notes`

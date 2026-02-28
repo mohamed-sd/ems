@@ -34,6 +34,7 @@ $driver_id = intval($_GET['id']);
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
   <!-- CSS الموقع -->
   <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
 </head>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
@@ -43,82 +44,20 @@ $driver_id = intval($_GET['id']);
   }
   
   body {
-    background: #f5f7fa;
+    background: var(--bg);
   }
   
   .main {
-    padding: 2rem;
-    background: #f5f7fa;
+    padding: 20px;
+    background: var(--bg);
+    min-height: 100vh;
   }
   
-  /* Page Title */
-  .main h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 2rem;
-  }
-  
-  /* Action Buttons Container */
-  .aligin {
+  /* Action Buttons - استخدام التصميم الموحد */
+  .page-header-actions {
     display: flex;
-    gap: 0.75rem;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  }
-  
-  /* Modern Action Buttons */
-  .aligin .add {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: white;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  }
-  
-  .aligin .add::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-  }
-  
-  .aligin .add:hover::before {
-    width: 300px;
-    height: 300px;
-  }
-  
-  .aligin .add:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 25px rgba(0,0,0,0.2);
-  }
-  
-  .aligin .add:active {
-    transform: translateY(-1px);
-  }
-  
-  #toggleForm {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
   }
   
   /* Form Styling */
@@ -126,44 +65,10 @@ $driver_id = intval($_GET['id']);
     animation: fadeInUp 0.6s ease;
   }
   
-  .card {
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    overflow: hidden;
-    margin-bottom: 2rem;
-  }
-  
-  .card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    padding: 1.5rem;
-    border: none;
-  }
-  
-  .card-header h5 {
-    color: white;
-    font-weight: 700;
-    margin: 0;
-  }
-  
-  .card-body {
-    padding: 2rem;
-  }
-  
   /* Section Titles */
-  .section-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #667eea;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin: 1.5rem 0;
-  }
-  
   .chip {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-l) 100%);
+    color: var(--gold);
     width: 35px;
     height: 35px;
     border-radius: 50%;
@@ -172,51 +77,55 @@ $driver_id = intval($_GET['id']);
     justify-content: center;
     font-weight: 700;
     font-size: 1.1rem;
-    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+    box-shadow: var(--shadow-md);
   }
   
-  /* Form Fields */
+  /* Form Fields - استخدام التصميم الموحد */
   .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
     margin-bottom: 1.5rem;
   }
   
   .field label {
-    display: block;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--sub);
+    letter-spacing: .06em;
+    text-transform: uppercase;
   }
   
   .field input,
   .field select,
   .field textarea {
     width: 100%;
-    padding: 0.75rem;
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: .88rem;
     font-weight: 500;
+    color: var(--txt);
+    background: var(--bg);
+    transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
+    outline: none;
   }
   
   .field input:focus,
   .field select:focus,
   .field textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-soft);
+    background: var(--surface);
   }
   
   .field input[readonly] {
     background: #f8f9fa;
     cursor: not-allowed;
+    opacity: 0.7;
   }
   
-  /* KPI Cards */
+  /* KPI Cards - استخدام التصميم الموحد */
   .totals {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -225,78 +134,91 @@ $driver_id = intval($_GET['id']);
   }
   
   .kpi {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    border: none;
-    border-radius: 15px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
     padding: 1.5rem;
     text-align: center;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    box-shadow: var(--shadow-md);
     transition: all 0.3s ease;
-    border-right: 5px solid #667eea;
+    border-right: 5px solid var(--gold);
   }
   
   .kpi:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    box-shadow: var(--shadow-lg);
   }
   
   .kpi .v {
     font-weight: 900;
     font-size: 2rem;
-    color: #667eea;
+    color: var(--navy);
     margin-bottom: 0.5rem;
   }
   
   .kpi .t {
-    color: #6c757d;
+    color: var(--sub);
     font-size: 0.9rem;
     font-weight: 600;
   }
   
-  /* Buttons */
+  /* Buttons - استخدام التصميم الموحد */
   button.primary,
   .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 10px;
-    font-weight: 600;
+    background: var(--gold-soft);
+    color: var(--navy);
+    border: 1.5px solid rgba(232,184,0,.28);
+    padding: 9px 18px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: .82rem;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    transition: all var(--ease);
+    font-family: 'Cairo', sans-serif;
   }
   
   button.primary:hover,
   .btn-primary:hover {
+    background: var(--gold);
+    color: var(--navy);
+    box-shadow: 0 5px 16px rgba(232,184,0,.35);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
   }
   
   #addEquipmentBtn {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    background: var(--blue-soft);
+    color: var(--blue);
+    border-color: rgba(37,99,235,.18);
+  }
+  
+  #addEquipmentBtn:hover {
+    background: var(--blue);
+    color: #fff;
+    box-shadow: 0 5px 16px rgba(37,99,235,.32);
   }
   
   /* HR Separator */
   .hr {
     height: 2px;
-    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
     margin: 2rem 0;
     border: none;
+    opacity: 0.5;
   }
   
   /* Equipment Sections */
   .equipment-section {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    background: var(--surface);
     padding: 1.5rem;
-    border-radius: 15px;
+    border-radius: var(--radius-lg);
     margin-bottom: 1.5rem;
-    border: 2px solid #e9ecef;
+    border: 1.5px solid var(--border);
     position: relative;
+    box-shadow: var(--shadow-sm);
   }
   
   .equipment-section h4 {
-    color: #667eea;
+    color: var(--navy);
     font-weight: 700;
     font-size: 1.1rem;
     margin-bottom: 1.5rem;
@@ -306,42 +228,44 @@ $driver_id = intval($_GET['id']);
   }
   
   .remove-equipment {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
-    border: none;
+    background: var(--red-soft);
+    color: var(--red);
+    border: 1.5px solid rgba(220,38,38,.18);
     padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--ease);
     position: absolute;
     top: 1rem;
     left: 1rem;
   }
   
   .remove-equipment:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    background: var(--red);
+    color: #fff;
+    box-shadow: 0 5px 16px rgba(220,38,38,.32);
+    transform: translateY(-2px);
   }
   
   /* DataTable Styling */
   .dataTables_wrapper {
     padding: 1rem;
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
   }
   
   table.dataTable {
     border-collapse: separate;
     border-spacing: 0;
-    border-radius: 10px;
+    border-radius: var(--radius);
     overflow: hidden;
   }
   
   table.dataTable thead th {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(125deg, var(--navy) 0%, var(--navy-l) 100%);
     color: white;
     font-weight: 700;
     padding: 1rem;
@@ -357,15 +281,15 @@ $driver_id = intval($_GET['id']);
   
   /* Group column colors for better organization */
   table.dataTable thead th.group-basic {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-l) 100%);
   }
   
   table.dataTable thead th.group-dates {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    background: linear-gradient(135deg, var(--blue) 0%, #1d4ed8 100%);
   }
   
   table.dataTable thead th.group-hours {
-    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    background: linear-gradient(135deg, var(--gold) 0%, #d4a800 100%);
   }
   
   table.dataTable thead th.group-parties {
@@ -373,15 +297,15 @@ $driver_id = intval($_GET['id']);
   }
   
   table.dataTable thead th.group-services {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
   }
   
   table.dataTable thead th.group-operations {
-    background: linear-gradient(135deg, #fd7e14 0%, #e66a0a 100%);
+    background: linear-gradient(135deg, var(--orange) 0%, #c95e00 100%);
   }
   
   table.dataTable thead th.group-status {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    background: linear-gradient(135deg, var(--red) 0%, #b91c1c 100%);
   }
   
   table.dataTable tbody tr {
@@ -389,9 +313,9 @@ $driver_id = intval($_GET['id']);
   }
   
   table.dataTable tbody tr:hover {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    transform: scale(1.005);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background: var(--gold-soft);
+    transform: scale(1.002);
+    box-shadow: var(--shadow-sm);
   }
   
   table.dataTable tbody td {
@@ -421,91 +345,95 @@ $driver_id = intval($_GET['id']);
   }
   
   .btn-action-edit {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: var(--blue-soft);
+    color: var(--blue);
   }
   
   .btn-action-edit:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background: var(--blue);
+    color: #fff;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 8px rgba(37,99,235,.3);
   }
   
   .btn-action-delete {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
+    background: var(--red-soft);
+    color: var(--red);
   }
   
   .btn-action-delete:hover {
-    background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+    background: var(--red);
+    color: #fff;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    box-shadow: 0 4px 8px rgba(220,38,38,.3);
   }
   
   .btn-action-view {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    color: white;
+    background: var(--green-soft);
+    color: var(--green);
   }
   
   .btn-action-view:hover {
-    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+    background: var(--green);
+    color: #fff;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 4px 8px rgba(22,163,74,.3);
   }
   
   /* Group Toggle Buttons */
   .btn-group-toggle {
     padding: 0.5rem 1rem;
-    border: 2px solid #e0e0e0;
-    background: white;
-    color: #666;
-    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--sub);
+    border-radius: 50px;
     cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: all var(--ease);
     display: inline-flex;
     align-items: center;
     gap: 6px;
   }
   
   .btn-group-toggle:hover {
-    border-color: #667eea;
-    color: #667eea;
+    border-color: var(--gold);
+    color: var(--navy);
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 10px rgba(232,184,0,.2);
   }
   
   .btn-group-toggle.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-color: transparent;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    background: var(--gold-soft);
+    color: var(--navy);
+    border-color: rgba(232,184,0,.28);
+    box-shadow: var(--shadow-sm);
   }
   
   .btn-group-toggle.active:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background: var(--gold);
   }
   
   .btn-group-toggle-all {
     padding: 0.5rem 1.2rem;
-    border: 2px solid #28a745;
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    color: white;
-    border-radius: 8px;
+    border: 1.5px solid rgba(22,163,74,.18);
+    background: var(--green-soft);
+    color: var(--green);
+    border-radius: 50px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 700;
-    transition: all 0.3s ease;
+    transition: all var(--ease);
     display: inline-flex;
     align-items: center;
     gap: 6px;
   }
   
   .btn-group-toggle-all:hover {
-    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+    background: var(--green);
+    color: #fff;
     transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+    box-shadow: 0 5px 16px rgba(22,163,74,.35);
   }
   
   /* Hidden columns */
@@ -563,23 +491,27 @@ $driver_id = intval($_GET['id']);
 
   <div class="main">
 
-    <h2><i class="fas fa-file-contract"></i> إدارة عقود السائق</h2>
-    
-    <div class="aligin">
-      <a href="javascript:void(0)" id="toggleForm" class="add">
-        <i class="fas fa-plus-circle"></i> عقد جديد
-      </a>
-      <a href="drivers.php" class="add" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);">
-        <i class="fas fa-arrow-right"></i> العودة للسائقين
-      </a>
+    <div class="page-header">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="title-icon"><i class="fas fa-file-contract"></i></div>
+        <h1 class="page-title">إدارة عقود السائق</h1>
+      </div>
+      <div class="page-header-actions">
+        <a href="drivers.php" class="back-btn">
+          <i class="fas fa-arrow-right"></i> رجوع للسائقين
+        </a>
+        <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+          <i class="fas fa-plus-circle"></i> عقد جديد
+        </a>
+      </div>
     </div>
 
     <!-- فورم إضافة عقد -->
     <form id="projectForm" action="" method="post" style="display:none;">
 
-      <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white">
-          <h5 class="mb-0">
+      <div class="card">
+        <div class="card-header">
+          <h5>
             <i class="fas fa-file-signature"></i> إضافة / تعديل عقد السائق
           </h5>
         </div>
@@ -630,28 +562,28 @@ $driver_id = intval($_GET['id']);
           </div>
           
           <!-- عرض معلومات ساعات العقد -->
-          <div id="projectHoursInfo" style="display:none; margin: 1rem 0; padding: 1.5rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 15px; border-right: 4px solid #2196f3; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+          <div id="projectHoursInfo" style="display:none; margin: 1rem 0; padding: 1.5rem; background: var(--blue-soft); border-radius: var(--radius-lg); border-right: 4px solid var(--blue); box-shadow: var(--shadow-md);">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-              <div style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                <strong style="color: #1976d2; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+              <div style="background: var(--surface); padding: 1.2rem; border-radius: var(--radius); box-shadow: var(--shadow-sm);">
+                <strong style="color: var(--blue); font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
                   <i class="fas fa-clock"></i> إجمالي ساعات العقد
                 </strong>
-                <div style="font-size: 2rem; color: #0d47a1; font-weight: 700;" id="contractTotalHours">0</div>
-                <div id="equipmentBreakdown" style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 2px dashed #e3f2fd; font-size: 0.85rem;">
+                <div style="font-size: 2rem; color: var(--navy); font-weight: 700;" id="contractTotalHours">0</div>
+                <div id="equipmentBreakdown" style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 2px dashed var(--border); font-size: 0.85rem;">
                   <!-- سيتم ملء التفصيل هنا -->
                 </div>
               </div>
-              <div style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                <strong style="color: #d32f2f; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+              <div style="background: var(--surface); padding: 1.2rem; border-radius: var(--radius); box-shadow: var(--shadow-sm);">
+                <strong style="color: var(--red); font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
                   <i class="fas fa-handshake"></i> المتعاقد عليه مع سائقين
                 </strong>
-                <div style="font-size: 2rem; color: #c62828; font-weight: 700;" id="driversContractedHours">0</div>
+                <div style="font-size: 2rem; color: var(--red); font-weight: 700;" id="driversContractedHours">0</div>
               </div>
-              <div style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                <strong style="color: #388e3c; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+              <div style="background: var(--surface); padding: 1.2rem; border-radius: var(--radius); box-shadow: var(--shadow-sm);">
+                <strong style="color: var(--green); font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
                   <i class="fas fa-chart-line"></i> الساعات المتبقية
                 </strong>
-                <div style="font-size: 2rem; color: #2e7d32; font-weight: 700;" id="remainingHours">0</div>
+                <div style="font-size: 2rem; color: var(--green); font-weight: 700;" id="remainingHours">0</div>
               </div>
             </div>
           </div>
@@ -679,9 +611,11 @@ $driver_id = intval($_GET['id']);
             </div>
           </div>
 
-          <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px; border-right: 4px solid #667eea;">
+          <div
+            style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px; border-right: 4px solid #667eea;">
             <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
-              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على البيانات المدخلة في الأقسام التالية
+              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
+              البيانات المدخلة في الأقسام التالية
             </p>
           </div>
 
@@ -906,6 +840,7 @@ $driver_id = intval($_GET['id']);
                     <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
                     <div class="control"><input name="equip_count_backup_1" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
                   </div>
+                  <div class="field md-3 sm-6">
                     <label>عدد المشغلين</label>
                     <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
                   </div>
@@ -1071,7 +1006,8 @@ $driver_id = intval($_GET['id']);
 
 
           <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
-            <button type="reset" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <button type="reset"
+              style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
               <i class="fas fa-eraser"></i> تفريغ الحقول
             </button>
             <button type="submit" class="primary" style="padding: 0.75rem 3rem;">
@@ -1081,9 +1017,9 @@ $driver_id = intval($_GET['id']);
         </div>
       </div>
     </form>
-    <div class="card shadow-sm">
-      <div class="card-header bg-dark text-white">
-        <h5 class="mb-0">
+    <div class="card">
+      <div class="card-header">
+        <h5>
           <i class="fas fa-list-alt"></i> قائمة العقود
         </h5>
       </div>

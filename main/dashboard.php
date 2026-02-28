@@ -16,6 +16,17 @@ $role     = $_SESSION['user']['role'];
 $userName = $_SESSION['user']['name'];
 $roleText = $roles[$role] ?? "غير معروف";
 
+/* جلب اسم المشروع للمستخدم */
+$userId = $_SESSION['user']['id'];
+$projectId = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
+$projectName = '';
+if ($projectId > 0) {
+  $projectQuery = $conn->query("SELECT name FROM project WHERE id = $projectId LIMIT 1");
+  if ($projectQuery && $projectRow = $projectQuery->fetch_assoc()) {
+    $projectName = $projectRow['name'];
+  }
+}
+
 /* Quick links */
 $allLinks = [
   "0"  => [['../Clients/clients.php','fa-users','العملاء'],['../Projects/oprationprojects.php','fa-project-diagram','المشاريع'],['../main/users.php','fa-user-shield','المستخدمين'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Settings/settings.php','fa-cog','الإعدادات']],
@@ -204,6 +215,13 @@ a{text-decoration:none;color:inherit}
   padding:2px 10px;border-radius:50px;margin-bottom:7px;
 }
 .banner-role i{font-size:.38rem}
+.banner-project{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);
+  color:#60a5fa;font-size:.72rem;font-weight:700;
+  padding:3px 12px;border-radius:50px;margin-bottom:7px;
+}
+.banner-project i{font-size:.6rem}
 .banner-name{font-size:1.4rem;font-weight:900;color:#fff;line-height:1.2;min-height:1.7rem}
 .cursor{
   display:inline-block;width:2px;height:1.1rem;
@@ -406,6 +424,8 @@ a{text-decoration:none;color:inherit}
   .clock{display:none}
   .banner-name{font-size:1.15rem}
   .banner-emoji{font-size:2rem}
+  .banner-project{font-size:.65rem;padding:2px 8px}
+  .banner-project i{font-size:.52rem}
   .cards-grid{grid-template-columns:1fr 1fr!important}
 }
   </style>
@@ -437,6 +457,12 @@ a{text-decoration:none;color:inherit}
     <div class="banner" id="bannerEl">
       <div class="banner-body">
         <div class="banner-role"><i class="fas fa-circle"></i><?= htmlspecialchars($roleText) ?></div>
+        <?php if ($projectName): ?>
+        <div class="banner-project">
+          <i class="fas fa-project-diagram"></i>
+          <span><?= htmlspecialchars($projectName) ?></span>
+        </div>
+        <?php endif; ?>
         <div class="banner-name"><span id="typed"></span><span class="cursor"></span></div>
         <div class="banner-sub">نتمنى لك يوماً مليئاً بالإنجازات 🚀</div>
       </div>
