@@ -1,0 +1,11 @@
+[01-Mar-2026 12:56:56 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function generate_csrf() in C:\xammp2026\htdocs\ems\index.php:53
+Stack trace:
+#0 {main}
+  thrown in C:\xammp2026\htdocs\ems\index.php on line 53
+[01-Mar-2026 13:02:34 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xammp2026\htdocs\ems\config.php:83) in C:\xammp2026\htdocs\ems\config.php on line 83
+[01-Mar-2026 13:02:40 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xammp2026\htdocs\ems\config.php:83) in C:\xammp2026\htdocs\ems\config.php on line 83
+[01-Mar-2026 13:02:50 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xammp2026\htdocs\ems\config.php:83) in C:\xammp2026\htdocs\ems\config.php on line 83
+[01-Mar-2026 13:03:23 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xammp2026\htdocs\ems\config.php:83) in C:\xammp2026\htdocs\ems\config.php on line 83
+[01-Mar-2026 13:03:28 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xammp2026\htdocs\ems\config.php:83) in C:\xammp2026\htdocs\ems\config.php on line 83
+[01-Mar-2026 13:04:21 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xammp2026\htdocs\ems\config.php:83) in C:\xammp2026\htdocs\ems\config.php on line 83
+[01-Mar-2026 13:08:58 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xammp2026\htdocs\ems\config.php:83) in C:\xammp2026\htdocs\ems\config.php on line 83

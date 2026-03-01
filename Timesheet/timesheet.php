@@ -5,11 +5,61 @@ if (!isset($_SESSION['user'])) {
   exit();
 }
 include '../config.php';
+
+// Handle POST submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
+  $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+  
+  // Secure form values
+  $fields = [
+    "operator", "driver", "shift", "date", "shift_hours", "executed_hours",
+    "bucket_hours", "jackhammer_hours", "extra_hours", "extra_hours_total",
+    "standby_hours", "dependence_hours", "total_work_hours", "work_notes",
+    "hr_fault", "maintenance_fault", "marketing_fault", "approval_fault",
+    "other_fault_hours", "total_fault_hours", "fault_notes",
+    "start_seconds", "start_minutes", "start_hours",
+    "end_seconds", "end_minutes", "end_hours", "counter_diff",
+    "fault_type", "fault_department", "fault_part", "fault_details",
+    "general_notes", "operator_hours", "machine_standby_hours",
+    "jackhammer_standby_hours", "bucket_standby_hours",
+    "extra_operator_hours", "operator_standby_hours", "operator_notes",
+    "type", "user_id"
+  ];
+
+  $values = [];
+  foreach ($fields as $f) {
+    $val = isset($_POST[$f]) ? mysqli_real_escape_string($conn, $_POST[$f]) : '';
+    $values[$f] = $val;
+  }
+
+  if ($id > 0) {
+    // UPDATE
+    $update_parts = [];
+    foreach ($fields as $f) {
+      $update_parts[] = "$f = '" . $values[$f] . "'";
+    }
+    $sql = "UPDATE timesheet SET " . implode(',', $update_parts) . " WHERE id = $id";
+  } else {
+    // INSERT
+    $sql = "INSERT INTO timesheet (" . implode(",", $fields) . ")
+            VALUES ('" . implode("','", $values) . "')";
+  }
+
+  if (mysqli_query($conn, $sql)) {
+    $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
+    echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
+    exit;
+  } else {
+    echo "<script>alert('❌ خطأ في الحفظ: " . addslashes(mysqli_error($conn)) . "');</script>";
+  }
+}
+
 $type = isset($_GET['type']) ? $_GET['type'] : "";
 if ($type !== "1" && $type !== "2") {
   header("Location: timesheet_type.php");
   exit();
 }
+
 $page_title = "إيكوبيشن | ساعات العمل ";
 include("../inheader.php");
 // include('../insidebar.php');
@@ -610,169 +660,7 @@ if ($type != "") {
           </tr>
         </thead>
         <tbody>
-          <?php
-
-
-          if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
-
-            $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-            // تأمين القيم من الفورم
-            $fields = [
-              "operator",
-              "driver",
-              "shift",
-              "date",
-              "shift_hours",
-              "executed_hours",
-              "bucket_hours",
-              "jackhammer_hours",
-              "extra_hours",
-              "extra_hours_total",
-              "standby_hours",
-              "dependence_hours",
-              "total_work_hours",
-              "work_notes",
-              "hr_fault",
-              "maintenance_fault",
-              "marketing_fault",
-              "approval_fault",
-              "other_fault_hours",
-              "total_fault_hours",
-              "fault_notes",
-              "start_seconds",
-              "start_minutes",
-              "start_hours",
-              "end_seconds",
-              "end_minutes",
-              "end_hours",
-              "counter_diff",
-              "fault_type",
-              "fault_department",
-              "fault_part",
-              "fault_details",
-              "general_notes",
-              "operator_hours",
-              "machine_standby_hours",
-              "jackhammer_standby_hours",
-              "bucket_standby_hours",
-              "extra_operator_hours",
-              "operator_standby_hours",
-              "operator_notes",
-              "type",
-              "user_id"
-            ];
-
-            $values = [];
-            foreach ($fields as $f) {
-              $val = isset($_POST[$f]) ? mysqli_real_escape_string($conn, $_POST[$f]) : '';
-              $values[$f] = $val;
-            }
-
-            if ($id > 0) {
-              // UPDATE
-              $update_parts = [];
-              foreach ($fields as $f) {
-                $update_parts[] = "$f = '" . $values[$f] . "'";
-              }
-              $sql = "UPDATE timesheet SET " . implode(',', $update_parts) . " WHERE id = $id";
-            } else {
-              // بناء الاستعلام
-              $sql = "INSERT INTO timesheet (" . implode(",", $fields) . ")
-            VALUES ('" . implode("','", $values) . "')";
-            }
-
-            if (mysqli_query($conn, $sql)) {
-              echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='timesheet.php?type=" . urlencode($type) . "';</script>";
-              exit;
-            } else {
-              echo "<script>alert('❌ خطأ في الحفظ: " . mysqli_real_escape_string($conn, mysqli_error($conn)) . "');</script>";
-            }
-          }
-
-          // عرض البيانات
-          $query = "SELECT t.id, t.shift, t.date, t.executed_hours ,
-        t.standby_hours , t.total_fault_hours ,bucket_hours,jackhammer_hours,
-        extra_hours,extra_hours_total,dependence_hours,	total_work_hours, t.status ,
-        work_notes,hr_fault,
-                 e.code AS eq_code, e.name AS eq_name,
-                 p.name AS project_name,
-                 o.id AS operation_id,
-                 d.name AS driver_name 
-          FROM timesheet t
-          JOIN operations o ON t.operator = o.id
-          JOIN equipments e ON o.equipment = e.id
-          JOIN project p ON o.project_id = p.id
-          JOIN drivers d ON t.driver = d.id
-          WHERE t.type LIKE '$type' 
-         ";
-
-          if ($_SESSION['user']['role'] == "6") {
-            // If the user is a driver, filter by their user ID
-            $user_filter = $_SESSION['user']['id'];
-           $query .= " AND t.user_id = '$user_filter'  ORDER BY t.id DESC ";
-}else {
-  $query .= " ORDER BY t.id DESC ";
-}
-
-
-
-          $result = mysqli_query($conn, $query);
-          $i = 1;
-          while ($row = mysqli_fetch_assoc($result)) {
-
-            $totalwork = $row['standby_hours'] + $row['bucket_hours'] + $row['jackhammer_hours'] + $row['extra_hours'] + $row['dependence_hours'];
-            $totalall = $row['total_work_hours'] + $row['total_fault_hours'];
-
-            // The Variable that take the status value
-            switch ($row['status']) {
-              case "1":
-                $status = "<font color='grey'> تحت المراجعة </font>";
-                break;
-              case "2":
-                $status = "<font color='green'> تم الاعتماد </font>";
-                break;
-              case "3":
-                $status = "<font color='red'> تم الرفض </font>";
-                break;
-              default:
-                $status = "غير معروف";
-            }
-
-            echo "<tr>";
-            echo "<td style='font-weight: 600;'>" . $i++ . "</td>";
-            echo "<td style='font-weight: 600; color: #2980b9;'>" . $row['eq_code'] . " - " . $row['eq_name'] . "</td>";
-            // echo "<td>" . $row['project_name'] . "</td>";
-            // echo "<td> ... </td>";
-            echo "<td>" . $row['date'] . "</td>";
-            echo $row['shift'] == "D" ? "<td><span style='background: #ffeaa7; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #2d3436;'><i class='fas fa-sun'></i> صباحية</span></td>" : "<td><span style='background: #2d3436; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #fff;'><i class='fas fa-moon'></i> مسائية</span></td>";
-            echo "<td style='background: #e8f5e9; font-weight: 600;'>" . $row['executed_hours'] . "</td>";
-            echo "<td style='background: #e8f5e9;'>" . $row['bucket_hours'] . "</td>";
-            echo "<td style='background: #e8f5e9;'>" . $row['jackhammer_hours'] . "</td>";
-            echo "<td style='background: #e8f5e9;'>" . $row['extra_hours'] . "</td>";
-
-            // echo "<td>" . $row['extra_hours_total'] . "</td>";
-            echo "<td style='background: #fff3e0; font-weight: 600;'>" . $row['standby_hours'] . "</td>";
-            echo "<td style='background: #fff3e0; font-weight: 600; color: #d63031;'>" . $row['total_fault_hours'] . "</td>";
-
-            echo "<td style='background: #e3f2fd; font-weight: 700; color: #2980b9; font-size: 1.05rem;'>" . $totalwork . "</td>";
-            echo "<td style='background: #ffebee; font-weight: 700; color: #c0392b; font-size: 1.05rem;'>" . $totalall . "</td>";
-
-
-            // echo "<td>" . $row['dependence_hours'] . "</td>";
-            // echo "<td>" . $row['total_work_hours'] . "</td>";
-            // echo "<td>" . $row['work_notes'] . "</td>";
-            // echo "<td>" . $row['hr_fault'] . "</td>";
-            echo "<td style='text-align: center;'>" . $status . "</td>";
-            echo "<td style='white-space: nowrap; text-align: center;'>
-        <a href='aprovment.php?t=" . $type . "&&type=1&&id=" . $row['id'] . "' title='قبول' style='color: #27ae60; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'> <i class='fas fa-check-circle'></i> </a>
-        <a href='aprovment.php?t=" . $type . "&&type=2&&id=" . $row['id'] . "' title='رفض' style='color: #e74c3c; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'> <i class='fas fa-times-circle'></i> </a>
-        <a href='javascript:void(0)' class='editBtn' data-id='" . $row['id'] . "' title='تعديل' style='color:#3498db; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'><i class='fas fa-edit'></i></a>
-        <a href='delete_timesheet.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' title='حذف' style='color: #e74c3c; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'><i class='fas fa-trash'></i></a>
-        <a href='timesheet_details.php?id=" . $row['id'] . "' title='عرض التفاصيل' style='color: #8e44ad; font-size: 1.1rem; margin: 0 3px; transition: all 0.3s;'> <i class='fas fa-eye'></i> </a>  
-        </td>";
-            echo "</tr>";
-          }
-          ?>
+          <!-- Data will be loaded via AJAX -->
         </tbody>
       </table>
       
@@ -795,10 +683,40 @@ if ($type != "") {
 <script>
   $(document).ready(function () {
     var table = $('#projectsTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+          url: 'get_timesheet_data.php',
+          type: 'GET',
+          data: {
+            type: '<?php echo $type; ?>'
+          },
+          error: function(xhr, error, thrown) {
+            console.error('DataTables AJAX Error:', error, thrown);
+          }
+        },
+        columns: [
+          { data: 0, orderable: false }, // #
+          { data: 1 }, // المعدة
+          { data: 2 }, // التاريخ
+          { data: 3, orderable: false }, // الوردية
+          { data: 4 }, // الساعات المنفذة
+          { data: 5 }, // الجردل
+          { data: 6 }, // الجاكهمر
+          { data: 7 }, // الإضافية
+          { data: 8 }, // الاستعداد
+          { data: 9 }, // الأعطال
+          { data: 10 }, // ساعات العمل
+          { data: 11, orderable: false }, // الإجمالي
+          { data: 12 }, // الحالة
+          { data: 13, orderable: false } // إجراءات
+        ],
+        order: [[2, 'desc']], // Sort by date descending by default
+        pageLength: 10,
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "الكل"]],
         scrollX: true,
         fixedHeader: true,
-      
-        dom: 'Bfrtip', // Buttons + Search + Pagination
+        dom: 'Blfrtip', // Buttons + Length + Search + Table + Info + Pagination
         buttons: [
           { extend: 'copy', text: 'نسخ' },
           { extend: 'excel', text: 'تصدير Excel' },
@@ -806,8 +724,9 @@ if ($type != "") {
           { extend: 'pdf', text: 'تصدير PDF' },
           { extend: 'print', text: 'طباعة' }
         ],
-        "language": {
-          "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+        language: {
+          url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json",
+          processing: '<i class="fas fa-spinner fa-spin fa-3x"></i><br>جاري التحميل...'
         }
       });
 

@@ -1,17 +1,25 @@
 <?php
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
-    exit();
-}
-
+// تحميل الإعدادات والأمان
 include '../config.php';
 
+// التحقق من تسجيل الدخول
+require_login();
+
 // معالجة حذف المشروع
-if (isset($_GET['delete_id'])) {
+if (isset($_GET['delete_id']) && isset($_GET['csrf_token'])) {
+    // التحقق من CSRF Token
+    if (!verify_csrf_token($_GET['csrf_token'])) {
+        header("Location: oprationprojects.php?error=خطأ+أمني");
+        exit();
+    }
+    
     $delete_id = intval($_GET['delete_id']);
-    $delete_query = "DELETE FROM project WHERE id = $delete_id";
-    if (mysqli_query($conn, $delete_query)) {
+    
+    // استخدام prepared statement لتجنب SQL Injection
+    $stmt = query_safe("DELETE FROM project WHERE id = ?", [$delete_id], 'i');
+    
+    if ($stmt) {
+        log_security_event('PROJECT_DELETED', "Deleted project ID: $delete_id");
         header("Location: oprationprojects.php?msg=تم+حذف+المشروع+بنجاح+✅");
         exit();
     } else {
@@ -21,67 +29,94 @@ if (isset($_GET['delete_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
+    // التحقق من CSRF Token
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        die('خطأ في التحقق من الأمان - CSRF Token غير صحيح');
+    }
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $company_client_id = !empty($_POST['company_client_id']) ? intval($_POST['company_client_id']) : 0;
 
-    // جلب البيانات المدخولة يدويًا
-    $name = mysqli_real_escape_string($conn, $_POST['project_name']);
-    $project_code = mysqli_real_escape_string($conn, $_POST['project_code'] ?? '');
-    $category = mysqli_real_escape_string($conn, $_POST['category'] ?? '');
-    $sub_sector = mysqli_real_escape_string($conn, $_POST['sub_sector'] ?? '');
-    $state = mysqli_real_escape_string($conn, $_POST['state'] ?? '');
-    $region = mysqli_real_escape_string($conn, $_POST['region'] ?? '');
-    $nearest_market = mysqli_real_escape_string($conn, $_POST['nearest_market'] ?? '');
-    $latitude = mysqli_real_escape_string($conn, $_POST['latitude'] ?? '');
-    $longitude = mysqli_real_escape_string($conn, $_POST['longitude'] ?? '');
-    $location = mysqli_real_escape_string($conn, $_POST['location'] ?? '');
+    // جلب البيانات المدخولة بشكل آمن
+    $name = sanitize_input($_POST['project_name']);
+    $project_code = sanitize_input($_POST['project_code'] ?? '');
+    $category = sanitize_input($_POST['category'] ?? '');
+    $sub_sector = sanitize_input($_POST['sub_sector'] ?? '');
+    $state = sanitize_input($_POST['state'] ?? '');
+    $region = sanitize_input($_POST['region'] ?? '');
+    $nearest_market = sanitize_input($_POST['nearest_market'] ?? '');
+    $latitude = sanitize_input($_POST['latitude'] ?? '');
+    $longitude = sanitize_input($_POST['longitude'] ?? '');
+    $location = sanitize_input($_POST['location'] ?? '');
+    $status = sanitize_input($_POST['status']);
+    $total = floatval($_POST['total'] ?? 0);
 
     // جلب اسم العميل إذا تم اختياره
     $client = '';
     if ($company_client_id > 0) {
-        $client_data = mysqli_query($conn, "SELECT client_name FROM clients WHERE id = $company_client_id");
-        if ($client_row = mysqli_fetch_assoc($client_data)) {
-            $client = mysqli_real_escape_string($conn, $client_row['client_name']);
+        $stmt = query_safe("SELECT client_name FROM clients WHERE id = ?", [$company_client_id], 'i');
+        if ($stmt) {
+            $stmt_result = mysqli_stmt_get_result($stmt);
+            if ($client_row = mysqli_fetch_assoc($stmt_result)) {
+                $client = sanitize_input($client_row['client_name']);
+            }
         }
     } else {
-        $client = mysqli_real_escape_string($conn, $_POST['client_name'] ?? '');
+        $client = sanitize_input($_POST['client_name'] ?? '');
     }
 
-    $total = floatval($_POST['total'] ?? 0);
-    $status = mysqli_real_escape_string($conn, $_POST['status']);
     $created_by = $_SESSION['user']['id'] ?? 1;
-    $date = date('Y-m-d H:i:s');
 
     if ($id > 0) {
-        // تحديث
-        $sql = "UPDATE project SET 
-            company_client_id='$company_client_id',
-            name='$name',
-            client='$client',
-            location='$location',
-            project_code='$project_code',
-            category='$category',
-            sub_sector='$sub_sector',
-            state='$state',
-            region='$region',
-            nearest_market='$nearest_market',
-            latitude='$latitude',
-            longitude='$longitude',
-            total='$total',
-            status='$status',
-            updated_at=NOW()
-        WHERE id=$id";
-        mysqli_query($conn, $sql);
-
-        header("Location: oprationprojects.php?msg=تم+تعديل+المشروع+بنجاح+✅");
-        exit;
+        // تحديث مع Prepared Statement
+        $stmt = query_safe(
+            "UPDATE project SET 
+                company_client_id = ?,
+                name = ?,
+                client = ?,
+                location = ?,
+                project_code = ?,
+                category = ?,
+                sub_sector = ?,
+                state = ?,
+                region = ?,
+                nearest_market = ?,
+                latitude = ?,
+                longitude = ?,
+                total = ?,
+                status = ?,
+                updated_at = NOW()
+            WHERE id = ?",
+            [$company_client_id, $name, $client, $location, $project_code, $category, 
+             $sub_sector, $state, $region, $nearest_market, $latitude, $longitude, $total, $status, $id],
+            'isssssssssddssi'
+        );
+        
+        if ($stmt) {
+            log_security_event('PROJECT_UPDATED', "Updated project: $name (ID: $id)");
+            header("Location: oprationprojects.php?msg=تم+تعديل+المشروع+بنجاح+✅");
+            exit;
+        } else {
+            header("Location: oprationprojects.php?msg=حدث+خطأ+أثناء+التعديل+❌");
+            exit;
+        }
     } else {
-        // إضافة
-        $sql = "INSERT INTO project (company_client_id, name, client, location, project_code, category, sub_sector, state, region, nearest_market, latitude, longitude, total, status, created_by, create_at) 
-        VALUES ('$company_client_id', '$name', '$client', '$location', '$project_code', '$category', '$sub_sector', '$state', '$region', '$nearest_market', '$latitude', '$longitude', '$total', '$status', '$created_by', '$date')";
-        mysqli_query($conn, $sql);
-        header("Location: oprationprojects.php?msg=تم+اضافه+المشروع+بنجاح+✅");
-        exit;
+        // إضافة مع Prepared Statement
+        $stmt = query_safe(
+            "INSERT INTO project (company_client_id, name, client, location, project_code, category, sub_sector, state, region, nearest_market, latitude, longitude, total, status, created_by, create_at) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+            [$company_client_id, $name, $client, $location, $project_code, $category, 
+             $sub_sector, $state, $region, $nearest_market, $latitude, $longitude, $total, $status, $created_by],
+            'issssssssssddssi'
+        );
+        
+        if ($stmt) {
+            log_security_event('PROJECT_CREATED', "Created project: $name");
+            header("Location: oprationprojects.php?msg=تم+اضافة+المشروع+بنجاح+✅");
+            exit;
+        } else {
+            header("Location: oprationprojects.php?msg=حدث+خطأ+أثناء+الإضافة+❌");
+            exit;
+        }
     }
 }
 ?>
@@ -129,6 +164,7 @@ include('../insidebar.php');
             </div>
             <div class="card-body">
                 <input type="hidden" name="id" id="project_id" value="">
+                <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                 <div class="form-grid">
                     <div>
                         <label><i class="fas fa-user-tie"></i> اسم العميل (اختياري)</label>
@@ -137,7 +173,7 @@ include('../insidebar.php');
                             <?php
                             $clients_query = mysqli_query($conn, "SELECT id, client_code, client_name FROM clients WHERE status = 'نشط' ORDER BY client_name ASC");
                             while ($cli = mysqli_fetch_assoc($clients_query)) {
-                                echo "<option value='" . $cli['id'] . "'>[" . $cli['client_code'] . "] " . $cli['client_name'] . "</option>";
+                                echo "<option value='" . intval($cli['id']) . "'>[" . e($cli['client_code']) . "] " . e($cli['client_name']) . "</option>";
                             }
                             ?>
                         </select>
@@ -246,7 +282,7 @@ include('../insidebar.php');
                     </thead>
                     <tbody>
                         <?php
-                        include '../config.php';
+                        // جلب جميع المشاريع من جدول project
 
                         $client_filter = "";
 
@@ -277,11 +313,11 @@ include('../insidebar.php');
                         $result = mysqli_query($conn, $query);
                         while ($row = mysqli_fetch_assoc($result)) {
                             echo "<tr>";
-                            echo "<td>" . $row['create_at'] . "</td>";
-                            echo "<td>" . ($row['client_name'] ?? $row['client']) . "</td>";
-                            echo "<td>" . ($row['project_code'] ?? '-') . "</td>";
-                            echo "<td><strong>" . $row['name'] . "</strong></td>";
-                            echo "<td><span class='count-badge'>" . $row['total_suppliers'] . "</span></td>";
+                            echo "<td>" . e($row['create_at']) . "</td>";
+                            echo "<td>" . e($row['client_name'] ?? $row['client']) . "</td>";
+                            echo "<td>" . e($row['project_code'] ?? '-') . "</td>";
+                            echo "<td><strong>" . e($row['name']) . "</strong></td>";
+                            echo "<td><span class='count-badge'>" . intval($row['total_suppliers']) . "</span></td>";
                             if ($row['status'] == "1") {
                                 echo "<td><span class='status-active'><i class='fas fa-check-circle'></i> نشط</span></td>";
                             } else {
@@ -291,11 +327,11 @@ include('../insidebar.php');
                             echo "<td>
                            
 
-                             <a href='project_mines.php?project_id=" . $row['id'] . "' 
+                             <a href='project_mines.php?project_id=" . intval($row['id']) . "' 
                                        class='mines-count-link' 
                                        title='عرض المناجم'>
                                         <i class='fas fa-mountain'></i>
-                                        <span class='mines-count-badge'>" . $row['mines_count'] . "</span>
+                                        <span class='mines-count-badge'>" . intval($row['mines_count']) . "</span>
                              </a>
 
                         </td>";
@@ -324,8 +360,8 @@ include('../insidebar.php');
                                 </a>
                                 <a href='javascript:void(0)' 
                                    class='action-btn edit editBtn' 
-                                   data-id='" . $row['id'] . "' 
-                                   data-company-client-id='" . ($row['company_client_id'] ?? '') . "' 
+                                   data-id='" . intval($row['id']) . "' 
+                                   data-company-client-id='" . intval($row['company_client_id'] ?? 0) . "' 
                                    data-project-name='" . htmlspecialchars($row['name']) . "' 
                                    data-location='" . htmlspecialchars($row['location']) . "' 
                                    data-project-code='" . htmlspecialchars($row['project_code'] ?? '') . "' 
@@ -336,11 +372,11 @@ include('../insidebar.php');
                                    data-nearest-market='" . htmlspecialchars($row['nearest_market'] ?? '') . "' 
                                    data-latitude='" . htmlspecialchars($row['latitude'] ?? '') . "' 
                                    data-longitude='" . htmlspecialchars($row['longitude'] ?? '') . "' 
-                                   data-status='" . $row['status'] . "'
+                                   data-status='" . htmlspecialchars($row['status']) . "'
                                    title='تعديل'>
                                    <i class='fas fa-edit'></i>
                                 </a>
-                                <a href='oprationprojects.php?delete_id=" . $row['id'] . "' 
+                                <a href='oprationprojects.php?delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode(generate_csrf_token()) . "' 
                                    class='action-btn delete' 
                                    onclick='return confirm(\"هل أنت متأكد من حذف هذا المشروع؟\")'
                                    title='حذف'>

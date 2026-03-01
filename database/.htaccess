@@ -1,0 +1,12 @@
+# حماية مجلد database - نسخة مبسطة
+# Deny direct access to SQL files
+
+Options -Indexes
+
+# منع الوصول لملفات .sql
+<FilesMatch "\.sql$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
+

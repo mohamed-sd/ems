@@ -18,6 +18,7 @@
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
     <link rel="stylesheet" href="../assets/css/admin-style.css">
+    <script src="../assets/js/performance-boost.js" defer></script>
 
 </head>
 <body>

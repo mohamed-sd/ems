@@ -1,35 +1,42 @@
 <?php
-$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443;
-$cookieParams = session_get_cookie_params();
-session_set_cookie_params(0, $cookieParams['path'], $cookieParams['domain'], $secure, true);
-ini_set('session.use_strict_mode', 1);
-session_start();
+// تحميل config.php الذي يحمل security.php تلقائياً
+require_once "config.php";
+
+// الآن يتم بدء الجلسة الآمنة من security.php تلقائياً
+// إعدادات الأمان الإضافية
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("Referrer-Policy: no-referrer");
-require_once "config.php";
 
-$max_attempts = 5; $lockout_minutes = 15;
-if (!isset($_SESSION['login_attempts'])) { $_SESSION['login_attempts'] = 0; $_SESSION['last_attempt_time'] = null; }
+// إعدادات تسجيل الدخول
+$max_attempts = 5;
+$lockout_minutes = 15;
 
-function is_locked_out() {
-  global $max_attempts,$lockout_minutes;
-  if (!empty($_SESSION['last_attempt_time']) && $_SESSION['login_attempts'] >= $max_attempts) {
-    if ((time()-$_SESSION['last_attempt_time']) < ($lockout_minutes*60)) return true;
-    $_SESSION['login_attempts']=0; $_SESSION['last_attempt_time']=null;
-  }
-  return false;
+// تهيئة محاولات تسجيل الدخول في الجلسة
+if (!isset($_SESSION['login_attempts'])) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['last_attempt_time'] = null;
 }
-function generate_csrf() { if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token']=bin2hex(openssl_random_pseudo_bytes(32)); return $_SESSION['csrf_token']; }
-function verify_csrf($t) { return isset($_SESSION['csrf_token'])&&$_SESSION['csrf_token']===$t; }
-function e($s) { return htmlspecialchars($s,ENT_QUOTES,'UTF-8'); }
+
+// دالة للتحقق من قفل الحساب
+function is_login_locked_out() {
+    global $max_attempts, $lockout_minutes;
+    if (!empty($_SESSION['last_attempt_time']) && $_SESSION['login_attempts'] >= $max_attempts) {
+        if ((time()-$_SESSION['last_attempt_time']) < ($lockout_minutes*60)) {
+            return true;
+        }
+        $_SESSION['login_attempts'] = 0;
+        $_SESSION['last_attempt_time'] = null;
+    }
+    return false;
+}
 
 $error='';
 if ($_SERVER['REQUEST_METHOD']==='POST') {
-  if (is_locked_out()) {
-    $mins=ceil((($lockout_minutes*60)-(time()-$_SESSION['last_attempt_time']))/60);
+  if (is_login_locked_out()) {
+    $mins = $lockout_minutes;
     $error="تم تجميد الحساب مؤقتاً. حاول بعد {$mins} دقيقة.";
-  } elseif (!verify_csrf($_POST['csrf_token']??'')) {
+  } elseif (!verify_csrf_token($_POST['csrf_token']??'')) {
     $error="رمز الأمان غير صحيح. أعد تحميل الصفحة.";
   } else {
     $u=trim($_POST['username']??''); $p=trim($_POST['password']??'');
@@ -58,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     }
   }
 }
-$csrf = generate_csrf();
+$csrf = generate_csrf_token(); // من security.php
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">

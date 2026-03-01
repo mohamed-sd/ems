@@ -1,0 +1,11 @@
+# حماية مجلد includes - نسخة مبسطة
+# Allow PHP includes but deny direct access to PHP files
+
+# السماح بالوصول من PHP (includes) لكن منع التصفح المباشر
+Options -Indexes
+
+# منع عرض محتوى المجلد
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+

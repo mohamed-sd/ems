@@ -1,0 +1,12 @@
+# حماية مجلد logs - نسخة مبسطة
+# Deny direct access to log files
+
+Options -Indexes
+
+# منع الوصول لملفات .log
+<FilesMatch "\.log$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
+
