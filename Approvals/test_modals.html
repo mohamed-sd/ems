@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار النوافذ المنبثقة</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">اختبار النوافذ المنبثقة</h1>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> هذه الصفحة لاختبار أن النوافذ المنبثقة تعمل بشكل صحيح
+        </div>
+
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary" id="testPayloadModal">
+                <i class="fas fa-eye"></i> اختبار نافذة العرض
+            </button>
+            <button type="button" class="btn btn-success" id="testApproveModal">
+                <i class="fas fa-check"></i> اختبار نافذة الاعتماد
+            </button>
+            <button type="button" class="btn btn-danger" id="testRejectModal">
+                <i class="fas fa-ban"></i> اختبار نافذة الرفض
+            </button>
+        </div>
+
+        <div class="mt-4">
+            <h5>نتيجة الاختبار:</h5>
+            <pre id="testResult" class="bg-light p-3 rounded"></pre>
+        </div>
+    </div>
+
+    <!-- Modal العرض -->
+    <div class="modal fade" id="payloadModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title">
+                        <i class="fas fa-info-circle text-info"></i> تفاصيل الطلب
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <pre id="payloadText" class="bg-light p-3 rounded">هذا نص تجريبي لاختبار نافذة العرض</pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> إغلاق
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal القرار -->
+    <div class="modal fade" id="decisionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-light" id="decisionHeader">
+                    <h5 class="modal-title" id="decisionTitle">
+                        <i class="fas fa-check-circle text-success"></i> قرار الموافقة
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info mb-3" id="decisionMessage">
+                        <i class="fas fa-lightbulb"></i> يرجى إدخال ملاحظتك قبل تأكيد القرار
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="decisionNote">
+                            <i class="fas fa-comment"></i> ملاحظات (اختياري)
+                        </label>
+                        <textarea id="decisionNote" class="form-control" rows="4" placeholder="أضف أي ملاحظات إضافية..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                    <button type="button" class="btn btn-primary" id="submitDecisionBtn">
+                        <i class="fas fa-check"></i> <span id="submitBtnText">تأكيد</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(function() {
+            // اختبار تحميل Bootstrap
+            if (typeof bootstrap === 'undefined') {
+                $('#testResult').text('❌ خطأ: Bootstrap غير محمل!');
+                return;
+            } else {
+                $('#testResult').text('✅ Bootstrap محمل بنجاح\n');
+            }
+
+            let payloadModal = null;
+            let decisionModal = null;
+
+            // تهيئة الـ modals
+            try {
+                payloadModal = new bootstrap.Modal(document.getElementById('payloadModal'));
+                decisionModal = new bootstrap.Modal(document.getElementById('decisionModal'));
+                $('#testResult').append('✅ تم تهيئة النوافذ المنبثقة بنجاح\n');
+            } catch(e) {
+                $('#testResult').append('❌ خطأ في تهيئة النوافذ: ' + e.message + '\n');
+                return;
+            }
+
+            // اختبار نافذة العرض
+            $('#testPayloadModal').on('click', function() {
+                try {
+                    $('#payloadText').text('تم فتح نافذة العرض بنجاح في: ' + new Date().toLocaleTimeString('ar-SA'));
+                    payloadModal.show();
+                    $('#testResult').append('✅ تم فتح نافذة العرض\n');
+                } catch(e) {
+                    $('#testResult').append('❌ خطأ في فتح نافذة العرض: ' + e.message + '\n');
+                }
+            });
+
+            // اختبار نافذة الاعتماد
+            $('#testApproveModal').on('click', function() {
+                try {
+                    $('#decisionTitle').html('<i class="fas fa-check-circle text-success"></i> اعتماد الطلب');
+                    $('#decisionMessage').html('<i class="fas fa-info-circle text-info"></i> يرجى تأكيد اعتماد هذا الطلب');
+                    $('#decisionHeader').removeClass().addClass('modal-header bg-success text-white');
+                    $('#submitBtnText').text('اعتماد');
+                    $('#submitDecisionBtn').removeClass().addClass('btn btn-success');
+                    decisionModal.show();
+                    $('#testResult').append('✅ تم فتح نافذة الاعتماد\n');
+                } catch(e) {
+                    $('#testResult').append('❌ خطأ في فتح نافذة الاعتماد: ' + e.message + '\n');
+                }
+            });
+
+            // اختبار نافذة الرفض
+            $('#testRejectModal').on('click', function() {
+                try {
+                    $('#decisionTitle').html('<i class="fas fa-ban text-danger"></i> رفض الطلب');
+                    $('#decisionMessage').html('<i class="fas fa-warning text-warning"></i> يرجى تحديد سبب الرفض');
+                    $('#decisionHeader').removeClass().addClass('modal-header bg-danger text-white');
+                    $('#submitBtnText').text('رفض');
+                    $('#submitDecisionBtn').removeClass().addClass('btn btn-danger');
+                    decisionModal.show();
+                    $('#testResult').append('✅ تم فتح نافذة الرفض\n');
+                } catch(e) {
+                    $('#testResult').append('❌ خطأ في فتح نافذة الرفض: ' + e.message + '\n');
+                }
+            });
+
+            // اختبار زر التأكيد
+            $('#submitDecisionBtn').on('click', function() {
+                $('#testResult').append('✅ تم الضغط على زر التأكيد\n');
+                decisionModal.hide();
+            });
+        });
+    </script>
+</body>
+</html>

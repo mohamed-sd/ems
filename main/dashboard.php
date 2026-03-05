@@ -2,6 +2,7 @@
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../index.php"); exit(); }
 include "../config.php";
+require_once dirname(__FILE__) . '/../includes/dynamic_nav.php';
 
 /* ══════════════════════════════
    DATA LAYER
@@ -27,17 +28,13 @@ if ($projectId > 0) {
   }
 }
 
-/* Quick links */
-$allLinks = [
-  "0"  => [['../Clients/clients.php','fa-users','العملاء'],['../Projects/oprationprojects.php','fa-project-diagram','المشاريع'],['../main/users.php','fa-user-shield','المستخدمين'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Settings/settings.php','fa-cog','الإعدادات']],
-  "1"  => [['../Clients/clients.php','fa-users','العملاء'],['../Projects/oprationprojects.php','fa-project-diagram','المشاريع'],['../main/users.php','fa-user-shield','المستخدمين'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Equipments/equipments_types.php','fa-screwdriver-wrench','الأنواع'],['../Settings/settings.php','fa-cog','الإعدادات']],
-  "2"  => [['../Suppliers/suppliers.php','fa-truck','الموردين'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Settings/settings.php','fa-cog','الإعدادات']],
-  "3"  => [['../Equipments/equipments.php','fa-tractor','المعدات'],['../Drivers/drivers.php','fa-id-badge','المشغلين'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Settings/settings.php','fa-cog','الإعدادات']],
-  "4"  => [['../Equipments/equipments.php','fa-tools','المعدات'],['../Oprators/oprators.php','fa-cogs','التشغيل'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Settings/settings.php','fa-cog','الإعدادات']],
-  "5"  => [['../main/project_users.php','fa-users-cog','المشرفين'],['../Timesheet/timesheet.php','fa-clock','الساعات'],['../Timesheet/view_timesheet.php','fa-clock','ساعات اليوم'],['../Reports/reports.php','fa-chart-line','التقارير'],['../Settings/settings.php','fa-cog','الإعدادات']],
-  "10" => [['../Oprators/oprators.php','fa-play-circle','التشغيل'],['../Equipments/equipments.php','fa-tools','المعدات'],['../Settings/settings.php','fa-cog','الإعدادات']],
-];
-$links = $allLinks[$role] ?? [];
+/* Quick links - Dynamic from modules table */
+$dynamicLinks = getDynamicNavLinks($conn, $role);
+$links = [];
+foreach ($dynamicLinks as $link) {
+  // Format: [href, icon, label]
+  $links[] = ['../' . $link['code'], 'fa-link', $link['name']];
+}
 
 /* Stat cards — [icon, raw_value, label, accent] */
 $stats = [];

@@ -20,6 +20,9 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once '../config.php';
+require_once '../includes/permissions_helper.php';
+
+enforce_module_permission_json($conn, 'projects', 'add', 'لا توجد صلاحية لإضافة المشاريع');
 
 ob_end_clean();
 

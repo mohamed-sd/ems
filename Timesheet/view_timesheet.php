@@ -6,9 +6,26 @@ if (!isset($_SESSION['user'])) {
   exit();
 }
 
+include '../includes/permissions_helper.php';
+
+// ════════════════════════════════════════════════════════════════════════════
+// 🔐 التحقق من صلاحيات المستخدم
+// ════════════════════════════════════════════════════════════════════════════
 $page_title = "إيكوبيشن | ساعات العمل";
 include("../inheader.php");
 include '../config.php';
+
+$page_permissions = check_page_permissions($conn, 'timesheet');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
+
+// منع الوصول إذا لم تكن صلاحية عرض
+if (!$can_view) {
+  header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+ساعات+العمل+❌");
+  exit();
+}
 
 $type = "1";
 

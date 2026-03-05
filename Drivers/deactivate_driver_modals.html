@@ -1,0 +1,252 @@
+<!-- موادل إيقاف المشغل - يتم تضمينها في drivers.php -->
+<div class="modal fade" id="deactivateDriverModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-ban"></i> إيقاف مشغل
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning mb-3">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    تحذير: لن يتمكن هذا المشغل من التشغيل بعد الموافقة على هذا الطلب
+                </div>
+                <input type="hidden" id="deactivateDriverId" value="">
+                
+                <div class="mb-3">
+                    <label class="form-label">اسم المشغل</label>
+                    <input type="text" class="form-control" id="deactivateDriverName" disabled>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">كود المشغل</label>
+                    <input type="text" class="form-control" id="deactivateDriverCode" disabled>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">تاريخ الإيقاف</label>
+                    <input type="date" class="form-control" id="deactivateDriverDate" value="<?php echo date('Y-m-d'); ?>">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label" for="deactivateDriverReason">
+                        <i class="fas fa-comment"></i> سبب الإيقاف
+                    </label>
+                    <textarea id="deactivateDriverReason" class="form-control" rows="4" placeholder="اشرح سبب إيقاف هذا المشغل..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+                <button type="button" class="btn btn-warning" id="submitDeactivateDriverBtn">
+                    <i class="fas fa-ban"></i> إيقاف المشغل
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- موادل إعادة تفعيل المشغل-->
+<div class="modal fade" id="reactivateDriverModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle"></i> إعادة تفعيل مشغل
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> 
+                    سيتمكن هذا المشغل من التشغيل مجدداً بعد الموافقة على هذا الطلب
+                </div>
+                <input type="hidden" id="reactivateDriverId" value="">
+                
+                <div class="mb-3">
+                    <label class="form-label">اسم المشغل</label>
+                    <input type="text" class="form-control" id="reactivateDriverName" disabled>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">كود المشغل</label>
+                    <input type="text" class="form-control" id="reactivateDriverCode" disabled>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">تاريخ إعادة التفعيل</label>
+                    <input type="date" class="form-control" id="reactivateDriverDate" value="<?php echo date('Y-m-d'); ?>">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label" for="reactivateDriverReason">
+                        <i class="fas fa-comment"></i> ملاحظات
+                    </label>
+                    <textarea id="reactivateDriverReason" class="form-control" rows="3" placeholder="أضف أي ملاحظات..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+                <button type="button" class="btn btn-success" id="submitReactivateDriverBtn">
+                    <i class="fas fa-check-circle"></i> إعادة التفعيل
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(function() {
+    const deactivateModal = new bootstrap.Modal(document.getElementById('deactivateDriverModal'), { keyboard: false });
+    const reactivateModal = new bootstrap.Modal(document.getElementById('reactivateDriverModal'), { keyboard: false });
+
+    // فتح نموذج الإيقاف
+    $(document).on('click', '.deactivateDriverBtn', function() {
+        const btn = $(this);
+        const driverId = btn.data('id');
+        const driverName = btn.data('name');
+        const driverCode = btn.data('code');
+        const status = btn.data('status');
+
+        // التحقق من الحالة
+        if (status !== 'نشط') {
+            alert('لا يمكن إيقاف مشغل غير نشط');
+            return;
+        }
+
+        $('#deactivateDriverId').val(driverId);
+        $('#deactivateDriverName').val(driverName);
+        $('#deactivateDriverCode').val(driverCode);
+        $('#deactivateDriverReason').val('');
+        $('#deactivateDriverDate').val('<?php echo date('Y-m-d'); ?>');
+
+        deactivateModal.show();
+    });
+
+    // فتح نموذج إعادة التفعيل
+    $(document).on('click', '.reactivateDriverBtn', function() {
+        const btn = $(this);
+        const driverId = btn.data('id');
+        const driverName = btn.data('name');
+        const driverCode = btn.data('code');
+        const status = btn.data('status');
+
+        // التحقق من الحالة
+        if (status !== 'موقوف') {
+            alert('لا يمكن إعادة تفعيل مشغل غير موقوف');
+            return;
+        }
+
+        $('#reactivateDriverId').val(driverId);
+        $('#reactivateDriverName').val(driverName);
+        $('#reactivateDriverCode').val(driverCode);
+        $('#reactivateDriverReason').val('');
+        $('#reactivateDriverDate').val('<?php echo date('Y-m-d'); ?>');
+
+        reactivateModal.show();
+    });
+
+    // تقديم طلب الإيقاف
+    $('#submitDeactivateDriverBtn').on('click', function() {
+        const driverId = $('#deactivateDriverId').val();
+        const reason = $('#deactivateDriverReason').val().trim();
+        const date = $('#deactivateDriverDate').val();
+
+        if (!reason) {
+            alert('يرجى إدخال سبب الإيقاف');
+            return;
+        }
+
+        const btn = $(this);
+        const originalHtml = btn.html();
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> جارٍ التنفيذ...');
+
+        $.ajax({
+            url: 'deactivate_driver_handler.php',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'deactivate_driver',
+                driver_id: driverId,
+                deactivation_reason: reason,
+                deactivation_date: date
+            },
+            success: function(res) {
+                if (res.success) {
+                    deactivateModal.hide();
+                    alert(res.message);
+                    
+                    if (res.auto_approved) {
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        // إعادة توجيه إلى صفحة الطلبات
+                        setTimeout(function() {
+                            window.location.href = '../Approvals/requests.php?status=pending';
+                        }, 1500);
+                    }
+                } else {
+                    alert('خطأ: ' + res.message);
+                    btn.prop('disabled', false).html(originalHtml);
+                }
+            },
+            error: function() {
+                alert('خطأ في الاتصال بالخادم');
+                btn.prop('disabled', false).html(originalHtml);
+            }
+        });
+    });
+
+    // تقديم طلب إعادة التفعيل
+    $('#submitReactivateDriverBtn').on('click', function() {
+        const driverId = $('#reactivateDriverId').val();
+        const reason = $('#reactivateDriverReason').val().trim();
+        const date = $('#reactivateDriverDate').val();
+
+        const btn = $(this);
+        const originalHtml = btn.html();
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> جارٍ التنفيذ...');
+
+        $.ajax({
+            url: 'deactivate_driver_handler.php',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'reactivate_driver',
+                driver_id: driverId,
+                deactivation_reason: reason,
+                deactivation_date: date
+            },
+            success: function(res) {
+                if (res.success) {
+                    reactivateModal.hide();
+                    alert(res.message);
+                    
+                    if (res.auto_approved) {
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        setTimeout(function() {
+                            window.location.href = '../Approvals/requests.php?status=pending';
+                        }, 1500);
+                    }
+                } else {
+                    alert('خطأ: ' + res.message);
+                    btn.prop('disabled', false).html(originalHtml);
+                }
+            },
+            error: function() {
+                alert('خطأ في الاتصال بالخادم');
+                btn.prop('disabled', false).html(originalHtml);
+            }
+        });
+    });
+});
+</script>

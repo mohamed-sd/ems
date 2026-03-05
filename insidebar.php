@@ -1,5 +1,13 @@
 <?php
 //session_start();
+// تضمين ملف الإعدادات والروابط الديناميكية
+require_once dirname(__FILE__) . '/config.php';
+require_once dirname(__FILE__) . '/includes/dynamic_nav.php';
+require_once dirname(__FILE__) . '/includes/permissions_helper.php';
+
+if (isset($_SESSION['user']) && isset($conn)) {
+  enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
 ?>
 <!-- زر القائمة في الموبايل -->
 <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -13,6 +21,13 @@
 
     <ul>
       <li><a href="../main/dashboard.php"><i class="fa fa-tachometer-alt"></i> <span>الرئيسية</span></a></li>
+
+      <?php
+      // عرض الروابط الديناميكية من جدول modules بناءً على دور المستخدم
+      if (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && isset($conn)) {
+        renderDynamicNavigation($conn, $_SESSION['user']['role'], '../');
+      }
+      ?>
 
       <?php // صلاحيات الادارة العليا == -1
       if ($_SESSION['user']['role'] == "-1") {
@@ -45,7 +60,8 @@
         <li><a href="../main/users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
         <!-- <li><a href="../Reports/new_reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
         <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>تقارير العقد</span></a></li>
-        <li><a href="../Equipments/equipments_types.php"><i class="fa-solid fa-screwdriver-wrench"></i> <span>  انواع المعدات</span></a></li>
+        <li><a href="../Equipments/equipments_types.php"><i class="fa-solid fa-screwdriver-wrench"></i> <span> انواع
+              المعدات</span></a></li>
       <?php } ?>
 
       <?php // صلاحيات مدير الموردين === 2
@@ -61,6 +77,7 @@
         <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
         <li><a href="../Drivers/drivers.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li>
         <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
+        <li><a href="../Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li>
 
       <?php } ?>
 
@@ -69,6 +86,7 @@
         <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
         <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
         <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
+        <li><a href="../Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li>
 
       <?php } ?>
 

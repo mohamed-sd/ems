@@ -1,10 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
-    exit();
-}
-include("../config.php"); // ملف الاتصال بقاعدة البيانات
+include '../config.php';
+require_login();
+require_once '../includes/approval_workflow.php';
 
 $type = isset($_GET['type']) ? $_GET['type'] : null;
 $id   = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -21,24 +18,39 @@ if ($type == "1") {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $t = mysqli_real_escape_string($conn, $_POST['t']);
     $notes = mysqli_real_escape_string($conn, $_POST['time_notes']);
+    $user_id = approval_get_user_id();
 
-    if ($type == "1") {
-        // تأكيد
-        $sql = "UPDATE timesheet 
-                SET status = 2, time_notes = '$notes' 
-                WHERE id = $id";
-    } elseif ($type == "2") {
-        // رفض
-        $sql = "UPDATE timesheet 
-                SET status = 3, time_notes = '$notes' 
-                WHERE id = $id";
+    $old_result = mysqli_query($conn, "SELECT id, status, time_notes FROM timesheet WHERE id = $id LIMIT 1");
+    $old_data = $old_result ? mysqli_fetch_assoc($old_result) : null;
+    if (!$old_data) {
+        echo "<script>alert('البيان غير موجود');window.location.href='timesheet.php?type=$t';</script>";
+        exit();
     }
 
-    if (mysqli_query($conn, $sql)) {
-        echo "<script>alert('تمت العملية بنجاح');window.location.href='timesheet.php?type=$t';</script>";
+    $new_status = 0;
+    $approval_action = '';
+    if ($type == "1") {
+        $new_status = 2;
+        $approval_action = 'approve';
+    } elseif ($type == "2") {
+        $new_status = 3;
+        $approval_action = 'reject';
+    }
+
+    $new_data = [
+        'status' => $new_status,
+        'time_notes' => $notes
+    ];
+
+    $payload = approval_build_simple_update_payload('timesheet', ['id' => $id], $new_data, $old_data);
+    $result = approval_create_request('timesheet', $id, $approval_action, $payload, $user_id, $conn);
+
+    if (!empty($result['success'])) {
+        $msg = (($result['status'] ?? 'pending') === 'approved') ? 'تم اعتماد الطلب وتنفيذه' : 'تم إرسال الطلب للموافقة';
+        echo "<script>alert('$msg');window.location.href='timesheet.php?type=$t';</script>";
         exit();
     } else {
-        echo "خطأ: " . mysqli_error($conn);
+        echo "خطأ: " . htmlspecialchars($result['message']);
     }
 }
 

@@ -6,6 +6,22 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+include '../includes/permissions_helper.php';
+
+// ════════════════════════════════════════════════════════════════════════════
+// 🔐 التحقق من صلاحيات المستخدم
+// ════════════════════════════════════════════════════════════════════════════
+$page_permissions = check_page_permissions($conn, 'equipments');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
+
+// منع الوصول إذا لم تكن صلاحية عرض
+if (!$can_view) {
+    header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+المعدات+❌");
+    exit();
+}
 
 $is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
 $user_project_id = $is_role10 ? intval($_SESSION['user']['project_id']) : 0;

@@ -92,7 +92,19 @@ if (!isset($_SESSION['user'])) {
 			<br /><br />
 			<a href="roles.php" class="settings-btn">
 				<i class="fa-solid fa-user-shield"></i>
-				صلاحيات المستخدمين
+				إدارة الصلاحيات والأدوار
+			</a>
+
+			<br /><br />
+			<a href="modules.php" class="settings-btn">
+				<i class="fa-solid fa-layer-group"></i>
+				إدارة الصفحات والموديولات
+			</a>
+
+			<br /><br />
+			<a href="role_permissions.php" class="settings-btn">
+				<i class="fa-solid fa-lock-open"></i>
+				⭐ إدارة الصلاحيات المفصلة
 			</a>
 		<?php } ?>
 

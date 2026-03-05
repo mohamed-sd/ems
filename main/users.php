@@ -2,14 +2,14 @@
 session_start();
 // تضمين ملف الجلسات
 include '../includes/sessions.php';
+// تضمين قاعدة البيانات أولاً (قبل sidebar لأننا نحتاجها)
+include '../config.php';
 // تعريف عنوان الصفحة
 $page_title = 'Equipation | المستخدمين';
 // تضمين الهيدر
 include '../inheader.php';
 // تضمين الشريط الجانبي
 include '../insidebar.php';
-
-include '../config.php';
 
 // إضافة أو تعديل مستخدم (بدون تشفير كلمة المرور)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {

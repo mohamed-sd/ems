@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Role Permissions System - File Map
+  نظام الصلاحيات المتقدم - خريطة الملفات
+  تاريخ: 2026-03-04
+  الإصدار: 1.0
+-->
+<role_permissions_system>
+  
+  <metadata>
+    <system>EMS - Equipment Management System</system>
+    <feature>Advanced Role Permissions System</feature>
+    <version>1.0</version>
+    <date>2026-03-04</date>
+    <status>🟢 Ready for Production</status>
+  </metadata>
+
+  <database>
+    <table name="role_permissions">
+      <sql_file>/database/role_permissions.sql</sql_file>
+      <description>جدول الصلاحيات الرئيسي</description>
+      <install_steps>
+        <step number="1">ذهب إلى /setup_role_permissions.php</step>
+        <step number="2">انقر "إنشاء الجدول الآن"</step>
+        <step number="3">انتظر رسالة النجاح</step>
+      </install_steps>
+    </table>
+  </database>
+
+  <pages>
+    <page name="Setup Page">
+      <path>/setup_role_permissions.php</path>
+      <title>إعداد جدول الصلاحيات</title>
+      <access_level>Admin (-1)</access_level>
+      <purpose>إنشاء وإدارة جدول role_permissions</purpose>
+      <features>
+        <feature>إنشاء الجدول الجديد</feature>
+        <feature>عرض حالة قاعدة البيانات</feature>
+        <feature>عرض الإحصائيات</feature>
+        <feature>عرض تفاصيل الجدول</feature>
+      </features>
+    </page>
+
+    <page name="Permissions Manager">
+      <path>/Settings/role_permissions.php</path>
+      <title>⭐ إدارة صلاحيات الأدوار</title>
+      <access_level>Project Manager (1)</access_level>
+      <purpose>إدارة صلاحيات دقيقة لكل دور على كل شاشة</purpose>
+      <tabs>
+        <tab name="Grid View">عرض الشبكة - واجهة بطاقات</tab>
+        <tab name="Table View">عرض الجدول - جدول شامل</tab>
+        <tab name="Quick Actions">الإجراءات السريعة</tab>
+      </tabs>
+      <operations>
+        <op name="save_permissions">حفظ صلاحيات جديدة أو تحديث موجودة</op>
+        <op name="delete_permission">حذف صلاحية واحدة</op>
+        <op name="grant_all">منح جميع الصلاحيات لدور</op>
+        <op name="revoke_all">سحب جميع الصلاحيات من دور</op>
+      </operations>
+    </page>
+
+    <page name="System Test">
+      <path>/test_role_permissions.php</path>
+      <title>اختبار نظام الصلاحيات</title>
+      <access_level>Admin (-1)</access_level>
+      <purpose>اختبار شامل للنظام والتحقق من سلامته</purpose>
+      <tests count="8">
+        <test number="1">وجود جدول role_permissions</test>
+        <test number="2">العلاقات الخارجية</test>
+        <test number="3">وجود جدول roles</test>
+        <test number="4">وجود جدول modules</test>
+        <test number="5">الدوال المساعدة</test>
+        <test number="6">البيانات النموذجية</test>
+        <test number="7">الفهارس</test>
+        <test number="8">دالة check_permission</test>
+      </tests>
+    </page>
+  </pages>
+
+  <helpers>
+    <helper name="permissions_helper.php">
+      <path>/includes/permissions_helper.php</path>
+      <description>مكتبة دوال مساعدة للتحقق من الصلاحيات</description>
+      <usage>
+        <syntax>require_once '../includes/permissions_helper.php';</syntax>
+      </usage>
+      <functions count="13">
+        <function name="check_permission">التحقق من صلاحية معينة</function>
+        <function name="check_view_permission">التحقق من صلاحية العرض مع توقف فوري</function>
+        <function name="check_add_permission">التحقق من صلاحية الإضافة مع توقف فوري</function>
+        <function name="check_edit_permission">التحقق من صلاحية التعديل مع توقف فوري</function>
+        <function name="check_delete_permission">التحقق من صلاحية الحذف مع توقف فوري</function>
+        <function name="get_module_permissions">الحصول على جميع صلاحيات شاشة معينة</function>
+        <function name="get_user_permissions">الحصول على جميع صلاحيات المستخدم الحالي</function>
+        <function name="can_show_button">إخفاء/إظهار الزر بناءً على الصلاحية</function>
+        <function name="permission_badge">عرض شارة الصلاحية (✅ أو ❌)</function>
+        <function name="permission_percentage">حساب النسبة المئوية للصلاحيات</function>
+        <function name="has_any_permission">التحقق من وجود أي صلاحية</function>
+        <function name="has_all_permissions">التحقق من وجود جميع الصلاحيات</function>
+      </functions>
+    </helper>
+  </helpers>
+
+  <documentation>
+    <docs>
+      <doc name="Quick Start">
+        <file>/ROLE_PERMISSIONS_QUICKSTART.md</file>
+        <target_audience>جميع المستخدمين</target_audience>
+        <reading_time>5 دقائق</reading_time>
+        <priority>⭐⭐⭐⭐⭐ ابدأ من هنا</priority>
+        <contents>
+          <item>ملخص في 3 خطوات</item>
+          <item>الصلاحيات الأربعة</item>
+          <item>أمثلة سريعة</item>
+          <item>حل المشاكل الشائعة</item>
+        </contents>
+      </doc>
+
+      <doc name="Comprehensive Guide">
+        <file>/ROLE_PERMISSIONS_GUIDE.md</file>
+        <target_audience>المسؤولين والمطورين</target_audience>
+        <reading_time>30 دقيقة</reading_time>
+        <priority>⭐⭐⭐⭐</priority>
+        <contents>
+          <item>نظرة عامة شاملة</item>
+          <item>شرح الجدول والحقول</item>
+          <item>صفحات الإدارة الثلاث</item>
+          <item>أمثلة واقعية</item>
+          <item>نموذج البيانات</item>
+          <item>الأمان والحماية</item>
+        </contents>
+      </doc>
+
+      <doc name="Implementation Guide">
+        <file>/IMPLEMENTATION_GUIDE.md</file>
+        <target_audience>المطورين</target_audience>
+        <reading_time>20 دقيقة</reading_time>
+        <priority>⭐⭐⭐⭐⭐ ضروري للمطورين</priority>
+        <contents>
+          <item>طرق الحماية المختلفة</item>
+          <item>أمثلة عملية للصفحات</item>
+          <item>معرفات الشاشات الصحيحة</item>
+          <item>قوائم مراجعة</item>
+        </contents>
+      </doc>
+
+      <doc name="Setup Summary">
+        <file>/ROLE_PERMISSIONS_SETUP_SUMMARY.md</file>
+        <target_audience>جميع المستخدمين</target_audience>
+        <reading_time>15 دقيقة</reading_time>
+        <priority>⭐⭐⭐</priority>
+        <contents>
+          <item>خريطة الملفات الشاملة</item>
+          <item>خطوات الاستخدام</item>
+          <item>الميزات الرئيسية</item>
+          <item>الإحصائيات</item>
+          <item>استكشاف الأخطاء</item>
+        </contents>
+      </doc>
+
+      <doc name="Start Here">
+        <file>/START_HERE_PERMISSIONS.md</file>
+        <target_audience>المستخدمين الجدد</target_audience>
+        <reading_time>2 دقيقة</reading_time>
+        <priority>⭐⭐⭐⭐⭐ للبدء الفوري</priority>
+        <contents>
+          <item>خطوات سريعة جداً</item>
+          <item>روابط مباشرة</item>
+          <item>الملفات الأساسية</item>
+        </contents>
+      </doc>
+
+      <doc name="Index">
+        <file>/ROLE_PERMISSIONS_INDEX.json</file>
+        <format>JSON</format>
+        <purpose>فهرس شامل لجميع الملفات والدوال</purpose>
+      </doc>
+    </docs>
+  </documentation>
+
+  <modified_files>
+    <file>
+      <path>/Settings/settings.php</path>
+      <change_type>إضافة رابط جديد</change_type>
+      <new_link>⭐ إدارة الصلاحيات المفصلة → /Settings/role_permissions.php</new_link>
+      <visibility>Project Manager Only</visibility>
+    </file>
+  </modified_files>
+
+  <permissions_reference>
+    <permission code="👁️" name="View" description="رؤية الشاشة والبيانات" />
+    <permission code="➕" name="Add" description="إضافة سجلات جديدة" />
+    <permission code="✏️" name="Edit" description="تعديل السجلات الموجودة" />
+    <permission code="🗑️" name="Delete" description="حذف السجلات" />
+  </permissions_reference>
+
+  <quick_reference>
+    <step number="1" title="الإعداد">
+      <action>ذهب إلى /setup_role_permissions.php</action>
+      <action>انقر "إنشاء الجدول الآن"</action>
+    </step>
+    <step number="2" title="الاختبار">
+      <action>ذهب إلى /test_role_permissions.php</action>
+      <action>تحقق من نتائج الاختبارات</action>
+    </step>
+    <step number="3" title="الإدارة">
+      <action>ذهب إلى Settings > درج الصلاحيات المفصلة</action>
+      <action>أضف الصلاحيات للأدوار</action>
+    </step>
+    <step number="4" title="الدمج">
+      <action>اقرأ IMPLEMENTATION_GUIDE.md</action>
+      <action>أضف الصلاحيات إلى الصفحات</action>
+    </step>
+  </quick_reference>
+
+  <file_structure>
+    <folder>
+      <path>/</path>
+      <item type="file" name="setup_role_permissions.php">إعداد الجدول 🔧</item>
+      <item type="file" name="test_role_permissions.php">اختبار النظام 🧪</item>
+      <item type="file" name="ROLE_PERMISSIONS_QUICKSTART.md">البدء السريع ⚡</item>
+      <item type="file" name="ROLE_PERMISSIONS_GUIDE.md">دليل شامل 📖</item>
+      <item type="file" name="IMPLEMENTATION_GUIDE.md">دليل الدمج 💻</item>
+      <item type="file" name="ROLE_PERMISSIONS_SETUP_SUMMARY.md">الملخص 📋</item>
+      <item type="file" name="START_HERE_PERMISSIONS.md">ابدأ من هنا 🚀</item>
+      <item type="file" name="ROLE_PERMISSIONS_INDEX.json">الفهرس 🗂️</item>
+      <item type="file" name="FILE_MAP.xml">هذا الملف 🗺️</item>
+    </folder>
+
+    <folder>
+      <path>/database</path>
+      <item type="file" name="role_permissions.sql">جدول الصلاحيات 🗄️</item>
+    </folder>
+
+    <folder>
+      <path>/Settings</path>
+      <item type="file" name="role_permissions.php">إدارة الصلاحيات ⭐</item>
+      <item type="file" name="settings.php">(معدلة - إضافة رابط)</item>
+    </folder>
+
+    <folder>
+      <path>/includes</path>
+      <item type="file" name="permissions_helper.php">دوال مساعدة 🛠️</item>
+    </folder>
+  </file_structure>
+
+  <statistics>
+    <sql_files>1</sql_files>
+    <php_pages>3</php_pages>
+    <php_helpers>1</php_helpers>
+    <documentation_files>6</documentation_files>
+    <total_functions>13</total_functions>
+    <lines_of_code>2000+</lines_of_code>
+    <permissions_types>4</permissions_types>
+  </statistics>
+
+  <deployment_status>
+    <item status="✅">جدول قاعدة البيانات جاهز</item>
+    <item status="✅">صفحات الإدارة جاهزة</item>
+    <item status="✅">الدوال المساعدة جاهزة</item>
+    <item status="✅">التوثيق الكامل جاهز</item>
+    <item status="✅">نظام الاختبار جاهز</item>
+    <item status="🟡">يحتاج تشغيل setup page أولاً</item>
+  </deployment_status>
+
+  <next_steps>
+    <step number="1">اقرأ START_HERE_PERMISSIONS.md</step>
+    <step number="2">شغّل setup_role_permissions.php</step>
+    <step number="3">اختبر النظام من test_role_permissions.php</step>
+    <step number="4">أضف الصلاحيات من role_permissions.php</step>
+    <step number="5">اقرأ IMPLEMENTATION_GUIDE.md</step>
+    <step number="6">ابدأ بدمج الصلاحيات في الصفحات</step>
+  </next_steps>
+
+</role_permissions_system>

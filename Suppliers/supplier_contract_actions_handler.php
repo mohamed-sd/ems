@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../config.php';
+require_once '../includes/permissions_helper.php';
 
 // تعيين نوع المحتوى كـ JSON
 header('Content-Type: application/json; charset=utf-8');
@@ -9,6 +10,8 @@ header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
 }
+
+enforce_module_permission_json($conn, 'suppliers', 'edit', 'لا توجد صلاحية تعديل الموردين/عقودهم');
 
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 $contract_id = isset($_POST['contract_id']) ? intval($_POST['contract_id']) : 0;

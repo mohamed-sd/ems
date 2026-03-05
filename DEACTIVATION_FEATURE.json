@@ -1,0 +1,266 @@
+{
+  "feature": "نظام طلبات إيقاف المشغلين والآليات",
+  "description": "تقديم طلبات إيقاف/تفعيل المشغلين والآليات مع نظام موافقات متعدد المستويات",
+  "createdDate": "2026-03-03",
+  "version": "1.0",
+  
+  "newFiles": [
+    {
+      "path": "Drivers/deactivate_driver_handler.php",
+      "type": "API Handler",
+      "description": "معالج طلبات إيقاف/تفعيل المشغلين",
+      "methods": ["POST"],
+      "actions": ["deactivate_driver", "reactivate_driver"],
+      "requiredRole": "10",
+      "approvingRole": "3"
+    },
+    {
+      "path": "Drivers/deactivate_driver_modals.html",
+      "type": "UI Component",
+      "description": "نماذج وأزرار إيقاف/تفعيل المشغلين",
+      "includes": ["Bootstrap Modals", "jQuery AJAX handlers"]
+    },
+    {
+      "path": "Equipments/deactivate_equipment_handler.php",
+      "type": "API Handler",
+      "description": "معالج طلبات إيقاف/تفعيل الآليات",
+      "methods": ["POST"],
+      "actions": ["deactivate_equipment", "reactivate_equipment"],
+      "requiredRole": "10",
+      "approvingRole": "4"
+    },
+    {
+      "path": "Equipments/deactivate_equipment_modals.html",
+      "type": "UI Component",
+      "description": "نماذج وأزرار إيقاف/تفعيل الآليات",
+      "includes": ["Bootstrap Modals", "jQuery AJAX handlers"]
+    }
+  ],
+
+  "modifiedFiles": [
+    {
+      "path": "sidebar.php",
+      "changes": "إضافة رابط 'طلبات الموافقات' لـ Role 3 (مدير المشغلين) و Role 4 (مدير الأسطول)"
+    },
+    {
+      "path": "database/approval_workflow.sql",
+      "changes": "إضافة 4 قواعد موافقة جديدة لإيقاف/تفعيل المشغلين والآليات"
+    }
+  ],
+
+  "workflowRules": [
+    {
+      "entity_type": "driver",
+      "action": "deactivate_driver",
+      "role_required": "3,-1",
+      "step_order": 1,
+      "description": "إيقاف مشغل - يتطلب موافقة مدير المشغلين"
+    },
+    {
+      "entity_type": "driver",
+      "action": "reactivate_driver",
+      "role_required": "3,-1",
+      "step_order": 1,
+      "description": "إعادة تفعيل مشغل - يتطلب موافقة مدير المشغلين"
+    },
+    {
+      "entity_type": "equipment",
+      "action": "deactivate_equipment",
+      "role_required": "4,-1",
+      "step_order": 1,
+      "description": "إيقاف آلية - يتطلب موافقة مدير الأسطول"
+    },
+    {
+      "entity_type": "equipment",
+      "action": "reactivate_equipment",
+      "role_required": "4,-1",
+      "step_order": 1,
+      "description": "إعادة تفعيل آلية - يتطلب موافقة مدير الأسطول"
+    }
+  ],
+
+  "apiEndpoints": [
+    {
+      "endpoint": "Drivers/deactivate_driver_handler.php",
+      "method": "POST",
+      "actions": {
+        "deactivate_driver": {
+          "description": "تقديم طلب إيقاف مشغل",
+          "parameters": {
+            "action": "deactivate_driver",
+            "driver_id": "معرف المشغل",
+            "deactivation_reason": "سبب الإيقاف",
+            "deactivation_date": "تاريخ الإيقاف (YYYY-MM-DD)"
+          },
+          "response": {
+            "success": true,
+            "message": "تم تقديم طلب إيقاف المشغل. ينتظر موافقة مدير المشغلين",
+            "request_id": 123,
+            "auto_approved": false
+          }
+        },
+        "reactivate_driver": {
+          "description": "تقديم طلب إعادة تفعيل مشغل",
+          "parameters": {
+            "action": "reactivate_driver",
+            "driver_id": "معرف المشغل",
+            "deactivation_reason": "ملاحظات إضافية",
+            "deactivation_date": "تاريخ الإعادة (YYYY-MM-DD)"
+          },
+          "response": {
+            "success": true,
+            "message": "تم تقديم طلب إعادة تفعيل المشغل. ينتظر موافقة مدير المشغلين",
+            "request_id": 124,
+            "auto_approved": false
+          }
+        }
+      }
+    },
+    {
+      "endpoint": "Equipments/deactivate_equipment_handler.php",
+      "method": "POST",
+      "actions": {
+        "deactivate_equipment": {
+          "description": "تقديم طلب إيقاف آلية",
+          "parameters": {
+            "action": "deactivate_equipment",
+            "equipment_id": "معرف الآلية",
+            "deactivation_reason": "سبب الإيقاف",
+            "deactivation_date": "تاريخ الإيقاف (YYYY-MM-DD)"
+          },
+          "response": {
+            "success": true,
+            "message": "تم تقديم طلب إيقاف الآلية. ينتظر موافقة مدير الأسطول",
+            "request_id": 125,
+            "auto_approved": false
+          }
+        },
+        "reactivate_equipment": {
+          "description": "تقديم طلب إعادة تفعيل آلية",
+          "parameters": {
+            "action": "reactivate_equipment",
+            "equipment_id": "معرف الآلية",
+            "deactivation_reason": "ملاحظات إضافية",
+            "deactivation_date": "تاريخ الإعادة (YYYY-MM-DD)"
+          },
+          "response": {
+            "success": true,
+            "message": "تم تقديم طلب إعادة تفعيل الآلية. ينتظر موافقة مدير الأسطول",
+            "request_id": 126,
+            "auto_approved": false
+          }
+        }
+      }
+    }
+  ],
+
+  "roles": {
+    "10": "مدير الحركة والتشغيل - يقدم طلبات الإيقاف",
+    "3": "مدير المشغلين - يوافق على إيقاف المشغلين",
+    "4": "مدير الأسطول - يوافق على إيقاف الآليات",
+    "-1": "الإدارة العليا - كل صلاحيات"
+  },
+
+  "dataFlowDriverDeactivation": {
+    "step1": {
+      "description": "مدير الحركة والتشغيل (Role 10) ينقر على زر إيقاف",
+      "ui": "Drivers Page > Deactivate Button"
+    },
+    "step2": {
+      "description": "فتح نموذج يطلب السبب والتاريخ",
+      "ui": "deactivateDriverModal Bootstrap Modal"
+    },
+    "step3": {
+      "description": "إرسال طلب AJAX إلى deactivate_driver_handler.php",
+      "endpoint": "Drivers/deactivate_driver_handler.php",
+      "data": {
+        "action": "deactivate_driver",
+        "driver_id": 5,
+        "deactivation_reason": "غياب طويل",
+        "deactivation_date": "2026-03-03"
+      }
+    },
+    "step4": {
+      "description": "معالج ينشئ طلب موافقة في قاعدة البيانات",
+      "table": "approval_requests",
+      "fields": {
+        "entity_type": "driver",
+        "entity_id": 5,
+        "action": "deactivate_driver",
+        "payload": "JSON with old/new values"
+      }
+    },
+    "step5": {
+      "description": "مدير المشغلين (Role 3) يرى الطلب في صفحة الموافقات",
+      "ui": "Approvals/requests.php"
+    },
+    "step6": {
+      "description": "بعد الموافقة، تحديث حالة المشغل",
+      "update": "drivers table - driver_status = 'موقوف'"
+    }
+  },
+
+  "databaseSchema": {
+    "approval_requests": {
+      "fields": [
+        "id", "entity_type", "entity_id", "action", "payload",
+        "requested_by", "current_step", "status", "created_at"
+      ]
+    },
+    "approval_steps": {
+      "fields": [
+        "id", "request_id", "role_required", "step_order",
+        "approved_by", "status", "note", "created_at"
+      ]
+    },
+    "approval_workflow_rules": {
+      "fields": [
+        "id", "entity_type", "action", "role_required",
+        "step_order", "is_active", "created_at"
+      ]
+    }
+  },
+
+  "testing": {
+    "testScenario1": {
+      "title": "اختبار إيقاف مشغل",
+      "steps": [
+        "تسجيل الدخول كـ مدير الحركة والتشغيل (Role 10)",
+        "الذهاب إلى صفحة المشغلين (Drivers/drivers.php)",
+        "اختيار مشغل نشط والنقر على زر 'إيقاف'",
+        "ملء نموذج الإيقاف (السبب والتاريخ)",
+        "النقر على 'إيقاف المشغل'",
+        "التحقق من ظهور رسالة النجاح",
+        "تسجيل الدخول كـ مدير المشغلين (Role 3)",
+        "الذهاب إلى صفحة طلبات الموافقات",
+        "البحث عن الطلب المعلق",
+        "الموافقة على الطلب",
+        "التحقق من تحديث حالة المشغل إلى 'موقوف'"
+      ]
+    },
+    "testScenario2": {
+      "title": "اختبار إيقاف آلية",
+      "steps": [
+        "تسجيل الدخول كـ مدير الحركة والتشغيل (Role 10)",
+        "الذهاب إلى صفحة الآليات (Equipments/equipments.php)",
+        "اختيار آلية متاحة والنقر على زر 'إيقاف'",
+        "ملء نموذج الإيقاف (السبب والتاريخ)",
+        "النقر على 'إيقاف الآلية'",
+        "التحقق من ظهور رسالة النجاح",
+        "تسجيل الدخول كـ مدير الأسطول (Role 4)",
+        "الذهاب إلى صفحة طلبات الموافقات",
+        "البحث عن الطلب المعلق",
+        "الموافقة على الطلب",
+        "التحقق من تحديث حالة الآلية إلى 'موقوفة للصيانة'"
+      ]
+    }
+  },
+
+  "nextSteps": [
+    "تضمين nماذج الإيقاف في صفحات Drivers و Equipments",
+    "إضافة الأزرار في جداول عرض المشغلين والآليات",
+    "تشغيل قواعد الموافقة الجديدة في قاعدة البيانات",
+    "الاختبار الشامل للسير الوظيفي",
+    "إضافة تنبيهات بريدية (اختياري)"
+  ]
+}

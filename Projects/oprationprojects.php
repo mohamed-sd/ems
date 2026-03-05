@@ -1,12 +1,34 @@
 <?php
 // تحميل الإعدادات والأمان
 include '../config.php';
+require_once '../includes/approval_workflow.php';
+require_once '../includes/permissions_helper.php';
 
 // التحقق من تسجيل الدخول
 require_login();
 
+// ════════════════════════════════════════════════════════════════════════════
+// 🔒 التحقق من صلاحيات المستخدم
+// ════════════════════════════════════════════════════════════════════════════
+$page_permissions = check_page_permissions($conn, 'Projects/oprationprojects.php');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
+
+// منع الوصول إذا لم تكن هناك صلاحية عرض
+if (!$can_view) {
+    header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+المشاريع+❌");
+    exit();
+}
+
 // معالجة حذف المشروع
 if (isset($_GET['delete_id']) && isset($_GET['csrf_token'])) {
+    if (!$can_delete) {
+        header("Location: oprationprojects.php?msg=لا+توجد+صلاحية+حذف+المشاريع+❌");
+        exit();
+    }
+
     // التحقق من CSRF Token
     if (!verify_csrf_token($_GET['csrf_token'])) {
         header("Location: oprationprojects.php?error=خطأ+أمني");
@@ -14,18 +36,31 @@ if (isset($_GET['delete_id']) && isset($_GET['csrf_token'])) {
     }
     
     $delete_id = intval($_GET['delete_id']);
-    
-    // استخدام prepared statement لتجنب SQL Injection
-    $stmt = query_safe("DELETE FROM project WHERE id = ?", [$delete_id], 'i');
-    
-    if ($stmt) {
-        log_security_event('PROJECT_DELETED', "Deleted project ID: $delete_id");
-        header("Location: oprationprojects.php?msg=تم+حذف+المشروع+بنجاح+✅");
-        exit();
-    } else {
-        header("Location: oprationprojects.php?msg=حدث+خطأ+أثناء+الحذف+❌");
+
+    $old_stmt = query_safe("SELECT * FROM project WHERE id = ? LIMIT 1", [$delete_id], 'i');
+    $old_project = null;
+    if ($old_stmt) {
+        $old_res = mysqli_stmt_get_result($old_stmt);
+        $old_project = mysqli_fetch_assoc($old_res);
+    }
+
+    if (!$old_project) {
+        header("Location: oprationprojects.php?msg=المشروع+غير+موجود+❌");
         exit();
     }
+
+    $payload = approval_build_simple_delete_payload('project', ['id' => $delete_id], $old_project);
+    $result = approval_create_request('project', $delete_id, 'delete', $payload, approval_get_user_id(), $conn);
+
+    if (!empty($result['success'])) {
+        log_security_event('PROJECT_DELETE_REQUESTED', "Delete approval requested for project ID: $delete_id");
+        $msg = ($result['status'] ?? 'pending') === 'approved' ? 'تم+اعتماد+حذف+المشروع+وتنفيذه+✅' : 'تم+إرسال+طلب+حذف+المشروع+للموافقة+✅';
+        header("Location: oprationprojects.php?msg=$msg");
+        exit();
+    }
+
+    header("Location: oprationprojects.php?msg=" . urlencode($result['message'] ?? 'حدث خطأ أثناء إنشاء طلب الحذف') . "+❌");
+    exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
@@ -33,7 +68,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
         die('خطأ في التحقق من الأمان - CSRF Token غير صحيح');
     }
+
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $is_editing = $id > 0;
+
+    if ($is_editing && !$can_edit) {
+        header("Location: oprationprojects.php?msg=لا+توجد+صلاحية+تعديل+المشاريع+❌");
+        exit;
+    } elseif (!$is_editing && !$can_add) {
+        header("Location: oprationprojects.php?msg=لا+توجد+صلاحية+إضافة+مشاريع+جديدة+❌");
+        exit;
+    }
+
     $company_client_id = !empty($_POST['company_client_id']) ? intval($_POST['company_client_id']) : 0;
 
     // جلب البيانات المدخولة بشكل آمن
@@ -67,38 +113,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
     $created_by = $_SESSION['user']['id'] ?? 1;
 
     if ($id > 0) {
-        // تحديث مع Prepared Statement
-        $stmt = query_safe(
-            "UPDATE project SET 
-                company_client_id = ?,
-                name = ?,
-                client = ?,
-                location = ?,
-                project_code = ?,
-                category = ?,
-                sub_sector = ?,
-                state = ?,
-                region = ?,
-                nearest_market = ?,
-                latitude = ?,
-                longitude = ?,
-                total = ?,
-                status = ?,
-                updated_at = NOW()
-            WHERE id = ?",
-            [$company_client_id, $name, $client, $location, $project_code, $category, 
-             $sub_sector, $state, $region, $nearest_market, $latitude, $longitude, $total, $status, $id],
-            'isssssssssddssi'
-        );
-        
-        if ($stmt) {
-            log_security_event('PROJECT_UPDATED', "Updated project: $name (ID: $id)");
-            header("Location: oprationprojects.php?msg=تم+تعديل+المشروع+بنجاح+✅");
-            exit;
-        } else {
-            header("Location: oprationprojects.php?msg=حدث+خطأ+أثناء+التعديل+❌");
+        $old_stmt = query_safe("SELECT * FROM project WHERE id = ? LIMIT 1", [$id], 'i');
+        $old_project = null;
+        if ($old_stmt) {
+            $old_res = mysqli_stmt_get_result($old_stmt);
+            $old_project = mysqli_fetch_assoc($old_res);
+        }
+
+        if (!$old_project) {
+            header("Location: oprationprojects.php?msg=المشروع+غير+موجود+❌");
             exit;
         }
+
+        $new_data = [
+            'company_client_id' => $company_client_id,
+            'name' => $name,
+            'client' => $client,
+            'location' => $location,
+            'project_code' => $project_code,
+            'category' => $category,
+            'sub_sector' => $sub_sector,
+            'state' => $state,
+            'region' => $region,
+            'nearest_market' => $nearest_market,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'total' => $total,
+            'status' => $status,
+            'updated_at' => approval_now()
+        ];
+
+        $payload = approval_build_simple_update_payload('project', ['id' => $id], $new_data, $old_project);
+        $approval_action = ($old_project['status'] == '1' && $status == '0') ? 'deactivate' : 'update';
+        $result = approval_create_request('project', $id, $approval_action, $payload, approval_get_user_id(), $conn);
+
+        if (!empty($result['success'])) {
+            log_security_event('PROJECT_UPDATE_REQUESTED', "Update approval requested for project: $name (ID: $id)");
+            $msg = ($result['status'] ?? 'pending') === 'approved' ? 'تم+اعتماد+التعديل+وتنفيذه+✅' : 'تم+إرسال+طلب+تعديل+المشروع+للموافقة+✅';
+            header("Location: oprationprojects.php?msg=$msg");
+            exit;
+        }
+
+        header("Location: oprationprojects.php?msg=" . urlencode($result['message'] ?? 'حدث خطأ أثناء إنشاء طلب التعديل') . "+❌");
+        exit;
     } else {
         // إضافة مع Prepared Statement
         $stmt = query_safe(
@@ -142,9 +199,15 @@ include('../insidebar.php');
             <a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
-            <a href="javascript:void(0)" id="toggleForm" class="add">
-                <i class="fas fa-plus-circle"></i> إضافة مشروع
-            </a>
+            <?php if ($can_add): ?>
+                <a href="javascript:void(0)" id="toggleForm" class="add">
+                    <i class="fas fa-plus-circle"></i> إضافة مشروع
+                </a>
+            <?php else: ?>
+                <button class="add" disabled style="opacity: .6; cursor: not-allowed;">
+                    <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحية)
+                </button>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -230,7 +293,6 @@ include('../insidebar.php');
                     </div>
                     <button type="submit">
                         <i class="fas fa-save"></i> <span>حفظ المشروع</span>
-                    </button> المشروع
                     </button>
                 </div>
             </div>
@@ -259,9 +321,11 @@ include('../insidebar.php');
                 <button class="btn btn-sm btn-success" id="exportBtn" title="تحميل النموذج">
                     <i class="fas fa-download"></i> تحميل النموذج
                 </button>
-                <button class="btn btn-sm btn-info" id="importBtn" title="استيراد ملف">
-                    <i class="fas fa-upload"></i> استيراد من Excel
-                </button>
+                <?php if ($can_add): ?>
+                    <button class="btn btn-sm btn-info" id="importBtn" title="استيراد ملف">
+                        <i class="fas fa-upload"></i> استيراد من Excel
+                    </button>
+                <?php endif; ?>
             </div>
         </div>
         <div class="card-body">
@@ -357,33 +421,39 @@ include('../insidebar.php');
                                    data-suppliers='" . $row['total_suppliers'] . "'
                                    title='عرض التفاصيل'>
                                    <i class='fas fa-eye'></i>
-                                </a>
-                                <a href='javascript:void(0)' 
-                                   class='action-btn edit editBtn' 
-                                   data-id='" . intval($row['id']) . "' 
-                                   data-company-client-id='" . intval($row['company_client_id'] ?? 0) . "' 
-                                   data-project-name='" . htmlspecialchars($row['name']) . "' 
-                                   data-location='" . htmlspecialchars($row['location']) . "' 
-                                   data-project-code='" . htmlspecialchars($row['project_code'] ?? '') . "' 
-                                   data-category='" . htmlspecialchars($row['category'] ?? '') . "' 
-                                   data-sub-sector='" . htmlspecialchars($row['sub_sector'] ?? '') . "' 
-                                   data-state='" . htmlspecialchars($row['state'] ?? '') . "' 
-                                   data-region='" . htmlspecialchars($row['region'] ?? '') . "' 
-                                   data-nearest-market='" . htmlspecialchars($row['nearest_market'] ?? '') . "' 
-                                   data-latitude='" . htmlspecialchars($row['latitude'] ?? '') . "' 
-                                   data-longitude='" . htmlspecialchars($row['longitude'] ?? '') . "' 
-                                   data-status='" . htmlspecialchars($row['status']) . "'
-                                   title='تعديل'>
-                                   <i class='fas fa-edit'></i>
-                                </a>
-                                <a href='oprationprojects.php?delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode(generate_csrf_token()) . "' 
-                                   class='action-btn delete' 
-                                   onclick='return confirm(\"هل أنت متأكد من حذف هذا المشروع؟\")'
-                                   title='حذف'>
-                                   <i class='fas fa-trash-alt'></i>
-                                </a>
+                                          </a>";
+
+                                          if ($can_edit) {
+                                                echo "<a href='javascript:void(0)' 
+                                                    class='action-btn edit editBtn' 
+                                                    data-id='" . intval($row['id']) . "' 
+                                                    data-company-client-id='" . intval($row['company_client_id'] ?? 0) . "' 
+                                                    data-project-name='" . htmlspecialchars($row['name']) . "' 
+                                                    data-location='" . htmlspecialchars($row['location']) . "' 
+                                                    data-project-code='" . htmlspecialchars($row['project_code'] ?? '') . "' 
+                                                    data-category='" . htmlspecialchars($row['category'] ?? '') . "' 
+                                                    data-sub-sector='" . htmlspecialchars($row['sub_sector'] ?? '') . "' 
+                                                    data-state='" . htmlspecialchars($row['state'] ?? '') . "' 
+                                                    data-region='" . htmlspecialchars($row['region'] ?? '') . "' 
+                                                    data-nearest-market='" . htmlspecialchars($row['nearest_market'] ?? '') . "' 
+                                                    data-latitude='" . htmlspecialchars($row['latitude'] ?? '') . "' 
+                                                    data-longitude='" . htmlspecialchars($row['longitude'] ?? '') . "' 
+                                                    data-status='" . htmlspecialchars($row['status']) . "'
+                                                    title='تعديل'>
+                                                    <i class='fas fa-edit'></i>
+                                                </a>";
+                                          }
+
+                                          if ($can_delete) {
+                                                echo "<a href='oprationprojects.php?delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode(generate_csrf_token()) . "' 
+                                                    class='action-btn delete' 
+                                                    onclick='return confirm(\"هل أنت متأكد من حذف هذا المشروع؟\")'
+                                                    title='حذف'>
+                                                    <i class='fas fa-trash-alt'></i>
+                                                </a>";
+                                          }
                               
-                            </div>
+                                     echo "</div>
                       </td>";
                             echo "</tr>";
                         }
@@ -472,9 +542,11 @@ include('../insidebar.php');
             <a id="viewMinesBtn" class="btn-modal btn-modal-save" style="text-decoration: none;">
                 <i class="fas fa-mountain"></i> مناجم المشروع
             </a>
-            <button type="button" class="btn-modal btn-modal-save editBtn" id="viewEditBtn">
-                <i class="fas fa-edit"></i> تعديل المشروع
-            </button>
+            <?php if ($can_edit): ?>
+                <button type="button" class="btn-modal btn-modal-save editBtn" id="viewEditBtn">
+                    <i class="fas fa-edit"></i> تعديل المشروع
+                </button>
+            <?php endif; ?>
             <button type="button" class="btn-modal btn-modal-cancel" onclick="closeViewModal()">
                 <i class="fas fa-times"></i> إغلاق
             </button>
@@ -523,23 +595,25 @@ include('../insidebar.php');
         // اظهار/اخفاء الفورم
         const toggleProjectFormBtn = document.getElementById('toggleForm');
         const projectForm = document.getElementById('projectForm');
-        toggleProjectFormBtn.addEventListener('click', function () {
-            projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
-            // تنظيف الحقول عند الإضافة
-            $("#project_id").val("");
-            $("#project_name").val("");
-            $("#company_client_id").val("");
-            $("#project_location").val("");
-            $("#project_code").val("");
-            $("#project_category").val("");
-            $("#project_sub_sector").val("");
-            $("#project_state").val("");
-            $("#project_region").val("");
-            $("#project_nearest_market").val("");
-            $("#project_latitude").val("");
-            $("#project_longitude").val("");
-            $("#project_status").val("");
-        });
+        if (toggleProjectFormBtn) {
+            toggleProjectFormBtn.addEventListener('click', function () {
+                projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
+                // تنظيف الحقول عند الإضافة
+                $("#project_id").val("");
+                $("#project_name").val("");
+                $("#company_client_id").val("");
+                $("#project_location").val("");
+                $("#project_code").val("");
+                $("#project_category").val("");
+                $("#project_sub_sector").val("");
+                $("#project_state").val("");
+                $("#project_region").val("");
+                $("#project_nearest_market").val("");
+                $("#project_latitude").val("");
+                $("#project_longitude").val("");
+                $("#project_status").val("");
+            });
+        }
 
         // عرض Modal عند الضغط على زر العرض
         $(document).on("click", ".viewBtn", function () {
@@ -743,9 +817,11 @@ include('../insidebar.php');
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-                <button type="submit" form="importFileForm" class="btn btn-primary">
-                    <i class="fas fa-upload"></i> استيراد
-                </button>
+                <?php if ($can_add): ?>
+                    <button type="submit" form="importFileForm" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> استيراد
+                    </button>
+                <?php endif; ?>
             </div>
         </div>
     </div>

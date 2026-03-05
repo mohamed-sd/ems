@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 $page_title = "إيكوبيشن | التشغيل ";
 include("../inheader.php");
 include '../config.php';
+require_once '../includes/approval_workflow.php';
 
 $is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
 $user_project_id = $is_role10 ? intval($_SESSION['user']['project_id']) : 0;
@@ -71,6 +72,91 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         echo "<script>alert('❌ خطأ في تحديث الحالة: " . mysqli_error($conn) . "');</script>";
     } else {
         echo "<script>alert('❌ بيانات غير صحيحة لتحديث الحالة');</script>";
+    }
+}
+
+// طلب إيقاف آلية عبر نظام الموافقات (مدير الحركة والتشغيل فقط)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'request_equipment_stop') {
+    if (!$is_role10) {
+        echo "<script>alert('❌ ليس لديك صلاحية لتقديم طلب إيقاف آلية');</script>";
+    } else {
+        $operation_id = isset($_POST['operation_id']) ? intval($_POST['operation_id']) : 0;
+        $request_reason = isset($_POST['request_reason']) ? trim($_POST['request_reason']) : '';
+
+        if ($operation_id <= 0) {
+            echo "<script>alert('❌ بيانات غير صحيحة');</script>";
+        } else {
+            $op_sql = "SELECT o.id, o.equipment, o.status, e.code AS equipment_code, e.name AS equipment_name, e.availability_status
+                       FROM operations o
+                       LEFT JOIN equipments e ON o.equipment = e.id
+                       WHERE o.id = $operation_id AND o.project_id = $selected_project_id
+                       LIMIT 1";
+            $op_result = mysqli_query($conn, $op_sql);
+
+            if (!$op_result || mysqli_num_rows($op_result) === 0) {
+                echo "<script>alert('❌ عملية التشغيل غير موجودة');</script>";
+            } else {
+                $op_row = mysqli_fetch_assoc($op_result);
+                $equipment_id = intval($op_row['equipment']);
+
+                if ($equipment_id <= 0) {
+                    echo "<script>alert('❌ لا توجد آلية مرتبطة بهذا التشغيل');</script>";
+                } else {
+                    $reason_text = $request_reason !== '' ? $request_reason : 'طلب إيقاف آلية من شاشة التشغيل';
+
+                    // ضمان وجود قاعدة الموافقة (مدير الأسطول) قبل إنشاء الطلب
+                    mysqli_query(
+                        $conn,
+                        "INSERT IGNORE INTO approval_workflow_rules (entity_type, action, role_required, step_order, is_active, created_at)
+                         VALUES ('equipment', 'deactivate_equipment', '4,-1', 1, 1, NOW())"
+                    );
+
+                    $payload = [
+                        'summary' => [
+                            'operation_id' => $operation_id,
+                            'equipment_id' => $equipment_id,
+                            'equipment_code' => $op_row['equipment_code'],
+                            'equipment_name' => $op_row['equipment_name'],
+                            'requested_by_role' => '10',
+                            'reason' => $reason_text,
+                            'current_availability_status' => $op_row['availability_status'],
+                            'new_availability_status' => 'موقوفة للصيانة'
+                        ],
+                        'operations' => [
+                            [
+                                'db_action' => 'update',
+                                'table' => 'equipments',
+                                'where' => ['id' => $equipment_id],
+                                'data' => ['availability_status' => 'موقوفة للصيانة']
+                            ],
+                            [
+                                'db_action' => 'update',
+                                'table' => 'operations',
+                                'where' => ['id' => $operation_id],
+                                'data' => ['status' => 3]
+                            ]
+                        ]
+                    ];
+
+                    $approval_result = approval_create_request(
+                        'equipment',
+                        $equipment_id,
+                        'deactivate_equipment',
+                        $payload,
+                        approval_get_user_id(),
+                        $conn
+                    );
+
+                    $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
+                    if (!empty($approval_result['success'])) {
+                        echo "<script>alert('✅ " . addslashes($approval_result['message']) . "'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+                        exit();
+                    }
+
+                    echo "<script>alert('❌ " . addslashes($approval_result['message']) . "');</script>";
+                }
+            }
+        }
     }
 }
 
@@ -453,12 +539,21 @@ include('../insidebar.php');
 
                         $action_buttons = "";
                         if ($status_value === 1) {
+                            if ($is_role10) {
+                                $action_buttons .= "<form method='post' style='display:inline;'>
+                                        <input type='hidden' name='action' value='request_equipment_stop'>
+                                        <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
+                                        <input type='hidden' name='request_reason' value='طلب إيقاف آلية من جدول التشغيل'>
+                                        <button type='submit' class='btn btn-sm btn-warning' onclick='return confirm(\"تأكيد إرسال طلب إيقاف الآلية لمدير الأسطول؟\")'>طلب إيقاف آلية</button>
+                                    </form> ";
+                            } else {
                                 $action_buttons .= "<form method='post' style='display:inline;'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='3'>
                                     <button type='submit' name='status_stop_submit' class='btn btn-sm btn-warning' onclick='return confirm(\"تأكيد إيقاف الآلية؟\")'>إيقاف</button>
                                 </form> ";
+                            }
                             $action_buttons .= "<form method='post' style='display:inline;'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>

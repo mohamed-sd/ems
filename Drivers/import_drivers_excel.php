@@ -7,6 +7,9 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 require '../vendor/autoload.php';
+require_once '../includes/permissions_helper.php';
+
+enforce_module_permission_json($conn, 'drivers', 'add', 'لا توجد صلاحية لإضافة المشغلين');
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 

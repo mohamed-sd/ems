@@ -6,10 +6,57 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+include '../includes/permissions_helper.php';
+
+// ════════════════════════════════════════════════════════════════════════════
+// 🔐 التحقق من صلاحيات المستخدم على وحدة العملاء
+// ════════════════════════════════════════════════════════════════════════════
+
+// الحصول على معرف وحدة العملاء من جدول modules
+$module_query = "SELECT id FROM modules 
+                      WHERE code = 'Clients/clients.php' 
+                          OR code = 'clients' 
+                          OR code LIKE '%clients.php%'
+                          OR name LIKE '%عملاء%'
+                      LIMIT 1";
+$module_result = $conn->query($module_query);
+$module_info = $module_result ? $module_result->fetch_assoc() : null;
+$module_id = $module_info ? $module_info['id'] : null;
+
+// الحصول على صلاحيات المستخدم على هذه الوحدة
+$can_view = false;
+$can_add = false;
+$can_edit = false;
+$can_delete = false;
+
+if ($module_id) {
+    $perms = get_module_permissions($conn, $module_id);
+    $can_view = $perms['can_view'];
+    $can_add = $perms['can_add'];
+    $can_edit = $perms['can_edit'];
+    $can_delete = $perms['can_delete'];
+}
+
+// منع الوصول إذا لم تكن هناك صلاحية عرض
+if (!$can_view) {
+    header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+العملاء+❌");
+    exit();
+}
 
 // معالجة إضافة/تعديل عميل عبر POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
+    // التحقق من صلاحية التعديل أو الإضافة
     $client_id = isset($_POST['client_id']) ? intval($_POST['client_id']) : 0;
+    $is_editing = $client_id > 0;
+    
+    if ($is_editing && !$can_edit) {
+        header("Location: clients.php?msg=لا+توجد+صلاحية+تعديل+العملاء+❌");
+        exit();
+    } elseif (!$is_editing && !$can_add) {
+        header("Location: clients.php?msg=لا+توجد+صلاحية+إضافة+عملاء+جدد+❌");
+        exit();
+    }
+
     $client_code = mysqli_real_escape_string($conn, trim($_POST['client_code']));
     $client_name = mysqli_real_escape_string($conn, trim($_POST['client_name']));
     $entity_type = mysqli_real_escape_string($conn, trim($_POST['entity_type']));
@@ -74,6 +121,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
 // معالجة حذف العميل
 if (isset($_GET['delete_id'])) {
     $delete_id = intval($_GET['delete_id']);
+    
+    // التحقق من صلاحية الحذف
+    if (!$can_delete) {
+        header("Location: clients.php?msg=لا+توجد+صلاحية+حذف+العملاء+❌");
+        exit();
+    }
+    
     header("Location: clients.php?msg=تم+تعطيل+الحذف+مؤقتا❌");
     //************************************* ازل التعليق لتفعيل عملية الحذف ***************************** */
     // $check_usage = mysqli_query($conn, "SELECT COUNT(*) as count FROM operationproject WHERE company_client_id = $delete_id");
@@ -117,13 +171,19 @@ include('../insidebar.php');
             <a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
-            <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fas fa-plus-circle"></i> إضافة عميل جديد
-            </a>
-            <a href="javascript:void(0)" id="openImportModal" class="add-btn"
-                style="background:linear-gradient(135deg,#064e3b,#065f46);color:#fff;border-color:transparent;">
-                <i class="fas fa-file-excel"></i> استيراد من Excel
-            </a>
+            <?php if ($can_add): ?>
+                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+                    <i class="fas fa-plus-circle"></i> إضافة عميل جديد
+                </a>
+                <a href="javascript:void(0)" id="openImportModal" class="add-btn"
+                    style="background:linear-gradient(135deg,#064e3b,#065f46);color:#fff;border-color:transparent;">
+                    <i class="fas fa-file-excel"></i> استيراد من Excel
+                </a>
+            <?php else: ?>
+                <button class="add-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
+                    <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحيات)
+                </button>
+            <?php endif; ?>
             <a href="download_clients_template.php" class="add-btn"
                 style="background:linear-gradient(135deg,var(--orange),#f59e0b);color:#fff;border-color:transparent;">
                 <i class="fas fa-download"></i> تحميل نموذج Excel
@@ -273,26 +333,33 @@ include('../insidebar.php');
                                        data-created='" . htmlspecialchars($row['creator_name'] ?? 'غير محدد') . "'
                                        title='عرض التفاصيل'>
                                         <i class='fas fa-eye'></i>
-                                    </a>
-                                    <a href='javascript:void(0)' 
-                                       class='action-btn edit editClientBtn' 
-                                       data-id='" . $row['id'] . "'
-                                       data-code='" . htmlspecialchars($row['client_code']) . "'
-                                       data-name='" . htmlspecialchars($row['client_name']) . "'
-                                       data-entity='" . htmlspecialchars($row['entity_type']) . "'
-                                       data-sector='" . htmlspecialchars($row['sector_category']) . "'
-                                       data-phone='" . htmlspecialchars($row['phone']) . "'
-                                       data-email='" . htmlspecialchars($row['email']) . "'
-                                       data-whatsapp='" . htmlspecialchars($row['whatsapp']) . "'
-                                       data-status='" . $row['status'] . "'
-                                       title='تعديل'>
-                                        <i class='fas fa-edit'></i>
-                                    </a>
-                                    <a href='?delete_id=" . $row['id'] . "' class='action-btn delete' 
-                                       onclick='return confirm(\"هل أنت متأكد من حذف هذا العميل؟\")' title='حذف'>
-                                        <i class='fas fa-trash-alt'></i>
-                                    </a>
-                                </div>
+                                    </a>";
+                                    
+                                    if ($can_edit) {
+                                        echo "<a href='javascript:void(0)' 
+                                           class='action-btn edit editClientBtn' 
+                                           data-id='" . $row['id'] . "'
+                                           data-code='" . htmlspecialchars($row['client_code']) . "'
+                                           data-name='" . htmlspecialchars($row['client_name']) . "'
+                                           data-entity='" . htmlspecialchars($row['entity_type']) . "'
+                                           data-sector='" . htmlspecialchars($row['sector_category']) . "'
+                                           data-phone='" . htmlspecialchars($row['phone']) . "'
+                                           data-email='" . htmlspecialchars($row['email']) . "'
+                                           data-whatsapp='" . htmlspecialchars($row['whatsapp']) . "'
+                                           data-status='" . $row['status'] . "'
+                                           title='تعديل'>
+                                            <i class='fas fa-edit'></i>
+                                        </a>";
+                                    }
+                                    
+                                    if ($can_delete) {
+                                        echo "<a href='?delete_id=" . $row['id'] . "' class='action-btn delete' 
+                                           onclick='return confirm(\"هل أنت متأكد من حذف هذا العميل؟\")' title='حذف'>
+                                            <i class='fas fa-trash-alt'></i>
+                                        </a>";
+                                    }
+                                    
+                                echo "</div>
                             </td>";
                             echo "</tr>";
                         }
@@ -404,9 +471,11 @@ include('../insidebar.php');
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn-modal btn-modal-save editClientBtn" id="viewEditBtn">
-                <i class="fas fa-edit"></i> تعديل البيانات
-            </button>
+            <?php if ($can_edit): ?>
+                <button type="button" class="btn-modal btn-modal-save editClientBtn" id="viewEditBtn">
+                    <i class="fas fa-edit"></i> تعديل البيانات
+                </button>
+            <?php endif; ?>
             <button type="button" class="btn-modal btn-modal-cancel" onclick="closeViewModal()">
                 <i class="fas fa-times"></i> إغلاق
             </button>

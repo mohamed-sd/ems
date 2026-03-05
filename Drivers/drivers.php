@@ -6,11 +6,38 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+include '../includes/permissions_helper.php';
+
+// ════════════════════════════════════════════════════════════════════════════
+// 🔐 التحقق من صلاحيات المستخدم
+// ════════════════════════════════════════════════════════════════════════════
+$page_permissions = check_page_permissions($conn, 'drivers');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
+
+// منع الوصول إذا لم تكن صلاحية عرض
+if (!$can_view) {
+    header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+المشغلين+❌");
+    exit();
+}
 
 $page_title = "إيكوبيشن | المشغلين";
 
 // معالجة إضافة/تعديل مشغل عند إرسال الفورم
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
+    // التحقق من الصلاحية (إضافة أو تعديل)
+    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $is_editing = $id > 0;
+    
+    if ($is_editing && !$can_edit) {
+        header("Location: drivers.php?msg=لا+توجد+صلاحية+تعديل+المشغلين+❌");
+        exit();
+    } elseif (!$is_editing && !$can_add) {
+        header("Location: drivers.php?msg=لا+توجد+صلاحية+إضافة+مشغلين+جدد+❌");
+        exit();
+    }
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     
     // 1. المعلومات الأساسية والتعريفية

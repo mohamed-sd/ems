@@ -22,6 +22,31 @@ if (!isset($_SESSION['user'])) {
 
 // الاتصال بقاعدة البيانات
 require_once '../config.php';
+require_once '../includes/permissions_helper.php';
+
+// التحقق من صلاحية الإضافة على شاشة العملاء
+$module_query = "SELECT id FROM modules 
+                 WHERE code = 'Clients/clients.php' 
+                    OR code = 'clients' 
+                    OR code LIKE '%clients.php%'
+                    OR name LIKE '%عملاء%'
+                 LIMIT 1";
+$module_result = $conn->query($module_query);
+$module_info = $module_result ? $module_result->fetch_assoc() : null;
+$module_id = $module_info ? $module_info['id'] : null;
+
+$can_add = false;
+if ($module_id) {
+    $perms = get_module_permissions($conn, $module_id);
+    $can_add = $perms['can_add'];
+}
+
+if (!$can_add) {
+    ob_end_clean();
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['success' => false, 'message' => 'لا توجد صلاحية لإضافة العملاء']);
+    exit;
+}
 
 // تنظيف أي مخرجات
 ob_end_clean();

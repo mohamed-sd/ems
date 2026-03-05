@@ -4,13 +4,22 @@
  * يقوم بقراءة ملف Excel أو CSV ومعالجة البيانات وإدخالها في قاعدة البيانات
  */
 
+session_start();
+if (!isset($_SESSION['user'])) {
+    header('Content-Type: application/json; charset=utf-8');
+    die(json_encode(['success' => false, 'message' => 'غير مصرح']));
+}
+
 require_once '../config.php';
 require_once '../vendor/autoload.php';
+require_once '../includes/permissions_helper.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 
 header('Content-Type: application/json; charset=utf-8');
+
+enforce_module_permission_json($conn, 'equipments', 'add', 'لا توجد صلاحية لإضافة الآليات');
 
 // التحقق من طريقة الطلب
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

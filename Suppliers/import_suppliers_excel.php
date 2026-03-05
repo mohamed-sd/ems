@@ -22,6 +22,9 @@ if (!isset($_SESSION['user'])) {
 
 // الاتصال بقاعدة البيانات
 require_once '../config.php';
+require_once '../includes/permissions_helper.php';
+
+enforce_module_permission_json($conn, 'suppliers', 'add', 'لا توجد صلاحية لإضافة الموردين');
 
 // تنظيف أي مخرجات
 ob_end_clean();

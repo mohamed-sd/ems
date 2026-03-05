@@ -6,6 +6,22 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once '../config.php';
+require_once '../includes/permissions_helper.php';
+
+// ════════════════════════════════════════════════════════════════════════════
+// 🔐 التحقق من صلاحيات المستخدم
+// ════════════════════════════════════════════════════════════════════════════
+$page_permissions = check_page_permissions($conn, 'contracts');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
+
+// منع الوصول إذا لم تكن صلاحية عرض
+if (!$can_view) {
+  header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+العقود+❌");
+  exit();
+}
 
 $equipmentTypes = [];
 $equipmentTypesQuery = "SELECT id, type FROM equipments_types WHERE status = 'active' ORDER BY type ASC";
