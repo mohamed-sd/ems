@@ -11,7 +11,7 @@ require_once '../includes/permissions_helper.php';
 // ════════════════════════════════════════════════════════════════════════════
 // 🔐 التحقق من صلاحيات المستخدم
 // ════════════════════════════════════════════════════════════════════════════
-$page_permissions = check_page_permissions($conn, 'contracts');
+$page_permissions = check_page_permissions($conn, 'Contracts/contracts.php');
 $can_view = $page_permissions['can_view'];
 $can_add = $page_permissions['can_add'];
 $can_edit = $page_permissions['can_edit'];
@@ -79,9 +79,11 @@ foreach ($equipmentTypes as $equipmentType) {
         <a href="../main/dashboard.php" class="back-btn">
           <i class="fas fa-arrow-right"></i> رجوع
         </a>
+        <?php if ($can_add): ?>
         <a href="javascript:void(0)" id="toggleForm" class="add-btn">
           <i class="fas fa-plus-circle"></i> عقد جديد
         </a>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -624,6 +626,14 @@ foreach ($equipmentTypes as $equipmentType) {
               $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
               $mine_id = intval($_POST['mine_id']);
 
+              if ($id > 0 && !$can_edit) {
+                header("Location: contracts.php?id=$mine_id&msg=لا+توجد+صلاحية+تعديل+العقود+❌");
+                exit;
+              } elseif ($id <= 0 && !$can_add) {
+                header("Location: contracts.php?id=$mine_id&msg=لا+توجد+صلاحية+إضافة+عقود+جديدة+❌");
+                exit;
+              }
+
 
               $contract_signing_date = $_POST['contract_signing_date'];
               $grace_period_days = $_POST['grace_period_days'];
@@ -855,8 +865,10 @@ foreach ($equipmentTypes as $equipmentType) {
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";
 
-              echo "<td class='group-status'>
-                        <a href='javascript:void(0)' class='editBtn'
+              echo "<td class='group-status'>";
+
+              if ($can_edit) {
+                echo "<a href='javascript:void(0)' class='editBtn'
              data-id='" . $row['id'] . "'
              data-contract_signing_date='" . $row['contract_signing_date'] . "'
              data-grace_period_days='" . $row['grace_period_days'] . "'
@@ -886,9 +898,14 @@ foreach ($equipmentTypes as $equipmentType) {
                   payment_date ='" . (isset($row['payment_date']) ? $row['payment_date'] : '') . "'
                   
              data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
-             class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>
-                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>
-                        <a href='contracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>
+             class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>";
+              }
+
+              if ($can_delete) {
+                echo "<a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>";
+              }
+
+              echo "<a href='contracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>
                       </td>";
               echo "</tr>";
             }
@@ -943,9 +960,11 @@ foreach ($equipmentTypes as $equipmentType) {
       const toggleContractFormBtn = document.getElementById('toggleForm');
       const contractForm = document.getElementById('projectForm');
 
-      toggleContractFormBtn.addEventListener('click', function () {
-        contractForm.style.display = contractForm.style.display === "none" ? "block" : "none";
-      });
+      if (toggleContractFormBtn && contractForm) {
+        toggleContractFormBtn.addEventListener('click', function () {
+          contractForm.style.display = contractForm.style.display === "none" ? "block" : "none";
+        });
+      }
     })();
 
   </script>

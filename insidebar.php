@@ -20,7 +20,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
     <h2 class="logo">Equipation</h2>
 
     <ul>
-      <li><a href="../main/dashboard.php"><i class="fa fa-tachometer-alt"></i> <span>الرئيسية</span></a></li>
+      <li><a href="../main/dashboard.php"><i class="fa-solid fa-angles-left"></i> <span>الرئيسية</span></a></li>
 
       <?php
       // عرض الروابط الديناميكية من جدول modules بناءً على دور المستخدم
@@ -54,7 +54,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
 
       <?php // صلاحيات مدير المشاريع === 1
       if ($_SESSION['user']['role'] == "1") { ?>
-        <li><a href="../Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li>
+        <!-- <li><a href="../Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li> -->
         <li><a href="../Projects/project_mines.php"><i class="fa fa-list-alt"></i> <span> المشاريع </span></a></li>
         <!-- <li><a href="../Projects/oprationprojects.php"><i class="fa fa-folder-open"></i> <span></span></a></li> -->
         <li><a href="../main/users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>

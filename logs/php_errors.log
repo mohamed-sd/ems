@@ -170,3 +170,107 @@ Stack trace:
 [04-Mar-2026 18:06:53 Europe/Berlin] PHP Warning:  Undefined variable $page_title in C:\xampp-v0.01\htdocs\ems\inheader.php on line 6
 [04-Mar-2026 18:07:01 Europe/Berlin] PHP Warning:  Undefined variable $page_title in C:\xampp-v0.01\htdocs\ems\inheader.php on line 6
 [04-Mar-2026 18:07:10 Europe/Berlin] PHP Warning:  Undefined variable $page_title in C:\xampp-v0.01\htdocs\ems\inheader.php on line 6
+[05-Mar-2026 13:07:57 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 196
+[05-Mar-2026 13:13:26 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:13:50 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:14:08 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:18:15 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:18:27 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:23:18 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:25:10 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:25:16 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:25:21 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:25:57 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:26:18 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:26:26 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:32:03 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:32:26 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:33:43 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:36:09 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:40:19 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:40:44 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[05-Mar-2026 13:47:50 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:38:14 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:38:29 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:40:39 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:41:03 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:44:33 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:46:45 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:48:35 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:48:52 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:49:13 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:51:44 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:51:55 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 207
+[07-Mar-2026 10:52:41 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 234
+[07-Mar-2026 10:58:05 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 234
+[07-Mar-2026 10:59:03 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 234
+[07-Mar-2026 11:12:00 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 234
+[07-Mar-2026 11:25:43 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 234
+[07-Mar-2026 11:26:50 Europe/Berlin] PHP Warning:  Undefined variable $where in C:\xampp-v0.01\htdocs\ems\Settings\modules.php on line 234
+[07-Mar-2026 11:54:13 Europe/Berlin] PHP Warning:  Undefined array key "edit" in C:\xampp-v0.01\htdocs\ems\Equipments\equipments_fleet.php on line 279
+[07-Mar-2026 11:59:05 Europe/Berlin] PHP Warning:  Undefined array key "edit" in C:\xampp-v0.01\htdocs\ems\Equipments\equipments_fleet.php on line 279
+[07-Mar-2026 12:01:07 Europe/Berlin] PHP Warning:  Undefined array key "edit" in C:\xampp-v0.01\htdocs\ems\Equipments\equipments_fleet.php on line 279
+[07-Mar-2026 12:01:31 Europe/Berlin] PHP Warning:  Undefined array key "edit" in C:\xampp-v0.01\htdocs\ems\Equipments\equipments_fleet.php on line 305
+[07-Mar-2026 12:20:23 Europe/Berlin] PHP Warning:  Undefined array key "edit" in C:\xampp-v0.01\htdocs\ems\Equipments\equipments_fleet.php on line 305
+[07-Mar-2026 12:20:43 Europe/Berlin] PHP Warning:  Undefined array key "edit" in C:\xampp-v0.01\htdocs\ems\Equipments\equipments_fleet.php on line 305
+[07-Mar-2026 12:50:10 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xampp-v0.01\htdocs\ems\config.php:91) in C:\xampp-v0.01\htdocs\ems\config.php on line 91
+[07-Mar-2026 12:52:32 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xampp-v0.01\htdocs\ems\config.php:91) in C:\xampp-v0.01\htdocs\ems\config.php on line 91
+[07-Mar-2026 12:52:33 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xampp-v0.01\htdocs\ems\config.php:91) in C:\xampp-v0.01\htdocs\ems\config.php on line 91
+[07-Mar-2026 12:52:45 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xampp-v0.01\htdocs\ems\config.php:91) in C:\xampp-v0.01\htdocs\ems\config.php on line 91
+[07-Mar-2026 12:52:45 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xampp-v0.01\htdocs\ems\config.php:91) in C:\xampp-v0.01\htdocs\ems\config.php on line 91
+[07-Mar-2026 12:55:12 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xampp-v0.01\htdocs\ems\config.php:91) in C:\xampp-v0.01\htdocs\ems\config.php on line 91
+[07-Mar-2026 12:55:15 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xampp-v0.01\htdocs\ems\config.php:91) in C:\xampp-v0.01\htdocs\ems\config.php on line 91
+[07-Mar-2026 13:19:10 Europe/Berlin] PHP Fatal error:  Cannot redeclare escape() (previously declared in C:\xampp-v0.01\htdocs\ems\config.php:91) in C:\xampp-v0.01\htdocs\ems\config.php on line 91
+[07-Mar-2026 14:50:45 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function enforce_current_page_view_permission() in C:\xampp-v0.01\htdocs\ems\insidebar.php:9
+Stack trace:
+#0 C:\xampp-v0.01\htdocs\ems\main\dashboard.php(438): include()
+#1 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\insidebar.php on line 9
+[07-Mar-2026 14:50:49 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function enforce_current_page_view_permission() in C:\xampp-v0.01\htdocs\ems\insidebar.php:9
+Stack trace:
+#0 C:\xampp-v0.01\htdocs\ems\main\dashboard.php(438): include()
+#1 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\insidebar.php on line 9
+[07-Mar-2026 14:50:52 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function enforce_current_page_view_permission() in C:\xampp-v0.01\htdocs\ems\insidebar.php:9
+Stack trace:
+#0 C:\xampp-v0.01\htdocs\ems\main\dashboard.php(438): include()
+#1 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\insidebar.php on line 9
+[07-Mar-2026 14:51:05 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function enforce_current_page_view_permission() in C:\xampp-v0.01\htdocs\ems\insidebar.php:9
+Stack trace:
+#0 C:\xampp-v0.01\htdocs\ems\main\dashboard.php(438): include()
+#1 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\insidebar.php on line 9
+[07-Mar-2026 14:51:59 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function enforce_current_page_view_permission() in C:\xampp-v0.01\htdocs\ems\insidebar.php:9
+Stack trace:
+#0 C:\xampp-v0.01\htdocs\ems\Settings\role_permissions.php(210): include()
+#1 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\insidebar.php on line 9
+[07-Mar-2026 14:55:44 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function enforce_current_page_view_permission() in C:\xampp-v0.01\htdocs\ems\insidebar.php:9
+Stack trace:
+#0 C:\xampp-v0.01\htdocs\ems\main\dashboard.php(438): include()
+#1 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\insidebar.php on line 9
+[07-Mar-2026 15:06:50 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function check_page_permissions() in C:\xampp-v0.01\htdocs\ems\Projects\oprationprojects.php:13
+Stack trace:
+#0 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\Projects\oprationprojects.php on line 13
+[07-Mar-2026 15:06:52 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function enforce_current_page_view_permission() in C:\xampp-v0.01\htdocs\ems\insidebar.php:9
+Stack trace:
+#0 C:\xampp-v0.01\htdocs\ems\Clients\clients.php(152): include()
+#1 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\insidebar.php on line 9
+[07-Mar-2026 15:13:02 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function get_module_permissions() in C:\xampp-v0.01\htdocs\ems\Clients\clients.php:33
+Stack trace:
+#0 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\Clients\clients.php on line 33
+[07-Mar-2026 15:13:04 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined function enforce_current_page_view_permission() in C:\xampp-v0.01\htdocs\ems\insidebar.php:9
+Stack trace:
+#0 C:\xampp-v0.01\htdocs\ems\main\dashboard.php(438): include()
+#1 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\insidebar.php on line 9
+[07-Mar-2026 15:20:38 Europe/Berlin] PHP Warning:  require_once(../permissions_helper.php): Failed to open stream: No such file or directory in C:\xampp-v0.01\htdocs\ems\Equipments\equipments_types.php on line 4
+[07-Mar-2026 15:20:38 Europe/Berlin] PHP Fatal error:  Uncaught Error: Failed opening required '../permissions_helper.php' (include_path='C:\xampp-v0.01\php\PEAR') in C:\xampp-v0.01\htdocs\ems\Equipments\equipments_types.php:4
+Stack trace:
+#0 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\Equipments\equipments_types.php on line 4

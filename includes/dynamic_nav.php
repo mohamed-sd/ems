@@ -35,6 +35,7 @@ function getDynamicNavLinks($conn, $roleId) {
                   SELECT parent_role_id FROM roles WHERE id = $roleId AND parent_role_id IS NOT NULL
               )
               AND (mr.status = '1' OR mr.status = 1)
+              AND is_link = '1'
               ORDER BY m.id ASC";
     
     $result = mysqli_query($conn, $query);
@@ -70,7 +71,7 @@ function printDynamicNavLinks($links, $basePrefix = '../') {
         $code = htmlspecialchars($link['code'], ENT_QUOTES, 'UTF-8');
         $name = htmlspecialchars($link['name'], ENT_QUOTES, 'UTF-8');
         // استخدام أيقونة افتراضية
-        $icon = 'fa fa-link';
+        $icon = 'fa-solid fa-angles-left'; // يمكنك تخصيص الأيقونة حسب الحاجة
         
         // تحديد البادئة (prefix) بناءً على موقع الملف الحالي
         $href = $basePrefix . $code;

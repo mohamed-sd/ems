@@ -5,6 +5,45 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+include '../includes/permissions_helper.php';
+
+// ════════════════════════════════════════════════════════════════════════════
+// 🔐 التحقق من صلاحيات المستخدم على وحدة المشرفين
+// ════════════════════════════════════════════════════════════════════════════
+$_currentUserRole = intval($_SESSION['user']['role']);
+
+// البحث عن معرف الوحدة مع مراعاة دور المستخدم الحالي
+$module_query = "SELECT id FROM modules 
+                WHERE (code = 'main/project_users.php' 
+                    OR code = 'project_users' 
+                    OR code LIKE '%project_users%')
+                AND owner_role_id = $_currentUserRole
+                LIMIT 1";
+$module_result = $conn->query($module_query);
+$module_info   = $module_result ? $module_result->fetch_assoc() : null;
+$module_id     = $module_info ? $module_info['id'] : null;
+
+// إذا لم يُوجد سجل خاص بهذا الدور، افترض جميع الصلاحيات (للتوافق مع الأدوار القديمة)
+if (!$module_id) {
+    $can_view = $can_add = $can_edit = $can_delete = true;
+} else {
+    $can_view   = false;
+    $can_add    = false;
+    $can_edit   = false;
+    $can_delete = false;
+
+    $perms      = get_module_permissions($conn, $module_id);
+    $can_view   = $perms['can_view'];
+    $can_add    = $perms['can_add'];
+    $can_edit   = $perms['can_edit'];
+    $can_delete = $perms['can_delete'];
+}
+
+// منع الوصول إذا لم تكن هناك صلاحية عرض
+if (!$can_view) {
+    header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+صفحة+المشرفين+❌");
+    exit();
+}
 
 $page_title = "إيكوبيشن | المشرفين";
 
@@ -19,6 +58,10 @@ if ($roleNameResult && $roleRow = mysqli_fetch_assoc($roleNameResult)) {
 
 // معالجة الحذف
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    if (!$can_delete) {
+        header("Location: project_users.php?msg=لا+توجد+صلاحية+حذف+المستخدمين+❌");
+        exit();
+    }
     $deleteId = intval($_GET['delete']);
     $userid = $_SESSION['user']['id'];
     
@@ -50,6 +93,10 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 
 // معالجة التعديل
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit') {
+    if (!$can_edit) {
+        header("Location: project_users.php?msg=لا+توجد+صلاحية+تعديل+المستخدمين+❌");
+        exit();
+    }
     $userId = intval($_POST['user_id']);
     $name = mysqli_real_escape_string($conn, trim($_POST['name']));
     $username = mysqli_real_escape_string($conn, trim($_POST['username']));
@@ -102,6 +149,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // معالجة إضافة مستخدم جديد
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($_POST['action']) || $_POST['action'] === 'add')) {
+    if (!$can_add) {
+        header("Location: project_users.php?msg=لا+توجد+صلاحية+إضافة+مستخدمين+جدد+❌");
+        exit();
+    }
     $name = mysqli_real_escape_string($conn, trim($_POST['name']));
     $username = mysqli_real_escape_string($conn, trim($_POST['username']));
     $password = mysqli_real_escape_string($conn, $_POST['password']);
@@ -132,16 +183,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
     }
 }
 
+$page_title = "إيكوبيشن | المشرفين";
 include("../inheader.php");
+include('../insidebar.php');
 ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
-
-<?php 
-include('../insidebar.php');
- ?>
 
 <div class="main">
     <div class="page-header">
@@ -153,9 +202,11 @@ include('../insidebar.php');
             <a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
+            <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة مشرف جديد
             </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -291,22 +342,21 @@ include('../insidebar.php');
                         echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
                         echo "<td>" . $roleText . "</td>";
                         echo "<td>" . $createdDate . "</td>";
-                        echo "<td>
-                                <div class='action-btns'>
-                                    <a href='javascript:void(0)' 
+                        $action_btns = "<td><div class='action-btns'>";
+                        if ($can_edit) {
+                            $action_btns .= "<a href='javascript:void(0)' 
                                        class='action-btn edit' 
                                        onclick='editUser({$row['id']}, \"" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "\", \"" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "\", \"" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "\", {$row['role']})'
-                                       title='تعديل'>
-                                        <i class='fas fa-edit'></i>
-                                    </a>
-                                    <a href='project_users.php?delete={$row['id']}' 
+                                       title='تعديل'><i class='fas fa-edit'></i></a>";
+                        }
+                        if ($can_delete) {
+                            $action_btns .= "<a href='project_users.php?delete={$row['id']}' 
                                        class='action-btn delete' 
                                        onclick=\"return confirm('هل أنت متأكد من حذف هذا المستخدم؟')\"
-                                       title='حذف'>
-                                        <i class='fas fa-trash'></i>
-                                    </a>
-                                </div>
-                            </td>";
+                                       title='حذف'><i class='fas fa-trash'></i></a>";
+                        }
+                        $action_btns .= "</div></td>";
+                        echo $action_btns;
                         echo "</tr>";
                     }
                     ?>

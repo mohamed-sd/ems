@@ -5,9 +5,55 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 $page_title = "إيكوبيشن | التشغيل ";
-include("../inheader.php");
 include '../config.php';
+include '../includes/permissions_helper.php';
 require_once '../includes/approval_workflow.php';
+
+// التحقق من صلاحيات المستخدم على شاشة التشغيل (مع أولوية سجل الدور الحالي)
+$current_role_id = intval($_SESSION['user']['role']);
+$module_query = "SELECT m.id
+                                 FROM modules m
+                                 LEFT JOIN role_permissions rp
+                                                ON rp.module_id = m.id
+                                             AND rp.role_id = $current_role_id
+                                 WHERE (
+                                                m.code = 'Oprators/oprators.php'
+                                         OR m.code = 'oprators.php'
+                                         OR m.code = 'oprators'
+                                         OR m.code LIKE '%Oprators/oprators.php%'
+                                         OR m.code LIKE '%oprators.php%'
+                                 )
+                                     AND m.owner_role_id IN ($current_role_id, -1)
+                                 ORDER BY
+                                     CASE WHEN rp.module_id IS NOT NULL THEN 0 ELSE 1 END,
+                                     CASE
+                                         WHEN m.owner_role_id = $current_role_id THEN 0
+                                         WHEN m.owner_role_id = -1 THEN 1
+                                         ELSE 2
+                                     END,
+                                     m.id ASC
+                                 LIMIT 1";
+$module_result = $conn->query($module_query);
+$module_info = $module_result ? $module_result->fetch_assoc() : null;
+$module_id = $module_info ? $module_info['id'] : null;
+
+$can_view = false;
+$can_add = false;
+$can_edit = false;
+$can_delete = false;
+
+if ($module_id) {
+    $perms = get_module_permissions($conn, $module_id);
+    $can_view = $perms['can_view'];
+    $can_add = $perms['can_add'];
+    $can_edit = $perms['can_edit'];
+    $can_delete = $perms['can_delete'];
+}
+
+if (!$can_view) {
+    header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+التشغيل+❌");
+    exit();
+}
 
 $is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
 $user_project_id = $is_role10 ? intval($_SESSION['user']['project_id']) : 0;
@@ -55,6 +101,12 @@ if (mysqli_num_rows($project_result) > 0) {
 
 // تغيير حالة التشغيل (إيقاف/تعطل/استئناف)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_status') {
+    if (!$can_edit) {
+        $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
+        echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+        exit();
+    }
+
     $operation_id = intval($_POST['operation_id']);
     $new_status = intval($_POST['new_status']);
     $allowed_statuses = [1, 3, 4];
@@ -77,7 +129,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // طلب إيقاف آلية عبر نظام الموافقات (مدير الحركة والتشغيل فقط)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'request_equipment_stop') {
-    if (!$is_role10) {
+    if (!$can_edit) {
+        echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل');</script>";
+    } elseif (!$is_role10) {
         echo "<script>alert('❌ ليس لديك صلاحية لتقديم طلب إيقاف آلية');</script>";
     } else {
         $operation_id = isset($_POST['operation_id']) ? intval($_POST['operation_id']) : 0;
@@ -162,6 +216,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // انهاء خدمة من الموديل
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'end_service') {
+    if (!$can_edit) {
+        $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
+        echo "<script>alert('❌ ليس لديك صلاحية إنهاء الخدمة'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+        exit();
+    }
+
     if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10") {
         $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
         echo "<script>alert('❌ ليس لديك صلاحية لإنهاء الخدمة'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
@@ -204,9 +264,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// حذف تشغيل
+if (isset($_GET['delete_id'])) {
+    if (!$can_delete) {
+        $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
+        header("Location: oprators.php" . ($redirect_project ? "?project_id=$redirect_project&msg=" : "?msg=") . "لا+توجد+صلاحية+حذف+التشغيل+❌");
+        exit();
+    }
+
+    $delete_id = intval($_GET['delete_id']);
+    if ($delete_id > 0) {
+        $delete_sql = "DELETE FROM operations WHERE id = $delete_id AND project_id = $selected_project_id";
+        if (mysqli_query($conn, $delete_sql)) {
+            header("Location: oprators.php?project_id=$selected_project_id&msg=تم+حذف+التشغيل+بنجاح+✅");
+            exit();
+        }
+        header("Location: oprators.php?project_id=$selected_project_id&msg=حدث+خطأ+أثناء+الحذف+❌");
+        exit();
+    }
+}
+
 ?>
 
 <?php 
+include("../inheader.php");
 include('../insidebar.php'); 
 ?>
 
@@ -241,11 +322,22 @@ include('../insidebar.php');
                 تغيير المشروع
             </a>
             <?php } ?>
+            <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fa fa-plus"></i> اضافة تشغيل
             </a>
+            <?php endif; ?>
         </div>
     </div>
+
+    <?php if (!empty($_GET['msg'])):
+        $isSuccess = strpos($_GET['msg'], '✅') !== false;
+    ?>
+        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
+            <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
+            <?php echo htmlspecialchars($_GET['msg']); ?>
+        </div>
+    <?php endif; ?>
 
     <h2 class="section-title">
         <i class="fas fa-cogs"></i>
@@ -253,6 +345,7 @@ include('../insidebar.php');
     </h2>
 
     <!-- فورم إضافة تشغيل -->
+    <?php if ($can_add || $can_edit): ?>
     <form id="projectForm" action="" method="post" class="form-hidden">
         <div class="card">
             <div class="card-header">
@@ -348,6 +441,7 @@ include('../insidebar.php');
             </div>
         </div>
     </form>
+    <?php endif; ?>
 
     <!-- قسم الإحصائيات -->
     <div id="contractStats" class="contract-stats is-hidden">
@@ -440,6 +534,16 @@ include('../insidebar.php');
                     // إضافة أو تعديل تشغيل
                     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_operation' && !empty($_POST['equipment'])) {
                         $operation_id = isset($_POST['operation_id']) ? intval($_POST['operation_id']) : 0;
+
+                        if ($operation_id > 0 && !$can_edit) {
+                            echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                            exit();
+                        }
+                        if ($operation_id === 0 && !$can_add) {
+                            echo "<script>alert('❌ ليس لديك صلاحية إضافة تشغيل جديد'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                            exit();
+                        }
+
                         $equipment = intval($_POST['equipment']);
                         $project_id = intval($_POST['project_id']);
                         $mine_id = intval($_POST['mine_id']);
@@ -538,7 +642,7 @@ include('../insidebar.php');
                         $status_cell = "<td><span class='status-pill $status_class'>$status_label</span></td>";
 
                         $action_buttons = "";
-                        if ($status_value === 1) {
+                        if ($status_value === 1 && $can_edit) {
                             if ($is_role10) {
                                 $action_buttons .= "<form method='post' style='display:inline;'>
                                         <input type='hidden' name='action' value='request_equipment_stop'>
@@ -560,7 +664,7 @@ include('../insidebar.php');
                                     <input type='hidden' name='new_status' value='4'>
                                     <button type='submit' name='status_down_submit' class='btn btn-sm btn-danger' onclick='return confirm(\"تأكيد تعطل الآلية؟\")'>تعطلت</button>
                                 </form> ";
-                        } elseif ($status_value === 3 || $status_value === 4) {
+                        } elseif (($status_value === 3 || $status_value === 4) && $can_edit) {
                             $action_buttons .= "<form method='post' style='display:inline;'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
@@ -569,30 +673,30 @@ include('../insidebar.php');
                                 </form> ";
                         }
 
-                        if ($status_value !== 0 && $_SESSION['user']['role'] != "10") {
+                        if ($status_value !== 0 && $_SESSION['user']['role'] != "10" && $can_edit) {
                             $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-outline-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
                         }
 
                                                 echo $status_cell;
                                                 echo "<td>
                                                                 <div class='action-btns'>
-                                                                        <a href='javascript:void(0)' class='action-btn edit editOperationBtn' 
-                                                                             data-id='" . $row['id'] . "'
-                                                                             data-equipment='" . $row['equipment'] . "'
-                                                                             data-equipment-type='" . $row['equipment_type'] . "'
-                                                                             data-equipment-category='" . $row['equipment_category'] . "'
-                                                                             data-mine='" . $row['mine_id'] . "'
-                                                                             data-contract='" . $row['contract_id'] . "'
-                                                                             data-supplier='" . $row['supplier_id'] . "'
-                                                                             data-start='" . $row['start'] . "'
-                                                                             data-end='" . $row['end'] . "'
-                                                                             data-total-hours='" . $row['total_equipment_hours'] . "'
-                                                                             data-shift-hours='" . $row['shift_hours'] . "'
-                                                                             data-status='" . $row['status'] . "'
-                                                                             title='تعديل'><i class='fa fa-edit'></i></a>
-                                                                        <a href='#' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد؟\")' title='حذف'>
-                                                                                <i class='fa fa-trash'></i>
-                                                                        </a>
+                                                            " . ($can_edit ? "<a href='javascript:void(0)' class='action-btn edit editOperationBtn' 
+                                                                 data-id='" . $row['id'] . "'
+                                                                 data-equipment='" . $row['equipment'] . "'
+                                                                 data-equipment-type='" . $row['equipment_type'] . "'
+                                                                 data-equipment-category='" . $row['equipment_category'] . "'
+                                                                 data-mine='" . $row['mine_id'] . "'
+                                                                 data-contract='" . $row['contract_id'] . "'
+                                                                 data-supplier='" . $row['supplier_id'] . "'
+                                                                 data-start='" . $row['start'] . "'
+                                                                 data-end='" . $row['end'] . "'
+                                                                 data-total-hours='" . $row['total_equipment_hours'] . "'
+                                                                 data-shift-hours='" . $row['shift_hours'] . "'
+                                                                 data-status='" . $row['status'] . "'
+                                                                 title='تعديل'><i class='fa fa-edit'></i></a>" : "") . "
+                                                            " . ($can_delete ? "<a href='oprators.php?project_id=" . $selected_project_id . "&delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف التشغيل؟\")' title='حذف'>
+                                                                <i class='fa fa-trash'></i>
+                                                            </a>" : "") . "
                                                                 </div>
                                                                 " . $action_buttons . "
                                                             </td>";

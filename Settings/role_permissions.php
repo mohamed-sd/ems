@@ -1,9 +1,4 @@
 <?php
-/**
- * إدارة صلاحيات الأدوار - Role Permissions Management
- * ⭐ شاشة تحديد الصلاحيات لكل دور على كل صفحة
- */
-
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../index.php");
@@ -526,6 +521,11 @@ include('../insidebar.php');
     <!-- الرأس -->
     <div class="header-title">
         <i class="fas fa-lock-open"></i> إدارة صلاحيات الأدوار
+     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="settings.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+        </div>
     </div>
 
     <!-- الرسائل -->

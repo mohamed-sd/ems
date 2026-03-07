@@ -1,11 +1,21 @@
 <?php
 session_start();
-require '../config.php';
-
 if (!isset($_SESSION['user'])) {
     header("Location: ../index.php");
-    exit;
+    exit();
 }
+
+include '../config.php';
+include '../includes/permissions_helper.php';
+
+$perms = get_page_permissions($conn );
+
+// منع الدخول إذا لم يكن لديه صلاحية عرض
+if (!$perms['can_view']) {
+    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا توجد صلاحية للوصول لهذه الصفحة'));
+    exit();
+}
+
 
 $page_title = "إيكوبيشن | أنواع الآليات";
 include("../inheader.php");
@@ -97,9 +107,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
+            <?php if ($perms['can_add']): ?>
             <button id="toggleForm" class="add">
                 <i class="fa-solid fa-plus-circle"></i> إضافة نوع جديد
             </button>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -204,14 +216,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <td class="text-center">
 
                                     <div class="action-btns">
+                                        <?php if ($perms['can_edit']): ?>
                                         <a href="equipments_types.php?edit_id=<?= $row['id']; ?>" class="action-btn edit"
                                             title="تعديل">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </a>
-
+                                        <?php endif; ?>
+                                        <?php if ($perms['can_delete']): ?>
                                         <button type="button" class="action-btn delete delete-disabled" title="حذف">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
+                                        <?php endif; ?>
                                     </div>
 
                                 </td>

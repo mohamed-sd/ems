@@ -14,7 +14,7 @@ $selected_role_id = isset($_GET['role_id']) ? (int)$_GET['role_id'] : null;
 $editData = null;
 if (isset($_GET['edit_id'])) {
     $id = (int) $_GET['edit_id'];
-    $stmt = $conn->prepare("SELECT `id`, `name`, `code`, `owner_role_id` FROM `modules` WHERE id = ?");
+    $stmt = $conn->prepare("SELECT `id`, `name`, `code`, `owner_role_id`, `is_link` FROM `modules` WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $editData = $stmt->get_result()->fetch_assoc();
@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $code = trim($_POST['code'] ?? '');
     $owner_role_id = !empty($_POST['owner_role_id']) ? (int)$_POST['owner_role_id'] : null;
+    $is_link = isset($_POST['is_link']) && $_POST['is_link'] == '1' ? 1 : 0;
 
     // التحقق من صحة البيانات
     if (empty($name) || empty($code)) {
@@ -34,22 +35,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // تعديل
             $id = (int) $_POST['edit_id'];
             $stmt = $conn->prepare(
-                "UPDATE `modules` SET `name` = ?, `code` = ?, `owner_role_id` = ? WHERE `id` = ?"
+                "UPDATE `modules` SET `name` = ?, `code` = ?, `owner_role_id` = ?, `is_link` = ? WHERE `id` = ?"
             );
-            $stmt->bind_param("ssii", $name, $code, $owner_role_id, $id);
+            $stmt->bind_param("sssii", $name, $code, $owner_role_id, $is_link, $id);
         } else {
-            // إضافة
-            $stmt = $conn->prepare(
-                "INSERT INTO `modules` (`name`, `code`, `owner_role_id`) VALUES (?, ?, ?)"
+            // التحقق من عدم تكرار نفس الصفحة لنفس الدور
+            $check_stmt = $conn->prepare(
+                "SELECT id FROM `modules` WHERE `code` = ? AND `owner_role_id` <=> ? LIMIT 1"
             );
-            $stmt->bind_param("ssi", $name, $code, $owner_role_id);
+            $check_stmt->bind_param("si", $code, $owner_role_id);
+            $check_stmt->execute();
+            $check_stmt->store_result();
+            if ($check_stmt->num_rows > 0) {
+                $error_msg = 'هذه الصفحة مضافة مسبقاً لنفس الدور المسؤول ❌';
+            } else {
+                // إضافة
+                $stmt = $conn->prepare(
+                    "INSERT INTO `modules` (`name`, `code`, `owner_role_id`, `is_link`) VALUES (?, ?, ?, ?)"
+                );
+                $stmt->bind_param("sssi", $name, $code, $owner_role_id, $is_link);
+            }
         }
 
-        if ($stmt->execute()) {
-            header("Location: modules.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✅");
-            exit;
-        } else {
-            $error_msg = 'حدث خطأ: ' . htmlspecialchars($stmt->error) . ' ❌';
+        if (!isset($error_msg)) {
+            if ($stmt->execute()) {
+                header("Location: modules.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✅");
+                exit;
+            } else {
+                $error_msg = 'حدث خطأ: ' . htmlspecialchars($stmt->error) . ' ❌';
+            }
         }
     }
 }
@@ -153,6 +167,14 @@ include('../insidebar.php');
                         </select>
                     </div>
 
+                    <!-- رابط -->
+                    <div style="display: flex; align-items: center;">
+                        <input type="checkbox" name="is_link" id="is_link" value="1" />
+                        <label for="is_link" style="margin: 0; margin-right: 8px; cursor: pointer;">
+                            <i class="fas fa-link"></i> رابط
+                        </label>
+                    </div>
+
                     <button type="submit" style="grid-column: 1 / -1; justify-self: center;">
                         <i class="fas fa-save"></i> حفظ الصفحة
                     </button>
@@ -163,8 +185,22 @@ include('../insidebar.php');
 
     <!-- جدول الصفحات -->
     <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-list"></i> جميع الصفحات والموديولات</h5>
+        <div class="card-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <h5 style="margin:0;"><i class="fas fa-list"></i> جميع الصفحات والموديولات</h5>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <label style="font-weight:700; margin:0;"><i class="fas fa-user-tie"></i> فلترة حسب الدور:</label>
+                <select id="roleFilterSelect" style="padding:7px 14px; border:1.5px solid var(--border); border-radius:var(--radius); font-family:'Cairo',sans-serif; font-size:.88rem; min-width:180px;">
+                    <option value="">-- جميع الأدوار --</option>
+                    <?php foreach ($roles as $role): ?>
+                        <option value="<?= htmlspecialchars($role['name'], ENT_QUOTES, 'UTF-8'); ?>">
+                            <?= htmlspecialchars($role['name'], ENT_QUOTES, 'UTF-8'); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <button id="clearRoleFilter" class="back-btn" style="display:none;" title="مسح الفلتر">
+                    <i class="fas fa-times"></i> مسح
+                </button>
+            </div>
         </div>
         <div class="card-body">
             <div class="table-container">
@@ -175,12 +211,13 @@ include('../insidebar.php');
                             <th><i class="fas fa-book"></i> اسم الصفحة</th>
                             <th width="150"><i class="fas fa-code"></i> الكود</th>
                             <th><i class="fas fa-user-tie"></i> الدور المسؤول</th>
+                            <th width="80"><i class="fas fa-link"></i> رابط</th>
                             <th width="150"><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-
+                        $where = '';
                         if (isset($_GET['edit_id'])) {
                                 $where = "WHERE m.id = " . (int)$_GET['edit_id'];
                         }
@@ -191,15 +228,16 @@ include('../insidebar.php');
                                 m.`name`, 
                                 m.`code`, 
                                 m.`owner_role_id`,
+                                m.`is_link`,
                                 r.`name` AS role_name
                             FROM `modules` m
-                            $where
                             LEFT JOIN `roles` r ON m.`owner_role_id` = r.`id`
+                            $where
                             ORDER BY m.`name`
                         ");
                         
                         if (!$result) {
-                            echo '<tr><td colspan="5" class="text-center text-danger">خطأ في جلب البيانات: ' . htmlspecialchars($conn->error) . '</td></tr>';
+                            echo '<tr><td colspan="6" class="text-center text-danger">خطأ في جلب البيانات: ' . htmlspecialchars($conn->error) . '</td></tr>';
                         } else {
                             $i = 1;
                             while ($row = $result->fetch_assoc()):
@@ -214,14 +252,26 @@ include('../insidebar.php');
                                             <?= htmlspecialchars($row['code'], ENT_QUOTES, 'UTF-8'); ?>
                                         </code>
                                     </td>
-                                    <td>
-                                        <a href="modules.php?role_id=<?= $row['owner_role_id']; ?>" 
+                                    <td data-search="<?= htmlspecialchars($row['role_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                                        <a href="role_permissions.php?role_id=<?= $row['owner_role_id']; ?>" 
                                            style="color: var(--blue); text-decoration: none; font-weight: 600; transition: all var(--ease);"
                                            onmouseover="this.style.color='var(--navy)'; this.style.textDecoration='underline';"
-                                           onmouseout="this.style.color='var(--blue)'; this.style.textDecoration='none';">
-                                            <i class="fas fa-link"></i> 
+                                           onmouseout="this.style.color='var(--blue)'; this.style.textDecoration='none';"
+                                           title="الانتقال إلى صلاحيات هذا الدور">
+                                            <i class="fas fa-user-shield"></i> 
                                             <?= htmlspecialchars($row['role_name'], ENT_QUOTES, 'UTF-8'); ?>
                                         </a>
+                                    </td>
+                                    <td class="text-center">
+                                        <?php if ($row['is_link'] == 1): ?>
+                                            <span style="display: inline-block; background: var(--green-soft); color: var(--green); padding: 4px 8px; border-radius: 4px; font-weight: 600;">
+                                                <i class="fas fa-check-circle"></i> نعم
+                                            </span>
+                                        <?php else: ?>
+                                            <span style="display: inline-block; background: var(--gray-soft); color: var(--gray); padding: 4px 8px; border-radius: 4px; font-weight: 600;">
+                                                <i class="fas fa-times-circle"></i> لا
+                                            </span>
+                                        <?php endif; ?>
                                     </td>
                                     <td class="text-center">
                                         <a href="javascript:void(0);" 
@@ -254,55 +304,77 @@ include('../insidebar.php');
 
 
 <script>
+$(document).ready(function () {
     // تهيئة DataTable
-    $('#modulesTable').DataTable({
+    var modulesTable = $('#modulesTable').DataTable({
         responsive: true,
         language: {
             url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
         },
         columnDefs: [
-            { "orderable": false, "targets": [4] }
+            { "orderable": false, "targets": [5] }
         ]
     });
 
-    $(document).ready(function () {
-        // إظهار/إخفاء النموذج
-        $('#toggleForm').on('click', function () {
-            $('#moduleForm').slideToggle(300);
-            $('html, body').animate({
-                scrollTop: $('#moduleForm').offset().top - 100
-            }, 500);
-        });
-
-        // تنظيف عند الإغلاق
-        <?php if ($selected_role_id): ?>
-            document.getElementById('moduleForm').style.display = 'block';
-            $('html, body').animate({
-                scrollTop: $('#moduleForm').offset().top - 100
-            }, 500);
-        <?php endif; ?>
+    // فلترة حسب الدور المسؤول (العمود index 3)
+    $('#roleFilterSelect').on('change', function () {
+        var val = $.trim($(this).val());
+        // بحث نصي عادي بدون regex لضمان عمله مع النص العربي
+        modulesTable.column(3).search(val, false, false).draw();
+        $('#clearRoleFilter').toggle(val !== '');
     });
 
-    // دالة تعديل البيانات
-    function editModule(data) {
-        document.getElementById('moduleForm').style.display = 'block';
-        document.getElementById('edit_id').value = data.id;
-        document.getElementById('name').value = data.name;
-        document.getElementById('code').value = data.code;
-        document.getElementById('owner_role_id').value = data.owner_role_id || '';
-        
-        // Scroll to form
+    $('#clearRoleFilter').on('click', function () {
+        $('#roleFilterSelect').val('');
+        modulesTable.column(3).search('', false, false).draw();
+        $(this).hide();
+    });
+
+    // إظهار/إخفاء النموذج
+    $('#toggleForm').on('click', function () {
+        $('#moduleForm').slideToggle(300);
         $('html, body').animate({
             scrollTop: $('#moduleForm').offset().top - 100
         }, 500);
-    }
+    });
 
-    // دالة تأكيد الحذف
-    function confirmDelete(id, name) {
-        if (confirm(`هل أنت متأكد من رغبتك في حذف الصفحة "${name}"؟`)) {
-            window.location.href = 'modules.php?delete_id=' + id;
+    // إذا كان هناك role_id محدد في URL، فعّل الفلتر تلقائياً بعد جاهزية DataTable
+    <?php if ($selected_role_id):
+        $selected_role_name = '';
+        foreach ($roles as $r) {
+            if ($r['id'] == $selected_role_id) { $selected_role_name = $r['name']; break; }
         }
+    ?>
+    var autoRoleName = <?= json_encode($selected_role_name); ?>;
+    if (autoRoleName) {
+        $('#roleFilterSelect').val(autoRoleName).trigger('change');
     }
+    <?php endif; ?>
+
+    // إظهار النموذج تلقائياً عند الانتقال ب role_id
+    <?php if ($selected_role_id): ?>
+    document.getElementById('moduleForm').style.display = 'block';
+    $('html, body').animate({ scrollTop: $('#moduleForm').offset().top - 100 }, 500);
+    <?php endif; ?>
+});
+
+// دالة تعديل البيانات
+function editModule(data) {
+    document.getElementById('moduleForm').style.display = 'block';
+    document.getElementById('edit_id').value = data.id;
+    document.getElementById('name').value = data.name;
+    document.getElementById('code').value = data.code;
+    document.getElementById('owner_role_id').value = data.owner_role_id || '';
+    document.getElementById('is_link').checked = data.is_link == 1;
+    $('html, body').animate({ scrollTop: $('#moduleForm').offset().top - 100 }, 500);
+}
+
+// دالة تأكيد الحذف
+function confirmDelete(id, name) {
+    if (confirm(`هل أنت متأكد من رغبتك في حذف الصفحة "${name}"؟`)) {
+        window.location.href = 'modules.php?delete_id=' + id;
+    }
+}
 </script>
 
 </body>

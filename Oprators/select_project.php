@@ -7,7 +7,7 @@ if (!isset($_SESSION['user'])) {
 $page_title = "إيكوبيشن | اختيار المشروع للتشغيل";
 include("../inheader.php");
 include("../insidebar.php");
-include '../config.php';
+
 ?>
 
 <style>
@@ -232,6 +232,7 @@ include '../config.php';
     
     <div class="projects-grid">
         <?php
+        
         // جلب جميع المشاريع النشطة مع إحصائيات
         $query = "SELECT 
                     p.id,

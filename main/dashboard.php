@@ -7,15 +7,22 @@ require_once dirname(__FILE__) . '/../includes/dynamic_nav.php';
 /* ══════════════════════════════
    DATA LAYER
 ══════════════════════════════ */
-$roles = [
-  "0"=>"مدير النظام","1"=>"مدير المشاريع","2"=>"مدير الموردين",
-  "3"=>"مدير المشغلين","4"=>"مدير الأسطول","5"=>"مدير موقع",
-  "6"=>"مدخل ساعات","7"=>"مراجع مورد","8"=>"مراجع مشغل",
-  "9"=>"مراجع الأعطال","10"=>"مدير حركة وتشغيل",
-];
 $role     = $_SESSION['user']['role'];
 $userName = $_SESSION['user']['name'];
-$roleText = $roles[$role] ?? "غير معروف";
+$roleText = "غير معروف";
+
+// جلب اسم الدور من جدول roles بدلاً من المصفوفة الثابتة
+$roleId = intval($role);
+$roleStmt = $conn->prepare("SELECT name FROM roles WHERE id = ? LIMIT 1");
+if ($roleStmt) {
+  $roleStmt->bind_param("i", $roleId);
+  $roleStmt->execute();
+  $roleResult = $roleStmt->get_result();
+  if ($roleResult && $roleRow = $roleResult->fetch_assoc()) {
+    $roleText = $roleRow['name'];
+  }
+  $roleStmt->close();
+}
 
 /* جلب اسم المشروع للمستخدم */
 $userId = $_SESSION['user']['id'];
@@ -33,7 +40,7 @@ $dynamicLinks = getDynamicNavLinks($conn, $role);
 $links = [];
 foreach ($dynamicLinks as $link) {
   // Format: [href, icon, label]
-  $links[] = ['../' . $link['code'], 'fa-link', $link['name']];
+  $links[] = ['../' . $link['code'], 'fas fa-bolt', $link['name']];
 }
 
 /* Stat cards — [icon, raw_value, label, accent] */
@@ -461,7 +468,7 @@ a{text-decoration:none;color:inherit}
         </div>
         <?php endif; ?>
         <div class="banner-name"><span id="typed"></span><span class="cursor"></span></div>
-        <div class="banner-sub">نتمنى لك يوماً مليئاً بالإنجازات 🚀</div>
+        <div class="banner-sub">نتمنى لك يوماً مليئاً بالإنجازات 🚀 <?php echo $_SESSION['user']['role'] ?></div>
       </div>
       <div class="banner-emoji">🏆</div>
     </div>

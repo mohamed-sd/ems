@@ -5,12 +5,20 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-// التحقق من الصلاحية
-if ($_SESSION['user']['role'] != "1" && $_SESSION['user']['role'] != "-1") {
-    die("غير مصرح لك بالدخول لهذه الصفحة");
-}
-
 include '../config.php';
+require_once '../includes/permissions_helper.php';
+
+// 🔐 التحقق من صلاحيات المستخدم
+$page_permissions = check_page_permissions($conn, 'Projects/project_mines.php');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
+
+if (!$can_view) {
+    header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+المناجم+❌");
+    exit();
+}
 
 // الحصول على معرف المشروع من URL
 $project_id = isset($_GET['project_id']) ? intval($_GET['project_id']) : 0;
@@ -32,6 +40,15 @@ if (!$project) {
 // معالجة إضافة/تعديل منجم عبر POST (بدون AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
     $mine_id = isset($_POST['mine_id']) ? intval($_POST['mine_id']) : 0;
+
+    if ($mine_id > 0 && !$can_edit) {
+        header("Location: project_mines.php?project_id=$project_id&msg=لا+توجد+صلاحية+تعديل+المناجم+❌");
+        exit();
+    } elseif ($mine_id <= 0 && !$can_add) {
+        header("Location: project_mines.php?project_id=$project_id&msg=لا+توجد+صلاحية+إضافة+مناجم+جديدة+❌");
+        exit();
+    }
+
     $mine_code = mysqli_real_escape_string($conn, trim($_POST['mine_code']));
     $mine_name = mysqli_real_escape_string($conn, trim($_POST['mine_name']));
     $manager_name = mysqli_real_escape_string($conn, trim($_POST['manager_name']));
@@ -119,6 +136,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
 
 // حذف منجم
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    if (!$can_delete) {
+        header("Location: project_mines.php?project_id=$project_id&msg=لا+توجد+صلاحية+حذف+المناجم+❌");
+        exit();
+    }
+
     $mine_id = intval($_GET['delete']);
     $delete_query = "DELETE FROM mines WHERE id = $mine_id AND project_id = $project_id";
 
@@ -348,9 +370,11 @@ include '../inheader.php';
             <a href="oprationprojects.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
+            <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة منجم جديد
             </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -364,6 +388,7 @@ include '../inheader.php';
     <?php endif; ?>
 
     <!-- فورم إضافة / تعديل منجم -->
+    <?php if ($can_add || $can_edit): ?>
     <form id="mineForm" action="" method="post" style="display:none; margin-bottom:20px;">
         <div class="card shadow-sm">
             <div class="card-header">
@@ -467,6 +492,7 @@ include '../inheader.php';
             </div>
         </div>
     </form>
+    <?php endif; ?>
             <div class="card-header">
                 <h5><i class="fas fa-list-alt"></i> قائمة المناجم</h5>
             </div>
@@ -533,14 +559,21 @@ include '../inheader.php';
                             <div class='action-btns'>
                                 <a href='javascript:void(0)' class='action-btn view' onclick='openViewModal(" . json_encode($mine) . ")' title='عرض'>
                                     <i class='fas fa-eye'></i>
-                                </a>
-                                <a href='javascript:void(0)' class='action-btn edit' onclick='editMine(" . json_encode($mine) . ")' title='تعديل'>
+                                </a>";
+
+                    if ($can_edit) {
+                        echo "<a href='javascript:void(0)' class='action-btn edit' onclick='editMine(" . json_encode($mine) . ")' title='تعديل'>
                                     <i class='fas fa-edit'></i>
-                                </a>
-                                <a href='javascript:void(0)' class='action-btn delete' onclick='deleteMine({$mine['id']})' title='حذف'>
+                                </a>";
+                    }
+
+                    if ($can_delete) {
+                        echo "<a href='javascript:void(0)' class='action-btn delete' onclick='deleteMine({$mine['id']})' title='حذف'>
                                     <i class='fas fa-trash-alt'></i>
-                                </a>
-                            </div>
+                                </a>";
+                    }
+
+                    echo "</div>
                           </td>";
                     echo "</tr>";
                     $counter++;
@@ -630,9 +663,11 @@ include '../inheader.php';
             <a id="view_contracts_btn" class="action-btn contracts" style="text-decoration: none;">
                 <i class="fas fa-file-contract"></i> عقودات المنجم
             </a>
+            <?php if ($can_edit): ?>
             <button type="button" class="action-btn edit" onclick="openEditFromView()">
                 <i class="fas fa-edit"></i> تعديل المنجم
             </button>
+            <?php endif; ?>
             <button type="button" class="action-btn delete" onclick="closeViewModal()">
                 <i class="fas fa-times"></i> إغلاق
             </button>
@@ -799,6 +834,12 @@ include '../inheader.php';
 
     // Edit Mine - Load data and show form
     function editMine(mine) {
+        const canEdit = <?php echo $can_edit ? 'true' : 'false'; ?>;
+        if (!canEdit) {
+            alert('لا توجد صلاحية تعديل المناجم');
+            return;
+        }
+
         $('#mine_id').val(mine.id);
         $('#mine_code').val(mine.mine_code);
         $('#mine_name').val(mine.mine_name);
@@ -866,6 +907,12 @@ include '../inheader.php';
 
     // Delete Mine
     function deleteMine(id) {
+        const canDelete = <?php echo $can_delete ? 'true' : 'false'; ?>;
+        if (!canDelete) {
+            alert('لا توجد صلاحية حذف المناجم');
+            return;
+        }
+
         if (confirm('هل أنت متأكد من حذف هذا المنجم؟')) {
             window.location.href = 'project_mines.php?project_id=<?php echo $project_id; ?>&delete=' + id;
         }

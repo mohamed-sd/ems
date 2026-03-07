@@ -4,6 +4,21 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../index.php");
     exit();
 }
+
+require_once '../config.php';
+require_once '../includes/permissions_helper.php';
+
+// 🔐 التحقق من صلاحيات المستخدم
+$page_permissions = check_page_permissions($conn, 'Contracts/contracts_details.php');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
+
+if (!$can_view) {
+    header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+تفاصيل+العقد+❌");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -916,6 +931,7 @@ if (!isset($_SESSION['user'])) {
         </div>
 
         <!-- ===== ACTIONS SECTION ===== -->
+        <?php if ($can_add): ?>
         <div class="actions-section">
             <div class="actions-header">
                 <div class="actions-header-icon">
@@ -947,9 +963,9 @@ if (!isset($_SESSION['user'])) {
                 </button>
             </div>
         </div>
+        <?php endif; ?>
 
         <?php
-        include '../config.php';
 
         $equipmentTypeMap = [];
         $equipmentTypesQuery = "SELECT id, type FROM equipments_types ORDER BY type ASC";
@@ -1107,9 +1123,11 @@ if (!isset($_SESSION['user'])) {
                                 <div class="detail-card-icon primary"><i class="fas fa-mountain"></i></div>
                                 <span class="detail-card-title">معلومات المنجم</span>
                             </div>
+                            <?php if ($can_edit): ?>
                             <button class="edit-btn-small" id="editProjectInfoBtn">
                                 <i class="fas fa-pen"></i> تعديل
                             </button>
+                            <?php endif; ?>
                         </div>
                         <div class="detail-card-body">
                             <div class="detail-row">
@@ -1138,9 +1156,11 @@ if (!isset($_SESSION['user'])) {
                                 <div class="detail-card-icon success"><i class="fas fa-concierge-bell"></i></div>
                                 <span class="detail-card-title">الخدمات المقدمة</span>
                             </div>
+                            <?php if ($can_edit): ?>
                             <button class="edit-btn-small" id="editServicesBtn">
                                 <i class="fas fa-pen"></i> تعديل
                             </button>
+                            <?php endif; ?>
                         </div>
                         <div class="detail-card-body">
                             <div class="detail-row">
@@ -1169,9 +1189,11 @@ if (!isset($_SESSION['user'])) {
                                 <div class="detail-card-icon info"><i class="fas fa-users"></i></div>
                                 <span class="detail-card-title">أطراف العقد</span>
                             </div>
+                            <?php if ($can_edit): ?>
                             <button class="edit-btn-small" id="editPartiesBtn">
                                 <i class="fas fa-pen"></i> تعديل
                             </button>
+                            <?php endif; ?>
                         </div>
                         <div class="detail-card-body">
                             <div class="detail-row">
@@ -1200,9 +1222,11 @@ if (!isset($_SESSION['user'])) {
                                 <div class="detail-card-icon warning"><i class="fas fa-money-bill-wave"></i></div>
                                 <span class="detail-card-title">البيانات المالية</span>
                             </div>
+                            <?php if ($can_edit): ?>
                             <button class="edit-btn-small" id="editPaymentBtn">
                                 <i class="fas fa-pen"></i> تعديل
                             </button>
+                            <?php endif; ?>
                         </div>
                         <div class="detail-card-body">
                             <div class="detail-row">
@@ -2127,9 +2151,16 @@ if (!isset($_SESSION['user'])) {
         const contractId = <?php echo $contract_id; ?>;
         const contractStatus = <?php echo isset($contractStatusValue) ? $contractStatusValue : 1; ?>;
         const actualEndDate = '<?php echo isset($actual_end_date) ? $actual_end_date : ''; ?>';
+        const canAddActions = <?php echo $can_add ? 'true' : 'false'; ?>;
+        const canEditDetails = <?php echo $can_edit ? 'true' : 'false'; ?>;
 
         // دالة عامة للإجراءات
         function performAction(action, data = {}) {
+            if (!canAddActions) {
+                alert('لا توجد صلاحية تنفيذ إجراءات العقد');
+                return;
+            }
+
             $.ajax({
                 url: 'contract_actions_handler.php',
                 type: 'POST',
@@ -2417,22 +2448,39 @@ if (!isset($_SESSION['user'])) {
 
         // أزرار التعديل
         $('#editProjectInfoBtn').click(function () {
+            if (!canEditDetails) {
+                alert('لا توجد صلاحية تعديل بيانات العقد');
+                return;
+            }
             const modal = new bootstrap.Modal(document.getElementById('editProjectInfoModal'));
             modal.show();
         });
 
         $('#editServicesBtn').click(function () {
+            if (!canEditDetails) {
+                alert('لا توجد صلاحية تعديل بيانات العقد');
+                return;
+            }
             const modal = new bootstrap.Modal(document.getElementById('editServicesModal'));
             modal.show();
         });
 
         $('#editPartiesBtn').click(function () {
+            if (!canEditDetails) {
+                alert('لا توجد صلاحية تعديل بيانات العقد');
+                return;
+            }
             const modal = new bootstrap.Modal(document.getElementById('editPartiesModal'));
             modal.show();
         });
 
         // حفظ معلومات المشروع
         $('#saveProjectInfo').click(function () {
+            if (!canEditDetails) {
+                alert('لا توجد صلاحية تعديل بيانات العقد');
+                return;
+            }
+
             const gracePeriod = $('#editGracePeriod').val();
             const dailyOperators = $('#editDailyOperators').val();
 
@@ -2465,6 +2513,11 @@ if (!isset($_SESSION['user'])) {
 
         // حفظ الخدمات
         $('#saveServices').click(function () {
+            if (!canEditDetails) {
+                alert('لا توجد صلاحية تعديل بيانات العقد');
+                return;
+            }
+
             const transportation = $('#editTransportation').val();
             const accommodation = $('#editAccommodation').val();
             const placeLiving = $('#editPlaceLiving').val();
@@ -2503,6 +2556,11 @@ if (!isset($_SESSION['user'])) {
 
         // حفظ أطراف العقد
         $('#saveParties').click(function () {
+            if (!canEditDetails) {
+                alert('لا توجد صلاحية تعديل بيانات العقد');
+                return;
+            }
+
             const firstParty = $('#editFirstParty').val();
             const secondParty = $('#editSecondParty').val();
             const witnessOne = $('#editWitnessOne').val();
@@ -2541,12 +2599,21 @@ if (!isset($_SESSION['user'])) {
 
         // فتح modal البيانات المالية
         $('#editPaymentBtn').click(function () {
+            if (!canEditDetails) {
+                alert('لا توجد صلاحية تعديل بيانات العقد');
+                return;
+            }
             const modal = new bootstrap.Modal(document.getElementById('editPaymentModal'));
             modal.show();
         });
 
         // حفظ البيانات المالية
         $('#savePayment').click(function () {
+            if (!canEditDetails) {
+                alert('لا توجد صلاحية تعديل بيانات العقد');
+                return;
+            }
+
             const currency = $('#editCurrency').val();
             const paidAmount = $('#editPaidAmount').val();
             const paymentTime = $('#editPaymentTime').val();

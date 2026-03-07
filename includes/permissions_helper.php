@@ -4,7 +4,7 @@
  * استخدم هذه الدوال في صفحاتك للتحقق من صلاحيات المستخدم
  * 
  * @package EMS
- * @version 1.0
+ * @version 1.1
  */
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -498,4 +498,118 @@ function enforce_module_permission_json($conn, $module_code, $permission = 'view
     }
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// 🌐 الحصول على صلاحيات الصفحة عن طريق رابط URL  ← جديد v1.1
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * دالة مساعدة داخلية - إرجاع الصلاحيات الكاملة الافتراضية
+ * تُستخدم للتوافقية مع الصفحات غير المسجلة في قاعدة البيانات
+ * 
+ * @internal لا تُستخدم مباشرة من خارج هذا الملف
+ * @return array
+ */
+function _default_full_permissions() {
+    return [
+        'id'         => null,
+        'can_view'   => true,
+        'can_add'    => true,
+        'can_edit'   => true,
+        'can_delete' => true
+    ];
+}
+
+/**
+ * الحصول على صلاحيات صفحة معينة بناءً على رابطها (URL)
+ * 
+ * ✅ دالة جديدة - لا تؤثر على أي كود قديم
+ * ✅ تعيد نفس بنية المصفوفة المستخدمة في باقي الدوال
+ * ✅ إذا لم توجد الصفحة في قاعدة البيانات تُرجع كل الصلاحيات للتوافقية
+ * 
+ * @param mysqli      $conn - اتصال قاعدة البيانات
+ * @param string|null $url  - رابط الصفحة كاملاً أو جزء منه
+ *                            إذا كان null يستخدم REQUEST_URI الحالي تلقائياً
+ * @return array - ['id', 'can_view', 'can_add', 'can_edit', 'can_delete']
+ * 
+ * @example
+ * // ✅ تمرير رابط محدد
+ * $perms = get_page_permissions($conn, '/ems/suppliers/index.php');
+ *
+ * // ✅ رابط مع query string - يتجاهلها تلقائياً
+ * $perms = get_page_permissions($conn, '/ems/suppliers/index.php?id=5&action=edit');
+ *
+ * // ✅ استخدام الرابط الحالي تلقائياً (بدون تمرير أي شيء)
+ * $perms = get_page_permissions($conn);
+ *
+ * // التحقق من الصلاحيات
+ * if (!$perms['can_view'])   die("❌ لا توجد صلاحية عرض");
+ * if ($perms['can_add'])     { /* عرض زر الإضافة *\/ }
+ * if ($perms['can_edit'])    { /* عرض زر التعديل *\/ }
+ * if ($perms['can_delete'])  { /* عرض زر الحذف   *\/ }
+ */
+function get_page_permissions($conn, $url = null) {
+    // إذا لم يُمرَّر رابط، استخدم الرابط الحالي
+    if ($url === null) {
+        $url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+    }
+
+    if (empty($url)) {
+        return _default_full_permissions();
+    }
+
+    // تنظيف الرابط - إزالة query string و fragment
+    $parsed = parse_url($url);
+    $path   = isset($parsed['path']) ? $parsed['path'] : $url;
+
+    // تطبيع الفواصل
+    $normalized = str_replace('\\', '/', $path);
+
+    // استخراج الجزء بعد /ems/ إن وجد، وإلا استخدم المسار كاملاً
+    $parts         = explode('/ems/', $normalized, 2);
+    $relative_path = isset($parts[1]) ? $parts[1] : ltrim($normalized, '/');
+
+    // اسم الملف فقط بدون المسار
+    $basename = basename($relative_path);
+
+    if (empty($basename)) {
+        return _default_full_permissions();
+    }
+
+    // البحث في قاعدة البيانات بأكثر من طريقة لضمان العثور على الوحدة
+    $stmt = $conn->prepare(
+        "SELECT id FROM modules 
+         WHERE code = ?
+            OR code = ?
+            OR code LIKE ?
+            OR code LIKE ?
+         LIMIT 1"
+    );
+
+    if (!$stmt) {
+        return _default_full_permissions();
+    }
+
+    $pattern_end = '%/' . $basename;      // مطابقة نهاية المسار   مثال: %/index.php
+    $pattern_any = '%' . $basename . '%'; // مطابقة جزئية          مثال: %index.php%
+
+    $stmt->bind_param("ssss", $relative_path, $basename, $pattern_end, $pattern_any);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+
+    // إذا لم توجد الوحدة في قاعدة البيانات، إرجاع كل الصلاحيات للتوافقية
+    if (!$result) {
+        return _default_full_permissions();
+    }
+
+    $module_id = intval($result['id']);
+    $perms     = get_module_permissions($conn, $module_id);
+
+    return [
+        'id'         => $module_id,
+        'can_view'   => $perms['can_view'],
+        'can_add'    => $perms['can_add'],
+        'can_edit'   => $perms['can_edit'],
+        'can_delete' => $perms['can_delete']
+    ];
+}
 ?>

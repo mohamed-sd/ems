@@ -104,6 +104,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         exit;
     }
 }
+
+// معالجة حذف المورد
+if (isset($_GET['delete_id'])) {
+    $delete_id = intval($_GET['delete_id']);
+
+    // التحقق من صلاحية الحذف
+    if (!$can_delete) {
+        header("Location: suppliers.php?msg=لا+توجد+صلاحية+حذف+الموردين+❌");
+        exit();
+    }
+
+    // التحقق من وجود معدات أو عقود مرتبطة
+    $check_equip = mysqli_query($conn, "SELECT COUNT(*) as count FROM equipments WHERE suppliers = $delete_id");
+    $equip_count = mysqli_fetch_assoc($check_equip)['count'];
+
+    $check_contracts = mysqli_query($conn, "SELECT COUNT(*) as count FROM supplierscontracts WHERE supplier_id = $delete_id");
+    $contracts_count = mysqli_fetch_assoc($check_contracts)['count'];
+
+    if ($equip_count > 0 || $contracts_count > 0) {
+        header("Location: suppliers.php?msg=لا+يمكن+حذف+المورد+لأنه+مرتبط+بمعدات+أو+عقود+موجودة+❌");
+        exit();
+    }
+
+    $delete_query = "DELETE FROM suppliers WHERE id = $delete_id";
+    if (mysqli_query($conn, $delete_query)) {
+        header("Location: suppliers.php?msg=تم+حذف+المورد+بنجاح+✅");
+        exit();
+    } else {
+        header("Location: suppliers.php?msg=حدث+خطأ+أثناء+الحذف+❌");
+        exit();
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -378,6 +410,7 @@ include('../insidebar.php');
             <a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
+            <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="add">
                 <i class="fa fa-plus-circle"></i> إضافة مورد جديد
             </a>
@@ -385,6 +418,7 @@ include('../insidebar.php');
                 style="background:linear-gradient(135deg,#064e3b,#065f46);color:#fff;border-color:transparent;">
                 <i class="fas fa-file-excel"></i> استيراد من Excel
             </a>
+            <?php endif; ?>
             <a href="download_suppliers_template.php" class="add"
                 style="background:linear-gradient(135deg,var(--orange),#f59e0b);color:#fff;border-color:transparent;">
                 <i class="fas fa-download"></i> تحميل نموذج Excel
@@ -659,19 +693,17 @@ include('../insidebar.php');
                                      echo "<td><span class='status-inactive'><i class='fas fa-times-circle' style='margin-left:6px;'></i>معلق</span></td>";
                         }
 
-                                echo "<td>
-                                <div class='action-btns'>
-                                <a href='javascript:void(0)' 
-                                    class='viewBtn action-btn view' 
-                                    $data_attrs
-                                    title='عرض التفاصيل'><i class='fas fa-eye'></i></a>
-                                <a href='javascript:void(0)' 
-                                    class='editBtn action-btn edit' 
-                                    $data_attrs
-                                    title='تعديل'><i class='fas fa-edit'></i></a>
-                                <a href='supplierscontracts.php?id=" . $row['id'] . "' class='action-btn contracts' title='العقود'><i class='fas fa-file-contract'></i></a>
-                                </div>
-                             </td>";
+                                $action_btns = "<td><div class='action-btns'>";
+                                $action_btns .= "<a href='javascript:void(0)' class='viewBtn action-btn view' $data_attrs title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
+                                if ($can_edit) {
+                                    $action_btns .= "<a href='javascript:void(0)' class='editBtn action-btn edit' $data_attrs title='تعديل'><i class='fas fa-edit'></i></a>";
+                                }
+                                $action_btns .= "<a href='supplierscontracts.php?id=" . $row['id'] . "' class='action-btn contracts' title='العقود'><i class='fas fa-file-contract'></i></a>";
+                                if ($can_delete) {
+                                    $action_btns .= "<a href='?delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف هذا المورد؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
+                                }
+                                $action_btns .= "</div></td>";
+                                echo $action_btns;
                         echo "</tr>";
                     }
                     ?>
@@ -884,14 +916,16 @@ include('../insidebar.php');
         // اظهار/اخفاء الفورم
         const toggleSupplierFormBtn = document.getElementById('toggleForm');
         const supplierForm = document.getElementById('projectForm');
-        toggleSupplierFormBtn.addEventListener('click', function () {
-            supplierForm.style.display = supplierForm.style.display === "none" ? "block" : "none";
-            // تنظيف الحقول عند الإضافة
-            $("#supplier_id").val("");
-            $("#supplier_name").val("");
-            $("#supplier_phone").val("");
-            $("#supplier_status").val("");
-        });
+        if (toggleSupplierFormBtn && supplierForm) {
+            toggleSupplierFormBtn.addEventListener('click', function () {
+                supplierForm.style.display = supplierForm.style.display === "none" ? "block" : "none";
+                // تنظيف الحقول عند الإضافة
+                $("#supplier_id").val("");
+                $("#supplier_name").val("");
+                $("#supplier_phone").val("");
+                $("#supplier_status").val("");
+            });
+        }
 
         // عند الضغط على زر تعديل
         $(document).on("click", ".editBtn", function () {
