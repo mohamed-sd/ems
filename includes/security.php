@@ -1,82 +1,82 @@
-<?php
+﻿<?php
 /**
- * ملف الأمان المركزي - EMS Security Core
- * يحتوي على جميع الوظائف الأمنية للنظام
+ * Ù…Ù„Ù Ø§Ù„Ø£Ù…Ø§Ù† Ø§Ù„Ù…Ø±ÙƒØ²ÙŠ - EMS Security Core
+ * ÙŠØ­ØªÙˆÙŠ Ø¹Ù„Ù‰ Ø¬Ù…ÙŠØ¹ Ø§Ù„ÙˆØ¸Ø§Ø¦Ù Ø§Ù„Ø£Ù…Ù†ÙŠØ© Ù„Ù„Ù†Ø¸Ø§Ù…
  * 
  * @version 2.0
  * @date 2026-03-01
  */
 
-// منع الوصول المباشر للملف
+// Ù…Ù†Ø¹ Ø§Ù„ÙˆØµÙˆÙ„ Ø§Ù„Ù…Ø¨Ø§Ø´Ø± Ù„Ù„Ù…Ù„Ù
 if (!defined('SECURITY_INCLUDED')) {
     define('SECURITY_INCLUDED', true);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 1. إعدادات الجلسة الآمنة (Secure Session Configuration)
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// 1. Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø¬Ù„Ø³Ø© Ø§Ù„Ø¢Ù…Ù†Ø© (Secure Session Configuration)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
- * بدء جلسة آمنة مع إعدادات محسنة
+ * Ø¨Ø¯Ø¡ Ø¬Ù„Ø³Ø© Ø¢Ù…Ù†Ø© Ù…Ø¹ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ù…Ø­Ø³Ù†Ø©
  */
 function secure_session_start() {
-    // منع بدء جلسة جديدة إذا كانت موجودة
+    // Ù…Ù†Ø¹ Ø¨Ø¯Ø¡ Ø¬Ù„Ø³Ø© Ø¬Ø¯ÙŠØ¯Ø© Ø¥Ø°Ø§ ÙƒØ§Ù†Øª Ù…ÙˆØ¬ÙˆØ¯Ø©
     if (session_status() === PHP_SESSION_ACTIVE) {
         return true;
     }
     
-    // إعدادات أمان الجلسة
+    // Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø£Ù…Ø§Ù† Ø§Ù„Ø¬Ù„Ø³Ø©
     $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || 
               (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
     
-    // تكوين cookie الجلسة
+    // ØªÙƒÙˆÙŠÙ† cookie Ø§Ù„Ø¬Ù„Ø³Ø©
     $cookieParams = [
-        'lifetime' => 0,              // تنتهي عند إغلاق المتصفح
-        'path' => '/',                // متاح لكل المسارات
-        'domain' => '',               // النطاق الحالي
-        'secure' => $secure,          // HTTPS فقط إذا كان متاحاً
-        'httponly' => true,           // لا يمكن الوصول عبر JavaScript
-        'samesite' => 'Strict'        // حماية من CSRF
+        'lifetime' => 0,              // ØªÙ†ØªÙ‡ÙŠ Ø¹Ù†Ø¯ Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„Ù…ØªØµÙØ­
+        'path' => '/',                // Ù…ØªØ§Ø­ Ù„ÙƒÙ„ Ø§Ù„Ù…Ø³Ø§Ø±Ø§Øª
+        'domain' => '',               // Ø§Ù„Ù†Ø·Ø§Ù‚ Ø§Ù„Ø­Ø§Ù„ÙŠ
+        'secure' => $secure,          // HTTPS ÙÙ‚Ø· Ø¥Ø°Ø§ ÙƒØ§Ù† Ù…ØªØ§Ø­Ø§Ù‹
+        'httponly' => true,           // Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø§Ù„ÙˆØµÙˆÙ„ Ø¹Ø¨Ø± JavaScript
+        'samesite' => 'Strict'        // Ø­Ù…Ø§ÙŠØ© Ù…Ù† CSRF
     ];
     
     session_set_cookie_params($cookieParams);
     
-    // إعدادات أمان إضافية
-    ini_set('session.use_strict_mode', 1);           // رفض session IDs غير معروفة
-    ini_set('session.use_only_cookies', 1);          // استخدام cookies فقط
-    ini_set('session.cookie_httponly', 1);           // حماية من XSS
+    // Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø£Ù…Ø§Ù† Ø¥Ø¶Ø§ÙÙŠØ©
+    ini_set('session.use_strict_mode', 1);           // Ø±ÙØ¶ session IDs ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙØ©
+    ini_set('session.use_only_cookies', 1);          // Ø§Ø³ØªØ®Ø¯Ø§Ù… cookies ÙÙ‚Ø·
+    ini_set('session.cookie_httponly', 1);           // Ø­Ù…Ø§ÙŠØ© Ù…Ù† XSS
     ini_set('session.cookie_secure', $secure ? 1 : 0);
-    ini_set('session.use_trans_sid', 0);             // عدم نقل session ID في URL
+    ini_set('session.use_trans_sid', 0);             // Ø¹Ø¯Ù… Ù†Ù‚Ù„ session ID ÙÙŠ URL
     ini_set('session.cookie_samesite', 'Strict');
-    ini_set('session.sid_length', 48);               // طول أكبر لـ session ID
+    ini_set('session.sid_length', 48);               // Ø·ÙˆÙ„ Ø£ÙƒØ¨Ø± Ù„Ù€ session ID
     ini_set('session.sid_bits_per_character', 6);
     
-    // بدء الجلسة
+    // Ø¨Ø¯Ø¡ Ø§Ù„Ø¬Ù„Ø³Ø©
     session_start();
     
-    // تجديد session ID بشكل دوري للحماية من Session Fixation
+    // ØªØ¬Ø¯ÙŠØ¯ session ID Ø¨Ø´ÙƒÙ„ Ø¯ÙˆØ±ÙŠ Ù„Ù„Ø­Ù…Ø§ÙŠØ© Ù…Ù† Session Fixation
     if (!isset($_SESSION['created_at'])) {
         session_regenerate_id(true);
         $_SESSION['created_at'] = time();
-    } else if (time() - $_SESSION['created_at'] > 1800) { // كل 30 دقيقة
+    } else if (time() - $_SESSION['created_at'] > 1800) { // ÙƒÙ„ 30 Ø¯Ù‚ÙŠÙ‚Ø©
         session_regenerate_id(true);
         $_SESSION['created_at'] = time();
     }
     
-    // تحقق من انتهاء الجلسة (Session Timeout)
+    // ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø¬Ù„Ø³Ø© (Session Timeout)
     check_session_timeout();
     
-    // التحقق من IP و User Agent للحماية من Session Hijacking
+    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† IP Ùˆ User Agent Ù„Ù„Ø­Ù…Ø§ÙŠØ© Ù…Ù† Session Hijacking
     validate_session_fingerprint();
     
     return true;
 }
 
 /**
- * التحقق من انتهاء صلاحية الجلسة (Session Timeout)
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù†ØªÙ‡Ø§Ø¡ ØµÙ„Ø§Ø­ÙŠØ© Ø§Ù„Ø¬Ù„Ø³Ø© (Session Timeout)
  */
 function check_session_timeout() {
-    $timeout = 3600; // 60 دقيقة بدون نشاط
+    $timeout = 3600; // 60 Ø¯Ù‚ÙŠÙ‚Ø© Ø¨Ø¯ÙˆÙ† Ù†Ø´Ø§Ø·
     
     if (isset($_SESSION['last_activity'])) {
         $elapsed = time() - $_SESSION['last_activity'];
@@ -85,8 +85,8 @@ function check_session_timeout() {
             session_unset();
             session_destroy();
             
-            // إعادة توجيه لصفحة تسجيل الدخول
-            header("Location: /ems/index.php?timeout=1");
+            // Ø¥Ø¹Ø§Ø¯Ø© ØªÙˆØ¬ÙŠÙ‡ Ù„ØµÙØ­Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„
+            header("Location: " . get_auth_login_path() . "?timeout=1");
             exit();
         }
     }
@@ -95,7 +95,20 @@ function check_session_timeout() {
 }
 
 /**
- * التحقق من بصمة الجلسة (Session Fingerprint) للحماية من Session Hijacking
+ * ØªØ­Ø¯ÙŠØ¯ ØµÙØ­Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…Ù†Ø§Ø³Ø¨Ø© Ø¨Ø­Ø³Ø¨ Ø³ÙŠØ§Ù‚ Ø§Ù„Ø¬Ù„Ø³Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©.
+ */
+function get_auth_login_path() {
+    $requestUri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+
+    if (!empty($_SESSION['super_admin']) || strpos($requestUri, '/admin/') !== false) {
+        return '/ems/admin/login.php';
+    }
+
+    return '/ems/login.php';
+}
+
+/**
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¨ØµÙ…Ø© Ø§Ù„Ø¬Ù„Ø³Ø© (Session Fingerprint) Ù„Ù„Ø­Ù…Ø§ÙŠØ© Ù…Ù† Session Hijacking
  */
 function validate_session_fingerprint() {
     if (php_sapi_name() === 'cli') {
@@ -112,10 +125,10 @@ function validate_session_fingerprint() {
     
     if (isset($_SESSION['fingerprint'])) {
         if ($_SESSION['fingerprint'] !== $fingerprint) {
-            // محاولة اختراق - تدمير الجلسة
+            // Ù…Ø­Ø§ÙˆÙ„Ø© Ø§Ø®ØªØ±Ø§Ù‚ - ØªØ¯Ù…ÙŠØ± Ø§Ù„Ø¬Ù„Ø³Ø©
             session_unset();
             session_destroy();
-            header("Location: /ems/index.php?security=violated");
+            header("Location: " . get_auth_login_path() . "?security=violated");
             exit();
         }
     } else {
@@ -123,12 +136,12 @@ function validate_session_fingerprint() {
     }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 2. حماية CSRF (Cross-Site Request Forgery)
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// 2. Ø­Ù…Ø§ÙŠØ© CSRF (Cross-Site Request Forgery)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
- * توليد CSRF Token
+ * ØªÙˆÙ„ÙŠØ¯ CSRF Token
  */
 function generate_csrf_token() {
     if (!isset($_SESSION['csrf_token'])) {
@@ -139,7 +152,7 @@ function generate_csrf_token() {
         $_SESSION['csrf_token_time'] = time();
     }
     
-    // تجديد التوكن كل ساعة
+    // ØªØ¬Ø¯ÙŠØ¯ Ø§Ù„ØªÙˆÙƒÙ† ÙƒÙ„ Ø³Ø§Ø¹Ø©
     if (time() - $_SESSION['csrf_token_time'] > 3600) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         $_SESSION['csrf_token_time'] = time();
@@ -149,7 +162,7 @@ function generate_csrf_token() {
 }
 
 /**
- * التحقق من CSRF Token
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† CSRF Token
  */
 function verify_csrf_token($token) {
     if (!isset($_SESSION['csrf_token']) || empty($token)) {
@@ -160,7 +173,7 @@ function verify_csrf_token($token) {
 }
 
 /**
- * طباعة حقل CSRF مخفي في الفورم
+ * Ø·Ø¨Ø§Ø¹Ø© Ø­Ù‚Ù„ CSRF Ù…Ø®ÙÙŠ ÙÙŠ Ø§Ù„ÙÙˆØ±Ù…
  */
 function csrf_field() {
     $token = generate_csrf_token();
@@ -168,19 +181,19 @@ function csrf_field() {
 }
 
 /**
- * الحصول على CSRF Token كـ meta tag للـ AJAX
+ * Ø§Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ CSRF Token ÙƒÙ€ meta tag Ù„Ù„Ù€ AJAX
  */
 function csrf_meta() {
     $token = generate_csrf_token();
     return '<meta name="csrf-token" content="' . $token . '">';
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 3. حماية من XSS (Cross-Site Scripting)
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// 3. Ø­Ù…Ø§ÙŠØ© Ù…Ù† XSS (Cross-Site Scripting)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
- * تنظيف النص من أكواد HTML/JavaScript الخبيثة
+ * ØªÙ†Ø¸ÙŠÙ Ø§Ù„Ù†Øµ Ù…Ù† Ø£ÙƒÙˆØ§Ø¯ HTML/JavaScript Ø§Ù„Ø®Ø¨ÙŠØ«Ø©
  */
 function clean_output($data) {
     if (is_array($data)) {
@@ -190,53 +203,53 @@ function clean_output($data) {
 }
 
 /**
- * اختصار لـ clean_output
+ * Ø§Ø®ØªØµØ§Ø± Ù„Ù€ clean_output
  */
 function e($data) {
     return clean_output($data);
 }
 
 /**
- * تنظيف URL
+ * ØªÙ†Ø¸ÙŠÙ URL
  */
 function clean_url($url) {
     return filter_var($url, FILTER_SANITIZE_URL);
 }
 
 /**
- * تنظيف Email
+ * ØªÙ†Ø¸ÙŠÙ Email
  */
 function clean_email($email) {
     return filter_var($email, FILTER_SANITIZE_EMAIL);
 }
 
 /**
- * تنظيف النص من tags HTML (مع السماح ببعض tags الآمنة)
+ * ØªÙ†Ø¸ÙŠÙ Ø§Ù„Ù†Øµ Ù…Ù† tags HTML (Ù…Ø¹ Ø§Ù„Ø³Ù…Ø§Ø­ Ø¨Ø¨Ø¹Ø¶ tags Ø§Ù„Ø¢Ù…Ù†Ø©)
  */
 function clean_html($html, $allowed_tags = '<p><br><strong><em><u><a>') {
     return strip_tags($html, $allowed_tags);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 4. التحقق من صحة المدخلات (Input Validation)
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// 4. Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµØ­Ø© Ø§Ù„Ù…Ø¯Ø®Ù„Ø§Øª (Input Validation)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
- * التحقق من صحة البريد الإلكتروني
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµØ­Ø© Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ
  */
 function validate_email($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
 
 /**
- * التحقق من صحة رقم الهاتف (أرقام فقط والعلامة +)
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµØ­Ø© Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ (Ø£Ø±Ù‚Ø§Ù… ÙÙ‚Ø· ÙˆØ§Ù„Ø¹Ù„Ø§Ù…Ø© +)
  */
 function validate_phone($phone) {
     return preg_match('/^[\+]?[0-9]{9,15}$/', $phone);
 }
 
 /**
- * التحقق من صحة التاريخ
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµØ­Ø© Ø§Ù„ØªØ§Ø±ÙŠØ®
  */
 function validate_date($date, $format = 'Y-m-d') {
     $d = DateTime::createFromFormat($format, $date);
@@ -244,7 +257,7 @@ function validate_date($date, $format = 'Y-m-d') {
 }
 
 /**
- * التحقق من صحة الرقم الصحيح
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµØ­Ø© Ø§Ù„Ø±Ù‚Ù… Ø§Ù„ØµØ­ÙŠØ­
  */
 function validate_integer($value, $min = null, $max = null) {
     if (!is_numeric($value) || intval($value) != $value) {
@@ -265,7 +278,7 @@ function validate_integer($value, $min = null, $max = null) {
 }
 
 /**
- * التحقق من طول النص
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø·ÙˆÙ„ Ø§Ù„Ù†Øµ
  */
 function validate_length($text, $min = 0, $max = PHP_INT_MAX) {
     $length = mb_strlen($text, 'UTF-8');
@@ -273,7 +286,7 @@ function validate_length($text, $min = 0, $max = PHP_INT_MAX) {
 }
 
 /**
- * تنظيف وتحويل المدخلات الآمن
+ * ØªÙ†Ø¸ÙŠÙ ÙˆØªØ­ÙˆÙŠÙ„ Ø§Ù„Ù…Ø¯Ø®Ù„Ø§Øª Ø§Ù„Ø¢Ù…Ù†
  */
 function sanitize_input($data, $type = 'string') {
     $data = trim($data);
@@ -293,12 +306,12 @@ function sanitize_input($data, $type = 'string') {
     }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 5. حماية SQL Injection (Database Security)
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// 5. Ø­Ù…Ø§ÙŠØ© SQL Injection (Database Security)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
- * تنظيف المدخلات قبل استخدامها في SQL
+ * ØªÙ†Ø¸ÙŠÙ Ø§Ù„Ù…Ø¯Ø®Ù„Ø§Øª Ù‚Ø¨Ù„ Ø§Ø³ØªØ®Ø¯Ø§Ù…Ù‡Ø§ ÙÙŠ SQL
  */
 function db_escape($conn, $data) {
     if (is_array($data)) {
@@ -311,7 +324,7 @@ function db_escape($conn, $data) {
 }
 
 /**
- * Prepared Statement Helper - بناء وتنفيذ استعلام آمن
+ * Prepared Statement Helper - Ø¨Ù†Ø§Ø¡ ÙˆØªÙ†ÙÙŠØ° Ø§Ø³ØªØ¹Ù„Ø§Ù… Ø¢Ù…Ù†
  */
 function db_query($conn, $query, $params = [], $types = '') {
     $stmt = mysqli_prepare($conn, $query);
@@ -322,7 +335,7 @@ function db_query($conn, $query, $params = [], $types = '') {
     }
     
     if (!empty($params)) {
-        // تخمين أنواع البيانات تلقائياً إذا لم تُحدد
+        // ØªØ®Ù…ÙŠÙ† Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ Ø¥Ø°Ø§ Ù„Ù… ØªÙØ­Ø¯Ø¯
         if (empty($types)) {
             $types = str_repeat('s', count($params));
             foreach ($params as $i => $param) {
@@ -342,58 +355,58 @@ function db_query($conn, $query, $params = [], $types = '') {
     return $stmt;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // 6. Security Headers
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
- * إضافة Security Headers لكل الصفحات
+ * Ø¥Ø¶Ø§ÙØ© Security Headers Ù„ÙƒÙ„ Ø§Ù„ØµÙØ­Ø§Øª
  */
 function set_security_headers() {
     if (php_sapi_name() === 'cli' || headers_sent()) {
         return;
     }
 
-    // منع الصفحة من العرض في iframe (Clickjacking Protection)
+    // Ù…Ù†Ø¹ Ø§Ù„ØµÙØ­Ø© Ù…Ù† Ø§Ù„Ø¹Ø±Ø¶ ÙÙŠ iframe (Clickjacking Protection)
     header("X-Frame-Options: DENY");
     
-    // منع المتصفح من تخمين نوع الملف (MIME-type sniffing)
+    // Ù…Ù†Ø¹ Ø§Ù„Ù…ØªØµÙØ­ Ù…Ù† ØªØ®Ù…ÙŠÙ† Ù†ÙˆØ¹ Ø§Ù„Ù…Ù„Ù (MIME-type sniffing)
     header("X-Content-Type-Options: nosniff");
     
-    // تفعيل XSS Filter في المتصفح
+    // ØªÙØ¹ÙŠÙ„ XSS Filter ÙÙŠ Ø§Ù„Ù…ØªØµÙØ­
     header("X-XSS-Protection: 1; mode=block");
     
-    // Content Security Policy - حماية شاملة من XSS
+    // Content Security Policy - Ø­Ù…Ø§ÙŠØ© Ø´Ø§Ù…Ù„Ø© Ù…Ù† XSS
     header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com https://cdn.datatables.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.datatables.net https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self';");
     
-    // Referrer Policy - التحكم في معلومات الإحالة
+    // Referrer Policy - Ø§Ù„ØªØ­ÙƒÙ… ÙÙŠ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø¥Ø­Ø§Ù„Ø©
     header("Referrer-Policy: strict-origin-when-cross-origin");
     
-    // Permissions Policy - تقييد الميزات الخطرة
+    // Permissions Policy - ØªÙ‚ÙŠÙŠØ¯ Ø§Ù„Ù…ÙŠØ²Ø§Øª Ø§Ù„Ø®Ø·Ø±Ø©
     header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
     
-    // Strict Transport Security (HSTS) - إجبار HTTPS
+    // Strict Transport Security (HSTS) - Ø¥Ø¬Ø¨Ø§Ø± HTTPS
     if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) {
         header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
     }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 7. التحقق من الصلاحيات (Authorization)
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// 7. Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª (Authorization)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
- * التحقق من تسجيل دخول المستخدم
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØªØ³Ø¬ÙŠÙ„ Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…
  */
 function require_login() {
     if (!isset($_SESSION['user'])) {
-        header("Location: /ems/index.php");
+        header("Location: /ems/login.php");
         exit();
     }
 }
 
 /**
- * التحقق من صلاحية محددة
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ© Ù…Ø­Ø¯Ø¯Ø©
  */
 function require_role($allowed_roles) {
     require_login();
@@ -404,13 +417,13 @@ function require_role($allowed_roles) {
     
     $user_role = $_SESSION['user']['role'] ?? null;
     
-    if (!in_array($user_role, $allowed_roles) && $user_role != '-1') { // -1 = مدير النظام
+    if (!in_array($user_role, $allowed_roles) && $user_role != '-1') { // -1 = Ù…Ø¯ÙŠØ± Ø§Ù„Ù†Ø¸Ø§Ù…
         die('
             <!DOCTYPE html>
             <html lang="ar" dir="rtl">
             <head>
                 <meta charset="UTF-8">
-                <title>غير مصرح</title>
+                <title>ØºÙŠØ± Ù…ØµØ±Ø­</title>
                 <style>
                     body { font-family: Cairo, Arial; text-align: center; padding: 50px; background: #f5f5f5; }
                     .error { background: white; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -420,9 +433,9 @@ function require_role($allowed_roles) {
             </head>
             <body>
                 <div class="error">
-                    <h1>⛔ غير مصرح لك بالوصول</h1>
-                    <p>ليس لديك صلاحية للوصول إلى هذه الصفحة</p>
-                    <a href="/ems/main/dashboard.php">← العودة للصفحة الرئيسية</a>
+                    <h1>â›” ØºÙŠØ± Ù…ØµØ±Ø­ Ù„Ùƒ Ø¨Ø§Ù„ÙˆØµÙˆÙ„</h1>
+                    <p>Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ ØµÙ„Ø§Ø­ÙŠØ© Ù„Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ù‡Ø°Ù‡ Ø§Ù„ØµÙØ­Ø©</p>
+                    <a href="/ems/main/dashboard.php">â† Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</a>
                 </div>
             </body>
             </html>
@@ -431,7 +444,7 @@ function require_role($allowed_roles) {
 }
 
 /**
- * التحقق من ملكية السجل (مثلاً: هل المستخدم يملك هذا المشروع)
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ù…Ù„ÙƒÙŠØ© Ø§Ù„Ø³Ø¬Ù„ (Ù…Ø«Ù„Ø§Ù‹: Ù‡Ù„ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… ÙŠÙ…Ù„Ùƒ Ù‡Ø°Ø§ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹)
  */
 function check_ownership($resource_id, $user_field = 'project_id') {
     require_login();
@@ -439,7 +452,7 @@ function check_ownership($resource_id, $user_field = 'project_id') {
     $user_value = $_SESSION['user'][$user_field] ?? null;
     $user_role = $_SESSION['user']['role'] ?? null;
     
-    // المدير يمكنه الوصول لكل شيء
+    // Ø§Ù„Ù…Ø¯ÙŠØ± ÙŠÙ…ÙƒÙ†Ù‡ Ø§Ù„ÙˆØµÙˆÙ„ Ù„ÙƒÙ„ Ø´ÙŠØ¡
     if ($user_role == '-1') {
         return true;
     }
@@ -450,7 +463,7 @@ function check_ownership($resource_id, $user_field = 'project_id') {
             <html lang="ar" dir="rtl">
             <head>
                 <meta charset="UTF-8">
-                <title>غير مصرح</title>
+                <title>ØºÙŠØ± Ù…ØµØ±Ø­</title>
                 <style>
                     body { font-family: Cairo, Arial; text-align: center; padding: 50px; background: #f5f5f5; }
                     .error { background: white; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -460,9 +473,9 @@ function check_ownership($resource_id, $user_field = 'project_id') {
             </head>
             <body>
                 <div class="error">
-                    <h1>⛔ غير مصرح لك بالوصول</h1>
-                    <p>لا يمكنك الوصول إلى هذا المحتوى</p>
-                    <a href="/ems/main/dashboard.php">← العودة للصفحة الرئيسية</a>
+                    <h1>â›” ØºÙŠØ± Ù…ØµØ±Ø­ Ù„Ùƒ Ø¨Ø§Ù„ÙˆØµÙˆÙ„</h1>
+                    <p>Ù„Ø§ ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ù‡Ø°Ø§ Ø§Ù„Ù…Ø­ØªÙˆÙ‰</p>
+                    <a href="/ems/main/dashboard.php">â† Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</a>
                 </div>
             </body>
             </html>
@@ -472,12 +485,12 @@ function check_ownership($resource_id, $user_field = 'project_id') {
     return true;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 8. Rate Limiting (حماية من الهجمات المتكررة)
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// 8. Rate Limiting (Ø­Ù…Ø§ÙŠØ© Ù…Ù† Ø§Ù„Ù‡Ø¬Ù…Ø§Øª Ø§Ù„Ù…ØªÙƒØ±Ø±Ø©)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
- * التحقق من عدد المحاولات (Rate Limiting)
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø§Øª (Rate Limiting)
  */
 function check_rate_limit($action, $max_attempts = 10, $time_window = 60) {
     $key = 'rate_limit_' . $action . '_' . $_SERVER['REMOTE_ADDR'];
@@ -489,7 +502,7 @@ function check_rate_limit($action, $max_attempts = 10, $time_window = 60) {
         ];
     }
     
-    // إعادة تعيين العداد إذا انتهى الوقت
+    // Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† Ø§Ù„Ø¹Ø¯Ø§Ø¯ Ø¥Ø°Ø§ Ø§Ù†ØªÙ‡Ù‰ Ø§Ù„ÙˆÙ‚Øª
     if (time() - $_SESSION[$key]['start_time'] > $time_window) {
         $_SESSION[$key] = [
             'count' => 0,
@@ -506,7 +519,7 @@ function check_rate_limit($action, $max_attempts = 10, $time_window = 60) {
             <html lang="ar" dir="rtl">
             <head>
                 <meta charset="UTF-8">
-                <title>محاولات كثيرة</title>
+                <title>Ù…Ø­Ø§ÙˆÙ„Ø§Øª ÙƒØ«ÙŠØ±Ø©</title>
                 <style>
                     body { font-family: Cairo, Arial; text-align: center; padding: 50px; background: #f5f5f5; }
                     .error { background: white; padding: 40px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -515,8 +528,8 @@ function check_rate_limit($action, $max_attempts = 10, $time_window = 60) {
             </head>
             <body>
                 <div class="error">
-                    <h1>⏱️ محاولات كثيرة جداً</h1>
-                    <p>لقد تجاوزت الحد المسموح من المحاولات. يرجى الانتظار قليلاً.</p>
+                    <h1>â±ï¸ Ù…Ø­Ø§ÙˆÙ„Ø§Øª ÙƒØ«ÙŠØ±Ø© Ø¬Ø¯Ø§Ù‹</h1>
+                    <p>Ù„Ù‚Ø¯ ØªØ¬Ø§ÙˆØ²Øª Ø§Ù„Ø­Ø¯ Ø§Ù„Ù…Ø³Ù…ÙˆØ­ Ù…Ù† Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø§Øª. ÙŠØ±Ø¬Ù‰ Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø± Ù‚Ù„ÙŠÙ„Ø§Ù‹.</p>
                 </div>
             </body>
             </html>
@@ -524,18 +537,18 @@ function check_rate_limit($action, $max_attempts = 10, $time_window = 60) {
     }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 9. تسجيل الأنشطة المشبوهة (Security Logging)
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// 9. ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø£Ù†Ø´Ø·Ø© Ø§Ù„Ù…Ø´Ø¨ÙˆÙ‡Ø© (Security Logging)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
- * تسجيل محاولة أمنية مشبوهة
+ * ØªØ³Ø¬ÙŠÙ„ Ù…Ø­Ø§ÙˆÙ„Ø© Ø£Ù…Ù†ÙŠØ© Ù…Ø´Ø¨ÙˆÙ‡Ø©
  */
 function log_security_event($event_type, $details = '') {
     $log_file = __DIR__ . '/../logs/security.log';
     $log_dir = dirname($log_file);
     
-    // إنشاء مجلد logs إذا لم يكن موجوداً
+    // Ø¥Ù†Ø´Ø§Ø¡ Ù…Ø¬Ù„Ø¯ logs Ø¥Ø°Ø§ Ù„Ù… ÙŠÙƒÙ† Ù…ÙˆØ¬ÙˆØ¯Ø§Ù‹
     if (!is_dir($log_dir)) {
         mkdir($log_dir, 0755, true);
     }
@@ -561,36 +574,36 @@ function log_security_event($event_type, $details = '') {
     error_log($log_entry, 3, $log_file);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 10. تنظيف وتأمين رفع الملفات (File Upload Security)
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// 10. ØªÙ†Ø¸ÙŠÙ ÙˆØªØ£Ù…ÙŠÙ† Ø±ÙØ¹ Ø§Ù„Ù…Ù„ÙØ§Øª (File Upload Security)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
- * التحقق من أمان الملف المرفوع
+ * Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø£Ù…Ø§Ù† Ø§Ù„Ù…Ù„Ù Ø§Ù„Ù…Ø±ÙÙˆØ¹
  */
 function validate_file_upload($file, $allowed_types = [], $max_size = 2097152) { // 2MB default
     $errors = [];
     
-    // التحقق من وجود أخطاء في الرفع
+    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ÙˆØ¬ÙˆØ¯ Ø£Ø®Ø·Ø§Ø¡ ÙÙŠ Ø§Ù„Ø±ÙØ¹
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        $errors[] = 'حدث خطأ أثناء رفع الملف';
+        $errors[] = 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø±ÙØ¹ Ø§Ù„Ù…Ù„Ù';
         return ['valid' => false, 'errors' => $errors];
     }
     
-    // التحقق من الحجم
+    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ø­Ø¬Ù…
     if ($file['size'] > $max_size) {
-        $errors[] = 'حجم الملف كبير جداً. الحد الأقصى: ' . ($max_size / 1024 / 1024) . 'MB';
+        $errors[] = 'Ø­Ø¬Ù… Ø§Ù„Ù…Ù„Ù ÙƒØ¨ÙŠØ± Ø¬Ø¯Ø§Ù‹. Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰: ' . ($max_size / 1024 / 1024) . 'MB';
     }
     
-    // التحقق من نوع الملف
+    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ù†ÙˆØ¹ Ø§Ù„Ù…Ù„Ù
     $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     $file_mime = mime_content_type($file['tmp_name']);
     
     if (!empty($allowed_types) && !in_array($file_ext, $allowed_types)) {
-        $errors[] = 'نوع الملف غير مسموح. الأنواع المسموحة: ' . implode(', ', $allowed_types);
+        $errors[] = 'Ù†ÙˆØ¹ Ø§Ù„Ù…Ù„Ù ØºÙŠØ± Ù…Ø³Ù…ÙˆØ­. Ø§Ù„Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ù…Ø³Ù…ÙˆØ­Ø©: ' . implode(', ', $allowed_types);
     }
     
-    // التحقق من المحتوى الفعلي للملف (ليس فقط الامتداد)
+    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø§Ù„ÙØ¹Ù„ÙŠ Ù„Ù„Ù…Ù„Ù (Ù„ÙŠØ³ ÙÙ‚Ø· Ø§Ù„Ø§Ù…ØªØ¯Ø§Ø¯)
     $allowed_mimes = [
         'jpg' => 'image/jpeg',
         'jpeg' => 'image/jpeg',
@@ -604,7 +617,7 @@ function validate_file_upload($file, $allowed_types = [], $max_size = 2097152) {
     ];
     
     if (isset($allowed_mimes[$file_ext]) && $file_mime !== $allowed_mimes[$file_ext]) {
-        $errors[] = 'محتوى الملف لا يطابق امتداده';
+        $errors[] = 'Ù…Ø­ØªÙˆÙ‰ Ø§Ù„Ù…Ù„Ù Ù„Ø§ ÙŠØ·Ø§Ø¨Ù‚ Ø§Ù…ØªØ¯Ø§Ø¯Ù‡';
     }
     
     if (!empty($errors)) {
@@ -615,7 +628,7 @@ function validate_file_upload($file, $allowed_types = [], $max_size = 2097152) {
 }
 
 /**
- * إنشاء اسم ملف آمن وعشوائي
+ * Ø¥Ù†Ø´Ø§Ø¡ Ø§Ø³Ù… Ù…Ù„Ù Ø¢Ù…Ù† ÙˆØ¹Ø´ÙˆØ§Ø¦ÙŠ
  */
 function generate_safe_filename($original_name) {
     $ext = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
@@ -623,21 +636,22 @@ function generate_safe_filename($original_name) {
     return $random . '.' . $ext;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// بدء تطبيق الأمان تلقائياً
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Ø¨Ø¯Ø¡ ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ø£Ù…Ø§Ù† ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-// بدء الجلسة الآمنة تلقائياً
+// Ø¨Ø¯Ø¡ Ø§Ù„Ø¬Ù„Ø³Ø© Ø§Ù„Ø¢Ù…Ù†Ø© ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹
 if (session_status() === PHP_SESSION_NONE) {
     secure_session_start();
 }
 
-// إضافة Security Headers تلقائياً
+// Ø¥Ø¶Ø§ÙØ© Security Headers ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹
 set_security_headers();
 
-// توليد CSRF Token تلقائياً
+// ØªÙˆÙ„ÙŠØ¯ CSRF Token ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹
 generate_csrf_token();
 
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // END OF SECURITY FILE
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+

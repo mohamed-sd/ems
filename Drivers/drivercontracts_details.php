@@ -1,8 +1,32 @@
 ﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
+}
+
+require_once '../config.php';
+
+$is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    die('لا يمكن تحديد الشركة الحالية');
+}
+
+$driver_contract_scope_sql = '1=1';
+if (!$is_super_admin) {
+    if (db_table_has_column($conn, 'drivercontracts', 'company_id')) {
+        $driver_contract_scope_sql = 'sc.company_id = ' . $company_id;
+    } else {
+        $driver_contract_scope_sql = "EXISTS (
+            SELECT 1
+            FROM project p
+            JOIN users su ON su.project_id = p.id
+            WHERE p.id = sc.project_id
+              AND su.company_id = " . $company_id . "
+        )";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -403,7 +427,6 @@ if (!isset($_SESSION['user'])) {
     </div>
 
 <?php
-include '../config.php';
 
 $contract_id = intval($_GET['id']);
 
@@ -424,13 +447,17 @@ $sql = "SELECT
         LEFT JOIN project op ON sc.project_id = op.id
         LEFT JOIN contracts c ON sc.project_contract_id = c.id
         LEFT JOIN mines m ON c.mine_id = m.id
-        WHERE sc.id = $contract_id
+        WHERE sc.id = $contract_id AND $driver_contract_scope_sql
         LIMIT 1";
 
 $result = mysqli_query($conn, $sql);
 
 if (!$result) {
     die("خطأ في الاستعلام: " . mysqli_error($conn));
+}
+
+if (mysqli_num_rows($result) === 0) {
+    die('العقد غير موجود أو خارج نطاق الشركة');
 }
 
 while ($row = mysqli_fetch_assoc($result)) {
@@ -783,8 +810,12 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 // Function to get driver contract equipments
                 if (!function_exists('getdriverContractEquipments')) {
                     function getdriverContractEquipments($contract_id, $conn) {
+                        global $driver_contract_scope_sql;
                         $equipments = [];
-                        $query = "SELECT * FROM drivercontractequipments WHERE contract_id = " . intval($contract_id);
+                        $query = "SELECT dce.*
+                                  FROM drivercontractequipments dce
+                                  JOIN drivercontracts sc ON sc.id = dce.contract_id
+                                  WHERE dce.contract_id = " . intval($contract_id) . " AND $driver_contract_scope_sql";
                         $result = mysqli_query($conn, $query);
                         if ($result) {
                             while ($row = mysqli_fetch_assoc($result)) {
@@ -874,9 +905,10 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </thead>
                 <tbody>
                     <?php
-                    $notes_query = "SELECT * 
-                                    FROM driver_contract_notes 
-                                    WHERE contract_id = $contract_id 
+                    $notes_query = "SELECT n.* 
+                                    FROM driver_contract_notes n
+                                    JOIN drivercontracts sc ON sc.id = n.contract_id
+                                    WHERE n.contract_id = $contract_id AND $driver_contract_scope_sql
                                     ORDER BY created_at DESC";
                     $notes_result = mysqli_query($conn, $notes_query);
                     
@@ -1278,7 +1310,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     <select id="mergeWithId" class="form-select">
                         <option value="">-- اختر عقد --</option>
                         <?php
-                        $merge_query = "SELECT id, contract_signing_date FROM drivercontracts WHERE driver_id = $driver_id AND project_id = $project_id AND id != $contract_id ORDER BY id DESC";
+                        $merge_query = "SELECT sc.id, sc.contract_signing_date FROM drivercontracts sc WHERE sc.driver_id = $driver_id AND sc.project_id = $project_id AND sc.id != $contract_id AND $driver_contract_scope_sql ORDER BY sc.id DESC";
                         $merge_result = mysqli_query($conn, $merge_query);
                         while ($m_row = mysqli_fetch_assoc($merge_result)) {
                             echo "<option value='" . $m_row['id'] . "'>العقد #" . $m_row['id'] . " - " . $m_row['contract_signing_date'] . "</option>";
@@ -2170,3 +2202,4 @@ $('#confirmMerge').click(function() {
 
 </body>
 </html>
+

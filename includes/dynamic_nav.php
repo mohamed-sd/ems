@@ -8,6 +8,25 @@
  */
 
 /**
+ * التحقق من وجود عمود icon في جدول modules.
+ *
+ * @param object $conn mysqli connection object
+ * @return bool
+ */
+function dynamicNavHasIconColumn($conn) {
+    static $has_icon_column = null;
+
+    if ($has_icon_column !== null) {
+        return $has_icon_column;
+    }
+
+    $result = mysqli_query($conn, "SHOW COLUMNS FROM modules LIKE 'icon'");
+    $has_icon_column = $result && mysqli_num_rows($result) > 0;
+
+    return $has_icon_column;
+}
+
+/**
  * جلب روابط الصفحات بناءً على دور المستخدم الحالي (الأدوار النشطة فقط)
  * يتم عرض الصفحات التابعة للدور مباشرة أو الصفحات التابعة لأدوار فرعية
  * Get modules/pages based on current user role (active roles only)
@@ -15,10 +34,13 @@
  * 
  * @param object $conn mysqli connection object
  * @param int $roleId user's role ID
- * @return array array of modules with id, name, code, owner_role_id
+ * @return array array of modules with id, name, code, owner_role_id, icon
  */
 function getDynamicNavLinks($conn, $roleId) {
     $links = array();
+    $icon_select = dynamicNavHasIconColumn($conn)
+        ? "COALESCE(NULLIF(TRIM(m.icon), ''), 'fa fa-link') AS icon"
+        : "'fa fa-link' AS icon";
     
     // التحقق من أن roleId صحيح
     $roleId = intval($roleId);
@@ -26,7 +48,7 @@ function getDynamicNavLinks($conn, $roleId) {
     // استعلام لجلب جميع الروابط للأدوار النشطة فقط
     // يعرض الصفحات التابعة للدور الحالي وأيضاً الصفحات التابعة للدور الأب إن وجد
     // Fetch pages assigned to current role AND pages assigned to parent role (if exists)
-    $query = "SELECT m.id, m.name, m.code, m.owner_role_id
+    $query = "SELECT m.id, m.name, m.code, m.owner_role_id, $icon_select
               FROM modules m
               INNER JOIN roles mr ON m.owner_role_id = mr.id
               WHERE m.owner_role_id IN (
@@ -70,8 +92,8 @@ function printDynamicNavLinks($links, $basePrefix = '../') {
         
         $code = htmlspecialchars($link['code'], ENT_QUOTES, 'UTF-8');
         $name = htmlspecialchars($link['name'], ENT_QUOTES, 'UTF-8');
-        // استخدام أيقونة افتراضية
-        $icon = 'fa-solid fa-angles-left'; // يمكنك تخصيص الأيقونة حسب الحاجة
+        $icon = !empty($link['icon']) ? $link['icon'] : 'fa fa-link';
+        $icon = htmlspecialchars($icon, ENT_QUOTES, 'UTF-8');
         
         // تحديد البادئة (prefix) بناءً على موقع الملف الحالي
         $href = $basePrefix . $code;

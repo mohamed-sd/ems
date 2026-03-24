@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
 ?>
@@ -11,7 +11,7 @@ if (!isset($_SESSION['user'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> إيكوبيشن | التقارير </title>
+    <title> Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ± </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/admin-style.css">
@@ -88,7 +88,7 @@ if (!isset($_SESSION['user'])) {
     include('../insidebar.php');
     include '../config.php';
 
-    // استقبال الفلاتر
+    // Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„ÙÙ„Ø§ØªØ±
     $date_filter = isset($_GET['date']) ? $_GET['date'] : '';
     $project_filter = isset($_GET['project']) ? $_GET['project'] : '';
     $supplier_filter = isset($_GET['supplier']) ? $_GET['supplier'] : '';
@@ -142,7 +142,7 @@ WHERE 1=1
     $sql .= " ORDER BY t.date, p.name, s.name ";
     $result = mysqli_query($conn, $sql);
 
-    // إجمالي الإحصائيات
+    // Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª
     $total_sql = "
 SELECT 
     SUM(t.executed_hours) AS executed_hours,
@@ -180,30 +180,30 @@ WHERE 1=1
         <div class="page-header">
             <h1 class="page-title">
                 <div class="title-icon"><i class="fa-solid fa-chart-column"></i></div>
-                تقرير التايم شيت اليومي
+                ØªÙ‚Ø±ÙŠØ± Ø§Ù„ØªØ§ÙŠÙ… Ø´ÙŠØª Ø§Ù„ÙŠÙˆÙ…ÙŠ
             </h1>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <a href="reports.php" class="back-btn">
-                    <i class="fas fa-arrow-right"></i> رجوع
+                    <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
                 </a>
             </div>
         </div>
 
         <div class="card mb-4">
             <div class="card-header">
-                <h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
+                <h5><i class="fas fa-filter"></i> ÙÙ„Ø§ØªØ± Ø§Ù„ØªÙ‚Ø±ÙŠØ±</h5>
             </div>
             <div class="card-body">
                 <form method="GET" class="form-grid">
                     <div class="">
-                        <label class="form-label">📅 التاريخ:</label>
+                        <label class="form-label">ðŸ“… Ø§Ù„ØªØ§Ø±ÙŠØ®:</label>
                         <input type="date" class="form-control" name="date" value="<?php echo $date_filter; ?>">
                     </div>
 
                     <div>
-                        <label><i class="fas fa-diagram-project"></i> المشروع</label>
+                        <label><i class="fas fa-diagram-project"></i> Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</label>
                         <select name="project">
-                            <option value="">-- الكل --</option>
+                            <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
                             <?php
                             $prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
                             while ($row = mysqli_fetch_assoc($prj)) {
@@ -215,9 +215,9 @@ WHERE 1=1
                     </div>
 
                     <div>
-                        <label><i class="fas fa-truck"></i> المورد</label>
+                        <label><i class="fas fa-truck"></i> Ø§Ù„Ù…ÙˆØ±Ø¯</label>
                         <select name="supplier">
-                            <option value="">-- الكل --</option>
+                            <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
                             <?php
                             $sup = mysqli_query($conn, "SELECT id, name FROM suppliers where status = '1' ");
                             while ($row = mysqli_fetch_assoc($sup)) {
@@ -229,69 +229,69 @@ WHERE 1=1
                     </div>
 
                     <div>
-                        <label><i class="fas fa-clock"></i> الوردية</label>
+                        <label><i class="fas fa-clock"></i> Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</label>
                         <select name="shift">
-                            <option value="">-- الكل --</option>
-                            <option value="D" <?php if (isset($_GET['shift']) && $_GET['shift'] == "صباحية") echo "selected"; ?>>صباحية</option>
-                            <option value="N" <?php if (isset($_GET['shift']) && $_GET['shift'] == "مسائية") echo "selected"; ?>>مسائية</option>
+                            <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
+                            <option value="D" <?php if (isset($_GET['shift']) && $_GET['shift'] == "ØµØ¨Ø§Ø­ÙŠØ©") echo "selected"; ?>>ØµØ¨Ø§Ø­ÙŠØ©</option>
+                            <option value="N" <?php if (isset($_GET['shift']) && $_GET['shift'] == "Ù…Ø³Ø§Ø¦ÙŠØ©") echo "selected"; ?>>Ù…Ø³Ø§Ø¦ÙŠØ©</option>
                         </select>
                     </div>
 
                     <div>
-                        <label><i class="fas fa-cogs"></i> نوع الآلية</label>
+                        <label><i class="fas fa-cogs"></i> Ù†ÙˆØ¹ Ø§Ù„Ø¢Ù„ÙŠØ©</label>
                         <select name="type">
-                            <option value="">-- الكل --</option>
-                            <option value="1" <?php if ($type_filter == "1") echo "selected"; ?>>حفار</option>
-                            <option value="2" <?php if ($type_filter == "2") echo "selected"; ?>>قلاب</option>
+                            <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
+                            <option value="1" <?php if ($type_filter == "1") echo "selected"; ?>>Ø­ÙØ§Ø±</option>
+                            <option value="2" <?php if ($type_filter == "2") echo "selected"; ?>>Ù‚Ù„Ø§Ø¨</option>
                         </select>
                     </div>
 
-                    <button type="submit"><i class="fa fa-search"></i> بحث</button>
+                    <button type="submit"><i class="fa fa-search"></i> Ø¨Ø­Ø«</button>
                 </form>
             </div>
         </div>
 
 
-        <!-- بطاقات الإحصائيات -->
+        <!-- Ø¨Ø·Ø§Ù‚Ø§Øª Ø§Ù„Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª -->
         <div class="stats-grid">
             <div class="stat-card executed">
-                <div class="stat-icon">⏱️</div>
-                <div class="stat-label">إجمالي ساعات العمل</div>
+                <div class="stat-icon">â±ï¸</div>
+                <div class="stat-label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</div>
                 <div class="stat-value"><?php echo !empty($totals['executed_hours']) ? $totals['executed_hours'] : 0; ?></div>
             </div>
             <div class="stat-card fault">
-                <div class="stat-icon">⚠️</div>
-                <div class="stat-label">إجمالي ساعات الأعطال</div>
+                <div class="stat-icon">âš ï¸</div>
+                <div class="stat-label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</div>
                 <div class="stat-value"><?php echo !empty($totals['total_fault']) ? $totals['total_fault'] : 0; ?></div>
             </div>
             <div class="stat-card standby">
-                <div class="stat-icon">⏸️</div>
-                <div class="stat-label">إجمالي ساعات الاستعداد</div>
+                <div class="stat-icon">â¸ï¸</div>
+                <div class="stat-label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯</div>
                 <div class="stat-value"><?php echo !empty($totals['total_standby']) ? $totals['total_standby'] : 0; ?></div>
             </div>
         </div>
 
         <div class="card shadow-sm">
             <div class="card-header">
-                <h5><i class="fas fa-table"></i> تفاصيل التايم شيت</h5>
+                <h5><i class="fas fa-table"></i> ØªÙØ§ØµÙŠÙ„ Ø§Ù„ØªØ§ÙŠÙ… Ø´ÙŠØª</h5>
             </div>
             <div class="card-body table-container">
                 <div class="table-responsive">
                 <table class="table table-bordered table-hover align-middle report-table" id="projectsTable">
                     <thead>
                         <tr>
-                            <th>التاريخ</th>
-                            <th>المشروع</th>
-                            <th>المورد</th>
-                            <th>الآلية</th>
-                            <th>كود الآلية</th>
-                            <th>السائق</th>
-                            <th>الشفت</th>
-                            <th>⏱️ ساعات العمل</th>
-                            <th>⚠️ ساعات الأعطال</th>
-                            <th>⏸️ ساعات الاستعداد</th>
-                            <th>📒 ملاحظات العمل</th>
-                            <th>📒 ملاحظات الأعطال</th>
+                            <th>Ø§Ù„ØªØ§Ø±ÙŠØ®</th>
+                            <th>Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</th>
+                            <th>Ø§Ù„Ù…ÙˆØ±Ø¯</th>
+                            <th>Ø§Ù„Ø¢Ù„ÙŠØ©</th>
+                            <th>ÙƒÙˆØ¯ Ø§Ù„Ø¢Ù„ÙŠØ©</th>
+                            <th>Ø§Ù„Ø³Ø§Ø¦Ù‚</th>
+                            <th>Ø§Ù„Ø´ÙØª</th>
+                            <th>â±ï¸ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</th>
+                            <th>âš ï¸ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</th>
+                            <th>â¸ï¸ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯</th>
+                            <th>ðŸ“’ Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ø¹Ù…Ù„</th>
+                            <th>ðŸ“’ Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</th>
                         </tr>
                     </thead>
                     <tbody>

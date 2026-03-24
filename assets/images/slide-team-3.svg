@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">فريق عمل ميداني</title>
+  <desc id="desc">تصميم توضيحي لفريق تشغيل مع معدات في موقع مشروع.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#12304d"/>
+      <stop offset="100%" stop-color="#2f5d84"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#213f5d"/>
+      <stop offset="100%" stop-color="#2a4d6d"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f5c449"/>
+      <stop offset="100%" stop-color="#d69c19"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect y="610" width="1600" height="290" fill="url(#ground)"/>
+  <rect x="180" y="250" width="340" height="250" rx="20" fill="#1d405f"/>
+  <rect x="215" y="290" width="120" height="100" rx="12" fill="#90a8c0"/>
+  <rect x="355" y="290" width="120" height="100" rx="12" fill="#90a8c0"/>
+  <rect x="250" y="500" width="200" height="90" rx="14" fill="#0f253c"/>
+  <rect x="760" y="460" width="320" height="140" rx="18" fill="#294d6f"/>
+  <rect x="1010" y="390" width="230" height="90" rx="14" fill="#3c6388"/>
+  <circle cx="840" cy="635" r="52" fill="#0d2237"/>
+  <circle cx="1020" cy="635" r="52" fill="#0d2237"/>
+  <g>
+    <circle cx="560" cy="520" r="34" fill="#f6caa7"/>
+    <rect x="520" y="550" width="80" height="110" rx="20" fill="url(#gold)"/>
+    <rect x="500" y="590" width="28" height="88" rx="12" fill="#15324f"/>
+    <rect x="592" y="590" width="28" height="88" rx="12" fill="#15324f"/>
+  </g>
+  <g>
+    <circle cx="670" cy="520" r="34" fill="#efc39f"/>
+    <rect x="630" y="550" width="80" height="110" rx="20" fill="#d9a325"/>
+    <rect x="610" y="590" width="28" height="88" rx="12" fill="#15324f"/>
+    <rect x="702" y="590" width="28" height="88" rx="12" fill="#15324f"/>
+  </g>
+  <path d="M80 650 L280 540 L450 650 Z" fill="#183652" opacity="0.65"/>
+  <path d="M1280 650 L1450 560 L1560 650 Z" fill="#183652" opacity="0.65"/>
+</svg>

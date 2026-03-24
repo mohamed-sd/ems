@@ -12,6 +12,36 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 enforce_module_permission_json($conn, 'contracts', 'edit', 'لا توجد صلاحية تعديل العقود');
 
+$is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    die(json_encode(['success' => false, 'message' => 'لا يمكن تحديد الشركة الحالية']));
+}
+
+function contractTenantScopeSql($conn, $is_super_admin, $company_id, $alias)
+{
+    if ($is_super_admin) {
+        return '1=1';
+    }
+
+    $safe_company_id = intval($company_id);
+    $a = $alias !== '' ? $alias . '.' : '';
+
+    if (db_table_has_column($conn, 'contracts', 'company_id')) {
+        return $a . "company_id = " . $safe_company_id;
+    }
+
+    return "EXISTS (
+        SELECT 1
+        FROM mines m
+        JOIN project p ON p.id = m.project_id
+        JOIN users u ON u.project_id = p.id
+        WHERE m.id = " . $a . "mine_id
+          AND u.company_id = " . $safe_company_id . "
+    )";
+}
+
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 $contract_id = isset($_POST['contract_id']) ? intval($_POST['contract_id']) : 0;
 $user_id = approval_get_user_id();
@@ -20,8 +50,9 @@ if (!$contract_id) {
     die(json_encode(['success' => false, 'message' => 'معرف العقد غير صحيح']));
 }
 
-function getContractData($contract_id, $conn) {
-    $query = "SELECT * FROM contracts WHERE id = $contract_id LIMIT 1";
+function getContractData($contract_id, $conn, $is_super_admin, $company_id) {
+    $tenant_scope = contractTenantScopeSql($conn, $is_super_admin, $company_id, 'c');
+    $query = "SELECT c.* FROM contracts c WHERE c.id = $contract_id AND $tenant_scope LIMIT 1";
     $result = mysqli_query($conn, $query);
     return $result ? mysqli_fetch_assoc($result) : null;
 }
@@ -49,6 +80,11 @@ function enqueueContractApproval($contract_id, $action, $payload_summary, $opera
     return approval_create_request('contract', intval($contract_id), $action, $payload, $requested_by, $conn);
 }
 
+$current_contract_scope = getContractData($contract_id, $conn, $is_super_admin, $company_id);
+if (!$current_contract_scope) {
+    die(json_encode(['success' => false, 'message' => 'العقد غير موجود أو خارج نطاق الشركة']));
+}
+
 // 1. تجديد العقد
 if ($action === 'renewal') {
     $new_start_date = isset($_POST['new_start_date']) ? $_POST['new_start_date'] : '';
@@ -69,7 +105,7 @@ if ($action === 'renewal') {
         die(json_encode(['success' => false, 'message' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء']));
     }
 
-    $contract_before = getContractData($contract_id, $conn);
+    $contract_before = getContractData($contract_id, $conn, $is_super_admin, $company_id);
     if (!$contract_before) {
         die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
     }
@@ -129,7 +165,7 @@ else if ($action === 'settlement') {
         die(json_encode(['success' => false, 'message' => 'نوع التسوية غير صحيح']));
     }
 
-    $contract = getContractData($contract_id, $conn);
+    $contract = getContractData($contract_id, $conn, $is_super_admin, $company_id);
     if (!$contract) {
         die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
     }
@@ -187,7 +223,7 @@ else if ($action === 'pause') {
         }
     }
 
-    $contract_before = getContractData($contract_id, $conn);
+    $contract_before = getContractData($contract_id, $conn, $is_super_admin, $company_id);
     if (!$contract_before) {
         die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
     }
@@ -233,7 +269,7 @@ else if ($action === 'resume') {
         }
     }
 
-    $contract_before = getContractData($contract_id, $conn);
+    $contract_before = getContractData($contract_id, $conn, $is_super_admin, $company_id);
     if (!$contract_before) {
         die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
     }
@@ -302,7 +338,7 @@ else if ($action === 'terminate') {
         die(json_encode(['success' => false, 'message' => 'نوع الإنهاء غير صحيح']));
     }
 
-    $contract_before = getContractData($contract_id, $conn);
+    $contract_before = getContractData($contract_id, $conn, $is_super_admin, $company_id);
     if (!$contract_before) {
         die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
     }
@@ -352,8 +388,8 @@ else if ($action === 'merge') {
         die(json_encode(['success' => false, 'message' => 'الرجاء اختيار عقد آخر للدمج']));
     }
 
-    $contract_to_merge = getContractData($merge_with_id, $conn);
-    $current_contract = getContractData($contract_id, $conn);
+    $contract_to_merge = getContractData($merge_with_id, $conn, $is_super_admin, $company_id);
+    $current_contract = getContractData($contract_id, $conn, $is_super_admin, $company_id);
 
     if (!$contract_to_merge || !$current_contract) {
         die(json_encode(['success' => false, 'message' => 'أحد العقود غير موجود']));

@@ -1,10 +1,10 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
-$page_title = "إيكوبيشن | اختر نوع الآلية";
+$page_title = "Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø§Ø®ØªØ± Ù†ÙˆØ¹ Ø§Ù„Ø¢Ù„ÙŠØ©";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
@@ -51,7 +51,7 @@ include('../insidebar.php');
   width: 100%;
 }
 
-/* ── Banner ── */
+/* â”€â”€ Banner â”€â”€ */
 .type-banner {
   position: relative;
   overflow: hidden;
@@ -137,7 +137,7 @@ include('../insidebar.php');
   50%    { transform: translateY(-10px) rotate(4deg); }
 }
 
-/* ── Cards Section ── */
+/* â”€â”€ Cards Section â”€â”€ */
 .type-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(260px, 1fr));
@@ -302,43 +302,43 @@ include('../insidebar.php');
     <div class="banner-left">
       <div class="banner-badge">
         <i class="fas fa-circle"></i>
-        ساعات العمل
+        Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„
       </div>
-      <h1 class="banner-title">اختر نوع الآلية</h1>
-      <p class="banner-sub">حدد تصنيف الآلية لبدء إدخال ساعات العمل</p>
+      <h1 class="banner-title">Ø§Ø®ØªØ± Ù†ÙˆØ¹ Ø§Ù„Ø¢Ù„ÙŠØ©</h1>
+      <p class="banner-sub">Ø­Ø¯Ø¯ ØªØµÙ†ÙŠÙ Ø§Ù„Ø¢Ù„ÙŠØ© Ù„Ø¨Ø¯Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</p>
     </div>
-    <div class="banner-emoji">⚙️</div>
+    <div class="banner-emoji">âš™ï¸</div>
   </div>
 
   <!-- Selection Cards -->
   <div class="type-cards">
 
-    <!-- معدات ثقيلة -->
+    <!-- Ù…Ø¹Ø¯Ø§Øª Ø«Ù‚ÙŠÙ„Ø© -->
     <a href="timesheet.php?type=1" class="type-card"
        style="--icon-color:#e8b800; --icon-bg:rgba(232,184,0,.12); --icon-glow:rgba(232,184,0,.10);">
       <div class="type-card-inner">
         <div class="type-card-icon">
           <i class="fas fa-tractor"></i>
         </div>
-        <div class="type-card-label">معدات ثقيلة</div>
-        <div class="type-card-desc">حفارات، لودرات، جريدرات<br>وجميع المعدات الثقيلة</div>
+        <div class="type-card-label">Ù…Ø¹Ø¯Ø§Øª Ø«Ù‚ÙŠÙ„Ø©</div>
+        <div class="type-card-desc">Ø­ÙØ§Ø±Ø§ØªØŒ Ù„ÙˆØ¯Ø±Ø§ØªØŒ Ø¬Ø±ÙŠØ¯Ø±Ø§Øª<br>ÙˆØ¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø«Ù‚ÙŠÙ„Ø©</div>
         <span class="type-card-arrow">
-          <i class="fas fa-arrow-left"></i> ابدأ الإدخال
+          <i class="fas fa-arrow-left"></i> Ø§Ø¨Ø¯Ø£ Ø§Ù„Ø¥Ø¯Ø®Ø§Ù„
         </span>
       </div>
     </a>
 
-    <!-- شاحنات -->
+    <!-- Ø´Ø§Ø­Ù†Ø§Øª -->
     <a href="timesheet.php?type=2" class="type-card"
        style="--icon-color:#2563eb; --icon-bg:rgba(37,99,235,.12); --icon-glow:rgba(37,99,235,.09);">
       <div class="type-card-inner">
         <div class="type-card-icon">
           <i class="fas fa-truck"></i>
         </div>
-        <div class="type-card-label">الشاحنات</div>
-        <div class="type-card-desc">قلابات، شاحنات نقل<br>وجميع مركبات النقل</div>
+        <div class="type-card-label">Ø§Ù„Ø´Ø§Ø­Ù†Ø§Øª</div>
+        <div class="type-card-desc">Ù‚Ù„Ø§Ø¨Ø§ØªØŒ Ø´Ø§Ø­Ù†Ø§Øª Ù†Ù‚Ù„<br>ÙˆØ¬Ù…ÙŠØ¹ Ù…Ø±ÙƒØ¨Ø§Øª Ø§Ù„Ù†Ù‚Ù„</div>
         <span class="type-card-arrow">
-          <i class="fas fa-arrow-left"></i> ابدأ الإدخال
+          <i class="fas fa-arrow-left"></i> Ø§Ø¨Ø¯Ø£ Ø§Ù„Ø¥Ø¯Ø®Ø§Ù„
         </span>
       </div>
     </a>
@@ -348,10 +348,11 @@ include('../insidebar.php');
   <!-- Back -->
   <a href="../main/dashboard.php" class="type-back">
     <i class="fas fa-arrow-right"></i>
-    العودة للرئيسية
+    Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ø±Ø¦ÙŠØ³ÙŠØ©
   </a>
 
 </div>
 
 </body>
 </html>
+

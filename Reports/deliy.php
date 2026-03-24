@@ -1,12 +1,12 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
 include '../config.php';
 
-// استقبال الفلاhتر
+// Ø§Ø³ØªÙ‚Ø¨Ø§Ù„ Ø§Ù„ÙÙ„Ø§hØªØ±
 $date_filter      = isset($_GET['date']) ? $_GET['date'] : '';
 $equipment_filter = isset($_GET['equipment']) ? $_GET['equipment'] : '';
 $project_filter   = isset($_GET['project']) ? $_GET['project'] : '';
@@ -39,9 +39,9 @@ if (!empty($project_filter)) {
     $sql .= " AND p.id = '$project_filter' ";
 }
 
-$result = mysqli_query($conn, $sql) or die("خطأ في الاستعلام: " . mysqli_error($conn));
+$result = mysqli_query($conn, $sql) or die("Ø®Ø·Ø£ ÙÙŠ Ø§Ù„Ø§Ø³ØªØ¹Ù„Ø§Ù…: " . mysqli_error($conn));
 
-// استعلام المجموع
+// Ø§Ø³ØªØ¹Ù„Ø§Ù… Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹
 $total_sql = "SELECT SUM(t.executed_hours) AS executed_hours
 FROM timesheet t
 JOIN operations o ON t.operator = o.id
@@ -59,7 +59,7 @@ if (!empty($project_filter)) {
     $total_sql .= " AND p.id = '$project_filter' ";
 }
 
-$total_result = mysqli_query($conn, $total_sql) or die("خطأ في استعلام المجموع: " . mysqli_error($conn));
+$total_result = mysqli_query($conn, $total_sql) or die("Ø®Ø·Ø£ ÙÙŠ Ø§Ø³ØªØ¹Ù„Ø§Ù… Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹: " . mysqli_error($conn));
 $total_row    = mysqli_fetch_assoc($total_result);
 $executed_hours  = $total_row['executed_hours'];
 ?>
@@ -68,7 +68,7 @@ $executed_hours  = $total_row['executed_hours'];
 <head>
 	<meta charset="UTF-8">
   	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>إيكوبيشن | التقارير</title>
+	<title>Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ±</title>
 	
 	<!-- Bootstrap 5 -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
@@ -115,30 +115,30 @@ $executed_hours  = $total_row['executed_hours'];
 	<div class="page-header">
 		<h1 class="page-title">
 			<div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
-			تقرير ساعات العمل اليومية
+			ØªÙ‚Ø±ÙŠØ± Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ Ø§Ù„ÙŠÙˆÙ…ÙŠØ©
 		</h1>
 		<div style="display: flex; gap: 10px; flex-wrap: wrap;">
 			<a href="reports.php" class="back-btn">
-				<i class="fas fa-arrow-right"></i> رجوع
+				<i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
 			</a>
 		</div>
 	</div>
 
 	<div class="card mb-4">
 		<div class="card-header">
-			<h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
+			<h5><i class="fas fa-filter"></i> ÙÙ„Ø§ØªØ± Ø§Ù„ØªÙ‚Ø±ÙŠØ±</h5>
 		</div>
 		<div class="card-body">
 			<form method="GET" class="form-grid">
 				<div>
-					<label><i class="fas fa-calendar-day"></i> التاريخ</label>
+					<label><i class="fas fa-calendar-day"></i> Ø§Ù„ØªØ§Ø±ÙŠØ®</label>
 					<input type="date" name="date" value="<?php echo $date_filter; ?>">
 				</div>
 
 				<div>
-					<label><i class="fas fa-cogs"></i> الآلية</label>
+					<label><i class="fas fa-cogs"></i> Ø§Ù„Ø¢Ù„ÙŠØ©</label>
 					<select name="equipment">
-						<option value="">-- الكل --</option>
+						<option value="">-- Ø§Ù„ÙƒÙ„ --</option>
 						<?php
 						$eqs = mysqli_query($conn, "SELECT id, name , code FROM equipments where status = '1' AND  id IN ( SELECT operations.equipment FROM `operations` WHERE `status` LIKE '1' ) ");
 						while($row = mysqli_fetch_assoc($eqs)){
@@ -150,9 +150,9 @@ $executed_hours  = $total_row['executed_hours'];
 				</div>
 
 				<div>
-					<label><i class="fas fa-diagram-project"></i> المشروع</label>
+					<label><i class="fas fa-diagram-project"></i> Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</label>
 					<select name="project">
-						<option value="">-- الكل --</option>
+						<option value="">-- Ø§Ù„ÙƒÙ„ --</option>
 						<?php
 						$prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
 						while($row = mysqli_fetch_assoc($prj)){
@@ -163,28 +163,28 @@ $executed_hours  = $total_row['executed_hours'];
 					</select>
 				</div>
 
-				<button type="submit"><i class="fa fa-search"></i> بحث</button>
+				<button type="submit"><i class="fa fa-search"></i> Ø¨Ø­Ø«</button>
 			</form>
 		</div>
 	</div>
 
 	<div class="card">
 		<div class="card-header">
-			<h5><i class="fas fa-table"></i> جدول البيانات</h5>
+			<h5><i class="fas fa-table"></i> Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª</h5>
 		</div>
 		<div class="card-body table-container">
 			<div class="table-responsive" id="projectsTable">
 				<table class="table table-striped table-hover align-middle report-table">
 					<thead>
 						<tr>
-							<th>المشروع</th>
-							<th>الآلية</th>
-							<th>السائق</th>
-							<th>التاريخ</th>
-							<th>الشفت</th>
-							<th>⏱️ ساعات العمل</th>
-							<th>⚠️ ساعات الأعطال</th>
-							<th>⏸️ Standby</th>
+							<th>Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</th>
+							<th>Ø§Ù„Ø¢Ù„ÙŠØ©</th>
+							<th>Ø§Ù„Ø³Ø§Ø¦Ù‚</th>
+							<th>Ø§Ù„ØªØ§Ø±ÙŠØ®</th>
+							<th>Ø§Ù„Ø´ÙØª</th>
+							<th>â±ï¸ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</th>
+							<th>âš ï¸ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</th>
+							<th>â¸ï¸ Standby</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -206,7 +206,7 @@ $executed_hours  = $total_row['executed_hours'];
 
 			<div class="stats-box mt-3">
 				<i class="fas fa-check-circle"></i>
-			مجموع ساعات العمل: <?php echo $executed_hours ? $executed_hours : 0; ?> ساعة
+			Ù…Ø¬Ù…ÙˆØ¹ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„: <?php echo $executed_hours ? $executed_hours : 0; ?> Ø³Ø§Ø¹Ø©
 			</div>
 		</div>
 	</div>
@@ -216,3 +216,4 @@ $executed_hours  = $total_row['executed_hours'];
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

@@ -1,10 +1,10 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
-$page_title = "إيكوبيشن | اختيار المشروع للتشغيل";
+$page_title = "Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ù„Ù„ØªØ´ØºÙŠÙ„";
 include("../inheader.php");
 include("../insidebar.php");
 
@@ -224,16 +224,16 @@ include("../insidebar.php");
 <div class="main">
     <h2>
         <i class="fas fa-cogs"></i>
-        اختر المشروع لإدارة التشغيل
+        Ø§Ø®ØªØ± Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ØªØ´ØºÙŠÙ„
     </h2>
     <p class="page-description">
-        اختر المشروع الذي تريد إدارة تشغيل المعدات والآليات فيه
+        Ø§Ø®ØªØ± Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„Ø°ÙŠ ØªØ±ÙŠØ¯ Ø¥Ø¯Ø§Ø±Ø© ØªØ´ØºÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª ÙˆØ§Ù„Ø¢Ù„ÙŠØ§Øª ÙÙŠÙ‡
     </p>
     
     <div class="projects-grid">
         <?php
         
-        // جلب جميع المشاريع النشطة مع إحصائيات
+        // Ø¬Ù„Ø¨ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹ Ø§Ù„Ù†Ø´Ø·Ø© Ù…Ø¹ Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª
         $query = "SELECT 
                     p.id,
                     p.name,
@@ -287,20 +287,20 @@ include("../insidebar.php");
                 
                 echo '      <div class="stat-box">';
                 echo '          <div class="stat-value">' . $mines_count . '</div>';
-                echo '          <div class="stat-label">⛰️ مناجم</div>';
+                echo '          <div class="stat-label">â›°ï¸ Ù…Ù†Ø§Ø¬Ù…</div>';
                 echo '      </div>';
                 
                 echo '      <div class="stat-box">';
                 echo '          <div class="stat-value">' . $operations_count . '</div>';
-                echo '          <div class="stat-label">⚙️ تشغيلات نشطة</div>';
+                echo '          <div class="stat-label">âš™ï¸ ØªØ´ØºÙŠÙ„Ø§Øª Ù†Ø´Ø·Ø©</div>';
                 echo '      </div>';
                 
                 echo '      <div class="stat-box">';
                 echo '          <div class="stat-value">' . $contracts_count . '</div>';
-                echo '          <div class="stat-label">📄 عقود نشطة</div>';
+                echo '          <div class="stat-label">ðŸ“„ Ø¹Ù‚ÙˆØ¯ Ù†Ø´Ø·Ø©</div>';
                 echo '      </div>';
                 
-                // حساب عدد المعدات المشغلة
+                // Ø­Ø³Ø§Ø¨ Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ù…Ø´ØºÙ„Ø©
                 $equip_query = "SELECT COUNT(DISTINCT equipment) as equip_count 
                                FROM operations 
                                WHERE project_id = $project_id AND status = 1";
@@ -310,7 +310,7 @@ include("../insidebar.php");
                 
                 echo '      <div class="stat-box">';
                 echo '          <div class="stat-value">' . $equip_count . '</div>';
-                echo '          <div class="stat-label">🚜 معدات مشغلة</div>';
+                echo '          <div class="stat-label">ðŸšœ Ù…Ø¹Ø¯Ø§Øª Ù…Ø´ØºÙ„Ø©</div>';
                 echo '      </div>';
                 
                 echo '  </div>';
@@ -319,7 +319,7 @@ include("../insidebar.php");
         } else {
             echo '<div class="no-projects">';
             echo '  <i class="fas fa-folder-open"></i>';
-            echo '  <p>لا توجد مشاريع متاحة حالياً</p>';
+            echo '  <p>Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø´Ø§Ø±ÙŠØ¹ Ù…ØªØ§Ø­Ø© Ø­Ø§Ù„ÙŠØ§Ù‹</p>';
             echo '</div>';
         }
         ?>
@@ -327,7 +327,7 @@ include("../insidebar.php");
 </div>
 
 <script>
-    // إضافة تأثير hover للكروت
+    // Ø¥Ø¶Ø§ÙØ© ØªØ£Ø«ÙŠØ± hover Ù„Ù„ÙƒØ±ÙˆØª
     document.querySelectorAll('.project-card').forEach(card => {
         card.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-10px) scale(1.02)';
@@ -341,3 +341,4 @@ include("../insidebar.php");
 
 </body>
 </html>
+

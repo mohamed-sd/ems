@@ -1,8 +1,60 @@
 ﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-  header("Location: ../index.php");
+  header("Location: ../login.php");
   exit();
+}
+
+require_once '../config.php';
+
+$is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+  die('لا يمكن تحديد الشركة الحالية');
+}
+
+$drivers_scope_sql = '1=1';
+if (!$is_super_admin) {
+  if (db_table_has_column($conn, 'drivers', 'company_id')) {
+    $drivers_scope_sql = 'd.company_id = ' . $company_id;
+  } else {
+    $drivers_scope_sql = "EXISTS (
+      SELECT 1
+      FROM users du
+      WHERE du.project_id = d.project
+        AND du.company_id = " . $company_id . "
+    )";
+  }
+}
+
+$driver_contract_scope_sql = '1=1';
+if (!$is_super_admin) {
+  if (db_table_has_column($conn, 'drivercontracts', 'company_id')) {
+    $driver_contract_scope_sql = 'sc.company_id = ' . $company_id;
+  } else {
+    $driver_contract_scope_sql = "EXISTS (
+      SELECT 1
+      FROM project p
+      JOIN users du ON du.project_id = p.id
+      WHERE p.id = sc.project_id
+        AND du.company_id = " . $company_id . "
+    )";
+  }
+}
+
+$project_scope_sql = '1=1';
+if (!$is_super_admin) {
+  if (db_table_has_column($conn, 'project', 'company_id')) {
+    $project_scope_sql = 'p.company_id = ' . $company_id;
+  } else {
+    $project_scope_sql = "EXISTS (
+      SELECT 1
+      FROM users du
+      WHERE du.project_id = p.id
+        AND du.company_id = " . $company_id . "
+    )";
+  }
 }
 
 // التحقق من وجود معرف السائق
@@ -12,6 +64,13 @@ if (!isset($_GET['id'])) {
 }
 
 $driver_id = intval($_GET['id']);
+
+$driver_check_sql = "SELECT d.id FROM drivers d WHERE d.id = $driver_id AND $drivers_scope_sql LIMIT 1";
+$driver_check_result = mysqli_query($conn, $driver_check_sql);
+if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
+  header('Location: drivers.php');
+  exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -531,8 +590,7 @@ $driver_id = intval($_GET['id']);
                 <select name="project_id" id="project_id" required>
                   <option value="">— اختر المشروع —</option>
                   <?php
-                  include '../config.php';
-                  $projects_query = "SELECT id, name FROM project WHERE status = 1 ORDER BY name ASC";
+                  $projects_query = "SELECT p.id, p.name FROM project p WHERE p.status = 1 AND $project_scope_sql ORDER BY p.name ASC";
                   $projects_result = mysqli_query($conn, $projects_query);
                   while ($project = mysqli_fetch_assoc($projects_result)) {
                     echo "<option value='" . $project['id'] . "'>" . $project['name'] . "</option>";
@@ -1108,8 +1166,6 @@ $driver_id = intval($_GET['id']);
           </thead>
           <tbody>
             <?php
-            include '../config.php';
-
             // إضافة عقد جديد عند إرسال الفورم
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['driver_id']) && !empty($_POST['project_id']) && !empty($_POST['project_contract_id'])) {
 
@@ -1167,9 +1223,13 @@ $driver_id = intval($_GET['id']);
               $total_contract_units = isset($_POST['total_contract']) ? intval($_POST['total_contract']) : 0;
 
 
+              if ($driver_id_post !== $driver_id) {
+                die('بيانات السائق غير متطابقة');
+              }
+
               if ($id > 0) {
                 // تعديل
-                $sql = "UPDATE drivercontracts SET 
+                $sql = "UPDATE drivercontracts sc SET 
             project_id='$project_id',
             mine_id='$mine_id',
             project_contract_id='$project_contract_id',
@@ -1200,24 +1260,33 @@ $driver_id = intval($_GET['id']);
             payment_time='$payment_time',
             guarantees='$guarantees',
             payment_date='$payment_date'
-        WHERE id=$id";
+          WHERE sc.id=$id AND sc.driver_id=$driver_id AND $driver_contract_scope_sql";
               } else {
                 // إضافة
-                $sql = "INSERT INTO drivercontracts (
-            driver_id, project_id, mine_id, project_contract_id, contract_signing_date, grace_period_days, contract_duration_days,
+              $insert_columns = "driver_id, project_id, mine_id, project_contract_id, contract_signing_date, grace_period_days, contract_duration_days,
             equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
             actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
             hours_monthly_target, forecasted_contracted_hours,
             daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two,
-            price_currency_contract, paid_contract, payment_time, guarantees, payment_date
-        ) VALUES (
-            '$driver_id_post', '$project_id', '$mine_id', '$project_contract_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days',
+            price_currency_contract, paid_contract, payment_time, guarantees, payment_date";
+
+              $insert_values = "'$driver_id_post', '$project_id', '$mine_id', '$project_contract_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days',
             '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
             '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
             '$hours_monthly_target','$forecasted_contracted_hours',
             '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two',
-            '$price_currency_contract','$paid_contract','$payment_time','$guarantees','$payment_date'
-        )";
+            '$price_currency_contract','$paid_contract','$payment_time','$guarantees','$payment_date'";
+
+              if (!$is_super_admin && db_table_has_column($conn, 'drivercontracts', 'company_id')) {
+                $insert_columns .= ', company_id';
+                $insert_values .= ', ' . $company_id;
+              }
+
+              $sql = "INSERT INTO drivercontracts (
+            $insert_columns
+          ) VALUES (
+            $insert_values
+          )";
               }
               $result = mysqli_query($conn, $sql);
 
@@ -1272,7 +1341,12 @@ $driver_id = intval($_GET['id']);
                 // إضافة بيانات المعدات الجديدة
                 if (!empty($equipment_array)) {
                   // حذف المعدات القديمة أولاً
-                  $delete_sql = "DELETE FROM drivercontractequipments WHERE contract_id = $contract_id";
+                  $delete_sql = "DELETE dce
+                                 FROM drivercontractequipments dce
+                                 JOIN drivercontracts sc ON sc.id = dce.contract_id
+                                 WHERE dce.contract_id = $contract_id
+                                   AND sc.driver_id = $driver_id
+                                   AND $driver_contract_scope_sql";
                   mysqli_query($conn, $delete_sql);
 
                   // إضافة المعدات الجديدة
@@ -1312,7 +1386,7 @@ $driver_id = intval($_GET['id']);
                       LEFT JOIN project op ON sc.project_id = op.id
                       LEFT JOIN contracts c ON sc.project_contract_id = c.id
                       LEFT JOIN mines m ON c.mine_id = m.id
-                      WHERE sc.driver_id = $driver_id 
+                      WHERE sc.driver_id = $driver_id AND $driver_contract_scope_sql
                       ORDER BY sc.id DESC";
             $result = mysqli_query($conn, $query);
             $i = 1;
@@ -2224,3 +2298,4 @@ $driver_id = intval($_GET['id']);
 </body>
 
 </html>
+

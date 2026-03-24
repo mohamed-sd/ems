@@ -274,3 +274,63 @@ Stack trace:
 Stack trace:
 #0 {main}
   thrown in C:\xampp-v0.01\htdocs\ems\Equipments\equipments_types.php on line 4
+[14-Mar-2026 13:35:27 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:35:35 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:36:21 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:36:57 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:36:59 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:38:51 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:38:53 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:39:25 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:39:27 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:40:37 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:40:39 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:40:44 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 13:57:39 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 14:42:52 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 15:58:55 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 17:00:03 Europe/Berlin] PHP Fatal error:  Cannot redeclare check_permission() (previously declared in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php:28) in C:\xampp-v0.01\htdocs\ems\includes\permissions_helper.php on line 28
+[14-Mar-2026 21:41:51 Europe/Berlin] PHP Warning:  file_get_contents(database/update_suppliers_table.sql): Failed to open stream: No such file or directory in C:\xampp-v0.01\htdocs\ems\setup_suppliers_table.php on line 12
+[14-Mar-2026 21:41:57 Europe/Berlin] PHP Warning:  file_get_contents(database/update_suppliers_table.sql): Failed to open stream: No such file or directory in C:\xampp-v0.01\htdocs\ems\setup_suppliers_table.php on line 12
+[14-Mar-2026 21:43:44 Europe/Berlin] PHP Warning:  file_get_contents(database/update_suppliers_table.sql): Failed to open stream: No such file or directory in C:\xampp-v0.01\htdocs\ems\setup_suppliers_table.php on line 12
+[14-Mar-2026 22:15:53 Europe/Berlin] PHP Warning:  Undefined array key "can_edi" in C:\xampp-v0.01\htdocs\ems\Settings\settings.php on line 265
+[18-Mar-2026 14:50:20 Europe/Berlin] PHP Warning:  mail(): Failed to connect to mailserver at &quot;localhost&quot; port 25, verify your &quot;SMTP&quot; and &quot;smtp_port&quot; setting in php.ini or use ini_set() in C:\xampp-v0.01\htdocs\ems\admin\includes\auth.php on line 126
+[18-Mar-2026 14:50:20 Europe/Berlin] Failed to send super admin reset email to sudanit2015@gmail.com
+[18-Mar-2026 14:51:01 Europe/Berlin] PHP Warning:  mail(): Failed to connect to mailserver at &quot;localhost&quot; port 25, verify your &quot;SMTP&quot; and &quot;smtp_port&quot; setting in php.ini or use ini_set() in C:\xampp-v0.01\htdocs\ems\admin\includes\auth.php on line 126
+[18-Mar-2026 14:51:01 Europe/Berlin] Failed to send super admin reset email to sudanit2015@gmail.com
+[23-Mar-2026 16:14:52 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): No connection could be made because the target machine actively refused it in C:\xampp-v0.01\htdocs\ems\config.php on line 48
+[23-Mar-2026 16:14:52 Europe/Berlin] Database Connection Failed: No connection could be made because the target machine actively refused it
+[24-Mar-2026 07:03:26 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): No connection could be made because the target machine actively refused it in C:\xampp-v0.01\htdocs\ems\config.php on line 48
+[24-Mar-2026 07:03:26 Europe/Berlin] Database Connection Failed: No connection could be made because the target machine actively refused it
+[24-Mar-2026 10:02:04 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function fetch_assoc() on bool in C:\xampp-v0.01\htdocs\ems\main\dashboard.php:130
+Stack trace:
+#0 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\main\dashboard.php on line 130
+[24-Mar-2026 10:02:06 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function fetch_assoc() on bool in C:\xampp-v0.01\htdocs\ems\main\dashboard.php:130
+Stack trace:
+#0 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\main\dashboard.php on line 130
+[24-Mar-2026 10:02:14 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function fetch_assoc() on bool in C:\xampp-v0.01\htdocs\ems\main\dashboard.php:130
+Stack trace:
+#0 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\main\dashboard.php on line 130
+[24-Mar-2026 10:02:49 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function fetch_assoc() on bool in C:\xampp-v0.01\htdocs\ems\main\dashboard.php:130
+Stack trace:
+#0 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\main\dashboard.php on line 130
+[24-Mar-2026 10:04:08 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function fetch_assoc() on bool in C:\xampp-v0.01\htdocs\ems\main\dashboard.php:130
+Stack trace:
+#0 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\main\dashboard.php on line 130
+[24-Mar-2026 10:04:09 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to a member function fetch_assoc() on bool in C:\xampp-v0.01\htdocs\ems\main\dashboard.php:130
+Stack trace:
+#0 {main}
+  thrown in C:\xampp-v0.01\htdocs\ems\main\dashboard.php on line 130
+[24-Mar-2026 10:41:15 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-v0.01\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Mar-2026 10:41:15 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-v0.01\php\PEAR') in C:\xampp-v0.01\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Mar-2026 10:41:37 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-v0.01\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Mar-2026 10:41:37 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-v0.01\php\PEAR') in C:\xampp-v0.01\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Mar-2026 10:41:58 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-v0.01\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Mar-2026 10:41:58 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-v0.01\php\PEAR') in C:\xampp-v0.01\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Mar-2026 10:42:04 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-v0.01\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Mar-2026 10:42:04 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-v0.01\php\PEAR') in C:\xampp-v0.01\htdocs\ems\admin\permissions\role_permissions.php on line 9

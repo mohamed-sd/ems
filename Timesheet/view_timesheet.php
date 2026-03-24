@@ -1,19 +1,44 @@
-<?php
+﻿<?php
 session_start();
 // check user login
 if (!isset($_SESSION['user'])) {
-  header("Location: ../index.php");
+  header("Location: ../login.php");
   exit();
 }
 
 include '../includes/permissions_helper.php';
 
-// ════════════════════════════════════════════════════════════════════════════
-// 🔐 التحقق من صلاحيات المستخدم
-// ════════════════════════════════════════════════════════════════════════════
-$page_title = "إيكوبيشن | ساعات العمل";
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ðŸ” Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+$page_title = "Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„";
 include("../inheader.php");
 include '../config.php';
+
+$is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    header("Location: ../login.php?msg=Unauthorized+company+context");
+    exit();
+}
+
+$tenant_scope = "";
+if (!$is_super_admin) {
+    if (db_table_has_column($conn, 'timesheet', 'company_id')) {
+        $tenant_scope = " AND t.company_id = $company_id";
+    } else {
+        $tenant_scope = " AND EXISTS (
+            SELECT 1
+            FROM project p2
+            LEFT JOIN users su2 ON su2.id = p2.created_by
+            LEFT JOIN clients sc2 ON sc2.id = p2.company_client_id
+            LEFT JOIN users scu2 ON scu2.id = sc2.created_by
+            WHERE p2.id = o.project_id
+                AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
+        )";
+    }
+}
 
 $page_permissions = check_page_permissions($conn, 'timesheet');
 $can_view = $page_permissions['can_view'];
@@ -21,9 +46,9 @@ $can_add = $page_permissions['can_add'];
 $can_edit = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 
-// منع الوصول إذا لم تكن صلاحية عرض
+// Ù…Ù†Ø¹ Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ø°Ø§ Ù„Ù… ØªÙƒÙ† ØµÙ„Ø§Ø­ÙŠØ© Ø¹Ø±Ø¶
 if (!$can_view) {
-  header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+ساعات+العمل+❌");
+  header("Location: ../login.php?msg=Ù„Ø§+ØªÙˆØ¬Ø¯+ØµÙ„Ø§Ø­ÙŠØ©+Ø¹Ø±Ø¶+Ø³Ø§Ø¹Ø§Øª+Ø§Ù„Ø¹Ù…Ù„+âŒ");
   exit();
 }
 
@@ -36,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $equipment_type = mysqli_real_escape_string($conn, $_POST['equipment_type']);
   $shift_filter   = isset($_POST['shift']) ? mysqli_real_escape_string($conn, $_POST['shift']) : '';
 
-  // مصفوفة لتجميع الشروط
+  // Ù…ØµÙÙˆÙØ© Ù„ØªØ¬Ù…ÙŠØ¹ Ø§Ù„Ø´Ø±ÙˆØ·
   $whereParts = [];
 
   if (!empty($start_date) && !empty($end_date)) {
@@ -49,16 +74,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $whereParts[] = "t.shift = '$shift_filter'";
   }
 
-  if (count($whereParts) > 0) {
-    $where = "WHERE " . implode(" AND ", $whereParts);
+    if (count($whereParts) > 0) {
+        $where = "WHERE " . implode(" AND ", $whereParts) . $tenant_scope;
+    } else {
+        $where = "WHERE 1=1" . $tenant_scope;
   }
 } else {
-  // ✅ أول مرة يفتح الصفحة: عرض سجلات اليوم فقط
+  // âœ… Ø£ÙˆÙ„ Ù…Ø±Ø© ÙŠÙØªØ­ Ø§Ù„ØµÙØ­Ø©: Ø¹Ø±Ø¶ Ø³Ø¬Ù„Ø§Øª Ø§Ù„ÙŠÙˆÙ… ÙÙ‚Ø·
   $today = date("Y-m-d");
-  $where = "WHERE t.date = '$today'";
+    $where = "WHERE t.date = '$today'" . $tenant_scope;
 }
 
-// --- إحصائيات ---
+// --- Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª ---
 $stats = [
   "total" => 0,
   "approved" => 0,
@@ -80,7 +107,7 @@ if ($row = mysqli_fetch_assoc($stat_query)) {
   $stats = $row;
 }
 
-// --- البيانات ---
+// --- Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª ---
 $query = "SELECT t.id, t.shift, t.date, t.executed_hours,
         t.standby_hours , t.total_fault_hours ,bucket_hours,jackhammer_hours,
         extra_hours, t.status ,
@@ -110,129 +137,129 @@ include('../insidebar.php');
     <div class="page-header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-business-time"></i></div>
-            ساعات العمل
+            Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„
         </h1>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
+                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
             </a>
             <a href="view_timesheet.php" class="back-btn" style="background: var(--green-soft); color: var(--green); border-color: rgba(22,163,74,.22);">
-                <i class="fas fa-redo"></i> إعادة تعيين
+                <i class="fas fa-redo"></i> Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ†
             </a>
         </div>
     </div>
 
-    <!-- ✅ إحصائيات -->
+    <!-- âœ… Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª -->
     <div class="stats-grid" style="margin-bottom: 24px;">
         <div class="stat-card">
             <div class="stat-card-icon"><i class="fas fa-check-circle"></i></div>
             <div class="stat-card-value" id="stat_approved"><?= !empty($stats['approved']) ? $stats['approved'] : 0 ?></div>
-            <div class="stat-card-label">سجلات معتمدة</div>
+            <div class="stat-card-label">Ø³Ø¬Ù„Ø§Øª Ù…Ø¹ØªÙ…Ø¯Ø©</div>
         </div>
         <div class="stat-card">
             <div class="stat-card-icon"><i class="fas fa-hourglass-half"></i></div>
             <div class="stat-card-value" id="stat_pending"><?= !empty($stats['pending']) ? $stats['pending'] : 0 ?></div>
-            <div class="stat-card-label">قيد المراجعة</div>
+            <div class="stat-card-label">Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©</div>
         </div>
         <div class="stat-card">
             <div class="stat-card-icon"><i class="fas fa-times-circle"></i></div>
             <div class="stat-card-value" id="stat_rejected"><?= !empty($stats['rejected']) ? $stats['rejected'] : 0 ?></div>
-            <div class="stat-card-label">سجلات مرفوضة</div>
+            <div class="stat-card-label">Ø³Ø¬Ù„Ø§Øª Ù…Ø±ÙÙˆØ¶Ø©</div>
         </div>
         <div class="stat-card">
             <div class="stat-card-icon"><i class="fas fa-clock"></i></div>
             <div class="stat-card-value" id="stat_hours"><?= !empty($stats['total_hours']) ? (int)$stats['total_hours'] : 0 ?></div>
-            <div class="stat-card-label">إجمالي الساعات</div>
+            <div class="stat-card-label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª</div>
         </div>
     </div>
 
-    <!-- ✅ فورم الفلترة -->
+    <!-- âœ… ÙÙˆØ±Ù… Ø§Ù„ÙÙ„ØªØ±Ø© -->
     <div class="card">
         <div class="card-header">
-            <h5><i class="fas fa-filter"></i> فلترة النتائج</h5>
+            <h5><i class="fas fa-filter"></i> ÙÙ„ØªØ±Ø© Ø§Ù„Ù†ØªØ§Ø¦Ø¬</h5>
         </div>
         <div class="card-body">
             <form method="POST" class="form-grid">
                 <div>
-                    <label><i class="fas fa-calendar"></i> تاريخ البداية</label>
+                    <label><i class="fas fa-calendar"></i> ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©</label>
                     <input type="date" name="start_date" class="form-control" />
                 </div>
                 <div>
-                    <label><i class="fas fa-calendar"></i> تاريخ النهاية</label>
+                    <label><i class="fas fa-calendar"></i> ØªØ§Ø±ÙŠØ® Ø§Ù„Ù†Ù‡Ø§ÙŠØ©</label>
                     <input type="date" name="end_date" class="form-control" />
                 </div>
                 <div>
-                    <label><i class="fas fa-cogs"></i> نوع المعدة</label>
+                    <label><i class="fas fa-cogs"></i> Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©</label>
                     <select name="equipment_type" class="form-control">
-                        <option value="">-- الكل --</option>
-                        <option value="1"> معدات ثقيبلة </option>
-                        <option value="2"> شاحنات </option>
+                        <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
+                        <option value="1"> Ù…Ø¹Ø¯Ø§Øª Ø«Ù‚ÙŠØ¨Ù„Ø© </option>
+                        <option value="2"> Ø´Ø§Ø­Ù†Ø§Øª </option>
                     </select>
                 </div>
                 <div>
-                    <label><i class="fas fa-sun"></i> الوردية</label>
+                    <label><i class="fas fa-sun"></i> Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</label>
                     <select name="shift" class="form-control">
-                        <option value="">-- الكل --</option>
-                        <option value="D">☀️ صباحية</option>
-                        <option value="N">🌙 مسائية</option>
+                        <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
+                        <option value="D">â˜€ï¸ ØµØ¨Ø§Ø­ÙŠØ©</option>
+                        <option value="N">ðŸŒ™ Ù…Ø³Ø§Ø¦ÙŠØ©</option>
                     </select>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: flex-end;">
                     <button type="submit" class="btn-submit">
-                        <i class="fas fa-search"></i> تطبيق
+                        <i class="fas fa-search"></i> ØªØ·Ø¨ÙŠÙ‚
                     </button>
                     <a href="view_timesheet.php" class="btn-cancel" style="text-decoration: none; padding: 11px 26px;">
-                        <i class="fas fa-redo"></i> إعادة تعيين
+                        <i class="fas fa-redo"></i> Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ†
                     </a>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- ✅ جدول البيانات -->
+    <!-- âœ… Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª -->
     <div class="card">
         <div class="card-header">
-            <h5><i class="fas fa-list-alt"></i> قائمة ساعات العمل</h5>
+            <h5><i class="fas fa-list-alt"></i> Ù‚Ø§Ø¦Ù…Ø© Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</h5>
         </div>
         <div class="card-body">
             <table id="timesheetTable" class="display nowrap">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>المعدة</th>
-                        <th>المشروع</th>
-                        <th>السائق</th>
-                        <th>التاريخ</th>
-                        <th>الوردية</th>
-                        <th>الساعات المنفذة</th>
-                        <th>الاستعداد</th>
-                        <th>الأعطال</th>
-                        <th>الحالة</th>
-                        <th>الإجراءات</th>
+                        <th>Ø§Ù„Ù…Ø¹Ø¯Ø©</th>
+                        <th>Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</th>
+                        <th>Ø§Ù„Ø³Ø§Ø¦Ù‚</th>
+                        <th>Ø§Ù„ØªØ§Ø±ÙŠØ®</th>
+                        <th>Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</th>
+                        <th>Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ù†ÙØ°Ø©</th>
+                        <th>Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯</th>
+                        <th>Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</th>
+                        <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+                        <th>Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
                     $i = 1;
                     while ($row = mysqli_fetch_assoc($result)) {
-                        // تحديد الحالة
+                        // ØªØ­Ø¯ÙŠØ¯ Ø§Ù„Ø­Ø§Ù„Ø©
                         $statusBadge = '';
                         switch ($row['status']) {
                             case "1":
-                                $statusBadge = '<span class="status-pill" style="background: rgba(232,184,0,.13); color: var(--gold); border: 1px solid rgba(232,184,0,.22);">⏳ قيد المراجعة</span>';
+                                $statusBadge = '<span class="status-pill" style="background: rgba(232,184,0,.13); color: var(--gold); border: 1px solid rgba(232,184,0,.22);">â³ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©</span>';
                                 break;
                             case "2":
-                                $statusBadge = '<span class="status-pill status-active">✓ معتمد</span>';
+                                $statusBadge = '<span class="status-pill status-active">âœ“ Ù…Ø¹ØªÙ…Ø¯</span>';
                                 break;
                             case "3":
-                                $statusBadge = '<span class="status-pill status-inactive">✗ مرفوض</span>';
+                                $statusBadge = '<span class="status-pill status-inactive">âœ— Ù…Ø±ÙÙˆØ¶</span>';
                                 break;
                             default:
-                                $statusBadge = '<span class="status-pill">غير معروف</span>';
+                                $statusBadge = '<span class="status-pill">ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ</span>';
                         }
 
-                        // تحديد الوردية
-                        $shiftText = $row['shift'] == "D" ? "☀️ صباحية" : "🌙 مسائية";
+                        // ØªØ­Ø¯ÙŠØ¯ Ø§Ù„ÙˆØ±Ø¯ÙŠØ©
+                        $shiftText = $row['shift'] == "D" ? "â˜€ï¸ ØµØ¨Ø§Ø­ÙŠØ©" : "ðŸŒ™ Ù…Ø³Ø§Ø¦ÙŠØ©";
 
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
@@ -241,33 +268,33 @@ include('../insidebar.php');
                         echo "<td>" . htmlspecialchars($row['driver_name']) . "</td>";
                         echo "<td>" . $row['date'] . "</td>";
                         echo "<td>" . $shiftText . "</td>";
-                        echo "<td><strong>" . $row['executed_hours'] . " ساعة</strong></td>";
-                        echo "<td>" . $row['standby_hours'] . " ساعة</td>";
-                        echo "<td>" . $row['total_fault_hours'] . " ساعة</td>";
+                        echo "<td><strong>" . $row['executed_hours'] . " Ø³Ø§Ø¹Ø©</strong></td>";
+                        echo "<td>" . $row['standby_hours'] . " Ø³Ø§Ø¹Ø©</td>";
+                        echo "<td>" . $row['total_fault_hours'] . " Ø³Ø§Ø¹Ø©</td>";
                         echo "<td>" . $statusBadge . "</td>";
                         echo "<td>
                             <div class='action-btns'>
                                 <a href='timesheet_details.php?id=" . $row['id'] . "' 
                                    class='action-btn view' 
-                                   title='عرض التفاصيل'>
+                                   title='Ø¹Ø±Ø¶ Ø§Ù„ØªÙØ§ØµÙŠÙ„'>
                                     <i class='fas fa-eye'></i>
                                 </a>
                                 <a href='aprovment.php?t=$type&type=1&id=" . $row['id'] . "' 
                                    class='action-btn' 
                                    style='background: var(--green-soft); color: var(--green);'
-                                   title='الموافقة'>
+                                   title='Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©'>
                                     <i class='fas fa-check'></i>
                                 </a>
                                 <a href='aprovment.php?t=$type&type=2&id=" . $row['id'] . "' 
                                    class='action-btn delete' 
-                                   title='الرفض'>
+                                   title='Ø§Ù„Ø±ÙØ¶'>
                                     <i class='fas fa-times'></i>
                                 </a>
                                 <a href='delete_timesheet.php?id=" . $row['id'] . "' 
                                    class='action-btn' 
                                    style='background: var(--red-soft); color: var(--red);'
-                                   onclick=\"return confirm('هل أنت متأكد من الحذف؟')\"
-                                   title='حذف'>
+                                   onclick=\"return confirm('Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø§Ù„Ø­Ø°ÙØŸ')\"
+                                   title='Ø­Ø°Ù'>
                                     <i class='fas fa-trash'></i>
                                 </a>
                             </div>
@@ -298,16 +325,16 @@ include('../insidebar.php');
 
 <script>
     $(document).ready(function () {
-        // تشغيل DataTable بالعربية
+        // ØªØ´ØºÙŠÙ„ DataTable Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©
         $('#timesheetTable').DataTable({
             responsive: true,
             dom: 'Bfrtip', // Buttons + Search + Pagination
             buttons: [
-                { extend: 'copy', text: 'نسخ' },
-                { extend: 'excel', text: 'تصدير Excel' },
-                { extend: 'csv', text: 'تصدير CSV' },
-                { extend: 'pdf', text: 'تصدير PDF' },
-                { extend: 'print', text: 'طباعة' }
+                { extend: 'copy', text: 'Ù†Ø³Ø®' },
+                { extend: 'excel', text: 'ØªØµØ¯ÙŠØ± Excel' },
+                { extend: 'csv', text: 'ØªØµØ¯ÙŠØ± CSV' },
+                { extend: 'pdf', text: 'ØªØµØ¯ÙŠØ± PDF' },
+                { extend: 'print', text: 'Ø·Ø¨Ø§Ø¹Ø©' }
             ],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"

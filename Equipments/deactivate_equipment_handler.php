@@ -20,6 +20,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
 }
 
+$current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$is_super_admin = ($current_role === '-1');
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    die(json_encode(['success' => false, 'message' => 'معرّف الشركة غير متوفر']));
+}
+
+$equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
+
 enforce_module_permission_json($conn, 'equipments', 'edit', 'لا توجد صلاحية تعديل حالة الآليات');
 
 // الحصول على البيانات
@@ -38,7 +48,8 @@ if ($equipment_id <= 0) {
 }
 
 // الحصول على بيانات الآلية الحالية
-$equipment_query = "SELECT id, code, name, availability_status FROM equipments WHERE id = $equipment_id";
+$equipment_scope = ($is_super_admin || !$equipments_has_company) ? '' : " AND company_id = $company_id";
+$equipment_query = "SELECT id, code, name, availability_status FROM equipments WHERE id = $equipment_id$equipment_scope";
 $equipment_result = mysqli_query($conn, $equipment_query);
 
 if (!$equipment_result || mysqli_num_rows($equipment_result) === 0) {
@@ -81,7 +92,7 @@ $payload = [
         [
             'type' => 'UPDATE',
             'table' => 'equipments',
-            'where' => "id = $equipment_id",
+            'where' => "id = $equipment_id" . (($is_super_admin || !$equipments_has_company) ? '' : " AND company_id = $company_id"),
             'fields' => [
                 'availability_status' => $action === 'deactivate_equipment' ? 'موقوفة للصيانة' : 'متاحة للعمل'
             ]

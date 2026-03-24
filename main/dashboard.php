@@ -1,17 +1,76 @@
-<?php
+﻿<?php
 session_start();
-if (!isset($_SESSION['user'])) { header("Location: ../index.php"); exit(); }
+if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include "../config.php";
 require_once dirname(__FILE__) . '/../includes/dynamic_nav.php';
 
-/* ══════════════════════════════
+if (!headers_sent()) {
+  header('Content-Type: text/html; charset=UTF-8');
+}
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    DATA LAYER
-══════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 $role     = $_SESSION['user']['role'];
 $userName = $_SESSION['user']['name'];
 $roleText = "غير معروف";
+$companyId = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$companyName = '';
 
-// جلب اسم الدور من جدول roles بدلاً من المصفوفة الثابتة
+if (!function_exists('dashboard_has_column')) {
+  function dashboard_has_column($conn, $tableName, $columnName) {
+    $safeTable = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
+    $safeCol = preg_replace('/[^a-zA-Z0-9_]/', '', $columnName);
+    $sql = "SHOW COLUMNS FROM " . $safeTable . " LIKE '" . mysqli_real_escape_string($conn, $safeCol) . "'";
+    $res = @mysqli_query($conn, $sql);
+    return $res && mysqli_num_rows($res) > 0;
+  }
+}
+
+if (!function_exists('dashboard_scalar')) {
+  function dashboard_scalar($conn, $sql, $key) {
+    $res = $conn->query($sql);
+    if (!$res) {
+      return 0;
+    }
+    $row = $res->fetch_assoc();
+    if (!$row || !isset($row[$key])) {
+      return 0;
+    }
+    return $row[$key];
+  }
+}
+
+$projectClientColumn = dashboard_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
+
+if ($companyId > 0) {
+  $companyNameCols = array();
+  if (dashboard_has_column($conn, 'admin_companies', 'company_name_ar')) {
+    $companyNameCols[] = 'company_name_ar';
+  }
+  if (dashboard_has_column($conn, 'admin_companies', 'company_name')) {
+    $companyNameCols[] = 'company_name';
+  }
+  if (dashboard_has_column($conn, 'admin_companies', 'name')) {
+    $companyNameCols[] = 'name';
+  }
+
+  if (!empty($companyNameCols)) {
+    $companyNameSql = "SELECT " . implode(', ', $companyNameCols) . " FROM admin_companies WHERE id = $companyId LIMIT 1";
+    $companyNameRes = @mysqli_query($conn, $companyNameSql);
+    if ($companyNameRes) {
+      $companyNameRow = mysqli_fetch_assoc($companyNameRes);
+      foreach ($companyNameCols as $col) {
+        if (isset($companyNameRow[$col]) && trim($companyNameRow[$col]) !== '') {
+          $companyName = trim($companyNameRow[$col]);
+          break;
+        }
+      }
+    }
+  }
+}
+
+// جلب اسم الدور من جدول roles بدلًا من المصفوفة الثابتة
 $roleId = intval($role);
 $roleStmt = $conn->prepare("SELECT name FROM roles WHERE id = ? LIMIT 1");
 if ($roleStmt) {
@@ -29,7 +88,16 @@ $userId = $_SESSION['user']['id'];
 $projectId = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
 $projectName = '';
 if ($projectId > 0) {
-  $projectQuery = $conn->query("SELECT name FROM project WHERE id = $projectId LIMIT 1");
+  $projectScopeForName = $companyId > 0
+    ? " AND (EXISTS (SELECT 1 FROM users su WHERE su.id = project.created_by AND su.company_id = $companyId)
+         OR EXISTS (
+             SELECT 1 FROM clients sc
+             INNER JOIN users scu ON scu.id = sc.created_by
+             WHERE sc.id = project.$projectClientColumn AND scu.company_id = $companyId
+         ))"
+    : '';
+
+  $projectQuery = $conn->query("SELECT name FROM project WHERE id = $projectId $projectScopeForName LIMIT 1");
   if ($projectQuery && $projectRow = $projectQuery->fetch_assoc()) {
     $projectName = $projectRow['name'];
   }
@@ -43,37 +111,69 @@ foreach ($dynamicLinks as $link) {
   $links[] = ['../' . $link['code'], 'fas fa-bolt', $link['name']];
 }
 
-/* Stat cards — [icon, raw_value, label, accent] */
+/* Stat cards â€” [icon, raw_value, label, accent] */
 $stats = [];
+
+$scopeClients = $companyId > 0
+  ? "EXISTS (SELECT 1 FROM users su WHERE su.id = clients.created_by AND su.company_id = $companyId)"
+  : '1=1';
+$scopeProjects = $companyId > 0
+  ? "(
+      EXISTS (SELECT 1 FROM users su WHERE su.id = project.created_by AND su.company_id = $companyId)
+      OR EXISTS (
+          SELECT 1 FROM clients sc
+          INNER JOIN users scu ON scu.id = sc.created_by
+          WHERE sc.id = project.$projectClientColumn AND scu.company_id = $companyId
+      )
+    )"
+  : '1=1';
+$scopeOperationsByProject = $companyId > 0
+  ? "operations.project_id IN (
+      SELECT p.id
+      FROM project p
+      WHERE
+        EXISTS (SELECT 1 FROM users su WHERE su.id = p.created_by AND su.company_id = $companyId)
+        OR EXISTS (
+            SELECT 1 FROM clients sc
+            INNER JOIN users scu ON scu.id = sc.created_by
+            WHERE sc.id = p.$projectClientColumn AND scu.company_id = $companyId
+        )
+    )"
+  : '1=1';
+
 if ($role=="0"||$role=="1") {
-  $c=$conn->query("SELECT COUNT(*) AS t FROM clients WHERE status='نشط'")->fetch_assoc()['t'];
-  $p=$conn->query("SELECT COUNT(*) AS t FROM project WHERE status='1'")->fetch_assoc()['t'];
-  $m=$conn->query("SELECT COUNT(*) AS t FROM mines WHERE status='1'")->fetch_assoc()['t'];
-  $u=$conn->query("SELECT COUNT(*) AS t FROM users WHERE parent_id='0' AND role!='-1'")->fetch_assoc()['t'];
+  $c=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM clients WHERE status='نشط' AND $scopeClients", 't');
+  $p=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM project WHERE status='1' AND $scopeProjects", 't');
+  $m=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM mines WHERE status='1' AND project_id IN (SELECT id FROM project WHERE $scopeProjects)", 't');
+  $u=($companyId > 0)
+    ? dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE company_id = $companyId AND role!='-1'", 't')
+    : dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE parent_id='0' AND role!='-1'", 't');
   $stats=[['fa-users',$c,'العملاء','gold'],['fa-project-diagram',$p,'المشاريع','blue'],['fa-mountain',$m,'المناجم','teal'],['fa-user-shield',$u,'المستخدمين','purple']];
 } elseif ($role=="2") {
-  $s=$conn->query("SELECT COUNT(*) AS t FROM suppliers WHERE status='1'")->fetch_assoc()['t'];
-  $e=$conn->query("SELECT COUNT(*) AS t FROM equipments WHERE status='1'")->fetch_assoc()['t'];
-  $co=$conn->query("SELECT COUNT(*) AS t FROM supplierscontracts WHERE status='1'")->fetch_assoc()['t'];
+  $s=dashboard_scalar($conn, "SELECT COUNT(DISTINCT s.id) AS t FROM suppliers s JOIN equipments e ON e.suppliers=s.id JOIN operations o ON o.equipment=e.id WHERE s.status='1' AND $scopeOperationsByProject", 't');
+  $e=dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e JOIN operations o ON o.equipment=e.id WHERE e.status='1' AND $scopeOperationsByProject", 't');
+  $co=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM supplierscontracts WHERE status='1' AND project_id IN (SELECT id FROM project WHERE $scopeProjects)", 't');
   $stats=[['fa-truck',$s,'الموردين','gold'],['fa-tools',$e,'الآليات','blue'],['fa-file-contract',$co,'العقود','teal']];
 } elseif ($role=="4") {
-  $eq=$conn->query("SELECT COUNT(*) AS t FROM equipments WHERE status='1'")->fetch_assoc()['t'];
-  $ao=$conn->query("SELECT COUNT(*) AS t FROM operations WHERE status='1'")->fetch_assoc()['t'];
-  $bo=$conn->query("SELECT COUNT(*) AS t FROM operations WHERE status='0'")->fetch_assoc()['t'];
+  $eq=dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e JOIN operations o ON o.equipment=e.id WHERE e.status='1' AND $scopeOperationsByProject", 't');
+  $ao=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM operations WHERE status='1' AND $scopeOperationsByProject", 't');
+  $bo=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM operations WHERE status='0' AND $scopeOperationsByProject", 't');
   $stats=[['fa-tools',$eq,'إجمالي المعدات','gold'],['fa-play-circle',$ao,'تعمل الآن','blue'],['fa-exclamation-triangle',$bo,'معطلة','orange']];
 } elseif ($role=="3") {
-  $dr=$conn->query("SELECT COUNT(*) AS t FROM drivers WHERE status='1'")->fetch_assoc()['t'];
-  $ad=$conn->query("SELECT COUNT(DISTINCT d.id) AS t FROM drivers d JOIN timesheet t ON d.id=t.driver WHERE t.status='1'")->fetch_assoc()['t'];
+  $dr=dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM drivers d JOIN equipment_drivers ed ON ed.driver_id=d.id JOIN operations o ON o.equipment=ed.equipment_id WHERE d.status='1' AND $scopeOperationsByProject", 't');
+  $ad=dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM drivers d JOIN timesheet t ON d.id=t.driver JOIN operations o ON t.operator=o.id WHERE t.status='1' AND $scopeOperationsByProject", 't');
   $stats=[['fa-id-badge',$dr,'المشغلين','gold'],['fa-user-check',$ad,'يعملون الآن','blue'],['fa-user-clock',$dr-$ad,'خاملين','orange']];
 } elseif ($role=="5") {
-  $sv=$conn->query("SELECT COUNT(*) AS t FROM users WHERE role IN ('6','7','8','9')")->fetch_assoc()['t'];
-  $h=$conn->query("SELECT SUM(total_work_hours) AS t FROM timesheet")->fetch_assoc()['t'];
-  $ah=$conn->query("SELECT SUM(total_work_hours) AS t FROM timesheet WHERE status='1'")->fetch_assoc()['t'];
+  $sv=($companyId > 0)
+    ? dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE company_id = $companyId AND role IN ('6','7','8','9')", 't')
+    : dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE role IN ('6','7','8','9')", 't');
+  $h=dashboard_scalar($conn, "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN operations o ON t.operator=o.id WHERE $scopeOperationsByProject", 't');
+  $ah=dashboard_scalar($conn, "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN operations o ON t.operator=o.id WHERE t.status='1' AND $scopeOperationsByProject", 't');
   $stats=[['fa-users-cog',$sv,'المشرفين','gold'],['fa-clock',(int)$h,'ساعات العمل','blue'],['fa-check-circle',(int)$ah,'الساعات المعتمدة','teal']];
 } elseif ($role=="10") {
-  $eq=$conn->query("SELECT COUNT(*) AS t FROM equipments WHERE status='1'")->fetch_assoc()['t'];
-  $dr=$conn->query("SELECT COUNT(*) AS t FROM drivers WHERE status='1'")->fetch_assoc()['t'];
-  $h=$conn->query("SELECT SUM(total_work_hours) AS t FROM timesheet")->fetch_assoc()['t'];
+  $eq=dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e JOIN operations o ON o.equipment=e.id WHERE e.status='1' AND $scopeOperationsByProject", 't');
+  $dr=dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM drivers d JOIN equipment_drivers ed ON ed.driver_id=d.id JOIN operations o ON o.equipment=ed.equipment_id WHERE d.status='1' AND $scopeOperationsByProject", 't');
+  $h=dashboard_scalar($conn, "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN operations o ON t.operator=o.id WHERE $scopeOperationsByProject", 't');
   $stats=[['fa-tools',$eq,'الآليات','gold'],['fa-id-badge',$dr,'المشغلين','blue'],['fa-clock',(int)$h,'الساعات','teal']];
 }
 
@@ -90,9 +190,9 @@ $linkCount = count($links);
   <link rel="stylesheet" href="../assets/css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
   <style>
-/* ════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    TOKENS
-════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 :root{
   --navy:      #0c1c3e;
   --navy-m:    #132050;
@@ -128,12 +228,12 @@ $linkCount = count($links);
 html,body{height:100%;font-family:var(--font);color:var(--txt);background:var(--bg)}
 a{text-decoration:none;color:inherit}
 
-/* ════════════════════════════════════════════════════
-   LAYOUT — 3-row grid that fills 100vh exactly
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   LAYOUT â€” 3-row grid that fills 100vh exactly
    row1: topbar   (auto)
    row2: hero     (auto)
-   row3: stats    (1fr — grows to fill all remaining)
-════════════════════════════════════════════════════ */
+   row3: stats    (1fr â€” grows to fill all remaining)
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .main{
   display:grid;
   grid-template-rows:auto auto 1fr;
@@ -144,9 +244,9 @@ a{text-decoration:none;color:inherit}
   width:100%;
 }
 
-/* ════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    TOP BAR
-════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
 
 .brand{display:flex;align-items:center;gap:10px}
@@ -176,9 +276,9 @@ a{text-decoration:none;color:inherit}
 }
 .btn-out:hover{background:var(--danger);color:#fff;box-shadow:0 5px 16px rgba(220,38,38,.3)}
 
-/* ════════════════════════════════════════════════════
-   HERO ROW — banner + quick links side by side
-════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   HERO ROW â€” banner + quick links side by side
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .hero-row{
   display:grid;
   grid-template-columns:1fr 230px;
@@ -186,7 +286,7 @@ a{text-decoration:none;color:inherit}
   flex-shrink:0;
 }
 
-/* ── Banner ── */
+/* â”€â”€ Banner â”€â”€ */
 .banner{
   position:relative;overflow:hidden;
   border-radius:var(--rx);
@@ -246,7 +346,7 @@ a{text-decoration:none;color:inherit}
 .sfx{position:absolute;color:var(--gold-l);pointer-events:none;z-index:0;animation:drift 3s linear forwards}
 @keyframes drift{0%{opacity:.85;transform:translateY(0)scale(1)rotate(0)}100%{opacity:0;transform:translateY(70px)scale(.2)rotate(330deg)}}
 
-/* ── Quick Links Panel ── */
+/* â”€â”€ Quick Links Panel â”€â”€ */
 .ql-panel{
   background:var(--card);
   border:1.5px solid var(--bdr);
@@ -263,7 +363,7 @@ a{text-decoration:none;color:inherit}
 }
 .ql-title i{color:var(--gold)}
 
-/* 2-col icon grid — never overflows vertically */
+/* 2-col icon grid â€” never overflows vertically */
 .ql-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;flex:1}
 .ql-btn{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -282,10 +382,10 @@ a{text-decoration:none;color:inherit}
 .ql-btn:hover span{color:var(--navy)}
 .ql-btn:last-child:nth-child(odd){grid-column:1/-1}
 
-/* ════════════════════════════════════════════════════
-   STATS SECTION — fills ALL remaining vertical space
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   STATS SECTION â€” fills ALL remaining vertical space
    Cards stretch to fill via flex + min-height:0
-════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .stats-wrap{
   display:flex;flex-direction:column;gap:8px;
   min-height:0; /* let it shrink */
@@ -312,7 +412,7 @@ a{text-decoration:none;color:inherit}
   min-height:0;
 }
 
-/* ── Stat Card ── */
+/* â”€â”€ Stat Card â”€â”€ */
 .scard{
   background:var(--card);
   border-radius:var(--rl);
@@ -363,7 +463,7 @@ a{text-decoration:none;color:inherit}
 .scard.orange .scard-icon{background:var(--orange-d);color:var(--orange)}
 .scard.orange:hover .scard-icon{background:var(--orange);color:#fff}
 
-/* card inner layout — centred, grows to fill height */
+/* card inner layout â€” centred, grows to fill height */
 .scard-inner{
   flex:1;
   display:flex;flex-direction:column;
@@ -391,7 +491,7 @@ a{text-decoration:none;color:inherit}
   font-size:.82rem;font-weight:600;color:var(--sub);margin-top:2px;
 }
 
-/* large ghost number — decorative */
+/* large ghost number â€” decorative */
 .scard-ghost{
   position:absolute;
   bottom:50px;left:76%;transform:translateX(-50%);
@@ -399,9 +499,9 @@ a{text-decoration:none;color:inherit}
   color:rgba(12,28,62,.04);pointer-events:none;user-select:none;white-space:nowrap;
 }
 
-/* ════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    RESPONSIVE
-════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 @media(max-width:980px){
   .main{height:auto;overflow:visible;padding-bottom:28px}
   .hero-row{grid-template-columns:1fr}
@@ -439,13 +539,19 @@ a{text-decoration:none;color:inherit}
 
 <div class="main">
 
-  <!-- ▌TOP BAR ▌-->
+  <!-- â–ŒTOP BAR â–Œ-->
   <div class="topbar">
     <div class="brand">
       <div class="brand-icon"><i class="fas fa-layer-group"></i></div>
       <div class="brand-info">
         <div class="sys">إيكوبيشن EPS</div>
-        <div class="greet">مرحباً، <?= htmlspecialchars($userName) ?> 👋</div>
+        <div class="greet">
+          مرحباً، <?= htmlspecialchars($userName) ?>
+          <?php if ($companyName !== ''): ?>
+            | <?= htmlspecialchars($companyName) ?>
+          <?php endif; ?>
+          👋
+        </div>
       </div>
     </div>
     <div class="topbar-r">
@@ -454,7 +560,7 @@ a{text-decoration:none;color:inherit}
     </div>
   </div>
 
-  <!-- ▌HERO ROW ▌-->
+  <!-- â–ŒHERO ROW â–Œ-->
   <div class="hero-row">
 
     <!-- Banner -->
@@ -468,7 +574,7 @@ a{text-decoration:none;color:inherit}
         </div>
         <?php endif; ?>
         <div class="banner-name"><span id="typed"></span><span class="cursor"></span></div>
-        <div class="banner-sub">نتمنى لك يوماً مليئاً بالإنجازات 🚀 <?php echo $_SESSION['user']['role'] ?></div>
+        <div class="banner-sub">نتمنى لك يوماً مليئاً بالإنجازات 🚀</div>
       </div>
       <div class="banner-emoji">🏆</div>
     </div>
@@ -477,7 +583,11 @@ a{text-decoration:none;color:inherit}
     <div class="ql-panel">
       <div class="ql-title"><i class="fas fa-bolt"></i>الوصول السريع</div>
       <div class="ql-grid">
-        <?php foreach ($links as $i=>[$href,$ico,$lbl]): ?>
+        <?php foreach ($links as $i => $lnk):
+          $href = isset($lnk[0]) ? $lnk[0] : '#';
+          $ico  = isset($lnk[1]) ? $lnk[1] : 'fa-link';
+          $lbl  = isset($lnk[2]) ? $lnk[2] : 'رابط';
+        ?>
         <a href="<?=$href?>" class="ql-btn" style="animation:popCard .4s <?=$i*.06?>s cubic-bezier(.4,0,.2,1) both">
           <i class="fas <?=$ico?>"></i><span><?=$lbl?></span>
         </a>
@@ -488,16 +598,24 @@ a{text-decoration:none;color:inherit}
 
   <!-- Mobile quick links (below banner, horizontal pills) -->
   <div class="mobile-links">
-    <?php foreach ($links as [$href,$ico,$lbl]): ?>
+    <?php foreach ($links as $lnk):
+      $href = isset($lnk[0]) ? $lnk[0] : '#';
+      $ico  = isset($lnk[1]) ? $lnk[1] : 'fa-link';
+      $lbl  = isset($lnk[2]) ? $lnk[2] : 'رابط';
+    ?>
     <a href="<?=$href?>" class="ml-btn"><i class="fas <?=$ico?>"></i><?=$lbl?></a>
     <?php endforeach; ?>
   </div>
 
-  <!-- ▌STATS ▌-->
+  <!-- â–ŒSTATS â–Œ-->
   <div class="stats-wrap">
     <div class="stats-label"><i class="fas fa-chart-bar"></i>الإحصائيات الحالية</div>
     <div class="cards-grid">
-      <?php foreach ($stats as [$ico,$val,$lbl,$accent]):
+      <?php foreach ($stats as $st):
+        $ico = isset($st[0]) ? $st[0] : 'fa-chart-bar';
+        $val = isset($st[1]) ? $st[1] : 0;
+        $lbl = isset($st[2]) ? $st[2] : 'إحصائية';
+        $accent = isset($st[3]) ? $st[3] : 'blue';
         $num = (int) str_replace(',','',$val);
         $display = number_format($num);
       ?>

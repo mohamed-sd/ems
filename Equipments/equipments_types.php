@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -10,24 +10,24 @@ include '../includes/permissions_helper.php';
 
 $perms = get_page_permissions($conn );
 
-// منع الدخول إذا لم يكن لديه صلاحية عرض
+// Ù…Ù†Ø¹ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¥Ø°Ø§ Ù„Ù… ÙŠÙƒÙ† Ù„Ø¯ÙŠÙ‡ ØµÙ„Ø§Ø­ÙŠØ© Ø¹Ø±Ø¶
 if (!$perms['can_view']) {
-    header('Location: ../main/dashboard.php?msg=' . urlencode('❌ لا توجد صلاحية للوصول لهذه الصفحة'));
+    header('Location: ../main/dashboard.php?msg=' . urlencode('âŒ Ù„Ø§ ØªÙˆØ¬Ø¯ ØµÙ„Ø§Ø­ÙŠØ© Ù„Ù„ÙˆØµÙˆÙ„ Ù„Ù‡Ø°Ù‡ Ø§Ù„ØµÙØ­Ø©'));
     exit();
 }
 
 
-$page_title = "إيكوبيشن | أنواع الآليات";
+$page_title = "Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ø¢Ù„ÙŠØ§Øª";
 include("../inheader.php");
 include("../insidebar.php");
 
-/* منع الحذف مؤقتاً (Backend) */
+/* Ù…Ù†Ø¹ Ø§Ù„Ø­Ø°Ù Ù…Ø¤Ù‚ØªØ§Ù‹ (Backend) */
 if (isset($_GET['delete_id'])) {
     http_response_code(403);
     exit('Deletion is temporarily disabled.');
 }
 
-/* جلب بيانات التعديل */
+/* Ø¬Ù„Ø¨ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ */
 $editData = null;
 if (isset($_GET['edit_id'])) {
     $id = (int) $_GET['edit_id'];
@@ -37,7 +37,7 @@ if (isset($_GET['edit_id'])) {
     $editData = $stmt->get_result()->fetch_assoc();
 }
 
-/* إضافة / تعديل */
+/* Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $form = trim($_POST['form']);
     $type = trim($_POST['type']);
@@ -101,33 +101,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="page-header">
         <div style="display: flex; align-items: center; gap: 12px;">
             <div class="title-icon"><i class="fas fa-cubes"></i></div>
-            <h1 class="page-title">إدارة أنواع الآليات</h1>
+            <h1 class="page-title">Ø¥Ø¯Ø§Ø±Ø© Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ø¢Ù„ÙŠØ§Øª</h1>
         </div>
         <div>
             <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
+                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
             </a>
             <?php if ($perms['can_add']): ?>
             <button id="toggleForm" class="add">
-                <i class="fa-solid fa-plus-circle"></i> إضافة نوع جديد
+                <i class="fa-solid fa-plus-circle"></i> Ø¥Ø¶Ø§ÙØ© Ù†ÙˆØ¹ Ø¬Ø¯ÙŠØ¯
             </button>
             <?php endif; ?>
         </div>
     </div>
 
-    <!-- رسالة الحذف (مخفية) -->
+    <!-- Ø±Ø³Ø§Ù„Ø© Ø§Ù„Ø­Ø°Ù (Ù…Ø®ÙÙŠØ©) -->
     <div id="deleteAlert" class="alert alert-warning text-center" style="display:none;">
         <i class="fa-solid fa-circle-info"></i>
-        تم إيقاف الحذف مؤقتاً حفاظاً على سلامة البيانات
+        ØªÙ… Ø¥ÙŠÙ‚Ø§Ù Ø§Ù„Ø­Ø°Ù Ù…Ø¤Ù‚ØªØ§Ù‹ Ø­ÙØ§Ø¸Ø§Ù‹ Ø¹Ù„Ù‰ Ø³Ù„Ø§Ù…Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
     </div>
 
-    <!-- فورم إضافة / تعديل -->
+    <!-- ÙÙˆØ±Ù… Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ -->
     <form id="projectForm" method="post" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>">
 
         <div class="card">
             <div class="card-header">
                 <h5>
-                    <?= !empty($editData) ? 'تعديل نوع الآلية' : 'إضافة نوع آلية جديدة'; ?>
+                    <?= !empty($editData) ? 'ØªØ¹Ø¯ÙŠÙ„ Ù†ÙˆØ¹ Ø§Ù„Ø¢Ù„ÙŠØ©' : 'Ø¥Ø¶Ø§ÙØ© Ù†ÙˆØ¹ Ø¢Ù„ÙŠØ© Ø¬Ø¯ÙŠØ¯Ø©'; ?>
                 </h5>
             </div>
 
@@ -139,35 +139,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
 
                     <div>
-                        <label>القسم</label>
+                        <label>Ø§Ù„Ù‚Ø³Ù…</label>
                           <select name="form" required>
-                            <option value="">-- اختر القسم --</option>
-                            <option value="1"  <?= (!empty($editData) && $editData['form'] === '1') ? 'selected' : ''; ?>> معدات ثقيلة </option>
-                            <option value="2" <?= (!empty($editData) && $editData['form'] === '2') ? 'selected' : ''; ?>> شاحنات  </option>
+                            <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ù‚Ø³Ù… --</option>
+                            <option value="1"  <?= (!empty($editData) && $editData['form'] === '1') ? 'selected' : ''; ?>> Ù…Ø¹Ø¯Ø§Øª Ø«Ù‚ÙŠÙ„Ø© </option>
+                            <option value="2" <?= (!empty($editData) && $editData['form'] === '2') ? 'selected' : ''; ?>> Ø´Ø§Ø­Ù†Ø§Øª  </option>
                         </select>
                     </div>
                     <div>                           
 
-                        <label>إسم النوع</label>
+                        <label>Ø¥Ø³Ù… Ø§Ù„Ù†ÙˆØ¹</label>
                         <input type="text" name="type" required
                             value="<?= htmlspecialchars($editData['type'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
 
                     <div>
-                        <label>الحالة</label>
+                        <label>Ø§Ù„Ø­Ø§Ù„Ø©</label>
                         <select name="status" required>
-                            <option value="">-- اختر الحالة --</option>
+                            <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø­Ø§Ù„Ø© --</option>
                             <option value="active" <?= (!empty($editData) && $editData['status'] === 'active') ? 'selected' : ''; ?>>
-                                نشطة
+                                Ù†Ø´Ø·Ø©
                             </option>
                             <option value="inactive" <?= (!empty($editData) && $editData['status'] === 'inactive') ? 'selected' : ''; ?>>
-                                غير نشطة
+                                ØºÙŠØ± Ù†Ø´Ø·Ø©
                             </option>
                         </select>
                     </div>
 
                     <button type="submit" class="btn btn-success">
-                        <i class="fa-solid fa-save"></i> حفظ
+                        <i class="fa-solid fa-save"></i> Ø­ÙØ¸
                     </button>
 
                 </div>
@@ -175,10 +175,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </form>
 
-    <!-- جدول الأنواع -->
+    <!-- Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ø£Ù†ÙˆØ§Ø¹ -->
     <div class="card">
         <div class="card-header">
-            <h5><i class="fas fa-list"></i> قائمة أنواع الآليات</h5>
+            <h5><i class="fas fa-list"></i> Ù‚Ø§Ø¦Ù…Ø© Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ø¢Ù„ÙŠØ§Øª</h5>
         </div>
 
         <div class="card-body">
@@ -187,10 +187,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>القسم</th>
-                            <th>النوع</th>
-                            <th>الحالة</th>
-                            <th>الإجراء</th>
+                            <th>Ø§Ù„Ù‚Ø³Ù…</th>
+                            <th>Ø§Ù„Ù†ÙˆØ¹</th>
+                            <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+                            <th>Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -204,26 +204,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <td><?= $i++; ?></td>
                                 <td>
                                    <?= $row['form'] === '1'
-                                        ? "<span class='badge-heavy'>معدات ثقيلة</span>"
-                                        : "<span class='badge-truck'>شاحنات</span>"; ?>
+                                        ? "<span class='badge-heavy'>Ù…Ø¹Ø¯Ø§Øª Ø«Ù‚ÙŠÙ„Ø©</span>"
+                                        : "<span class='badge-truck'>Ø´Ø§Ø­Ù†Ø§Øª</span>"; ?>
                                 </td>
                                 <td><?= htmlspecialchars($row['type'], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td>
                                     <?= $row['status'] === 'active'
-                                        ? "<span class='status-active'>نشط</span>"
-                                        : "<span class='status-inactive'>غير نشط</span>"; ?>
+                                        ? "<span class='status-active'>Ù†Ø´Ø·</span>"
+                                        : "<span class='status-inactive'>ØºÙŠØ± Ù†Ø´Ø·</span>"; ?>
                                 </td>
                                 <td class="text-center">
 
                                     <div class="action-btns">
                                         <?php if ($perms['can_edit']): ?>
                                         <a href="equipments_types.php?edit_id=<?= $row['id']; ?>" class="action-btn edit"
-                                            title="تعديل">
+                                            title="ØªØ¹Ø¯ÙŠÙ„">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </a>
                                         <?php endif; ?>
                                         <?php if ($perms['can_delete']): ?>
-                                        <button type="button" class="action-btn delete delete-disabled" title="حذف">
+                                        <button type="button" class="action-btn delete delete-disabled" title="Ø­Ø°Ù">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                         <?php endif; ?>

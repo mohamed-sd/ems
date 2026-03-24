@@ -1,25 +1,50 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
 
 include '../config.php';
 include '../includes/permissions_helper.php';
 
-// ════════════════════════════════════════════════════════════════════════════
-// 🔐 التحقق من صلاحيات المستخدم
-// ════════════════════════════════════════════════════════════════════════════
+$current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$is_super_admin = ($current_role === '-1');
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    header("Location: ../login.php?msg=Ù„Ø§+ØªÙˆØ¬Ø¯+Ø¨ÙŠØ¦Ø©+Ø´Ø±ÙƒØ©+ØµØ§Ù„Ø­Ø©+Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù…+âŒ");
+    exit();
+}
+
+$equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
+$suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
+
+$project_scope_sql = "1=1";
+if (!$is_super_admin) {
+    $project_scope_sql = "(
+        EXISTS (SELECT 1 FROM users su WHERE su.id = project.created_by AND su.company_id = $company_id)
+        OR EXISTS (
+            SELECT 1
+            FROM clients sc
+            INNER JOIN users scu ON scu.id = sc.created_by
+            WHERE sc.id = project.company_client_id AND scu.company_id = $company_id
+        )
+    )";
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ðŸ” Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 $page_permissions = check_page_permissions($conn, 'equipments');
 $can_view = $page_permissions['can_view'];
 $can_add = $page_permissions['can_add'];
 $can_edit = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 
-// منع الوصول إذا لم تكن صلاحية عرض
+// Ù…Ù†Ø¹ Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ø°Ø§ Ù„Ù… ØªÙƒÙ† ØµÙ„Ø§Ø­ÙŠØ© Ø¹Ø±Ø¶
 if (!$can_view) {
-    header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+المعدات+❌");
+    header("Location: ../login.php?msg=Ù„Ø§+ØªÙˆØ¬Ø¯+ØµÙ„Ø§Ø­ÙŠØ©+Ø¹Ø±Ø¶+Ø§Ù„Ù…Ø¹Ø¯Ø§Øª+âŒ");
     exit();
 }
 
@@ -72,7 +97,7 @@ if ($is_role10) {
 
 $selected_project = null;
 if ($selected_project_id > 0) {
-    $project_check_query = "SELECT id, name, project_code FROM project WHERE id = $selected_project_id AND status = '1'";
+    $project_check_query = "SELECT id, name, project_code FROM project WHERE id = $selected_project_id AND status = '1' AND $project_scope_sql";
     $project_check_result = mysqli_query($conn, $project_check_query);
     if ($project_check_result && mysqli_num_rows($project_check_result) > 0) {
         $selected_project = mysqli_fetch_assoc($project_check_result);
@@ -82,13 +107,13 @@ if ($selected_project_id > 0) {
     }
 }
 
-$projects_result = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name");
+$projects_result = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' AND $project_scope_sql ORDER BY name");
 
-$page_title = "إدارة المعدات";
+$page_title = "Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø¹Ø¯Ø§Øª";
 include("../inheader.php");
 include("../insidebar.php");
 
-// معالجة رسالة النجاح
+// Ù…Ø¹Ø§Ù„Ø¬Ø© Ø±Ø³Ø§Ù„Ø© Ø§Ù„Ù†Ø¬Ø§Ø­
 $success_msg = '';
 if (isset($_GET['msg'])) {
     $success_msg = htmlspecialchars($_GET['msg']);
@@ -100,20 +125,20 @@ if (isset($_GET['msg'])) {
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="../assets/css/admin-style.css">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<!-- Font Awesome من CDN لضمان ظهور الأيقونات بشكل صحيح -->
+<!-- Font Awesome Ù…Ù† CDN Ù„Ø¶Ù…Ø§Ù† Ø¸Ù‡ÙˆØ± Ø§Ù„Ø£ÙŠÙ‚ÙˆÙ†Ø§Øª Ø¨Ø´ÙƒÙ„ ØµØ­ÙŠØ­ -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
 <?php
 
-// معالجة الحفظ أو التعديل
+// Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„Ø­ÙØ¸ Ø£Ùˆ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10") {
-        $success_msg = "❌ ليس لديك صلاحية لتعديل أو إضافة المعدات";
+        $success_msg = "âŒ Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ ØµÙ„Ø§Ø­ÙŠØ© Ù„ØªØ¹Ø¯ÙŠÙ„ Ø£Ùˆ Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù…Ø¹Ø¯Ø§Øª";
         goto skip_save;
     }
     
-    // الحقول الأساسية
+    // Ø§Ù„Ø­Ù‚ÙˆÙ„ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©
     $suppliers = mysqli_real_escape_string($conn, $_POST['suppliers']);
     $code      = mysqli_real_escape_string($conn, trim($_POST['code']));
     $type      = mysqli_real_escape_string($conn, $_POST['type']);
@@ -121,54 +146,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     $status    = mysqli_real_escape_string($conn, $_POST['status']);
     $edit_id   = isset($_POST['edit_id']) ? intval($_POST['edit_id']) : 0;
     
-    // المعلومات الأساسية والتعريفية
+    // Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© ÙˆØ§Ù„ØªØ¹Ø±ÙŠÙÙŠØ©
     $serial_number = mysqli_real_escape_string($conn, trim($_POST['serial_number'] ?? ''));
     $chassis_number = mysqli_real_escape_string($conn, trim($_POST['chassis_number'] ?? ''));
     
-    // بيانات الصنع والموديل
+    // Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØµÙ†Ø¹ ÙˆØ§Ù„Ù…ÙˆØ¯ÙŠÙ„
     $manufacturer = mysqli_real_escape_string($conn, trim($_POST['manufacturer'] ?? ''));
     $model = mysqli_real_escape_string($conn, trim($_POST['model'] ?? ''));
     $manufacturing_year = !empty($_POST['manufacturing_year']) ? intval($_POST['manufacturing_year']) : 'NULL';
     $import_year = !empty($_POST['import_year']) ? intval($_POST['import_year']) : 'NULL';
     
-    // الحالة الفنية والمواصفات
-    $equipment_condition = mysqli_real_escape_string($conn, $_POST['equipment_condition'] ?? 'في حالة جيدة');
+    // Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„ÙÙ†ÙŠØ© ÙˆØ§Ù„Ù…ÙˆØ§ØµÙØ§Øª
+    $equipment_condition = mysqli_real_escape_string($conn, $_POST['equipment_condition'] ?? 'ÙÙŠ Ø­Ø§Ù„Ø© Ø¬ÙŠØ¯Ø©');
     $operating_hours = !empty($_POST['operating_hours']) ? intval($_POST['operating_hours']) : 'NULL';
-    $engine_condition = mysqli_real_escape_string($conn, $_POST['engine_condition'] ?? 'جيدة');
+    $engine_condition = mysqli_real_escape_string($conn, $_POST['engine_condition'] ?? 'Ø¬ÙŠØ¯Ø©');
     $tires_condition = mysqli_real_escape_string($conn, $_POST['tires_condition'] ?? 'N/A');
     
-    // بيانات الملكية
+    // Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ù„ÙƒÙŠØ©
     $actual_owner_name = mysqli_real_escape_string($conn, trim($_POST['actual_owner_name'] ?? ''));
     $owner_type = mysqli_real_escape_string($conn, $_POST['owner_type'] ?? '');
     $owner_phone = mysqli_real_escape_string($conn, trim($_POST['owner_phone'] ?? ''));
     $owner_supplier_relation = mysqli_real_escape_string($conn, $_POST['owner_supplier_relation'] ?? '');
     
-    // الوثائق والتسجيلات
+    // Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ ÙˆØ§Ù„ØªØ³Ø¬ÙŠÙ„Ø§Øª
     $license_number = mysqli_real_escape_string($conn, trim($_POST['license_number'] ?? ''));
     $license_authority = mysqli_real_escape_string($conn, trim($_POST['license_authority'] ?? ''));
     $license_expiry_date = !empty($_POST['license_expiry_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['license_expiry_date']) . "'" : 'NULL';
     $inspection_certificate_number = mysqli_real_escape_string($conn, trim($_POST['inspection_certificate_number'] ?? ''));
     $last_inspection_date = !empty($_POST['last_inspection_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['last_inspection_date']) . "'" : 'NULL';
     
-    // الموقع والتوفر
+    // Ø§Ù„Ù…ÙˆÙ‚Ø¹ ÙˆØ§Ù„ØªÙˆÙØ±
     $current_location = mysqli_real_escape_string($conn, trim($_POST['current_location'] ?? ''));
-    $availability_status = mysqli_real_escape_string($conn, $_POST['availability_status'] ?? 'متاحة للعمل');
+    $availability_status = mysqli_real_escape_string($conn, $_POST['availability_status'] ?? 'Ù…ØªØ§Ø­Ø© Ù„Ù„Ø¹Ù…Ù„');
     
-    // البيانات المالية والقيمة
+    // Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ© ÙˆØ§Ù„Ù‚ÙŠÙ…Ø©
     $estimated_value = !empty($_POST['estimated_value']) ? floatval($_POST['estimated_value']) : 'NULL';
     $daily_rental_price = !empty($_POST['daily_rental_price']) ? floatval($_POST['daily_rental_price']) : 'NULL';
     $monthly_rental_price = !empty($_POST['monthly_rental_price']) ? floatval($_POST['monthly_rental_price']) : 'NULL';
     $insurance_status = mysqli_real_escape_string($conn, $_POST['insurance_status'] ?? '');
     
-    // ملاحظات وسجل الصيانة
+    // Ù…Ù„Ø§Ø­Ø¸Ø§Øª ÙˆØ³Ø¬Ù„ Ø§Ù„ØµÙŠØ§Ù†Ø©
     $general_notes = mysqli_real_escape_string($conn, trim($_POST['general_notes'] ?? ''));
     $last_maintenance_date = !empty($_POST['last_maintenance_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['last_maintenance_date']) . "'" : 'NULL';
 
 
 
-    // التحقق من عدم تجاوز العدد المتعاقد عليه (فقط عند الإضافة)
+    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¹Ø¯Ù… ØªØ¬Ø§ÙˆØ² Ø§Ù„Ø¹Ø¯Ø¯ Ø§Ù„Ù…ØªØ¹Ø§Ù‚Ø¯ Ø¹Ù„ÙŠÙ‡ (ÙÙ‚Ø· Ø¹Ù†Ø¯ Ø§Ù„Ø¥Ø¶Ø§ÙØ©)
     if ($edit_id == 0  && $suppliers && $type) {
-        // الحصول على عدد المعدات المتعاقد عليها لهذا المورد ونوع المعدة
+        // Ø§Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ù…ØªØ¹Ø§Ù‚Ø¯ Ø¹Ù„ÙŠÙ‡Ø§ Ù„Ù‡Ø°Ø§ Ø§Ù„Ù…ÙˆØ±Ø¯ ÙˆÙ†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©
         $supplier_contract_query = "SELECT sc.id, sce.equip_count
                                    FROM supplierscontracts sc
                                    JOIN suppliercontractequipments sce ON sc.id = sce.contract_id
@@ -182,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
             $supplier_contract = mysqli_fetch_assoc($supplier_contract_result);
             $contracted_count = intval($supplier_contract['equip_count']);
             
-            // حساب عدد المعدات المضافة حالياً
+            // Ø­Ø³Ø§Ø¨ Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ù…Ø¶Ø§ÙØ© Ø­Ø§Ù„ÙŠØ§Ù‹
             $added_count_query = "SELECT COUNT(*) as added_count 
                                  FROM equipments 
                                  WHERE suppliers = $suppliers 
@@ -192,16 +217,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
             $added_count_row = mysqli_fetch_assoc($added_count_result);
             $current_added = intval($added_count_row['added_count']);
             
-            // التحقق من عدم تجاوز العدد المتعاقد عليه
+            // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¹Ø¯Ù… ØªØ¬Ø§ÙˆØ² Ø§Ù„Ø¹Ø¯Ø¯ Ø§Ù„Ù…ØªØ¹Ø§Ù‚Ø¯ Ø¹Ù„ÙŠÙ‡
             if ($current_added >= $contracted_count) {
-                $success_msg = "⚠️ تحذير: تم الوصول للحد الأقصى! العدد المتعاقد عليه: $contracted_count | المضاف حالياً: $current_added. لا يمكن إضافة المزيد من المعدات.";
+                $success_msg = "âš ï¸ ØªØ­Ø°ÙŠØ±: ØªÙ… Ø§Ù„ÙˆØµÙˆÙ„ Ù„Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰! Ø§Ù„Ø¹Ø¯Ø¯ Ø§Ù„Ù…ØªØ¹Ø§Ù‚Ø¯ Ø¹Ù„ÙŠÙ‡: $contracted_count | Ø§Ù„Ù…Ø¶Ø§Ù Ø­Ø§Ù„ÙŠØ§Ù‹: $current_added. Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù…Ø²ÙŠØ¯ Ù…Ù† Ø§Ù„Ù…Ø¹Ø¯Ø§Øª.";
                 goto skip_save;
             }
         }
     }
 
     if ($edit_id > 0) {
-        // تعديل
+        // ØªØ¹Ø¯ÙŠÙ„
+        $scope_update = ($is_super_admin || !$equipments_has_company) ? "" : " AND company_id = $company_id";
         $sql = "UPDATE equipments 
                 SET  
                     suppliers='$suppliers', 
@@ -236,10 +262,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
                     insurance_status='$insurance_status',
                     general_notes='$general_notes',
                     last_maintenance_date=$last_maintenance_date
-                WHERE id='$edit_id'";
-        $msg = "تم+تعديل+المعدة+بنجاح+✅";
+                WHERE id='$edit_id'$scope_update";
+        $msg = "ØªÙ…+ØªØ¹Ø¯ÙŠÙ„+Ø§Ù„Ù…Ø¹Ø¯Ø©+Ø¨Ù†Ø¬Ø§Ø­+âœ…";
     } else {
-        // إضافة
+        // Ø¥Ø¶Ø§ÙØ©
+        $insert_company_col = (!$is_super_admin && $equipments_has_company) ? ", company_id" : "";
+        $insert_company_val = (!$is_super_admin && $equipments_has_company) ? ", '$company_id'" : "";
         $sql = "INSERT INTO equipments 
                 (suppliers, code, type, name, status, serial_number, chassis_number, 
                  manufacturer, model, manufacturing_year, import_year, 
@@ -249,7 +277,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
                  inspection_certificate_number, last_inspection_date,
                  current_location, availability_status,
                  estimated_value, daily_rental_price, monthly_rental_price, insurance_status,
-                 general_notes, last_maintenance_date) 
+             general_notes, last_maintenance_date$insert_company_col) 
                 VALUES 
                 ('$suppliers', '$code', '$type', '$name', '$status', '$serial_number', '$chassis_number',
                  '$manufacturer', '$model', $manufacturing_year, $import_year,
@@ -259,27 +287,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
                  '$inspection_certificate_number', $last_inspection_date,
                  '$current_location', '$availability_status',
                  $estimated_value, $daily_rental_price, $monthly_rental_price, '$insurance_status',
-                 '$general_notes', $last_maintenance_date)";
-        $msg = "تمت+إضافة+المعدة+بنجاح+✅";
+             '$general_notes', $last_maintenance_date$insert_company_val)";
+        $msg = "ØªÙ…Øª+Ø¥Ø¶Ø§ÙØ©+Ø§Ù„Ù…Ø¹Ø¯Ø©+Ø¨Ù†Ø¬Ø§Ø­+âœ…";
     }
 
     if (mysqli_query($conn, $sql)) {
         header("Location: equipments.php?msg=$msg");
         exit;
     } else {
-        $success_msg = "خطأ في الحفظ: " . mysqli_error($conn);
+        $success_msg = "Ø®Ø·Ø£ ÙÙŠ Ø§Ù„Ø­ÙØ¸: " . mysqli_error($conn);
     }
     
     skip_save:
 }
 
-// في حالة تعديل تجهيز البيانات
+// ÙÙŠ Ø­Ø§Ù„Ø© ØªØ¹Ø¯ÙŠÙ„ ØªØ¬Ù‡ÙŠØ² Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
 $editData = [];
 if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && isset($_GET['edit'])) {
-    $success_msg = "❌ ليس لديك صلاحية لتعديل المعدات";
+    $success_msg = "âŒ Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ ØµÙ„Ø§Ø­ÙŠØ© Ù„ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª";
 } elseif (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     $editId = intval($_GET['edit']);
-    $res = mysqli_query($conn, "SELECT * FROM equipments WHERE id='$editId'");
+    $scope_edit = ($is_super_admin || !$equipments_has_company) ? "" : " AND company_id = $company_id";
+    $res = mysqli_query($conn, "SELECT * FROM equipments WHERE id='$editId'$scope_edit");
     if ($res && mysqli_num_rows($res) > 0) {
         $editData = mysqli_fetch_assoc($res);
     }
@@ -287,36 +316,36 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 ?>
 
 <div class="main">
-    <!-- عنوان الصفحة -->
+    <!-- Ø¹Ù†ÙˆØ§Ù† Ø§Ù„ØµÙØ­Ø© -->
     <div class="page-header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-cogs"></i></div>
-            إدارة المعدات
+            Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø¹Ø¯Ø§Øª
         </h1>
         <div class="page-header-actions">
             <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
+                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
             </a>
             <?php if ($_SESSION['user']['role'] != "10") { ?>
-            <!-- أزرار الاستيراد من Excel -->
+            <!-- Ø£Ø²Ø±Ø§Ø± Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯ Ù…Ù† Excel -->
             <a href="download_equipments_template.php" class="btn" style="background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;">
-                <i class="fas fa-file-excel"></i> تحميل نموذج Excel
+                <i class="fas fa-file-excel"></i> ØªØ­Ù…ÙŠÙ„ Ù†Ù…ÙˆØ°Ø¬ Excel
             </a>
             <a href="download_equipments_template_csv.php" class="btn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;">
-                <i class="fas fa-file-csv"></i> تحميل نموذج CSV
+                <i class="fas fa-file-csv"></i> ØªØ­Ù…ÙŠÙ„ Ù†Ù…ÙˆØ°Ø¬ CSV
             </a>
             <a href="javascript:void(0)" id="openImportModal" class="btn" style="background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease;">
-                <i class="fas fa-file-import"></i> استيراد من Excel
+                <i class="fas fa-file-import"></i> Ø§Ø³ØªÙŠØ±Ø§Ø¯ Ù…Ù† Excel
             </a>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fas fa-plus-circle"></i> إضافة معدة جديدة
+                <i class="fas fa-plus-circle"></i> Ø¥Ø¶Ø§ÙØ© Ù…Ø¹Ø¯Ø© Ø¬Ø¯ÙŠØ¯Ø©
             </a>
             <?php } ?>
         </div>
     </div>
 
     <?php if (!empty($success_msg)): 
-        $isSuccess = strpos($success_msg, '✅') !== false;
+        $isSuccess = strpos($success_msg, 'âœ…') !== false;
     ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
@@ -325,13 +354,13 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
     <?php endif; ?>
 
     <?php if ($_SESSION['user']['role'] != "10") { ?>
-    <!-- فورم إضافة / تعديل معدة -->
+    <!-- ÙÙˆØ±Ù… Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ Ù…Ø¹Ø¯Ø© -->
     <form id="projectForm" action="" method="post" style="display:<?php echo !empty($editData) ? 'block' : 'none'; ?>;">
         <div class="card">
             <div class="card-header">
                 <h5>
                     <i class="fas fa-<?php echo !empty($editData) ? 'edit' : 'plus-circle'; ?>"></i>
-                    <?php echo !empty($editData) ? "تعديل الآلية" : "إضافة آلية جديدة"; ?>
+                    <?php echo !empty($editData) ? "ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¢Ù„ÙŠØ©" : "Ø¥Ø¶Ø§ÙØ© Ø¢Ù„ÙŠØ© Ø¬Ø¯ÙŠØ¯Ø©"; ?>
                 </h5>
             </div>
             <div class="card-body">
@@ -343,12 +372,16 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <div>
                         <label>
                             <i class="fas fa-truck-loading"></i>
-                            المورد <span class="required-indicator">*</span>
+                            Ø§Ù„Ù…ÙˆØ±Ø¯ <span class="required-indicator">*</span>
                         </label>
                         <select name="suppliers" id="suppliers" required>
-                            <option value="">-- اختر المورد --</option>
+                            <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ù…ÙˆØ±Ø¯ --</option>
                             <?php
-                            $supplier_query = "SELECT id, name FROM suppliers WHERE status = 1 ORDER BY name";
+                            $supplier_scope_sql = "status = 1";
+                            if (!$is_super_admin && $suppliers_has_company) {
+                                $supplier_scope_sql .= " AND company_id = $company_id";
+                            }
+                            $supplier_query = "SELECT id, name FROM suppliers WHERE $supplier_scope_sql ORDER BY name";
                             $supplier_result = mysqli_query($conn, $supplier_query);
                             while($supplier = mysqli_fetch_assoc($supplier_result)) {
                                 $selected = (!empty($editData) && $editData['suppliers'] == $supplier['id']) ? 'selected' : '';
@@ -361,19 +394,19 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <div>
                         <label>
                             <i class="fas fa-barcode"></i>
-                            كود المعدة <span class="required-indicator">*</span>
+                            ÙƒÙˆØ¯ Ø§Ù„Ù…Ø¹Ø¯Ø© <span class="required-indicator">*</span>
                         </label>
-                        <input type="text" name="code" id="code" placeholder="أدخل كود المعدة" 
+                        <input type="text" name="code" id="code" placeholder="Ø£Ø¯Ø®Ù„ ÙƒÙˆØ¯ Ø§Ù„Ù…Ø¹Ø¯Ø©" 
                                value="<?php echo isset($editData['code']) ? htmlspecialchars($editData['code']) : ''; ?>" required />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-list-alt"></i>
-                            نوع المعدة <span class="required-indicator">*</span>
+                            Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø© <span class="required-indicator">*</span>
                         </label>
                         <select name="type" id="type" required>
-                            <option value="">-- حدد نوع المعدة --</option>
+                            <option value="">-- Ø­Ø¯Ø¯ Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø© --</option>
                             <?php
                             $type_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
                             $type_result = mysqli_query($conn, $type_query);
@@ -390,223 +423,223 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <div>
                         <label>
                             <i class="fas fa-tag"></i>
-                            اسم المعدة <span class="required-indicator">*</span>
+                            Ø§Ø³Ù… Ø§Ù„Ù…Ø¹Ø¯Ø© <span class="required-indicator">*</span>
                         </label>
-                        <input type="text" name="name" id="name" placeholder="أدخل اسم المعدة" 
+                        <input type="text" name="name" id="name" placeholder="Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø§Ù„Ù…Ø¹Ø¯Ø©" 
                                value="<?php echo isset($editData['name']) ? htmlspecialchars($editData['name']) : ''; ?>" required />
                     </div>
                     
                     <!-- ================================= -->
-                    <!-- قسم: المعلومات الأساسية والتعريفية -->
+                    <!-- Ù‚Ø³Ù…: Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© ÙˆØ§Ù„ØªØ¹Ø±ÙŠÙÙŠØ© -->
                     <!-- ================================= -->
                     <div class="form-section-header">
-                        <h6><i class="fas fa-id-card"></i> المعلومات الأساسية والتعريفية</h6>
+                        <h6><i class="fas fa-id-card"></i> Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© ÙˆØ§Ù„ØªØ¹Ø±ÙŠÙÙŠØ©</h6>
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-hashtag"></i>
-                            رقم المعدة/الرقم التسلسلي
+                            Ø±Ù‚Ù… Ø§Ù„Ù…Ø¹Ø¯Ø©/Ø§Ù„Ø±Ù‚Ù… Ø§Ù„ØªØ³Ù„Ø³Ù„ÙŠ
                         </label>
-                        <input type="text" name="serial_number" id="serial_number" placeholder="مثال: EXC-2024-001" 
+                        <input type="text" name="serial_number" id="serial_number" placeholder="Ù…Ø«Ø§Ù„: EXC-2024-001" 
                                value="<?php echo isset($editData['serial_number']) ? htmlspecialchars($editData['serial_number']) : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-barcode"></i>
-                            رقم الهيكل/الهيكل الأساسي (VIN/Chassis)
+                            Ø±Ù‚Ù… Ø§Ù„Ù‡ÙŠÙƒÙ„/Ø§Ù„Ù‡ÙŠÙƒÙ„ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ (VIN/Chassis)
                         </label>
-                        <input type="text" name="chassis_number" id="chassis_number" placeholder="مثال: CAT320-ABC123456" 
+                        <input type="text" name="chassis_number" id="chassis_number" placeholder="Ù…Ø«Ø§Ù„: CAT320-ABC123456" 
                                value="<?php echo isset($editData['chassis_number']) ? htmlspecialchars($editData['chassis_number']) : ''; ?>" />
                     </div>
                     
                     <!-- ================================= -->
-                    <!-- قسم: بيانات الصنع والموديل -->
+                    <!-- Ù‚Ø³Ù…: Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØµÙ†Ø¹ ÙˆØ§Ù„Ù…ÙˆØ¯ÙŠÙ„ -->
                     <!-- ================================= -->
                     <div class="form-section-header">
-                        <h6><i class="fas fa-industry"></i> بيانات الصنع والموديل</h6>
+                        <h6><i class="fas fa-industry"></i> Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØµÙ†Ø¹ ÙˆØ§Ù„Ù…ÙˆØ¯ÙŠÙ„</h6>
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-building"></i>
-                            الماركة/الشركة المصنعة
+                            Ø§Ù„Ù…Ø§Ø±ÙƒØ©/Ø§Ù„Ø´Ø±ÙƒØ© Ø§Ù„Ù…ØµÙ†Ø¹Ø©
                         </label>
-                        <input type="text" name="manufacturer" id="manufacturer" placeholder="مثال: كاتربيلر، كوماتسو، هيونداي" 
+                        <input type="text" name="manufacturer" id="manufacturer" placeholder="Ù…Ø«Ø§Ù„: ÙƒØ§ØªØ±Ø¨ÙŠÙ„Ø±ØŒ ÙƒÙˆÙ…Ø§ØªØ³ÙˆØŒ Ù‡ÙŠÙˆÙ†Ø¯Ø§ÙŠ" 
                                value="<?php echo isset($editData['manufacturer']) ? htmlspecialchars($editData['manufacturer']) : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-car"></i>
-                            الموديل/الطراز
+                            Ø§Ù„Ù…ÙˆØ¯ÙŠÙ„/Ø§Ù„Ø·Ø±Ø§Ø²
                         </label>
-                        <input type="text" name="model" id="model" placeholder="مثال: 320D, PC200, HD1024" 
+                        <input type="text" name="model" id="model" placeholder="Ù…Ø«Ø§Ù„: 320D, PC200, HD1024" 
                                value="<?php echo isset($editData['model']) ? htmlspecialchars($editData['model']) : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-calendar"></i>
-                            سنة الصنع
+                            Ø³Ù†Ø© Ø§Ù„ØµÙ†Ø¹
                         </label>
-                        <input type="number" name="manufacturing_year" id="manufacturing_year" placeholder="مثال: 2018" min="1950" max="2099" 
+                        <input type="number" name="manufacturing_year" id="manufacturing_year" placeholder="Ù…Ø«Ø§Ù„: 2018" min="1950" max="2099" 
                                value="<?php echo isset($editData['manufacturing_year']) ? $editData['manufacturing_year'] : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-calendar-plus"></i>
-                            سنة الاستيراد/البدء
+                            Ø³Ù†Ø© Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯/Ø§Ù„Ø¨Ø¯Ø¡
                         </label>
-                        <input type="number" name="import_year" id="import_year" placeholder="مثال: 2020" min="1950" max="2099" 
+                        <input type="number" name="import_year" id="import_year" placeholder="Ù…Ø«Ø§Ù„: 2020" min="1950" max="2099" 
                                value="<?php echo isset($editData['import_year']) ? $editData['import_year'] : ''; ?>" />
                     </div>
                     
                     <!-- ================================= -->
-                    <!-- قسم: الحالة الفنية والمواصفات -->
+                    <!-- Ù‚Ø³Ù…: Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„ÙÙ†ÙŠØ© ÙˆØ§Ù„Ù…ÙˆØ§ØµÙØ§Øª -->
                     <!-- ================================= -->
                     <div class="form-section-header">
-                        <h6><i class="fas fa-wrench"></i> الحالة الفنية والمواصفات</h6>
+                        <h6><i class="fas fa-wrench"></i> Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„ÙÙ†ÙŠØ© ÙˆØ§Ù„Ù…ÙˆØ§ØµÙØ§Øª</h6>
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-cogs"></i>
-                            حالة المعدة
+                            Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø¹Ø¯Ø©
                         </label>
                         <select name="equipment_condition" id="equipment_condition">
-                            <option value="جديدة (لم تستخدم)" <?php echo (!empty($editData) && $editData['equipment_condition']=="جديدة (لم تستخدم)") ? "selected" : ""; ?>>جديدة (لم تستخدم)</option>
-                            <option value="جديدة نسبياً (أقل من سنة استخدام)" <?php echo (!empty($editData) && $editData['equipment_condition']=="جديدة نسبياً (أقل من سنة استخدام)") ? "selected" : ""; ?>>جديدة نسبياً (أقل من سنة استخدام)</option>
-                            <option value="في حالة جيدة" <?php echo (empty($editData) || $editData['equipment_condition']=="في حالة جيدة") ? "selected" : ""; ?>>في حالة جيدة</option>
-                            <option value="في حالة متوسطة" <?php echo (!empty($editData) && $editData['equipment_condition']=="في حالة متوسطة") ? "selected" : ""; ?>>في حالة متوسطة</option>
-                            <option value="في حالة ضعيفة" <?php echo (!empty($editData) && $editData['equipment_condition']=="في حالة ضعيفة") ? "selected" : ""; ?>>في حالة ضعيفة</option>
-                            <option value="محتاجة إصلاح فوري" <?php echo (!empty($editData) && $editData['equipment_condition']=="محتاجة إصلاح فوري") ? "selected" : ""; ?>>محتاجة إصلاح فوري</option>
-                            <option value="معطلة مؤقتاً" <?php echo (!empty($editData) && $editData['equipment_condition']=="معطلة مؤقتاً") ? "selected" : ""; ?>>معطلة مؤقتاً</option>
-                            <option value="مستعملة بكثافة" <?php echo (!empty($editData) && $editData['equipment_condition']=="مستعملة بكثافة") ? "selected" : ""; ?>>مستعملة بكثافة</option>
+                            <option value="Ø¬Ø¯ÙŠØ¯Ø© (Ù„Ù… ØªØ³ØªØ®Ø¯Ù…)" <?php echo (!empty($editData) && $editData['equipment_condition']=="Ø¬Ø¯ÙŠØ¯Ø© (Ù„Ù… ØªØ³ØªØ®Ø¯Ù…)") ? "selected" : ""; ?>>Ø¬Ø¯ÙŠØ¯Ø© (Ù„Ù… ØªØ³ØªØ®Ø¯Ù…)</option>
+                            <option value="Ø¬Ø¯ÙŠØ¯Ø© Ù†Ø³Ø¨ÙŠØ§Ù‹ (Ø£Ù‚Ù„ Ù…Ù† Ø³Ù†Ø© Ø§Ø³ØªØ®Ø¯Ø§Ù…)" <?php echo (!empty($editData) && $editData['equipment_condition']=="Ø¬Ø¯ÙŠØ¯Ø© Ù†Ø³Ø¨ÙŠØ§Ù‹ (Ø£Ù‚Ù„ Ù…Ù† Ø³Ù†Ø© Ø§Ø³ØªØ®Ø¯Ø§Ù…)") ? "selected" : ""; ?>>Ø¬Ø¯ÙŠØ¯Ø© Ù†Ø³Ø¨ÙŠØ§Ù‹ (Ø£Ù‚Ù„ Ù…Ù† Ø³Ù†Ø© Ø§Ø³ØªØ®Ø¯Ø§Ù…)</option>
+                            <option value="ÙÙŠ Ø­Ø§Ù„Ø© Ø¬ÙŠØ¯Ø©" <?php echo (empty($editData) || $editData['equipment_condition']=="ÙÙŠ Ø­Ø§Ù„Ø© Ø¬ÙŠØ¯Ø©") ? "selected" : ""; ?>>ÙÙŠ Ø­Ø§Ù„Ø© Ø¬ÙŠØ¯Ø©</option>
+                            <option value="ÙÙŠ Ø­Ø§Ù„Ø© Ù…ØªÙˆØ³Ø·Ø©" <?php echo (!empty($editData) && $editData['equipment_condition']=="ÙÙŠ Ø­Ø§Ù„Ø© Ù…ØªÙˆØ³Ø·Ø©") ? "selected" : ""; ?>>ÙÙŠ Ø­Ø§Ù„Ø© Ù…ØªÙˆØ³Ø·Ø©</option>
+                            <option value="ÙÙŠ Ø­Ø§Ù„Ø© Ø¶Ø¹ÙŠÙØ©" <?php echo (!empty($editData) && $editData['equipment_condition']=="ÙÙŠ Ø­Ø§Ù„Ø© Ø¶Ø¹ÙŠÙØ©") ? "selected" : ""; ?>>ÙÙŠ Ø­Ø§Ù„Ø© Ø¶Ø¹ÙŠÙØ©</option>
+                            <option value="Ù…Ø­ØªØ§Ø¬Ø© Ø¥ØµÙ„Ø§Ø­ ÙÙˆØ±ÙŠ" <?php echo (!empty($editData) && $editData['equipment_condition']=="Ù…Ø­ØªØ§Ø¬Ø© Ø¥ØµÙ„Ø§Ø­ ÙÙˆØ±ÙŠ") ? "selected" : ""; ?>>Ù…Ø­ØªØ§Ø¬Ø© Ø¥ØµÙ„Ø§Ø­ ÙÙˆØ±ÙŠ</option>
+                            <option value="Ù…Ø¹Ø·Ù„Ø© Ù…Ø¤Ù‚ØªØ§Ù‹" <?php echo (!empty($editData) && $editData['equipment_condition']=="Ù…Ø¹Ø·Ù„Ø© Ù…Ø¤Ù‚ØªØ§Ù‹") ? "selected" : ""; ?>>Ù…Ø¹Ø·Ù„Ø© Ù…Ø¤Ù‚ØªØ§Ù‹</option>
+                            <option value="Ù…Ø³ØªØ¹Ù…Ù„Ø© Ø¨ÙƒØ«Ø§ÙØ©" <?php echo (!empty($editData) && $editData['equipment_condition']=="Ù…Ø³ØªØ¹Ù…Ù„Ø© Ø¨ÙƒØ«Ø§ÙØ©") ? "selected" : ""; ?>>Ù…Ø³ØªØ¹Ù…Ù„Ø© Ø¨ÙƒØ«Ø§ÙØ©</option>
                         </select>
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-clock"></i>
-                            ساعات التشغيل (للمعدات الثقيلة)
+                            Ø³Ø§Ø¹Ø§Øª Ø§Ù„ØªØ´ØºÙŠÙ„ (Ù„Ù„Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø«Ù‚ÙŠÙ„Ø©)
                         </label>
-                        <input type="number" name="operating_hours" id="operating_hours" placeholder="مثال: 5400 ساعة" min="0" 
+                        <input type="number" name="operating_hours" id="operating_hours" placeholder="Ù…Ø«Ø§Ù„: 5400 Ø³Ø§Ø¹Ø©" min="0" 
                                value="<?php echo isset($editData['operating_hours']) ? $editData['operating_hours'] : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-car-crash"></i>
-                            حالة المحرك
+                            Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø­Ø±Ùƒ
                         </label>
                         <select name="engine_condition" id="engine_condition">
-                            <option value="ممتازة" <?php echo (!empty($editData) && $editData['engine_condition']=="ممتازة") ? "selected" : ""; ?>>ممتازة</option>
-                            <option value="جيدة" <?php echo (empty($editData) || $editData['engine_condition']=="جيدة") ? "selected" : ""; ?>>جيدة</option>
-                            <option value="متوسطة" <?php echo (!empty($editData) && $editData['engine_condition']=="متوسطة") ? "selected" : ""; ?>>متوسطة</option>
-                            <option value="محتاجة صيانة" <?php echo (!empty($editData) && $editData['engine_condition']=="محتاجة صيانة") ? "selected" : ""; ?>>محتاجة صيانة</option>
-                            <option value="محتاجة إصلاح" <?php echo (!empty($editData) && $editData['engine_condition']=="محتاجة إصلاح") ? "selected" : ""; ?>>محتاجة إصلاح</option>
+                            <option value="Ù…Ù…ØªØ§Ø²Ø©" <?php echo (!empty($editData) && $editData['engine_condition']=="Ù…Ù…ØªØ§Ø²Ø©") ? "selected" : ""; ?>>Ù…Ù…ØªØ§Ø²Ø©</option>
+                            <option value="Ø¬ÙŠØ¯Ø©" <?php echo (empty($editData) || $editData['engine_condition']=="Ø¬ÙŠØ¯Ø©") ? "selected" : ""; ?>>Ø¬ÙŠØ¯Ø©</option>
+                            <option value="Ù…ØªÙˆØ³Ø·Ø©" <?php echo (!empty($editData) && $editData['engine_condition']=="Ù…ØªÙˆØ³Ø·Ø©") ? "selected" : ""; ?>>Ù…ØªÙˆØ³Ø·Ø©</option>
+                            <option value="Ù…Ø­ØªØ§Ø¬Ø© ØµÙŠØ§Ù†Ø©" <?php echo (!empty($editData) && $editData['engine_condition']=="Ù…Ø­ØªØ§Ø¬Ø© ØµÙŠØ§Ù†Ø©") ? "selected" : ""; ?>>Ù…Ø­ØªØ§Ø¬Ø© ØµÙŠØ§Ù†Ø©</option>
+                            <option value="Ù…Ø­ØªØ§Ø¬Ø© Ø¥ØµÙ„Ø§Ø­" <?php echo (!empty($editData) && $editData['engine_condition']=="Ù…Ø­ØªØ§Ø¬Ø© Ø¥ØµÙ„Ø§Ø­") ? "selected" : ""; ?>>Ù…Ø­ØªØ§Ø¬Ø© Ø¥ØµÙ„Ø§Ø­</option>
                         </select>
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-circle-notch"></i>
-                            حالة الإطارات (للشاحنات)
+                            Ø­Ø§Ù„Ø© Ø§Ù„Ø¥Ø·Ø§Ø±Ø§Øª (Ù„Ù„Ø´Ø§Ø­Ù†Ø§Øª)
                         </label>
                         <select name="tires_condition" id="tires_condition">
                             <option value="N/A" <?php echo (empty($editData) || $editData['tires_condition']=="N/A") ? "selected" : ""; ?>>N/A</option>
-                            <option value="جديدة" <?php echo (!empty($editData) && $editData['tires_condition']=="جديدة") ? "selected" : ""; ?>>جديدة</option>
-                            <option value="جيدة" <?php echo (!empty($editData) && $editData['tires_condition']=="جيدة") ? "selected" : ""; ?>>جيدة</option>
-                            <option value="متوسطة" <?php echo (!empty($editData) && $editData['tires_condition']=="متوسطة") ? "selected" : ""; ?>>متوسطة</option>
-                            <option value="محتاجة تبديل" <?php echo (!empty($editData) && $editData['tires_condition']=="محتاجة تبديل") ? "selected" : ""; ?>>محتاجة تبديل</option>
+                            <option value="Ø¬Ø¯ÙŠØ¯Ø©" <?php echo (!empty($editData) && $editData['tires_condition']=="Ø¬Ø¯ÙŠØ¯Ø©") ? "selected" : ""; ?>>Ø¬Ø¯ÙŠØ¯Ø©</option>
+                            <option value="Ø¬ÙŠØ¯Ø©" <?php echo (!empty($editData) && $editData['tires_condition']=="Ø¬ÙŠØ¯Ø©") ? "selected" : ""; ?>>Ø¬ÙŠØ¯Ø©</option>
+                            <option value="Ù…ØªÙˆØ³Ø·Ø©" <?php echo (!empty($editData) && $editData['tires_condition']=="Ù…ØªÙˆØ³Ø·Ø©") ? "selected" : ""; ?>>Ù…ØªÙˆØ³Ø·Ø©</option>
+                            <option value="Ù…Ø­ØªØ§Ø¬Ø© ØªØ¨Ø¯ÙŠÙ„" <?php echo (!empty($editData) && $editData['tires_condition']=="Ù…Ø­ØªØ§Ø¬Ø© ØªØ¨Ø¯ÙŠÙ„") ? "selected" : ""; ?>>Ù…Ø­ØªØ§Ø¬Ø© ØªØ¨Ø¯ÙŠÙ„</option>
                         </select>
                     </div>
                     
                     <!-- ================================= -->
-                    <!-- قسم: بيانات الملكية -->
+                    <!-- Ù‚Ø³Ù…: Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ù„ÙƒÙŠØ© -->
                     <!-- ================================= -->
                     <div class="form-section-header">
-                        <h6><i class="fas fa-user-tie"></i> بيانات الملكية</h6>
+                        <h6><i class="fas fa-user-tie"></i> Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ù„ÙƒÙŠØ©</h6>
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-user"></i>
-                            اسم المالك الفعلي
+                            Ø§Ø³Ù… Ø§Ù„Ù…Ø§Ù„Ùƒ Ø§Ù„ÙØ¹Ù„ÙŠ
                         </label>
-                        <input type="text" name="actual_owner_name" id="actual_owner_name" placeholder="مثال: محمد علي أحمد" 
+                        <input type="text" name="actual_owner_name" id="actual_owner_name" placeholder="Ù…Ø«Ø§Ù„: Ù…Ø­Ù…Ø¯ Ø¹Ù„ÙŠ Ø£Ø­Ù…Ø¯" 
                                value="<?php echo isset($editData['actual_owner_name']) ? htmlspecialchars($editData['actual_owner_name']) : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-briefcase"></i>
-                            نوع المالك
+                            Ù†ÙˆØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ
                         </label>
                         <select name="owner_type" id="owner_type">
-                            <option value="">-- اختر نوع المالك --</option>
-                            <option value="مالك فردي" <?php echo (!empty($editData) && $editData['owner_type']=="مالك فردي") ? "selected" : ""; ?>>مالك فردي</option>
-                            <option value="شركة متخصصة" <?php echo (!empty($editData) && $editData['owner_type']=="شركة متخصصة") ? "selected" : ""; ?>>شركة متخصصة</option>
-                            <option value="مؤسسة" <?php echo (!empty($editData) && $editData['owner_type']=="مؤسسة") ? "selected" : ""; ?>>مؤسسة</option>
-                            <option value="أخرى" <?php echo (!empty($editData) && $editData['owner_type']=="أخرى") ? "selected" : ""; ?>>أخرى</option>
+                            <option value="">-- Ø§Ø®ØªØ± Ù†ÙˆØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ --</option>
+                            <option value="Ù…Ø§Ù„Ùƒ ÙØ±Ø¯ÙŠ" <?php echo (!empty($editData) && $editData['owner_type']=="Ù…Ø§Ù„Ùƒ ÙØ±Ø¯ÙŠ") ? "selected" : ""; ?>>Ù…Ø§Ù„Ùƒ ÙØ±Ø¯ÙŠ</option>
+                            <option value="Ø´Ø±ÙƒØ© Ù…ØªØ®ØµØµØ©" <?php echo (!empty($editData) && $editData['owner_type']=="Ø´Ø±ÙƒØ© Ù…ØªØ®ØµØµØ©") ? "selected" : ""; ?>>Ø´Ø±ÙƒØ© Ù…ØªØ®ØµØµØ©</option>
+                            <option value="Ù…Ø¤Ø³Ø³Ø©" <?php echo (!empty($editData) && $editData['owner_type']=="Ù…Ø¤Ø³Ø³Ø©") ? "selected" : ""; ?>>Ù…Ø¤Ø³Ø³Ø©</option>
+                            <option value="Ø£Ø®Ø±Ù‰" <?php echo (!empty($editData) && $editData['owner_type']=="Ø£Ø®Ø±Ù‰") ? "selected" : ""; ?>>Ø£Ø®Ø±Ù‰</option>
                         </select>
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-phone"></i>
-                            رقم هاتف المالك
+                            Ø±Ù‚Ù… Ù‡Ø§ØªÙ Ø§Ù„Ù…Ø§Ù„Ùƒ
                         </label>
-                        <input type="text" name="owner_phone" id="owner_phone" placeholder="مثال: +249-9-123-4567" 
+                        <input type="text" name="owner_phone" id="owner_phone" placeholder="Ù…Ø«Ø§Ù„: +249-9-123-4567" 
                                value="<?php echo isset($editData['owner_phone']) ? htmlspecialchars($editData['owner_phone']) : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-handshake"></i>
-                            علاقة المالك بالمورد
+                            Ø¹Ù„Ø§Ù‚Ø© Ø§Ù„Ù…Ø§Ù„Ùƒ Ø¨Ø§Ù„Ù…ÙˆØ±Ø¯
                         </label>
                         <select name="owner_supplier_relation" id="owner_supplier_relation">
-                            <option value="">-- اختر العلاقة --</option>
-                            <option value="مالك مباشر (يتعاقد معنا مباشرة)" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="مالك مباشر (يتعاقد معنا مباشرة)") ? "selected" : ""; ?>>مالك مباشر (يتعاقد معنا مباشرة)</option>
-                            <option value="تحت وساطة المورد (المورد يدير المعدة نيابة عنه)" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="تحت وساطة المورد (المورد يدير المعدة نيابة عنه)") ? "selected" : ""; ?>>تحت وساطة المورد (المورد يدير المعدة نيابة عنه)</option>
-                            <option value="تابع للمورد (مملوكة للمورد نفسه)" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="تابع للمورد (مملوكة للمورد نفسه)") ? "selected" : ""; ?>>تابع للمورد (مملوكة للمورد نفسه)</option>
-                            <option value="غير محدد" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="غير محدد") ? "selected" : ""; ?>>غير محدد</option>
+                            <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø¹Ù„Ø§Ù‚Ø© --</option>
+                            <option value="Ù…Ø§Ù„Ùƒ Ù…Ø¨Ø§Ø´Ø± (ÙŠØªØ¹Ø§Ù‚Ø¯ Ù…Ø¹Ù†Ø§ Ù…Ø¨Ø§Ø´Ø±Ø©)" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="Ù…Ø§Ù„Ùƒ Ù…Ø¨Ø§Ø´Ø± (ÙŠØªØ¹Ø§Ù‚Ø¯ Ù…Ø¹Ù†Ø§ Ù…Ø¨Ø§Ø´Ø±Ø©)") ? "selected" : ""; ?>>Ù…Ø§Ù„Ùƒ Ù…Ø¨Ø§Ø´Ø± (ÙŠØªØ¹Ø§Ù‚Ø¯ Ù…Ø¹Ù†Ø§ Ù…Ø¨Ø§Ø´Ø±Ø©)</option>
+                            <option value="ØªØ­Øª ÙˆØ³Ø§Ø·Ø© Ø§Ù„Ù…ÙˆØ±Ø¯ (Ø§Ù„Ù…ÙˆØ±Ø¯ ÙŠØ¯ÙŠØ± Ø§Ù„Ù…Ø¹Ø¯Ø© Ù†ÙŠØ§Ø¨Ø© Ø¹Ù†Ù‡)" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="ØªØ­Øª ÙˆØ³Ø§Ø·Ø© Ø§Ù„Ù…ÙˆØ±Ø¯ (Ø§Ù„Ù…ÙˆØ±Ø¯ ÙŠØ¯ÙŠØ± Ø§Ù„Ù…Ø¹Ø¯Ø© Ù†ÙŠØ§Ø¨Ø© Ø¹Ù†Ù‡)") ? "selected" : ""; ?>>ØªØ­Øª ÙˆØ³Ø§Ø·Ø© Ø§Ù„Ù…ÙˆØ±Ø¯ (Ø§Ù„Ù…ÙˆØ±Ø¯ ÙŠØ¯ÙŠØ± Ø§Ù„Ù…Ø¹Ø¯Ø© Ù†ÙŠØ§Ø¨Ø© Ø¹Ù†Ù‡)</option>
+                            <option value="ØªØ§Ø¨Ø¹ Ù„Ù„Ù…ÙˆØ±Ø¯ (Ù…Ù…Ù„ÙˆÙƒØ© Ù„Ù„Ù…ÙˆØ±Ø¯ Ù†ÙØ³Ù‡)" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="ØªØ§Ø¨Ø¹ Ù„Ù„Ù…ÙˆØ±Ø¯ (Ù…Ù…Ù„ÙˆÙƒØ© Ù„Ù„Ù…ÙˆØ±Ø¯ Ù†ÙØ³Ù‡)") ? "selected" : ""; ?>>ØªØ§Ø¨Ø¹ Ù„Ù„Ù…ÙˆØ±Ø¯ (Ù…Ù…Ù„ÙˆÙƒØ© Ù„Ù„Ù…ÙˆØ±Ø¯ Ù†ÙØ³Ù‡)</option>
+                            <option value="ØºÙŠØ± Ù…Ø­Ø¯Ø¯" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="ØºÙŠØ± Ù…Ø­Ø¯Ø¯") ? "selected" : ""; ?>>ØºÙŠØ± Ù…Ø­Ø¯Ø¯</option>
                         </select>
                     </div>
                     
                     <!-- ================================= -->
-                    <!-- قسم: الوثائق والتسجيلات -->
+                    <!-- Ù‚Ø³Ù…: Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ ÙˆØ§Ù„ØªØ³Ø¬ÙŠÙ„Ø§Øª -->
                     <!-- ================================= -->
                     <div class="form-section-header">
-                        <h6><i class="fas fa-file-contract"></i> الوثائق والتسجيلات</h6>
+                        <h6><i class="fas fa-file-contract"></i> Ø§Ù„ÙˆØ«Ø§Ø¦Ù‚ ÙˆØ§Ù„ØªØ³Ø¬ÙŠÙ„Ø§Øª</h6>
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-address-card"></i>
-                            رقم الترخيص/التسجيل
+                            Ø±Ù‚Ù… Ø§Ù„ØªØ±Ø®ÙŠØµ/Ø§Ù„ØªØ³Ø¬ÙŠÙ„
                         </label>
-                        <input type="text" name="license_number" id="license_number" placeholder="مثال: VEH-2024-12345" 
+                        <input type="text" name="license_number" id="license_number" placeholder="Ù…Ø«Ø§Ù„: VEH-2024-12345" 
                                value="<?php echo isset($editData['license_number']) ? htmlspecialchars($editData['license_number']) : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-landmark"></i>
-                            جهة الترخيص
+                            Ø¬Ù‡Ø© Ø§Ù„ØªØ±Ø®ÙŠØµ
                         </label>
-                        <input type="text" name="license_authority" id="license_authority" placeholder="مثال: المرور، وزارة النقل" 
+                        <input type="text" name="license_authority" id="license_authority" placeholder="Ù…Ø«Ø§Ù„: Ø§Ù„Ù…Ø±ÙˆØ±ØŒ ÙˆØ²Ø§Ø±Ø© Ø§Ù„Ù†Ù‚Ù„" 
                                value="<?php echo isset($editData['license_authority']) ? htmlspecialchars($editData['license_authority']) : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-calendar-times"></i>
-                            تاريخ انتهاء الترخيص
+                            ØªØ§Ø±ÙŠØ® Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„ØªØ±Ø®ÙŠØµ
                         </label>
                         <input type="date" name="license_expiry_date" id="license_expiry_date" 
                                value="<?php echo isset($editData['license_expiry_date']) ? $editData['license_expiry_date'] : ''; ?>" />
@@ -615,120 +648,120 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <div>
                         <label>
                             <i class="fas fa-certificate"></i>
-                            رقم شهادة الفحص
+                            Ø±Ù‚Ù… Ø´Ù‡Ø§Ø¯Ø© Ø§Ù„ÙØ­Øµ
                         </label>
-                        <input type="text" name="inspection_certificate_number" id="inspection_certificate_number" placeholder="رقم شهادة الفحص الفنية" 
+                        <input type="text" name="inspection_certificate_number" id="inspection_certificate_number" placeholder="Ø±Ù‚Ù… Ø´Ù‡Ø§Ø¯Ø© Ø§Ù„ÙØ­Øµ Ø§Ù„ÙÙ†ÙŠØ©" 
                                value="<?php echo isset($editData['inspection_certificate_number']) ? htmlspecialchars($editData['inspection_certificate_number']) : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-calendar-check"></i>
-                            تاريخ آخر فحص
+                            ØªØ§Ø±ÙŠØ® Ø¢Ø®Ø± ÙØ­Øµ
                         </label>
                         <input type="date" name="last_inspection_date" id="last_inspection_date" 
                                value="<?php echo isset($editData['last_inspection_date']) ? $editData['last_inspection_date'] : ''; ?>" />
                     </div>
                     
                     <!-- ================================= -->
-                    <!-- قسم: الموقع والتوفر -->
+                    <!-- Ù‚Ø³Ù…: Ø§Ù„Ù…ÙˆÙ‚Ø¹ ÙˆØ§Ù„ØªÙˆÙØ± -->
                     <!-- ================================= -->
                     <div class="form-section-header">
-                        <h6><i class="fas fa-map-marker-alt"></i> الموقع والتوفر</h6>
+                        <h6><i class="fas fa-map-marker-alt"></i> Ø§Ù„Ù…ÙˆÙ‚Ø¹ ÙˆØ§Ù„ØªÙˆÙØ±</h6>
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-location-arrow"></i>
-                            الموقع الحالي
+                            Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø­Ø§Ù„ÙŠ
                         </label>
-                        <input type="text" name="current_location" id="current_location" placeholder="مثال: منجم الذهب الشرقي، مستودع الخرطوم" 
+                        <input type="text" name="current_location" id="current_location" placeholder="Ù…Ø«Ø§Ù„: Ù…Ù†Ø¬Ù… Ø§Ù„Ø°Ù‡Ø¨ Ø§Ù„Ø´Ø±Ù‚ÙŠØŒ Ù…Ø³ØªÙˆØ¯Ø¹ Ø§Ù„Ø®Ø±Ø·ÙˆÙ…" 
                                value="<?php echo isset($editData['current_location']) ? htmlspecialchars($editData['current_location']) : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-traffic-light"></i>
-                            حالة التوفر
+                            Ø­Ø§Ù„Ø© Ø§Ù„ØªÙˆÙØ±
                         </label>
                         <select name="availability_status" id="availability_status">
-                            <option value="متاحة للعمل" <?php echo (empty($editData) || $editData['availability_status']=="متاحة للعمل") ? "selected" : ""; ?>>متاحة للعمل</option>
-                            <option value="قيد الاستخدام" <?php echo (!empty($editData) && $editData['availability_status']=="قيد الاستخدام") ? "selected" : ""; ?>>قيد الاستخدام</option>
-                            <option value="تحت الصيانة" <?php echo (!empty($editData) && $editData['availability_status']=="تحت الصيانة") ? "selected" : ""; ?>>تحت الصيانة</option>
-                            <option value="محجوزة" <?php echo (!empty($editData) && $editData['availability_status']=="محجوزة") ? "selected" : ""; ?>>محجوزة</option>
-                            <option value="معطلة" <?php echo (!empty($editData) && $editData['availability_status']=="معطلة") ? "selected" : ""; ?>>معطلة</option>
-                            <option value="في المستودع" <?php echo (!empty($editData) && $editData['availability_status']=="في المستودع") ? "selected" : ""; ?>>في المستودع</option>
-                            <option value="مبيعة/مسحوبة" <?php echo (!empty($editData) && $editData['availability_status']=="مبيعة/مسحوبة") ? "selected" : ""; ?>>مبيعة/مسحوبة</option>
+                            <option value="Ù…ØªØ§Ø­Ø© Ù„Ù„Ø¹Ù…Ù„" <?php echo (empty($editData) || $editData['availability_status']=="Ù…ØªØ§Ø­Ø© Ù„Ù„Ø¹Ù…Ù„") ? "selected" : ""; ?>>Ù…ØªØ§Ø­Ø© Ù„Ù„Ø¹Ù…Ù„</option>
+                            <option value="Ù‚ÙŠØ¯ Ø§Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…" <?php echo (!empty($editData) && $editData['availability_status']=="Ù‚ÙŠØ¯ Ø§Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…") ? "selected" : ""; ?>>Ù‚ÙŠØ¯ Ø§Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…</option>
+                            <option value="ØªØ­Øª Ø§Ù„ØµÙŠØ§Ù†Ø©" <?php echo (!empty($editData) && $editData['availability_status']=="ØªØ­Øª Ø§Ù„ØµÙŠØ§Ù†Ø©") ? "selected" : ""; ?>>ØªØ­Øª Ø§Ù„ØµÙŠØ§Ù†Ø©</option>
+                            <option value="Ù…Ø­Ø¬ÙˆØ²Ø©" <?php echo (!empty($editData) && $editData['availability_status']=="Ù…Ø­Ø¬ÙˆØ²Ø©") ? "selected" : ""; ?>>Ù…Ø­Ø¬ÙˆØ²Ø©</option>
+                            <option value="Ù…Ø¹Ø·Ù„Ø©" <?php echo (!empty($editData) && $editData['availability_status']=="Ù…Ø¹Ø·Ù„Ø©") ? "selected" : ""; ?>>Ù…Ø¹Ø·Ù„Ø©</option>
+                            <option value="ÙÙŠ Ø§Ù„Ù…Ø³ØªÙˆØ¯Ø¹" <?php echo (!empty($editData) && $editData['availability_status']=="ÙÙŠ Ø§Ù„Ù…Ø³ØªÙˆØ¯Ø¹") ? "selected" : ""; ?>>ÙÙŠ Ø§Ù„Ù…Ø³ØªÙˆØ¯Ø¹</option>
+                            <option value="Ù…Ø¨ÙŠØ¹Ø©/Ù…Ø³Ø­ÙˆØ¨Ø©" <?php echo (!empty($editData) && $editData['availability_status']=="Ù…Ø¨ÙŠØ¹Ø©/Ù…Ø³Ø­ÙˆØ¨Ø©") ? "selected" : ""; ?>>Ù…Ø¨ÙŠØ¹Ø©/Ù…Ø³Ø­ÙˆØ¨Ø©</option>
                         </select>
                     </div>
                     
                     <!-- ================================= -->
-                    <!-- قسم: البيانات المالية والقيمة -->
+                    <!-- Ù‚Ø³Ù…: Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ© ÙˆØ§Ù„Ù‚ÙŠÙ…Ø© -->
                     <!-- ================================= -->
                     <div class="form-section-header">
-                        <h6><i class="fas fa-dollar-sign"></i> البيانات المالية والقيمة</h6>
+                        <h6><i class="fas fa-dollar-sign"></i> Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ© ÙˆØ§Ù„Ù‚ÙŠÙ…Ø©</h6>
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-money-bill-wave"></i>
-                            القيمة المقدرة للمعدة (بالدولار)
+                            Ø§Ù„Ù‚ÙŠÙ…Ø© Ø§Ù„Ù…Ù‚Ø¯Ø±Ø© Ù„Ù„Ù…Ø¹Ø¯Ø© (Ø¨Ø§Ù„Ø¯ÙˆÙ„Ø§Ø±)
                         </label>
-                        <input type="number" name="estimated_value" id="estimated_value" placeholder="مثال: 150000" min="0" step="0.01" 
+                        <input type="number" name="estimated_value" id="estimated_value" placeholder="Ù…Ø«Ø§Ù„: 150000" min="0" step="0.01" 
                                value="<?php echo isset($editData['estimated_value']) ? $editData['estimated_value'] : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-calendar-day"></i>
-                            سعر التأجير اليومي (بالدولار)
+                            Ø³Ø¹Ø± Ø§Ù„ØªØ£Ø¬ÙŠØ± Ø§Ù„ÙŠÙˆÙ…ÙŠ (Ø¨Ø§Ù„Ø¯ÙˆÙ„Ø§Ø±)
                         </label>
-                        <input type="number" name="daily_rental_price" id="daily_rental_price" placeholder="مثال: 500" min="0" step="0.01" 
+                        <input type="number" name="daily_rental_price" id="daily_rental_price" placeholder="Ù…Ø«Ø§Ù„: 500" min="0" step="0.01" 
                                value="<?php echo isset($editData['daily_rental_price']) ? $editData['daily_rental_price'] : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-calendar-alt"></i>
-                            سعر التأجير الشهري (بالدولار)
+                            Ø³Ø¹Ø± Ø§Ù„ØªØ£Ø¬ÙŠØ± Ø§Ù„Ø´Ù‡Ø±ÙŠ (Ø¨Ø§Ù„Ø¯ÙˆÙ„Ø§Ø±)
                         </label>
-                        <input type="number" name="monthly_rental_price" id="monthly_rental_price" placeholder="مثال: 10000" min="0" step="0.01" 
+                        <input type="number" name="monthly_rental_price" id="monthly_rental_price" placeholder="Ù…Ø«Ø§Ù„: 10000" min="0" step="0.01" 
                                value="<?php echo isset($editData['monthly_rental_price']) ? $editData['monthly_rental_price'] : ''; ?>" />
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-shield-alt"></i>
-                            التأمين/الضمان
+                            Ø§Ù„ØªØ£Ù…ÙŠÙ†/Ø§Ù„Ø¶Ù…Ø§Ù†
                         </label>
                         <select name="insurance_status" id="insurance_status">
-                            <option value="">-- اختر حالة التأمين --</option>
-                            <option value="مؤمن بالكامل" <?php echo (!empty($editData) && $editData['insurance_status']=="مؤمن بالكامل") ? "selected" : ""; ?>>مؤمن بالكامل</option>
-                            <option value="مؤمن جزئياً" <?php echo (!empty($editData) && $editData['insurance_status']=="مؤمن جزئياً") ? "selected" : ""; ?>>مؤمن جزئياً</option>
-                            <option value="غير مؤمن" <?php echo (!empty($editData) && $editData['insurance_status']=="غير مؤمن") ? "selected" : ""; ?>>غير مؤمن</option>
-                            <option value="جاري التأمين" <?php echo (!empty($editData) && $editData['insurance_status']=="جاري التأمين") ? "selected" : ""; ?>>جاري التأمين</option>
+                            <option value="">-- Ø§Ø®ØªØ± Ø­Ø§Ù„Ø© Ø§Ù„ØªØ£Ù…ÙŠÙ† --</option>
+                            <option value="Ù…Ø¤Ù…Ù† Ø¨Ø§Ù„ÙƒØ§Ù…Ù„" <?php echo (!empty($editData) && $editData['insurance_status']=="Ù…Ø¤Ù…Ù† Ø¨Ø§Ù„ÙƒØ§Ù…Ù„") ? "selected" : ""; ?>>Ù…Ø¤Ù…Ù† Ø¨Ø§Ù„ÙƒØ§Ù…Ù„</option>
+                            <option value="Ù…Ø¤Ù…Ù† Ø¬Ø²Ø¦ÙŠØ§Ù‹" <?php echo (!empty($editData) && $editData['insurance_status']=="Ù…Ø¤Ù…Ù† Ø¬Ø²Ø¦ÙŠØ§Ù‹") ? "selected" : ""; ?>>Ù…Ø¤Ù…Ù† Ø¬Ø²Ø¦ÙŠØ§Ù‹</option>
+                            <option value="ØºÙŠØ± Ù…Ø¤Ù…Ù†" <?php echo (!empty($editData) && $editData['insurance_status']=="ØºÙŠØ± Ù…Ø¤Ù…Ù†") ? "selected" : ""; ?>>ØºÙŠØ± Ù…Ø¤Ù…Ù†</option>
+                            <option value="Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ£Ù…ÙŠÙ†" <?php echo (!empty($editData) && $editData['insurance_status']=="Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ£Ù…ÙŠÙ†") ? "selected" : ""; ?>>Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ£Ù…ÙŠÙ†</option>
                         </select>
                     </div>
                     
                     <!-- ================================= -->
-                    <!-- قسم: ملاحظات وسجل الصيانة -->
+                    <!-- Ù‚Ø³Ù…: Ù…Ù„Ø§Ø­Ø¸Ø§Øª ÙˆØ³Ø¬Ù„ Ø§Ù„ØµÙŠØ§Ù†Ø© -->
                     <!-- ================================= -->
                     <div class="form-section-header">
-                        <h6><i class="fas fa-tools"></i> ملاحظات وسجل الصيانة</h6>
+                        <h6><i class="fas fa-tools"></i> Ù…Ù„Ø§Ø­Ø¸Ø§Øª ÙˆØ³Ø¬Ù„ Ø§Ù„ØµÙŠØ§Ù†Ø©</h6>
                     </div>
                     
                     <div class="form-grid-full">
                         <label>
                             <i class="fas fa-comment-alt"></i>
-                            ملاحظات عامة
+                            Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø¹Ø§Ù…Ø©
                         </label>
-                        <textarea name="general_notes" id="general_notes" rows="3" placeholder="مثال: معدة موثوقة، تحتاج إلى صيانة دورية كل 3 أشهر"><?php echo isset($editData['general_notes']) ? htmlspecialchars($editData['general_notes']) : ''; ?></textarea>
+                        <textarea name="general_notes" id="general_notes" rows="3" placeholder="Ù…Ø«Ø§Ù„: Ù…Ø¹Ø¯Ø© Ù…ÙˆØ«ÙˆÙ‚Ø©ØŒ ØªØ­ØªØ§Ø¬ Ø¥Ù„Ù‰ ØµÙŠØ§Ù†Ø© Ø¯ÙˆØ±ÙŠØ© ÙƒÙ„ 3 Ø£Ø´Ù‡Ø±"><?php echo isset($editData['general_notes']) ? htmlspecialchars($editData['general_notes']) : ''; ?></textarea>
                     </div>
                     
                     <div>
                         <label>
                             <i class="fas fa-wrench"></i>
-                            تاريخ آخر صيانة
+                            ØªØ§Ø±ÙŠØ® Ø¢Ø®Ø± ØµÙŠØ§Ù†Ø©
                         </label>
                         <input type="date" name="last_maintenance_date" id="last_maintenance_date" 
                                value="<?php echo isset($editData['last_maintenance_date']) ? $editData['last_maintenance_date'] : ''; ?>" />
@@ -737,23 +770,23 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <div>
                         <label>
                             <i class="fas fa-toggle-on"></i>
-                            الحالة <span class="required-indicator">*</span>
+                            Ø§Ù„Ø­Ø§Ù„Ø© <span class="required-indicator">*</span>
                         </label>
                         <select name="status" id="status" required>
-                            <option value="">-- اختر الحالة --</option>
-                            <option value="1" <?php echo (!empty($editData) && $editData['status']=="1") ? "selected" : ""; ?>>متاحة</option>
-                            <option value="0" <?php echo (!empty($editData) && $editData['status']=="0") ? "selected" : ""; ?>>مشغولة</option>
+                            <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø­Ø§Ù„Ø© --</option>
+                            <option value="1" <?php echo (!empty($editData) && $editData['status']=="1") ? "selected" : ""; ?>>Ù…ØªØ§Ø­Ø©</option>
+                            <option value="0" <?php echo (!empty($editData) && $editData['status']=="0") ? "selected" : ""; ?>>Ù…Ø´ØºÙˆÙ„Ø©</option>
                         </select>
                     </div>
                     
                     <div class="form-actions">
                         <button type="submit">
                             <i class="fas fa-save"></i>
-                            <?php echo !empty($editData) ? "تحديث المعدة" : "حفظ المعدة"; ?>
+                            <?php echo !empty($editData) ? "ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù…Ø¹Ø¯Ø©" : "Ø­ÙØ¸ Ø§Ù„Ù…Ø¹Ø¯Ø©"; ?>
                         </button>
                         <button type="button" class="btn-secondary" onclick="document.getElementById('projectForm').style.display='none'; document.getElementById('projectForm').reset();">
                             <i class="fas fa-times"></i>
-                            إلغاء
+                            Ø¥Ù„ØºØ§Ø¡
                         </button>
                     </div>
                 </div>
@@ -762,31 +795,35 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
     </form>
     <?php } ?>
 
-    <!-- جدول المعدات -->
+    <!-- Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª -->
     <div class="card">
         <div class="card-header">
             <h5>
                 <i class="fas fa-list-alt"></i>
-                قائمة المعدات
+                Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ù…Ø¹Ø¯Ø§Øª
             </h5>
         </div>
         <div class="card-body">
-            <!-- نظام الفلاتر -->
+            <!-- Ù†Ø¸Ø§Ù… Ø§Ù„ÙÙ„Ø§ØªØ± -->
             <div class="filters-container">
                 <div class="filters-header">
-                    <h6><i class="fas fa-filter"></i> فلترة المعدات</h6>
+                    <h6><i class="fas fa-filter"></i> ÙÙ„ØªØ±Ø© Ø§Ù„Ù…Ø¹Ø¯Ø§Øª</h6>
                     <button type="button" class="btn-clear-filters" id="clearFiltersBtn">
-                        <i class="fas fa-times-circle"></i> إلغاء الفلاتر
+                        <i class="fas fa-times-circle"></i> Ø¥Ù„ØºØ§Ø¡ Ø§Ù„ÙÙ„Ø§ØªØ±
                     </button>
                 </div>
                 
                 <div class="filters-grid">
                     <div class="filter-item">
-                        <label><i class="fas fa-truck-loading"></i> فلترة بالمورد</label>
+                        <label><i class="fas fa-truck-loading"></i> ÙÙ„ØªØ±Ø© Ø¨Ø§Ù„Ù…ÙˆØ±Ø¯</label>
                         <select id="filterSupplier" class="filter-select">
-                            <option value="">— جميع الموردين —</option>
+                            <option value="">â€” Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ† â€”</option>
                             <?php
-                            $supplier_filter_query = "SELECT id, name FROM suppliers WHERE status = 1 ORDER BY name";
+                            $supplier_filter_scope_sql = "status = 1";
+                            if (!$is_super_admin && $suppliers_has_company) {
+                                $supplier_filter_scope_sql .= " AND company_id = $company_id";
+                            }
+                            $supplier_filter_query = "SELECT id, name FROM suppliers WHERE $supplier_filter_scope_sql ORDER BY name";
                             $supplier_filter_result = mysqli_query($conn, $supplier_filter_query);
                             while($supplier = mysqli_fetch_assoc($supplier_filter_result)) {
                                 echo "<option value='" . htmlspecialchars($supplier['name']) . "'>" . htmlspecialchars($supplier['name']) . "</option>";
@@ -796,9 +833,9 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     </div>
                     
                     <div class="filter-item">
-                        <label><i class="fas fa-list-alt"></i> فلترة بالنوع</label>
+                        <label><i class="fas fa-list-alt"></i> ÙÙ„ØªØ±Ø© Ø¨Ø§Ù„Ù†ÙˆØ¹</label>
                         <select id="filterType" class="filter-select">
-                            <option value="">— جميع الأنواع —</option>
+                            <option value="">â€” Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø£Ù†ÙˆØ§Ø¹ â€”</option>
                             <?php
                             $type_filter_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
                             $type_filter_result = mysqli_query($conn, $type_filter_query);
@@ -810,22 +847,22 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     </div>
                     
                     <div class="filter-item">
-                        <label><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
+                        <label><i class="fas fa-toggle-on"></i> ÙÙ„ØªØ±Ø© Ø¨Ø§Ù„Ø­Ø§Ù„Ø©</label>
                         <select id="filterStatus" class="filter-select">
-                            <option value="">— جميع الحالات —</option>
-                            <option value="نشط">نشط</option>
-                            <option value="غير نشط">غير نشط</option>
+                            <option value="">â€” Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø­Ø§Ù„Ø§Øª â€”</option>
+                            <option value="Ù†Ø´Ø·">Ù†Ø´Ø·</option>
+                            <option value="ØºÙŠØ± Ù†Ø´Ø·">ØºÙŠØ± Ù†Ø´Ø·</option>
                         </select>
                     </div>
                     
                     <div class="filter-item">
-                        <label><i class="fas fa-traffic-light"></i> فلترة بالتوفر</label>
+                        <label><i class="fas fa-traffic-light"></i> ÙÙ„ØªØ±Ø© Ø¨Ø§Ù„ØªÙˆÙØ±</label>
                         <select id="filterAvailability" class="filter-select">
-                            <option value="">— جميع حالات التوفر —</option>
-                            <option value="متاحة للعمل">متاحة للعمل</option>
-                            <option value="مشغولة حالياً">مشغولة حالياً</option>
-                            <option value="تحت الصيانة">تحت الصيانة</option>
-                            <option value="معطلة مؤقتاً">معطلة مؤقتاً</option>
+                            <option value="">â€” Ø¬Ù…ÙŠØ¹ Ø­Ø§Ù„Ø§Øª Ø§Ù„ØªÙˆÙØ± â€”</option>
+                            <option value="Ù…ØªØ§Ø­Ø© Ù„Ù„Ø¹Ù…Ù„">Ù…ØªØ§Ø­Ø© Ù„Ù„Ø¹Ù…Ù„</option>
+                            <option value="Ù…Ø´ØºÙˆÙ„Ø© Ø­Ø§Ù„ÙŠØ§Ù‹">Ù…Ø´ØºÙˆÙ„Ø© Ø­Ø§Ù„ÙŠØ§Ù‹</option>
+                            <option value="ØªØ­Øª Ø§Ù„ØµÙŠØ§Ù†Ø©">ØªØ­Øª Ø§Ù„ØµÙŠØ§Ù†Ø©</option>
+                            <option value="Ù…Ø¹Ø·Ù„Ø© Ù…Ø¤Ù‚ØªØ§Ù‹">Ù…Ø¹Ø·Ù„Ø© Ù…Ø¤Ù‚ØªØ§Ù‹</option>
                         </select>
                     </div>
                 </div>
@@ -836,28 +873,28 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 </div>
             </div>
             
-            <!-- أزرار إظهار/إخفاء المجموعات -->
+            <!-- Ø£Ø²Ø±Ø§Ø± Ø¥Ø¸Ù‡Ø§Ø±/Ø¥Ø®ÙØ§Ø¡ Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹Ø§Øª -->
             <div class="column-groups-toggle">
-                <button type="button" class="toggle-group-btn active" data-group="basic" title="المعلومات الأساسية">
-                    <i class="fas fa-info-circle"></i> أساسية
+                <button type="button" class="toggle-group-btn active" data-group="basic" title="Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©">
+                    <i class="fas fa-info-circle"></i> Ø£Ø³Ø§Ø³ÙŠØ©
                 </button>
-                <button type="button" class="toggle-group-btn active" data-group="identification" title="بيانات التعريف">
-                    <i class="fas fa-id-card"></i> التعريف
+                <button type="button" class="toggle-group-btn active" data-group="identification" title="Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªØ¹Ø±ÙŠÙ">
+                    <i class="fas fa-id-card"></i> Ø§Ù„ØªØ¹Ø±ÙŠÙ
                 </button>
-                <button type="button" class="toggle-group-btn" data-group="manufacturing" title="بيانات الصنع">
-                    <i class="fas fa-industry"></i> الصنع
+                <button type="button" class="toggle-group-btn" data-group="manufacturing" title="Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØµÙ†Ø¹">
+                    <i class="fas fa-industry"></i> Ø§Ù„ØµÙ†Ø¹
                 </button>
-                <button type="button" class="toggle-group-btn" data-group="technical" title="الحالة الفنية">
-                    <i class="fas fa-wrench"></i> فنية
+                <button type="button" class="toggle-group-btn" data-group="technical" title="Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„ÙÙ†ÙŠØ©">
+                    <i class="fas fa-wrench"></i> ÙÙ†ÙŠØ©
                 </button>
-                <button type="button" class="toggle-group-btn active" data-group="ownership" title="بيانات الملكية">
-                    <i class="fas fa-user-tie"></i> الملكية
+                <button type="button" class="toggle-group-btn active" data-group="ownership" title="Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ù„ÙƒÙŠØ©">
+                    <i class="fas fa-user-tie"></i> Ø§Ù„Ù…Ù„ÙƒÙŠØ©
                 </button>
-                <button type="button" class="toggle-group-btn active" data-group="status" title="الحالة والإجراءات">
-                    <i class="fas fa-toggle-on"></i> الحالة
+                <button type="button" class="toggle-group-btn active" data-group="status" title="Ø§Ù„Ø­Ø§Ù„Ø© ÙˆØ§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª">
+                    <i class="fas fa-toggle-on"></i> Ø§Ù„Ø­Ø§Ù„Ø©
                 </button>
-                <button type="button" class="toggle-all-btn" title="إظهار/إخفاء الكل">
-                    <i class="fas fa-eye"></i> الكل
+                <button type="button" class="toggle-all-btn" title="Ø¥Ø¸Ù‡Ø§Ø±/Ø¥Ø®ÙØ§Ø¡ Ø§Ù„ÙƒÙ„">
+                    <i class="fas fa-eye"></i> Ø§Ù„ÙƒÙ„
                 </button>
             </div>
             
@@ -865,22 +902,32 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 <thead>
                     <tr>
                         <th data-group="basic"><i class="fas fa-hashtag"></i> #</th>
-                        <th data-group="basic"><i class="fas fa-truck-loading"></i> المورد</th>
-                        <th data-group="basic"><i class="fas fa-barcode"></i> كود المعدة</th>
-                        <th data-group="identification"><i class="fas fa-hashtag"></i> رقم تسلسلي</th>
-                        <th data-group="basic"><i class="fas fa-list-alt"></i> النوع</th>
-                        <th data-group="basic"><i class="fas fa-tag"></i> الاسم</th>
-                        <th data-group="manufacturing"><i class="fas fa-car"></i> الموديل</th>
-                        <th data-group="manufacturing"><i class="fas fa-calendar"></i> سنة الصنع</th>
-                        <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
-                        <th data-group="ownership"><i class="fas fa-user"></i> المالك</th>
-                        <th data-group="technical"><i class="fas fa-traffic-light"></i> التوفر</th>
-                        <th data-group="status"><i class="fas fa-toggle-on"></i> الحالة</th>
-                        <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
+                        <th data-group="basic"><i class="fas fa-truck-loading"></i> Ø§Ù„Ù…ÙˆØ±Ø¯</th>
+                        <th data-group="basic"><i class="fas fa-barcode"></i> ÙƒÙˆØ¯ Ø§Ù„Ù…Ø¹Ø¯Ø©</th>
+                        <th data-group="identification"><i class="fas fa-hashtag"></i> Ø±Ù‚Ù… ØªØ³Ù„Ø³Ù„ÙŠ</th>
+                        <th data-group="basic"><i class="fas fa-list-alt"></i> Ø§Ù„Ù†ÙˆØ¹</th>
+                        <th data-group="basic"><i class="fas fa-tag"></i> Ø§Ù„Ø§Ø³Ù…</th>
+                        <th data-group="manufacturing"><i class="fas fa-car"></i> Ø§Ù„Ù…ÙˆØ¯ÙŠÙ„</th>
+                        <th data-group="manufacturing"><i class="fas fa-calendar"></i> Ø³Ù†Ø© Ø§Ù„ØµÙ†Ø¹</th>
+                        <th data-group="technical"><i class="fas fa-cogs"></i> Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø¹Ø¯Ø©</th>
+                        <th data-group="ownership"><i class="fas fa-user"></i> Ø§Ù„Ù…Ø§Ù„Ùƒ</th>
+                        <th data-group="technical"><i class="fas fa-traffic-light"></i> Ø§Ù„ØªÙˆÙØ±</th>
+                        <th data-group="status"><i class="fas fa-toggle-on"></i> Ø§Ù„Ø­Ø§Ù„Ø©</th>
+                        <th data-group="status"><i class="fas fa-sliders-h"></i> Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
+                    $equipment_scope_where = "1=1";
+                    if (!$is_super_admin && $equipments_has_company) {
+                        $equipment_scope_where = "m.company_id = $company_id";
+                    } elseif ($selected_project_id > 0) {
+                        $equipment_scope_where = "EXISTS (
+                            SELECT 1 FROM operations so
+                            WHERE so.equipment = m.id AND so.project_id = $selected_project_id
+                        )";
+                    }
+
                     $query2 = "
                         SELECT 
                             m.id, 
@@ -908,6 +955,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         LEFT JOIN drivers d 
                             ON d.id = ed.driver_id 
                             AND ed.status = '1'
+                        WHERE $equipment_scope_where
                         GROUP BY m.id
                         ORDER BY m.id DESC
                     ";
@@ -919,21 +967,21 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
                         echo "<td><span class='mono code-badge'>" . htmlspecialchars($row['code']) . "</span></td>";
                         
-                        // رقم تسلسلي
+                        // Ø±Ù‚Ù… ØªØ³Ù„Ø³Ù„ÙŠ
                         $serial = !empty($row['serial_number'])
                             ? "<span class='mono'>" . htmlspecialchars($row['serial_number']) . "</span>"
-                            : "<span class='text-muted'>غير محدد</span>";
+                            : "<span class='text-muted'>ØºÙŠØ± Ù…Ø­Ø¯Ø¯</span>";
                         echo "<td>" . $serial . "</td>";
 
-                        // نوع المعدة
+                        // Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©
                         $type_icon = $row['type'] == "1" ? "fa-tractor" : "fa-truck-moving";
-                        $type_text = $row['type'] == "1" ? "حفار" : "قلاب";
+                        $type_text = $row['type'] == "1" ? "Ø­ÙØ§Ø±" : "Ù‚Ù„Ø§Ø¨";
                         echo "<td><span class='badge-type'><i class='fas $type_icon'></i> $type_text</span></td>";
 
-                        // اسم المعدة (تهيئة المتغير)
+                        // Ø§Ø³Ù… Ø§Ù„Ù…Ø¹Ø¯Ø© (ØªÙ‡ÙŠØ¦Ø© Ø§Ù„Ù…ØªØºÙŠØ±)
                         $name_display = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
                         
-                        // المشروع النشط
+                        // Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„Ù†Ø´Ø·
                         if (!empty($row['project'])) {
                             $p_res = mysqli_query($conn, "SELECT name FROM project WHERE id='" . $row['project'] . "'");
                             if ($p_res && mysqli_num_rows($p_res) > 0) {
@@ -942,58 +990,58 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             }
                         }
 
-                        // عدد السائقين النشطين
+                        // Ø¹Ø¯Ø¯ Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ† Ø§Ù„Ù†Ø´Ø·ÙŠÙ†
                         if ($row['drivers_count'] > 0) {
-                            $name_display .= "<br><span class='extra-info'><i class='fas fa-users'></i> " . $row['drivers_count'] . " سائق</span>";
+                            $name_display .= "<br><span class='extra-info'><i class='fas fa-users'></i> " . $row['drivers_count'] . " Ø³Ø§Ø¦Ù‚</span>";
                         }
 
                         echo "<td>" . $name_display . "</td>";
 
-                        // الموديل
-                        $model = !empty($row['model']) ? htmlspecialchars($row['model']) : "<span class='text-muted'>غير محدد</span>";
+                        // Ø§Ù„Ù…ÙˆØ¯ÙŠÙ„
+                        $model = !empty($row['model']) ? htmlspecialchars($row['model']) : "<span class='text-muted'>ØºÙŠØ± Ù…Ø­Ø¯Ø¯</span>";
                         echo "<td>" . $model . "</td>";
                         
-                        // سنة الصنع
-                        $manufacturing_year = !empty($row['manufacturing_year']) ? $row['manufacturing_year'] : "<span class='text-muted'>غير محدد</span>";
+                        // Ø³Ù†Ø© Ø§Ù„ØµÙ†Ø¹
+                        $manufacturing_year = !empty($row['manufacturing_year']) ? $row['manufacturing_year'] : "<span class='text-muted'>ØºÙŠØ± Ù…Ø­Ø¯Ø¯</span>";
                         echo "<td>" . $manufacturing_year . "</td>";
                         
-                        // حالة المعدة
-                        $equipment_condition = !empty($row['equipment_condition']) ? htmlspecialchars($row['equipment_condition']) : "<span class='text-muted'>غير محدد</span>";
+                        // Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø¹Ø¯Ø©
+                        $equipment_condition = !empty($row['equipment_condition']) ? htmlspecialchars($row['equipment_condition']) : "<span class='text-muted'>ØºÙŠØ± Ù…Ø­Ø¯Ø¯</span>";
                         echo "<td>" . $equipment_condition . "</td>";
                         
-                        // المالك
-                        $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span class='text-muted'>غير محدد</span>";
+                        // Ø§Ù„Ù…Ø§Ù„Ùƒ
+                        $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span class='text-muted'>ØºÙŠØ± Ù…Ø­Ø¯Ø¯</span>";
                         echo "<td>" . $owner . "</td>";
                         
-                        // التوفر
-                        $availability = !empty($row['availability_status']) ? htmlspecialchars($row['availability_status']) : "متاحة للعمل";
+                        // Ø§Ù„ØªÙˆÙØ±
+                        $availability = !empty($row['availability_status']) ? htmlspecialchars($row['availability_status']) : "Ù…ØªØ§Ø­Ø© Ù„Ù„Ø¹Ù…Ù„";
                         echo "<td>" . $availability . "</td>";
 
-                        // الحالة
+                        // Ø§Ù„Ø­Ø§Ù„Ø©
                         if (!empty($row['project_id']) && $row['operation_status'] == "1") {
-                            echo "<td><span class='badge-working'><i class='fas fa-spinner fa-spin'></i> قيد التشغيل</span></td>";
+                            echo "<td><span class='badge-working'><i class='fas fa-spinner fa-spin'></i> Ù‚ÙŠØ¯ Ø§Ù„ØªØ´ØºÙŠÙ„</span></td>";
                         } else {
                             if ($row['status'] == "1") {
-                                echo "<td><span class='badge-available'><i class='fas fa-check-circle'></i> متاحة</span></td>";
+                                echo "<td><span class='badge-available'><i class='fas fa-check-circle'></i> Ù…ØªØ§Ø­Ø©</span></td>";
                             } else {
-                                echo "<td><span class='badge-busy'><i class='fas fa-times-circle'></i> مشغولة</span></td>";
+                                echo "<td><span class='badge-busy'><i class='fas fa-times-circle'></i> Ù…Ø´ØºÙˆÙ„Ø©</span></td>";
                             }
                         }
 
-                        // الإجراءات
+                        // Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª
                                                 echo "<td>";
-                                                echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
+                                                echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='Ø¹Ø±Ø¶ Ø§Ù„ØªÙØ§ØµÙŠÙ„'>
                                                         <i class='fas fa-eye'></i>
                                                     </a>";
                                                 if ($_SESSION['user']['role'] == "3" || $_SESSION['user']['role'] == "10") {
-                                                                                                                echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-driver' title='إدارة المشغلين'>
+                                                                                                                echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-driver' title='Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ†'>
                                                                         <i class='fas fa-user-cog'></i>
                                                                     </a>";
                                                 } else {
-                                                                                                                echo "<a href='equipments.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
+                                                                                                                echo "<a href='equipments.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='ØªØ¹Ø¯ÙŠÙ„'>
                                                                         <i class='fas fa-edit'></i>
                                                                     </a>";
-                                                        // يمكن إضافة زر حذف هنا إذا لزم الأمر
+                                                        // ÙŠÙ…ÙƒÙ† Ø¥Ø¶Ø§ÙØ© Ø²Ø± Ø­Ø°Ù Ù‡Ù†Ø§ Ø¥Ø°Ø§ Ù„Ø²Ù… Ø§Ù„Ø£Ù…Ø±
                                                 }
                                                 echo "</td>";
 
@@ -1005,149 +1053,149 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
         </div>
     </div>
 
-<!-- Modal عرض تفاصيل المعدة -->
+<!-- Modal Ø¹Ø±Ø¶ ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø© -->
 <div id="viewEquipmentModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h5><i class="fas fa-eye"></i> عرض بيانات المعدة</h5>
+            <h5><i class="fas fa-eye"></i> Ø¹Ø±Ø¶ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø¹Ø¯Ø©</h5>
             <button class="close-modal" id="closeEquipmentModal">&times;</button>
         </div>
         <div class="modal-body">
             <div class="view-modal-body">
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-barcode"></i> كود المعدة</div>
+                    <div class="view-item-label"><i class="fas fa-barcode"></i> ÙƒÙˆØ¯ Ø§Ù„Ù…Ø¹Ø¯Ø©</div>
                     <div class="view-item-value" id="view_eq_code">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-tag"></i> اسم المعدة</div>
+                    <div class="view-item-label"><i class="fas fa-tag"></i> Ø§Ø³Ù… Ø§Ù„Ù…Ø¹Ø¯Ø©</div>
                     <div class="view-item-value" id="view_eq_name">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-tools"></i> نوع المعدة</div>
+                    <div class="view-item-label"><i class="fas fa-tools"></i> Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©</div>
                     <div class="view-item-value" id="view_eq_type">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-truck-loading"></i> المورد</div>
+                    <div class="view-item-label"><i class="fas fa-truck-loading"></i> Ø§Ù„Ù…ÙˆØ±Ø¯</div>
                     <div class="view-item-value" id="view_eq_supplier">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-project-diagram"></i> المشروع</div>
+                    <div class="view-item-label"><i class="fas fa-project-diagram"></i> Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</div>
                     <div class="view-item-value" id="view_eq_project">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-mountain"></i> المنجم</div>
+                    <div class="view-item-label"><i class="fas fa-mountain"></i> Ø§Ù„Ù…Ù†Ø¬Ù…</div>
                     <div class="view-item-value" id="view_eq_mine">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-hashtag"></i> الرقم التسلسلي</div>
+                    <div class="view-item-label"><i class="fas fa-hashtag"></i> Ø§Ù„Ø±Ù‚Ù… Ø§Ù„ØªØ³Ù„Ø³Ù„ÙŠ</div>
                     <div class="view-item-value" id="view_eq_serial">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-car"></i> رقم الهيكل</div>
+                    <div class="view-item-label"><i class="fas fa-car"></i> Ø±Ù‚Ù… Ø§Ù„Ù‡ÙŠÙƒÙ„</div>
                     <div class="view-item-value" id="view_eq_chassis">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-industry"></i> الشركة المصنعة</div>
+                    <div class="view-item-label"><i class="fas fa-industry"></i> Ø§Ù„Ø´Ø±ÙƒØ© Ø§Ù„Ù…ØµÙ†Ø¹Ø©</div>
                     <div class="view-item-value" id="view_eq_manufacturer">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-car-side"></i> الموديل</div>
+                    <div class="view-item-label"><i class="fas fa-car-side"></i> Ø§Ù„Ù…ÙˆØ¯ÙŠÙ„</div>
                     <div class="view-item-value" id="view_eq_model">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar"></i> سنة الصنع</div>
+                    <div class="view-item-label"><i class="fas fa-calendar"></i> Ø³Ù†Ø© Ø§Ù„ØµÙ†Ø¹</div>
                     <div class="view-item-value" id="view_eq_year">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar-plus"></i> سنة الاستيراد</div>
+                    <div class="view-item-label"><i class="fas fa-calendar-plus"></i> Ø³Ù†Ø© Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯</div>
                     <div class="view-item-value" id="view_eq_import_year">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-cogs"></i> حالة المعدة</div>
+                    <div class="view-item-label"><i class="fas fa-cogs"></i> Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø¹Ø¯Ø©</div>
                     <div class="view-item-value" id="view_eq_condition">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-clock"></i> ساعات التشغيل</div>
+                    <div class="view-item-label"><i class="fas fa-clock"></i> Ø³Ø§Ø¹Ø§Øª Ø§Ù„ØªØ´ØºÙŠÙ„</div>
                     <div class="view-item-value" id="view_eq_hours">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-car-crash"></i> حالة المحرك</div>
+                    <div class="view-item-label"><i class="fas fa-car-crash"></i> Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø­Ø±Ùƒ</div>
                     <div class="view-item-value" id="view_eq_engine">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-circle-notch"></i> حالة الإطارات</div>
+                    <div class="view-item-label"><i class="fas fa-circle-notch"></i> Ø­Ø§Ù„Ø© Ø§Ù„Ø¥Ø·Ø§Ø±Ø§Øª</div>
                     <div class="view-item-value" id="view_eq_tires">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-user"></i> اسم المالك</div>
+                    <div class="view-item-label"><i class="fas fa-user"></i> Ø§Ø³Ù… Ø§Ù„Ù…Ø§Ù„Ùƒ</div>
                     <div class="view-item-value" id="view_eq_owner">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-briefcase"></i> نوع المالك</div>
+                    <div class="view-item-label"><i class="fas fa-briefcase"></i> Ù†ÙˆØ¹ Ø§Ù„Ù…Ø§Ù„Ùƒ</div>
                     <div class="view-item-value" id="view_eq_owner_type">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-phone"></i> هاتف المالك</div>
+                    <div class="view-item-label"><i class="fas fa-phone"></i> Ù‡Ø§ØªÙ Ø§Ù„Ù…Ø§Ù„Ùƒ</div>
                     <div class="view-item-value" id="view_eq_owner_phone">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-handshake"></i> علاقة المالك بالمورد</div>
+                    <div class="view-item-label"><i class="fas fa-handshake"></i> Ø¹Ù„Ø§Ù‚Ø© Ø§Ù„Ù…Ø§Ù„Ùƒ Ø¨Ø§Ù„Ù…ÙˆØ±Ø¯</div>
                     <div class="view-item-value" id="view_eq_owner_relation">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-address-card"></i> رقم الترخيص</div>
+                    <div class="view-item-label"><i class="fas fa-address-card"></i> Ø±Ù‚Ù… Ø§Ù„ØªØ±Ø®ÙŠØµ</div>
                     <div class="view-item-value" id="view_eq_license">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-landmark"></i> جهة الترخيص</div>
+                    <div class="view-item-label"><i class="fas fa-landmark"></i> Ø¬Ù‡Ø© Ø§Ù„ØªØ±Ø®ÙŠØµ</div>
                     <div class="view-item-value" id="view_eq_license_authority">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar-times"></i> انتهاء الترخيص</div>
+                    <div class="view-item-label"><i class="fas fa-calendar-times"></i> Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„ØªØ±Ø®ÙŠØµ</div>
                     <div class="view-item-value" id="view_eq_license_expiry">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-certificate"></i> رقم شهادة الفحص</div>
+                    <div class="view-item-label"><i class="fas fa-certificate"></i> Ø±Ù‚Ù… Ø´Ù‡Ø§Ø¯Ø© Ø§Ù„ÙØ­Øµ</div>
                     <div class="view-item-value" id="view_eq_inspection">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar-check"></i> آخر فحص</div>
+                    <div class="view-item-label"><i class="fas fa-calendar-check"></i> Ø¢Ø®Ø± ÙØ­Øµ</div>
                     <div class="view-item-value" id="view_eq_last_inspection">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-map-marker-alt"></i> الموقع الحالي</div>
+                    <div class="view-item-label"><i class="fas fa-map-marker-alt"></i> Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ø­Ø§Ù„ÙŠ</div>
                     <div class="view-item-value" id="view_eq_location">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-traffic-light"></i> حالة التوفر</div>
+                    <div class="view-item-label"><i class="fas fa-traffic-light"></i> Ø­Ø§Ù„Ø© Ø§Ù„ØªÙˆÙØ±</div>
                     <div class="view-item-value" id="view_eq_availability">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-money-bill-wave"></i> القيمة المقدرة</div>
+                    <div class="view-item-label"><i class="fas fa-money-bill-wave"></i> Ø§Ù„Ù‚ÙŠÙ…Ø© Ø§Ù„Ù…Ù‚Ø¯Ø±Ø©</div>
                     <div class="view-item-value" id="view_eq_value">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar-day"></i> سعر التأجير اليومي</div>
+                    <div class="view-item-label"><i class="fas fa-calendar-day"></i> Ø³Ø¹Ø± Ø§Ù„ØªØ£Ø¬ÙŠØ± Ø§Ù„ÙŠÙˆÙ…ÙŠ</div>
                     <div class="view-item-value" id="view_eq_daily">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar-alt"></i> سعر التأجير الشهري</div>
+                    <div class="view-item-label"><i class="fas fa-calendar-alt"></i> Ø³Ø¹Ø± Ø§Ù„ØªØ£Ø¬ÙŠØ± Ø§Ù„Ø´Ù‡Ø±ÙŠ</div>
                     <div class="view-item-value" id="view_eq_monthly">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-shield-alt"></i> التأمين/الضمان</div>
+                    <div class="view-item-label"><i class="fas fa-shield-alt"></i> Ø§Ù„ØªØ£Ù…ÙŠÙ†/Ø§Ù„Ø¶Ù…Ø§Ù†</div>
                     <div class="view-item-value" id="view_eq_insurance">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-comment-alt"></i> ملاحظات عامة</div>
+                    <div class="view-item-label"><i class="fas fa-comment-alt"></i> Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø¹Ø§Ù…Ø©</div>
                     <div class="view-item-value" id="view_eq_notes">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-wrench"></i> آخر صيانة</div>
+                    <div class="view-item-label"><i class="fas fa-wrench"></i> Ø¢Ø®Ø± ØµÙŠØ§Ù†Ø©</div>
                     <div class="view-item-value" id="view_eq_last_maintenance">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> الحالة</div>
+                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> Ø§Ù„Ø­Ø§Ù„Ø©</div>
                     <div class="view-item-value" id="view_eq_status">-</div>
                 </div>
             </div>
@@ -1155,11 +1203,11 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
         <div class="modal-footer">
             <?php if ($_SESSION['user']['role'] != "3" && $_SESSION['user']['role'] != "10") { ?>
             <a id="viewEquipmentEditBtn" class="btn-modal btn-modal-save" style="text-decoration: none;">
-                <i class="fas fa-edit"></i> تعديل المعدة
+                <i class="fas fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø©
             </a>
             <?php } ?>
             <button type="button" class="btn-modal btn-modal-cancel" id="closeEquipmentModalFooter">
-                <i class="fas fa-times"></i> إغلاق
+                <i class="fas fa-times"></i> Ø¥ØºÙ„Ø§Ù‚
             </button>
         </div>
     </div>
@@ -1184,28 +1232,28 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 responsive: true,
                 dom: 'Bfrtip',
                 buttons: [
-                    { extend: 'copy', text: 'نسخ' },
-                    { extend: 'excel', text: 'تصدير Excel' },
-                    { extend: 'csv', text: 'تصدير CSV' },
-                    { extend: 'pdf', text: 'تصدير PDF' },
-                    { extend: 'print', text: 'طباعة' }
+                    { extend: 'copy', text: 'Ù†Ø³Ø®' },
+                    { extend: 'excel', text: 'ØªØµØ¯ÙŠØ± Excel' },
+                    { extend: 'csv', text: 'ØªØµØ¯ÙŠØ± CSV' },
+                    { extend: 'pdf', text: 'ØªØµØ¯ÙŠØ± PDF' },
+                    { extend: 'print', text: 'Ø·Ø¨Ø§Ø¹Ø©' }
                 ],
                 "language": {
                     "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
                 }
             });
             
-            // نظام إظهار/إخفاء المجموعات
+            // Ù†Ø¸Ø§Ù… Ø¥Ø¸Ù‡Ø§Ø±/Ø¥Ø®ÙØ§Ø¡ Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹Ø§Øª
             var columnGroups = {
-                'basic': [0, 1, 2, 4, 5],        // #، المورد، كود المعدة، النوع، الاسم
-                'identification': [3],            // رقم تسلسلي
-                'manufacturing': [6, 7],          // الموديل، سنة الصنع
-                'technical': [8, 10],             // حالة المعدة، التوفر
-                'ownership': [9],                 // المالك
-                'status': [11, 12]                // الحالة، الإجراءات
+                'basic': [0, 1, 2, 4, 5],        // #ØŒ Ø§Ù„Ù…ÙˆØ±Ø¯ØŒ ÙƒÙˆØ¯ Ø§Ù„Ù…Ø¹Ø¯Ø©ØŒ Ø§Ù„Ù†ÙˆØ¹ØŒ Ø§Ù„Ø§Ø³Ù…
+                'identification': [3],            // Ø±Ù‚Ù… ØªØ³Ù„Ø³Ù„ÙŠ
+                'manufacturing': [6, 7],          // Ø§Ù„Ù…ÙˆØ¯ÙŠÙ„ØŒ Ø³Ù†Ø© Ø§Ù„ØµÙ†Ø¹
+                'technical': [8, 10],             // Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø¹Ø¯Ø©ØŒ Ø§Ù„ØªÙˆÙØ±
+                'ownership': [9],                 // Ø§Ù„Ù…Ø§Ù„Ùƒ
+                'status': [11, 12]                // Ø§Ù„Ø­Ø§Ù„Ø©ØŒ Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª
             };
             
-            // حفظ حالة المجموعات (الصنع والفنية مخفيتين بشكل افتراضي)
+            // Ø­ÙØ¸ Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹Ø§Øª (Ø§Ù„ØµÙ†Ø¹ ÙˆØ§Ù„ÙÙ†ÙŠØ© Ù…Ø®ÙÙŠØªÙŠÙ† Ø¨Ø´ÙƒÙ„ Ø§ÙØªØ±Ø§Ø¶ÙŠ)
             var groupsState = {
                 'basic': true,
                 'identification': true,
@@ -1215,7 +1263,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 'status': true
             };
             
-            // إخفاء الأعمدة المخفية بشكل افتراضي عند التحميل
+            // Ø¥Ø®ÙØ§Ø¡ Ø§Ù„Ø£Ø¹Ù…Ø¯Ø© Ø§Ù„Ù…Ø®ÙÙŠØ© Ø¨Ø´ÙƒÙ„ Ø§ÙØªØ±Ø§Ø¶ÙŠ Ø¹Ù†Ø¯ Ø§Ù„ØªØ­Ù…ÙŠÙ„
             columnGroups['manufacturing'].forEach(function(colIndex) {
                 table.column(colIndex).visible(false);
             });
@@ -1223,7 +1271,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 table.column(colIndex).visible(false);
             });
             
-            // نظام الفلترة الاحترافي
+            // Ù†Ø¸Ø§Ù… Ø§Ù„ÙÙ„ØªØ±Ø© Ø§Ù„Ø§Ø­ØªØ±Ø§ÙÙŠ
             var activeFilters = {
                 supplier: '',
                 type: '',
@@ -1231,7 +1279,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 availability: ''
             };
             
-            // تهيئة الفلاتر
+            // ØªÙ‡ÙŠØ¦Ø© Ø§Ù„ÙÙ„Ø§ØªØ±
             $('#filterSupplier, #filterType, #filterStatus, #filterAvailability').on('change', function() {
                 var filterType = $(this).attr('id').replace('filter', '').toLowerCase();
                 activeFilters[filterType] = $(this).val();
@@ -1239,36 +1287,36 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 updateFiltersSummary();
             });
             
-            // تطبيق الفلاتر
+            // ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„ÙÙ„Ø§ØªØ±
             function applyFilters() {
                 $.fn.dataTable.ext.search.push(
                     function(settings, data, dataIndex) {
-                        // data[1] = المورد
-                        // data[4] = النوع (يحتوي على نص مثل "حفار" أو "قلاب")
-                        // data[11] = الحالة (يحتوي على "نشط" أو "غير نشط")
-                        // data[10] = التوفر
+                        // data[1] = Ø§Ù„Ù…ÙˆØ±Ø¯
+                        // data[4] = Ø§Ù„Ù†ÙˆØ¹ (ÙŠØ­ØªÙˆÙŠ Ø¹Ù„Ù‰ Ù†Øµ Ù…Ø«Ù„ "Ø­ÙØ§Ø±" Ø£Ùˆ "Ù‚Ù„Ø§Ø¨")
+                        // data[11] = Ø§Ù„Ø­Ø§Ù„Ø© (ÙŠØ­ØªÙˆÙŠ Ø¹Ù„Ù‰ "Ù†Ø´Ø·" Ø£Ùˆ "ØºÙŠØ± Ù†Ø´Ø·")
+                        // data[10] = Ø§Ù„ØªÙˆÙØ±
                         
                         var supplierMatch = true;
                         var typeMatch = true;
                         var statusMatch = true;
                         var availabilityMatch = true;
                         
-                        // فلترة المورد
+                        // ÙÙ„ØªØ±Ø© Ø§Ù„Ù…ÙˆØ±Ø¯
                         if (activeFilters.supplier !== '') {
                             supplierMatch = data[1].indexOf(activeFilters.supplier) !== -1;
                         }
                         
-                        // فلترة النوع
+                        // ÙÙ„ØªØ±Ø© Ø§Ù„Ù†ÙˆØ¹
                         if (activeFilters.type !== '') {
                             typeMatch = data[4].indexOf(activeFilters.type) !== -1;
                         }
                         
-                        // فلترة الحالة
+                        // ÙÙ„ØªØ±Ø© Ø§Ù„Ø­Ø§Ù„Ø©
                         if (activeFilters.status !== '') {
                             statusMatch = data[11].indexOf(activeFilters.status) !== -1;
                         }
                         
-                        // فلترة التوفر
+                        // ÙÙ„ØªØ±Ø© Ø§Ù„ØªÙˆÙØ±
                         if (activeFilters.availability !== '') {
                             availabilityMatch = data[10].indexOf(activeFilters.availability) !== -1;
                         }
@@ -1279,36 +1327,36 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 
                 table.draw();
                 
-                // إزالة دالة البحث بعد التطبيق لتجنب التكرار
+                // Ø¥Ø²Ø§Ù„Ø© Ø¯Ø§Ù„Ø© Ø§Ù„Ø¨Ø­Ø« Ø¨Ø¹Ø¯ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ù„ØªØ¬Ù†Ø¨ Ø§Ù„ØªÙƒØ±Ø§Ø±
                 $.fn.dataTable.ext.search.pop();
             }
             
-            // تحديث ملخص الفلاتر
+            // ØªØ­Ø¯ÙŠØ« Ù…Ù„Ø®Øµ Ø§Ù„ÙÙ„Ø§ØªØ±
             function updateFiltersSummary() {
                 var activeCount = 0;
                 var summaryParts = [];
                 
                 if (activeFilters.supplier) {
                     activeCount++;
-                    summaryParts.push('المورد: ' + activeFilters.supplier);
+                    summaryParts.push('Ø§Ù„Ù…ÙˆØ±Ø¯: ' + activeFilters.supplier);
                 }
                 if (activeFilters.type) {
                     activeCount++;
-                    summaryParts.push('النوع: ' + activeFilters.type);
+                    summaryParts.push('Ø§Ù„Ù†ÙˆØ¹: ' + activeFilters.type);
                 }
                 if (activeFilters.status) {
                     activeCount++;
-                    summaryParts.push('الحالة: ' + activeFilters.status);
+                    summaryParts.push('Ø§Ù„Ø­Ø§Ù„Ø©: ' + activeFilters.status);
                 }
                 if (activeFilters.availability) {
                     activeCount++;
-                    summaryParts.push('التوفر: ' + activeFilters.availability);
+                    summaryParts.push('Ø§Ù„ØªÙˆÙØ±: ' + activeFilters.availability);
                 }
                 
                 var $summary = $('#filtersSummary');
                 if (activeCount > 0) {
                     $summary.find('.summary-text').text(
-                        'تم تطبيق ' + activeCount + ' فلتر: ' + summaryParts.join(' | ')
+                        'ØªÙ… ØªØ·Ø¨ÙŠÙ‚ ' + activeCount + ' ÙÙ„ØªØ±: ' + summaryParts.join(' | ')
                     );
                     $summary.slideDown(300);
                 } else {
@@ -1316,7 +1364,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 }
             }
             
-            // إلغاء جميع الفلاتر
+            // Ø¥Ù„ØºØ§Ø¡ Ø¬Ù…ÙŠØ¹ Ø§Ù„ÙÙ„Ø§ØªØ±
             $('#clearFiltersBtn').on('click', function() {
                 activeFilters = {
                     supplier: '',
@@ -1329,14 +1377,14 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 applyFilters();
                 updateFiltersSummary();
                 
-                // تأثير بصري
+                // ØªØ£Ø«ÙŠØ± Ø¨ØµØ±ÙŠ
                 $(this).addClass('btn-clear-active');
                 setTimeout(function() {
                     $('#clearFiltersBtn').removeClass('btn-clear-active');
                 }, 300);
             });
             
-            // وظيفة إظهار/إخفاء مجموعة
+            // ÙˆØ¸ÙŠÙØ© Ø¥Ø¸Ù‡Ø§Ø±/Ø¥Ø®ÙØ§Ø¡ Ù…Ø¬Ù…ÙˆØ¹Ø©
             function toggleGroup(groupName) {
                 var columns = columnGroups[groupName];
                 var isVisible = groupsState[groupName];
@@ -1348,14 +1396,14 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 groupsState[groupName] = !isVisible;
             }
             
-            // معالج النقر على أزرار المجموعات
+            // Ù…Ø¹Ø§Ù„Ø¬ Ø§Ù„Ù†Ù‚Ø± Ø¹Ù„Ù‰ Ø£Ø²Ø±Ø§Ø± Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹Ø§Øª
             $('.toggle-group-btn').on('click', function() {
                 var groupName = $(this).data('group');
                 toggleGroup(groupName);
                 $(this).toggleClass('active');
             });
             
-            // زر إظهار/إخفاء الكل
+            // Ø²Ø± Ø¥Ø¸Ù‡Ø§Ø±/Ø¥Ø®ÙØ§Ø¡ Ø§Ù„ÙƒÙ„
             var allVisible = true;
             $('.toggle-all-btn').on('click', function() {
                 allVisible = !allVisible;
@@ -1370,10 +1418,10 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 
                 if (allVisible) {
                     $('.toggle-group-btn').addClass('active');
-                    $(this).html('<i class="fas fa-eye"></i> الكل');
+                    $(this).html('<i class="fas fa-eye"></i> Ø§Ù„ÙƒÙ„');
                 } else {
                     $('.toggle-group-btn').removeClass('active');
-                    $(this).html('<i class="fas fa-eye-slash"></i> إخفاء الكل');
+                    $(this).html('<i class="fas fa-eye-slash"></i> Ø¥Ø®ÙØ§Ø¡ Ø§Ù„ÙƒÙ„');
                 }
             });
         });
@@ -1396,13 +1444,13 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
             });
         }
         
-        // تحميل بيانات التعديل عند تحميل الصفحة
+        // ØªØ­Ù…ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ Ø¹Ù†Ø¯ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙØ­Ø©
         <?php if (!empty($editData)) { ?>
         $(document).ready(function() {
-            // عرض الفورم
+            // Ø¹Ø±Ø¶ Ø§Ù„ÙÙˆØ±Ù…
             $('#projectForm').show();
             
-            // التمرير للفورم
+            // Ø§Ù„ØªÙ…Ø±ÙŠØ± Ù„Ù„ÙÙˆØ±Ù…
             $('html, body').animate({
                 scrollTop: $('#projectForm').offset().top - 100
             }, 500);
@@ -1417,25 +1465,25 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
         function setViewValue(elementId, value) {
             const el = document.getElementById(elementId);
             if (!el) return;
-            const safeValue = (value !== null && value !== undefined && value !== '') ? value : 'غير محدد';
+            const safeValue = (value !== null && value !== undefined && value !== '') ? value : 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯';
             el.textContent = safeValue;
         }
 
         function formatCurrency(value) {
-            if (value === null || value === undefined || value === '') return 'غير محدد';
+            if (value === null || value === undefined || value === '') return 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯';
             const num = parseFloat(value);
             if (Number.isNaN(num)) return value;
             return '$' + num.toLocaleString();
         }
 
         function formatType(value) {
-            if (!value) return 'غير محدد';
-            return String(value) === '1' ? 'حفار' : 'قلاب';
+            if (!value) return 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯';
+            return String(value) === '1' ? 'Ø­ÙØ§Ø±' : 'Ù‚Ù„Ø§Ø¨';
         }
 
         function formatStatus(value) {
-            if (value === null || value === undefined || value === '') return 'غير محدد';
-            return String(value) === '1' ? 'متاحة' : 'مشغولة';
+            if (value === null || value === undefined || value === '') return 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯';
+            return String(value) === '1' ? 'Ù…ØªØ§Ø­Ø©' : 'Ù…Ø´ØºÙˆÙ„Ø©';
         }
 
         $(document).on('click', '.viewEquipmentBtn', function() {
@@ -1444,7 +1492,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 
             viewEquipmentModal.style.display = 'flex';
 
-            const loadingText = 'جار التحميل...';
+            const loadingText = 'Ø¬Ø§Ø± Ø§Ù„ØªØ­Ù…ÙŠÙ„...';
             [
                 'view_eq_code','view_eq_name','view_eq_type','view_eq_supplier','view_eq_project','view_eq_mine',
                 'view_eq_serial','view_eq_chassis','view_eq_manufacturer','view_eq_model','view_eq_year',
@@ -1468,7 +1516,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 dataType: 'json',
                 success: function(response) {
                     if (!response.success || !response.data) {
-                        setViewValue('view_eq_name', 'تعذر تحميل البيانات');
+                        setViewValue('view_eq_name', 'ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª');
                         return;
                     }
 
@@ -1486,7 +1534,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     setViewValue('view_eq_year', data.manufacturing_year);
                     setViewValue('view_eq_import_year', data.import_year);
                     setViewValue('view_eq_condition', data.equipment_condition);
-                    setViewValue('view_eq_hours', data.operating_hours ? data.operating_hours + ' ساعة' : 'غير محدد');
+                    setViewValue('view_eq_hours', data.operating_hours ? data.operating_hours + ' Ø³Ø§Ø¹Ø©' : 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯');
                     setViewValue('view_eq_engine', data.engine_condition);
                     setViewValue('view_eq_tires', data.tires_condition);
                     setViewValue('view_eq_owner', data.actual_owner_name);
@@ -1509,7 +1557,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     setViewValue('view_eq_status', formatStatus(data.status));
                 },
                 error: function() {
-                    setViewValue('view_eq_name', 'تعذر الاتصال بالخادم');
+                    setViewValue('view_eq_name', 'ØªØ¹Ø°Ø± Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø®Ø§Ø¯Ù…');
                 }
             });
         });
@@ -1541,29 +1589,29 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 </script>
 
 <!-- ========================================== -->
-<!-- Modal استيراد من Excel/CSV -->
+<!-- Modal Ø§Ø³ØªÙŠØ±Ø§Ø¯ Ù…Ù† Excel/CSV -->
 <!-- ========================================== -->
 <div id="importExcelModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:9999; align-items:center; justify-content:center;">
     <div style="background:white; border-radius:16px; width:90%; max-width:650px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; animation:modalSlideIn 0.3s ease;">
-        <!-- رأس Modal -->
+        <!-- Ø±Ø£Ø³ Modal -->
         <div style="background:linear-gradient(135deg, #0c1c3e 0%, #1e3a5f 100%); color:white; padding:24px 32px; display:flex; justify-content:space-between; align-items:center;">
             <h5 style="margin:0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:12px;">
                 <i class="fas fa-file-import" style="color:#e8b800;"></i>
-                استيراد المعدات من Excel/CSV
+                Ø§Ø³ØªÙŠØ±Ø§Ø¯ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ù…Ù† Excel/CSV
             </h5>
             <button onclick="closeImportModal()" style="background:rgba(255,255,255,0.1); border:none; color:white; font-size:1.5rem; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
-        <!-- جسم Modal -->
+        <!-- Ø¬Ø³Ù… Modal -->
         <div style="padding:32px;">
             <form id="importExcelForm" enctype="multipart/form-data">
-                <!-- منطقة رفع الملف -->
+                <!-- Ù…Ù†Ø·Ù‚Ø© Ø±ÙØ¹ Ø§Ù„Ù…Ù„Ù -->
                 <div style="margin-bottom:24px;">
                     <label style="display:block; font-weight:600; margin-bottom:12px; color:#0c1c3e; font-size:1rem;">
                         <i class="fas fa-upload" style="color:#e8b800; margin-left:6px;"></i>
-                        اختر ملف Excel أو CSV
+                        Ø§Ø®ØªØ± Ù…Ù„Ù Excel Ø£Ùˆ CSV
                     </label>
                     <input type="file" 
                            id="excel_file" 
@@ -1573,40 +1621,40 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                            style="width:100%; padding:14px; border:2px dashed #cbd5e1; border-radius:10px; font-size:0.95rem; cursor:pointer; transition:all 0.3s; background:#f8fafc;">
                 </div>
 
-                <!-- مؤشر التحميل -->
+                <!-- Ù…Ø¤Ø´Ø± Ø§Ù„ØªØ­Ù…ÙŠÙ„ -->
                 <div id="importProgress" style="display:none; padding:16px; background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:10px; margin-bottom:20px; text-align:center; color:#1e40af;">
                     <i class="fas fa-spinner fa-spin" style="font-size:1.5rem; margin-bottom:8px;"></i>
-                    <p style="margin:0; font-weight:600;">جاري معالجة الملف... يرجى الانتظار</p>
+                    <p style="margin:0; font-weight:600;">Ø¬Ø§Ø±ÙŠ Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„Ù…Ù„Ù... ÙŠØ±Ø¬Ù‰ Ø§Ù„Ø§Ù†ØªØ¸Ø§Ø±</p>
                 </div>
 
-                <!-- نتيجة الاستيراد -->
+                <!-- Ù†ØªÙŠØ¬Ø© Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯ -->
                 <div id="importResult" style="display:none; margin-bottom:20px;"></div>
 
-                <!-- التعليمات -->
+                <!-- Ø§Ù„ØªØ¹Ù„ÙŠÙ…Ø§Øª -->
                 <div style="background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:10px; padding:18px; margin-bottom:24px;">
                     <h6 style="margin:0 0 12px 0; color:#1e40af; font-weight:700; font-size:0.95rem;">
-                        <i class="fas fa-info-circle"></i> تعليمات الاستيراد:
+                        <i class="fas fa-info-circle"></i> ØªØ¹Ù„ÙŠÙ…Ø§Øª Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯:
                     </h6>
                     <ul style="margin:0; padding-right:20px; color:#475569; font-size:0.9rem; line-height:1.8;">
-                        <li>قم بتحميل نموذج Excel أو CSV أولاً</li>
-                        <li>املأ البيانات في النموذج (الحقول المطلوبة: كود المعدة، اسم المورد، نوع المعدة، اسم المعدة)</li>
-                        <li>تأكد من أن اسم المورد ونوع المعدة موجودان في النظام</li>
-                        <li>احذف الأمثلة قبل رفع الملف</li>
-                        <li>الحد الأقصى لحجم الملف: 5 ميجا بايت</li>
-                        <li>الصيغ المدعومة: .xlsx, .xls, .csv</li>
+                        <li>Ù‚Ù… Ø¨ØªØ­Ù…ÙŠÙ„ Ù†Ù…ÙˆØ°Ø¬ Excel Ø£Ùˆ CSV Ø£ÙˆÙ„Ø§Ù‹</li>
+                        <li>Ø§Ù…Ù„Ø£ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª ÙÙŠ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ (Ø§Ù„Ø­Ù‚ÙˆÙ„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©: ÙƒÙˆØ¯ Ø§Ù„Ù…Ø¹Ø¯Ø©ØŒ Ø§Ø³Ù… Ø§Ù„Ù…ÙˆØ±Ø¯ØŒ Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©ØŒ Ø§Ø³Ù… Ø§Ù„Ù…Ø¹Ø¯Ø©)</li>
+                        <li>ØªØ£ÙƒØ¯ Ù…Ù† Ø£Ù† Ø§Ø³Ù… Ø§Ù„Ù…ÙˆØ±Ø¯ ÙˆÙ†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø© Ù…ÙˆØ¬ÙˆØ¯Ø§Ù† ÙÙŠ Ø§Ù„Ù†Ø¸Ø§Ù…</li>
+                        <li>Ø§Ø­Ø°Ù Ø§Ù„Ø£Ù…Ø«Ù„Ø© Ù‚Ø¨Ù„ Ø±ÙØ¹ Ø§Ù„Ù…Ù„Ù</li>
+                        <li>Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ Ù„Ø­Ø¬Ù… Ø§Ù„Ù…Ù„Ù: 5 Ù…ÙŠØ¬Ø§ Ø¨Ø§ÙŠØª</li>
+                        <li>Ø§Ù„ØµÙŠØº Ø§Ù„Ù…Ø¯Ø¹ÙˆÙ…Ø©: .xlsx, .xls, .csv</li>
                     </ul>
                 </div>
 
-                <!-- أزرار التحكم -->
+                <!-- Ø£Ø²Ø±Ø§Ø± Ø§Ù„ØªØ­ÙƒÙ… -->
                 <div style="display:flex; gap:12px; justify-content:flex-end;">
                     <button type="button" 
                             onclick="closeImportModal()" 
                             style="padding:12px 28px; border:2px solid #e2e8f0; background:white; color:#64748b; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.3s; font-size:0.95rem;">
-                        <i class="fas fa-times"></i> إلغاء
+                        <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
                     </button>
                     <button type="submit" 
                             style="padding:12px 28px; background:linear-gradient(135deg, #16a34a 0%, #059669 100%); color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.3s; box-shadow:0 2px 8px rgba(22,163,74,0.25); font-size:0.95rem;">
-                        <i class="fas fa-file-import"></i> رفع واستيراد
+                        <i class="fas fa-file-import"></i> Ø±ÙØ¹ ÙˆØ§Ø³ØªÙŠØ±Ø§Ø¯
                     </button>
                 </div>
             </form>
@@ -1615,7 +1663,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 </div>
 
 <style>
-/* نظام الفلترة الاحترافي */
+/* Ù†Ø¸Ø§Ù… Ø§Ù„ÙÙ„ØªØ±Ø© Ø§Ù„Ø§Ø­ØªØ±Ø§ÙÙŠ */
 .filters-container {
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     border: 1.5px solid var(--border);
@@ -1810,12 +1858,12 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 </style>
 
 <script>
-    // فتح Modal الاستيراد
+    // ÙØªØ­ Modal Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯
     $('#openImportModal').on('click', function () {
         $('#importExcelModal').css('display', 'flex').hide().fadeIn(300);
     });
 
-    // إغلاق Modal الاستيراد
+    // Ø¥ØºÙ„Ø§Ù‚ Modal Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯
     function closeImportModal() {
         $('#importExcelModal').fadeOut(300);
         $('#importExcelForm')[0].reset();
@@ -1823,20 +1871,20 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
         $('#importResult').hide();
     }
 
-    // إغلاق عند الضغط خارج Modal
+    // Ø¥ØºÙ„Ø§Ù‚ Ø¹Ù†Ø¯ Ø§Ù„Ø¶ØºØ· Ø®Ø§Ø±Ø¬ Modal
     $(window).on('click', function (e) {
         if (e.target.id === 'importExcelModal') {
             closeImportModal();
         }
     });
 
-    // معالجة رفع ملف Excel
+    // Ù…Ø¹Ø§Ù„Ø¬Ø© Ø±ÙØ¹ Ù…Ù„Ù Excel
     $('#importExcelForm').on('submit', function (e) {
         e.preventDefault();
 
         const fileInput = $('#excel_file')[0];
         if (!fileInput.files.length) {
-            alert('الرجاء اختيار ملف Excel أو CSV');
+            alert('Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø§Ø®ØªÙŠØ§Ø± Ù…Ù„Ù Excel Ø£Ùˆ CSV');
             return;
         }
 
@@ -1861,13 +1909,13 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 
                 if (response.success) {
                     resultHtml += 'background:#dcfce7;border-color:rgba(22,163,74,.22);color:#15803d">';
-                    resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-check-circle"></i> تم الاستيراد بنجاح!</h6>';
-                    resultHtml += '<p style="margin:4px 0;">✅ تم إضافة: <strong>' + response.added + '</strong> معدة</p>';
+                    resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-check-circle"></i> ØªÙ… Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯ Ø¨Ù†Ø¬Ø§Ø­!</h6>';
+                    resultHtml += '<p style="margin:4px 0;">âœ… ØªÙ… Ø¥Ø¶Ø§ÙØ©: <strong>' + response.added + '</strong> Ù…Ø¹Ø¯Ø©</p>';
                     if (response.skipped > 0) {
-                        resultHtml += '<p style="margin:4px 0;color:#854d0e;">⚠️ تم تخطي: <strong>' + response.skipped + '</strong> معدة</p>';
+                        resultHtml += '<p style="margin:4px 0;color:#854d0e;">âš ï¸ ØªÙ… ØªØ®Ø·ÙŠ: <strong>' + response.skipped + '</strong> Ù…Ø¹Ø¯Ø©</p>';
                     }
                     if (response.errors.length > 0) {
-                        resultHtml += '<p style="margin:8px 0 4px;"><strong>الأخطاء:</strong></p><ul style="margin:0;padding-right:20px;max-height:200px;overflow-y:auto;">';
+                        resultHtml += '<p style="margin:8px 0 4px;"><strong>Ø§Ù„Ø£Ø®Ø·Ø§Ø¡:</strong></p><ul style="margin:0;padding-right:20px;max-height:200px;overflow-y:auto;">';
                         response.errors.forEach(function (error) {
                             resultHtml += '<li style="margin:4px 0;">' + error + '</li>';
                         });
@@ -1877,7 +1925,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     setTimeout(function () { location.reload(); }, 3000);
                 } else {
                     resultHtml += 'background:#fee2e2;border-color:rgba(220,38,38,.22);color:#991b1b">';
-                    resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> فشل الاستيراد</h6>';
+                    resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> ÙØ´Ù„ Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯</h6>';
                     resultHtml += '<p style="margin:0;">' + response.message + '</p>';
                     if (response.errors && response.errors.length > 0) {
                         resultHtml += '<ul style="margin:8px 0 0;padding-right:20px;max-height:200px;overflow-y:auto;">';
@@ -1894,7 +1942,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
             error: function (xhr, status, error) {
                 $('#importProgress').hide();
 
-                let errorMsg = 'حدث خطأ أثناء رفع الملف. الرجاء المحاولة مرة أخرى.';
+                let errorMsg = 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø±ÙØ¹ Ø§Ù„Ù…Ù„Ù. Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.';
 
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMsg = xhr.responseJSON.message;
@@ -1903,20 +1951,20 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         const response = JSON.parse(xhr.responseText);
                         if (response.message) { errorMsg = response.message; }
                     } catch (e) {
-                        errorMsg += '<br><small>تفاصيل الخطأ: ' + status + '</small>';
+                        errorMsg += '<br><small>ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø®Ø·Ø£: ' + status + '</small>';
                     }
                 }
 
                 const errorHtml = '<div style="padding:16px;border-radius:10px;background:#fee2e2;color:#991b1b;border:1.5px solid rgba(220,38,38,.22);">' +
-                    '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> حدث خطأ</h6>' +
+                    '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> Ø­Ø¯Ø« Ø®Ø·Ø£</h6>' +
                     '<p style="margin:0;">' + errorMsg + '</p>' +
-                    '<p style="margin:10px 0 4px;"><strong>نصائح:</strong></p>' +
+                    '<p style="margin:10px 0 4px;"><strong>Ù†ØµØ§Ø¦Ø­:</strong></p>' +
                     '<ul style="font-size:.85rem;margin:0;padding-right:20px;">' +
-                    '<li>تأكد من أن الملف بصيغة .xlsx, .xls أو .csv</li>' +
-                    '<li>تأكد من أن حجم الملف أقل من 5 ميجا</li>' +
-                    '<li>تأكد من أن الملف يحتوي على بيانات صحيحة</li>' +
-                    '<li>تأكد من أن أسماء الموردين وأنواع المعدات موجودة في النظام</li>' +
-                    '<li>إذا كنت تستخدم Excel، جرب حفظ الملف كـ CSV</li>' +
+                    '<li>ØªØ£ÙƒØ¯ Ù…Ù† Ø£Ù† Ø§Ù„Ù…Ù„Ù Ø¨ØµÙŠØºØ© .xlsx, .xls Ø£Ùˆ .csv</li>' +
+                    '<li>ØªØ£ÙƒØ¯ Ù…Ù† Ø£Ù† Ø­Ø¬Ù… Ø§Ù„Ù…Ù„Ù Ø£Ù‚Ù„ Ù…Ù† 5 Ù…ÙŠØ¬Ø§</li>' +
+                    '<li>ØªØ£ÙƒØ¯ Ù…Ù† Ø£Ù† Ø§Ù„Ù…Ù„Ù ÙŠØ­ØªÙˆÙŠ Ø¹Ù„Ù‰ Ø¨ÙŠØ§Ù†Ø§Øª ØµØ­ÙŠØ­Ø©</li>' +
+                    '<li>ØªØ£ÙƒØ¯ Ù…Ù† Ø£Ù† Ø£Ø³Ù…Ø§Ø¡ Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ† ÙˆØ£Ù†ÙˆØ§Ø¹ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ù…ÙˆØ¬ÙˆØ¯Ø© ÙÙŠ Ø§Ù„Ù†Ø¸Ø§Ù…</li>' +
+                    '<li>Ø¥Ø°Ø§ ÙƒÙ†Øª ØªØ³ØªØ®Ø¯Ù… ExcelØŒ Ø¬Ø±Ø¨ Ø­ÙØ¸ Ø§Ù„Ù…Ù„Ù ÙƒÙ€ CSV</li>' +
                     '</ul></div>';
                 $('#importResult').html(errorHtml).fadeIn(300);
             }
@@ -1927,3 +1975,4 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 </div> <!-- closing main div -->
 </body>
 </html>
+

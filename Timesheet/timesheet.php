@@ -1,10 +1,21 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-  header("Location: ../index.php");
+  header("Location: ../login.php");
   exit();
 }
 include '../config.php';
+
+$current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$is_super_admin = ($current_role === '-1');
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+  header("Location: ../login.php?msg=Ù„Ø§+ØªÙˆØ¬Ø¯+Ø¨ÙŠØ¦Ø©+Ø´Ø±ÙƒØ©+ØµØ§Ù„Ø­Ø©+Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù…+âŒ");
+  exit();
+}
+
+$timesheet_has_company = db_table_has_column($conn, 'timesheet', 'company_id');
 
 // Handle POST submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
@@ -38,19 +49,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     foreach ($fields as $f) {
       $update_parts[] = "$f = '" . $values[$f] . "'";
     }
-    $sql = "UPDATE timesheet SET " . implode(',', $update_parts) . " WHERE id = $id";
+    $update_scope = "";
+    if (!$is_super_admin) {
+      if ($timesheet_has_company) {
+        $update_scope = " AND company_id = $company_id";
+      } else {
+        $update_scope = " AND EXISTS (
+          SELECT 1
+          FROM operations o
+          INNER JOIN project p ON p.id = o.project_id
+          LEFT JOIN users su ON su.id = p.created_by
+          LEFT JOIN clients sc ON sc.id = p.company_client_id
+          LEFT JOIN users scu ON scu.id = sc.created_by
+          WHERE o.id = timesheet.operator
+            AND (su.company_id = $company_id OR scu.company_id = $company_id)
+        )";
+      }
+    }
+    $sql = "UPDATE timesheet SET " . implode(',', $update_parts) . " WHERE id = $id" . $update_scope;
   } else {
     // INSERT
-    $sql = "INSERT INTO timesheet (" . implode(",", $fields) . ")
-            VALUES ('" . implode("','", $values) . "')";
+    $insert_company_col = (!$is_super_admin && $timesheet_has_company) ? ",company_id" : "";
+    $insert_company_val = (!$is_super_admin && $timesheet_has_company) ? ", '" . $company_id . "'" : "";
+    $sql = "INSERT INTO timesheet (" . implode(",", $fields) . $insert_company_col . ")
+            VALUES ('" . implode("','", $values) . "'" . $insert_company_val . ")";
   }
 
   if (mysqli_query($conn, $sql)) {
     $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
-    echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
+    echo "<script>alert('âœ… ØªÙ… Ø§Ù„Ø­ÙØ¸ Ø¨Ù†Ø¬Ø§Ø­'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
     exit;
   } else {
-    echo "<script>alert('❌ خطأ في الحفظ: " . addslashes(mysqli_error($conn)) . "');</script>";
+    echo "<script>alert('âŒ Ø®Ø·Ø£ ÙÙŠ Ø§Ù„Ø­ÙØ¸: " . addslashes(mysqli_error($conn)) . "');</script>";
   }
 }
 
@@ -60,13 +90,26 @@ if ($type !== "1" && $type !== "2") {
   exit();
 }
 
-$page_title = "إيكوبيشن | ساعات العمل ";
+$page_title = "Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ ";
 include("../inheader.php");
 // include('../insidebar.php');
-// تحديد النوع من الرابط (إن وجد)
+// ØªØ­Ø¯ÙŠØ¯ Ø§Ù„Ù†ÙˆØ¹ Ù…Ù† Ø§Ù„Ø±Ø§Ø¨Ø· (Ø¥Ù† ÙˆØ¬Ø¯)
 $type_filter = "";
 if ($type != "") {
   $type_filter = " AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE '$type' AND status = 'active') ";
+}
+
+$timesheet_project_scope_sql = "";
+if (!$is_super_admin) {
+  $timesheet_project_scope_sql = " AND EXISTS (
+    SELECT 1
+    FROM project p
+    LEFT JOIN users su ON su.id = p.created_by
+    LEFT JOIN clients sc ON sc.id = p.company_client_id
+    LEFT JOIN users scu ON scu.id = sc.created_by
+    WHERE p.id = o.project_id
+      AND (su.company_id = $company_id OR scu.company_id = $company_id)
+  )";
 }
 ?>
 
@@ -150,36 +193,36 @@ if ($type != "") {
     <div class="page-header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-clock"></i></div>
-            إدارة ساعات العمل
+            Ø¥Ø¯Ø§Ø±Ø© Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„
         </h1>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="timesheet_type.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
+                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
             </a>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fas fa-plus-circle"></i> إضافة ساعات عمل جديدة
+                <i class="fas fa-plus-circle"></i> Ø¥Ø¶Ø§ÙØ© Ø³Ø§Ø¹Ø§Øª Ø¹Ù…Ù„ Ø¬Ø¯ÙŠØ¯Ø©
             </a>
         </div>
     </div>
     <form id="projectForm" action="" method="post" style="display:none;">
         <?php if ($_GET['type'] == "1") {
-          // نوع المعدة كان حفار 
+          // Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø© ÙƒØ§Ù† Ø­ÙØ§Ø± 
           ?>
           <div class="card">
               <div class="card-header">
-                  <h5><i class="fas fa-edit"></i> إضافة / تعديل حفار</h5>
+                  <h5><i class="fas fa-edit"></i> Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ Ø­ÙØ§Ø±</h5>
               </div>
           <div class="card-body">
             <div class="form-grid">
               <div>
-                <label>الالية</label>
+                <label>Ø§Ù„Ø§Ù„ÙŠØ©</label>
                 <select name="operator" id="operator" required>
-                  <option value="">-- اختر الالية --</option>
+                  <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø§Ù„ÙŠØ© --</option>
                   <?php
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project_id'] . "'");
+                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project_id'] . "' $timesheet_project_scope_sql");
 
 
 
@@ -193,148 +236,148 @@ if ($type != "") {
               <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
 
               <div>
-                <label>السائق</label>
+                <label>Ø§Ù„Ø³Ø§Ø¦Ù‚</label>
                 <select id="driver" name="driver">
-                  <option value="">-- اختر السائق --</option>
+                  <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø³Ø§Ø¦Ù‚ --</option>
                 </select>
               </div>
               <div>
-                <label>الوردية</label>
+                <label>Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</label>
                 <select name="shift" id="shift">
-                  <option value=""> -- اختار الوردية -- </option>
-                  <option value="D"> صباحية </option>
-                  <option value="N"> مسائية </option>
+                  <option value=""> -- Ø§Ø®ØªØ§Ø± Ø§Ù„ÙˆØ±Ø¯ÙŠØ© -- </option>
+                  <option value="D"> ØµØ¨Ø§Ø­ÙŠØ© </option>
+                  <option value="N"> Ù…Ø³Ø§Ø¦ÙŠØ© </option>
                 </select>
               </div>
               <div>
-                <label for="date"> التاريخ </label>
+                <label for="date"> Ø§Ù„ØªØ§Ø±ÙŠØ® </label>
                 <input type="date" name="date" id="date" required />
               </div>
 
               <!-- ********************************************************** -->
 
               <div>
-                <label>ساعات الوردية</label>
+                <label>Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</label>
                 <input type="number" name="shift_hours" id="shift_hours" value="0">
               </div>
 
 
               <div>
-                <label> ⏱️ عداد البداية</label>
+                <label> â±ï¸ Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©</label>
                 <div class="counter-input-group">
                   <div class="counter-field">
                     <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
-                    <span>ساعات</span>
+                    <span>Ø³Ø§Ø¹Ø§Øª</span>
                   </div>
                   <span class="counter-separator">:</span>
                   <div class="counter-field">
                     <input type="number" value="0" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="00" required>
-                    <span>دقائق</span>
+                    <span>Ø¯Ù‚Ø§Ø¦Ù‚</span>
                   </div>
                   <span class="counter-separator">:</span>
                   <div class="counter-field">
                     <input type="number" value="0" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="00" required>
-                    <span>ثواني</span>
+                    <span>Ø«ÙˆØ§Ù†ÙŠ</span>
                   </div>
                 </div>
               </div>
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات العمل </h3>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ </h3>
 
               <div>
-                <label>الساعات المنفذة</label>
+                <label>Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ù†ÙØ°Ø©</label>
                 <input type="number" name="executed_hours" id="executed_hours" value="0">
               </div>
               <div>
-                <label>ساعات جردل</label>
+                <label>Ø³Ø§Ø¹Ø§Øª Ø¬Ø±Ø¯Ù„</label>
                 <input type="number" name="bucket_hours" id="bucket_hours" value="0">
               </div>
               <div>
-                <label>ساعات جاك همر</label>
+                <label>Ø³Ø§Ø¹Ø§Øª Ø¬Ø§Ùƒ Ù‡Ù…Ø±</label>
                 <input type="number" name="jackhammer_hours" id="jackhammer_hours" value="0">
               </div>
               <div>
-                <label>ساعات إضافية</label>
+                <label>Ø³Ø§Ø¹Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ©</label>
                 <input type="number" name="extra_hours" id="extra_hours" value="0">
               </div>
               <div>
-                <label>مجموع الساعات الإضافية</label>
+                <label>Ù…Ø¬Ù…ÙˆØ¹ Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¥Ø¶Ø§ÙÙŠØ©</label>
                 <input type="number" name="extra_hours_total" id="extra_hours_total" value="0">
               </div>
               <div>
-                <label>ساعات الاستعداد (بسبب العميل)</label>
+                <label>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ (Ø¨Ø³Ø¨Ø¨ Ø§Ù„Ø¹Ù…ÙŠÙ„)</label>
                 <input type="number" name="standby_hours" id="standby_hours" value="0">
               </div>
               <div>
-                <label>ساعات الاستعداد ( اعتماد )</label>
+                <label>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ ( Ø§Ø¹ØªÙ…Ø§Ø¯ )</label>
                 <input type="number" name="dependence_hours" id="dependence_hours" value="0">
               </div>
               <div>
-                <label>مجموع ساعات العمل</label>
+                <label>Ù…Ø¬Ù…ÙˆØ¹ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</label>
                 <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
               </div>
               <div>
-                <label>ملاحظات ساعات العمل</label>
+                <label>Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</label>
                 <textarea name="work_notes"></textarea>
               </div>
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات الاعطال </h3>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø¹Ø·Ø§Ù„ </h3>
 
               <div>
-                <label>عطل HR</label>
+                <label>Ø¹Ø·Ù„ HR</label>
                 <input type="number" name="hr_fault" id="hr_fault" value="0">
               </div>
               <div>
-                <label>عطل صيانة</label>
+                <label>Ø¹Ø·Ù„ ØµÙŠØ§Ù†Ø©</label>
                 <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
               </div>
               <div>
-                <label>عطل تسويق</label>
+                <label>Ø¹Ø·Ù„ ØªØ³ÙˆÙŠÙ‚</label>
                 <input type="number" name="marketing_fault" id="marketing_fault" value="0">
               </div>
               <div>
-                <label>عطل اعتماد</label>
+                <label>Ø¹Ø·Ù„ Ø§Ø¹ØªÙ…Ø§Ø¯</label>
                 <input type="number" name="approval_fault" id="approval_fault" value="0">
               </div>
               <div>
-                <label>ساعات أعطال أخرى</label>
+                <label>Ø³Ø§Ø¹Ø§Øª Ø£Ø¹Ø·Ø§Ù„ Ø£Ø®Ø±Ù‰</label>
                 <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
               </div>
               <div>
-                <label> مجموع ساعات التعطل</label>
+                <label> Ù…Ø¬Ù…ÙˆØ¹ Ø³Ø§Ø¹Ø§Øª Ø§Ù„ØªØ¹Ø·Ù„</label>
                 <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
               </div>
               <div>
-                <label>ملاحظات ساعات الأعطال</label>
+                <label>Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</label>
                 <textarea name="fault_notes"></textarea>
               </div>
 
 
               <div>
-                <label> ⏱️ عداد النهاية </label>
+                <label> â±ï¸ Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ù†Ù‡Ø§ÙŠØ© </label>
                 <div class="counter-input-group">
                   <div class="counter-field">
                     <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
-                    <span>ساعات</span>
+                    <span>Ø³Ø§Ø¹Ø§Øª</span>
                   </div>
                   <span class="counter-separator">:</span>
                   <div class="counter-field">
                     <input type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="00">
-                    <span>دقائق</span>
+                    <span>Ø¯Ù‚Ø§Ø¦Ù‚</span>
                   </div>
                   <span class="counter-separator">:</span>
                   <div class="counter-field">
                     <input type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="00">
-                    <span>ثواني</span>
+                    <span>Ø«ÙˆØ§Ù†ÙŠ</span>
                   </div>
                 </div>
               </div>
 
               <div>
-                <label>⚡ فرق العداد</label>
+                <label>âš¡ ÙØ±Ù‚ Ø§Ù„Ø¹Ø¯Ø§Ø¯</label>
                 <input type="text" name="counter_diff" id="counter_diff_display" readonly>
                 <input type="hidden" id="counter_diff" />
               </div>
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> Ø§Ù„Ø§Ø¹Ø·Ø§Ù„ </h3>
 
 
               <div></div>
@@ -342,55 +385,55 @@ if ($type != "") {
 
 
               <div>
-                <label>نوع العطل</label>
+                <label>Ù†ÙˆØ¹ Ø§Ù„Ø¹Ø·Ù„</label>
                 <input type="text" name="fault_type" id="fault_type" />
               </div>
               <div>
-                <label>قسم العطل</label>
+                <label>Ù‚Ø³Ù… Ø§Ù„Ø¹Ø·Ù„</label>
                 <input type="text" name="fault_department" id="fault_department" />
               </div>
               <div>
-                <label>الجزء المعطل</label>
+                <label>Ø§Ù„Ø¬Ø²Ø¡ Ø§Ù„Ù…Ø¹Ø·Ù„</label>
                 <input type="text" name="fault_part" id="fault_part" />
               </div>
               <div>
-                <label>تفاصيل العطل</label>
+                <label>ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¹Ø·Ù„</label>
                 <textarea name="fault_details" id="fault_details"></textarea>
               </div>
               <div>
-                <label>ملاحظات عامة</label>
+                <label>Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø¹Ø§Ù…Ø©</label>
                 <textarea name="general_notes" id="general_notes"></textarea>
               </div>
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات عمل المشغل </h3>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> Ø³Ø§Ø¹Ø§Øª Ø¹Ù…Ù„ Ø§Ù„Ù…Ø´ØºÙ„ </h3>
 
               <div>
-                <label>⏱️ ساعات عمل المشغل</label>
+                <label>â±ï¸ Ø³Ø§Ø¹Ø§Øª Ø¹Ù…Ù„ Ø§Ù„Ù…Ø´ØºÙ„</label>
                 <input type="text" name="operator_hours" id="operator_hours" value="0">
               </div>
               <div>
-                <label>⚙️ ساعات استعداد الآلية</label>
+                <label>âš™ï¸ Ø³Ø§Ø¹Ø§Øª Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ø¢Ù„ÙŠØ©</label>
                 <input type="text" name="machine_standby_hours" id="machine_standby_hours" value="0" readonly>
               </div>
               <div>
-                <label>⚙️ ساعات استعداد الجاك همر</label>
+                <label>âš™ï¸ Ø³Ø§Ø¹Ø§Øª Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ø¬Ø§Ùƒ Ù‡Ù…Ø±</label>
                 <input type="text" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
               </div>
               <div>
-                <label>⚙️ ساعات استعداد الجردل</label>
+                <label>âš™ï¸ Ø³Ø§Ø¹Ø§Øª Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ø¬Ø±Ø¯Ù„</label>
                 <input type="text" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
               </div>
               <div>
-                <label>➕ الساعات الإضافية</label>
+                <label>âž• Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¥Ø¶Ø§ÙÙŠØ©</label>
                 <input type="text" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
               </div>
               <div>
-                <label>👷 ساعات استعداد المشغل</label>
+                <label>ðŸ‘· Ø³Ø§Ø¹Ø§Øª Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ù…Ø´ØºÙ„</label>
                 <input type="text" name="operator_standby_hours" id="operator_standby_hours" class="form-control"
                   value="0">
               </div>
               <div>
-                <label>📝 ملاحظات المشغل</label>
+                <label>ðŸ“ Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ù…Ø´ØºÙ„</label>
                 <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
 
               </div>
@@ -398,31 +441,31 @@ if ($type != "") {
               <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
 
               <button type="submit" style="margin-top: 20px;">
-                <i class="fas fa-save"></i> حفظ الساعات
+                <i class="fas fa-save"></i> Ø­ÙØ¸ Ø§Ù„Ø³Ø§Ø¹Ø§Øª
               </button>
 
             </div>
           </div>
         </div>
         <?php } else {
-          // نوع المهدةطلع قلاب
+          // Ù†ÙˆØ¹ Ø§Ù„Ù…Ù‡Ø¯Ø©Ø·Ù„Ø¹ Ù‚Ù„Ø§Ø¨
           ?>
           <div class="card">
               <div class="card-header">
-                  <h5><i class="fas fa-edit"></i> إضافة / تعديل قلاب</h5>
+                  <h5><i class="fas fa-edit"></i> Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ Ù‚Ù„Ø§Ø¨</h5>
               </div>
               <div class="card-body">
             <div class="form-grid">
               <div>
-                <label>الالية</label>
+                <label>Ø§Ù„Ø§Ù„ÙŠØ©</label>
                 <select name="operator" id="operator" required>
-                  <option value="">-- اختر الالية --</option>
+                  <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø§Ù„ÙŠØ© --</option>
                   <?php
                   include '../config.php';
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, o.project_id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project_id'] . "'");
+                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project_id'] . "' $timesheet_project_scope_sql");
 
 
 
@@ -436,11 +479,29 @@ if ($type != "") {
               <input type="hidden" name="id" id="timesheet_id" value="">
               <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
               <div>
-                <label>السائق</label>
+                <label>Ø§Ù„Ø³Ø§Ø¦Ù‚</label>
                 <!-- <select name="driver"  required>
-            <option value="">-- اختر السائق --</option>
+            <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø³Ø§Ø¦Ù‚ --</option>
             <?php
-            $dr_res = mysqli_query($conn, "SELECT id, name FROM drivers");
+            $driver_scope_sql = "1=1";
+            if (!$is_super_admin) {
+              if (db_table_has_column($conn, 'drivers', 'company_id')) {
+                $driver_scope_sql = "company_id = $company_id";
+              } else {
+                $driver_scope_sql = "EXISTS (
+                  SELECT 1
+                  FROM equipment_drivers ed
+                  INNER JOIN operations o ON o.equipment = ed.equipment_id
+                  INNER JOIN project p ON p.id = o.project_id
+                  LEFT JOIN users su ON su.id = p.created_by
+                  LEFT JOIN clients sc ON sc.id = p.company_client_id
+                  LEFT JOIN users scu ON scu.id = sc.created_by
+                  WHERE ed.driver_id = drivers.id
+                    AND (su.company_id = $company_id OR scu.company_id = $company_id)
+                )";
+              }
+            }
+            $dr_res = mysqli_query($conn, "SELECT id, name FROM drivers WHERE $driver_scope_sql");
             while ($dr = mysqli_fetch_assoc($dr_res)) {
               echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
             }
@@ -450,21 +511,21 @@ if ($type != "") {
 
 
                 <select id="driver" name="driver">
-                  <option value="">-- اختر السائق --</option>
+                  <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø³Ø§Ø¦Ù‚ --</option>
                 </select>
 
 
               </div>
               <div>
-                <label>الوردية</label>
+                <label>Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</label>
                 <select name="shift" id="shift">
-                  <option value=""> -- اختار الوردية -- </option>
-                  <option value="D"> صباحية </option>
-                  <option value="N"> مسائية </option>
+                  <option value=""> -- Ø§Ø®ØªØ§Ø± Ø§Ù„ÙˆØ±Ø¯ÙŠØ© -- </option>
+                  <option value="D"> ØµØ¨Ø§Ø­ÙŠØ© </option>
+                  <option value="N"> Ù…Ø³Ø§Ø¦ÙŠØ© </option>
                 </select>
               </div>
               <div>
-                <label> التاريخ </label>
+                <label> Ø§Ù„ØªØ§Ø±ÙŠØ® </label>
                 <input type="date" name="date" id="date" required />
               </div>
 
@@ -472,16 +533,16 @@ if ($type != "") {
               <!-- ********************************************************** -->
 
               <div>
-                <label>ساعات الوردية</label>
+                <label>Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</label>
                 <input type="number" name="shift_hours" id="shift_hours" value="0">
               </div>
 
               <div>
-                <label> ⏱️ عداد البداية</label>
+                <label> â±ï¸ Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©</label>
                 <div class="counter-input-group">
                   <div class="counter-field">
                     <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
-                    <span>ساعات</span>
+                    <span>Ø³Ø§Ø¹Ø§Øª</span>
                   </div>
                 </div>
                 <input type="hidden" value="0" id="start_minutes" name="start_minutes" min="0" max="59" required>
@@ -493,9 +554,9 @@ if ($type != "") {
               <div></div>
               <div></div>
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الساعات </h3>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> Ø§Ù„Ø³Ø§Ø¹Ø§Øª </h3>
               <div>
-                <label>الساعات المنفذة</label>
+                <label>Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ù†ÙØ°Ø©</label>
                 <input type="number" name="executed_hours" id="executed_hours" value="0">
               </div>
 
@@ -505,63 +566,63 @@ if ($type != "") {
               <input type="hidden" name="extra_hours" id="extra_hours" value="0">
 
               <div>
-                <label>مجموع الساعات الإضافية</label>
+                <label>Ù…Ø¬Ù…ÙˆØ¹ Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¥Ø¶Ø§ÙÙŠØ©</label>
                 <input type="number" name="extra_hours_total" id="extra_hours_total" value="0">
               </div>
               <div>
-                <label>ساعات الاستعداد (بسبب العميل)</label>
+                <label>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ (Ø¨Ø³Ø¨Ø¨ Ø§Ù„Ø¹Ù…ÙŠÙ„)</label>
                 <input type="number" name="standby_hours" id="standby_hours" value="0">
               </div>
               <div>
-                <label>ساعات الاستعداد ( اعتماد )</label>
+                <label>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ ( Ø§Ø¹ØªÙ…Ø§Ø¯ )</label>
                 <input type="number" name="dependence_hours" id="dependence_hours" value="0">
               </div>
               <div>
-                <label>مجموع ساعات العمل</label>
+                <label>Ù…Ø¬Ù…ÙˆØ¹ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</label>
                 <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
               </div>
               <div>
-                <label>ملاحظات ساعات العمل</label>
+                <label>Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</label>
                 <textarea name="work_notes" id="work_notes"></textarea>
               </div>
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات الاعطال </h3>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø¹Ø·Ø§Ù„ </h3>
 
               <div>
-                <label>عطل HR</label>
+                <label>Ø¹Ø·Ù„ HR</label>
                 <input type="number" name="hr_fault" id="hr_fault" value="0">
               </div>
               <div>
-                <label>عطل صيانة</label>
+                <label>Ø¹Ø·Ù„ ØµÙŠØ§Ù†Ø©</label>
                 <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
               </div>
               <div>
-                <label>عطل تسويق</label>
+                <label>Ø¹Ø·Ù„ ØªØ³ÙˆÙŠÙ‚</label>
                 <input type="number" name="marketing_fault" id="marketing_fault" value="0">
               </div>
               <div>
-                <label>عطل اعتماد</label>
+                <label>Ø¹Ø·Ù„ Ø§Ø¹ØªÙ…Ø§Ø¯</label>
                 <input type="number" name="approval_fault" id="approval_fault" value="0">
               </div>
               <div>
-                <label>ساعات أعطال أخرى</label>
+                <label>Ø³Ø§Ø¹Ø§Øª Ø£Ø¹Ø·Ø§Ù„ Ø£Ø®Ø±Ù‰</label>
                 <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
               </div>
               <div>
-                <label> مجموع ساعات التعطل</label>
+                <label> Ù…Ø¬Ù…ÙˆØ¹ Ø³Ø§Ø¹Ø§Øª Ø§Ù„ØªØ¹Ø·Ù„</label>
                 <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
               </div>
               <div>
-                <label>ملاحظات ساعات الأعطال</label>
+                <label>Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</label>
                 <textarea name="fault_notes" id="fault_notes"></textarea>
               </div>
 
               <div>
-                <label> ⏱️ عداد النهاية </label>
+                <label> â±ï¸ Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ù†Ù‡Ø§ÙŠØ© </label>
                 <div class="counter-input-group">
                   <div class="counter-field">
                     <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
-                    <span>ساعات</span>
+                    <span>Ø³Ø§Ø¹Ø§Øª</span>
                   </div>
                 </div>
                 <input type="hidden" value="0" id="end_minutes" name="end_minutes" min="0" max="59">
@@ -569,65 +630,65 @@ if ($type != "") {
               </div>
 
               <div>
-                <label>⚡ فرق العداد</label>
+                <label>âš¡ ÙØ±Ù‚ Ø§Ù„Ø¹Ø¯Ø§Ø¯</label>
                 <input type="text" name="counter_diff" id="counter_diff_display" readonly>
                 <input type="hidden" id="counter_diff" />
               </div>
               <div></div>
 
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>              <div>
-                <label>نوع العطل</label>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> Ø§Ù„Ø§Ø¹Ø·Ø§Ù„ </h3>              <div>
+                <label>Ù†ÙˆØ¹ Ø§Ù„Ø¹Ø·Ù„</label>
                 <input type="text" name="fault_type" id="fault_type" />
               </div>
               <div>
-                <label>قسم العطل</label>
+                <label>Ù‚Ø³Ù… Ø§Ù„Ø¹Ø·Ù„</label>
                 <input type="text" name="fault_department" id="fault_department" />
               </div>
               <div>
-                <label>الجزء المعطل</label>
+                <label>Ø§Ù„Ø¬Ø²Ø¡ Ø§Ù„Ù…Ø¹Ø·Ù„</label>
                 <input type="text" name="fault_part" id="fault_part" />
               </div>
               <div>
-                <label>تفاصيل العطل</label>
+                <label>ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¹Ø·Ù„</label>
                 <textarea name="fault_details" id="fault_details"></textarea>
               </div>
               <div>
-                <label>ملاحظات عامة</label>
+                <label>Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø¹Ø§Ù…Ø©</label>
                 <textarea name="general_notes" id="general_notes"></textarea>
               </div>
 
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات عمل المشغل </h3>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> Ø³Ø§Ø¹Ø§Øª Ø¹Ù…Ù„ Ø§Ù„Ù…Ø´ØºÙ„ </h3>
               <div></div>
               <div></div>
               <div></div>
               <div></div>
 
               <div>
-                <label>⏱️ ساعات عمل المشغل</label>
+                <label>â±ï¸ Ø³Ø§Ø¹Ø§Øª Ø¹Ù…Ù„ Ø§Ù„Ù…Ø´ØºÙ„</label>
                 <input type="text" name="operator_hours" id="operator_hours" value="0">
               </div>
               <div>
-                <label>⚙️ ساعات استعداد الآلية</label>
+                <label>âš™ï¸ Ø³Ø§Ø¹Ø§Øª Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ø¢Ù„ÙŠØ©</label>
                 <input type="text" name="machine_standby_hours" value="0" readonly>
               </div>
               <input type="hidden" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
               <input type="hidden" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
               <input type="hidden" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
               <div>
-                <label>👷 ساعات استعداد المشغل</label>
+                <label>ðŸ‘· Ø³Ø§Ø¹Ø§Øª Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ù…Ø´ØºÙ„</label>
                 <input type="text" name="operator_standby_hours" class="form-control" value="0">
               </div>
               <div>
-                <label>📝 ملاحظات المشغل</label>
+                <label>ðŸ“ Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ù…Ø´ØºÙ„</label>
                 <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
               </div>
 
               <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
 
               <button type="submit" style="margin-top: 20px;">
-                <i class="fas fa-save"></i> حفظ الساعات
+                <i class="fas fa-save"></i> Ø­ÙØ¸ Ø§Ù„Ø³Ø§Ø¹Ø§Øª
               </button>
 
             </div>
@@ -637,26 +698,26 @@ if ($type != "") {
   </form>
     <div class="card">
         <div class="card-header">
-            <h5><i class="fas fa-list-alt"></i> قائمة ساعات العمل</h5>
+            <h5><i class="fas fa-list-alt"></i> Ù‚Ø§Ø¦Ù…Ø© Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</h5>
         </div>
         <div class="card-body table-container">
       <table id="projectsTable" class="display">
         <thead>
           <tr>
             <th><i class="fas fa-hashtag"></i> #</th>
-            <th><i class="fas fa-tool"></i> المعدة</th>
-            <th><i class="fas fa-calendar"></i> التاريخ</th>
-            <th><i class="fas fa-sun"></i> الوردية</th>
-            <th><i class="fas fa-hourglass"></i> الساعات المنفذة</th>
-            <th><i class="fas fa-cube"></i> الجردل</th>
-            <th><i class="fas fa-gavel"></i> الجاكهمر</th>
-            <th><i class="fas fa-plus-circle"></i> الإضافية</th>
-            <th><i class="fas fa-pause"></i> الاستعداد</th>
-            <th><i class="fas fa-wrench"></i> الأعطال</th>
-            <th><i class="fas fa-briefcase"></i> ساعات العمل</th>
-            <th><i class="fas fa-chart-bar"></i> الإجمالي</th>
-            <th><i class="fas fa-toggle-on"></i> الحالة</th>
-            <th><i class="fas fa-cogs"></i> إجراءات</th>
+            <th><i class="fas fa-tool"></i> Ø§Ù„Ù…Ø¹Ø¯Ø©</th>
+            <th><i class="fas fa-calendar"></i> Ø§Ù„ØªØ§Ø±ÙŠØ®</th>
+            <th><i class="fas fa-sun"></i> Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</th>
+            <th><i class="fas fa-hourglass"></i> Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ù†ÙØ°Ø©</th>
+            <th><i class="fas fa-cube"></i> Ø§Ù„Ø¬Ø±Ø¯Ù„</th>
+            <th><i class="fas fa-gavel"></i> Ø§Ù„Ø¬Ø§ÙƒÙ‡Ù…Ø±</th>
+            <th><i class="fas fa-plus-circle"></i> Ø§Ù„Ø¥Ø¶Ø§ÙÙŠØ©</th>
+            <th><i class="fas fa-pause"></i> Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯</th>
+            <th><i class="fas fa-wrench"></i> Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</th>
+            <th><i class="fas fa-briefcase"></i> Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</th>
+            <th><i class="fas fa-chart-bar"></i> Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ</th>
+            <th><i class="fas fa-toggle-on"></i> Ø§Ù„Ø­Ø§Ù„Ø©</th>
+            <th><i class="fas fa-cogs"></i> Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th>
           </tr>
         </thead>
         <tbody>
@@ -697,36 +758,36 @@ if ($type != "") {
         },
         columns: [
           { data: 0, orderable: false }, // #
-          { data: 1 }, // المعدة
-          { data: 2 }, // التاريخ
-          { data: 3, orderable: false }, // الوردية
-          { data: 4 }, // الساعات المنفذة
-          { data: 5 }, // الجردل
-          { data: 6 }, // الجاكهمر
-          { data: 7 }, // الإضافية
-          { data: 8 }, // الاستعداد
-          { data: 9 }, // الأعطال
-          { data: 10 }, // ساعات العمل
-          { data: 11, orderable: false }, // الإجمالي
-          { data: 12 }, // الحالة
-          { data: 13, orderable: false } // إجراءات
+          { data: 1 }, // Ø§Ù„Ù…Ø¹Ø¯Ø©
+          { data: 2 }, // Ø§Ù„ØªØ§Ø±ÙŠØ®
+          { data: 3, orderable: false }, // Ø§Ù„ÙˆØ±Ø¯ÙŠØ©
+          { data: 4 }, // Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ù†ÙØ°Ø©
+          { data: 5 }, // Ø§Ù„Ø¬Ø±Ø¯Ù„
+          { data: 6 }, // Ø§Ù„Ø¬Ø§ÙƒÙ‡Ù…Ø±
+          { data: 7 }, // Ø§Ù„Ø¥Ø¶Ø§ÙÙŠØ©
+          { data: 8 }, // Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯
+          { data: 9 }, // Ø§Ù„Ø£Ø¹Ø·Ø§Ù„
+          { data: 10 }, // Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„
+          { data: 11, orderable: false }, // Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ
+          { data: 12 }, // Ø§Ù„Ø­Ø§Ù„Ø©
+          { data: 13, orderable: false } // Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª
         ],
         order: [[2, 'desc']], // Sort by date descending by default
         pageLength: 10,
-        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "الكل"]],
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Ø§Ù„ÙƒÙ„"]],
         scrollX: true,
         fixedHeader: true,
         dom: 'Blfrtip', // Buttons + Length + Search + Table + Info + Pagination
         buttons: [
-          { extend: 'copy', text: 'نسخ' },
-          { extend: 'excel', text: 'تصدير Excel' },
-          { extend: 'csv', text: 'تصدير CSV' },
-          { extend: 'pdf', text: 'تصدير PDF' },
-          { extend: 'print', text: 'طباعة' }
+          { extend: 'copy', text: 'Ù†Ø³Ø®' },
+          { extend: 'excel', text: 'ØªØµØ¯ÙŠØ± Excel' },
+          { extend: 'csv', text: 'ØªØµØ¯ÙŠØ± CSV' },
+          { extend: 'pdf', text: 'ØªØµØ¯ÙŠØ± PDF' },
+          { extend: 'print', text: 'Ø·Ø¨Ø§Ø¹Ø©' }
         ],
         language: {
           url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json",
-          processing: '<i class="fas fa-spinner fa-spin fa-3x"></i><br>جاري التحميل...'
+          processing: '<i class="fas fa-spinner fa-spin fa-3x"></i><br>Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...'
         }
       });
 
@@ -777,7 +838,7 @@ if ($type != "") {
           document.querySelector("input[name='owner_name']").value = data.owner || "";
         }
       })
-      .catch(err => console.error("خطأ في جلب البيانات:", err));
+      .catch(err => console.error("Ø®Ø·Ø£ ÙÙŠ Ø¬Ù„Ø¨ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª:", err));
   }
 
   document.querySelectorAll("#start_minutes, #start_seconds, #end_minutes, #end_seconds")
@@ -790,7 +851,7 @@ if ($type != "") {
     });
 
 
-  // ✅ دالة لحساب العمليات الثلاثة
+  // âœ… Ø¯Ø§Ù„Ø© Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª Ø§Ù„Ø«Ù„Ø§Ø«Ø©
   function calculateCustomHours() {
     let dependence = parseFloat(document.querySelector("input[name='dependence_hours']").value) || 0;
     let executed = parseFloat(document.querySelector("input[name='executed_hours']").value) || 0;
@@ -800,43 +861,43 @@ if ($type != "") {
     let maintenance = parseFloat(document.querySelector("input[name='maintenance_fault']").value) || 0;
     let marketing = parseFloat(document.querySelector("input[name='marketing_fault']").value) || 0;
 
-    // العملية الأولى: مجموع ساعات العمل
+    // Ø§Ù„Ø¹Ù…Ù„ÙŠØ© Ø§Ù„Ø£ÙˆÙ„Ù‰: Ù…Ø¬Ù…ÙˆØ¹ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„
     let totalWork = executed + extraTotal + standby;
     document.querySelector("input[name='total_work_hours']").value = totalWork;
 
-    // العملية الثانية: ساعات أعطال أخرى
+    // Ø§Ù„Ø¹Ù…Ù„ÙŠØ© Ø§Ù„Ø«Ø§Ù†ÙŠØ©: Ø³Ø§Ø¹Ø§Øª Ø£Ø¹Ø·Ø§Ù„ Ø£Ø®Ø±Ù‰
     let otherFault = shift - executed - standby - dependence;
     if (otherFault < 0) otherFault = 0;
     document.querySelector("input[name='total_fault_hours']").value = otherFault;
 
-    // العملية الثالثة: ساعات استعداد المشغل
+    // Ø§Ù„Ø¹Ù…Ù„ÙŠØ© Ø§Ù„Ø«Ø§Ù„Ø«Ø©: Ø³Ø§Ø¹Ø§Øª Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ù…Ø´ØºÙ„
     let operatorStandby = 0;
     if (executed < shift) {
       operatorStandby = maintenance + marketing + dependence;
     }
     document.querySelector("input[name='operator_standby_hours']").value = operatorStandby;
 
-    // اسناد قيمة استعدات الاليه 
+    // Ø§Ø³Ù†Ø§Ø¯ Ù‚ÙŠÙ…Ø© Ø§Ø³ØªØ¹Ø¯Ø§Øª Ø§Ù„Ø§Ù„ÙŠÙ‡ 
     document.querySelector("input[name='machine_standby_hours']").value = standby;
   }
 
-  // شغل الحساب عند أي تغيير في الحقول
+  // Ø´ØºÙ„ Ø§Ù„Ø­Ø³Ø§Ø¨ Ø¹Ù†Ø¯ Ø£ÙŠ ØªØºÙŠÙŠØ± ÙÙŠ Ø§Ù„Ø­Ù‚ÙˆÙ„
   document.querySelectorAll("input[name='executed_hours'], input[name='extra_hours_total'], input[name='standby_hours'], input[name='shift_hours'], input[name='maintenance_fault'], input[name='marketing_fault'] , input[name='dependence_hours'] , input[name='machine_standby_hours']  ")
     .forEach(el => el.addEventListener("input", calculateCustomHours));
 
-  // ✅ استدعاء أول مرة
+  // âœ… Ø§Ø³ØªØ¯Ø¹Ø§Ø¡ Ø£ÙˆÙ„ Ù…Ø±Ø©
   calculateCustomHours();
 
   var machineType = "<?php echo $_GET['type']; ?>";
   if (machineType === "1") {
     function calculateDiff() {
-      // اجمع البداية
+      // Ø§Ø¬Ù…Ø¹ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©
       let start =
         (parseInt(document.getElementById("start_hours").value || 0) * 3600) +
         (parseInt(document.getElementById("start_minutes").value || 0) * 60) +
         (parseInt(document.getElementById("start_seconds").value || 0));
 
-      // اجمع النهاية
+      // Ø§Ø¬Ù…Ø¹ Ø§Ù„Ù†Ù‡Ø§ÙŠØ©
       let end =
         (parseInt(document.getElementById("end_hours").value || 0) * 3600) +
         (parseInt(document.getElementById("end_minutes").value || 0) * 60) +
@@ -846,18 +907,18 @@ if ($type != "") {
       let extraTotal = parseFloat(document.querySelector("input[name='extra_hours_total']").value) || 0;
 
       let diff = end - start;
-      if (diff < 0) diff = 0; // حماية
+      if (diff < 0) diff = 0; // Ø­Ù…Ø§ÙŠØ©
 
-      // حوّل الفرق إلى ساعات/دقائق/ثواني
+      // Ø­ÙˆÙ‘Ù„ Ø§Ù„ÙØ±Ù‚ Ø¥Ù„Ù‰ Ø³Ø§Ø¹Ø§Øª/Ø¯Ù‚Ø§Ø¦Ù‚/Ø«ÙˆØ§Ù†ÙŠ
       let hours = (executed + extraTotal) - Math.floor(diff / 3600);
       let minutes = Math.floor((diff % 3600) / 60);
       let seconds = diff % 60;
 
-      // عرض الفرق
+      // Ø¹Ø±Ø¶ Ø§Ù„ÙØ±Ù‚
       document.getElementById("counter_diff_display").value =
-        hours + " ساعة " + minutes + " دقيقة " + seconds + " ثانية";
+        hours + " Ø³Ø§Ø¹Ø© " + minutes + " Ø¯Ù‚ÙŠÙ‚Ø© " + seconds + " Ø«Ø§Ù†ÙŠØ©";
 
-      // حفظ القيمة (بالثواني) للإرسال
+      // Ø­ÙØ¸ Ø§Ù„Ù‚ÙŠÙ…Ø© (Ø¨Ø§Ù„Ø«ÙˆØ§Ù†ÙŠ) Ù„Ù„Ø¥Ø±Ø³Ø§Ù„
       document.getElementById("counter_diff").value = diff;
     }
   } else {
@@ -867,7 +928,7 @@ if ($type != "") {
       document.getElementById("counter_diff_display").value = end - start;
     }
   }
-  // شغل الحساب عند أي تغيير
+  // Ø´ØºÙ„ Ø§Ù„Ø­Ø³Ø§Ø¨ Ø¹Ù†Ø¯ Ø£ÙŠ ØªØºÙŠÙŠØ±
   document.querySelectorAll("#start_hours, #start_minutes, #start_seconds, #end_hours, #end_minutes, #end_seconds")
     .forEach(el => el.addEventListener("input", calculateDiff));
 
@@ -885,15 +946,15 @@ if ($type != "") {
           type: "GET",
           data: { operation_id: equipId },
           success: function (response) {
-            console.log("📌 Response:", response); // Debug
+            console.log("ðŸ“Œ Response:", response); // Debug
             $("#driver").html(response);
           },
           error: function (xhr, status, error) {
-            console.error("❌ AJAX Error:", error);
+            console.error("âŒ AJAX Error:", error);
           }
         });
       } else {
-        $("#driver").html("<option value=''>-- اختر السائق --</option>");
+        $("#driver").html("<option value=''>-- Ø§Ø®ØªØ± Ø§Ù„Ø³Ø§Ø¦Ù‚ --</option>");
       }
     });
   });
@@ -910,15 +971,15 @@ if ($type != "") {
           type: "GET",
           data: { operation_id: opId },
           success: function (response) {
-            console.log("✅ تم جلب ساعات الوردية:", response);
-            $("#shift_hours").val(response); // عرض القيمة داخل input
+            console.log("âœ… ØªÙ… Ø¬Ù„Ø¨ Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ©:", response);
+            $("#shift_hours").val(response); // Ø¹Ø±Ø¶ Ø§Ù„Ù‚ÙŠÙ…Ø© Ø¯Ø§Ø®Ù„ input
             
-            // إعادة حساب الحقول الأخرى تلقائياً بعد تحميل ساعات الوردية
+            // Ø¥Ø¹Ø§Ø¯Ø© Ø­Ø³Ø§Ø¨ Ø§Ù„Ø­Ù‚ÙˆÙ„ Ø§Ù„Ø£Ø®Ø±Ù‰ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ Ø¨Ø¹Ø¯ ØªØ­Ù…ÙŠÙ„ Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ©
             calculateCustomHours();
           },
           error: function (xhr, status, error) {
-            console.error("❌ خطأ في جلب ساعات الوردية:", error);
-            $("#shift_hours").val("8"); // قيمة افتراضية في حالة الخطأ
+            console.error("âŒ Ø®Ø·Ø£ ÙÙŠ Ø¬Ù„Ø¨ Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ©:", error);
+            $("#shift_hours").val("8"); // Ù‚ÙŠÙ…Ø© Ø§ÙØªØ±Ø§Ø¶ÙŠØ© ÙÙŠ Ø­Ø§Ù„Ø© Ø§Ù„Ø®Ø·Ø£
           }
         });
       } else {
@@ -933,14 +994,14 @@ if ($type != "") {
     if (!id) return;
     $.getJSON("get_timesheet.php", { id: id }, function (data) {
       if (!data || !data.id) {
-        alert("لم أستطع جلب بيانات السجل.");
+        alert("Ù„Ù… Ø£Ø³ØªØ·Ø¹ Ø¬Ù„Ø¨ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø³Ø¬Ù„.");
         return;
       }
 
       $("#timesheet_id").val(data.id);
       $("#operator").val(data.operator).trigger('change');
 
-      // بعد تحميل السائقين من AJAX نضبط السائق المحدد (ننتظر قليلاً)
+      // Ø¨Ø¹Ø¯ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ† Ù…Ù† AJAX Ù†Ø¶Ø¨Ø· Ø§Ù„Ø³Ø§Ø¦Ù‚ Ø§Ù„Ù…Ø­Ø¯Ø¯ (Ù†Ù†ØªØ¸Ø± Ù‚Ù„ÙŠÙ„Ø§Ù‹)
       setTimeout(function () {
         $("#driver").val(data.driver);
       }, 300);
@@ -993,7 +1054,7 @@ if ($type != "") {
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
     })
       .fail(function () {
-        alert("خطأ في جلب بيانات التايم شيت.");
+        alert("Ø®Ø·Ø£ ÙÙŠ Ø¬Ù„Ø¨ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªØ§ÙŠÙ… Ø´ÙŠØª.");
       });
   });
 

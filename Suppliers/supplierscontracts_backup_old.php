@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-  header("Location: ../index.php");
+  header("Location: ../login.php");
   exit();
 }
 ?>
@@ -11,7 +11,7 @@ if (!isset($_SESSION['user'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إيكوبيشن | عقود الموردين</title>
+  <title>Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø¹Ù‚ÙˆØ¯ Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ†</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <!-- DataTables CSS -->
   <!-- Font Awesome -->
@@ -22,7 +22,7 @@ if (!isset($_SESSION['user'])) {
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
-  <!-- CSS الموقع -->
+  <!-- CSS Ø§Ù„Ù…ÙˆÙ‚Ø¹ -->
   <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
 </head>
 <style>
@@ -67,15 +67,15 @@ if (!isset($_SESSION['user'])) {
   <div class="main">
 
     <?php
-    // عرض إحصائيات المورد
+    // Ø¹Ø±Ø¶ Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª Ø§Ù„Ù…ÙˆØ±Ø¯
     include '../config.php';
     $supplier_id = intval($_GET['id']);
     
-    // جلب معلومات المورد
+    // Ø¬Ù„Ø¨ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…ÙˆØ±Ø¯
     $supplier_query = mysqli_query($conn, "SELECT name FROM suppliers WHERE id = $supplier_id");
     $supplier_data = mysqli_fetch_assoc($supplier_query);
     
-    // حساب إجمالي الساعات المتعاقد عليها
+    // Ø­Ø³Ø§Ø¨ Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…ØªØ¹Ø§Ù‚Ø¯ Ø¹Ù„ÙŠÙ‡Ø§
     $hours_query = mysqli_query($conn, "SELECT 
         COUNT(*) as total_contracts,
         COALESCE(SUM(forecasted_contracted_hours), 0) as total_hours,
@@ -85,7 +85,7 @@ if (!isset($_SESSION['user'])) {
     $hours_data = mysqli_fetch_assoc($hours_query);
     ?>
 
-    <!-- بطاقة إحصائيات المورد -->
+    <!-- Ø¨Ø·Ø§Ù‚Ø© Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª Ø§Ù„Ù…ÙˆØ±Ø¯ -->
     <div class="card shadow-sm" style="margin-bottom: 20px; border-left: 5px solid #667eea;">
       <div class="card-body">
         <h4 style="color: #667eea; margin-bottom: 15px;">
@@ -94,46 +94,46 @@ if (!isset($_SESSION['user'])) {
         <div class="totals" style="grid-template-columns: repeat(3, 1fr);">
           <div class="kpi">
             <div class="v"><?php echo $hours_data['total_contracts']; ?></div>
-            <div class="t">عدد العقود الإجمالي</div>
+            <div class="t">Ø¹Ø¯Ø¯ Ø§Ù„Ø¹Ù‚ÙˆØ¯ Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ</div>
           </div>
           <div class="kpi">
             <div class="v"><?php echo number_format($hours_data['monthly_hours']); ?></div>
-            <div class="t">الساعات الشهرية المتوسطة</div>
+            <div class="t">Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø´Ù‡Ø±ÙŠØ© Ø§Ù„Ù…ØªÙˆØ³Ø·Ø©</div>
           </div>
           <div class="kpi" style="border-right-color: #28a745;">
             <div class="v" style="color: #28a745;"><?php echo number_format($hours_data['total_hours']); ?></div>
-            <div class="t">إجمالي الساعات المتعاقد عليها</div>
+            <div class="t">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…ØªØ¹Ø§Ù‚Ø¯ Ø¹Ù„ÙŠÙ‡Ø§</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- <h2>العقود</h2> -->
+    <!-- <h2>Ø§Ù„Ø¹Ù‚ÙˆØ¯</h2> -->
     <div class="aligin">
       <a href="javascript:void(0)" id="toggleForm" class="add">
-        <i class="fa fa-plus"></i> اضافة عقد
+        <i class="fa fa-plus"></i> Ø§Ø¶Ø§ÙØ© Ø¹Ù‚Ø¯
       </a>
     </div>
 
-    <!-- فورم إضافة عقد -->
+    <!-- ÙÙˆØ±Ù… Ø¥Ø¶Ø§ÙØ© Ø¹Ù‚Ø¯ -->
     <form id="projectForm" action="" method="post" style="display:none;">
 
       <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
-          <h5 class="mb-0"> اضافة/ تعديل العقد </h5>
+          <h5 class="mb-0"> Ø§Ø¶Ø§ÙØ©/ ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¹Ù‚Ø¯ </h5>
         </div>
         <div class="card-body">
 
                   <input type="hidden" name="id" id="contract_id" value="">
 
 
-          <input type="hidden" name="supplier_id" placeholder="اسم المورد" value="<?php echo $_GET['id'] ?>" required />
+          <input type="hidden" name="supplier_id" placeholder="Ø§Ø³Ù… Ø§Ù„Ù…ÙˆØ±Ø¯" value="<?php echo $_GET['id'] ?>" required />
 
-          <div class="section-title"><span class="chip">1</span> البيانات الأساسية للمورد والعقد</div>
+          <div class="section-title"><span class="chip">1</span> Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© Ù„Ù„Ù…ÙˆØ±Ø¯ ÙˆØ§Ù„Ø¹Ù‚Ø¯</div>
           <br>
           <div class="form-grid">
               <div class="field md-3 sm-6">
-            <label class="form-label">المشروع</label>
+            <label class="form-label">Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</label>
             <div class="control">
               <select name="project_id" id="project_id" required>
 
@@ -143,7 +143,7 @@ if (!isset($_SESSION['user'])) {
                 $sql = "SELECT id, name FROM project ORDER BY name ASC";
                 $result = mysqli_query($conn, $sql);
                 ?>
-                <option value="">-- اختر المشروع --</option>
+                <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ --</option>
                 <?php while ($row = mysqli_fetch_assoc($result)): ?>
                   <option value="<?php echo $row['id']; ?>">
                     <?php echo htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>
@@ -153,63 +153,63 @@ if (!isset($_SESSION['user'])) {
             </div>
           </div>
             <div class="field md-3 sm-6">
-              <label>تاريخ توقيع العقد </label>
+              <label>ØªØ§Ø±ÙŠØ® ØªÙˆÙ‚ÙŠØ¹ Ø§Ù„Ø¹Ù‚Ø¯ </label>
               <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>فترة السماح بين التوقيع والتنفيذ</label>
-              <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0" placeholder="عدد الأيام"></div>
+              <label>ÙØªØ±Ø© Ø§Ù„Ø³Ù…Ø§Ø­ Ø¨ÙŠÙ† Ø§Ù„ØªÙˆÙ‚ÙŠØ¹ ÙˆØ§Ù„ØªÙ†ÙÙŠØ°</label>
+              <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0" placeholder="Ø¹Ø¯Ø¯ Ø§Ù„Ø£ÙŠØ§Ù…"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>مدة العقد بالشهور </label>
+              <label>Ù…Ø¯Ø© Ø§Ù„Ø¹Ù‚Ø¯ Ø¨Ø§Ù„Ø´Ù‡ÙˆØ± </label>
               <div class="control"><input name="contract_duration_months" id="contract_duration_months" type="number"
-                  min="0" placeholder="بالشهور"></div>
+                  min="0" placeholder="Ø¨Ø§Ù„Ø´Ù‡ÙˆØ±"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>بداية التنفيذ الفعلي المتفق عليه</label>
+              <label>Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„ØªÙ†ÙÙŠØ° Ø§Ù„ÙØ¹Ù„ÙŠ Ø§Ù„Ù…ØªÙÙ‚ Ø¹Ù„ÙŠÙ‡</label>
               <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>نهاية التنفيذ الفعلي المتفق عليه</label>
+              <label>Ù†Ù‡Ø§ÙŠØ© Ø§Ù„ØªÙ†ÙÙŠØ° Ø§Ù„ÙØ¹Ù„ÙŠ Ø§Ù„Ù…ØªÙÙ‚ Ø¹Ù„ÙŠÙ‡</label>
               <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>الترحيل </label>
+              <label>Ø§Ù„ØªØ±Ø­ÙŠÙ„ </label>
               <div class="control">
                 <select name="transportation" id="transportation">
-                  <option value="">— اختر —</option>
-                  <option>مشمولة</option>
-                  <option>غير مشمولة</option>
+                  <option value="">â€” Ø§Ø®ØªØ± â€”</option>
+                  <option>Ù…Ø´Ù…ÙˆÙ„Ø©</option>
+                  <option>ØºÙŠØ± Ù…Ø´Ù…ÙˆÙ„Ø©</option>
                 </select>
               </div>
             </div>
             <div class="field md-3 sm-6">
-              <label>الإعاشة </label>
+              <label>Ø§Ù„Ø¥Ø¹Ø§Ø´Ø© </label>
               <div class="control">
                 <select name="accommodation" id="accommodation">
-                  <option value="">— اختر —</option>
-                  <option>مشمولة</option>
-                  <option>غير مشمولة</option>
+                  <option value="">â€” Ø§Ø®ØªØ± â€”</option>
+                  <option>Ù…Ø´Ù…ÙˆÙ„Ø©</option>
+                  <option>ØºÙŠØ± Ù…Ø´Ù…ÙˆÙ„Ø©</option>
                 </select>
               </div>
             </div>
             <div class="field md-3 sm-6">
-              <label>السكن </label>
+              <label>Ø§Ù„Ø³ÙƒÙ† </label>
               <div class="control">
                 <select name="place_for_living" id="place_for_living">
-                  <option value="">— اختر —</option>
-                  <option>مشمولة</option>
-                  <option>غير مشمولة</option>
+                  <option value="">â€” Ø§Ø®ØªØ± â€”</option>
+                  <option>Ù…Ø´Ù…ÙˆÙ„Ø©</option>
+                  <option>ØºÙŠØ± Ù…Ø´Ù…ÙˆÙ„Ø©</option>
                 </select>
               </div>
             </div>
             <div class="field md-3 sm-6">
-              <label>الورشة </label>
+              <label>Ø§Ù„ÙˆØ±Ø´Ø© </label>
               <div class="control">
                 <select name="workshop" id="workshop">
-                  <option value="">— اختر —</option>
-                  <option>مشمولة</option>
-                  <option>غير مشمولة</option>
+                  <option value="">â€” Ø§Ø®ØªØ± â€”</option>
+                  <option>Ù…Ø´Ù…ÙˆÙ„Ø©</option>
+                  <option>ØºÙŠØ± Ù…Ø´Ù…ÙˆÙ„Ø©</option>
                 </select>
               </div>
             </div>
@@ -217,23 +217,23 @@ if (!isset($_SESSION['user'])) {
 
           <hr class="hr" />
 
-          <!-- القسم 2: بيانات ساعات العمل المطلوبة للمعدات -->
-          <div class="section-title"><span class="chip">2</span> بيانات ساعات العمل المطلوبة <strong>للمعدات</strong>
+          <!-- Ø§Ù„Ù‚Ø³Ù… 2: Ø¨ÙŠØ§Ù†Ø§Øª Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© Ù„Ù„Ù…Ø¹Ø¯Ø§Øª -->
+          <div class="section-title"><span class="chip">2</span> Ø¨ÙŠØ§Ù†Ø§Øª Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© <strong>Ù„Ù„Ù…Ø¹Ø¯Ø§Øª</strong>
           </div>
                     <br>
 
           <div class="form-grid">
             <div class="field md-4 sm-6">
-              <label>نوع المعدة المطلوبة </label>
-              <div class="control"><input name="equip_type" id="equip_type" type="text" placeholder="مثال: حفار" value="حفار" ></div>
+              <label>Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© </label>
+              <div class="control"><input name="equip_type" id="equip_type" type="text" placeholder="Ù…Ø«Ø§Ù„: Ø­ÙØ§Ø±" value="Ø­ÙØ§Ø±" ></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>حجم المعدة المطلوبة </label>
-              <div class="control"><input name="equip_size" id="equip_size" type="number" placeholder="مثال: 340" value="340"></span>
+              <label>Ø­Ø¬Ù… Ø§Ù„Ù…Ø¹Ø¯Ø© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© </label>
+              <div class="control"><input name="equip_size" id="equip_size" type="number" placeholder="Ù…Ø«Ø§Ù„: 340" value="340"></span>
               </div>
             </div>
             <div class="field md-4 sm-6">
-              <label>عدد المعدات المطلوبة</label>
+              <label>Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©</label>
               <div class="control"><input name="equip_count" id="equip_count" type="number" min="0" value="2"></div>
             </div>
 
@@ -242,40 +242,40 @@ if (!isset($_SESSION['user'])) {
             <div class="field md-3 sm-6"> </div>
 
             <div class="field md-4 sm-6">
-              <label>ساعات العمل  للمعدة شهرياً</label>
+              <label>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„  Ù„Ù„Ù…Ø¹Ø¯Ø© Ø´Ù‡Ø±ÙŠØ§Ù‹</label>
               <div class="control"><input name="equip_target_per_month" id="equip_target_per_month" type="number"
                   min="0" value="600"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي الساعات  للمعدات شهرياً</label>
+              <label>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª  Ù„Ù„Ù…Ø¹Ø¯Ø§Øª Ø´Ù‡Ø±ÙŠØ§Ù‹</label>
               <div class="control"><input name="equip_total_month" id="equip_total_month" type="number" readonly
-                  placeholder="يُحتسب تلقائياً"></div>
+                  placeholder="ÙŠÙØ­ØªØ³Ø¨ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي ساعات العقد  للمعدات</label>
+              <label>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯  Ù„Ù„Ù…Ø¹Ø¯Ø§Øª</label>
               <div class="control"><input name="equip_total_contract" id="equip_total_contract" type="number" readonly
-                  placeholder="يُحتسب تلقائياً"></div>
+                  placeholder="ÙŠÙØ­ØªØ³Ø¨ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹"></div>
             </div>
           </div>
 
           <hr class="hr" />
 
-          <!-- القسم 3: بيانات ساعات العمل المطلوبة للآليات -->
-          <div class="section-title"><span class="chip">3</span> بيانات ساعات العمل المطلوبة <strong>للآليات</strong>
+          <!-- Ø§Ù„Ù‚Ø³Ù… 3: Ø¨ÙŠØ§Ù†Ø§Øª Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© Ù„Ù„Ø¢Ù„ÙŠØ§Øª -->
+          <div class="section-title"><span class="chip">3</span> Ø¨ÙŠØ§Ù†Ø§Øª Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø© <strong>Ù„Ù„Ø¢Ù„ÙŠØ§Øª</strong>
           </div>
                     <br>
 
           <div class="form-grid">
             <div class="field md-4 sm-6">
-              <label>نوع الآلية المطلوبة</label>
-              <div class="control"><input name="mach_type" id="mach_type" type="text" placeholder="مثال: قلاب" value="قلاب"></div>
+              <label>Ù†ÙˆØ¹ Ø§Ù„Ø¢Ù„ÙŠØ© Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©</label>
+              <div class="control"><input name="mach_type" id="mach_type" type="text" placeholder="Ù…Ø«Ø§Ù„: Ù‚Ù„Ø§Ø¨" value="Ù‚Ù„Ø§Ø¨"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>حجم حمولة الآلية</label>
-              <div class="control"><input name="mach_size" id="mach_size" type="number" placeholder="مثال: 340" value="340"></div>
+              <label>Ø­Ø¬Ù… Ø­Ù…ÙˆÙ„Ø© Ø§Ù„Ø¢Ù„ÙŠØ©</label>
+              <div class="control"><input name="mach_size" id="mach_size" type="number" placeholder="Ù…Ø«Ø§Ù„: 340" value="340"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>عدد الآليات المطلوبة</label>
+              <label>Ø¹Ø¯Ø¯ Ø§Ù„Ø¢Ù„ÙŠØ§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©</label>
               <div class="control"><input name="mach_count" id="mach_count" type="number" min="0" value="8"></div>
             </div>
 
@@ -284,38 +284,38 @@ if (!isset($_SESSION['user'])) {
             <div class="field md-3 sm-6"> </div>
 
             <div class="field md-4 sm-6">
-              <label>ساعات العمل  للآلية شهرياً</label>
+              <label>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„  Ù„Ù„Ø¢Ù„ÙŠØ© Ø´Ù‡Ø±ÙŠØ§Ù‹</label>
               <div class="control"><input name="mach_target_per_month" id="mach_target_per_month" type="number" min="0"
                   value="600"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي الساعات  للآليات شهرياً</label>
+              <label>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª  Ù„Ù„Ø¢Ù„ÙŠØ§Øª Ø´Ù‡Ø±ÙŠØ§Ù‹</label>
               <div class="control"><input name="mach_total_month" id="mach_total_month" type="number" readonly
-                  placeholder="يُحتسب تلقائياً"></div>
+                  placeholder="ÙŠÙØ­ØªØ³Ø¨ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹"></div>
             </div>
             <div class="field md-4 sm-6">
-              <label>إجمالي ساعات العقد  للآليات</label>
+              <label>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯  Ù„Ù„Ø¢Ù„ÙŠØ§Øª</label>
               <div class="control"><input name="mach_total_contract" id="mach_total_contract" type="number" readonly
-                  placeholder="يُحتسب تلقائياً"></div>
+                  placeholder="ÙŠÙØ­ØªØ³Ø¨ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹"></div>
             </div>
           </div>
 
           <hr class="hr" />
-          <div class="section-title"><span class="chip">5</span> بيانات إضافية</div>
+          <div class="section-title"><span class="chip">5</span> Ø¨ÙŠØ§Ù†Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ©</div>
                     <br>
 
           <div class="form-grid">
             <div class="field md-3 sm-6">
-              <label>عدد ساعات العمل اليومية</label>
-              <div class="control"><input type="number" name="daily_work_hours" id="daily_work_hours" min="0" placeholder="مثال: 8"></div>
+              <label>Ø¹Ø¯Ø¯ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ Ø§Ù„ÙŠÙˆÙ…ÙŠØ©</label>
+              <div class="control"><input type="number" name="daily_work_hours" id="daily_work_hours" min="0" placeholder="Ù…Ø«Ø§Ù„: 8"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>عدد المشغلين للساعات اليومية</label>
-              <div class="control"><input type="number" name="daily_operators" id="daily_operators" min="0" placeholder="مثال: 3"></div>
+              <label>Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ† Ù„Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙŠÙˆÙ…ÙŠØ©</label>
+              <div class="control"><input type="number" name="daily_operators" id="daily_operators" min="0" placeholder="Ù…Ø«Ø§Ù„: 3"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label> الطرف الأول </label>
-              <div class="control"><input type="text" name="first_party" id="first_party" placeholder="اسم الطرف الاول  "></div>
+              <label> Ø§Ù„Ø·Ø±Ù Ø§Ù„Ø£ÙˆÙ„ </label>
+              <div class="control"><input type="text" name="first_party" id="first_party" placeholder="Ø§Ø³Ù… Ø§Ù„Ø·Ø±Ù Ø§Ù„Ø§ÙˆÙ„  "></div>
             </div>
 
             <!-- Orgnization Break  -->
@@ -323,42 +323,42 @@ if (!isset($_SESSION['user'])) {
             <div class="field md-3 sm-6"> </div>
 
             <div class="field md-3 sm-6">
-              <label> الطرف الثاني </label>
-              <div class="control"><input type="text" name="second_party" id="second_party" placeholder="اسم الطرف الثاني"></div>
+              <label> Ø§Ù„Ø·Ø±Ù Ø§Ù„Ø«Ø§Ù†ÙŠ </label>
+              <div class="control"><input type="text" name="second_party" id="second_party" placeholder="Ø§Ø³Ù… Ø§Ù„Ø·Ø±Ù Ø§Ù„Ø«Ø§Ù†ÙŠ"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>الشاهد الأول</label>
-              <div class="control"><input type="text" name="witness_one" id="witness_one" placeholder="اسم الشاهد الأول"></div>
+              <label>Ø§Ù„Ø´Ø§Ù‡Ø¯ Ø§Ù„Ø£ÙˆÙ„</label>
+              <div class="control"><input type="text" name="witness_one" id="witness_one" placeholder="Ø§Ø³Ù… Ø§Ù„Ø´Ø§Ù‡Ø¯ Ø§Ù„Ø£ÙˆÙ„"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>الشاهد الثاني</label>
-              <div class="control"><input type="text" name="witness_two" id="witness_two" placeholder="اسم الشاهد الثاني"></div>
+              <label>Ø§Ù„Ø´Ø§Ù‡Ø¯ Ø§Ù„Ø«Ø§Ù†ÙŠ</label>
+              <div class="control"><input type="text" name="witness_two" id="witness_two" placeholder="Ø§Ø³Ù… Ø§Ù„Ø´Ø§Ù‡Ø¯ Ø§Ù„Ø«Ø§Ù†ÙŠ"></div>
             </div>
           </div>
 
 
           <hr class="hr" />
 
-          <!-- القسم 4: الإجماليات -->
-          <div class="section-title"><span class="chip">4</span> إجماليات الساعات (شهرياً وللعقد)</div>
+          <!-- Ø§Ù„Ù‚Ø³Ù… 4: Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠØ§Øª -->
+          <div class="section-title"><span class="chip">4</span> Ø¥Ø¬Ù…Ø§Ù„ÙŠØ§Øª Ø§Ù„Ø³Ø§Ø¹Ø§Øª (Ø´Ù‡Ø±ÙŠØ§Ù‹ ÙˆÙ„Ù„Ø¹Ù‚Ø¯)</div>
           
-          <!-- معلومات المشروع المحدد -->
+          <!-- Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„Ù…Ø­Ø¯Ø¯ -->
           <div id="project_hours_info" style="display:none; margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; border-right: 5px solid #2196f3;">
             <h5 style="color: #1976d2; margin-bottom: 10px;">
-              <i class="fa fa-info-circle"></i> معلومات ساعات المشروع
+              <i class="fa fa-info-circle"></i> Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
             </h5>
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
               <div>
-                <strong style="color: #1976d2;">المشروع:</strong> 
+                <strong style="color: #1976d2;">Ø§Ù„Ù…Ø´Ø±ÙˆØ¹:</strong> 
                 <span id="selected_project_name" style="color: #424242;">-</span>
               </div>
               <div>
-                <strong style="color: #1976d2;">إجمالي ساعات المشروع:</strong> 
-                <span id="project_total_hours" style="color: #424242; font-weight: 600;">0 ساعة</span>
+                <strong style="color: #1976d2;">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹:</strong> 
+                <span id="project_total_hours" style="color: #424242; font-weight: 600;">0 Ø³Ø§Ø¹Ø©</span>
               </div>
               <div>
-                <strong style="color: #1976d2;">الساعات المتعاقد عليها مع موردين آخرين:</strong> 
-                <span id="project_contracted_hours" style="color: #f57c00; font-weight: 600;">0 ساعة</span>
+                <strong style="color: #1976d2;">Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…ØªØ¹Ø§Ù‚Ø¯ Ø¹Ù„ÙŠÙ‡Ø§ Ù…Ø¹ Ù…ÙˆØ±Ø¯ÙŠÙ† Ø¢Ø®Ø±ÙŠÙ†:</strong> 
+                <span id="project_contracted_hours" style="color: #f57c00; font-weight: 600;">0 Ø³Ø§Ø¹Ø©</span>
               </div>
             </div>
           </div>
@@ -366,59 +366,59 @@ if (!isset($_SESSION['user'])) {
           <div class="totals">
             <div class="kpi">
               <div class="v" id="kpi_month_total">0</div>
-              <div class="t">الساعات المستهدفة شهرياً - معدات وآليات</div>
+              <div class="t">Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ø³ØªÙ‡Ø¯ÙØ© Ø´Ù‡Ø±ÙŠØ§Ù‹ - Ù…Ø¹Ø¯Ø§Øª ÙˆØ¢Ù„ÙŠØ§Øª</div>
               <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
             </div>
             <div class="kpi">
               <div class="v" id="kpi_contract_total">0</div>
-              <div class="t">ساعات العقد المستهدفة - معدات وآليات</div>
+              <div class="t">Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ù…Ø³ØªÙ‡Ø¯ÙØ© - Ù…Ø¹Ø¯Ø§Øª ÙˆØ¢Ù„ÙŠØ§Øª</div>
               <input type="hidden" name="forecasted_contracted_hours" id="forecasted_contracted_hours" value="0" />
             </div>
             <div class="kpi">
               <div class="v" id="kpi_equip_month">0</div>
-              <div class="t">إجمالي معدات (شهري)</div>
+              <div class="t">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ù…Ø¹Ø¯Ø§Øª (Ø´Ù‡Ø±ÙŠ)</div>
             </div>
             <div class="kpi">
               <div class="v" id="kpi_mach_month">0</div>
-              <div class="t">إجمالي آليات (شهري)</div>
+              <div class="t">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø¢Ù„ÙŠØ§Øª (Ø´Ù‡Ø±ÙŠ)</div>
             </div>
           </div>
 
           <div class="toolbar">
-            <button type="reset" class="ghost">تفريغ الحقول</button>
-                      <button type="submit" class="primary">حفظ البيانات</button>
+            <button type="reset" class="ghost">ØªÙØ±ÙŠØº Ø§Ù„Ø­Ù‚ÙˆÙ„</button>
+                      <button type="submit" class="primary">Ø­ÙØ¸ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª</button>
 
           </div>
 
-          <p class="muted" style="margin-top:8px">* يتم احتساب الحقول الإجمالية تلقائياً بناءً على المدخلات.</p>
+          <p class="muted" style="margin-top:8px">* ÙŠØªÙ… Ø§Ø­ØªØ³Ø§Ø¨ Ø§Ù„Ø­Ù‚ÙˆÙ„ Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠØ© ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ Ø¨Ù†Ø§Ø¡Ù‹ Ø¹Ù„Ù‰ Ø§Ù„Ù…Ø¯Ø®Ù„Ø§Øª.</p>
         </div>
       </div>
     </form>
-    <!-- جدول العقود -->
+    <!-- Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ø¹Ù‚ÙˆØ¯ -->
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-white">
-        <h5 class="mb-0"> قائمة العقودات </h5>
+        <h5 class="mb-0"> Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ø¹Ù‚ÙˆØ¯Ø§Øª </h5>
       </div>
       <div class="card-body">
         <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
           <thead>
             <tr>
-              <th>المشروع</th>
-              <th>تاريخ التوقيع</th>
-              <th>مدة العقد (شهور)</th>
-              <th>بداية التنفيذ</th>
-              <th>نهاية التنفيذ</th>
-              <th>ساعات شهرياً</th>
-              <th>إجمالي ساعات العقد</th>
-              <th>الحالة</th>
-              <th>الإجراءات</th>
+              <th>Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</th>
+              <th>ØªØ§Ø±ÙŠØ® Ø§Ù„ØªÙˆÙ‚ÙŠØ¹</th>
+              <th>Ù…Ø¯Ø© Ø§Ù„Ø¹Ù‚Ø¯ (Ø´Ù‡ÙˆØ±)</th>
+              <th>Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„ØªÙ†ÙÙŠØ°</th>
+              <th>Ù†Ù‡Ø§ÙŠØ© Ø§Ù„ØªÙ†ÙÙŠØ°</th>
+              <th>Ø³Ø§Ø¹Ø§Øª Ø´Ù‡Ø±ÙŠØ§Ù‹</th>
+              <th>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯</th>
+              <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+              <th>Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th>
             </tr>
           </thead>
           <tbody>
             <?php
             include '../config.php';
 
-            // إضافة عقد جديد عند إرسال الفورم
+            // Ø¥Ø¶Ø§ÙØ© Ø¹Ù‚Ø¯ Ø¬Ø¯ÙŠØ¯ Ø¹Ù†Ø¯ Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„ÙÙˆØ±Ù…
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['supplier_id'])) {
 
                        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -465,7 +465,7 @@ if (!isset($_SESSION['user'])) {
               $witness_two = $_POST['witness_two'];
 
                 if ($id > 0) {
-                  // تحديث العقد
+                  // ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø¹Ù‚Ø¯
                   mysqli_query($conn, "UPDATE supplierscontracts SET 
                     contract_signing_date='$contract_signing_date',
                     grace_period_days='$grace_period_days',
@@ -499,7 +499,7 @@ if (!isset($_SESSION['user'])) {
                     project_id='$project_id'
                   WHERE id=$id");
                 } else {
-                  // إضافة عقد جديد
+                  // Ø¥Ø¶Ø§ÙØ© Ø¹Ù‚Ø¯ Ø¬Ø¯ÙŠØ¯
 
 
               mysqli_query($conn, "INSERT INTO supplierscontracts (
@@ -520,14 +520,14 @@ if (!isset($_SESSION['user'])) {
 
 
                 }
-              // إعادة تحميل الصفحة لتحديث القائمة
+              // Ø¥Ø¹Ø§Ø¯Ø© ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙØ­Ø© Ù„ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©
                mysqli_query($conn, $sql);
               echo "<script>window.location.href='supplierscontracts.php?id=$supplier_id';</script>";
               exit();
 
             }
             $supplier_id = $_GET['id'];
-            // جلب العقود مع أسماء المشاريع
+            // Ø¬Ù„Ø¨ Ø§Ù„Ø¹Ù‚ÙˆØ¯ Ù…Ø¹ Ø£Ø³Ù…Ø§Ø¡ Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹
             $query = "SELECT sc.*, op.name as project_name 
                       FROM `supplierscontracts` sc
                       LEFT JOIN project op ON sc.project_id = op.id
@@ -539,17 +539,17 @@ if (!isset($_SESSION['user'])) {
 
             while ($row = mysqli_fetch_assoc($result)) {
 
-               $status = $row['status']=="1" ? "<font color='green'>ساري</font>" : "
-                    <font color='red'>منتهي</font>";
+               $status = $row['status']=="1" ? "<font color='green'>Ø³Ø§Ø±ÙŠ</font>" : "
+                    <font color='red'>Ù…Ù†ØªÙ‡ÙŠ</font>";
 
               echo "<tr>";
-              echo "<td><strong>" . ($row['project_name'] ?? 'غير محدد') . "</strong></td>";
+              echo "<td><strong>" . ($row['project_name'] ?? 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯') . "</strong></td>";
               echo "<td>" . $row['contract_signing_date'] . "</td>";
               echo "<td>" . $row['contract_duration_months'] . "</td>";
               echo "<td>" . $row['actual_start'] . "</td>";
               echo "<td>" . $row['actual_end'] . "</td>";
-              echo "<td style='font-weight: 600; color: #28a745;'>" . number_format($row['hours_monthly_target']) . " ساعة</td>";
-              echo "<td style='font-weight: 700; color: #667eea;'>" . number_format($row['forecasted_contracted_hours']) . " ساعة</td>";
+              echo "<td style='font-weight: 600; color: #28a745;'>" . number_format($row['hours_monthly_target']) . " Ø³Ø§Ø¹Ø©</td>";
+              echo "<td style='font-weight: 700; color: #667eea;'>" . number_format($row['forecasted_contracted_hours']) . " Ø³Ø§Ø¹Ø©</td>";
               echo "<td>" . $status . "</td>";
 
               echo "<td>
@@ -585,7 +585,7 @@ if (!isset($_SESSION['user'])) {
                   
              data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
              style='color:#007bff'><i class='fa fa-edit'></i></a> | 
-                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
+                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ØŸ\")' style='color: #dc3545'><i class='fa fa-trash'></i></a> | 
                         <a href='showcontractsuppliers.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a>
                       </td>";
               echo "</tr>";
@@ -618,7 +618,7 @@ if (!isset($_SESSION['user'])) {
 
   <script>
     (function () {
-      // تشغيل DataTable بالعربية
+      // ØªØ´ØºÙŠÙ„ DataTable Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©
 
 
       $(document).ready(function () {
@@ -626,11 +626,11 @@ if (!isset($_SESSION['user'])) {
           responsive: true,
           dom: 'Bfrtip', // Buttons + Search + Pagination
           buttons: [
-            { extend: 'copy', text: 'نسخ' },
-            { extend: 'excel', text: 'تصدير Excel' },
-            { extend: 'csv', text: 'تصدير CSV' },
-            { extend: 'pdf', text: 'تصدير PDF' },
-            { extend: 'print', text: 'طباعة' }
+            { extend: 'copy', text: 'Ù†Ø³Ø®' },
+            { extend: 'excel', text: 'ØªØµØ¯ÙŠØ± Excel' },
+            { extend: 'csv', text: 'ØªØµØ¯ÙŠØ± CSV' },
+            { extend: 'pdf', text: 'ØªØµØ¯ÙŠØ± PDF' },
+            { extend: 'print', text: 'Ø·Ø¨Ø§Ø¹Ø©' }
           ],
           "language": {
             "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
@@ -639,11 +639,11 @@ if (!isset($_SESSION['user'])) {
       });
 
 
-      // التحكم في إظهار وإخفاء الفورم
+      // Ø§Ù„ØªØ­ÙƒÙ… ÙÙŠ Ø¥Ø¸Ù‡Ø§Ø± ÙˆØ¥Ø®ÙØ§Ø¡ Ø§Ù„ÙÙˆØ±Ù…
       const toggleContractFormBtn = document.getElementById('toggleForm');
       const contractForm = document.getElementById('projectForm');
 
-      // جلب معلومات المشروع عند اختياره
+      // Ø¬Ù„Ø¨ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ø¹Ù†Ø¯ Ø§Ø®ØªÙŠØ§Ø±Ù‡
       $('#project_id').on('change', function() {
         const projectId = $(this).val();
         const projectName = $(this).find('option:selected').text();
@@ -658,8 +658,8 @@ if (!isset($_SESSION['user'])) {
               if (response.success) {
                 $('#project_hours_info').show();
                 $('#selected_project_name').text(projectName);
-                $('#project_total_hours').text(response.project_total_hours + ' ساعة');
-                $('#project_contracted_hours').text(response.suppliers_contracted_hours + ' ساعة');
+                $('#project_total_hours').text(response.project_total_hours + ' Ø³Ø§Ø¹Ø©');
+                $('#project_contracted_hours').text(response.suppliers_contracted_hours + ' Ø³Ø§Ø¹Ø©');
               }
             },
             error: function() {
@@ -711,19 +711,19 @@ if (!isset($_SESSION['user'])) {
     function recalc() {
       const months = num(fields.contractMonths.value);
 
-      // معدات
+      // Ù…Ø¹Ø¯Ø§Øª
       const equipCount = num(fields.equipCount.value);
       const equipTarget = num(fields.equipTarget.value);
       const equipMonth = equipCount * equipTarget;
       const equipContract = equipMonth * months;
 
-      // آليات
+      // Ø¢Ù„ÙŠØ§Øª
       const machCount = num(fields.machCount.value);
       const machTarget = num(fields.machTarget.value);
       const machMonth = machCount * machTarget;
       const machContract = machMonth * months;
 
-      // تحديث الحقول
+      // ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø­Ù‚ÙˆÙ„
       fields.equipTotalMonth.value = equipMonth;
       fields.equipTotalContract.value = equipContract;
       fields.machTotalMonth.value = machMonth;
@@ -741,22 +741,22 @@ if (!isset($_SESSION['user'])) {
       fields.forecastedContractedHours.value = contractTotal;
     }
 
-    // تشغيل الحسبة عند تغيير أي مدخل
+    // ØªØ´ØºÙŠÙ„ Ø§Ù„Ø­Ø³Ø¨Ø© Ø¹Ù†Ø¯ ØªØºÙŠÙŠØ± Ø£ÙŠ Ù…Ø¯Ø®Ù„
     const inputs = document.querySelectorAll('#projectForm input, #projectForm select');
     inputs.forEach(el => el.addEventListener('input', recalc));
 
-    // جلب الفورم
+    // Ø¬Ù„Ø¨ Ø§Ù„ÙÙˆØ±Ù…
     const contractForm = document.getElementById('projectForm');
     if (contractForm) {
       contractForm.addEventListener('reset', () => setTimeout(recalc, 0));
     }
 
-    // أول تشغيل
+    // Ø£ÙˆÙ„ ØªØ´ØºÙŠÙ„
     recalc();
 
 
     
-    // تعبئة الفورم عند التعديل
+    // ØªØ¹Ø¨Ø¦Ø© Ø§Ù„ÙÙˆØ±Ù… Ø¹Ù†Ø¯ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„
     $(document).on("click", ".editBtn", function () {
       $("#projectForm").show();
       $("#contract_id").val($(this).data("id"));

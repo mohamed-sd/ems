@@ -547,7 +547,7 @@ function _default_full_permissions() {
  * if ($perms['can_edit'])    { /* عرض زر التعديل *\/ }
  * if ($perms['can_delete'])  { /* عرض زر الحذف   *\/ }
  */
-function get_page_permissions($conn, $url = null) {
+function get_page_permissions($conn, $url = null ) {
     // إذا لم يُمرَّر رابط، استخدم الرابط الحالي
     if ($url === null) {
         $url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
@@ -575,13 +575,23 @@ function get_page_permissions($conn, $url = null) {
         return _default_full_permissions();
     }
 
-    // البحث في قاعدة البيانات بأكثر من طريقة لضمان العثور على الوحدة
+    // الدور الحالي للمستخدم (المالك المطلوب مطابقته أولاً)
+    $current_role_id = isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : 0;
+
+    // البحث في قاعدة البيانات بأكثر من طريقة، مع تفضيل owner_role_id المطابق للدور الحالي
     $stmt = $conn->prepare(
-        "SELECT id FROM modules 
+        "SELECT id, owner_role_id FROM modules 
          WHERE code = ?
             OR code = ?
             OR code LIKE ?
             OR code LIKE ?
+         ORDER BY
+            CASE
+                WHEN owner_role_id = ? THEN 0
+                WHEN owner_role_id IS NULL OR owner_role_id = 0 THEN 1
+                ELSE 2
+            END,
+            id ASC
          LIMIT 1"
     );
 
@@ -592,7 +602,7 @@ function get_page_permissions($conn, $url = null) {
     $pattern_end = '%/' . $basename;      // مطابقة نهاية المسار   مثال: %/index.php
     $pattern_any = '%' . $basename . '%'; // مطابقة جزئية          مثال: %index.php%
 
-    $stmt->bind_param("ssss", $relative_path, $basename, $pattern_end, $pattern_any);
+    $stmt->bind_param("ssssi", $relative_path, $basename, $pattern_end, $pattern_any, $current_role_id);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
 
@@ -606,6 +616,7 @@ function get_page_permissions($conn, $url = null) {
 
     return [
         'id'         => $module_id,
+        'owner_role_id' => isset($result['owner_role_id']) ? intval($result['owner_role_id']) : null,
         'can_view'   => $perms['can_view'],
         'can_add'    => $perms['can_add'],
         'can_edit'   => $perms['can_edit'],

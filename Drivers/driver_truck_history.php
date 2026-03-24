@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -21,7 +21,7 @@ if (!$driver) {
     exit();
 }
 
-$page_title = "إيكوبيشن | سجل قيادة الشاحنات";
+$page_title = "Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø³Ø¬Ù„ Ù‚ÙŠØ§Ø¯Ø© Ø§Ù„Ø´Ø§Ø­Ù†Ø§Øª";
 include("../inheader.php");
 include("../insidebar.php");
 ?>
@@ -55,26 +55,26 @@ include("../insidebar.php");
 
 <div class="main">
     <div class="history-header">
-        <h2><i class="fa fa-history"></i> سجل قيادة الشاحنات</h2>
+        <h2><i class="fa fa-history"></i> Ø³Ø¬Ù„ Ù‚ÙŠØ§Ø¯Ø© Ø§Ù„Ø´Ø§Ø­Ù†Ø§Øª</h2>
         <div class="history-meta">
-            السائق: <?php echo htmlspecialchars($driver['name']); ?>
+            Ø§Ù„Ø³Ø§Ø¦Ù‚: <?php echo htmlspecialchars($driver['name']); ?>
         </div>
     </div>
 
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">تاريخ قيادة الشاحنات</h5>
+            <h5 class="mb-0">ØªØ§Ø±ÙŠØ® Ù‚ÙŠØ§Ø¯Ø© Ø§Ù„Ø´Ø§Ø­Ù†Ø§Øª</h5>
         </div>
         <div class="card-body">
             <table id="historyTable" class="display" style="width:100%; margin-top: 10px;">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>الشاحنة</th>
-                        <th>من تاريخ</th>
-                        <th>إلى تاريخ</th>
-                        <th>المورد</th>
-                        <th>الحالة</th>
+                        <th>Ø§Ù„Ø´Ø§Ø­Ù†Ø©</th>
+                        <th>Ù…Ù† ØªØ§Ø±ÙŠØ®</th>
+                        <th>Ø¥Ù„Ù‰ ØªØ§Ø±ÙŠØ®</th>
+                        <th>Ø§Ù„Ù…ÙˆØ±Ø¯</th>
+                        <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,7 +103,7 @@ include("../insidebar.php");
                         while ($row = mysqli_fetch_assoc($history_result)) {
                             $is_current = ($row['status'] == '1');
                             $row_class = $is_current ? 'current-assignment' : '';
-                            $status_text = $is_current ? 'يعمل حاليا' : 'سابق';
+                            $status_text = $is_current ? 'ÙŠØ¹Ù…Ù„ Ø­Ø§Ù„ÙŠØ§' : 'Ø³Ø§Ø¨Ù‚';
                             $truck_label = htmlspecialchars($row['name']);
                             if (!empty($row['code'])) {
                                 $truck_label .= " (" . htmlspecialchars($row['code']) . ")";
@@ -123,7 +123,7 @@ include("../insidebar.php");
                 </tbody>
             </table>
             <?php if (!$history_result || mysqli_num_rows($history_result) === 0) { ?>
-                <div style="margin-top: 1rem; color: #6c757d;">لا يوجد سجل قيادة للشاحنات لهذا السائق.</div>
+                <div style="margin-top: 1rem; color: #6c757d;">Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø³Ø¬Ù„ Ù‚ÙŠØ§Ø¯Ø© Ù„Ù„Ø´Ø§Ø­Ù†Ø§Øª Ù„Ù‡Ø°Ø§ Ø§Ù„Ø³Ø§Ø¦Ù‚.</div>
             <?php } ?>
         </div>
     </div>
@@ -149,3 +149,4 @@ include("../insidebar.php");
 
 </body>
 </html>
+

@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
 include '../config.php';
@@ -12,30 +12,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_password = mysqli_real_escape_string($conn, trim($_POST['new_password']));
     $confirm_password = mysqli_real_escape_string($conn, trim($_POST['confirm_password']));
 
-    // التحقق من طول كلمة السر الجديدة
+    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø·ÙˆÙ„ ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©
     if (strlen($new_password) < 6) {
-        $error = "كلمة السر الجديدة يجب أن تكون 6 أحرف على الأقل!";
+        $error = "ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† 6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„!";
     } elseif ($new_password !== $confirm_password) {
-        $error = "كلمة السر الجديدة غير متطابقة!";
+        $error = "ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚Ø©!";
     } else {
-        // جلب كلمة السر القديمة من قاعدة البيانات
+        // Ø¬Ù„Ø¨ ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ù‚Ø¯ÙŠÙ…Ø© Ù…Ù† Ù‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
         $query = "SELECT password FROM users WHERE id = $user_id";
         $result = mysqli_query($conn, $query);
         $row = mysqli_fetch_assoc($result);
 
         if (!$row || $old_password != $row['password']) {
-            $error = "كلمة السر القديمة غير صحيحة!";
+            $error = "ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ù‚Ø¯ÙŠÙ…Ø© ØºÙŠØ± ØµØ­ÙŠØ­Ø©!";
         } else {
-            // تحديث كلمة السر
+            // ØªØ­Ø¯ÙŠØ« ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø±
             $update_query = "UPDATE users SET password = '$new_password', updated_at = NOW() WHERE id = $user_id";
             if (mysqli_query($conn, $update_query)) {
-                $success = "تم تغيير كلمة السر بنجاح 🎉";
-                // تحديث كلمة السر في الجلسة إذا كانت مخزنة
+                $success = "ØªÙ… ØªØºÙŠÙŠØ± ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø¨Ù†Ø¬Ø§Ø­ ðŸŽ‰";
+                // ØªØ­Ø¯ÙŠØ« ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± ÙÙŠ Ø§Ù„Ø¬Ù„Ø³Ø© Ø¥Ø°Ø§ ÙƒØ§Ù†Øª Ù…Ø®Ø²Ù†Ø©
                 if (isset($_SESSION['user']['password'])) {
                     $_SESSION['user']['password'] = $new_password;
                 }
             } else {
-                $error = "حدث خطأ أثناء تحديث كلمة السر!";
+                $error = "Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ ØªØ­Ø¯ÙŠØ« ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø±!";
             }
         }
     }
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إيكوبيشن | تغيير كلمة السر</title>
+  <title>Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | ØªØºÙŠÙŠØ± ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø±</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
   <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .requirement-item::before {
-      content: '○';
+      content: 'â—‹';
       position: absolute;
       right: 0;
       color: var(--txt-light);
@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .requirement-item.met::before {
-      content: '✓';
+      content: 'âœ“';
       color: var(--green);
     }
 
@@ -153,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       position: relative;
     }
 
-    /* تصميم محسّن للأزرار */
+    /* ØªØµÙ…ÙŠÙ… Ù…Ø­Ø³Ù‘Ù† Ù„Ù„Ø£Ø²Ø±Ø§Ø± */
     .form-actions {
       display: flex;
       gap: 14px;
@@ -313,11 +313,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="page-header">
       <div style="display: flex; align-items: center; gap: 12px;">
         <div class="title-icon"><i class="fas fa-key"></i></div>
-        <h1 class="page-title">تغيير كلمة السر</h1>
+        <h1 class="page-title">ØªØºÙŠÙŠØ± ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø±</h1>
       </div>
       <div style="display: flex; gap: 10px;">
         <a href="settings.php" class="back-btn">
-          <i class="fas fa-arrow-right"></i> العودة للإعدادات
+          <i class="fas fa-arrow-right"></i> Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª
         </a>
       </div>
     </div>
@@ -326,7 +326,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="alert alert-danger">
       <div class="alert-icon"><i class="fas fa-exclamation-circle"></i></div>
       <div class="alert-content">
-        <strong>خطأ!</strong>
+        <strong>Ø®Ø·Ø£!</strong>
         <p><?php echo htmlspecialchars($error); ?></p>
       </div>
     </div>
@@ -336,7 +336,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="alert alert-success">
       <div class="alert-icon"><i class="fas fa-check-circle"></i></div>
       <div class="alert-content">
-        <strong>نجح!</strong>
+        <strong>Ù†Ø¬Ø­!</strong>
         <p><?php echo htmlspecialchars($success); ?></p>
       </div>
     </div>
@@ -345,25 +345,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Card -->
     <div class="card">
       <div class="card-header">
-        <h5><i class="fas fa-shield-alt"></i> تحديث بيانات الدخول</h5>
+        <h5><i class="fas fa-shield-alt"></i> ØªØ­Ø¯ÙŠØ« Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¯Ø®ÙˆÙ„</h5>
       </div>
       <div class="card-body">
         <form method="POST" id="changePasswordForm">
           <div class="form-grid">
-            <!-- كلمة السر القديمة -->
+            <!-- ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ù‚Ø¯ÙŠÙ…Ø© -->
             <div class="field md-12">
-              <label><i class="fas fa-lock"></i> كلمة السر القديمة <span class="required">*</span></label>
+              <label><i class="fas fa-lock"></i> ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ù‚Ø¯ÙŠÙ…Ø© <span class="required">*</span></label>
               <div class="control">
-                <input type="password" name="old_password" id="old_password" required placeholder="أدخل كلمة السر الحالية">
+                <input type="password" name="old_password" id="old_password" required placeholder="Ø£Ø¯Ø®Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ø­Ø§Ù„ÙŠØ©">
                 <i class="fas fa-eye toggle-password" data-target="old_password"></i>
               </div>
             </div>
 
-            <!-- كلمة السر الجديدة -->
+            <!-- ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© -->
             <div class="field md-12">
-              <label><i class="fas fa-key"></i> كلمة السر الجديدة <span class="required">*</span></label>
+              <label><i class="fas fa-key"></i> ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© <span class="required">*</span></label>
               <div class="control">
-                <input type="password" name="new_password" id="new_password" required placeholder="أدخل كلمة السر الجديدة" minlength="6">
+                <input type="password" name="new_password" id="new_password" required placeholder="Ø£Ø¯Ø®Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©" minlength="6">
                 <i class="fas fa-eye toggle-password" data-target="new_password"></i>
               </div>
               <div class="password-strength" id="strengthBar">
@@ -372,22 +372,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <div class="password-strength-text" id="strengthText"></div>
             </div>
 
-            <!-- متطلبات كلمة السر -->
+            <!-- Ù…ØªØ·Ù„Ø¨Ø§Øª ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± -->
             <div class="field md-12">
               <div class="password-requirements">
-                <h6><i class="fas fa-info-circle"></i> متطلبات كلمة السر:</h6>
-                <div class="requirement-item" id="req-length">6 أحرف على الأقل</div>
-                <div class="requirement-item" id="req-uppercase">حرف كبير واحد على الأقل (A-Z)</div>
-                <div class="requirement-item" id="req-lowercase">حرف صغير واحد على الأقل (a-z)</div>
-                <div class="requirement-item" id="req-number">رقم واحد على الأقل (0-9)</div>
+                <h6><i class="fas fa-info-circle"></i> Ù…ØªØ·Ù„Ø¨Ø§Øª ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø±:</h6>
+                <div class="requirement-item" id="req-length">6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„</div>
+                <div class="requirement-item" id="req-uppercase">Ø­Ø±Ù ÙƒØ¨ÙŠØ± ÙˆØ§Ø­Ø¯ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„ (A-Z)</div>
+                <div class="requirement-item" id="req-lowercase">Ø­Ø±Ù ØµØºÙŠØ± ÙˆØ§Ø­Ø¯ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„ (a-z)</div>
+                <div class="requirement-item" id="req-number">Ø±Ù‚Ù… ÙˆØ§Ø­Ø¯ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„ (0-9)</div>
               </div>
             </div>
 
-            <!-- تأكيد كلمة السر -->
+            <!-- ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± -->
             <div class="field md-12">
-              <label><i class="fas fa-check-double"></i> تأكيد كلمة السر الجديدة <span class="required">*</span></label>
+              <label><i class="fas fa-check-double"></i> ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© <span class="required">*</span></label>
               <div class="control">
-                <input type="password" name="confirm_password" id="confirm_password" required placeholder="أعد إدخال كلمة السر الجديدة">
+                <input type="password" name="confirm_password" id="confirm_password" required placeholder="Ø£Ø¹Ø¯ Ø¥Ø¯Ø®Ø§Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©">
                 <i class="fas fa-eye toggle-password" data-target="confirm_password"></i>
               </div>
               <div id="match-message" style="font-size: 0.82rem; margin-top: 6px; font-weight: 600;"></div>
@@ -398,11 +398,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="form-actions">
             <button type="submit" class="btn-save" id="submitBtn">
               <i class="fas fa-save"></i>
-              <span>حفظ كلمة السر الجديدة</span>
+              <span>Ø­ÙØ¸ ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©</span>
             </button>
             <button type="reset" class="btn-reset">
               <i class="fas fa-redo"></i>
-              <span>إعادة تعيين</span>
+              <span>Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ†</span>
             </button>
           </div>
         </form>
@@ -483,17 +483,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         strengthBarFill.style.width = '33%';
         strengthBarFill.classList.add('strength-weak');
         strengthText.classList.add('strength-weak');
-        strengthText.textContent = 'ضعيفة';
+        strengthText.textContent = 'Ø¶Ø¹ÙŠÙØ©';
       } else if (strength <= 3) {
         strengthBarFill.style.width = '66%';
         strengthBarFill.classList.add('strength-medium');
         strengthText.classList.add('strength-medium');
-        strengthText.textContent = 'متوسطة';
+        strengthText.textContent = 'Ù…ØªÙˆØ³Ø·Ø©';
       } else {
         strengthBarFill.style.width = '100%';
         strengthBarFill.classList.add('strength-strong');
         strengthText.classList.add('strength-strong');
-        strengthText.textContent = 'قوية';
+        strengthText.textContent = 'Ù‚ÙˆÙŠØ©';
       }
 
       checkPasswordMatch();
@@ -512,10 +512,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
 
       if (password === confirm) {
-        matchMessage.innerHTML = '<i class="fas fa-check-circle"></i> كلمات السر متطابقة';
+        matchMessage.innerHTML = '<i class="fas fa-check-circle"></i> ÙƒÙ„Ù…Ø§Øª Ø§Ù„Ø³Ø± Ù…ØªØ·Ø§Ø¨Ù‚Ø©';
         matchMessage.style.color = 'var(--green)';
       } else {
-        matchMessage.innerHTML = '<i class="fas fa-times-circle"></i> كلمات السر غير متطابقة';
+        matchMessage.innerHTML = '<i class="fas fa-times-circle"></i> ÙƒÙ„Ù…Ø§Øª Ø§Ù„Ø³Ø± ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚Ø©';
         matchMessage.style.color = 'var(--red)';
       }
     }
@@ -527,13 +527,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       if (newPassword !== confirmPassword) {
         e.preventDefault();
-        alert('❌ كلمة السر الجديدة غير متطابقة!');
+        alert('âŒ ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚Ø©!');
         return false;
       }
 
       if (newPassword.length < 6) {
         e.preventDefault();
-        alert('❌ كلمة السر يجب أن تكون 6 أحرف على الأقل!');
+        alert('âŒ ÙƒÙ„Ù…Ø© Ø§Ù„Ø³Ø± ÙŠØ¬Ø¨ Ø£Ù† ØªÙƒÙˆÙ† 6 Ø£Ø­Ø±Ù Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„!');
         return false;
       }
 
@@ -545,7 +545,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       submitBtn.classList.add('loading');
       btnIcon.classList.remove('fa-save');
       btnIcon.classList.add('fa-spinner', 'fa-spin');
-      btnText.textContent = 'جاري الحفظ...';
+      btnText.textContent = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø­ÙØ¸...';
     });
 
     // Reset button handler
@@ -577,3 +577,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
+

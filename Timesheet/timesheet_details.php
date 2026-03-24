@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
 ?>
@@ -10,13 +10,13 @@ if (!isset($_SESSION['user'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | تفاصيل ساعات العمل</title>
+    <title>Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | ØªÙØ§ØµÙŠÙ„ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</title>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- CSS الموقع -->
+    <!-- CSS Ø§Ù„Ù…ÙˆÙ‚Ø¹ -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
@@ -456,19 +456,43 @@ if (!isset($_SESSION['user'])) {
                     <i class="fas fa-clock"></i>
                 </div>
                 <div>
-                    <h1 class="hero-title">تفاصيل ساعات العمل</h1>
-                    <p class="hero-subtitle">عرض تقرير مفصّل لجميع ساعات التشغيل والأعطال والمشغل</p>
+                    <h1 class="hero-title">ØªÙØ§ØµÙŠÙ„ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</h1>
+                    <p class="hero-subtitle">Ø¹Ø±Ø¶ ØªÙ‚Ø±ÙŠØ± Ù…ÙØµÙ‘Ù„ Ù„Ø¬Ù…ÙŠØ¹ Ø³Ø§Ø¹Ø§Øª Ø§Ù„ØªØ´ØºÙŠÙ„ ÙˆØ§Ù„Ø£Ø¹Ø·Ø§Ù„ ÙˆØ§Ù„Ù…Ø´ØºÙ„</p>
                 </div>
             </div>
             <a href="javascript:history.back()" class="btn-back">
-                <i class="fas fa-arrow-right"></i> رجوع
+                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
             </a>
         </div>
     </div>
 
 <?php
 include '../config.php';
+$is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    die('Unauthorized company context');
+}
+
 $project = intval($_GET['id']);
+$details_scope = "";
+if (!$is_super_admin) {
+    if (db_table_has_column($conn, 'timesheet', 'company_id')) {
+        $details_scope = " AND t.company_id = $company_id";
+    } else {
+        $details_scope = " AND EXISTS (
+            SELECT 1
+            FROM project p2
+            LEFT JOIN users su2 ON su2.id = p2.created_by
+            LEFT JOIN clients sc2 ON sc2.id = p2.company_client_id
+            LEFT JOIN users scu2 ON scu2.id = sc2.created_by
+            WHERE p2.id = o.project_id
+              AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
+        )";
+    }
+}
+
 $sql = "SELECT  * , t.id,
                d.name AS driver_name,
                e.code AS equipment_name,
@@ -481,79 +505,79 @@ $sql = "SELECT  * , t.id,
         JOIN operations o ON t.operator = o.id
         JOIN equipments e ON o.equipment = e.id
         JOIN project p ON o.project_id = p.id
-        WHERE t.id = $project
+        WHERE t.id = $project" . $details_scope . "
         ORDER BY t.date DESC";
 
 $result = mysqli_query($conn, $sql);
 while ($row = mysqli_fetch_assoc($result)) {
-    $shift_display = $row['shift'] == "D" ? "صباح" : "مساء";
+    $shift_display = $row['shift'] == "D" ? "ØµØ¨Ø§Ø­" : "Ù…Ø³Ø§Ø¡";
     $shift_class   = $row['shift'] == "D" ? "day" : "night";
     $shift_icon    = $row['shift'] == "D" ? "fas fa-sun" : "fas fa-moon";
 ?>
 
-    <!-- ============================= 1. المعلومات العامة ============================= -->
+    <!-- ============================= 1. Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø¹Ø§Ù…Ø© ============================= -->
     <div class="section-block">
         <div class="section-header">
             <div class="section-header-icon"><i class="fas fa-info-circle"></i></div>
-            <h4>المعلومات العامة</h4>
+            <h4>Ø§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø¹Ø§Ù…Ø©</h4>
         </div>
         <div class="cards-grid grid-4">
 
-            <!-- المشغل -->
+            <!-- Ø§Ù„Ù…Ø´ØºÙ„ -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon primary"><i class="fas fa-user-tie"></i></div>
-                    <span class="detail-card-title">بيانات المشغل</span>
+                    <span class="detail-card-title">Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø´ØºÙ„</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-id-card"></i> اسم المشغل</span>
+                        <span class="detail-label"><i class="fas fa-id-card"></i> Ø§Ø³Ù… Ø§Ù„Ù…Ø´ØºÙ„</span>
                         <span class="detail-value"><?php echo htmlspecialchars($row['driver_name']); ?></span>
                     </div>
                 </div>
             </div>
 
-            <!-- المعدة -->
+            <!-- Ø§Ù„Ù…Ø¹Ø¯Ø© -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon info"><i class="fas fa-truck-moving"></i></div>
-                    <span class="detail-card-title">بيانات المعدة</span>
+                    <span class="detail-card-title">Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø¹Ø¯Ø©</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-barcode"></i> الكود</span>
+                        <span class="detail-label"><i class="fas fa-barcode"></i> Ø§Ù„ÙƒÙˆØ¯</span>
                         <span class="detail-value chip-info"><?php echo htmlspecialchars($row['equipment_name']); ?></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-tag"></i> الاسم</span>
+                        <span class="detail-label"><i class="fas fa-tag"></i> Ø§Ù„Ø§Ø³Ù…</span>
                         <span class="detail-value"><?php echo htmlspecialchars($row['equipment_fullname']); ?></span>
                     </div>
                 </div>
             </div>
 
-            <!-- المشروع -->
+            <!-- Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon success"><i class="fas fa-project-diagram"></i></div>
-                    <span class="detail-card-title">بيانات المشروع</span>
+                    <span class="detail-card-title">Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-building"></i> اسم المشروع</span>
+                        <span class="detail-label"><i class="fas fa-building"></i> Ø§Ø³Ù… Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</span>
                         <span class="detail-value"><?php echo htmlspecialchars($row['project_name']); ?></span>
                     </div>
                 </div>
             </div>
 
-            <!-- الوردية والتاريخ -->
+            <!-- Ø§Ù„ÙˆØ±Ø¯ÙŠØ© ÙˆØ§Ù„ØªØ§Ø±ÙŠØ® -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon warning"><i class="fas fa-calendar-alt"></i></div>
-                    <span class="detail-card-title">الوردية والتاريخ</span>
+                    <span class="detail-card-title">Ø§Ù„ÙˆØ±Ø¯ÙŠØ© ÙˆØ§Ù„ØªØ§Ø±ÙŠØ®</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="<?php echo $shift_icon; ?>"></i> الوردية</span>
+                        <span class="detail-label"><i class="<?php echo $shift_icon; ?>"></i> Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</span>
                         <span class="detail-value">
                             <span class="shift-badge <?php echo $shift_class; ?>">
                                 <i class="<?php echo $shift_icon; ?>"></i>
@@ -562,7 +586,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                         </span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-calendar-day"></i> التاريخ</span>
+                        <span class="detail-label"><i class="fas fa-calendar-day"></i> Ø§Ù„ØªØ§Ø±ÙŠØ®</span>
                         <span class="detail-value"><?php echo htmlspecialchars($row['date']); ?></span>
                     </div>
                 </div>
@@ -571,85 +595,85 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
     </div>
 
-    <!-- ============================= 2. ساعات العمل ============================= -->
+    <!-- ============================= 2. Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ ============================= -->
     <div class="section-block">
         <div class="section-header">
             <div class="section-header-icon"><i class="fas fa-business-time"></i></div>
-            <h4>ساعات العمل</h4>
+            <h4>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</h4>
         </div>
         <div class="cards-grid grid-4">
 
-            <!-- ساعات الوردية -->
+            <!-- Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ© -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon success"><i class="fas fa-clock"></i></div>
-                    <span class="detail-card-title">ساعات الوردية</span>
+                    <span class="detail-card-title">Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-hourglass-start"></i> ساعات الوردية</span>
+                        <span class="detail-label"><i class="fas fa-hourglass-start"></i> Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['shift_hours']); ?></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-check-circle"></i> المنفذة</span>
+                        <span class="detail-label"><i class="fas fa-check-circle"></i> Ø§Ù„Ù…Ù†ÙØ°Ø©</span>
                         <span class="detail-value"><span class="chip-success"><?php echo htmlspecialchars($row['executed_hours']); ?></span></span>
                     </div>
                 </div>
             </div>
 
-            <!-- ساعات معدات إضافية -->
+            <!-- Ø³Ø§Ø¹Ø§Øª Ù…Ø¹Ø¯Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ© -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon info"><i class="fas fa-tools"></i></div>
-                    <span class="detail-card-title">ساعات معدات إضافية</span>
+                    <span class="detail-card-title">Ø³Ø§Ø¹Ø§Øª Ù…Ø¹Ø¯Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ©</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-box"></i> الجردل</span>
+                        <span class="detail-label"><i class="fas fa-box"></i> Ø§Ù„Ø¬Ø±Ø¯Ù„</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['bucket_hours']); ?></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-wrench"></i> الجاكمر</span>
+                        <span class="detail-label"><i class="fas fa-wrench"></i> Ø§Ù„Ø¬Ø§ÙƒÙ…Ø±</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['jackhammer_hours']); ?></span>
                     </div>
                 </div>
             </div>
 
-            <!-- الساعات الإضافية -->
+            <!-- Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¥Ø¶Ø§ÙÙŠØ© -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon warning"><i class="fas fa-plus-circle"></i></div>
-                    <span class="detail-card-title">الساعات الإضافية</span>
+                    <span class="detail-card-title">Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¥Ø¶Ø§ÙÙŠØ©</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-plus"></i> إضافية</span>
+                        <span class="detail-label"><i class="fas fa-plus"></i> Ø¥Ø¶Ø§ÙÙŠØ©</span>
                         <span class="detail-value"><span class="chip-warning"><?php echo htmlspecialchars($row['extra_hours']); ?></span></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-calculator"></i> مجموع الإضافي</span>
+                        <span class="detail-label"><i class="fas fa-calculator"></i> Ù…Ø¬Ù…ÙˆØ¹ Ø§Ù„Ø¥Ø¶Ø§ÙÙŠ</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['extra_hours_total']); ?></span>
                     </div>
                 </div>
             </div>
 
-            <!-- ساعات الاستعداد -->
+            <!-- Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon primary"><i class="fas fa-pause-circle"></i></div>
-                    <span class="detail-card-title">ساعات الاستعداد</span>
+                    <span class="detail-card-title">Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-user-clock"></i> استعداد العميل</span>
+                        <span class="detail-label"><i class="fas fa-user-clock"></i> Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ø¹Ù…ÙŠÙ„</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['standby_hours']); ?></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-check-double"></i> استعداد اعتماد</span>
+                        <span class="detail-label"><i class="fas fa-check-double"></i> Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ø¹ØªÙ…Ø§Ø¯</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['dependence_hours']); ?></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-sigma"></i> مجموع ساعات العمل</span>
+                        <span class="detail-label"><i class="fas fa-sigma"></i> Ù…Ø¬Ù…ÙˆØ¹ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</span>
                         <span class="detail-value"><span class="chip-total"><?php echo htmlspecialchars($row['total_work_hours']); ?></span></span>
                     </div>
                 </div>
@@ -658,22 +682,22 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
     </div>
 
-    <!-- ============================= 3. ساعات الأعطال ============================= -->
+    <!-- ============================= 3. Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø£Ø¹Ø·Ø§Ù„ ============================= -->
     <div class="section-block">
         <div class="section-header">
             <div class="section-header-icon"><i class="fas fa-exclamation-triangle"></i></div>
-            <h4>ساعات الأعطال والتعطل</h4>
+            <h4>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø£Ø¹Ø·Ø§Ù„ ÙˆØ§Ù„ØªØ¹Ø·Ù„</h4>
         </div>
         <div class="cards-grid grid-5">
 
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon danger"><i class="fas fa-user-times"></i></div>
-                    <span class="detail-card-title">عطل HR</span>
+                    <span class="detail-card-title">Ø¹Ø·Ù„ HR</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات</span>
+                        <span class="detail-label"><i class="fas fa-clock"></i> Ø³Ø§Ø¹Ø§Øª</span>
                         <span class="detail-value"><span class="chip-danger"><?php echo htmlspecialchars($row['hr_fault']); ?></span></span>
                     </div>
                 </div>
@@ -682,11 +706,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon danger"><i class="fas fa-wrench"></i></div>
-                    <span class="detail-card-title">عطل الصيانة</span>
+                    <span class="detail-card-title">Ø¹Ø·Ù„ Ø§Ù„ØµÙŠØ§Ù†Ø©</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات</span>
+                        <span class="detail-label"><i class="fas fa-clock"></i> Ø³Ø§Ø¹Ø§Øª</span>
                         <span class="detail-value"><span class="chip-danger"><?php echo htmlspecialchars($row['maintenance_fault']); ?></span></span>
                     </div>
                 </div>
@@ -695,11 +719,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon danger"><i class="fas fa-chart-line"></i></div>
-                    <span class="detail-card-title">عطل التسويق</span>
+                    <span class="detail-card-title">Ø¹Ø·Ù„ Ø§Ù„ØªØ³ÙˆÙŠÙ‚</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات</span>
+                        <span class="detail-label"><i class="fas fa-clock"></i> Ø³Ø§Ø¹Ø§Øª</span>
                         <span class="detail-value"><span class="chip-danger"><?php echo htmlspecialchars($row['marketing_fault']); ?></span></span>
                     </div>
                 </div>
@@ -708,11 +732,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon danger"><i class="fas fa-clipboard-check"></i></div>
-                    <span class="detail-card-title">عطل الاعتماد</span>
+                    <span class="detail-card-title">Ø¹Ø·Ù„ Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات</span>
+                        <span class="detail-label"><i class="fas fa-clock"></i> Ø³Ø§Ø¹Ø§Øª</span>
                         <span class="detail-value"><span class="chip-danger"><?php echo htmlspecialchars($row['approval_fault']); ?></span></span>
                     </div>
                 </div>
@@ -721,15 +745,15 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon danger"><i class="fas fa-ellipsis-h"></i></div>
-                    <span class="detail-card-title">أعطال أخرى</span>
+                    <span class="detail-card-title">Ø£Ø¹Ø·Ø§Ù„ Ø£Ø®Ø±Ù‰</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات أخرى</span>
+                        <span class="detail-label"><i class="fas fa-clock"></i> Ø³Ø§Ø¹Ø§Øª Ø£Ø®Ø±Ù‰</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['other_fault_hours']); ?></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-sigma"></i> مجموع التعطل</span>
+                        <span class="detail-label"><i class="fas fa-sigma"></i> Ù…Ø¬Ù…ÙˆØ¹ Ø§Ù„ØªØ¹Ø·Ù„</span>
                         <span class="detail-value"><span class="chip-total"><?php echo htmlspecialchars($row['total_fault_hours']); ?></span></span>
                     </div>
                 </div>
@@ -738,19 +762,19 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
     </div>
 
-    <!-- ============================= 4. عداد الساعات ============================= -->
+    <!-- ============================= 4. Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ø³Ø§Ø¹Ø§Øª ============================= -->
     <div class="section-block">
         <div class="section-header">
             <div class="section-header-icon"><i class="fas fa-tachometer-alt"></i></div>
-            <h4>عداد الساعات</h4>
+            <h4>Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ø³Ø§Ø¹Ø§Øª</h4>
         </div>
         <div class="cards-grid grid-3">
 
-            <!-- عداد البداية -->
+            <!-- Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ© -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon info"><i class="fas fa-play-circle"></i></div>
-                    <span class="detail-card-title">عداد البداية</span>
+                    <span class="detail-card-title">Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="counter-display">
@@ -763,11 +787,11 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </div>
             </div>
 
-            <!-- عداد النهاية -->
+            <!-- Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ù†Ù‡Ø§ÙŠØ© -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon danger"><i class="fas fa-stop-circle"></i></div>
-                    <span class="detail-card-title">عداد النهاية</span>
+                    <span class="detail-card-title">Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ù†Ù‡Ø§ÙŠØ©</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="counter-display">
@@ -780,11 +804,11 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </div>
             </div>
 
-            <!-- فرق العداد -->
+            <!-- ÙØ±Ù‚ Ø§Ù„Ø¹Ø¯Ø§Ø¯ -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon success"><i class="fas fa-calculator"></i></div>
-                    <span class="detail-card-title">فرق العداد</span>
+                    <span class="detail-card-title">ÙØ±Ù‚ Ø§Ù„Ø¹Ø¯Ø§Ø¯</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row" style="padding-top: 10px; padding-bottom: 10px; justify-content: center;">
@@ -799,27 +823,27 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
     </div>
 
-    <!-- ============================= 5. تفاصيل الأعطال ============================= -->
+    <!-- ============================= 5. ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø£Ø¹Ø·Ø§Ù„ ============================= -->
     <div class="section-block">
         <div class="section-header">
             <div class="section-header-icon"><i class="fas fa-clipboard-list"></i></div>
-            <h4>تفاصيل الأعطال</h4>
+            <h4>ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</h4>
         </div>
         <div class="cards-grid grid-3">
 
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon danger"><i class="fas fa-bug"></i></div>
-                    <span class="detail-card-title">نوع العطل</span>
+                    <span class="detail-card-title">Ù†ÙˆØ¹ Ø§Ù„Ø¹Ø·Ù„</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-tag"></i> النوع</span>
+                        <span class="detail-label"><i class="fas fa-tag"></i> Ø§Ù„Ù†ÙˆØ¹</span>
                         <span class="detail-value">
                             <?php if($row['fault_type']): ?>
                                 <span class="chip-danger"><?php echo htmlspecialchars($row['fault_type']); ?></span>
                             <?php else: ?>
-                                <span class="no-data">—</span>
+                                <span class="no-data">â€”</span>
                             <?php endif; ?>
                         </span>
                     </div>
@@ -829,16 +853,16 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon danger"><i class="fas fa-cogs"></i></div>
-                    <span class="detail-card-title">الجزء المعطل</span>
+                    <span class="detail-card-title">Ø§Ù„Ø¬Ø²Ø¡ Ø§Ù„Ù…Ø¹Ø·Ù„</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-puzzle-piece"></i> الجزء</span>
+                        <span class="detail-label"><i class="fas fa-puzzle-piece"></i> Ø§Ù„Ø¬Ø²Ø¡</span>
                         <span class="detail-value">
                             <?php if($row['fault_part']): ?>
                                 <span class="chip-danger"><?php echo htmlspecialchars($row['fault_part']); ?></span>
                             <?php else: ?>
-                                <span class="no-data">—</span>
+                                <span class="no-data">â€”</span>
                             <?php endif; ?>
                         </span>
                     </div>
@@ -848,11 +872,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon danger"><i class="fas fa-file-alt"></i></div>
-                    <span class="detail-card-title">تفاصيل العطل</span>
+                    <span class="detail-card-title">ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¹Ø·Ù„</span>
                 </div>
                 <div class="detail-card-body">
                     <span class="detail-value note-text">
-                        <?php echo htmlspecialchars($row['fault_details'] ? $row['fault_details'] : 'لا توجد تفاصيل'); ?>
+                        <?php echo htmlspecialchars($row['fault_details'] ? $row['fault_details'] : 'Ù„Ø§ ØªÙˆØ¬Ø¯ ØªÙØ§ØµÙŠÙ„'); ?>
                     </span>
                 </div>
             </div>
@@ -860,53 +884,53 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
     </div>
 
-    <!-- ============================= 6. ساعات المشغل ============================= -->
+    <!-- ============================= 6. Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ø´ØºÙ„ ============================= -->
     <div class="section-block">
         <div class="section-header">
             <div class="section-header-icon"><i class="fas fa-user-clock"></i></div>
-            <h4>ساعات المشغل</h4>
+            <h4>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ø´ØºÙ„</h4>
         </div>
         <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px,1fr));">
 
-            <!-- ساعات عمل المشغل -->
+            <!-- Ø³Ø§Ø¹Ø§Øª Ø¹Ù…Ù„ Ø§Ù„Ù…Ø´ØºÙ„ -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon success"><i class="fas fa-user-check"></i></div>
-                    <span class="detail-card-title">ساعات عمل المشغل</span>
+                    <span class="detail-card-title">Ø³Ø§Ø¹Ø§Øª Ø¹Ù…Ù„ Ø§Ù„Ù…Ø´ØºÙ„</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-clock"></i> ساعات العمل</span>
+                        <span class="detail-label"><i class="fas fa-clock"></i> Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</span>
                         <span class="detail-value"><span class="chip-success"><?php echo htmlspecialchars($row['operator_hours']); ?></span></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-plus-circle"></i> ساعات إضافية</span>
+                        <span class="detail-label"><i class="fas fa-plus-circle"></i> Ø³Ø§Ø¹Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ©</span>
                         <span class="detail-value"><span class="chip-warning"><?php echo htmlspecialchars($row['extra_operator_hours']); ?></span></span>
                     </div>
                 </div>
             </div>
 
-            <!-- ساعات الاستعداد -->
+            <!-- Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ -->
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon warning"><i class="fas fa-pause-circle"></i></div>
-                    <span class="detail-card-title">ساعات الاستعداد</span>
+                    <span class="detail-card-title">Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-truck"></i> استعداد الآلية</span>
+                        <span class="detail-label"><i class="fas fa-truck"></i> Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ø¢Ù„ÙŠØ©</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['machine_standby_hours']); ?></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-wrench"></i> استعداد الجاكمر</span>
+                        <span class="detail-label"><i class="fas fa-wrench"></i> Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ø¬Ø§ÙƒÙ…Ø±</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['jackhammer_standby_hours']); ?></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-box"></i> استعداد الجردل</span>
+                        <span class="detail-label"><i class="fas fa-box"></i> Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ø¬Ø±Ø¯Ù„</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['bucket_standby_hours']); ?></span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-user-clock"></i> استعداد المشغل</span>
+                        <span class="detail-label"><i class="fas fa-user-clock"></i> Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ Ø§Ù„Ù…Ø´ØºÙ„</span>
                         <span class="detail-value mono"><?php echo htmlspecialchars($row['operator_standby_hours']); ?></span>
                     </div>
                 </div>
@@ -915,22 +939,22 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
     </div>
 
-    <!-- ============================= 7. الملاحظات ============================= -->
+    <!-- ============================= 7. Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø§Øª ============================= -->
     <div class="section-block">
         <div class="section-header">
             <div class="section-header-icon"><i class="fas fa-sticky-note"></i></div>
-            <h4>الملاحظات</h4>
+            <h4>Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø§Øª</h4>
         </div>
         <div class="cards-grid grid-3" style="grid-template-columns: repeat(auto-fit, minmax(240px,1fr));">
 
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon primary"><i class="fas fa-comment-dots"></i></div>
-                    <span class="detail-card-title">ملاحظات ساعات العمل</span>
+                    <span class="detail-card-title">Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</span>
                 </div>
                 <div class="detail-card-body">
                     <span class="detail-value note-text">
-                        <?php echo htmlspecialchars($row['work_notes'] ? $row['work_notes'] : 'لا توجد ملاحظات'); ?>
+                        <?php echo htmlspecialchars($row['work_notes'] ? $row['work_notes'] : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø§Øª'); ?>
                     </span>
                 </div>
             </div>
@@ -938,11 +962,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon danger"><i class="fas fa-comment-alt"></i></div>
-                    <span class="detail-card-title">ملاحظات ساعات التعطل</span>
+                    <span class="detail-card-title">Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø³Ø§Ø¹Ø§Øª Ø§Ù„ØªØ¹Ø·Ù„</span>
                 </div>
                 <div class="detail-card-body">
                     <span class="detail-value note-text">
-                        <?php echo htmlspecialchars($row['fault_notes'] ? $row['fault_notes'] : 'لا توجد ملاحظات'); ?>
+                        <?php echo htmlspecialchars($row['fault_notes'] ? $row['fault_notes'] : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø§Øª'); ?>
                     </span>
                 </div>
             </div>
@@ -950,11 +974,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon info"><i class="fas fa-user-edit"></i></div>
-                    <span class="detail-card-title">ملاحظات المشغل</span>
+                    <span class="detail-card-title">Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ù…Ø´ØºÙ„</span>
                 </div>
                 <div class="detail-card-body">
                     <span class="detail-value note-text">
-                        <?php echo htmlspecialchars($row['operator_notes'] ? $row['operator_notes'] : 'لا توجد ملاحظات'); ?>
+                        <?php echo htmlspecialchars($row['operator_notes'] ? $row['operator_notes'] : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø§Øª'); ?>
                     </span>
                 </div>
             </div>
@@ -962,11 +986,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon warning"><i class="fas fa-user-tie"></i></div>
-                    <span class="detail-card-title">ملاحظات مشرفي الساعات</span>
+                    <span class="detail-card-title">Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ù…Ø´Ø±ÙÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª</span>
                 </div>
                 <div class="detail-card-body">
                     <span class="detail-value note-text">
-                        <?php echo htmlspecialchars($row['time_notes'] ? $row['time_notes'] : 'لا توجد ملاحظات'); ?>
+                        <?php echo htmlspecialchars($row['time_notes'] ? $row['time_notes'] : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø§Øª'); ?>
                     </span>
                 </div>
             </div>
@@ -974,11 +998,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="detail-card">
                 <div class="detail-card-header">
                     <div class="detail-card-icon success"><i class="fas fa-clipboard"></i></div>
-                    <span class="detail-card-title">ملاحظات عامة</span>
+                    <span class="detail-card-title">Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø¹Ø§Ù…Ø©</span>
                 </div>
                 <div class="detail-card-body">
                     <span class="detail-value note-text">
-                        <?php echo htmlspecialchars($row['general_notes'] ? $row['general_notes'] : 'لا توجد ملاحظات'); ?>
+                        <?php echo htmlspecialchars($row['general_notes'] ? $row['general_notes'] : 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø§Øª'); ?>
                     </span>
                 </div>
             </div>

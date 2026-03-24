@@ -1,8 +1,77 @@
 <?php
 session_start();
+if (!isset($_SESSION['user'])) {
+    echo json_encode(['success' => false, 'message' => 'غير مصرح']);
+    exit;
+}
+
 include '../config.php';
 
 header('Content-Type: application/json; charset=utf-8');
+
+$current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$is_super_admin = ($current_role === '-1');
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    echo json_encode(['success' => false, 'message' => 'معرّف الشركة غير متوفر']);
+    exit;
+}
+
+$contracts_has_company = db_table_has_column($conn, 'contracts', 'company_id');
+$supplierscontracts_has_company = db_table_has_column($conn, 'supplierscontracts', 'company_id');
+$operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
+$project_has_company = db_table_has_column($conn, 'project', 'company_id');
+
+$project_scope_sql = '1=1';
+if (!$is_super_admin) {
+    if ($project_has_company) {
+        $project_scope_sql = "p.company_id = $company_id";
+    } else {
+        $project_scope_sql = "(
+            EXISTS (SELECT 1 FROM users su WHERE su.id = p.created_by AND su.company_id = $company_id)
+            OR EXISTS (
+                SELECT 1
+                FROM clients sc
+                JOIN users scu ON scu.id = sc.created_by
+                WHERE sc.id = p.company_client_id AND scu.company_id = $company_id
+            )
+        )";
+    }
+}
+
+$contract_scope_sql = '1=1';
+if (!$is_super_admin) {
+    if ($contracts_has_company) {
+        $contract_scope_sql = "c.company_id = $company_id";
+    } else {
+        $contract_scope_sql = $project_scope_sql;
+    }
+}
+
+$supplier_contract_scope_sql = '1=1';
+if (!$is_super_admin) {
+    if ($supplierscontracts_has_company) {
+        $supplier_contract_scope_sql = "sc.company_id = $company_id";
+    } elseif ($project_has_company) {
+        $supplier_contract_scope_sql = "EXISTS (SELECT 1 FROM project sp WHERE sp.id = sc.project_id AND sp.company_id = $company_id)";
+    } else {
+        $supplier_contract_scope_sql = "EXISTS (
+            SELECT 1
+            FROM project sp
+            WHERE sp.id = sc.project_id
+              AND (
+                  EXISTS (SELECT 1 FROM users su WHERE su.id = sp.created_by AND su.company_id = $company_id)
+                  OR EXISTS (
+                      SELECT 1
+                      FROM clients sc2
+                      JOIN users scu ON scu.id = sc2.created_by
+                      WHERE sc2.id = sp.company_client_id AND scu.company_id = $company_id
+                  )
+              )
+        )";
+    }
+}
 
 $contract_id = isset($_GET['contract_id']) ? intval($_GET['contract_id']) : 0;
 
@@ -19,7 +88,8 @@ $contract_query = "SELECT c.*, m.mine_name, m.project_id, p.name as project_name
                    FROM contracts c 
                    LEFT JOIN mines m ON c.mine_id = m.id
                    LEFT JOIN project p ON m.project_id = p.id
-                   WHERE c.id = $contract_id";
+                                     WHERE c.id = $contract_id
+                                         AND $contract_scope_sql";
 $contract_result = mysqli_query($conn, $contract_query);
 
 if (!$contract_result) {
@@ -49,6 +119,7 @@ $suppliers_query = "SELECT
 FROM supplierscontracts sc
 LEFT JOIN suppliers s ON sc.supplier_id = s.id
 WHERE sc.project_id = $project_id AND sc.status = 1
+    AND $supplier_contract_scope_sql
 ORDER BY s.name";
 
 $suppliers_result = mysqli_query($conn, $suppliers_query);
@@ -76,13 +147,13 @@ if ($suppliers_result) {
         
         while ($equip = mysqli_fetch_assoc($equip_details_result)) {
             // حساب عدد الآليات المشغّلة فعليًا من جدول operations
-            $operating_count_query = "SELECT COUNT(DISTINCT o.equipment) as operating_count
+                        $operating_count_query = "SELECT COUNT(DISTINCT o.equipment) as operating_count
                                       FROM operations o
                                       JOIN equipments e ON o.equipment = e.id
                                       WHERE e.suppliers = " . $row['supplier_id'] . "
                                         AND e.type = " . intval($equip['equip_type']) . "
                                         AND o.project_id = $project_id
-                                        AND o.status = 1";
+                                                                                AND o.status = 1" . ((!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "");
             $operating_result = mysqli_query($conn, $operating_count_query);
             $operating_row = mysqli_fetch_assoc($operating_result);
             $operating_count = intval($operating_row['operating_count']);

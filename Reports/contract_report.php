@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
 ?>
@@ -10,7 +10,7 @@ if (!isset($_SESSION['user'])) {
 <head>
 	<meta charset="UTF-8">
   	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>إيكوبيشن | تقرير العقود</title>
+	<title>Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | ØªÙ‚Ø±ÙŠØ± Ø§Ù„Ø¹Ù‚ÙˆØ¯</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/admin-style.css">
@@ -78,7 +78,7 @@ $contract_data = null;
 $monthly_stats = null;
 
 if (!empty($contract_filter)) {
-    // بيانات العقد الأساسية
+    // Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©
     $sql_info = "
     SELECT 
         c.id AS contract_id,
@@ -103,7 +103,7 @@ if (!empty($contract_filter)) {
     
     $contract_data = mysqli_fetch_assoc(mysqli_query($conn, $sql_info));
 
-    // إحصائية شهرية
+    // Ø¥Ø­ØµØ§Ø¦ÙŠØ© Ø´Ù‡Ø±ÙŠØ©
     $sql_monthly = "
     SELECT 
         YEAR(t.date) AS year,
@@ -128,54 +128,54 @@ if (!empty($contract_filter)) {
     <div class="page-header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fa-solid fa-file-contract"></i></div>
-            تقرير إحصائية العقود
+            ØªÙ‚Ø±ÙŠØ± Ø¥Ø­ØµØ§Ø¦ÙŠØ© Ø§Ù„Ø¹Ù‚ÙˆØ¯
         </h1>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="reports.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
+                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
             </a>
         </div>
     </div>
 
     <div class="card mb-4">
         <div class="card-header">
-            <h5><i class="fas fa-filter"></i> اختيار العقد</h5>
+            <h5><i class="fas fa-filter"></i> Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø¹Ù‚Ø¯</h5>
         </div>
         <div class="card-body">
             <form method="GET" class="form-grid" style="align-items:end;">
                 <div>
-                    <label><i class="fas fa-file-signature"></i> اختر العقد</label>
+                    <label><i class="fas fa-file-signature"></i> Ø§Ø®ØªØ± Ø§Ù„Ø¹Ù‚Ø¯</label>
                     <select name="contract">
-                        <option value="">-- اختر --</option>
+                        <option value="">-- Ø§Ø®ØªØ± --</option>
                         <?php while($row = mysqli_fetch_assoc($contracts)) {
                             $selected = ($contract_filter == $row['id']) ? "selected" : "";
-                            echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['project_name']}</option>";
+                            echo "<option value='{$row['id']}' $selected>Ø¹Ù‚Ø¯ #{$row['id']} - {$row['project_name']}</option>";
                         } ?>
                     </select>
                 </div>
-                <button type="submit"><i class="fa fa-eye"></i> عرض التقرير</button>
+                <button type="submit"><i class="fa fa-eye"></i> Ø¹Ø±Ø¶ Ø§Ù„ØªÙ‚Ø±ÙŠØ±</button>
             </form>
         </div>
     </div>
 
     <?php if ($contract_data) { ?>
-        <!-- تفاصيل العقد -->
+        <!-- ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¹Ù‚Ø¯ -->
         <div class="card mb-4">
             <div class="card-header">
-                <h5><i class="fas fa-thumbtack"></i> تفاصيل العقد</h5>
+                <h5><i class="fas fa-thumbtack"></i> ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¹Ù‚Ø¯</h5>
             </div>
             <div class="card-body">
                 <div class="report-summary">
-                    <div class="summary-item"><div class="label">المشروع</div><div class="value"><?php echo $contract_data['project_name']; ?></div></div>
-                    <div class="summary-item"><div class="label">تاريخ التوقيع</div><div class="value"><?php echo $contract_data['contract_signing_date']; ?></div></div>
-                    <div class="summary-item"><div class="label">مدة العقد</div><div class="value"><?php echo $contract_data['contract_duration_months']; ?> شهور</div></div>
-                    <div class="summary-item"><div class="label">الهدف الشهري</div><div class="value"><?php echo $contract_data['hours_monthly_target']; ?></div></div>
-                    <div class="summary-item"><div class="label">إجمالي الساعات المتوقعة</div><div class="value"><?php echo $contract_data['forecasted_contracted_hours']; ?></div></div>
-                    <div class="summary-item"><div class="label">المنفذ فعلياً</div><div class="value"><?php echo $contract_data['actual_hours']; ?></div></div>
-                    <div class="summary-item"><div class="label">المتبقي</div><div class="value"><?php echo $contract_data['remaining_hours']; ?></div></div>
+                    <div class="summary-item"><div class="label">Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</div><div class="value"><?php echo $contract_data['project_name']; ?></div></div>
+                    <div class="summary-item"><div class="label">ØªØ§Ø±ÙŠØ® Ø§Ù„ØªÙˆÙ‚ÙŠØ¹</div><div class="value"><?php echo $contract_data['contract_signing_date']; ?></div></div>
+                    <div class="summary-item"><div class="label">Ù…Ø¯Ø© Ø§Ù„Ø¹Ù‚Ø¯</div><div class="value"><?php echo $contract_data['contract_duration_months']; ?> Ø´Ù‡ÙˆØ±</div></div>
+                    <div class="summary-item"><div class="label">Ø§Ù„Ù‡Ø¯Ù Ø§Ù„Ø´Ù‡Ø±ÙŠ</div><div class="value"><?php echo $contract_data['hours_monthly_target']; ?></div></div>
+                    <div class="summary-item"><div class="label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…ØªÙˆÙ‚Ø¹Ø©</div><div class="value"><?php echo $contract_data['forecasted_contracted_hours']; ?></div></div>
+                    <div class="summary-item"><div class="label">Ø§Ù„Ù…Ù†ÙØ° ÙØ¹Ù„ÙŠØ§Ù‹</div><div class="value"><?php echo $contract_data['actual_hours']; ?></div></div>
+                    <div class="summary-item"><div class="label">Ø§Ù„Ù…ØªØ¨Ù‚ÙŠ</div><div class="value"><?php echo $contract_data['remaining_hours']; ?></div></div>
                 </div>
                 <div class="report-progress">
-                    <div style="font-weight:700; margin-bottom:8px; color:#0c1c3e;">نسبة الإنجاز الكلية</div>
+                    <div style="font-weight:700; margin-bottom:8px; color:#0c1c3e;">Ù†Ø³Ø¨Ø© Ø§Ù„Ø¥Ù†Ø¬Ø§Ø² Ø§Ù„ÙƒÙ„ÙŠØ©</div>
                         <?php 
                         $overall_percent = ($contract_data['forecasted_contracted_hours'] > 0) 
                             ? round(($contract_data['actual_hours'] / $contract_data['forecasted_contracted_hours']) * 100, 2) 
@@ -198,20 +198,20 @@ if (!empty($contract_filter)) {
             </div>
         </div>
 
-        <!-- الأداء الشهري -->
+        <!-- Ø§Ù„Ø£Ø¯Ø§Ø¡ Ø§Ù„Ø´Ù‡Ø±ÙŠ -->
         <div class="card mb-4">
             <div class="card-header">
-                <h5><i class="fas fa-chart-column"></i> الأداء الشهري</h5>
+                <h5><i class="fas fa-chart-column"></i> Ø§Ù„Ø£Ø¯Ø§Ø¡ Ø§Ù„Ø´Ù‡Ø±ÙŠ</h5>
             </div>
             <div class="card-body table-responsive">
                 <table class="table table-bordered text-center align-middle">
                     <thead>
                         <tr>
-                            <th>السنة</th>
-                            <th>الشهر</th>
-                            <th>المنفذ</th>
-                            <th>الهدف الشهري</th>
-                            <th>نسبة الإنجاز</th>
+                            <th>Ø§Ù„Ø³Ù†Ø©</th>
+                            <th>Ø§Ù„Ø´Ù‡Ø±</th>
+                            <th>Ø§Ù„Ù…Ù†ÙØ°</th>
+                            <th>Ø§Ù„Ù‡Ø¯Ù Ø§Ù„Ø´Ù‡Ø±ÙŠ</th>
+                            <th>Ù†Ø³Ø¨Ø© Ø§Ù„Ø¥Ù†Ø¬Ø§Ø²</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -259,10 +259,10 @@ if (!empty($contract_filter)) {
             </div>
         </div>
 
-        <!-- الرسم البياني -->
+        <!-- Ø§Ù„Ø±Ø³Ù… Ø§Ù„Ø¨ÙŠØ§Ù†ÙŠ -->
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-chart-line"></i> الرسم البياني</h5>
+                <h5><i class="fas fa-chart-line"></i> Ø§Ù„Ø±Ø³Ù… Ø§Ù„Ø¨ÙŠØ§Ù†ÙŠ</h5>
             </div>
             <div class="card-body">
                 <canvas id="chart" height="100"></canvas>
@@ -277,17 +277,17 @@ if (!empty($contract_filter)) {
                 labels: <?php echo json_encode($labels); ?>,
                 datasets: [
                     {
-                        label: 'المنفذ',
+                        label: 'Ø§Ù„Ù…Ù†ÙØ°',
                         data: <?php echo json_encode($actual); ?>,
                         backgroundColor: 'rgba(37, 99, 235, 0.75)'
                     },
                     {
-                        label: 'الهدف الشهري',
+                        label: 'Ø§Ù„Ù‡Ø¯Ù Ø§Ù„Ø´Ù‡Ø±ÙŠ',
                         data: <?php echo json_encode($target); ?>,
                         backgroundColor: 'rgba(232, 184, 0, 0.75)'
                     },
                     {
-                        label: 'نسبة الإنجاز (%)',
+                        label: 'Ù†Ø³Ø¨Ø© Ø§Ù„Ø¥Ù†Ø¬Ø§Ø² (%)',
                         data: <?php echo json_encode($percentages); ?>,
                         type: 'line',
                         borderColor: '#0c1c3e',
@@ -300,12 +300,12 @@ if (!empty($contract_filter)) {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        title: { display: true, text: 'ساعات' }
+                        title: { display: true, text: 'Ø³Ø§Ø¹Ø§Øª' }
                     },
                     percentage: {
                         beginAtZero: true,
                         position: 'right',
-                        title: { display: true, text: 'نسبة الإنجاز %' },
+                        title: { display: true, text: 'Ù†Ø³Ø¨Ø© Ø§Ù„Ø¥Ù†Ø¬Ø§Ø² %' },
                         ticks: { callback: (value) => value + "%" }
                     }
                 }
@@ -319,3 +319,4 @@ if (!empty($contract_filter)) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

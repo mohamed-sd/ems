@@ -6,6 +6,30 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 
+$is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    die(json_encode(['error' => 'Unauthorized company context']));
+}
+
+$tenant_scope = "";
+if (!$is_super_admin) {
+    if (db_table_has_column($conn, 'timesheet', 'company_id')) {
+        $tenant_scope = " AND t.company_id = $company_id";
+    } else {
+        $tenant_scope = " AND EXISTS (
+            SELECT 1
+            FROM project p2
+            LEFT JOIN users su2 ON su2.id = p2.created_by
+            LEFT JOIN clients sc2 ON sc2.id = p2.company_client_id
+            LEFT JOIN users scu2 ON scu2.id = sc2.created_by
+            WHERE p2.id = o.project_id
+              AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
+        )";
+    }
+}
+
 // Get parameters from DataTable
 $draw = isset($_GET['draw']) ? intval($_GET['draw']) : 1;
 $start = isset($_GET['start']) ? intval($_GET['start']) : 0;
@@ -23,7 +47,7 @@ $orderDir = isset($_GET['order'][0]['dir']) && $_GET['order'][0]['dir'] === 'asc
 $orderColumn = isset($columns[$orderColumnIndex]) ? $columns[$orderColumnIndex] : 't.id';
 
 // Build WHERE clause
-$where = "WHERE t.type LIKE '$type'";
+$where = "WHERE t.type LIKE '$type'" . $tenant_scope;
 
 if ($_SESSION['user']['role'] == "6") {
     $user_filter = $_SESSION['user']['id'];
@@ -46,7 +70,7 @@ $totalQuery = "SELECT COUNT(*) as total
                JOIN equipments e ON o.equipment = e.id
                JOIN project p ON o.project_id = p.id
                JOIN drivers d ON t.driver = d.id
-               WHERE t.type LIKE '$type'";
+               WHERE t.type LIKE '$type'" . $tenant_scope;
 
 if ($_SESSION['user']['role'] == "6") {
     $totalQuery .= " AND t.user_id = '$user_filter'";

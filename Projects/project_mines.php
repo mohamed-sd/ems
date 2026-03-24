@@ -1,14 +1,14 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
 
 include '../config.php';
 require_once '../includes/permissions_helper.php';
 
-// 🔐 التحقق من صلاحيات المستخدم
+// ðŸ” Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…
 $page_permissions = check_page_permissions($conn, 'Projects/project_mines.php');
 $can_view = $page_permissions['can_view'];
 $can_add = $page_permissions['can_add'];
@@ -16,36 +16,36 @@ $can_edit = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 
 if (!$can_view) {
-    header("Location: ../index.php?msg=لا+توجد+صلاحية+عرض+المناجم+❌");
+    header("Location: ../login.php?msg=Ù„Ø§+ØªÙˆØ¬Ø¯+ØµÙ„Ø§Ø­ÙŠØ©+Ø¹Ø±Ø¶+Ø§Ù„Ù…Ù†Ø§Ø¬Ù…+âŒ");
     exit();
 }
 
-// الحصول على معرف المشروع من URL
+// Ø§Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ù…Ø¹Ø±Ù Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ù…Ù† URL
 $project_id = isset($_GET['project_id']) ? intval($_GET['project_id']) : 0;
 
 if ($project_id <= 0) {
-    header("Location: oprationprojects.php");
+    header("Location: projects.php");
     exit();
 }
 
-// جلب بيانات المشروع
+// Ø¬Ù„Ø¨ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
 $project_query = "SELECT * FROM project WHERE id = $project_id LIMIT 1";
 $project_result = mysqli_query($conn, $project_query);
 $project = mysqli_fetch_assoc($project_result);
 
 if (!$project) {
-    die("المشروع غير موجود");
+    die("Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯");
 }
 
-// معالجة إضافة/تعديل منجم عبر POST (بدون AJAX)
+// Ù…Ø¹Ø§Ù„Ø¬Ø© Ø¥Ø¶Ø§ÙØ©/ØªØ¹Ø¯ÙŠÙ„ Ù…Ù†Ø¬Ù… Ø¹Ø¨Ø± POST (Ø¨Ø¯ÙˆÙ† AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
     $mine_id = isset($_POST['mine_id']) ? intval($_POST['mine_id']) : 0;
 
     if ($mine_id > 0 && !$can_edit) {
-        header("Location: project_mines.php?project_id=$project_id&msg=لا+توجد+صلاحية+تعديل+المناجم+❌");
+        header("Location: project_mines.php?project_id=$project_id&msg=Ù„Ø§+ØªÙˆØ¬Ø¯+ØµÙ„Ø§Ø­ÙŠØ©+ØªØ¹Ø¯ÙŠÙ„+Ø§Ù„Ù…Ù†Ø§Ø¬Ù…+âŒ");
         exit();
     } elseif ($mine_id <= 0 && !$can_add) {
-        header("Location: project_mines.php?project_id=$project_id&msg=لا+توجد+صلاحية+إضافة+مناجم+جديدة+❌");
+        header("Location: project_mines.php?project_id=$project_id&msg=Ù„Ø§+ØªÙˆØ¬Ø¯+ØµÙ„Ø§Ø­ÙŠØ©+Ø¥Ø¶Ø§ÙØ©+Ù…Ù†Ø§Ø¬Ù…+Ø¬Ø¯ÙŠØ¯Ø©+âŒ");
         exit();
     }
 
@@ -65,12 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
     $notes = mysqli_real_escape_string($conn, trim($_POST['notes']));
 
     if ($mine_id > 0) {
-        // تعديل منجم موجود
+        // ØªØ¹Ø¯ÙŠÙ„ Ù…Ù†Ø¬Ù… Ù…ÙˆØ¬ÙˆØ¯
         $check_query = "SELECT id FROM mines WHERE mine_code = '$mine_code' AND id != $mine_id";
         $check_result = mysqli_query($conn, $check_query);
 
         if (mysqli_num_rows($check_result) > 0) {
-            header("Location: project_mines.php?project_id=$project_id&msg=كود+المنجم+موجود+مسبقاً❌");
+            header("Location: project_mines.php?project_id=$project_id&msg=ÙƒÙˆØ¯+Ø§Ù„Ù…Ù†Ø¬Ù…+Ù…ÙˆØ¬ÙˆØ¯+Ù…Ø³Ø¨Ù‚Ø§Ù‹âŒ");
             exit();
         }
 
@@ -95,19 +95,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
             WHERE id = $mine_id AND project_id = $project_id";
         
         if (mysqli_query($conn, $update_query)) {
-            header("Location: project_mines.php?project_id=$project_id&msg=تم+تعديل+المنجم+بنجاح+✅");
+            header("Location: project_mines.php?project_id=$project_id&msg=ØªÙ…+ØªØ¹Ø¯ÙŠÙ„+Ø§Ù„Ù…Ù†Ø¬Ù…+Ø¨Ù†Ø¬Ø§Ø­+âœ…");
             exit();
         } else {
-            header("Location: project_mines.php?project_id=$project_id&msg=حدث+خطأ+أثناء+التعديل+❌");
+            header("Location: project_mines.php?project_id=$project_id&msg=Ø­Ø¯Ø«+Ø®Ø·Ø£+Ø£Ø«Ù†Ø§Ø¡+Ø§Ù„ØªØ¹Ø¯ÙŠÙ„+âŒ");
             exit();
         }
     } else {
-        // إضافة منجم جديد
+        // Ø¥Ø¶Ø§ÙØ© Ù…Ù†Ø¬Ù… Ø¬Ø¯ÙŠØ¯
         $check_query = "SELECT id FROM mines WHERE mine_code = '$mine_code'";
         $check_result = mysqli_query($conn, $check_query);
 
         if (mysqli_num_rows($check_result) > 0) {
-            header("Location: project_mines.php?project_id=$project_id&msg=كود+المنجم+موجود+مسبقاً❌");
+            header("Location: project_mines.php?project_id=$project_id&msg=ÙƒÙˆØ¯+Ø§Ù„Ù…Ù†Ø¬Ù…+Ù…ÙˆØ¬ÙˆØ¯+Ù…Ø³Ø¨Ù‚Ø§Ù‹âŒ");
             exit();
         }
 
@@ -125,19 +125,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
              $mining_depth_value, '$contract_nature', $status, '$notes', $created_by)";
 
         if (mysqli_query($conn, $insert_query)) {
-            header("Location: project_mines.php?project_id=$project_id&msg=تم+إضافة+المنجم+بنجاح+✅");
+            header("Location: project_mines.php?project_id=$project_id&msg=ØªÙ…+Ø¥Ø¶Ø§ÙØ©+Ø§Ù„Ù…Ù†Ø¬Ù…+Ø¨Ù†Ø¬Ø§Ø­+âœ…");
             exit();
         } else {
-            header("Location: project_mines.php?project_id=$project_id&msg=حدث+خطأ+أثناء+الإضافة+❌");
+            header("Location: project_mines.php?project_id=$project_id&msg=Ø­Ø¯Ø«+Ø®Ø·Ø£+Ø£Ø«Ù†Ø§Ø¡+Ø§Ù„Ø¥Ø¶Ø§ÙØ©+âŒ");
             exit();
         }
     }
 }
 
-// حذف منجم
+// Ø­Ø°Ù Ù…Ù†Ø¬Ù…
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     if (!$can_delete) {
-        header("Location: project_mines.php?project_id=$project_id&msg=لا+توجد+صلاحية+حذف+المناجم+❌");
+        header("Location: project_mines.php?project_id=$project_id&msg=Ù„Ø§+ØªÙˆØ¬Ø¯+ØµÙ„Ø§Ø­ÙŠØ©+Ø­Ø°Ù+Ø§Ù„Ù…Ù†Ø§Ø¬Ù…+âŒ");
         exit();
     }
 
@@ -145,14 +145,14 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $delete_query = "DELETE FROM mines WHERE id = $mine_id AND project_id = $project_id";
 
     if (mysqli_query($conn, $delete_query)) {
-        echo "<script>alert('تم حذف المنجم بنجاح'); window.location.href='project_mines.php?project_id=$project_id';</script>";
+        echo "<script>alert('ØªÙ… Ø­Ø°Ù Ø§Ù„Ù…Ù†Ø¬Ù… Ø¨Ù†Ø¬Ø§Ø­'); window.location.href='project_mines.php?project_id=$project_id';</script>";
     } else {
-        echo "<script>alert('حدث خطأ أثناء الحذف'); window.location.href='project_mines.php?project_id=$project_id';</script>";
+        echo "<script>alert('Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø­Ø°Ù'); window.location.href='project_mines.php?project_id=$project_id';</script>";
     }
     exit();
 }
 
-$page_title = "المناجم - " . $project['name'];
+$page_title = "Ø§Ù„Ù…Ù†Ø§Ø¬Ù… - " . $project['name'];
 include '../inheader.php';
 // include '../insidebar.php';
 ?>
@@ -364,22 +364,22 @@ include '../inheader.php';
     <div class="page-header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-mountain"></i></div>
-            إدارة المناجم - <?php echo htmlspecialchars($project['name']); ?>
+            Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ù†Ø§Ø¬Ù… - <?php echo htmlspecialchars($project['name']); ?>
         </h1>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="oprationprojects.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
+            <a href="projects.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
             </a>
             <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fas fa-plus-circle"></i> إضافة منجم جديد
+                <i class="fas fa-plus-circle"></i> Ø¥Ø¶Ø§ÙØ© Ù…Ù†Ø¬Ù… Ø¬Ø¯ÙŠØ¯
             </a>
             <?php endif; ?>
         </div>
     </div>
 
     <?php if (!empty($_GET['msg'])):
-        $isSuccess = strpos($_GET['msg'], '✅') !== false;
+        $isSuccess = strpos($_GET['msg'], 'âœ…') !== false;
     ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
@@ -387,106 +387,106 @@ include '../inheader.php';
         </div>
     <?php endif; ?>
 
-    <!-- فورم إضافة / تعديل منجم -->
+    <!-- ÙÙˆØ±Ù… Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ Ù…Ù†Ø¬Ù… -->
     <?php if ($can_add || $can_edit): ?>
     <form id="mineForm" action="" method="post" style="display:none; margin-bottom:20px;">
         <div class="card shadow-sm">
             <div class="card-header">
-                <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة منجم جديد</span></h5>
+                <h5><i class="fas fa-edit"></i> <span id="formTitle">Ø¥Ø¶Ø§ÙØ© Ù…Ù†Ø¬Ù… Ø¬Ø¯ÙŠØ¯</span></h5>
             </div>
             <div class="card-body">
                 <input type="hidden" name="mine_id" id="mine_id" value="">
                 <div class="form-grid">
                     <div>
-                        <label><i class="fas fa-barcode"></i> كود المنجم *</label>
-                        <input type="text" name="mine_code" id="mine_code" placeholder="مثال: MINE-001" required />
+                        <label><i class="fas fa-barcode"></i> ÙƒÙˆØ¯ Ø§Ù„Ù…Ù†Ø¬Ù… *</label>
+                        <input type="text" name="mine_code" id="mine_code" placeholder="Ù…Ø«Ø§Ù„: MINE-001" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-mountain"></i> اسم المنجم *</label>
-                        <input type="text" name="mine_name" id="mine_name" placeholder="أدخل اسم المنجم" required />
+                        <label><i class="fas fa-mountain"></i> Ø§Ø³Ù… Ø§Ù„Ù…Ù†Ø¬Ù… *</label>
+                        <input type="text" name="mine_name" id="mine_name" placeholder="Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø§Ù„Ù…Ù†Ø¬Ù…" required />
                     </div>
                     <div>
-                        <label><i class="fas fa-user-tie"></i> اسم مدير المنجم</label>
-                        <input type="text" name="manager_name" id="manager_name" placeholder="أدخل اسم المدير" />
+                        <label><i class="fas fa-user-tie"></i> Ø§Ø³Ù… Ù…Ø¯ÙŠØ± Ø§Ù„Ù…Ù†Ø¬Ù…</label>
+                        <input type="text" name="manager_name" id="manager_name" placeholder="Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø§Ù„Ù…Ø¯ÙŠØ±" />
                     </div>
                     <div>
-                        <label><i class="fas fa-gem"></i> نوع المعدن</label>
-                        <input type="text" name="mineral_type" id="mineral_type" placeholder="مثال: ذهب، فضة، نحاس" />
+                        <label><i class="fas fa-gem"></i> Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ù†</label>
+                        <input type="text" name="mineral_type" id="mineral_type" placeholder="Ù…Ø«Ø§Ù„: Ø°Ù‡Ø¨ØŒ ÙØ¶Ø©ØŒ Ù†Ø­Ø§Ø³" />
                     </div>
                     <div>
-                        <label><i class="fas fa-industry"></i> نوع المنجم *</label>
+                        <label><i class="fas fa-industry"></i> Ù†ÙˆØ¹ Ø§Ù„Ù…Ù†Ø¬Ù… *</label>
                         <select name="mine_type" id="mine_type" required onchange="toggleOtherField('mine_type')">
-                            <option value="">-- اختر --</option>
-                            <option value="حفرة مفتوحة">حفرة مفتوحة</option>
-                            <option value="تحت أرضي">تحت أرضي</option>
-                            <option value="آبار">آبار</option>
-                            <option value="مهجور">مهجور</option>
-                            <option value="مجمع معالجة/تركيز">مجمع معالجة/تركيز</option>
-                            <option value="موقع تخزين/مستودع">موقع تخزين/مستودع</option>
-                            <option value="أخرى">أخرى</option>
+                            <option value="">-- Ø§Ø®ØªØ± --</option>
+                            <option value="Ø­ÙØ±Ø© Ù…ÙØªÙˆØ­Ø©">Ø­ÙØ±Ø© Ù…ÙØªÙˆØ­Ø©</option>
+                            <option value="ØªØ­Øª Ø£Ø±Ø¶ÙŠ">ØªØ­Øª Ø£Ø±Ø¶ÙŠ</option>
+                            <option value="Ø¢Ø¨Ø§Ø±">Ø¢Ø¨Ø§Ø±</option>
+                            <option value="Ù…Ù‡Ø¬ÙˆØ±">Ù…Ù‡Ø¬ÙˆØ±</option>
+                            <option value="Ù…Ø¬Ù…Ø¹ Ù…Ø¹Ø§Ù„Ø¬Ø©/ØªØ±ÙƒÙŠØ²">Ù…Ø¬Ù…Ø¹ Ù…Ø¹Ø§Ù„Ø¬Ø©/ØªØ±ÙƒÙŠØ²</option>
+                            <option value="Ù…ÙˆÙ‚Ø¹ ØªØ®Ø²ÙŠÙ†/Ù…Ø³ØªÙˆØ¯Ø¹">Ù…ÙˆÙ‚Ø¹ ØªØ®Ø²ÙŠÙ†/Ù…Ø³ØªÙˆØ¯Ø¹</option>
+                            <option value="Ø£Ø®Ø±Ù‰">Ø£Ø®Ø±Ù‰</option>
                         </select>
                     </div>
                     <div id="mine_type_other_div" style="display: none;">
-                        <label><i class="fas fa-info-circle"></i> تفاصيل نوع المنجم</label>
+                        <label><i class="fas fa-info-circle"></i> ØªÙØ§ØµÙŠÙ„ Ù†ÙˆØ¹ Ø§Ù„Ù…Ù†Ø¬Ù…</label>
                         <input type="text" name="mine_type_other" id="mine_type_other" />
                     </div>
                     <div>
-                        <label><i class="fas fa-building"></i> نوع الملكية *</label>
+                        <label><i class="fas fa-building"></i> Ù†ÙˆØ¹ Ø§Ù„Ù…Ù„ÙƒÙŠØ© *</label>
                         <select name="ownership_type" id="ownership_type" required onchange="toggleOtherField('ownership_type')">
-                            <option value="">-- اختر --</option>
-                            <option value="تعدين أهلي/تقليدي">تعدين أهلي/تقليدي</option>
-                            <option value="شركة سودانية خاصة">شركة سودانية خاصة</option>
-                            <option value="شركة حكومية/قطاع عام">شركة حكومية/قطاع عام</option>
-                            <option value="شركة أجنبية">شركة أجنبية</option>
-                            <option value="مشروع مشترك (سوداني-أجنبي)">مشروع مشترك (سوداني-أجنبي)</option>
-                            <option value="أخرى">أخرى</option>
+                            <option value="">-- Ø§Ø®ØªØ± --</option>
+                            <option value="ØªØ¹Ø¯ÙŠÙ† Ø£Ù‡Ù„ÙŠ/ØªÙ‚Ù„ÙŠØ¯ÙŠ">ØªØ¹Ø¯ÙŠÙ† Ø£Ù‡Ù„ÙŠ/ØªÙ‚Ù„ÙŠØ¯ÙŠ</option>
+                            <option value="Ø´Ø±ÙƒØ© Ø³ÙˆØ¯Ø§Ù†ÙŠØ© Ø®Ø§ØµØ©">Ø´Ø±ÙƒØ© Ø³ÙˆØ¯Ø§Ù†ÙŠØ© Ø®Ø§ØµØ©</option>
+                            <option value="Ø´Ø±ÙƒØ© Ø­ÙƒÙˆÙ…ÙŠØ©/Ù‚Ø·Ø§Ø¹ Ø¹Ø§Ù…">Ø´Ø±ÙƒØ© Ø­ÙƒÙˆÙ…ÙŠØ©/Ù‚Ø·Ø§Ø¹ Ø¹Ø§Ù…</option>
+                            <option value="Ø´Ø±ÙƒØ© Ø£Ø¬Ù†Ø¨ÙŠØ©">Ø´Ø±ÙƒØ© Ø£Ø¬Ù†Ø¨ÙŠØ©</option>
+                            <option value="Ù…Ø´Ø±ÙˆØ¹ Ù…Ø´ØªØ±Ùƒ (Ø³ÙˆØ¯Ø§Ù†ÙŠ-Ø£Ø¬Ù†Ø¨ÙŠ)">Ù…Ø´Ø±ÙˆØ¹ Ù…Ø´ØªØ±Ùƒ (Ø³ÙˆØ¯Ø§Ù†ÙŠ-Ø£Ø¬Ù†Ø¨ÙŠ)</option>
+                            <option value="Ø£Ø®Ø±Ù‰">Ø£Ø®Ø±Ù‰</option>
                         </select>
                     </div>
                     <div id="ownership_type_other_div" style="display: none;">
-                        <label><i class="fas fa-info-circle"></i> تفاصيل نوع الملكية</label>
+                        <label><i class="fas fa-info-circle"></i> ØªÙØ§ØµÙŠÙ„ Ù†ÙˆØ¹ Ø§Ù„Ù…Ù„ÙƒÙŠØ©</label>
                         <input type="text" name="ownership_type_other" id="ownership_type_other" />
                     </div>
                     <div>
-                        <label><i class="fas fa-ruler-combined"></i> مساحة المنجم</label>
+                        <label><i class="fas fa-ruler-combined"></i> Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ù…Ù†Ø¬Ù…</label>
                         <input type="number" step="0.01" name="mine_area" id="mine_area" placeholder="0.00" />
                     </div>
                     <div>
-                        <label><i class="fas fa-arrows-alt-v"></i> وحدة قياس المساحة</label>
+                        <label><i class="fas fa-arrows-alt-v"></i> ÙˆØ­Ø¯Ø© Ù‚ÙŠØ§Ø³ Ø§Ù„Ù…Ø³Ø§Ø­Ø©</label>
                         <select name="mine_area_unit" id="mine_area_unit">
-                            <option value="هكتار">هكتار</option>
-                            <option value="كم²">كم²</option>
+                            <option value="Ù‡ÙƒØªØ§Ø±">Ù‡ÙƒØªØ§Ø±</option>
+                            <option value="ÙƒÙ…Â²">ÙƒÙ…Â²</option>
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-height"></i> عمق التعدين (متر)</label>
+                        <label><i class="fas fa-height"></i> Ø¹Ù…Ù‚ Ø§Ù„ØªØ¹Ø¯ÙŠÙ† (Ù…ØªØ±)</label>
                         <input type="number" step="0.01" name="mining_depth" id="mining_depth" placeholder="0.00" />
                     </div>
                     <div>
-                        <label><i class="fas fa-file-signature"></i> طبيعة التعاقد</label>
+                        <label><i class="fas fa-file-signature"></i> Ø·Ø¨ÙŠØ¹Ø© Ø§Ù„ØªØ¹Ø§Ù‚Ø¯</label>
                         <select name="contract_nature" id="contract_nature">
-                            <option value="">-- اختر --</option>
-                            <option value="موظف مباشر لدى المالك">موظف مباشر لدى المالك</option>
-                            <option value="مقاول/شركة مقاولات">مقاول/شركة مقاولات</option>
+                            <option value="">-- Ø§Ø®ØªØ± --</option>
+                            <option value="Ù…ÙˆØ¸Ù Ù…Ø¨Ø§Ø´Ø± Ù„Ø¯Ù‰ Ø§Ù„Ù…Ø§Ù„Ùƒ">Ù…ÙˆØ¸Ù Ù…Ø¨Ø§Ø´Ø± Ù„Ø¯Ù‰ Ø§Ù„Ù…Ø§Ù„Ùƒ</option>
+                            <option value="Ù…Ù‚Ø§ÙˆÙ„/Ø´Ø±ÙƒØ© Ù…Ù‚Ø§ÙˆÙ„Ø§Øª">Ù…Ù‚Ø§ÙˆÙ„/Ø´Ø±ÙƒØ© Ù…Ù‚Ø§ÙˆÙ„Ø§Øª</option>
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-toggle-on"></i> الحالة *</label>
+                        <label><i class="fas fa-toggle-on"></i> Ø§Ù„Ø­Ø§Ù„Ø© *</label>
                         <select name="status" id="status" required>
-                            <option value="1">نشط ✅</option>
-                            <option value="0">غير نشط</option>
+                            <option value="1">Ù†Ø´Ø· âœ…</option>
+                            <option value="0">ØºÙŠØ± Ù†Ø´Ø·</option>
                         </select>
                     </div>
                 </div>
                 <div>
-                    <label><i class="fas fa-sticky-note"></i> ملاحظات إضافية</label>
-                    <textarea name="notes" id="notes" placeholder="أي معلومات إضافية عن المنجم..." style="width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: var(--radius); font-family: 'Cairo', sans-serif; resize: vertical; min-height: 100px;"></textarea>
+                    <label><i class="fas fa-sticky-note"></i> Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ©</label>
+                    <textarea name="notes" id="notes" placeholder="Ø£ÙŠ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ© Ø¹Ù† Ø§Ù„Ù…Ù†Ø¬Ù…..." style="width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: var(--radius); font-family: 'Cairo', sans-serif; resize: vertical; min-height: 100px;"></textarea>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
                     <button type="submit" style="background: linear-gradient(135deg, var(--navy), var(--navy-l)); color: #fff; padding: 12px 20px; border: none; border-radius: var(--radius); cursor: pointer; font-size: 1rem; font-weight: 800; flex: 1;">
-                        <i class="fas fa-save"></i> حفظ البيانات
+                        <i class="fas fa-save"></i> Ø­ÙØ¸ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
                     </button>
                     <button type="button" onclick="toggleForm()" style="background: #dc3545; color: #fff; padding: 12px 20px; border: none; border-radius: var(--radius); cursor: pointer; font-size: 1rem; font-weight: 800;">
-                        <i class="fas fa-times"></i> إلغاء
+                        <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
                     </button>
                 </div>
             </div>
@@ -494,24 +494,24 @@ include '../inheader.php';
     </form>
     <?php endif; ?>
             <div class="card-header">
-                <h5><i class="fas fa-list-alt"></i> قائمة المناجم</h5>
+                <h5><i class="fas fa-list-alt"></i> Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ù…Ù†Ø§Ø¬Ù…</h5>
             </div>
             <div class="card-body" style="overflow-x: auto;">
                 <table id="minesTable" class="display nowrap" style="width:100%; margin-top: 10px;">
           <thead>
                 <tr>
                     <th>#</th>
-                    <th>كود المنجم</th>
-                    <th>اسم المنجم</th>
-                    <th>المدير</th>
-                    <th>المعدن</th>
-                    <th>نوع المنجم</th>
-                    <th>المساحة</th>
-                    <th>العمق (م)</th>
-                    <th> عدد العقود </th>
-                    <th> العقود </th>
-                    <th>الحالة</th>
-                    <th>الإجراءات</th>
+                    <th>ÙƒÙˆØ¯ Ø§Ù„Ù…Ù†Ø¬Ù…</th>
+                    <th>Ø§Ø³Ù… Ø§Ù„Ù…Ù†Ø¬Ù…</th>
+                    <th>Ø§Ù„Ù…Ø¯ÙŠØ±</th>
+                    <th>Ø§Ù„Ù…Ø¹Ø¯Ù†</th>
+                    <th>Ù†ÙˆØ¹ Ø§Ù„Ù…Ù†Ø¬Ù…</th>
+                    <th>Ø§Ù„Ù…Ø³Ø§Ø­Ø©</th>
+                    <th>Ø§Ù„Ø¹Ù…Ù‚ (Ù…)</th>
+                    <th> Ø¹Ø¯Ø¯ Ø§Ù„Ø¹Ù‚ÙˆØ¯ </th>
+                    <th> Ø§Ù„Ø¹Ù‚ÙˆØ¯ </th>
+                    <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+                    <th>Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th>
                 </tr>
             </thead>
             <tbody>
@@ -522,15 +522,15 @@ include '../inheader.php';
 
                 while ($mine = mysqli_fetch_assoc($mines_result)) {
                     $status_badge = $mine['status'] == 1 ?
-                        '<span class="status-active">نشط</span>' :
-                        '<span class="status-inactive">غير نشط</span>';
+                        '<span class="status-active">Ù†Ø´Ø·</span>' :
+                        '<span class="status-inactive">ØºÙŠØ± Ù†Ø´Ø·</span>';
 
                     $area_display = $mine['mine_area'] ?
                         number_format($mine['mine_area'], 2) . ' ' . $mine['mine_area_unit'] :
                         '-';
 
                     $depth_display = $mine['mining_depth'] ?
-                        number_format($mine['mining_depth'], 2) . ' م' :
+                        number_format($mine['mining_depth'], 2) . ' Ù…' :
                         '-';
 
                     echo "<tr>";
@@ -542,7 +542,7 @@ include '../inheader.php';
                     echo "<td>{$mine['mine_type']}</td>";
                     echo "<td>{$area_display}</td>";
                     echo "<td>{$depth_display}</td>";
-                    // جلب عدد العقود المرتبطة بالمنجم  
+                    // Ø¬Ù„Ø¨ Ø¹Ø¯Ø¯ Ø§Ù„Ø¹Ù‚ÙˆØ¯ Ø§Ù„Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ù…Ù†Ø¬Ù…  
                     $contracts_count_query = "SELECT COUNT(*) AS contract_count FROM contracts WHERE mine_id = " . $mine['id'];
                     $contracts_count_result = mysqli_query($conn, $contracts_count_query);
                     $contracts_count = mysqli_fetch_assoc($contracts_count_result)['contract_count'];
@@ -550,25 +550,25 @@ include '../inheader.php';
                     echo "<td> 
                      <a href='../Contracts/contracts.php?id=" . $mine['id'] . "' 
                                class='action-btn contracts'
-                               title='عرض عقود المنجم'>
+                               title='Ø¹Ø±Ø¶ Ø¹Ù‚ÙˆØ¯ Ø§Ù„Ù…Ù†Ø¬Ù…'>
                                <i class='fas fa-file-contract'></i>
                             </a>
                     </td>";
                     echo "<td>{$status_badge}</td>";
                     echo "<td>
                             <div class='action-btns'>
-                                <a href='javascript:void(0)' class='action-btn view' onclick='openViewModal(" . json_encode($mine) . ")' title='عرض'>
+                                <a href='javascript:void(0)' class='action-btn view' onclick='openViewModal(" . json_encode($mine) . ")' title='Ø¹Ø±Ø¶'>
                                     <i class='fas fa-eye'></i>
                                 </a>";
 
                     if ($can_edit) {
-                        echo "<a href='javascript:void(0)' class='action-btn edit' onclick='editMine(" . json_encode($mine) . ")' title='تعديل'>
+                        echo "<a href='javascript:void(0)' class='action-btn edit' onclick='editMine(" . json_encode($mine) . ")' title='ØªØ¹Ø¯ÙŠÙ„'>
                                     <i class='fas fa-edit'></i>
                                 </a>";
                     }
 
                     if ($can_delete) {
-                        echo "<a href='javascript:void(0)' class='action-btn delete' onclick='deleteMine({$mine['id']})' title='حذف'>
+                        echo "<a href='javascript:void(0)' class='action-btn delete' onclick='deleteMine({$mine['id']})' title='Ø­Ø°Ù'>
                                     <i class='fas fa-trash-alt'></i>
                                 </a>";
                     }
@@ -584,92 +584,92 @@ include '../inheader.php';
             </div>
         </div>
 
-<!-- Modal عرض المنجم -->
+<!-- Modal Ø¹Ø±Ø¶ Ø§Ù„Ù…Ù†Ø¬Ù… -->
 <div id="viewMineModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h5><i class="fas fa-eye"></i> عرض بيانات المنجم</h5>
+            <h5><i class="fas fa-eye"></i> Ø¹Ø±Ø¶ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ù†Ø¬Ù…</h5>
             <button class="close-modal" onclick="closeViewModal()">&times;</button>
         </div>
         <div class="modal-body">
             <div class="view-modal-body">
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-barcode"></i> كود المنجم</div>
+                    <div class="view-item-label"><i class="fas fa-barcode"></i> ÙƒÙˆØ¯ Ø§Ù„Ù…Ù†Ø¬Ù…</div>
                     <div class="view-item-value" id="view_mine_code">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-mountain"></i> اسم المنجم</div>
+                    <div class="view-item-label"><i class="fas fa-mountain"></i> Ø§Ø³Ù… Ø§Ù„Ù…Ù†Ø¬Ù…</div>
                     <div class="view-item-value" id="view_mine_name">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-user-tie"></i> مدير المنجم</div>
+                    <div class="view-item-label"><i class="fas fa-user-tie"></i> Ù…Ø¯ÙŠØ± Ø§Ù„Ù…Ù†Ø¬Ù…</div>
                     <div class="view-item-value" id="view_manager_name">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-gem"></i> نوع المعدن</div>
+                    <div class="view-item-label"><i class="fas fa-gem"></i> Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ù†</div>
                     <div class="view-item-value" id="view_mineral_type">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-industry"></i> نوع المنجم</div>
+                    <div class="view-item-label"><i class="fas fa-industry"></i> Ù†ÙˆØ¹ Ø§Ù„Ù…Ù†Ø¬Ù…</div>
                     <div class="view-item-value" id="view_mine_type">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-info-circle"></i> تفاصيل نوع المنجم</div>
+                    <div class="view-item-label"><i class="fas fa-info-circle"></i> ØªÙØ§ØµÙŠÙ„ Ù†ÙˆØ¹ Ø§Ù„Ù…Ù†Ø¬Ù…</div>
                     <div class="view-item-value" id="view_mine_type_other">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-building"></i> نوع الملكية</div>
+                    <div class="view-item-label"><i class="fas fa-building"></i> Ù†ÙˆØ¹ Ø§Ù„Ù…Ù„ÙƒÙŠØ©</div>
                     <div class="view-item-value" id="view_ownership_type">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-info-circle"></i> تفاصيل نوع الملكية</div>
+                    <div class="view-item-label"><i class="fas fa-info-circle"></i> ØªÙØ§ØµÙŠÙ„ Ù†ÙˆØ¹ Ø§Ù„Ù…Ù„ÙƒÙŠØ©</div>
                     <div class="view-item-value" id="view_ownership_type_other">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-ruler-combined"></i> مساحة المنجم</div>
+                    <div class="view-item-label"><i class="fas fa-ruler-combined"></i> Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ù…Ù†Ø¬Ù…</div>
                     <div class="view-item-value" id="view_mine_area">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-arrows-alt-v"></i> عمق التعدين</div>
+                    <div class="view-item-label"><i class="fas fa-arrows-alt-v"></i> Ø¹Ù…Ù‚ Ø§Ù„ØªØ¹Ø¯ÙŠÙ†</div>
                     <div class="view-item-value" id="view_mining_depth">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-file-signature"></i> طبيعة التعاقد</div>
+                    <div class="view-item-label"><i class="fas fa-file-signature"></i> Ø·Ø¨ÙŠØ¹Ø© Ø§Ù„ØªØ¹Ø§Ù‚Ø¯</div>
                     <div class="view-item-value" id="view_contract_nature">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> الحالة</div>
+                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> Ø§Ù„Ø­Ø§Ù„Ø©</div>
                     <div class="view-item-value" id="view_status">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-sticky-note"></i> ملاحظات</div>
+                    <div class="view-item-label"><i class="fas fa-sticky-note"></i> Ù…Ù„Ø§Ø­Ø¸Ø§Øª</div>
                     <div class="view-item-value" id="view_notes">-</div>
                 </div>
             </div>
         </div>
         <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end; padding: 0 20px 20px;">
             <a id="view_contracts_btn" class="action-btn contracts" style="text-decoration: none;">
-                <i class="fas fa-file-contract"></i> عقودات المنجم
+                <i class="fas fa-file-contract"></i> Ø¹Ù‚ÙˆØ¯Ø§Øª Ø§Ù„Ù…Ù†Ø¬Ù…
             </a>
             <?php if ($can_edit): ?>
             <button type="button" class="action-btn edit" onclick="openEditFromView()">
-                <i class="fas fa-edit"></i> تعديل المنجم
+                <i class="fas fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ù…Ù†Ø¬Ù…
             </button>
             <?php endif; ?>
             <button type="button" class="action-btn delete" onclick="closeViewModal()">
-                <i class="fas fa-times"></i> إغلاق
+                <i class="fas fa-times"></i> Ø¥ØºÙ„Ø§Ù‚
             </button>
         </div>
     </div>
@@ -679,7 +679,7 @@ include '../inheader.php';
 <div id="mineModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 id="modalTitle">إضافة منجم جديد</h3>
+            <h3 id="modalTitle">Ø¥Ø¶Ø§ÙØ© Ù…Ù†Ø¬Ù… Ø¬Ø¯ÙŠØ¯</h3>
             <span class="close" onclick="closeModal()">&times;</span>
         </div>
         <div class="modal-body">
@@ -689,106 +689,106 @@ include '../inheader.php';
 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>كود/رمز المنجم <span class="required">*</span></label>
+                        <label>ÙƒÙˆØ¯/Ø±Ù…Ø² Ø§Ù„Ù…Ù†Ø¬Ù… <span class="required">*</span></label>
                         <input type="text" id="mine_code" name="mine_code" required>
                     </div>
 
                     <div class="form-group">
-                        <label>اسم المنجم <span class="required">*</span></label>
+                        <label>Ø§Ø³Ù… Ø§Ù„Ù…Ù†Ø¬Ù… <span class="required">*</span></label>
                         <input type="text" id="mine_name" name="mine_name" required>
                     </div>
 
                     <div class="form-group">
-                        <label>اسم مدير المنجم</label>
+                        <label>Ø§Ø³Ù… Ù…Ø¯ÙŠØ± Ø§Ù„Ù…Ù†Ø¬Ù…</label>
                         <input type="text" id="manager_name" name="manager_name">
                     </div>
 
                     <div class="form-group">
-                        <label>نوع المعدن</label>
-                        <input type="text" id="mineral_type" name="mineral_type" placeholder="مثال: ذهب، فضة، نحاس">
+                        <label>Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ù†</label>
+                        <input type="text" id="mineral_type" name="mineral_type" placeholder="Ù…Ø«Ø§Ù„: Ø°Ù‡Ø¨ØŒ ÙØ¶Ø©ØŒ Ù†Ø­Ø§Ø³">
                     </div>
 
                     <div class="form-group">
-                        <label>نوع المنجم <span class="required">*</span></label>
+                        <label>Ù†ÙˆØ¹ Ø§Ù„Ù…Ù†Ø¬Ù… <span class="required">*</span></label>
                         <select id="mine_type" name="mine_type" required onchange="toggleOtherField('mine_type')">
-                            <option value="">-- اختر --</option>
-                            <option value="حفرة مفتوحة">حفرة مفتوحة</option>
-                            <option value="تحت أرضي">تحت أرضي</option>
-                            <option value="آبار">آبار</option>
-                            <option value="مهجور">مهجور</option>
-                            <option value="مجمع معالجة/تركيز">مجمع معالجة/تركيز</option>
-                            <option value="موقع تخزين/مستودع">موقع تخزين/مستودع</option>
-                            <option value="أخرى">أخرى</option>
+                            <option value="">-- Ø§Ø®ØªØ± --</option>
+                            <option value="Ø­ÙØ±Ø© Ù…ÙØªÙˆØ­Ø©">Ø­ÙØ±Ø© Ù…ÙØªÙˆØ­Ø©</option>
+                            <option value="ØªØ­Øª Ø£Ø±Ø¶ÙŠ">ØªØ­Øª Ø£Ø±Ø¶ÙŠ</option>
+                            <option value="Ø¢Ø¨Ø§Ø±">Ø¢Ø¨Ø§Ø±</option>
+                            <option value="Ù…Ù‡Ø¬ÙˆØ±">Ù…Ù‡Ø¬ÙˆØ±</option>
+                            <option value="Ù…Ø¬Ù…Ø¹ Ù…Ø¹Ø§Ù„Ø¬Ø©/ØªØ±ÙƒÙŠØ²">Ù…Ø¬Ù…Ø¹ Ù…Ø¹Ø§Ù„Ø¬Ø©/ØªØ±ÙƒÙŠØ²</option>
+                            <option value="Ù…ÙˆÙ‚Ø¹ ØªØ®Ø²ÙŠÙ†/Ù…Ø³ØªÙˆØ¯Ø¹">Ù…ÙˆÙ‚Ø¹ ØªØ®Ø²ÙŠÙ†/Ù…Ø³ØªÙˆØ¯Ø¹</option>
+                            <option value="Ø£Ø®Ø±Ù‰">Ø£Ø®Ø±Ù‰</option>
                         </select>
                     </div>
 
                     <div class="form-group conditional-field" id="mine_type_other_div">
-                        <label>تفاصيل نوع المنجم</label>
+                        <label>ØªÙØ§ØµÙŠÙ„ Ù†ÙˆØ¹ Ø§Ù„Ù…Ù†Ø¬Ù…</label>
                         <input type="text" id="mine_type_other" name="mine_type_other">
                     </div>
 
                     <div class="form-group">
-                        <label>نوع الملكية <span class="required">*</span></label>
+                        <label>Ù†ÙˆØ¹ Ø§Ù„Ù…Ù„ÙƒÙŠØ© <span class="required">*</span></label>
                         <select id="ownership_type" name="ownership_type" required
                             onchange="toggleOtherField('ownership_type')">
-                            <option value="">-- اختر --</option>
-                            <option value="تعدين أهلي/تقليدي">تعدين أهلي/تقليدي</option>
-                            <option value="شركة سودانية خاصة">شركة سودانية خاصة</option>
-                            <option value="شركة حكومية/قطاع عام">شركة حكومية/قطاع عام</option>
-                            <option value="شركة أجنبية">شركة أجنبية</option>
-                            <option value="مشروع مشترك (سوداني-أجنبي)">مشروع مشترك (سوداني-أجنبي)</option>
-                            <option value="أخرى">أخرى</option>
+                            <option value="">-- Ø§Ø®ØªØ± --</option>
+                            <option value="ØªØ¹Ø¯ÙŠÙ† Ø£Ù‡Ù„ÙŠ/ØªÙ‚Ù„ÙŠØ¯ÙŠ">ØªØ¹Ø¯ÙŠÙ† Ø£Ù‡Ù„ÙŠ/ØªÙ‚Ù„ÙŠØ¯ÙŠ</option>
+                            <option value="Ø´Ø±ÙƒØ© Ø³ÙˆØ¯Ø§Ù†ÙŠØ© Ø®Ø§ØµØ©">Ø´Ø±ÙƒØ© Ø³ÙˆØ¯Ø§Ù†ÙŠØ© Ø®Ø§ØµØ©</option>
+                            <option value="Ø´Ø±ÙƒØ© Ø­ÙƒÙˆÙ…ÙŠØ©/Ù‚Ø·Ø§Ø¹ Ø¹Ø§Ù…">Ø´Ø±ÙƒØ© Ø­ÙƒÙˆÙ…ÙŠØ©/Ù‚Ø·Ø§Ø¹ Ø¹Ø§Ù…</option>
+                            <option value="Ø´Ø±ÙƒØ© Ø£Ø¬Ù†Ø¨ÙŠØ©">Ø´Ø±ÙƒØ© Ø£Ø¬Ù†Ø¨ÙŠØ©</option>
+                            <option value="Ù…Ø´Ø±ÙˆØ¹ Ù…Ø´ØªØ±Ùƒ (Ø³ÙˆØ¯Ø§Ù†ÙŠ-Ø£Ø¬Ù†Ø¨ÙŠ)">Ù…Ø´Ø±ÙˆØ¹ Ù…Ø´ØªØ±Ùƒ (Ø³ÙˆØ¯Ø§Ù†ÙŠ-Ø£Ø¬Ù†Ø¨ÙŠ)</option>
+                            <option value="Ø£Ø®Ø±Ù‰">Ø£Ø®Ø±Ù‰</option>
                         </select>
                     </div>
 
                     <div class="form-group conditional-field" id="ownership_type_other_div">
-                        <label>تفاصيل نوع الملكية</label>
+                        <label>ØªÙØ§ØµÙŠÙ„ Ù†ÙˆØ¹ Ø§Ù„Ù…Ù„ÙƒÙŠØ©</label>
                         <input type="text" id="ownership_type_other" name="ownership_type_other">
                     </div>
 
                     <div class="form-group">
-                        <label>مساحة المنجم</label>
+                        <label>Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ù…Ù†Ø¬Ù…</label>
                         <input type="number" step="0.01" id="mine_area" name="mine_area" placeholder="0.00">
                     </div>
 
                     <div class="form-group">
-                        <label>وحدة قياس المساحة</label>
+                        <label>ÙˆØ­Ø¯Ø© Ù‚ÙŠØ§Ø³ Ø§Ù„Ù…Ø³Ø§Ø­Ø©</label>
                         <select id="mine_area_unit" name="mine_area_unit">
-                            <option value="هكتار">هكتار</option>
-                            <option value="كم²">كم²</option>
+                            <option value="Ù‡ÙƒØªØ§Ø±">Ù‡ÙƒØªØ§Ø±</option>
+                            <option value="ÙƒÙ…Â²">ÙƒÙ…Â²</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>عمق التعدين (متر)</label>
+                        <label>Ø¹Ù…Ù‚ Ø§Ù„ØªØ¹Ø¯ÙŠÙ† (Ù…ØªØ±)</label>
                         <input type="number" step="0.01" id="mining_depth" name="mining_depth" placeholder="0.00">
                     </div>
 
                     <div class="form-group">
-                        <label>طبيعة التعاقد</label>
+                        <label>Ø·Ø¨ÙŠØ¹Ø© Ø§Ù„ØªØ¹Ø§Ù‚Ø¯</label>
                         <select id="contract_nature" name="contract_nature">
-                            <option value="">-- اختر --</option>
-                            <option value="موظف مباشر لدى المالك">موظف مباشر لدى المالك</option>
-                            <option value="مقاول/شركة مقاولات">مقاول/شركة مقاولات</option>
+                            <option value="">-- Ø§Ø®ØªØ± --</option>
+                            <option value="Ù…ÙˆØ¸Ù Ù…Ø¨Ø§Ø´Ø± Ù„Ø¯Ù‰ Ø§Ù„Ù…Ø§Ù„Ùƒ">Ù…ÙˆØ¸Ù Ù…Ø¨Ø§Ø´Ø± Ù„Ø¯Ù‰ Ø§Ù„Ù…Ø§Ù„Ùƒ</option>
+                            <option value="Ù…Ù‚Ø§ÙˆÙ„/Ø´Ø±ÙƒØ© Ù…Ù‚Ø§ÙˆÙ„Ø§Øª">Ù…Ù‚Ø§ÙˆÙ„/Ø´Ø±ÙƒØ© Ù…Ù‚Ø§ÙˆÙ„Ø§Øª</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>الحالة <span class="required">*</span></label>
+                        <label>Ø§Ù„Ø­Ø§Ù„Ø© <span class="required">*</span></label>
                         <select id="status" name="status" required>
-                            <option value="1">نشط</option>
-                            <option value="0">غير نشط</option>
+                            <option value="1">Ù†Ø´Ø·</option>
+                            <option value="0">ØºÙŠØ± Ù†Ø´Ø·</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>ملاحظات إضافية</label>
-                    <textarea id="notes" name="notes" placeholder="أي معلومات إضافية عن المنجم..."></textarea>
+                    <label>Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ©</label>
+                    <textarea id="notes" name="notes" placeholder="Ø£ÙŠ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ© Ø¹Ù† Ø§Ù„Ù…Ù†Ø¬Ù…..."></textarea>
                 </div>
 
                 <button type="submit" class="btn-submit">
-                    <i class="fas fa-save"></i> حفظ البيانات
+                    <i class="fas fa-save"></i> Ø­ÙØ¸ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
                 </button>
             </form>
         </div>
@@ -826,7 +826,7 @@ include '../inheader.php';
     function resetForm() {
         $('#mineForm')[0].reset();
         $('#mine_id').val('');
-        $('#formTitle').text('إضافة منجم جديد');
+        $('#formTitle').text('Ø¥Ø¶Ø§ÙØ© Ù…Ù†Ø¬Ù… Ø¬Ø¯ÙŠØ¯');
         document.querySelectorAll('[id*="_other_div"]').forEach(field => {
             field.style.display = 'none';
         });
@@ -836,7 +836,7 @@ include '../inheader.php';
     function editMine(mine) {
         const canEdit = <?php echo $can_edit ? 'true' : 'false'; ?>;
         if (!canEdit) {
-            alert('لا توجد صلاحية تعديل المناجم');
+            alert('Ù„Ø§ ØªÙˆØ¬Ø¯ ØµÙ„Ø§Ø­ÙŠØ© ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ù…Ù†Ø§Ø¬Ù…');
             return;
         }
 
@@ -859,7 +859,7 @@ include '../inheader.php';
         toggleOtherField('mine_type');
         toggleOtherField('ownership_type');
 
-        $('#formTitle').text('تعديل بيانات المنجم');
+        $('#formTitle').text('ØªØ¹Ø¯ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ù†Ø¬Ù…');
         closeViewModal();
         $('#mineForm').slideDown(400);
         $('html, body').animate({
@@ -880,12 +880,12 @@ include '../inheader.php';
         $('#view_ownership_type_other').text(mine.ownership_type_other || '-');
 
         const areaText = mine.mine_area ? `${parseFloat(mine.mine_area).toFixed(2)} ${mine.mine_area_unit || ''}` : '-';
-        const depthText = mine.mining_depth ? `${parseFloat(mine.mining_depth).toFixed(2)} م` : '-';
+        const depthText = mine.mining_depth ? `${parseFloat(mine.mining_depth).toFixed(2)} Ù…` : '-';
 
         $('#view_mine_area').text(areaText.trim() || '-');
         $('#view_mining_depth').text(depthText);
         $('#view_contract_nature').text(mine.contract_nature || '-');
-        $('#view_status').text((String(mine.status) === '1') ? 'نشط' : 'غير نشط');
+        $('#view_status').text((String(mine.status) === '1') ? 'Ù†Ø´Ø·' : 'ØºÙŠØ± Ù†Ø´Ø·');
         $('#view_notes').text(mine.notes || '-');
 
         $('#view_contracts_btn').attr('href', '../Contracts/contracts.php?id=' + mine.id);
@@ -909,11 +909,11 @@ include '../inheader.php';
     function deleteMine(id) {
         const canDelete = <?php echo $can_delete ? 'true' : 'false'; ?>;
         if (!canDelete) {
-            alert('لا توجد صلاحية حذف المناجم');
+            alert('Ù„Ø§ ØªÙˆØ¬Ø¯ ØµÙ„Ø§Ø­ÙŠØ© Ø­Ø°Ù Ø§Ù„Ù…Ù†Ø§Ø¬Ù…');
             return;
         }
 
-        if (confirm('هل أنت متأكد من حذف هذا المنجم؟')) {
+        if (confirm('Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø­Ø°Ù Ù‡Ø°Ø§ Ø§Ù„Ù…Ù†Ø¬Ù…ØŸ')) {
             window.location.href = 'project_mines.php?project_id=<?php echo $project_id; ?>&delete=' + id;
         }
     }
@@ -923,7 +923,7 @@ include '../inheader.php';
         const select = document.getElementById(fieldType);
         const otherDiv = document.getElementById(fieldType + '_other_div');
 
-        if (select.value === 'أخرى') {
+        if (select.value === 'Ø£Ø®Ø±Ù‰') {
             otherDiv.style.display = 'block';
         } else {
             otherDiv.style.display = 'none';

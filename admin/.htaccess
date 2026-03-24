@@ -1,0 +1,25 @@
+RewriteEngine On
+RewriteBase /ems/admin/
+Options -Indexes
+
+# ── Auth ──────────────────────────────────────────────────────────────────
+RewriteRule ^login/?$            login.php           [L,QSA]
+RewriteRule ^logout/?$           logout.php          [L,QSA]
+RewriteRule ^forgot-password/?$  forgot_password.php [L,QSA]
+RewriteRule ^reset-password/?$   reset_password.php  [L,QSA]
+
+# ── Core pages ─────────────────────────────────────────────────────────────
+RewriteRule ^dashboard/?$        dashboard.php       [L,QSA]
+RewriteRule ^managers/?$         managers.php        [L,QSA]
+RewriteRule ^companies/?$        companies.php       [L,QSA]
+RewriteRule ^companies/(\d+)/?$  companies/view.php?id=$1 [L,QSA]
+RewriteRule ^subscriptions/requests/?$  subscriptions/requests.php [L,QSA]
+RewriteRule ^plans/?$            plans.php           [L,QSA]
+RewriteRule ^support/view/?$     support/view.php    [L,QSA]
+RewriteRule ^audit-log/?$        audit_log.php       [L,QSA]
+RewriteRule ^settings/?$         settings.php        [L,QSA]
+
+# Sensitive one-time setup script must only be accessed locally
+<Files "setup_once.php">
+	Require local
+</Files>

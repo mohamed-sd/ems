@@ -3,6 +3,13 @@ include '../config.php';
 require_login();
 require_once '../includes/approval_workflow.php';
 
+$is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    die('Unauthorized company context');
+}
+
 $type = isset($_GET['type']) ? $_GET['type'] : null;
 $id   = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -20,7 +27,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $notes = mysqli_real_escape_string($conn, $_POST['time_notes']);
     $user_id = approval_get_user_id();
 
-    $old_result = mysqli_query($conn, "SELECT id, status, time_notes FROM timesheet WHERE id = $id LIMIT 1");
+    $scope = "";
+    if (!$is_super_admin) {
+        if (db_table_has_column($conn, 'timesheet', 'company_id')) {
+            $scope = " AND company_id = $company_id";
+        } else {
+            $scope = " AND EXISTS (
+                SELECT 1
+                FROM operations o
+                JOIN project p ON p.id = o.project_id
+                LEFT JOIN users su ON su.id = p.created_by
+                LEFT JOIN clients sc ON sc.id = p.company_client_id
+                LEFT JOIN users scu ON scu.id = sc.created_by
+                WHERE o.id = timesheet.operator
+                  AND (su.company_id = $company_id OR scu.company_id = $company_id)
+            )";
+        }
+    }
+
+    $old_result = mysqli_query($conn, "SELECT id, status, time_notes FROM timesheet WHERE id = $id" . $scope . " LIMIT 1");
     $old_data = $old_result ? mysqli_fetch_assoc($old_result) : null;
     if (!$old_data) {
         echo "<script>alert('البيان غير موجود');window.location.href='timesheet.php?type=$t';</script>";

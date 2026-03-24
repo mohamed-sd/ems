@@ -1,21 +1,21 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
 
 include '../config.php';
-$page_title = "إدارة صلاحيات الأدوار";
+$page_title = "Ø¥Ø¯Ø§Ø±Ø© ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ø£Ø¯ÙˆØ§Ø±";
 
-// ════════════════════════════════════════════════════════════════════════════
-// 📊 معالجة الطلبات الأساسية (CRUD)
-// ════════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ðŸ“Š Ù…Ø¹Ø§Ù„Ø¬Ø© Ø§Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© (CRUD)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 $success_msg = null;
 $error_msg = null;
 
-// 1️⃣ حفظ صلاحيات الدور
+// 1ï¸âƒ£ Ø­ÙØ¸ ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ø¯ÙˆØ±
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_permissions') {
     $role_id = $_POST['role_id'] ?? null;
     $module_id = $_POST['module_id'] ?? null;
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $can_delete = isset($_POST['can_delete']) ? 1 : 0;
 
     if (!$role_id || !$module_id) {
-        $error_msg = 'الدور والصفحة مطلوبان ❌';
+        $error_msg = 'Ø§Ù„Ø¯ÙˆØ± ÙˆØ§Ù„ØµÙØ­Ø© Ù…Ø·Ù„ÙˆØ¨Ø§Ù† âŒ';
     } else {
         $stmt = $conn->prepare("SELECT id FROM role_permissions WHERE role_id = ? AND module_id = ?");
         $stmt->bind_param("ii", $role_id, $module_id);
@@ -47,37 +47,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
 
         if ($stmt->execute()) {
-            $success_msg = 'تم حفظ الصلاحيات بنجاح ✅';
+            $success_msg = 'ØªÙ… Ø­ÙØ¸ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª Ø¨Ù†Ø¬Ø§Ø­ âœ…';
         } else {
-            $error_msg = 'حدث خطأ: ' . $stmt->error . ' ❌';
+            $error_msg = 'Ø­Ø¯Ø« Ø®Ø·Ø£: ' . $stmt->error . ' âŒ';
         }
     }
 }
 
-// 2️⃣ حذف صلاحية
+// 2ï¸âƒ£ Ø­Ø°Ù ØµÙ„Ø§Ø­ÙŠØ©
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_permission') {
     $id = $_POST['id'] ?? null;
 
     if (!$id) {
-        $error_msg = 'معرف الصلاحية غير صحيح ❌';
+        $error_msg = 'Ù…Ø¹Ø±Ù Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ© ØºÙŠØ± ØµØ­ÙŠØ­ âŒ';
     } else {
         $stmt = $conn->prepare("DELETE FROM role_permissions WHERE id = ?");
         $stmt->bind_param("i", $id);
 
         if ($stmt->execute()) {
-            $success_msg = 'تم حذف الصلاحية بنجاح ✅';
+            $success_msg = 'ØªÙ… Ø­Ø°Ù Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ© Ø¨Ù†Ø¬Ø§Ø­ âœ…';
         } else {
-            $error_msg = 'حدث خطأ: ' . $stmt->error . ' ❌';
+            $error_msg = 'Ø­Ø¯Ø« Ø®Ø·Ø£: ' . $stmt->error . ' âŒ';
         }
     }
 }
 
-// 3️⃣ منح جميع الصلاحيات للدور
+// 3ï¸âƒ£ Ù…Ù†Ø­ Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª Ù„Ù„Ø¯ÙˆØ±
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'grant_all') {
     $role_id = $_POST['role_id'] ?? null;
 
     if (!$role_id) {
-        $error_msg = 'الدور مطلوب ❌';
+        $error_msg = 'Ø§Ù„Ø¯ÙˆØ± Ù…Ø·Ù„ÙˆØ¨ âŒ';
     } else {
         $stmt = $conn->prepare("DELETE FROM role_permissions WHERE role_id = ?");
         $stmt->bind_param("i", $role_id);
@@ -95,31 +95,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $stmt->execute();
         }
 
-        $success_msg = 'تم منح جميع الصلاحيات للدور ✅';
+        $success_msg = 'ØªÙ… Ù…Ù†Ø­ Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª Ù„Ù„Ø¯ÙˆØ± âœ…';
     }
 }
 
-// 4️⃣ إزالة جميع الصلاحيات من الدور
+// 4ï¸âƒ£ Ø¥Ø²Ø§Ù„Ø© Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª Ù…Ù† Ø§Ù„Ø¯ÙˆØ±
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'revoke_all') {
     $role_id = $_POST['role_id'] ?? null;
 
     if (!$role_id) {
-        $error_msg = 'الدور مطلوب ❌';
+        $error_msg = 'Ø§Ù„Ø¯ÙˆØ± Ù…Ø·Ù„ÙˆØ¨ âŒ';
     } else {
         $stmt = $conn->prepare("DELETE FROM role_permissions WHERE role_id = ?");
         $stmt->bind_param("i", $role_id);
 
         if ($stmt->execute()) {
-            $success_msg = 'تم سحب جميع الصلاحيات من الدور ✅';
+            $success_msg = 'ØªÙ… Ø³Ø­Ø¨ Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª Ù…Ù† Ø§Ù„Ø¯ÙˆØ± âœ…';
         } else {
-            $error_msg = 'حدث خطأ: ' . $stmt->error . ' ❌';
+            $error_msg = 'Ø­Ø¯Ø« Ø®Ø·Ø£: ' . $stmt->error . ' âŒ';
         }
     }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// 🛠️ دوال مساعدة
-// ════════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ðŸ› ï¸ Ø¯ÙˆØ§Ù„ Ù…Ø³Ø§Ø¹Ø¯Ø©
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function get_parent_roles($conn, $role_id) {
     $parent_roles = [$role_id];
@@ -166,9 +166,9 @@ function get_assigned_modules($conn, $role_id) {
     return $modules;
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// 📥 جلب البيانات
-// ════════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ðŸ“¥ Ø¬Ù„Ø¨ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 $selected_role_id = isset($_GET['role_id']) ? (int)$_GET['role_id'] : null;
 
@@ -518,17 +518,17 @@ include('../insidebar.php');
 </style>
 
 <div class="main">
-    <!-- الرأس -->
+    <!-- Ø§Ù„Ø±Ø£Ø³ -->
     <div class="header-title">
-        <i class="fas fa-lock-open"></i> إدارة صلاحيات الأدوار
+        <i class="fas fa-lock-open"></i> Ø¥Ø¯Ø§Ø±Ø© ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ø£Ø¯ÙˆØ§Ø±
      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="settings.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
+                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
             </a>
         </div>
     </div>
 
-    <!-- الرسائل -->
+    <!-- Ø§Ù„Ø±Ø³Ø§Ø¦Ù„ -->
     <?php if ($success_msg): ?>
         <div class="alert alert-custom alert-success">
             <i class="fas fa-check-circle"></i> <?php echo $success_msg; ?>
@@ -541,56 +541,56 @@ include('../insidebar.php');
         </div>
     <?php endif; ?>
 
-    <!-- الإحصائيات -->
+    <!-- Ø§Ù„Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª -->
     <div class="stats-container">
         <div class="stat-card">
-            <div class="stat-label">عدد الأدوار</div>
+            <div class="stat-label">Ø¹Ø¯Ø¯ Ø§Ù„Ø£Ø¯ÙˆØ§Ø±</div>
             <div class="stat-number"><?php echo count($roles); ?></div>
         </div>
         <div class="stat-card blue">
-            <div class="stat-label">الشاشات المتاحة</div>
+            <div class="stat-label">Ø§Ù„Ø´Ø§Ø´Ø§Øª Ø§Ù„Ù…ØªØ§Ø­Ø©</div>
             <div class="stat-number"><?php echo count($modules); ?></div>
         </div>
         <div class="stat-card teal">
-            <div class="stat-label">إجمالي الصلاحيات</div>
+            <div class="stat-label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª</div>
             <div class="stat-number"><?php echo count($all_permissions); ?></div>
         </div>
     </div>
 
-    <!-- التبويبات -->
+    <!-- Ø§Ù„ØªØ¨ÙˆÙŠØ¨Ø§Øª -->
     <ul class="nav nav-tabs" role="tablist" style="border-bottom: 2px solid #e0e0e0;">
         <li class="nav-item">
             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#grid-view">
-                <i class="fas fa-th"></i> عرض الشبكة
+                <i class="fas fa-th"></i> Ø¹Ø±Ø¶ Ø§Ù„Ø´Ø¨ÙƒØ©
             </button>
         </li>
         <li class="nav-item">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#table-view">
-                <i class="fas fa-table"></i> عرض الجدول
+                <i class="fas fa-table"></i> Ø¹Ø±Ø¶ Ø§Ù„Ø¬Ø¯ÙˆÙ„
             </button>
         </li>
         <li class="nav-item">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#quick-actions">
-                <i class="fas fa-bolt"></i> إجراءات سريعة
+                <i class="fas fa-bolt"></i> Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø³Ø±ÙŠØ¹Ø©
             </button>
         </li>
     </ul>
 
-    <!-- محتويات التبويبات -->
+    <!-- Ù…Ø­ØªÙˆÙŠØ§Øª Ø§Ù„ØªØ¨ÙˆÙŠØ¨Ø§Øª -->
     <div class="tab-content mt-4">
-        <!-- 1️⃣ عرض الشبكة -->
+        <!-- 1ï¸âƒ£ Ø¹Ø±Ø¶ Ø§Ù„Ø´Ø¨ÙƒØ© -->
         <div class="tab-pane fade show active" id="grid-view">
             <div class="card-main">
                 <div class="card-header-custom">
-                    <i class="fas fa-sliders-h"></i> اختر الدور
+                    <i class="fas fa-sliders-h"></i> Ø§Ø®ØªØ± Ø§Ù„Ø¯ÙˆØ±
                 </div>
                 <div class="card-body-custom">
                     <div class="filters-section">
                         <form method="GET" class="row">
                             <div class="col-md-6">
-                                <label class="form-label">الدور</label>
+                                <label class="form-label">Ø§Ù„Ø¯ÙˆØ±</label>
                                 <select name="role_id" class="form-select" onchange="this.form.submit()">
-                                    <option value="">-- اختر الدور --</option>
+                                    <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø¯ÙˆØ± --</option>
                                     <?php foreach ($roles as $role): ?>
                                         <option value="<?php echo $role['id']; ?>" 
                                             <?php echo ($selected_role_id == $role['id']) ? 'selected' : ''; ?>>
@@ -613,21 +613,21 @@ include('../insidebar.php');
 
                         <div class="action-bar">
                             <div class="action-bar-title">
-                                <i class="fas fa-cog"></i> إدارة صلاحيات: <strong><?php echo htmlspecialchars($selected_role_name); ?></strong>
+                                <i class="fas fa-cog"></i> Ø¥Ø¯Ø§Ø±Ø© ØµÙ„Ø§Ø­ÙŠØ§Øª: <strong><?php echo htmlspecialchars($selected_role_name); ?></strong>
                             </div>
                             <div class="action-buttons">
                                 <form method="POST" style="margin: 0;">
                                     <input type="hidden" name="action" value="grant_all">
                                     <input type="hidden" name="role_id" value="<?php echo $selected_role_id; ?>">
                                     <button type="submit" class="btn btn-sm btn-success" style="background: linear-gradient(135deg, var(--teal) 0%, #059669 100%); color: white; border: none;">
-                                        <i class="fas fa-check-circle"></i> منح الكل
+                                        <i class="fas fa-check-circle"></i> Ù…Ù†Ø­ Ø§Ù„ÙƒÙ„
                                     </button>
                                 </form>
                                 <form method="POST" style="margin: 0;">
                                     <input type="hidden" name="action" value="revoke_all">
                                     <input type="hidden" name="role_id" value="<?php echo $selected_role_id; ?>">
                                     <button type="submit" class="btn btn-sm btn-danger" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none;">
-                                        <i class="fas fa-ban"></i> سحب الكل
+                                        <i class="fas fa-ban"></i> Ø³Ø­Ø¨ Ø§Ù„ÙƒÙ„
                                     </button>
                                 </form>
                             </div>
@@ -654,7 +654,7 @@ include('../insidebar.php');
                                                 <label>
                                                     <input type="checkbox" name="can_view"
                                                         <?php echo ($perm && $perm['can_view']) ? 'checked' : ''; ?>>
-                                                    👁️ عرض
+                                                    ðŸ‘ï¸ Ø¹Ø±Ø¶
                                                 </label>
                                             </div>
 
@@ -662,7 +662,7 @@ include('../insidebar.php');
                                                 <label>
                                                     <input type="checkbox" name="can_add"
                                                         <?php echo ($perm && $perm['can_add']) ? 'checked' : ''; ?>>
-                                                    ➕ إضافة
+                                                    âž• Ø¥Ø¶Ø§ÙØ©
                                                 </label>
                                             </div>
 
@@ -670,7 +670,7 @@ include('../insidebar.php');
                                                 <label>
                                                     <input type="checkbox" name="can_edit"
                                                         <?php echo ($perm && $perm['can_edit']) ? 'checked' : ''; ?>>
-                                                    ✏️ تعديل
+                                                    âœï¸ ØªØ¹Ø¯ÙŠÙ„
                                                 </label>
                                             </div>
 
@@ -678,12 +678,12 @@ include('../insidebar.php');
                                                 <label>
                                                     <input type="checkbox" name="can_delete"
                                                         <?php echo ($perm && $perm['can_delete']) ? 'checked' : ''; ?>>
-                                                    🗑️ حذف
+                                                    ðŸ—‘ï¸ Ø­Ø°Ù
                                                 </label>
                                             </div>
 
                                             <button type="submit" class="btn-save">
-                                                <i class="fas fa-save"></i> حفظ
+                                                <i class="fas fa-save"></i> Ø­ÙØ¸
                                             </button>
                                         </form>
                                     </div>
@@ -691,36 +691,36 @@ include('../insidebar.php');
                             </div>
                         <?php else: ?>
                             <div class="empty-state alert-custom alert-info">
-                                <i class="fas fa-info-circle"></i> لا توجد شاشات مسندة لهذا الدور
+                                <i class="fas fa-info-circle"></i> Ù„Ø§ ØªÙˆØ¬Ø¯ Ø´Ø§Ø´Ø§Øª Ù…Ø³Ù†Ø¯Ø© Ù„Ù‡Ø°Ø§ Ø§Ù„Ø¯ÙˆØ±
                             </div>
                         <?php endif; ?>
                     <?php else: ?>
                         <div class="empty-state alert-custom alert-info">
-                            <i class="fas fa-arrow-left"></i> اختر دوراً من القائمة لعرض الشاشات والصلاحيات
+                            <i class="fas fa-arrow-left"></i> Ø§Ø®ØªØ± Ø¯ÙˆØ±Ø§Ù‹ Ù…Ù† Ø§Ù„Ù‚Ø§Ø¦Ù…Ø© Ù„Ø¹Ø±Ø¶ Ø§Ù„Ø´Ø§Ø´Ø§Øª ÙˆØ§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª
                         </div>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
 
-        <!-- 2️⃣ عرض الجدول -->
+        <!-- 2ï¸âƒ£ Ø¹Ø±Ø¶ Ø§Ù„Ø¬Ø¯ÙˆÙ„ -->
         <div class="tab-pane fade" id="table-view">
             <div class="card-main">
                 <div class="card-header-custom">
-                    <i class="fas fa-list"></i> جميع الصلاحيات
+                    <i class="fas fa-list"></i> Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª
                 </div>
                 <div class="card-body-custom">
                     <div class="table-responsive">
                         <table class="table table-custom">
                             <thead>
                                 <tr>
-                                    <th>الدور</th>
-                                    <th>الشاشة</th>
-                                    <th>👁️ عرض</th>
-                                    <th>➕ إضافة</th>
-                                    <th>✏️ تعديل</th>
-                                    <th>🗑️ حذف</th>
-                                    <th>الإجراء</th>
+                                    <th>Ø§Ù„Ø¯ÙˆØ±</th>
+                                    <th>Ø§Ù„Ø´Ø§Ø´Ø©</th>
+                                    <th>ðŸ‘ï¸ Ø¹Ø±Ø¶</th>
+                                    <th>âž• Ø¥Ø¶Ø§ÙØ©</th>
+                                    <th>âœï¸ ØªØ¹Ø¯ÙŠÙ„</th>
+                                    <th>ðŸ—‘ï¸ Ø­Ø°Ù</th>
+                                    <th>Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -729,16 +729,16 @@ include('../insidebar.php');
                                         <td><strong><?php echo htmlspecialchars($perm['role_name']); ?></strong></td>
                                         <td><?php echo htmlspecialchars($perm['module_name']); ?></td>
                                         <td><span class="status-badge <?php echo $perm['can_view'] ? 'active' : 'inactive'; ?>">
-                                            <?php echo $perm['can_view'] ? '✓' : '✗'; ?>
+                                            <?php echo $perm['can_view'] ? 'âœ“' : 'âœ—'; ?>
                                         </span></td>
                                         <td><span class="status-badge <?php echo $perm['can_add'] ? 'active' : 'inactive'; ?>">
-                                            <?php echo $perm['can_add'] ? '✓' : '✗'; ?>
+                                            <?php echo $perm['can_add'] ? 'âœ“' : 'âœ—'; ?>
                                         </span></td>
                                         <td><span class="status-badge <?php echo $perm['can_edit'] ? 'active' : 'inactive'; ?>">
-                                            <?php echo $perm['can_edit'] ? '✓' : '✗'; ?>
+                                            <?php echo $perm['can_edit'] ? 'âœ“' : 'âœ—'; ?>
                                         </span></td>
                                         <td><span class="status-badge <?php echo $perm['can_delete'] ? 'active' : 'inactive'; ?>">
-                                            <?php echo $perm['can_delete'] ? '✓' : '✗'; ?>
+                                            <?php echo $perm['can_delete'] ? 'âœ“' : 'âœ—'; ?>
                                         </span></td>
                                         <td>
                                             <form method="POST" style="display: inline;">
@@ -758,21 +758,21 @@ include('../insidebar.php');
             </div>
         </div>
 
-        <!-- 3️⃣ إجراءات سريعة -->
+        <!-- 3ï¸âƒ£ Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª Ø³Ø±ÙŠØ¹Ø© -->
         <div class="tab-pane fade" id="quick-actions">
             <div class="row">
                 <div class="col-md-6">
                     <div class="card-main">
                         <div class="card-header-custom" style="background: linear-gradient(135deg, var(--teal) 0%, #059669 100%);">
-                            <i class="fas fa-check-circle"></i> منح جميع الصلاحيات
+                            <i class="fas fa-check-circle"></i> Ù…Ù†Ø­ Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª
                         </div>
                         <div class="card-body-custom">
                             <form method="POST">
                                 <input type="hidden" name="action" value="grant_all">
                                 <div class="mb-3">
-                                    <label class="form-label">اختر الدور</label>
+                                    <label class="form-label">Ø§Ø®ØªØ± Ø§Ù„Ø¯ÙˆØ±</label>
                                     <select name="role_id" class="form-select" required>
-                                        <option value="">-- اختر الدور --</option>
+                                        <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø¯ÙˆØ± --</option>
                                         <?php foreach ($roles as $role): ?>
                                             <option value="<?php echo $role['id']; ?>">
                                                 <?php echo htmlspecialchars($role['name']); ?>
@@ -781,8 +781,8 @@ include('../insidebar.php');
                                     </select>
                                 </div>
                                 <button type="submit" class="btn btn-save" style="background: linear-gradient(135deg, var(--teal) 0%, #059669 100%); margin-top: 0.5rem;"
-                                    onclick="return confirm('سيتم منح جميع الصلاحيات. هل أنت متأكد؟')">
-                                    <i class="fas fa-check-circle"></i> منح الكل
+                                    onclick="return confirm('Ø³ÙŠØªÙ… Ù…Ù†Ø­ Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª. Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ØŸ')">
+                                    <i class="fas fa-check-circle"></i> Ù…Ù†Ø­ Ø§Ù„ÙƒÙ„
                                 </button>
                             </form>
                         </div>
@@ -792,15 +792,15 @@ include('../insidebar.php');
                 <div class="col-md-6">
                     <div class="card-main">
                         <div class="card-header-custom" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
-                            <i class="fas fa-ban"></i> سحب جميع الصلاحيات
+                            <i class="fas fa-ban"></i> Ø³Ø­Ø¨ Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª
                         </div>
                         <div class="card-body-custom">
                             <form method="POST">
                                 <input type="hidden" name="action" value="revoke_all">
                                 <div class="mb-3">
-                                    <label class="form-label">اختر الدور</label>
+                                    <label class="form-label">Ø§Ø®ØªØ± Ø§Ù„Ø¯ÙˆØ±</label>
                                     <select name="role_id" class="form-select" required>
-                                        <option value="">-- اختر الدور --</option>
+                                        <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø¯ÙˆØ± --</option>
                                         <?php foreach ($roles as $role): ?>
                                             <option value="<?php echo $role['id']; ?>">
                                                 <?php echo htmlspecialchars($role['name']); ?>
@@ -809,8 +809,8 @@ include('../insidebar.php');
                                     </select>
                                 </div>
                                 <button type="submit" class="btn btn-save" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); margin-top: 0.5rem;"
-                                    onclick="return confirm('سيتم سحب جميع الصلاحيات. هل أنت متأكد؟')">
-                                    <i class="fas fa-ban"></i> سحب الكل
+                                    onclick="return confirm('Ø³ÙŠØªÙ… Ø³Ø­Ø¨ Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª. Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ØŸ')">
+                                    <i class="fas fa-ban"></i> Ø³Ø­Ø¨ Ø§Ù„ÙƒÙ„
                                 </button>
                             </form>
                         </div>
@@ -824,3 +824,4 @@ include('../insidebar.php');
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

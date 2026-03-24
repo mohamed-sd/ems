@@ -1,34 +1,91 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
 
 include '../config.php';
+$current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$is_super_admin = ($current_role === '-1');
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+if (!$is_super_admin && $company_id <= 0) {
+    die('معرّف الشركة غير متوفر');
+}
+
+$equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
+$equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
+$drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
+$drivers_has_supplier = db_table_has_column($conn, 'drivers', 'supplier_id');
+$suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
+
+$equipment_scope_sql = '1=1';
+if (!$is_super_admin) {
+    if ($equipments_has_company) {
+        $equipment_scope_sql = "e.company_id = $company_id";
+    } else {
+        $equipment_scope_sql = "EXISTS (
+            SELECT 1
+            FROM operations so
+            JOIN project sp ON sp.id = so.project_id
+            WHERE so.equipment = e.id
+              AND (
+                  EXISTS (SELECT 1 FROM users su WHERE su.id = sp.created_by AND su.company_id = $company_id)
+                  OR EXISTS (
+                      SELECT 1
+                      FROM clients sc
+                      JOIN users scu ON scu.id = sc.created_by
+                      WHERE sc.id = sp.company_client_id AND scu.company_id = $company_id
+                  )
+              )
+        )";
+    }
+}
+
+$driver_scope_sql = '1=1';
+if (!$is_super_admin) {
+    if ($drivers_has_company) {
+        $driver_scope_sql = "d.company_id = $company_id";
+    } elseif ($drivers_has_supplier && $suppliers_has_company) {
+        $driver_scope_sql = "EXISTS (
+            SELECT 1
+            FROM suppliers ds
+            WHERE ds.id = d.supplier_id
+              AND ds.company_id = $company_id
+        )";
+    } else {
+        $driver_scope_sql = "0=1";
+    }
+}
+
 $equipment_id = intval($_GET['equipment_id']);
 
-// جلب معلومات المعدة
+// Ø¬Ù„Ø¨ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…Ø¹Ø¯Ø©
 $equipment_query = "SELECT e.*, s.name as supplier_name 
                     FROM equipments e 
                     LEFT JOIN suppliers s ON e.suppliers = s.id 
-                    WHERE e.id = $equipment_id";
+                    WHERE e.id = $equipment_id AND $equipment_scope_sql";
 $equipment_result = mysqli_query($conn, $equipment_query);
 $equipment = mysqli_fetch_assoc($equipment_result);
+if (!$equipment) {
+    die('المعدة غير موجودة أو خارج نطاق الشركة');
+}
 
-// جلب المشغلين المرتبطين مسبقًا
+// Ø¬Ù„Ø¨ Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ† Ø§Ù„Ù…Ø±ØªØ¨Ø·ÙŠÙ† Ù…Ø³Ø¨Ù‚Ù‹Ø§
 $current = [];
 $linked = [];
 $res = mysqli_query($conn, "SELECT ed.id, ed.start_date, ed.end_date, d.id AS driver_id, d.name, d.phone, ed.status
                              FROM equipment_drivers ed
                              JOIN drivers d ON ed.driver_id = d.id
-                             WHERE ed.equipment_id = $equipment_id");
+                                                         WHERE ed.equipment_id = $equipment_id
+                                                             AND $driver_scope_sql" . (($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND ed.company_id = $company_id"));
 while ($r = mysqli_fetch_assoc($res)) {
     $current[] = $r['driver_id'];
     $linked[] = $r;
 }
 
-$page_title = "إيكوبيشن | إدارة مشغلي المعدة";
+$page_title = "Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø¥Ø¯Ø§Ø±Ø© Ù…Ø´ØºÙ„ÙŠ Ø§Ù„Ù…Ø¹Ø¯Ø©";
 include("../inheader.php");
 ?>
 
@@ -36,7 +93,7 @@ include("../inheader.php");
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
 <style>
-/* استخدام نفس نظام الألوان الموحد للنظام */
+/* Ø§Ø³ØªØ®Ø¯Ø§Ù… Ù†ÙØ³ Ù†Ø¸Ø§Ù… Ø§Ù„Ø£Ù„ÙˆØ§Ù† Ø§Ù„Ù…ÙˆØ­Ø¯ Ù„Ù„Ù†Ø¸Ø§Ù… */
 :root {
     --navy:        #0c1c3e;
     --navy-m:      #132050;
@@ -285,7 +342,7 @@ body {
     color: var(--gold);
 }
 
-/* نظام اختيار السائقين الاحترافي */
+/* Ù†Ø¸Ø§Ù… Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ† Ø§Ù„Ø§Ø­ØªØ±Ø§ÙÙŠ */
 .drivers-selection-container {
     background: var(--bg);
     border: 1.5px solid var(--border);
@@ -758,22 +815,22 @@ table.dataTable tbody tr:hover {
         <div>
             <h1 class="page-title">
                 <div class="title-icon"><i class="fas fa-users-cog"></i></div>
-                إدارة مشغلي المعدة
+                Ø¥Ø¯Ø§Ø±Ø© Ù…Ø´ØºÙ„ÙŠ Ø§Ù„Ù…Ø¹Ø¯Ø©
             </h1>
             <?php if ($equipment): ?>
             <div class="equipment-info">
                 <h3><i class="fas fa-cogs"></i> <?php echo htmlspecialchars($equipment['name']); ?></h3>
-                <p><i class="fas fa-barcode"></i> الكود: <strong><?php echo htmlspecialchars($equipment['code']); ?></strong> | 
-                   <i class="fas fa-building"></i> المورد: <strong><?php echo htmlspecialchars($equipment['supplier_name'] ?: 'غير محدد'); ?></strong></p>
+                <p><i class="fas fa-barcode"></i> Ø§Ù„ÙƒÙˆØ¯: <strong><?php echo htmlspecialchars($equipment['code']); ?></strong> | 
+                   <i class="fas fa-building"></i> Ø§Ù„Ù…ÙˆØ±Ø¯: <strong><?php echo htmlspecialchars($equipment['supplier_name'] ?: 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯'); ?></strong></p>
             </div>
             <?php endif; ?>
         </div>
         <div class="btn-group">
             <a href="equipments.php" class="btn btn-secondary">
-                <i class="fas fa-arrow-right"></i> رجوع
+                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
             </a>
             <a href="javascript:void(0)" id="toggleForm" class="btn btn-success">
-                <i class="fas fa-user-plus"></i> إسناد مشغل جديد
+                <i class="fas fa-user-plus"></i> Ø¥Ø³Ù†Ø§Ø¯ Ù…Ø´ØºÙ„ Ø¬Ø¯ÙŠØ¯
             </a>
         </div>
     </div>
@@ -785,18 +842,18 @@ table.dataTable tbody tr:hover {
         </div>
     <?php endif; ?>
 
-    <!-- فورم إضافة مشغل -->
+    <!-- ÙÙˆØ±Ù… Ø¥Ø¶Ø§ÙØ© Ù…Ø´ØºÙ„ -->
     <div class="card" id="projectForm" style="display: none;">
         <div class="card-header">
-            <i class="fas fa-user-plus"></i> إسناد مشغل جديد للمعدة
+            <i class="fas fa-user-plus"></i> Ø¥Ø³Ù†Ø§Ø¯ Ù…Ø´ØºÙ„ Ø¬Ø¯ÙŠØ¯ Ù„Ù„Ù…Ø¹Ø¯Ø©
         </div>
         <div class="card-body">
             <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i>
                 <div>
-                    <strong>ملاحظة:</strong> يمكنك اختيار أكثر من مشغل بالنقر على البطاقات.
-                    <br>استخدم البحث للعثور على مشغل محدد، أو استخدم "تحديد الكل" لاختيار جميع المشغلين المتاحين.
-                    <br>المشغلون المعروضون هم الذين لم يتم إسنادهم لأي معدة نشطة حالياً.
+                    <strong>Ù…Ù„Ø§Ø­Ø¸Ø©:</strong> ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ø®ØªÙŠØ§Ø± Ø£ÙƒØ«Ø± Ù…Ù† Ù…Ø´ØºÙ„ Ø¨Ø§Ù„Ù†Ù‚Ø± Ø¹Ù„Ù‰ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø§Øª.
+                    <br>Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø¨Ø­Ø« Ù„Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ù…Ø´ØºÙ„ Ù…Ø­Ø¯Ø¯ØŒ Ø£Ùˆ Ø§Ø³ØªØ®Ø¯Ù… "ØªØ­Ø¯ÙŠØ¯ Ø§Ù„ÙƒÙ„" Ù„Ø§Ø®ØªÙŠØ§Ø± Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ† Ø§Ù„Ù…ØªØ§Ø­ÙŠÙ†.
+                    <br>Ø§Ù„Ù…Ø´ØºÙ„ÙˆÙ† Ø§Ù„Ù…Ø¹Ø±ÙˆØ¶ÙˆÙ† Ù‡Ù… Ø§Ù„Ø°ÙŠÙ† Ù„Ù… ÙŠØªÙ… Ø¥Ø³Ù†Ø§Ø¯Ù‡Ù… Ù„Ø£ÙŠ Ù…Ø¹Ø¯Ø© Ù†Ø´Ø·Ø© Ø­Ø§Ù„ÙŠØ§Ù‹.
                 </div>
             </div>
             
@@ -806,14 +863,14 @@ table.dataTable tbody tr:hover {
                 <div class="form-grid">
                     <div class="form-group">
                         <label>
-                            <i class="fas fa-calendar-check"></i> تاريخ بداية القيادة <span style="color: red;">*</span>
+                            <i class="fas fa-calendar-check"></i> ØªØ§Ø±ÙŠØ® Ø¨Ø¯Ø§ÙŠØ© Ø§Ù„Ù‚ÙŠØ§Ø¯Ø© <span style="color: red;">*</span>
                         </label>
                         <input type="date" name="start_date" required>
                     </div>
                     
                     <div class="form-group">
                         <label>
-                            <i class="fas fa-calendar-times"></i> تاريخ نهاية القيادة (اختياري)
+                            <i class="fas fa-calendar-times"></i> ØªØ§Ø±ÙŠØ® Ù†Ù‡Ø§ÙŠØ© Ø§Ù„Ù‚ÙŠØ§Ø¯Ø© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)
                         </label>
                         <input type="date" name="end_date">
                     </div>
@@ -821,26 +878,26 @@ table.dataTable tbody tr:hover {
                 
                 <div class="form-group">
                     <label>
-                        <i class="fas fa-users"></i> اختر المشغلين <span style="color: red;">*</span>
+                        <i class="fas fa-users"></i> Ø§Ø®ØªØ± Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ† <span style="color: red;">*</span>
                     </label>
                     
                     <div class="drivers-selection-container">
                         <div class="selection-header">
                             <div class="search-box">
-                                <input type="text" id="driverSearch" placeholder="🔍 ابحث عن مشغل بالاسم أو رقم الهاتف..." autocomplete="off">
+                                <input type="text" id="driverSearch" placeholder="ðŸ” Ø§Ø¨Ø­Ø« Ø¹Ù† Ù…Ø´ØºÙ„ Ø¨Ø§Ù„Ø§Ø³Ù… Ø£Ùˆ Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ..." autocomplete="off">
                                 <i class="fas fa-search"></i>
                             </div>
                             
                             <div class="selection-controls">
                                 <button type="button" class="btn btn-secondary" id="selectAllDrivers">
-                                    <i class="fas fa-check-double"></i> تحديد الكل
+                                    <i class="fas fa-check-double"></i> ØªØ­Ø¯ÙŠØ¯ Ø§Ù„ÙƒÙ„
                                 </button>
                                 <button type="button" class="btn btn-secondary" id="clearAllDrivers">
-                                    <i class="fas fa-times-circle"></i> إلغاء الكل
+                                    <i class="fas fa-times-circle"></i> Ø¥Ù„ØºØ§Ø¡ Ø§Ù„ÙƒÙ„
                                 </button>
                                 <span class="selected-count" id="selectedCount">
                                     <i class="fas fa-user-check"></i>
-                                    <span id="countNumber">0</span> محدد
+                                    <span id="countNumber">0</span> Ù…Ø­Ø¯Ø¯
                                 </span>
                             </div>
                         </div>
@@ -852,14 +909,15 @@ table.dataTable tbody tr:hover {
                                                             WHERE d.id NOT IN (
                                                                 SELECT driver_id 
                                                                 FROM equipment_drivers 
-                                                                WHERE status = 1
+                                                                WHERE status = 1" . (($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id") . "
                                                             ) AND d.status = 1
+                                                            AND $driver_scope_sql
                                                             ORDER BY d.name");
                             
                             if (mysqli_num_rows($drivers) > 0) {
                                 while ($d = mysqli_fetch_assoc($drivers)) {
                                     $driverName = htmlspecialchars($d['name']);
-                                    $driverPhone = htmlspecialchars($d['phone'] ?: 'لا يوجد');
+                                    $driverPhone = htmlspecialchars($d['phone'] ?: 'Ù„Ø§ ÙŠÙˆØ¬Ø¯');
                                     $driverInitial = mb_substr($driverName, 0, 1);
                                     echo "
                                     <div class='driver-card' data-driver-id='{$d['id']}' data-driver-name='$driverName' data-driver-phone='$driverPhone'>
@@ -882,7 +940,7 @@ table.dataTable tbody tr:hover {
                                 echo "
                                 <div class='no-drivers-message'>
                                     <i class='fas fa-user-slash'></i>
-                                    <p>لا يوجد مشغلون متاحون حالياً</p>
+                                    <p>Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ø´ØºÙ„ÙˆÙ† Ù…ØªØ§Ø­ÙˆÙ† Ø­Ø§Ù„ÙŠØ§Ù‹</p>
                                 </div>
                                 ";
                             }
@@ -895,23 +953,23 @@ table.dataTable tbody tr:hover {
                 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save"></i> حفظ الإسناد
+                        <i class="fas fa-save"></i> Ø­ÙØ¸ Ø§Ù„Ø¥Ø³Ù†Ø§Ø¯
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="document.getElementById('projectForm').style.display='none'">
-                        <i class="fas fa-times"></i> إلغاء
+                        <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- جدول المشغلين المرتبطين -->
+    <!-- Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ† Ø§Ù„Ù…Ø±ØªØ¨Ø·ÙŠÙ† -->
     <div class="card">
         <div class="card-header">
-            <i class="fas fa-list-alt"></i> المشغلون المرتبطون بهذه المعدة
+            <i class="fas fa-list-alt"></i> Ø§Ù„Ù…Ø´ØºÙ„ÙˆÙ† Ø§Ù„Ù…Ø±ØªØ¨Ø·ÙˆÙ† Ø¨Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø¹Ø¯Ø©
             <?php if (count($linked) > 0): ?>
                 <span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; margin-right: auto;">
-                    <?php echo count($linked); ?> مشغل
+                    <?php echo count($linked); ?> Ù…Ø´ØºÙ„
                 </span>
             <?php endif; ?>
         </div>
@@ -922,12 +980,12 @@ table.dataTable tbody tr:hover {
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>اسم المشغل</th>
-                                <th>رقم الهاتف</th>
-                                <th>تاريخ البداية</th>
-                                <th>تاريخ النهاية</th>
-                                <th>الحالة</th>
-                                <th>الإجراءات</th>
+                                <th>Ø§Ø³Ù… Ø§Ù„Ù…Ø´ØºÙ„</th>
+                                <th>Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ</th>
+                                <th>ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©</th>
+                                <th>ØªØ§Ø±ÙŠØ® Ø§Ù„Ù†Ù‡Ø§ÙŠØ©</th>
+                                <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+                                <th>Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -936,9 +994,9 @@ table.dataTable tbody tr:hover {
                             foreach ($linked as $row): 
                                 $statusClass = $row['status'] ? 'status-active' : 'status-inactive';
                                 $statusIcon = $row['status'] ? 'check-circle' : 'times-circle';
-                                $statusText = $row['status'] ? 'نشط' : 'غير نشط';
+                                $statusText = $row['status'] ? 'Ù†Ø´Ø·' : 'ØºÙŠØ± Ù†Ø´Ø·';
                                 $actionIcon = $row['status'] ? 'ban' : 'check';
-                                $actionText = $row['status'] ? 'تعطيل' : 'تفعيل';
+                                $actionText = $row['status'] ? 'ØªØ¹Ø·ÙŠÙ„' : 'ØªÙØ¹ÙŠÙ„';
                                 $actionClass = $row['status'] ? 'delete' : 'activate';
                             ?>
                             <tr>
@@ -957,7 +1015,7 @@ table.dataTable tbody tr:hover {
                                     <div class="action-btns">
                                         <a href="delete_equipment_driver.php?id=<?php echo $row['id']; ?>&equipment_id=<?php echo $equipment_id; ?>" 
                                            class="action-btn <?php echo $actionClass; ?>"
-                                           onclick="return confirm('هل أنت متأكد من <?php echo $actionText; ?> هذا المشغل؟')"
+                                           onclick="return confirm('Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† <?php echo $actionText; ?> Ù‡Ø°Ø§ Ø§Ù„Ù…Ø´ØºÙ„ØŸ')"
                                            title="<?php echo $actionText; ?>">
                                             <i class="fas fa-<?php echo $actionIcon; ?>"></i>
                                         </a>
@@ -971,10 +1029,10 @@ table.dataTable tbody tr:hover {
             <?php else: ?>
                 <div class="empty-state">
                     <i class="fas fa-user-slash"></i>
-                    <h3>لا يوجد مشغلون مسندون لهذه المعدة</h3>
-                    <p>ابدأ بإضافة مشغلين للمعدة باستخدام الزر أعلاه</p>
+                    <h3>Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ø´ØºÙ„ÙˆÙ† Ù…Ø³Ù†Ø¯ÙˆÙ† Ù„Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø¹Ø¯Ø©</h3>
+                    <p>Ø§Ø¨Ø¯Ø£ Ø¨Ø¥Ø¶Ø§ÙØ© Ù…Ø´ØºÙ„ÙŠÙ† Ù„Ù„Ù…Ø¹Ø¯Ø© Ø¨Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„Ø²Ø± Ø£Ø¹Ù„Ø§Ù‡</p>
                     <button onclick="document.getElementById('toggleForm').click()" class="btn btn-success">
-                        <i class="fas fa-user-plus"></i> إسناد مشغل الآن
+                        <i class="fas fa-user-plus"></i> Ø¥Ø³Ù†Ø§Ø¯ Ù…Ø´ØºÙ„ Ø§Ù„Ø¢Ù†
                     </button>
                 </div>
             <?php endif; ?>
@@ -982,7 +1040,7 @@ table.dataTable tbody tr:hover {
     </div>
 </div>
 
-<!-- jQuery (واحد فقط) -->
+<!-- jQuery (ÙˆØ§Ø­Ø¯ ÙÙ‚Ø·) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <!-- DataTables core -->
@@ -1001,20 +1059,20 @@ table.dataTable tbody tr:hover {
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
-<!-- تهيئة DataTable وجافاسكربت الواجهة -->
+<!-- ØªÙ‡ÙŠØ¦Ø© DataTable ÙˆØ¬Ø§ÙØ§Ø³ÙƒØ±Ø¨Øª Ø§Ù„ÙˆØ§Ø¬Ù‡Ø© -->
 <script>
 $(document).ready(function() {
-    // تهيئة DataTable
+    // ØªÙ‡ÙŠØ¦Ø© DataTable
     <?php if (count($linked) > 0): ?>
     $('#projectsTable').DataTable({
         responsive: true,
         dom: 'Bfrtip',
         buttons: [
-            { extend: 'copy', text: '<i class="fas fa-copy"></i> نسخ' },
-            { extend: 'excel', text: '<i class="fas fa-file-excel"></i> تصدير Excel' },
-            { extend: 'csv', text: '<i class="fas fa-file-csv"></i> تصدير CSV' },
-            { extend: 'pdf', text: '<i class="fas fa-file-pdf"></i> تصدير PDF' },
-            { extend: 'print', text: '<i class="fas fa-print"></i> طباعة' }
+            { extend: 'copy', text: '<i class="fas fa-copy"></i> Ù†Ø³Ø®' },
+            { extend: 'excel', text: '<i class="fas fa-file-excel"></i> ØªØµØ¯ÙŠØ± Excel' },
+            { extend: 'csv', text: '<i class="fas fa-file-csv"></i> ØªØµØ¯ÙŠØ± CSV' },
+            { extend: 'pdf', text: '<i class="fas fa-file-pdf"></i> ØªØµØ¯ÙŠØ± PDF' },
+            { extend: 'print', text: '<i class="fas fa-print"></i> Ø·Ø¨Ø§Ø¹Ø©' }
         ],
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json'
@@ -1024,30 +1082,30 @@ $(document).ready(function() {
     });
     <?php endif; ?>
 
-    // التحكم في إظهار/إخفاء الفورم
+    // Ø§Ù„ØªØ­ÙƒÙ… ÙÙŠ Ø¥Ø¸Ù‡Ø§Ø±/Ø¥Ø®ÙØ§Ø¡ Ø§Ù„ÙÙˆØ±Ù…
     $('#toggleForm').on('click', function(e) {
         e.preventDefault();
         const form = $('#projectForm');
         
         if (form.is(':visible')) {
             form.slideUp(300);
-            $(this).html('<i class="fas fa-user-plus"></i> إسناد مشغل جديد');
+            $(this).html('<i class="fas fa-user-plus"></i> Ø¥Ø³Ù†Ø§Ø¯ Ù…Ø´ØºÙ„ Ø¬Ø¯ÙŠØ¯');
         } else {
             form.slideDown(300);
-            $(this).html('<i class="fas fa-times"></i> إخفاء الفورم');
+            $(this).html('<i class="fas fa-times"></i> Ø¥Ø®ÙØ§Ø¡ Ø§Ù„ÙÙˆØ±Ù…');
             $('html, body').animate({ scrollTop: form.offset().top - 100 }, 500);
         }
     });
 
-    // نظام اختيار السائقين الاحترافي
+    // Ù†Ø¸Ø§Ù… Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ† Ø§Ù„Ø§Ø­ØªØ±Ø§ÙÙŠ
     let selectedDrivers = [];
 
-    // تحديث العداد والـ hidden input
+    // ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø¹Ø¯Ø§Ø¯ ÙˆØ§Ù„Ù€ hidden input
     function updateSelectedCount() {
         $('#countNumber').text(selectedDrivers.length);
         $('#driversSelected').val(selectedDrivers.join(','));
         
-        // تحديث اللون بناء على العدد
+        // ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù„ÙˆÙ† Ø¨Ù†Ø§Ø¡ Ø¹Ù„Ù‰ Ø§Ù„Ø¹Ø¯Ø¯
         if (selectedDrivers.length > 0) {
             $('#selectedCount').css({
                 'background': 'var(--gold-soft)',
@@ -1061,18 +1119,18 @@ $(document).ready(function() {
         }
     }
 
-    // النقر على البطاقة
+    // Ø§Ù„Ù†Ù‚Ø± Ø¹Ù„Ù‰ Ø§Ù„Ø¨Ø·Ø§Ù‚Ø©
     $('.driver-card').on('click', function() {
         const driverId = $(this).data('driver-id');
         const index = selectedDrivers.indexOf(driverId);
         
         if (index > -1) {
-            // إلغاء التحديد
+            // Ø¥Ù„ØºØ§Ø¡ Ø§Ù„ØªØ­Ø¯ÙŠØ¯
             selectedDrivers.splice(index, 1);
             $(this).removeClass('selected');
             $(this).find('.driver-checkbox-input').prop('checked', false);
         } else {
-            // تحديد
+            // ØªØ­Ø¯ÙŠØ¯
             selectedDrivers.push(driverId);
             $(this).addClass('selected');
             $(this).find('.driver-checkbox-input').prop('checked', true);
@@ -1081,7 +1139,7 @@ $(document).ready(function() {
         updateSelectedCount();
     });
 
-    // تحديد الكل
+    // ØªØ­Ø¯ÙŠØ¯ Ø§Ù„ÙƒÙ„
     $('#selectAllDrivers').on('click', function() {
         selectedDrivers = [];
         $('.driver-card:visible').each(function() {
@@ -1093,7 +1151,7 @@ $(document).ready(function() {
         updateSelectedCount();
     });
 
-    // إلغاء الكل
+    // Ø¥Ù„ØºØ§Ø¡ Ø§Ù„ÙƒÙ„
     $('#clearAllDrivers').on('click', function() {
         selectedDrivers = [];
         $('.driver-card').removeClass('selected');
@@ -1101,7 +1159,7 @@ $(document).ready(function() {
         updateSelectedCount();
     });
 
-    // البحث عن السائقين
+    // Ø§Ù„Ø¨Ø­Ø« Ø¹Ù† Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ†
     $('#driverSearch').on('input', function() {
         const searchTerm = $(this).val().toLowerCase().trim();
         
@@ -1116,7 +1174,7 @@ $(document).ready(function() {
             }
         });
 
-        // رسالة إذا لم يتم العثور على نتائج
+        // Ø±Ø³Ø§Ù„Ø© Ø¥Ø°Ø§ Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ù†ØªØ§Ø¦Ø¬
         const visibleCards = $('.driver-card:visible').length;
         const noResultsMsg = $('#noResultsMsg');
         
@@ -1125,7 +1183,7 @@ $(document).ready(function() {
                 $('#driversGrid').append(`
                     <div id="noResultsMsg" class="no-drivers-message" style="grid-column: 1 / -1;">
                         <i class="fas fa-search"></i>
-                        <p>لم يتم العثور على نتائج للبحث: "${searchTerm}"</p>
+                        <p>Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ù†ØªØ§Ø¦Ø¬ Ù„Ù„Ø¨Ø­Ø«: "${searchTerm}"</p>
                     </div>
                 `);
             }
@@ -1134,39 +1192,39 @@ $(document).ready(function() {
         }
     });
 
-    // التحقق من الصحة قبل الإرسال
+    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„ØµØ­Ø© Ù‚Ø¨Ù„ Ø§Ù„Ø¥Ø±Ø³Ø§Ù„
     $('form').on('submit', function(e) {
         if (selectedDrivers.length === 0) {
             e.preventDefault();
-            alert('⚠️ يجب اختيار مشغل واحد على الأقل');
+            alert('âš ï¸ ÙŠØ¬Ø¨ Ø§Ø®ØªÙŠØ§Ø± Ù…Ø´ØºÙ„ ÙˆØ§Ø­Ø¯ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„');
             $('#driverSearch').focus();
             return false;
         }
     });
 
-    // تحسين تجربة اختيار المشغلين المتعددين - تم إزالة الـ select القديم
-    // تم استبداله بنظام الـ cards
+    // ØªØ­Ø³ÙŠÙ† ØªØ¬Ø±Ø¨Ø© Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ† Ø§Ù„Ù…ØªØ¹Ø¯Ø¯ÙŠÙ† - ØªÙ… Ø¥Ø²Ø§Ù„Ø© Ø§Ù„Ù€ select Ø§Ù„Ù‚Ø¯ÙŠÙ…
+    // ØªÙ… Ø§Ø³ØªØ¨Ø¯Ø§Ù„Ù‡ Ø¨Ù†Ø¸Ø§Ù… Ø§Ù„Ù€ cards
 
-    // التحقق من صحة التواريخ
+    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµØ­Ø© Ø§Ù„ØªÙˆØ§Ø±ÙŠØ®
     $('input[name="end_date"]').on('change', function() {
         const startDate = new Date($('input[name="start_date"]').val());
         const endDate = new Date($(this).val());
         if (endDate < startDate) {
-            alert('⚠️ تاريخ النهاية لا يمكن أن يكون قبل تاريخ البداية');
+            alert('âš ï¸ ØªØ§Ø±ÙŠØ® Ø§Ù„Ù†Ù‡Ø§ÙŠØ© Ù„Ø§ ÙŠÙ…ÙƒÙ† Ø£Ù† ÙŠÙƒÙˆÙ† Ù‚Ø¨Ù„ ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©');
             $(this).val('');
         }
     });
 
-    // رسالة النجاح التلقائية
+    // Ø±Ø³Ø§Ù„Ø© Ø§Ù„Ù†Ø¬Ø§Ø­ Ø§Ù„ØªÙ„Ù‚Ø§Ø¦ÙŠØ©
     <?php if (isset($_GET['msg'])): ?>
     setTimeout(function() { $('.alert-success').fadeOut(500); }, 5000);
     <?php endif; ?>
 
-    // تحسين رسائل التأكيد
+    // ØªØ­Ø³ÙŠÙ† Ø±Ø³Ø§Ø¦Ù„ Ø§Ù„ØªØ£ÙƒÙŠØ¯
     $('.action-btn').on('click', function(e) {
-        const actionType = $(this).hasClass('delete') ? 'تعطيل' : 'تفعيل';
+        const actionType = $(this).hasClass('delete') ? 'ØªØ¹Ø·ÙŠÙ„' : 'ØªÙØ¹ÙŠÙ„';
         const driverName = $(this).closest('tr').find('td:eq(1)').text();
-        if (!confirm(`هل أنت متأكد من ${actionType} المشغل: ${driverName}؟`)) {
+        if (!confirm(`Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† ${actionType} Ø§Ù„Ù…Ø´ØºÙ„: ${driverName}ØŸ`)) {
             e.preventDefault();
             return false;
         }

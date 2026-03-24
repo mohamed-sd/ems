@@ -1,10 +1,10 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../index.php");
+    header("Location: ../login.php");
     exit();
 }
-$page_title = "إيكوبيشن | اختيار المشروع";
+$page_title = "Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù…Ø´Ø±ÙˆØ¹";
 include("../inheader.php");
 include("../insidebar.php");
 include '../config.php';
@@ -217,12 +217,12 @@ include '../config.php';
 <div class="main">
     <h2>
         <i class="fas fa-project-diagram"></i>
-        اختر المشروع لإدارة المعدات
+        Ø§Ø®ØªØ± Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø¹Ø¯Ø§Øª
     </h2>
     
     <p class="page-description">
         <i class="fas fa-info-circle"></i>
-        اختر المشروع الذي ترغب في إدارة معداته
+        Ø§Ø®ØªØ± Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„Ø°ÙŠ ØªØ±ØºØ¨ ÙÙŠ Ø¥Ø¯Ø§Ø±Ø© Ù…Ø¹Ø¯Ø§ØªÙ‡
     </p>
 
     <div class="projects-grid">
@@ -262,18 +262,18 @@ include '../config.php';
                         
                         <div class="project-detail-item">
                             <i class="fas fa-mountain"></i>
-                            <span><?php echo intval($project['mines_count']); ?> منجم</span>
+                            <span><?php echo intval($project['mines_count']); ?> Ù…Ù†Ø¬Ù…</span>
                         </div>
                         
                         <div class="project-detail-item">
                             <i class="fas fa-cogs"></i>
-                            <span><?php echo intval($project['equipments_count']); ?> معدة مسجلة</span>
+                            <span><?php echo intval($project['equipments_count']); ?> Ù…Ø¹Ø¯Ø© Ù…Ø³Ø¬Ù„Ø©</span>
                         </div>
                     </div>
                     
                     <div class="action-button">
                         <i class="fas fa-arrow-left"></i>
-                        إدارة المعدات
+                        Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø¹Ø¯Ø§Øª
                     </div>
                 </a>
                 <?php
@@ -282,7 +282,7 @@ include '../config.php';
             ?>
             <div class="no-projects">
                 <i class="fas fa-folder-open"></i>
-                <p>لا توجد مشاريع متاحة حالياً</p>
+                <p>Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø´Ø§Ø±ÙŠØ¹ Ù…ØªØ§Ø­Ø© Ø­Ø§Ù„ÙŠØ§Ù‹</p>
             </div>
             <?php
         }
@@ -292,3 +292,4 @@ include '../config.php';
 
 </body>
 </html>
+

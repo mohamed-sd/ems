@@ -11,11 +11,11 @@ include '../inheader.php';
 // تضمين الشريط الجانبي
 include '../insidebar.php';
 
-// إضافة أو تعديل مستخدم (بدون تشفير كلمة المرور)
+// إضافة أو تعديل مستخدم
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $name = mysqli_real_escape_string($conn, $_POST['name']);
     $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = isset($_POST['password']) ? mysqli_real_escape_string($conn, $_POST['password']) : '';
+    $passwordRaw = isset($_POST['password']) ? trim($_POST['password']) : '';
     $phone = mysqli_real_escape_string($conn, $_POST['phone']);
     $role = mysqli_real_escape_string($conn, $_POST['role']);
     $project = (($role == "5" || $role == "10") && !empty($_POST['project_id'])) ? intval($_POST['project_id']) : 0;
@@ -31,10 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         } elseif (mysqli_num_rows($check) > 0) {
             echo "<script>alert('⚠️ اسم المستخدم موجود مسبقاً!');</script>";
         } else {
-            // إذا تم إدخال كلمة مرور جديدة، نحدّثها كما هي؛ وإلا لا نغيّرها
+            // إذا تم إدخال كلمة مرور جديدة، نشفّرها ونحدّثها؛ وإلا لا نغيّرها
             $sql_pass = "";
-            if (!empty($password)) {
-                $sql_pass = ", password='$password'";
+            if ($passwordRaw !== '') {
+                $hashedPass = mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_BCRYPT));
+                $sql_pass = ", password='$hashedPass'";
             }
 
             $sql = "UPDATE users 
@@ -328,7 +329,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             echo "<td><strong>" . $i++ . "</strong></td>";
                             echo "<td>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . $project_info . "</td>";
                             echo "<td><strong>" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "</strong></td>";
-                            echo "<td><span class='password-cell'>" . htmlspecialchars($row['password'], ENT_QUOTES, 'UTF-8') . "</span></td>";
+                            echo "<td><span class='password-cell' style='letter-spacing:2px;color:#94a3b8;'>••••••••</span></td>";
                             echo "<td><span class='role-badge role-" . $row['role'] . "'>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</span></td>";
                             echo "<td><i class='fas fa-phone'></i>" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
                             echo "<td>

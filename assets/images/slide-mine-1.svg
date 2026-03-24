@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">مشهد تعدين ليلي</title>
+  <desc id="desc">خلفية جبلية مع معدات تعدين بأسلوب توضيحي.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#08203a"/>
+      <stop offset="100%" stop-color="#204f74"/>
+    </linearGradient>
+    <linearGradient id="land" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#142d46"/>
+      <stop offset="100%" stop-color="#2a4967"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6c84d"/>
+      <stop offset="100%" stop-color="#d89e18"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <circle cx="250" cy="170" r="80" fill="#f6c84d" opacity="0.95"/>
+  <path d="M0 520 L300 300 L620 530 L930 320 L1240 540 L1600 330 L1600 900 L0 900 Z" fill="url(#land)"/>
+  <path d="M0 620 L260 470 L500 620 L720 500 L940 640 L1220 520 L1600 680 L1600 900 L0 900 Z" fill="#1d3855"/>
+  <rect x="950" y="560" width="300" height="120" rx="12" fill="#264563"/>
+  <rect x="1160" y="500" width="170" height="80" rx="10" fill="#365c7e"/>
+  <circle cx="1020" cy="700" r="48" fill="#10253b"/>
+  <circle cx="1220" cy="700" r="48" fill="#10253b"/>
+  <path d="M1310 500 L1490 420 L1510 455 L1326 530 Z" fill="url(#accent)"/>
+  <rect x="420" y="560" width="180" height="38" rx="8" fill="url(#accent)"/>
+  <rect x="390" y="610" width="240" height="22" rx="8" fill="#0f2238" opacity="0.85"/>
+  <g opacity="0.35" stroke="#ffffff" stroke-width="2">
+    <line x1="180" y1="250" x2="260" y2="250"/>
+    <line x1="160" y1="280" x2="290" y2="280"/>
+    <line x1="200" y1="310" x2="320" y2="310"/>
+  </g>
+</svg>
