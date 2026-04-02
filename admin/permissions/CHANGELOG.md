@@ -182,7 +182,7 @@ require_once __DIR__ . '/../includes/layout_head.php';  // Header
 
 ### الرابط الرئيسي:
 ```
-http://localhost/ems/admin/permissions/
+http://localhost/<project-folder>/admin/permissions/
 ```
 
 ### الروابط الفرعية:

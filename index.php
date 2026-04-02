@@ -1,5 +1,20 @@
 <?php
 $year = date('Y');
+
+$scriptName = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : '/index.php';
+$baseUrl = rtrim(dirname($scriptName), '/');
+if ($baseUrl === '/' || $baseUrl === '\\') {
+    $baseUrl = '';
+}
+
+function landing_url($path = '') {
+    global $baseUrl;
+    if ($path === '' || $path === '/') {
+        return $baseUrl === '' ? '/' : $baseUrl;
+    }
+
+    return ($baseUrl === '' ? '' : $baseUrl) . '/' . ltrim($path, '/');
+}
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -799,7 +814,7 @@ $year = date('Y');
 
     <header class="header">
         <div class="container navbar">
-            <a class="logo" href="/ems/index.php" aria-label="الصفحة الرئيسية">
+            <a class="logo" href="<?php echo landing_url('index.php'); ?>" aria-label="الصفحة الرئيسية">
                 <span class="logo-icon"><i class="fas fa-layer-group"></i></span>
                 <span>
                     <h1>منصة إنجاز</h1>
@@ -811,11 +826,11 @@ $year = date('Y');
                 <a href="#features">المزايا</a>
                 <a href="#comparison">المقارنة</a>
                 <a href="#journey">رحلة الاستخدام</a>
-                <a href="/ems/company/login.php">بوابة الشركات</a>
-                <a href="/ems/admin/login.php">لوحة الإدارة</a>
+                <a href="<?php echo landing_url('company/login.php'); ?>">بوابة الشركات</a>
+                <a href="<?php echo landing_url('admin/login.php'); ?>">لوحة الإدارة</a>
             </nav>
 
-            <a class="nav-cta" href="/ems/login.php"><i class="fas fa-right-to-bracket"></i> دخول النظام</a>
+            <a class="nav-cta" href="<?php echo landing_url('login.php'); ?>"><i class="fas fa-right-to-bracket"></i> دخول النظام</a>
         </div>
     </header>
 
@@ -829,8 +844,8 @@ $year = date('Y');
                     النتيجة: دورة عمل واضحة، واجهة أسرع، ومعلومات تشغيلية جاهزة لاتخاذ القرار من دون تعقيد.
                 </p>
                 <div class="hero-actions">
-                    <a class="btn btn-gold" href="/ems/company/register.php"><i class="fas fa-building-circle-check"></i> تسجيل شركة جديدة</a>
-                    <a class="btn btn-ghost" href="/ems/login.php"><i class="fas fa-arrow-left"></i> تسجيل الدخول للنظام</a>
+                    <a class="btn btn-gold" href="<?php echo landing_url('company/register.php'); ?>"><i class="fas fa-building-circle-check"></i> تسجيل شركة جديدة</a>
+                    <a class="btn btn-ghost" href="<?php echo landing_url('login.php'); ?>"><i class="fas fa-arrow-left"></i> تسجيل الدخول للنظام</a>
                 </div>
 
                 <div class="hero-metrics" aria-label="مؤشرات سريعة">
@@ -844,21 +859,21 @@ $year = date('Y');
                 <article class="glass-card">
                     <div class="slider" id="heroSlider" aria-label="معرض مرئي للمنصة">
                         <figure class="slide active" data-slide="0">
-                            <img src="/ems/assets/images/slide-mine-1.svg" alt="مشهد تعدين حديث">
+                            <img src="<?php echo landing_url('assets/images/slide-mine-1.svg'); ?>" alt="مشهد تعدين حديث">
                             <figcaption class="slide-caption">
                                 <strong>تشغيل ميداني منظم</strong>
                                 <span>متابعة مواقع العمل والمعدات في رؤية واحدة.</span>
                             </figcaption>
                         </figure>
                         <figure class="slide" data-slide="1">
-                            <img src="/ems/assets/images/slide-dashboard-2.svg" alt="لوحة بيانات تشغيلية">
+                            <img src="<?php echo landing_url('assets/images/slide-dashboard-2.svg'); ?>" alt="لوحة بيانات تشغيلية">
                             <figcaption class="slide-caption">
                                 <strong>تحليلات لحظية</strong>
                                 <span>مؤشرات عقود ومشاريع تساعد في قرارات أسرع.</span>
                             </figcaption>
                         </figure>
                         <figure class="slide" data-slide="2">
-                            <img src="/ems/assets/images/slide-team-3.svg" alt="فريق تشغيل معدات">
+                            <img src="<?php echo landing_url('assets/images/slide-team-3.svg'); ?>" alt="فريق تشغيل معدات">
                             <figcaption class="slide-caption">
                                 <strong>تنسيق الفرق</strong>
                                 <span>ربط المشغلين بالمعدات والمشاريع بدون فجوات.</span>
@@ -879,10 +894,10 @@ $year = date('Y');
                     <h3><i class="fas fa-route" style="color:#2563eb"></i> مسارات الدخول</h3>
                     <p style="margin:0;color:var(--muted);font-size:.88rem;line-height:1.8;">اختر المسار الصحيح حسب نوع حسابك.</p>
                     <ul class="entry-list">
-                        <li><a href="/ems/company/register.php"><i class="fas fa-user-plus"></i> إنشاء حساب شركة</a></li>
-                        <li><a href="/ems/company/login.php"><i class="fas fa-users"></i> دخول مستخدمي الشركات</a></li>
-                        <li><a href="/ems/login.php"><i class="fas fa-gauge-high"></i> دخول نظام التشغيل</a></li>
-                        <li><a href="/ems/admin/login.php"><i class="fas fa-user-shield"></i> دخول الإدارة العليا</a></li>
+                        <li><a href="<?php echo landing_url('company/register.php'); ?>"><i class="fas fa-user-plus"></i> إنشاء حساب شركة</a></li>
+                        <li><a href="<?php echo landing_url('company/login.php'); ?>"><i class="fas fa-users"></i> دخول مستخدمي الشركات</a></li>
+                        <li><a href="<?php echo landing_url('login.php'); ?>"><i class="fas fa-gauge-high"></i> دخول نظام التشغيل</a></li>
+                        <li><a href="<?php echo landing_url('admin/login.php'); ?>"><i class="fas fa-user-shield"></i> دخول الإدارة العليا</a></li>
                     </ul>
                 </article>
 
@@ -1016,8 +1031,8 @@ $year = date('Y');
                 <p>نقطة دخول واحدة لجميع المستخدمين مع تجربة تشغيل احترافية وثابتة.</p>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <a class="btn btn-gold" href="/ems/company/register.php"><i class="fas fa-building-circle-check"></i> تسجيل شركة جديدة</a>
-                <a class="btn btn-ghost" href="/ems/admin/login.php"><i class="fas fa-user-shield"></i> لوحة الإدارة</a>
+                <a class="btn btn-gold" href="<?php echo landing_url('company/register.php'); ?>"><i class="fas fa-building-circle-check"></i> تسجيل شركة جديدة</a>
+                <a class="btn btn-ghost" href="<?php echo landing_url('admin/login.php'); ?>"><i class="fas fa-user-shield"></i> لوحة الإدارة</a>
             </div>
         </section>
     </main>
@@ -1026,9 +1041,9 @@ $year = date('Y');
         <div class="container footer-wrap">
             <small>&copy; <?php echo $year; ?> منصة إنجاز - جميع الحقوق محفوظة</small>
             <div class="footer-links">
-                <a href="/ems/login.php">دخول النظام</a>
-                <a href="/ems/company/login.php">بوابة الشركات</a>
-                <a href="/ems/admin/login.php">الإدارة العليا</a>
+                <a href="<?php echo landing_url('login.php'); ?>">دخول النظام</a>
+                <a href="<?php echo landing_url('company/login.php'); ?>">بوابة الشركات</a>
+                <a href="<?php echo landing_url('admin/login.php'); ?>">الإدارة العليا</a>
             </div>
         </div>
     </footer>

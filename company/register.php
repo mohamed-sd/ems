@@ -2,7 +2,7 @@
 require_once __DIR__ . '/auth.php';
 
 if (company_is_logged_in()) {
-    $to = isset($_SESSION['company_user']['dashboard']) ? $_SESSION['company_user']['dashboard'] : '/ems/company/home.php';
+    $to = isset($_SESSION['company_user']['dashboard']) ? $_SESSION['company_user']['dashboard'] : ems_url('company/home.php');
     header('Location: ' . $to);
     exit();
 }
@@ -357,6 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $selectedPlan = isset($plansById[$selectedPlanId]) ? $plansById[$selectedPlanId] : $freemiumPlan;
         $isFreemium = ($selectedPlanId === $freemiumPlanId);
 
+        // Validation checks
         if (!validate_length($companyName, 2, 200)) {
             $error = 'اسم الشركة مطلوب.';
         } elseif (!validate_length($commercialRegistration, 2, 120)) {
@@ -380,13 +381,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($isFreemium && $managerPassword !== $managerPasswordConfirm) {
             $error = 'تأكيد كلمة المرور غير مطابق.';
         } else {
-            $checkCompany = mysqli_prepare($conn, 'SELECT id FROM admin_companies WHERE email = ? LIMIT 1');
+            $checkCompany = mysqli_prepare($conn, 'SELECT id FROM admin_companies WHERE email = ? OR commercial_registration = ? LIMIT 1');
             $checkRequest = mysqli_prepare($conn, 'SELECT id FROM admin_subscription_requests WHERE email = ? AND status = "pending" LIMIT 1');
 
             if (!$checkCompany || !$checkRequest) {
                 $error = 'تعذر التحقق من البيانات حالياً.';
             } else {
-                mysqli_stmt_bind_param($checkCompany, 's', $companyEmail);
+                mysqli_stmt_bind_param($checkCompany, 'ss', $companyEmail, $commercialRegistration);
                 mysqli_stmt_execute($checkCompany);
                 $companyExists = mysqli_stmt_get_result($checkCompany);
                 $companyExistsRow = $companyExists ? mysqli_fetch_assoc($companyExists) : null;
@@ -411,7 +412,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 if ($companyExistsRow) {
-                    $error = 'البريد الرسمي للشركة مسجل مسبقاً.';
+                    $error = 'البريد الرسمي للشركة أو رقم السجل التجاري مسجل مسبقاً.';
                 } elseif ($managerDupRow) {
                     $error = 'بريد المدير العام مستخدم مسبقاً.';
                 } elseif (!$isFreemium && $requestExistsRow) {

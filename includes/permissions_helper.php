@@ -398,8 +398,9 @@ function get_module_id_by_script_path($conn, $script_path = null) {
     }
 
     $normalized = str_replace('\\', '/', $script_name);
-    $parts = explode('/ems/', $normalized, 2);
-    $relative_path = isset($parts[1]) ? $parts[1] : ltrim($normalized, '/');
+    $relative_path = function_exists('ems_relative_path')
+        ? ems_relative_path($normalized)
+        : ltrim($normalized, '/');
     $basename = basename($relative_path);
 
     $stmt = $conn->prepare(
@@ -533,10 +534,10 @@ function _default_full_permissions() {
  * 
  * @example
  * // ✅ تمرير رابط محدد
- * $perms = get_page_permissions($conn, '/ems/suppliers/index.php');
+ * $perms = get_page_permissions($conn, '/suppliers/index.php');
  *
  * // ✅ رابط مع query string - يتجاهلها تلقائياً
- * $perms = get_page_permissions($conn, '/ems/suppliers/index.php?id=5&action=edit');
+ * $perms = get_page_permissions($conn, '/suppliers/index.php?id=5&action=edit');
  *
  * // ✅ استخدام الرابط الحالي تلقائياً (بدون تمرير أي شيء)
  * $perms = get_page_permissions($conn);
@@ -564,9 +565,10 @@ function get_page_permissions($conn, $url = null ) {
     // تطبيع الفواصل
     $normalized = str_replace('\\', '/', $path);
 
-    // استخراج الجزء بعد /ems/ إن وجد، وإلا استخدم المسار كاملاً
-    $parts         = explode('/ems/', $normalized, 2);
-    $relative_path = isset($parts[1]) ? $parts[1] : ltrim($normalized, '/');
+    // استخراج المسار النسبي داخل المشروع بشكل ديناميكي
+    $relative_path = function_exists('ems_relative_path')
+        ? ems_relative_path($normalized)
+        : ltrim($normalized, '/');
 
     // اسم الملف فقط بدون المسار
     $basename = basename($relative_path);

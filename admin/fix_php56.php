@@ -3,7 +3,7 @@
  * PHP 5.6 Compatibility Fixer
  * Replaces PHP 7+ null coalescing ?? with compatible isset() ternary
  * Run ONCE via browser, then delete this file.
- * URL: http://localhost/ems/admin/fix_php56.php
+ * URL: /admin/fix_php56.php (تحت جذر المشروع الحالي)
  */
 $base = __DIR__;
 $files = [

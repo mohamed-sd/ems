@@ -124,7 +124,11 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
     <span style="color:var(--ink);font-weight:700;"><?php echo e($displayName); ?></span>
 </div>
 
-<?php if ($msg): list($type, $text) = explode(':', $msg, 2); ?>
+<?php if ($msg):
+    $parts = explode(':', $msg, 2);
+    $type = isset($parts[0]) ? $parts[0] : 'error';
+    $text = isset($parts[1]) ? $parts[1] : $msg;
+?>
 <div class="alert alert-<?php echo $type === 'success' ? 'success' : 'danger'; ?>" style="margin-bottom:16px;">
     <i class="fas fa-<?php echo $type === 'success' ? 'check-circle' : 'exclamation-circle'; ?>"></i>
     <span><?php echo e($text); ?></span>

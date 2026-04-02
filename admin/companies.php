@@ -88,7 +88,11 @@ require_once __DIR__ . '/includes/layout_head.php';
     </div>
 </div>
 
-<?php if ($msg): list($type, $text) = explode(':', $msg, 2); ?>
+<?php if ($msg):
+    $parts = explode(':', $msg, 2);
+    $type = isset($parts[0]) ? $parts[0] : 'error';
+    $text = isset($parts[1]) ? $parts[1] : $msg;
+?>
 <div class="alert alert-<?php echo $type === 'success' ? 'success' : 'danger'; ?>" style="margin-bottom:16px;">
     <i class="fas fa-<?php echo $type === 'success' ? 'check-circle' : 'exclamation-circle'; ?>"></i>
     <span><?php echo e($text); ?></span>

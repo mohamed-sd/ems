@@ -194,7 +194,7 @@ $csrf = generate_csrf_token();
 
     <div class="top-links">
         <a class="linkbtn" href="<?php echo e(company_url('home.php')); ?>">العودة لبوابة الشركة</a>
-        <a class="linkbtn" href="/ems/main/dashboard.php">الذهاب للوحة النظام</a>
+        <a class="linkbtn" href="<?php echo e(ems_url('main/dashboard.php')); ?>">الذهاب للوحة النظام</a>
     </div>
 
     <div class="grid">

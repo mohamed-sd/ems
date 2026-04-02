@@ -204,11 +204,17 @@ if (file_exists('approval_api.php')) {
 
 echo "\n=== نتيجة الاختبار ===\n";
 if (count($missing_files) === 0 && count($missing_functions) === 0) {
+    $scriptName = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : '/Approvals/test_system.php';
+    $basePath = rtrim(dirname(dirname($scriptName)), '/');
+    if ($basePath === '/' || $basePath === '\\') {
+        $basePath = '';
+    }
+
     echo "✅ جميع الاختبارات نجحت! النظام جاهز للاستخدام.\n";
     echo "\nللوصول إلى واجهة الموافقات:\n";
-    echo "   🔗 http://localhost/ems/Approvals/requests.php\n";
+    echo "   🔗 " . $basePath . "/Approvals/requests.php\n";
     echo "\nلاختبار النوافذ المنبثقة:\n";
-    echo "   🔗 http://localhost/ems/Approvals/test_modals.html\n";
+    echo "   🔗 " . $basePath . "/Approvals/test_modals.html\n";
 } else {
     echo "❌ بعض الاختبارات فشلت. يرجى مراجعة الأخطاء أعلاه.\n";
     exit(1);

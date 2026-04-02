@@ -1,4 +1,4 @@
 ﻿<?php
-header('Location: /ems/index.php');
+header('Location: index.php');
 exit();
 

@@ -10,15 +10,7 @@ if (!defined('COMPANY_USER_ABSOLUTE_TIMEOUT')) {
 }
 
 function company_base_url() {
-    $scriptName = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : '/ems/company/login.php';
-    $marker = '/company/';
-    $position = strpos($scriptName, $marker);
-
-    if ($position === false) {
-        return '/ems/company';
-    }
-
-    return substr($scriptName, 0, $position + strlen('/company'));
+    return rtrim(ems_url('company'), '/');
 }
 
 function company_url($path = '') {
@@ -48,17 +40,14 @@ function company_table_exists($tableName) {
     }
 
     $safeTable = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
-    $stmt = @mysqli_prepare($GLOBALS['conn'], "SHOW TABLES LIKE ?");
-    if (!$stmt) {
+    if ($safeTable === '') {
         $cache[$key] = false;
         return false;
     }
 
-    mysqli_stmt_bind_param($stmt, 's', $safeTable);
-    mysqli_stmt_execute($stmt);
-    $res = mysqli_stmt_get_result($stmt);
+    $sql = "SHOW TABLES LIKE '" . mysqli_real_escape_string($GLOBALS['conn'], $safeTable) . "'";
+    $res = @mysqli_query($GLOBALS['conn'], $sql);
     $exists = $res && mysqli_num_rows($res) > 0;
-    mysqli_stmt_close($stmt);
 
     $cache[$key] = $exists;
     return $exists;
@@ -239,14 +228,14 @@ function company_dashboard_for_role($roleId) {
 
     // Company owner / project manager first lands on company home.
     if ($rid === '1') {
-        return '/ems/company/home.php';
+        return ems_url('company/home.php');
     }
 
     if (in_array($rid, array('-1','2','3','4','5','6','7','8','9','10','11'), true)) {
-        return '/ems/main/dashboard.php';
+        return ems_url('main/dashboard.php');
     }
 
-    return '/ems/main/dashboard.php';
+    return ems_url('main/dashboard.php');
 }
 
 function company_login_success(array $userRow, array $companyRow) {

@@ -104,6 +104,12 @@ ini_set('allow_url_include', 0);
 // 3. إعدادات قاعدة البيانات
 // ═══════════════════════════════════════════════════════════════════════════
 
+// PHP 8 compatibility: keep legacy mysqli false-return flow instead of exceptions
+// because most modules handle DB errors using mysqli_query() result checks.
+if (function_exists('mysqli_report')) {
+    mysqli_report(MYSQLI_REPORT_OFF);
+}
+
 $host = "localhost";
 $user = "root";
 $pass = "";
@@ -195,13 +201,14 @@ function ems_force_logout_if_company_suspended($conn) {
 
     $requestUri = isset($_SERVER['REQUEST_URI']) ? str_replace('\\', '/', $_SERVER['REQUEST_URI']) : '';
     $inCompanyPortal = strpos($requestUri, '/company/') !== false;
-    $loginPath = $inCompanyPortal ? '/ems/company/login.php' : '/ems/login.php';
+    $loginPath = $inCompanyPortal ? ems_url('company/login.php') : ems_url('login.php');
 
     $isOnLoginPage = false;
     if ($inCompanyPortal) {
         $isOnLoginPage = strpos($requestUri, '/company/login.php') !== false;
     } else {
-        $isOnLoginPage = preg_match('#/ems/login\.php(?:\?|$)#', $requestUri) === 1;
+        $loginPathPattern = '#^' . preg_quote(ems_url('login.php'), '#') . '(?:\?|$)#';
+        $isOnLoginPage = preg_match($loginPathPattern, $requestUri) === 1;
     }
 
     if (!ems_table_has_column_raw($conn, 'admin_companies', 'status')) {

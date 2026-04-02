@@ -10,15 +10,7 @@ if (!defined('SUPER_ADMIN_ABSOLUTE_TIMEOUT')) {
 }
 
 function super_admin_base_url() {
-    $scriptName = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : '/ems/admin/login.php';
-    $marker = '/admin/';
-    $position = strpos($scriptName, $marker);
-
-    if ($position === false) {
-        return '/ems/admin';
-    }
-
-    return substr($scriptName, 0, $position + strlen('/admin'));
+    return rtrim(ems_url('admin'), '/');
 }
 
 function super_admin_url($path = '') {

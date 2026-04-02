@@ -56,7 +56,7 @@ function req_get_request_details($req) {
         $addDetail('تاريخ الطلب', date('d/m/Y H:i', strtotime($req['created_at'])));
     }
 
-    $messageRaw = isset($req['message']) ? trim($req['message']) : '';
+    $messageRaw = isset($req['message']) ? trim((string)$req['message']) : '';
     $decodedPayload = array();
     if ($messageRaw !== '' && substr($messageRaw, 0, 1) === '{') {
         $decoded = json_decode($messageRaw, true);
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['action'])) {
             }
 
             $payload = array();
-            $messageRaw = isset($reqRow['message']) ? trim($reqRow['message']) : '';
+            $messageRaw = isset($reqRow['message']) ? trim((string)$reqRow['message']) : '';
             if ($messageRaw !== '' && substr($messageRaw, 0, 1) === '{') {
                 $decoded = json_decode($messageRaw, true);
                 if (is_array($decoded)) {
@@ -153,9 +153,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['action'])) {
                 }
             }
 
-            $companyName = isset($reqRow['company_name']) ? trim($reqRow['company_name']) : '';
-            $companyEmail = isset($reqRow['email']) ? trim($reqRow['email']) : '';
-            $companyPhone = isset($reqRow['phone']) ? trim($reqRow['phone']) : '';
+            $companyName = isset($reqRow['company_name']) ? trim((string)$reqRow['company_name']) : '';
+            $companyEmail = isset($reqRow['email']) ? trim((string)$reqRow['email']) : '';
+            $companyPhone = isset($reqRow['phone']) ? trim((string)$reqRow['phone']) : '';
             $planId = intval(isset($reqRow['plan_id']) ? $reqRow['plan_id'] : 0);
 
             $managerName = trim(isset($payload['manager_name']) ? $payload['manager_name'] : '');

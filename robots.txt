@@ -4,17 +4,17 @@
 User-agent: *
 
 # منع المجلدات الحساسة
-Disallow: /ems/includes/
-Disallow: /ems/logs/
-Disallow: /ems/database/
-Disallow: /ems/vendor/
+Disallow: /*/includes/
+Disallow: /*/logs/
+Disallow: /*/database/
+Disallow: /*/vendor/
 
 # منع الملفات الحساسة
-Disallow: /ems/config.php
-Disallow: /ems/.htaccess
-Disallow: /ems/composer.json
-Disallow: /ems/composer.lock
-Disallow: /ems/migrate_passwords.php
+Disallow: /*/config.php
+Disallow: /*/.htaccess
+Disallow: /*/composer.json
+Disallow: /*/composer.lock
+Disallow: /*/migrate_passwords.php
 
 # منع ملفات النسخ الاحتياطي
 Disallow: /*.bak
@@ -24,8 +24,8 @@ Disallow: /*.sql
 Disallow: /*.log
 
 # السماح بالصفحة الرئيسية فقط
-Allow: /ems/index.php
-Allow: /ems/assets/
+Allow: /*/index.php
+Allow: /*/assets/
 
 # معلومات إضافية
 # Sitemap: http://yourdomain.com/sitemap.xml

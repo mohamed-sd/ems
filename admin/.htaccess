@@ -1,5 +1,4 @@
 RewriteEngine On
-RewriteBase /ems/admin/
 Options -Indexes
 
 # ── Auth ──────────────────────────────────────────────────────────────────

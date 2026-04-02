@@ -44,7 +44,7 @@ $companyName = isset($user['company_name']) ? $user['company_name'] : '';
             <p>شركة: <?php echo e($companyName); ?> | الباقة: <?php echo e($planName); ?></p>
         </div>
         <div class="links">
-            <a class="btn btn-main" href="/ems/main/dashboard.php"><i class="fas fa-gauge-high"></i> لوحة النظام</a>
+            <a class="btn btn-main" href="<?php echo e(ems_url('main/dashboard.php')); ?>"><i class="fas fa-gauge-high"></i> لوحة النظام</a>
             <a class="btn btn-ghost" href="<?php echo e(company_url('logout.php')); ?>"><i class="fas fa-right-from-bracket"></i> تسجيل الخروج</a>
         </div>
     </div>
@@ -66,7 +66,7 @@ $companyName = isset($user['company_name']) ? $user['company_name'] : '';
             <h2><i class="fas fa-diagram-project" style="color:#d97706"></i> إدارة الكيانات</h2>
             <div class="meta">بعد الدخول يمكنك استخدام شاشات النظام الحالية لإضافة العملاء والمشاريع والمناجم وبقية الكيانات حسب صلاحيات الدور.</div>
             <div class="links" style="margin-top:14px;">
-                <a class="btn btn-main" href="/ems/main/dashboard.php"><i class="fas fa-arrow-left"></i> متابعة إلى لوحة النظام</a>
+                <a class="btn btn-main" href="<?php echo e(ems_url('main/dashboard.php')); ?>"><i class="fas fa-arrow-left"></i> متابعة إلى لوحة النظام</a>
             </div>
         </div>
     </div>

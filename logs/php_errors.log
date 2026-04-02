@@ -334,3 +334,32 @@ Stack trace:
 [24-Mar-2026 10:41:58 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-v0.01\php\PEAR') in C:\xampp-v0.01\htdocs\ems\admin\permissions\role_permissions.php on line 9
 [24-Mar-2026 10:42:04 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-v0.01\htdocs\ems\admin\permissions\role_permissions.php on line 9
 [24-Mar-2026 10:42:04 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-v0.01\php\PEAR') in C:\xampp-v0.01\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[01-Apr-2026 13:42:24 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Duplicate entry 'C001' for key 'unique_client_code' in C:\xampp-latest\htdocs\emss\Clients\clients.php:185
+Stack trace:
+#0 C:\xampp-latest\htdocs\emss\Clients\clients.php(185): mysqli_query(Object(mysqli), 'INSERT INTO cli...')
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\emss\Clients\clients.php on line 185
+[01-Apr-2026 13:59:39 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '?' at line 1 in C:\xampp-latest\htdocs\emss\company\auth.php:43
+Stack trace:
+#0 C:\xampp-latest\htdocs\emss\company\auth.php(43): mysqli_prepare(Object(mysqli), 'SHOW TABLES LIK...')
+#1 C:\xampp-latest\htdocs\emss\company\auth.php(136): company_table_exists('role_permission...')
+#2 C:\xampp-latest\htdocs\emss\company\auth.php(266): company_load_permissions('1')
+#3 C:\xampp-latest\htdocs\emss\company\register.php(598): company_login_success(Array, Array)
+#4 {main}
+  thrown in C:\xampp-latest\htdocs\emss\company\auth.php on line 43
+[01-Apr-2026 14:27:24 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '?' at line 1 in C:\xampp-latest\htdocs\emss\company\auth.php:43
+Stack trace:
+#0 C:\xampp-latest\htdocs\emss\company\auth.php(43): mysqli_prepare(Object(mysqli), 'SHOW TABLES LIK...')
+#1 C:\xampp-latest\htdocs\emss\company\auth.php(136): company_table_exists('role_permission...')
+#2 C:\xampp-latest\htdocs\emss\company\auth.php(266): company_load_permissions('1')
+#3 C:\xampp-latest\htdocs\emss\company\register.php(599): company_login_success(Array, Array)
+#4 {main}
+  thrown in C:\xampp-latest\htdocs\emss\company\auth.php on line 43
+[01-Apr-2026 14:29:57 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '?' at line 1 in C:\xampp-latest\htdocs\emss\company\auth.php:43
+Stack trace:
+#0 C:\xampp-latest\htdocs\emss\company\auth.php(43): mysqli_prepare(Object(mysqli), 'SHOW TABLES LIK...')
+#1 C:\xampp-latest\htdocs\emss\company\auth.php(136): company_table_exists('role_permission...')
+#2 C:\xampp-latest\htdocs\emss\company\auth.php(266): company_load_permissions('1')
+#3 C:\xampp-latest\htdocs\emss\company\register.php(599): company_login_success(Array, Array)
+#4 {main}
+  thrown in C:\xampp-latest\htdocs\emss\company\auth.php on line 43

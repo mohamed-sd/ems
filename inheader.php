@@ -2,6 +2,8 @@
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
+
+$iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '../assets/css/all.min.css';
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -11,7 +13,7 @@ if (!headers_sent()) {
     <title><?php echo $page_title ; ?></title>
 
     <!-- Font awsome icon link مكتبة الايقونات -->
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo $iconsCss; ?>">
 
     <!-- Call bootstrap 5 -->
     <link href="../assets/css/bootstrap.min.css" rel="stylesheet">

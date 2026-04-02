@@ -2,7 +2,7 @@
 require_once __DIR__ . '/auth.php';
 
 if (company_is_logged_in()) {
-    $to = isset($_SESSION['company_user']['dashboard']) ? $_SESSION['company_user']['dashboard'] : '/ems/main/dashboard.php';
+    $to = isset($_SESSION['company_user']['dashboard']) ? $_SESSION['company_user']['dashboard'] : ems_url('main/dashboard.php');
     header('Location: ' . $to);
     exit();
 }

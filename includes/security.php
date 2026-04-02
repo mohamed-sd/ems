@@ -12,6 +12,72 @@ if (!defined('SECURITY_INCLUDED')) {
     define('SECURITY_INCLUDED', true);
 }
 
+/**
+ * Resolve application root URL prefix dynamically (e.g. '', '/eps').
+ */
+function ems_root_path() {
+    static $rootPath = null;
+
+    if ($rootPath !== null) {
+        return $rootPath;
+    }
+
+    $rootPath = '';
+
+    $projectDir = realpath(dirname(__DIR__));
+    $docRoot = isset($_SERVER['DOCUMENT_ROOT']) ? realpath($_SERVER['DOCUMENT_ROOT']) : false;
+
+    if ($projectDir && $docRoot) {
+        $projectDirNorm = str_replace('\\', '/', $projectDir);
+        $docRootNorm = str_replace('\\', '/', $docRoot);
+
+        if (strpos($projectDirNorm, $docRootNorm) === 0) {
+            $relative = trim(substr($projectDirNorm, strlen($docRootNorm)), '/');
+            $rootPath = $relative === '' ? '' : '/' . $relative;
+            return $rootPath;
+        }
+    }
+
+    $scriptName = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : '';
+    $projectBase = basename(dirname(__DIR__));
+    if ($scriptName !== '') {
+        $parts = explode('/', trim($scriptName, '/'));
+        if (isset($parts[0]) && $parts[0] === $projectBase) {
+            $rootPath = '/' . $projectBase;
+        }
+    }
+
+    return $rootPath;
+}
+
+/**
+ * Build an app-relative URL under the dynamic project root.
+ */
+function ems_url($path = '') {
+    $root = ems_root_path();
+    if ($path === '' || $path === '/') {
+        return $root === '' ? '/' : $root;
+    }
+
+    return ($root === '' ? '' : $root) . '/' . ltrim($path, '/');
+}
+
+/**
+ * Convert full URL/path to app-relative script path.
+ */
+function ems_relative_path($path) {
+    $normalized = str_replace('\\', '/', (string)$path);
+    $parsed = parse_url($normalized);
+    $cleanPath = isset($parsed['path']) ? $parsed['path'] : $normalized;
+
+    $root = ems_root_path();
+    if ($root !== '' && strpos($cleanPath, $root . '/') === 0) {
+        return ltrim(substr($cleanPath, strlen($root) + 1), '/');
+    }
+
+    return ltrim($cleanPath, '/');
+}
+
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // 1. Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø¬Ù„Ø³Ø© Ø§Ù„Ø¢Ù…Ù†Ø© (Secure Session Configuration)
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -101,10 +167,10 @@ function get_auth_login_path() {
     $requestUri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
 
     if (!empty($_SESSION['super_admin']) || strpos($requestUri, '/admin/') !== false) {
-        return '/ems/admin/login.php';
+        return ems_url('admin/login.php');
     }
 
-    return '/ems/login.php';
+    return ems_url('login.php');
 }
 
 /**
@@ -400,7 +466,7 @@ function set_security_headers() {
  */
 function require_login() {
     if (!isset($_SESSION['user'])) {
-        header("Location: /ems/login.php");
+        header('Location: ' . ems_url('login.php'));
         exit();
     }
 }
@@ -418,6 +484,7 @@ function require_role($allowed_roles) {
     $user_role = $_SESSION['user']['role'] ?? null;
     
     if (!in_array($user_role, $allowed_roles) && $user_role != '-1') { // -1 = Ù…Ø¯ÙŠØ± Ø§Ù„Ù†Ø¸Ø§Ù…
+        $dashboardUrl = ems_url('main/dashboard.php');
         die('
             <!DOCTYPE html>
             <html lang="ar" dir="rtl">
@@ -435,7 +502,7 @@ function require_role($allowed_roles) {
                 <div class="error">
                     <h1>â›” ØºÙŠØ± Ù…ØµØ±Ø­ Ù„Ùƒ Ø¨Ø§Ù„ÙˆØµÙˆÙ„</h1>
                     <p>Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ ØµÙ„Ø§Ø­ÙŠØ© Ù„Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ù‡Ø°Ù‡ Ø§Ù„ØµÙØ­Ø©</p>
-                    <a href="/ems/main/dashboard.php">â† Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</a>
+                    <a href="' . $dashboardUrl . '">â† Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</a>
                 </div>
             </body>
             </html>
@@ -458,6 +525,7 @@ function check_ownership($resource_id, $user_field = 'project_id') {
     }
     
     if ($user_value != $resource_id) {
+        $dashboardUrl = ems_url('main/dashboard.php');
         die('
             <!DOCTYPE html>
             <html lang="ar" dir="rtl">
@@ -475,7 +543,7 @@ function check_ownership($resource_id, $user_field = 'project_id') {
                 <div class="error">
                     <h1>â›” ØºÙŠØ± Ù…ØµØ±Ø­ Ù„Ùƒ Ø¨Ø§Ù„ÙˆØµÙˆÙ„</h1>
                     <p>Ù„Ø§ ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ Ù‡Ø°Ø§ Ø§Ù„Ù…Ø­ØªÙˆÙ‰</p>
-                    <a href="/ems/main/dashboard.php">â† Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</a>
+                    <a href="' . $dashboardUrl . '">â† Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„ØµÙØ­Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</a>
                 </div>
             </body>
             </html>
