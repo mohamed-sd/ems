@@ -40,6 +40,61 @@ if ($company_id <= 0) {
 $project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
 $project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
 $clients_has_company_id = db_table_has_column($conn, 'clients', 'company_id');
+$project_has_is_deleted = db_table_has_column($conn, 'project', 'is_deleted');
+$project_has_deleted_at = db_table_has_column($conn, 'project', 'deleted_at');
+$project_has_deleted_by = db_table_has_column($conn, 'project', 'deleted_by');
+$clients_has_is_deleted = db_table_has_column($conn, 'clients', 'is_deleted');
+$clients_has_deleted_at = db_table_has_column($conn, 'clients', 'deleted_at');
+$mines_has_is_deleted = db_table_has_column($conn, 'mines', 'is_deleted');
+$mines_has_deleted_at = db_table_has_column($conn, 'mines', 'deleted_at');
+
+if (!$project_has_is_deleted || !$project_has_deleted_at || !$project_has_deleted_by) {
+    $alter_parts = array();
+    if (!$project_has_is_deleted) {
+        $alter_parts[] = "ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0";
+    }
+    if (!$project_has_deleted_at) {
+        $alter_parts[] = "ADD COLUMN deleted_at DATETIME NULL DEFAULT NULL";
+    }
+    if (!$project_has_deleted_by) {
+        $alter_parts[] = "ADD COLUMN deleted_by INT(11) NULL DEFAULT NULL";
+    }
+    if (!empty($alter_parts)) {
+        @mysqli_query($conn, "ALTER TABLE project " . implode(', ', $alter_parts));
+    }
+
+    $project_has_is_deleted = db_table_has_column($conn, 'project', 'is_deleted');
+    $project_has_deleted_at = db_table_has_column($conn, 'project', 'deleted_at');
+    $project_has_deleted_by = db_table_has_column($conn, 'project', 'deleted_by');
+}
+
+$project_not_deleted_sql = '1=1';
+if ($project_has_is_deleted) {
+    $project_not_deleted_sql = 'op.is_deleted = 0';
+} elseif ($project_has_deleted_at) {
+    $project_not_deleted_sql = 'op.deleted_at IS NULL';
+}
+
+$project_not_deleted_plain_sql = '1=1';
+if ($project_has_is_deleted) {
+    $project_not_deleted_plain_sql = 'is_deleted = 0';
+} elseif ($project_has_deleted_at) {
+    $project_not_deleted_plain_sql = 'deleted_at IS NULL';
+}
+
+$client_not_deleted_sql = '1=1';
+if ($clients_has_is_deleted) {
+    $client_not_deleted_sql = 'c.is_deleted = 0';
+} elseif ($clients_has_deleted_at) {
+    $client_not_deleted_sql = 'c.deleted_at IS NULL';
+}
+
+$mines_not_deleted_sql = '1=1';
+if ($mines_has_is_deleted) {
+    $mines_not_deleted_sql = 'm.is_deleted = 0';
+} elseif ($mines_has_deleted_at) {
+    $mines_not_deleted_sql = 'm.deleted_at IS NULL';
+}
 
 $project_scope_sql = $project_has_company_id
     ? "op.company_id = $company_id"
@@ -56,6 +111,7 @@ $project_scope_sql = $project_has_company_id
 $client_scope_sql = $clients_has_company_id
     ? "c.company_id = $company_id"
     : "EXISTS (SELECT 1 FROM users scope_u WHERE scope_u.id = c.created_by AND scope_u.company_id = $company_id)";
+$client_scope_sql .= " AND $client_not_deleted_sql";
 
 function projects_redirect_with_msg($msg)
 {
@@ -99,7 +155,7 @@ if (isset($_GET['delete_id']) && isset($_GET['csrf_token'])) {
     $delete_id = intval($_GET['delete_id']);
 
     $old_project = null;
-    $old_res = mysqli_query($conn, "SELECT op.* FROM project op WHERE op.id = $delete_id AND $project_scope_sql LIMIT 1");
+    $old_res = mysqli_query($conn, "SELECT op.* FROM project op WHERE op.id = $delete_id AND $project_scope_sql AND $project_not_deleted_sql LIMIT 1");
     if ($old_res) {
         $old_project = mysqli_fetch_assoc($old_res);
     }
@@ -108,16 +164,29 @@ if (isset($_GET['delete_id']) && isset($_GET['csrf_token'])) {
         projects_redirect_with_msg('المشروع غير موجود أو لا يتبع لشركتك ❌');
     }
 
-    $payload = approval_build_simple_delete_payload('project', ['id' => $delete_id], $old_project);
-    $result = approval_create_request('project', $delete_id, 'delete', $payload, approval_get_user_id(), $conn);
-
-    if (!empty($result['success'])) {
-        log_security_event('PROJECT_DELETE_REQUESTED', "Delete approval requested for project ID: $delete_id");
-        $msg = ((isset($result['status']) ? $result['status'] : 'pending') === 'approved') ? 'تم اعتماد حذف المشروع وتنفيذه ✅' : 'تم إرسال طلب حذف المشروع للموافقة ✅';
-        projects_redirect_with_msg($msg);
+    if (!$project_has_is_deleted && !$project_has_deleted_at) {
+        projects_redirect_with_msg('تعذر تفعيل الحذف الناعم للمشاريع حالياً ❌');
     }
 
-    projects_redirect_with_msg((isset($result['message']) ? $result['message'] : 'حدث خطأ أثناء إنشاء طلب الحذف') . ' ❌');
+    $delete_set = array("status = '0'");
+    if ($project_has_is_deleted) {
+        $delete_set[] = "is_deleted = 1";
+    }
+    if ($project_has_deleted_at) {
+        $delete_set[] = "deleted_at = NOW()";
+    }
+    if ($project_has_deleted_by) {
+        $deleted_by = approval_get_user_id();
+        $delete_set[] = "deleted_by = " . intval($deleted_by);
+    }
+
+    $delete_query = "UPDATE project SET " . implode(', ', $delete_set) . " WHERE id = $delete_id AND $project_scope_sql AND $project_not_deleted_sql";
+    if (mysqli_query($conn, $delete_query)) {
+        log_security_event('PROJECT_SOFT_DELETED', "Soft deleted project ID: $delete_id");
+        projects_redirect_with_msg('تم حذف المشروع (حذف ناعم) بنجاح ✅');
+    }
+
+    projects_redirect_with_msg('حدث خطأ أثناء حذف المشروع ❌');
     exit();
 }
 
@@ -184,7 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
 
     if ($id > 0) {
         $old_project = null;
-        $old_res = mysqli_query($conn, "SELECT op.* FROM project op WHERE op.id = $id AND $project_scope_sql LIMIT 1");
+        $old_res = mysqli_query($conn, "SELECT op.* FROM project op WHERE op.id = $id AND $project_scope_sql AND $project_not_deleted_sql LIMIT 1");
         if ($old_res) {
             $old_project = mysqli_fetch_assoc($old_res);
         }
@@ -421,7 +490,7 @@ include('../insidebar.php');
                         <?php
                         // Ø¬Ù„Ø¨ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹ Ù…Ù† Ø¬Ø¯ÙˆÙ„ project
 
-                        $where_clauses = array($project_scope_sql);
+                        $where_clauses = array($project_scope_sql, $project_not_deleted_sql);
 
                         if (isset($_GET['client_id']) && is_numeric($_GET['client_id'])) {
                             $client_id = intval($_GET['client_id']);
@@ -438,12 +507,12 @@ include('../insidebar.php');
                       (SELECT COUNT(*) 
                        FROM contracts c 
                        INNER JOIN mines m ON c.mine_id = m.id 
-                       WHERE m.project_id = op.id) as 'contracts',
+                       WHERE m.project_id = op.id AND $mines_not_deleted_sql) as 'contracts',
                       (SELECT COUNT(DISTINCT pm.suppliers) 
                           FROM equipments pm
                           JOIN operations m ON pm.id = m.equipment
                           WHERE m.project_id = op.id) as 'total_suppliers',
-                          (SELECT COUNT(*) FROM mines WHERE project_id = op.id) as mines_count
+                          (SELECT COUNT(*) FROM mines m WHERE m.project_id = op.id AND $mines_not_deleted_sql) as mines_count
                       FROM project op
                           LEFT JOIN clients cc ON op.$project_client_column = cc.id
                       $client_filter

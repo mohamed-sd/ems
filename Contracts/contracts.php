@@ -8,9 +8,38 @@ if (!isset($_SESSION['user'])) {
 require_once '../config.php';
 require_once '../includes/permissions_helper.php';
 
+if (!headers_sent()) {
+  header('Content-Type: text/html; charset=UTF-8');
+}
+
+if (!function_exists('contracts_fix_mojibake_output')) {
+  function contracts_fix_mojibake_output($buffer)
+  {
+    $map = array(
+      'Ø§' => 'ا', 'Ø¨' => 'ب', 'Øª' => 'ت', 'Ø«' => 'ث', 'Ø¬' => 'ج', 'Ø­' => 'ح',
+      'Ø®' => 'خ', 'Ø¯' => 'د', 'Ø°' => 'ذ', 'Ø±' => 'ر', 'Ø²' => 'ز', 'Ø³' => 'س',
+      'Ø´' => 'ش', 'Øµ' => 'ص', 'Ø¶' => 'ض', 'Ø·' => 'ط', 'Ø¸' => 'ظ', 'Ø¹' => 'ع',
+      'Øº' => 'غ', 'Ù' => 'ف', 'Ù‚' => 'ق', 'Ùƒ' => 'ك', 'Ù„' => 'ل', 'Ù…' => 'م',
+      'Ù†' => 'ن', 'Ù‡' => 'ه', 'Ùˆ' => 'و', 'ÙŠ' => 'ي', 'Ù‰' => 'ى', 'Ø©' => 'ة',
+      'Ø¡' => 'ء', 'Ø£' => 'أ', 'Ø¥' => 'إ', 'Ø¢' => 'آ', 'Ø¤' => 'ؤ', 'Ø¦' => 'ئ',
+      'ØŒ' => '،', 'Ø›' => '؛', 'ØŸ' => '؟', 'âœ…' => '✅', 'âŒ' => '❌', 'â¸' => '⏸',
+      'ðŸ”' => '🔐', 'ðŸ‘‹' => '👋', 'ðŸš€' => '🚀', 'ðŸ†' => '🏆'
+    );
+
+    return strtr($buffer, $map);
+  }
+}
+
+ob_start('contracts_fix_mojibake_output');
+
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
+$project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
+$mines_has_company_id = db_table_has_column($conn, 'mines', 'company_id');
+$mines_has_is_deleted = db_table_has_column($conn, 'mines', 'is_deleted');
+$mines_has_deleted_at = db_table_has_column($conn, 'mines', 'deleted_at');
 
 if (!$is_super_admin && $company_id <= 0) {
   header("Location: ../login.php?msg=Ù„Ø§+ØªÙˆØ¬Ø¯+Ø¨ÙŠØ¦Ø©+Ø´Ø±ÙƒØ©+ØµØ§Ù„Ø­Ø©+Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù…+âŒ");
@@ -18,24 +47,85 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 $contracts_has_company = db_table_has_column($conn, 'contracts', 'company_id');
+$contracts_has_is_deleted = db_table_has_column($conn, 'contracts', 'is_deleted');
+$contracts_has_deleted_at = db_table_has_column($conn, 'contracts', 'deleted_at');
+$contracts_has_deleted_by = db_table_has_column($conn, 'contracts', 'deleted_by');
+
+if (!$contracts_has_is_deleted || !$contracts_has_deleted_at || !$contracts_has_deleted_by) {
+  $alter_parts = array();
+  if (!$contracts_has_is_deleted) {
+    $alter_parts[] = "ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0";
+  }
+  if (!$contracts_has_deleted_at) {
+    $alter_parts[] = "ADD COLUMN deleted_at DATETIME NULL DEFAULT NULL";
+  }
+  if (!$contracts_has_deleted_by) {
+    $alter_parts[] = "ADD COLUMN deleted_by INT(11) NULL DEFAULT NULL";
+  }
+  if (!empty($alter_parts)) {
+    @mysqli_query($conn, "ALTER TABLE contracts " . implode(', ', $alter_parts));
+  }
+
+  $contracts_has_is_deleted = db_table_has_column($conn, 'contracts', 'is_deleted');
+  $contracts_has_deleted_at = db_table_has_column($conn, 'contracts', 'deleted_at');
+  $contracts_has_deleted_by = db_table_has_column($conn, 'contracts', 'deleted_by');
+}
+
+$contract_not_deleted_sql = '1=1';
+if ($contracts_has_is_deleted) {
+  $contract_not_deleted_sql = 'c.is_deleted = 0';
+} elseif ($contracts_has_deleted_at) {
+  $contract_not_deleted_sql = 'c.deleted_at IS NULL';
+}
+
+$contract_not_deleted_plain_sql = '1=1';
+if ($contracts_has_is_deleted) {
+  $contract_not_deleted_plain_sql = 'is_deleted = 0';
+} elseif ($contracts_has_deleted_at) {
+  $contract_not_deleted_plain_sql = 'deleted_at IS NULL';
+}
+
+if (empty($_SESSION['contracts_csrf_token'])) {
+  $_SESSION['contracts_csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
+}
+$contracts_csrf_token = $_SESSION['contracts_csrf_token'];
 
 $contract_scope_sql = "1=1";
 if (!$is_super_admin) {
   if ($contracts_has_company) {
     $contract_scope_sql = "c.company_id = $company_id";
   } else {
+    $scope_mine_not_deleted = '1=1';
+    if ($mines_has_is_deleted) {
+      $scope_mine_not_deleted = 'sm.is_deleted = 0';
+    } elseif ($mines_has_deleted_at) {
+      $scope_mine_not_deleted = 'sm.deleted_at IS NULL';
+    }
+
+    $company_scope_or = array();
+    if ($mines_has_company_id) {
+      $company_scope_or[] = "sm.company_id = $company_id";
+    }
+    if ($project_has_company_id) {
+      $company_scope_or[] = "sp.company_id = $company_id";
+    }
+    $company_scope_or[] = "su.company_id = $company_id";
+    $company_scope_or[] = "scu.company_id = $company_id";
+
     $contract_scope_sql = "EXISTS (
       SELECT 1
       FROM mines sm
       INNER JOIN project sp ON sp.id = sm.project_id
       LEFT JOIN users su ON su.id = sp.created_by
-      LEFT JOIN clients sc ON sc.id = sp.company_client_id
+      LEFT JOIN clients sc ON sc.id = sp.$project_client_column
       LEFT JOIN users scu ON scu.id = sc.created_by
       WHERE sm.id = c.mine_id
-        AND (su.company_id = $company_id OR scu.company_id = $company_id)
+        AND $scope_mine_not_deleted
+        AND (" . implode(' OR ', $company_scope_or) . ")
     )";
   }
 }
+$contract_scope_sql .= " AND $contract_not_deleted_sql";
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ðŸ” Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…
@@ -128,6 +218,7 @@ foreach ($equipmentTypes as $equipmentType) {
         <div class="card-body">
 
           <input type="hidden" name="id" id="contract_id" value="">
+          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($contracts_csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
 
           <input type="hidden" name="mine_id" placeholder="Ù…Ø¹Ø±Ù Ø§Ù„Ù…Ù†Ø¬Ù…"
             value="<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>" required />
@@ -647,27 +738,91 @@ foreach ($equipmentTypes as $equipmentType) {
           <tbody>
             <?php
             include 'contractequipments_handler.php';
-            $mine_id = $_GET['id'];
+            $mine_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+            if (isset($_GET['delete_id'])) {
+              $delete_id = intval($_GET['delete_id']);
+              $delete_csrf = isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '';
+
+              if (!$can_delete) {
+                header("Location: contracts.php?id=$mine_id&msg=Ù„Ø§+ØªÙˆØ¬Ø¯+ØµÙ„Ø§Ø­ÙŠØ©+Ø­Ø°Ù+Ø§Ù„Ø¹Ù‚ÙˆØ¯+âŒ");
+                exit;
+              }
+
+              if (empty($delete_csrf) || !hash_equals($contracts_csrf_token, $delete_csrf)) {
+                header("Location: contracts.php?id=$mine_id&msg=Ø¬Ù„Ø³Ø©+Ø§Ù„Ø­Ø°Ù+ØºÙŠØ±+ØµØ§Ù„Ø­Ø©+âŒ");
+                exit;
+              }
+
+              if (!$contracts_has_is_deleted && !$contracts_has_deleted_at) {
+                header("Location: contracts.php?id=$mine_id&msg=ØªØ¹Ø°Ø±+ØªÙØ¹ÙŠÙ„+Ø§Ù„Ø­Ø°Ù+Ø§Ù„Ù†Ø§Ø¹Ù…+Ù„Ù„Ø¹Ù‚ÙˆØ¯+âŒ");
+                exit;
+              }
+
+              $delete_scope = (!$is_super_admin && $contracts_has_company)
+                ? " AND company_id = $company_id"
+                : "";
+
+              $delete_set = array("status = '0'");
+              if ($contracts_has_is_deleted) {
+                $delete_set[] = "is_deleted = 1";
+              }
+              if ($contracts_has_deleted_at) {
+                $delete_set[] = "deleted_at = NOW()";
+              }
+              if ($contracts_has_deleted_by) {
+                $delete_set[] = "deleted_by = " . intval(isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0);
+              }
+
+              $delete_sql = "UPDATE contracts SET " . implode(', ', $delete_set) . " WHERE id = $delete_id AND mine_id = $mine_id AND $contract_not_deleted_plain_sql$delete_scope";
+              mysqli_query($conn, $delete_sql);
+              echo "<script>window.location.href='contracts.php?id=$mine_id';</script>";
+              exit;
+            }
 
             // Ø¥Ø¶Ø§ÙØ© Ø¹Ù‚Ø¯ Ø¬Ø¯ÙŠØ¯ Ø¹Ù†Ø¯ Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„ÙÙˆØ±Ù…
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_id'])) {
+
+              $posted_csrf = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+              if (empty($posted_csrf) || !hash_equals($contracts_csrf_token, $posted_csrf)) {
+                echo "<script>alert('âŒ Ø¬Ù„Ø³Ø© Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ ØºÙŠØ± ØµØ§Ù„Ø­Ø©'); window.location.href='contracts.php?id=$mine_id';</script>";
+                exit;
+              }
 
               $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
               $mine_id = intval($_POST['mine_id']);
 
               if (!$is_super_admin) {
+                $mine_not_deleted_sql = '1=1';
+                if ($mines_has_is_deleted) {
+                  $mine_not_deleted_sql = 'm.is_deleted = 0';
+                } elseif ($mines_has_deleted_at) {
+                  $mine_not_deleted_sql = 'm.deleted_at IS NULL';
+                }
+
+                $mine_scope_or = array();
+                if ($mines_has_company_id) {
+                  $mine_scope_or[] = "m.company_id = $company_id";
+                }
+                if ($project_has_company_id) {
+                  $mine_scope_or[] = "p.company_id = $company_id";
+                }
+                $mine_scope_or[] = "su.company_id = $company_id";
+                $mine_scope_or[] = "scu.company_id = $company_id";
+
                 $mine_scope_query = "SELECT m.id
                   FROM mines m
                   INNER JOIN project p ON p.id = m.project_id
                   LEFT JOIN users su ON su.id = p.created_by
-                  LEFT JOIN clients sc ON sc.id = p.company_client_id
+                  LEFT JOIN clients sc ON sc.id = p.$project_client_column
                   LEFT JOIN users scu ON scu.id = sc.created_by
                   WHERE m.id = $mine_id
-                    AND (su.company_id = $company_id OR scu.company_id = $company_id)
+                    AND $mine_not_deleted_sql
+                    AND (" . implode(' OR ', $mine_scope_or) . ")
                   LIMIT 1";
                 $mine_scope_result = mysqli_query($conn, $mine_scope_query);
                 if (!$mine_scope_result || mysqli_num_rows($mine_scope_result) === 0) {
-                  echo "<script>alert('âŒ Ø§Ù„Ù…Ù†Ø¬Ù… Ø§Ù„Ù…Ø­Ø¯Ø¯ Ù„Ø§ ÙŠØªØ¨Ø¹ Ù„Ø´Ø±ÙƒØªÙƒ'); window.location.href='contracts.php?id=$mine_id';</script>";
+                  echo "<script>alert('❌ المنجم المحدد لا يتبع لشركتك'); window.location.href='contracts.php?id=$mine_id';</script>";
                   exit;
                 }
               }
@@ -761,11 +916,12 @@ foreach ($equipmentTypes as $equipmentType) {
             payment_time='$payment_time',
             guarantees='$guarantees',
             payment_date='$payment_date'
-          WHERE id=$id$contract_update_scope";
+          WHERE id=$id AND $contract_not_deleted_plain_sql$contract_update_scope";
               } else {
                 // Ø¥Ø¶Ø§ÙØ©
-              $contract_insert_col = (!$is_super_admin && $contracts_has_company) ? ", company_id" : "";
-              $contract_insert_val = (!$is_super_admin && $contracts_has_company) ? ", '$company_id'" : "";
+              $contract_insert_company_id = ($contracts_has_company && $company_id > 0) ? $company_id : 0;
+              $contract_insert_col = ($contracts_has_company && $contract_insert_company_id > 0) ? ", company_id" : "";
+              $contract_insert_val = ($contracts_has_company && $contract_insert_company_id > 0) ? ", '$contract_insert_company_id'" : "";
                 $sql = "INSERT INTO contracts (
             contract_signing_date, mine_id, grace_period_days, contract_duration_days,
             equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
@@ -953,7 +1109,7 @@ foreach ($equipmentTypes as $equipmentType) {
               }
 
               if ($can_delete) {
-                echo "<a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ØŸ\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>";
+                echo "<a href='contracts.php?id=" . intval($mine_id) . "&delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode($contracts_csrf_token) . "' onclick='return confirm(\"Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ØŸ\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>";
               }
 
               echo "<a href='contracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>

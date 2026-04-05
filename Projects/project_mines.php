@@ -1,4 +1,23 @@
 ﻿<?php
+
+// fix_comments.php - شغّله مرة واحدة ثم احذفه
+$file ='../Clients/clients.php';
+$content = file_get_contents($file);
+
+// إعادة تفسير الترميز
+$fixed = mb_convert_encoding($content, 'UTF-8', 'UTF-8');
+
+// إصلاح Mojibake الشائع
+$map = [
+    "\xC3\x98\xC2\xA7" => 'ا',
+    "\xC3\x99\x84"     => 'ل',
+    // أضف حسب الحاجة
+];
+
+$fixed = strtr($fixed, $map);
+file_put_contents($file, $fixed);
+echo "تم ✅";
+
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -8,16 +27,108 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 require_once '../includes/permissions_helper.php';
 
+if (!headers_sent()) {
+    header('Content-Type: text/html; charset=UTF-8');
+}
+
+if (!function_exists('project_mines_fix_mojibake_output')) {
+    function project_mines_fix_mojibake_output($buffer)
+    {
+        $map = array(
+            'Ø§' => 'ا', 'Ø¨' => 'ب', 'Øª' => 'ت', 'Ø«' => 'ث', 'Ø¬' => 'ج', 'Ø­' => 'ح',
+            'Ø®' => 'خ', 'Ø¯' => 'د', 'Ø°' => 'ذ', 'Ø±' => 'ر', 'Ø²' => 'ز', 'Ø³' => 'س',
+            'Ø´' => 'ش', 'Øµ' => 'ص', 'Ø¶' => 'ض', 'Ø·' => 'ط', 'Ø¸' => 'ظ', 'Ø¹' => 'ع',
+            'Øº' => 'غ', 'Ù' => 'ف', 'Ù‚' => 'ق', 'Ùƒ' => 'ك', 'Ù„' => 'ل', 'Ù…' => 'م',
+            'Ù†' => 'ن', 'Ù‡' => 'ه', 'Ùˆ' => 'و', 'ÙŠ' => 'ي', 'Ù‰' => 'ى', 'Ø©' => 'ة',
+            'Ø¡' => 'ء', 'Ø£' => 'أ', 'Ø¥' => 'إ', 'Ø¢' => 'آ', 'Ø¤' => 'ؤ', 'Ø¦' => 'ئ',
+            'ØŒ' => '،', 'Ø›' => '؛', 'ØŸ' => '؟', 'âœ…' => '✅', 'âŒ' => '❌', 'â¸' => '⏸',
+            'ðŸ”' => '🔐', 'ðŸ‘‹' => '👋', 'ðŸš€' => '🚀', 'ðŸ†' => '🏆'
+        );
+
+        return strtr($buffer, $map);
+    }
+}
+
+ob_start('project_mines_fix_mojibake_output');
+
+if (!function_exists('project_mines_table_has_column')) {
+    function project_mines_table_has_column($conn, $tableName, $columnName)
+    {
+        $safeTable = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
+        $safeCol = preg_replace('/[^a-zA-Z0-9_]/', '', $columnName);
+        $sql = "SHOW COLUMNS FROM " . $safeTable . " LIKE '" . mysqli_real_escape_string($conn, $safeCol) . "'";
+        $res = @mysqli_query($conn, $sql);
+
+        return $res && mysqli_num_rows($res) > 0;
+    }
+}
+
+if (!function_exists('project_mines_redirect_with_msg')) {
+    function project_mines_redirect_with_msg($project_id, $msg)
+    {
+        header('Location: project_mines.php?project_id=' . intval($project_id) . '&msg=' . urlencode($msg));
+        exit();
+    }
+}
+
 // ðŸ” Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…
 $page_permissions = check_page_permissions($conn, 'Projects/project_mines.php');
 $can_view = $page_permissions['can_view'];
 $can_add = $page_permissions['can_add'];
 $can_edit = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$can_view) {
     header("Location: ../login.php?msg=Ù„Ø§+ØªÙˆØ¬Ø¯+ØµÙ„Ø§Ø­ÙŠØ©+Ø¹Ø±Ø¶+Ø§Ù„Ù…Ù†Ø§Ø¬Ù…+âŒ");
     exit();
+}
+
+if (empty($_SESSION['project_mines_csrf_token'])) {
+    $_SESSION['project_mines_csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
+}
+$project_mines_csrf_token = $_SESSION['project_mines_csrf_token'];
+
+$mines_has_is_deleted = project_mines_table_has_column($conn, 'mines', 'is_deleted');
+$mines_has_deleted_at = project_mines_table_has_column($conn, 'mines', 'deleted_at');
+$mines_has_deleted_by = project_mines_table_has_column($conn, 'mines', 'deleted_by');
+$mines_has_company_id = project_mines_table_has_column($conn, 'mines', 'company_id');
+
+if (!$mines_has_is_deleted || !$mines_has_deleted_at || !$mines_has_deleted_by) {
+    $alter_parts = array();
+    if (!$mines_has_is_deleted) {
+        $alter_parts[] = "ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0";
+    }
+    if (!$mines_has_deleted_at) {
+        $alter_parts[] = "ADD COLUMN deleted_at DATETIME NULL DEFAULT NULL";
+    }
+    if (!$mines_has_deleted_by) {
+        $alter_parts[] = "ADD COLUMN deleted_by INT(11) NULL DEFAULT NULL";
+    }
+    if (!empty($alter_parts)) {
+        @mysqli_query($conn, "ALTER TABLE mines " . implode(', ', $alter_parts));
+    }
+
+    $mines_has_is_deleted = project_mines_table_has_column($conn, 'mines', 'is_deleted');
+    $mines_has_deleted_at = project_mines_table_has_column($conn, 'mines', 'deleted_at');
+    $mines_has_deleted_by = project_mines_table_has_column($conn, 'mines', 'deleted_by');
+}
+
+$project_has_is_deleted = project_mines_table_has_column($conn, 'project', 'is_deleted');
+$project_has_deleted_at = project_mines_table_has_column($conn, 'project', 'deleted_at');
+
+$project_not_deleted_sql = '1=1';
+if ($project_has_is_deleted) {
+    $project_not_deleted_sql = 'is_deleted = 0';
+} elseif ($project_has_deleted_at) {
+    $project_not_deleted_sql = 'deleted_at IS NULL';
+}
+
+$mines_not_deleted_sql = '1=1';
+if ($mines_has_is_deleted) {
+    $mines_not_deleted_sql = 'is_deleted = 0';
+} elseif ($mines_has_deleted_at) {
+    $mines_not_deleted_sql = 'deleted_at IS NULL';
 }
 
 // Ø§Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ù…Ø¹Ø±Ù Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ù…Ù† URL
@@ -29,7 +140,7 @@ if ($project_id <= 0) {
 }
 
 // Ø¬Ù„Ø¨ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
-$project_query = "SELECT * FROM project WHERE id = $project_id LIMIT 1";
+$project_query = "SELECT * FROM project WHERE id = $project_id AND $project_not_deleted_sql LIMIT 1";
 $project_result = mysqli_query($conn, $project_query);
 $project = mysqli_fetch_assoc($project_result);
 
@@ -39,6 +150,11 @@ if (!$project) {
 
 // Ù…Ø¹Ø§Ù„Ø¬Ø© Ø¥Ø¶Ø§ÙØ©/ØªØ¹Ø¯ÙŠÙ„ Ù…Ù†Ø¬Ù… Ø¹Ø¨Ø± POST (Ø¨Ø¯ÙˆÙ† AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
+    $posted_csrf = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+    if (empty($posted_csrf) || !hash_equals($project_mines_csrf_token, $posted_csrf)) {
+        project_mines_redirect_with_msg($project_id, 'جلسة النموذج غير صالحة، يرجى إعادة المحاولة ❌');
+    }
+
     $mine_id = isset($_POST['mine_id']) ? intval($_POST['mine_id']) : 0;
 
     if ($mine_id > 0 && !$can_edit) {
@@ -66,14 +182,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
 
     if ($mine_id > 0) {
         // ØªØ¹Ø¯ÙŠÙ„ Ù…Ù†Ø¬Ù… Ù…ÙˆØ¬ÙˆØ¯
-        $check_query = "SELECT id FROM mines WHERE mine_code = '$mine_code' AND id != $mine_id";
-        $check_result = mysqli_query($conn, $check_query);
-
-        if (mysqli_num_rows($check_result) > 0) {
-            header("Location: project_mines.php?project_id=$project_id&msg=ÙƒÙˆØ¯+Ø§Ù„Ù…Ù†Ø¬Ù…+Ù…ÙˆØ¬ÙˆØ¯+Ù…Ø³Ø¨Ù‚Ø§Ù‹âŒ");
-            exit();
-        }
-
         $mine_area_value = $mine_area !== null ? $mine_area : "NULL";
         $mining_depth_value = $mining_depth !== null ? $mining_depth : "NULL";
 
@@ -92,7 +200,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
             contract_nature = '$contract_nature',
             status = $status,
             notes = '$notes'
-            WHERE id = $mine_id AND project_id = $project_id";
+            WHERE id = $mine_id AND project_id = $project_id AND $mines_not_deleted_sql";
+
+        if ($mines_has_company_id && $company_id > 0) {
+            $update_query = "UPDATE mines SET 
+            mine_code = '$mine_code',
+            mine_name = '$mine_name',
+            manager_name = '$manager_name',
+            mineral_type = '$mineral_type',
+            mine_type = '$mine_type',
+            mine_type_other = '$mine_type_other',
+            ownership_type = '$ownership_type',
+            ownership_type_other = '$ownership_type_other',
+            mine_area = $mine_area_value,
+            mine_area_unit = '$mine_area_unit',
+            mining_depth = $mining_depth_value,
+            contract_nature = '$contract_nature',
+            status = $status,
+            notes = '$notes',
+            company_id = $company_id
+            WHERE id = $mine_id AND project_id = $project_id AND $mines_not_deleted_sql";
+        }
         
         if (mysqli_query($conn, $update_query)) {
             header("Location: project_mines.php?project_id=$project_id&msg=ØªÙ…+ØªØ¹Ø¯ÙŠÙ„+Ø§Ù„Ù…Ù†Ø¬Ù…+Ø¨Ù†Ø¬Ø§Ø­+âœ…");
@@ -103,14 +231,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
         }
     } else {
         // Ø¥Ø¶Ø§ÙØ© Ù…Ù†Ø¬Ù… Ø¬Ø¯ÙŠØ¯
-        $check_query = "SELECT id FROM mines WHERE mine_code = '$mine_code'";
-        $check_result = mysqli_query($conn, $check_query);
-
-        if (mysqli_num_rows($check_result) > 0) {
-            header("Location: project_mines.php?project_id=$project_id&msg=ÙƒÙˆØ¯+Ø§Ù„Ù…Ù†Ø¬Ù…+Ù…ÙˆØ¬ÙˆØ¯+Ù…Ø³Ø¨Ù‚Ø§Ù‹âŒ");
-            exit();
-        }
-
         $mine_area_value = $mine_area !== null ? $mine_area : "NULL";
         $mining_depth_value = $mining_depth !== null ? $mining_depth : "NULL";
         $created_by = $_SESSION['user']['id'];
@@ -123,6 +243,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
             ($project_id, '$mine_code', '$mine_name', '$manager_name', '$mineral_type', '$mine_type', 
              '$mine_type_other', '$ownership_type', '$ownership_type_other', $mine_area_value, '$mine_area_unit', 
              $mining_depth_value, '$contract_nature', $status, '$notes', $created_by)";
+
+        if ($mines_has_company_id && $company_id > 0) {
+            $insert_query = "INSERT INTO mines 
+            (company_id, project_id, mine_code, mine_name, manager_name, mineral_type, mine_type, mine_type_other, 
+             ownership_type, ownership_type_other, mine_area, mine_area_unit, mining_depth, contract_nature, 
+             status, notes, created_by) 
+            VALUES 
+            ($company_id, $project_id, '$mine_code', '$mine_name', '$manager_name', '$mineral_type', '$mine_type', 
+             '$mine_type_other', '$ownership_type', '$ownership_type_other', $mine_area_value, '$mine_area_unit', 
+             $mining_depth_value, '$contract_nature', $status, '$notes', $created_by)";
+        }
 
         if (mysqli_query($conn, $insert_query)) {
             header("Location: project_mines.php?project_id=$project_id&msg=ØªÙ…+Ø¥Ø¶Ø§ÙØ©+Ø§Ù„Ù…Ù†Ø¬Ù…+Ø¨Ù†Ø¬Ø§Ø­+âœ…");
@@ -141,13 +272,33 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
         exit();
     }
 
+    $delete_csrf = isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '';
+    if (empty($delete_csrf) || !hash_equals($project_mines_csrf_token, $delete_csrf)) {
+        project_mines_redirect_with_msg($project_id, 'جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
+    }
+
     $mine_id = intval($_GET['delete']);
-    $delete_query = "DELETE FROM mines WHERE id = $mine_id AND project_id = $project_id";
+    if (!$mines_has_is_deleted && !$mines_has_deleted_at) {
+        project_mines_redirect_with_msg($project_id, 'تعذر تفعيل الحذف الناعم للمناجم حالياً ❌');
+    }
+
+    $delete_set = array("status = 0");
+    if ($mines_has_is_deleted) {
+        $delete_set[] = "is_deleted = 1";
+    }
+    if ($mines_has_deleted_at) {
+        $delete_set[] = "deleted_at = NOW()";
+    }
+    if ($mines_has_deleted_by) {
+        $deleted_by = intval($_SESSION['user']['id']);
+        $delete_set[] = "deleted_by = $deleted_by";
+    }
+    $delete_query = "UPDATE mines SET " . implode(', ', $delete_set) . " WHERE id = $mine_id AND project_id = $project_id AND $mines_not_deleted_sql";
 
     if (mysqli_query($conn, $delete_query)) {
-        echo "<script>alert('ØªÙ… Ø­Ø°Ù Ø§Ù„Ù…Ù†Ø¬Ù… Ø¨Ù†Ø¬Ø§Ø­'); window.location.href='project_mines.php?project_id=$project_id';</script>";
+        project_mines_redirect_with_msg($project_id, 'تم حذف المنجم بنجاح ✅');
     } else {
-        echo "<script>alert('Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø­Ø°Ù'); window.location.href='project_mines.php?project_id=$project_id';</script>";
+        project_mines_redirect_with_msg($project_id, 'حدث خطأ أثناء الحذف ❌');
     }
     exit();
 }
@@ -396,6 +547,7 @@ include '../inheader.php';
             </div>
             <div class="card-body">
                 <input type="hidden" name="mine_id" id="mine_id" value="">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($project_mines_csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
                 <div class="form-grid">
                     <div>
                         <label><i class="fas fa-barcode"></i> ÙƒÙˆØ¯ Ø§Ù„Ù…Ù†Ø¬Ù… *</label>
@@ -516,7 +668,11 @@ include '../inheader.php';
             </thead>
             <tbody>
                 <?php
-                $mines_query = "SELECT * FROM mines WHERE project_id = $project_id ORDER BY created_at DESC";
+                $mines_query = "SELECT m.*, 
+                               (SELECT COUNT(*) FROM contracts c WHERE c.mine_id = m.id) AS contract_count
+                               FROM mines m
+                               WHERE m.project_id = $project_id AND " . str_replace('is_deleted', 'm.is_deleted', str_replace('deleted_at', 'm.deleted_at', $mines_not_deleted_sql)) . "
+                               ORDER BY m.created_at DESC";
                 $mines_result = mysqli_query($conn, $mines_query);
                 $counter = 1;
 
@@ -542,10 +698,7 @@ include '../inheader.php';
                     echo "<td>{$mine['mine_type']}</td>";
                     echo "<td>{$area_display}</td>";
                     echo "<td>{$depth_display}</td>";
-                    // Ø¬Ù„Ø¨ Ø¹Ø¯Ø¯ Ø§Ù„Ø¹Ù‚ÙˆØ¯ Ø§Ù„Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ø§Ù„Ù…Ù†Ø¬Ù…  
-                    $contracts_count_query = "SELECT COUNT(*) AS contract_count FROM contracts WHERE mine_id = " . $mine['id'];
-                    $contracts_count_result = mysqli_query($conn, $contracts_count_query);
-                    $contracts_count = mysqli_fetch_assoc($contracts_count_result)['contract_count'];
+                    $contracts_count = isset($mine['contract_count']) ? intval($mine['contract_count']) : 0;
                     echo "<td>{$contracts_count}</td>"; 
                     echo "<td> 
                      <a href='../Contracts/contracts.php?id=" . $mine['id'] . "' 
@@ -914,7 +1067,7 @@ include '../inheader.php';
         }
 
         if (confirm('Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø­Ø°Ù Ù‡Ø°Ø§ Ø§Ù„Ù…Ù†Ø¬Ù…ØŸ')) {
-            window.location.href = 'project_mines.php?project_id=<?php echo $project_id; ?>&delete=' + id;
+            window.location.href = 'project_mines.php?project_id=<?php echo $project_id; ?>&delete=' + id + '&csrf_token=<?php echo urlencode($project_mines_csrf_token); ?>';
         }
     }
 
