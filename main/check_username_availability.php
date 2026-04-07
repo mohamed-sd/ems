@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
+session_start();
 
 // تضمين ملف الاتصال بقاعدة البيانات
 require_once '../config.php';
@@ -12,6 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // الحصول على اسم المستخدم من الطلب
 $username = isset($_POST['username']) ? trim($_POST['username']) : '';
 $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
+
+$current_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$users_has_company_id = db_table_has_column($conn, 'users', 'company_id');
+$users_not_deleted_sql = db_table_has_column($conn, 'users', 'is_deleted') ? 'COALESCE(is_deleted,0)=0' : '1=1';
 
 // التحقق من أن اسم المستخدم غير فارغ
 if (empty($username)) {
@@ -28,11 +33,17 @@ $username_escaped = mysqli_real_escape_string($conn, $username);
 
 if ($uid > 0) {
     // في حالة التعديل، نتجاهل السجل الحالي
-    $query = "SELECT id FROM users WHERE username = '$username_escaped' AND id != $uid LIMIT 1";
+    $query = "SELECT id FROM users WHERE username = '$username_escaped' AND id != $uid AND $users_not_deleted_sql";
 } else {
     // في حالة الإضافة
-    $query = "SELECT id FROM users WHERE username = '$username_escaped' LIMIT 1";
+    $query = "SELECT id FROM users WHERE username = '$username_escaped' AND $users_not_deleted_sql";
 }
+
+if ($users_has_company_id && $current_company_id > 0) {
+    $query .= " AND company_id = $current_company_id";
+}
+
+$query .= " LIMIT 1";
 
 $result = mysqli_query($conn, $query);
 

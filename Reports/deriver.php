@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -54,7 +54,7 @@ $result = mysqli_query($conn, $sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | ØªÙ‚Ø§Ø±ÙŠØ± Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ†</title>
+    <title>إيكوبيشن | تقارير السائقين</title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
@@ -71,11 +71,11 @@ $result = mysqli_query($conn, $sql);
     <div class="page-header">
       <div style="display: flex; align-items: center; gap: 12px;">
         <div class="title-icon"><i class="fas fa-user-clock"></i></div>
-        <h1 class="page-title">ØªÙ‚Ø±ÙŠØ± Ø³Ø§Ø¹Ø§Øª Ø¹Ù…Ù„ Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ†</h1>
+        <h1 class="page-title">تقرير ساعات عمل السائقين</h1>
       </div>
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
         <a href="reports.php" class="back-btn">
-          <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
+          <i class="fas fa-arrow-right"></i> رجوع
         </a>
       </div>
     </div>
@@ -83,17 +83,17 @@ $result = mysqli_query($conn, $sql);
     <div class="card">
         <div class="card-header">
             <h5>
-                <i class="fas fa-filter"></i> ÙÙ„Ø§ØªØ± Ø§Ù„Ø¨Ø­Ø«
+                <i class="fas fa-filter"></i> فلاتر البحث
             </h5>
         </div>
         <div class="card-body">
 
-            <!-- ÙÙˆØ±Ù… Ø§Ù„ÙÙ„Ø§ØªØ± -->
+            <!-- فورم الفلاتر -->
             <form method="GET" class="form-grid" style="margin-bottom: 2rem;">
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-project-diagram" style="margin-left: 5px;"></i> Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</label>
+                    <label><i class="fas fa-project-diagram" style="margin-left: 5px;"></i> المشروع</label>
                     <div class="control"><select name="project">
-                        <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
+                        <option value="">-- الكل --</option>
                         <?php
                         $prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
                         while ($prjRow = mysqli_fetch_assoc($prj)) {
@@ -105,9 +105,9 @@ $result = mysqli_query($conn, $sql);
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-user-tie" style="margin-left: 5px;"></i> Ø§Ù„Ø³Ø§Ø¦Ù‚</label>
+                    <label><i class="fas fa-user-tie" style="margin-left: 5px;"></i> السائق</label>
                     <div class="control"><select name="driver">
-                        <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
+                        <option value="">-- الكل --</option>
                         <?php
                         $drv = mysqli_query($conn, "SELECT id, name FROM drivers where status = '1' ");
                         while ($drvRow = mysqli_fetch_assoc($drv)) {
@@ -119,28 +119,28 @@ $result = mysqli_query($conn, $sql);
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> Ù…Ù† ØªØ§Ø±ÙŠØ®</label>
+                    <label><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> من تاريخ</label>
                     <div class="control"><input type="date" name="start_date" value="<?php echo $start_date; ?>"></div>
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> Ø¥Ù„Ù‰ ØªØ§Ø±ÙŠØ®</label>
+                    <label><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> إلى تاريخ</label>
                     <div class="control"><input type="date" name="end_date" value="<?php echo $end_date; ?>"></div>
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-moon" style="margin-left: 5px;"></i> Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</label>
+                    <label><i class="fas fa-moon" style="margin-left: 5px;"></i> الوردية</label>
                     <div class="control"><select name="shift">
-                        <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
-                        <option value="D" <?php if ($shift_filter == "D") echo "selected"; ?>>ØµØ¨Ø§Ø­ÙŠØ©</option>
-                        <option value="N" <?php if ($shift_filter == "N") echo "selected"; ?>>Ù…Ø³Ø§Ø¦ÙŠØ©</option>
+                        <option value="">-- الكل --</option>
+                        <option value="D" <?php if ($shift_filter == "D") echo "selected"; ?>>صباحية</option>
+                        <option value="N" <?php if ($shift_filter == "N") echo "selected"; ?>>مسائية</option>
                     </select></div>
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-cogs" style="margin-left: 5px;"></i> Ø§Ù„Ø¢Ù„ÙŠØ©</label>
+                    <label><i class="fas fa-cogs" style="margin-left: 5px;"></i> الآلية</label>
                     <div class="control"><select name="equipment_id">
-                        <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
+                        <option value="">-- الكل --</option>
                         <?php
                         $res = mysqli_query($conn, "
                             SELECT DISTINCT e.id, e.name 
@@ -157,7 +157,7 @@ $result = mysqli_query($conn, $sql);
 
                 <div class="field md-12" style="text-align: center; margin-top: 1rem;">
                     <button class="primary" type="submit" style="padding: 10px 40px;">
-                        <i class="fa fa-search"></i> Ø¨Ø­Ø«
+                        <i class="fa fa-search"></i> بحث
                     </button>
                 </div>
             </form>
@@ -167,18 +167,18 @@ $result = mysqli_query($conn, $sql);
     <div class="card">
         <div class="card-header">
             <h5>
-                <i class="fas fa-table"></i> Ù†ØªØ§Ø¦Ø¬ Ø§Ù„ØªÙ‚Ø±ÙŠØ±
+                <i class="fas fa-table"></i> نتائج التقرير
             </h5>
         </div>
         <div class="card-body" style="padding: 2rem; overflow-x: auto;">
             <table id="projectsTable" class="display nowrap" style="width:100%;">
                 <thead>
                     <tr>
-                        <th><i class="fas fa-calendar"></i> Ø§Ù„ØªØ§Ø±ÙŠØ®</th>
-                        <th><i class="fas fa-project-diagram"></i> Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</th>
-                        <th><i class="fas fa-user-tie"></i> Ø§Ù„Ø³Ø§Ø¦Ù‚</th>
-                        <th><i class="fas fa-cogs"></i> Ø§Ù„Ø¢Ù„ÙŠØ©</th>
-                        <th><i class="fas fa-clock"></i> Ù…Ø¬Ù…ÙˆØ¹ Ø§Ù„Ø³Ø§Ø¹Ø§Øª</th>
+                        <th><i class="fas fa-calendar"></i> التاريخ</th>
+                        <th><i class="fas fa-project-diagram"></i> المشروع</th>
+                        <th><i class="fas fa-user-tie"></i> السائق</th>
+                        <th><i class="fas fa-cogs"></i> الآلية</th>
+                        <th><i class="fas fa-clock"></i> مجموع الساعات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -192,7 +192,7 @@ $result = mysqli_query($conn, $sql);
                         <td><?php echo $row['project_name']; ?></td>
                         <td><?php echo $row['driver_name']; ?></td>
                         <td><?php echo $row['equipment_name']; ?></td>
-                        <td><span class="status-active"><?php echo $row['total_hours']; ?> Ø³Ø§Ø¹Ø©</span></td>
+                        <td><span class="status-active"><?php echo $row['total_hours']; ?> ساعة</span></td>
                     </tr>
                 <?php } ?>
                 </tbody>
@@ -200,13 +200,13 @@ $result = mysqli_query($conn, $sql);
         </div>
     </div>
 
-    <!-- Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹ -->
+    <!-- المجموع -->
     <div class="card" style="margin-top: 1.5rem;">
         <div class="card-body">
             <div class="totals">
                 <div class="kpi">
                     <div class="v"><?php echo $grand_total; ?></div>
-                    <div class="t">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</div>
+                    <div class="t">إجمالي ساعات العمل</div>
                 </div>
             </div>
         </div>

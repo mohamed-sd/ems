@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -10,13 +10,13 @@ if (!isset($_SESSION['user'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | ØªÙØ§ØµÙŠÙ„ Ø¹Ù‚Ø¯ Ø§Ù„Ù…ÙˆØ±Ø¯</title>
+    <title>إيكوبيشن | تفاصيل عقد المورد</title>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- CSS Ø§Ù„Ù…ÙˆÙ‚Ø¹ -->
+    <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
     
     <style>
@@ -375,30 +375,30 @@ if (!isset($_SESSION['user'])) {
 
 <div class="main">
 
-    <h3><i class="fas fa-file-contract"></i> ØªÙØ§ØµÙŠÙ„ Ø¹Ù‚Ø¯ Ø§Ù„Ù…ÙˆØ±Ø¯</h3>
+    <h3><i class="fas fa-file-contract"></i> تفاصيل عقد المورد</h3>
 
-    <!-- Ø£Ø²Ø±Ø§Ø± Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª -->
+    <!-- أزرار الإجراءات -->
     <div class="aligin">
-        <button class="add" id="renewalBtn" title="ØªØ¬Ø¯ÙŠØ¯ Ù…Ø¯Ø© Ø§Ù„Ø¹Ù‚Ø¯">
-            <i class="fas fa-sync-alt"></i> ØªØ¬Ø¯ÙŠØ¯ Ø§Ù„Ø¹Ù‚Ø¯
+        <button class="add" id="renewalBtn" title="تجديد مدة العقد">
+            <i class="fas fa-sync-alt"></i> تجديد العقد
         </button>
-        <button class="add" id="settlementBtn" title="ØªØ³ÙˆÙŠØ© Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…ØªØ¨Ù‚ÙŠØ©">
-            <i class="fas fa-balance-scale"></i> ØªØ³ÙˆÙŠØ©
+        <button class="add" id="settlementBtn" title="تسوية الساعات المتبقية">
+            <i class="fas fa-balance-scale"></i> تسوية
         </button>
-        <button class="add" id="pauseBtn" title="Ø¥ÙŠÙ‚Ø§Ù Ù…Ø¤Ù‚Øª Ù„Ù„Ø¹Ù‚Ø¯">
-            <i class="fas fa-pause-circle"></i> Ø¥ÙŠÙ‚Ø§Ù
+        <button class="add" id="pauseBtn" title="إيقاف مؤقت للعقد">
+            <i class="fas fa-pause-circle"></i> إيقاف
         </button>
-        <button class="add" id="resumeBtn" title="Ø§Ø³ØªØ¦Ù†Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ù…ØªÙˆÙ‚Ù">
-            <i class="fas fa-play-circle"></i> Ø§Ø³ØªØ¦Ù†Ø§Ù
+        <button class="add" id="resumeBtn" title="استئناف العقد المتوقف">
+            <i class="fas fa-play-circle"></i> استئناف
         </button>
-        <button class="add" id="terminateBtn" title="Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯">
-            <i class="fas fa-times-circle"></i> Ø¥Ù†Ù‡Ø§Ø¡
+        <button class="add" id="terminateBtn" title="إنهاء العقد">
+            <i class="fas fa-times-circle"></i> إنهاء
         </button>
-        <button class="add" id="mergeBtn" title="Ø¯Ù…Ø¬ Ù‡Ø°Ø§ Ø§Ù„Ø¹Ù‚Ø¯ Ù…Ø¹ Ø¹Ù‚Ø¯ Ø¢Ø®Ø±">
-            <i class="fas fa-object-group"></i> Ø¯Ù…Ø¬
+        <button class="add" id="mergeBtn" title="دمج هذا العقد مع عقد آخر">
+            <i class="fas fa-object-group"></i> دمج
         </button>
-        <button class="add" id="completeBtn" title="ØªØ³Ø¬ÙŠÙ„ Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯">
-            <i class="fas fa-check-circle"></i> Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯
+        <button class="add" id="completeBtn" title="تسجيل انتهاء العقد">
+            <i class="fas fa-check-circle"></i> انتهاء العقد
         </button>
     </div>
 
@@ -430,12 +430,12 @@ $sql = "SELECT
 $result = mysqli_query($conn, $sql);
 
 if (!$result) {
-    die("Ø®Ø·Ø£ ÙÙŠ Ø§Ù„Ø§Ø³ØªØ¹Ù„Ø§Ù…: " . mysqli_error($conn));
+    die("خطأ في الاستعلام: " . mysqli_error($conn));
 }
 
 while ($row = mysqli_fetch_assoc($result)) {
 
-    // Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø¯Ø© Ø§Ù„Ù…ØªØ¨Ù‚ÙŠØ© Ù…Ù† Ø§Ù„Ø¹Ù‚Ø¯ Ø¨Ø§Ø¹ØªÙ…Ø§Ø¯ ØªØ§Ø±ÙŠØ® Ø§Ù„ÙŠÙˆÙ… ÙˆØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡
+    // حساب المدة المتبقية من العقد باعتماد تاريخ اليوم وتاريخ الانتهاء
     $today = new DateTime();
     $actual_end_date = new DateTime($row['actual_end']);
     $interval = $today->diff($actual_end_date);
@@ -444,28 +444,28 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 
 
-    // ØªØ­Ø¯ÙŠØ¯ Ù„ÙˆÙ† Ø§Ù„Ø­Ø§Ù„Ø©
+    // تحديد لون الحالة
     $status_color = 'green';
-    $status_text = 'Ø³Ø§Ø±ÙŠ';
+    $status_text = 'ساري';
     if (isset($row['status'])) {
         if ($row['status'] == 1) {
             $status_color = 'green';
-            $status_text = 'Ø³Ø§Ø±ÙŠ';
+            $status_text = 'ساري';
         } else {
             $status_color = 'red';
-            $status_text = 'ØºÙŠØ± Ø³Ø§Ø±ÙŠ';
+            $status_text = 'غير ساري';
         }
     } else {
         $row['status'] = 1;
     }
 ?>
-    <!-- Ø¨Ø·Ø§Ù‚Ø§Øª Ù…Ù„Ø®Øµ Ø§Ù„Ø¹Ù‚Ø¯ -->
+    <!-- بطاقات ملخص العقد -->
     <div class="info-cards-grid">
-        <!-- Ø¨Ø·Ø§Ù‚Ø© Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…ÙˆØ±Ø¯ -->
+        <!-- بطاقة معلومات المورد -->
         <div class="info-card" style="border-right-color: #ff6b6b;">
-            <h5><i class="fas fa-industry"></i> Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…ÙˆØ±Ø¯</h5>
+            <h5><i class="fas fa-industry"></i> معلومات المورد</h5>
             <div class="info-item">
-                <span class="info-label">Ø§Ø³Ù… Ø§Ù„Ù…ÙˆØ±Ø¯</span>
+                <span class="info-label">اسم المورد</span>
                 <span class="info-value"><?php echo htmlspecialchars($row['supplier_name']); ?></span>
             </div>
             <div class="info-item">
@@ -479,16 +479,16 @@ while ($row = mysqli_fetch_assoc($result)) {
                         }
                     }
                     if (!empty($row['project_contract_id'])) {
-                        echo ' - Ø¹Ù‚Ø¯ #' . htmlspecialchars($row['project_contract_id']);
+                        echo ' - عقد #' . htmlspecialchars($row['project_contract_id']);
                     }
                     ?>
                 </span>
             </div>
         </div>
 
-        <!-- Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø­Ø§Ù„Ø© -->
+        <!-- بطاقة الحالة -->
         <div class="info-card <?php echo ($row['status'] == 1) ? 'success' : 'danger'; ?>">
-            <h5><i class="fas fa-info-circle"></i> Ø­Ø§Ù„Ø© Ø§Ù„Ø¹Ù‚Ø¯</h5>
+            <h5><i class="fas fa-info-circle"></i> حالة العقد</h5>
             <div class="text-center py-3">
                 <span class="status-badge <?php echo ($row['status'] == 1) ? 'active' : 'inactive'; ?>">
                     <?php echo $status_text; ?>
@@ -496,215 +496,215 @@ while ($row = mysqli_fetch_assoc($result)) {
             </div>
         </div>
 
-        <!-- Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ù…Ø¯Ø© -->
+        <!-- بطاقة المدة -->
         <div class="info-card primary">
-            <h5><i class="fas fa-calendar-alt"></i> Ù…Ø¯Ø© Ø§Ù„Ø¹Ù‚Ø¯</h5>
+            <h5><i class="fas fa-calendar-alt"></i> مدة العقد</h5>
             <div class="info-item">
-                <span class="info-label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø¯Ø©</span>
-                <span class="info-value"><?php echo $row['contract_duration_days']; ?> ÙŠÙˆÙ…</span>
+                <span class="info-label">إجمالي المدة</span>
+                <span class="info-value"><?php echo $row['contract_duration_days']; ?> يوم</span>
             </div>
             <div class="info-item">
-                <span class="info-label"><i class="fas fa-hourglass-half"></i> Ø§Ù„Ù…ØªØ¨Ù‚ÙŠ</span>
+                <span class="info-label"><i class="fas fa-hourglass-half"></i> المتبقي</span>
                 <span class="info-value" style="color: <?php echo $remaining_days > 30 ? '#28a745' : ($remaining_days > 0 ? '#ffc107' : '#dc3545'); ?>; font-weight: 700;">
-                    <?php echo $remaining_days; ?> ÙŠÙˆÙ…
+                    <?php echo $remaining_days; ?> يوم
                 </span>
             </div>
         </div>
 
-        <!-- Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„ØªÙˆØ§Ø±ÙŠØ® -->
+        <!-- بطاقة التواريخ -->
         <div class="info-card info">
-            <h5><i class="fas fa-calendar-check"></i> Ø§Ù„ØªÙˆØ§Ø±ÙŠØ® Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©</h5>
+            <h5><i class="fas fa-calendar-check"></i> التواريخ الأساسية</h5>
             <div class="info-item">
-                <span class="info-label">Ø§Ù„ØªÙˆÙ‚ÙŠØ¹</span>
+                <span class="info-label">التوقيع</span>
                 <span class="info-value"><?php echo $row['contract_signing_date']; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label">Ø§Ù„Ø¨Ø¯Ø¡ Ø§Ù„ÙØ¹Ù„ÙŠ</span>
+                <span class="info-label">البدء الفعلي</span>
                 <span class="info-value"><?php echo $row['actual_start']; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label">Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ù…ØªÙˆÙ‚Ø¹</span>
+                <span class="info-label">الانتهاء المتوقع</span>
                 <span class="info-value"><?php echo $row['actual_end']; ?></span>
             </div>
         </div>
 
-        <!-- Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø³Ø§Ø¹Ø§Øª -->
+        <!-- بطاقة الساعات -->
         <div class="info-card warning">
-            <h5><i class="fas fa-clock"></i> Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„ØªØ¹Ø§Ù‚Ø¯ÙŠØ©</h5>
+            <h5><i class="fas fa-clock"></i> الساعات التعاقدية</h5>
             <div class="info-item">
-                <span class="info-label">Ø§Ù„Ù‡Ø¯Ù Ø§Ù„Ø´Ù‡Ø±ÙŠ</span>
-                <span class="info-value"><?php echo $row['hours_monthly_target'] * 30; ?> Ø³Ø§Ø¹Ø©</span>
+                <span class="info-label">الهدف الشهري</span>
+                <span class="info-value"><?php echo $row['hours_monthly_target'] * 30; ?> ساعة</span>
             </div>
             <div class="info-item">
-                <span class="info-label">Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…ØªÙˆÙ‚Ø¹Ø©</span>
-                <span class="info-value"><?php echo $row['forecasted_contracted_hours']; ?> Ø³Ø§Ø¹Ø©</span>
+                <span class="info-label">الساعات المتوقعة</span>
+                <span class="info-value"><?php echo $row['forecasted_contracted_hours']; ?> ساعة</span>
             </div>
             <div class="info-item">
-                <span class="info-label">Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ Ø§Ù„ÙŠÙˆÙ…ÙŠØ©</span>
-                <span class="info-value"><?php echo $row['daily_work_hours']; ?> Ø³Ø§Ø¹Ø©</span>
+                <span class="info-label">ساعات العمل اليومية</span>
+                <span class="info-value"><?php echo $row['daily_work_hours']; ?> ساعة</span>
             </div>
         </div>
 
-        <!-- Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¥Ø¶Ø§ÙÙŠØ© Ù„Ù„Ø¹Ù‚Ø¯ -->
+        <!-- بطاقة البيانات الإضافية للعقد -->
         <div class="info-card" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <h5 style="color: white;"><i class="fas fa-file-contract"></i> Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ø¥Ø¶Ø§ÙÙŠØ©</h5>
+            <h5 style="color: white;"><i class="fas fa-file-contract"></i> بيانات العقد الإضافية</h5>
             <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">Ø¹Ø¯Ø¯ Ø§Ù„ÙˆØ±Ø¯ÙŠØ§Øª</span>
+                <span class="info-label" style="color: rgba(255,255,255,0.9);">عدد الورديات</span>
                 <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</span>
-                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['shift_contract']) ? $row['shift_contract'] : 0; ?> Ø³Ø§Ø¹Ø©</span>
+                <span class="info-label" style="color: rgba(255,255,255,0.9);">ساعات الوردية</span>
+                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['shift_contract']) ? $row['shift_contract'] : 0; ?> ساعة</span>
             </div>
             <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">Ø§Ù„ÙˆØ­Ø¯Ø§Øª ÙŠÙˆÙ…ÙŠØ§Ù‹</span>
+                <span class="info-label" style="color: rgba(255,255,255,0.9);">الوحدات يومياً</span>
                 <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">ÙˆØ­Ø¯Ø§Øª Ø§Ù„Ø´Ù‡Ø±</span>
+                <span class="info-label" style="color: rgba(255,255,255,0.9);">وحدات الشهر</span>
                 <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„ÙˆØ­Ø¯Ø§Øª</span>
+                <span class="info-label" style="color: rgba(255,255,255,0.9);">إجمالي الوحدات</span>
                 <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['total_contract_units']) ? $row['total_contract_units'] : 0; ?></span>
             </div>
         </div>
     </div>
 
-    <!-- Ø¨Ø·Ø§Ù‚Ø§Øª ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¹Ù‚Ø¯ -->
+    <!-- بطاقات تفاصيل العقد -->
     <div class="info-cards-grid">
-        <!-- Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ -->
+        <!-- معلومات المشروع -->
         <div class="info-card primary">
             <h5>
-                <i class="fas fa-project-diagram"></i> Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
+                <i class="fas fa-project-diagram"></i> معلومات المشروع
                 <button class="btn btn-sm btn-outline-primary ms-auto" id="editProjectInfoBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                    <i class="fas fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„
+                    <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
             <div class="info-item">
-                <span class="info-label">Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</span>
+                <span class="info-label">المشروع</span>
                 <span class="info-value" id="projectDisplay"><?php echo htmlspecialchars($row['project_name']); ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label">ÙØªØ±Ø© Ø§Ù„Ø³Ù…Ø§Ø­</span>
-                <span class="info-value" id="graceDisplay"><?php echo $row['grace_period_days']; ?> ÙŠÙˆÙ…</span>
+                <span class="info-label">فترة السماح</span>
+                <span class="info-value" id="graceDisplay"><?php echo $row['grace_period_days']; ?> يوم</span>
             </div>
             <div class="info-item">
-                <span class="info-label">Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ†</span>
+                <span class="info-label">عدد المشغلين</span>
                 <span class="info-value" id="operatorsDisplay"><?php echo $row['daily_operators']; ?></span>
             </div>
         </div>
 
 
-        <!-- Ø§Ù„Ø®Ø¯Ù…Ø§Øª -->
+        <!-- الخدمات -->
         <div class="info-card success">
             <h5>
-                <i class="fas fa-concierge-bell"></i> Ø§Ù„Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ù…Ù‚Ø¯Ù…Ø©
+                <i class="fas fa-concierge-bell"></i> الخدمات المقدمة
                 <button class="btn btn-sm btn-outline-success ms-auto" id="editServicesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                    <i class="fas fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„
+                    <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
             <div class="info-item">
-                <span class="info-label"><i class="fas fa-bus"></i> Ø§Ù„Ù†Ù‚Ù„</span>
+                <span class="info-label"><i class="fas fa-bus"></i> النقل</span>
                 <span class="info-value" id="transportationDisplay"><?php echo $row['transportation']; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label"><i class="fas fa-hotel"></i> Ø§Ù„Ø³ÙƒÙ†</span>
+                <span class="info-label"><i class="fas fa-hotel"></i> السكن</span>
                 <span class="info-value" id="accommodationDisplay"><?php echo $row['accommodation']; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label"><i class="fas fa-map-marker-alt"></i> Ù…ÙƒØ§Ù† Ø§Ù„Ø³ÙƒÙ†</span>
+                <span class="info-label"><i class="fas fa-map-marker-alt"></i> مكان السكن</span>
                 <span class="info-value" id="placeLivingDisplay"><?php echo $row['place_for_living']; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label"><i class="fas fa-wrench"></i> Ø§Ù„ÙˆØ±Ø´Ø©</span>
+                <span class="info-label"><i class="fas fa-wrench"></i> الورشة</span>
                 <span class="info-value" id="workshopDisplay"><?php echo $row['workshop']; ?></span>
             </div>
         </div>
 
-        <!-- Ø£Ø·Ø±Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯ -->
+        <!-- أطراف العقد -->
         <div class="info-card info">
             <h5>
-                <i class="fas fa-users"></i> Ø£Ø·Ø±Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯
+                <i class="fas fa-users"></i> أطراف العقد
                 <button class="btn btn-sm btn-outline-info ms-auto" id="editPartiesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                    <i class="fas fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„
+                    <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
             <div class="info-item">
-                <span class="info-label">Ø§Ù„Ø·Ø±Ù Ø§Ù„Ø£ÙˆÙ„</span>
+                <span class="info-label">الطرف الأول</span>
                 <span class="info-value" id="firstPartyDisplay"><?php echo $row['first_party']; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label">Ø§Ù„Ø·Ø±Ù Ø§Ù„Ø«Ø§Ù†ÙŠ</span>
+                <span class="info-label">الطرف الثاني</span>
                 <span class="info-value" id="secondPartyDisplay"><?php echo $row['second_party']; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label">Ø§Ù„Ø´Ø§Ù‡Ø¯ Ø§Ù„Ø£ÙˆÙ„</span>
+                <span class="info-label">الشاهد الأول</span>
                 <span class="info-value" id="witnessOneDisplay"><?php echo $row['witness_one']; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label">Ø§Ù„Ø´Ø§Ù‡Ø¯ Ø§Ù„Ø«Ø§Ù†ÙŠ</span>
+                <span class="info-label">الشاهد الثاني</span>
                 <span class="info-value" id="witnessTwoDisplay"><?php echo $row['witness_two']; ?></span>
             </div>
         </div>
 
-        <!-- Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ© -->
+        <!-- البيانات المالية -->
         <div class="info-card warning">
             <h5>
-                <i class="fas fa-money-bill-wave"></i> Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©
+                <i class="fas fa-money-bill-wave"></i> البيانات المالية
                 <button class="btn btn-sm btn-outline-warning ms-auto" id="editPaymentBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                    <i class="fas fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„
+                    <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
             <div class="info-item">
-                <span class="info-label"><i class="fas fa-dollar-sign"></i> Ø§Ù„Ø¹Ù…Ù„Ø©</span>
+                <span class="info-label"><i class="fas fa-dollar-sign"></i> العملة</span>
                 <span class="info-value" id="currencyDisplay"><?php echo !empty($row['price_currency_contract']) ? $row['price_currency_contract'] : '-'; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label"><i class="fas fa-money-check-alt"></i> Ø§Ù„Ù…Ø¨Ù„Øº Ø§Ù„Ù…Ø¯ÙÙˆØ¹</span>
+                <span class="info-label"><i class="fas fa-money-check-alt"></i> المبلغ المدفوع</span>
                 <span class="info-value" id="paidAmountDisplay"><?php echo !empty($row['paid_contract']) ? $row['paid_contract'] : '-'; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label"><i class="fas fa-clock"></i> ÙˆÙ‚Øª Ø§Ù„Ø¯ÙØ¹</span>
+                <span class="info-label"><i class="fas fa-clock"></i> وقت الدفع</span>
                 <span class="info-value" id="paymentTimeDisplay"><?php echo !empty($row['payment_time']) ? $row['payment_time'] : '-'; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label"><i class="fas fa-shield-alt"></i> Ø§Ù„Ø¶Ù…Ø§Ù†Ø§Øª</span>
+                <span class="info-label"><i class="fas fa-shield-alt"></i> الضمانات</span>
                 <span class="info-value" id="guaranteesDisplay"><?php echo !empty($row['guarantees']) ? $row['guarantees'] : '-'; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label"><i class="fas fa-calendar-check"></i> ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¯ÙØ¹</span>
+                <span class="info-label"><i class="fas fa-calendar-check"></i> تاريخ الدفع</span>
                 <span class="info-value" id="paymentDateDisplay"><?php echo !empty($row['payment_date']) ? $row['payment_date'] : '-'; ?></span>
             </div>
         </div>
 
-        <!-- Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù†Ø¸Ø§Ù… -->
+        <!-- معلومات النظام -->
         <div class="info-card" style="border-right-color: #6c757d;">
-            <h5><i class="fas fa-database"></i> Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù†Ø¸Ø§Ù…</h5>
+            <h5><i class="fas fa-database"></i> معلومات النظام</h5>
             <div class="info-item">
-                <span class="info-label">ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¥Ù†Ø´Ø§Ø¡</span>
+                <span class="info-label">تاريخ الإنشاء</span>
                 <span class="info-value"><?php echo $row['created_at']; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label">Ø¢Ø®Ø± ØªØ­Ø¯ÙŠØ«</span>
+                <span class="info-label">آخر تحديث</span>
                 <span class="info-value"><?php echo $row['updated_at']; ?></span>
             </div>
         </div>
     </div>
 
     <?php if ((isset($row['pause_reason']) && !empty($row['pause_reason'])) || (isset($row['termination_reason']) && !empty($row['termination_reason']))): ?>
-    <!-- Ø¨Ø·Ø§Ù‚Ø© Ø§Ù„ØªØ­Ø°ÙŠØ±Ø§Øª ÙˆØ§Ù„Ù…Ù„Ø§Ø­Ø¸Ø§Øª -->
+    <!-- بطاقة التحذيرات والملاحظات -->
     <div class="info-card danger" style="margin-bottom: 2rem;">
-        <h5><i class="fas fa-exclamation-triangle"></i> ØªØ­Ø°ÙŠØ±Ø§Øª ÙˆÙ…Ù„Ø§Ø­Ø¸Ø§Øª Ù‡Ø§Ù…Ø©</h5>
+        <h5><i class="fas fa-exclamation-triangle"></i> تحذيرات وملاحظات هامة</h5>
         <?php if (isset($row['pause_reason']) && !empty($row['pause_reason'])): ?>
         <div class="info-item">
-            <span class="info-label">Ø³Ø¨Ø¨ Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù</span>
+            <span class="info-label">سبب الإيقاف</span>
             <span class="info-value"><?php echo $row['pause_reason']; ?></span>
         </div>
         <?php endif; ?>
         <?php if (isset($row['termination_reason']) && !empty($row['termination_reason'])): ?>
         <div class="info-item">
-            <span class="info-label">Ø³Ø¨Ø¨ Ø§Ù„Ø¥Ù†Ù‡Ø§Ø¡</span>
+            <span class="info-label">سبب الإنهاء</span>
             <span class="info-value"><?php echo $row['termination_reason']; ?></span>
         </div>
         <?php endif; ?>
@@ -718,7 +718,7 @@ $actual_end_date = $row['actual_end'];
 $pause_date = isset($row['pause_date']) ? $row['pause_date'] : '';
 $pause_reason = isset($row['pause_reason']) ? $row['pause_reason'] : '';
 
-// Ø­ÙØ¸ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯ Ù„Ù„ØªØ¹Ø¯ÙŠÙ„
+// حفظ بيانات العقد للتعديل
 $grace_period = $row['grace_period_days'];
 $daily_operators = $row['daily_operators'];
 $transportation = $row['transportation'];
@@ -730,7 +730,7 @@ $second_party = $row['second_party'];
 $witness_one = $row['witness_one'];
 $witness_two = $row['witness_two'];
 
-// Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©
+// البيانات المالية
 $price_currency_contract = isset($row['price_currency_contract']) ? $row['price_currency_contract'] : '';
 $paid_contract = isset($row['paid_contract']) ? $row['paid_contract'] : '';
 $payment_time = isset($row['payment_time']) ? $row['payment_time'] : '';
@@ -739,14 +739,14 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 } 
 ?>
 
-<!-- Ø¬Ø¯ÙˆÙ„ Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯ (Ø¨Ù…Ø§ ÙÙŠÙ‡Ø§ Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ù…Ø¯Ù…ÙˆØ¬) -->
+<!-- جدول معدات العقد (بما فيها معدات العقد المدموج) -->
 <div style="background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-top: 2rem;">
     <h4 style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: #667eea; font-weight: 700;">
         <i class="fas fa-boxes"></i>
-        Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯
+        معدات العقد
         <?php 
         if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
-            echo "<span style='font-size: 0.9rem; color: #6c757d;'>(Ø§Ù„Ø¹Ù‚Ø¯ #" . $contract_id . " + Ø§Ù„Ø¹Ù‚Ø¯ #" . $row['merged_with'] . ")</span>";
+            echo "<span style='font-size: 0.9rem; color: #6c757d;'>(العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")</span>";
         }
         ?>
     </h4>
@@ -755,23 +755,23 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©</th>
-                    <th>Ø§Ù„Ø­Ø¬Ù…</th>
-                    <th>Ø§Ù„Ø¹Ø¯Ø¯</th>
-                    <th>Ø¹Ø¯Ø¯ Ø§Ù„ÙˆØ±Ø¯ÙŠØ§Øª</th>
-                    <th>Ø§Ù„Ø³Ø§Ø¹Ø§Øª/Ø§Ù„ÙŠÙˆÙ…</th>
-                    <th>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª</th>
-                    <th>ÙˆØ­Ø¯Ø§Øª Ø§Ù„Ø¹Ù…Ù„/Ø§Ù„Ø´Ù‡Ø±</th>
-                    <th>Ø§Ù„ÙˆØ­Ø¯Ø©</th>
-                    <th>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯</th>
-                    <th>Ø§Ù„Ø³Ø¹Ø±</th>
-                    <th>Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ†</th>
-                    <th>Ø§Ù„Ù…Ø´Ø±ÙÙŠÙ†</th>
-                    <th>Ø§Ù„ÙÙ†ÙŠÙŠÙ†</th>
-                    <th>Ø§Ù„Ù…Ø³Ø§Ø¹Ø¯ÙŠÙ†</th>
+                    <th>نوع المعدة</th>
+                    <th>الحجم</th>
+                    <th>العدد</th>
+                    <th>عدد الورديات</th>
+                    <th>الساعات/اليوم</th>
+                    <th>إجمالي الساعات</th>
+                    <th>وحدات العمل/الشهر</th>
+                    <th>الوحدة</th>
+                    <th>إجمالي ساعات العقد</th>
+                    <th>السعر</th>
+                    <th>المشغلين</th>
+                    <th>المشرفين</th>
+                    <th>الفنيين</th>
+                    <th>المساعدين</th>
                     <?php 
                     if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
-                        echo "<th>Ø§Ù„Ù…ØµØ¯Ø±</th>";
+                        echo "<th>المصدر</th>";
                     }
                     ?>
                 </tr>
@@ -815,7 +815,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         echo "<td>" . $equip['equip_technicians'] . "</td>";
                         echo "<td>" . $equip['equip_assistants'] . "</td>";
                         if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
-                            // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ù‡Ù„ Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø¹Ø¯Ø© Ù…Ù† Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ù…Ø¯Ù…ÙˆØ¬ Ø£Ù… Ù„Ø§
+                            // التحقق من هل هذه المعدة من العقد المدموج أم لا
                             $merged_equipments = getSupplierContractEquipments(intval($row['merged_with']), $conn);
                             $is_from_merged = false;
                             foreach ($merged_equipments as $m_equip) {
@@ -827,7 +827,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                                 }
                             }
                             echo "<td><span class='badge " . ($is_from_merged ? "bg-success" : "bg-primary") . "'>" . 
-                                 ($is_from_merged ? "Ø§Ù„Ø¹Ù‚Ø¯ #" . $row['merged_with'] : "Ø§Ù„Ø¹Ù‚Ø¯ #" . $contract_id) . 
+                                 ($is_from_merged ? "العقد #" . $row['merged_with'] : "العقد #" . $contract_id) . 
                                  "</span></td>";
                         }
                         echo "</tr>";
@@ -836,7 +836,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 } else {
                     echo "<tr><td colspan='14' style='text-align: center; padding: 2rem;'>";
                     echo "<i class='fas fa-inbox' style='font-size: 3rem; color: #e9ecef; margin-bottom: 1rem;'></i>";
-                    echo "<p style='color: #999; font-size: 1.1rem;'>Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø¹Ø¯Ø§Øª Ù„Ù‡Ø°Ø§ Ø§Ù„Ø¹Ù‚Ø¯</p>";
+                    echo "<p style='color: #999; font-size: 1.1rem;'>لا توجد معدات لهذا العقد</p>";
                     echo "</td></tr>";
                 }
                 ?>
@@ -846,26 +846,26 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 </div>
 
 <?php 
-// Ø¥Ø²Ø§Ù„Ø© Ø§Ù„Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ù…Ù†ÙØµÙ„ Ù„Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ù…Ø¯Ù…ÙˆØ¬ (ØªÙ… Ø¯Ù…Ø¬ Ù…Ø¹Ø¯Ø§ØªÙ‡ ÙÙŠ Ø§Ù„Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ)
+// إزالة الجدول المنفصل للعقد المدموج (تم دمج معداته في الجدول الرئيسي)
 ?>
 
     <br/><br/><br/>
 
-    <!-- Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø§Øª -->
+    <!-- جدول الملاحظات -->
     <div style="background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-top: 2rem; margin-bottom: 3rem;">
         <h4 style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: #667eea; font-weight: 700;">
             <i class="fas fa-history"></i>
-            Ø³Ø¬Ù„ Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø§Øª ÙˆØ§Ù„ØªØºÙŠÙŠØ±Ø§Øª
+            سجل الملاحظات والتغييرات
         </h4>
         <div style="overflow-x: auto;">
             <table class="modern-table">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Ù†ÙˆØ¹ Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡</th>
-                        <th>Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø©</th>
-                        <th>Ø¨ÙˆØ§Ø³Ø·Ø©</th>
-                        <th>Ø§Ù„ØªØ§Ø±ÙŠØ® ÙˆØ§Ù„ÙˆÙ‚Øª</th>
+                        <th>نوع الإجراء</th>
+                        <th>الملاحظة</th>
+                        <th>بواسطة</th>
+                        <th>التاريخ والوقت</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -879,37 +879,37 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     if ($notes_result && mysqli_num_rows($notes_result) > 0) {
                         $j = 1;
                         while ($note = mysqli_fetch_assoc($notes_result)) {
-                            // ØªØ­Ø¯ÙŠØ¯ Ù†ÙˆØ¹ Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡ Ù…Ù† Ø§Ù„Ù†Øµ
+                            // تحديد نوع الإجراء من النص
                             $note_text = htmlspecialchars($note['note']);
                             $action_icon = '<i class="fas fa-sticky-note"></i>';
                             $action_badge = 'info';
                             
-                            if (strpos($note_text, 'ØªØ¬Ø¯ÙŠØ¯') !== false) {
+                            if (strpos($note_text, 'تجديد') !== false) {
                                 $action_icon = '<i class="fas fa-sync-alt"></i>';
                                 $action_badge = 'primary';
-                                $action_type = 'ØªØ¬Ø¯ÙŠØ¯';
-                            } elseif (strpos($note_text, 'ØªØ³ÙˆÙŠØ©') !== false) {
+                                $action_type = 'تجديد';
+                            } elseif (strpos($note_text, 'تسوية') !== false) {
                                 $action_icon = '<i class="fas fa-balance-scale"></i>';
                                 $action_badge = 'secondary';
-                                $action_type = 'ØªØ³ÙˆÙŠØ©';
-                            } elseif (strpos($note_text, 'Ø¥ÙŠÙ‚Ø§Ù') !== false) {
+                                $action_type = 'تسوية';
+                            } elseif (strpos($note_text, 'إيقاف') !== false) {
                                 $action_icon = '<i class="fas fa-pause-circle"></i>';
                                 $action_badge = 'warning';
-                                $action_type = 'Ø¥ÙŠÙ‚Ø§Ù';
-                            } elseif (strpos($note_text, 'Ø§Ø³ØªØ¦Ù†Ø§Ù') !== false) {
+                                $action_type = 'إيقاف';
+                            } elseif (strpos($note_text, 'استئناف') !== false) {
                                 $action_icon = '<i class="fas fa-play-circle"></i>';
                                 $action_badge = 'success';
-                                $action_type = 'Ø§Ø³ØªØ¦Ù†Ø§Ù';
-                            } elseif (strpos($note_text, 'Ø¥Ù†Ù‡Ø§Ø¡') !== false || strpos($note_text, 'Ø§Ù†Ù‡Ø§Ø¡') !== false) {
+                                $action_type = 'استئناف';
+                            } elseif (strpos($note_text, 'إنهاء') !== false || strpos($note_text, 'انهاء') !== false) {
                                 $action_icon = '<i class="fas fa-times-circle"></i>';
                                 $action_badge = 'danger';
-                                $action_type = 'Ø¥Ù†Ù‡Ø§Ø¡';
-                            } elseif (strpos($note_text, 'Ø¯Ù…Ø¬') !== false) {
+                                $action_type = 'إنهاء';
+                            } elseif (strpos($note_text, 'دمج') !== false) {
                                 $action_icon = '<i class="fas fa-object-group"></i>';
                                 $action_badge = 'purple';
-                                $action_type = 'Ø¯Ù…Ø¬';
+                                $action_type = 'دمج';
                             } else {
-                                $action_type = 'Ù…Ù„Ø§Ø­Ø¸Ø© Ø¹Ø§Ù…Ø©';
+                                $action_type = 'ملاحظة عامة';
                             }
                             
                             $badge_colors = [
@@ -926,7 +926,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             echo "<td>" . $j . "</td>";
                             echo "<td><span style='" . $badge_colors[$action_badge] . " color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;'>" . $action_icon . " " . $action_type . "</span></td>";
                             echo "<td style='text-align: right;'>" . $note_text . "</td>";
-                            echo "<td><i class='fas fa-user' style='color:#667eea; margin-left:5px;'></i>Ø§Ù„Ù†Ø¸Ø§Ù…</td>";
+                            echo "<td><i class='fas fa-user' style='color:#667eea; margin-left:5px;'></i>النظام</td>";
                             echo "<td><i class='far fa-clock' style='margin-left: 0.5rem;'></i>" . $note['created_at'] . "</td>";
                             echo "</tr>";
                             $j++;
@@ -934,7 +934,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     } else {
                         echo "<tr><td colspan='5' style='text-align: center; padding: 2rem;'>";
                         echo "<i class='fas fa-inbox' style='font-size: 3rem; color: #e9ecef; margin-bottom: 1rem;'></i>";
-                        echo "<p style='color: #999; font-size: 1.1rem;'>Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ù„Ù‡Ø°Ø§ Ø§Ù„Ø¹Ù‚Ø¯</p>";
+                        echo "<p style='color: #999; font-size: 1.1rem;'>لا توجد ملاحظات لهذا العقد</p>";
                         echo "</td></tr>";
                     }
                     ?>
@@ -943,10 +943,10 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
         </div>
     </div>
 
-    <!-- Ø²Ø± Ø§Ù„Ø¹ÙˆØ¯Ø© -->
+    <!-- زر العودة -->
     <div style="text-align: center; margin: 2rem 0;">
         <a href="suppliers.php" class="btn btn-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem 3rem; border-radius: 15px; font-weight: 700; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
-            <i class="fas fa-arrow-right"></i> Ø§Ù„Ø¹ÙˆØ¯Ø© Ø¥Ù„Ù‰ Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ†
+            <i class="fas fa-arrow-right"></i> العودة إلى قائمة الموردين
         </a>
     </div>
 
@@ -959,42 +959,42 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-header" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
                 <h5 class="modal-title" id="renewalModalLabel">
                     <i class="fas fa-sync-alt"></i>
-                    ØªØ¬Ø¯ÙŠØ¯ Ø§Ù„Ø¹Ù‚Ø¯
+                    تجديد العقد
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
                     <i class="fas fa-info-circle"></i>
-                    <strong>Ù…Ø¹Ù„ÙˆÙ…Ø©:</strong> Ø³ÙŠØªÙ… ØªØ¬Ø¯ÙŠØ¯ Ù…Ø¯Ø© Ø§Ù„Ø¹Ù‚Ø¯ Ø¨Ø§Ù„ØªÙˆØ§Ø±ÙŠØ® Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©.
+                    <strong>معلومة:</strong> سيتم تجديد مدة العقد بالتواريخ الجديدة.
                 </div>
                 <div class="mb-4">
                     <label for="renewalStartDate" class="form-label">
                         <i class="far fa-calendar-alt" style="margin-left: 0.5rem;"></i>
-                        ØªØ§Ø±ÙŠØ® Ø¨Ø¯Ø¡ Ø§Ù„ØªØ¬Ø¯ÙŠØ¯ <span style="color: red;">*</span>
+                        تاريخ بدء التجديد <span style="color: red;">*</span>
                     </label>
                     <input type="date" id="renewalStartDate" class="form-control">
                 </div>
                 <div class="mb-3">
                     <label for="renewalEndDate" class="form-label">
                         <i class="far fa-calendar-check" style="margin-left: 0.5rem;"></i>
-                        ØªØ§Ø±ÙŠØ® Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„ØªØ¬Ø¯ÙŠØ¯ <span style="color: red;">*</span>
+                        تاريخ انتهاء التجديد <span style="color: red;">*</span>
                     </label>
                     <input type="date" id="renewalEndDate" class="form-control">
                 </div>
                 <div id="renewalDurationDisplay" style="display: none; padding: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; margin-top: 1rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600;">
                         <i class="fas fa-calendar-days"></i>
-                        <span>Ù…Ø¯Ø© Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©: <strong id="calculatedDays">0</strong> ÙŠÙˆÙ…</span>
+                        <span>مدة العقد الجديدة: <strong id="calculatedDays">0</strong> يوم</span>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Ø§Ù„ØºØ§Ø¡
+                    <i class="fas fa-times"></i> الغاء
                 </button>
                 <button type="button" class="btn" id="confirmRenewal" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; border: none;">
-                    <i class="fas fa-check"></i> ØªØ¬Ø¯ÙŠØ¯
+                    <i class="fas fa-check"></i> تجديد
                 </button>
             </div>
         </div>
@@ -1008,47 +1008,47 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-header" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);">
                 <h5 class="modal-title" id="settlementModalLabel">
                     <i class="fas fa-balance-scale"></i>
-                    ØªØ³ÙˆÙŠØ© Ø§Ù„Ø¹Ù‚Ø¯
+                    تسوية العقد
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
                     <i class="fas fa-info-circle"></i>
-                    <strong>Ù…Ø¹Ù„ÙˆÙ…Ø©:</strong> ÙŠÙ…ÙƒÙ†Ùƒ Ø²ÙŠØ§Ø¯Ø© Ø£Ùˆ ØªØ®ÙÙŠØ¶ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯.
+                    <strong>معلومة:</strong> يمكنك زيادة أو تخفيض ساعات العقد.
                 </div>
                 <div class="mb-4">
                     <label for="settlementType" class="form-label">
                         <i class="fas fa-exchange-alt" style="margin-left: 0.5rem;"></i>
-                        Ù†ÙˆØ¹ Ø§Ù„ØªØ³ÙˆÙŠØ© <span style="color: red;">*</span>
+                        نوع التسوية <span style="color: red;">*</span>
                     </label>
                     <select id="settlementType" class="form-select">
-                        <option value="">-- Ø§Ø®ØªØ± --</option>
-                        <option value="increase">âž• Ø²ÙŠØ§Ø¯Ø© Ø³Ø§Ø¹Ø§Øª</option>
-                        <option value="decrease">âž– Ù†Ù‚ØµØ§Ù† Ø³Ø§Ø¹Ø§Øª</option>
+                        <option value="">-- اختر --</option>
+                        <option value="increase">➕ زيادة ساعات</option>
+                        <option value="decrease">➖ نقصان ساعات</option>
                     </select>
                 </div>
                 <div class="mb-4">
                     <label for="settlementHours" class="form-label">
                         <i class="far fa-clock" style="margin-left: 0.5rem;"></i>
-                        Ø¹Ø¯Ø¯ Ø§Ù„Ø³Ø§Ø¹Ø§Øª <span style="color: red;">*</span>
+                        عدد الساعات <span style="color: red;">*</span>
                     </label>
-                    <input type="number" id="settlementHours" class="form-control" min="1" placeholder="Ø£Ø¯Ø®Ù„ Ø¹Ø¯Ø¯ Ø§Ù„Ø³Ø§Ø¹Ø§Øª">
+                    <input type="number" id="settlementHours" class="form-control" min="1" placeholder="أدخل عدد الساعات">
                 </div>
                 <div class="mb-3">
                     <label for="settlementReason" class="form-label">
                         <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„Ø³Ø¨Ø¨ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)
+                        السبب (اختياري)
                     </label>
-                    <textarea id="settlementReason" class="form-control" rows="3" placeholder="Ø£Ø¯Ø®Ù„ Ø§Ù„Ø³Ø¨Ø¨"></textarea>
+                    <textarea id="settlementReason" class="form-control" rows="3" placeholder="أدخل السبب"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
+                    <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn" id="confirmSettlement" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none;">
-                    <i class="fas fa-check"></i> ØªØ³ÙˆÙŠØ©
+                    <i class="fas fa-check"></i> تسوية
                 </button>
             </div>
         </div>
@@ -1062,36 +1062,36 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-header" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
                 <h5 class="modal-title" id="pauseModalLabel">
                     <i class="fas fa-pause-circle"></i>
-                    Ø¥ÙŠÙ‚Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯
+                    إيقاف العقد
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-warning" role="alert">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <strong>ØªÙ†Ø¨ÙŠÙ‡:</strong> Ø³ÙŠØªÙ… Ø¥ÙŠÙ‚Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯ Ù…Ø¤Ù‚ØªØ§Ù‹. ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ø³ØªØ¦Ù†Ø§ÙÙ‡ Ù„Ø§Ø­Ù‚Ø§Ù‹.
+                    <strong>تنبيه:</strong> سيتم إيقاف العقد مؤقتاً. يمكنك استئنافه لاحقاً.
                 </div>
                 <div class="mb-4">
                     <label for="pauseDate" class="form-label">
                         <i class="far fa-calendar-alt" style="margin-left: 0.5rem;"></i>
-                        ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù <span style="color: red;">*</span>
+                        تاريخ الإيقاف <span style="color: red;">*</span>
                     </label>
                     <input type="date" id="pauseDate" class="form-control" value="<?php echo date('Y-m-d'); ?>">
                 </div>
                 <div class="mb-3">
                     <label for="pauseReason" class="form-label">
                         <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                        Ø³Ø¨Ø¨ Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù <span style="color: red;">*</span>
+                        سبب الإيقاف <span style="color: red;">*</span>
                     </label>
-                    <textarea id="pauseReason" class="form-control" rows="4" placeholder="Ø£Ø¯Ø®Ù„ Ø§Ù„Ø³Ø¨Ø¨ Ø§Ù„Ù…ÙØµÙ„ Ù„Ù„Ø¥ÙŠÙ‚Ø§Ù"></textarea>
+                    <textarea id="pauseReason" class="form-control" rows="4" placeholder="أدخل السبب المفصل للإيقاف"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
+                    <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn" id="confirmPause" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white; border: none;">
-                    <i class="fas fa-pause-circle"></i> Ø¥ÙŠÙ‚Ø§Ù
+                    <i class="fas fa-pause-circle"></i> إيقاف
                 </button>
             </div>
         </div>
@@ -1105,68 +1105,68 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
                 <h5 class="modal-title" id="resumeModalLabel">
                     <i class="fas fa-play-circle"></i>
-                    Ø§Ø³ØªØ¦Ù†Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯
+                    استئناف العقد
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-success" role="alert">
                     <i class="fas fa-check-circle"></i>
-                    <strong>ØªØ£ÙƒÙŠØ¯:</strong> Ø³ÙŠØªÙ… Ø§Ø³ØªØ¦Ù†Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯ ÙˆØ¥Ø¹Ø§Ø¯Ø© ØªÙØ¹ÙŠÙ„Ù‡.
+                    <strong>تأكيد:</strong> سيتم استئناف العقد وإعادة تفعيله.
                 </div>
                 
-                <!-- Ø¹Ø±Ø¶ ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ -->
+                <!-- عرض تاريخ الإيقاف تلقائياً -->
                 <div class="mb-4" style="padding: 1.25rem; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 12px; border-right: 5px solid #ffc107; box-shadow: 0 2px 10px rgba(255, 193, 7, 0.2);">
                     <div style="display: flex; align-items: center; gap: 0.75rem; color: #856404; font-weight: 700; margin-bottom: 0.75rem; font-size: 1.05rem;">
                         <i class="fas fa-pause-circle" style="font-size: 1.3rem;"></i>
-                        <span>Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù</span>
+                        <span>معلومات الإيقاف</span>
                     </div>
                     <div style="color: #856404; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
                         <i class="far fa-calendar-times"></i>
-                        <strong>ØªØ§Ø±ÙŠØ® Ø¥ÙŠÙ‚Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯:</strong> 
+                        <strong>تاريخ إيقاف العقد:</strong> 
                         <span style="background: white; padding: 0.4rem 1rem; border-radius: 6px; font-weight: 700; color: #d39e00;">
-                            <?php echo !empty($pause_date) ? date('Y-m-d', strtotime($pause_date)) : 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯'; ?>
+                            <?php echo !empty($pause_date) ? date('Y-m-d', strtotime($pause_date)) : 'غير محدد'; ?>
                         </span>
                     </div>
                     <?php if (!empty($pause_reason)): ?>
                     <div style="color: #856404; font-size: 0.95rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #ffc107;">
                         <i class="fas fa-comment-dots"></i>
-                        <strong>Ø³Ø¨Ø¨ Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù:</strong> <?php echo htmlspecialchars($pause_reason); ?>
+                        <strong>سبب الإيقاف:</strong> <?php echo htmlspecialchars($pause_reason); ?>
                     </div>
                     <?php endif; ?>
                 </div>
                 
-                <!-- Ø¥Ø¯Ø®Ø§Ù„ ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ø³ØªØ¦Ù†Ø§Ù -->
+                <!-- إدخال تاريخ الاستئناف -->
                 <div class="mb-4">
                     <label for="resumeDate" class="form-label" style="font-weight: 700; font-size: 1.05rem;">
                         <i class="far fa-calendar-check" style="margin-left: 0.5rem; color: #28a745;"></i>
-                        ØªØ§Ø±ÙŠØ® Ø§Ø³ØªØ¦Ù†Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯ <span style="color: red;">*</span>
+                        تاريخ استئناف العقد <span style="color: red;">*</span>
                     </label>
                     <input type="date" id="resumeDate" class="form-control" value="<?php echo date('Y-m-d'); ?>" style="font-size: 1.05rem; font-weight: 600;">
                     <small class="form-text text-muted" style="display: block; margin-top: 0.5rem;">
-                        <i class="fas fa-info-circle"></i> Ø§Ù„ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ Ù‡Ùˆ Ø§Ù„ÙŠÙˆÙ…ØŒ ÙŠÙ…ÙƒÙ†Ùƒ ØªØ¹Ø¯ÙŠÙ„Ù‡ Ø­Ø³Ø¨ Ø§Ù„Ø­Ø§Ø¬Ø©
+                        <i class="fas fa-info-circle"></i> التاريخ الافتراضي هو اليوم، يمكنك تعديله حسب الحاجة
                     </small>
                 </div>
                 
                 <div id="pauseDurationDisplay" style="display: none; padding: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; margin-bottom: 1rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600; margin-bottom: 1rem;">
                         <i class="fas fa-clock"></i>
-                        <span>Ù…Ø¯Ø© Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù: <strong id="calculatedPauseDays">0</strong> ÙŠÙˆÙ…</span>
+                        <span>مدة الإيقاف: <strong id="calculatedPauseDays">0</strong> يوم</span>
                     </div>
                     
-                    <!-- Ø®ÙŠØ§Ø±Ø§Øª Ù…Ø¹Ø§Ù„Ø¬Ø© Ø£ÙŠØ§Ù… Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù -->
+                    <!-- خيارات معالجة أيام الإيقاف -->
                     <div style="background: white; padding: 1rem; border-radius: 8px; border: 2px solid #1976d2;">
                         <div style="font-weight: 700; color: #1976d2; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
                             <i class="fas fa-question-circle"></i>
-                            <span>ÙƒÙŠÙ ØªØ±ÙŠØ¯ Ù…Ø¹Ø§Ù„Ø¬Ø© Ø£ÙŠØ§Ù… Ø§Ù„Ø¥ÙŠÙ‚Ø§ÙØŸ</span>
+                            <span>كيف تريد معالجة أيام الإيقاف؟</span>
                         </div>
                         <div class="form-check mb-2" style="padding-right: 1.8rem;">
                             <input class="form-check-input" type="radio" name="pauseHandling" id="extendContract" value="extend" checked style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
                             <label class="form-check-label" for="extendContract" style="font-weight: 600; color: #495057; cursor: pointer;">
                                 <i class="fas fa-plus-circle" style="color: #28a745; margin-left: 0.5rem;"></i>
-                                ØªÙ…Ø¯ÙŠØ¯ Ø§Ù„Ø¹Ù‚Ø¯: Ø¥Ø¶Ø§ÙØ© Ø£ÙŠØ§Ù… Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù Ø¥Ù„Ù‰ ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡
+                                تمديد العقد: إضافة أيام الإيقاف إلى تاريخ الانتهاء
                                 <small style="display: block; color: #6c757d; font-weight: normal; margin-top: 0.25rem; margin-right: 1.5rem;">
-                                    Ø³ÙŠØªÙ… ØªØ£Ø¬ÙŠÙ„ ØªØ§Ø±ÙŠØ® Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯ Ø¨Ø¹Ø¯Ø¯ Ø£ÙŠØ§Ù… Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù
+                                    سيتم تأجيل تاريخ انتهاء العقد بعدد أيام الإيقاف
                                 </small>
                             </label>
                         </div>
@@ -1174,9 +1174,9 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             <input class="form-check-input" type="radio" name="pauseHandling" id="deductFromContract" value="deduct" style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
                             <label class="form-check-label" for="deductFromContract" style="font-weight: 600; color: #495057; cursor: pointer;">
                                 <i class="fas fa-minus-circle" style="color: #dc3545; margin-left: 0.5rem;"></i>
-                                Ø®ØµÙ… Ù…Ù† Ø§Ù„Ø¹Ù‚Ø¯: ØªÙ‚Ù„ÙŠÙ„ Ù…Ø¯Ø© Ø§Ù„Ø¹Ù‚Ø¯ Ø¨Ø£ÙŠØ§Ù… Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù
+                                خصم من العقد: تقليل مدة العقد بأيام الإيقاف
                                 <small style="display: block; color: #6c757d; font-weight: normal; margin-top: 0.25rem; margin-right: 1.5rem;">
-                                    Ø³ÙŠØªÙ… ØªÙ‚Ù„ÙŠÙ„ ØªØ§Ø±ÙŠØ® Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯ Ø¨Ø¹Ø¯Ø¯ Ø£ÙŠØ§Ù… Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù
+                                    سيتم تقليل تاريخ انتهاء العقد بعدد أيام الإيقاف
                                 </small>
                             </label>
                         </div>
@@ -1186,17 +1186,17 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <div class="mb-3">
                     <label for="resumeReason" class="form-label">
                         <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                        Ù…Ù„Ø§Ø­Ø¸Ø§Øª (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)
+                        ملاحظات (اختياري)
                     </label>
-                    <textarea id="resumeReason" class="form-control" rows="3" placeholder="Ø£Ø¯Ø®Ù„ Ø£ÙŠ Ù…Ù„Ø§Ø­Ø¸Ø§Øª"></textarea>
+                    <textarea id="resumeReason" class="form-control" rows="3" placeholder="أدخل أي ملاحظات"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
+                    <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn" id="confirmResume" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none;">
-                    <i class="fas fa-play-circle"></i> Ø§Ø³ØªØ¦Ù†Ø§Ù
+                    <i class="fas fa-play-circle"></i> استئناف
                 </button>
             </div>
         </div>
@@ -1210,40 +1210,40 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
                 <h5 class="modal-title" id="terminateModalLabel">
                     <i class="fas fa-times-circle"></i>
-                    Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯
+                    إنهاء العقد
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-danger" role="alert">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <strong>ØªØ­Ø°ÙŠØ±:</strong> Ø¹Ù…Ù„ÙŠØ© Ø§Ù„Ø¥Ù†Ù‡Ø§Ø¡ Ù†Ù‡Ø§Ø¦ÙŠØ© ÙˆÙ„Ø§ ÙŠÙ…ÙƒÙ† Ø§Ù„ØªØ±Ø§Ø¬Ø¹ Ø¹Ù†Ù‡Ø§!
+                    <strong>تحذير:</strong> عملية الإنهاء نهائية ولا يمكن التراجع عنها!
                 </div>
                 <div class="mb-4">
                     <label for="terminationType" class="form-label">
                         <i class="fas fa-list-ul" style="margin-left: 0.5rem;"></i>
-                        Ù†ÙˆØ¹ Ø§Ù„Ø¥Ù†Ù‡Ø§Ø¡ <span style="color: red;">*</span>
+                        نوع الإنهاء <span style="color: red;">*</span>
                     </label>
                     <select id="terminationType" class="form-select">
-                        <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ù†ÙˆØ¹ --</option>
-                        <option value="amicable">ðŸ¤ Ø±Ø¶Ø§Ø¦ÙŠ</option>
-                        <option value="hardship">âš ï¸ Ø¨Ø³Ø¨Ø¨ Ø§Ù„ØªØ¹Ø³Ø±</option>
+                        <option value="">-- اختر النوع --</option>
+                        <option value="amicable">🤝 رضائي</option>
+                        <option value="hardship">⚠️ بسبب التعسر</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="terminationReason" class="form-label">
                         <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„Ø³Ø¨Ø¨ Ø§Ù„Ù…ÙØµÙ„ <span style="color: red;">*</span>
+                        السبب المفصل <span style="color: red;">*</span>
                     </label>
-                    <textarea id="terminationReason" class="form-control" rows="4" placeholder="Ø£Ø¯Ø®Ù„ Ø§Ù„Ø³Ø¨Ø¨ Ø§Ù„Ù…ÙØµÙ„ Ù„Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯" required></textarea>
+                    <textarea id="terminationReason" class="form-control" rows="4" placeholder="أدخل السبب المفصل لإنهاء العقد" required></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
+                    <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn btn-danger" id="confirmTerminate">
-                    <i class="fas fa-times-circle"></i> Ø¥Ù†Ù‡Ø§Ø¡ Ù†Ù‡Ø§Ø¦ÙŠØ§Ù‹
+                    <i class="fas fa-times-circle"></i> إنهاء نهائياً
                 </button>
             </div>
         </div>
@@ -1257,50 +1257,50 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-header" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
                 <h5 class="modal-title" id="mergeModalLabel">
                     <i class="fas fa-object-group"></i>
-                    Ø¯Ù…Ø¬ Ø§Ù„Ø¹Ù‚ÙˆØ¯
+                    دمج العقود
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
                     <i class="fas fa-info-circle"></i>
-                    <strong>Ù…Ø¹Ù„ÙˆÙ…Ø©:</strong> Ø³ÙŠØªÙ… Ø¯Ù…Ø¬ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª ÙˆØ§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ù…Ù† Ù‡Ø°Ø§ Ø§Ù„Ø¹Ù‚Ø¯ Ø¥Ù„Ù‰ Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ù…Ø®ØªØ§Ø±.
+                    <strong>معلومة:</strong> سيتم دمج المعدات والبيانات من هذا العقد إلى العقد المختار.
                 </div>
                 <div class="mb-4">
                     <label for="mergeWithId" class="form-label">
                         <i class="fas fa-file-contract" style="margin-left: 0.5rem;"></i>
-                        Ø§Ø®ØªØ± Ø§Ù„Ø¹Ù‚Ø¯ Ù„Ù„Ø¯Ù…Ø¬ Ù…Ø¹Ù‡ <span style="color: red;">*</span>
+                        اختر العقد للدمج معه <span style="color: red;">*</span>
                     </label>
                     <select id="mergeWithId" class="form-select">
-                        <option value="">-- Ø§Ø®ØªØ± Ø¹Ù‚Ø¯ --</option>
+                        <option value="">-- اختر عقد --</option>
                         <?php
                         $merge_query = "SELECT id, contract_signing_date FROM supplierscontracts WHERE supplier_id = $supplier_id AND project_id = $project_id AND id != $contract_id ORDER BY id DESC";
                         $merge_result = mysqli_query($conn, $merge_query);
                         while ($m_row = mysqli_fetch_assoc($merge_result)) {
-                            echo "<option value='" . $m_row['id'] . "'>Ø§Ù„Ø¹Ù‚Ø¯ #" . $m_row['id'] . " - " . $m_row['contract_signing_date'] . "</option>";
+                            echo "<option value='" . $m_row['id'] . "'>العقد #" . $m_row['id'] . " - " . $m_row['contract_signing_date'] . "</option>";
                         }
                         ?>
                     </select>
                 </div>
                 
-                <!-- Ø¹Ø±Ø¶ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø­Ø§Ù„ÙŠØ© ÙˆØ§Ù„Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø®Ø§ØµØ© Ø¨Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ù…Ø®ØªØ§Ø± -->
+                <!-- عرض المعدات الحالية والمعدات الخاصة بالعقد المختار -->
                 <div id="mergeEquipmentsContainer" style="margin-top: 20px;">
-                    <h6 class="mb-3">Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø¹Ù‚ÙˆØ¯:</h6>
+                    <h6 class="mb-3">معدات العقود:</h6>
                     
-                    <!-- Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ø­Ø§Ù„ÙŠ -->
+                    <!-- معدات العقد الحالي -->
                     <div class="mb-4">
                         <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #0066cc;">
-                            <i class="fa fa-cube"></i> Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ø­Ø§Ù„ÙŠ (#<?php echo $contract_id; ?>)
+                            <i class="fa fa-cube"></i> معدات العقد الحالي (#<?php echo $contract_id; ?>)
                         </h6>
                         <div id="currentContractEquipments">
                             <table class="table table-sm table-bordered">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©</th>
-                                        <th>Ø§Ù„Ø­Ø¬Ù…</th>
-                                        <th>Ø§Ù„Ø¹Ø¯Ø¯</th>
-                                        <th>Ø§Ù„Ø³Ø§Ø¹Ø§Øª/Ø§Ù„Ø´Ù‡Ø±</th>
-                                        <th>ÙˆØ­Ø¯Ø§Øª/Ø§Ù„Ø´Ù‡Ø±</th>
+                                        <th>نوع المعدة</th>
+                                        <th>الحجم</th>
+                                        <th>العدد</th>
+                                        <th>الساعات/الشهر</th>
+                                        <th>وحدات/الشهر</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1317,7 +1317,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                                             echo "</tr>";
                                         }
                                     } else {
-                                        echo "<tr><td colspan='5' style='text-align: center; color: #999;'>Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø¹Ø¯Ø§Øª</td></tr>";
+                                        echo "<tr><td colspan='5' style='text-align: center; color: #999;'>لا توجد معدات</td></tr>";
                                     }
                                     ?>
                                 </tbody>
@@ -1325,23 +1325,23 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         </div>
                     </div>
                     
-                    <!-- Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ù…Ø®ØªØ§Ø± -->
+                    <!-- معدات العقد المختار -->
                     <div class="mb-4">
                         <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #28a745;">
-                            <i class="fa fa-cube"></i> Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ù…Ø®ØªØ§Ø±
+                            <i class="fa fa-cube"></i> معدات العقد المختار
                         </h6>
                         <div id="selectedContractEquipments" style="min-height: 100px;">
-                            <p style="text-align: center; color: #999;">Ø§Ø®ØªØ± Ø¹Ù‚Ø¯Ø§Ù‹ Ù„Ø¹Ø±Ø¶ Ù…Ø¹Ø¯Ø§ØªÙ‡</p>
+                            <p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
+                    <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn" id="confirmMerge" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); color: white; border: none;">
-                    <i class="fas fa-object-group"></i> Ø¯Ù…Ø¬ Ø§Ù„Ø¹Ù‚Ø¯
+                    <i class="fas fa-object-group"></i> دمج العقد
                 </button>
             </div>
         </div>
@@ -1355,42 +1355,42 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-header" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
                 <h5 class="modal-title" id="completeModalLabel">
                     <i class="fas fa-check-circle"></i>
-                    Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯
+                    انتهاء العقد
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-success" role="alert">
                     <i class="fas fa-info-circle"></i>
-                    <strong>Ù…Ù„Ø§Ø­Ø¸Ø©:</strong> ØªØ³Ø¬ÙŠÙ„ Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯ Ø¨Ø´ÙƒÙ„ Ø·Ø¨ÙŠØ¹ÙŠ.
+                    <strong>ملاحظة:</strong> تسجيل انتهاء العقد بشكل طبيعي.
                 </div>
                 <div class="mb-3">
                     <label for="completeNote" class="form-label">
                         <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                        Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡ <span style="color: red;">*</span>
+                        ملاحظات الانتهاء <span style="color: red;">*</span>
                     </label>
-                    <textarea id="completeNote" class="form-control" rows="4" placeholder="Ø£Ø¯Ø®Ù„ Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø­ÙˆÙ„ Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯" required></textarea>
+                    <textarea id="completeNote" class="form-control" rows="4" placeholder="أدخل ملاحظات حول انتهاء العقد" required></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
+                    <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); color: white;" id="confirmComplete">
-                    <i class="fas fa-check-circle"></i> ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡
+                    <i class="fas fa-check-circle"></i> تسجيل الانتهاء
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Ù„ØªØ¹Ø¯ÙŠÙ„ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ -->
+<!-- Modal لتعديل معلومات المشروع -->
 <div class="modal fade" id="editProjectInfoModal" tabindex="-1" aria-labelledby="editProjectInfoLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <h5 class="modal-title" id="editProjectInfoLabel">
-                    <i class="fas fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
+                    <i class="fas fa-edit"></i> تعديل معلومات المشروع
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -1398,37 +1398,37 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <div class="mb-3">
                     <label for="editGracePeriod" class="form-label">
                         <i class="fas fa-calendar-alt" style="margin-left: 0.5rem;"></i>
-                        ÙØªØ±Ø© Ø§Ù„Ø³Ù…Ø§Ø­ (Ø¨Ø§Ù„Ø£ÙŠØ§Ù…)
+                        فترة السماح (بالأيام)
                     </label>
                     <input type="number" id="editGracePeriod" class="form-control" value="<?php echo $grace_period; ?>" min="0">
                 </div>
                 <div class="mb-3">
                     <label for="editDailyOperators" class="form-label">
                         <i class="fas fa-users-cog" style="margin-left: 0.5rem;"></i>
-                        Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ† Ø§Ù„ÙŠÙˆÙ…ÙŠ
+                        عدد المشغلين اليومي
                     </label>
                     <input type="number" id="editDailyOperators" class="form-control" value="<?php echo $daily_operators; ?>" min="0">
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
+                    <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn btn-primary" id="saveProjectInfo">
-                    <i class="fas fa-save"></i> Ø­ÙØ¸
+                    <i class="fas fa-save"></i> حفظ
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Ù„ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø®Ø¯Ù…Ø§Øª -->
+<!-- Modal لتعديل الخدمات -->
 <div class="modal fade" id="editServicesModal" tabindex="-1" aria-labelledby="editServicesLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
                 <h5 class="modal-title" id="editServicesLabel">
-                    <i class="fas fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø®Ø¯Ù…Ø§Øª
+                    <i class="fas fa-edit"></i> تعديل الخدمات
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -1436,71 +1436,71 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <div class="mb-3">
                     <label for="editTransportation" class="form-label">
                         <i class="fas fa-bus" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„Ù†Ù‚Ù„ (Transportation)
+                        النقل (Transportation)
                     </label>
                     <select id="editTransportation" class="form-select">
-                        <option value="">â€” Ø§Ø®ØªØ± â€”</option>
-                        <option value="Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©" <?php echo ($transportation == 'Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©') ? 'selected' : ''; ?>>Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©</option>
-                        <option value="Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹" <?php echo ($transportation == 'Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹') ? 'selected' : ''; ?>>Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</option>
-                        <option value="Ø¨Ø¯ÙˆÙ†" <?php echo ($transportation == 'Ø¨Ø¯ÙˆÙ†') ? 'selected' : ''; ?>>Ø¨Ø¯ÙˆÙ†</option>
+                        <option value="">— اختر —</option>
+                        <option value="مالك المعدة" <?php echo ($transportation == 'مالك المعدة') ? 'selected' : ''; ?>>مالك المعدة</option>
+                        <option value="مالك المشروع" <?php echo ($transportation == 'مالك المشروع') ? 'selected' : ''; ?>>مالك المشروع</option>
+                        <option value="بدون" <?php echo ($transportation == 'بدون') ? 'selected' : ''; ?>>بدون</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="editAccommodation" class="form-label">
                         <i class="fas fa-hotel" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„Ø¥Ø¹Ø§Ø´Ø© (Accommodation)
+                        الإعاشة (Accommodation)
                     </label>
                     <select id="editAccommodation" class="form-select">
-                        <option value="">â€” Ø§Ø®ØªØ± â€”</option>
-                        <option value="Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©" <?php echo ($accommodation == 'Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©') ? 'selected' : ''; ?>>Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©</option>
-                        <option value="Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹" <?php echo ($accommodation == 'Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹') ? 'selected' : ''; ?>>Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</option>
-                        <option value="Ø¨Ø¯ÙˆÙ†" <?php echo ($accommodation == 'Ø¨Ø¯ÙˆÙ†') ? 'selected' : ''; ?>>Ø¨Ø¯ÙˆÙ†</option>
+                        <option value="">— اختر —</option>
+                        <option value="مالك المعدة" <?php echo ($accommodation == 'مالك المعدة') ? 'selected' : ''; ?>>مالك المعدة</option>
+                        <option value="مالك المشروع" <?php echo ($accommodation == 'مالك المشروع') ? 'selected' : ''; ?>>مالك المشروع</option>
+                        <option value="بدون" <?php echo ($accommodation == 'بدون') ? 'selected' : ''; ?>>بدون</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="editPlaceLiving" class="form-label">
                         <i class="fas fa-map-marker-alt" style="margin-left: 0.5rem;"></i>
-                        Ù…ÙƒØ§Ù† Ø§Ù„Ø³ÙƒÙ† (Place for Living)
+                        مكان السكن (Place for Living)
                     </label>
                     <select id="editPlaceLiving" class="form-select">
-                        <option value="">â€” Ø§Ø®ØªØ± â€”</option>
-                        <option value="Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©" <?php echo ($place_for_living == 'Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©') ? 'selected' : ''; ?>>Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©</option>
-                        <option value="Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹" <?php echo ($place_for_living == 'Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹') ? 'selected' : ''; ?>>Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</option>
-                        <option value="Ø¨Ø¯ÙˆÙ†" <?php echo ($place_for_living == 'Ø¨Ø¯ÙˆÙ†') ? 'selected' : ''; ?>>Ø¨Ø¯ÙˆÙ†</option>
+                        <option value="">— اختر —</option>
+                        <option value="مالك المعدة" <?php echo ($place_for_living == 'مالك المعدة') ? 'selected' : ''; ?>>مالك المعدة</option>
+                        <option value="مالك المشروع" <?php echo ($place_for_living == 'مالك المشروع') ? 'selected' : ''; ?>>مالك المشروع</option>
+                        <option value="بدون" <?php echo ($place_for_living == 'بدون') ? 'selected' : ''; ?>>بدون</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="editWorkshop" class="form-label">
                         <i class="fas fa-wrench" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„ÙˆØ±Ø´Ø© (Workshop)
+                        الورشة (Workshop)
                     </label>
                     <select id="editWorkshop" class="form-select">
-                        <option value="">â€” Ø§Ø®ØªØ± â€”</option>
-                        <option value="Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©" <?php echo ($workshop == 'Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©') ? 'selected' : ''; ?>>Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø¹Ø¯Ø©</option>
-                        <option value="Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹" <?php echo ($workshop == 'Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹') ? 'selected' : ''; ?>>Ù…Ø§Ù„Ùƒ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</option>
-                        <option value="Ø¨Ø¯ÙˆÙ†" <?php echo ($workshop == 'Ø¨Ø¯ÙˆÙ†') ? 'selected' : ''; ?>>Ø¨Ø¯ÙˆÙ†</option>
+                        <option value="">— اختر —</option>
+                        <option value="مالك المعدة" <?php echo ($workshop == 'مالك المعدة') ? 'selected' : ''; ?>>مالك المعدة</option>
+                        <option value="مالك المشروع" <?php echo ($workshop == 'مالك المشروع') ? 'selected' : ''; ?>>مالك المشروع</option>
+                        <option value="بدون" <?php echo ($workshop == 'بدون') ? 'selected' : ''; ?>>بدون</option>
                     </select>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
+                    <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn btn-success" id="saveServices">
-                    <i class="fas fa-save"></i> Ø­ÙØ¸
+                    <i class="fas fa-save"></i> حفظ
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Ù„ØªØ¹Ø¯ÙŠÙ„ Ø£Ø·Ø±Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯ -->
+<!-- Modal لتعديل أطراف العقد -->
 <div class="modal fade" id="editPartiesModal" tabindex="-1" aria-labelledby="editPartiesLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
                 <h5 class="modal-title" id="editPartiesLabel">
-                    <i class="fas fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„ Ø£Ø·Ø±Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯
+                    <i class="fas fa-edit"></i> تعديل أطراف العقد
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -1508,51 +1508,51 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <div class="mb-3">
                     <label for="editFirstParty" class="form-label">
                         <i class="fas fa-user-tie" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„Ø·Ø±Ù Ø§Ù„Ø£ÙˆÙ„
+                        الطرف الأول
                     </label>
-                    <input type="text" id="editFirstParty" class="form-control" value="<?php echo htmlspecialchars($first_party); ?>" placeholder="Ø§Ø³Ù… Ø§Ù„Ø·Ø±Ù Ø§Ù„Ø£ÙˆÙ„">
+                    <input type="text" id="editFirstParty" class="form-control" value="<?php echo htmlspecialchars($first_party); ?>" placeholder="اسم الطرف الأول">
                 </div>
                 <div class="mb-3">
                     <label for="editSecondParty" class="form-label">
                         <i class="fas fa-user-check" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„Ø·Ø±Ù Ø§Ù„Ø«Ø§Ù†ÙŠ
+                        الطرف الثاني
                     </label>
-                    <input type="text" id="editSecondParty" class="form-control" value="<?php echo htmlspecialchars($second_party); ?>" placeholder="Ø§Ø³Ù… Ø§Ù„Ø·Ø±Ù Ø§Ù„Ø«Ø§Ù†ÙŠ">
+                    <input type="text" id="editSecondParty" class="form-control" value="<?php echo htmlspecialchars($second_party); ?>" placeholder="اسم الطرف الثاني">
                 </div>
                 <div class="mb-3">
                     <label for="editWitnessOne" class="form-label">
                         <i class="fas fa-eye" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„Ø´Ø§Ù‡Ø¯ Ø§Ù„Ø£ÙˆÙ„
+                        الشاهد الأول
                     </label>
-                    <input type="text" id="editWitnessOne" class="form-control" value="<?php echo htmlspecialchars($witness_one); ?>" placeholder="Ø§Ø³Ù… Ø§Ù„Ø´Ø§Ù‡Ø¯ Ø§Ù„Ø£ÙˆÙ„">
+                    <input type="text" id="editWitnessOne" class="form-control" value="<?php echo htmlspecialchars($witness_one); ?>" placeholder="اسم الشاهد الأول">
                 </div>
                 <div class="mb-3">
                     <label for="editWitnessTwo" class="form-label">
                         <i class="fas fa-eye" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„Ø´Ø§Ù‡Ø¯ Ø§Ù„Ø«Ø§Ù†ÙŠ
+                        الشاهد الثاني
                     </label>
-                    <input type="text" id="editWitnessTwo" class="form-control" value="<?php echo htmlspecialchars($witness_two); ?>" placeholder="Ø§Ø³Ù… Ø§Ù„Ø´Ø§Ù‡Ø¯ Ø§Ù„Ø«Ø§Ù†ÙŠ">
+                    <input type="text" id="editWitnessTwo" class="form-control" value="<?php echo htmlspecialchars($witness_two); ?>" placeholder="اسم الشاهد الثاني">
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
+                    <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn btn-info" id="saveParties">
-                    <i class="fas fa-save"></i> Ø­ÙØ¸
+                    <i class="fas fa-save"></i> حفظ
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Ù„ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ© -->
+<!-- Modal لتعديل البيانات المالية -->
 <div class="modal fade" id="editPaymentModal" tabindex="-1" aria-labelledby="editPaymentLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
                 <h5 class="modal-title" id="editPaymentLabel">
-                    <i class="fas fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©
+                    <i class="fas fa-edit"></i> تعديل البيانات المالية
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -1560,53 +1560,53 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <div class="mb-3">
                     <label for="editCurrency" class="form-label">
                         <i class="fas fa-dollar-sign" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„Ø¹Ù…Ù„Ø©
+                        العملة
                     </label>
                     <select id="editCurrency" class="form-select">
-                        <option value="">â€” Ø§Ø®ØªØ± â€”</option>
-                        <option value="Ø¯ÙˆÙ„Ø§Ø±" <?php echo ($price_currency_contract == 'Ø¯ÙˆÙ„Ø§Ø±') ? 'selected' : ''; ?>>Ø¯ÙˆÙ„Ø§Ø±</option>
-                        <option value="Ø¬Ù†ÙŠÙ‡" <?php echo ($price_currency_contract == 'Ø¬Ù†ÙŠÙ‡') ? 'selected' : ''; ?>>Ø¬Ù†ÙŠÙ‡</option>
+                        <option value="">— اختر —</option>
+                        <option value="دولار" <?php echo ($price_currency_contract == 'دولار') ? 'selected' : ''; ?>>دولار</option>
+                        <option value="جنيه" <?php echo ($price_currency_contract == 'جنيه') ? 'selected' : ''; ?>>جنيه</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="editPaidAmount" class="form-label">
                         <i class="fas fa-money-check-alt" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„Ù…Ø¨Ù„Øº Ø§Ù„Ù…Ø¯ÙÙˆØ¹
+                        المبلغ المدفوع
                     </label>
-                    <input type="text" id="editPaidAmount" class="form-control" value="<?php echo htmlspecialchars($paid_contract); ?>" placeholder="Ø£Ø¯Ø®Ù„ Ø§Ù„Ù…Ø¨Ù„Øº">
+                    <input type="text" id="editPaidAmount" class="form-control" value="<?php echo htmlspecialchars($paid_contract); ?>" placeholder="أدخل المبلغ">
                 </div>
                 <div class="mb-3">
                     <label for="editPaymentTime" class="form-label">
                         <i class="fas fa-clock" style="margin-left: 0.5rem;"></i>
-                        ÙˆÙ‚Øª Ø§Ù„Ø¯ÙØ¹
+                        وقت الدفع
                     </label>
                     <select id="editPaymentTime" class="form-select">
-                        <option value="">â€” Ø§Ø®ØªØ± â€”</option>
-                        <option value="Ù…Ù‚Ø¯Ù…" <?php echo ($payment_time == 'Ù…Ù‚Ø¯Ù…') ? 'selected' : ''; ?>>Ù…Ù‚Ø¯Ù…</option>
-                        <option value="Ù…Ø¤Ø®Ø±" <?php echo ($payment_time == 'Ù…Ø¤Ø®Ø±' || $payment_time == ' Ù…Ø¤Ø®Ø±') ? 'selected' : ''; ?>>Ù…Ø¤Ø®Ø±</option>
+                        <option value="">— اختر —</option>
+                        <option value="مقدم" <?php echo ($payment_time == 'مقدم') ? 'selected' : ''; ?>>مقدم</option>
+                        <option value="مؤخر" <?php echo ($payment_time == 'مؤخر' || $payment_time == ' مؤخر') ? 'selected' : ''; ?>>مؤخر</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="editGuarantees" class="form-label">
                         <i class="fas fa-shield-alt" style="margin-left: 0.5rem;"></i>
-                        Ø§Ù„Ø¶Ù…Ø§Ù†Ø§Øª
+                        الضمانات
                     </label>
-                    <textarea id="editGuarantees" class="form-control" rows="3" placeholder="ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¶Ù…Ø§Ù†Ø§Øª"><?php echo htmlspecialchars($guarantees); ?></textarea>
+                    <textarea id="editGuarantees" class="form-control" rows="3" placeholder="تفاصيل الضمانات"><?php echo htmlspecialchars($guarantees); ?></textarea>
                 </div>
                 <div class="mb-3">
                     <label for="editPaymentDate" class="form-label">
                         <i class="fas fa-calendar-check" style="margin-left: 0.5rem;"></i>
-                        ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¯ÙØ¹
+                        تاريخ الدفع
                     </label>
                     <input type="date" id="editPaymentDate" class="form-control" value="<?php echo htmlspecialchars($payment_date); ?>">
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Ø¥Ù„ØºØ§Ø¡
+                    <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn btn-warning" id="savePayment">
-                    <i class="fas fa-save"></i> Ø­ÙØ¸
+                    <i class="fas fa-save"></i> حفظ
                 </button>
             </div>
         </div>
@@ -1621,9 +1621,9 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <script>
 const contractId = <?php echo $contract_id; ?>;
 const contractStatus = <?php echo isset($contractStatusValue) ? $contractStatusValue : 1; ?>;
-const actualEndDate = '<?php echo isset($actual_end_date) ? $actual_end_date : ''; ?>';  // ØªØ§Ø±ÙŠØ® Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„ÙØ¹Ù„ÙŠ
+const actualEndDate = '<?php echo isset($actual_end_date) ? $actual_end_date : ''; ?>';  // تاريخ انتهاء العقد الفعلي
 
-// Ø¯Ø§Ù„Ø© Ø¹Ø§Ù…Ø© Ù„Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª
+// دالة عامة للإجراءات
 function performAction(action, data = {}) {
     $.ajax({
         url: 'supplier_contract_actions_handler.php',
@@ -1635,17 +1635,17 @@ function performAction(action, data = {}) {
                 alert(response.message);
                 location.reload();
             } else {
-                alert('Ø®Ø·Ø£: ' + response.message);
+                alert('خطأ: ' + response.message);
             }
         },
         error: function(xhr, status, error) {
-            console.error('Ø§Ù„Ø®Ø·Ø£:', error);
-            alert('Ø®Ø·Ø£ ÙÙŠ Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ø§Ù„Ø®Ø§Ø¯Ù…: ' + (xhr.responseText || error));
+            console.error('الخطأ:', error);
+            alert('خطأ في الاتصال بالخادم: ' + (xhr.responseText || error));
         }
     });
 }
 
-// Ø¯Ø§Ù„Ø© Ù„Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¥Ù…ÙƒØ§Ù†ÙŠØ© ØªÙ†ÙÙŠØ° Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡
+// دالة للتحقق من إمكانية تنفيذ الإجراء
 function canPerformAction(action) {
     const activeStatuses = {
         'renewal': [1],
@@ -1660,23 +1660,23 @@ function canPerformAction(action) {
     
     if (!activeStatuses[action].includes(contractStatus)) {
         const statusMsg = {
-            'renewal': 'Ø§Ù„Ø¹Ù‚Ø¯ ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† Ø³Ø§Ø±ÙŠ Ù„ØªØ¬Ø¯ÙŠØ¯Ù‡',
-            'settlement': 'Ø§Ù„Ø¹Ù‚Ø¯ ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† Ø³Ø§Ø±ÙŠ Ù„ØªØ³ÙˆÙŠØªÙ‡',
-            'pause': 'Ø§Ù„Ø¹Ù‚Ø¯ ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† Ø³Ø§Ø±ÙŠ Ù„Ø¥ÙŠÙ‚Ø§ÙÙ‡',
-            'resume': 'Ø§Ù„Ø¹Ù‚Ø¯ ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† ØºÙŠØ± Ø³Ø§Ø±ÙŠ Ù„Ø§Ø³ØªØ¦Ù†Ø§ÙÙ‡',
-            'terminate': 'Ø§Ù„Ø¹Ù‚Ø¯ ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† Ø³Ø§Ø±ÙŠ Ø£Ùˆ ØºÙŠØ± Ø³Ø§Ø±ÙŠ Ù„Ø¥Ù†Ù‡Ø§Ø¤Ù‡',
-            'merge': 'Ø§Ù„Ø¹Ù‚Ø¯ ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† Ø³Ø§Ø±ÙŠ Ù„Ù„Ø¯Ù…Ø¬'
+            'renewal': 'العقد يجب أن يكون ساري لتجديده',
+            'settlement': 'العقد يجب أن يكون ساري لتسويته',
+            'pause': 'العقد يجب أن يكون ساري لإيقافه',
+            'resume': 'العقد يجب أن يكون غير ساري لاستئنافه',
+            'terminate': 'العقد يجب أن يكون ساري أو غير ساري لإنهاؤه',
+            'merge': 'العقد يجب أن يكون ساري للدمج'
         };
-        alert(statusMsg[action] || 'Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªÙ†ÙÙŠØ° Ù‡Ø°Ø§ Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡ ÙÙŠ Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©');
+        alert(statusMsg[action] || 'لا يمكن تنفيذ هذا الإجراء في الحالة الحالية');
         return false;
     }
     return true;
 }
 
-// Ø£Ø²Ø±Ø§Ø± Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª - Bootstrap 5 syntax
+// أزرار الإجراءات - Bootstrap 5 syntax
 $('#renewalBtn').click(function() {
     if (!canPerformAction('renewal')) return;
-    // ØªØ¹ÙŠÙŠÙ† ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¨Ø¯Ø¡ Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ Ù„ØªØ§Ø±ÙŠØ® Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„ÙØ¹Ù„ÙŠ
+    // تعيين تاريخ البدء الافتراضي لتاريخ انتهاء العقد الفعلي
     if (actualEndDate) {
         $('#renewalStartDate').val(actualEndDate);
     }
@@ -1684,13 +1684,13 @@ $('#renewalBtn').click(function() {
     modal.show();
 });
 
-// Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† Ø¹Ø±Ø¶ Ø§Ù„Ù…Ø¯Ø© Ø¹Ù†Ø¯ Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„Ù…ÙˆØ¯Ø§Ù„
+// إعادة تعيين عرض المدة عند إغلاق المودال
 document.getElementById('renewalModal').addEventListener('hidden.bs.modal', function() {
     $('#renewalDurationDisplay').hide();
     $('#calculatedDays').text('0');
 });
 
-// Ø­Ø³Ø§Ø¨ Ø§Ù„Ù…Ø¯Ø© ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ Ø¹Ù†Ø¯ ØªØºÙŠÙŠØ± Ø§Ù„ØªÙˆØ§Ø±ÙŠØ®
+// حساب المدة تلقائياً عند تغيير التواريخ
 function calculateRenewalDuration() {
     const startDate = $('#renewalStartDate').val();
     const endDate = $('#renewalEndDate').val();
@@ -1719,15 +1719,15 @@ $('#confirmRenewal').click(function() {
     const startDate = $('#renewalStartDate').val();
     const endDate = $('#renewalEndDate').val();
     if (!startDate || !endDate) {
-        alert('Ø§Ù„Ø±Ø¬Ø§Ø¡ Ù…Ù„Ø¡ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø­Ù‚ÙˆÙ„');
+        alert('الرجاء ملء جميع الحقول');
         return;
     }
     if (new Date(startDate) >= new Date(endDate)) {
-        alert('ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¨Ø¯Ø¡ ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† Ù‚Ø¨Ù„ ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡');
+        alert('تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء');
         return;
     }
     
-    // Ø­Ø³Ø§Ø¨ Ø¹Ø¯Ø¯ Ø§Ù„Ø£ÙŠØ§Ù… Ø¨ÙŠÙ† Ø§Ù„ØªØ§Ø±ÙŠØ®ÙŠÙ†
+    // حساب عدد الأيام بين التاريخين
     const start = new Date(startDate);
     const end = new Date(endDate);
     const timeDiff = end.getTime() - start.getTime();
@@ -1756,11 +1756,11 @@ $('#confirmSettlement').click(function() {
     const type = $('#settlementType').val();
     const hours = $('#settlementHours').val();
     if (!type || !hours) {
-        alert('Ø§Ù„Ø±Ø¬Ø§Ø¡ Ù…Ù„Ø¡ Ø§Ù„Ø­Ù‚ÙˆÙ„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©');
+        alert('الرجاء ملء الحقول المطلوبة');
         return;
     }
     if (parseInt(hours) <= 0) {
-        alert('Ø¹Ø¯Ø¯ Ø§Ù„Ø³Ø§Ø¹Ø§Øª ÙŠØ¬Ø¨ Ø£Ù† ÙŠÙƒÙˆÙ† Ø£ÙƒØ¨Ø± Ù…Ù† ØµÙØ±');
+        alert('عدد الساعات يجب أن يكون أكبر من صفر');
         return;
     }
     performAction('settlement', {
@@ -1785,11 +1785,11 @@ $('#confirmPause').click(function() {
     const reason = $('#pauseReason').val();
     const pauseDate = $('#pauseDate').val();
     if (!reason) {
-        alert('Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø³Ø¨Ø¨ Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù');
+        alert('الرجاء إدخال سبب الإيقاف');
         return;
     }
     if (!pauseDate) {
-        alert('Ø§Ù„Ø±Ø¬Ø§Ø¡ ØªØ­Ø¯ÙŠØ¯ ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù');
+        alert('الرجاء تحديد تاريخ الإيقاف');
         return;
     }
     performAction('pause', {
@@ -1807,11 +1807,11 @@ $('#resumeBtn').click(function() {
     const modal = new bootstrap.Modal(document.getElementById('resumeModal'));
     modal.show();
     
-    // Ø­Ø³Ø§Ø¨ Ø¹Ø¯Ø¯ Ø£ÙŠØ§Ù… Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù Ø¹Ù†Ø¯ ÙØªØ­ Ø§Ù„Ù€ modal
+    // حساب عدد أيام الإيقاف عند فتح الـ modal
     calculatePauseDuration();
 });
 
-// Ø¯Ø§Ù„Ø© Ù„Ø­Ø³Ø§Ø¨ Ù…Ø¯Ø© Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù
+// دالة لحساب مدة الإيقاف
 function calculatePauseDuration() {
     const resumeDate = $('#resumeDate').val();
     const pauseDate = '<?php echo !empty($pause_date) ? $pause_date : ''; ?>';
@@ -1839,7 +1839,7 @@ $('#resumeDate').on('change', calculatePauseDuration);
 $('#confirmResume').click(function() {
     const resumeDate = $('#resumeDate').val();
     if (!resumeDate) {
-        alert('Ø§Ù„Ø±Ø¬Ø§Ø¡ ØªØ­Ø¯ÙŠØ¯ ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ø³ØªØ¦Ù†Ø§Ù');
+        alert('الرجاء تحديد تاريخ الاستئناف');
         return;
     }
     
@@ -1853,7 +1853,7 @@ $('#confirmResume').click(function() {
         pauseDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
     }
     
-    // Ø§Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ø®ÙŠØ§Ø± Ù…Ø¹Ø§Ù„Ø¬Ø© Ø£ÙŠØ§Ù… Ø§Ù„Ø¥ÙŠÙ‚Ø§Ù
+    // الحصول على خيار معالجة أيام الإيقاف
     const pauseHandling = $('input[name="pauseHandling"]:checked').val();
     
     performAction('resume', {
@@ -1879,7 +1879,7 @@ $('#terminateBtn').click(function() {
 $('#confirmTerminate').click(function() {
     const type = $('#terminationType').val();
     if (!type) {
-        alert('Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø§Ø®ØªÙŠØ§Ø± Ù†ÙˆØ¹ Ø§Ù„Ø¥Ù†Ù‡Ø§Ø¡');
+        alert('الرجاء اختيار نوع الإنهاء');
         return;
     }
     performAction('terminate', {
@@ -1907,7 +1907,7 @@ $('#completeBtn').click(function() {
 $('#confirmComplete').click(function() {
     const note = $('#completeNote').val().trim();
     if (!note) {
-        alert('Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ù…Ù„Ø§Ø­Ø¸Ø§Øª Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡');
+        alert('الرجاء إدخال ملاحظات الانتهاء');
         return;
     }
     performAction('complete', {
@@ -1918,7 +1918,7 @@ $('#confirmComplete').click(function() {
     $('#completeNote').val('');
 });
 
-// Ø£Ø²Ø±Ø§Ø± Ø§Ù„ØªØ¹Ø¯ÙŠÙ„
+// أزرار التعديل
 $('#editProjectInfoBtn').click(function() {
     const modal = new bootstrap.Modal(document.getElementById('editProjectInfoModal'));
     modal.show();
@@ -1934,7 +1934,7 @@ $('#editPartiesBtn').click(function() {
     modal.show();
 });
 
-// Ø­ÙØ¸ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
+// حفظ معلومات المشروع
 $('#saveProjectInfo').click(function() {
     const gracePeriod = $('#editGracePeriod').val();
     const dailyOperators = $('#editDailyOperators').val();
@@ -1951,7 +1951,7 @@ $('#saveProjectInfo').click(function() {
         dataType: 'json',
         success: function(response) {
             if (response.success) {
-                $('#graceDisplay').text(gracePeriod + ' ÙŠÙˆÙ…');
+                $('#graceDisplay').text(gracePeriod + ' يوم');
                 $('#operatorsDisplay').text(dailyOperators);
                 bootstrap.Modal.getInstance(document.getElementById('editProjectInfoModal')).hide();
                 alert(response.message);
@@ -1961,12 +1961,12 @@ $('#saveProjectInfo').click(function() {
             }
         },
         error: function() {
-            alert('Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø­ÙØ¸');
+            alert('حدث خطأ أثناء الحفظ');
         }
     });
 });
 
-// Ø­ÙØ¸ Ø§Ù„Ø®Ø¯Ù…Ø§Øª
+// حفظ الخدمات
 $('#saveServices').click(function() {
     const transportation = $('#editTransportation').val();
     const accommodation = $('#editAccommodation').val();
@@ -1999,12 +1999,12 @@ $('#saveServices').click(function() {
             }
         },
         error: function() {
-            alert('Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø­ÙØ¸');
+            alert('حدث خطأ أثناء الحفظ');
         }
     });
 });
 
-// Ø­ÙØ¸ Ø£Ø·Ø±Ø§Ù Ø§Ù„Ø¹Ù‚Ø¯
+// حفظ أطراف العقد
 $('#saveParties').click(function() {
     const firstParty = $('#editFirstParty').val();
     const secondParty = $('#editSecondParty').val();
@@ -2037,18 +2037,18 @@ $('#saveParties').click(function() {
             }
         },
         error: function() {
-            alert('Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø­ÙØ¸');
+            alert('حدث خطأ أثناء الحفظ');
         }
     });
 });
 
-// ÙØªØ­ modal Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©
+// فتح modal البيانات المالية
 $('#editPaymentBtn').click(function() {
     const modal = new bootstrap.Modal(document.getElementById('editPaymentModal'));
     modal.show();
 });
 
-// Ø­ÙØ¸ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø§Ù„ÙŠØ©
+// حفظ البيانات المالية
 $('#savePayment').click(function() {
     const currency = $('#editCurrency').val();
     const paidAmount = $('#editPaidAmount').val();
@@ -2084,21 +2084,21 @@ $('#savePayment').click(function() {
             }
         },
         error: function() {
-            alert('Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø­ÙØ¸');
+            alert('حدث خطأ أثناء الحفظ');
         }
     });
 });
 
-// ØªØ­Ù…ÙŠÙ„ Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ù…Ø®ØªØ§Ø± Ø¹Ù†Ø¯ Ø§Ù„ØªØºÙŠÙŠØ±
+// تحميل معدات العقد المختار عند التغيير
 $('#mergeWithId').on('change', function() {
     const selectedContractId = $(this).val();
     
     if (!selectedContractId) {
-        $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">Ø§Ø®ØªØ± Ø¹Ù‚Ø¯Ø§Ù‹ Ù„Ø¹Ø±Ø¶ Ù…Ø¹Ø¯Ø§ØªÙ‡</p>');
+        $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>');
         return;
     }
     
-    // ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ø¹Ø¨Ø± AJAX
+    // تحميل المعدات عبر AJAX
     $.ajax({
         url: 'get_supplier_contract_equipments.php',
         type: 'GET',
@@ -2110,11 +2110,11 @@ $('#mergeWithId').on('change', function() {
                 if (response.equipments.length > 0) {
                     html = '<table class="table table-sm table-bordered">';
                     html += '<thead class="table-light"><tr>';
-                    html += '<th>Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©</th>';
-                    html += '<th>Ø§Ù„Ø­Ø¬Ù…</th>';
-                    html += '<th>Ø§Ù„Ø¹Ø¯Ø¯</th>';
-                    html += '<th>Ø§Ù„Ø³Ø§Ø¹Ø§Øª/Ø§Ù„Ø´Ù‡Ø±</th>';
-                    html += '<th>ÙˆØ­Ø¯Ø§Øª/Ø§Ù„Ø´Ù‡Ø±</th>';
+                    html += '<th>نوع المعدة</th>';
+                    html += '<th>الحجم</th>';
+                    html += '<th>العدد</th>';
+                    html += '<th>الساعات/الشهر</th>';
+                    html += '<th>وحدات/الشهر</th>';
                     html += '</tr></thead>';
                     html += '<tbody>';
                     
@@ -2130,16 +2130,16 @@ $('#mergeWithId').on('change', function() {
                     
                     html += '</tbody></table>';
                 } else {
-                    html = '<p style="text-align: center; color: #999;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø¹Ø¯Ø§Øª Ù„Ù‡Ø°Ø§ Ø§Ù„Ø¹Ù‚Ø¯</p>';
+                    html = '<p style="text-align: center; color: #999;">لا توجد معدات لهذا العقد</p>';
                 }
                 $('#selectedContractEquipments').html(html);
             } else {
-                $('#selectedContractEquipments').html('<p style="text-align: center; color: #c00;">Ø®Ø·Ø£: ' + response.message + '</p>');
+                $('#selectedContractEquipments').html('<p style="text-align: center; color: #c00;">خطأ: ' + response.message + '</p>');
             }
         },
         error: function(xhr, status, error) {
-            console.error('Ø§Ù„Ø®Ø·Ø£:', error);
-            $('#selectedContractEquipments').html('<p style="text-align: center; color: #c00;">Ø®Ø·Ø£ ÙÙŠ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª</p>');
+            console.error('الخطأ:', error);
+            $('#selectedContractEquipments').html('<p style="text-align: center; color: #c00;">خطأ في تحميل المعدات</p>');
         }
     });
 });
@@ -2147,11 +2147,11 @@ $('#mergeWithId').on('change', function() {
 $('#confirmMerge').click(function() {
     const mergeId = $('#mergeWithId').val();
     if (!mergeId) {
-        alert('Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø¹Ù‚Ø¯ Ù„Ù„Ø¯Ù…Ø¬ Ù…Ø¹Ù‡');
+        alert('الرجاء اختيار العقد للدمج معه');
         return;
     }
     if (parseInt(mergeId) === contractId) {
-        alert('Ù„Ø§ ÙŠÙ…ÙƒÙ†Ùƒ Ø¯Ù…Ø¬ Ø§Ù„Ø¹Ù‚Ø¯ Ù…Ø¹ Ù†ÙØ³Ù‡');
+        alert('لا يمكنك دمج العقد مع نفسه');
         return;
     }
     performAction('merge', {
@@ -2160,7 +2160,7 @@ $('#confirmMerge').click(function() {
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById('mergeModal')).hide();
     $('#mergeWithId').val('');
-    $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">Ø§Ø®ØªØ± Ø¹Ù‚Ø¯Ø§Ù‹ Ù„Ø¹Ø±Ø¶ Ù…Ø¹Ø¯Ø§ØªÙ‡</p>');
+    $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>');
 });
 </script>
 

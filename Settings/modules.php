@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -17,40 +17,40 @@ function moduleColumnExists($conn, $column_name)
 $module_has_icon_column = moduleColumnExists($conn, 'icon');
 $default_module_icon = 'fa fa-link';
 $common_sidebar_icons = array(
-    array('class' => 'fa fa-link', 'label' => 'Ø±Ø§Ø¨Ø· Ø¹Ø§Ù…'),
-    array('class' => 'fa fa-home', 'label' => 'Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©'),
-    array('class' => 'fa fa-users', 'label' => 'Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡'),
-    array('class' => 'fa fa-user-shield', 'label' => 'Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª'),
-    array('class' => 'fa fa-users-cog', 'label' => 'Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙˆÙ†'),
-    array('class' => 'fa fa-folder-open', 'label' => 'Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹'),
-    array('class' => 'fa fa-list-alt', 'label' => 'Ø§Ù„Ù‚ÙˆØ§Ø¦Ù…'),
-    array('class' => 'fa fa-mountain', 'label' => 'Ø§Ù„Ù…Ù†Ø§Ø¬Ù…'),
-    array('class' => 'fa fa-truck-loading', 'label' => 'Ø§Ù„Ù…ÙˆØ±Ø¯ÙˆÙ†'),
-    array('class' => 'fa fa-tractor', 'label' => 'Ø§Ù„Ù…Ø¹Ø¯Ø§Øª'),
-    array('class' => 'fa fa-truck-moving', 'label' => 'Ø§Ù„Ø£Ø³Ø·ÙˆÙ„'),
-    array('class' => 'fa fa-id-card', 'label' => 'Ø§Ù„Ù…Ø´ØºÙ„ÙˆÙ†'),
-    array('class' => 'fa fa-cogs', 'label' => 'Ø§Ù„ØªØ´ØºÙŠÙ„'),
-    array('class' => 'fa fa-business-time', 'label' => 'Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„'),
-    array('class' => 'fa fa-calendar-days', 'label' => 'Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙŠÙˆÙ…'),
-    array('class' => 'fa fa-file-contract', 'label' => 'Ø§Ù„Ø¹Ù‚ÙˆØ¯'),
-    array('class' => 'fa fa-check-double', 'label' => 'Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø§Øª'),
-    array('class' => 'fa fa-chart-pie', 'label' => 'Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ±'),
-    array('class' => 'fa fa-chart-line', 'label' => 'ØªØ­Ù„ÙŠÙ„'),
-    array('class' => 'fa fa-chart-column', 'label' => 'Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª'),
-    array('class' => 'fa fa-gear', 'label' => 'Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª'),
-    array('class' => 'fa fa-key', 'label' => 'Ø§Ù„Ø£Ù…Ø§Ù†'),
-    array('class' => 'fa fa-clipboard-list', 'label' => 'Ù†Ù…Ø§Ø°Ø¬'),
-    array('class' => 'fa fa-screwdriver-wrench', 'label' => 'Ø§Ù„Ø£Ù†ÙˆØ§Ø¹'),
-    array('class' => 'fa fa-hard-hat', 'label' => 'Ø§Ù„Ù…ÙˆÙ‚Ø¹'),
-    array('class' => 'fa fa-layer-group', 'label' => 'Ù…ÙˆØ¯ÙŠÙˆÙ„Ø§Øª'),
-    array('class' => 'fa fa-database', 'label' => 'Ø¨ÙŠØ§Ù†Ø§Øª'),
-    array('class' => 'fa fa-bell', 'label' => 'ØªÙ†Ø¨ÙŠÙ‡Ø§Øª')
+    array('class' => 'fa fa-link', 'label' => 'رابط عام'),
+    array('class' => 'fa fa-home', 'label' => 'الرئيسية'),
+    array('class' => 'fa fa-users', 'label' => 'العملاء'),
+    array('class' => 'fa fa-user-shield', 'label' => 'الصلاحيات'),
+    array('class' => 'fa fa-users-cog', 'label' => 'المستخدمون'),
+    array('class' => 'fa fa-folder-open', 'label' => 'المشاريع'),
+    array('class' => 'fa fa-list-alt', 'label' => 'القوائم'),
+    array('class' => 'fa fa-mountain', 'label' => 'المناجم'),
+    array('class' => 'fa fa-truck-loading', 'label' => 'الموردون'),
+    array('class' => 'fa fa-tractor', 'label' => 'المعدات'),
+    array('class' => 'fa fa-truck-moving', 'label' => 'الأسطول'),
+    array('class' => 'fa fa-id-card', 'label' => 'المشغلون'),
+    array('class' => 'fa fa-cogs', 'label' => 'التشغيل'),
+    array('class' => 'fa fa-business-time', 'label' => 'ساعات العمل'),
+    array('class' => 'fa fa-calendar-days', 'label' => 'ساعات اليوم'),
+    array('class' => 'fa fa-file-contract', 'label' => 'العقود'),
+    array('class' => 'fa fa-check-double', 'label' => 'الموافقات'),
+    array('class' => 'fa fa-chart-pie', 'label' => 'التقارير'),
+    array('class' => 'fa fa-chart-line', 'label' => 'تحليل'),
+    array('class' => 'fa fa-chart-column', 'label' => 'إحصائيات'),
+    array('class' => 'fa fa-gear', 'label' => 'الإعدادات'),
+    array('class' => 'fa fa-key', 'label' => 'الأمان'),
+    array('class' => 'fa fa-clipboard-list', 'label' => 'نماذج'),
+    array('class' => 'fa fa-screwdriver-wrench', 'label' => 'الأنواع'),
+    array('class' => 'fa fa-hard-hat', 'label' => 'الموقع'),
+    array('class' => 'fa fa-layer-group', 'label' => 'موديولات'),
+    array('class' => 'fa fa-database', 'label' => 'بيانات'),
+    array('class' => 'fa fa-bell', 'label' => 'تنبيهات')
 );
 
-// Ø¬Ù„Ø¨ role_id Ù…Ù† URL Ø¥Ù† ÙˆØ¬Ø¯ (Ù„Ù„Ø§Ù†ØªÙ‚Ø§Ù„ Ù…Ù† ØµÙØ­Ø© Ø§Ù„Ø£Ø¯ÙˆØ§Ø±)
+// جلب role_id من URL إن وجد (للانتقال من صفحة الأدوار)
 $selected_role_id = isset($_GET['role_id']) ? (int)$_GET['role_id'] : null;
 
-/* Ø¬Ù„Ø¨ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ */
+/* جلب بيانات التعديل */
 $editData = null;
 if (isset($_GET['edit_id'])) {
     $id = (int) $_GET['edit_id'];
@@ -67,7 +67,7 @@ if (isset($_GET['edit_id'])) {
     }
 }
 
-/* Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ */
+/* إضافة / تعديل */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $code = trim($_POST['code'] ?? '');
@@ -80,12 +80,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $icon = $default_module_icon;
     }
 
-    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµØ­Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
+    // التحقق من صحة البيانات
     if (empty($name) || empty($code)) {
-        $error_msg = 'Ø§Ø³Ù… Ø§Ù„ØµÙØ­Ø© ÙˆØ§Ù„ÙƒÙˆØ¯ Ù…Ø·Ù„ÙˆØ¨Ø§Ù† âŒ';
+        $error_msg = 'اسم الصفحة والكود مطلوبان ❌';
     } else {
         if (!empty($_POST['edit_id'])) {
-            // ØªØ¹Ø¯ÙŠÙ„
+            // تعديل
             $id = (int) $_POST['edit_id'];
             if ($module_has_icon_column) {
                 $stmt = $conn->prepare(
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->bind_param("ssiii", $name, $code, $owner_role_id, $is_link, $id);
             }
         } else {
-            // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¹Ø¯Ù… ØªÙƒØ±Ø§Ø± Ù†ÙØ³ Ø§Ù„ØµÙØ­Ø© Ù„Ù†ÙØ³ Ø§Ù„Ø¯ÙˆØ±
+            // التحقق من عدم تكرار نفس الصفحة لنفس الدور
             $check_stmt = $conn->prepare(
                 "SELECT id FROM `modules` WHERE `code` = ? AND `owner_role_id` <=> ? LIMIT 1"
             );
@@ -107,9 +107,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $check_stmt->execute();
             $check_stmt->store_result();
             if ($check_stmt->num_rows > 0) {
-                $error_msg = 'Ù‡Ø°Ù‡ Ø§Ù„ØµÙØ­Ø© Ù…Ø¶Ø§ÙØ© Ù…Ø³Ø¨Ù‚Ø§Ù‹ Ù„Ù†ÙØ³ Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„ âŒ';
+                $error_msg = 'هذه الصفحة مضافة مسبقاً لنفس الدور المسؤول ❌';
             } else {
-                // Ø¥Ø¶Ø§ÙØ©
+                // إضافة
                 if ($module_has_icon_column) {
                     $stmt = $conn->prepare(
                         "INSERT INTO `modules` (`name`, `code`, `owner_role_id`, `is_link`, `icon`) VALUES (?, ?, ?, ?, ?)"
@@ -126,34 +126,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!isset($error_msg)) {
             if ($stmt->execute()) {
-                header("Location: modules.php?msg=ØªÙ…+Ø§Ù„Ø¨Ø­ÙØ§Ø¸+Ø¹Ù„Ù‰+Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª+Ø¨Ù†Ø¬Ø§Ø­+âœ…");
+                header("Location: modules.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✅");
                 exit;
             } else {
-                $error_msg = 'Ø­Ø¯Ø« Ø®Ø·Ø£: ' . htmlspecialchars($stmt->error) . ' âŒ';
+                $error_msg = 'حدث خطأ: ' . htmlspecialchars($stmt->error) . ' ❌';
             }
         }
     }
 }
 
-/* Ø­Ø°Ù */
+/* حذف */
 if (isset($_GET['delete_id'])) {
     $id = (int) $_GET['delete_id'];
     $stmt = $conn->prepare("DELETE FROM `modules` WHERE `id` = ?");
     $stmt->bind_param("i", $id);
     if ($stmt->execute()) {
-        header("Location: modules.php?msg=ØªÙ…+Ø­Ø°Ù+Ø§Ù„ØµÙØ­Ø©+Ø¨Ù†Ø¬Ø§Ø­+âœ…");
+        header("Location: modules.php?msg=تم+حذف+الصفحة+بنجاح+✅");
     } else {
-        header("Location: modules.php?msg=Ø­Ø¯Ø«+Ø®Ø·Ø£+ÙÙŠ+Ø§Ù„Ø­Ø°Ù+âŒ");
+        header("Location: modules.php?msg=حدث+خطأ+في+الحذف+❌");
     }
     exit;
 }
 
-// Ø¬Ù„Ø¨ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø£Ø¯ÙˆØ§Ø±
+// جلب جميع الأدوار
 $stmt = $conn->prepare("SELECT `id`, `name` FROM `roles` ORDER BY `level`, `name`");
 $stmt->execute();
 $roles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-$page_title = "Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ØµÙØ­Ø§Øª ÙˆØ§Ù„Ù…ÙˆØ¯ÙŠÙˆÙ„Ø§Øª";
+$page_title = "إدارة الصفحات والموديولات";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
@@ -304,20 +304,20 @@ include('../insidebar.php');
     <div class="page-header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-layer-group"></i></div>
-            Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ØµÙØ­Ø§Øª ÙˆØ§Ù„Ù…ÙˆØ¯ÙŠÙˆÙ„Ø§Øª
+            إدارة الصفحات والموديولات
         </h1>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="settings.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
+                <i class="fas fa-arrow-right"></i> رجوع
             </a>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fas fa-plus-circle"></i> Ø¥Ø¶Ø§ÙØ© ØµÙØ­Ø© Ø¬Ø¯ÙŠØ¯Ø©
+                <i class="fas fa-plus-circle"></i> إضافة صفحة جديدة
             </a>
         </div>
     </div>
 
     <?php if (!empty($_GET['msg'])):
-        $isSuccess = strpos($_GET['msg'], 'âœ…') !== false;
+        $isSuccess = strpos($_GET['msg'], '✅') !== false;
     ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
@@ -332,29 +332,29 @@ include('../insidebar.php');
         </div>
     <?php endif; ?>
 
-    <!-- ÙÙˆØ±Ù… Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ -->
+    <!-- فورم إضافة / تعديل -->
     <form id="moduleForm" action="" method="post" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>">
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-edit"></i> <?= !empty($editData) ? 'ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ØµÙØ­Ø©' : 'Ø¥Ø¶Ø§ÙØ© ØµÙØ­Ø© Ø¬Ø¯ÙŠØ¯Ø©'; ?></h5>
+                <h5><i class="fas fa-edit"></i> <?= !empty($editData) ? 'تعديل الصفحة' : 'إضافة صفحة جديدة'; ?></h5>
             </div>
             <div class="card-body">
                 <input type="hidden" name="edit_id" id="edit_id" value="">
                 <div class="form-grid">
-                    <!-- Ø§Ø³Ù… Ø§Ù„ØµÙØ­Ø© -->
+                    <!-- اسم الصفحة -->
                     <div>
-                        <label><i class="fas fa-book"></i> Ø§Ø³Ù… Ø§Ù„ØµÙØ­Ø© *</label>
-                        <input type="text" name="name" id="name" placeholder="Ù…Ø«Ø§Ù„: Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡" required />
+                        <label><i class="fas fa-book"></i> اسم الصفحة *</label>
+                        <input type="text" name="name" id="name" placeholder="مثال: إدارة العملاء" required />
                     </div>
 
-                    <!-- ÙƒÙˆØ¯ Ø§Ù„ØµÙØ­Ø© -->
+                    <!-- كود الصفحة -->
                     <div>
-                        <label><i class="fas fa-code"></i> ÙƒÙˆØ¯ Ø§Ù„ØµÙØ­Ø© *</label>
-                        <input type="text" name="code" id="code" placeholder="Ù…Ø«Ø§Ù„: clients" required />
+                        <label><i class="fas fa-code"></i> كود الصفحة *</label>
+                        <input type="text" name="code" id="code" placeholder="مثال: clients" required />
                     </div>
 
                     <div style="grid-column: 1 / -1;">
-                        <label><i class="fas fa-icons"></i> Ø£ÙŠÙ‚ÙˆÙ†Ø© Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©</label>
+                        <label><i class="fas fa-icons"></i> أيقونة القائمة</label>
                         <div class="icon-picker-shell">
                             <input type="hidden" name="icon" id="icon" value="<?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?>" />
                             <input type="hidden" id="icon_manually_selected" value="0" />
@@ -362,15 +362,15 @@ include('../insidebar.php');
                             <div class="icon-preview-card">
                                 <div class="icon-preview-box"><i id="icon_preview" class="<?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?>"></i></div>
                                 <div class="icon-preview-meta">
-                                    <strong>Ø§Ù„Ø£ÙŠÙ‚ÙˆÙ†Ø© Ø§Ù„Ù…Ø®ØªØ§Ø±Ø© Ù„Ù„Ù€ sidebar</strong>
+                                    <strong>الأيقونة المختارة للـ sidebar</strong>
                                     <span id="icon_preview_text"><?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?></span>
                                 </div>
                             </div>
 
                             <div class="icon-picker-toolbar">
-                                <input type="text" id="iconSearch" class="icon-picker-search" placeholder="Ø§Ø¨Ø­Ø« Ø¨Ø§Ø³Ù… Ø§Ù„Ø£ÙŠÙ‚ÙˆÙ†Ø© Ø£Ùˆ Ù…Ø¹Ù†Ø§Ù‡Ø§ Ù…Ø«Ù„: ØªÙ‚Ø§Ø±ÙŠØ±ØŒ Ù…Ø³ØªØ®Ø¯Ù…ÙŠÙ†ØŒ Ù…Ø¹Ø¯Ø§Øª" />
+                                <input type="text" id="iconSearch" class="icon-picker-search" placeholder="ابحث باسم الأيقونة أو معناها مثل: تقارير، مستخدمين، معدات" />
                                 <button type="button" id="autoSuggestIcon" class="back-btn icon-suggest-btn">
-                                    <i class="fas fa-wand-magic-sparkles"></i> Ø§Ù‚ØªØ±Ø§Ø­ ØªÙ„Ù‚Ø§Ø¦ÙŠ
+                                    <i class="fas fa-wand-magic-sparkles"></i> اقتراح تلقائي
                                 </button>
                             </div>
 
@@ -388,19 +388,19 @@ include('../insidebar.php');
                             </div>
 
                             <div class="icon-picker-note">
-                                ÙŠØªÙ… Ø¹Ø±Ø¶ Ø£Ø´Ù‡Ø± Ø£ÙŠÙ‚ÙˆÙ†Ø§Øª Ø§Ù„Ø´Ø±ÙŠØ· Ø§Ù„Ø¬Ø§Ù†Ø¨ÙŠ Ø§Ù„Ø¬Ø§Ù‡Ø²Ø© Ù„Ù„Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø³Ø±ÙŠØ¹ØŒ Ù…Ø¹ Ø§Ù‚ØªØ±Ø§Ø­ ØªÙ„Ù‚Ø§Ø¦ÙŠ Ø­Ø³Ø¨ Ø§Ø³Ù… Ø§Ù„ØµÙØ­Ø© ÙˆÙ…Ø³Ø§Ø±Ù‡Ø§.
+                                يتم عرض أشهر أيقونات الشريط الجانبي الجاهزة للاختيار السريع، مع اقتراح تلقائي حسب اسم الصفحة ومسارها.
                                 <?php if (!$module_has_icon_column): ?>
-                                    <br>Ù…Ù„Ø§Ø­Ø¸Ø©: Ù‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø­Ø§Ù„ÙŠØ© Ù„Ø§ ØªØ­ØªÙˆÙŠ Ø¨Ø¹Ø¯ Ø¹Ù„Ù‰ Ø¹Ù…ÙˆØ¯ `icon`ØŒ Ù„Ø°Ø§ Ø³ØªØ¸Ù‡Ø± Ø§Ù„Ø£ÙŠÙ‚ÙˆÙ†Ø© Ø¨Ø¹Ø¯ ØªÙ†ÙÙŠØ° Ù…Ù„Ù Ø§Ù„ØªØ­Ø¯ÙŠØ« Ø¯Ø§Ø®Ù„ Ù…Ø¬Ù„Ø¯ `database`.
+                                    <br>ملاحظة: قاعدة البيانات الحالية لا تحتوي بعد على عمود `icon`، لذا ستظهر الأيقونة بعد تنفيذ ملف التحديث داخل مجلد `database`.
                                 <?php endif; ?>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„ -->
+                    <!-- الدور المسؤول -->
                     <div>
-                        <label><i class="fas fa-user-tie"></i> Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„ *</label>
+                        <label><i class="fas fa-user-tie"></i> الدور المسؤول *</label>
                         <select name="owner_role_id" id="owner_role_id" required>
-                            <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„ --</option>
+                            <option value="">-- اختر الدور المسؤول --</option>
                             <?php foreach ($roles as $role): ?>
                                 <option value="<?= $role['id']; ?>" 
                                     <?= ($selected_role_id && $selected_role_id == $role['id'] && !$editData) ? 'selected' : ''; ?>
@@ -411,38 +411,38 @@ include('../insidebar.php');
                         </select>
                     </div>
 
-                    <!-- Ø±Ø§Ø¨Ø· -->
+                    <!-- رابط -->
                     <div style="display: flex; align-items: center;">
                         <input type="checkbox" name="is_link" id="is_link" value="1" />
                         <label for="is_link" style="margin: 0; margin-right: 8px; cursor: pointer;">
-                            <i class="fas fa-link"></i> Ø±Ø§Ø¨Ø·
+                            <i class="fas fa-link"></i> رابط
                         </label>
                     </div>
 
                     <button type="submit" style="grid-column: 1 / -1; justify-self: center;">
-                        <i class="fas fa-save"></i> Ø­ÙØ¸ Ø§Ù„ØµÙØ­Ø©
+                        <i class="fas fa-save"></i> حفظ الصفحة
                     </button>
                 </div>
             </div>
         </div>
     </form>
 
-    <!-- Ø¬Ø¯ÙˆÙ„ Ø§Ù„ØµÙØ­Ø§Øª -->
+    <!-- جدول الصفحات -->
     <div class="card">
         <div class="card-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-            <h5 style="margin:0;"><i class="fas fa-list"></i> Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙØ­Ø§Øª ÙˆØ§Ù„Ù…ÙˆØ¯ÙŠÙˆÙ„Ø§Øª</h5>
+            <h5 style="margin:0;"><i class="fas fa-list"></i> جميع الصفحات والموديولات</h5>
             <div style="display:flex; align-items:center; gap:10px;">
-                <label style="font-weight:700; margin:0;"><i class="fas fa-user-tie"></i> ÙÙ„ØªØ±Ø© Ø­Ø³Ø¨ Ø§Ù„Ø¯ÙˆØ±:</label>
+                <label style="font-weight:700; margin:0;"><i class="fas fa-user-tie"></i> فلترة حسب الدور:</label>
                 <select id="roleFilterSelect" style="padding:7px 14px; border:1.5px solid var(--border); border-radius:var(--radius); font-family:'Cairo',sans-serif; font-size:.88rem; min-width:180px;">
-                    <option value="">-- Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø£Ø¯ÙˆØ§Ø± --</option>
+                    <option value="">-- جميع الأدوار --</option>
                     <?php foreach ($roles as $role): ?>
                         <option value="<?= htmlspecialchars($role['name'], ENT_QUOTES, 'UTF-8'); ?>">
                             <?= htmlspecialchars($role['name'], ENT_QUOTES, 'UTF-8'); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <button id="clearRoleFilter" class="back-btn" style="display:none;" title="Ù…Ø³Ø­ Ø§Ù„ÙÙ„ØªØ±">
-                    <i class="fas fa-times"></i> Ù…Ø³Ø­
+                <button id="clearRoleFilter" class="back-btn" style="display:none;" title="مسح الفلتر">
+                    <i class="fas fa-times"></i> مسح
                 </button>
             </div>
         </div>
@@ -452,12 +452,12 @@ include('../insidebar.php');
                     <thead>
                         <tr>
                             <th width="80"><i class="fas fa-barcode"></i> #</th>
-                            <th><i class="fas fa-book"></i> Ø§Ø³Ù… Ø§Ù„ØµÙØ­Ø©</th>
-                            <th width="110"><i class="fas fa-icons"></i> Ø§Ù„Ø£ÙŠÙ‚ÙˆÙ†Ø©</th>
-                            <th width="150"><i class="fas fa-code"></i> Ø§Ù„ÙƒÙˆØ¯</th>
-                            <th><i class="fas fa-user-tie"></i> Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„</th>
-                            <th width="80"><i class="fas fa-link"></i> Ø±Ø§Ø¨Ø·</th>
-                            <th width="150"><i class="fas fa-cogs"></i> Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th>
+                            <th><i class="fas fa-book"></i> اسم الصفحة</th>
+                            <th width="110"><i class="fas fa-icons"></i> الأيقونة</th>
+                            <th width="150"><i class="fas fa-code"></i> الكود</th>
+                            <th><i class="fas fa-user-tie"></i> الدور المسؤول</th>
+                            <th width="80"><i class="fas fa-link"></i> رابط</th>
+                            <th width="150"><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -483,7 +483,7 @@ include('../insidebar.php');
                         ");
                         
                         if (!$result) {
-                            echo '<tr><td colspan="7" class="text-center text-danger">Ø®Ø·Ø£ ÙÙŠ Ø¬Ù„Ø¨ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª: ' . htmlspecialchars($conn->error) . '</td></tr>';
+                            echo '<tr><td colspan="7" class="text-center text-danger">خطأ في جلب البيانات: ' . htmlspecialchars($conn->error) . '</td></tr>';
                         } else {
                             $i = 1;
                             while ($row = $result->fetch_assoc()):
@@ -508,7 +508,7 @@ include('../insidebar.php');
                                            style="color: var(--blue); text-decoration: none; font-weight: 600; transition: all var(--ease);"
                                            onmouseover="this.style.color='var(--navy)'; this.style.textDecoration='underline';"
                                            onmouseout="this.style.color='var(--blue)'; this.style.textDecoration='none';"
-                                           title="Ø§Ù„Ø§Ù†ØªÙ‚Ø§Ù„ Ø¥Ù„Ù‰ ØµÙ„Ø§Ø­ÙŠØ§Øª Ù‡Ø°Ø§ Ø§Ù„Ø¯ÙˆØ±">
+                                           title="الانتقال إلى صلاحيات هذا الدور">
                                             <i class="fas fa-user-shield"></i> 
                                             <?= htmlspecialchars($row['role_name'], ENT_QUOTES, 'UTF-8'); ?>
                                         </a>
@@ -516,23 +516,23 @@ include('../insidebar.php');
                                     <td class="text-center">
                                         <?php if ($row['is_link'] == 1): ?>
                                             <span style="display: inline-block; background: var(--green-soft); color: var(--green); padding: 4px 8px; border-radius: 4px; font-weight: 600;">
-                                                <i class="fas fa-check-circle"></i> Ù†Ø¹Ù…
+                                                <i class="fas fa-check-circle"></i> نعم
                                             </span>
                                         <?php else: ?>
                                             <span style="display: inline-block; background: var(--gray-soft); color: var(--gray); padding: 4px 8px; border-radius: 4px; font-weight: 600;">
-                                                <i class="fas fa-times-circle"></i> Ù„Ø§
+                                                <i class="fas fa-times-circle"></i> لا
                                             </span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center">
                                         <a href="javascript:void(0);" 
                                            onclick="editModule(<?= htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)"
-                                           class="btn btn-sm btn-primary" title="ØªØ¹Ø¯ÙŠÙ„" style="background: var(--blue-soft); color: var(--blue); border: 1.5px solid rgba(37,99,235,.18);">
+                                           class="btn btn-sm btn-primary" title="تعديل" style="background: var(--blue-soft); color: var(--blue); border: 1.5px solid rgba(37,99,235,.18);">
                                             <i class="fas fa-edit"></i> 
                                         </a>
                                         <a href="javascript:void(0);" 
                                            onclick="confirmDelete(<?= $row['id']; ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>')"
-                                           class="btn btn-sm btn-danger" title="Ø­Ø°Ù" style="background: var(--red-soft); color: var(--red); border: 1.5px solid rgba(220,38,38,.18);">
+                                           class="btn btn-sm btn-danger" title="حذف" style="background: var(--red-soft); color: var(--red); border: 1.5px solid rgba(220,38,38,.18);">
                                             <i class="fas fa-trash"></i> 
                                         </a>
                                     </td>
@@ -556,7 +556,7 @@ include('../insidebar.php');
 
 <script>
 $(document).ready(function () {
-    // ØªÙ‡ÙŠØ¦Ø© DataTable
+    // تهيئة DataTable
     var modulesTable = $('#modulesTable').DataTable({
         responsive: true,
         language: {
@@ -567,10 +567,10 @@ $(document).ready(function () {
         ]
     });
 
-    // ÙÙ„ØªØ±Ø© Ø­Ø³Ø¨ Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ù…Ø³Ø¤ÙˆÙ„ (Ø§Ù„Ø¹Ù…ÙˆØ¯ index 4)
+    // فلترة حسب الدور المسؤول (العمود index 4)
     $('#roleFilterSelect').on('change', function () {
         var val = $.trim($(this).val());
-        // Ø¨Ø­Ø« Ù†ØµÙŠ Ø¹Ø§Ø¯ÙŠ Ø¨Ø¯ÙˆÙ† regex Ù„Ø¶Ù…Ø§Ù† Ø¹Ù…Ù„Ù‡ Ù…Ø¹ Ø§Ù„Ù†Øµ Ø§Ù„Ø¹Ø±Ø¨ÙŠ
+        // بحث نصي عادي بدون regex لضمان عمله مع النص العربي
         modulesTable.column(4).search(val, false, false).draw();
         $('#clearRoleFilter').toggle(val !== '');
     });
@@ -581,7 +581,7 @@ $(document).ready(function () {
         $(this).hide();
     });
 
-    // Ø¥Ø¸Ù‡Ø§Ø±/Ø¥Ø®ÙØ§Ø¡ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬
+    // إظهار/إخفاء النموذج
     $('#toggleForm').on('click', function () {
         $('#moduleForm').slideToggle(300);
         $('html, body').animate({
@@ -589,7 +589,7 @@ $(document).ready(function () {
         }, 500);
     });
 
-    // Ø¥Ø°Ø§ ÙƒØ§Ù† Ù‡Ù†Ø§Ùƒ role_id Ù…Ø­Ø¯Ø¯ ÙÙŠ URLØŒ ÙØ¹Ù‘Ù„ Ø§Ù„ÙÙ„ØªØ± ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ Ø¨Ø¹Ø¯ Ø¬Ø§Ù‡Ø²ÙŠØ© DataTable
+    // إذا كان هناك role_id محدد في URL، فعّل الفلتر تلقائياً بعد جاهزية DataTable
     <?php if ($selected_role_id):
         $selected_role_name = '';
         foreach ($roles as $r) {
@@ -602,7 +602,7 @@ $(document).ready(function () {
     }
     <?php endif; ?>
 
-    // Ø¥Ø¸Ù‡Ø§Ø± Ø§Ù„Ù†Ù…ÙˆØ°Ø¬ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ Ø¹Ù†Ø¯ Ø§Ù„Ø§Ù†ØªÙ‚Ø§Ù„ Ø¨ role_id
+    // إظهار النموذج تلقائياً عند الانتقال ب role_id
     <?php if ($selected_role_id): ?>
     document.getElementById('moduleForm').style.display = 'block';
     $('html, body').animate({ scrollTop: $('#moduleForm').offset().top - 100 }, 500);
@@ -666,25 +666,25 @@ function autoSuggestIcon() {
     var text = [$('#name').val(), $('#code').val()].join(' ').toLowerCase();
     var suggestedIcon = 'fa fa-link';
     var iconMap = [
-        { pattern: /(home|dashboard|Ø±Ø¦ÙŠØ³|Ù„ÙˆØ­Ø©)/, icon: 'fa fa-home' },
-        { pattern: /(client|customer|Ø¹Ù…ÙŠÙ„|Ø¹Ù…Ù„Ø§Ø¡)/, icon: 'fa fa-users' },
-        { pattern: /(role|permission|ØµÙ„Ø§Ø­|Ø¯ÙˆØ±)/, icon: 'fa fa-user-shield' },
-        { pattern: /(user|users|Ù…Ø³ØªØ®Ø¯Ù…)/, icon: 'fa fa-users-cog' },
-        { pattern: /(project|projects|Ù…Ø´Ø±ÙˆØ¹|Ù…Ø´Ø§Ø±ÙŠØ¹)/, icon: 'fa fa-folder-open' },
-        { pattern: /(mine|mines|Ù…Ù†Ø¬Ù…|Ù…Ù†Ø§Ø¬Ù…)/, icon: 'fa fa-mountain' },
-        { pattern: /(supplier|suppliers|Ù…ÙˆØ±Ø¯)/, icon: 'fa fa-truck-loading' },
-        { pattern: /(equipment|equipments|fleet|Ù…Ø¹Ø¯Ø©|Ù…Ø¹Ø¯Ø§Øª|Ø¢Ù„ÙŠØ§Øª|Ø§Ø³Ø·ÙˆÙ„|Ø£Ø³Ø·ÙˆÙ„)/, icon: 'fa fa-tractor' },
-        { pattern: /(driver|drivers|Ù…Ø´ØºÙ„|Ù…Ø´ØºÙ„ÙŠÙ†)/, icon: 'fa fa-id-card' },
-        { pattern: /(operator|operation|oprator|ØªØ´ØºÙŠÙ„)/, icon: 'fa fa-cogs' },
-        { pattern: /(timesheet|hour|hours|Ø³Ø§Ø¹Ø§Øª|Ø¯ÙˆØ§Ù…)/, icon: 'fa fa-business-time' },
-        { pattern: /(day|daily|today|ÙŠÙˆÙ…|Ø§Ù„ÙŠÙˆÙ…)/, icon: 'fa fa-calendar-days' },
-        { pattern: /(contract|contracts|Ø¹Ù‚Ø¯|Ø¹Ù‚ÙˆØ¯)/, icon: 'fa fa-file-contract' },
-        { pattern: /(approval|request|requests|Ù…ÙˆØ§ÙÙ‚|Ø§Ø¹ØªÙ…Ø§Ø¯|Ø·Ù„Ø¨Ø§Øª)/, icon: 'fa fa-check-double' },
-        { pattern: /(report|reports|ØªÙ‚Ø§Ø±ÙŠØ±|Ø§Ø­ØµØ§|Ø¥Ø­ØµØ§|chart)/, icon: 'fa fa-chart-pie' },
-        { pattern: /(setting|settings|Ø§Ø¹Ø¯Ø§Ø¯|Ø¥Ø¹Ø¯Ø§Ø¯)/, icon: 'fa fa-gear' },
-        { pattern: /(password|security|key|ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±|Ø§Ù…Ø§Ù†|Ø£Ù…Ø§Ù†)/, icon: 'fa fa-key' },
-        { pattern: /(module|modules|ØµÙØ­Ø©|Ù…ÙˆØ¯ÙŠÙˆÙ„)/, icon: 'fa fa-layer-group' },
-        { pattern: /(type|types|Ù†ÙˆØ¹|Ø£Ù†ÙˆØ§Ø¹)/, icon: 'fa fa-screwdriver-wrench' }
+        { pattern: /(home|dashboard|رئيس|لوحة)/, icon: 'fa fa-home' },
+        { pattern: /(client|customer|عميل|عملاء)/, icon: 'fa fa-users' },
+        { pattern: /(role|permission|صلاح|دور)/, icon: 'fa fa-user-shield' },
+        { pattern: /(user|users|مستخدم)/, icon: 'fa fa-users-cog' },
+        { pattern: /(project|projects|مشروع|مشاريع)/, icon: 'fa fa-folder-open' },
+        { pattern: /(mine|mines|منجم|مناجم)/, icon: 'fa fa-mountain' },
+        { pattern: /(supplier|suppliers|مورد)/, icon: 'fa fa-truck-loading' },
+        { pattern: /(equipment|equipments|fleet|معدة|معدات|آليات|اسطول|أسطول)/, icon: 'fa fa-tractor' },
+        { pattern: /(driver|drivers|مشغل|مشغلين)/, icon: 'fa fa-id-card' },
+        { pattern: /(operator|operation|oprator|تشغيل)/, icon: 'fa fa-cogs' },
+        { pattern: /(timesheet|hour|hours|ساعات|دوام)/, icon: 'fa fa-business-time' },
+        { pattern: /(day|daily|today|يوم|اليوم)/, icon: 'fa fa-calendar-days' },
+        { pattern: /(contract|contracts|عقد|عقود)/, icon: 'fa fa-file-contract' },
+        { pattern: /(approval|request|requests|موافق|اعتماد|طلبات)/, icon: 'fa fa-check-double' },
+        { pattern: /(report|reports|تقارير|احصا|إحصا|chart)/, icon: 'fa fa-chart-pie' },
+        { pattern: /(setting|settings|اعداد|إعداد)/, icon: 'fa fa-gear' },
+        { pattern: /(password|security|key|كلمة المرور|امان|أمان)/, icon: 'fa fa-key' },
+        { pattern: /(module|modules|صفحة|موديول)/, icon: 'fa fa-layer-group' },
+        { pattern: /(type|types|نوع|أنواع)/, icon: 'fa fa-screwdriver-wrench' }
     ];
 
     $.each(iconMap, function (_, item) {
@@ -697,7 +697,7 @@ function autoSuggestIcon() {
     selectIcon(suggestedIcon, false);
 }
 
-// Ø¯Ø§Ù„Ø© ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
+// دالة تعديل البيانات
 function editModule(data) {
     document.getElementById('moduleForm').style.display = 'block';
     document.getElementById('edit_id').value = data.id;
@@ -710,9 +710,9 @@ function editModule(data) {
     $('html, body').animate({ scrollTop: $('#moduleForm').offset().top - 100 }, 500);
 }
 
-// Ø¯Ø§Ù„Ø© ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø­Ø°Ù
+// دالة تأكيد الحذف
 function confirmDelete(id, name) {
-    if (confirm(`Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø±ØºØ¨ØªÙƒ ÙÙŠ Ø­Ø°Ù Ø§Ù„ØµÙØ­Ø© "${name}"ØŸ`)) {
+    if (confirm(`هل أنت متأكد من رغبتك في حذف الصفحة "${name}"؟`)) {
         window.location.href = 'modules.php?delete_id=' + id;
     }
 }

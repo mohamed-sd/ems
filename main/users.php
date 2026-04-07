@@ -4,6 +4,73 @@ session_start();
 include '../includes/sessions.php';
 // تضمين قاعدة البيانات أولاً (قبل sidebar لأننا نحتاجها)
 include '../config.php';
+
+$current_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$users_has_company_id = db_table_has_column($conn, 'users', 'company_id');
+
+// تجهيز أعمدة الحذف الناعم إن لم تكن موجودة
+$users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');
+$users_has_deleted_at = db_table_has_column($conn, 'users', 'deleted_at');
+$users_has_deleted_by = db_table_has_column($conn, 'users', 'deleted_by');
+
+if (!$users_has_is_deleted) {
+    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0");
+}
+if (!$users_has_deleted_at) {
+    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN deleted_at DATETIME NULL");
+}
+if (!$users_has_deleted_by) {
+    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN deleted_by INT NULL");
+}
+
+$users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');
+$users_has_deleted_at = db_table_has_column($conn, 'users', 'deleted_at');
+$users_not_deleted_sql = $users_has_is_deleted ? "(COALESCE(is_deleted,0)=0)" : "1=1";
+
+if ($users_has_company_id && $current_company_id <= 0) {
+    echo "<script>alert('❌ الحساب غير مرتبط بشركة'); window.location.href='../login.php';</script>";
+    exit;
+}
+
+$roles = array();
+$roles_query = "SELECT id, name FROM roles WHERE (parent_role_id IS NULL OR parent_role_id = 0) AND status = 1 ORDER BY level ASC, id ASC";
+$roles_result = mysqli_query($conn, $roles_query);
+if ($roles_result) {
+    while ($role_row = mysqli_fetch_assoc($roles_result)) {
+        $role_id = isset($role_row['id']) ? (string) $role_row['id'] : '';
+        $role_name = isset($role_row['name']) ? trim($role_row['name']) : '';
+        if ($role_id !== '' && $role_name !== '') {
+            $roles[$role_id] = $role_name;
+        }
+    }
+}
+
+if (empty($roles)) {
+    $roles = array(
+        "1" => "مدير المشاريع",
+        "2" => "مدير الموردين",
+        "3" => "مدير المشغلين",
+        "4" => "مدير الأسطول",
+        "5" => "مدير موقع",
+        "10" => "حركة وتشغيل"
+    );
+}
+
+// حذف ناعم
+if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    $delete_id = intval($_GET['delete']);
+    $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
+
+    $delete_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
+    $delete_sql = "UPDATE users SET is_deleted = 1, deleted_at = NOW(), deleted_by = $current_user_id, updated_at = NOW() WHERE id = $delete_id AND role != '-1' AND $users_not_deleted_sql $delete_scope";
+
+    if (@mysqli_query($conn, $delete_sql) && mysqli_affected_rows($conn) > 0) {
+        echo "<script>alert('✅ تم حذف المستخدم بنجاح'); window.location.href='users.php';</script>";
+    } else {
+        echo "<script>alert('❌ حدث خطأ أثناء الحذف أو لا توجد صلاحية'); window.location.href='users.php';</script>";
+    }
+    exit;
+}
 // تعريف عنوان الصفحة
 $page_title = 'Equipation | المستخدمين';
 // تضمين الهيدر
@@ -25,7 +92,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
     if ($uid > 0) {
         // تحقق من التكرار عند التعديل (يتجاهل السجل الحالي)
-        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' AND id != '$uid' LIMIT 1");
+        $check_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
+        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' AND id != '$uid' AND $users_not_deleted_sql $check_scope LIMIT 1");
         if (!$check) {
             echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
         } elseif (mysqli_num_rows($check) > 0) {
@@ -38,9 +106,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 $sql_pass = ", password='$hashedPass'";
             }
 
-            $sql = "UPDATE users 
+                $company_update = ($users_has_company_id && $current_company_id > 0) ? ", company_id='$current_company_id'" : "";
+                $update_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
+
+                $sql = "UPDATE users 
                     SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', mine_id='$mine', contract_id='$contract', updated_at=NOW() $sql_pass
-                    WHERE id='$uid'";
+                    $company_update
+                    WHERE id='$uid' AND $users_not_deleted_sql $update_scope";
             if (mysqli_query($conn, $sql)) {
                 echo "<script>alert('✅ تم التعديل بنجاح'); window.location.href='users.php';</script>";
             } else {
@@ -49,19 +121,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         }
     } else {
         // تحقق من التكرار عند الإضافة
-        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' LIMIT 1");
+        $check_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
+        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' AND $users_not_deleted_sql $check_scope LIMIT 1");
         if (!$check) {
             echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
         } elseif (mysqli_num_rows($check) > 0) {
             echo "<script>alert('⚠️ اسم المستخدم موجود مسبقاً!');</script>";
         } else {
-            // إدراج كلمة المرور كنص عادي (غير مشفر)
-            $sql = "INSERT INTO users (name, username, password, phone, role, project_id, mine_id, contract_id, parent_id, created_at, updated_at) 
-                    VALUES ('$name', '$username', '$password', '$phone', '$role', '$project', '$mine', '$contract', '0', NOW(), NOW())";
-            if (mysqli_query($conn, $sql)) {
-                echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='users.php';</script>";
+            if ($passwordRaw === '') {
+                echo "<script>alert('⚠️ كلمة المرور مطلوبة عند إضافة مستخدم جديد');</script>";
             } else {
-                echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
+                $hashedPass = mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_BCRYPT));
+
+                $insert_columns = "name, username, password, phone, role, project_id, mine_id, contract_id, parent_id, created_at, updated_at";
+                $insert_values  = "'$name', '$username', '$hashedPass', '$phone', '$role', '$project', '$mine', '$contract', '0', NOW(), NOW()";
+
+                if ($users_has_company_id && $current_company_id > 0) {
+                    $insert_columns .= ", company_id";
+                    $insert_values .= ", '$current_company_id'";
+                }
+
+                $sql = "INSERT INTO users ($insert_columns) VALUES ($insert_values)";
+                if (mysqli_query($conn, $sql)) {
+                    echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='users.php';</script>";
+                } else {
+                    echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
+                }
             }
         }
     }
@@ -155,20 +240,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
         <?php
 
-        $roles = array(
-            "0" => "مدير",
-            "1" => "مدير المشاريع",
-            "2" => "مدير الموردين",
-            "3" => "مدير المشغلين",
-            "4" => "مدير الأسطول",
-            "5" => "مدير موقع",
-            "6" => "مدخل ساعات عمل",
-            "7" => "مراجع ساعات مورد",
-            "8" => "مراجع ساعات مشغل",
-            "9" => "مراجع الاعطال",
-            "10" => "حركة وتشغيل"
-        );
-
         $userRole = $_SESSION['user']['role'];
         $userName = $_SESSION['user']['name'];
         $roleText = isset($roles[$userRole]) ? $roles[$userRole] : "غير معروف";
@@ -184,16 +255,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     <div class="form-grid">
                         <div>
                             <label><i class="fas fa-user"></i> الاسم الثلاثي</label>
-                            <input type="text" name="name" id="name" placeholder="الاسم الثلاثي" required />
+                            <input type="text" name="name" id="name" placeholder="الاسم الثلاثي" value="مستخدم" required />
                         </div>
                         <div>
                             <label><i class="fas fa-id-badge"></i> اسم المستخدم</label>
-                            <input type="text" name="username" id="username" placeholder="اسم المستخدم (الحد الأدنى 3 أحرف)" required autocomplete="off" />
+                            <input type="text" name="username" id="username" placeholder="اسم المستخدم (الحد الأدنى 3 أحرف)" value="username" required autocomplete="off" />
                             <small id="usernameFeedback" style="display:block; margin-top:5px; min-height:20px;"></small>
                         </div>
                         <div>
                             <label><i class="fas fa-lock"></i> كلمة المرور</label>
-                            <input type="password" name="password" id="password" placeholder="كلمة المرور" />
+                            <input type="password" name="password" id="password" placeholder="كلمة المرور" value="12345678" />
                             <small class="text-muted"><i class="fas fa-info-circle"></i> اتركه فارغاً إذا لا تريد تغييره
                                 عند التعديل</small>
                         </div>
@@ -201,17 +272,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             <label><i class="fas fa-user-shield"></i> الدور / الصلاحية</label>
                             <select name="role" id="role" class="form-control" required>
                                 <option value="">-- حدد الصلاحية --</option>
-                                <option value="1">👨‍💼 مدير المشاريع</option>
-                                <option value="2">🏢 مدير الموردين</option>
-                                <option value="4">🚚 مدير الأسطول</option>
-                                <option value="3">👷 مدير المشغلين</option>
-                                <option value="5">📍 مدير موقع</option>
-                                <option value="10">📍 حركة وتشغيل </option>
+                                <?php foreach ($roles as $role_id => $role_name): ?>
+                                    <option value="<?php echo htmlspecialchars((string) $role_id, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($role_name, ENT_QUOTES, 'UTF-8'); ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div>
                             <label><i class="fas fa-phone"></i> رقم الهاتف</label>
-                            <input type="text" name="phone" id="phone" placeholder="رقم الهاتف" required />
+                            <input type="text" name="phone" id="phone" placeholder="رقم الهاتف" required value="09209303903" />
                         </div>
 
                         <div id="projectDiv" style="display:none;">
@@ -220,7 +288,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             <select id="project_id" name="project_id" class="form-control">
                                 <option value="">-- اختر المشروع --</option>
                                 <?php
-                                $sql = "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name ASC";
+                                $project_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
+                                $project_not_deleted = db_table_has_column($conn, 'project', 'is_deleted') ? " AND COALESCE(is_deleted,0)=0" : "";
+                                $sql = "SELECT id, name, project_code FROM project WHERE status = '1' $project_not_deleted $project_scope ORDER BY name ASC";
                                 $result = mysqli_query($conn, $sql);
                                 while ($row = mysqli_fetch_assoc($result)) {
                                     echo "<option value='{$row['id']}'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . " ({$row['project_code']})</option>";
@@ -275,17 +345,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     </thead>
                     <tbody>
                         <?php
-                        $query = "SELECT id, name, username, password, phone, role, project_id, mine_id, contract_id FROM users WHERE parent_id='0' AND role!='-1' ORDER BY id DESC";
+                        $list_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
+                        $query = "SELECT id, name, username, password, phone, role, project_id, mine_id, contract_id FROM users WHERE parent_id='0' AND role!='-1' AND $users_not_deleted_sql $list_scope ORDER BY id DESC";
                         $result = mysqli_query($conn, $query);
-
-                        $roles = array(
-                            "1" => "مدير المشاريع",
-                            "2" => "مدير الموردين",
-                            "3" => "مدير المشغلين",
-                            "4" => "مدير الاسطول",
-                            "5" => "مدير موقع",
-                            "10" => "حركة وتشغيل"
-                        );
 
                         $i = 1;
                         while ($row = mysqli_fetch_assoc($result)) {

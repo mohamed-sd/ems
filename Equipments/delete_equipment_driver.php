@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -26,7 +26,7 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
     $user_role = isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : '';
     $is_role10 = ($user_role == "10");
 
-    // Ø§Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø±Ø¨Ø· Ø§Ù„Ø­Ø§Ù„ÙŠ
+    // الحصول على بيانات الربط الحالي
     $scope_sql = '1=1';
     if (!$is_super_admin) {
         if ($equipment_drivers_has_company) {
@@ -59,7 +59,7 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
                                  WHERE ed.id=$id AND $scope_sql");
     
     if (!$res || mysqli_num_rows($res) === 0) {
-        echo "<script>alert('âŒ Ø§Ù„Ø±Ø¨Ø· ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯'); window.location.href='add_drivers.php?equipment_id=$equipment_id';</script>";
+        echo "<script>alert('❌ الربط غير موجود'); window.location.href='add_drivers.php?equipment_id=$equipment_id';</script>";
         exit;
     }
     
@@ -71,12 +71,12 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
     $equipment_code = $row['equipment_code'];
     $equipment_name = $row['equipment_name'];
 
-    // Ø¥Ø°Ø§ ÙƒØ§Ù† Ù…Ø¯ÙŠØ± Ø§Ù„Ø­Ø±ÙƒØ© ÙˆØ§Ù„ØªØ´ØºÙŠÙ„ (role 10)ØŒ Ø¥Ù†Ø´Ø§Ø¡ Ø·Ù„Ø¨ Ù…ÙˆØ§ÙÙ‚Ø©
+    // إذا كان مدير الحركة والتشغيل (role 10)، إنشاء طلب موافقة
     if ($is_role10) {
         $action_type = ($new_status == 0) ? 'deactivate_driver' : 'reactivate_driver';
-        $action_ar = ($new_status == 0) ? 'Ø¥ÙŠÙ‚Ø§Ù' : 'ØªØ´ØºÙŠÙ„';
+        $action_ar = ($new_status == 0) ? 'إيقاف' : 'تشغيل';
         
-        // Ø¶Ù…Ø§Ù† ÙˆØ¬ÙˆØ¯ Ù‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© (Ù…Ø¯ÙŠØ± Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ†)
+        // ضمان وجود قاعدة الموافقة (مدير المشغلين)
         mysqli_query(
             $conn,
             "INSERT IGNORE INTO approval_workflow_rules (entity_type, action, role_required, step_order, is_active, created_at)
@@ -95,7 +95,7 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
                 'new_status' => $new_status,
                 'action' => $action_ar,
                 'requested_by_role' => '10',
-                'reason' => "Ø·Ù„Ø¨ $action_ar Ù…Ø´ØºÙ„ Ù…Ù† Ø´Ø§Ø´Ø© Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø´ØºÙ„ÙŠÙ†"
+                'reason' => "طلب $action_ar مشغل من شاشة إدارة المشغلين"
             ],
             'operations' => [
                 [
@@ -117,14 +117,14 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
         );
 
         if (!empty($approval_result['success'])) {
-            echo "<script>alert('âœ… " . addslashes($approval_result['message']) . "'); window.location.href='add_drivers.php?equipment_id=$equipment_id';</script>";
+            echo "<script>alert('✅ " . addslashes($approval_result['message']) . "'); window.location.href='add_drivers.php?equipment_id=$equipment_id';</script>";
         } else {
-            echo "<script>alert('âŒ " . addslashes($approval_result['message']) . "'); window.location.href='add_drivers.php?equipment_id=$equipment_id';</script>";
+            echo "<script>alert('❌ " . addslashes($approval_result['message']) . "'); window.location.href='add_drivers.php?equipment_id=$equipment_id';</script>";
         }
         exit;
     }
 
-    // Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙˆÙ† Ø§Ù„Ø¢Ø®Ø±ÙˆÙ†: ØªØºÙŠÙŠØ± Ø§Ù„Ø­Ø§Ù„Ø© Ù…Ø¨Ø§Ø´Ø±Ø©
+    // المستخدمون الآخرون: تغيير الحالة مباشرة
     $update_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";
     mysqli_query($conn, "UPDATE equipment_drivers SET status=$new_status WHERE id=$id$update_scope");
     header("Location: add_drivers.php?equipment_id=$equipment_id");

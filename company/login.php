@@ -63,6 +63,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (company_users_has_column('status')) {
                     $fields .= ', u.status';
                 }
+                if (company_users_has_column('is_deleted')) {
+                    $fields .= ', u.is_deleted';
+                }
+                if (company_users_has_column('deleted_at')) {
+                    $fields .= ', u.deleted_at';
+                }
 
                 $hasCompaniesTable = company_table_exists('admin_companies');
                 $hasCompanyIdOnUsers = company_users_has_column('company_id');
@@ -160,8 +166,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (!$user || !$passOk) {
                         $error = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
                     } else {
+                        $isDeletedUser = false;
+                        if (company_users_has_column('is_deleted') && isset($user['is_deleted']) && intval($user['is_deleted']) === 1) {
+                            $isDeletedUser = true;
+                        }
+                        if (company_users_has_column('deleted_at') && isset($user['deleted_at']) && trim((string)$user['deleted_at']) !== '') {
+                            $isDeletedUser = true;
+                        }
+                        if ($isDeletedUser) {
+                            $error = 'لم يعد حسابك نشط بعد الان';
+                        }
+
                         // Check #1: users.status = active
-                        if (company_users_has_column('status') && isset($user['status']) && strtolower((string)$user['status']) !== 'active') {
+                        if ($error === '' && company_users_has_column('status') && isset($user['status']) && strtolower((string)$user['status']) !== 'active') {
                             $error = 'الحساب معطّل، يرجى التواصل مع مدير شركتك.';
                         }
 

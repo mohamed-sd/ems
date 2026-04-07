@@ -87,6 +87,9 @@ function req_get_request_details($req) {
         );
 
         foreach ($decodedPayload as $key => $value) {
+            if ($key === 'manager_password_hash') {
+                continue;
+            }
             if (is_array($value) || is_object($value)) {
                 continue;
             }
@@ -174,6 +177,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['action'])) {
             $maxUsers = intval(isset($payload['max_users']) ? $payload['max_users'] : 0);
             $maxEquipments = intval(isset($payload['max_equipments']) ? $payload['max_equipments'] : 0);
             $maxProjects = intval(isset($payload['max_projects']) ? $payload['max_projects'] : 0);
+            $requestedPasswordHash = trim(isset($payload['manager_password_hash']) ? $payload['manager_password_hash'] : '');
+            $useRequestedPassword = (strlen($requestedPasswordHash) > 20 && substr($requestedPasswordHash, 0, 1) === '$');
 
             if ($managerName === '') {
                 $managerName = $companyName . ' - المدير العام';
@@ -334,13 +339,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['action'])) {
                     mysqli_stmt_close($userDupStmt);
 
                     if (!$dupRow) {
-                        $tempPassword = req_make_temp_password(12);
-                        $tempPasswordHash = password_hash($tempPassword, PASSWORD_BCRYPT);
+                        $userPasswordHash = '';
+                        $forcePasswordChange = 0;
+                        $setTempPasswordTimestamp = false;
+
+                        if ($useRequestedPassword) {
+                            $userPasswordHash = $requestedPasswordHash;
+                        } else {
+                            $tempPassword = req_make_temp_password(12);
+                            $userPasswordHash = password_hash($tempPassword, PASSWORD_BCRYPT);
+                            $forcePasswordChange = 1;
+                            $setTempPasswordTimestamp = true;
+                        }
 
                         $managerNameEsc = mysqli_real_escape_string($conn, $managerName);
                         $managerEmailEsc = mysqli_real_escape_string($conn, $managerEmail);
                         $managerPhoneEsc = mysqli_real_escape_string($conn, $managerPhone);
-                        $passEsc = mysqli_real_escape_string($conn, $tempPasswordHash);
+                        $passEsc = mysqli_real_escape_string($conn, $userPasswordHash);
 
                         $uCols = array('name', 'username', 'password', 'phone', 'role');
                         $uVals = array("'" . $managerNameEsc . "'", "'" . $managerEmailEsc . "'", "'" . $passEsc . "'", "'" . $managerPhoneEsc . "'", "'1'");
@@ -363,9 +378,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['action'])) {
                         }
                         if (req_table_has_column('users', 'force_password_change')) {
                             $uCols[] = 'force_password_change';
-                            $uVals[] = '1';
+                            $uVals[] = strval($forcePasswordChange);
                         }
-                        if (req_table_has_column('users', 'temp_password_set_at')) {
+                        if ($setTempPasswordTimestamp && req_table_has_column('users', 'temp_password_set_at')) {
                             $uCols[] = 'temp_password_set_at';
                             $uVals[] = 'NOW()';
                         }
@@ -384,7 +399,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['action'])) {
                             exit;
                         }
 
-                        $approvalMessage = 'تم إنشاء حساب المدير العام. كلمة المرور المؤقتة: ' . $tempPassword;
+                        if ($setTempPasswordTimestamp) {
+                            $approvalMessage = 'تم إنشاء حساب المدير العام. كلمة المرور المؤقتة: ' . $tempPassword;
+                        }
                     }
                 }
             }

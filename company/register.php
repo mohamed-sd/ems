@@ -196,31 +196,13 @@ function ensure_saas_subscription_tables($conn) {
         }
     }
 
-    if (register_table_exists('admin_subscription_plans')) {
-        $countRes = @mysqli_query($conn, 'SELECT COUNT(*) AS c FROM admin_subscription_plans');
-        $countRow = $countRes ? mysqli_fetch_assoc($countRes) : null;
-        $countVal = $countRow ? intval($countRow['c']) : 0;
-
-        if ($countVal === 0) {
-            foreach (company_default_plan_catalog() as $plan) {
-                $nameEsc = mysqli_real_escape_string($conn, $plan['plan_name']);
-                $featuresEsc = mysqli_real_escape_string($conn, $plan['features']);
-                $sql = "INSERT INTO admin_subscription_plans (id, plan_name, price, max_users, max_projects, max_equipments, features, sort_order, is_active)
-                        VALUES (" . intval($plan['id']) . ", '" . $nameEsc . "', " . floatval($plan['price']) . ", " . intval($plan['max_users']) . ", " . intval($plan['max_projects']) . ", " . intval($plan['max_equipments']) . ", '" . $featuresEsc . "', " . intval($plan['sort_order']) . ", 1)";
-                if (!@mysqli_query($conn, $sql)) {
-                    return mysqli_error($conn);
-                }
-            }
-        }
-    }
-
     return '';
 }
 
 function company_get_plan_options($conn) {
     $plans = array();
     if (!register_table_exists('admin_subscription_plans')) {
-        return company_default_plan_catalog();
+        return $plans;
     }
 
     $q = @mysqli_query($conn, 'SELECT id, plan_name, price, max_users, max_projects, max_equipments, features, sort_order, is_active FROM admin_subscription_plans WHERE is_active = 1 ORDER BY sort_order, id');
@@ -230,10 +212,6 @@ function company_get_plan_options($conn) {
             $row['accent'] = 'blue';
             $plans[] = $row;
         }
-    }
-
-    if (empty($plans)) {
-        return company_default_plan_catalog();
     }
 
     return $plans;
@@ -307,19 +285,18 @@ if ($bootstrapError !== '' && $error === '') {
     $error = 'تعذر تهيئة جداول الاشتراكات تلقائياً: ' . $bootstrapError;
 }
 
-$freemiumPlan = company_freemium_plan_definition();
-if ($bootstrapError === '') {
-    $freemiumPlan = company_sync_freemium_plan($conn);
-}
-
 $plans = company_get_plan_options($conn);
 $plansById = company_get_plan_index_by_id($plans);
-$freemiumPlanId = intval(isset($freemiumPlan['id']) ? $freemiumPlan['id'] : 1);
-if ($freemiumPlanId <= 0) {
-    $freemiumPlanId = 1;
+$freemiumPlanId = 0;
+foreach ($plans as $planItem) {
+    $planPrice = floatval(isset($planItem['price']) ? $planItem['price'] : 0);
+    if ($planPrice <= 0) {
+        $freemiumPlanId = intval(isset($planItem['id']) ? $planItem['id'] : 0);
+        break;
+    }
 }
-if (!isset($plansById[$freemiumPlanId])) {
-    $plansById[$freemiumPlanId] = $freemiumPlan;
+if (empty($plansById) && $error === '') {
+    $error = 'الشركة لم تضف خطط دفع بعد.';
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -327,6 +304,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'رمز الحماية غير صالح. أعد تحميل الصفحة.';
     } elseif ($bootstrapError !== '') {
         $error = 'تعذر تجهيز بيئة الاشتراكات حالياً. ' . $bootstrapError;
+    } elseif (empty($plansById)) {
+        $error = 'الشركة لم تضف خطط دفع بعد.';
     } elseif (!register_table_exists('admin_subscription_requests')) {
         $error = 'تعذر إنشاء جدول طلبات الاشتراك تلقائياً.';
     } elseif (!register_table_exists('admin_companies')) {
@@ -352,14 +331,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $managerPhone = trim(isset($_POST['manager_phone']) ? $_POST['manager_phone'] : '');
         $managerPassword = trim(isset($_POST['manager_password']) ? $_POST['manager_password'] : '');
         $managerPasswordConfirm = trim(isset($_POST['manager_password_confirm']) ? $_POST['manager_password_confirm'] : '');
+        $managerPasswordHash = '';
 
-        $selectedPlanId = ($planId > 0 && isset($plansById[$planId])) ? $planId : $freemiumPlanId;
-        $selectedPlan = isset($plansById[$selectedPlanId]) ? $plansById[$selectedPlanId] : $freemiumPlan;
-        $isFreemium = ($selectedPlanId === $freemiumPlanId);
+        $selectedPlanId = ($planId > 0 && isset($plansById[$planId])) ? $planId : 0;
+        $selectedPlan = ($selectedPlanId > 0 && isset($plansById[$selectedPlanId])) ? $plansById[$selectedPlanId] : null;
+        $isFreemium = ($selectedPlan && floatval(isset($selectedPlan['price']) ? $selectedPlan['price'] : 0) <= 0);
 
         // Validation checks
         if (!validate_length($companyName, 2, 200)) {
             $error = 'اسم الشركة مطلوب.';
+        } elseif ($selectedPlanId <= 0) {
+            $error = 'يرجى اختيار خطة الاشتراك.';
         } elseif (!validate_length($commercialRegistration, 2, 120)) {
             $error = 'رقم السجل التجاري مطلوب.';
         } elseif (!in_array($sector, array('تعدين', 'مقاولات', 'إنشاء'), true)) {
@@ -376,11 +358,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'بريد المدير العام غير صالح.';
         } elseif (!validate_length($managerPhone, 3, 30)) {
             $error = 'رقم هاتف المدير مطلوب.';
-        } elseif ($isFreemium && !validate_length($managerPassword, 8, 100)) {
-            $error = 'كلمة مرور المدير العام مطلوبة (8 أحرف على الأقل) للتفعيل الفوري.';
-        } elseif ($isFreemium && $managerPassword !== $managerPasswordConfirm) {
+        } elseif (!validate_length($managerPassword, 8, 100)) {
+            $error = 'كلمة مرور المدير العام مطلوبة (8 أحرف على الأقل).';
+        } elseif ($managerPassword !== $managerPasswordConfirm) {
             $error = 'تأكيد كلمة المرور غير مطابق.';
         } else {
+            $managerPasswordHash = password_hash($managerPassword, PASSWORD_BCRYPT);
             $checkCompany = mysqli_prepare($conn, 'SELECT id FROM admin_companies WHERE email = ? OR commercial_registration = ? LIMIT 1');
             $checkRequest = mysqli_prepare($conn, 'SELECT id FROM admin_subscription_requests WHERE email = ? AND status = "pending" LIMIT 1');
 
@@ -434,9 +417,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $currencyEsc = mysqli_real_escape_string($conn, $currency);
                     $timezoneEsc = mysqli_real_escape_string($conn, $timezone);
 
-                    $maxUsers = intval(isset($freemiumPlan['max_users']) ? $freemiumPlan['max_users'] : 3);
-                    $maxProjects = intval(isset($freemiumPlan['max_projects']) ? $freemiumPlan['max_projects'] : 1);
-                    $maxEquipments = intval(isset($freemiumPlan['max_equipments']) ? $freemiumPlan['max_equipments'] : 1);
+                    $maxUsers = intval(isset($selectedPlan['max_users']) ? $selectedPlan['max_users'] : 0);
+                    $maxProjects = intval(isset($selectedPlan['max_projects']) ? $selectedPlan['max_projects'] : 0);
+                    $maxEquipments = intval(isset($selectedPlan['max_equipments']) ? $selectedPlan['max_equipments'] : 0);
 
                     $cols = array();
                     $vals = array();
@@ -507,7 +490,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     if (register_table_has_column('admin_companies', 'plan_id')) {
                         $cols[] = 'plan_id';
-                        $vals[] = strval($freemiumPlanId);
+                        $vals[] = strval($selectedPlanId);
                     }
                     if (register_table_has_column('admin_companies', 'status')) {
                         $cols[] = 'status';
@@ -622,6 +605,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'manager_name' => $managerName,
                         'manager_email' => $managerEmail,
                         'manager_phone' => $managerPhone,
+                        'manager_password_hash' => $managerPasswordHash,
                         'source' => 'company_register'
                     );
 
@@ -1059,8 +1043,8 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
             <!-- Card header -->
             <div class="card-head">
                 <span class="ch-badge"><i class="fas fa-building"></i> تسجيل شركة جديدة</span>
-                <h2>ابدأ فوراً على الباقة المجانية</h2>
-                <p>اختر الباقة المناسبة: المجانية تتفعّل مباشرة، والمدفوعة تُرسل للمراجعة</p>
+                <h2>اختيار خطة الاشتراك</h2>
+                <p>يجب اختيار خطة قبل إرسال طلب التسجيل</p>
             </div>
 
             <!-- Step navigator -->
@@ -1247,7 +1231,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                     </div>
                     <div class="note-box" style="margin-top:4px;">
                         <i class="fas fa-key"></i>
-                        <p>كلمة المرور مطلوبة فقط عند اختيار الباقة <strong>المجانية</strong> لأن الحساب يُفعّل فوراً. في الباقات المدفوعة سيظل الطلب قيد المراجعة.</p>
+                        <p>كلمة المرور مطلوبة لجميع الباقات. عند الموافقة على الطلب المدفوع يتم إنشاء حساب المدير العام بنفس كلمة المرور التي تم إدخالها عند التسجيل.</p>
                     </div>
                     <div class="step-actions">
                         <button class="btn-secondary" type="button" onclick="prevStep()"><i class="fas fa-arrow-right"></i> السابق</button>
@@ -1257,12 +1241,15 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
 
                 <!-- ══ STEP 3: Plan & Settings ══ -->
                 <div class="step" data-step="3" style="display:none;">
-                    <?php $selectedPlan = isset($_POST['plan_id']) ? intval($_POST['plan_id']) : $freemiumPlanId; ?>
+                    <?php $selectedPlan = isset($_POST['plan_id']) ? intval($_POST['plan_id']) : 0; ?>
                     <div class="sec-head">
                         <div class="sec-ico"><i class="fas fa-crown"></i></div>
                         <h3>اختر الباقة المناسبة</h3>
                     </div>
                     <input type="hidden" id="plan_id" name="plan_id" value="<?php echo $selectedPlan; ?>">
+                    <?php if (empty($plans)): ?>
+                    <div class="alert alert-err"><i class="fas fa-exclamation-circle"></i><span>الشركة لم تضف خطط دفع بعد.</span></div>
+                    <?php else: ?>
                     <div class="plans-grid">
                         <?php foreach ($plans as $p):
                             $pid = intval($p['id']);
@@ -1310,6 +1297,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                         <option value="<?php echo intval($p['id']); ?>" <?php echo $selectedPlan === intval($p['id']) ? 'selected' : ''; ?>><?php echo e($p['plan_name']); ?></option>
                         <?php endforeach; ?>
                     </select>
+                    <?php endif; ?>
 
                     <div class="sec-head" style="margin-top:18px;">
                         <div class="sec-ico"><i class="fas fa-cog"></i></div>
@@ -1360,7 +1348,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
 
                     <div class="step-actions">
                         <button class="btn-secondary" type="button" onclick="prevStep()"><i class="fas fa-arrow-right"></i> السابق</button>
-                        <button class="btn-primary" type="submit"><i class="fas fa-paper-plane"></i><span>إنشاء الحساب / إرسال الطلب</span></button>
+                        <button class="btn-primary" type="submit" <?php echo empty($plans) ? 'disabled style="opacity:.6;cursor:not-allowed;"' : ''; ?>><i class="fas fa-paper-plane"></i><span>إنشاء الحساب / إرسال الطلب</span></button>
                     </div>
                 </div>
             </form>
@@ -1412,6 +1400,15 @@ function validateStep(step) {
             return false;
         }
     }
+
+    if (step === 3) {
+        var planCards = stepEl.querySelectorAll('.plan-card');
+        var selectedPlanInput = document.getElementById('plan_id');
+        if (planCards.length > 0 && selectedPlanInput && parseInt(selectedPlanInput.value || '0', 10) <= 0) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -1441,23 +1438,15 @@ function setPlanLimitsFromCard(card) {
 }
 
 function syncManagerPasswordRequirement() {
-    var freemiumPlanId = document.getElementById('freemium_plan_id');
-    var selectedPlanId = document.getElementById('plan_id');
     var passwordInput = document.getElementById('manager_password');
     var passwordConfirmInput = document.getElementById('manager_password_confirm');
 
-    if (!freemiumPlanId || !selectedPlanId || !passwordInput || !passwordConfirmInput) {
+    if (!passwordInput || !passwordConfirmInput) {
         return;
     }
 
-    var isFreemium = String(selectedPlanId.value) === String(freemiumPlanId.value);
-    if (isFreemium) {
-        passwordInput.required = true;
-        passwordConfirmInput.required = true;
-    } else {
-        passwordInput.required = false;
-        passwordConfirmInput.required = false;
-    }
+    passwordInput.required = true;
+    passwordConfirmInput.required = true;
 }
 
 function selectPlan(card) {
@@ -1470,7 +1459,7 @@ function selectPlan(card) {
 
 // Init
 showStep(1);
-var selectedCard = document.querySelector('.plan-card.selected') || document.querySelector('.plan-card');
+var selectedCard = document.querySelector('.plan-card.selected');
 if (selectedCard) {
     selectPlan(selectedCard);
 } else {

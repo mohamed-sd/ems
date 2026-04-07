@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 24, 2026 at 03:52 PM
+-- Generation Time: Apr 07, 2026 at 06:12 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -44,60 +44,15 @@ CREATE TABLE `admin_audit_log` (
 --
 
 INSERT INTO `admin_audit_log` (`id`, `admin_id`, `action_type`, `target_name`, `target_id`, `description`, `ip_address`, `user_agent`, `created_at`) VALUES
-(1, 1, 'logout', 'جلسة الإدارة العليا', 1, 'جلسة غير مكتملة', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-18 17:30:53'),
-(2, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-18 17:31:02'),
-(3, 1, 'create', 'مدير أعلى', 2, 'إنشاء حساب مدير أعلى جديد: medo@gmail.com', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-18 17:32:54'),
-(4, 1, 'logout', 'جلسة الإدارة العليا', 1, 'تسجيل خروج يدوي من المستخدم', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-18 17:33:03'),
-(5, NULL, 'login', 'جلسة الإدارة العليا', 2, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-18 17:33:24'),
-(6, NULL, 'update', 'مدير أعلى', 2, 'تحديث بيانات مدير أعلى: medo@gmail.com', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-18 17:34:07'),
-(7, NULL, 'update', 'مدير أعلى', 2, 'تحديث بيانات مدير أعلى: medo@gmail.com', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-18 17:34:20'),
-(8, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 15:18:24'),
-(9, 1, 'logout', 'جلسة الإدارة العليا', 1, 'تسجيل خروج يدوي من المستخدم', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 15:36:35'),
-(10, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 15:36:51'),
-(11, 1, 'create', 'شركة', 1, 'إضافة شركة جديدة: الدهاب', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 15:37:59'),
-(12, 1, 'logout', 'جلسة الإدارة العليا', 1, 'تسجيل خروج يدوي من المستخدم', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 15:39:23'),
-(13, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 15:39:41'),
-(14, 1, 'create', 'شركة', 2, 'إضافة شركة جديدة: الحمار', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 15:46:36'),
-(15, 1, 'create', 'شركة', 3, 'إضافة شركة جديدة: ايكوبيشن', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 15:47:28'),
-(16, 1, 'update', 'شركة', 3, 'تحديث بيانات الشركة: ايكوبيشن', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 16:25:46'),
-(17, 1, 'logout', 'جلسة الإدارة العليا', 1, 'انتهت الجلسة بسبب عدم النشاط', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 17:22:45'),
-(18, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 17:22:48'),
-(19, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 17:27:16'),
-(20, 1, 'approve', 'طلب اشتراك', 2, 'قبول الطلب وإنشاء الشركة والمدير العام', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 17:29:08'),
-(21, 1, 'logout', 'جلسة الإدارة العليا', 1, 'تسجيل خروج يدوي من المستخدم', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 17:32:15'),
-(22, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 17:32:57'),
-(23, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 19:41:59'),
-(24, 1, 'logout', 'جلسة الإدارة العليا', 1, 'تسجيل خروج يدوي من المستخدم', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 19:42:21'),
-(25, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 19:44:02'),
-(26, 1, 'update', 'مدير أعلى', 1, 'تحديث بيانات مدير أعلى: enjaz@gmail.com', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 20:00:18'),
-(27, 1, 'logout', 'جلسة الإدارة العليا', 1, 'تسجيل خروج يدوي من المستخدم', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 20:00:34'),
-(28, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 20:01:01'),
-(29, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-23 20:04:16'),
-(30, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 20:45:45'),
-(31, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 21:19:44'),
-(32, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 21:55:19'),
-(33, 1, 'logout', 'جلسة الإدارة العليا', 1, 'تسجيل خروج يدوي من المستخدم', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 21:55:24'),
-(34, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-23 21:57:27'),
-(35, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-24 06:03:40'),
-(36, 1, 'logout', 'جلسة الإدارة العليا', 1, 'تسجيل خروج يدوي من المستخدم', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-24 06:17:15'),
-(37, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-24 06:17:53'),
-(38, 1, 'logout', 'جلسة الإدارة العليا', 1, 'تسجيل خروج يدوي من المستخدم', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-03-24 06:19:39'),
-(39, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 06:20:12'),
-(40, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 06:20:29'),
-(41, 1, 'approve', 'طلب اشتراك', 2, 'قبول الطلب وإنشاء الشركة والمدير العام', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 06:26:55'),
-(42, 1, 'update', 'شركة', 2, 'تحديث بيانات الشركة: إيكوبيشن', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 06:27:25'),
-(43, 1, 'update_password', 'شركة', 2, 'تحديث كلمة مرور مستخدم الشركة: #15', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 06:35:38'),
-(44, 1, 'update_password', 'شركة', 2, 'تحديث كلمة مرور مستخدم الشركة: #15', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 06:44:42'),
-(45, 1, 'update_password', 'شركة', 2, 'تحديث كلمة مرور مستخدم الشركة: #15', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 06:45:05'),
-(46, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 08:23:48'),
-(47, 1, 'suspend', 'شركة', 2, 'تعليق الشركة رقم #2', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 08:31:10'),
-(48, 1, 'activate', 'شركة', 2, 'تفعيل الشركة رقم #2', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 08:36:50'),
-(49, 1, 'update', 'شركة', 2, 'تحديث بيانات الشركة: إيكوبيشن', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 08:43:08'),
-(50, 1, 'activate', 'شركة', 2, 'تفعيل الشركة رقم #2', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 08:43:59'),
-(51, 1, 'logout', 'جلسة الإدارة العليا', 1, 'تسجيل خروج يدوي من المستخدم', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 09:22:41'),
-(52, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 09:30:32'),
-(53, 1, 'logout', 'جلسة الإدارة العليا', 1, 'تسجيل خروج يدوي من المستخدم', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 09:30:40'),
-(54, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-03-24 09:30:45');
+(1, 1, 'update', 'شركة', 1, 'تحديث بيانات الشركة: ايكوبيشن مجاني', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-04-07 10:55:13'),
+(2, 1, 'approve', 'طلب اشتراك', 1, 'قبول الطلب وإنشاء الشركة والمدير العام', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-04-07 10:57:22'),
+(3, 1, 'suspend', 'شركة', 1, 'تعليق الشركة رقم #1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-04-07 11:03:40'),
+(4, 1, 'activate', 'شركة', 1, 'تفعيل الشركة رقم #1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-04-07 11:04:26'),
+(5, 1, 'update_password', 'شركة', 2, 'تحديث كلمة مرور مستخدم الشركة: #2', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-04-07 11:05:06'),
+(6, 1, 'delete', 'شركة', 2, 'حذف شركة رقم #2', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-04-07 11:09:15'),
+(7, 1, 'approve', 'طلب اشتراك', 2, 'قبول الطلب وإنشاء الشركة والمدير العام', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-04-07 11:10:58'),
+(8, 1, 'approve', 'طلب اشتراك', 3, 'قبول الطلب وإنشاء الشركة والمدير العام', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-04-07 11:19:26'),
+(9, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-04-07 11:36:12');
 
 -- --------------------------------------------------------
 
@@ -106,35 +61,35 @@ INSERT INTO `admin_audit_log` (`id`, `admin_id`, `action_type`, `target_name`, `
 --
 
 CREATE TABLE `admin_companies` (
-  `id` int(11) NOT NULL,
-  `company_name` varchar(200) NOT NULL,
-  `commercial_registration` varchar(120) DEFAULT NULL,
-  `sector` varchar(100) DEFAULT NULL,
-  `country` varchar(100) DEFAULT NULL,
-  `city` varchar(100) DEFAULT NULL,
-  `tax_number` varchar(120) DEFAULT NULL,
-  `email` varchar(150) NOT NULL,
-  `phone` varchar(30) DEFAULT NULL,
-  `address` text DEFAULT NULL,
-  `postal_address` text DEFAULT NULL,
-  `logo_path` varchar(255) DEFAULT NULL,
-  `plan_id` int(11) DEFAULT NULL,
+  `id` int(11) NOT NULL COMMENT 'معرف فريد',
+  `company_name` varchar(200) NOT NULL COMMENT 'اسم الشركة',
+  `commercial_registration` varchar(120) DEFAULT NULL COMMENT 'السجل التجاري',
+  `sector` varchar(100) DEFAULT NULL COMMENT 'القطاع',
+  `country` varchar(100) DEFAULT NULL COMMENT 'البلد',
+  `city` varchar(100) DEFAULT NULL COMMENT 'المدينة',
+  `tax_number` varchar(120) DEFAULT NULL COMMENT 'الرقم الضريبي',
+  `email` varchar(150) NOT NULL COMMENT 'البريد',
+  `phone` varchar(30) DEFAULT NULL COMMENT 'رقم الهاتف',
+  `address` text DEFAULT NULL COMMENT 'العنوان',
+  `postal_address` text DEFAULT NULL COMMENT 'العنوان البريدي',
+  `logo_path` varchar(255) DEFAULT NULL COMMENT 'الشعار',
+  `plan_id` int(11) DEFAULT NULL COMMENT 'خطة الاشتراك',
   `modules_enabled` text DEFAULT NULL,
-  `name` varchar(200) DEFAULT NULL,
-  `company_name_ar` varchar(200) DEFAULT NULL,
-  `company_name_en` varchar(200) DEFAULT NULL,
-  `status` enum('pending','active','suspended','cancelled') NOT NULL DEFAULT 'pending',
-  `subscription_start` date DEFAULT NULL,
-  `subscription_end` date DEFAULT NULL,
-  `users_count` int(11) NOT NULL DEFAULT 0,
-  `max_users` int(11) NOT NULL DEFAULT 0,
-  `max_equipments` int(11) NOT NULL DEFAULT 0,
-  `max_projects` int(11) NOT NULL DEFAULT 0,
-  `currency` varchar(20) NOT NULL DEFAULT 'SAR',
-  `timezone` varchar(64) NOT NULL DEFAULT 'Asia/Riyadh',
-  `notes` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `name` varchar(200) DEFAULT NULL COMMENT 'الاسم',
+  `company_name_ar` varchar(200) DEFAULT NULL COMMENT 'اسم الشركة عربي',
+  `company_name_en` varchar(200) DEFAULT NULL COMMENT 'اسم الشركة انحليزي',
+  `status` enum('pending','active','suspended','cancelled') NOT NULL DEFAULT 'pending' COMMENT 'الحالة',
+  `subscription_start` date DEFAULT NULL COMMENT 'بداية الاشتراك',
+  `subscription_end` date DEFAULT NULL COMMENT 'نهاية الاشتراك',
+  `users_count` int(11) NOT NULL DEFAULT 0 COMMENT 'عدد المستخدمين',
+  `max_users` int(11) NOT NULL DEFAULT 0 COMMENT 'المستخدمين',
+  `max_equipments` int(11) NOT NULL DEFAULT 0 COMMENT 'المعدات',
+  `max_projects` int(11) NOT NULL DEFAULT 0 COMMENT 'المشاريع',
+  `currency` varchar(20) NOT NULL DEFAULT 'SAR' COMMENT 'العملة',
+  `timezone` varchar(64) NOT NULL DEFAULT 'Asia/Riyadh' COMMENT 'المنطقة الزمنية',
+  `notes` text DEFAULT NULL COMMENT 'الملاحظات',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'الانشاء',
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'التعديل'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -142,8 +97,8 @@ CREATE TABLE `admin_companies` (
 --
 
 INSERT INTO `admin_companies` (`id`, `company_name`, `commercial_registration`, `sector`, `country`, `city`, `tax_number`, `email`, `phone`, `address`, `postal_address`, `logo_path`, `plan_id`, `modules_enabled`, `name`, `company_name_ar`, `company_name_en`, `status`, `subscription_start`, `subscription_end`, `users_count`, `max_users`, `max_equipments`, `max_projects`, `currency`, `timezone`, `notes`, `created_at`, `updated_at`) VALUES
-(1, 'الجلابي', '123123', 'مقاولات', 'السودان', 'عطبرة', '7878378738', 'info@galaby.com', '0938938933993', 'عطبرة', 'عطبرة', NULL, 1, 'projects', 'الجلابي', 'الجلابي', 'Elgalaby', 'active', '2026-03-23', NULL, 1, 3, 1, 1, 'SAR', 'Asia/Riyadh', NULL, '2026-03-23 20:48:22', '2026-03-23 20:48:22'),
-(2, 'إيكوبيشن', '12345678', 'تعدين', 'السودان', 'عطبرة', '54321', 'info@equipation.com', '094898498494', '', 'عطبرة الطابق ال 3', '', 2, 'projects', 'إيكوبيشن', 'إيكوبيشن', 'Equipation', 'active', NULL, NULL, 1, 1000, 500, 100, 'SAR', 'Asia/Riyadh', NULL, '2026-03-24 06:26:55', '2026-03-24 08:43:59');
+(1, 'ايكوبيشن مجاني', '17687687', 'تعدين', 'السودان', 'عطبرة', '5675867698', 'info@freeequipation.com', '+249915657576', '', 'عطبرة السوق الكبير', '', 1, '', 'ايكوبيشن مجاني', 'ايكوبيشن مجاني', 'Free Equipation', 'active', '2026-04-07', NULL, 1, 10, 50, 2, 'USD', 'Asia/Riyadh', NULL, '2026-04-07 10:53:47', '2026-04-07 11:04:26'),
+(4, 'ايكوبيشن', '0989897987987', 'تعدين', 'السودان', 'عطبرة', '6576576576567', 'info@equipation.com', '+249915657576', 'عطبرة الطايق الاول', 'عطبرة الطايق الاول', NULL, 2, '', 'ايكوبيشن', 'ايكوبيشن', 'Equipation', 'active', NULL, NULL, 1, 0, 100, 10, 'USD', 'Asia/Riyadh', NULL, '2026-04-07 11:19:26', '2026-04-07 11:19:26');
 
 -- --------------------------------------------------------
 
@@ -153,16 +108,16 @@ INSERT INTO `admin_companies` (`id`, `company_name`, `commercial_registration`, 
 
 CREATE TABLE `admin_subscription_plans` (
   `id` int(11) NOT NULL,
-  `plan_name` varchar(100) NOT NULL,
-  `price` decimal(10,2) NOT NULL DEFAULT 0.00,
-  `max_users` int(11) NOT NULL DEFAULT 0 COMMENT '0 = unlimited',
-  `max_projects` int(11) NOT NULL DEFAULT 0,
-  `max_equipments` int(11) NOT NULL DEFAULT 0,
-  `features` text DEFAULT NULL COMMENT 'newline-separated feature list',
-  `sort_order` int(11) NOT NULL DEFAULT 0,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `plan_name` varchar(100) NOT NULL COMMENT 'اسم الخطة',
+  `price` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'السعر',
+  `max_users` int(11) NOT NULL DEFAULT 0 COMMENT '0 = unlimited المستخدمين',
+  `max_projects` int(11) NOT NULL DEFAULT 0 COMMENT 'المشاريع',
+  `max_equipments` int(11) NOT NULL DEFAULT 0 COMMENT 'المعدات',
+  `features` text DEFAULT NULL COMMENT 'المميزات',
+  `sort_order` int(11) NOT NULL DEFAULT 0 COMMENT 'الترتيب',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'نشط',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'الانشاء',
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'التعديل'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -170,8 +125,8 @@ CREATE TABLE `admin_subscription_plans` (
 --
 
 INSERT INTO `admin_subscription_plans` (`id`, `plan_name`, `price`, `max_users`, `max_projects`, `max_equipments`, `features`, `sort_order`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'مجاني', 0.00, 3, 1, 1, 'تجربة ذاتية فورية\n1 مشروع\n1 معدة\n3 مستخدمين', 1, 1, '2026-03-23 20:02:14', '2026-03-23 20:45:53'),
-(2, 'pro', 100.00, 1000, 100, 500, 'تقارير قوية', 1, 1, '2026-03-23 20:02:55', '2026-03-23 20:02:55');
+(1, 'مجاني', 0.00, 10, 2, 50, '', 0, 1, '2026-04-07 10:25:23', '2026-04-07 10:31:06'),
+(2, 'مدفوع', 10.00, 0, 10, 100, '', 1, 1, '2026-04-07 10:26:08', '2026-04-07 10:31:14');
 
 -- --------------------------------------------------------
 
@@ -180,18 +135,18 @@ INSERT INTO `admin_subscription_plans` (`id`, `plan_name`, `price`, `max_users`,
 --
 
 CREATE TABLE `admin_subscription_requests` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL COMMENT 'null if company not created yet',
-  `company_name` varchar(200) NOT NULL,
-  `email` varchar(150) NOT NULL,
-  `phone` varchar(30) DEFAULT NULL,
-  `plan_id` int(11) DEFAULT NULL,
-  `message` text DEFAULT NULL COMMENT 'message from the requesting company',
-  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
-  `reviewed_by` int(11) DEFAULT NULL COMMENT 'super_admins.id',
-  `reviewed_at` timestamp NULL DEFAULT NULL,
-  `review_note` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `id` int(11) NOT NULL COMMENT 'معرف فريد',
+  `company_id` int(11) DEFAULT NULL COMMENT 'null if company not  created yet رقم الشركة',
+  `company_name` varchar(200) NOT NULL COMMENT 'اسم الشركة',
+  `email` varchar(150) NOT NULL COMMENT 'البريد',
+  `phone` varchar(30) DEFAULT NULL COMMENT 'الهاتف',
+  `plan_id` int(11) DEFAULT NULL COMMENT 'خطة الاشتراك',
+  `message` text DEFAULT NULL COMMENT 'message from the requesting company جميع بيانات الشركة ',
+  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending' COMMENT 'الحالة',
+  `reviewed_by` int(11) DEFAULT NULL COMMENT 'super_admins.id المراجع',
+  `reviewed_at` timestamp NULL DEFAULT NULL COMMENT 'زمن المراجعه',
+  `review_note` text DEFAULT NULL COMMENT 'الملاحظات',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'الانشاء'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -199,8 +154,7 @@ CREATE TABLE `admin_subscription_requests` (
 --
 
 INSERT INTO `admin_subscription_requests` (`id`, `company_id`, `company_name`, `email`, `phone`, `plan_id`, `message`, `status`, `reviewed_by`, `reviewed_at`, `review_note`, `created_at`) VALUES
-(1, NULL, 'إيكوبيشن', 'info@equipation.com', '+20123456789', 1, '{\"company_name_en\":\"Equipation\",\"commercial_registration\":\"123456789\",\"sector\":\"تعدين\",\"country\":\"السودان\",\"city\":\"عطبرة\",\"tax_number\":\"9876543210\",\"postal_address\":\"عطبرة سوق عطبرة الطابق التالت\",\"modules_enabled\":\"projects\",\"currency\":\"SAR\",\"timezone\":\"Asia\\/Riyadh\",\"max_users\":0,\"max_equipments\":0,\"max_projects\":0,\"manager_name\":\"مستر محمد ادريس\",\"manager_email\":\"info@mah.com\",\"manager_phone\":\"+20123456789\",\"source\":\"company_register\"}', 'rejected', 1, '2026-03-24 06:26:43', 'تم الاشتراك في الباقة المدفوعة', '2026-03-23 20:10:45'),
-(2, 2, 'إيكوبيشن', 'info@equipation2.com', '094898498494', 2, '{\"company_name_en\":\"Equipation\",\"commercial_registration\":\"12345678\",\"sector\":\"تعدين\",\"country\":\"السودان\",\"city\":\"عطبرة\",\"tax_number\":\"54321\",\"postal_address\":\"عطبرة الطابق ال 3\",\"modules_enabled\":\"projects\",\"currency\":\"SAR\",\"timezone\":\"Asia\\/Riyadh\",\"max_users\":1000,\"max_equipments\":500,\"max_projects\":100,\"manager_name\":\"مستر محمد ادريس\",\"manager_email\":\"medoit@gmail.com\",\"manager_phone\":\"098398393303\",\"source\":\"company_register\"}', 'approved', 1, '2026-03-24 06:26:55', 'تم الدفع بنجاح\nتم إنشاء حساب المدير العام. كلمة المرور المؤقتة: XK%L@kb4gYLL', '2026-03-24 06:25:57');
+(3, 4, 'ايكوبيشن', 'info@equipation.com', '+249915657576', 2, '{\"company_name_en\":\"Equipation\",\"commercial_registration\":\"0989897987987\",\"sector\":\"تعدين\",\"country\":\"السودان\",\"city\":\"عطبرة\",\"tax_number\":\"6576576576567\",\"postal_address\":\"عطبرة الطايق الاول\",\"modules_enabled\":\"\",\"currency\":\"USD\",\"timezone\":\"Asia\\/Riyadh\",\"max_users\":0,\"max_equipments\":100,\"max_projects\":10,\"manager_name\":\"مستر محمد ادريس\",\"manager_email\":\"admin@gmail.com\",\"manager_phone\":\"+249915657576\",\"manager_password_hash\":\"$2y$10$8FcRlrkxuIOUr6kWAwy6Z.lh1rYmAzAA\\/8zSH7sxhgPAc69eQNLTG\",\"source\":\"company_register\"}', 'approved', 1, '2026-04-07 11:19:26', 'تم الدفع', '2026-04-07 11:19:08');
 
 -- --------------------------------------------------------
 
@@ -251,14 +205,7 @@ CREATE TABLE `approval_requests` (
 --
 
 INSERT INTO `approval_requests` (`id`, `entity_type`, `entity_id`, `action`, `payload`, `requested_by`, `current_step`, `status`, `rejection_reason`, `approved_at`, `rejected_at`, `executed_at`, `created_at`, `updated_at`) VALUES
-(1, 'project', 1, 'deactivate', '{\"summary\":{\"table\":\"project\",\"operation\":\"update\",\"old_values\":{\"id\":1,\"company_client_id\":1,\"name\":\"مشروع الروسيه جديد\",\"client\":\"وزارة البنية التحتية\",\"location\":\"الخرطوم2\",\"project_code\":\"PRJ-2026-001\",\"category\":\"\",\"sub_sector\":\"التعدين\",\"state\":\"الخرطوم\",\"region\":\"الكويت\",\"nearest_market\":\"سوق بحري\",\"latitude\":\"15.5527\",\"longitude\":\"32.5599\",\"total\":\"0\",\"status\":1,\"created_by\":1,\"create_at\":\"2026-02-16 23:13:41\",\"updated_at\":null},\"new_values\":{\"company_client_id\":1,\"name\":\"مشروع الروسيه جديد\",\"client\":\"وزارة البنية التحتية\",\"location\":\"الخرطوم2\",\"project_code\":\"PRJ-2026-001\",\"category\":\"\",\"sub_sector\":\"التعدين\",\"state\":\"الخرطوم\",\"region\":\"الكويت\",\"nearest_market\":\"سوق بحري\",\"latitude\":\"15.5527\",\"longitude\":\"32.5599\",\"total\":0,\"status\":\"0\",\"updated_at\":\"2026-03-03 14:28:27\"}},\"operations\":[{\"db_action\":\"update\",\"table\":\"project\",\"where\":{\"id\":1},\"data\":{\"company_client_id\":1,\"name\":\"مشروع الروسيه جديد\",\"client\":\"وزارة البنية التحتية\",\"location\":\"الخرطوم2\",\"project_code\":\"PRJ-2026-001\",\"category\":\"\",\"sub_sector\":\"التعدين\",\"state\":\"الخرطوم\",\"region\":\"الكويت\",\"nearest_market\":\"سوق بحري\",\"latitude\":\"15.5527\",\"longitude\":\"32.5599\",\"total\":0,\"status\":\"0\",\"updated_at\":\"2026-03-03 14:28:27\"}}]}', 1, NULL, 'approved', NULL, '2026-03-03 15:28:27', NULL, '2026-03-03 15:28:27', '2026-03-03 15:28:27', '2026-03-03 15:28:27'),
-(2, 'project', 1, 'update', '{\"summary\":{\"table\":\"project\",\"operation\":\"update\",\"old_values\":{\"id\":1,\"company_client_id\":1,\"name\":\"مشروع الروسيه جديد\",\"client\":\"وزارة البنية التحتية\",\"location\":\"الخرطوم2\",\"project_code\":\"PRJ-2026-001\",\"category\":\"\",\"sub_sector\":\"التعدين\",\"state\":\"الخرطوم\",\"region\":\"الكويت\",\"nearest_market\":\"سوق بحري\",\"latitude\":\"15.5527\",\"longitude\":\"32.5599\",\"total\":\"0\",\"status\":0,\"created_by\":1,\"create_at\":\"2026-02-16 23:13:41\",\"updated_at\":\"2026-03-03 14:28:27\"},\"new_values\":{\"company_client_id\":1,\"name\":\"مشروع الروسيه جديد\",\"client\":\"وزارة البنية التحتية\",\"location\":\"الخرطوم2\",\"project_code\":\"PRJ-2026-001\",\"category\":\"\",\"sub_sector\":\"التعدين\",\"state\":\"الخرطوم\",\"region\":\"الكويت\",\"nearest_market\":\"سوق بحري\",\"latitude\":\"15.5527\",\"longitude\":\"32.5599\",\"total\":0,\"status\":\"1\",\"updated_at\":\"2026-03-03 14:29:34\"}},\"operations\":[{\"db_action\":\"update\",\"table\":\"project\",\"where\":{\"id\":1},\"data\":{\"company_client_id\":1,\"name\":\"مشروع الروسيه جديد\",\"client\":\"وزارة البنية التحتية\",\"location\":\"الخرطوم2\",\"project_code\":\"PRJ-2026-001\",\"category\":\"\",\"sub_sector\":\"التعدين\",\"state\":\"الخرطوم\",\"region\":\"الكويت\",\"nearest_market\":\"سوق بحري\",\"latitude\":\"15.5527\",\"longitude\":\"32.5599\",\"total\":0,\"status\":\"1\",\"updated_at\":\"2026-03-03 14:29:34\"}}]}', 1, NULL, 'approved', NULL, '2026-03-03 15:29:34', NULL, '2026-03-03 15:29:34', '2026-03-03 15:29:34', '2026-03-03 15:29:34'),
-(3, 'contract', 1, 'update_services', '{\"summary\":{\"old_values\":{\"transportation\":\"مالك المعدة\",\"accommodation\":\"مالك المعدة\",\"place_for_living\":\"مالك المعدة\",\"workshop\":\"مالك المعدة\"},\"new_values\":{\"transportation\":\"مالك المشروع\",\"accommodation\":\"مالك المعدة\",\"place_for_living\":\"مالك المعدة\",\"workshop\":\"مالك المعدة\",\"updated_at\":\"2026-03-03 14:32:25\"}},\"operations\":[{\"db_action\":\"update\",\"table\":\"contracts\",\"where\":{\"id\":1},\"data\":{\"transportation\":\"مالك المشروع\",\"accommodation\":\"مالك المعدة\",\"place_for_living\":\"مالك المعدة\",\"workshop\":\"مالك المعدة\",\"updated_at\":\"2026-03-03 14:32:25\"}},{\"db_action\":\"insert\",\"table\":\"contract_notes\",\"data\":{\"contract_id\":1,\"note\":\"طلب تحديث الخدمات بالعقد\",\"user_id\":1,\"created_at\":\"2026-03-03 14:32:25\"}}]}', 1, NULL, 'approved', NULL, '2026-03-03 15:32:25', NULL, '2026-03-03 15:32:25', '2026-03-03 15:32:25', '2026-03-03 15:32:25'),
-(4, 'equipment', 2, 'deactivate_equipment', '{\"summary\":{\"operation_id\":4,\"equipment_id\":2,\"equipment_code\":\"Wq1\",\"equipment_name\":\"Wq1\",\"requested_by_role\":\"10\",\"reason\":\"طلب إيقاف آلية من جدول التشغيل\",\"current_availability_status\":\"متاحة للعمل\",\"new_availability_status\":\"موقوفة للصيانة\"},\"operations\":[{\"db_action\":\"update\",\"table\":\"equipments\",\"where\":{\"id\":2},\"data\":{\"availability_status\":\"موقوفة للصيانة\"}},{\"db_action\":\"update\",\"table\":\"operations\",\"where\":{\"id\":4},\"data\":{\"status\":3}}]}', 7, NULL, 'approved', NULL, '2026-03-03 16:23:22', NULL, '2026-03-03 16:23:22', '2026-03-03 16:03:44', '2026-03-03 16:23:22'),
-(5, 'equipment', 2, 'deactivate_equipment', '{\"summary\":{\"operation_id\":4,\"equipment_id\":2,\"equipment_code\":\"Wq1\",\"equipment_name\":\"Wq1\",\"requested_by_role\":\"10\",\"reason\":\"طلب إيقاف آلية من جدول التشغيل\",\"current_availability_status\":\"موقوفة للصيانة\",\"new_availability_status\":\"موقوفة للصيانة\"},\"operations\":[{\"db_action\":\"update\",\"table\":\"equipments\",\"where\":{\"id\":2},\"data\":{\"availability_status\":\"موقوفة للصيانة\"}},{\"db_action\":\"update\",\"table\":\"operations\",\"where\":{\"id\":4},\"data\":{\"status\":3}}]}', 7, NULL, 'approved', NULL, '2026-03-03 16:25:20', NULL, '2026-03-03 16:25:20', '2026-03-03 16:24:10', '2026-03-03 16:25:20'),
-(6, 'equipment', 2, 'deactivate_equipment', '{\"summary\":{\"operation_id\":4,\"equipment_id\":2,\"equipment_code\":\"Wq1\",\"equipment_name\":\"Wq1\",\"requested_by_role\":\"10\",\"reason\":\"طلب إيقاف آلية من جدول التشغيل\",\"current_availability_status\":\"موقوفة للصيانة\",\"new_availability_status\":\"موقوفة للصيانة\"},\"operations\":[{\"db_action\":\"update\",\"table\":\"equipments\",\"where\":{\"id\":2},\"data\":{\"availability_status\":\"موقوفة للصيانة\"}},{\"db_action\":\"update\",\"table\":\"operations\",\"where\":{\"id\":4},\"data\":{\"status\":3}}]}', 7, NULL, 'approved', NULL, '2026-03-03 17:30:54', NULL, '2026-03-03 17:30:54', '2026-03-03 17:17:08', '2026-03-03 17:30:54'),
-(7, 'driver', 3, 'deactivate_driver', '{\"summary\":{\"equipment_driver_id\":25,\"driver_id\":3,\"driver_name\":\"محمد أحمد علي\",\"equipment_id\":7,\"equipment_code\":\"TQ-002\",\"equipment_name\":\"هيونداي\",\"current_status\":1,\"new_status\":0,\"action\":\"إيقاف\",\"requested_by_role\":\"10\",\"reason\":\"طلب إيقاف مشغل من شاشة إدارة المشغلين\"},\"operations\":[{\"db_action\":\"update\",\"table\":\"equipment_drivers\",\"where\":{\"id\":25},\"data\":{\"status\":0}}]}', 7, NULL, 'approved', NULL, '2026-03-03 17:29:50', NULL, '2026-03-03 17:29:50', '2026-03-03 17:22:51', '2026-03-03 17:29:50'),
-(8, 'equipment', 2, 'deactivate_equipment', '{\"summary\":{\"operation_id\":4,\"equipment_id\":2,\"equipment_code\":\"Wq1\",\"equipment_name\":\"Wq1\",\"requested_by_role\":\"10\",\"reason\":\"طلب إيقاف آلية من جدول التشغيل\",\"current_availability_status\":\"موقوفة للصيانة\",\"new_availability_status\":\"موقوفة للصيانة\"},\"operations\":[{\"db_action\":\"update\",\"table\":\"equipments\",\"where\":{\"id\":2},\"data\":{\"availability_status\":\"موقوفة للصيانة\"}},{\"db_action\":\"update\",\"table\":\"operations\",\"where\":{\"id\":4},\"data\":{\"status\":3}}]}', 7, NULL, 'approved', NULL, '2026-03-04 01:45:57', NULL, '2026-03-04 01:45:57', '2026-03-04 01:45:02', '2026-03-04 01:45:57');
+(1, 'timesheet', 1, 'approve', '{\"summary\":{\"table\":\"timesheet\",\"operation\":\"update\",\"old_values\":{\"id\":\"1\",\"status\":\"1\",\"time_notes\":\"لاتوجد ملاحظات\"},\"new_values\":{\"status\":2,\"time_notes\":\"تم\"}},\"operations\":[{\"db_action\":\"update\",\"table\":\"timesheet\",\"where\":{\"id\":1},\"data\":{\"status\":2,\"time_notes\":\"تم\"}}]}', 8, 1, 'pending', NULL, NULL, NULL, NULL, '2026-04-07 15:11:42', '2026-04-07 15:11:42');
 
 -- --------------------------------------------------------
 
@@ -283,14 +230,7 @@ CREATE TABLE `approval_steps` (
 --
 
 INSERT INTO `approval_steps` (`id`, `request_id`, `role_required`, `step_order`, `approved_by`, `approved_at`, `status`, `note`, `created_at`) VALUES
-(1, 1, '1,-1', 1, 1, '2026-03-03 15:28:27', 'approved', 'اعتماد تلقائي (منشئ الطلب يملك صلاحية المرحلة)', '2026-03-03 15:28:27'),
-(2, 2, '1,-1', 1, 1, '2026-03-03 15:29:34', 'approved', 'اعتماد تلقائي (منشئ الطلب يملك صلاحية المرحلة)', '2026-03-03 15:29:34'),
-(3, 3, '1,-1', 1, 1, '2026-03-03 15:32:25', 'approved', 'اعتماد تلقائي (منشئ الطلب يملك صلاحية المرحلة)', '2026-03-03 15:32:25'),
-(4, 4, '4,-1', 1, 2, '2026-03-03 16:23:22', 'approved', 'تم الاعتماد', '2026-03-03 16:03:44'),
-(5, 5, '4,-1', 1, 2, '2026-03-03 16:25:20', 'approved', 'تم اعتماد التعطيل', '2026-03-03 16:24:10'),
-(6, 6, '4,-1', 1, 2, '2026-03-03 17:30:54', 'approved', '', '2026-03-03 17:17:08'),
-(7, 7, '3,-1', 1, 4, '2026-03-03 17:29:50', 'approved', 'تم الاعتماد', '2026-03-03 17:22:51'),
-(8, 8, '4,-1', 1, 2, '2026-03-04 01:45:57', 'approved', 'تم', '2026-03-04 01:45:02');
+(1, 1, '-1', 1, NULL, NULL, 'pending', NULL, '2026-04-07 15:11:42');
 
 -- --------------------------------------------------------
 
@@ -309,33 +249,6 @@ CREATE TABLE `approval_workflow_rules` (
   `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `approval_workflow_rules`
---
-
-INSERT INTO `approval_workflow_rules` (`id`, `entity_type`, `action`, `role_required`, `step_order`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'project', 'update', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(2, 'project', 'deactivate', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(3, 'project', 'delete', '-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(4, 'contract', 'renewal', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(5, 'contract', 'settlement', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(6, 'contract', 'pause', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(7, 'contract', 'resume', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(8, 'contract', 'terminate', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(9, 'contract', 'merge', '-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(10, 'contract', 'update_project_info', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(11, 'contract', 'update_services', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(12, 'contract', 'update_parties', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(13, 'contract', 'update_payment', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(14, 'contract', 'complete', '1,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(15, 'timesheet', 'approve', '7,8,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(16, 'timesheet', 'reject', '7,8,-1', 1, 1, '2026-03-03 15:27:50', NULL),
-(32, 'equipment', 'deactivate_equipment', '4,-1', 1, 1, '2026-03-03 17:08:59', NULL),
-(35, 'driver', 'activate_driver', '3,-1', 1, 1, '2026-03-03 17:08:59', NULL),
-(36, 'driver', 'deactivate_driver', '3,-1', 1, 1, '2026-03-03 17:08:59', NULL),
-(37, 'driver', 'reactivate_driver', '3,-1', 1, 1, '2026-03-03 17:08:59', NULL),
-(38, 'equipment', 'reactivate_equipment', '4,-1', 1, 1, '2026-03-03 17:09:00', NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -353,6 +266,17 @@ CREATE TABLE `audit_logs` (
   `user_agent` varchar(300) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `audit_logs`
+--
+
+INSERT INTO `audit_logs` (`id`, `user_id`, `company_id`, `action_type`, `target_name`, `description`, `ip_address`, `user_agent`, `created_at`) VALUES
+(1, 0, 1, 'login', 'بوابة الشركة', 'تسجيل دخول ناجح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-04-07 10:53:47'),
+(2, 1, 1, 'login', 'بوابة الشركة', 'تسجيل دخول ناجح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-04-07 10:54:04'),
+(3, 1, 1, 'logout', 'بوابة الشركة', 'تسجيل خروج يدوي', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0', '2026-04-07 10:54:10'),
+(4, 4, 4, 'login', 'بوابة الشركة', 'تسجيل دخول ناجح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-04-07 11:24:49'),
+(5, 4, 4, 'login', 'بوابة الشركة', 'تسجيل دخول ناجح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-04-07 11:33:56');
 
 -- --------------------------------------------------------
 
@@ -373,17 +297,18 @@ CREATE TABLE `clients` (
   `status` enum('نشط','متوقف') NOT NULL DEFAULT 'نشط' COMMENT 'حالة العميل',
   `created_by` int(11) DEFAULT NULL COMMENT 'معرف المستخدم الذي أضاف العميل',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'تاريخ الإضافة',
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'تاريخ آخر تحديث'
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'تاريخ آخر تحديث',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول العملاء';
 
 --
 -- Dumping data for table `clients`
 --
 
-INSERT INTO `clients` (`id`, `company_id`, `client_code`, `client_name`, `entity_type`, `sector_category`, `phone`, `email`, `whatsapp`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 2, 'C002', 'وزارة البنية التحتية', 'خاص', 'بنية تحتية', '76887534', 'infotelecomwasla@gmail.com', '', 'نشط', 1, '2026-02-16 22:12:46', '2026-03-24 08:30:28'),
-(2, 2, 'CL-0015', 'شركة المستقبل للمقاولات', 'حكومي', 'بنية تحتية', '249123456789', 'info@future-co.com', '249123456789', 'نشط', 1, '2026-02-25 18:16:23', '2026-03-24 08:45:11'),
-(3, 2, 'C001', 'إيكوبيشن', 'حكومي', 'بنية تحتية', '0928999999', 'sudan@gmail.com', '0912345678', 'نشط', 15, '2026-03-24 08:35:44', '2026-03-24 08:35:44');
+INSERT INTO `clients` (`id`, `company_id`, `client_code`, `client_name`, `entity_type`, `sector_category`, `phone`, `email`, `whatsapp`, `status`, `created_by`, `created_at`, `updated_at`, `is_deleted`, `deleted_at`, `deleted_by`) VALUES
+(1, 4, 'C001', 'شركة بايناتس', 'حكومي', 'بنية تحتية', '01123475758', 'sudan@gmail.com', '0912345678', 'نشط', 4, '2026-04-07 11:45:22', '2026-04-07 11:45:22', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -439,11 +364,8 @@ CREATE TABLE `contractequipments` (
 --
 
 INSERT INTO `contractequipments` (`id`, `company_id`, `contract_id`, `equip_type`, `equip_size`, `equip_count`, `equip_count_basic`, `equip_count_backup`, `equip_shifts`, `equip_unit`, `shift1_start`, `shift1_end`, `shift2_start`, `shift2_end`, `shift_hours`, `equip_total_month`, `equip_monthly_target`, `equip_total_contract`, `equip_price`, `equip_operators`, `equip_supervisors`, `equip_technicians`, `equip_assistants`, `equip_price_currency`, `created_at`) VALUES
-(3, NULL, 2, '1', 120, 2, 2, 2, 0, '', NULL, NULL, NULL, NULL, 10, 20, 0, 600, 0.00, 0, 0, 0, 0, '', '2026-02-27 23:44:25'),
-(4, NULL, 2, '2', 340, 2, 1, 1, 0, '', NULL, NULL, NULL, NULL, 10, 20, 0, 600, 0.00, 0, 0, 0, 0, '', '2026-02-27 23:44:25'),
-(5, NULL, 2, '3', 120, 3, 1, 1, 0, '', NULL, NULL, NULL, NULL, 10, 30, 0, 900, 0.00, 0, 0, 0, 0, '', '2026-02-27 23:44:25'),
-(6, NULL, 1, '1', 240, 4, 0, 0, 0, '', NULL, NULL, NULL, NULL, 10, 40, 0, 1240, 0.00, 0, 0, 0, 0, '', '2026-03-03 13:32:09'),
-(7, NULL, 1, '2', 240, 2, 0, 0, 0, '', NULL, NULL, NULL, NULL, 10, 20, 0, 620, 0.00, 1, 0, 0, 1, '', '2026-03-03 13:32:09');
+(1, NULL, 1, '1', 100, 5, 3, 2, 2, 'ساعة', '13:51:00', '13:51:00', '13:51:00', '13:52:00', 10, 50, 6000, 1000, 10.00, 3, 3, 3, 3, '', '2026-04-07 11:52:10'),
+(2, NULL, 1, '2', 300, 5, 3, 2, 3, 'ساعة', '13:52:00', '13:53:00', '13:54:00', '13:55:00', 10, 50, 6000, 1000, 10.00, 3, 3, 3, 3, 'دولار', '2026-04-07 11:52:10');
 
 -- --------------------------------------------------------
 
@@ -492,16 +414,18 @@ CREATE TABLE `contracts` (
   `termination_type` varchar(50) DEFAULT NULL,
   `termination_reason` text DEFAULT NULL,
   `merged_with` int(11) DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1 COMMENT '1=نشط, 0=موقوف'
+  `status` tinyint(1) DEFAULT 1 COMMENT '1=نشط, 0=موقوف',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `contracts`
 --
 
-INSERT INTO `contracts` (`id`, `company_id`, `mine_id`, `contract_signing_date`, `grace_period_days`, `contract_duration_months`, `contract_duration_days`, `equip_shifts_contract`, `shift_contract`, `equip_total_contract_daily`, `total_contract_permonth`, `total_contract_units`, `actual_start`, `actual_end`, `transportation`, `accommodation`, `place_for_living`, `workshop`, `hours_monthly_target`, `forecasted_contracted_hours`, `created_at`, `updated_at`, `daily_work_hours`, `daily_operators`, `first_party`, `second_party`, `witness_one`, `witness_two`, `price_currency_contract`, `paid_contract`, `payment_time`, `guarantees`, `payment_date`, `contract_status`, `pause_reason`, `pause_date`, `resume_date`, `termination_type`, `termination_reason`, `merged_with`, `status`) VALUES
-(1, NULL, 1, '2026-02-01', 3, 0, 31, 1, 1, 1, 1, 1, '2026-02-01', '2026-03-03', 'مالك المشروع', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 60, 1860, '2026-02-16 22:17:51', '2026-03-03 12:32:25', '20', '2', '', '', '', '', 'دولار', '2000', 'مقدم', 'شيك', '2026-02-03', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(2, NULL, 2, '2026-02-01', 5, 0, 31, 2, 10, 10, 0, 0, '2026-02-01', '2026-03-03', '', '', '', '', 70, 2100, '2026-02-27 23:44:25', NULL, '20', '', '', '', '', '', 'دولار', '2000', ' مؤخر', 'شيك', '2026-02-01', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
+INSERT INTO `contracts` (`id`, `company_id`, `mine_id`, `contract_signing_date`, `grace_period_days`, `contract_duration_months`, `contract_duration_days`, `equip_shifts_contract`, `shift_contract`, `equip_total_contract_daily`, `total_contract_permonth`, `total_contract_units`, `actual_start`, `actual_end`, `transportation`, `accommodation`, `place_for_living`, `workshop`, `hours_monthly_target`, `forecasted_contracted_hours`, `created_at`, `updated_at`, `daily_work_hours`, `daily_operators`, `first_party`, `second_party`, `witness_one`, `witness_two`, `price_currency_contract`, `paid_contract`, `payment_time`, `guarantees`, `payment_date`, `contract_status`, `pause_reason`, `pause_date`, `resume_date`, `termination_type`, `termination_reason`, `merged_with`, `status`, `is_deleted`, `deleted_at`, `deleted_by`) VALUES
+(1, 4, 1, '2026-04-01', 10, 0, 21, 2, 10, 40, 6000, 6000, '2026-04-10', '2026-04-30', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 100, 2000, '2026-04-07 11:52:10', NULL, '20', '3', 'محمد سيد', 'مبارك عوض', 'سمير الليل', 'مبارك محمود', 'دولار', '1000', 'مقدم', 'رهن سيارة', '2026-04-20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -518,13 +442,6 @@ CREATE TABLE `contract_notes` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Dumping data for table `contract_notes`
---
-
-INSERT INTO `contract_notes` (`id`, `company_id`, `contract_id`, `note`, `user_id`, `created_at`, `created_by`) VALUES
-(1, NULL, 1, 'طلب تحديث الخدمات بالعقد', 1, '2026-03-03 12:32:25', NULL);
 
 -- --------------------------------------------------------
 
@@ -678,9 +595,8 @@ CREATE TABLE `drivers` (
 --
 
 INSERT INTO `drivers` (`id`, `company_id`, `name`, `driver_code`, `nickname`, `identity_type`, `identity_number`, `identity_expiry_date`, `license_number`, `license_type`, `license_expiry_date`, `license_issuer`, `specialized_equipment`, `years_in_field`, `years_on_equipment`, `skill_level`, `certificates`, `owner_supervisor`, `supplier_id`, `employment_affiliation`, `salary_type`, `monthly_salary`, `email`, `address`, `performance_rating`, `behavior_record`, `accident_record`, `health_status`, `health_issues`, `vaccinations_status`, `previous_employer`, `employment_duration`, `reference_contact`, `general_notes`, `driver_status`, `start_date`, `created_at`, `phone`, `phone_alternative`, `status`) VALUES
-(1, NULL, 'محمد سيد', '', '', '', '', NULL, '', '', NULL, '', '', NULL, NULL, '', '', '', NULL, '', '', NULL, '', '', '', '', '', '', '', '', '', '', '', '', 'نشط', NULL, '2026-02-25 20:54:22', '01923329', '', 1),
-(2, NULL, 'ahmed', 'ad', '', '', '', NULL, '', '', NULL, '', '', NULL, NULL, '', '', '', NULL, '', '', NULL, '', '', '', '', '', '', '', '', '', '', '', '', 'نشط', NULL, '2026-02-25 20:54:22', '98', '', 1),
-(3, NULL, 'محمد أحمد علي', 'OPR-001-2026', 'أبو محمد', 'بطاقة هوية وطنية', '123456789123', '2028-12-31', 'DL-2024-456789', 'فئة د (شاحنات ثقيلة)', '2027-06-30', 'إدارة المرور - الخرطوم', 'حفارة (Excavator), شاحنة قلابة (Dump Truck)', 8, 5, 'خبير (5-10 سنوات)', 'شهادة تشغيل حفارات من معهد التعدين', 'محمد علي', 3, 'تابع لمالك المعدة مباشرة', 'شهري', 3500.00, 'mohammed@example.com', 'شارع النيل، الخرطوم', 'ممتاز', 'ممتاز (لا توجد شكاوى)', 'نظيف (لا توجد حوادث)', 'سليم تماماً', '', 'محدثة', 'شركة الذهب للتعدين', '3 سنوات', 'محمود أحمد - مدير الأسطول (09-123-4567)', 'مشغل موثوق وذو كفاءة عالية', 'نشط', '2024-01-15', '2026-02-25 20:58:52', '+249-9-123-4567', '+249-9-765-4321', 0);
+(1, 4, 'محمد سيد', 'DR1', 'Linda Workman', 'بطاقة هوية وطنية', '939', '1976-08-07', '661', 'فئة د (شاحنات ثقيلة)', '2007-11-30', 'Saepe nisi hic et se', 'حفارة (Excavator), دوزر (Dozer), شاحنة تناكر/صهريج (Tanker Truck), معدات أخرى', 4, 3, 'سيد حرفة (أكثر من 10 سنوات)', 'Dolorem ad maxime qu', 'Duis non autem paria', 1, 'تابع للمورد/الوسيط', 'يومي', 12.00, 'hefade@mailinator.com', 'Rerum dignissimos mo', 'جيد جداً', 'مقبول (بعض الشكاوى)', 'غير محدد', 'محتاج متابعة طبية', 'Mollitia corporis oc', 'قديمة', 'Non optio est et ma', 'Quisquam laudantium', 'Dolorem et laboriosa', 'Facere aliquid obcae', 'نشط', '1994-05-07', '2026-04-07 12:39:24', '+1 (165) 293-2817', '+1 (433) 539-7514', 1),
+(2, 4, 'حسن سيد حسن', 'DR2', 'Halee Hancock', 'رخصة قيادة', '590', '1985-01-22', '79', 'فئة د (شاحنات ثقيلة)', '2002-05-10', 'Sed id delectus mol', 'حفارة (Excavator), دوزر (Dozer), شاحنة قلابة (Dump Truck), جرافة (Loader), ممهدة (Grader)', 3, 2, 'خبير (5-10 سنوات)', 'Cumque consequatur', 'Fugit anim minus id', 1, 'تابع لشركة متخصصة في التشغيل', 'حسب المشروع', 8.00, 'zusatipyx@mailinator.com', 'Ad eveniet aut volu', 'ممتاز', 'غير محدد', 'غير محدد', 'سليم تماماً', 'Pariatur A est eius', 'محدثة', 'Eos similique ea sus', 'Ea quis in excepturi', 'Qui ut voluptas poss', 'Aut laborum Ut sequ', 'نشط', '1990-05-29', '2026-04-07 12:40:06', '+1 (743) 975-1092', '+1 (834) 162-7231', 1);
 
 -- --------------------------------------------------------
 
@@ -744,16 +660,10 @@ CREATE TABLE `equipments` (
 --
 
 INSERT INTO `equipments` (`id`, `company_id`, `suppliers`, `code`, `type`, `name`, `serial_number`, `chassis_number`, `manufacturer`, `model`, `manufacturing_year`, `import_year`, `equipment_condition`, `operating_hours`, `engine_condition`, `tires_condition`, `actual_owner_name`, `owner_type`, `owner_phone`, `owner_supplier_relation`, `license_number`, `license_authority`, `license_expiry_date`, `inspection_certificate_number`, `last_inspection_date`, `current_location`, `availability_status`, `estimated_value`, `daily_rental_price`, `monthly_rental_price`, `insurance_status`, `general_notes`, `last_maintenance_date`, `status`) VALUES
-(1, NULL, '1', 'fr-FR', '1', 'tq1', '1212389', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1),
-(2, NULL, '2', 'Wq1', '1', 'Wq1', '1111', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'موقوفة للصيانة', NULL, NULL, NULL, '', '', NULL, 1),
-(3, NULL, '2', 'swd', '1', 'swd', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1),
-(4, NULL, '2', 'EQ-001', '1', 'حفار كاتربيلر 320', 'EXC-2024-001', 'CAT320-ABC123456', 'كاتربيلر', '320D', 2018, 2020, 'في حالة جيدة', 5400, 'جيدة', 'N/A', 'محمد علي أحمد', 'مالك فردي', '+249-912345678', 'تابع للمورد (مملوكة للمورد نفسه)', 'VEH-2024-12345', 'المرور', '2025-12-31', 'INS-2024-001', '2024-06-15', 'منجم الذهب الشرقي', 'متاحة للعمل', 150000.00, 500.00, 10000.00, 'مؤمن بالكامل', 'معدة موثوقة، تحتاج صيانة دورية كل 3 أشهر', '2024-05-10', 1),
-(5, NULL, '2', 'EQ-002', '2', 'شاحنة قلاب هيونداي', 'TRK-2024-002', 'HYN-DEF789012', 'هيونداي', 'HD270', 2019, 2021, 'جديدة نسبياً (أقل من سنة استخدام)', 2800, 'ممتازة', 'جيدة', 'أحمد محمد علي', 'شركة متخصصة', '+249-923456789', 'مالك مباشر (يتعاقد معنا مباشرة)', 'VEH-2024-67890', 'وزارة النقل', '2026-03-15', 'INS-2024-002', '2024-07-20', 'مستودع الخرطوم', 'قيد الاستخدام', 80000.00, 300.00, 7000.00, 'مؤمن جزئياً', 'شاحنة جديدة بحالة ممتازة', '2024-06-01', 1),
-(6, NULL, '1', 'TQ-001', '1', 'حفار كاتر', 'EXC-2024-001', 'CAT320-ABC123456', 'كاتربيلر', '320D', 2018, 2020, 'في حالة جيدة', 5400, 'جيدة', 'N/A', 'محمد علي أحمد', 'مالك فردي', '+249-912345678', 'تابع للمورد (مملوكة للمورد نفسه)', 'VEH-2024-12345', 'المرور', '2025-12-31', 'INS-2024-001', '2024-06-15', 'منجم الذهب الشرقي', 'متاحة للعمل', 150000.00, 500.00, 10000.00, 'مؤمن بالكامل', 'معدة موثوقة، تحتاج صيانة دورية كل 3 أشهر', '2024-05-10', 1),
-(7, NULL, '1', 'TQ-002', '1', 'هيونداي', 'TRK-2024-002', 'HYN-DEF789012', 'هيونداي', 'HD270', 2019, 2021, 'جديدة نسبياً (أقل من سنة استخدام)', 2800, 'ممتازة', 'جيدة', 'أحمد محمد علي', 'شركة متخصصة', '+249-923456789', 'مالك مباشر (يتعاقد معنا مباشرة)', 'VEH-2024-67890', 'وزارة النقل', '2026-03-15', 'INS-2024-002', '2024-07-20', 'مستودع الخرطوم', 'قيد الاستخدام', 80000.00, 300.00, 7000.00, 'مؤمن جزئياً', 'شاحنة جديدة بحالة ممتازة', '2024-06-01', 1),
-(8, NULL, '4', 'm1', '1', 'm1', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1),
-(9, NULL, '4', 'm130', '2', 'm130', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1),
-(10, NULL, '4', 'mg120', '3', 'mg120', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', NULL, '', NULL, '', 'متاحة للعمل', NULL, NULL, NULL, '', '', NULL, 1);
+(1, 4, '1', 'EQTQ1', '1', 'Plato Roberson', '883', '751', 'Aut officia aut exce', 'Alias ducimus eius', 2001, 2008, 'في حالة ضعيفة', 40, 'جيدة', 'متوسطة', 'Keegan Blanchard', 'مؤسسة', '+1 (835) 262-4394', 'تابع للمورد (مملوكة للمورد نفسه)', '435', 'Eum alias nisi et si', '1980-03-25', '72', '2001-10-21', 'Non natus in qui exp', 'قيد الاستخدام', 81.00, 457.00, 596.00, 'مؤمن بالكامل', 'Eum nihil eveniet c', '1975-01-22', 1),
+(2, 4, '1', 'EQTQ2', '1', 'Orson Holcomb', '195', '78', 'Nobis ipsum eum dolo', 'Eaque ut veniam et', 1978, 2004, 'في حالة جيدة', 98, 'محتاجة صيانة', 'محتاجة تبديل', 'Rama Delaney', 'شركة متخصصة', '+1 (338) 629-2108', 'غير محدد', '93', 'Consequatur non recu', '1989-06-19', '36', '1985-06-18', 'Et culpa corporis au', 'معطلة', 93.00, 259.00, 576.00, 'مؤمن بالكامل', 'Et sunt laboris volu', '1992-04-28', 1),
+(3, 4, '1', 'EQEQ1', '2', 'Ashely Holloway', '740', '691', 'Non nisi ipsum nesc', 'Pariatur Ullamco fu', 1975, 1997, 'مستعملة بكثافة', 25, 'محتاجة صيانة', 'متوسطة', 'Kirk Burton', 'أخرى', '+1 (703) 267-4949', 'تحت وساطة المورد (المورد يدير المعدة نيابة عنه)', '387', 'Minima necessitatibu', '1998-11-26', '249', '2014-08-02', 'Deserunt occaecat id', 'مبيعة/مسحوبة', NULL, 31.00, 791.00, 'غير مؤمن', 'Consequatur id prov', '2008-05-12', 1),
+(4, 4, '1', 'EQEQ2', '2', 'Amir Tate', '304', '962', 'Velit recusandae Vi', 'Nam aliquip consequa', 2000, 1977, 'معطلة مؤقتاً', 63, 'متوسطة', 'N/A', 'Keely Mckenzie', 'مؤسسة', '+1 (117) 553-1123', 'تابع للمورد (مملوكة للمورد نفسه)', '265', 'Modi corrupti dolor', '2020-01-22', '14', '2013-09-21', 'Fugiat ut possimus', 'قيد الاستخدام', 50.00, 356.00, 470.00, 'مؤمن جزئياً', 'Corporis in doloribu', '1998-08-19', 1);
 
 -- --------------------------------------------------------
 
@@ -775,10 +685,8 @@ CREATE TABLE `equipments_types` (
 --
 
 INSERT INTO `equipments_types` (`id`, `form`, `type`, `status`, `created_at`, `updated_at`) VALUES
-(1, '1', 'حفار120', 'active', '2026-02-28 08:00:26', '2026-02-27 23:39:11'),
-(2, '1', 'حفار130', 'active', '2026-02-28 08:00:30', '2026-02-27 23:39:26'),
-(3, '2', 'قلاب120', 'active', '2026-02-28 08:00:35', '2026-02-27 23:39:38'),
-(4, '2', 'قلاب130', 'active', '2026-02-28 08:00:39', '2026-02-27 23:39:50');
+(1, '1', 'حفار', 'active', '2026-04-07 11:49:34', '2026-04-07 11:49:34'),
+(2, '2', 'قلاب', 'active', '2026-04-07 11:49:43', '2026-04-07 11:49:43');
 
 -- --------------------------------------------------------
 
@@ -801,10 +709,8 @@ CREATE TABLE `equipment_drivers` (
 --
 
 INSERT INTO `equipment_drivers` (`id`, `company_id`, `equipment_id`, `driver_id`, `start_date`, `end_date`, `status`) VALUES
-(23, NULL, 2, 2, '2026-02-01', '2026-02-28', 1),
-(24, NULL, 7, 1, '2026-02-04', '2026-02-06', 0),
-(25, NULL, 7, 3, '2026-02-10', '2099-12-31', 0),
-(26, NULL, 7, 1, '2026-02-10', '2099-12-31', 1);
+(1, 4, 1, 1, '2026-04-01', '2026-04-30', 1),
+(2, 4, 3, 2, '2026-04-01', '2026-04-30', 1);
 
 -- --------------------------------------------------------
 
@@ -832,17 +738,18 @@ CREATE TABLE `mines` (
   `notes` text DEFAULT NULL COMMENT 'ملاحظات إضافية',
   `created_by` int(11) DEFAULT NULL COMMENT 'معرف المستخدم الذي أضاف السجل',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'تاريخ الإضافة',
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'تاريخ آخر تحديث'
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'تاريخ آخر تحديث',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول المناجم المرتبطة بالمشاريع';
 
 --
 -- Dumping data for table `mines`
 --
 
-INSERT INTO `mines` (`id`, `company_id`, `project_id`, `mine_name`, `mine_code`, `manager_name`, `mineral_type`, `mine_type`, `mine_type_other`, `ownership_type`, `ownership_type_other`, `mine_area`, `mine_area_unit`, `mining_depth`, `contract_nature`, `status`, `notes`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, NULL, 1, 'منجم احمد', 'منجم', 'سامبا', 'ذهب', 'حفرة مفتوحة', '', 'تعدين أهلي/تقليدي', '', NULL, 'هكتار', NULL, '', 1, '', 1, '2026-02-16 22:14:04', '2026-02-16 22:14:04'),
-(2, NULL, 2, 'منجم اليونان', 'rox230', 'سامبا', 'ذهب', 'تحت أرضي', '', 'تعدين أهلي/تقليدي', '', NULL, 'هكتار', NULL, 'موظف مباشر لدى المالك', 1, '', 1, '2026-02-27 23:42:13', '2026-02-27 23:42:13'),
-(3, NULL, 3, 'منجم حمد', 'MI192', 'محمد سيد', 'ذهب', 'حفرة مفتوحة', '', 'شركة حكومية/قطاع عام', '', 500.00, 'هكتار', 588.00, 'موظف مباشر لدى المالك', 1, '', 15, '2026-03-24 09:16:28', '2026-03-24 09:16:28');
+INSERT INTO `mines` (`id`, `company_id`, `project_id`, `mine_name`, `mine_code`, `manager_name`, `mineral_type`, `mine_type`, `mine_type_other`, `ownership_type`, `ownership_type_other`, `mine_area`, `mine_area_unit`, `mining_depth`, `contract_nature`, `status`, `notes`, `created_by`, `created_at`, `updated_at`, `is_deleted`, `deleted_at`, `deleted_by`) VALUES
+(1, 4, 1, 'منجم 1', 'MIN01', 'محمد سيد', 'ذهب', 'حفرة مفتوحة', '', 'شركة سودانية خاصة', '', 100.00, 'هكتار', 100.00, 'موظف مباشر لدى المالك', 1, 'ملحوظات اضافية', 4, '2026-04-07 11:47:00', '2026-04-07 11:47:00', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -870,23 +777,26 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `is_link`, `icon`)
 (4, 'شاشة التقارير', 'Reports/reports.php', 1, '', ''),
 (5, 'شاشة انواع المعدات', 'Equipments/equipments_types.php', 1, '1', 'fa fa-tractor'),
 (6, 'شاشة التقارير', 'Reports/reports.php', 2, '1', 'fa fa-chart-pie'),
-(7, 'شاشاة المشغلين', 'Drivers/drivers.php', 4, '0', 'fa fa-id-card'),
+(7, 'شاشاة المشغلين', 'Drivers/drivers.php', 4, '1', 'fa fa-link'),
 (8, 'معدات الاسطول', 'Equipments/equipments_fleet.php', 3, '1', 'fa fa-tractor'),
-(9, 'شاشة التشغيل', 'Oprators/oprators.php', 6, '', ''),
+(9, 'شاشة التشغيل', 'Oprators/oprators.php', 6, '1', 'fa fa-link'),
 (10, 'صفحة الساعات', 'Timesheet/timesheet_type.php', 5, '1', 'fa fa-business-time'),
 (11, 'الإعدادات', 'Settings/settings.php', 1, '1', 'fa fa-gear'),
 (12, 'شاشة المشرفين', 'main/project_users.php', 1, '1', 'fa fa-users-cog'),
 (14, 'شاشة المشرفين', 'main/project_users.php', 2, '1', 'fa fa-users-cog'),
 (15, 'شاشة المشرفين', 'main/project_users.php', 3, '1', 'fa fa-users-cog'),
-(16, 'شاشة المشرفين', 'main/project_users.php', 4, '0', 'fa fa-users-cog'),
+(16, 'شاشة المشرفين', 'main/project_users.php', 4, '1', 'fa fa-link'),
 (17, 'شاشة المشرفين', 'main/project_users.php', 5, '1', 'fa fa-users-cog'),
-(18, 'شاشة المشرفين', 'main/project_users.php', 6, '', ''),
+(18, 'شاشة المشرفين', 'main/project_users.php', 6, '1', 'fa fa-link'),
 (19, 'شاشة المناجم', 'Projects/project_mines.php', 1, '0', ''),
 (20, 'شاشة عقود المشاريع', 'Contracts/contracts.php', 1, '0', ''),
 (21, 'تفاصيل عقد المشاريع', 'Contracts/contracts_details.php', 1, '0', ''),
 (22, 'شاشة الموردين', 'Suppliers/suppliers.php', 2, '1', 'fa fa-truck-loading'),
 (23, 'شاشة التشغيل', 'Oprators/oprators.php', 3, '1', 'fa fa-cogs'),
-(24, 'الاعدادات', 'Settings/settings.php', 2, '1', 'fa fa-gear');
+(24, 'الاعدادات', 'Settings/settings.php', 2, '1', 'fa fa-gear'),
+(25, 'عقود الموردين', 'Suppliers/supplierscontracts.php', 2, '0', 'fa fa-link'),
+(26, 'تفاصيل عقد المورد', 'Suppliers/supplierscontracts_details.php', 2, '0', 'fa fa-link'),
+(27, 'المعدات', 'Equipments/equipments_drivers.php', 4, '1', 'fa fa-link');
 
 -- --------------------------------------------------------
 
@@ -918,11 +828,8 @@ CREATE TABLE `operations` (
 --
 
 INSERT INTO `operations` (`id`, `company_id`, `equipment`, `equipment_type`, `equipment_category`, `project_id`, `mine_id`, `contract_id`, `supplier_id`, `start`, `end`, `reason`, `days`, `total_equipment_hours`, `shift_hours`, `status`) VALUES
-(4, NULL, '2', '1', 'أساسي', '1', '1', '1', '2', '2026-02-02', '2026-03-03', '', '0', 100.00, 10.00, 3),
-(5, NULL, '8', '1', 'أساسي', '2', '2', '2', '4', '2026-02-01', '2026-03-03', '', '0', 200.00, 10.00, 1),
-(6, NULL, '9', '2', 'أساسي', '2', '2', '2', '4', '2026-02-01', '2026-03-03', '', '0', 200.00, 10.00, 1),
-(7, NULL, '10', '3', 'أساسي', '2', '2', '2', '4', '2026-02-01', '2026-03-30', 'sff', '57', 100.00, 10.00, 0),
-(8, NULL, '2', '1', 'أساسي', '2', '2', '2', '2', '2026-03-01', '2026-03-30', '', '0', 10.00, 10.00, 1);
+(1, 4, '1', '1', 'أساسي', '1', '1', '1', '1', '2026-04-01', '2026-04-30', '', '0', 20.00, 10.00, 1),
+(2, 4, '3', '2', 'أساسي', '1', '1', '1', '1', '2026-04-01', '2026-04-30', '', '0', 20.00, 10.00, 1);
 
 -- --------------------------------------------------------
 
@@ -949,17 +856,18 @@ CREATE TABLE `project` (
   `status` tinyint(1) DEFAULT 1,
   `created_by` int(11) DEFAULT NULL COMMENT 'معرف المستخدم المنشئ',
   `create_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT 'تاريخ آخر تحديث'
+  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT 'تاريخ آخر تحديث',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `project`
 --
 
-INSERT INTO `project` (`id`, `company_id`, `client_id`, `name`, `client`, `location`, `project_code`, `category`, `sub_sector`, `state`, `region`, `nearest_market`, `latitude`, `longitude`, `total`, `status`, `created_by`, `create_at`, `updated_at`) VALUES
-(1, 2, 1, 'مشروع الروسيه جديد', 'وزارة البنية التحتية', 'الخرطوم2', 'PRJ-2026-001', '', 'التعدين', 'الخرطوم', 'الكويت', 'سوق بحري', '15.5527', '32.5599', '0', 1, 1, '2026-02-16 21:13:41', '2026-03-24 10:46:13'),
-(2, 1, 2, 'مشروع اليونان', 'شركة المستقبل للمقاولات', 'الخرطوم2', 'PRJ-2026-071', '', 'التعدين', 'الخرطوم', '', '', '', '', '0', 1, 1, '2026-02-27 22:41:15', '2026-03-24 11:13:50'),
-(3, 2, 3, 'مشروع الجزيرة', 'إيكوبيشن', 'نهر النيل', 'PRG4', 'فئة المشروع', 'قطاع غرب', 'نهر النيل', 'حفر الباطن', '', '', '', '0', 1, 15, '2026-03-24 09:15:07', NULL);
+INSERT INTO `project` (`id`, `company_id`, `client_id`, `name`, `client`, `location`, `project_code`, `category`, `sub_sector`, `state`, `region`, `nearest_market`, `latitude`, `longitude`, `total`, `status`, `created_by`, `create_at`, `updated_at`, `is_deleted`, `deleted_at`, `deleted_by`) VALUES
+(1, 4, 1, 'مشروع الروسية', 'شركة بايناتس', 'شمال غرب المناقل', 'PR1', 'فئة المشروع', 'فرعي', 'نهر النيل', 'حفر الباطن', 'سوق اللفة', '12', '31', '0', 1, 4, '2026-04-07 11:46:05', NULL, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -981,16 +889,16 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `name`, `parent_role_id`, `level`, `status`, `created_at`) VALUES
-(1, 'مدير المشاريع', NULL, 1, '1', '2026-03-04 12:46:56'),
-(2, 'مدير الموردين', NULL, 1, '1', '2026-03-04 12:47:22'),
-(3, 'مدير الاسطول', NULL, 1, '1', '2026-03-04 12:47:41'),
-(4, 'مدير المشغلين', NULL, 1, '1', '2026-03-04 12:50:24'),
-(5, 'مدير الموقع', NULL, 1, '1', '2026-03-04 12:52:29'),
-(6, 'مدير حركة وتشغيل', NULL, 1, '1', '2026-03-04 12:52:47'),
-(7, 'مشرف - مشاريع', 1, 2, '1', '2026-03-04 15:18:15'),
-(8, 'مشرف موردين', 2, 2, '1', '2026-03-04 15:34:07'),
-(10, 'مشرف اسطول', 3, 2, '1', '2026-03-07 10:37:24'),
-(11, 'مشغل اسطول', 3, 2, '1', '2026-03-09 11:45:51');
+(1, 'مدير المشاريع', NULL, 1, '1', '2026-03-04 10:46:56'),
+(2, 'مدير الموردين', NULL, 1, '1', '2026-03-04 10:47:22'),
+(3, 'مدير الاسطول', NULL, 1, '1', '2026-03-04 10:47:41'),
+(4, 'مدير المشغلين', NULL, 1, '1', '2026-03-04 10:50:24'),
+(5, 'مدير الموقع', NULL, 1, '1', '2026-03-04 10:52:29'),
+(6, 'مدير حركة وتشغيل', NULL, 1, '1', '2026-03-04 10:52:47'),
+(7, 'مشرف - مشاريع', 1, 2, '1', '2026-03-04 13:18:15'),
+(8, 'مشرف موردين', 2, 2, '1', '2026-03-04 13:34:07'),
+(10, 'مشرف اسطول', 3, 2, '1', '2026-03-07 08:37:24'),
+(11, 'مشغل اسطول', 3, 2, '1', '2026-03-09 09:45:51');
 
 -- --------------------------------------------------------
 
@@ -1024,7 +932,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (21, 1, 2, 1, 1, 1, 1),
 (22, 1, 3, 1, 1, 1, 1),
 (23, 1, 4, 1, 1, 1, 1),
-(24, 1, 5, 1, 0, 0, 0),
+(24, 1, 5, 1, 1, 1, 1),
 (25, 1, 11, 1, 1, 1, 1),
 (26, 1, 12, 1, 1, 1, 1),
 (27, 1, 19, 1, 1, 1, 1),
@@ -1133,7 +1041,63 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (160, 11, 17, 1, 1, 1, 1),
 (161, 11, 9, 1, 1, 1, 1),
 (162, 11, 18, 1, 1, 1, 1),
-(163, 2, 24, 1, 1, 1, 0);
+(163, 2, 24, 1, 1, 1, 0),
+(164, 8, 24, 1, 0, 0, 0),
+(165, 2, 25, 1, 1, 1, 1),
+(166, 8, 25, 1, 1, 1, 0),
+(167, 2, 26, 1, 1, 1, 1),
+(168, 8, 26, 1, 0, 0, 0),
+(169, 6, 1, 1, 1, 1, 1),
+(170, 6, 2, 1, 1, 1, 1),
+(171, 6, 3, 1, 1, 1, 1),
+(172, 6, 4, 1, 1, 1, 1),
+(173, 6, 5, 1, 1, 1, 1),
+(174, 6, 11, 1, 1, 1, 1),
+(175, 6, 12, 1, 1, 1, 1),
+(176, 6, 19, 1, 1, 1, 1),
+(177, 6, 20, 1, 1, 1, 1),
+(178, 6, 21, 1, 1, 1, 1),
+(179, 6, 6, 1, 1, 1, 1),
+(180, 6, 14, 1, 1, 1, 1),
+(181, 6, 22, 1, 1, 1, 1),
+(182, 6, 24, 1, 1, 1, 1),
+(183, 6, 25, 1, 1, 1, 1),
+(184, 6, 26, 1, 1, 1, 1),
+(185, 6, 8, 1, 1, 1, 1),
+(186, 6, 15, 1, 1, 1, 1),
+(187, 6, 23, 1, 1, 1, 1),
+(188, 6, 7, 1, 1, 1, 1),
+(189, 6, 16, 1, 1, 1, 1),
+(190, 6, 10, 1, 1, 1, 1),
+(191, 6, 17, 1, 1, 1, 1),
+(192, 6, 9, 1, 1, 1, 1),
+(193, 6, 18, 1, 1, 1, 1),
+(194, 4, 1, 1, 1, 1, 1),
+(195, 4, 2, 1, 1, 1, 1),
+(196, 4, 3, 1, 1, 1, 1),
+(197, 4, 4, 1, 1, 1, 1),
+(198, 4, 5, 1, 1, 1, 1),
+(199, 4, 11, 1, 1, 1, 1),
+(200, 4, 12, 1, 1, 1, 1),
+(201, 4, 19, 1, 1, 1, 1),
+(202, 4, 20, 1, 1, 1, 1),
+(203, 4, 21, 1, 1, 1, 1),
+(204, 4, 6, 1, 1, 1, 1),
+(205, 4, 14, 1, 1, 1, 1),
+(206, 4, 22, 1, 1, 1, 1),
+(207, 4, 24, 1, 1, 1, 1),
+(208, 4, 25, 1, 1, 1, 1),
+(209, 4, 26, 1, 1, 1, 1),
+(210, 4, 8, 1, 1, 1, 1),
+(211, 4, 15, 1, 1, 1, 1),
+(212, 4, 23, 1, 1, 1, 1),
+(213, 4, 7, 1, 1, 1, 1),
+(214, 4, 16, 1, 1, 1, 1),
+(215, 4, 10, 1, 1, 1, 1),
+(216, 4, 17, 1, 1, 1, 1),
+(217, 4, 9, 1, 1, 1, 1),
+(218, 4, 18, 1, 1, 1, 1),
+(219, 4, 27, 1, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -1142,44 +1106,22 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 --
 
 CREATE TABLE `super_admins` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `email` varchar(150) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `last_login_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id` int(11) NOT NULL COMMENT 'معرف فريد',
+  `name` varchar(100) NOT NULL COMMENT 'الإسم',
+  `email` varchar(150) NOT NULL COMMENT 'البريد ',
+  `password` varchar(255) NOT NULL COMMENT 'كلمة المرور',
+  `is_active` tinyint(4) NOT NULL DEFAULT 1 COMMENT 'نشط',
+  `last_login_at` timestamp NULL DEFAULT NULL COMMENT 'آخر دخول',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'انشاء في',
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'تعديل في'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `super_admins`
 --
 
 INSERT INTO `super_admins` (`id`, `name`, `email`, `password`, `is_active`, `last_login_at`, `created_at`, `updated_at`) VALUES
-(1, 'super', 'enjaz@gmail.com', '$2y$10$auVJYb4WXFejEfthvqjpSOtyZlfdzJxM18TH6NBhPvPMyNMPq0B8K', 1, '2026-03-24 09:30:45', '2026-03-18 13:49:17', '2026-03-24 09:30:45');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `super_admin_password_resets`
---
-
-CREATE TABLE `super_admin_password_resets` (
-  `id` int(11) NOT NULL,
-  `super_admin_id` int(11) NOT NULL,
-  `token_hash` char(64) NOT NULL,
-  `expires_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `used_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `super_admin_password_resets`
---
-
-INSERT INTO `super_admin_password_resets` (`id`, `super_admin_id`, `token_hash`, `expires_at`, `used_at`, `created_at`) VALUES
-(2, 1, 'c61c2b19674eed38b0382d55985d995ddfab638fdc898200872b016f0d515a9a', '2026-03-18 14:50:59', NULL, '2026-03-18 13:50:59');
+(1, 'super', 'enjaz@gmail.com', '$2y$10$auVJYb4WXFejEfthvqjpSOtyZlfdzJxM18TH6NBhPvPMyNMPq0B8K', 1, '2026-04-07 11:36:12', '2026-03-18 11:49:17', '2026-04-07 11:36:12');
 
 -- --------------------------------------------------------
 
@@ -1220,10 +1162,8 @@ CREATE TABLE `suppliercontractequipments` (
 --
 
 INSERT INTO `suppliercontractequipments` (`id`, `company_id`, `contract_id`, `equip_type`, `equip_size`, `equip_count`, `equip_count_basic`, `equip_count_backup`, `equip_shifts`, `equip_unit`, `shift1_start`, `shift1_end`, `shift2_start`, `shift2_end`, `shift_hours`, `equip_total_month`, `equip_monthly_target`, `equip_total_contract`, `equip_price`, `equip_price_currency`, `equip_operators`, `equip_supervisors`, `equip_technicians`, `equip_assistants`, `created_at`) VALUES
-(1, NULL, 1, '1', 340, 2, 0, 0, 0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 10.00, 20.00, 0.00, 600.00, 0.00, '', 0, 0, 0, 0, '2026-02-16 22:22:09'),
-(2, NULL, 2, '1', 122, 1, 1, 0, 0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 5.00, 5.00, 0.00, 260.00, 0.00, '', 0, 0, 0, 0, '2026-02-27 23:57:27'),
-(3, NULL, 2, '2', 130, 1, 1, 0, 0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 5.00, 5.00, 0.00, 260.00, 0.00, '', 0, 0, 0, 0, '2026-02-27 23:57:27'),
-(4, NULL, 2, '3', 120, 1, 0, 0, 0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 5.00, 5.00, 0.00, 260.00, 0.00, '', 0, 0, 0, 0, '2026-02-27 23:57:27');
+(1, NULL, 1, '1', 200, 5, 3, 2, 2, 'ساعة', '14:21:00', '14:21:00', '14:22:00', '14:22:00', 10.00, 50.00, 6000.00, 1000.00, 10.00, '', 3, 3, 3, 3, '2026-04-07 12:22:54'),
+(2, NULL, 1, '2', 300, 5, 3, 2, 2, 'ساعة', '14:22:00', '14:23:00', '14:24:00', '14:25:00', 10.00, 50.00, 6000.00, 1000.00, 10.00, 'دولار', 0, 3, 3, 3, '2026-04-07 12:22:54');
 
 -- --------------------------------------------------------
 
@@ -1252,18 +1192,19 @@ CREATE TABLE `suppliers` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `phone` varchar(15) NOT NULL,
-  `status` tinyint(1) DEFAULT 1
+  `status` tinyint(1) DEFAULT 1,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `suppliers`
 --
 
-INSERT INTO `suppliers` (`id`, `company_id`, `name`, `supplier_code`, `supplier_type`, `dealing_nature`, `equipment_types`, `commercial_registration`, `identity_type`, `identity_number`, `identity_expiry_date`, `email`, `phone_alternative`, `full_address`, `contact_person_name`, `contact_person_phone`, `financial_registration_status`, `created_at`, `updated_at`, `phone`, `status`) VALUES
-(1, NULL, 'اكوبيشن', '123', 'شركة', 'متعاقد مباشر', 'حفارات, مكنات تخريم, دوازر', '234', 'جواز سفر', '1234', NULL, 'infotelecomwasla@gmail.com', '', '', '', '', 'مسجل رسميا', '2026-02-16 22:20:14', '2026-02-16 22:20:14', '76887534', 1),
-(2, NULL, 'احمد', '1234', 'فرد', 'مورد معدات مباشر (مالك)', 'حفارات, معدات معالجة', '765', 'بطاقة هوية وطنية', '', NULL, 'a.samba12@gmail.com', '', '', '', '', '', '2026-02-16 22:20:56', '2026-02-16 22:20:56', '0920045986', 1),
-(3, NULL, 'شركة النيل للمعدات الثقيلة', 'SUP-001', '', 'مباشر', 'حفار, قلاب, لودر', 'CR-123456', 'بطاقة شخصية', '123456789', '2027-12-31', 'info@nile-equip.com', '249987654321', 'الخرطوم - شارع النيل', 'أحمد محمد', '249123456789', '', '2026-02-25 19:37:15', '2026-02-25 19:37:15', '249123456789', 1),
-(4, NULL, 'مؤسسة المستقبل للآليات', 'SUP-002', 'فرد', 'وسيط', '', 'CR-789012', 'جواز سفر', 'P987654321', '2028-06-30', 'contact@mustaqbal.sd', '249444555666', 'أم درمان - الموردة', 'محمد أحمد', '249111222333', 'غير مسجل', '2026-02-25 19:37:15', '2026-02-25 19:38:38', '249111222333', 1);
+INSERT INTO `suppliers` (`id`, `company_id`, `name`, `supplier_code`, `supplier_type`, `dealing_nature`, `equipment_types`, `commercial_registration`, `identity_type`, `identity_number`, `identity_expiry_date`, `email`, `phone_alternative`, `full_address`, `contact_person_name`, `contact_person_phone`, `financial_registration_status`, `created_at`, `updated_at`, `phone`, `status`, `is_deleted`, `deleted_at`, `deleted_by`) VALUES
+(1, 4, 'مورد 1', 'MOR1', 'فرد', 'متعاقد مباشر', 'حفارات, مكنات تخريم', '12345678', 'بطاقة هوية وطنية', '839', '2026-04-30', 'sudanit2015@gmail.com', '+1 (454) 678-6091', 'عنوان كامل', 'Naomi Wilcox', '+1 (628) 682-7512', '', '2026-04-07 11:53:32', '2026-04-07 12:18:47', '0115667710', 1, 0, NULL, NULL),
+(2, 4, 'مورد 2', 'MOR2', 'شركة', 'وسيط', 'حفارات', '123', 'جواز سفر', 'P98909', '2026-04-30', 'equipation@gmail.com', '+1 (161) 121-1423', 'عنوان', 'Mary Washington', '+1 (584) 739-3927', '', '2026-04-07 11:54:24', '2026-04-07 12:18:42', '09144760109', 1, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1334,8 +1275,7 @@ CREATE TABLE `supplierscontracts` (
 --
 
 INSERT INTO `supplierscontracts` (`id`, `company_id`, `supplier_id`, `contract_signing_date`, `grace_period_days`, `contract_duration_months`, `contract_duration_days`, `equip_shifts_contract`, `shift_contract`, `equip_total_contract_daily`, `total_contract_permonth`, `total_contract_units`, `actual_start`, `actual_end`, `transportation`, `accommodation`, `place_for_living`, `workshop`, `equip_type`, `equip_size`, `equip_count`, `equip_target_per_month`, `equip_total_month`, `equip_total_contract`, `mach_type`, `mach_size`, `mach_count`, `mach_target_per_month`, `mach_total_month`, `mach_total_contract`, `hours_monthly_target`, `forecasted_contracted_hours`, `created_at`, `updated_at`, `daily_work_hours`, `daily_operators`, `first_party`, `second_party`, `witness_one`, `witness_two`, `price_currency_contract`, `paid_contract`, `payment_time`, `guarantees`, `payment_date`, `project_id`, `mine_id`, `project_contract_id`, `status`, `pause_reason`, `pause_date`, `resume_date`, `termination_type`, `termination_reason`, `merged_with`) VALUES
-(1, NULL, 2, '2026-02-01', 5, 0, 31, 0, 0, 0, 0, 0, '2026-03-01', '2026-03-31', '', '', '', '', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 20, 600, '2026-02-16 22:22:09', NULL, '20', '0', '', '', '', '', 'جنيه', '', '', '', '0000-00-00', 1, 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(2, NULL, 4, '2026-02-01', 4, 0, 53, 0, 0, 0, 0, 0, '2026-02-01', '2026-03-25', '', '', '', '', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 15, 780, '2026-02-27 23:57:27', NULL, '20', '0', '', '', '', '', 'دولار', '', '', '', '0000-00-00', 2, 2, 2, 1, NULL, NULL, NULL, NULL, NULL, NULL);
+(1, 4, 1, '2026-04-01', 10, 0, 21, 2, 10, 100, 6000, 6000, '2026-04-10', '2026-04-30', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', 'مالك المعدة', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 100, 2000, '2026-04-07 12:22:54', NULL, '20', '3', 'محمد سيد', 'سمير الو الليل', 'سمر الهاني', 'هاني المحامي', 'دولار', '1000', 'مقدم', 'رهن سيارة', '2026-04-20', 1, 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1412,7 +1352,11 @@ CREATE TABLE `timesheet` (
 --
 
 INSERT INTO `timesheet` (`id`, `company_id`, `operator`, `driver`, `shift`, `date`, `shift_hours`, `executed_hours`, `bucket_hours`, `jackhammer_hours`, `extra_hours`, `extra_hours_total`, `standby_hours`, `dependence_hours`, `total_work_hours`, `work_notes`, `hr_fault`, `maintenance_fault`, `marketing_fault`, `approval_fault`, `other_fault_hours`, `total_fault_hours`, `fault_notes`, `start_seconds`, `start_minutes`, `start_hours`, `end_seconds`, `end_minutes`, `end_hours`, `counter_diff`, `fault_type`, `fault_department`, `fault_part`, `fault_details`, `general_notes`, `operator_hours`, `machine_standby_hours`, `jackhammer_standby_hours`, `bucket_standby_hours`, `extra_operator_hours`, `operator_standby_hours`, `operator_notes`, `type`, `user_id`, `time_notes`, `status`) VALUES
-(1, NULL, '1', '2', 'D', '2026-02-17', 10, 8, 3, 5, 0, 0, 0, 0, 8, '', 0, 0, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', '1', 5, 'لاتوجد ملاحظات', 1);
+(1, 4, '1', '1', 'D', '2026-04-07', 10, 10, 0, 0, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 10, 0, 0, 0, 0, 0, '', '1', 8, 'لاتوجد ملاحظات', 1),
+(2, 4, '1', '', 'N', '2026-04-07', 10, 10, 77, 13, 22, 77, 59, 50, 146, 'Occaecat labore aliq', 18, 43, 4, 56, 96, 0, 'Est quia placeat qu', 19, 25, 99, 54, 49, 75, '100 ساعة 0 دقيقة 0 ثانية', 'Aliqua Voluptas nis', 'Sunt maiores commodo', 'Libero deserunt nost', 'Architecto quia nesc', 'Quaerat sint molliti', 10, 59, 0, 0, 0, 0, 'In consectetur molli', '1', 8, 'Voluptatum eaque dol', 1),
+(3, 4, '1', '1', 'D', '2014-08-09', 10, 46, 43, 59, 10, 82, 1, 9, 129, 'Consequuntur quis id', 68, 90, 73, 25, 49, 0, 'Sapiente labore esse', 57, 21, 33, 0, 26, 83, '78 ساعة 4 دقيقة 3 ثانية', 'Optio exercitation ', 'Alias et quos omnis ', 'Id ut asperiores qua', 'Cum amet nisi volup', 'Numquam officia in v', 0, 1, 0, 0, 0, 0, 'Laboriosam ut ducim', '1', 8, 'Aut accusamus qui su', 1),
+(4, 4, '2', '2', 'D', '2004-03-02', 10, 73, 0, 0, 0, 23, 65, 43, 161, 'Ad consequatur maio', 15, 97, 99, 26, 16, 0, 'Alias dolor aut qui ', 0, 0, 58, 0, 0, 15, '-43', 'Nostrud in cum reici', 'Cum tenetur consequa', 'Sunt unde velit do', 'Accusantium tempore', 'Natus necessitatibus', 0, 65, 0, 0, 0, 0, 'Et ut facilis quae i', '2', 8, 'Illo nesciunt ut re', 1),
+(5, 4, '2', '2', 'N', '1989-12-07', 10, 35, 0, 0, 0, 85, 29, 12, 149, 'Quia et iure sed tem', 96, 42, 50, 99, 77, 0, 'Veniam eius volupta', 0, 0, 37, 0, 0, 58, '21', 'Aut pariatur Eum te', 'Numquam qui numquam ', 'Natus consequat Cil', 'Sed in mollit ea vol', 'Nihil maiores dicta ', 0, 29, 0, 0, 0, 0, 'Sed vel fuga Reicie', '2', 8, 'Et aute possimus vo', 1);
 
 -- --------------------------------------------------------
 
@@ -1421,47 +1365,41 @@ INSERT INTO `timesheet` (`id`, `company_id`, `operator`, `driver`, `shift`, `dat
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL COMMENT 'معرف فريد',
   `name` varchar(100) NOT NULL COMMENT 'الاسم الثلاثي',
-  `username` varchar(150) NOT NULL,
-  `email` varchar(150) DEFAULT NULL,
-  `password` varchar(255) NOT NULL,
-  `phone` varchar(20) DEFAULT NULL,
+  `username` varchar(150) NOT NULL COMMENT 'اسم المستخدم',
+  `email` varchar(150) DEFAULT NULL COMMENT 'البريد',
+  `password` varchar(255) NOT NULL COMMENT 'كلمة المرور',
+  `phone` varchar(20) DEFAULT NULL COMMENT 'رقم الهاتف',
   `role` varchar(30) NOT NULL COMMENT 'رقم الصلاحية',
-  `company_id` int(11) DEFAULT NULL,
-  `role_id` int(11) DEFAULT NULL,
-  `status` enum('active','inactive','suspended') NOT NULL DEFAULT 'active',
+  `company_id` int(11) DEFAULT NULL COMMENT 'رقم الشركة',
+  `role_id` int(11) DEFAULT NULL COMMENT 'رقم الصلاحية',
+  `status` enum('active','inactive','suspended') NOT NULL DEFAULT 'active' COMMENT 'الحالة',
   `force_password_change` tinyint(1) NOT NULL DEFAULT 0,
   `temp_password_set_at` timestamp NULL DEFAULT NULL,
-  `project_id` varchar(20) NOT NULL DEFAULT '0',
-  `mine_id` int(11) DEFAULT 0 COMMENT 'معرف المنجم لمدير الموقع',
-  `contract_id` int(11) DEFAULT 0 COMMENT 'معرف العقد لمدير الموقع',
-  `parent_id` varchar(20) NOT NULL DEFAULT '0',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `last_login_at` timestamp NULL DEFAULT NULL
+  `project_id` varchar(20) NOT NULL DEFAULT '0' COMMENT 'المشروع',
+  `mine_id` int(11) DEFAULT 0 COMMENT 'المنجم',
+  `contract_id` int(11) DEFAULT 0 COMMENT 'العقد',
+  `parent_id` varchar(20) NOT NULL DEFAULT '0' COMMENT 'المستخدم الاب',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'انشئ في',
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'عدل في',
+  `last_login_at` timestamp NULL DEFAULT NULL COMMENT 'اخر دخول',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'محذوف',
+  `deleted_at` datetime DEFAULT NULL COMMENT 'وقت الحذف',
+  `deleted_by` int(11) DEFAULT NULL COMMENT 'الحاذف'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `username`, `email`, `password`, `phone`, `role`, `company_id`, `role_id`, `status`, `force_password_change`, `temp_password_set_at`, `project_id`, `mine_id`, `contract_id`, `parent_id`, `created_at`, `updated_at`, `last_login_at`) VALUES
-(1, 'admin', 'admin', NULL, '2025', '0', '1', NULL, 1, 'active', 0, NULL, '0', 0, 0, '0', '2026-02-16 22:06:44', '2026-03-23 16:24:10', NULL),
-(2, 'o', 'o', NULL, 'o', '0', '3', NULL, 3, 'active', 0, NULL, '0', 0, 0, '0', '2026-02-16 22:07:07', '2026-03-23 16:24:10', NULL),
-(3, 'r', 'r', NULL, 'r', '5', '2', NULL, 2, 'active', 0, NULL, '0', 0, 0, '0', '2026-02-16 22:19:20', '2026-03-23 16:24:10', NULL),
-(4, 'm', 'm', NULL, 'm', '0', '4', NULL, 4, 'active', 0, NULL, '0', 0, 0, '0', '2026-02-16 22:37:21', '2026-03-23 16:24:10', NULL),
-(5, 'q', 'q', NULL, 'q', '5', '5', NULL, 5, 'active', 0, NULL, '1', 1, 1, '0', '2026-02-16 22:40:08', '2026-03-23 16:24:10', NULL),
-(6, 'x', 'x', NULL, 'x', '6', '5', NULL, 5, 'active', 0, NULL, '1', 1, 1, '0', '2026-02-17 14:07:51', '2026-03-23 16:24:10', NULL),
-(7, 't', 't', NULL, 't', '0', '10', NULL, 10, 'active', 0, NULL, '1', 1, 1, '0', '2026-02-22 15:06:10', '2026-03-23 16:24:10', NULL),
-(8, 'موقع يونان', 'yyy', NULL, 'y', '989', '5', NULL, 5, 'active', 0, NULL, '2', 2, 2, '0', '2026-02-28 00:29:07', '2026-03-23 16:24:10', NULL),
-(9, 'اواب', 'aw', NULL, 'aw', '09999', '7', NULL, 7, 'active', 0, NULL, '0', 0, 0, '1', '2026-03-04 15:44:28', '2026-03-23 16:24:10', NULL),
-(10, 'حمادة', 'hm', NULL, 'hm', '09', '8', NULL, 8, 'active', 0, NULL, '0', 0, 0, '3', '2026-03-04 15:56:15', '2026-03-23 16:24:10', NULL),
-(11, 'شيماء', 'sh', NULL, 'sh', '09', '10', NULL, 10, 'active', 0, NULL, '0', 0, 0, '2', '2026-03-07 11:30:17', '2026-03-23 16:24:10', NULL),
-(12, 'علي', 'd', NULL, 'd', '09', '11', NULL, 11, 'active', 0, NULL, '0', 0, 0, '2', '2026-03-09 11:48:46', '2026-03-23 16:24:10', NULL),
-(13, 'محمد سيد حسن غنيم', 'medo@gmail.com', 'medo@gmail.com', '$2y$10$Bkdijez09hoW2VPWEIvbDuFFUhq7xEV3WOlAuPPftgprCur2eg0pe', '0928999999', '1', 4, 1, 'active', 1, '2026-03-23 17:29:08', '0', 0, 0, '0', '2026-03-23 17:29:08', '2026-03-23 18:06:41', '2026-03-23 17:57:25'),
-(14, 'محمد سيد حسن', 'medo2@gmail.com', 'medo2@gmail.com', '$2y$10$uam9DROqIaU3UGzkOMzwp.d1tNMT9.avvYBCBwNHv/zTOemw61OW2', '093888883', '1', 1, 1, 'active', 0, NULL, '0', 0, 0, '0', '2026-03-23 20:48:23', '2026-03-23 20:48:37', '2026-03-23 20:48:37'),
-(15, 'مستر محمد ادريس', 'medoit@gmail.com', 'medoit@gmail.com', '$2y$10$DSgFmtlrinEiZc/SEYs3nelRtfduPrCupP53cweX..h/nwPpz7h1e', '098398393303', '1', 2, 1, 'active', 1, '2026-03-24 06:45:05', '0', 0, 0, '0', '2026-03-24 06:26:55', '2026-03-24 06:45:31', '2026-03-24 06:45:31');
+INSERT INTO `users` (`id`, `name`, `username`, `email`, `password`, `phone`, `role`, `company_id`, `role_id`, `status`, `force_password_change`, `temp_password_set_at`, `project_id`, `mine_id`, `contract_id`, `parent_id`, `created_at`, `updated_at`, `last_login_at`, `is_deleted`, `deleted_at`, `deleted_by`) VALUES
+(1, 'محمد ادريس', 'adminfree@gmail.com', 'adminfree@gmail.com', '$2y$10$3I7ZYbnPjX9BEWzLR4HHz.FHcMPMzUBMnQNI3vBYLnBzIGUYI.UMG', '+249915657576', '1', 1, 1, 'active', 0, NULL, '0', 0, 0, '0', '2026-04-07 10:53:47', '2026-04-07 10:54:04', '2026-04-07 10:54:04', 0, NULL, NULL),
+(4, 'مستر محمد ادريس', 'admin@gmail.com', 'admin@gmail.com', '$2y$10$8FcRlrkxuIOUr6kWAwy6Z.lh1rYmAzAA/8zSH7sxhgPAc69eQNLTG', '+249915657576', '1', 4, 1, 'active', 0, NULL, '0', 0, 0, '0', '2026-04-07 11:19:26', '2026-04-07 11:33:56', '2026-04-07 11:33:56', 0, NULL, NULL),
+(5, 'موردين', 'مورد', NULL, '$2y$10$WA9lipyyjBky7B1zieAXPur.sdLhy.UlHy5Jj4q1IZYzP6B3tGTeq', '09209303903', '2', 4, NULL, 'active', 0, NULL, '0', 0, 0, '0', '2026-04-07 11:33:09', '2026-04-07 12:17:39', NULL, 0, NULL, NULL),
+(6, 'الاسطول', 'اسطول', NULL, '$2y$10$dpgJiR7LQuaJVDgQIO/F4.ze3HXdjjT6OiflD/RS0C0VgxjmiBh4W', '09209303903', '3', 4, NULL, 'active', 0, NULL, '0', 0, 0, '0', '2026-04-07 11:34:52', '2026-04-07 12:17:42', NULL, 0, NULL, NULL),
+(7, 'المشغلين', 'مشغل', NULL, '$2y$10$Jk5vHPG/HMIwfhP6x1mFC.t4mUs524htfwDDrCYWmKW/lv9tJvEzS', '09209303903', '4', 4, NULL, 'active', 0, NULL, '0', 0, 0, '0', '2026-04-07 11:35:27', '2026-04-07 12:17:46', NULL, 0, NULL, NULL),
+(8, 'المواقع', 'موقع', NULL, '$2y$10$5ln6ocflqV231lrG01s9LOV4DZR.dHrEci8RJ7XeA/RbFpadupmY2', '09209303903', '5', 4, NULL, 'active', 0, NULL, '1', 1, 1, '0', '2026-04-07 12:45:25', '2026-04-07 12:45:25', NULL, 0, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -1550,7 +1488,6 @@ ALTER TABLE `audit_logs`
 --
 ALTER TABLE `clients`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_client_code` (`client_code`),
   ADD KEY `idx_client_name` (`client_name`),
   ADD KEY `idx_status` (`status`);
 
@@ -1650,7 +1587,6 @@ ALTER TABLE `equipment_drivers`
 --
 ALTER TABLE `mines`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `mine_code` (`mine_code`),
   ADD KEY `project_id` (`project_id`),
   ADD KEY `idx_mine_type` (`mine_type`),
   ADD KEY `idx_ownership_type` (`ownership_type`),
@@ -1699,16 +1635,7 @@ ALTER TABLE `role_permissions`
 -- Indexes for table `super_admins`
 --
 ALTER TABLE `super_admins`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_super_admins_email` (`email`);
-
---
--- Indexes for table `super_admin_password_resets`
---
-ALTER TABLE `super_admin_password_resets`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_super_admin_password_resets_token_hash` (`token_hash`),
-  ADD KEY `idx_super_admin_password_resets_admin_id` (`super_admin_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `suppliercontractequipments`
@@ -1721,7 +1648,8 @@ ALTER TABLE `suppliercontractequipments`
 -- Indexes for table `suppliers`
 --
 ALTER TABLE `suppliers`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_suppliers_is_deleted` (`is_deleted`);
 
 --
 -- Indexes for table `supplierscontracts`
@@ -1758,7 +1686,8 @@ ALTER TABLE `users`
   ADD KEY `idx_mine_id` (`mine_id`),
   ADD KEY `idx_contract_id` (`contract_id`),
   ADD KEY `idx_users_company_id` (`company_id`),
-  ADD KEY `idx_users_status` (`status`);
+  ADD KEY `idx_users_status` (`status`),
+  ADD KEY `idx_users_is_deleted` (`is_deleted`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -1768,13 +1697,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `admin_audit_log`
 --
 ALTER TABLE `admin_audit_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `admin_companies`
 --
 ALTER TABLE `admin_companies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد', AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `admin_subscription_plans`
@@ -1786,7 +1715,7 @@ ALTER TABLE `admin_subscription_plans`
 -- AUTO_INCREMENT for table `admin_subscription_requests`
 --
 ALTER TABLE `admin_subscription_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد', AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `admin_subscription_requests_test_probe`
@@ -1798,31 +1727,31 @@ ALTER TABLE `admin_subscription_requests_test_probe`
 -- AUTO_INCREMENT for table `approval_requests`
 --
 ALTER TABLE `approval_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `approval_steps`
 --
 ALTER TABLE `approval_steps`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `approval_workflow_rules`
 --
 ALTER TABLE `approval_workflow_rules`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `clients`
 --
 ALTER TABLE `clients`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `company_user_password_resets`
@@ -1834,19 +1763,19 @@ ALTER TABLE `company_user_password_resets`
 -- AUTO_INCREMENT for table `contractequipments`
 --
 ALTER TABLE `contractequipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `contracts`
 --
 ALTER TABLE `contracts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `contract_notes`
 --
 ALTER TABLE `contract_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `drivercontractequipments`
@@ -1864,7 +1793,7 @@ ALTER TABLE `drivercontracts`
 -- AUTO_INCREMENT for table `drivers`
 --
 ALTER TABLE `drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `driver_contract_notes`
@@ -1876,43 +1805,43 @@ ALTER TABLE `driver_contract_notes`
 -- AUTO_INCREMENT for table `equipments`
 --
 ALTER TABLE `equipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `equipments_types`
 --
 ALTER TABLE `equipments_types`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `equipment_drivers`
 --
 ALTER TABLE `equipment_drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `mines`
 --
 ALTER TABLE `mines`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `modules`
 --
 ALTER TABLE `modules`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `operations`
 --
 ALTER TABLE `operations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `project`
 --
 ALTER TABLE `project`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -1924,37 +1853,31 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `role_permissions`
 --
 ALTER TABLE `role_permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=164;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=220;
 
 --
 -- AUTO_INCREMENT for table `super_admins`
 --
 ALTER TABLE `super_admins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `super_admin_password_resets`
---
-ALTER TABLE `super_admin_password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد', AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `suppliercontractequipments`
 --
 ALTER TABLE `suppliercontractequipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `suppliers`
 --
 ALTER TABLE `suppliers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `supplierscontracts`
 --
 ALTER TABLE `supplierscontracts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `supplier_contract_notes`
@@ -1966,13 +1889,13 @@ ALTER TABLE `supplier_contract_notes`
 -- AUTO_INCREMENT for table `timesheet`
 --
 ALTER TABLE `timesheet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد', AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
@@ -2097,12 +2020,6 @@ ALTER TABLE `roles`
 ALTER TABLE `role_permissions`
   ADD CONSTRAINT `role_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
   ADD CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`module_id`) REFERENCES `modules` (`id`);
-
---
--- Constraints for table `super_admin_password_resets`
---
-ALTER TABLE `super_admin_password_resets`
-  ADD CONSTRAINT `fk_super_admin_password_resets_admin` FOREIGN KEY (`super_admin_id`) REFERENCES `super_admins` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `suppliercontractequipments`

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 // check user login
 if (!isset($_SESSION['user'])) {
@@ -8,10 +8,10 @@ if (!isset($_SESSION['user'])) {
 
 include '../includes/permissions_helper.php';
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// ðŸ” Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-$page_title = "Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„";
+// ════════════════════════════════════════════════════════════════════════════
+// 🔐 التحقق من صلاحيات المستخدم
+// ════════════════════════════════════════════════════════════════════════════
+$page_title = "إيكوبيشن | ساعات العمل";
 include("../inheader.php");
 include '../config.php';
 
@@ -46,9 +46,9 @@ $can_add = $page_permissions['can_add'];
 $can_edit = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 
-// Ù…Ù†Ø¹ Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ø°Ø§ Ù„Ù… ØªÙƒÙ† ØµÙ„Ø§Ø­ÙŠØ© Ø¹Ø±Ø¶
+// منع الوصول إذا لم تكن صلاحية عرض
 if (!$can_view) {
-  header("Location: ../login.php?msg=Ù„Ø§+ØªÙˆØ¬Ø¯+ØµÙ„Ø§Ø­ÙŠØ©+Ø¹Ø±Ø¶+Ø³Ø§Ø¹Ø§Øª+Ø§Ù„Ø¹Ù…Ù„+âŒ");
+  header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+ساعات+العمل+❌");
   exit();
 }
 
@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $equipment_type = mysqli_real_escape_string($conn, $_POST['equipment_type']);
   $shift_filter   = isset($_POST['shift']) ? mysqli_real_escape_string($conn, $_POST['shift']) : '';
 
-  // Ù…ØµÙÙˆÙØ© Ù„ØªØ¬Ù…ÙŠØ¹ Ø§Ù„Ø´Ø±ÙˆØ·
+  // مصفوفة لتجميع الشروط
   $whereParts = [];
 
   if (!empty($start_date) && !empty($end_date)) {
@@ -80,12 +80,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $where = "WHERE 1=1" . $tenant_scope;
   }
 } else {
-  // âœ… Ø£ÙˆÙ„ Ù…Ø±Ø© ÙŠÙØªØ­ Ø§Ù„ØµÙØ­Ø©: Ø¹Ø±Ø¶ Ø³Ø¬Ù„Ø§Øª Ø§Ù„ÙŠÙˆÙ… ÙÙ‚Ø·
+  // ✅ أول مرة يفتح الصفحة: عرض سجلات اليوم فقط
   $today = date("Y-m-d");
     $where = "WHERE t.date = '$today'" . $tenant_scope;
 }
 
-// --- Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª ---
+// --- إحصائيات ---
 $stats = [
   "total" => 0,
   "approved" => 0,
@@ -107,7 +107,7 @@ if ($row = mysqli_fetch_assoc($stat_query)) {
   $stats = $row;
 }
 
-// --- Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª ---
+// --- البيانات ---
 $query = "SELECT t.id, t.shift, t.date, t.executed_hours,
         t.standby_hours , t.total_fault_hours ,bucket_hours,jackhammer_hours,
         extra_hours, t.status ,
@@ -137,129 +137,129 @@ include('../insidebar.php');
     <div class="page-header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-business-time"></i></div>
-            Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„
+            ساعات العمل
         </h1>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
+                <i class="fas fa-arrow-right"></i> رجوع
             </a>
             <a href="view_timesheet.php" class="back-btn" style="background: var(--green-soft); color: var(--green); border-color: rgba(22,163,74,.22);">
-                <i class="fas fa-redo"></i> Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ†
+                <i class="fas fa-redo"></i> إعادة تعيين
             </a>
         </div>
     </div>
 
-    <!-- âœ… Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª -->
+    <!-- ✅ إحصائيات -->
     <div class="stats-grid" style="margin-bottom: 24px;">
         <div class="stat-card">
             <div class="stat-card-icon"><i class="fas fa-check-circle"></i></div>
             <div class="stat-card-value" id="stat_approved"><?= !empty($stats['approved']) ? $stats['approved'] : 0 ?></div>
-            <div class="stat-card-label">Ø³Ø¬Ù„Ø§Øª Ù…Ø¹ØªÙ…Ø¯Ø©</div>
+            <div class="stat-card-label">سجلات معتمدة</div>
         </div>
         <div class="stat-card">
             <div class="stat-card-icon"><i class="fas fa-hourglass-half"></i></div>
             <div class="stat-card-value" id="stat_pending"><?= !empty($stats['pending']) ? $stats['pending'] : 0 ?></div>
-            <div class="stat-card-label">Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©</div>
+            <div class="stat-card-label">قيد المراجعة</div>
         </div>
         <div class="stat-card">
             <div class="stat-card-icon"><i class="fas fa-times-circle"></i></div>
             <div class="stat-card-value" id="stat_rejected"><?= !empty($stats['rejected']) ? $stats['rejected'] : 0 ?></div>
-            <div class="stat-card-label">Ø³Ø¬Ù„Ø§Øª Ù…Ø±ÙÙˆØ¶Ø©</div>
+            <div class="stat-card-label">سجلات مرفوضة</div>
         </div>
         <div class="stat-card">
             <div class="stat-card-icon"><i class="fas fa-clock"></i></div>
             <div class="stat-card-value" id="stat_hours"><?= !empty($stats['total_hours']) ? (int)$stats['total_hours'] : 0 ?></div>
-            <div class="stat-card-label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª</div>
+            <div class="stat-card-label">إجمالي الساعات</div>
         </div>
     </div>
 
-    <!-- âœ… ÙÙˆØ±Ù… Ø§Ù„ÙÙ„ØªØ±Ø© -->
+    <!-- ✅ فورم الفلترة -->
     <div class="card">
         <div class="card-header">
-            <h5><i class="fas fa-filter"></i> ÙÙ„ØªØ±Ø© Ø§Ù„Ù†ØªØ§Ø¦Ø¬</h5>
+            <h5><i class="fas fa-filter"></i> فلترة النتائج</h5>
         </div>
         <div class="card-body">
             <form method="POST" class="form-grid">
                 <div>
-                    <label><i class="fas fa-calendar"></i> ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©</label>
+                    <label><i class="fas fa-calendar"></i> تاريخ البداية</label>
                     <input type="date" name="start_date" class="form-control" />
                 </div>
                 <div>
-                    <label><i class="fas fa-calendar"></i> ØªØ§Ø±ÙŠØ® Ø§Ù„Ù†Ù‡Ø§ÙŠØ©</label>
+                    <label><i class="fas fa-calendar"></i> تاريخ النهاية</label>
                     <input type="date" name="end_date" class="form-control" />
                 </div>
                 <div>
-                    <label><i class="fas fa-cogs"></i> Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©</label>
+                    <label><i class="fas fa-cogs"></i> نوع المعدة</label>
                     <select name="equipment_type" class="form-control">
-                        <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
-                        <option value="1"> Ù…Ø¹Ø¯Ø§Øª Ø«Ù‚ÙŠØ¨Ù„Ø© </option>
-                        <option value="2"> Ø´Ø§Ø­Ù†Ø§Øª </option>
+                        <option value="">-- الكل --</option>
+                        <option value="1"> معدات ثقيبلة </option>
+                        <option value="2"> شاحنات </option>
                     </select>
                 </div>
                 <div>
-                    <label><i class="fas fa-sun"></i> Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</label>
+                    <label><i class="fas fa-sun"></i> الوردية</label>
                     <select name="shift" class="form-control">
-                        <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
-                        <option value="D">â˜€ï¸ ØµØ¨Ø§Ø­ÙŠØ©</option>
-                        <option value="N">ðŸŒ™ Ù…Ø³Ø§Ø¦ÙŠØ©</option>
+                        <option value="">-- الكل --</option>
+                        <option value="D">☀️ صباحية</option>
+                        <option value="N">🌙 مسائية</option>
                     </select>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: flex-end;">
                     <button type="submit" class="btn-submit">
-                        <i class="fas fa-search"></i> ØªØ·Ø¨ÙŠÙ‚
+                        <i class="fas fa-search"></i> تطبيق
                     </button>
                     <a href="view_timesheet.php" class="btn-cancel" style="text-decoration: none; padding: 11px 26px;">
-                        <i class="fas fa-redo"></i> Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ†
+                        <i class="fas fa-redo"></i> إعادة تعيين
                     </a>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- âœ… Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª -->
+    <!-- ✅ جدول البيانات -->
     <div class="card">
         <div class="card-header">
-            <h5><i class="fas fa-list-alt"></i> Ù‚Ø§Ø¦Ù…Ø© Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</h5>
+            <h5><i class="fas fa-list-alt"></i> قائمة ساعات العمل</h5>
         </div>
         <div class="card-body">
             <table id="timesheetTable" class="display nowrap">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Ø§Ù„Ù…Ø¹Ø¯Ø©</th>
-                        <th>Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</th>
-                        <th>Ø§Ù„Ø³Ø§Ø¦Ù‚</th>
-                        <th>Ø§Ù„ØªØ§Ø±ÙŠØ®</th>
-                        <th>Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</th>
-                        <th>Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…Ù†ÙØ°Ø©</th>
-                        <th>Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯</th>
-                        <th>Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</th>
-                        <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
-                        <th>Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th>
+                        <th>المعدة</th>
+                        <th>المشروع</th>
+                        <th>السائق</th>
+                        <th>التاريخ</th>
+                        <th>الوردية</th>
+                        <th>الساعات المنفذة</th>
+                        <th>الاستعداد</th>
+                        <th>الأعطال</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
                     $i = 1;
                     while ($row = mysqli_fetch_assoc($result)) {
-                        // ØªØ­Ø¯ÙŠØ¯ Ø§Ù„Ø­Ø§Ù„Ø©
+                        // تحديد الحالة
                         $statusBadge = '';
                         switch ($row['status']) {
                             case "1":
-                                $statusBadge = '<span class="status-pill" style="background: rgba(232,184,0,.13); color: var(--gold); border: 1px solid rgba(232,184,0,.22);">â³ Ù‚ÙŠØ¯ Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©</span>';
+                                $statusBadge = '<span class="status-pill" style="background: rgba(232,184,0,.13); color: var(--gold); border: 1px solid rgba(232,184,0,.22);">⏳ قيد المراجعة</span>';
                                 break;
                             case "2":
-                                $statusBadge = '<span class="status-pill status-active">âœ“ Ù…Ø¹ØªÙ…Ø¯</span>';
+                                $statusBadge = '<span class="status-pill status-active">✓ معتمد</span>';
                                 break;
                             case "3":
-                                $statusBadge = '<span class="status-pill status-inactive">âœ— Ù…Ø±ÙÙˆØ¶</span>';
+                                $statusBadge = '<span class="status-pill status-inactive">✗ مرفوض</span>';
                                 break;
                             default:
-                                $statusBadge = '<span class="status-pill">ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ</span>';
+                                $statusBadge = '<span class="status-pill">غير معروف</span>';
                         }
 
-                        // ØªØ­Ø¯ÙŠØ¯ Ø§Ù„ÙˆØ±Ø¯ÙŠØ©
-                        $shiftText = $row['shift'] == "D" ? "â˜€ï¸ ØµØ¨Ø§Ø­ÙŠØ©" : "ðŸŒ™ Ù…Ø³Ø§Ø¦ÙŠØ©";
+                        // تحديد الوردية
+                        $shiftText = $row['shift'] == "D" ? "☀️ صباحية" : "🌙 مسائية";
 
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
@@ -268,33 +268,33 @@ include('../insidebar.php');
                         echo "<td>" . htmlspecialchars($row['driver_name']) . "</td>";
                         echo "<td>" . $row['date'] . "</td>";
                         echo "<td>" . $shiftText . "</td>";
-                        echo "<td><strong>" . $row['executed_hours'] . " Ø³Ø§Ø¹Ø©</strong></td>";
-                        echo "<td>" . $row['standby_hours'] . " Ø³Ø§Ø¹Ø©</td>";
-                        echo "<td>" . $row['total_fault_hours'] . " Ø³Ø§Ø¹Ø©</td>";
+                        echo "<td><strong>" . $row['executed_hours'] . " ساعة</strong></td>";
+                        echo "<td>" . $row['standby_hours'] . " ساعة</td>";
+                        echo "<td>" . $row['total_fault_hours'] . " ساعة</td>";
                         echo "<td>" . $statusBadge . "</td>";
                         echo "<td>
                             <div class='action-btns'>
                                 <a href='timesheet_details.php?id=" . $row['id'] . "' 
                                    class='action-btn view' 
-                                   title='Ø¹Ø±Ø¶ Ø§Ù„ØªÙØ§ØµÙŠÙ„'>
+                                   title='عرض التفاصيل'>
                                     <i class='fas fa-eye'></i>
                                 </a>
                                 <a href='aprovment.php?t=$type&type=1&id=" . $row['id'] . "' 
                                    class='action-btn' 
                                    style='background: var(--green-soft); color: var(--green);'
-                                   title='Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø©'>
+                                   title='الموافقة'>
                                     <i class='fas fa-check'></i>
                                 </a>
                                 <a href='aprovment.php?t=$type&type=2&id=" . $row['id'] . "' 
                                    class='action-btn delete' 
-                                   title='Ø§Ù„Ø±ÙØ¶'>
+                                   title='الرفض'>
                                     <i class='fas fa-times'></i>
                                 </a>
                                 <a href='delete_timesheet.php?id=" . $row['id'] . "' 
                                    class='action-btn' 
                                    style='background: var(--red-soft); color: var(--red);'
-                                   onclick=\"return confirm('Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø§Ù„Ø­Ø°ÙØŸ')\"
-                                   title='Ø­Ø°Ù'>
+                                   onclick=\"return confirm('هل أنت متأكد من الحذف؟')\"
+                                   title='حذف'>
                                     <i class='fas fa-trash'></i>
                                 </a>
                             </div>
@@ -325,16 +325,16 @@ include('../insidebar.php');
 
 <script>
     $(document).ready(function () {
-        // ØªØ´ØºÙŠÙ„ DataTable Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©
+        // تشغيل DataTable بالعربية
         $('#timesheetTable').DataTable({
             responsive: true,
             dom: 'Bfrtip', // Buttons + Search + Pagination
             buttons: [
-                { extend: 'copy', text: 'Ù†Ø³Ø®' },
-                { extend: 'excel', text: 'ØªØµØ¯ÙŠØ± Excel' },
-                { extend: 'csv', text: 'ØªØµØ¯ÙŠØ± CSV' },
-                { extend: 'pdf', text: 'ØªØµØ¯ÙŠØ± PDF' },
-                { extend: 'print', text: 'Ø·Ø¨Ø§Ø¹Ø©' }
+                { extend: 'copy', text: 'نسخ' },
+                { extend: 'excel', text: 'تصدير Excel' },
+                { extend: 'csv', text: 'تصدير CSV' },
+                { extend: 'pdf', text: 'تصدير PDF' },
+                { extend: 'print', text: 'طباعة' }
             ],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"

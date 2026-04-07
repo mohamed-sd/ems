@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -12,7 +12,7 @@ if (!isset($_SESSION['user'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ±</title>
+    <title>إيكوبيشن | التقارير</title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
@@ -23,7 +23,7 @@ if (!isset($_SESSION['user'])) {
     <link rel="stylesheet" href="../assets/css/admin-style.css">
     <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 
-    <!-- Ù…Ù„Ù Ø§Ù„ØªØµÙ…ÙŠÙ… Ø§Ù„Ù‚Ø¯ÙŠÙ… -->
+    <!-- ملف التصميم القديم -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
@@ -83,19 +83,19 @@ JOIN project p ON o.project_id = p.id
 WHERE 1=1
 ";
 
-// ÙÙ„ØªØ±Ø© Ø¨Ø§Ù„ØªØ§Ø±ÙŠØ®
+// فلترة بالتاريخ
 if (!empty($start_date) && !empty($end_date)) {
     $sql .= " AND t.date BETWEEN '$start_date' AND '$end_date' ";
 } elseif (!empty($start_date)) {
     $sql .= " AND t.date = '$start_date' ";
 }
 
-// ÙÙ„ØªØ±Ø© Ø¨Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
+// فلترة بالمشروع
 if (!empty($project_filter)) {
     $sql .= " AND p.id = '$project_filter' ";
 }
 
-// ÙÙ„ØªØ±Ø© Ø¨Ø§Ù„Ø³Ø§Ø¦Ù‚
+// فلترة بالسائق
 if (!empty($driver_filter)) {
     $sql .= " AND d.id = '$driver_filter' ";
 }
@@ -109,25 +109,25 @@ $result = mysqli_query($conn, $sql);
     <div class="page-header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fa-solid fa-truck"></i></div>
-            ØªÙ‚Ø±ÙŠØ± Ø³Ø§Ø¹Ø§Øª Ø¹Ù…Ù„ Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ†
+            تقرير ساعات عمل السائقين
         </h1>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="reports.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
+                <i class="fas fa-arrow-right"></i> رجوع
             </a>
         </div>
     </div>
 
     <div class="card mb-4">
         <div class="card-header">
-            <h5><i class="fas fa-filter"></i> ÙÙ„Ø§ØªØ± Ø§Ù„ØªÙ‚Ø±ÙŠØ±</h5>
+            <h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
         </div>
         <div class="card-body">
             <form method="GET" class="form-grid">
                 <div>
-                    <label><i class="fas fa-diagram-project"></i> Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</label>
+                    <label><i class="fas fa-diagram-project"></i> المشروع</label>
                     <select name="project">
-                        <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
+                        <option value="">-- الكل --</option>
                         <?php
                         $prj = mysqli_query($conn, "SELECT id, name FROM project");
                         while ($row = mysqli_fetch_assoc($prj)) {
@@ -139,9 +139,9 @@ $result = mysqli_query($conn, $sql);
                 </div>
 
                 <div>
-                    <label><i class="fas fa-user-gear"></i> Ø§Ù„Ø³Ø§Ø¦Ù‚</label>
+                    <label><i class="fas fa-user-gear"></i> السائق</label>
                     <select name="driver">
-                        <option value="">-- Ø§Ù„ÙƒÙ„ --</option>
+                        <option value="">-- الكل --</option>
                         <?php
                         $drv = mysqli_query($conn, "SELECT id, name FROM drivers");
                         while ($row = mysqli_fetch_assoc($drv)) {
@@ -153,34 +153,34 @@ $result = mysqli_query($conn, $sql);
                 </div>
 
                 <div>
-                    <label><i class="fas fa-calendar-day"></i> Ù…Ù†</label>
+                    <label><i class="fas fa-calendar-day"></i> من</label>
                     <input type="date" name="start_date" value="<?php echo $start_date; ?>">
                 </div>
 
                 <div>
-                    <label><i class="fas fa-calendar-check"></i> Ø¥Ù„Ù‰</label>
+                    <label><i class="fas fa-calendar-check"></i> إلى</label>
                     <input type="date" name="end_date" value="<?php echo $end_date; ?>">
                 </div>
 
-                <button type="submit"><i class="fa fa-search"></i> Ø¨Ø­Ø«</button>
+                <button type="submit"><i class="fa fa-search"></i> بحث</button>
             </form>
         </div>
     </div>
 
     <div class="card">
         <div class="card-header">
-            <h5><i class="fas fa-table"></i> Ù†ØªØ§Ø¦Ø¬ Ø§Ù„ØªÙ‚Ø±ÙŠØ±</h5>
+            <h5><i class="fas fa-table"></i> نتائج التقرير</h5>
         </div>
         <div class="card-body table-container">
             <div class="table-responsive">
                 <table class="table table-bordered table-striped align-middle report-table">
                     <thead>
                     <tr>
-                        <th>Ø§Ù„Ø³Ø§Ø¦Ù‚</th>
-                        <th>Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</th>
-                        <th>Ø§Ù„Ø¢Ù„ÙŠØ©</th>
-                        <th>Ø§Ù„ØªØ§Ø±ÙŠØ®</th>
-                        <th>â±ï¸ Ù…Ø¬Ù…ÙˆØ¹ Ø§Ù„Ø³Ø§Ø¹Ø§Øª</th>
+                        <th>السائق</th>
+                        <th>المشروع</th>
+                        <th>الآلية</th>
+                        <th>التاريخ</th>
+                        <th>⏱️ مجموع الساعات</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -203,7 +203,7 @@ $result = mysqli_query($conn, $sql);
 
             <div class="total-hours-box mt-3">
                 <i class="fas fa-check-circle"></i>
-                Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª: <?php echo $grand_total; ?> Ø³Ø§Ø¹Ø©
+                إجمالي الساعات: <?php echo $grand_total; ?> ساعة
             </div>
         </div>
     </div>

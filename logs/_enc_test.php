@@ -1,5 +1,5 @@
-﻿<?php
-$s = "ØÙØÙÙØØ";
+<?php
+$s = "�������";
 echo "orig=$s\n";
 echo "f1=" . utf8_encode(utf8_decode($s)) . "\n";
 echo "f2=" . mb_convert_encoding($s, 'UTF-8', 'Windows-1252') . "\n";

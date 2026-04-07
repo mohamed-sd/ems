@@ -1,24 +1,24 @@
 <?php
-// تحميل config.php الذي يحمل security.php تلقائياً
+// تضمين config.php (يتضمن دوال security.php الأساسية)
 require_once "config.php";
 
-// الآن يتم بدء الجلسة الآمنة من security.php تلقائياً
-// إعدادات الأمان الإضافية
+// تعيين بعض رؤوس الأمان الإضافية فوق security.php
+// (اختياري لكن مفيد)
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("Referrer-Policy: no-referrer");
 
-// إعدادات تسجيل الدخول
+// إعدادات قفل المحاولات
 $max_attempts = 5;
 $lockout_minutes = 15;
 
-// تهيئة محاولات تسجيل الدخول في الجلسة
+// تهيئة عداد محاولات تسجيل الدخول في الجلسة
 if (!isset($_SESSION['login_attempts'])) {
     $_SESSION['login_attempts'] = 0;
     $_SESSION['last_attempt_time'] = null;
 }
 
-// دالة للتحقق من قفل الحساب
+// فحص حالة القفل الحالي
 function is_login_locked_out() {
     global $max_attempts, $lockout_minutes;
     if (!empty($_SESSION['last_attempt_time']) && $_SESSION['login_attempts'] >= $max_attempts) {
@@ -40,13 +40,13 @@ if (isset($_GET['msg']) && trim($_GET['msg']) !== '') {
 if ($_SERVER['REQUEST_METHOD']==='POST') {
   if (is_login_locked_out()) {
     $mins = $lockout_minutes;
-    $error="تم تجميد الحساب مؤقتاً. حاول بعد {$mins} دقيقة.";
+    $error="تم تجاوز عدد محاولات الدخول. حاول بعد {$mins} دقيقة.";
   } elseif (!verify_csrf_token(isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '')) {
-    $error="رمز الأمان غير صحيح. أعد تحميل الصفحة.";
+    $error="رمز الحماية غير صالح. أعد تحميل الصفحة.";
   } else {
     $u=trim(isset($_POST['username']) ? $_POST['username'] : ''); $p=trim(isset($_POST['password']) ? $_POST['password'] : '');
-    if ($u===''||$p==='') { $error="الرجاء إدخال بيانات الدخول."; }
-    elseif (mb_strlen($u)>50||mb_strlen($p)>128) { $error="المدخلات تتجاوز الحد المسموح."; }
+    if ($u===''||$p==='') { $error="يرجى إدخال اسم المستخدم وكلمة المرور."; }
+    elseif (mb_strlen($u)>50||mb_strlen($p)>128) { $error="بيانات الاعتماد أطول من المسموح."; }
     else {
       $stmt=mysqli_prepare($conn,"SELECT id,name,username,password,phone,role,project_id,mine_id,contract_id,company_id,parent_id,created_at,updated_at FROM users WHERE username=? LIMIT 1");
       if ($stmt) {
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 
               if (!$is_super_admin && $company_id_val <= 0) {
                 $_SESSION['login_attempts']++; $_SESSION['last_attempt_time']=time();
-                $error="Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„: Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… ØºÙŠØ± Ù…Ø±ØªØ¨Ø· Ø¨Ø´Ø±ÙƒØ© (company_id).";
+                $error="لا يمكن تسجيل الدخول: المستخدم غير مرتبط بشركة (company_id).";
                 mysqli_stmt_close($stmt);
                 goto login_end;
               }
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 
                 if ($companyStatus !== 'active') {
                   $_SESSION['login_attempts']++; $_SESSION['last_attempt_time']=time();
-                  $error="لا يمكن تسجيل الدخول: الشركة موقوفة حالياً.";
+                  $error="لا يمكن تسجيل الدخول: حالة الشركة غير نشطة.";
                   mysqli_stmt_close($stmt);
                   goto login_end;
                 }
@@ -97,10 +97,10 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
               'parent'=>$user['parent_id'],'created_at'=>$user['created_at'],
               'updated_at'=>$user['updated_at'],'last_login'=>date('Y-m-d H:i:s')];
             header("Location: main/dashboard.php"); exit();
-          } else { $_SESSION['login_attempts']++; $_SESSION['last_attempt_time']=time(); $error="بيانات الدخول غير صحيحة. المحاولات المتبقية: ".max(0,$max_attempts-$_SESSION['login_attempts']); }
-        } else { $_SESSION['login_attempts']++; $_SESSION['last_attempt_time']=time(); $error="بيانات الدخول غير صحيحة. المحاولات المتبقية: ".max(0,$max_attempts-$_SESSION['login_attempts']); }
+          } else { $_SESSION['login_attempts']++; $_SESSION['last_attempt_time']=time(); $error="اسم المستخدم أو كلمة المرور غير صحيحة. المحاولات المتبقية: ".max(0,$max_attempts-$_SESSION['login_attempts']); }
+        } else { $_SESSION['login_attempts']++; $_SESSION['last_attempt_time']=time(); $error="اسم المستخدم أو كلمة المرور غير صحيحة. المحاولات المتبقية: ".max(0,$max_attempts-$_SESSION['login_attempts']); }
         mysqli_stmt_close($stmt);
-      } else { $error="خطأ داخلي، حاول لاحقاً."; }
+      } else { $error="حدث خطأ أثناء التحقق."; }
     }
   }
 }
@@ -116,7 +116,7 @@ $csrf = generate_csrf_token(); // من security.php
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-/* ─── TOKENS (identical to dashboard) ─── */
+/* --- TOKENS (identical to dashboard) --- */
 :root{
   --navy:    #0c1c3e;
   --navy-m:  #132050;
@@ -140,10 +140,10 @@ $csrf = generate_csrf_token(); // من security.php
 html,body{height:100%;font-family:var(--font);color:var(--txt)}
 a{text-decoration:none;color:inherit}
 
-/* ─── SPLIT LAYOUT ─── */
+/* --- SPLIT LAYOUT --- */
 .page{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
 
-/* ═══ LEFT PANEL ═══ */
+/* --- LEFT PANEL --- */
 .panel{
   position:relative;overflow:hidden;
   background:linear-gradient(130deg,var(--navy) 0%,var(--navy-m) 55%,var(--navy-l) 100%);
@@ -174,11 +174,11 @@ a{text-decoration:none;color:inherit}
 
 .p-foot{position:relative;z-index:1;font-size:.68rem;color:var(--gold);letter-spacing:.05em;animation:fadeUp .5s .2s cubic-bezier(.4,0,.2,1) both}
 
-/* ═══ RIGHT SIDE ═══ */
+/* --- RIGHT SIDE --- */
 .login-side{background:var(--bg);display:flex;align-items:center;justify-content:center;padding:40px 24px;position:relative}
 .login-side::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(12,28,62,.04) 1px,transparent 1px);background-size:24px 24px;pointer-events:none}
 
-/* ─── CARD ─── */
+/* --- CARD --- */
 .card{
   position:relative;z-index:1;
   background:var(--card);border-radius:24px;
@@ -267,7 +267,7 @@ a{text-decoration:none;color:inherit}
   transform:translateY(-1px);box-shadow:var(--s2)
 }
 
-/* ─── RESPONSIVE ─── */
+/* --- RESPONSIVE --- */
 @media(max-width:860px){
   .page{grid-template-columns:1fr}
   .panel{display:none}
@@ -282,7 +282,7 @@ a{text-decoration:none;color:inherit}
 <body>
 <div class="page">
 
-  <!-- ████ LEFT PANEL ████ -->
+  <!-- LEFT PANEL -->
   <div class="panel">
     <div class="orb-bl"></div>
 
@@ -295,33 +295,33 @@ a{text-decoration:none;color:inherit}
     <div class="features">
       <div class="feat">
         <div class="fi-ico"><i class="fas fa-project-diagram"></i></div>
-        <div class="fi-txt"><h4>إدارة المشاريع</h4><p>تتبع شامل للمشاريع والمناجم</p></div>
+        <div class="fi-txt"><h4>إدارة المشاريع</h4><p>تنظيم ومتابعة المشاريع بكفاءة</p></div>
       </div>
       <div class="feat">
         <div class="fi-ico"><i class="fas fa-tools"></i></div>
-        <div class="fi-txt"><h4>إدارة الأسطول</h4><p>مراقبة المعدات والمشغلين في الوقت الفعلي</p></div>
+        <div class="fi-txt"><h4>إدارة المعدات</h4><p>متابعة المعدات المخصصة في جميع المواقع</p></div>
       </div>
       <div class="feat">
         <div class="fi-ico"><i class="fas fa-clock"></i></div>
-        <div class="fi-txt"><h4>ساعات العمل</h4><p>تسجيل ومراجعة ساعات المشغلين</p></div>
+        <div class="fi-txt"><h4>إدارة الوقت</h4><p>مراقبة ساعات العمل والإنتاجية</p></div>
       </div>
       <div class="feat">
         <div class="fi-ico"><i class="fas fa-chart-line"></i></div>
-        <div class="fi-txt"><h4>التقارير</h4><p>إحصائيات دقيقة لدعم القرار</p></div>
+        <div class="fi-txt"><h4>التقارير</h4><p>تقارير فورية تدعم القرار</p></div>
       </div>
     </div>
 
-    <div class="p-foot">© <?= date('Y') ?> إيكوبيشن — جميع الحقوق محفوظة</div>
+    <div class="p-foot">© <?= date('Y') ?> إيكوبيشن • نظام إدارة المعدات</div>
   </div>
 
-  <!-- ████ RIGHT LOGIN ████ -->
+  <!-- RIGHT LOGIN -->
   <div class="login-side">
     <div class="card">
 
       <div class="card-head">
         <div class="ch-logo"><i class="fas fa-layer-group"></i></div>
         <h2>تسجيل الدخول</h2>
-        <p>أدخل بياناتك للوصول إلى النظام</p>
+        <p>أدخل بياناتك للمتابعة إلى النظام</p>
       </div>
 
       <div class="div-line"></div>
@@ -340,7 +340,7 @@ a{text-decoration:none;color:inherit}
           <label for="un">اسم المستخدم</label>
           <div class="fw">
             <input id="un" name="username" type="text" maxlength="50"
-              placeholder="أدخل اسم المستخدم" required autocomplete="username"
+              placeholder="اكتب اسم المستخدم" required autocomplete="username"
               value="<?= isset($_POST['username']) ? e($_POST['username']) : '' ?>">
             <i class="fas fa-user ico"></i>
           </div>
@@ -350,7 +350,7 @@ a{text-decoration:none;color:inherit}
           <label for="pw">كلمة المرور</label>
           <div class="fw">
             <input id="pw" name="password" type="password" maxlength="128"
-              placeholder="أدخل كلمة المرور" required autocomplete="current-password">
+              placeholder="اكتب كلمة المرور" required autocomplete="current-password">
             <i class="fas fa-lock ico"></i>
             <button type="button" class="pw-toggle" id="pwt">
               <i class="fas fa-eye" id="eyi"></i>
@@ -359,7 +359,7 @@ a{text-decoration:none;color:inherit}
         </div>
 
         <button type="submit" class="btn-submit" id="sb">
-          <span class="bt">دخول إلى النظام</span>
+          <span class="bt">تسجيل الدخول</span>
           <i class="fas fa-arrow-left bi"></i>
         </button>
       </form>
@@ -367,13 +367,13 @@ a{text-decoration:none;color:inherit}
       <div class="sec-note">
         <i class="fas fa-shield-alt"></i>
         <p>
-          الحد الأقصى: <strong><?= e($max_attempts) ?> محاولات</strong> —
-          التجميد: <strong><?= e($lockout_minutes) ?> دقيقة</strong>
+          حد المحاولات: <strong><?= e($max_attempts) ?> محاولة</strong> •
+          مدة القفل: <strong><?= e($lockout_minutes) ?> دقيقة</strong>
         </p>
       </div>
 
       <div class="portal-links">
-        <a class="portal-link" href="company/login.php"><i class="fas fa-building"></i> دخول مستخدمي الشركات</a>
+        <a class="portal-link" href="company/login.php"><i class="fas fa-building"></i> دخول بوابة الشركات</a>
         <a class="portal-link" href="company/register.php"><i class="fas fa-plus-circle"></i> تسجيل شركة جديدة</a>
       </div>
 

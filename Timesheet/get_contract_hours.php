@@ -9,6 +9,7 @@ include '../config.php';
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
 
 if (!$is_super_admin && $company_id <= 0) {
     echo 0;
@@ -25,7 +26,7 @@ if (isset($_GET['operation_id'])) {
             SELECT 1
             FROM project p
             LEFT JOIN users su ON su.id = p.created_by
-            LEFT JOIN clients sc ON sc.id = p.company_client_id
+                        LEFT JOIN clients sc ON sc.id = p.$project_client_column
             LEFT JOIN users scu ON scu.id = sc.created_by
             WHERE p.id = operations.project_id
               AND (su.company_id = $company_id OR scu.company_id = $company_id)

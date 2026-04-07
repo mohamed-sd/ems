@@ -363,3 +363,307 @@ Stack trace:
 #3 C:\xampp-latest\htdocs\emss\company\register.php(599): company_login_success(Array, Array)
 #4 {main}
   thrown in C:\xampp-latest\htdocs\emss\company\auth.php on line 43
+[06-Apr-2026 13:16:07 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): No connection could be made because the target machine actively refused it in C:\xampp-latest\htdocs\ems\config.php on line 119
+[06-Apr-2026 13:16:07 Europe/Berlin] Database Connection Failed: No connection could be made because the target machine actively refused it
+[06-Apr-2026 13:29:59 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 729
+[06-Apr-2026 13:32:29 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 729
+[06-Apr-2026 13:35:32 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 729
+[06-Apr-2026 13:42:57 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 755
+[06-Apr-2026 13:45:11 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:46:00 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:46:29 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:47:27 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:48:03 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:48:03 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:48:25 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:48:27 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:51:22 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:52:46 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:54:56 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:55:04 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[06-Apr-2026 13:55:47 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[06-Apr-2026 13:55:47 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[06-Apr-2026 13:55:52 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 13:55:52 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 13:56:28 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[06-Apr-2026 13:56:28 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[06-Apr-2026 13:57:02 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 13:57:02 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 13:57:06 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 13:57:06 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 13:57:14 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 13:57:14 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 16:09:24 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 16:09:24 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 16:09:29 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 16:09:29 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 16:09:36 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 16:09:36 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 16:09:41 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 16:09:41 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 16:09:49 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[06-Apr-2026 16:09:49 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 07:57:20 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 07:57:58 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 07:58:36 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 07:58:45 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 07:59:05 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 07:59:07 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 07:59:10 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 08:00:48 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 08:02:02 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 08:02:59 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:02:59 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:03:07 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:03:07 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:03:39 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 08:03:39 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 08:03:51 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:03:51 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:04:23 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:04:23 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:04:23 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:04:23 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:04:50 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:04:50 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:04:55 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:04:55 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:05:04 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:05:04 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:05:08 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:05:08 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:05:20 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:05:20 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:05:30 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 08:39:17 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 08:46:37 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 08:46:37 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 08:46:45 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:46:45 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:47:19 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:47:19 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:47:19 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:47:19 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 08:47:39 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:47:39 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:47:44 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:47:44 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:48:07 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:48:07 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:48:15 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:48:15 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:48:23 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:48:23 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:48:45 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:48:45 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:49:06 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:49:06 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:49:31 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:49:31 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:52:34 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:52:34 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:52:52 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 08:52:52 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 09:06:03 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 09:08:24 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 09:09:03 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 09:09:22 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 09:09:32 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 09:11:12 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 09:12:49 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 09:19:36 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 09:46:23 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[07-Apr-2026 09:47:17 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 09:47:17 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 09:47:30 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:47:30 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:48:02 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 09:48:02 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 09:48:07 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:48:07 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:50:56 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:50:56 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:37 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:37 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:45 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:45 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:45 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:45 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:54 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:54 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:58 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:58 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:58 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:51:58 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:52:24 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:52:24 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 09:52:28 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 09:52:28 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 09:52:33 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 09:52:33 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 09:52:36 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 09:52:36 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:03:36 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_num_rows(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Oprators\oprators.php:117
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Oprators\oprators.php(117): mysqli_num_rows(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Oprators\oprators.php on line 117
+[07-Apr-2026 10:03:59 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_num_rows(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Oprators\oprators.php:117
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Oprators\oprators.php(117): mysqli_num_rows(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Oprators\oprators.php on line 117
+[07-Apr-2026 10:05:13 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php:229
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php(229): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php on line 229
+[07-Apr-2026 10:05:24 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp-latest\htdocs\ems\config.php:158) in C:\xampp-latest\htdocs\ems\config.php on line 168
+[07-Apr-2026 10:06:37 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp-latest\htdocs\ems\config.php:158) in C:\xampp-latest\htdocs\ems\config.php on line 168
+[07-Apr-2026 10:06:41 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php:229
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php(229): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php on line 229
+[07-Apr-2026 10:06:56 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php:229
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php(229): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php on line 229
+[07-Apr-2026 10:09:11 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php:229
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php(229): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php on line 229
+[07-Apr-2026 10:09:15 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php:229
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php(229): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php on line 229
+[07-Apr-2026 10:19:47 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_num_rows(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Oprators\oprators.php:117
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Oprators\oprators.php(117): mysqli_num_rows(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Oprators\oprators.php on line 117
+[07-Apr-2026 10:19:56 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_num_rows(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Oprators\oprators.php:117
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Oprators\oprators.php(117): mysqli_num_rows(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Oprators\oprators.php on line 117
+[07-Apr-2026 10:19:58 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_num_rows(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Oprators\oprators.php:117
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Oprators\oprators.php(117): mysqli_num_rows(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Oprators\oprators.php on line 117
+[07-Apr-2026 10:28:47 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 10:28:47 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 10:28:55 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:28:55 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:29:31 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:29:31 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:29:37 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:29:37 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:29:41 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:29:41 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:29:58 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:29:58 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:05 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:05 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:09 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:09 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:09 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:09 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:17 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:17 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:29 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:29 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:30 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:30 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:30 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:30:30 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:45:58 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 10:45:58 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 10:46:05 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:46:05 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:46:26 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:46:26 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:46:26 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:46:26 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:46:39 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:46:39 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:46:47 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:46:47 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:46:47 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:46:47 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:47:04 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:47:04 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:47:09 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:47:09 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:47:19 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:47:19 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 10:52:03 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:52:03 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:52:10 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:52:10 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:52:26 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:52:26 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:52:26 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:52:26 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 10:57:50 Europe/Berlin] PHP Warning:  Undefined array key "equipment_id" in C:\xampp-latest\htdocs\ems\Equipments\add_drivers.php on line 62
+[07-Apr-2026 11:08:12 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:08:12 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:08:19 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:08:19 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:08:40 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:08:40 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:08:40 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:08:40 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:08:53 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:08:53 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:09:00 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:09:00 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:09:00 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 11:09:00 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 13:27:20 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:20 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:26 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:26 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:26 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:26 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:30 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:30 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:30 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:30 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:35 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:35 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:35 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:35 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:39 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:39 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:39 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:39 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:57 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:57 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:57 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:27:57 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:30:36 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:30:36 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:31:06 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:31:06 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\roles.php on line 9
+[07-Apr-2026 13:36:28 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 13:36:28 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 13:38:01 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 13:38:01 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[07-Apr-2026 13:49:07 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 13:49:07 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 13:49:11 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 13:49:11 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 13:49:18 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 13:49:18 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[07-Apr-2026 15:22:29 Europe/Berlin] PHP Warning:  Undefined variable $timesheet_has_company in C:\xampp-latest\htdocs\ems\Timesheet\get_timesheet_data.php on line 19
+[07-Apr-2026 15:22:31 Europe/Berlin] PHP Warning:  Undefined variable $timesheet_has_company in C:\xampp-latest\htdocs\ems\Timesheet\get_timesheet_data.php on line 19
+[07-Apr-2026 15:22:35 Europe/Berlin] PHP Warning:  Undefined variable $timesheet_has_company in C:\xampp-latest\htdocs\ems\Timesheet\get_timesheet_data.php on line 19
+[07-Apr-2026 15:22:41 Europe/Berlin] PHP Warning:  Undefined variable $timesheet_has_company in C:\xampp-latest\htdocs\ems\Timesheet\get_timesheet_data.php on line 19
+[07-Apr-2026 15:22:48 Europe/Berlin] PHP Warning:  Undefined variable $timesheet_has_company in C:\xampp-latest\htdocs\ems\Timesheet\get_timesheet_data.php on line 19
+[07-Apr-2026 15:22:49 Europe/Berlin] PHP Warning:  Undefined variable $timesheet_has_company in C:\xampp-latest\htdocs\ems\Timesheet\get_timesheet_data.php on line 19
+[07-Apr-2026 15:22:53 Europe/Berlin] PHP Warning:  Undefined variable $timesheet_has_company in C:\xampp-latest\htdocs\ems\Timesheet\get_timesheet_data.php on line 19

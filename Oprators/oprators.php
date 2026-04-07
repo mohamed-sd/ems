@@ -1,10 +1,10 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
     exit();
 }
-$page_title = "Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø§Ù„ØªØ´ØºÙŠÙ„ ";
+$page_title = "إيكوبيشن | التشغيل ";
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once '../includes/approval_workflow.php';
@@ -12,28 +12,45 @@ require_once '../includes/approval_workflow.php';
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
+$project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
 
 if (!$is_super_admin && $company_id <= 0) {
-    header("Location: ../login.php?msg=Ù„Ø§+ØªÙˆØ¬Ø¯+Ø¨ÙŠØ¦Ø©+Ø´Ø±ÙƒØ©+ØµØ§Ù„Ø­Ø©+Ù„Ù„Ù…Ø³ØªØ®Ø¯Ù…+âŒ");
+    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
     exit();
 }
 
 $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
+if (!$operations_has_company) {
+    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN company_id INT NULL AFTER project_id");
+    @mysqli_query($conn, "ALTER TABLE operations ADD INDEX idx_operations_company_id (company_id)");
+    $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
+}
+
+if (!$is_super_admin && !$operations_has_company) {
+    die('لا يمكن تطبيق عزل الشركات في شاشة التشغيل لأن عمود company_id غير متاح في جدول operations.');
+}
+
+$operations_company_scope = (!$is_super_admin && $operations_has_company) ? " AND company_id = $company_id" : "";
 
 $project_scope_sql = "1=1";
 if (!$is_super_admin) {
-    $project_scope_sql = "(
-        EXISTS (SELECT 1 FROM users su WHERE su.id = project.created_by AND su.company_id = $company_id)
-        OR EXISTS (
-            SELECT 1
-            FROM clients sc
-            INNER JOIN users scu ON scu.id = sc.created_by
-            WHERE sc.id = project.company_client_id AND scu.company_id = $company_id
-        )
-    )";
+    if ($project_has_company_id) {
+        $project_scope_sql = "project.company_id = $company_id";
+    } else {
+        $project_scope_sql = "(
+            EXISTS (SELECT 1 FROM users su WHERE su.id = project.created_by AND su.company_id = $company_id)
+            OR EXISTS (
+                SELECT 1
+                FROM clients sc
+                INNER JOIN users scu ON scu.id = sc.created_by
+                WHERE sc.id = project.$project_client_column AND scu.company_id = $company_id
+            )
+        )";
+    }
 }
 
-// Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø¹Ù„Ù‰ Ø´Ø§Ø´Ø© Ø§Ù„ØªØ´ØºÙŠÙ„ (Ù…Ø¹ Ø£ÙˆÙ„ÙˆÙŠØ© Ø³Ø¬Ù„ Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ø­Ø§Ù„ÙŠ)
+// التحقق من صلاحيات المستخدم على شاشة التشغيل (مع أولوية سجل الدور الحالي)
 $current_role_id = intval($_SESSION['user']['role']);
 $module_query = "SELECT m.id
                                  FROM modules m
@@ -75,7 +92,7 @@ if ($module_id) {
 }
 
 if (!$can_view) {
-    header("Location: ../login.php?msg=Ù„Ø§+ØªÙˆØ¬Ø¯+ØµÙ„Ø§Ø­ÙŠØ©+Ø¹Ø±Ø¶+Ø§Ù„ØªØ´ØºÙŠÙ„+âŒ");
+    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+التشغيل+❌");
     exit();
 }
 
@@ -83,11 +100,11 @@ $is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "1
 $user_project_id = $is_role10 ? intval($_SESSION['user']['project_id']) : 0;
 $user_mine_id = $is_role10 ? intval($_SESSION['user']['mine_id']) : 0;
 $user_contract_id = $is_role10 ? intval($_SESSION['user']['contract_id']) : 0;
-// Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ÙˆØ¬ÙˆØ¯ Ù…Ø´Ø±ÙˆØ¹ Ù…Ø­Ø¯Ø¯
+// التحقق من وجود مشروع محدد
 $selected_project_id = 0;
 $selected_project = null;
 
-// Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† GET parameter Ø£Ùˆ SESSION
+// التحقق من GET parameter أو SESSION
 if ($is_role10) {
     $selected_project_id = $user_project_id;
     if ($selected_project_id > 0) {
@@ -100,34 +117,39 @@ if ($is_role10) {
     $selected_project_id = intval($_SESSION['operations_project_id']);
 }
 
-// Ø¥Ø°Ø§ Ù„Ù… ÙŠØªÙ… ØªØ­Ø¯ÙŠØ¯ Ù…Ø´Ø±ÙˆØ¹ØŒ Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„ØªÙˆØ¬ÙŠÙ‡ Ù„ØµÙØ­Ø© Ø§Ù„Ø§Ø®ØªÙŠØ§Ø±
+// إذا لم يتم تحديد مشروع، إعادة التوجيه لصفحة الاختيار
 if ($selected_project_id == 0) {
     if ($is_role10) {
-        echo "<script>alert('âŒ Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ø´Ø±ÙˆØ¹ Ù…Ø­Ø¯Ø¯ Ù„Ù‡Ø°Ø§ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…'); window.location.href='../main/dashboard.php';</script>";
+        echo "<script>alert('❌ لا يوجد مشروع محدد لهذا المستخدم'); window.location.href='../main/dashboard.php';</script>";
         exit();
     }
     header("Location: select_project.php");
     exit();
 }
 
-// Ø¬Ù„Ø¨ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„Ù…Ø­Ø¯Ø¯
+// جلب بيانات المشروع المحدد
 $project_query = "SELECT id, name, project_code, location FROM project WHERE id = $selected_project_id AND status = 1 AND $project_scope_sql";
 $project_result = mysqli_query($conn, $project_query);
+
+if (!$project_result) {
+    echo "<script>alert('❌ خطأ في تحميل بيانات المشروع'); window.location.href='select_project.php';</script>";
+    exit();
+}
 
 if (mysqli_num_rows($project_result) > 0) {
     $selected_project = mysqli_fetch_assoc($project_result);
 } else {
-    // Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯ Ø£Ùˆ ØºÙŠØ± Ù†Ø´Ø·
+    // المشروع غير موجود أو غير نشط
     unset($_SESSION['operations_project_id']);
     header("Location: select_project.php");
     exit();
 }
 
-// ØªØºÙŠÙŠØ± Ø­Ø§Ù„Ø© Ø§Ù„ØªØ´ØºÙŠÙ„ (Ø¥ÙŠÙ‚Ø§Ù/ØªØ¹Ø·Ù„/Ø§Ø³ØªØ¦Ù†Ø§Ù)
+// تغيير حالة التشغيل (إيقاف/تعطل/استئناف)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_status') {
     if (!$can_edit) {
         $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-        echo "<script>alert('âŒ Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ ØµÙ„Ø§Ø­ÙŠØ© ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ØªØ´ØºÙŠÙ„'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+        echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
         exit();
     }
 
@@ -136,53 +158,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $allowed_statuses = [1, 3, 4];
 
     if (!empty($operation_id) && in_array($new_status, $allowed_statuses, true)) {
-        $update_sql = "UPDATE operations SET status = $new_status WHERE id = $operation_id AND project_id = $selected_project_id";
+        $update_sql = "UPDATE operations SET status = $new_status WHERE id = $operation_id AND project_id = $selected_project_id$operations_company_scope";
         $update_result = mysqli_query($conn, $update_sql);
 
         if ($update_result) {
             $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-            echo "<script>alert('âœ… ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø­Ø§Ù„Ø© Ø¨Ù†Ø¬Ø§Ø­'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+            echo "<script>alert('✅ تم تحديث الحالة بنجاح'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
             exit();
         }
 
-        echo "<script>alert('âŒ Ø®Ø·Ø£ ÙÙŠ ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø­Ø§Ù„Ø©: " . mysqli_error($conn) . "');</script>";
+        echo "<script>alert('❌ خطأ في تحديث الحالة: " . mysqli_error($conn) . "');</script>";
     } else {
-        echo "<script>alert('âŒ Ø¨ÙŠØ§Ù†Ø§Øª ØºÙŠØ± ØµØ­ÙŠØ­Ø© Ù„ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø­Ø§Ù„Ø©');</script>";
+        echo "<script>alert('❌ بيانات غير صحيحة لتحديث الحالة');</script>";
     }
 }
 
-// Ø·Ù„Ø¨ Ø¥ÙŠÙ‚Ø§Ù Ø¢Ù„ÙŠØ© Ø¹Ø¨Ø± Ù†Ø¸Ø§Ù… Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø§Øª (Ù…Ø¯ÙŠØ± Ø§Ù„Ø­Ø±ÙƒØ© ÙˆØ§Ù„ØªØ´ØºÙŠÙ„ ÙÙ‚Ø·)
+// طلب إيقاف آلية عبر نظام الموافقات (مدير الحركة والتشغيل فقط)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'request_equipment_stop') {
     if (!$can_edit) {
-        echo "<script>alert('âŒ Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ ØµÙ„Ø§Ø­ÙŠØ© ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ØªØ´ØºÙŠÙ„');</script>";
+        echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل');</script>";
     } elseif (!$is_role10) {
-        echo "<script>alert('âŒ Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ ØµÙ„Ø§Ø­ÙŠØ© Ù„ØªÙ‚Ø¯ÙŠÙ… Ø·Ù„Ø¨ Ø¥ÙŠÙ‚Ø§Ù Ø¢Ù„ÙŠØ©');</script>";
+        echo "<script>alert('❌ ليس لديك صلاحية لتقديم طلب إيقاف آلية');</script>";
     } else {
         $operation_id = isset($_POST['operation_id']) ? intval($_POST['operation_id']) : 0;
         $request_reason = isset($_POST['request_reason']) ? trim($_POST['request_reason']) : '';
 
         if ($operation_id <= 0) {
-            echo "<script>alert('âŒ Ø¨ÙŠØ§Ù†Ø§Øª ØºÙŠØ± ØµØ­ÙŠØ­Ø©');</script>";
+            echo "<script>alert('❌ بيانات غير صحيحة');</script>";
         } else {
             $op_sql = "SELECT o.id, o.equipment, o.status, e.code AS equipment_code, e.name AS equipment_name, e.availability_status
                        FROM operations o
                        LEFT JOIN equipments e ON o.equipment = e.id
-                       WHERE o.id = $operation_id AND o.project_id = $selected_project_id
+                       WHERE o.id = $operation_id AND o.project_id = $selected_project_id" . str_replace('company_id', 'o.company_id', $operations_company_scope) . "
                        LIMIT 1";
             $op_result = mysqli_query($conn, $op_sql);
 
             if (!$op_result || mysqli_num_rows($op_result) === 0) {
-                echo "<script>alert('âŒ Ø¹Ù…Ù„ÙŠØ© Ø§Ù„ØªØ´ØºÙŠÙ„ ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯Ø©');</script>";
+                echo "<script>alert('❌ عملية التشغيل غير موجودة');</script>";
             } else {
                 $op_row = mysqli_fetch_assoc($op_result);
                 $equipment_id = intval($op_row['equipment']);
 
                 if ($equipment_id <= 0) {
-                    echo "<script>alert('âŒ Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¢Ù„ÙŠØ© Ù…Ø±ØªØ¨Ø·Ø© Ø¨Ù‡Ø°Ø§ Ø§Ù„ØªØ´ØºÙŠÙ„');</script>";
+                    echo "<script>alert('❌ لا توجد آلية مرتبطة بهذا التشغيل');</script>";
                 } else {
-                    $reason_text = $request_reason !== '' ? $request_reason : 'Ø·Ù„Ø¨ Ø¥ÙŠÙ‚Ø§Ù Ø¢Ù„ÙŠØ© Ù…Ù† Ø´Ø§Ø´Ø© Ø§Ù„ØªØ´ØºÙŠÙ„';
+                    $reason_text = $request_reason !== '' ? $request_reason : 'طلب إيقاف آلية من شاشة التشغيل';
 
-                    // Ø¶Ù…Ø§Ù† ÙˆØ¬ÙˆØ¯ Ù‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ù…ÙˆØ§ÙÙ‚Ø© (Ù…Ø¯ÙŠØ± Ø§Ù„Ø£Ø³Ø·ÙˆÙ„) Ù‚Ø¨Ù„ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø·Ù„Ø¨
+                    // ضمان وجود قاعدة الموافقة (مدير الأسطول) قبل إنشاء الطلب
                     mysqli_query(
                         $conn,
                         "INSERT IGNORE INTO approval_workflow_rules (entity_type, action, role_required, step_order, is_active, created_at)
@@ -198,14 +220,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             'requested_by_role' => '10',
                             'reason' => $reason_text,
                             'current_availability_status' => $op_row['availability_status'],
-                            'new_availability_status' => 'Ù…ÙˆÙ‚ÙˆÙØ© Ù„Ù„ØµÙŠØ§Ù†Ø©'
+                            'new_availability_status' => 'موقوفة للصيانة'
                         ],
                         'operations' => [
                             [
                                 'db_action' => 'update',
                                 'table' => 'equipments',
                                 'where' => ['id' => $equipment_id],
-                                'data' => ['availability_status' => 'Ù…ÙˆÙ‚ÙˆÙØ© Ù„Ù„ØµÙŠØ§Ù†Ø©']
+                                'data' => ['availability_status' => 'موقوفة للصيانة']
                             ],
                             [
                                 'db_action' => 'update',
@@ -227,28 +249,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                     $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
                     if (!empty($approval_result['success'])) {
-                        echo "<script>alert('âœ… " . addslashes($approval_result['message']) . "'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+                        echo "<script>alert('✅ " . addslashes($approval_result['message']) . "'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
                         exit();
                     }
 
-                    echo "<script>alert('âŒ " . addslashes($approval_result['message']) . "');</script>";
+                    echo "<script>alert('❌ " . addslashes($approval_result['message']) . "');</script>";
                 }
             }
         }
     }
 }
 
-// Ø§Ù†Ù‡Ø§Ø¡ Ø®Ø¯Ù…Ø© Ù…Ù† Ø§Ù„Ù…ÙˆØ¯ÙŠÙ„
+// انهاء خدمة من الموديل
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'end_service') {
     if (!$can_edit) {
         $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-        echo "<script>alert('âŒ Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ ØµÙ„Ø§Ø­ÙŠØ© Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø®Ø¯Ù…Ø©'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+        echo "<script>alert('❌ ليس لديك صلاحية إنهاء الخدمة'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
         exit();
     }
 
     if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10") {
         $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-        echo "<script>alert('âŒ Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ ØµÙ„Ø§Ø­ÙŠØ© Ù„Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø®Ø¯Ù…Ø©'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+        echo "<script>alert('❌ ليس لديك صلاحية لإنهاء الخدمة'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
         exit();
     }
 
@@ -258,7 +280,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     if (!empty($operation_id) && !empty($end_date)) {
         $days_value = "NULL";
-        $start_res = mysqli_query($conn, "SELECT `start` FROM operations WHERE id = $operation_id AND project_id = $selected_project_id");
+        $start_res = mysqli_query($conn, "SELECT `start` FROM operations WHERE id = $operation_id AND project_id = $selected_project_id$operations_company_scope");
         if ($start_res && mysqli_num_rows($start_res) > 0) {
             $start_row = mysqli_fetch_assoc($start_res);
             $start_date = $start_row['start'];
@@ -272,38 +294,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
         }
 
-        $update_sql = "UPDATE operations SET status = 0, `end` = '$end_date', reason = '$reason', days = $days_value WHERE id = $operation_id AND project_id = $selected_project_id";
+        $update_sql = "UPDATE operations SET status = 0, `end` = '$end_date', reason = '$reason', days = $days_value WHERE id = $operation_id AND project_id = $selected_project_id$operations_company_scope";
         $update_result = mysqli_query($conn, $update_sql);
         
         if ($update_result) {
-            // Ø§Ù„Ø­ÙØ§Ø¸ Ø¹Ù„Ù‰ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„Ù…Ø­Ø¯Ø¯ Ø¨Ø¹Ø¯ Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø®Ø¯Ù…Ø©
+            // الحفاظ على المشروع المحدد بعد إنهاء الخدمة
             $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-            echo "<script>alert('âœ… ØªÙ… Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø®Ø¯Ù…Ø© Ø¨Ù†Ø¬Ø§Ø­'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+            echo "<script>alert('✅ تم إنهاء الخدمة بنجاح'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
             exit();
         } else {
-            echo "<script>alert('âŒ Ø®Ø·Ø£ ÙÙŠ Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø®Ø¯Ù…Ø©: " . mysqli_error($conn) . "');</script>";
+            echo "<script>alert('❌ خطأ في إنهاء الخدمة: " . mysqli_error($conn) . "');</script>";
         }
     } else {
-        echo "<script>alert('âŒ ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©');</script>";
+        echo "<script>alert('❌ يرجى إدخال جميع البيانات المطلوبة');</script>";
     }
 }
 
-// Ø­Ø°Ù ØªØ´ØºÙŠÙ„
+// حذف تشغيل
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) {
         $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-        header("Location: oprators.php" . ($redirect_project ? "?project_id=$redirect_project&msg=" : "?msg=") . "Ù„Ø§+ØªÙˆØ¬Ø¯+ØµÙ„Ø§Ø­ÙŠØ©+Ø­Ø°Ù+Ø§Ù„ØªØ´ØºÙŠÙ„+âŒ");
+        header("Location: oprators.php" . ($redirect_project ? "?project_id=$redirect_project&msg=" : "?msg=") . "لا+توجد+صلاحية+حذف+التشغيل+❌");
         exit();
     }
 
     $delete_id = intval($_GET['delete_id']);
     if ($delete_id > 0) {
-        $delete_sql = "DELETE FROM operations WHERE id = $delete_id AND project_id = $selected_project_id";
+        $delete_sql = "DELETE FROM operations WHERE id = $delete_id AND project_id = $selected_project_id$operations_company_scope";
         if (mysqli_query($conn, $delete_sql)) {
-            header("Location: oprators.php?project_id=$selected_project_id&msg=ØªÙ…+Ø­Ø°Ù+Ø§Ù„ØªØ´ØºÙŠÙ„+Ø¨Ù†Ø¬Ø§Ø­+âœ…");
+            header("Location: oprators.php?project_id=$selected_project_id&msg=تم+حذف+التشغيل+بنجاح+✅");
             exit();
         }
-        header("Location: oprators.php?project_id=$selected_project_id&msg=Ø­Ø¯Ø«+Ø®Ø·Ø£+Ø£Ø«Ù†Ø§Ø¡+Ø§Ù„Ø­Ø°Ù+âŒ");
+        header("Location: oprators.php?project_id=$selected_project_id&msg=حدث+خطأ+أثناء+الحذف+❌");
         exit();
     }
 }
@@ -327,35 +349,35 @@ include('../insidebar.php');
                 <?php if (!empty($selected_project['project_code'])) { ?>
                     <small class="page-subtitle">
                         <i class="fas fa-barcode"></i>
-                        ÙƒÙˆØ¯ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹: <?php echo htmlspecialchars($selected_project['project_code']); ?>
+                        كود المشروع: <?php echo htmlspecialchars($selected_project['project_code']); ?>
                     </small>
                 <?php } ?>
                 <small class="page-subtitle">
                     <i class="fas fa-cogs"></i>
-                    ØªÙ†Ø¸ÙŠÙ… ØªØ´ØºÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª ÙˆØ±Ø¨Ø·Ù‡Ø§ Ø¨Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹ ÙˆØ§Ù„Ù…Ù†Ø§Ø¬Ù… ÙˆØ§Ù„Ø¹Ù‚ÙˆØ¯
+                    تنظيم تشغيل المعدات وربطها بالمشاريع والمناجم والعقود
                 </small>
             </div>
         </h1>
         <div class="page-header-actions">
              <a href="../main/dashboard.php" class="back-btn">
-                    <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
+                    <i class="fas fa-arrow-right"></i> رجوع
                 </a>
             <?php if($_SESSION['user']['role'] != "10") { ?>
             <a href="select_project.php" class="back-btn">
                 <i class="fas fa-exchange-alt"></i>
-                ØªØºÙŠÙŠØ± Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
+                تغيير المشروع
             </a>
             <?php } ?>
             <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fa fa-plus"></i> Ø§Ø¶Ø§ÙØ© ØªØ´ØºÙŠÙ„
+                <i class="fa fa-plus"></i> اضافة تشغيل
             </a>
             <?php endif; ?>
         </div>
     </div>
 
     <?php if (!empty($_GET['msg'])):
-        $isSuccess = strpos($_GET['msg'], 'âœ…') !== false;
+        $isSuccess = strpos($_GET['msg'], '✅') !== false;
     ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
@@ -365,31 +387,31 @@ include('../insidebar.php');
 
     <h2 class="section-title">
         <i class="fas fa-cogs"></i>
-        Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ØªØ´ØºÙŠÙ„
+        إدارة التشغيل
     </h2>
 
-    <!-- ÙÙˆØ±Ù… Ø¥Ø¶Ø§ÙØ© ØªØ´ØºÙŠÙ„ -->
+    <!-- فورم إضافة تشغيل -->
     <?php if ($can_add || $can_edit): ?>
     <form id="projectForm" action="" method="post" class="form-hidden">
         <div class="card">
             <div class="card-header">
                 <h5 id="formTitle">
-                    <i class="fa fa-plus-circle"></i> Ø§Ø¶Ø§ÙØ© ØªØ´ØºÙŠÙ„ Ø¢Ù„ÙŠØ© Ø¬Ø¯ÙŠØ¯
+                    <i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد
                 </h5>
             </div>
             <div class="card-body">
                 <div class="form-grid">
-                    <!-- ID Ù„Ù„ØªØ¹Ø¯ÙŠÙ„ -->
+                    <!-- المعرّف أثناء التعديل -->
                     <input type="hidden" name="operation_id" id="operation_id" value="">
 
-                    <!-- Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ù…Ø®ÙÙŠ Ù„Ø£Ù†Ù‡ Ù…Ø­Ø¯Ø¯ Ù…Ø³Ø¨Ù‚Ø§Ù‹ -->
+                    <!-- المشروع مخفي لأنه محدد مسبقاً -->
                     <input type="hidden" name="project_id" id="project_id" value="<?php echo $selected_project_id; ?>">
 
-                    <!-- Ø§Ù„Ù…Ù†Ø§Ø¬Ù… -->
+                    <!-- المناجم -->
                     <select name="mine_id" id="mine_id" required>
-                        <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ù…Ù†Ø¬Ù… --</option>
+                        <option value="">-- اختر المنجم --</option>
                         <?php
-                        // ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ù†Ø§Ø¬Ù… Ù„Ù„Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„Ù…Ø­Ø¯Ø¯ Ù…Ø¨Ø§Ø´Ø±Ø©
+                        // تحميل المناجم للمشروع المحدد مباشرة
                         $mines_filter = $is_role10 && $user_mine_id > 0 ? " AND id = $user_mine_id" : "";
                         $mines_query = "SELECT id, mine_name FROM mines WHERE project_id = $selected_project_id AND status='1'$mines_filter ORDER BY mine_name";
                         $mines_result = mysqli_query($conn, $mines_query);
@@ -400,18 +422,18 @@ include('../insidebar.php');
                         ?>
                     </select>
 
-                    <!-- Ø§Ù„Ø¹Ù‚ÙˆØ¯ -->
+                    <!-- العقود -->
                     <select name="contract_id" id="contract_id" required>
-                        <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø¹Ù‚Ø¯ --</option>
+                        <option value="">-- اختر العقد --</option>
                     </select>
 
-                    <!-- Ø§Ù„Ù…ÙˆØ±Ø¯ -->
+                    <!-- المورد -->
                     <select name="supplier_id" id="supplier_id" required>
-                        <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ù…ÙˆØ±Ø¯ --</option>
+                        <option value="">-- اختر المورد --</option>
                     </select>
 
                     <select name="type" id="type" required>
-                        <option value=""> -- Ø­Ø¯Ø¯ Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø© --- </option>
+                        <option value=""> -- حدد نوع المعدة --- </option>
                         <?php
                         $type_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
                         $type_result = mysqli_query($conn, $type_query);
@@ -424,54 +446,54 @@ include('../insidebar.php');
                     </select>
 
                     <select name="equipment" id="equipment" required>
-                        <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ù…Ø¹Ø¯Ø© --</option>
-                        <!-- Ø³ÙŠØªÙ… Ù…Ù„Ø¤Ù‡Ø§ Ø¯ÙŠÙ†Ø§Ù…ÙŠÙƒÙŠÙ‹Ø§ Ø¹Ø¨Ø± AJAX -->
+                        <option value="">-- اختر المعدة --</option>
+                        <!-- سيتم ملؤها ديناميكيًا عبر AJAX -->
                     </select>
 
                     <div>
                         <div>
-                            <label><i class="fas fa-check-circle"></i> Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©</label>
+                            <label><i class="fas fa-check-circle"></i> نوع المعدة</label>
                             <select name="equipment_category" id="equipment_category" required>
-                                <option value="">-- Ø£Ø³Ø§Ø³ÙŠ / Ø§Ø­ØªÙŠØ§Ø·ÙŠ --</option>
-                                <option value="Ø£Ø³Ø§Ø³ÙŠ">ðŸ”µ Ø£Ø³Ø§Ø³ÙŠ</option>
-                                <option value="Ø§Ø­ØªÙŠØ§Ø·ÙŠ">ðŸŸ¡ Ø§Ø­ØªÙŠØ§Ø·ÙŠ</option>
+                                <option value="">-- أساسي / احتياطي --</option>
+                                <option value="أساسي">🔵 أساسي</option>
+                                <option value="احتياطي">🟡 احتياطي</option>
                             </select>
                         </div>
                     </div>
 
-                    <input type="date" name="start" id="start_date" required placeholder="ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©" />
-                    <input type="date" name="end" id="end_date" required placeholder="ØªØ§Ø±ÙŠØ® Ø§Ù„Ù†Ù‡Ø§ÙŠØ©" />
-                    <input type="hidden" step="0.01" name="hours" placeholder="Ø¹Ø¯Ø¯ Ø§Ù„Ø³Ø§Ø¹Ø§Øª" value="0" />
+                    <input type="date" name="start" id="start_date" required placeholder="تاريخ البداية" />
+                    <input type="date" name="end" id="end_date" required placeholder="تاريخ النهاية" />
+                    <input type="hidden" step="0.01" name="hours" placeholder="عدد الساعات" value="0" />
                     
                     <div>
-                        <label><i class="fa fa-clock"></i> Ø¹Ø¯Ø¯ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„  Ù„Ù„Ø¢Ù„ÙŠØ©</label>
-                        <input type="number" name="total_equipment_hours" id="total_equipment_hours" step="0.01" placeholder="Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„" value="0" required />
+                        <label><i class="fa fa-clock"></i> عدد ساعات العمل  للآلية</label>
+                        <input type="number" name="total_equipment_hours" id="total_equipment_hours" step="0.01" placeholder="إجمالي ساعات العمل" value="0" required />
                     </div>
                     
                     <div>
-                        <label><i class="fa fa-hourglass-half"></i> Ø¹Ø¯Ø¯ Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</label>
-                        <input type="number" name="shift_hours" id="shift_hours" step="0.01" placeholder="Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ©" value="0" required />
+                        <label><i class="fa fa-hourglass-half"></i> عدد ساعات الوردية</label>
+                        <input type="number" name="shift_hours" id="shift_hours" step="0.01" placeholder="ساعات الوردية" value="0" required />
                     </div>
                     
                     <select name="status" id="status" required>
-                        <option value="1">ØªØ¹Ù…Ù„</option>
-                        <option value="0">Ù…ØªØ§Ø­Ø©</option>
-                        <option value="3">Ù…ØªÙˆÙ‚ÙØ©</option>
-                        <option value="4">Ù…Ø¹Ø·Ù„Ø©</option>
+                        <option value="1">تعمل</option>
+                        <option value="0">متاحة</option>
+                        <option value="3">متوقفة</option>
+                        <option value="4">معطلة</option>
                     </select>
                     <input type="hidden" name="action" value="save_operation" />
-                    <button type="submit" name="save_operation_submit" id="save_operation_submit">Ø­ÙØ¸ Ø§Ù„ØªØ´ØºÙŠÙ„</button>
+                    <button type="submit" name="save_operation_submit" id="save_operation_submit">حفظ التشغيل</button>
                 </div>
             </div>
         </div>
     </form>
     <?php endif; ?>
 
-    <!-- Ù‚Ø³Ù… Ø§Ù„Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª -->
+    <!-- قسم الإحصائيات -->
     <div id="contractStats" class="contract-stats is-hidden">
         <h5 class="stats-title">
             <i class="fas fa-chart-line"></i>
-            Ø¥Ø­ØµØ§Ø¦ÙŠØ§Øª Ø¹Ù‚Ø¯ Ø§Ù„Ù…Ù†Ø¬Ù…
+            إحصائيات عقد المنجم
         </h5>
 
         <div id="suppliersSection" class="suppliers-section">
@@ -480,26 +502,26 @@ include('../insidebar.php');
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Ø§Ù„Ù…ÙˆØ±Ø¯</th>
-                            <th>Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…ØªØ¹Ø§Ù‚Ø¯ Ø¹Ù„ÙŠÙ‡Ø§</th>
-                            <th>Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ù…ØªØ¹Ø§Ù‚Ø¯ Ø¹Ù„ÙŠÙ‡Ø§</th>
-                            <th><span class="legend-dot legend-basic">â– </span> Ø£Ø³Ø§Ø³ÙŠØ©</th>
-                            <th><span class="legend-dot legend-backup">â– </span> Ø§Ø­ØªÙŠØ§Ø·ÙŠØ©</th>
-                            <th>Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ù…Ø¶Ø§ÙØ©</th>
-                            <th>Ø§Ù„Ù…ØªØ¨Ù‚ÙŠ Ù„Ù„Ø¥Ø¶Ø§ÙØ©</th>
-                            <th>ØªÙˆØ²ÙŠØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª ÙˆØ§Ù„Ø³Ø§Ø¹Ø§Øª</th>
+                            <th>المورد</th>
+                            <th>الساعات المتعاقد عليها</th>
+                            <th>عدد المعدات المتعاقد عليها</th>
+                            <th><span class="legend-dot legend-basic">■</span> أساسية</th>
+                            <th><span class="legend-dot legend-backup">■</span> احتياطية</th>
+                            <th>المعدات المضافة</th>
+                            <th>المتبقي للإضافة</th>
+                            <th>توزيع المعدات والساعات</th>
                         </tr>
                     </thead>
                     <tbody id="suppliersTableBody">
                         <tr>
                             <td colspan="9" class="suppliers-empty">
-                                <i class="fas fa-info-circle"></i> Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª
+                                <i class="fas fa-info-circle"></i> لا توجد بيانات
                             </td>
                         </tr>
                     </tbody>
                     <tfoot>
                         <tr class="suppliers-total-row">
-                            <td colspan="2" class="suppliers-total-label">Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ</td>
+                            <td colspan="2" class="suppliers-total-label">الإجمالي</td>
                             <td id="total_supplier_hours" class="suppliers-total-value">0</td>
                             <td id="total_supplier_equipment" class="suppliers-total-value">0</td>
                             <td id="total_supplier_basic" class="suppliers-total-value">0</td>
@@ -517,54 +539,54 @@ include('../insidebar.php');
             <div class="stat-card">
                 <div class="stat-card-icon"><i class="fas fa-clock"></i></div>
                 <div class="stat-card-value" id="stat_total_hours">0</div>
-                <div class="stat-card-label">Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ù…ØªØ¹Ø§Ù‚Ø¯ Ø¹Ù„ÙŠÙ‡Ø§</div>
+                <div class="stat-card-label">إجمالي الساعات المتعاقد عليها</div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-card-icon"><i class="fas fa-cogs"></i></div>
                 <div class="stat-card-value" id="stat_equipment_count">0</div>
-                <div class="stat-card-label">Ø¹Ø¯Ø¯ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ø§Ù„Ù…Ø´ØºÙ„Ø©</div>
+                <div class="stat-card-label">عدد المعدات المشغلة</div>
             </div>
         </div>
     </div>
     <div class="card">
         <div class="card-header">
-            <h5> Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„ØªØ´ØºÙŠÙ„</h5>
+            <h5> قائمة التشغيل</h5>
         </div>
         <div class="card-body">
             <table id="projectsTable" class="display nowrap">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Ø§Ù„Ù…Ø¹Ø¯Ø©</th>
+                        <th>المعدة</th>
 
-                        <th>Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ†</th>
+                        <th>السائقين</th>
 
-                        <th>Ø§Ù„Ù…ÙˆØ±Ø¯</th>
-                        <th>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„ Ø§Ù„ÙƒÙ„ÙŠØ©</th>
-                        <th>Ø³Ø§Ø¹Ø§Øª Ø§Ù„ÙˆØ±Ø¯ÙŠØ©</th>
+                        <th>المورد</th>
+                        <th>ساعات العمل الكلية</th>
+                        <th>ساعات الوردية</th>
 
-                        <th>ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¨Ø¯Ø§ÙŠØ©</th>
-                        <th>ØªØ§Ø±ÙŠØ® Ø§Ù„Ù†Ù‡Ø§ÙŠØ©</th>
-                        <th>Ø§Ù„Ù†ÙˆØ¹</th>
-                        <!-- <th style="text-align:right;">Ø¹Ø¯Ø¯ Ø§Ù„Ø³Ø§Ø¹Ø§Øª</th> -->
-                        <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
-                        <th>Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th>
+                        <th>تاريخ البداية</th>
+                        <th>تاريخ النهاية</th>
+                        <th>النوع</th>
+                        <!-- <th style="text-align:right;">عدد الساعات</th> -->
+                        <th>الحالة</th>
+                        <th>إجراءات</th>
 
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    // Ø¥Ø¶Ø§ÙØ© Ø£Ùˆ ØªØ¹Ø¯ÙŠÙ„ ØªØ´ØºÙŠÙ„
+                    // إضافة أو تعديل تشغيل
                     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_operation' && !empty($_POST['equipment'])) {
                         $operation_id = isset($_POST['operation_id']) ? intval($_POST['operation_id']) : 0;
 
                         if ($operation_id > 0 && !$can_edit) {
-                            echo "<script>alert('âŒ Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ ØµÙ„Ø§Ø­ÙŠØ© ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ØªØ´ØºÙŠÙ„'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                            echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                             exit();
                         }
                         if ($operation_id === 0 && !$can_add) {
-                            echo "<script>alert('âŒ Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ ØµÙ„Ø§Ø­ÙŠØ© Ø¥Ø¶Ø§ÙØ© ØªØ´ØºÙŠÙ„ Ø¬Ø¯ÙŠØ¯'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                            echo "<script>alert('❌ ليس لديك صلاحية إضافة تشغيل جديد'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                             exit();
                         }
 
@@ -584,7 +606,7 @@ include('../insidebar.php');
                         $status = mysqli_real_escape_string($conn, $_POST['status']);
 
                         if ($operation_id > 0) {
-                            // ØªØ¹Ø¯ÙŠÙ„ Ø³Ø¬Ù„ Ù…ÙˆØ¬ÙˆØ¯
+                            // تعديل سجل موجود
                                 $sql = "UPDATE operations SET 
                                     equipment = '$equipment',
                                     equipment_type = '$equipment_type',
@@ -598,20 +620,20 @@ include('../insidebar.php');
                                     total_equipment_hours = '$total_equipment_hours',
                                     shift_hours = '$shift_hours',
                                     status = '$status'
-                                    WHERE id = $operation_id AND project_id = '$project_id'";
+                                        WHERE id = $operation_id AND project_id = '$project_id'$operations_company_scope";
                             mysqli_query($conn, $sql);
-                            echo "<script>alert('âœ… ØªÙ… Ø§Ù„ØªØ­Ø¯ÙŠØ« Ø¨Ù†Ø¬Ø§Ø­'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                            echo "<script>alert('✅ تم التحديث بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                         } else {
-                            // Ø¥Ø¶Ø§ÙØ© Ø³Ø¬Ù„ Ø¬Ø¯ÙŠØ¯
+                            // إضافة سجل جديد
                             $insert_company_col = (!$is_super_admin && $operations_has_company) ? ", company_id" : "";
                             $insert_company_val = (!$is_super_admin && $operations_has_company) ? ", '$company_id'" : "";
                             mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, mine_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, status$insert_company_col) 
                                          VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$mine_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$status'$insert_company_val)");
-                            echo "<script>alert('âœ… ØªÙ… Ø§Ù„Ø­ÙØ¸ Ø¨Ù†Ø¬Ø§Ø­'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                            echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                         }
                     }
 
-                    // Ø¬Ù„Ø¨ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªØ´ØºÙŠÙ„ Ù„Ù„Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„Ù…Ø­Ø¯Ø¯ ÙÙ‚Ø·
+                    // جلب بيانات التشغيل للمشروع المحدد فقط
                     $role10_filters = '';
                   
 
@@ -646,24 +668,24 @@ include('../insidebar.php');
                         echo "<td>" . $row['start'] . "</td>";
                         echo "<td>" . $row['end'] . "</td>";
                         
-                        // Ø¹Ø±Ø¶ Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø© (Ø£Ø³Ø§Ø³ÙŠ/Ø§Ø­ØªÙŠØ§Ø·ÙŠ)
-                        $categoryText = ($row['equipment_category'] === 'Ø£Ø³Ø§Ø³ÙŠ') ? 'Ø£Ø³Ø§Ø³ÙŠ' : 'Ø§Ø­ØªÙŠØ§Ø·ÙŠ';
-                        $categoryClass = ($row['equipment_category'] === 'Ø£Ø³Ø§Ø³ÙŠ') ? 'basic' : 'backup';
+                        // عرض نوع المعدة (أساسي/احتياطي)
+                        $categoryText = ($row['equipment_category'] === 'أساسي') ? 'أساسي' : 'احتياطي';
+                        $categoryClass = ($row['equipment_category'] === 'أساسي') ? 'basic' : 'backup';
                         echo "<td><span class='category-badge $categoryClass'>$categoryText</span></td>";
                         
                         // echo "<td>" . $row['hours'] . "</td>";
                         $status_value = intval($row['status']);
                         if ($status_value === 1) {
-                            $status_label = 'ØªØ¹Ù…Ù„';
+                            $status_label = 'تعمل';
                             $status_class = 'status-running';
                         } elseif ($status_value === 0) {
-                            $status_label = 'Ù…ØªØ§Ø­Ø©';
+                            $status_label = 'متاحة';
                             $status_class = 'status-idle';
                         } elseif ($status_value === 3) {
-                            $status_label = 'Ù…ØªÙˆÙ‚ÙØ©';
+                            $status_label = 'متوقفة';
                             $status_class = 'status-stopped';
                         } else {
-                            $status_label = 'Ù…Ø¹Ø·Ù„Ø©';
+                            $status_label = 'معطلة';
                             $status_class = 'status-down';
                         }
 
@@ -675,34 +697,34 @@ include('../insidebar.php');
                                 $action_buttons .= "<form method='post' style='display:inline;'>
                                         <input type='hidden' name='action' value='request_equipment_stop'>
                                         <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
-                                        <input type='hidden' name='request_reason' value='Ø·Ù„Ø¨ Ø¥ÙŠÙ‚Ø§Ù Ø¢Ù„ÙŠØ© Ù…Ù† Ø¬Ø¯ÙˆÙ„ Ø§Ù„ØªØ´ØºÙŠÙ„'>
-                                        <button type='submit' class='btn btn-sm btn-warning' onclick='return confirm(\"ØªØ£ÙƒÙŠØ¯ Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ Ø¥ÙŠÙ‚Ø§Ù Ø§Ù„Ø¢Ù„ÙŠØ© Ù„Ù…Ø¯ÙŠØ± Ø§Ù„Ø£Ø³Ø·ÙˆÙ„ØŸ\")'>Ø·Ù„Ø¨ Ø¥ÙŠÙ‚Ø§Ù Ø¢Ù„ÙŠØ©</button>
+                                        <input type='hidden' name='request_reason' value='طلب إيقاف آلية من جدول التشغيل'>
+                                        <button type='submit' class='btn btn-sm btn-warning' onclick='return confirm(\"تأكيد إرسال طلب إيقاف الآلية لمدير الأسطول؟\")'>طلب إيقاف آلية</button>
                                     </form> ";
                             } else {
                                 $action_buttons .= "<form method='post' style='display:inline;'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='3'>
-                                    <button type='submit' name='status_stop_submit' class='btn btn-sm btn-warning' onclick='return confirm(\"ØªØ£ÙƒÙŠØ¯ Ø¥ÙŠÙ‚Ø§Ù Ø§Ù„Ø¢Ù„ÙŠØ©ØŸ\")'>Ø¥ÙŠÙ‚Ø§Ù</button>
+                                    <button type='submit' name='status_stop_submit' class='btn btn-sm btn-warning' onclick='return confirm(\"تأكيد إيقاف الآلية؟\")'>إيقاف</button>
                                 </form> ";
                             }
                             $action_buttons .= "<form method='post' style='display:inline;'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='4'>
-                                    <button type='submit' name='status_down_submit' class='btn btn-sm btn-danger' onclick='return confirm(\"ØªØ£ÙƒÙŠØ¯ ØªØ¹Ø·Ù„ Ø§Ù„Ø¢Ù„ÙŠØ©ØŸ\")'>ØªØ¹Ø·Ù„Øª</button>
+                                    <button type='submit' name='status_down_submit' class='btn btn-sm btn-danger' onclick='return confirm(\"تأكيد تعطل الآلية؟\")'>تعطلت</button>
                                 </form> ";
                         } elseif (($status_value === 3 || $status_value === 4) && $can_edit) {
                             $action_buttons .= "<form method='post' style='display:inline;'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='1'>
-                                    <button type='submit' name='status_resume_submit' class='btn btn-sm btn-success' onclick='return confirm(\"ØªØ£ÙƒÙŠØ¯ Ø§Ø³ØªØ¦Ù†Ø§Ù Ø§Ù„Ø¹Ù…Ù„ØŸ\")'>Ø§Ø³ØªØ¦Ù†Ø§Ù</button>
+                                    <button type='submit' name='status_resume_submit' class='btn btn-sm btn-success' onclick='return confirm(\"تأكيد استئناف العمل؟\")'>استئناف</button>
                                 </form> ";
                         }
 
                         if ($status_value !== 0 && $_SESSION['user']['role'] != "10" && $can_edit) {
-                            $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-outline-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> Ø¥Ù†Ù‡Ø§Ø¡ Ø®Ø¯Ù…Ø© </a> ";
+                            $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-outline-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
                         }
 
                                                 echo $status_cell;
@@ -721,8 +743,8 @@ include('../insidebar.php');
                                                                  data-total-hours='" . $row['total_equipment_hours'] . "'
                                                                  data-shift-hours='" . $row['shift_hours'] . "'
                                                                  data-status='" . $row['status'] . "'
-                                                                 title='ØªØ¹Ø¯ÙŠÙ„'><i class='fa fa-edit'></i></a>" : "") . "
-                                                            " . ($can_delete ? "<a href='oprators.php?project_id=" . $selected_project_id . "&delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø­Ø°Ù Ø§Ù„ØªØ´ØºÙŠÙ„ØŸ\")' title='Ø­Ø°Ù'>
+                                                                 title='تعديل'><i class='fa fa-edit'></i></a>" : "") . "
+                                                            " . ($can_delete ? "<a href='oprators.php?project_id=" . $selected_project_id . "&delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف التشغيل؟\")' title='حذف'>
                                                                 <i class='fa fa-trash'></i>
                                                             </a>" : "") . "
                                                                 </div>
@@ -737,44 +759,44 @@ include('../insidebar.php');
     </div>
 </div>
 
-<!-- jQuery (Required first) -->
+<!-- مكتبة jQuery (مطلوبة أولاً) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<!-- Bootstrap Bundle (Includes Popper) -->
+<!-- حزمة Bootstrap (تشمل Popper) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables JS -->
+<!-- ملفات DataTables -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-<!-- Ù…ÙˆØ¯ÙŠÙ„ Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø®Ø¯Ù…Ø© -->
+<!-- موديل إنهاء الخدمة -->
 <div class="modal fade" id="endServiceModal" tabindex="-1" aria-labelledby="endServiceLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" action="">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="endServiceLabel">Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø®Ø¯Ù…Ø©</h5>
+                    <h5 class="modal-title" id="endServiceLabel">إنهاء الخدمة</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="action" value="end_service" />
                     <input type="hidden" name="operation_id" id="modal_operation_id" />
                     <div class="mb-3">
-                        <label for="service_end_date" class="form-label">ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¥Ù†Ù‡Ø§Ø¡</label>
+                        <label for="service_end_date" class="form-label">تاريخ الإنهاء</label>
                         <input type="date" class="form-control" name="end_date" id="service_end_date" required />
                     </div>
                     <div class="mb-3">
-                        <label for="service_reason" class="form-label">Ø³Ø¨Ø¨ Ø§Ù„Ø¥Ù†Ù‡Ø§Ø¡</label>
+                        <label for="service_reason" class="form-label">سبب الإنهاء</label>
                         <textarea class="form-control" name="reason" id="service_reason" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" name="end_service_cancel" class="btn btn-secondary" data-bs-dismiss="modal">Ø¥ØºÙ„Ø§Ù‚</button>
-                    <button type="submit" name="end_service_submit" class="btn btn-danger">ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¥Ù†Ù‡Ø§Ø¡</button>
+                    <button type="button" name="end_service_cancel" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="submit" name="end_service_submit" class="btn btn-danger">تأكيد الإنهاء</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- DataTables Responsive & Buttons -->
+<!-- إضافات DataTables للاستجابة والأزرار -->
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
@@ -797,7 +819,7 @@ include('../insidebar.php');
         if (form.classList.contains('form-hidden')) {
             const formTitle = document.getElementById('formTitle');
             if (formTitle) {
-                formTitle.innerHTML = '<i class="fa fa-plus-circle"></i> Ø§Ø¶Ø§ÙØ© ØªØ´ØºÙŠÙ„ Ø¢Ù„ÙŠØ© Ø¬Ø¯ÙŠØ¯';
+                formTitle.innerHTML = '<i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد';
             }
 
             const operationId = document.getElementById('operation_id');
@@ -814,10 +836,10 @@ include('../insidebar.php');
 
             if (operationId) operationId.value = '';
             if (mineId) mineId.value = '';
-            if (contractId) contractId.innerHTML = '<option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø¹Ù‚Ø¯ --</option>';
-            if (supplierId) supplierId.innerHTML = '<option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ù…ÙˆØ±Ø¯ --</option>';
+            if (contractId) contractId.innerHTML = '<option value="">-- اختر العقد --</option>';
+            if (supplierId) supplierId.innerHTML = '<option value="">-- اختر المورد --</option>';
             if (typeId) typeId.value = '';
-            if (equipmentId) equipmentId.innerHTML = '<option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ù…Ø¹Ø¯Ø© --</option>';
+            if (equipmentId) equipmentId.innerHTML = '<option value="">-- اختر المعدة --</option>';
             if (startDate) startDate.value = '';
             if (endDate) endDate.value = '';
             if (totalEquipmentHours) totalEquipmentHours.value = '0';
@@ -835,18 +857,18 @@ include('../insidebar.php');
     }
 
     (function () {
-        // ØªØ´ØºÙŠÙ„ DataTable Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©
-        // ØªØ´ØºÙŠÙ„ DataTable Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©
+        // تشغيل DataTable بالعربية
+        // تشغيل DataTable بالعربية
         $(document).ready(function () {
             $('#projectsTable').DataTable({
                 responsive: true,
-                dom: 'Bfrtip', // Buttons + Search + Pagination
+                dom: 'Bfrtip', // أزرار + بحث + ترقيم الصفحات
                 buttons: [
-                    { extend: 'copy', text: 'Ù†Ø³Ø®' },
-                    { extend: 'excel', text: 'ØªØµØ¯ÙŠØ± Excel' },
-                    { extend: 'csv', text: 'ØªØµØ¯ÙŠØ± CSV' },
-                    { extend: 'pdf', text: 'ØªØµØ¯ÙŠØ± PDF' },
-                    { extend: 'print', text: 'Ø·Ø¨Ø§Ø¹Ø©' }
+                    { extend: 'copy', text: 'نسخ' },
+                    { extend: 'excel', text: 'تصدير Excel' },
+                    { extend: 'csv', text: 'تصدير CSV' },
+                    { extend: 'pdf', text: 'تصدير PDF' },
+                    { extend: 'print', text: 'طباعة' }
                 ],
                 "language": {
                     "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
@@ -869,17 +891,17 @@ include('../insidebar.php');
 
     $(document).ready(function () {
         function resetEquipment() {
-            $("#equipment").html("<option value=''>-- Ø§Ø®ØªØ± Ø§Ù„Ù…Ø¹Ø¯Ø© --</option>");
+            $("#equipment").html("<option value=''>-- اختر المعدة --</option>");
         }
 
         function resetSupplier() {
-            $("#supplier_id").html("<option value=''>-- Ø§Ø®ØªØ± Ø§Ù„Ù…ÙˆØ±Ø¯ --</option>");
+            $("#supplier_id").html("<option value=''>-- اختر المورد --</option>");
         }
 
         function resetStats() {
             $("#contractStats").hide();
             $("#suppliersSection").hide();
-            $("#suppliersTableBody").html("<tr><td colspan='9' class='suppliers-empty'><i class='fas fa-info-circle'></i> Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª</td></tr>");
+            $("#suppliersTableBody").html("<tr><td colspan='9' class='suppliers-empty'><i class='fas fa-info-circle'></i> لا توجد بيانات</td></tr>");
             $("#stat_total_hours").text("0");
             $("#stat_equipment_count").text("0");
             $("#total_supplier_hours").text("0");
@@ -915,19 +937,19 @@ include('../insidebar.php');
                             var addedCount = item.added_count || 0;
                             var remaining = item.remaining || 0;
                             var statusClass = remaining === 0 ? 'is-active' : (addedCount > 0 ? 'is-warning' : 'is-muted');
-                            var basicInfo = item.count_basic > 0 ? '<span class="breakdown-tag is-basic">Ø£Ø³Ø§Ø³ÙŠ:' + item.count_basic + '</span>' : '';
-                            var backupInfo = item.count_backup > 0 ? '<span class="breakdown-tag is-backup">Ø§Ø­ØªÙŠØ§Ø·ÙŠ:' + item.count_backup + '</span>' : '';
+                            var basicInfo = item.count_basic > 0 ? '<span class="breakdown-tag is-basic">أساسي:' + item.count_basic + '</span>' : '';
+                            var backupInfo = item.count_backup > 0 ? '<span class="breakdown-tag is-backup">احتياطي:' + item.count_backup + '</span>' : '';
 
                             return '<div class="breakdown-item">' +
-                                '<i class="fas fa-tools"></i> <strong>' + (item.type || 'ØºÙŠØ± Ù…Ø­Ø¯Ø¯') + '</strong>: ' +
-                                item.count + ' Ù…ØªØ¹Ø§Ù‚Ø¯ ' + basicInfo + ' ' + backupInfo + ' | ' +
-                                '<span class="breakdown-count ' + statusClass + '">' + addedCount + ' Ù…Ø¶Ø§Ù</span> | ' +
-                                '<span class="breakdown-count ' + (remaining === 0 ? 'is-active' : 'is-warning') + '">' + remaining + ' Ù…ØªØ¨Ù‚ÙŠ</span> | ' +
-                                '<i class="fas fa-clock"></i> ' + parseFloat(item.hours || 0).toLocaleString() + ' Ø³Ø§Ø¹Ø©' +
+                                '<i class="fas fa-tools"></i> <strong>' + (item.type || 'غير محدد') + '</strong>: ' +
+                                item.count + ' متعاقد ' + basicInfo + ' ' + backupInfo + ' | ' +
+                                '<span class="breakdown-count ' + statusClass + '">' + addedCount + ' مضاف</span> | ' +
+                                '<span class="breakdown-count ' + (remaining === 0 ? 'is-active' : 'is-warning') + '">' + remaining + ' متبقي</span> | ' +
+                                '<i class="fas fa-clock"></i> ' + parseFloat(item.hours || 0).toLocaleString() + ' ساعة' +
                                 '</div>';
                         }).join('');
                     } else {
-                        breakdownHtml = '<span class="breakdown-empty">Ù„Ø§ ØªÙˆØ¬Ø¯ ØªÙØ§ØµÙŠÙ„</span>';
+                        breakdownHtml = '<span class="breakdown-empty">لا توجد تفاصيل</span>';
                     }
 
                     var addedEquipment = supplier.added_to_equipments || 0;
@@ -992,7 +1014,7 @@ include('../insidebar.php');
                         $("#equipment").html(response);
                     },
                     error: function (xhr, status, error) {
-                        console.error("âŒ AJAX Error:", error);
+                        console.error("❌ AJAX Error:", error);
                     }
                 });
             } else {
@@ -1000,11 +1022,11 @@ include('../insidebar.php');
             }
         }
 
-        // Ù„Ù… Ù†Ø¹Ø¯ Ø¨Ø­Ø§Ø¬Ø© Ù„Ù€ event listener Ù„Ù„Ù…Ø´Ø±ÙˆØ¹ Ù„Ø£Ù†Ù‡ Ù…Ø­Ø¯Ø¯ Ù…Ø³Ø¨Ù‚Ø§Ù‹ Ù…Ù† Ø§Ù„ØµÙØ­Ø© Ø§Ù„Ø³Ø§Ø¨Ù‚Ø©
+        // لم نعد بحاجة لـ event listener للمشروع لأنه محدد مسبقاً من الصفحة السابقة
         
         $("#mine_id").change(function () {
             var mineId = $(this).val();
-            $("#contract_id").html("<option value=''>-- Ø§Ø®ØªØ± Ø§Ù„Ø¹Ù‚Ø¯ --</option>");
+            $("#contract_id").html("<option value=''>-- اختر العقد --</option>");
             resetSupplier();
             $("#type").val("");
             resetEquipment();
@@ -1019,7 +1041,7 @@ include('../insidebar.php');
                     data: { mine_id: mineId },
                     success: function (response) {
                         if (response.success) {
-                            var options = "<option value=''>-- Ø§Ø®ØªØ± Ø§Ù„Ø¹Ù‚Ø¯ --</option>";
+                            var options = "<option value=''>-- اختر العقد --</option>";
                             response.contracts.forEach(function (contract) {
                                 options += "<option value='" + contract.id + "' data-end='" + contract.end_date + "'>" + contract.display_name + "</option>";
                             });
@@ -1049,7 +1071,7 @@ include('../insidebar.php');
                     data: { contract_id: contractId },
                     success: function (response) {
                         if (response.success) {
-                            var options = "<option value=''>-- Ø§Ø®ØªØ± Ø§Ù„Ù…ÙˆØ±Ø¯ --</option>";
+                            var options = "<option value=''>-- اختر المورد --</option>";
                             response.suppliers.forEach(function (supplier) {
                                 options += "<option value='" + supplier.id + "'>" + supplier.name + "</option>";
                             });
@@ -1084,32 +1106,32 @@ include('../insidebar.php');
         $(document).on("click", ".end-service-btn", function (e) {
             e.preventDefault();
             var opId = $(this).data('id');
-            console.log('ðŸ”´ Ø²Ø± Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ø®Ø¯Ù…Ø© - ID:', opId);
+            console.log('🔴 زر إنهاء الخدمة - ID:', opId);
         });
 
         $("#endServiceModal").on("show.bs.modal", function (event) {
             var button = $(event.relatedTarget);
             var opId = button.data("id") || "";
-            console.log('ðŸš¨ Ø¥Ù†Ù‡Ø§Ø¡ Ø®Ø¯Ù…Ø© Ø§Ù„ØªØ´ØºÙŠÙ„ Ø±Ù‚Ù…:', opId);
+            console.log('🚨 إنهاء خدمة التشغيل رقم:', opId);
             $("#modal_operation_id").val(opId);
             $("#service_end_date").val("");
             $("#service_reason").val("");
         });
         
-        // ÙˆØ¸ÙŠÙØ© Ø§Ù„ØªØ¹Ø¯ÙŠÙ„
+        // وظيفة التعديل
         $(document).on('click', '.editOperationBtn', function() {
             var btn = $(this);
             
-            console.log('ðŸ”§ Ø¨Ø¯Ø¡ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ - ID:', btn.data('id'));
+            console.log('🔧 بدء التعديل - ID:', btn.data('id'));
             
-            // ØªØºÙŠÙŠØ± Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ù†Ù…ÙˆØ°Ø¬
-            $('#formTitle').html('<i class="fa fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªØ´ØºÙŠÙ„');
+            // تغيير عنوان النموذج
+            $('#formTitle').html('<i class="fa fa-edit"></i> تعديل بيانات التشغيل');
             
-            // Ø¥Ø¸Ù‡Ø§Ø± Ø§Ù„Ù†Ù…ÙˆØ°Ø¬
+            // إظهار النموذج
             $('#projectForm').removeClass('form-hidden').show();
             $('html, body').animate({scrollTop: $('#projectForm').offset().top - 100}, 500);
             
-            // Ù…Ù„Ø¡ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©
+            // ملء البيانات الأساسية
             $('#operation_id').val(btn.data('id'));
             $('#start_date').val(btn.data('start'));
             $('#end_date').val(btn.data('end'));
@@ -1118,15 +1140,15 @@ include('../insidebar.php');
             $('#status').val(btn.data('status'));
             $('#equipment_category').val(btn.data('equipment-category'));
             
-            console.log('âœ… ØªÙ… Ù…Ù„Ø¡ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©');
+            console.log('✅ تم ملء البيانات الأساسية');
             
-            // ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ù†Ø¬Ù…
+            // تحميل المنجم
             var mineId = btn.data('mine');
             $('#mine_id').val(mineId);
             
-            console.log('ðŸ“ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¹Ù‚ÙˆØ¯ Ù„Ù„Ù…Ù†Ø¬Ù…:', mineId);
+            console.log('📍 تحميل العقود للمنجم:', mineId);
             
-            // ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¹Ù‚ÙˆØ¯ Ù„Ù„Ù…Ù†Ø¬Ù… Ø§Ù„Ù…Ø­Ø¯Ø¯
+            // تحميل العقود للمنجم المحدد
             setTimeout(function() {
                 $.ajax({
                     url: "get_mine_contracts.php",
@@ -1134,21 +1156,21 @@ include('../insidebar.php');
                     dataType: "json",
                     data: { mine_id: mineId },
                     success: function (response) {
-                        console.log('ðŸ“‹ Ø§Ø³ØªØ¬Ø§Ø¨Ø© Ø§Ù„Ø¹Ù‚ÙˆØ¯:', response);
+                        console.log('📋 استجابة العقود:', response);
                         if (response.success) {
-                            var options = "<option value=''>-- Ø§Ø®ØªØ± Ø§Ù„Ø¹Ù‚Ø¯ --</option>";
+                            var options = "<option value=''>-- اختر العقد --</option>";
                             response.contracts.forEach(function (contract) {
                                 var selected = (contract.id == btn.data('contract')) ? 'selected' : '';
                                 options += "<option value='" + contract.id + "' data-end='" + contract.end_date + "' " + selected + ">" + contract.display_name + "</option>";
                             });
                             $('#contract_id').html(options);
                             
-                            console.log('âœ… ØªÙ… ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¹Ù‚ÙˆØ¯');
+                            console.log('✅ تم تحميل العقود');
                             
-                            // ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ† Ù„Ù„Ø¹Ù‚Ø¯ Ø§Ù„Ù…Ø­Ø¯Ø¯
+                            // تحميل الموردين للعقد المحدد
                             setTimeout(function() {
                                 var contractId = btn.data('contract');
-                                console.log('ðŸ¢ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ† Ù„Ù„Ø¹Ù‚Ø¯:', contractId);
+                                console.log('🏢 تحميل الموردين للعقد:', contractId);
                                 
                                 $.ajax({
                                     url: "get_contract_suppliers.php",
@@ -1156,49 +1178,49 @@ include('../insidebar.php');
                                     dataType: "json",
                                     data: { contract_id: contractId },
                                     success: function (response) {
-                                        console.log('ðŸª Ø§Ø³ØªØ¬Ø§Ø¨Ø© Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ†:', response);
+                                        console.log('🏪 استجابة الموردين:', response);
                                         if (response.success) {
-                                            var options = "<option value=''>-- Ø§Ø®ØªØ± Ø§Ù„Ù…ÙˆØ±Ø¯ --</option>";
+                                            var options = "<option value=''>-- اختر المورد --</option>";
                                             response.suppliers.forEach(function (supplier) {
                                                 var selected = (supplier.id == btn.data('supplier')) ? 'selected' : '';
                                                 options += "<option value='" + supplier.id + "' " + selected + ">" + supplier.name + "</option>";
                                             });
                                             $('#supplier_id').html(options);
                                             
-                                            console.log('âœ… ØªÙ… ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ†');
+                                            console.log('✅ تم تحميل الموردين');
                                             
-                                            // ØªØ­Ø¯ÙŠØ¯ Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©
+                                            // تحديد نوع المعدة
                                             $('#type').val(btn.data('equipment-type'));
                                             
-                                            console.log('ðŸ”§ Ù†ÙˆØ¹ Ø§Ù„Ù…Ø¹Ø¯Ø©:', btn.data('equipment-type'));
+                                            console.log('🔧 نوع المعدة:', btn.data('equipment-type'));
                                             
-                                            // ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª
+                                            // تحميل المعدات
                                             setTimeout(function() {
-                                                console.log('ðŸšœ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª...');
+                                                console.log('🚜 تحميل المعدات...');
                                                 loadEquipmentsForEdit(btn.data('equipment'));
                                             }, 300);
                                         }
                                     },
                                     error: function(xhr, status, error) {
-                                        console.error('âŒ Ø®Ø·Ø£ ÙÙŠ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ†:', error);
+                                        console.error('❌ خطأ في تحميل الموردين:', error);
                                     }
                                 });
                             }, 300);
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('âŒ Ø®Ø·Ø£ ÙÙŠ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¹Ù‚ÙˆØ¯:', error);
+                        console.error('❌ خطأ في تحميل العقود:', error);
                     }
                 });
             }, 300);
         });
         
-        // Ø¯Ø§Ù„Ø© ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ù…Ø¹ ØªØ­Ø¯ÙŠØ¯ Ø§Ù„Ù…Ø¹Ø¯Ø© Ø§Ù„Ù…Ø®ØªØ§Ø±Ø©
+        // دالة تحميل المعدات مع تحديد المعدة المختارة
         function loadEquipmentsForEdit(selectedEquipmentId) {
             var typeId = $("#type").val();
             var supplierId = $("#supplier_id").val();
             
-            console.log('ðŸšœ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª - Ø§Ù„Ù†ÙˆØ¹:', typeId, '| Ø§Ù„Ù…ÙˆØ±Ø¯:', supplierId, '| Ø§Ù„Ù…Ø¹Ø¯Ø© Ø§Ù„Ù…Ø®ØªØ§Ø±Ø©:', selectedEquipmentId);
+            console.log('🚜 تحميل المعدات - النوع:', typeId, '| المورد:', supplierId, '| المعدة المختارة:', selectedEquipmentId);
             
             if (typeId && supplierId) {
                 $.ajax({
@@ -1209,18 +1231,18 @@ include('../insidebar.php');
                         supplier_id: supplierId
                     },
                     success: function (data) {
-                        console.log('âœ… ØªÙ… ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª Ø¨Ù†Ø¬Ø§Ø­');
+                        console.log('✅ تم تحميل المعدات بنجاح');
                         $("#equipment").html(data);
                         $("#equipment").val(selectedEquipmentId);
-                        console.log('âœ… ØªÙ… ØªØ­Ø¯ÙŠØ¯ Ø§Ù„Ù…Ø¹Ø¯Ø©:', selectedEquipmentId);
+                        console.log('✅ تم تحديد المعدة:', selectedEquipmentId);
                     },
                     error: function(xhr, status, error) {
-                        console.error("âŒ Ø®Ø·Ø£ ÙÙŠ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø¹Ø¯Ø§Øª:", error);
-                        $("#equipment").html("<option value=''>Ø®Ø·Ø£ ÙÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„</option>");
+                        console.error("❌ خطأ في تحميل المعدات:", error);
+                        $("#equipment").html("<option value=''>خطأ في التحميل</option>");
                     }
                 });
             } else {
-                console.warn('âš ï¸ Ø§Ù„Ù†ÙˆØ¹ Ø£Ùˆ Ø§Ù„Ù…ÙˆØ±Ø¯ ØºÙŠØ± Ù…Ø­Ø¯Ø¯');
+                console.warn('⚠️ النوع أو المورد غير محدد');
             }
         }
     });

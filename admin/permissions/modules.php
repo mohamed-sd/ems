@@ -147,7 +147,7 @@ if (isset($_GET['delete_id'])) {
 }
 
 // جلب جميع الأدوار
-$stmt = $conn->prepare("SELECT `id`, `name` FROM `roles` ORDER BY `level`, `name`");
+$stmt = $conn->prepare("SELECT `id`, `name` FROM `roles` WHERE parent_role_id IS NULL ORDER BY `level`, `name`");
 $stmt->execute();
 $roles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 

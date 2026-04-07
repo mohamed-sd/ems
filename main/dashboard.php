@@ -8,9 +8,9 @@ if (!headers_sent()) {
   header('Content-Type: text/html; charset=UTF-8');
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ==============================
    DATA LAYER
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+============================== */
 $role     = $_SESSION['user']['role'];
 $userName = $_SESSION['user']['name'];
 $roleText = "غير معروف";
@@ -111,7 +111,7 @@ foreach ($dynamicLinks as $link) {
   $links[] = ['../' . $link['code'], 'fas fa-bolt', $link['name']];
 }
 
-/* Stat cards â€” [icon, raw_value, label, accent] */
+/* Stat cards - [icon, raw_value, label, accent] */
 $stats = [];
 
 $scopeClients = $companyId > 0
@@ -190,9 +190,9 @@ $linkCount = count($links);
   <link rel="stylesheet" href="../assets/css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
   <style>
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ====================================================
    TOKENS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+==================================================== */
 :root{
   --navy:      #0c1c3e;
   --navy-m:    #132050;
@@ -228,12 +228,12 @@ $linkCount = count($links);
 html,body{height:100%;font-family:var(--font);color:var(--txt);background:var(--bg)}
 a{text-decoration:none;color:inherit}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   LAYOUT â€” 3-row grid that fills 100vh exactly
+/* ====================================================
+  LAYOUT - 3-row grid that fills 100vh exactly
    row1: topbar   (auto)
    row2: hero     (auto)
-   row3: stats    (1fr â€” grows to fill all remaining)
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+  row3: stats    (1fr - grows to fill all remaining)
+==================================================== */
 .main{
   display:grid;
   grid-template-rows:auto auto 1fr;
@@ -244,9 +244,9 @@ a{text-decoration:none;color:inherit}
   width:100%;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ====================================================
    TOP BAR
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+==================================================== */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
 
 .brand{display:flex;align-items:center;gap:10px}
@@ -276,9 +276,9 @@ a{text-decoration:none;color:inherit}
 }
 .btn-out:hover{background:var(--danger);color:#fff;box-shadow:0 5px 16px rgba(220,38,38,.3)}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   HERO ROW â€” banner + quick links side by side
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ====================================================
+  HERO ROW - banner + quick links side by side
+==================================================== */
 .hero-row{
   display:grid;
   grid-template-columns:1fr 230px;
@@ -286,7 +286,7 @@ a{text-decoration:none;color:inherit}
   flex-shrink:0;
 }
 
-/* â”€â”€ Banner â”€â”€ */
+/* -- Banner -- */
 .banner{
   position:relative;overflow:hidden;
   border-radius:var(--rx);
@@ -346,7 +346,7 @@ a{text-decoration:none;color:inherit}
 .sfx{position:absolute;color:var(--gold-l);pointer-events:none;z-index:0;animation:drift 3s linear forwards}
 @keyframes drift{0%{opacity:.85;transform:translateY(0)scale(1)rotate(0)}100%{opacity:0;transform:translateY(70px)scale(.2)rotate(330deg)}}
 
-/* â”€â”€ Quick Links Panel â”€â”€ */
+/* -- Quick Links Panel -- */
 .ql-panel{
   background:var(--card);
   border:1.5px solid var(--bdr);
@@ -363,7 +363,7 @@ a{text-decoration:none;color:inherit}
 }
 .ql-title i{color:var(--gold)}
 
-/* 2-col icon grid â€” never overflows vertically */
+/* 2-col icon grid - never overflows vertically */
 .ql-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;flex:1}
 .ql-btn{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -382,10 +382,10 @@ a{text-decoration:none;color:inherit}
 .ql-btn:hover span{color:var(--navy)}
 .ql-btn:last-child:nth-child(odd){grid-column:1/-1}
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   STATS SECTION â€” fills ALL remaining vertical space
+/* ====================================================
+  STATS SECTION - fills ALL remaining vertical space
    Cards stretch to fill via flex + min-height:0
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+==================================================== */
 .stats-wrap{
   display:flex;flex-direction:column;gap:8px;
   min-height:0; /* let it shrink */
@@ -412,7 +412,7 @@ a{text-decoration:none;color:inherit}
   min-height:0;
 }
 
-/* â”€â”€ Stat Card â”€â”€ */
+/* -- Stat Card -- */
 .scard{
   background:var(--card);
   border-radius:var(--rl);
@@ -463,7 +463,7 @@ a{text-decoration:none;color:inherit}
 .scard.orange .scard-icon{background:var(--orange-d);color:var(--orange)}
 .scard.orange:hover .scard-icon{background:var(--orange);color:#fff}
 
-/* card inner layout â€” centred, grows to fill height */
+/* card inner layout - centred, grows to fill height */
 .scard-inner{
   flex:1;
   display:flex;flex-direction:column;
@@ -491,7 +491,7 @@ a{text-decoration:none;color:inherit}
   font-size:.82rem;font-weight:600;color:var(--sub);margin-top:2px;
 }
 
-/* large ghost number â€” decorative */
+/* large ghost number - decorative */
 .scard-ghost{
   position:absolute;
   bottom:50px;left:76%;transform:translateX(-50%);
@@ -499,9 +499,9 @@ a{text-decoration:none;color:inherit}
   color:rgba(12,28,62,.04);pointer-events:none;user-select:none;white-space:nowrap;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ====================================================
    RESPONSIVE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+==================================================== */
 @media(max-width:980px){
   .main{height:auto;overflow:visible;padding-bottom:28px}
   .hero-row{grid-template-columns:1fr}
@@ -539,7 +539,7 @@ a{text-decoration:none;color:inherit}
 
 <div class="main">
 
-  <!-- â–ŒTOP BAR â–Œ-->
+  <!-- TOP BAR -->
   <div class="topbar">
     <div class="brand">
       <div class="brand-icon"><i class="fas fa-layer-group"></i></div>
@@ -560,7 +560,7 @@ a{text-decoration:none;color:inherit}
     </div>
   </div>
 
-  <!-- â–ŒHERO ROW â–Œ-->
+  <!-- HERO ROW -->
   <div class="hero-row">
 
     <!-- Banner -->
@@ -607,7 +607,7 @@ a{text-decoration:none;color:inherit}
     <?php endforeach; ?>
   </div>
 
-  <!-- â–ŒSTATS â–Œ-->
+  <!-- STATS -->
   <div class="stats-wrap">
     <div class="stats-label"><i class="fas fa-chart-bar"></i>الإحصائيات الحالية</div>
     <div class="cards-grid">

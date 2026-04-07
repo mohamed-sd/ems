@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -359,9 +359,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
             <a href="javascript:void(0)" id="openImportModal" class="btn" style="background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease;">
                 <i class="fas fa-file-import"></i> استيراد من Excel
             </a>
-            <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fas fa-plus-circle"></i> إضافة معدة جديدة
-            </a>
+           
             <?php } ?>
         </div>
     </div>
@@ -1055,16 +1053,14 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                                                 echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
                                                         <i class='fas fa-eye'></i>
                                                     </a>";
-                                                if ($_SESSION['user']['role'] == "3" || $_SESSION['user']['role'] == "10") {
+                                                
                                                                                                                 echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-driver' title='إدارة المشغلين'>
                                                                         <i class='fas fa-user-cog'></i>
                                                                     </a>";
-                                                } else {
-                                                                                                                echo "<a href='equipments.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
-                                                                        <i class='fas fa-edit'></i>
-                                                                    </a>";
+                                                
+                                                               
                                                         // يمكن إضافة زر حذف هنا إذا لزم الأمر
-                                                }
+                                                
                                                 echo "</td>";
 
                         echo "</tr>";

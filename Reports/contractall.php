@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -11,17 +11,17 @@ if (!isset($_SESSION['user'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø§Ù„ØªÙ‚Ø§Ø±ÙŠØ± </title>
+    <title> إيكوبيشن | التقارير </title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
 
-    <!-- Ø£ÙŠÙ‚ÙˆÙ†Ø§Øª -->
+    <!-- أيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <link rel="stylesheet" href="../assets/css/admin-style.css">
     <link rel="stylesheet" href="../assets/css/main_admin_style.css">
-    <!-- Ø§Ø³ØªØ§ÙŠÙ„Ùƒ Ø§Ù„Ù‚Ø¯ÙŠÙ… -->
+    <!-- استايلك القديم -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 
@@ -105,7 +105,7 @@ if (!isset($_SESSION['user'])) {
     $contract_data = $time_vs_progress = $faults = $suppliers = $equipments = $drivers = $variance = null;
 
     if (!empty($contract_filter)) {
-        // ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¹Ù‚Ø¯
+        // تفاصيل العقد
         $sql_info = "
         SELECT 
             c.id AS contract_id,
@@ -126,7 +126,7 @@ if (!isset($_SESSION['user'])) {
         GROUP BY c.id, m.mine_name, p.name";
         $contract_data = mysqli_fetch_assoc(mysqli_query($conn, $sql_info));
 
-        // Ø§Ù„Ø²Ù…Ù† Ù…Ù‚Ø§Ø¨Ù„ Ø§Ù„Ø¥Ù†Ø¬Ø§Ø²
+        // الزمن مقابل الإنجاز
         $sql_time = "
         SELECT 
             (TIMESTAMPDIFF(MONTH, c.contract_signing_date, CURDATE()) / c.contract_duration_months) * 100 AS time_progress,
@@ -140,7 +140,7 @@ if (!isset($_SESSION['user'])) {
         WHERE c.id = '$contract_filter'";
         $time_vs_progress = mysqli_fetch_assoc(mysqli_query($conn, $sql_time));
 
-        // Ø§Ù„Ø£Ø¹Ø·Ø§Ù„
+        // الأعطال
         $sql_faults = "
         SELECT SUM(t.total_fault_hours) AS total_fault_hours
         FROM contracts c
@@ -152,7 +152,7 @@ if (!isset($_SESSION['user'])) {
         WHERE c.id = '$contract_filter'";
         $faults = mysqli_fetch_assoc(mysqli_query($conn, $sql_faults));
 
-        // Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ†
+        // الموردين
         $sql_suppliers = "
         SELECT s.name AS supplier_name, SUM(t.executed_hours) AS total_work_hours
         FROM contracts c
@@ -166,7 +166,7 @@ if (!isset($_SESSION['user'])) {
         GROUP BY s.name";
         $suppliers = mysqli_query($conn, $sql_suppliers);
 
-        // Ø§Ù„Ø¢Ù„ÙŠØ§Øª
+        // الآليات
         $sql_equipments = "
         SELECT e.name AS equipment_name,
                SUM(t.executed_hours) AS work_hours,
@@ -181,7 +181,7 @@ if (!isset($_SESSION['user'])) {
         GROUP BY e.name";
         $equipments = mysqli_query($conn, $sql_equipments);
 
-        // Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ†
+        // السائقين
         $sql_drivers = "
         SELECT d.name AS driver_name, SUM(t.executed_hours) AS driver_hours
         FROM contracts c
@@ -195,7 +195,7 @@ if (!isset($_SESSION['user'])) {
         GROUP BY d.name";
         $drivers = mysqli_query($conn, $sql_drivers);
 
-        // Ø§Ù„Ø§Ù†Ø­Ø±Ø§Ù
+        // الانحراف
         $sql_variance = "
         SELECT c.forecasted_contracted_hours AS planned_hours,
                IFNULL(SUM(t.executed_hours),0) AS actual_hours,
@@ -216,83 +216,83 @@ if (!isset($_SESSION['user'])) {
         <div class="page-header">
             <h1 class="page-title">
                 <div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
-                ØªÙ‚Ø§Ø±ÙŠØ± ØªÙØµÙŠÙ„ÙŠØ© Ù„Ù„Ø¹Ù‚Ø¯
+                تقارير تفصيلية للعقد
             </h1>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <a href="reports.php" class="back-btn">
-                    <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
+                    <i class="fas fa-arrow-right"></i> رجوع
                 </a>
             </div>
         </div>
 
         <div class="card mb-4">
             <div class="card-header">
-                <h5><i class="fas fa-filter"></i> Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø¹Ù‚Ø¯</h5>
+                <h5><i class="fas fa-filter"></i> اختيار العقد</h5>
             </div>
             <div class="card-body">
                 <form method="GET" class="form-grid" style="align-items:end;">
                     <div>
-                        <label><i class="fas fa-file-contract"></i> Ø§Ø®ØªØ± Ø§Ù„Ø¹Ù‚Ø¯</label>
+                        <label><i class="fas fa-file-contract"></i> اختر العقد</label>
                         <select name="contract">
-                            <option value="">-- Ø§Ø®ØªØ± --</option>
+                            <option value="">-- اختر --</option>
                             <?php while($row = mysqli_fetch_assoc($contracts)) {
                                 $selected = ($contract_filter == $row['id']) ? "selected" : "";
-                                echo "<option value='{$row['id']}' $selected>Ø¹Ù‚Ø¯ #{$row['id']} - {$row['mine_name']} ({$row['project_name']})</option>";
+                                echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['mine_name']} ({$row['project_name']})</option>";
                             } ?>
                         </select>
                     </div>
-                    <button type="submit"><i class="fa fa-eye"></i> Ø¹Ø±Ø¶ Ø§Ù„ØªÙ‚Ø±ÙŠØ±</button>
+                    <button type="submit"><i class="fa fa-eye"></i> عرض التقرير</button>
                 </form>
             </div>
         </div>
 
         <?php if ($contract_data) { ?>
         <ul class="nav nav-pills report-tabs mb-3" id="pills-tab" role="tablist">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#basic"><i class="fas fa-file-lines"></i> Ø§Ù„ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ©</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#time"><i class="fas fa-hourglass-half"></i> Ø§Ù„Ø²Ù…Ù† Ù…Ù‚Ø§Ø¨Ù„ Ø§Ù„Ø¥Ù†Ø¬Ø§Ø²</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#faults"><i class="fas fa-triangle-exclamation"></i> Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#suppliers"><i class="fas fa-truck"></i> Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ†</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#equipments"><i class="fas fa-tractor"></i> Ø§Ù„Ø¢Ù„ÙŠØ§Øª</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#drivers"><i class="fas fa-helmet-safety"></i> Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ†</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#variance"><i class="fas fa-chart-line"></i> Ø§Ù„Ø§Ù†Ø­Ø±Ø§Ù</button></li>
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#basic"><i class="fas fa-file-lines"></i> التفاصيل الأساسية</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#time"><i class="fas fa-hourglass-half"></i> الزمن مقابل الإنجاز</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#faults"><i class="fas fa-triangle-exclamation"></i> الأعطال</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#suppliers"><i class="fas fa-truck"></i> الموردين</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#equipments"><i class="fas fa-tractor"></i> الآليات</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#drivers"><i class="fas fa-helmet-safety"></i> السائقين</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#variance"><i class="fas fa-chart-line"></i> الانحراف</button></li>
         </ul>
 
         <div class="tab-content">
-            <!-- Ø§Ù„ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© -->
+            <!-- التفاصيل الأساسية -->
             <div class="tab-pane fade show active" id="basic">
                 <div class="tab-card">
                     <ul class="list-group summary-list">
-                        <li class="list-group-item">Ø§Ù„Ù…Ø´Ø±ÙˆØ¹: <?= $contract_data['project_name'] ?></li>
-                        <li class="list-group-item">ØªØ§Ø±ÙŠØ® Ø§Ù„ØªÙˆÙ‚ÙŠØ¹: <?= $contract_data['contract_signing_date'] ?></li>
-                        <li class="list-group-item">Ù…Ø¯Ø© Ø§Ù„Ø¹Ù‚Ø¯: <?= $contract_data['contract_duration_months'] ?> Ø´Ù‡ÙˆØ±</li>
-                        <li class="list-group-item">Ø§Ù„Ù‡Ø¯Ù Ø§Ù„Ø´Ù‡Ø±ÙŠ: <?= $contract_data['hours_monthly_target'] ?></li>
-                        <li class="list-group-item">Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…ØªÙˆÙ‚Ø¹: <?= $contract_data['forecasted_contracted_hours'] ?></li>
-                        <li class="list-group-item">Ø§Ù„Ù…Ù†ÙØ°: <?= $contract_data['actual_hours'] ?></li>
+                        <li class="list-group-item">المشروع: <?= $contract_data['project_name'] ?></li>
+                        <li class="list-group-item">تاريخ التوقيع: <?= $contract_data['contract_signing_date'] ?></li>
+                        <li class="list-group-item">مدة العقد: <?= $contract_data['contract_duration_months'] ?> شهور</li>
+                        <li class="list-group-item">الهدف الشهري: <?= $contract_data['hours_monthly_target'] ?></li>
+                        <li class="list-group-item">الإجمالي المتوقع: <?= $contract_data['forecasted_contracted_hours'] ?></li>
+                        <li class="list-group-item">المنفذ: <?= $contract_data['actual_hours'] ?></li>
                     </ul>
                 </div>
             </div>
 
-            <!-- Ø§Ù„Ø²Ù…Ù† Ù…Ù‚Ø§Ø¨Ù„ Ø§Ù„Ø¥Ù†Ø¬Ø§Ø² -->
+            <!-- الزمن مقابل الإنجاز -->
             <div class="tab-pane fade" id="time">
                 <div class="tab-card">
-                    <div class="metric-box">Ø§Ù„ØªÙ‚Ø¯Ù… Ø§Ù„Ø²Ù…Ù†ÙŠ: <?= round($time_vs_progress['time_progress'], 2) ?> %</div>
-                    <div class="metric-box">Ø§Ù„ØªÙ‚Ø¯Ù… Ø§Ù„ÙØ¹Ù„ÙŠ: <?= round($time_vs_progress['work_progress'], 2) ?> %</div>
+                    <div class="metric-box">التقدم الزمني: <?= round($time_vs_progress['time_progress'], 2) ?> %</div>
+                    <div class="metric-box">التقدم الفعلي: <?= round($time_vs_progress['work_progress'], 2) ?> %</div>
                 </div>
             </div>
 
-            <!-- Ø§Ù„Ø£Ø¹Ø·Ø§Ù„ -->
+            <!-- الأعطال -->
             <div class="tab-pane fade" id="faults">
                 <div class="tab-card">
-                   <p><?php echo isset($faults['total_fault_hours']) ? $faults['total_fault_hours'] : 0; ?> Ø³Ø§Ø¹Ø©</p>
+                   <p><?php echo isset($faults['total_fault_hours']) ? $faults['total_fault_hours'] : 0; ?> ساعة</p>
                 </div>
             </div>
 
-            <!-- Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ† -->
+            <!-- الموردين -->
             <div class="tab-pane fade" id="suppliers">
                 <div class="tab-card table-responsive">
                 <table class="table table-striped report-table">
                     <thead>
-                        <tr><th>Ø§Ù„Ù…ÙˆØ±Ø¯</th><th>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª</th></tr>
+                        <tr><th>المورد</th><th>إجمالي الساعات</th></tr>
                     </thead>
                     <tbody>
                     <?php while($row = mysqli_fetch_assoc($suppliers)) { ?>
@@ -306,12 +306,12 @@ if (!isset($_SESSION['user'])) {
                 </div>
             </div>
 
-            <!-- Ø§Ù„Ø¢Ù„ÙŠØ§Øª -->
+            <!-- الآليات -->
             <div class="tab-pane fade" id="equipments">
                 <div class="tab-card table-responsive">
                 <table class="table table-bordered report-table">
                     <thead>
-                        <tr><th>Ø§Ù„Ø¢Ù„ÙŠØ©</th><th>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</th><th>Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø£Ø¹Ø·Ø§Ù„</th></tr>
+                        <tr><th>الآلية</th><th>ساعات العمل</th><th>ساعات الأعطال</th></tr>
                     </thead>
                     <tbody>
                     <?php while($row = mysqli_fetch_assoc($equipments)) { ?>
@@ -326,12 +326,12 @@ if (!isset($_SESSION['user'])) {
                 </div>
             </div>
 
-            <!-- Ø§Ù„Ø³Ø§Ø¦Ù‚ÙŠÙ† -->
+            <!-- السائقين -->
             <div class="tab-pane fade" id="drivers">
                 <div class="tab-card table-responsive">
                 <table class="table table-hover report-table">
                     <thead>
-                        <tr><th>Ø§Ù„Ø³Ø§Ø¦Ù‚</th><th>Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø³Ø§Ø¹Ø§Øª</th></tr>
+                        <tr><th>السائق</th><th>إجمالي الساعات</th></tr>
                     </thead>
                     <tbody>
                     <?php while($row = mysqli_fetch_assoc($drivers)) { ?>
@@ -345,12 +345,12 @@ if (!isset($_SESSION['user'])) {
                 </div>
             </div>
 
-            <!-- Ø§Ù„Ø§Ù†Ø­Ø±Ø§Ù -->
+            <!-- الانحراف -->
             <div class="tab-pane fade" id="variance">
                 <div class="tab-card">
-                    <div class="metric-box">Ø§Ù„Ù…Ø®Ø·Ø·: <?= $variance['planned_hours'] ?> Ø³Ø§Ø¹Ø©</div>
-                    <div class="metric-box">Ø§Ù„Ù…Ù†ÙØ°: <?= $variance['actual_hours'] ?> Ø³Ø§Ø¹Ø©</div>
-                    <div class="metric-box">Ø§Ù„Ø§Ù†Ø­Ø±Ø§Ù: <?= $variance['variance'] ?> Ø³Ø§Ø¹Ø©</div>
+                    <div class="metric-box">المخطط: <?= $variance['planned_hours'] ?> ساعة</div>
+                    <div class="metric-box">المنفذ: <?= $variance['actual_hours'] ?> ساعة</div>
+                    <div class="metric-box">الانحراف: <?= $variance['variance'] ?> ساعة</div>
                 </div>
             </div>
         </div>

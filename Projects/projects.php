@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // تحميل الإعدادات والأمان
 include '../config.php';
 require_once '../includes/approval_workflow.php';
@@ -119,9 +119,9 @@ function projects_redirect_with_msg($msg)
     exit();
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// ðŸ”’ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ════════════════════════════════════════════════════════════════════════════
+// 🔒 التحقق من صلاحيات المستخدم
+// ════════════════════════════════════════════════════════════════════════════
 $page_permissions = check_page_permissions($conn, 'Projects/projects.php');
 if (!isset($page_permissions['can_view']) || !$page_permissions['can_view']) {
     $legacy_page_permissions = check_page_permissions($conn, 'Projects/oprationprojects.php');
@@ -134,19 +134,19 @@ $can_add = $page_permissions['can_add'];
 $can_edit = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
 
-// Ù…Ù†Ø¹ Ø§Ù„ÙˆØµÙˆÙ„ Ø¥Ø°Ø§ Ù„Ù… ØªÙƒÙ† Ù‡Ù†Ø§Ùƒ ØµÙ„Ø§Ø­ÙŠØ© Ø¹Ø±Ø¶
+// منع الوصول إذا لم تكن هناك صلاحية عرض
 if (!$can_view) {
     header('Location: ../login.php?msg=' . urlencode('لا توجد صلاحية عرض المشاريع ❌'));
     exit();
 }
 
-// Ù…Ø¹Ø§Ù„Ø¬Ø© Ø­Ø°Ù Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
+// معالجة حذف المشروع
 if (isset($_GET['delete_id']) && isset($_GET['csrf_token'])) {
     if (!$can_delete) {
         projects_redirect_with_msg('لا توجد صلاحية حذف المشاريع ❌');
     }
 
-    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† CSRF Token
+    // التحقق من CSRF Token
     if (!verify_csrf_token($_GET['csrf_token'])) {
         header('Location: projects.php?error=' . urlencode('خطأ أمني'));
         exit();
@@ -191,7 +191,7 @@ if (isset($_GET['delete_id']) && isset($_GET['csrf_token'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
-    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† CSRF Token
+    // التحقق من CSRF Token
     if (!verify_csrf_token(isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '')) {
         die('خطأ في التحقق من الأمان - CSRF Token غير صحيح');
     }
@@ -210,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
         $client_id = intval($_POST['company_client_id']);
     }
 
-    // Ø¬Ù„Ø¨ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø¯Ø®ÙˆÙ„Ø© Ø¨Ø´ÙƒÙ„ Ø¢Ù…Ù†
+    // جلب البيانات المدخولة بشكل آمن
     $name = sanitize_input($_POST['project_name']);
     $project_code = sanitize_input(isset($_POST['project_code']) ? $_POST['project_code'] : '');
     $category = sanitize_input(isset($_POST['category']) ? $_POST['category'] : '');
@@ -224,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
     $status = sanitize_input($_POST['status']);
     $total = floatval(isset($_POST['total']) ? $_POST['total'] : 0);
 
-    // Ø¬Ù„Ø¨ Ø§Ø³Ù… Ø§Ù„Ø¹Ù…ÙŠÙ„ Ø¥Ø°Ø§ ØªÙ… Ø§Ø®ØªÙŠØ§Ø±Ù‡
+    // جلب اسم العميل إذا تم اختياره
     $client = '';
     if ($client_id > 0) {
         $stmt = query_safe(
@@ -296,7 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
 
         projects_redirect_with_msg((isset($result['message']) ? $result['message'] : 'حدث خطأ أثناء إنشاء طلب التعديل') . ' ❌');
     } else {
-        // Ø¥Ø¶Ø§ÙØ© Ù…Ø¹ Prepared Statement
+        // إضافة مع Prepared Statement
         $insert_columns = "$project_client_column, name, client, location, project_code, category, sub_sector, state, region, nearest_market, latitude, longitude, total, status, created_by";
         $insert_values = array($client_id, $name, $client, $location, $project_code, $category, $sub_sector, $state, $region, $nearest_market, $latitude, $longitude, $total, $status, $created_by);
 
@@ -335,19 +335,19 @@ include('../insidebar.php');
     <div class="page-header">
         <div style="display: flex; align-items: center; gap: 12px;">
             <div class="title-icon"><i class="fas fa-project-diagram"></i></div>
-            <h1 class="page-title">Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹</h1>
+            <h1 class="page-title">إدارة المشاريع</h1>
         </div>
         <div>
             <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
+                <i class="fas fa-arrow-right"></i> رجوع
             </a>
             <?php if ($can_add): ?>
                 <a href="javascript:void(0)" id="toggleForm" class="add">
-                    <i class="fas fa-plus-circle"></i> Ø¥Ø¶Ø§ÙØ© Ù…Ø´Ø±ÙˆØ¹
+                    <i class="fas fa-plus-circle"></i> إضافة مشروع
                 </a>
             <?php else: ?>
                 <button class="add" disabled style="opacity: .6; cursor: not-allowed;">
-                    <i class="fas fa-plus-circle"></i> Ø¥Ø¶Ø§ÙØ© (Ø¨Ø¯ÙˆÙ† ØµÙ„Ø§Ø­ÙŠØ©)
+                    <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحية)
                 </button>
             <?php endif; ?>
         </div>
@@ -361,20 +361,20 @@ include('../insidebar.php');
 
 
 
-    <!-- ÙÙˆØ±Ù… Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ Ù…Ø´Ø±ÙˆØ¹ -->
+    <!-- فورم إضافة / تعديل مشروع -->
     <form id="projectForm" action="" method="post" style="display:none;">
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-edit"></i> Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ Ù…Ø´Ø±ÙˆØ¹</h5>
+                <h5><i class="fas fa-edit"></i> إضافة / تعديل مشروع</h5>
             </div>
             <div class="card-body">
                 <input type="hidden" name="id" id="project_id" value="">
                 <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                 <div class="form-grid">
                     <div>
-                        <label><i class="fas fa-user-tie"></i> Ø§Ø³Ù… Ø§Ù„Ø¹Ù…ÙŠÙ„ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)</label>
+                        <label><i class="fas fa-user-tie"></i> اسم العميل (اختياري)</label>
                         <select name="client_id" id="client_id" required>
-                            <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø¹Ù…ÙŠÙ„  --</option>
+                            <option value="">-- اختر العميل  --</option>
                             <?php
                             $clients_query = mysqli_query($conn, "SELECT c.id, c.client_code, c.client_name FROM clients c WHERE c.status = 'نشط' AND $client_scope_sql ORDER BY c.client_name ASC");
                             while ($cli = mysqli_fetch_assoc($clients_query)) {
@@ -384,67 +384,67 @@ include('../insidebar.php');
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-barcode"></i> ÙƒÙˆØ¯ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</label>
-                        <input type="text" name="project_code" placeholder="ÙƒÙˆØ¯ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹" id="project_code" />
+                        <label><i class="fas fa-barcode"></i> كود المشروع</label>
+                        <input type="text" name="project_code" placeholder="كود المشروع" id="project_code" />
                     </div>
                     <div>
-                        <label><i class="fas fa-file-signature"></i> Ø§Ø³Ù… Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</label>
-                        <input type="text" name="project_name" id="project_name" placeholder="Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø§Ù„Ù…Ø´Ø±ÙˆØ¹"
+                        <label><i class="fas fa-file-signature"></i> اسم المشروع</label>
+                        <input type="text" name="project_name" id="project_name" placeholder="أدخل اسم المشروع"
                             required />
                     </div>
                     <div>
-                        <label><i class="fas fa-map-marker-alt"></i> Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</label>
-                        <input type="text" name="location" placeholder="Ø£Ø¯Ø®Ù„ Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹" id="project_location" />
+                        <label><i class="fas fa-map-marker-alt"></i> موقع المشروع</label>
+                        <input type="text" name="location" placeholder="أدخل موقع المشروع" id="project_location" />
                         <input type="hidden" name="total" value="0" />
                     </div>
                     <div>
-                        <label><i class="fas fa-layer-group"></i> Ø§Ù„ÙØ¦Ø©</label>
-                        <input type="text" name="category" placeholder="Ø§Ù„ÙØ¦Ø©" id="project_category" />
+                        <label><i class="fas fa-layer-group"></i> الفئة</label>
+                        <input type="text" name="category" placeholder="الفئة" id="project_category" />
                     </div>
                     <div>
-                        <label><i class="fas fa-industry"></i> Ø§Ù„Ù‚Ø·Ø§Ø¹ Ø§Ù„ÙØ±Ø¹ÙŠ</label>
-                        <input type="text" name="sub_sector" placeholder="Ø§Ù„Ù‚Ø·Ø§Ø¹ Ø§Ù„ÙØ±Ø¹ÙŠ" id="project_sub_sector" />
+                        <label><i class="fas fa-industry"></i> القطاع الفرعي</label>
+                        <input type="text" name="sub_sector" placeholder="القطاع الفرعي" id="project_sub_sector" />
                     </div>
                     <div>
-                        <label><i class="fas fa-map-marked-alt"></i> Ø§Ù„ÙˆÙ„Ø§ÙŠØ©</label>
-                        <input type="text" name="state" placeholder="Ø§Ù„ÙˆÙ„Ø§ÙŠØ©" id="project_state" />
+                        <label><i class="fas fa-map-marked-alt"></i> الولاية</label>
+                        <input type="text" name="state" placeholder="الولاية" id="project_state" />
                     </div>
                     <div>
-                        <label><i class="fas fa-map-pin"></i> Ø§Ù„Ù…Ù†Ø·Ù‚Ø©</label>
-                        <input type="text" name="region" placeholder="Ø§Ù„Ù…Ù†Ø·Ù‚Ø©" id="project_region" />
+                        <label><i class="fas fa-map-pin"></i> المنطقة</label>
+                        <input type="text" name="region" placeholder="المنطقة" id="project_region" />
                     </div>
                     <div>
-                        <label><i class="fas fa-store"></i> Ø£Ù‚Ø±Ø¨ Ø³ÙˆÙ‚</label>
-                        <input type="text" name="nearest_market" placeholder="Ø£Ù‚Ø±Ø¨ Ø³ÙˆÙ‚" id="project_nearest_market" />
+                        <label><i class="fas fa-store"></i> أقرب سوق</label>
+                        <input type="text" name="nearest_market" placeholder="أقرب سوق" id="project_nearest_market" />
                     </div>
                     <div>
-                        <label><i class="fas fa-map-marker"></i> Ø®Ø· Ø§Ù„Ø¹Ø±Ø¶</label>
-                        <input type="text" name="latitude" placeholder="Ø®Ø· Ø§Ù„Ø¹Ø±Ø¶" id="project_latitude" />
+                        <label><i class="fas fa-map-marker"></i> خط العرض</label>
+                        <input type="text" name="latitude" placeholder="خط العرض" id="project_latitude" />
                     </div>
                     <div>
-                        <label><i class="fas fa-map-marker"></i> Ø®Ø· Ø§Ù„Ø·ÙˆÙ„</label>
-                        <input type="text" name="longitude" placeholder="Ø®Ø· Ø§Ù„Ø·ÙˆÙ„" id="project_longitude" />
+                        <label><i class="fas fa-map-marker"></i> خط الطول</label>
+                        <input type="text" name="longitude" placeholder="خط الطول" id="project_longitude" />
                     </div>
                     <div>
-                        <label><i class="fas fa-toggle-on"></i> Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</label>
+                        <label><i class="fas fa-toggle-on"></i> حالة المشروع</label>
                         <select name="status" id="project_status" required>
-                            <option value="">-- Ø§Ø®ØªØ± Ø§Ù„Ø­Ø§Ù„Ø© --</option>
-                            <option value="1">âœ… Ù†Ø´Ø·</option>
-                            <option value="0">âŒ ØºÙŠØ± Ù†Ø´Ø·</option>
+                            <option value="">-- اختر الحالة --</option>
+                            <option value="1">✅ نشط</option>
+                            <option value="0">❌ غير نشط</option>
                         </select>
                     </div>
                     <button type="submit">
-                        <i class="fas fa-save"></i> <span>Ø­ÙØ¸ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</span>
+                        <i class="fas fa-save"></i> <span>حفظ المشروع</span>
                     </button>
                 </div>
             </div>
         </div>
     </form>
 
-    <!-- Ø¬Ø¯ÙˆÙ„ Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹ -->
+    <!-- جدول المشاريع -->
     <div class="card">
         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h5 style="margin: 0;"><i class="fas fa-list"></i> Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹</h5>
+            <h5 style="margin: 0;"><i class="fas fa-list"></i> قائمة المشاريع</h5>
 
                 <?php
 
@@ -452,7 +452,7 @@ include('../insidebar.php');
                     $client_id = intval($_GET['client_id']);
                     $client_result = mysqli_query($conn, "SELECT c.client_name FROM clients c WHERE c.id = $client_id AND $client_scope_sql");
                     if ($client_row = mysqli_fetch_assoc($client_result)) {
-                        echo "Ù„Ù„Ø¹Ù…ÙŠÙ„: <strong>" . htmlspecialchars($client_row['client_name']) . "</strong>";
+                        echo "للعميل: <strong>" . htmlspecialchars($client_row['client_name']) . "</strong>";
                     }
                 }
 
@@ -460,12 +460,12 @@ include('../insidebar.php');
 
             </h5>
             <div style="display: flex; gap: 10px;">
-                <button class="btn btn-sm btn-success" id="exportBtn" title="ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬">
-                    <i class="fas fa-download"></i> ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬
+                <button class="btn btn-sm btn-success" id="exportBtn" title="تحميل النموذج">
+                    <i class="fas fa-download"></i> تحميل النموذج
                 </button>
                 <?php if ($can_add): ?>
-                    <button class="btn btn-sm btn-info" id="importBtn" title="Ø§Ø³ØªÙŠØ±Ø§Ø¯ Ù…Ù„Ù">
-                        <i class="fas fa-upload"></i> Ø§Ø³ØªÙŠØ±Ø§Ø¯ Ù…Ù† Excel
+                    <button class="btn btn-sm btn-info" id="importBtn" title="استيراد ملف">
+                        <i class="fas fa-upload"></i> استيراد من Excel
                     </button>
                 <?php endif; ?>
             </div>
@@ -475,20 +475,20 @@ include('../insidebar.php');
                 <table id="projectsTable" class="display" style="width:100%;">
                     <thead>
                         <tr>
-                            <th><i class="fas fa-calendar"></i> ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¥Ø¶Ø§ÙØ©</th>
-                            <th><i class="fas fa-user-tie"></i> Ø§Ù„Ø¹Ù…ÙŠÙ„</th>
-                            <th><i class="fas fa-file-contract"></i> ÙƒÙˆØ¯ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</th>
-                            <th><i class="fas fa-project-diagram"></i> Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</th>
-                            <th><i class="fas fa-truck"></i> Ø¹Ø¯Ø¯ Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ†</th>
-                            <th><i class="fas fa-toggle-on"></i> Ø§Ù„Ø­Ø§Ù„Ø©</th>
-                            <!-- <th><i class="fas fa-file-contract"></i> Ø¹Ù‚ÙˆØ¯ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</th> -->
-                            <th> Ø§Ù„Ù…Ù†Ø§Ø¬Ù…</th>
-                            <th><i class="fas fa-cogs"></i> Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th>
+                            <th><i class="fas fa-calendar"></i> تاريخ الإضافة</th>
+                            <th><i class="fas fa-user-tie"></i> العميل</th>
+                            <th><i class="fas fa-file-contract"></i> كود المشروع</th>
+                            <th><i class="fas fa-project-diagram"></i> المشروع</th>
+                            <th><i class="fas fa-truck"></i> عدد الموردين</th>
+                            <th><i class="fas fa-toggle-on"></i> الحالة</th>
+                            <!-- <th><i class="fas fa-file-contract"></i> عقود المشروع</th> -->
+                            <th> المناجم</th>
+                            <th><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        // Ø¬Ù„Ø¨ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹ Ù…Ù† Ø¬Ø¯ÙˆÙ„ project
+                        // جلب جميع المشاريع من جدول project
 
                         $where_clauses = array($project_scope_sql, $project_not_deleted_sql);
 
@@ -499,7 +499,7 @@ include('../insidebar.php');
 
                         $client_filter = ' WHERE ' . implode(' AND ', $where_clauses);
 
-                        // Ø¬Ù„Ø¨ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹ Ù…Ù† Ø¬Ø¯ÙˆÙ„ project Ù…Ø¹ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø¯Ø®ÙˆÙ„Ø© ÙŠØ¯ÙˆÙŠÙ‹Ø§
+                        // جلب جميع المشاريع من جدول project مع البيانات المدخولة يدويًا
                         $query = "SELECT op.`id`, op.`name`, op.`client`, op.`location`, op.`total`, op.`status`, op.`create_at`, 
                       op.`project_code`, op.`category`, op.`sub_sector`, op.`state`, op.`region`, 
                                             op.`nearest_market`, op.`latitude`, op.`longitude`, op.`$project_client_column` AS `client_id`,
@@ -537,7 +537,7 @@ include('../insidebar.php');
 
                              <a href='project_mines.php?project_id=" . intval($row['id']) . "' 
                                        class='mines-count-link' 
-                                       title='Ø¹Ø±Ø¶ Ø§Ù„Ù…Ù†Ø§Ø¬Ù…'>
+                                       title='عرض المناجم'>
                                         <i class='fas fa-mountain'></i>
                                         <span class='mines-count-badge'>" . intval($row['mines_count']) . "</span>
                              </a>
@@ -564,7 +564,7 @@ include('../insidebar.php');
                                    data-status='" . $row['status'] . "' 
                                    data-contracts='" . $row['contracts'] . "' 
                                    data-suppliers='" . $row['total_suppliers'] . "'
-                                   title='Ø¹Ø±Ø¶ Ø§Ù„ØªÙØ§ØµÙŠÙ„'>
+                                   title='عرض التفاصيل'>
                                    <i class='fas fa-eye'></i>
                                           </a>";
 
@@ -584,7 +584,7 @@ include('../insidebar.php');
                                                     data-latitude='" . htmlspecialchars(isset($row['latitude']) ? $row['latitude'] : '') . "' 
                                                     data-longitude='" . htmlspecialchars(isset($row['longitude']) ? $row['longitude'] : '') . "' 
                                                     data-status='" . htmlspecialchars($row['status']) . "'
-                                                    title='ØªØ¹Ø¯ÙŠÙ„'>
+                                                    title='تعديل'>
                                                     <i class='fas fa-edit'></i>
                                                 </a>";
                                           }
@@ -592,8 +592,8 @@ include('../insidebar.php');
                                           if ($can_delete) {
                                                 echo "<a href='projects.php?delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode(generate_csrf_token()) . "' 
                                                     class='action-btn delete' 
-                                                    onclick='return confirm(\"Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø­Ø°Ù Ù‡Ø°Ø§ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ØŸ\")'
-                                                    title='Ø­Ø°Ù'>
+                                                    onclick='return confirm(\"هل أنت متأكد من حذف هذا المشروع؟\")'
+                                                    title='حذف'>
                                                     <i class='fas fa-trash-alt'></i>
                                                 </a>";
                                           }
@@ -610,90 +610,90 @@ include('../insidebar.php');
     </div>
 </div>
 
-<!-- Modal Ø¹Ø±Ø¶ ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ -->
+<!-- Modal عرض تفاصيل المشروع -->
 <div id="viewProjectModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h5><i class="fas fa-eye"></i> Ø¹Ø±Ø¶ ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</h5>
+            <h5><i class="fas fa-eye"></i> عرض تفاصيل المشروع</h5>
             <button class="close-modal" onclick="closeViewModal()">&times;</button>
         </div>
         <div class="modal-body">
             <div class="view-modal-body">
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-user-tie"></i> Ø§Ø³Ù… Ø§Ù„Ø¹Ù…ÙŠÙ„</div>
+                    <div class="view-item-label"><i class="fas fa-user-tie"></i> اسم العميل</div>
                     <div class="view-item-value" id="view_client_name">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-barcode"></i> ÙƒÙˆØ¯ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</div>
+                    <div class="view-item-label"><i class="fas fa-barcode"></i> كود المشروع</div>
                     <div class="view-item-value" id="view_project_code">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-project-diagram"></i> Ø§Ø³Ù… Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</div>
+                    <div class="view-item-label"><i class="fas fa-project-diagram"></i> اسم المشروع</div>
                     <div class="view-item-value" id="view_project_name">-</div>
                 </div>
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-layer-group"></i> Ø§Ù„ÙØ¦Ø©</div>
+                    <div class="view-item-label"><i class="fas fa-layer-group"></i> الفئة</div>
                     <div class="view-item-value" id="view_category">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-industry"></i> Ø§Ù„Ù‚Ø·Ø§Ø¹ Ø§Ù„ÙØ±Ø¹ÙŠ</div>
+                    <div class="view-item-label"><i class="fas fa-industry"></i> القطاع الفرعي</div>
                     <div class="view-item-value" id="view_sub_sector">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-map-marked-alt"></i> Ø§Ù„ÙˆÙ„Ø§ÙŠØ©</div>
+                    <div class="view-item-label"><i class="fas fa-map-marked-alt"></i> الولاية</div>
                     <div class="view-item-value" id="view_state">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-map-pin"></i> Ø§Ù„Ù…Ù†Ø·Ù‚Ø©</div>
+                    <div class="view-item-label"><i class="fas fa-map-pin"></i> المنطقة</div>
                     <div class="view-item-value" id="view_region">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-map-marker-alt"></i> Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</div>
+                    <div class="view-item-label"><i class="fas fa-map-marker-alt"></i> موقع المشروع</div>
                     <div class="view-item-value" id="view_location">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-store"></i> Ø£Ù‚Ø±Ø¨ Ø³ÙˆÙ‚</div>
+                    <div class="view-item-label"><i class="fas fa-store"></i> أقرب سوق</div>
                     <div class="view-item-value" id="view_nearest_market">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-map-marker"></i> Ø§Ù„Ø¥Ø­Ø¯Ø§Ø«ÙŠØ§Øª (Ø®Ø· Ø§Ù„Ø¹Ø±Ø¶ / Ø®Ø· Ø§Ù„Ø·ÙˆÙ„)
+                    <div class="view-item-label"><i class="fas fa-map-marker"></i> الإحداثيات (خط العرض / خط الطول)
                     </div>
                     <div class="view-item-value" id="view_coordinates">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-file-contract"></i> Ø¹Ø¯Ø¯ Ø§Ù„Ø¹Ù‚ÙˆØ¯</div>
+                    <div class="view-item-label"><i class="fas fa-file-contract"></i> عدد العقود</div>
                     <div class="view-item-value" id="view_contracts">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-truck"></i> Ø¹Ø¯Ø¯ Ø§Ù„Ù…ÙˆØ±Ø¯ÙŠÙ†</div>
+                    <div class="view-item-label"><i class="fas fa-truck"></i> عدد الموردين</div>
                     <div class="view-item-value" id="view_suppliers">-</div>
                 </div>
 
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> Ø­Ø§Ù„Ø© Ø§Ù„Ù…Ø´Ø±ÙˆØ¹</div>
+                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> حالة المشروع</div>
                     <div class="view-item-value" id="view_status">-</div>
                 </div>
             </div>
         </div>
         <div class="modal-footer">
             <a id="viewMinesBtn" class="btn-modal btn-modal-save" style="text-decoration: none;">
-                <i class="fas fa-mountain"></i> Ù…Ù†Ø§Ø¬Ù… Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
+                <i class="fas fa-mountain"></i> مناجم المشروع
             </a>
             <?php if ($can_edit): ?>
                 <button type="button" class="btn-modal btn-modal-save editBtn" id="viewEditBtn">
-                    <i class="fas fa-edit"></i> ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
+                    <i class="fas fa-edit"></i> تعديل المشروع
                 </button>
             <?php endif; ?>
             <button type="button" class="btn-modal btn-modal-cancel" onclick="closeViewModal()">
-                <i class="fas fa-times"></i> Ø¥ØºÙ„Ø§Ù‚
+                <i class="fas fa-times"></i> إغلاق
             </button>
         </div>
     </div>
@@ -714,22 +714,22 @@ include('../insidebar.php');
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
 <script>
-    // Ø¥ØºÙ„Ø§Ù‚ Modal Ø¹Ø±Ø¶ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ - ØªØ¹Ø±ÙŠÙ Ø¹Ø§Ù…
+    // إغلاق Modal عرض المشروع - تعريف عام
     function closeViewModal() {
         $('#viewProjectModal').fadeOut(300);
     }
 
     (function () {
-        // ØªØ´ØºÙŠÙ„ DataTable
+        // تشغيل DataTable
         $(document).ready(function () {
             $('#projectsTable').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
-                    { extend: 'copy', text: 'Ù†Ø³Ø® (Copy)' },
-                    { extend: 'excel', text: 'ØªØµØ¯ÙŠØ± Excel' },
-                    { extend: 'csv', text: 'ØªØµØ¯ÙŠØ± CSV' },
-                    { extend: 'pdf', text: 'ØªØµØ¯ÙŠØ± PDF' },
-                    { extend: 'print', text: 'Ø·Ø¨Ø§Ø¹Ø© (Print)' }
+                    { extend: 'copy', text: 'نسخ (Copy)' },
+                    { extend: 'excel', text: 'تصدير Excel' },
+                    { extend: 'csv', text: 'تصدير CSV' },
+                    { extend: 'pdf', text: 'تصدير PDF' },
+                    { extend: 'print', text: 'طباعة (Print)' }
                 ],
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
@@ -737,13 +737,13 @@ include('../insidebar.php');
             });
         });
 
-        // Ø§Ø¸Ù‡Ø§Ø±/Ø§Ø®ÙØ§Ø¡ Ø§Ù„ÙÙˆØ±Ù…
+        // اظهار/اخفاء الفورم
         const toggleProjectFormBtn = document.getElementById('toggleForm');
         const projectForm = document.getElementById('projectForm');
         if (toggleProjectFormBtn) {
             toggleProjectFormBtn.addEventListener('click', function () {
                 projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
-                // ØªÙ†Ø¸ÙŠÙ Ø§Ù„Ø­Ù‚ÙˆÙ„ Ø¹Ù†Ø¯ Ø§Ù„Ø¥Ø¶Ø§ÙØ©
+                // تنظيف الحقول عند الإضافة
                 $("#project_id").val("");
                 $("#project_name").val("");
                 $("#client_id").val("");
@@ -760,7 +760,7 @@ include('../insidebar.php');
             });
         }
 
-        // Ø¹Ø±Ø¶ Modal Ø¹Ù†Ø¯ Ø§Ù„Ø¶ØºØ· Ø¹Ù„Ù‰ Ø²Ø± Ø§Ù„Ø¹Ø±Ø¶
+        // عرض Modal عند الضغط على زر العرض
         $(document).on("click", ".viewBtn", function () {
             const projectData = {
                 id: $(this).data('id'),
@@ -780,7 +780,7 @@ include('../insidebar.php');
                 suppliers: $(this).data('suppliers')
             };
 
-            // Ù…Ù„Ø¡ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¹Ø±Ø¶
+            // ملء بيانات العرض
             $('#view_project_name').text(projectData.projectName || '-');
             $('#view_client_name').text(projectData.clientName || '-');
             $('#view_project_code').text(projectData.projectCode || '-');
@@ -791,7 +791,7 @@ include('../insidebar.php');
             $('#view_location').text(projectData.location || '-');
             $('#view_nearest_market').text(projectData.nearestMarket || '-');
 
-            // Ø¹Ø±Ø¶ Ø§Ù„Ø¥Ø­Ø¯Ø§Ø«ÙŠØ§Øª
+            // عرض الإحداثيات
             let coordsText = '-';
             if (projectData.latitude && projectData.longitude) {
                 coordsText = projectData.latitude + ' / ' + projectData.longitude;
@@ -801,7 +801,7 @@ include('../insidebar.php');
             $('#view_contracts').text(projectData.contracts || '0');
             $('#view_suppliers').text(projectData.suppliers || '0');
 
-            // Ø¹Ø±Ø¶ Ø§Ù„Ø­Ø§Ù„Ø© Ø¨Ø£Ù„ÙˆØ§Ù†
+            // عرض الحالة بألوان
             let statusHtml = '<span style="padding: 4px 12px; border-radius: 20px; color: white;';
             if (projectData.status === '1' || projectData.status === 1) {
                 statusHtml += ' background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);';
@@ -809,10 +809,10 @@ include('../insidebar.php');
                 statusHtml += ' background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);';
             }
             statusHtml += ' display: inline-block;">';
-            statusHtml += '<i class="fas fa-circle" style="margin-left: 6px; font-size: 8px;"></i> ' + (projectData.status === '1' || projectData.status === 1 ? 'Ù†Ø´Ø·' : 'ØºÙŠØ± Ù†Ø´Ø·') + '</span>';
+            statusHtml += '<i class="fas fa-circle" style="margin-left: 6px; font-size: 8px;"></i> ' + (projectData.status === '1' || projectData.status === 1 ? 'نشط' : 'غير نشط') + '</span>';
             $('#view_status').html(statusHtml);
 
-            // ØªØ­Ø¶ÙŠØ± Ø²Ø± Ø§Ù„ØªØ¹Ø¯ÙŠÙ„
+            // تحضير زر التعديل
             const editBtn = $('#viewEditBtn');
             editBtn.data('id', projectData.id);
             editBtn.data('company-project-id', $(this).data('company-project-id'));
@@ -821,27 +821,27 @@ include('../insidebar.php');
             editBtn.data('location', projectData.location);
             editBtn.data('status', projectData.status);
 
-            // ØªØ­Ø¶ÙŠØ± Ø²Ø± Ù…Ù†Ø§Ø¬Ù… Ø§Ù„Ù…Ø´Ø±ÙˆØ¹
+            // تحضير زر مناجم المشروع
             $('#viewMinesBtn').attr('href', 'project_mines.php?project_id=' + projectData.id);
 
             $('#viewProjectModal').fadeIn(300);
         });
 
-        // Ø¥ØºÙ„Ø§Ù‚ Ø¹Ù†Ø¯ Ø§Ù„Ø¶ØºØ· Ø®Ø§Ø±Ø¬ Modal
+        // إغلاق عند الضغط خارج Modal
         $(window).on('click', function (e) {
             if (e.target.id === 'viewProjectModal') {
                 closeViewModal();
             }
         });
 
-        // Ø¥ØºÙ„Ø§Ù‚ Ø¹Ù†Ø¯ Ø§Ù„Ø¶ØºØ· Ø¹Ù„Ù‰ ESC
+        // إغلاق عند الضغط على ESC
         $(document).on('keydown', function (e) {
             if (e.key === 'Escape' && $('#viewProjectModal').is(':visible')) {
                 closeViewModal();
             }
         });
 
-        // Ø§Ù„ØªØ¹Ø§Ù…Ù„ Ù…Ø¹ Ø²Ø± Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ Ù…Ù† Modal Ø§Ù„Ø¹Ø±Ø¶
+        // التعامل مع زر التعديل من Modal العرض
         $('#viewEditBtn').on('click', function () {
             $("#project_id").val($(this).data('id'));
             $("#company_project_id").val($(this).data('company-project-id'));
@@ -854,7 +854,7 @@ include('../insidebar.php');
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
         });
 
-        // Ø¹Ù†Ø¯ Ø§Ù„Ø¶ØºØ· Ø¹Ù„Ù‰ Ø²Ø± ØªØ¹Ø¯ÙŠÙ„ Ù…Ù† Ø§Ù„Ø¬Ø¯ÙˆÙ„
+        // عند الضغط على زر تعديل من الجدول
         $(document).on("click", ".editBtn:not(#viewEditBtn)", function () {
             $("#project_id").val($(this).data("id"));
             $("#project_name").val($(this).data("project-name"));
@@ -874,9 +874,9 @@ include('../insidebar.php');
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
         });
 
-        // Ø¹Ù†Ø¯ ØªÙ…Ø±ÙŠØ± Ø±Ù‚Ù… Ø§Ù„Ø¹Ù…ÙŠÙ„ Ù‚ÙŠ Ø§Ù„ url
+        // عند تمرير رقم العميل قي ال url
         $(document).ready(function () {
-            // Ø¥Ø°Ø§ ØªÙ… ØªÙ…Ø±ÙŠØ± client_id ÙÙŠ Ø§Ù„Ø±Ø§Ø¨Ø·ØŒ Ø§ÙØªØ­ Ø§Ù„ÙÙˆØ±Ù… ØªÙ„Ù‚Ø§Ø¦ÙŠÙ‹Ø§
+            // إذا تم تمرير client_id في الرابط، افتح الفورم تلقائيًا
             const urlParams = new URLSearchParams(window.location.search);
             const clientId = urlParams.get('client_id');
 
@@ -886,25 +886,25 @@ include('../insidebar.php');
             }
         });
 
-        // ===== Ù…Ø¹Ø§Ù„Ø¬Ø§Øª Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯ ÙˆØ§Ù„ØªØµØ¯ÙŠØ± =====
+        // ===== معالجات الاستيراد والتصدير =====
         
-        // Ø²Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬
+        // زر تحميل النموذج
         $('#exportBtn').on('click', function() {
             window.location.href = 'download_projects_template.php';
         });
 
-        // Ø²Ø± Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯ Ù…Ù† Excel
+        // زر الاستيراد من Excel
         $('#importBtn').on('click', function() {
             $('#importModal').modal('show');
         });
 
-        // Ù…Ø¹Ø§Ù„Ø¬ Ø±ÙØ¹ Ø§Ù„Ù…Ù„Ù
+        // معالج رفع الملف
         $('#importFileForm').on('submit', function(e) {
             e.preventDefault();
             
             const fileInput = $('#projectFile')[0];
             if (!fileInput.files.length) {
-                alert('ÙŠØ±Ø¬Ù‰ Ø§Ø®ØªÙŠØ§Ø± Ù…Ù„Ù');
+                alert('يرجى اختيار ملف');
                 return;
             }
 
@@ -920,12 +920,12 @@ include('../insidebar.php');
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
-                        alert('ØªÙ… Ø§Ø³ØªÙŠØ±Ø§Ø¯ ' + response.imported_count + ' Ù…Ø´Ø±ÙˆØ¹ Ø¨Ù†Ø¬Ø§Ø­!');
+                        alert('تم استيراد ' + response.imported_count + ' مشروع بنجاح!');
                         $('#importModal').modal('hide');
                         $('#projectsTable').DataTable().ajax.reload();
-                        location.reload(); // Ø¥Ø¹Ø§Ø¯Ø© ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙØ­Ø© Ù„ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø¬Ø¯ÙˆÙ„
+                        location.reload(); // إعادة تحميل الصفحة لتحديث الجدول
                     } else {
-                        let errorMsg = 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø£Ø«Ù†Ø§Ø¡ Ø§Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯:\n\n';
+                        let errorMsg = 'حدث خطأ أثناء الاستيراد:\n\n';
                         if (response.errors && response.errors.length > 0) {
                             response.errors.forEach(function(error) {
                                 errorMsg += error + '\n';
@@ -935,7 +935,7 @@ include('../insidebar.php');
                     }
                 },
                 error: function(xhr, status, error) {
-                    alert('Ø­Ø¯Ø« Ø®Ø·Ø£ ÙÙŠ Ø§Ù„Ø§ØªØµØ§Ù„: ' + error);
+                    alert('حدث خطأ في الاتصال: ' + error);
                 }
             });
         });
@@ -943,28 +943,28 @@ include('../insidebar.php');
     })();
 </script>
 
-<!-- Modal Ù„Ø§Ø³ØªÙŠØ±Ø§Ø¯ Ø§Ù„Ù…Ù„ÙØ§Øª -->
+<!-- Modal لاستيراد الملفات -->
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="importModalLabel"><i class="fas fa-upload"></i> Ø§Ø³ØªÙŠØ±Ø§Ø¯ Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹ Ù…Ù† Ù…Ù„Ù Excel</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Ø¥ØºÙ„Ø§Ù‚"></button>
+                <h5 class="modal-title" id="importModalLabel"><i class="fas fa-upload"></i> استيراد المشاريع من ملف Excel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
             </div>
             <div class="modal-body">
                 <form id="importFileForm">
                     <div class="form-group">
-                        <label for="projectFile">Ø§Ø®ØªØ± Ù…Ù„Ù Excel:</label>
+                        <label for="projectFile">اختر ملف Excel:</label>
                         <input type="file" class="form-control" id="projectFile" name="file" accept=".xlsx,.xls" required>
-                        <small class="form-text text-muted">Ø§Ù„Ù…Ù„ÙØ§Øª Ø§Ù„Ù…Ù‚Ø¨ÙˆÙ„Ø©: Excel (.xlsx, .xls)</small>
+                        <small class="form-text text-muted">الملفات المقبولة: Excel (.xlsx, .xls)</small>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ø¥ØºÙ„Ø§Ù‚</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
                 <?php if ($can_add): ?>
                     <button type="submit" form="importFileForm" class="btn btn-primary">
-                        <i class="fas fa-upload"></i> Ø§Ø³ØªÙŠØ±Ø§Ø¯
+                        <i class="fas fa-upload"></i> استيراد
                     </button>
                 <?php endif; ?>
             </div>

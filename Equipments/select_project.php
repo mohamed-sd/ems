@@ -1,10 +1,10 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
     exit();
 }
-$page_title = "Ø¥ÙŠÙƒÙˆØ¨ÙŠØ´Ù† | Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù…Ø´Ø±ÙˆØ¹";
+$page_title = "إيكوبيشن | اختيار المشروع";
 include("../inheader.php");
 include("../insidebar.php");
 include '../config.php';
@@ -217,12 +217,12 @@ include '../config.php';
 <div class="main">
     <h2>
         <i class="fas fa-project-diagram"></i>
-        Ø§Ø®ØªØ± Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø¹Ø¯Ø§Øª
+        اختر المشروع لإدارة المعدات
     </h2>
     
     <p class="page-description">
         <i class="fas fa-info-circle"></i>
-        Ø§Ø®ØªØ± Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„Ø°ÙŠ ØªØ±ØºØ¨ ÙÙŠ Ø¥Ø¯Ø§Ø±Ø© Ù…Ø¹Ø¯Ø§ØªÙ‡
+        اختر المشروع الذي ترغب في إدارة معداته
     </p>
 
     <div class="projects-grid">
@@ -262,18 +262,18 @@ include '../config.php';
                         
                         <div class="project-detail-item">
                             <i class="fas fa-mountain"></i>
-                            <span><?php echo intval($project['mines_count']); ?> Ù…Ù†Ø¬Ù…</span>
+                            <span><?php echo intval($project['mines_count']); ?> منجم</span>
                         </div>
                         
                         <div class="project-detail-item">
                             <i class="fas fa-cogs"></i>
-                            <span><?php echo intval($project['equipments_count']); ?> Ù…Ø¹Ø¯Ø© Ù…Ø³Ø¬Ù„Ø©</span>
+                            <span><?php echo intval($project['equipments_count']); ?> معدة مسجلة</span>
                         </div>
                     </div>
                     
                     <div class="action-button">
                         <i class="fas fa-arrow-left"></i>
-                        Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø¹Ø¯Ø§Øª
+                        إدارة المعدات
                     </div>
                 </a>
                 <?php
@@ -282,7 +282,7 @@ include '../config.php';
             ?>
             <div class="no-projects">
                 <i class="fas fa-folder-open"></i>
-                <p>Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø´Ø§Ø±ÙŠØ¹ Ù…ØªØ§Ø­Ø© Ø­Ø§Ù„ÙŠØ§Ù‹</p>
+                <p>لا توجد مشاريع متاحة حالياً</p>
             </div>
             <?php
         }

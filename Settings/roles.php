@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -7,7 +7,7 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 
-/* Ø¬Ù„Ø¨ Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ */
+/* جلب بيانات التعديل */
 $editData = null;
 if (isset($_GET['edit_id'])) {
     $id = (int) $_GET['edit_id'];
@@ -17,26 +17,26 @@ if (isset($_GET['edit_id'])) {
     $editData = $stmt->get_result()->fetch_assoc();
 }
 
-/* Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ */
+/* إضافة / تعديل */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $parent_role_id = !empty($_POST['parent_role_id']) && $_POST['parent_role_id'] !== '' ? (int) $_POST['parent_role_id'] : null;
     $level = (int) ($_POST['level'] ?? 1);
     $status = (int) ($_POST['status'] ?? 1);
 
-    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† ØµØ­Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
+    // التحقق من صحة البيانات
     if (empty($name)) {
-        $error_msg = 'Ø§Ø³Ù… Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ© Ù…Ø·Ù„ÙˆØ¨ âŒ';
+        $error_msg = 'اسم الصلاحية مطلوب ❌';
     } else {
         if (!empty($_POST['edit_id'])) {
-            // ØªØ¹Ø¯ÙŠÙ„
+            // تعديل
             $id = (int) $_POST['edit_id'];
             $stmt = $conn->prepare(
                 "UPDATE `roles` SET `name` = ?, `parent_role_id` = ?, `level` = ?, `status` = ? WHERE `id` = ?"
             );
             $stmt->bind_param("siiii", $name, $parent_role_id, $level, $status, $id);
         } else {
-            // Ø¥Ø¶Ø§ÙØ©
+            // إضافة
             $stmt = $conn->prepare(
                 "INSERT INTO `roles` (`name`, `parent_role_id`, `level`, `status`, `created_at`) VALUES (?, ?, ?, ?, NOW())"
             );
@@ -44,43 +44,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($stmt->execute()) {
-            header("Location: roles.php?msg=ØªÙ…+Ø§Ù„Ø¨Ø­ÙØ§Ø¸+Ø¹Ù„Ù‰+Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª+Ø¨Ù†Ø¬Ø§Ø­+âœ…");
+            header("Location: roles.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✅");
             exit;
         } else {
-            $error_msg = 'Ø­Ø¯Ø« Ø®Ø·Ø£: ' . htmlspecialchars($stmt->error) . ' âŒ';
+            $error_msg = 'حدث خطأ: ' . htmlspecialchars($stmt->error) . ' ❌';
         }
     }
 }
 
-/* Ø­Ø°Ù */
+/* حذف */
 if (isset($_GET['delete_id'])) {
     $id = (int) $_GET['delete_id'];
-    // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¹Ø¯Ù… Ø§Ø³ØªØ®Ø¯Ø§Ù… Ù‡Ø°Ø§ Ø§Ù„Ø¯ÙˆØ± ÙƒØ¯ÙˆØ± Ø£Ø¨
+    // التحقق من عدم استخدام هذا الدور كدور أب
     $stmt = $conn->prepare("SELECT COUNT(*) as count FROM `roles` WHERE `parent_role_id` = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
 
     if ($result['count'] > 0) {
-        header("Location: roles.php?msg=Ù„Ø§+ÙŠÙ…ÙƒÙ†+Ø­Ø°Ù+Ù‡Ø°Ø§+Ø§Ù„Ø¯ÙˆØ±+Ù„Ø£Ù†Ù‡+ÙŠÙ…ØªÙ„Ùƒ+Ø£Ø¯ÙˆØ§Ø±+ÙØ±Ø¹ÙŠØ©+âŒ");
+        header("Location: roles.php?msg=لا+يمكن+حذف+هذا+الدور+لأنه+يمتلك+أدوار+فرعية+❌");
     } else {
         $stmt = $conn->prepare("DELETE FROM `roles` WHERE `id` = ?");
         $stmt->bind_param("i", $id);
         if ($stmt->execute()) {
-            header("Location: roles.php?msg=ØªÙ…+Ø­Ø°Ù+Ø§Ù„Ø¯ÙˆØ±+Ø¨Ù†Ø¬Ø§Ø­+âœ…");
+            header("Location: roles.php?msg=تم+حذف+الدور+بنجاح+✅");
         } else {
-            header("Location: roles.php?msg=Ø­Ø¯Ø«+Ø®Ø·Ø£+ÙÙŠ+Ø§Ù„Ø­Ø°Ù+âŒ");
+            header("Location: roles.php?msg=حدث+خطأ+في+الحذف+❌");
         }
     }
     exit;
 }
 
-// Ø¬Ù„Ø¨ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø£Ø¯ÙˆØ§Ø± Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© (Ø¨Ø¯ÙˆÙ† Ø¯ÙˆØ± Ø£Ø¨)
+// جلب جميع الأدوار الرئيسية (بدون دور أب)
 $stmt = $conn->prepare("SELECT `id`, `name` FROM `roles` WHERE `parent_role_id` IS NULL ORDER BY `name`");
 $stmt->execute();
 $parent_roles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-$page_title = "Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª";
+$page_title = "إدارة الصلاحيات";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
@@ -97,20 +97,20 @@ include('../insidebar.php');
     <div class="page-header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-shield-alt"></i></div>
-            Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª ÙˆØ§Ù„Ø£Ø¯ÙˆØ§Ø±
+            إدارة الصلاحيات والأدوار
         </h1>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="settings.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> Ø±Ø¬ÙˆØ¹
+                <i class="fas fa-arrow-right"></i> رجوع
             </a>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fas fa-plus-circle"></i> Ø¥Ø¶Ø§ÙØ© ØµÙ„Ø§Ø­ÙŠØ© Ø¬Ø¯ÙŠØ¯Ø©
+                <i class="fas fa-plus-circle"></i> إضافة صلاحية جديدة
             </a>
         </div>
     </div>
 
     <?php if (!empty($_GET['msg'])):
-        $isSuccess = strpos($_GET['msg'], 'âœ…') !== false;
+        $isSuccess = strpos($_GET['msg'], '✅') !== false;
         ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
@@ -125,26 +125,26 @@ include('../insidebar.php');
         </div>
     <?php endif; ?>
 
-    <!-- ÙÙˆØ±Ù… Ø¥Ø¶Ø§ÙØ© / ØªØ¹Ø¯ÙŠÙ„ -->
+    <!-- فورم إضافة / تعديل -->
     <form id="roleForm" action="" method="post" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>">
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-edit"></i> <?= !empty($editData) ? 'ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©' : 'Ø¥Ø¶Ø§ÙØ© ØµÙ„Ø§Ø­ÙŠØ© Ø¬Ø¯ÙŠØ¯Ø©'; ?></h5>
+                <h5><i class="fas fa-edit"></i> <?= !empty($editData) ? 'تعديل الصلاحية' : 'إضافة صلاحية جديدة'; ?></h5>
             </div>
             <div class="card-body">
                 <input type="hidden" name="edit_id" id="edit_id" value="">
                 <div class="form-grid">
-                    <!-- Ø§Ø³Ù… Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ© -->
+                    <!-- اسم الصلاحية -->
                     <div>
-                        <label><i class="fas fa-tag"></i> Ø§Ø³Ù… Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ© *</label>
-                        <input type="text" name="name" id="name" placeholder="Ù…Ø«Ø§Ù„: Ù…Ø¯ÙŠØ± Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹" required />
+                        <label><i class="fas fa-tag"></i> اسم الصلاحية *</label>
+                        <input type="text" name="name" id="name" placeholder="مثال: مدير المشاريع" required />
                     </div>
 
-                    <!-- Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ø£Ø¨ (Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ© Ø§Ù„Ø£Ø¨) -->
+                    <!-- الدور الأب (الصلاحية الأب) -->
                     <div>
-                        <label><i class="fas fa-sitemap"></i> Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ø£Ø¨ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)</label>
+                        <label><i class="fas fa-sitemap"></i> الدور الأب (اختياري)</label>
                         <select id="parent_role_id" name="parent_role_id">
-                            <option value="">-- Ø¨Ø¯ÙˆÙ† Ø¯ÙˆØ± Ø£Ø¨ (Ù…Ø¯ÙŠØ± Ø±Ø¦ÙŠØ³ÙŠ) --</option>
+                            <option value="">-- بدون دور أب (مدير رئيسي) --</option>
                             <?php foreach ($parent_roles as $pRole): ?>
                                 <option value="<?= $pRole['id']; ?>">
                                     <?= htmlspecialchars($pRole['name'], ENT_QUOTES, 'UTF-8'); ?>
@@ -153,36 +153,36 @@ include('../insidebar.php');
                         </select>
                     </div>
 
-                    <!-- Ø§Ù„Ù…Ø³ØªÙˆÙ‰ -->
+                    <!-- المستوى -->
                     <div>
-                        <label><i class="fas fa-layer-group"></i> Ù…Ø³ØªÙˆÙ‰ Ø§Ù„Ù‡Ø±Ù…ÙŠØ©</label>
+                        <label><i class="fas fa-layer-group"></i> مستوى الهرمية</label>
                         <select name="level" id="level" required>
-                            <option value="1" selected> Ù…Ø¯ÙŠØ± </option>
-                            <option value="2"> Ù…Ø´Ø±Ù </option>
+                            <option value="1" selected> مدير </option>
+                            <option value="2"> مشرف </option>
                         </select>
                     </div>
 
-                    <!-- Ø§Ù„Ø­Ø§Ù„Ø© -->
+                    <!-- الحالة -->
                     <div>
-                        <label><i class="fas fa-toggle-on"></i> Ø­Ø§Ù„Ø© Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ© *</label>
+                        <label><i class="fas fa-toggle-on"></i> حالة الصلاحية *</label>
                         <select name="status" id="status" required>
-                            <option value="1" selected>Ù†Ø´Ø·Ø© âœ…</option>
-                            <option value="0">ØºÙŠØ± Ù†Ø´Ø·Ø© â¸</option>
+                            <option value="1" selected>نشطة ✅</option>
+                            <option value="0">غير نشطة ⏸</option>
                         </select>
                     </div>
 
                     <button type="submit" style="grid-column: 1 / -1; justify-self: center;">
-                        <i class="fas fa-save"></i> Ø­ÙØ¸ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©
+                        <i class="fas fa-save"></i> حفظ الصلاحية
                     </button>
                 </div>
             </div>
         </div>
     </form>
 
-    <!-- Ø¬Ø¯ÙˆÙ„ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª -->
+    <!-- جدول الصلاحيات -->
     <div class="card">
         <div class="card-header">
-            <h5><i class="fas fa-list"></i> Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª</h5>
+            <h5><i class="fas fa-list"></i> جميع الصلاحيات</h5>
         </div>
         <div class="card-body">
             <div class="table-container">
@@ -190,12 +190,12 @@ include('../insidebar.php');
                     <thead>
                         <tr>
                             <th width="80"><i class="fas fa-barcode"></i> #</th>
-                            <th><i class="fas fa-tag"></i> Ø§Ø³Ù… Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©</th>
-                            <th><i class="fas fa-sitemap"></i> Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ø£Ø¨</th>
-                            <th width="100"><i class="fas fa-layer-group"></i> Ø§Ù„Ù…Ø³ØªÙˆÙ‰</th>
-                            <th width="100"><i class="fas fa-toggle-on"></i> Ø§Ù„Ø­Ø§Ù„Ø©</th>
-                            <th width="120"><i class="fas fa-calendar"></i> ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¥Ù†Ø´Ø§Ø¡</th>
-                            <th width="120"><i class="fas fa-cogs"></i> Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª</th>
+                            <th><i class="fas fa-tag"></i> اسم الصلاحية</th>
+                            <th><i class="fas fa-sitemap"></i> الدور الأب</th>
+                            <th width="100"><i class="fas fa-layer-group"></i> المستوى</th>
+                            <th width="100"><i class="fas fa-toggle-on"></i> الحالة</th>
+                            <th width="120"><i class="fas fa-calendar"></i> تاريخ الإنشاء</th>
+                            <th width="120"><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -215,13 +215,13 @@ include('../insidebar.php');
                         ");
 
                         if (!$result) {
-                            echo '<tr><td colspan="7" class="text-center text-danger">Ø®Ø·Ø£ ÙÙŠ Ø¬Ù„Ø¨ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª: ' . htmlspecialchars($conn->error) . '</td></tr>';
+                            echo '<tr><td colspan="7" class="text-center text-danger">خطأ في جلب البيانات: ' . htmlspecialchars($conn->error) . '</td></tr>';
                         } else {
                             $i = 1;
                             while ($row = $result->fetch_assoc()):
                                 $status_badge = $row['status'] == 1
-                                    ? '<span class="status-active"><i class="fas fa-check-circle"></i> Ù†Ø´Ø·</span>'
-                                    : '<span class="status-inactive"><i class="fas fa-times-circle"></i> ØºÙŠØ± Ù†Ø´Ø·</span>';
+                                    ? '<span class="status-active"><i class="fas fa-check-circle"></i> نشط</span>'
+                                    : '<span class="status-inactive"><i class="fas fa-times-circle"></i> غير نشط</span>';
                                 ?>
                                 <tr>
                                     <td><strong><?= $i++; ?></strong></td>
@@ -233,7 +233,7 @@ include('../insidebar.php');
                                             <strong><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                         </a>
                                         <?php if ($row['parent_role_id'] === null): ?>
-                                            <br><small style="color: var(--gold); font-weight: 600;">ðŸ”µ Ù…Ø¯ÙŠØ± Ø±Ø¦ÙŠØ³ÙŠ</small>
+                                            <br><small style="color: var(--gold); font-weight: 600;">🔵 مدير رئيسي</small>
                                         <?php endif; ?>
                                     </td>
                                     <td>
@@ -261,13 +261,13 @@ include('../insidebar.php');
                                     <td class="text-center">
                                         <a href="javascript:void(0);"
                                             onclick="editRole(<?= htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)"
-                                            class="btn btn-sm btn-primary" title="ØªØ¹Ø¯ÙŠÙ„"
+                                            class="btn btn-sm btn-primary" title="تعديل"
                                             style="background: var(--blue-soft); color: var(--blue); border: 1.5px solid rgba(37,99,235,.18);">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="javascript:void(0);"
                                             onclick="confirmDelete(<?= $row['id']; ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>')"
-                                            class="btn btn-sm btn-danger" title="Ø­Ø°Ù"
+                                            class="btn btn-sm btn-danger" title="حذف"
                                             style="background: var(--red-soft); color: var(--red); border: 1.5px solid rgba(220,38,38,.18);">
                                             <i class="fas fa-trash"></i>
                                         </a>
@@ -291,7 +291,7 @@ include('../insidebar.php');
 
 
 <script>
-    // ØªÙ‡ÙŠØ¦Ø© DataTable
+    // تهيئة DataTable
     $('#rolesTable').DataTable({
         responsive: true,
         language: {
@@ -303,7 +303,7 @@ include('../insidebar.php');
     });
 
     $(document).ready(function () {
-        // Ø¥Ø¸Ù‡Ø§Ø±/Ø¥Ø®ÙØ§Ø¡ Ø§Ù„Ù†Ù…ÙˆØ°Ø¬
+        // إظهار/إخفاء النموذج
         $('#toggleForm').on('click', function () {
             $('#roleForm').slideToggle(300);
             $('html, body').animate({
@@ -312,7 +312,7 @@ include('../insidebar.php');
         });
     });
 
-    // Ø¯Ø§Ù„Ø© ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
+    // دالة تعديل البيانات
     function editRole(data) {
         document.getElementById('roleForm').style.display = 'block';
         document.getElementById('edit_id').value = data.id;
@@ -327,9 +327,9 @@ include('../insidebar.php');
         }, 500);
     }
 
-    // Ø¯Ø§Ù„Ø© ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø­Ø°Ù
+    // دالة تأكيد الحذف
     function confirmDelete(id, name) {
-        if (confirm(`Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø±ØºØ¨ØªÙƒ ÙÙŠ Ø­Ø°Ù Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ© "${name}"ØŸ`)) {
+        if (confirm(`هل أنت متأكد من رغبتك في حذف الصلاحية "${name}"؟`)) {
             window.location.href = 'roles.php?delete_id=' + id;
         }
     }
