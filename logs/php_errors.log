@@ -667,3 +667,50 @@ Stack trace:
 [07-Apr-2026 15:22:48 Europe/Berlin] PHP Warning:  Undefined variable $timesheet_has_company in C:\xampp-latest\htdocs\ems\Timesheet\get_timesheet_data.php on line 19
 [07-Apr-2026 15:22:49 Europe/Berlin] PHP Warning:  Undefined variable $timesheet_has_company in C:\xampp-latest\htdocs\ems\Timesheet\get_timesheet_data.php on line 19
 [07-Apr-2026 15:22:53 Europe/Berlin] PHP Warning:  Undefined variable $timesheet_has_company in C:\xampp-latest\htdocs\ems\Timesheet\get_timesheet_data.php on line 19
+[09-Apr-2026 16:29:05 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php:229
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php(229): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php on line 229
+[09-Apr-2026 16:33:19 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php:229
+Stack trace:
+#0 C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php(229): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xampp-latest\htdocs\ems\Timesheet\timesheet.php on line 229
+[09-Apr-2026 16:42:14 Europe/Berlin] Timesheet operators query failed (type=1): Unknown column 'p.company_client_id' in 'on clause'
+[09-Apr-2026 16:42:30 Europe/Berlin] Timesheet operators query failed (type=1): Unknown column 'p.company_client_id' in 'on clause'
+[09-Apr-2026 16:43:25 Europe/Berlin] Timesheet operators query failed (type=2): Unknown column 'p.company_client_id' in 'on clause'
+[09-Apr-2026 16:43:32 Europe/Berlin] Timesheet operators query failed (type=1): Unknown column 'p.company_client_id' in 'on clause'
+[09-Apr-2026 16:43:39 Europe/Berlin] Timesheet operators query failed (type=2): Unknown column 'p.company_client_id' in 'on clause'
+[09-Apr-2026 16:43:48 Europe/Berlin] Timesheet operators query failed (type=2): Unknown column 'p.company_client_id' in 'on clause'
+[09-Apr-2026 16:46:00 Europe/Berlin] Timesheet operators query failed (type=1): Unknown column 'p.company_client_id' in 'on clause'
+[09-Apr-2026 16:46:18 Europe/Berlin] Timesheet operators query failed (type=1): Unknown column 'p.company_client_id' in 'on clause'
+[09-Apr-2026 16:50:08 Europe/Berlin] Timesheet operators query failed (type=1): Unknown column 'p.company_client_id' in 'on clause'
+[09-Apr-2026 16:50:19 Europe/Berlin] Timesheet operators query failed (type=1): Unknown column 'p.company_client_id' in 'on clause'
+[09-Apr-2026 16:50:24 Europe/Berlin] Timesheet operators query failed (type=2): Unknown column 'p.company_client_id' in 'on clause'
+[09-Apr-2026 16:53:09 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp-latest\htdocs\ems\config.php:158) in C:\xampp-latest\htdocs\ems\config.php on line 168
+[09-Apr-2026 16:53:13 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp-latest\htdocs\ems\config.php:158) in C:\xampp-latest\htdocs\ems\config.php on line 168
+[09-Apr-2026 16:53:15 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp-latest\htdocs\ems\config.php:158) in C:\xampp-latest\htdocs\ems\config.php on line 168
+[09-Apr-2026 16:53:19 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp-latest\htdocs\ems\config.php:158) in C:\xampp-latest\htdocs\ems\config.php on line 168
+[09-Apr-2026 16:53:35 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp-latest\htdocs\ems\config.php:158) in C:\xampp-latest\htdocs\ems\config.php on line 168
+[09-Apr-2026 16:53:49 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp-latest\htdocs\ems\config.php:158) in C:\xampp-latest\htdocs\ems\config.php on line 168
+[09-Apr-2026 16:54:01 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp-latest\htdocs\ems\config.php:158) in C:\xampp-latest\htdocs\ems\config.php on line 168
+[09-Apr-2026 16:54:37 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp-latest\htdocs\ems\config.php:158) in C:\xampp-latest\htdocs\ems\config.php on line 168
+[09-Apr-2026 17:12:18 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[09-Apr-2026 17:12:18 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[09-Apr-2026 17:12:47 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[09-Apr-2026 17:12:47 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[09-Apr-2026 17:12:47 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[09-Apr-2026 17:12:47 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\modules.php on line 9
+[09-Apr-2026 17:12:54 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[09-Apr-2026 17:12:54 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[09-Apr-2026 17:12:58 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[09-Apr-2026 17:12:58 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[09-Apr-2026 17:13:07 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[09-Apr-2026 17:13:07 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[09-Apr-2026 17:23:31 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[09-Apr-2026 17:23:31 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[09-Apr-2026 17:23:39 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[09-Apr-2026 17:23:39 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[09-Apr-2026 17:23:45 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[09-Apr-2026 17:23:45 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp-latest\php\PEAR') in C:\xampp-latest\htdocs\ems\admin\permissions\role_permissions.php on line 9

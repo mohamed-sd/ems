@@ -65,19 +65,21 @@ if (!isset($_SESSION['user'])) {
 
 <?php 
 include('../insidebar.php'); 
-include '../config.php';
 
-$contract_filter = isset($_GET['contract']) ? $_GET['contract'] : '';
+$operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
+
+$contract_filter = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 
 $sql_contracts = "SELECT c.id, p.name AS project_name 
                   FROM contracts c 
-                  JOIN project p ON c.mine_id = p.id";
+                  LEFT JOIN mines m ON c.mine_id = m.id
+                  LEFT JOIN project p ON m.project_id = p.id";
 $contracts = mysqli_query($conn, $sql_contracts);
 
 $contract_data = null;
 $monthly_stats = null;
 
-if (!empty($contract_filter)) {
+if ($contract_filter > 0) {
     // بيانات العقد الأساسية
     $sql_info = "
     SELECT 
@@ -95,13 +97,17 @@ if (!empty($contract_filter)) {
     FROM contracts c
     LEFT JOIN mines m ON c.mine_id = m.id
     LEFT JOIN project p ON m.project_id = p.id
-    LEFT JOIN operations o ON o.project_id = p.id
+    LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN timesheet t ON t.operator = o.id
-    WHERE c.id = '$contract_filter'
+    WHERE c.id = $contract_filter
     GROUP BY c.id, m.mine_name, p.name, c.contract_signing_date, c.contract_duration_months";
-    
-    $contract_data = mysqli_fetch_assoc(mysqli_query($conn, $sql_info));
+    $contract_data_res = mysqli_query($conn, $sql_info);
+    if ($contract_data_res) {
+        $contract_data = mysqli_fetch_assoc($contract_data_res);
+    } else {
+        error_log('contract_report.php sql_info failed: ' . mysqli_error($conn));
+    }
 
     // إحصائية شهرية
     $sql_monthly = "
@@ -113,14 +119,17 @@ if (!empty($contract_filter)) {
     FROM contracts c
     LEFT JOIN mines m ON c.mine_id = m.id
     LEFT JOIN project p ON m.project_id = p.id
-    LEFT JOIN operations o ON o.project_id = p.id
+    LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN timesheet t ON t.operator = o.id
-    WHERE c.id = '$contract_filter'
+    WHERE c.id = $contract_filter
     GROUP BY YEAR(t.date), MONTH(t.date), c.hours_monthly_target
     ORDER BY year, month";
-    
+
     $monthly_stats = mysqli_query($conn, $sql_monthly);
+    if (!$monthly_stats) {
+        error_log('contract_report.php sql_monthly failed: ' . mysqli_error($conn));
+    }
 }
 ?>
 
@@ -221,6 +230,7 @@ if (!empty($contract_filter)) {
                         $target = array();
                         $percentages = array();
 
+                        if ($monthly_stats) {
                         mysqli_data_seek($monthly_stats, 0);
                         while($row = mysqli_fetch_assoc($monthly_stats)) { 
                             $labels[] = $row['year']."-".$row['month'];
@@ -253,7 +263,8 @@ if (!empty($contract_filter)) {
                                 </div>
                             </td>
                         </tr>
-                        <?php } ?>
+                        <?php }
+                        } ?>
                     </tbody>
                 </table>
             </div>

@@ -92,9 +92,10 @@ if (!isset($_SESSION['user'])) {
 
 <body>
     <?php include('../insidebar.php');
-    include '../config.php';
 
-    $contract_filter = isset($_GET['contract']) ? $_GET['contract'] : '';
+    $operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
+
+    $contract_filter = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 
     $sql_contracts = "SELECT c.id, m.mine_name, p.name AS project_name 
                       FROM contracts c 
@@ -104,7 +105,7 @@ if (!isset($_SESSION['user'])) {
 
     $contract_data = $time_vs_progress = $faults = $suppliers = $equipments = $drivers = $variance = null;
 
-    if (!empty($contract_filter)) {
+    if ($contract_filter > 0) {
         // تفاصيل العقد
         $sql_info = "
         SELECT 
@@ -119,12 +120,17 @@ if (!isset($_SESSION['user'])) {
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        LEFT JOIN operations o ON o.project_id = p.id
+        LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = '$contract_filter'
+        WHERE c.id = $contract_filter
         GROUP BY c.id, m.mine_name, p.name";
-        $contract_data = mysqli_fetch_assoc(mysqli_query($conn, $sql_info));
+        $contract_data_res = mysqli_query($conn, $sql_info);
+        if ($contract_data_res) {
+            $contract_data = mysqli_fetch_assoc($contract_data_res);
+        } else {
+            error_log('contractall.php sql_info failed: ' . mysqli_error($conn));
+        }
 
         // الزمن مقابل الإنجاز
         $sql_time = "
@@ -134,11 +140,16 @@ if (!isset($_SESSION['user'])) {
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        LEFT JOIN operations o ON o.project_id = p.id
+        LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = '$contract_filter'";
-        $time_vs_progress = mysqli_fetch_assoc(mysqli_query($conn, $sql_time));
+        WHERE c.id = $contract_filter";
+        $time_vs_progress_res = mysqli_query($conn, $sql_time);
+        if ($time_vs_progress_res) {
+            $time_vs_progress = mysqli_fetch_assoc($time_vs_progress_res);
+        } else {
+            error_log('contractall.php sql_time failed: ' . mysqli_error($conn));
+        }
 
         // الأعطال
         $sql_faults = "
@@ -146,11 +157,16 @@ if (!isset($_SESSION['user'])) {
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        LEFT JOIN operations o ON o.project_id = p.id
+        LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = '$contract_filter'";
-        $faults = mysqli_fetch_assoc(mysqli_query($conn, $sql_faults));
+        WHERE c.id = $contract_filter";
+        $faults_res = mysqli_query($conn, $sql_faults);
+        if ($faults_res) {
+            $faults = mysqli_fetch_assoc($faults_res);
+        } else {
+            error_log('contractall.php sql_faults failed: ' . mysqli_error($conn));
+        }
 
         // الموردين
         $sql_suppliers = "
@@ -158,13 +174,16 @@ if (!isset($_SESSION['user'])) {
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        JOIN operations o ON o.project_id = p.id
+        JOIN operations o ON o." . $operations_project_column . " = p.id
         JOIN equipments e ON e.id = o.equipment
         JOIN suppliers s ON e.suppliers = s.id
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = '$contract_filter'
+        WHERE c.id = $contract_filter
         GROUP BY s.name";
         $suppliers = mysqli_query($conn, $sql_suppliers);
+        if (!$suppliers) {
+            error_log('contractall.php sql_suppliers failed: ' . mysqli_error($conn));
+        }
 
         // الآليات
         $sql_equipments = "
@@ -174,12 +193,15 @@ if (!isset($_SESSION['user'])) {
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        JOIN operations o ON o.project_id = p.id
+        JOIN operations o ON o." . $operations_project_column . " = p.id
         JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = '$contract_filter'
+        WHERE c.id = $contract_filter
         GROUP BY e.name";
         $equipments = mysqli_query($conn, $sql_equipments);
+        if (!$equipments) {
+            error_log('contractall.php sql_equipments failed: ' . mysqli_error($conn));
+        }
 
         // السائقين
         $sql_drivers = "
@@ -187,13 +209,16 @@ if (!isset($_SESSION['user'])) {
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        JOIN operations o ON o.project_id = p.id
+        JOIN operations o ON o." . $operations_project_column . " = p.id
         JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
         JOIN drivers d ON t.driver = d.id
-        WHERE c.id = '$contract_filter'
+        WHERE c.id = $contract_filter
         GROUP BY d.name";
         $drivers = mysqli_query($conn, $sql_drivers);
+        if (!$drivers) {
+            error_log('contractall.php sql_drivers failed: ' . mysqli_error($conn));
+        }
 
         // الانحراف
         $sql_variance = "
@@ -203,12 +228,17 @@ if (!isset($_SESSION['user'])) {
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         LEFT JOIN project p ON m.project_id = p.id
-        LEFT JOIN operations o ON o.project_id = p.id
+        LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
-        WHERE c.id = '$contract_filter'
+        WHERE c.id = $contract_filter
         GROUP BY c.id";
-        $variance = mysqli_fetch_assoc(mysqli_query($conn, $sql_variance));
+        $variance_res = mysqli_query($conn, $sql_variance);
+        if ($variance_res) {
+            $variance = mysqli_fetch_assoc($variance_res);
+        } else {
+            error_log('contractall.php sql_variance failed: ' . mysqli_error($conn));
+        }
     }
     ?>
 

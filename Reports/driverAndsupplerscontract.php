@@ -61,12 +61,13 @@ if (!isset($_SESSION['user'])) {
 
 <?php
 include('../insidebar.php');
-include '../config.php';
 
-$project_filter = isset($_GET['project']) ? $_GET['project'] : '';
-$driver_filter  = isset($_GET['driver']) ? $_GET['driver'] : '';
-$start_date     = isset($_GET['start_date']) ? $_GET['start_date'] : '';
-$end_date       = isset($_GET['end_date']) ? $_GET['end_date'] : '';
+$operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
+
+$project_filter = isset($_GET['project']) ? intval($_GET['project']) : 0;
+$driver_filter  = isset($_GET['driver']) ? intval($_GET['driver']) : 0;
+$start_date     = isset($_GET['start_date']) ? mysqli_real_escape_string($conn, $_GET['start_date']) : '';
+$end_date       = isset($_GET['end_date']) ? mysqli_real_escape_string($conn, $_GET['end_date']) : '';
 
 $sql = "
 SELECT 
@@ -79,7 +80,7 @@ FROM timesheet t
 JOIN drivers d ON t.driver = d.id
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id 
-JOIN project p ON o.project_id = p.id
+JOIN project p ON o." . $operations_project_column . " = p.id
 WHERE 1=1
 ";
 
@@ -102,6 +103,9 @@ if (!empty($driver_filter)) {
 
 $sql .= " GROUP BY d.name, p.name, e.name, t.date ORDER BY t.date, d.name";
 $result = mysqli_query($conn, $sql);
+if (!$result) {
+    error_log('driverAndsupplerscontract.php report query failed: ' . mysqli_error($conn));
+}
 ?>
 
 <div class="main">

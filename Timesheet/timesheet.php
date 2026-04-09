@@ -16,6 +16,8 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 $timesheet_has_company = db_table_has_column($conn, 'timesheet', 'company_id');
+$operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
+$session_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
 
 // Handle POST submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
@@ -57,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
         $update_scope = " AND EXISTS (
           SELECT 1
           FROM operations o
-          INNER JOIN project p ON p.id = o.project_id
+          INNER JOIN project p ON p.id = o." . $operations_project_column . "
           LEFT JOIN users su ON su.id = p.created_by
           LEFT JOIN clients sc ON sc.id = p.company_client_id
           LEFT JOIN users scu ON scu.id = sc.created_by
@@ -107,7 +109,7 @@ if (!$is_super_admin) {
     LEFT JOIN users su ON su.id = p.created_by
     LEFT JOIN clients sc ON sc.id = p.company_client_id
     LEFT JOIN users scu ON scu.id = sc.created_by
-    WHERE p.id = o.project_id
+    WHERE p.id = o." . $operations_project_column . "
       AND (su.company_id = $company_id OR scu.company_id = $company_id)
   )";
 }
@@ -222,12 +224,17 @@ if (!$is_super_admin) {
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project_id'] . "' $timesheet_project_scope_sql");
+                                            JOIN project p ON o." . $operations_project_column . " = p.id
+                                            WHERE 1 $type_filter AND o.status = '1' AND o." . $operations_project_column . " = '" . $session_project_id . "' $timesheet_project_scope_sql");
 
 
 
-                  while ($op = mysqli_fetch_assoc($op_res)) {
-                    echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
+                  if ($op_res) {
+                    while ($op = mysqli_fetch_assoc($op_res)) {
+                      echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
+                    }
+                  } else {
+                    error_log('Timesheet operators query failed (type=1): ' . mysqli_error($conn));
                   }
                   ?>
                 </select>
@@ -461,16 +468,20 @@ if (!$is_super_admin) {
                 <select name="operator" id="operator" required>
                   <option value="">-- اختر الالية --</option>
                   <?php
-                  include '../config.php';
-                  $op_res = mysqli_query($conn, "SELECT o.id, o.status, o.project_id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
+                  $op_res = mysqli_query($conn, "SELECT o.id, o.status, o." . $operations_project_column . " AS project_id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
-                                            JOIN project p ON o.project_id = p.id    WHERE 1 $type_filter AND o.status = '1' AND o.project_id = '" . $_SESSION['user']['project_id'] . "' $timesheet_project_scope_sql");
+                                            JOIN project p ON o." . $operations_project_column . " = p.id
+                                            WHERE 1 $type_filter AND o.status = '1' AND o." . $operations_project_column . " = '" . $session_project_id . "' $timesheet_project_scope_sql");
 
 
 
-                  while ($op = mysqli_fetch_assoc($op_res)) {
-                    echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
+                  if ($op_res) {
+                    while ($op = mysqli_fetch_assoc($op_res)) {
+                      echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
+                    }
+                  } else {
+                    error_log('Timesheet operators query failed (type=2): ' . mysqli_error($conn));
                   }
                   ?>
                 </select>
@@ -492,7 +503,7 @@ if (!$is_super_admin) {
                   SELECT 1
                   FROM equipment_drivers ed
                   INNER JOIN operations o ON o.equipment = ed.equipment_id
-                  INNER JOIN project p ON p.id = o.project_id
+                  INNER JOIN project p ON p.id = o." . $operations_project_column . "
                   LEFT JOIN users su ON su.id = p.created_by
                   LEFT JOIN clients sc ON sc.id = p.company_client_id
                   LEFT JOIN users scu ON scu.id = sc.created_by

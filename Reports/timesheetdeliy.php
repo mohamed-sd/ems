@@ -86,15 +86,16 @@ if (!isset($_SESSION['user'])) {
 
     <?php
     include('../insidebar.php');
-    include '../config.php';
+
+    $operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
 
     // استقبال الفلاتر
-    $date_filter = isset($_GET['date']) ? $_GET['date'] : '';
-    $project_filter = isset($_GET['project']) ? $_GET['project'] : '';
-    $supplier_filter = isset($_GET['supplier']) ? $_GET['supplier'] : '';
+    $date_filter = isset($_GET['date']) ? mysqli_real_escape_string($conn, $_GET['date']) : '';
+    $project_filter = isset($_GET['project']) ? intval($_GET['project']) : 0;
+    $supplier_filter = isset($_GET['supplier']) ? intval($_GET['supplier']) : 0;
 
-    $shift_filter = isset($_GET['shift']) ? $_GET['shift'] : '';
-    $type_filter = isset($_GET['type']) ? $_GET['type'] : '';
+    $shift_filter = isset($_GET['shift']) ? mysqli_real_escape_string($conn, $_GET['shift']) : '';
+    $type_filter = isset($_GET['type']) ? intval($_GET['type']) : 0;
 
 
     $sql = "
@@ -117,7 +118,7 @@ JOIN drivers d ON t.driver = d.id
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id 
 JOIN suppliers s ON e.suppliers = s.id
-JOIN project p ON o.project_id = p.id
+JOIN project p ON o." . $operations_project_column . " = p.id
 WHERE 1=1
 ";
 
@@ -141,6 +142,9 @@ WHERE 1=1
 
     $sql .= " ORDER BY t.date, p.name, s.name ";
     $result = mysqli_query($conn, $sql);
+    if (!$result) {
+        error_log('timesheetdeliy.php details query failed: ' . mysqli_error($conn));
+    }
 
     // إجمالي الإحصائيات
     $total_sql = "
@@ -152,7 +156,7 @@ FROM timesheet t
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id 
 JOIN suppliers s ON e.suppliers = s.id
-JOIN project p ON o.project_id = p.id
+JOIN project p ON o." . $operations_project_column . " = p.id
 WHERE 1=1
 ";
 
@@ -172,7 +176,10 @@ WHERE 1=1
 
 
     $total_res = mysqli_query($conn, $total_sql);
-    $totals = mysqli_fetch_assoc($total_res);
+    $totals = $total_res ? mysqli_fetch_assoc($total_res) : ['executed_hours' => 0, 'total_fault' => 0, 'total_standby' => 0];
+    if (!$total_res) {
+        error_log('timesheetdeliy.php totals query failed: ' . mysqli_error($conn));
+    }
     ?>
 
     <div class="main">
@@ -232,8 +239,8 @@ WHERE 1=1
                         <label><i class="fas fa-clock"></i> الوردية</label>
                         <select name="shift">
                             <option value="">-- الكل --</option>
-                            <option value="D" <?php if (isset($_GET['shift']) && $_GET['shift'] == "صباحية") echo "selected"; ?>>صباحية</option>
-                            <option value="N" <?php if (isset($_GET['shift']) && $_GET['shift'] == "مسائية") echo "selected"; ?>>مسائية</option>
+                            <option value="D" <?php if ($shift_filter == "D") echo "selected"; ?>>صباحية</option>
+                            <option value="N" <?php if ($shift_filter == "N") echo "selected"; ?>>مسائية</option>
                         </select>
                     </div>
 
