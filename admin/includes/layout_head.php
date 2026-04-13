@@ -375,6 +375,10 @@ textarea.form-ctrl { resize: vertical; min-height: 80px; }
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
 .g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 13px; }
+.g2, .g3, .g4 { align-items: start; }
+.g2 > .card + .card,
+.g3 > .card + .card,
+.g4 > .card + .card { margin-top: 0; }
 .flex { display: flex; align-items: center; gap: 8px; }
 .mt-4 { margin-top: 4px; }
 .mt-16 { margin-top: 16px; }

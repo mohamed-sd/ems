@@ -12,26 +12,6 @@ if (!headers_sent()) {
   header('Content-Type: text/html; charset=UTF-8');
 }
 
-if (!function_exists('contracts_fix_mojibake_output')) {
-  function contracts_fix_mojibake_output($buffer)
-  {
-    $map = array(
-      'ا' => '?', 'ب' => '?', 'ت' => '?', 'ث' => '?', 'ج' => '?', 'ح' => '?',
-      'خ' => '?', 'د' => '?', 'ذ' => '?', 'ر' => '?', 'ز' => '?', 'س' => '?',
-      'ش' => '?', 'ص' => '?', 'ض' => '?', 'ط' => '?', 'ظ' => '?', 'ع' => '?',
-      'غ' => '?', 'ف' => '?', 'ق' => '?', 'ك' => '?', 'ل' => '?', 'م' => '?',
-      'ن' => '?', 'ه' => '?', 'و' => '?', 'ي' => '?', 'ى' => '?', 'ة' => '?',
-      'ء' => '?', 'أ' => '?', 'إ' => '?', 'آ' => '?', 'ؤ' => '?', 'ئ' => '?',
-      '،' => '?', '؛' => '?', '؟' => '?', '✅' => '?', '❌' => '?', '⏸' => '?',
-      '🔐' => '??', '👋' => '??', '🚀' => '??', '🏆' => '??'
-    );
-
-    return strtr($buffer, $map);
-  }
-}
-
-ob_start('contracts_fix_mojibake_output');
-
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;

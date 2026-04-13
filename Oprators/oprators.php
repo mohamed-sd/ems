@@ -1225,10 +1225,11 @@ include('../insidebar.php');
             if (typeId && supplierId) {
                 $.ajax({
                     url: "getoprator.php",
-                    type: "POST",
+                    type: "GET",
                     data: { 
                         type: typeId,
-                        supplier_id: supplierId
+                        supplier_id: supplierId,
+                        current_equipment: selectedEquipmentId
                     },
                     success: function (data) {
                         console.log('✅ تم تحميل المعدات بنجاح');

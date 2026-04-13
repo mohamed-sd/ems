@@ -8,7 +8,7 @@
     <h2 class="logo">Equipation</h2>
 
     <ul>
-      <li><a href="main/dashboard.php"><i class="fa fa-tachometer-alt"></i> <span>الرئيسية</span></a></li>
+      <li><a href="main/dashboard.php"><i class="fa-solid fa-house"></i> <span>الرئيسية</span></a></li>
 
       <?php
       include 'config.php';
@@ -61,10 +61,10 @@
 
       <?php // صلاحيات مدير الاسطول === 4
       if ($_SESSION['user']['role'] == "4") { ?>
-        <li><a href="Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
+        <!-- <li><a href="Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
         <li><a href="Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
         <li><a href="Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
-        <li><a href="Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li>
+        <li><a href="Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li> -->
 
       <?php } ?>
 

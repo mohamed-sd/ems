@@ -57,7 +57,7 @@ $show_all_projects = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_project_id'])) {
     if ($is_role10) {
-        header("Location: equipments.php");
+        header("Location: equipments_fleet.php");
         exit();
     }
     $selected_project_value = trim($_POST['selected_project_id']);
@@ -68,17 +68,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_project_id']
     } else {
         unset($_SESSION['equipments_project_id']);
     }
-    header("Location: equipments.php");
+    header("Location: equipments_fleet.php");
     exit();
 }
 
 if (isset($_GET['project_id']) && is_numeric($_GET['project_id'])) {
     if ($is_role10) {
-        header("Location: equipments.php");
+        header("Location: equipments_fleet.php");
         exit();
     }
     $_SESSION['equipments_project_id'] = intval($_GET['project_id']);
-    header("Location: equipments.php");
+    header("Location: equipments_fleet.php");
     exit();
 }
 
@@ -296,7 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     }
 
     if (mysqli_query($conn, $sql)) {
-        header("Location: equipments.php?msg=$msg");
+        header("Location: equipments_fleet.php?msg=$msg");
         exit;
     } else {
         $success_msg = "خطأ في الحفظ: " . mysqli_error($conn);

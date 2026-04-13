@@ -21,6 +21,32 @@ if (!isset($_GET['id'])) {
     echo json_encode([]);
     exit;
 }
+
+if (!function_exists('normalize_timesheet_date')) {
+    function normalize_timesheet_date($date_str)
+    {
+        $date_str = trim((string)$date_str);
+        if ($date_str === '') {
+            return '';
+        }
+
+        $formats = ['Y-m-d', 'd-m-Y', 'd/m/Y', 'Y/m/d'];
+        foreach ($formats as $fmt) {
+            $dt = DateTime::createFromFormat($fmt, $date_str);
+            if ($dt && $dt->format($fmt) === $date_str) {
+                return $dt->format('Y-m-d');
+            }
+        }
+
+        $ts = strtotime($date_str);
+        if ($ts !== false) {
+            return date('Y-m-d', $ts);
+        }
+
+        return '';
+    }
+}
+
 $id = intval($_GET['id']);
 $scope = "";
 if (!$is_super_admin) {
@@ -45,6 +71,11 @@ $row = mysqli_fetch_assoc($q);
 if (!$row) {
     echo json_encode([]);
     exit;
+}
+
+if (isset($row['date'])) {
+    $safe_date = normalize_timesheet_date($row['date']);
+    $row['date'] = ($safe_date !== '') ? $safe_date : '';
 }
 
 // لإظهار فرق العداد بشكل ودود نعيّن counter_diff_display

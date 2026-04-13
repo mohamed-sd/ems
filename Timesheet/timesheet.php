@@ -19,6 +19,49 @@ $timesheet_has_company = db_table_has_column($conn, 'timesheet', 'company_id');
 $operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
 $session_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
 
+if (!function_exists('normalize_timesheet_date')) {
+  function normalize_timesheet_date($date_str)
+  {
+    $date_str = trim((string)$date_str);
+    if ($date_str === '') {
+      return '';
+    }
+
+    $formats = ['Y-m-d', 'd-m-Y', 'd/m/Y', 'Y/m/d'];
+    foreach ($formats as $fmt) {
+      $dt = DateTime::createFromFormat($fmt, $date_str);
+      if ($dt && $dt->format($fmt) === $date_str) {
+        return $dt->format('Y-m-d');
+      }
+    }
+
+    $ts = strtotime($date_str);
+    if ($ts !== false) {
+      return date('Y-m-d', $ts);
+    }
+
+    return '';
+  }
+}
+
+// If user doesn't have a project assigned, get the first available project from the company
+if ($session_project_id <= 0) {
+  if ($is_super_admin) {
+    // Super admin can access all projects, so we'll need to handle this differently
+    $session_project_id = 0; // Will be handled with a WHERE clause
+  } else {
+    // Regular user should have a project assigned, try to get one from their company
+    $project_check = mysqli_query($conn, "SELECT id FROM project WHERE company_id = $company_id AND status = 1 LIMIT 1");
+    if ($project_check && mysqli_num_rows($project_check) > 0) {
+      $proj = mysqli_fetch_assoc($project_check);
+      $session_project_id = intval($proj['id']);
+    } else {
+      // No projects available for this company
+      $session_project_id = 0;
+    }
+  }
+}
+
 // Handle POST submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
   $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -45,6 +88,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     $values[$f] = $val;
   }
 
+  // Ensure date is always valid for both storage and edit form input[type=date].
+  $normalized_date = normalize_timesheet_date(isset($_POST['date']) ? $_POST['date'] : '');
+  if ($normalized_date === '') {
+    echo "<script>alert('❌ تنسيق التاريخ غير صحيح');</script>";
+    exit;
+  }
+  $values['date'] = mysqli_real_escape_string($conn, $normalized_date);
+
   if ($id > 0) {
     // UPDATE
     $update_parts = [];
@@ -61,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
           FROM operations o
           INNER JOIN project p ON p.id = o." . $operations_project_column . "
           LEFT JOIN users su ON su.id = p.created_by
-          LEFT JOIN clients sc ON sc.id = p.company_client_id
+          LEFT JOIN clients sc ON sc.id = p.client_id
           LEFT JOIN users scu ON scu.id = sc.created_by
           WHERE o.id = timesheet.operator
             AND (su.company_id = $company_id OR scu.company_id = $company_id)
@@ -107,7 +158,7 @@ if (!$is_super_admin) {
     SELECT 1
     FROM project p
     LEFT JOIN users su ON su.id = p.created_by
-    LEFT JOIN clients sc ON sc.id = p.company_client_id
+    LEFT JOIN clients sc ON sc.id = p.client_id
     LEFT JOIN users scu ON scu.id = sc.created_by
     WHERE p.id = o." . $operations_project_column . "
       AND (su.company_id = $company_id OR scu.company_id = $company_id)
@@ -221,11 +272,15 @@ if (!$is_super_admin) {
                 <select name="operator" id="operator" required>
                   <option value="">-- اختر الالية --</option>
                   <?php
+                  $project_filter = "";
+                  if ($session_project_id > 0) {
+                    $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
+                  }
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o." . $operations_project_column . " = p.id
-                                            WHERE 1 $type_filter AND o.status = '1' AND o." . $operations_project_column . " = '" . $session_project_id . "' $timesheet_project_scope_sql");
+                                            WHERE 1 $type_filter AND o.status = '1'" . $project_filter . " $timesheet_project_scope_sql");
 
 
 
@@ -468,11 +523,15 @@ if (!$is_super_admin) {
                 <select name="operator" id="operator" required>
                   <option value="">-- اختر الالية --</option>
                   <?php
+                  $project_filter = "";
+                  if ($session_project_id > 0) {
+                    $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
+                  }
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, o." . $operations_project_column . " AS project_id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o." . $operations_project_column . " = p.id
-                                            WHERE 1 $type_filter AND o.status = '1' AND o." . $operations_project_column . " = '" . $session_project_id . "' $timesheet_project_scope_sql");
+                                            WHERE 1 $type_filter AND o.status = '1'" . $project_filter . " $timesheet_project_scope_sql");
 
 
 
@@ -505,7 +564,7 @@ if (!$is_super_admin) {
                   INNER JOIN operations o ON o.equipment = ed.equipment_id
                   INNER JOIN project p ON p.id = o." . $operations_project_column . "
                   LEFT JOIN users su ON su.id = p.created_by
-                  LEFT JOIN clients sc ON sc.id = p.company_client_id
+                  LEFT JOIN clients sc ON sc.id = p.client_id
                   LEFT JOIN users scu ON scu.id = sc.created_by
                   WHERE ed.driver_id = drivers.id
                     AND (su.company_id = $company_id OR scu.company_id = $company_id)
@@ -716,6 +775,7 @@ if (!$is_super_admin) {
         <thead>
           <tr>
             <th><i class="fas fa-hashtag"></i> #</th>
+            <th><i class="fas fa-id-badge"></i> ID</th>
             <th><i class="fas fa-tool"></i> المعدة</th>
             <th><i class="fas fa-calendar"></i> التاريخ</th>
             <th><i class="fas fa-sun"></i> الوردية</th>
@@ -769,21 +829,22 @@ if (!$is_super_admin) {
         },
         columns: [
           { data: 0, orderable: false }, // #
-          { data: 1 }, // المعدة
-          { data: 2 }, // التاريخ
-          { data: 3, orderable: false }, // الوردية
-          { data: 4 }, // الساعات المنفذة
-          { data: 5 }, // الجردل
-          { data: 6 }, // الجاكهمر
-          { data: 7 }, // الإضافية
-          { data: 8 }, // الاستعداد
-          { data: 9 }, // الأعطال
-          { data: 10 }, // ساعات العمل
-          { data: 11, orderable: false }, // الإجمالي
-          { data: 12 }, // الحالة
-          { data: 13, orderable: false } // إجراءات
+          { data: 1 }, // ID
+          { data: 2 }, // المعدة
+          { data: 3 }, // التاريخ
+          { data: 4, orderable: false }, // الوردية
+          { data: 5 }, // الساعات المنفذة
+          { data: 6 }, // الجردل
+          { data: 7 }, // الجاكهمر
+          { data: 8 }, // الإضافية
+          { data: 9 }, // الاستعداد
+          { data: 10 }, // الأعطال
+          { data: 11 }, // ساعات العمل
+          { data: 12, orderable: false }, // الإجمالي
+          { data: 13 }, // الحالة
+          { data: 14, orderable: false } // إجراءات
         ],
-        order: [[2, 'desc']], // Sort by date descending by default
+        order: [[3, 'desc']], // Sort by date descending by default
         pageLength: 10,
         lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "الكل"]],
         scrollX: true,

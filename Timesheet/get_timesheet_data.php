@@ -38,9 +38,9 @@ $search = isset($_GET['search']['value']) ? mysqli_real_escape_string($conn, $_G
 $type = isset($_GET['type']) ? mysqli_real_escape_string($conn, $_GET['type']) : '';
 
 // Column mapping for ordering
-$columns = ['t.id', 'e.code', 't.date', 't.shift', 't.executed_hours', 't.bucket_hours', 
-            't.jackhammer_hours', 't.extra_hours', 't.standby_hours', 't.total_fault_hours', 
-            't.total_work_hours', '', 't.status'];
+$columns = ['', 't.id', 'e.code', 't.date', 't.shift', 't.executed_hours', 't.bucket_hours',
+            't.jackhammer_hours', 't.extra_hours', 't.standby_hours', 't.total_fault_hours',
+            't.total_work_hours', '', 't.status', ''];
 
 $orderColumnIndex = isset($_GET['order'][0]['column']) ? intval($_GET['order'][0]['column']) : 0;
 $orderDir = isset($_GET['order'][0]['dir']) && $_GET['order'][0]['dir'] === 'asc' ? 'ASC' : 'DESC';
@@ -163,6 +163,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     $data[] = [
         "<span style='font-weight: 600;'>$i</span>",
+        "<span style='font-weight: 700; color: #1f2937;'>{$row['id']}</span>",
         "<span style='font-weight: 600; color: #2980b9;'>{$row['eq_code']} - {$row['eq_name']}</span>",
         $row['date'],
         $shiftBadge,

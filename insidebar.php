@@ -20,7 +20,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
     <h2 class="logo">Equipation</h2>
 
     <ul>
-      <li><a href="../main/dashboard.php"><i class="fa-solid fa-angles-left"></i> <span>الرئيسية</span></a></li>
+      <li><a href="../main/dashboard.php"><i class="fa-solid fa-house"></i> <span>الرئيسية</span></a></li>
 
       <?php
       // عرض الروابط الديناميكية من جدول modules بناءً على دور المستخدم
@@ -74,7 +74,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
 
       <?php // صلاحيات مدير المشغلين === 3
       if ($_SESSION['user']['role'] == "3") { ?>
-        <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
+        <!-- <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li> -->
         <li><a href="../Drivers/drivers.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li>
         <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
         <li><a href="../Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li>
@@ -83,7 +83,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
 
       <?php // صلاحيات مدير الاسطول === 4
       if ($_SESSION['user']['role'] == "4") { ?>
-        <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
+        <!-- <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li> -->
         <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
         <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
         <li><a href="../Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li>
