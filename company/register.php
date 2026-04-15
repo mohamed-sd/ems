@@ -646,8 +646,8 @@ $csrf = generate_csrf_token();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>طلب تسجيل شركة | إيكوبيشن</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
     <style>
 /* ─── DESIGN TOKENS (matches main app index.php) ─── */
 :root {
@@ -1114,8 +1114,8 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                                 <select id="sector" name="sector" required>
                                     <option value="">— اختر القطاع —</option>
                                     <option value="تعدين" <?php echo (isset($_POST['sector']) && $_POST['sector'] === 'تعدين') ? 'selected' : ''; ?>>⛏️ تعدين</option>
-                                    <option value="مقاولات" <?php echo (isset($_POST['sector']) && $_POST['sector'] === 'مقاولات') ? 'selected' : ''; ?>>🏗️ مقاولات</option>
-                                    <option value="إنشاء" <?php echo (isset($_POST['sector']) && $_POST['sector'] === 'إنشاء') ? 'selected' : ''; ?>>🏢 إنشاء</option>
+                                    <option value="مقاولات" <?php echo (isset($_POST['sector']) && $_POST['sector'] === 'مقاولات') ? 'selected' : ''; ?>>ðŸ—️ مقاولات</option>
+                                    <option value="إنشاء" <?php echo (isset($_POST['sector']) && $_POST['sector'] === 'إنشاء') ? 'selected' : ''; ?>>ðŸ¢ إنشاء</option>
                                 </select>
                                 <i class="fas fa-industry ico"></i>
                             </div>
@@ -1468,3 +1468,5 @@ if (selectedCard) {
 </script>
 </body>
 </html>
+
+

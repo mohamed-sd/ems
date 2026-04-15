@@ -11,7 +11,7 @@ include '../config.php';
 ?>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+    @import url('/ems/assets/css/local-fonts.css');
 
     :root {
         --primary-color: #01072a;
@@ -292,4 +292,6 @@ include '../config.php';
 
 </body>
 </html>
+
+
 

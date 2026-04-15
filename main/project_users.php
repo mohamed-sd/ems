@@ -33,7 +33,7 @@ if ($users_has_company_id && $current_company_id <= 0) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// 🔐 التحقق من صلاحيات المستخدم على وحدة المشرفين
+// ðŸ” التحقق من صلاحيات المستخدم على وحدة المشرفين
 // ══════════════════════════════════════════════════════════════════════════════
 $_currentUserRole = intval($_SESSION['user']['role']);
 
@@ -242,8 +242,8 @@ include("../inheader.php");
 include('../insidebar.php');
 ?>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ems/assets/css/all.min.css">
+<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 
 <div class="main">
@@ -364,10 +364,10 @@ include('../insidebar.php');
                     $currentRole = $_SESSION['user']['role'];
 
                     $roles = [
-                        "6" => "📝 مدخل ساعات عمل",
+                        "6" => "ðŸ“ مدخل ساعات عمل",
                         "7" => "✔ مراجع ساعات مورد",
                         "8" => "✔ مراجع ساعات مشغل",
-                        "9" => "🔧 مراجع الأعطال",
+                        "9" => "ðŸ”§ مراجع الأعطال",
                     ];
 
                           $query = "SELECT DISTINCT u.id, u.name, u.username, u.phone, u.role, u.created_at
@@ -427,18 +427,18 @@ include('../insidebar.php');
 </div>
 
 <!-- jQuery (مطلوب أولاً) -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- Bootstrap Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
 <script>
     (function () {
@@ -456,7 +456,7 @@ include('../insidebar.php');
                     { extend: 'print', text: 'طباعة'        }
                 ],
                 "language": {
-                    "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                    "url": "https:/ems/assets/i18n/datatables/ar.json"
                 }
             });
         });
@@ -517,3 +517,4 @@ include('../insidebar.php');
 
 </body>
 </html>
+

@@ -130,17 +130,17 @@ include("../insidebar.php");
 </div>
 
 <!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script>
     (function () {
         $(document).ready(function () {
             $('#historyTable').DataTable({
                 responsive: true,
                 "language": {
-                    "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                    "url": "https:/ems/assets/i18n/datatables/ar.json"
                 }
             });
         });
@@ -149,4 +149,6 @@ include("../insidebar.php");
 
 </body>
 </html>
+
+
 

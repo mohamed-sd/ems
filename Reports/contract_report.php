@@ -11,13 +11,13 @@ if (!isset($_SESSION['user'])) {
 	<meta charset="UTF-8">
   	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>إيكوبيشن | تقرير العقود</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="/ems/assets/css/all.min.css">
+	<link href="/ems/assets/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/admin-style.css">
     <link rel="stylesheet" href="../assets/css/main_admin_style.css">
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+    <script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
     <style>
         .main { font-family: 'Cairo', sans-serif; }
         .report-summary {
@@ -327,7 +327,9 @@ if ($contract_filter > 0) {
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
 

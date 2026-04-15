@@ -154,9 +154,9 @@ $roles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 require_once __DIR__ . '/../includes/layout_head.php';
 ?>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 
 <style>
 .page-shell {
@@ -503,7 +503,7 @@ $(document).ready(function () {
     var modulesTable = $('#modulesTable').DataTable({
         responsive: true,
         language: {
-            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+            url: "/ems/assets/i18n/datatables/ar.json"
         },
         columnDefs: [
             { "orderable": false, "targets": [5] }
@@ -540,3 +540,5 @@ $(document).ready(function () {
 </script>
 
 <?php require_once __DIR__ . '/../includes/layout_foot.php'; ?>
+
+

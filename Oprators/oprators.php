@@ -338,7 +338,7 @@ include('../insidebar.php');
 ?>
 
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <div class="main">
     <div class="page-header">
@@ -455,8 +455,8 @@ include('../insidebar.php');
                             <label><i class="fas fa-check-circle"></i> نوع المعدة</label>
                             <select name="equipment_category" id="equipment_category" required>
                                 <option value="">-- أساسي / احتياطي --</option>
-                                <option value="أساسي">🔵 أساسي</option>
-                                <option value="احتياطي">🟡 احتياطي</option>
+                                <option value="أساسي">ðŸ”µ أساسي</option>
+                                <option value="احتياطي">ðŸŸ¡ احتياطي</option>
                             </select>
                         </div>
                     </div>
@@ -760,11 +760,11 @@ include('../insidebar.php');
 </div>
 
 <!-- مكتبة jQuery (مطلوبة أولاً) -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- حزمة Bootstrap (تشمل Popper) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- ملفات DataTables -->
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 
 <!-- موديل إنهاء الخدمة -->
 <div class="modal fade" id="endServiceModal" tabindex="-1" aria-labelledby="endServiceLabel" aria-hidden="true">
@@ -797,13 +797,13 @@ include('../insidebar.php');
 </div>
 
 <!-- إضافات DataTables للاستجابة والأزرار -->
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
 <script>
     function toggleOperationForm(event) {
@@ -871,7 +871,7 @@ include('../insidebar.php');
                     { extend: 'print', text: 'طباعة' }
                 ],
                 "language": {
-                    "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                    "url": "https:/ems/assets/i18n/datatables/ar.json"
                 }
             });
         });
@@ -1106,13 +1106,13 @@ include('../insidebar.php');
         $(document).on("click", ".end-service-btn", function (e) {
             e.preventDefault();
             var opId = $(this).data('id');
-            console.log('🔴 زر إنهاء الخدمة - ID:', opId);
+            console.log('ðŸ”´ زر إنهاء الخدمة - ID:', opId);
         });
 
         $("#endServiceModal").on("show.bs.modal", function (event) {
             var button = $(event.relatedTarget);
             var opId = button.data("id") || "";
-            console.log('🚨 إنهاء خدمة التشغيل رقم:', opId);
+            console.log('ðŸš¨ إنهاء خدمة التشغيل رقم:', opId);
             $("#modal_operation_id").val(opId);
             $("#service_end_date").val("");
             $("#service_reason").val("");
@@ -1122,7 +1122,7 @@ include('../insidebar.php');
         $(document).on('click', '.editOperationBtn', function() {
             var btn = $(this);
             
-            console.log('🔧 بدء التعديل - ID:', btn.data('id'));
+            console.log('ðŸ”§ بدء التعديل - ID:', btn.data('id'));
             
             // تغيير عنوان النموذج
             $('#formTitle').html('<i class="fa fa-edit"></i> تعديل بيانات التشغيل');
@@ -1146,7 +1146,7 @@ include('../insidebar.php');
             var mineId = btn.data('mine');
             $('#mine_id').val(mineId);
             
-            console.log('📍 تحميل العقود للمنجم:', mineId);
+            console.log('ðŸ“ تحميل العقود للمنجم:', mineId);
             
             // تحميل العقود للمنجم المحدد
             setTimeout(function() {
@@ -1156,7 +1156,7 @@ include('../insidebar.php');
                     dataType: "json",
                     data: { mine_id: mineId },
                     success: function (response) {
-                        console.log('📋 استجابة العقود:', response);
+                        console.log('ðŸ“‹ استجابة العقود:', response);
                         if (response.success) {
                             var options = "<option value=''>-- اختر العقد --</option>";
                             response.contracts.forEach(function (contract) {
@@ -1170,7 +1170,7 @@ include('../insidebar.php');
                             // تحميل الموردين للعقد المحدد
                             setTimeout(function() {
                                 var contractId = btn.data('contract');
-                                console.log('🏢 تحميل الموردين للعقد:', contractId);
+                                console.log('ðŸ¢ تحميل الموردين للعقد:', contractId);
                                 
                                 $.ajax({
                                     url: "get_contract_suppliers.php",
@@ -1178,7 +1178,7 @@ include('../insidebar.php');
                                     dataType: "json",
                                     data: { contract_id: contractId },
                                     success: function (response) {
-                                        console.log('🏪 استجابة الموردين:', response);
+                                        console.log('ðŸª استجابة الموردين:', response);
                                         if (response.success) {
                                             var options = "<option value=''>-- اختر المورد --</option>";
                                             response.suppliers.forEach(function (supplier) {
@@ -1192,11 +1192,11 @@ include('../insidebar.php');
                                             // تحديد نوع المعدة
                                             $('#type').val(btn.data('equipment-type'));
                                             
-                                            console.log('🔧 نوع المعدة:', btn.data('equipment-type'));
+                                            console.log('ðŸ”§ نوع المعدة:', btn.data('equipment-type'));
                                             
                                             // تحميل المعدات
                                             setTimeout(function() {
-                                                console.log('🚜 تحميل المعدات...');
+                                                console.log('ðŸšœ تحميل المعدات...');
                                                 loadEquipmentsForEdit(btn.data('equipment'));
                                             }, 300);
                                         }
@@ -1220,7 +1220,7 @@ include('../insidebar.php');
             var typeId = $("#type").val();
             var supplierId = $("#supplier_id").val();
             
-            console.log('🚜 تحميل المعدات - النوع:', typeId, '| المورد:', supplierId, '| المعدة المختارة:', selectedEquipmentId);
+            console.log('ðŸšœ تحميل المعدات - النوع:', typeId, '| المورد:', supplierId, '| المعدة المختارة:', selectedEquipmentId);
             
             if (typeId && supplierId) {
                 $.ajax({
@@ -1253,3 +1253,5 @@ include('../insidebar.php');
 </body>
 
 </html>
+
+

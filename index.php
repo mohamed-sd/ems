@@ -22,9 +22,9 @@ header("Permissions-Policy: camera=(), microphone=(), geolocation=()");
 <title>منصة إنجاز | إدارة التعدين في السودان</title>
 <meta name="description" content="منصة إنجاز — نظام SaaS متخصص لإدارة شركات التعدين والمناجم والمعدات الثقيلة والعقود في السودان.">
 <meta name="robots" content="index, follow">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="/ems/assets/css/local-fonts.css">
+<link rel="preconnect" href="/ems/assets/css/local-fonts.css" crossorigin>
+<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════════════
    TOKENS — Heavy Industry / Sudan Mining Palette
@@ -1389,3 +1389,4 @@ ul{list-style:none}
 </script>
 </body>
 </html>
+

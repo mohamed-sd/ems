@@ -24,7 +24,7 @@ if (!function_exists('clients_fix_mojibake_output')) {
             'ن' => 'ن', 'ه' => 'ه', 'و' => 'و', 'ي' => 'ي', 'ى' => 'ى', 'ة' => 'ة',
             'ء' => 'ء', 'أ' => 'أ', 'إ' => 'إ', 'آ' => 'آ', 'ؤ' => 'ؤ', 'ئ' => 'ئ',
             '،' => '،', '؛' => '؛', '؟' => '؟', '✅' => '✅', '❌' => '❌', '⏸' => '⏸',
-            '🔐' => '🔐', '👋' => '👋', '🚀' => '🚀', '🏆' => '🏆'
+            'ðŸ”' => 'ðŸ”', 'ðŸ‘‹' => 'ðŸ‘‹', 'ðŸš€' => 'ðŸš€', 'ðŸ†' => 'ðŸ†'
         );
         return strtr($buffer, $map);
     }
@@ -151,7 +151,7 @@ if (empty($_SESSION['clients_csrf_token'])) {
 $clients_csrf_token = $_SESSION['clients_csrf_token'];
 
 // ══════════════════════════════════════════════════════════════════════════════
-// 🔐 التحقق من صلاحيات المستخدم على وحدة العملاء
+// ðŸ” التحقق من صلاحيات المستخدم على وحدة العملاء
 // ══════════════════════════════════════════════════════════════════════════════
 
 // الحصول على معرف وحدة العملاء من جدول modules
@@ -373,14 +373,14 @@ include("../inheader.php");
 include('../insidebar.php');
 ?>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="../assets/css/admin-style.css">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 <!-- Font Awesome من CDN لضمان ظهور الأيقونات بشكل صحيح -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ems/assets/css/all.min.css">
+<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <div class="main">
     <div class="page-header">
@@ -712,21 +712,21 @@ include('../insidebar.php');
 </div>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
 <script>
     $(document).ready(function () {
         // تهيئة جدول العملاء بالعربية
         $('#clientsTable').DataTable({
             language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json'
+                url: '/ems/assets/i18n/datatables/ar.json'
             }
         });
     });
@@ -1000,3 +1000,4 @@ include('../insidebar.php');
 
 </body>
 </html>
+

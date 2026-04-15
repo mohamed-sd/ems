@@ -789,3 +789,15 @@ Stack trace:
 [13-Apr-2026 17:50:48 Europe/Berlin] Database Connection Failed: MySQL server has gone away
 [13-Apr-2026 19:41:34 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
 [13-Apr-2026 19:43:39 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp-latest\htdocs\ems\Suppliers\suppliers.php on line 791
+[14-Apr-2026 13:34:25 Europe/Berlin] PHP Warning:  mysqli::__construct(): php_network_getaddresses: getaddrinfo failed: No such host is known.  in C:\xamppit\htdocs\ems\config.php on line 118
+[14-Apr-2026 13:34:25 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): php_network_getaddresses: getaddrinfo failed: No such host is known.  in C:\xamppit\htdocs\ems\config.php on line 118
+[14-Apr-2026 13:34:25 Europe/Berlin] Database Connection Failed: php_network_getaddresses: getaddrinfo failed: No such host is known. 
+[14-Apr-2026 13:34:30 Europe/Berlin] PHP Warning:  mysqli::__construct(): php_network_getaddresses: getaddrinfo failed: No such host is known.  in C:\xamppit\htdocs\ems\config.php on line 118
+[14-Apr-2026 13:34:30 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): php_network_getaddresses: getaddrinfo failed: No such host is known.  in C:\xamppit\htdocs\ems\config.php on line 118
+[14-Apr-2026 13:34:30 Europe/Berlin] Database Connection Failed: php_network_getaddresses: getaddrinfo failed: No such host is known. 
+[15-Apr-2026 14:48:38 Europe/Berlin] PHP Warning:  mysqli::__construct(): php_network_getaddresses: getaddrinfo for srv1986.hstgr.io failed: No such host is known.  in C:\xampp\htdocs\ems\config.php on line 118
+[15-Apr-2026 14:48:38 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): php_network_getaddresses: getaddrinfo for srv1986.hstgr.io failed: No such host is known.  in C:\xampp\htdocs\ems\config.php on line 118
+[15-Apr-2026 14:48:38 Europe/Berlin] Database Connection Failed: php_network_getaddresses: getaddrinfo for srv1986.hstgr.io failed: No such host is known. 
+[15-Apr-2026 15:26:51 Europe/Berlin] PHP Warning:  mysqli::__construct(): php_network_getaddresses: getaddrinfo for srv1986.hstgr.io failed: No such host is known.  in C:\xampp\htdocs\ems\config.php on line 118
+[15-Apr-2026 15:26:51 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): php_network_getaddresses: getaddrinfo for srv1986.hstgr.io failed: No such host is known.  in C:\xampp\htdocs\ems\config.php on line 118
+[15-Apr-2026 15:26:51 Europe/Berlin] Database Connection Failed: php_network_getaddresses: getaddrinfo for srv1986.hstgr.io failed: No such host is known. 

@@ -57,8 +57,8 @@ $result = mysqli_query($conn, $sql);
     <title>إيكوبيشن | تقارير السائقين</title>
 
     <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="/ems/assets/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
     <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
 </head>
@@ -214,7 +214,7 @@ $result = mysqli_query($conn, $sql);
 </div>
 
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <style>
   /* Form Grid */
@@ -311,4 +311,6 @@ $result = mysqli_query($conn, $sql);
 
 </body>
 </html>
+
+
 

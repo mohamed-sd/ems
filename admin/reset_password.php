@@ -96,7 +96,7 @@ $csrf = generate_csrf_token();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الإدارة العليا | تعيين كلمة مرور جديدة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
     <style>
         body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: linear-gradient(135deg, #edf2f7, #f7f2e5); font-family: 'Cairo', sans-serif; color: #102443; }
         .card { width: 100%; max-width: 520px; background: #fff; border-radius: 24px; padding: 32px; box-shadow: 0 24px 55px rgba(16,36,67,0.12); }
@@ -138,3 +138,4 @@ $csrf = generate_csrf_token();
     </div>
 </body>
 </html>
+

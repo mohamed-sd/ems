@@ -11,18 +11,19 @@ if (!headers_sent()) {
 if (!function_exists('projects_fix_mojibake_output')) {
     function projects_fix_mojibake_output($buffer)
     {
-        $map = array(
-            'Ø§' => 'ا', 'Ø¨' => 'ب', 'Øª' => 'ت', 'Ø«' => 'ث', 'Ø¬' => 'ج', 'Ø­' => 'ح',
-            'Ø®' => 'خ', 'Ø¯' => 'د', 'Ø°' => 'ذ', 'Ø±' => 'ر', 'Ø²' => 'ز', 'Ø³' => 'س',
-            'Ø´' => 'ش', 'Øµ' => 'ص', 'Ø¶' => 'ض', 'Ø·' => 'ط', 'Ø¸' => 'ظ', 'Ø¹' => 'ع',
-            'Øº' => 'غ', 'Ù' => 'ف', 'Ù‚' => 'ق', 'Ùƒ' => 'ك', 'Ù„' => 'ل', 'Ù…' => 'م',
-            'Ù†' => 'ن', 'Ù‡' => 'ه', 'Ùˆ' => 'و', 'ÙŠ' => 'ي', 'Ù‰' => 'ى', 'Ø©' => 'ة',
-            'Ø¡' => 'ء', 'Ø£' => 'أ', 'Ø¥' => 'إ', 'Ø¢' => 'آ', 'Ø¤' => 'ؤ', 'Ø¦' => 'ئ',
-            'ØŒ' => '،', 'Ø›' => '؛', 'ØŸ' => '؟', 'âœ…' => '✅', 'âŒ' => '❌', 'â¸' => '⏸',
-            'ðŸ”’' => '🔒', 'ðŸ‘‹' => '👋', 'ðŸš€' => '🚀', 'ðŸ†' => '🏆'
-        );
+        $pattern = '/[\x{00C2}\x{00C3}\x{00D8}\x{00D9}\x{00E2}\x{00F0}][^\s<>{}\[\]"\'=]{0,24}/u';
+        $fixed = preg_replace_callback($pattern, function ($m) {
+            if (function_exists('mb_convert_encoding')) {
+                $decoded = @mb_convert_encoding($m[0], 'UTF-8', 'Windows-1252');
+                if ($decoded !== false && $decoded !== '') {
+                    return $decoded;
+                }
+            }
 
-        return strtr($buffer, $map);
+            return $m[0];
+        }, $buffer);
+
+        return is_string($fixed) ? $fixed : $buffer;
     }
 }
 
@@ -120,7 +121,7 @@ function projects_redirect_with_msg($msg)
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// 🔒 التحقق من صلاحيات المستخدم
+// ðŸ”’ التحقق من صلاحيات المستخدم
 // ════════════════════════════════════════════════════════════════════════════
 $page_permissions = check_page_permissions($conn, 'Projects/projects.php');
 if (!isset($page_permissions['can_view']) || !$page_permissions['can_view']) {
@@ -327,8 +328,8 @@ include("../inheader.php");
 include('../insidebar.php');
 ?>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ems/assets/css/all.min.css">
+<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 
 <div class="main">
@@ -700,18 +701,18 @@ include('../insidebar.php');
 </div>
 
 <!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- Bootstrap JS (Bundle includes Popper) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
 <script>
     // إغلاق Modal عرض المشروع - تعريف عام
@@ -732,7 +733,7 @@ include('../insidebar.php');
                     { extend: 'print', text: 'طباعة (Print)' }
                 ],
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                    "url": "/ems/assets/i18n/datatables/ar.json"
                 }
             });
         });
@@ -975,4 +976,6 @@ include('../insidebar.php');
 </body>
 
 </html>
+
+
 

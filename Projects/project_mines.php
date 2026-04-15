@@ -15,18 +15,19 @@ if (!headers_sent()) {
 if (!function_exists('project_mines_fix_mojibake_output')) {
     function project_mines_fix_mojibake_output($buffer)
     {
-        $map = array(
-            'Ø§' => 'ا', 'Ø¨' => 'ب', 'Øª' => 'ت', 'Ø«' => 'ث', 'Ø¬' => 'ج', 'Ø­' => 'ح',
-            'Ø®' => 'خ', 'Ø¯' => 'د', 'Ø°' => 'ذ', 'Ø±' => 'ر', 'Ø²' => 'ز', 'Ø³' => 'س',
-            'Ø´' => 'ش', 'Øµ' => 'ص', 'Ø¶' => 'ض', 'Ø·' => 'ط', 'Ø¸' => 'ظ', 'Ø¹' => 'ع',
-            'Øº' => 'غ', 'Ù' => 'ف', 'Ù‚' => 'ق', 'Ùƒ' => 'ك', 'Ù„' => 'ل', 'Ù…' => 'م',
-            'Ù†' => 'ن', 'Ù‡' => 'ه', 'Ùˆ' => 'و', 'ÙŠ' => 'ي', 'Ù‰' => 'ى', 'Ø©' => 'ة',
-            'Ø¡' => 'ء', 'Ø£' => 'أ', 'Ø¥' => 'إ', 'Ø¢' => 'آ', 'Ø¤' => 'ؤ', 'Ø¦' => 'ئ',
-            'ØŒ' => '،', 'Ø›' => '؛', 'ØŸ' => '؟', 'âœ…' => '✅', 'âŒ' => '❌', 'â¸' => '⏸',
-            'ðŸ”' => '🔐', 'ðŸ‘‹' => '👋', 'ðŸš€' => '🚀', 'ðŸ†' => '🏆'
-        );
+        $pattern = '/[\x{00C2}\x{00C3}\x{00D8}\x{00D9}\x{00E2}\x{00F0}][^\s<>{}\[\]"\'=]{0,24}/u';
+        $fixed = preg_replace_callback($pattern, function ($m) {
+            if (function_exists('mb_convert_encoding')) {
+                $decoded = @mb_convert_encoding($m[0], 'UTF-8', 'Windows-1252');
+                if ($decoded !== false && $decoded !== '') {
+                    return $decoded;
+                }
+            }
 
-        return strtr($buffer, $map);
+            return $m[0];
+        }, $buffer);
+
+        return is_string($fixed) ? $fixed : $buffer;
     }
 }
 
@@ -52,7 +53,7 @@ if (!function_exists('project_mines_redirect_with_msg')) {
     }
 }
 
-// 🔐 التحقق من صلاحيات المستخدم
+// ðŸ” التحقق من صلاحيات المستخدم
 $page_permissions = check_page_permissions($conn, 'Projects/project_mines.php');
 $can_view = $page_permissions['can_view'];
 $can_add = $page_permissions['can_add'];
@@ -961,14 +962,14 @@ include '../inheader.php';
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 
 <script>
     $(document).ready(function () {
         $('#minesTable').DataTable({
             language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json'
+                url: '/ems/assets/i18n/datatables/ar.json'
             },
             order: [[0, 'desc']]
         });
@@ -1108,3 +1109,5 @@ include '../inheader.php';
 </body>
 
 </html>
+
+

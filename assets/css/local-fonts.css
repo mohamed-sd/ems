@@ -1,0 +1,12 @@
+/* Offline-safe font stack fallback used instead of Google Fonts */
+:root {
+  --app-font-family: "Cairo", "Tajawal", "Barlow Condensed", "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+body,
+input,
+select,
+textarea,
+button {
+  font-family: var(--app-font-family);
+}

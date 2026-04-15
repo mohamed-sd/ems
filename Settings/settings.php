@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -23,8 +23,8 @@ include('../insidebar.php');
 
 <link rel="stylesheet" href="../assets/css/admin-style.css">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ems/assets/css/all.min.css">
+<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <style>
     /* ── الهيكل العام ── */

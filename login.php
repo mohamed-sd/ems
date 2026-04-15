@@ -113,8 +113,8 @@ $csrf = generate_csrf_token(); // من security.php
   <meta charset="UTF-8">
   <title>إيكوبيشن | تسجيل الدخول</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
   <style>
 /* --- TOKENS (identical to dashboard) --- */
 :root{
@@ -399,3 +399,4 @@ a{text-decoration:none;color:inherit}
 </script>
 </body>
 </html>
+

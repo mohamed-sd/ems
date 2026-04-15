@@ -38,8 +38,8 @@ $_admin_nav = [
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo e($page_title ?? ''); ?> | لوحة الإدارة العليا</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+<link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <style>
 /* ═══════════════════════════ TOKENS ═══════════════════════════ */
 :root {
@@ -459,3 +459,5 @@ textarea.form-ctrl { resize: vertical; min-height: 80px; }
     </header>
 
     <main class="content">
+
+

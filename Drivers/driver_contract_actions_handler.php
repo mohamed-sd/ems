@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 include '../config.php';
 require_once '../includes/permissions_helper.php';

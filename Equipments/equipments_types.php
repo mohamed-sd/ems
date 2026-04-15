@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="/ems/assets/css/all.min.css">
 
 <style>
     .delete-disabled {
@@ -243,7 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- JS -->
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="../includes/js/jquery.dataTables.main.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -251,7 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $('#projectsTable').DataTable({
             responsive: true,
             language: {
-                url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                url: "/ems/assets/i18n/datatables/ar.json"
             }
         });
 
@@ -274,3 +274,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 </html>
+
+

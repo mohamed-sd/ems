@@ -51,7 +51,7 @@ $driver_insert_col = (!$is_super_admin && $drivers_has_company) ? ", company_id"
 $driver_insert_val = (!$is_super_admin && $drivers_has_company) ? ", '$company_id'" : "";
 
 // ════════════════════════════════════════════════════════════════════════════
-// 🔐 التحقق من صلاحيات المستخدم
+// ðŸ” التحقق من صلاحيات المستخدم
 // ════════════════════════════════════════════════════════════════════════════
 $page_permissions = check_page_permissions($conn, 'drivers');
 $can_view = $page_permissions['can_view'];
@@ -224,8 +224,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 include("../inheader.php");
 ?>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ems/assets/css/all.min.css">
+<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 
 <style>
@@ -687,7 +687,7 @@ include('../insidebar.php');
                                 <select name="behavior_record" id="behavior_record">
                                     <option value="">-- اختر السجل --</option>
                                     <option value="ممتاز (لا توجد شكاوى)">✅ ممتاز (لا توجد شكاوى)</option>
-                                    <option value="جيد (شكاوى نادرة)">👍 جيد (شكاوى نادرة)</option>
+                                    <option value="جيد (شكاوى نادرة)">ðŸ‘ جيد (شكاوى نادرة)</option>
                                     <option value="مقبول (بعض الشكاوى)">⚠️ مقبول (بعض الشكاوى)</option>
                                     <option value="ضعيف (شكاوى متكررة)">❌ ضعيف (شكاوى متكررة)</option>
                                     <option value="غير محدد">غير محدد</option>
@@ -699,7 +699,7 @@ include('../insidebar.php');
                                     <option value="">-- اختر السجل --</option>
                                     <option value="نظيف (لا توجد حوادث)">✅ نظيف (لا توجد حوادث)</option>
                                     <option value="حادث واحد (طفيف)">⚠️ حادث واحد (طفيف)</option>
-                                    <option value="حادثان (متوسط)">🚨 حادثان (متوسط)</option>
+                                    <option value="حادثان (متوسط)">ðŸš¨ حادثان (متوسط)</option>
                                     <option value="ثلاثة حوادث فأكثر (خطير)">☠️ ثلاثة حوادث فأكثر (خطير)</option>
                                     <option value="غير محدد">غير محدد</option>
                                 </select>
@@ -722,9 +722,9 @@ include('../insidebar.php');
                                 <select name="health_status" id="health_status">
                                     <option value="">-- اختر الحالة --</option>
                                     <option value="سليم تماماً">✅ سليم تماماً</option>
-                                    <option value="بحالة جيدة">👍 بحالة جيدة</option>
+                                    <option value="بحالة جيدة">ðŸ‘ بحالة جيدة</option>
                                     <option value="بحالة مقبولة">⚠️ بحالة مقبولة</option>
-                                    <option value="محتاج متابعة طبية">🏥 محتاج متابعة طبية</option>
+                                    <option value="محتاج متابعة طبية">ðŸ¥ محتاج متابعة طبية</option>
                                     <option value="غير محدد">غير محدد</option>
                                 </select>
                             </div>
@@ -788,10 +788,10 @@ include('../insidebar.php');
                                 <label><i class="fas fa-info-circle"></i> حالة المشغل <span style="color: red;">*</span></label>
                                 <select name="driver_status" id="driver_status" required>
                                     <option value="">-- اختر الحالة --</option>
-                                    <option value="نشط">🟢 نشط</option>
+                                    <option value="نشط">ðŸŸ¢ نشط</option>
                                     <option value="معلق">⏸️ معلق</option>
-                                    <option value="مفصول">🔴 مفصول</option>
-                                    <option value="في إجازة">🏖️ في إجازة</option>
+                                    <option value="مفصول">ðŸ”´ مفصول</option>
+                                    <option value="في إجازة">ðŸ–️ في إجازة</option>
                                     <option value="تحت التقييم">⏳ تحت التقييم</option>
                                 </select>
                             </div>
@@ -803,8 +803,8 @@ include('../insidebar.php');
                                 <label><i class="fas fa-power-off"></i> حالة النظام <span style="color: red;">*</span></label>
                                 <select name="status" id="status" required>
                                     <option value="">-- اختر الحالة --</option>
-                                    <option value="1">🟢 مفعّل</option>
-                                    <option value="0">🔴 موقف</option>
+                                    <option value="1">ðŸŸ¢ مفعّل</option>
+                                    <option value="0">ðŸ”´ موقف</option>
                                 </select>
                             </div>
                         </div>
@@ -881,7 +881,7 @@ include('../insidebar.php');
                     $i = 1;
                     
                     while ($row = mysqli_fetch_assoc($result)) {
-                        $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">🟢 مفعّل</span>' : '<span class="status-pill status-inactive">🔴 موقف</span>';
+                        $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">ðŸŸ¢ مفعّل</span>' : '<span class="status-pill status-inactive">ðŸ”´ موقف</span>';
                         
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
@@ -923,18 +923,18 @@ include('../insidebar.php');
 </div>
 
 <!-- jQuery (Required first) -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- Bootstrap Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
 <script>
     // دالة طي/فتح المجموعات
@@ -974,7 +974,7 @@ include('../insidebar.php');
                     { extend: 'print', text: 'طباعة' }
                 ],
                 "language": {
-                    "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                    "url": "https:/ems/assets/i18n/datatables/ar.json"
                 }
             });
         });
@@ -1186,4 +1186,6 @@ include('../insidebar.php');
 
 </body>
 </html>
+
+
 

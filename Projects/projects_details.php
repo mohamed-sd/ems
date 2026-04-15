@@ -14,10 +14,10 @@ if (!isset($_SESSION['user'])) {
     <title>إيكوبيشن | تفاصيل المشروع</title>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 
     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
        <!-- Bootstrab 5 -->
   <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS الموقع -->
@@ -196,9 +196,9 @@ WHERE pm.project = $project";
     </div>
 
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
     <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 
     <script>
         (function () {
@@ -206,14 +206,14 @@ WHERE pm.project = $project";
             $(document).ready(function () {
                 $('#projectsTable').DataTable({
                     "language": {
-                        "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                        "url": "/ems/assets/i18n/datatables/ar.json"
                     }
                 });
             });
             $(document).ready(function () {
                 $('#projectsTable1').DataTable({
                     "language": {
-                        "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                        "url": "/ems/assets/i18n/datatables/ar.json"
                     }
                 });
             });
@@ -231,3 +231,5 @@ WHERE pm.project = $project";
 </body>
 
 </html>
+
+

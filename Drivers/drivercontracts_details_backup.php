@@ -13,14 +13,14 @@ if (!isset($_SESSION['user'])) {
     <title>إيكوبيشن | تفاصيل عقد المورد</title>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
     <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+        @import url('/ems/assets/css/local-fonts.css');
         
         * {
             font-family: 'Cairo', sans-serif;
@@ -1226,7 +1226,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     </label>
                     <select id="terminationType" class="form-select">
                         <option value="">-- اختر النوع --</option>
-                        <option value="amicable">🤝 رضائي</option>
+                        <option value="amicable">ðŸ¤ رضائي</option>
                         <option value="hardship">⚠️ بسبب التعسر</option>
                     </select>
                 </div>
@@ -1614,9 +1614,9 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 </div>
 
 <!-- jQuery (required for your AJAX calls) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- Bootstrap 5 Bundle (includes Popper) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <script>
 const contractId = <?php echo $contract_id; ?>;
@@ -2166,4 +2166,6 @@ $('#confirmMerge').click(function() {
 
 </body>
 </html>
+
+
 

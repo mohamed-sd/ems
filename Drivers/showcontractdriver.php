@@ -13,7 +13,7 @@ if (!isset($_SESSION['user'])) {
     <title>إيكوبيشن | تفاصيل العقد</title>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
            <!-- Bootstrab 5 -->
   <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS الموقع -->
@@ -166,4 +166,6 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 </body>
 </html>
+
+
 

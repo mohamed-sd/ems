@@ -85,13 +85,13 @@ include("../inheader.php");
 include('../insidebar.php');
 ?>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="../assets/css/admin-style.css">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ems/assets/css/all.min.css">
+<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <div class="main">
     <div class="page-header">
@@ -233,7 +233,7 @@ include('../insidebar.php');
                                             <strong><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                         </a>
                                         <?php if ($row['parent_role_id'] === null): ?>
-                                            <br><small style="color: var(--gold); font-weight: 600;">🔵 مدير رئيسي</small>
+                                            <br><small style="color: var(--gold); font-weight: 600;">ðŸ”µ مدير رئيسي</small>
                                         <?php endif; ?>
                                     </td>
                                     <td>
@@ -287,7 +287,7 @@ include('../insidebar.php');
 <!-- JS -->
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="../includes/js/jquery.dataTables.main.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 
 
 <script>
@@ -295,7 +295,7 @@ include('../insidebar.php');
     $('#rolesTable').DataTable({
         responsive: true,
         language: {
-            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+            url: "/ems/assets/i18n/datatables/ar.json"
         },
         columnDefs: [
             { "orderable": false, "targets": [6] }
@@ -338,3 +338,5 @@ include('../insidebar.php');
 </body>
 
 </html>
+
+

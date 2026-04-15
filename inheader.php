@@ -19,9 +19,9 @@ $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '..
     <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
     <link rel="stylesheet" href="../assets/css/admin-style.css">
@@ -29,3 +29,4 @@ $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '..
 
 </head>
 <body>
+

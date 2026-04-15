@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include "../config.php";
@@ -188,7 +188,7 @@ $linkCount = count($links);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../assets/css/all.min.css">
   <link rel="stylesheet" href="../assets/css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
   <style>
 /* ====================================================
    TOKENS
@@ -663,3 +663,4 @@ setInterval(star,900);
 </script>
 </body>
 </html>
+

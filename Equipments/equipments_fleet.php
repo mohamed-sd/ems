@@ -9,7 +9,7 @@ include '../config.php';
 include '../includes/permissions_helper.php';
 
 // ════════════════════════════════════════════════════════════════════════════
-// 🔐 التحقق من صلاحيات المستخدم
+// ðŸ” التحقق من صلاحيات المستخدم
 // ════════════════════════════════════════════════════════════════════════════
 $page_permissions = check_page_permissions($conn, 'Equipments/equipments_fleet.php');
 $can_view = $page_permissions['can_view'];
@@ -121,14 +121,14 @@ if (isset($_GET['msg'])) {
 }
 ?>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="../assets/css/admin-style.css">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 <!-- Font Awesome من CDN لضمان ظهور الأيقونات بشكل صحيح -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/ems/assets/css/all.min.css">
+<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <?php
 
@@ -1240,15 +1240,15 @@ if (isset($_GET['edit']) && $can_edit) {
     </div>
 
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
     <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+    <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+    <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+    <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+    <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+    <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
     <script>
         (function () {
@@ -1263,7 +1263,7 @@ if (isset($_GET['edit']) && $can_edit) {
                         { extend: 'print', text: 'طباعة' }
                     ],
                     "language": {
-                        "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                        "url": "https:/ems/assets/i18n/datatables/ar.json"
                     }
                 });
 
@@ -2033,3 +2033,5 @@ if (isset($_GET['edit']) && $can_edit) {
 </body>
 
 </html>
+
+

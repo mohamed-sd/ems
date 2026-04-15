@@ -11,7 +11,7 @@ include("../insidebar.php");
 ?>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+    @import url('/ems/assets/css/local-fonts.css');
 
     :root {
         --primary-color: #01072a;
@@ -297,7 +297,7 @@ include("../insidebar.php");
                 
                 echo '      <div class="stat-box">';
                 echo '          <div class="stat-value">' . $contracts_count . '</div>';
-                echo '          <div class="stat-label">📄 عقود نشطة</div>';
+                echo '          <div class="stat-label">ðŸ“„ عقود نشطة</div>';
                 echo '      </div>';
                 
                 // حساب عدد المعدات المشغلة
@@ -310,7 +310,7 @@ include("../insidebar.php");
                 
                 echo '      <div class="stat-box">';
                 echo '          <div class="stat-value">' . $equip_count . '</div>';
-                echo '          <div class="stat-label">🚜 معدات مشغلة</div>';
+                echo '          <div class="stat-label">ðŸšœ معدات مشغلة</div>';
                 echo '      </div>';
                 
                 echo '  </div>';
@@ -341,4 +341,6 @@ include("../insidebar.php");
 
 </body>
 </html>
+
+
 

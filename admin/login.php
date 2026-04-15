@@ -75,8 +75,8 @@ $csrf = generate_csrf_token();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الإدارة العليا | تسجيل الدخول</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
     <style>
         :root {
             --ink: #102443;
@@ -328,3 +328,4 @@ $csrf = generate_csrf_token();
     </div>
 </body>
 </html>
+

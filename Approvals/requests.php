@@ -61,7 +61,7 @@ $sql = "SELECT ar.*,
 
 $result = mysqli_query($conn, $sql);
 ?>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 
 <div class="main">
@@ -439,16 +439,16 @@ $result = mysqli_query($conn, $sql);
 }
 </style>
 
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script>
 $(function () {
     // تهيئة DataTable
     const table = $('#approvalsTable').DataTable({
         pageLength: 25,
         order: [[0, 'desc']],
-        language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json' },
+        language: { url: '/ems/assets/i18n/datatables/ar.json' },
         columnDefs: [
             { orderable: false, targets: [7] }
         ]
@@ -607,3 +607,5 @@ $(function () {
     });
 });
 </script>
+
+

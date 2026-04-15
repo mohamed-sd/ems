@@ -441,7 +441,7 @@ if (isset($_GET['edit'])) {
 $(document).ready(function() {
     $('#dataTable').DataTable({
         language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json'
+            url: '/ems/assets/i18n/datatables/ar.json'
         },
         pageLength: 10,
         order: [[0, 'desc']]
@@ -451,3 +451,5 @@ $(document).ready(function() {
 
 </body>
 </html>
+
+

@@ -26,11 +26,11 @@ $projects = $conn->query("SELECT id, name, client, location, total, status, crea
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap + DataTables -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
+    <link rel="stylesheet" href="/ems/assets/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.bootstrap5.min.css">
     <!-- Call font awsome libary -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
     <!-- Call local style -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
     <style>
@@ -132,7 +132,7 @@ $projects = $conn->query("SELECT id, name, client, location, total, status, crea
 
             <!-- زر الطباعة -->
             <div class="btns mb-3">
-                <button onclick="window.print()" class="btn btn-primary">🖨 طباعة التقرير</button>
+                <button onclick="window.print()" class="btn btn-primary">ðŸ–¨ طباعة التقرير</button>
             </div>
 
             <!-- الهيدر للطباعة -->
@@ -180,16 +180,16 @@ $projects = $conn->query("SELECT id, name, client, location, total, status, crea
             </div>
 
             <!-- Scripts -->
-            <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-            <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-            <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+            <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+            <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+            <script src="/ems/assets/vendor/datatables/js/dataTables.bootstrap5.min.js"></script>
             <script>
                 $(document).ready(function () {
                     $('#reportTable').DataTable({
                         pageLength: 10,
                         lengthMenu: [10, 25, 50],
                         language: {
-                            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json"
+                            url: "/ems/assets/i18n/datatables/ar.json"
                         }
                     });
                 });
@@ -199,3 +199,4 @@ $projects = $conn->query("SELECT id, name, client, location, total, status, crea
 </body>
 
 </html>
+

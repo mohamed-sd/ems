@@ -9,7 +9,7 @@ include '../config.php';
 $page_title = "إدارة صلاحيات الأدوار";
 
 // ════════════════════════════════════════════════════════════════════════════
-// 📊 معالجة الطلبات الأساسية (CRUD)
+// ðŸ“Š معالجة الطلبات الأساسية (CRUD)
 // ════════════════════════════════════════════════════════════════════════════
 
 $success_msg = null;
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// 🛠️ دوال مساعدة
+// ðŸ› ️ دوال مساعدة
 // ════════════════════════════════════════════════════════════════════════════
 
 function get_parent_roles($conn, $role_id) {
@@ -167,7 +167,7 @@ function get_assigned_modules($conn, $role_id) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// 📥 جلب البيانات
+// ðŸ“¥ جلب البيانات
 // ════════════════════════════════════════════════════════════════════════════
 
 $selected_role_id = isset($_GET['role_id']) ? (int)$_GET['role_id'] : null;
@@ -654,7 +654,7 @@ include('../insidebar.php');
                                                 <label>
                                                     <input type="checkbox" name="can_view"
                                                         <?php echo ($perm && $perm['can_view']) ? 'checked' : ''; ?>>
-                                                    👁️ عرض
+                                                    ðŸ‘️ عرض
                                                 </label>
                                             </div>
 
@@ -678,7 +678,7 @@ include('../insidebar.php');
                                                 <label>
                                                     <input type="checkbox" name="can_delete"
                                                         <?php echo ($perm && $perm['can_delete']) ? 'checked' : ''; ?>>
-                                                    🗑️ حذف
+                                                    ðŸ—‘️ حذف
                                                 </label>
                                             </div>
 
@@ -716,10 +716,10 @@ include('../insidebar.php');
                                 <tr>
                                     <th>الدور</th>
                                     <th>الشاشة</th>
-                                    <th>👁️ عرض</th>
+                                    <th>ðŸ‘️ عرض</th>
                                     <th>➕ إضافة</th>
                                     <th>✏️ تعديل</th>
-                                    <th>🗑️ حذف</th>
+                                    <th>ðŸ—‘️ حذف</th>
                                     <th>الإجراء</th>
                                 </tr>
                             </thead>
@@ -821,7 +821,9 @@ include('../insidebar.php');
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
 

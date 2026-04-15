@@ -199,7 +199,7 @@ foreach ($all_permissions as $perm) {
 require_once __DIR__ . '/../includes/layout_head.php';
 ?>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
 
 <style>
 .page-shell {
@@ -575,7 +575,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
                                         <label>
                                             <input type="checkbox" name="can_view"
                                                 <?php echo ($perm && $perm['can_view']) ? 'checked' : ''; ?>>
-                                            👁️ عرض
+                                            ðŸ‘️ عرض
                                         </label>
                                     </div>
 
@@ -599,7 +599,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
                                         <label>
                                             <input type="checkbox" name="can_delete"
                                                 <?php echo ($perm && $perm['can_delete']) ? 'checked' : ''; ?>>
-                                            🗑️ حذف
+                                            ðŸ—‘️ حذف
                                         </label>
                                     </div>
 
@@ -632,3 +632,5 @@ $(document).ready(function () {
 </script>
 
 <?php require_once __DIR__ . '/../includes/layout_foot.php'; ?>
+
+
