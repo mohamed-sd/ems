@@ -252,6 +252,9 @@ if (!$is_super_admin) {
             <a href="timesheet_type.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
+          <a href="view_timesheet.php?type=<?= urlencode($type) ?>" class="back-btn" style="background: var(--green-soft); color: var(--green); border-color: rgba(22,163,74,.22);">
+            <i class="fas fa-table"></i> شاشة العرض الكاملة
+          </a>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة ساعات عمل جديدة
             </a>
@@ -821,7 +824,8 @@ if (!$is_super_admin) {
           url: 'get_timesheet_data.php',
           type: 'GET',
           data: {
-            type: '<?php echo $type; ?>'
+            type: '<?php echo $type; ?>',
+            today_only: '1'
           },
           error: function(xhr, error, thrown) {
             console.error('DataTables AJAX Error:', error, thrown);

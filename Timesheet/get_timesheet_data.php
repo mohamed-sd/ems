@@ -36,6 +36,12 @@ $start = isset($_GET['start']) ? intval($_GET['start']) : 0;
 $length = isset($_GET['length']) ? intval($_GET['length']) : 10;
 $search = isset($_GET['search']['value']) ? mysqli_real_escape_string($conn, $_GET['search']['value']) : '';
 $type = isset($_GET['type']) ? mysqli_real_escape_string($conn, $_GET['type']) : '';
+$today_only = isset($_GET['today_only']) ? $_GET['today_only'] : '0';
+$today_filter = '';
+if ($today_only === '1') {
+    $today = date('Y-m-d');
+    $today_filter = " AND t.date = '$today'";
+}
 
 // Column mapping for ordering
 $columns = ['', 't.id', 'e.code', 't.date', 't.shift', 't.executed_hours', 't.bucket_hours',
@@ -47,7 +53,7 @@ $orderDir = isset($_GET['order'][0]['dir']) && $_GET['order'][0]['dir'] === 'asc
 $orderColumn = isset($columns[$orderColumnIndex]) ? $columns[$orderColumnIndex] : 't.id';
 
 // Build WHERE clause
-$where = "WHERE t.type LIKE '$type'" . $tenant_scope;
+$where = "WHERE t.type LIKE '$type'" . $tenant_scope . $today_filter;
 
 if ($_SESSION['user']['role'] == "6") {
     $user_filter = $_SESSION['user']['id'];
@@ -70,7 +76,7 @@ $totalQuery = "SELECT COUNT(*) as total
                JOIN equipments e ON o.equipment = e.id
                JOIN project p ON o.project_id = p.id
                JOIN drivers d ON t.driver = d.id
-               WHERE t.type LIKE '$type'" . $tenant_scope;
+               WHERE t.type LIKE '$type'" . $tenant_scope . $today_filter;
 
 if ($_SESSION['user']['role'] == "6") {
     $totalQuery .= " AND t.user_id = '$user_filter'";
