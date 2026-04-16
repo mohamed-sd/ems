@@ -1388,28 +1388,40 @@ foreach ($equipmentTypes as $equipmentType) {
       // حساب إجمالي المعدات
       let totalEquipMonth = 0;
       let totalEquipContract = 0;
+      let totalMonthlyUnits = 0;
 
       // حساب كل قسم معدات
       document.querySelectorAll('.equipment-section').forEach(section => {
         const index = section.getAttribute('data-index');
         const countInput = section.querySelector(`input[name="equip_count_${index}"]`);
+        const countBasicInput = section.querySelector(`input[name="equip_count_basic_${index}"]`);
+        const countBackupInput = section.querySelector(`input[name="equip_count_backup_${index}"]`);
         const targetInput = section.querySelector(`input[name="shift_hours_${index}"]`);
+        const monthlyTargetInput = section.querySelector(`input[name="equip_target_per_month_${index}"]`);
         const monthInput = section.querySelector(`input[name="equip_total_month_${index}"]`);
         const contractInput = section.querySelector(`input[name="equip_total_contract_${index}"]`);
 
         if (countInput && targetInput) {
-          const count = num(countInput.value);
+          const countBasic = num(countBasicInput ? countBasicInput.value : 0);
+          const countBackup = num(countBackupInput ? countBackupInput.value : 0);
+          const rawCount = num(countInput.value);
+          const count = (countBasic + countBackup) > 0 ? (countBasic + countBackup) : rawCount;
           const target = num(targetInput.value);
           const sectionMonth = count * target;
+          const sectionMonthlyUnits = count > 0 ? (sectionMonth * 30) / count : 0;
           // حساب إجمالي الساعات على أساس الأيام بدلاً من الشهور
           // نفترض أن الـ target هو الساعات اليومية للمعدة
           const sectionContract = sectionMonth * days;
 
           monthInput.value = sectionMonth;
+          if (monthlyTargetInput) {
+            monthlyTargetInput.value = sectionMonthlyUnits;
+          }
           contractInput.value = sectionContract;
 
           totalEquipMonth += sectionMonth;
           totalEquipContract += sectionContract;
+          totalMonthlyUnits += sectionMonthlyUnits;
         }
       });
 
@@ -1420,7 +1432,7 @@ foreach ($equipmentTypes as $equipmentType) {
       fields.kpiMonthTotal.textContent = fmt(monthTotal);
       fields.kpiContractTotal.textContent = fmt(contractTotal);
 
-      fields.hoursMonthlyTarget.value = monthTotal;
+      fields.hoursMonthlyTarget.value = totalMonthlyUnits;
       fields.forecastedContractedHours.value = contractTotal;
     }
 
@@ -1521,6 +1533,8 @@ foreach ($equipmentTypes as $equipmentType) {
                 $(`select[name="equip_type_1"]`).val(equip.equip_type);
                 $(`input[name="equip_size_1"]`).val(equip.equip_size);
                 $(`input[name="equip_count_1"]`).val(equip.equip_count);
+                $(`input[name="equip_count_basic_1"]`).val(equip.equip_count_basic || 0);
+                $(`input[name="equip_count_backup_1"]`).val(equip.equip_count_backup || 0);
                 $(`input[name="equip_shifts_1"]`).val(equip.equip_shifts);
                 $(`select[name="equip_unit_1"]`).val(equip.equip_unit);
                 $(`input[name="shift1_start_1"]`).val(equip.shift1_start);
@@ -1571,6 +1585,14 @@ foreach ($equipmentTypes as $equipmentType) {
                       <div class="field md-3 sm-6">
                         <label>عدد المعدات</label>
                         <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
+                      </div>
+                      <div class="field md-3 sm-6">
+                        <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;" value="${equip.equip_count_basic || 0}"></div>
+                      </div>
+                      <div class="field md-3 sm-6">
+                        <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;" value="${equip.equip_count_backup || 0}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المشغلين</label>

@@ -114,7 +114,9 @@ if ($contract_filter > 0) {
     SELECT 
         YEAR(t.date) AS year,
         MONTH(t.date) AS month,
-        SUM(t.executed_hours) AS actual_hours,
+        IFNULL(SUM(t.executed_hours),0) AS executed_hours,
+        IFNULL(SUM(t.standby_hours),0) AS standby_hours,
+        IFNULL(SUM(t.executed_hours),0) + IFNULL(SUM(t.standby_hours),0) AS total_hours,
         c.hours_monthly_target
     FROM contracts c
     LEFT JOIN mines m ON c.mine_id = m.id
@@ -219,6 +221,8 @@ if ($contract_filter > 0) {
                             <th>السنة</th>
                             <th>الشهر</th>
                             <th>المنفذ</th>
+                            <th>الاستعداد</th>
+                            <th>الإجمالي</th>
                             <th>الهدف الشهري</th>
                             <th>نسبة الإنجاز</th>
                         </tr>
@@ -234,11 +238,11 @@ if ($contract_filter > 0) {
                         mysqli_data_seek($monthly_stats, 0);
                         while($row = mysqli_fetch_assoc($monthly_stats)) { 
                             $labels[] = $row['year']."-".$row['month'];
-                            $actual[] = isset($row['actual_hours']) ? $row['actual_hours'] : 0;
+                            $actual[] = isset($row['total_hours']) ? $row['total_hours'] : 0;
                             $target[] = isset($row['hours_monthly_target']) ? $row['hours_monthly_target'] : 0;
 
                             $percent = ($row['hours_monthly_target'] > 0) 
-                                       ? round(($row['actual_hours'] / $row['hours_monthly_target']) * 100, 2)
+                                       ? round(($row['total_hours'] / $row['hours_monthly_target']) * 100, 2)
                                        : 0;
                             $percentages[] = $percent;
 
@@ -252,7 +256,9 @@ if ($contract_filter > 0) {
                         <tr>
                             <td><?php echo $row['year']; ?></td>
                             <td><?php echo $row['month']; ?></td>
-                            <td><?php echo $row['actual_hours']; ?></td>
+                            <td><?php echo $row['executed_hours']; ?></td>
+                            <td><?php echo $row['standby_hours']; ?></td>
+                            <td><?php echo $row['total_hours']; ?></td>
                             <td><?php echo $row['hours_monthly_target']; ?></td>
                             <td>
                                 <div class="progress report-progress">
@@ -288,7 +294,7 @@ if ($contract_filter > 0) {
                 labels: <?php echo json_encode($labels); ?>,
                 datasets: [
                     {
-                        label: 'المنفذ',
+                        label: 'الإجمالي',
                         data: <?php echo json_encode($actual); ?>,
                         backgroundColor: 'rgba(37, 99, 235, 0.75)'
                     },
