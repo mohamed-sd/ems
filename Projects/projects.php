@@ -332,6 +332,35 @@ include('../insidebar.php');
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 
+<style>
+    .link-alert-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-right: 6px;
+        padding: 2px 9px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #fff7d6, #ffe8bf);
+        color: #7c2d12;
+        border: 1px solid rgba(217, 119, 6, 0.28);
+        font-size: .72rem;
+        font-weight: 800;
+        box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
+        animation: linkAlertPulse 1.6s ease-in-out infinite;
+        vertical-align: middle;
+    }
+
+    .link-alert-chip i {
+        color: #b45309;
+        font-size: .75rem;
+    }
+
+    @keyframes linkAlertPulse {
+        0%, 100% { transform: translateY(0); box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18); }
+        50% { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28); }
+    }
+</style>
+
 <div class="main">
     <div class="page-header">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -521,11 +550,16 @@ include('../insidebar.php');
 
                         $result = mysqli_query($conn, $query);
                         while ($row = mysqli_fetch_assoc($result)) {
+                            $project_name_cell = "<strong>" . e($row['name']) . "</strong>";
+                            if (intval($row['mines_count']) === 0) {
+                                $project_name_cell .= " <span class='link-alert-chip' title='المشروع ليس بداخله منجم'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
+                            }
+
                             echo "<tr>";
                             echo "<td>" . e($row['create_at']) . "</td>";
                             echo "<td>" . e(isset($row['client_name']) && $row['client_name'] !== '' ? $row['client_name'] : $row['client']) . "</td>";
                             echo "<td>" . e(isset($row['project_code']) && $row['project_code'] !== '' ? $row['project_code'] : '-') . "</td>";
-                            echo "<td><strong>" . e($row['name']) . "</strong></td>";
+                            echo "<td>" . $project_name_cell . "</td>";
                             echo "<td><span class='count-badge'>" . intval($row['total_suppliers']) . "</span></td>";
                             if ($row['status'] == "1") {
                                 echo "<td><span class='status-active'><i class='fas fa-check-circle'></i> نشط</span></td>";
@@ -621,7 +655,7 @@ include('../insidebar.php');
         <div class="modal-body">
             <div class="view-modal-body">
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-user-tie"></i> اسم العميل</div>
+                    <div class="view-item-label"><i class="fas fa-user-tie"></i>  العميل</div>
                     <div class="view-item-value" id="view_client_name">-</div>
                 </div>
                 <div class="view-item">

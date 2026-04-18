@@ -112,6 +112,25 @@ $clients_has_is_deleted = clients_table_has_column($conn, 'clients', 'is_deleted
 $clients_has_deleted_at = clients_table_has_column($conn, 'clients', 'deleted_at');
 $clients_has_deleted_by = clients_table_has_column($conn, 'clients', 'deleted_by');
 
+$project_has_client_id         = clients_table_has_column($conn, 'project', 'client_id');
+$project_has_company_client_id = clients_table_has_column($conn, 'project', 'company_client_id');
+$project_has_company_id        = clients_table_has_column($conn, 'project', 'company_id');
+$project_has_is_deleted        = clients_table_has_column($conn, 'project', 'is_deleted');
+$project_has_deleted_at        = clients_table_has_column($conn, 'project', 'deleted_at');
+
+$operations_has_company_id       = clients_table_has_column($conn, 'operations', 'company_id');
+$equipment_drivers_has_company_id = clients_table_has_column($conn, 'equipment_drivers', 'company_id');
+$mines_has_company_id            = clients_table_has_column($conn, 'mines', 'company_id');
+$mines_has_is_deleted            = clients_table_has_column($conn, 'mines', 'is_deleted');
+$mines_has_deleted_at            = clients_table_has_column($conn, 'mines', 'deleted_at');
+
+$project_client_link_column = '';
+if ($project_has_company_client_id) {
+    $project_client_link_column = 'company_client_id';
+} elseif ($project_has_client_id) {
+    $project_client_link_column = 'client_id';
+}
+
 if (!$clients_has_is_deleted || !$clients_has_deleted_at || !$clients_has_deleted_by) {
     $alter_parts = array();
     if (!$clients_has_is_deleted) {
@@ -141,6 +160,20 @@ $scope_clients_sql        = clients_build_scope_sql($company_id, $clients_has_co
 $scope_clients_update_sql = clients_build_scope_sql($company_id, $clients_has_company_id, '');
 $not_deleted_cc_sql       = clients_not_deleted_sql('cc', $clients_has_is_deleted, $clients_has_deleted_at);
 $not_deleted_plain_sql    = clients_not_deleted_sql('', $clients_has_is_deleted, $clients_has_deleted_at);
+
+$scope_project_sql      = clients_build_scope_sql($company_id, $project_has_company_id, 'p');
+$not_deleted_project_sql = clients_not_deleted_sql('p', $project_has_is_deleted, $project_has_deleted_at);
+
+$projects_count_select_sql = '0';
+if ($project_client_link_column !== '') {
+    $projects_count_select_sql = "(
+        SELECT COUNT(*)
+        FROM project p
+        WHERE p.$project_client_link_column = cc.id
+          AND $scope_project_sql
+          AND $not_deleted_project_sql
+    )";
+}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // توليد رمز CSRF لحماية النماذج
@@ -368,6 +401,129 @@ if (isset($_GET['delete_id'])) {
     clients_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
+    header('Content-Type: application/json; charset=UTF-8');
+
+    $client_id = isset($_GET['client_id']) ? intval($_GET['client_id']) : 0;
+    if ($client_id <= 0) {
+        echo json_encode(array('success' => false, 'message' => 'معرف العميل غير صالح'));
+        exit();
+    }
+
+    $client_check_query = "SELECT cc.id FROM clients cc WHERE cc.id = $client_id AND $scope_clients_sql AND $not_deleted_cc_sql LIMIT 1";
+    $client_check_res   = mysqli_query($conn, $client_check_query);
+    if (!$client_check_res || mysqli_num_rows($client_check_res) === 0) {
+        echo json_encode(array('success' => false, 'message' => 'العميل غير موجود أو خارج نطاق الشركة'));
+        exit();
+    }
+
+    if ($project_client_link_column === '') {
+        echo json_encode(array('success' => true, 'projects' => array()));
+        exit();
+    }
+
+    $operations_company_filter = $operations_has_company_id ? " AND o.company_id = $company_id" : '';
+    $equipment_drivers_company_filter = $equipment_drivers_has_company_id ? " AND ed.company_id = $company_id" : '';
+    $mines_company_filter = $mines_has_company_id ? " AND m.company_id = $company_id" : '';
+    $mines_not_deleted_sql = clients_not_deleted_sql('m', $mines_has_is_deleted, $mines_has_deleted_at);
+
+    $projects_query = "
+        SELECT
+            p.id,
+            p.name,
+            p.project_code,
+            p.status,
+            (
+                SELECT COUNT(*)
+                FROM mines m
+                WHERE m.project_id = p.id
+                  AND m.status = 1
+                  AND $mines_not_deleted_sql
+                  $mines_company_filter
+            ) AS mines_count,
+            (
+                SELECT COUNT(DISTINCT CASE
+                    WHEN o.supplier_id IS NOT NULL AND o.supplier_id <> '' AND o.supplier_id <> '0' THEN o.supplier_id
+                    ELSE NULL
+                END)
+                FROM operations o
+                WHERE o.project_id = p.id
+                  $operations_company_filter
+            ) AS suppliers_count,
+            (
+                SELECT COUNT(DISTINCT o.equipment)
+                FROM operations o
+                WHERE o.project_id = p.id
+                  AND o.equipment IS NOT NULL
+                  AND o.equipment <> ''
+                  AND o.equipment <> '0'
+                  $operations_company_filter
+            ) AS equipments_total,
+            (
+                SELECT COUNT(DISTINCT o.equipment)
+                FROM operations o
+                WHERE o.project_id = p.id
+                  AND o.status = 1
+                  AND o.equipment IS NOT NULL
+                  AND o.equipment <> ''
+                  AND o.equipment <> '0'
+                  $operations_company_filter
+            ) AS equipments_working,
+            (
+                SELECT COUNT(DISTINCT ed.driver_id)
+                FROM operations o
+                JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
+                WHERE o.project_id = p.id
+                  AND ed.driver_id IS NOT NULL
+                  $operations_company_filter
+                  $equipment_drivers_company_filter
+            ) AS operators_total,
+            (
+                SELECT COUNT(DISTINCT ed.driver_id)
+                FROM operations o
+                JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
+                WHERE o.project_id = p.id
+                  AND ed.status = 1
+                  AND ed.driver_id IS NOT NULL
+                  $operations_company_filter
+                  $equipment_drivers_company_filter
+            ) AS operators_working
+        FROM project p
+        WHERE p.$project_client_link_column = $client_id
+          AND $scope_project_sql
+          AND $not_deleted_project_sql
+        ORDER BY p.id DESC
+    ";
+
+    $projects_result = mysqli_query($conn, $projects_query);
+    if (!$projects_result) {
+        echo json_encode(array('success' => false, 'message' => 'تعذر تحميل بيانات المشاريع'));
+        exit();
+    }
+
+    $projects = array();
+    while ($project_row = mysqli_fetch_assoc($projects_result)) {
+        $equipments_total   = intval($project_row['equipments_total']);
+        $equipments_working = intval($project_row['equipments_working']);
+        $operators_total    = intval($project_row['operators_total']);
+        $operators_working  = intval($project_row['operators_working']);
+
+        $project_row['equipments_total']   = $equipments_total;
+        $project_row['equipments_working'] = $equipments_working;
+        $project_row['equipments_stopped'] = max(0, $equipments_total - $equipments_working);
+        $project_row['operators_total']    = $operators_total;
+        $project_row['operators_working']  = $operators_working;
+        $project_row['operators_stopped']  = max(0, $operators_total - $operators_working);
+        $project_row['mines_count']        = intval($project_row['mines_count']);
+        $project_row['suppliers_count']    = intval($project_row['suppliers_count']);
+
+        $projects[] = $project_row;
+    }
+
+    echo json_encode(array('success' => true, 'projects' => $projects));
+    exit();
+}
+
 $page_title = "قائمة العملاء";
 include("../inheader.php");
 include('../insidebar.php');
@@ -381,6 +537,35 @@ include('../insidebar.php');
 <!-- Font Awesome من CDN لضمان ظهور الأيقونات بشكل صحيح -->
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+
+<style>
+    .link-alert-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-right: 6px;
+        padding: 2px 9px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #fff7d6, #ffe8bf);
+        color: #7c2d12;
+        border: 1px solid rgba(217, 119, 6, 0.28);
+        font-size: .72rem;
+        font-weight: 800;
+        box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
+        animation: linkAlertPulse 1.6s ease-in-out infinite;
+        vertical-align: middle;
+    }
+
+    .link-alert-chip i {
+        color: #b45309;
+        font-size: .75rem;
+    }
+
+    @keyframes linkAlertPulse {
+        0%, 100% { transform: translateY(0); box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18); }
+        50% { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28); }
+    }
+</style>
 
 <div class="main">
     <div class="page-header">
@@ -506,6 +691,20 @@ include('../insidebar.php');
             <h5><i class="fas fa-list"></i> جميع العملاء</h5>
         </div>
         <div class="card-body">
+            <div class="row" style="margin-bottom: 16px;">
+                <div class="col-md-4 col-sm-6" style="margin-bottom:10px;">
+                    <label for="filterEntityType" style="font-weight:600;">فلتر نوع الكيان</label>
+                    <select id="filterEntityType" class="form-control">
+                        <option value="">الكل</option>
+                    </select>
+                </div>
+                <div class="col-md-4 col-sm-6" style="margin-bottom:10px;">
+                    <label for="filterSectorCategory" style="font-weight:600;">فلتر تصنيف القطاع</label>
+                    <select id="filterSectorCategory" class="form-control">
+                        <option value="">الكل</option>
+                    </select>
+                </div>
+            </div>
             <div class="table-container">
                 <table id="clientsTable" class="display">
                     <thead>
@@ -514,6 +713,7 @@ include('../insidebar.php');
                             <th><i class="fas fa-user"></i> اسم العميل</th>
                             <th><i class="fas fa-building"></i> نوع الكيان</th>
                             <th><i class="fas fa-industry"></i> تصنيف القطاع</th>
+                            <th><i class="fas fa-project-diagram"></i> عدد المشاريع</th>
                             <th><i class="fas fa-phone"></i> الهاتف</th>
                             <th><i class="fas fa-toggle-on"></i> الحالة</th>
                             <th><i class="fas fa-cogs"></i> إجراءات</th>
@@ -521,7 +721,7 @@ include('../insidebar.php');
                     </thead>
                     <tbody>
                         <?php
-                        $query  = "SELECT cc.*, u.name as creator_name 
+                        $query  = "SELECT cc.*, u.name as creator_name, $projects_count_select_sql AS projects_count
                                   FROM clients cc 
                                   LEFT JOIN users u ON cc.created_by = u.id 
                                   WHERE $scope_clients_sql AND $not_deleted_cc_sql
@@ -529,11 +729,17 @@ include('../insidebar.php');
                         $result = mysqli_query($conn, $query);
 
                         while ($row = mysqli_fetch_assoc($result)) {
+                            $client_name_cell = "<a class='client-name-link' href='../Projects/projects.php?client_id=" . urlencode($row['id']) . "'>" . clients_e($row['client_name']) . "</a>";
+                            if (intval($row['projects_count']) === 0) {
+                                $client_name_cell .= " <span class='link-alert-chip' title='العميل ليس مشترك في مشروع'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
+                            }
+
                             echo "<tr>";
                             echo "<td><strong style='font-family:monospace;letter-spacing:.03em'>" . clients_e($row['client_code']) . "</strong></td>";
-                            echo "<td><a class='client-name-link' href='../Projects/projects.php?client_id=" . urlencode($row['id']) . "'>" . clients_e($row['client_name']) . "</a></td>";
+                            echo "<td>" . $client_name_cell . "</td>";
                             echo "<td>" . clients_e($row['entity_type']) . "</td>";
                             echo "<td>" . clients_e($row['sector_category']) . "</td>";
+                            echo "<td><span class='status-active' style='display:inline-flex;align-items:center;gap:5px'><i class='fas fa-briefcase'></i> " . intval($row['projects_count']) . "</span></td>";
                             echo "<td>" . clients_e($row['phone']) . "</td>";
 
                             // عرض الحالة بألوان
@@ -557,6 +763,7 @@ include('../insidebar.php');
                                        data-email='"    . clients_e($row['email'])                                         . "'
                                        data-whatsapp='" . clients_e($row['whatsapp'])                                      . "'
                                        data-status='"   . clients_e($row['status'])                                        . "'
+                                       data-projects-count='" . intval($row['projects_count'])                              . "'
                                        data-created='"  . clients_e(isset($row['creator_name']) ? $row['creator_name'] : 'غير محدد') . "'
                                        title='عرض التفاصيل'>
                                         <i class='fas fa-eye'></i>
@@ -677,6 +884,10 @@ include('../insidebar.php');
                     <div class="view-item-value" id="view_sector_category">-</div>
                 </div>
                 <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-project-diagram"></i> عدد المشاريع المرتبطة</div>
+                    <div class="view-item-value" id="view_projects_count">0</div>
+                </div>
+                <div class="view-item">
                     <div class="view-item-label"><i class="fas fa-phone"></i> الهاتف</div>
                     <div class="view-item-value" id="view_phone">-</div>
                 </div>
@@ -696,6 +907,44 @@ include('../insidebar.php');
                     <div class="view-item-label"><i class="fas fa-user-plus"></i> أضيف بواسطة</div>
                     <div class="view-item-value" id="view_created_by">-</div>
                 </div>
+            </div>
+
+            <hr style="margin:20px 0;" />
+            <h6 style="font-weight:700;margin-bottom:12px;"><i class="fas fa-folder-open"></i> المشاريع المرتبطة بالعميل</h6>
+
+            <div id="clientProjectsSummary" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+                <span class="status-active" style="padding:6px 10px;">المشاريع: <strong id="summary_projects_count">0</strong></span>
+                <span class="status-active" style="padding:6px 10px;">المناجم: <strong id="summary_mines_count">0</strong></span>
+                <span class="status-active" style="padding:6px 10px;">الموردون: <strong id="summary_suppliers_count">0</strong></span>
+                <span class="status-active" style="padding:6px 10px;">الآليات: <strong id="summary_equipments_count">0</strong></span>
+                <span class="status-active" style="padding:6px 10px;">المشغلون: <strong id="summary_operators_count">0</strong></span>
+            </div>
+
+            <div id="clientProjectsLoading" style="display:none;color:#2563eb;font-weight:600;margin-bottom:8px;">
+                <i class="fas fa-spinner fa-spin"></i> جاري تحميل بيانات المشاريع...
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm" style="margin-bottom:0;">
+                    <thead>
+                        <tr>
+                            <th>المشروع</th>
+                            <th>المناجم</th>
+                            <th>الموردون</th>
+                            <th>الآليات</th>
+                            <th>الآليات العاملة</th>
+                            <th>الآليات المتوقفة</th>
+                            <th>المشغلون</th>
+                            <th>المشغلون النشطون</th>
+                            <th>المشغلون المتوقفون</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientProjectsTableBody">
+                        <tr>
+                            <td colspan="9" style="text-align:center;color:#6b7280;">لا توجد بيانات بعد</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="modal-footer">
@@ -724,10 +973,45 @@ include('../insidebar.php');
 <script>
     $(document).ready(function () {
         // تهيئة جدول العملاء بالعربية
-        $('#clientsTable').DataTable({
+        const clientsTable = $('#clientsTable').DataTable({
             language: {
                 url: '/ems/assets/i18n/datatables/ar.json'
             }
+        });
+
+        function fillFilterOptions(columnIndex, selectId) {
+            const select = $(selectId);
+            const currentValue = select.val();
+            const values = [];
+
+            clientsTable.column(columnIndex).data().each(function (value) {
+                const text = $('<div>').html(value).text().trim();
+                if (text !== '' && values.indexOf(text) === -1) {
+                    values.push(text);
+                }
+            });
+
+            values.sort();
+            values.forEach(function (val) {
+                select.append('<option value="' + val.replace(/"/g, '&quot;') + '">' + val + '</option>');
+            });
+
+            if (currentValue) {
+                select.val(currentValue);
+            }
+        }
+
+        fillFilterOptions(2, '#filterEntityType');
+        fillFilterOptions(3, '#filterSectorCategory');
+
+        $('#filterEntityType').on('change', function () {
+            const value = $.fn.dataTable.util.escapeRegex($(this).val());
+            clientsTable.column(2).search(value ? '^' + value + '$' : '', true, false).draw();
+        });
+
+        $('#filterSectorCategory').on('change', function () {
+            const value = $.fn.dataTable.util.escapeRegex($(this).val());
+            clientsTable.column(3).search(value ? '^' + value + '$' : '', true, false).draw();
         });
     });
 
@@ -791,6 +1075,7 @@ include('../insidebar.php');
             email:    $(this).data('email'),
             whatsapp: $(this).data('whatsapp'),
             status:   $(this).data('status'),
+            projectsCount: $(this).data('projects-count'),
             created:  $(this).data('created')
         };
 
@@ -802,6 +1087,7 @@ include('../insidebar.php');
         $('#view_phone').text(clientData.phone         || '-');
         $('#view_email').text(clientData.email         || '-');
         $('#view_whatsapp').text(clientData.whatsapp   || '-');
+        $('#view_projects_count').text(clientData.projectsCount || 0);
 
         // عرض الحالة بألوان
         let statusHtml = '';
@@ -825,8 +1111,90 @@ include('../insidebar.php');
         editBtn.data('whatsapp', clientData.whatsapp);
         editBtn.data('status',   clientData.status);
 
+        loadClientProjectsStats(clientData.id);
+
         $('#viewClientModal').fadeIn(300);
     });
+
+    function setProjectsSummary(projects) {
+        let mines = 0;
+        let suppliers = 0;
+        let equipments = 0;
+        let operators = 0;
+
+        projects.forEach(function (project) {
+            mines += parseInt(project.mines_count || 0, 10);
+            suppliers += parseInt(project.suppliers_count || 0, 10);
+            equipments += parseInt(project.equipments_total || 0, 10);
+            operators += parseInt(project.operators_total || 0, 10);
+        });
+
+        $('#summary_projects_count').text(projects.length);
+        $('#summary_mines_count').text(mines);
+        $('#summary_suppliers_count').text(suppliers);
+        $('#summary_equipments_count').text(equipments);
+        $('#summary_operators_count').text(operators);
+    }
+
+    function renderClientProjects(projects) {
+        const tbody = $('#clientProjectsTableBody');
+        tbody.empty();
+
+        if (!projects.length) {
+            tbody.append('<tr><td colspan="9" style="text-align:center;color:#6b7280;">لا توجد مشاريع مرتبطة بهذا العميل</td></tr>');
+            setProjectsSummary([]);
+            return;
+        }
+
+        projects.forEach(function (project) {
+            const projectLabel = (project.name || '-') + (project.project_code ? ' (' + project.project_code + ')' : '');
+            const rowHtml = '<tr>' +
+                '<td>' + projectLabel + '</td>' +
+                '<td>' + (project.mines_count || 0) + '</td>' +
+                '<td>' + (project.suppliers_count || 0) + '</td>' +
+                '<td>' + (project.equipments_total || 0) + '</td>' +
+                '<td style="color:#065f46;font-weight:700;">' + (project.equipments_working || 0) + '</td>' +
+                '<td style="color:#b91c1c;font-weight:700;">' + (project.equipments_stopped || 0) + '</td>' +
+                '<td>' + (project.operators_total || 0) + '</td>' +
+                '<td style="color:#065f46;font-weight:700;">' + (project.operators_working || 0) + '</td>' +
+                '<td style="color:#b91c1c;font-weight:700;">' + (project.operators_stopped || 0) + '</td>' +
+            '</tr>';
+
+            tbody.append(rowHtml);
+        });
+
+        setProjectsSummary(projects);
+    }
+
+    function loadClientProjectsStats(clientId) {
+        $('#clientProjectsLoading').show();
+        $('#clientProjectsTableBody').html('<tr><td colspan="9" style="text-align:center;color:#6b7280;">جاري التحميل...</td></tr>');
+
+        $.ajax({
+            url: 'clients.php',
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                ajax: 'client_projects',
+                client_id: clientId
+            },
+            success: function (response) {
+                $('#clientProjectsLoading').hide();
+                if (!response || !response.success) {
+                    $('#clientProjectsTableBody').html('<tr><td colspan="9" style="text-align:center;color:#b91c1c;">تعذر تحميل بيانات المشاريع</td></tr>');
+                    setProjectsSummary([]);
+                    return;
+                }
+
+                renderClientProjects(response.projects || []);
+            },
+            error: function () {
+                $('#clientProjectsLoading').hide();
+                $('#clientProjectsTableBody').html('<tr><td colspan="9" style="text-align:center;color:#b91c1c;">حدث خطأ أثناء تحميل بيانات المشاريع</td></tr>');
+                setProjectsSummary([]);
+            }
+        });
+    }
 
     // إغلاق مودال العرض
     function closeViewModal() {

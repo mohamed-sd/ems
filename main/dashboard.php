@@ -113,6 +113,18 @@ foreach ($dynamicLinks as $link) {
 
 /* Stat cards - [icon, raw_value, label, accent] */
 $stats = [];
+$role6SupplierBreakdown = array();
+$role6ContextText = '';
+
+$operationsHasMineId = dashboard_has_column($conn, 'operations', 'mine_id');
+$operationsHasSupplierId = dashboard_has_column($conn, 'operations', 'supplier_id');
+$equipmentsHasAvailability = dashboard_has_column($conn, 'equipments', 'availability_status');
+$driversHasDriverStatus = dashboard_has_column($conn, 'drivers', 'driver_status');
+$supplierscontractsHasMineId = dashboard_has_column($conn, 'supplierscontracts', 'mine_id');
+$supplierscontractsHasProjectContractId = dashboard_has_column($conn, 'supplierscontracts', 'project_contract_id');
+
+$sessionMineId = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0;
+$sessionContractId = isset($_SESSION['user']['contract_id']) ? intval($_SESSION['user']['contract_id']) : 0;
 
 $scopeClients = $companyId > 0
   ? "EXISTS (SELECT 1 FROM users su WHERE su.id = clients.created_by AND su.company_id = $companyId)"
@@ -170,6 +182,145 @@ if ($role=="0"||$role=="1") {
   $h=dashboard_scalar($conn, "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN operations o ON t.operator=o.id WHERE $scopeOperationsByProject", 't');
   $ah=dashboard_scalar($conn, "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN operations o ON t.operator=o.id WHERE t.status='1' AND $scopeOperationsByProject", 't');
   $stats=[['fa-users-cog',$sv,'المشرفين','gold'],['fa-clock',(int)$h,'ساعات العمل','blue'],['fa-check-circle',(int)$ah,'الساعات المعتمدة','teal']];
+} elseif ($role=="6") {
+  $projectScopeSql = $projectId > 0 ? "o.project_id = '$projectId'" : "1=0";
+  $mineScopeSql = ($sessionMineId > 0 && $operationsHasMineId) ? " AND o.mine_id = '$sessionMineId'" : '';
+
+  $role6ContextText = $projectId > 0
+    ? 'النطاق: المشروع الحالي' . ($sessionMineId > 0 ? ' + المنجم المحدد' : '')
+    : 'لا يوجد مشروع محدد في الجلسة';
+
+  $availabilityStoppedList = "'معطلة','تحت الصيانة','في الصيانة','موقوفة للصيانة','متوقفة','موقوفة'";
+  $workingAvailabilityCondition = $equipmentsHasAvailability
+    ? " AND (e.availability_status IS NULL OR e.availability_status NOT IN ($availabilityStoppedList))"
+    : '';
+
+  $totalEquipments = dashboard_scalar(
+    $conn,
+    "SELECT COUNT(DISTINCT o.equipment) AS t
+     FROM operations o
+     WHERE $projectScopeSql
+       $mineScopeSql
+       AND o.equipment IS NOT NULL
+       AND o.equipment <> ''
+       AND o.equipment <> '0'",
+    't'
+  );
+
+  $workingEquipments = dashboard_scalar(
+    $conn,
+    "SELECT COUNT(DISTINCT o.equipment) AS t
+     FROM operations o
+     LEFT JOIN equipments e ON e.id = o.equipment
+     WHERE $projectScopeSql
+       $mineScopeSql
+       AND o.status = '1'
+       AND (e.status = '1' OR e.status IS NULL)
+       $workingAvailabilityCondition
+       AND o.equipment IS NOT NULL
+       AND o.equipment <> ''
+       AND o.equipment <> '0'",
+    't'
+  );
+
+  $stoppedEquipments = max(0, intval($totalEquipments) - intval($workingEquipments));
+
+  $driverWorkingStatusCondition = $driversHasDriverStatus
+    ? " AND (d.driver_status IS NULL OR d.driver_status NOT IN ('موقوف','متوقف'))"
+    : '';
+
+  $totalOperators = dashboard_scalar(
+    $conn,
+    "SELECT COUNT(DISTINCT ed.driver_id) AS t
+     FROM operations o
+     JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
+     JOIN drivers d ON d.id = ed.driver_id
+     WHERE $projectScopeSql
+       $mineScopeSql",
+    't'
+  );
+
+  $workingOperators = dashboard_scalar(
+    $conn,
+    "SELECT COUNT(DISTINCT ed.driver_id) AS t
+     FROM operations o
+     JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
+     JOIN drivers d ON d.id = ed.driver_id
+     WHERE $projectScopeSql
+       $mineScopeSql
+       AND ed.status = '1'
+       AND d.status = '1'
+       $driverWorkingStatusCondition",
+    't'
+  );
+
+  $stoppedOperators = max(0, intval($totalOperators) - intval($workingOperators));
+
+  $supplierContractMineScope = ($sessionMineId > 0 && $supplierscontractsHasMineId)
+    ? " AND sc.mine_id = $sessionMineId"
+    : '';
+  $supplierContractIdScope = ($sessionContractId > 0 && $supplierscontractsHasProjectContractId)
+    ? " AND sc.project_contract_id = $sessionContractId"
+    : '';
+
+  $suppliersOnContract = dashboard_scalar(
+    $conn,
+    "SELECT COUNT(DISTINCT sc.supplier_id) AS t
+     FROM supplierscontracts sc
+     WHERE sc.status = '1'
+       AND sc.project_id = $projectId
+       $supplierContractMineScope
+       $supplierContractIdScope",
+    't'
+  );
+
+  if ($projectId > 0 && $operationsHasSupplierId) {
+    $supplierScopeSubquery = "
+      SELECT DISTINCT sc.supplier_id
+      FROM supplierscontracts sc
+      WHERE sc.status = '1'
+        AND sc.project_id = $projectId
+        $supplierContractMineScope
+        $supplierContractIdScope
+    ";
+
+    $supplierBreakdownSql = "
+      SELECT
+        o.supplier_id,
+        COALESCE(s.name, CONCAT('مورد #', o.supplier_id)) AS supplier_name,
+        COUNT(DISTINCT o.equipment) AS equipments_count
+      FROM operations o
+      LEFT JOIN suppliers s ON s.id = o.supplier_id
+      WHERE $projectScopeSql
+        $mineScopeSql
+        AND o.supplier_id IS NOT NULL
+        AND o.supplier_id <> ''
+        AND o.supplier_id <> '0'
+        AND o.supplier_id IN ($supplierScopeSubquery)
+      GROUP BY o.supplier_id, supplier_name
+      ORDER BY equipments_count DESC, supplier_name ASC
+    ";
+
+    $supplierBreakdownRes = $conn->query($supplierBreakdownSql);
+    if ($supplierBreakdownRes) {
+      while ($supplierRow = $supplierBreakdownRes->fetch_assoc()) {
+        $role6SupplierBreakdown[] = array(
+          'supplier_name' => $supplierRow['supplier_name'],
+          'equipments_count' => intval($supplierRow['equipments_count'])
+        );
+      }
+    }
+  }
+
+  $stats = [
+    ['fa-tools', intval($totalEquipments), 'إجمالي الآليات بالمشروع', 'gold'],
+    ['fa-play-circle', intval($workingEquipments), 'آليات تعمل الآن', 'blue'],
+    ['fa-wrench', intval($stoppedEquipments), 'آليات لا تعمل/صيانة', 'orange'],
+    ['fa-id-badge', intval($totalOperators), 'إجمالي المشغلين (المشروع/المنجم)', 'teal'],
+    ['fa-user-check', intval($workingOperators), 'مشغلون يعملون الآن', 'blue'],
+    ['fa-user-times', intval($stoppedOperators), 'مشغلون متوقفون', 'orange'],
+    ['fa-truck', intval($suppliersOnContract), 'موردون تابعون للعقد', 'purple']
+  ];
 } elseif ($role=="10") {
   $eq=dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e JOIN operations o ON o.equipment=e.id WHERE e.status='1' AND $scopeOperationsByProject", 't');
   $dr=dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM drivers d JOIN equipment_drivers ed ON ed.driver_id=d.id JOIN operations o ON o.equipment=ed.equipment_id WHERE d.status='1' AND $scopeOperationsByProject", 't');
@@ -384,6 +535,70 @@ a{text-decoration:none;color:inherit}
 .stats-wrap{
   display:flex;flex-direction:column;gap:6px;
   min-height:0; /* let it shrink */
+}
+
+.stats-context-note{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  width:fit-content;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid rgba(37,99,235,.2);
+  background:rgba(37,99,235,.08);
+  color:#1d4ed8;
+  font-size:.78rem;
+  font-weight:700;
+}
+
+.supplier-breakdown-card{
+  background:var(--card);
+  border:1px solid var(--bdr);
+  border-radius:var(--r);
+  box-shadow:var(--s1);
+  overflow:hidden;
+}
+
+.supplier-breakdown-head{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  font-size:.88rem;
+  font-weight:800;
+  color:var(--txt);
+  background:linear-gradient(90deg, rgba(124,58,237,.1), rgba(37,99,235,.08));
+  border-bottom:1px solid var(--bdr);
+}
+
+.supplier-breakdown-head i{color:var(--purple)}
+
+.supplier-breakdown-table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.supplier-breakdown-table th,
+.supplier-breakdown-table td{
+  padding:9px 12px;
+  text-align:right;
+  border-bottom:1px solid rgba(12,28,62,.07);
+  font-size:.82rem;
+}
+
+.supplier-breakdown-table th{
+  color:var(--sub);
+  font-weight:800;
+  background:#f8fafc;
+}
+
+.supplier-breakdown-table tbody tr:hover{background:#f8fafc}
+
+.supplier-breakdown-empty{
+  padding:12px;
+  color:var(--sub);
+  font-weight:700;
+  font-size:.82rem;
 }
 
 .stats-label{
@@ -603,6 +818,9 @@ a{text-decoration:none;color:inherit}
   <!-- STATS -->
   <div class="stats-wrap">
     <div class="stats-label"><i class="fas fa-chart-bar"></i>الإحصائيات الحالية</div>
+    <?php if ($role == "6" && $role6ContextText !== ''): ?>
+      <div class="stats-context-note"><i class="fas fa-map-marker-alt"></i><?= htmlspecialchars($role6ContextText) ?></div>
+    <?php endif; ?>
     <div class="cards-grid">
       <?php foreach ($stats as $st):
         $ico = isset($st[0]) ? $st[0] : 'fa-chart-bar';
@@ -625,6 +843,32 @@ a{text-decoration:none;color:inherit}
       </div>
       <?php endforeach; ?>
     </div>
+
+    <?php if ($role == "6"): ?>
+      <div class="supplier-breakdown-card">
+        <div class="supplier-breakdown-head"><i class="fas fa-truck-loading"></i>الموردون التابعون للعقد داخل المشروع وعدد الآليات لكل مورد</div>
+        <?php if (!empty($role6SupplierBreakdown)): ?>
+          <table class="supplier-breakdown-table">
+            <thead>
+              <tr>
+                <th>المورد</th>
+                <th>عدد الآليات المقدمة للمشروع</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($role6SupplierBreakdown as $supplierRow): ?>
+                <tr>
+                  <td><?= htmlspecialchars($supplierRow['supplier_name']) ?></td>
+                  <td><?= number_format(intval($supplierRow['equipments_count'])) ?></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        <?php else: ?>
+          <div class="supplier-breakdown-empty">لا توجد بيانات مورّدين مرتبطة بالعقد ضمن نطاق المشروع/المنجم المحدد.</div>
+        <?php endif; ?>
+      </div>
+    <?php endif; ?>
   </div>
 
 </div><!-- .main -->

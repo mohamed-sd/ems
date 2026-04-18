@@ -871,3 +871,31 @@ Stack trace:
 [18-Apr-2026 01:55:50 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
 [18-Apr-2026 01:55:57 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
 [18-Apr-2026 01:55:57 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[18-Apr-2026 12:01:35 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/1045): Access denied for user 'u359449619_ems'@'156.193.245.166' (using password: YES) in C:\xampp\htdocs\ems\config.php on line 124
+[18-Apr-2026 12:01:35 Europe/Berlin] Database Connection Failed: Access denied for user 'u359449619_ems'@'156.193.245.166' (using password: YES)
+[18-Apr-2026 12:02:20 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[18-Apr-2026 12:02:21 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[18-Apr-2026 12:04:25 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 12:04:25 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 12:30:02 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 12:30:02 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 14:31:30 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 14:31:30 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 14:33:30 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 14:33:30 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 14:33:33 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 14:33:33 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 14:33:33 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 14:33:33 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[18-Apr-2026 16:02:12 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xamppp\htdocs\ems\Projects\projects_details.php on line 34
+[18-Apr-2026 16:02:12 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xamppp\htdocs\ems\Projects\projects_details.php on line 38
+[18-Apr-2026 16:02:12 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xamppp\htdocs\ems\config.php:163) in C:\xamppp\htdocs\ems\config.php on line 173
+[18-Apr-2026 16:16:40 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppp\htdocs\ems\Suppliers\suppliers.php on line 796
+[18-Apr-2026 16:28:51 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppp\htdocs\ems\Suppliers\suppliers.php on line 823
+[18-Apr-2026 16:29:26 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppp\htdocs\ems\Suppliers\suppliers.php on line 823
+[18-Apr-2026 16:29:30 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppp\htdocs\ems\Suppliers\suppliers.php on line 823
+[18-Apr-2026 16:29:45 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppp\htdocs\ems\Suppliers\suppliers.php on line 823
+[18-Apr-2026 16:29:48 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppp\htdocs\ems\Suppliers\suppliers.php on line 823
+[18-Apr-2026 16:29:51 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppp\htdocs\ems\Suppliers\suppliers.php on line 823
+[18-Apr-2026 16:30:36 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppp\htdocs\ems\Suppliers\suppliers.php on line 823
+[18-Apr-2026 16:30:38 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppp\htdocs\ems\Suppliers\suppliers.php on line 823

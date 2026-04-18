@@ -313,6 +313,33 @@ include("../inheader.php");
     cursor: pointer;
     accent-color: var(--gold);
 }
+
+.link-alert-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 6px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #fff7d6, #ffe8bf);
+    color: #7c2d12;
+    border: 1px solid rgba(217, 119, 6, 0.28);
+    font-size: .72rem;
+    font-weight: 800;
+    box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
+    animation: linkAlertPulse 1.6s ease-in-out infinite;
+    vertical-align: middle;
+}
+
+.link-alert-chip i {
+    color: #b45309;
+    font-size: .75rem;
+}
+
+@keyframes linkAlertPulse {
+    0%, 100% { transform: translateY(0); box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18); }
+    50% { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28); }
+}
 </style>
 
 <?php 
@@ -882,11 +909,15 @@ include('../insidebar.php');
                     
                     while ($row = mysqli_fetch_assoc($result)) {
                         $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">ðŸŸ¢ مفعّل</span>' : '<span class="status-pill status-inactive">ðŸ”´ موقف</span>';
+                        $driver_name_cell = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
+                        if (intval($row['numcontracts']) === 0) {
+                            $driver_name_cell .= " <span class='link-alert-chip' title='المشغل ليس لديه عقد'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
+                        }
                         
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
                         echo "<td><code>" . htmlspecialchars($row['driver_code'] ?: 'N/A') . "</code></td>";
-                        echo "<td><strong>" . htmlspecialchars($row['name']) . "</strong></td>";
+                        echo "<td>" . $driver_name_cell . "</td>";
                         echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['supplier_name'] ?: '-') . "</td>";
                         echo "<td>" . htmlspecialchars($row['skill_level'] ?: 'غير محدد') . "</td>";

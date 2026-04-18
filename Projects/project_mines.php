@@ -523,6 +523,33 @@ include '../inheader.php';
         border-radius: 10px;
         gap: 6px;
     }
+
+    .link-alert-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-right: 6px;
+        padding: 2px 9px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #fff7d6, #ffe8bf);
+        color: #7c2d12;
+        border: 1px solid rgba(217, 119, 6, 0.28);
+        font-size: .72rem;
+        font-weight: 800;
+        box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
+        animation: linkAlertPulse 1.6s ease-in-out infinite;
+        vertical-align: middle;
+    }
+
+    .link-alert-chip i {
+        color: #b45309;
+        font-size: .75rem;
+    }
+
+    @keyframes linkAlertPulse {
+        0%, 100% { transform: translateY(0); box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18); }
+        50% { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28); }
+    }
 </style>
 
 <div class="main">
@@ -703,16 +730,21 @@ include '../inheader.php';
                         number_format($mine['mining_depth'], 2) . ' م' :
                         '-';
 
+                    $contracts_count = isset($mine['contract_count']) ? intval($mine['contract_count']) : 0;
+                    $mine_name_cell = htmlspecialchars($mine['mine_name']);
+                    if ($contracts_count === 0) {
+                        $mine_name_cell .= " <span class='link-alert-chip' title='المنجم ليس مربوط بعقد محدد'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
+                    }
+
                     echo "<tr>";
                     echo "<td>{$counter}</td>";
                     echo "<td>{$mine['mine_code']}</td>";
-                    echo "<td>{$mine['mine_name']}</td>";
+                    echo "<td>{$mine_name_cell}</td>";
                     echo "<td>" . ($mine['manager_name'] ?: '-') . "</td>";
                     echo "<td>" . ($mine['mineral_type'] ?: '-') . "</td>";
                     echo "<td>{$mine['mine_type']}</td>";
                     echo "<td>{$area_display}</td>";
                     echo "<td>{$depth_display}</td>";
-                    $contracts_count = isset($mine['contract_count']) ? intval($mine['contract_count']) : 0;
                     echo "<td>{$contracts_count}</td>"; 
                     echo "<td> 
                      <a href='../Contracts/contracts.php?id=" . $mine['id'] . "' 

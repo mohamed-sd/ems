@@ -508,6 +508,33 @@ if (isset($_GET['delete_id'])) {
             .form-actions   { flex-direction: column; }
             .checkbox-grid  { grid-template-columns: 1fr; }
         }
+
+        .link-alert-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 6px;
+            padding: 2px 9px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #fff7d6, #ffe8bf);
+            color: #7c2d12;
+            border: 1px solid rgba(217, 119, 6, 0.28);
+            font-size: .72rem;
+            font-weight: 800;
+            box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
+            animation: linkAlertPulse 1.6s ease-in-out infinite;
+            vertical-align: middle;
+        }
+
+        .link-alert-chip i {
+            color: #b45309;
+            font-size: .75rem;
+        }
+
+        @keyframes linkAlertPulse {
+            0%, 100% { transform: translateY(0); box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18); }
+            50% { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28); }
+        }
     </style>
 </head>
 <body>
@@ -777,6 +804,11 @@ if (isset($_GET['delete_id'])) {
                         $i = 1;
 
                         while ($row = mysqli_fetch_assoc($result)) {
+                            $supplier_name_cell = "<span class='client-name-link'>" . htmlspecialchars($row['name']) . "</span>";
+                            if (intval($row['num_contracts']) === 0) {
+                                $supplier_name_cell .= " <span class='link-alert-chip' title='المورد ليس لديه عقد'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
+                            }
+
                             // إعداد data-attributes للتعديل والعرض
                             $data_attrs =
                                 "data-id='"                            . $row['id']                                                               . "' " .
@@ -800,7 +832,7 @@ if (isset($_GET['delete_id'])) {
                             
                             echo "<tr>";
                             echo "<td><strong>" . $i++ . "</strong></td>";
-                            echo "<td><span class='client-name-link'>" . htmlspecialchars($row['name']) . "</span></td>";
+                            echo "<td>" . $supplier_name_cell . "</td>";
                             echo "<td><span class='stat-cell'>" . $row['equipments']    . "</span></td>";
                             echo "<td><span class='stat-cell'>" . $row['num_contracts'] . "</span></td>";
                             echo "<td><span class='status-active'>" . number_format($row['total_hours']) . " ساعة</span></td>";
