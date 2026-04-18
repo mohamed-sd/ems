@@ -151,10 +151,19 @@ function get_assigned_modules($conn, $role_id) {
     $parent_roles = get_parent_roles($conn, $role_id);
     $parent_roles_list = implode(',', $parent_roles);
     
+    // التحقق من وجود عمود display_order
+    $has_display_order = false;
+    $check_column = $conn->query("SHOW COLUMNS FROM modules LIKE 'display_order'");
+    if ($check_column && $check_column->num_rows > 0) {
+        $has_display_order = true;
+    }
+    
+    $order_by = $has_display_order ? "m.display_order ASC, m.name ASC" : "m.name ASC";
+    
     $query = "SELECT DISTINCT m.id, m.name, m.code 
               FROM modules m
               WHERE m.owner_role_id IN ({$parent_roles_list})
-              ORDER BY m.name";
+              ORDER BY {$order_by}";
     
     $result = $conn->query($query);
     $modules = [];

@@ -27,6 +27,25 @@ function dynamicNavHasIconColumn($conn) {
 }
 
 /**
+ * التحقق من وجود عمود display_order في جدول modules.
+ *
+ * @param object $conn mysqli connection object
+ * @return bool
+ */
+function dynamicNavHasDisplayOrderColumn($conn) {
+    static $has_display_order_column = null;
+
+    if ($has_display_order_column !== null) {
+        return $has_display_order_column;
+    }
+
+    $result = mysqli_query($conn, "SHOW COLUMNS FROM modules LIKE 'display_order'");
+    $has_display_order_column = $result && mysqli_num_rows($result) > 0;
+
+    return $has_display_order_column;
+}
+
+/**
  * جلب روابط الصفحات بناءً على دور المستخدم الحالي (الأدوار النشطة فقط)
  * يتم عرض الصفحات التابعة للدور مباشرة أو الصفحات التابعة لأدوار فرعية
  * Get modules/pages based on current user role (active roles only)
@@ -45,6 +64,11 @@ function getDynamicNavLinks($conn, $roleId) {
     // التحقق من أن roleId صحيح
     $roleId = intval($roleId);
     
+    // تحديد الترتيب بناءً على وجود عمود display_order
+    $order_by = dynamicNavHasDisplayOrderColumn($conn)
+        ? "m.display_order ASC, m.name ASC"
+        : "m.id ASC";
+    
     // استعلام لجلب جميع الروابط للأدوار النشطة فقط
     // يعرض الصفحات التابعة للدور الحالي وأيضاً الصفحات التابعة للدور الأب إن وجد
     // Fetch pages assigned to current role AND pages assigned to parent role (if exists)
@@ -58,7 +82,7 @@ function getDynamicNavLinks($conn, $roleId) {
               )
               AND (mr.status = '1' OR mr.status = 1)
               AND is_link = '1'
-              ORDER BY m.id ASC";
+              ORDER BY $order_by";
     
     $result = mysqli_query($conn, $query);
     

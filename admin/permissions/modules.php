@@ -15,6 +15,7 @@ function moduleColumnExists($conn, $column_name) {
 }
 
 $module_has_icon_column = moduleColumnExists($conn, 'icon');
+$module_has_display_order_column = moduleColumnExists($conn, 'display_order');
 $default_module_icon = 'fa fa-link';
 $common_sidebar_icons = array(
     array('class' => 'fa fa-link', 'label' => 'رابط عام'),
@@ -58,6 +59,9 @@ if (isset($_GET['edit_id'])) {
     if ($module_has_icon_column) {
         $select_columns .= ", `icon`";
     }
+    if ($module_has_display_order_column) {
+        $select_columns .= ", `display_order`";
+    }
     $stmt = $conn->prepare("SELECT " . $select_columns . " FROM `modules` WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -73,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $code = trim($_POST['code'] ?? '');
     $owner_role_id = !empty($_POST['owner_role_id']) ? (int)$_POST['owner_role_id'] : null;
     $is_link = isset($_POST['is_link']) && $_POST['is_link'] == '1' ? 1 : 0;
+    $display_order = isset($_POST['display_order']) ? (int)$_POST['display_order'] : 0;
     $icon = trim($_POST['icon'] ?? $default_module_icon);
     $icon = preg_replace('/[^a-zA-Z0-9\-\s]/', '', $icon);
     $icon = trim(preg_replace('/\s+/', ' ', $icon));
@@ -87,11 +92,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($_POST['edit_id'])) {
             // تعديل
             $id = (int) $_POST['edit_id'];
-            if ($module_has_icon_column) {
+            if ($module_has_icon_column && $module_has_display_order_column) {
+                $stmt = $conn->prepare(
+                    "UPDATE `modules` SET `name` = ?, `code` = ?, `owner_role_id` = ?, `is_link` = ?, `icon` = ?, `display_order` = ? WHERE `id` = ?"
+                );
+                $stmt->bind_param("ssiisii", $name, $code, $owner_role_id, $is_link, $icon, $display_order, $id);
+            } elseif ($module_has_icon_column) {
                 $stmt = $conn->prepare(
                     "UPDATE `modules` SET `name` = ?, `code` = ?, `owner_role_id` = ?, `is_link` = ?, `icon` = ? WHERE `id` = ?"
                 );
                 $stmt->bind_param("ssiisi", $name, $code, $owner_role_id, $is_link, $icon, $id);
+            } elseif ($module_has_display_order_column) {
+                $stmt = $conn->prepare(
+                    "UPDATE `modules` SET `name` = ?, `code` = ?, `owner_role_id` = ?, `is_link` = ?, `display_order` = ? WHERE `id` = ?"
+                );
+                $stmt->bind_param("ssiii", $name, $code, $owner_role_id, $is_link, $display_order, $id);
             } else {
                 $stmt = $conn->prepare(
                     "UPDATE `modules` SET `name` = ?, `code` = ?, `owner_role_id` = ?, `is_link` = ? WHERE `id` = ?"
@@ -110,11 +125,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error_msg = 'هذه الصفحة مضافة مسبقاً لنفس الدور المسؤول ❌';
             } else {
                 // إضافة
-                if ($module_has_icon_column) {
+                if ($module_has_icon_column && $module_has_display_order_column) {
+                    $stmt = $conn->prepare(
+                        "INSERT INTO `modules` (`name`, `code`, `owner_role_id`, `is_link`, `icon`, `display_order`) VALUES (?, ?, ?, ?, ?, ?)"
+                    );
+                    $stmt->bind_param("ssiisi", $name, $code, $owner_role_id, $is_link, $icon, $display_order);
+                } elseif ($module_has_icon_column) {
                     $stmt = $conn->prepare(
                         "INSERT INTO `modules` (`name`, `code`, `owner_role_id`, `is_link`, `icon`) VALUES (?, ?, ?, ?, ?)"
                     );
                     $stmt->bind_param("ssiis", $name, $code, $owner_role_id, $is_link, $icon);
+                } elseif ($module_has_display_order_column) {
+                    $stmt = $conn->prepare(
+                        "INSERT INTO `modules` (`name`, `code`, `owner_role_id`, `is_link`, `display_order`) VALUES (?, ?, ?, ?, ?)"
+                    );
+                    $stmt->bind_param("ssiii", $name, $code, $owner_role_id, $is_link, $display_order);
                 } else {
                     $stmt = $conn->prepare(
                         "INSERT INTO `modules` (`name`, `code`, `owner_role_id`, `is_link`) VALUES (?, ?, ?, ?)"
@@ -306,6 +331,24 @@ require_once __DIR__ . '/../includes/layout_head.php';
 #moduleForm.show {
     display: block;
 }
+
+/* Icon Preview Styles */
+#icon_preview {
+    transition: all 0.3s ease;
+}
+
+#icon_preview:hover {
+    border-color: var(--blue);
+    background: #f0f4ff;
+}
+
+#icon_preview i {
+    transition: all 0.3s ease;
+}
+
+input[type="radio"] {
+    cursor: pointer;
+}
 </style>
 
 <div class="page-shell">
@@ -389,6 +432,67 @@ require_once __DIR__ . '/../includes/layout_head.php';
                         </label>
                     </div>
 
+                    <!-- الأيقونة -->
+                    <div>
+                        <label><i class="fas fa-icons"></i> الأيقونة</label>
+                        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; margin: 0;">
+                                <input type="radio" name="icon_type" value="list" id="icon_type_list" checked>
+                                <span>من القائمة</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; margin: 0;">
+                                <input type="radio" name="icon_type" value="custom" id="icon_type_custom">
+                                <span>إدخال يدوي</span>
+                            </label>
+                        </div>
+                        
+                        <!-- القائمة المنسدلة -->
+                        <select name="icon_select" id="icon_select" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Cairo', sans-serif;">
+                            <option value="">-- اختر الأيقونة --</option>
+                            <?php foreach ($common_sidebar_icons as $iconOption): ?>
+                                <option value="<?= htmlspecialchars($iconOption['class'], ENT_QUOTES, 'UTF-8'); ?>"
+                                    <?= (!empty($editData) && $editData['icon'] == $iconOption['class']) ? 'selected' : ''; ?>>
+                                    <?= htmlspecialchars($iconOption['label'], ENT_QUOTES, 'UTF-8'); ?> (<?= htmlspecialchars($iconOption['class'], ENT_QUOTES, 'UTF-8'); ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        
+                        <!-- حقل الإدخال اليدوي -->
+                        <input type="text" name="icon_custom" id="icon_custom" 
+                               placeholder="مثال: fas fa-star أو fa fa-chart-line" 
+                               style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Cairo', sans-serif; display: none;"
+                               value="<?= htmlspecialchars($editData['icon'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" />
+                        
+                        <!-- الحقل المخفي الذي يُرسل القيمة الفعلية -->
+                        <input type="hidden" name="icon" id="icon" value="<?= htmlspecialchars($editData['icon'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" />
+                        
+                        <!-- معاينة الأيقونة -->
+                        <div id="icon_preview" style="margin-top: 10px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center; border: 2px dashed #dee2e6;">
+                            <i class="<?= htmlspecialchars($editData['icon'] ?? 'fa fa-link', ENT_QUOTES, 'UTF-8'); ?>" 
+                               style="font-size: 2.5rem; color: var(--navy);"></i>
+                            <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
+                                <code id="icon_preview_text"><?= htmlspecialchars($editData['icon'] ?? 'fa fa-link', ENT_QUOTES, 'UTF-8'); ?></code>
+                            </div>
+                        </div>
+                        
+                        <small style="color: #666; display: block; margin-top: 8px;">
+                            <i class="fas fa-info-circle"></i> يمكنك استخدام أيقونات من 
+                            <a href="https://fontawesome.com/icons" target="_blank" style="color: var(--blue);">FontAwesome</a>
+                            (مثل: fas fa-star, far fa-bell, fab fa-github)
+                        </small>
+                    </div>
+
+                    <!-- الترتيب -->
+                    <div>
+                        <label><i class="fas fa-sort-numeric-down"></i> الترتيب</label>
+                        <input type="number" name="display_order" id="display_order" 
+                               placeholder="0" min="0" step="1"
+                               value="<?= htmlspecialchars($editData['display_order'] ?? '0', ENT_QUOTES, 'UTF-8'); ?>" />
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> الرقم الأصغر يظهر أولاً
+                        </small>
+                    </div>
+
                     <button type="submit" class="add-btn" style="grid-column: 1 / -1; justify-self: center;">
                         <i class="fas fa-save"></i> حفظ الصفحة
                     </button>
@@ -422,6 +526,8 @@ require_once __DIR__ . '/../includes/layout_head.php';
                     <thead>
                         <tr>
                             <th width="80"><i class="fas fa-barcode"></i> #</th>
+                            <th width="80"><i class="fas fa-sort-numeric-down"></i> الترتيب</th>
+                            <th width="80"><i class="fas fa-icons"></i> الأيقونة</th>
                             <th><i class="fas fa-book"></i> اسم الصفحة</th>
                             <th width="150"><i class="fas fa-code"></i> الكود</th>
                             <th><i class="fas fa-user-tie"></i> الدور المسؤول</th>
@@ -431,17 +537,21 @@ require_once __DIR__ . '/../includes/layout_head.php';
                     </thead>
                     <tbody>
                         <?php
+                        $order_by = $module_has_display_order_column ? "m.`display_order` ASC, m.`name` ASC" : "m.`name` ASC";
+                        $select_cols = "m.`id`, m.`name`, m.`code`, m.`owner_role_id`, m.`is_link`";
+                        if ($module_has_display_order_column) {
+                            $select_cols .= ", m.`display_order`";
+                        }
+                        if ($module_has_icon_column) {
+                            $select_cols .= ", m.`icon`";
+                        }
                         $result = $conn->query("
                             SELECT 
-                                m.`id`, 
-                                m.`name`, 
-                                m.`code`, 
-                                m.`owner_role_id`,
-                                m.`is_link`,
+                                " . $select_cols . ",
                                 r.`name` AS role_name
                             FROM `modules` m
                             LEFT JOIN `roles` r ON m.`owner_role_id` = r.`id`
-                            ORDER BY m.`name`
+                            ORDER BY " . $order_by . "
                         ");
                         
                         if ($result) {
@@ -450,6 +560,19 @@ require_once __DIR__ . '/../includes/layout_head.php';
                                 ?>
                                 <tr>
                                     <td><strong><?= $i++; ?></strong></td>
+                                    <td class="text-center">
+                                        <span style="display: inline-block; background: var(--blue-soft); color: var(--blue); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.9rem;">
+                                            <?= htmlspecialchars($row['display_order'] ?? '0', ENT_QUOTES, 'UTF-8'); ?>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <?php 
+                                        $icon_class = !empty($row['icon']) ? $row['icon'] : 'fa fa-link';
+                                        ?>
+                                        <i class="<?= htmlspecialchars($icon_class, ENT_QUOTES, 'UTF-8'); ?>" 
+                                           style="font-size: 1.5rem; color: var(--navy);" 
+                                           title="<?= htmlspecialchars($icon_class, ENT_QUOTES, 'UTF-8'); ?>"></i>
+                                    </td>
                                     <td><strong><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?></strong></td>
                                     <td>
                                         <code style="background: var(--gold-soft); color: var(--navy); padding: 4px 8px; border-radius: 6px; font-weight: 600;">
@@ -505,21 +628,22 @@ $(document).ready(function () {
         language: {
             url: "/ems/assets/i18n/datatables/ar.json"
         },
+        order: [[1, 'asc']], // الترتيب الافتراضي حسب عمود الترتيب
         columnDefs: [
-            { "orderable": false, "targets": [5] }
+            { "orderable": false, "targets": [7] } // منع ترتيب عمود الإجراءات
         ]
     });
 
     // فلترة حسب الدور المسؤول
     $('#roleFilterSelect').on('change', function () {
         var val = $.trim($(this).val());
-        modulesTable.column(3).search(val, false, false).draw();
+        modulesTable.column(5).search(val, false, false).draw(); // عمود الدور المسؤول الآن رقم 5
         $('#clearRoleFilter').toggle(val !== '');
     });
 
     $('#clearRoleFilter').on('click', function () {
         $('#roleFilterSelect').val('');
-        modulesTable.column(3).search('', false, false).draw();
+        modulesTable.column(5).search('', false, false).draw(); // عمود الدور المسؤول الآن رقم 5
         $(this).hide();
     });
 
@@ -529,6 +653,66 @@ $(document).ready(function () {
         $('html, body').animate({
             scrollTop: $('#moduleForm').offset().top - 100
         }, 500);
+    });
+
+    // التبديل بين القائمة المنسدلة والإدخال اليدوي للأيقونة
+    $('input[name="icon_type"]').on('change', function () {
+        var selectedType = $(this).val();
+        if (selectedType === 'list') {
+            $('#icon_select').show();
+            $('#icon_custom').hide();
+            // تحديث القيمة من القائمة
+            $('#icon').val($('#icon_select').val());
+            updateIconPreview($('#icon_select').val());
+        } else {
+            $('#icon_select').hide();
+            $('#icon_custom').show();
+            // تحديث القيمة من الحقل اليدوي
+            $('#icon').val($('#icon_custom').val());
+            updateIconPreview($('#icon_custom').val());
+        }
+    });
+
+    // معاينة الأيقونة من القائمة المنسدلة
+    $('#icon_select').on('change', function () {
+        var iconClass = $(this).val();
+        $('#icon').val(iconClass);
+        updateIconPreview(iconClass);
+    });
+
+    // معاينة الأيقونة من الحقل اليدوي
+    $('#icon_custom').on('input', function () {
+        var iconClass = $(this).val().trim();
+        $('#icon').val(iconClass);
+        updateIconPreview(iconClass);
+    });
+
+    // دالة لتحديث معاينة الأيقونة
+    function updateIconPreview(iconClass) {
+        if (!iconClass) {
+            iconClass = 'fa fa-link';
+        }
+        $('#icon_preview i').attr('class', iconClass);
+        $('#icon_preview_text').text(iconClass);
+    }
+
+    // تحديد النوع المناسب عند التحميل (للتعديل)
+    $(document).ready(function() {
+        var currentIcon = $('#icon').val();
+        if (currentIcon) {
+            // التحقق من وجود الأيقونة في القائمة
+            var existsInList = $('#icon_select option[value="' + currentIcon + '"]').length > 0;
+            if (existsInList) {
+                $('#icon_type_list').prop('checked', true);
+                $('#icon_select').val(currentIcon).show();
+                $('#icon_custom').hide();
+            } else {
+                $('#icon_type_custom').prop('checked', true);
+                $('#icon_select').hide();
+                $('#icon_custom').val(currentIcon).show();
+            }
+            updateIconPreview(currentIcon);
+        }
     });
 
     // إذا كان هناك edit_id في URL، أعرض النموذج
