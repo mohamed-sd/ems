@@ -33,14 +33,17 @@ if ($users_has_company_id && $current_company_id <= 0) {
 }
 
 $roles = array();
-$roles_query = "SELECT id, name FROM roles WHERE (parent_role_id IS NULL OR parent_role_id = 0) AND status = 1 ORDER BY level ASC, id ASC";
+$roles_scope = array();
+$roles_query = "SELECT id, name, role_scope FROM roles WHERE (parent_role_id IS NULL OR parent_role_id = 0) AND status = 1 ORDER BY level ASC, id ASC";
 $roles_result = mysqli_query($conn, $roles_query);
 if ($roles_result) {
     while ($role_row = mysqli_fetch_assoc($roles_result)) {
         $role_id = isset($role_row['id']) ? (string) $role_row['id'] : '';
         $role_name = isset($role_row['name']) ? trim($role_row['name']) : '';
+        $scope_value = isset($role_row['role_scope']) ? trim($role_row['role_scope']) : 'gloable';
         if ($role_id !== '' && $role_name !== '') {
             $roles[$role_id] = $role_name;
+            $roles_scope[$role_id] = ($scope_value === 'mine') ? 'mine' : 'gloable';
         }
     }
 }
@@ -53,6 +56,15 @@ if (empty($roles)) {
         "4" => "مدير الأسطول",
         "5" => "مدير موقع",
         "10" => "حركة وتشغيل"
+    );
+
+    $roles_scope = array(
+        "1" => "gloable",
+        "2" => "gloable",
+        "3" => "gloable",
+        "4" => "gloable",
+        "5" => "mine",
+        "10" => "mine"
     );
 }
 
@@ -85,12 +97,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $passwordRaw = isset($_POST['password']) ? trim($_POST['password']) : '';
     $phone = mysqli_real_escape_string($conn, $_POST['phone']);
     $role = mysqli_real_escape_string($conn, $_POST['role']);
-    $project = (($role == "5" || $role == "10") && !empty($_POST['project_id'])) ? intval($_POST['project_id']) : 0;
-    $mine = (($role == "5" || $role == "10") && !empty($_POST['mine_id'])) ? intval($_POST['mine_id']) : 0;
-    $contract = (($role == "5" || $role == "10") && !empty($_POST['contract_id'])) ? intval($_POST['contract_id']) : 0;
+    $selected_role_scope = 'gloable';
+    $role_lookup_sql = "SELECT role_scope FROM roles WHERE id='" . mysqli_real_escape_string($conn, $role) . "' LIMIT 1";
+    $role_lookup_result = mysqli_query($conn, $role_lookup_sql);
+    if ($role_lookup_result && mysqli_num_rows($role_lookup_result) > 0) {
+        $role_lookup_row = mysqli_fetch_assoc($role_lookup_result);
+        if (isset($role_lookup_row['role_scope']) && $role_lookup_row['role_scope'] === 'mine') {
+            $selected_role_scope = 'mine';
+        }
+    }
+
+    $requires_project_context = ($selected_role_scope === 'mine');
+    $project = ($requires_project_context && !empty($_POST['project_id'])) ? intval($_POST['project_id']) : 0;
+    $mine = ($requires_project_context && !empty($_POST['mine_id'])) ? intval($_POST['mine_id']) : 0;
+    $contract = ($requires_project_context && !empty($_POST['contract_id'])) ? intval($_POST['contract_id']) : 0;
     $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
 
-    if ($uid > 0) {
+    if ($requires_project_context && ($project <= 0 || $mine <= 0 || $contract <= 0)) {
+        echo "<script>alert('⚠️ هذا الدور مرتبط بمنجم محدد، يرجى اختيار المشروع والمنجم والعقد');</script>";
+    } elseif ($uid > 0) {
+
         // تحقق من التكرار عند التعديل (يتجاهل السجل الحالي)
         $check_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
         $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' AND id != '$uid' AND $users_not_deleted_sql $check_scope LIMIT 1");
@@ -357,7 +383,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
                             $project_info = "";
 
-                            if ($row['role'] == "5" || $row['role'] == "10") {
+                            $row_role_key = isset($row['role']) ? (string) $row['role'] : '';
+                            $row_role_scope = isset($roles_scope[$row_role_key]) ? $roles_scope[$row_role_key] : 'gloable';
+
+                            if ($row_role_scope === 'mine') {
                                 // جلب اسم المشروع
                                 if ($project_id > 0) {
                                     $select_project = mysqli_query($conn, "SELECT name, project_code FROM `project` WHERE `id` = $project_id");
@@ -434,6 +463,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     <script>
 document.addEventListener("DOMContentLoaded", function () {
 
+    const roleScopes = <?php echo json_encode($roles_scope, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+
     const roleSelect = document.getElementById("role");
     const projectDiv = document.getElementById("projectDiv");
     const mineDiv = document.getElementById("mineDiv");
@@ -449,12 +480,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let usernameValid = true;
 
+    function roleNeedsMineScope(roleId) {
+        if (!roleId) {
+            return false;
+        }
+        return roleScopes[String(roleId)] === "mine";
+    }
+
     /* =============================
        إظهار الحقول حسب الدور
     ============================== */
     roleSelect.addEventListener("change", function () {
 
-        if (this.value === "5" || this.value === "10") {
+        if (roleNeedsMineScope(this.value)) {
 
             projectDiv.style.display = "block";
             mineDiv.style.display = "block";
@@ -615,7 +653,7 @@ document.addEventListener("DOMContentLoaded", function () {
         usernameInput.style.boxShadow = "";
         usernameValid = true;
 
-        if (role == "5" || role == "10") {
+        if (roleNeedsMineScope(role)) {
 
             if (projectId) {
                 $('#project_id').val(projectId);

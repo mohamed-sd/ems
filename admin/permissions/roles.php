@@ -12,7 +12,7 @@ include '../config.php';
 $editData = null;
 if (isset($_GET['edit_id'])) {
     $id = (int) $_GET['edit_id'];
-    $stmt = $conn->prepare("SELECT `id`, `name`, `parent_role_id`, `level`, `status`, `created_at` FROM `roles` WHERE id = ?");
+    $stmt = $conn->prepare("SELECT `id`, `name`, `parent_role_id`, `level`, `role_scope`, `status`, `created_at` FROM `roles` WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $editData = $stmt->get_result()->fetch_assoc();
@@ -23,7 +23,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $parent_role_id = !empty($_POST['parent_role_id']) && $_POST['parent_role_id'] !== '' ? (int) $_POST['parent_role_id'] : null;
     $level = (int) ($_POST['level'] ?? 1);
+    $role_scope = $_POST['role_scope'] ?? 'gloable';
     $status = (int) ($_POST['status'] ?? 1);
+
+    if (!in_array($role_scope, ['gloable', 'mine'], true)) {
+        $role_scope = 'gloable';
+    }
 
     // التحقق من صحة البيانات
     if (empty($name)) {
@@ -33,15 +38,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // تعديل
             $id = (int) $_POST['edit_id'];
             $stmt = $conn->prepare(
-                "UPDATE `roles` SET `name` = ?, `parent_role_id` = ?, `level` = ?, `status` = ? WHERE `id` = ?"
+                "UPDATE `roles` SET `name` = ?, `parent_role_id` = ?, `level` = ?, `role_scope` = ?, `status` = ? WHERE `id` = ?"
             );
-            $stmt->bind_param("siiii", $name, $parent_role_id, $level, $status, $id);
+            $stmt->bind_param("siisii", $name, $parent_role_id, $level, $role_scope, $status, $id);
         } else {
             // إضافة
             $stmt = $conn->prepare(
-                "INSERT INTO `roles` (`name`, `parent_role_id`, `level`, `status`, `created_at`) VALUES (?, ?, ?, ?, NOW())"
+                "INSERT INTO `roles` (`name`, `parent_role_id`, `level`, `role_scope`, `status`, `created_at`) VALUES (?, ?, ?, ?, ?, NOW())"
             );
-            $stmt->bind_param("siii", $name, $parent_role_id, $level, $status);
+            $stmt->bind_param("siisi", $name, $parent_role_id, $level, $role_scope, $status);
         }
 
         if ($stmt->execute()) {
@@ -319,6 +324,15 @@ require_once __DIR__ . '/../includes/layout_head.php';
                         </select>
                     </div>
 
+                    <!-- نطاق الدور -->
+                    <div>
+                        <label><i class="fas fa-globe"></i> نطاق الدور *</label>
+                        <select name="role_scope" id="role_scope" required>
+                            <option value="gloable" <?= (empty($editData) || ($editData['role_scope'] ?? 'gloable') === 'gloable') ? 'selected' : ''; ?>>عام (gloable)</option>
+                            <option value="mine" <?= (!empty($editData) && ($editData['role_scope'] ?? 'gloable') === 'mine') ? 'selected' : ''; ?>>منجم محدد (mine)</option>
+                        </select>
+                    </div>
+
                     <!-- الحالة -->
                     <div>
                         <label><i class="fas fa-toggle-on"></i> حالة الدور *</label>
@@ -352,6 +366,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
                             <th><i class="fas fa-tag"></i> اسم الدور</th>
                             <th><i class="fas fa-sitemap"></i> الدور الأب</th>
                             <th width="100"><i class="fas fa-layer-group"></i> المستوى</th>
+                            <th width="140"><i class="fas fa-globe"></i> النطاق</th>
                             <th width="100"><i class="fas fa-toggle-on"></i> الحالة</th>
                             <th width="120"><i class="fas fa-calendar"></i> تاريخ الإنشاء</th>
                             <th width="120"><i class="fas fa-cogs"></i> إجراءات</th>
@@ -378,6 +393,17 @@ require_once __DIR__ . '/../includes/layout_head.php';
                                         <span style="background: var(--gold-soft); color: var(--gold); padding: 4px 8px; border-radius: 4px; font-weight: 600;">
                                             <?= $row['level'] == 1 ? 'مدير' : 'مشرف'; ?>
                                         </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <?php if (($row['role_scope'] ?? 'gloable') === 'mine'): ?>
+                                            <span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: 600;">
+                                                منجم محدد
+                                            </span>
+                                        <?php else: ?>
+                                            <span style="background: #ecfdf5; color: #047857; padding: 4px 8px; border-radius: 4px; font-weight: 600;">
+                                                عام
+                                            </span>
+                                        <?php endif; ?>
                                     </td>
                                     <td class="text-center">
                                         <?php if ($row['status'] == 1): ?>
@@ -422,7 +448,7 @@ $(document).ready(function () {
             url: "/ems/assets/i18n/datatables/ar.json"
         },
         columnDefs: [
-            { "orderable": false, "targets": [6] }
+            { "orderable": false, "targets": [7] }
         ]
     });
 
