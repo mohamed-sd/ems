@@ -22,40 +22,40 @@
       <?php // صلاحيات الادارة العليا == -1
       if ($_SESSION['user']['role'] == "-1") {
         ?>
-        <li><a href="Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li>
+        <!-- <li><a href="Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li>
         <li><a href="Projects/view_projects.php"><i class="fa fa-list-alt"></i> <span>قائمة المشاريع</span></a></li>
         <li><a href="Projects/projects.php"><i class="fa fa-folder-open"></i> <span>المشاريع</span></a></li>
         <li><a href="Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
         <li><a href="users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
-        <li><a href="Reports/new_reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
+        <li><a href="Reports/new_reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
         <?php
       }
       ?>
 
       <?php // صلاحيات مدير المشاريع === 1
       if ($_SESSION['user']['role'] == "1") { ?>
-        <li><a href="Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li>
+        <!-- <li><a href="Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li>
         <li><a href="Projects/projects.php"><i class="fa fa-list-alt"></i> <span> المشاريع</span></a></li>
-        <li><a href="main/users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
+        <li><a href="main/users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li> -->
         <!-- <li><a href="Reports/new_reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
-        <li><a href="Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>تقارير العقود</span></a></li>
+        <!-- <li><a href="Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>تقارير العقود</span></a></li> -->
 
       <?php } ?>
 
       <?php // صلاحيات مدير الموردين === 2
       if ($_SESSION['user']['role'] == "2") { ?>
-        <li><a href="Suppliers/suppliers.php"><i class="fa fa-truck-loading"></i> <span>الموردين</span></a></li>
+        <!-- <li><a href="Suppliers/suppliers.php"><i class="fa fa-truck-loading"></i> <span>الموردين</span></a></li> -->
         <!-- <li><a href="Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li> -->
-        <li><a href="Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
+        <!-- <li><a href="Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
 
       <?php } ?>
 
       <?php // صلاحيات مدير المشغلين === 3
       if ($_SESSION['user']['role'] == "3") { ?>
-        <li><a href="Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
+        <!-- <li><a href="Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
         <li><a href="Drivers/drivers.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li>
         <li><a href="Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
-        <li><a href="Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li>
+        <li><a href="Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li> -->
 
       <?php } ?>
 
@@ -70,40 +70,40 @@
 
       <?php // صلاحيات مدير الحركة والتشغيل === 10
       if ($_SESSION['user']['role'] == "10") { ?>
-        <li><a href="Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
+        <!-- <li><a href="Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
         <li><a href="Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
-        <li><a href="Drivers/drivers.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li>
+        <li><a href="Drivers/drivers.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li> -->
 
       <?php } ?>
 
       <?php // صلاحيات مدير الموقع === 5
       if ($_SESSION['user']['role'] == "5") { ?>
-        <li><a href="main/project_users.php"><i class="fa fa-users-cog"></i> <span> المشرفين </span></a></li>
+        <!-- <li><a href="main/project_users.php"><i class="fa fa-users-cog"></i> <span> المشرفين </span></a></li>
         <li><a href="Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a></li>
         <li><a href="Timesheet/view_timesheet.php"><i class="fa fa-calendar-days"></i> <span>عرض الساعات</span></a></li>
-        <li><a href="Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
+        <li><a href="Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
       <?php } ?>
 
 
       <?php // صلاحيات  مدخل الساعات === 6 
       if ($_SESSION['user']['role'] == "6") { ?>
-        <li><a href="Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a></li>
-        <li><a href="Timesheet/view_timesheet.php"><i class="fa fa-calendar-days"></i> <span>عرض الساعات</span></a></li>
+        <!-- <li><a href="Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a></li>
+        <li><a href="Timesheet/view_timesheet.php"><i class="fa fa-calendar-days"></i> <span>عرض الساعات</span></a></li> -->
       <?php } ?>
 
       <?php // صلاحيات مراجع ساعات المورد والمشغل === 7 8 
       if ($_SESSION['user']['role'] == "7" || $_SESSION['user']['role'] == "8") { ?>
         <!-- <li><a href="Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
-        <li><a href="Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a></li>
+        <!-- <li><a href="Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a></li> -->
       <?php } ?>
 
       <?php // صلاحيات مراجع الاعطال === 9 
       if ($_SESSION['user']['role'] == "9") { ?>
-        <li><a href="Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a></li>
+        <!-- <li><a href="Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a></li> -->
       <?php } ?>
 
       <?php if (in_array($_SESSION['user']['role'], ["-1", "1", "7", "8", "9"])) { ?>
-        <li><a href="Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li>
+        <!-- <li><a href="Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li> -->
       <?php } ?>
 
       <li><a href="Settings/settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
