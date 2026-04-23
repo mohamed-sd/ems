@@ -2,6 +2,9 @@
   <i class="fa fa-bars"></i>
 </button>
 
+<!-- طبقة الخلفية المعتمة (للموبايل) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 <div class="sidebar closed" id="sidebar">
   <div>
     <div class="toggle-btn" id="toggleBtn"><i class="fa fa-bars"></i></div>
@@ -152,19 +155,59 @@
 </div>
 
 <script>
-  const sidebar = document.getElementById('sidebar');
-  const toggleBtn = document.getElementById('toggleBtn');
-  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const sidebar        = document.getElementById('sidebar');
+  const toggleBtn      = document.getElementById('toggleBtn');
+  const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-  // للحاسوب
-  toggleBtn.addEventListener('click', () => {
-    if (window.innerWidth > 768) {
-      sidebar.classList.toggle('active');
+  function isMobile() { return window.innerWidth <= 768; }
+
+  function openSidebar() {
+    sidebar.classList.add('active');
+    sidebarOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // زر السهم داخل السايدبار (للحاسوب فقط)
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      if (!isMobile()) {
+        sidebar.classList.toggle('closed');
+      }
+    });
+  }
+
+  // زر الهامبرغر الخارجي (للموبايل)
+  mobileMenuBtn.addEventListener('click', () => {
+    if (sidebar.classList.contains('active')) {
+      closeSidebar();
+    } else {
+      openSidebar();
     }
   });
 
-  // للموبايل
-  mobileMenuBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('closed');
+  // إغلاق عند النقر على الخلفية المعتمة
+  sidebarOverlay.addEventListener('click', () => {
+    closeSidebar();
+  });
+
+  // إغلاق عند الضغط على أي رابط داخل السايدبار (موبايل)
+  sidebar.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (isMobile()) closeSidebar();
+    });
+  });
+
+  // إغلاق عند تغيير حجم الشاشة للكمبيوتر
+  window.addEventListener('resize', () => {
+    if (!isMobile()) {
+      closeSidebar();
+    }
   });
 </script>

@@ -53,7 +53,7 @@ $driver_insert_val = (!$is_super_admin && $drivers_has_company) ? ", '$company_i
 // ════════════════════════════════════════════════════════════════════════════
 // ðŸ” التحقق من صلاحيات المستخدم
 // ════════════════════════════════════════════════════════════════════════════
-$page_permissions = check_page_permissions($conn, 'drivers');
+$page_permissions = check_page_permissions($conn, 'Drivers/drivers.php');
 $can_view = $page_permissions['can_view'];
 $can_add = $page_permissions['can_add'];
 $can_edit = $page_permissions['can_edit'];
@@ -221,6 +221,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     }
 }
 
+if (isset($_GET['delete_id'])) {
+    if (!$can_delete) {
+        header("Location: drivers.php?msg=لا+توجد+صلاحية+حذف+المشغلين+❌");
+        exit();
+    }
+
+    $delete_id = intval($_GET['delete_id']);
+    if ($delete_id <= 0) {
+        header("Location: drivers.php?msg=معرف+المشغل+غير+صحيح+❌");
+        exit();
+    }
+
+    $scope_where = sprintf($driver_scope_where, $delete_id);
+    $active_contracts = 0;
+    $active_equipment_assignments = 0;
+
+    $contracts_sql = "SELECT COUNT(*) AS total FROM drivercontracts WHERE driver_id = $delete_id AND status = 1";
+    $contracts_result = mysqli_query($conn, $contracts_sql);
+    if ($contracts_result) {
+        $contracts_row = mysqli_fetch_assoc($contracts_result);
+        $active_contracts = intval($contracts_row['total']);
+    }
+
+    $assignments_sql = "SELECT COUNT(*) AS total FROM equipment_drivers WHERE driver_id = $delete_id AND status = 1";
+    $assignments_result = mysqli_query($conn, $assignments_sql);
+    if ($assignments_result) {
+        $assignments_row = mysqli_fetch_assoc($assignments_result);
+        $active_equipment_assignments = intval($assignments_row['total']);
+    }
+
+    if ($active_contracts > 0 || $active_equipment_assignments > 0) {
+        header("Location: drivers.php?msg=لا+يمكن+حذف+المشغل+لارتباطه+بعقود+أو+تشغيل+نشط+❌");
+        exit();
+    }
+
+    $delete_sql = "DELETE FROM drivers WHERE $scope_where";
+    if (mysqli_query($conn, $delete_sql) && mysqli_affected_rows($conn) > 0) {
+        header("Location: drivers.php?msg=تم+حذف+المشغل+بنجاح+✅");
+        exit();
+    }
+
+    header("Location: drivers.php?msg=تعذر+حذف+المشغل+أو+أنه+خارج+نطاق+الشركة+❌");
+    exit();
+}
+
 include("../inheader.php");
 ?>
 
@@ -356,9 +401,11 @@ include('../insidebar.php');
             <a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
+            <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة مشغل جديد
             </a>
+            <?php endif; ?>
             <a href="download_drivers_template.php" class="btn btn-success" style="display: flex; align-items: center; gap: 8px; padding: 10px 20px;">
                 <i class="fas fa-file-excel"></i> تحميل نموذج Excel
             </a>
@@ -923,15 +970,16 @@ include('../insidebar.php');
                         echo "<td>" . htmlspecialchars($row['skill_level'] ?: 'غير محدد') . "</td>";
                         echo "<td><span class='badge badge-info'>" . $row['numcontracts'] . " عقد</span></td>";
                         echo "<td>" . $statusBadge . "</td>";
-                        echo "<td>
-                                <div class='action-btns'>
-                                    <a href='javascript:void(0)' 
+                        echo "<td><div class='action-btns'>";
+                        if ($can_edit) {
+                            echo "<a href='javascript:void(0)' 
                                        class='action-btn edit editBtn' 
                                        data-id='" . $row['id'] . "' 
                                        title='تعديل'>
                                         <i class='fas fa-edit'></i>
-                                    </a>
-                                    <a href='drivercontracts.php?id=" . $row['id'] . "' 
+                                    </a>";
+                        }
+                        echo "<a href='drivercontracts.php?id=" . $row['id'] . "' 
                                        class='action-btn view' 
                                        title='عرض العقود'>
                                         <i class='fas fa-file-contract'></i>
@@ -940,9 +988,13 @@ include('../insidebar.php');
                                        class='action-btn history' 
                                        title='تاريخ القيادة'>
                                         <i class='fas fa-history'></i>
-                                    </a>
-                                </div>
-                            </td>";
+                                    </a>";
+                        if ($can_delete) {
+                            echo "<a href='drivers.php?delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف المشغل؟\")' title='حذف'>
+                                        <i class='fas fa-trash'></i>
+                                    </a>";
+                        }
+                        echo "</div></td>";
                         echo "</tr>";
                     }
                     ?>

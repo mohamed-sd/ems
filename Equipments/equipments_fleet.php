@@ -1060,11 +1060,6 @@ if (isset($_GET['edit']) && $can_edit) {
                                                                         <i class='fas fa-edit'></i>
                                                                     </a>";
                         }
-                        if ($can_delete) {
-                            echo "<a href='equipments_fleet.php?delete_id=" . $row['id'] . "' class='action-btn delete' onclick=\"return confirm('هل أنت متأكد من حذف هذه المعدة؟')\" title='حذف'>
-                                                                        <i class='fas fa-trash'></i>
-                                                                    </a>";
-                        }
                         echo "</td>";
 
                         echo "</tr>";

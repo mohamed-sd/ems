@@ -584,7 +584,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
                                         <label>
                                             <input type="checkbox" name="can_view"
                                                 <?php echo ($perm && $perm['can_view']) ? 'checked' : ''; ?>>
-                                            ðŸ‘️ عرض
+                                             عرض
                                         </label>
                                     </div>
 
@@ -608,7 +608,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
                                         <label>
                                             <input type="checkbox" name="can_delete"
                                                 <?php echo ($perm && $perm['can_delete']) ? 'checked' : ''; ?>>
-                                            ðŸ—‘️ حذف
+                                             حذف
                                         </label>
                                     </div>
 

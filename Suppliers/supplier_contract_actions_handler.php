@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
 }
 
-enforce_module_permission_json($conn, 'suppliers', 'edit', 'لا توجد صلاحية تعديل الموردين/عقودهم');
+enforce_module_permission_json($conn, 'Suppliers/supplierscontracts_details.php', 'edit', 'لا توجد صلاحية تعديل عقود الموردين');
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
@@ -428,12 +428,29 @@ elseif ($action === 'complete') {
         die(json_encode(['success' => false, 'message' => 'الرجاء إدخال ملاحظات الانتهاء']));
     }
     
+    $tenant_scope = supplierContractTenantScopeSql($conn, $is_super_admin, $company_id, 'sc');
+    $status_update_parts = array(
+        "status = 0",
+        "updated_at = NOW()"
+    );
+
+    if (db_table_has_column($conn, 'supplierscontracts', 'contract_status')) {
+        $status_update_parts[] = "contract_status = 'completed'";
+    }
+
+    $complete_update_query = "UPDATE supplierscontracts sc SET " . implode(', ', $status_update_parts) . " WHERE sc.id = $contract_id AND $tenant_scope";
+
+    if (!mysqli_query($conn, $complete_update_query)) {
+        echo json_encode(['success' => false, 'message' => 'خطأ في تحديث حالة العقد: ' . mysqli_error($conn)]);
+        exit;
+    }
+
     // إضافة الملاحظة في جدول supplier_contract_notes
-    $note_text = "انتهاء العقد: " . $complete_note;
+    $note_text = "تم إنهاء العقد وتحويل حالته إلى غير ساري: " . $complete_note;
     if (addNote($contract_id, $note_text, $conn)) {
-        echo json_encode(['success' => true, 'message' => 'تم تسجيل انتهاء العقد بنجاح']);
+        echo json_encode(['success' => true, 'message' => 'تم تسجيل انتهاء العقد وتحديث حالته بنجاح']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'خطأ في تسجيل انتهاء العقد']);
+        echo json_encode(['success' => true, 'message' => 'تم تحديث حالة العقد إلى غير ساري، لكن تعذر حفظ الملاحظة']);
     }
 }
 

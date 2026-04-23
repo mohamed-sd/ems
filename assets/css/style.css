@@ -474,16 +474,50 @@ table {
     flex-direction: column;
   }
 
+  /* السايدبار مخفي تماماً خارج الشاشة من جهة اليمين (RTL) */
   .sidebar {
     position: fixed;
     top: 0;
-    left: -240px;
+    right: 0;
+    width: 100% !important;   /* كامل الشاشة عند الفتح */
     height: 100%;
     z-index: 1000;
+    transform: translateX(100%); /* مخفي للخارج */
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* حالة مفتوح: يظهر في كامل الشاشة */
   .sidebar.active {
-    right: 0;
+    transform: translateX(0);
+  }
+
+  /* منع تأثير closed على الموبايل */
+  .sidebar.closed {
+    width: 100% !important;
+    transform: translateX(100%);
+  }
+
+  .sidebar.closed.active {
+    transform: translateX(0);
+  }
+
+  /* إخفاء زر toggle الداخلي على الموبايل */
+  .sidebar .toggle-btn {
+    display: none;
+  }
+
+  /* طبقة الخلفية المعتمة خلف السايدبار */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 999;
+    cursor: pointer;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
   }
 
   .main {
@@ -493,16 +527,22 @@ table {
   .mobile-menu-btn {
     display: block;
     position: fixed;
-    top: 30px;
-    right: 5px;
+    top: 16px;
+    right: 12px;
     background: var(--equipation-gold);
     color: #fff;
     border: none;
-    padding: 10px 12px;
+    padding: 10px 14px;
     font-size: 20px;
     border-radius: 8px;
     z-index: 1100;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    transition: background 0.2s;
+  }
+
+  .mobile-menu-btn:hover {
+    background: #d4a800;
   }
 
   #projectForm .form-grid {

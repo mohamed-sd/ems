@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -285,20 +285,21 @@ include('../insidebar.php');
                 <div class="form-grid">
                     <div>
                         <label><i class="fas fa-user"></i> الاسم ثلاثي *</label>
-                        <input type="text" name="name" id="name" placeholder="أدخل الاسم ثلاثي" value="محمد سيد" required />
+                        <input type="text" name="name" id="name" placeholder="أدخل الاسم ثلاثي" value="" required />
                     </div>
                     <div>
                         <label><i class="fas fa-at"></i> اسم المستخدم *</label>
-                        <input type="text" name="username" id="username" placeholder="أدخل اسم المستخدم" value=" medo " required />
+                        <input type="text" name="username" id="username" placeholder="أدخل اسم المستخدم" value="" required autocomplete="off" />
+                        <small id="usernameFeedback" style="display:block; margin-top:6px; font-weight:600;"></small>
                     </div>
                     <div>
                         <label><i class="fas fa-lock"></i> كلمة المرور <span id="passwordRequired">*</span></label>
-                        <input type="password" name="password" id="password" placeholder="أدخل كلمة المرور" value="12345678"/>
+                        <input type="password" name="password" id="password" placeholder="أدخل كلمة المرور" value=""/>
                         <small id="passwordHint" style="color: #999; display:none;">اتركه فارغاً للاحتفاظ بكلمة المرور الحالية</small>
                     </div>
                     <div>
                         <label><i class="fas fa-phone"></i> رقم الهاتف *</label>
-                        <input type="tel" name="phone" id="phone" placeholder="مثال: +249123456789" required value="09144760109" />
+                        <input type="tel" name="phone" id="phone" placeholder="مثال: +249123456789" required value="" />
                     </div>
                     <div>
                         <label><i class="fas fa-shield-alt"></i> الصلاحية / الدور *</label>
@@ -363,32 +364,25 @@ include('../insidebar.php');
                     $userid      = $_SESSION['user']['id'];
                     $currentRole = $_SESSION['user']['role'];
 
-                    $roles = [
-                        "6" => "ðŸ“ مدخل ساعات عمل",
-                        "7" => "✔ مراجع ساعات مورد",
-                        "8" => "✔ مراجع ساعات مشغل",
-                        "9" => "ðŸ”§ مراجع الأعطال",
-                    ];
-
-                          $query = "SELECT DISTINCT u.id, u.name, u.username, u.phone, u.role, u.created_at
+                    $query = "SELECT DISTINCT u.id, u.name, u.username, u.phone, u.role, u.created_at, ro.name AS role_name
                              FROM users u
+                             LEFT JOIN roles ro ON ro.id = u.role
                                                   WHERE " . ($users_has_company_id ? "u.company_id = '$current_company_id' AND " : "") . "COALESCE(u.is_deleted,0)=0 AND (
                                           u.parent_id = '$userid'
                                 OR u.role IN (
-                                   SELECT r.id FROM roles r 
-                                   WHERE r.parent_role_id = $currentRole 
+                                   SELECT r.id FROM roles r
+                                   WHERE r.parent_role_id = $currentRole
                                    AND (r.status = '1' OR r.status = 1)
                                 )
                                       )
                                       ORDER BY u.id DESC";
-                    
                     $result = mysqli_query($conn, $query);
                     $i = 1;
 
                     while ($row = mysqli_fetch_assoc($result)) {
-                        $roleText    = isset($roles[$row['role']]) 
-                                       ? $roles[$row['role']] 
-                                       : '<span style="color: #999;">غير معروف</span>';
+                        $roleText = !empty($row['role_name'])
+                            ? htmlspecialchars($row['role_name'], ENT_QUOTES, 'UTF-8')
+                            : '<span style="color: #999;">غير معروف</span>';
                         $createdDate = date('Y-m-d', strtotime($row['created_at']));
 
                         echo "<tr>";
@@ -476,6 +470,65 @@ include('../insidebar.php');
             });
         }
 
+        const usernameInput = document.getElementById('username');
+        const usernameFeedback = document.getElementById('usernameFeedback');
+        let usernameValid = true;
+
+        // تحقق اسم المستخدم أثناء الكتابة
+        usernameInput.addEventListener('input', async function () {
+            const username = this.value.trim();
+            const uid = document.getElementById('user_id').value || 0;
+
+            if (username === '') {
+                usernameFeedback.innerHTML = '';
+                usernameInput.style.borderColor = '#e9ecef';
+                usernameInput.style.boxShadow = '';
+                usernameValid = true;
+                return;
+            }
+            if (username.length < 3) {
+                usernameFeedback.innerHTML = '<span style="color: #ffc107;"><i class="fas fa-info-circle"></i> الحد الأدنى 3 أحرف</span>';
+                usernameInput.style.borderColor = '#ffc107';
+                usernameInput.style.boxShadow = '0 0 0 0.2rem rgba(255, 193, 7, 0.25)';
+                usernameValid = false;
+                return;
+            }
+            usernameFeedback.innerHTML = '<span style="color: #17a2b8;"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>';
+            try {
+                const response = await fetch('check_username_availability.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `username=${encodeURIComponent(username)}&uid=${encodeURIComponent(uid)}`
+                });
+                const data = await response.json();
+                if (data.available) {
+                    usernameFeedback.innerHTML = `<span style="color: #28a745;"><i class="fas fa-check-circle"></i> ${data.message}</span>`;
+                    usernameInput.style.borderColor = '#28a745';
+                    usernameInput.style.boxShadow = '0 0 0 0.2rem rgba(40, 167, 69, 0.25)';
+                    usernameValid = true;
+                } else {
+                    usernameFeedback.innerHTML = `<span style="color: #dc3545;"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
+                    usernameInput.style.borderColor = '#dc3545';
+                    usernameInput.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+                    usernameValid = false;
+                }
+            } catch (error) {
+                usernameFeedback.innerHTML = '<span style="color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> خطأ في التحقق</span>';
+                usernameValid = false;
+            }
+        });
+
+        // منع الإرسال عند اسم مستخدم غير متاح
+        document.getElementById('projectForm').addEventListener('submit', function (e) {
+            const username = usernameInput.value.trim();
+            if (username !== '' && !usernameValid) {
+                e.preventDefault();
+                alert('⚠️ اسم المستخدم غير متاح، يرجى اختيار اسم آخر');
+                usernameInput.focus();
+                return false;
+            }
+        });
+
         // دالة تعديل المستخدم — تملأ الفورم ببيانات المستخدم المحدد
         window.editUser = function(userId, name, username, phone, role) {
             document.getElementById('user_id').value  = userId;
@@ -489,6 +542,12 @@ include('../insidebar.php');
             document.getElementById('formTitle').textContent     = 'تعديل المستخدم';
             document.getElementById('submitBtnText').textContent = 'تحديث المستخدم';
             document.getElementById('action').value              = 'edit';
+
+            // إعادة تعيين حالة التحقق من اسم المستخدم
+            usernameFeedback.innerHTML = '<span style="color: #28a745;"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';
+            usernameInput.style.borderColor = '#e9ecef';
+            usernameInput.style.boxShadow = '';
+            usernameValid = true;
 
             // كلمة المرور اختيارية عند التعديل
             document.getElementById('passwordRequired').style.display = 'none';
@@ -510,6 +569,11 @@ include('../insidebar.php');
             document.getElementById('passwordRequired').style.display = 'inline';
             document.getElementById('passwordHint').style.display     = 'none';
             document.getElementById('password').setAttribute('required', 'required');
+
+            usernameFeedback.innerHTML = '';
+            usernameInput.style.borderColor = '#e9ecef';
+            usernameInput.style.boxShadow = '';
+            usernameValid = true;
         };
 
     })();

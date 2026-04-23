@@ -6,6 +6,18 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once '../config.php';
+require_once '../includes/permissions_helper.php';
+
+$page_permissions = check_page_permissions($conn, 'Suppliers/supplierscontracts_details.php');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
+
+if (!$can_view) {
+    header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+تفاصيل+عقود+الموردين+❌");
+    exit();
+}
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
@@ -67,6 +79,7 @@ if (!$is_super_admin) {
             <h5><i class="fas fa-cogs"></i> إجراءات العقد</h5>
         </div>
         <div class="card-body">
+            <?php if ($can_edit): ?>
             <div class="action-bar">
                 <button class="add-btn" id="renewalBtn" title="تجديد مدة العقد" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
                     <i class="fas fa-sync-alt"></i> تجديد العقد
@@ -90,6 +103,11 @@ if (!$is_super_admin) {
                     <i class="fas fa-check-circle"></i> انتهاء العقد
                 </button>
             </div>
+            <?php else: ?>
+            <div class="alert alert-warning mb-0">
+                لا توجد صلاحية تعديل على هذا العقد.
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -268,9 +286,11 @@ while ($row = mysqli_fetch_assoc($result)) {
         <div class="info-card primary">
             <h5>
                 <i class="fas fa-project-diagram"></i> معلومات المشروع
+                <?php if ($can_edit): ?>
                 <button class="btn btn-sm btn-outline-primary ms-auto" id="editProjectInfoBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
+                <?php endif; ?>
             </h5>
             <div class="info-item">
                 <span class="info-label">المشروع</span>
@@ -291,9 +311,11 @@ while ($row = mysqli_fetch_assoc($result)) {
         <div class="info-card success">
             <h5>
                 <i class="fas fa-concierge-bell"></i> الخدمات المقدمة
+                <?php if ($can_edit): ?>
                 <button class="btn btn-sm btn-outline-success ms-auto" id="editServicesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
+                <?php endif; ?>
             </h5>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-bus"></i> النقل</span>
@@ -317,9 +339,11 @@ while ($row = mysqli_fetch_assoc($result)) {
         <div class="info-card info">
             <h5>
                 <i class="fas fa-users"></i> أطراف العقد
+                <?php if ($can_edit): ?>
                 <button class="btn btn-sm btn-outline-info ms-auto" id="editPartiesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
+                <?php endif; ?>
             </h5>
             <div class="info-item">
                 <span class="info-label">الطرف الأول</span>
@@ -343,9 +367,11 @@ while ($row = mysqli_fetch_assoc($result)) {
         <div class="info-card warning">
             <h5>
                 <i class="fas fa-money-bill-wave"></i> البيانات المالية
+                <?php if ($can_edit): ?>
                 <button class="btn btn-sm btn-outline-warning ms-auto" id="editPaymentBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
+                <?php endif; ?>
             </h5>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-dollar-sign"></i> العملة</span>
@@ -1322,9 +1348,15 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 const contractId = <?php echo $contract_id; ?>;
 const contractStatus = <?php echo isset($contractStatusValue) ? $contractStatusValue : 1; ?>;
 const actualEndDate = '<?php echo isset($actual_end_date) ? $actual_end_date : ''; ?>';  // تاريخ انتهاء العقد الفعلي
+const canEditContract = <?php echo $can_edit ? 'true' : 'false'; ?>;
 
 // دالة عامة للإجراءات
 function performAction(action, data = {}) {
+    if (!canEditContract) {
+        alert('❌ ليس لديك صلاحية تعديل العقد');
+        return;
+    }
+
     $.ajax({
         url: 'supplier_contract_actions_handler.php',
         type: 'POST',

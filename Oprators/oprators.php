@@ -50,46 +50,12 @@ if (!$is_super_admin) {
     }
 }
 
-// التحقق من صلاحيات المستخدم على شاشة التشغيل (مع أولوية سجل الدور الحالي)
-$current_role_id = intval($_SESSION['user']['role']);
-$module_query = "SELECT m.id
-                                 FROM modules m
-                                 LEFT JOIN role_permissions rp
-                                                ON rp.module_id = m.id
-                                             AND rp.role_id = $current_role_id
-                                 WHERE (
-                                                m.code = 'Oprators/oprators.php'
-                                         OR m.code = 'oprators.php'
-                                         OR m.code = 'oprators'
-                                         OR m.code LIKE '%Oprators/oprators.php%'
-                                         OR m.code LIKE '%oprators.php%'
-                                 )
-                                     AND m.owner_role_id IN ($current_role_id, -1)
-                                 ORDER BY
-                                     CASE WHEN rp.module_id IS NOT NULL THEN 0 ELSE 1 END,
-                                     CASE
-                                         WHEN m.owner_role_id = $current_role_id THEN 0
-                                         WHEN m.owner_role_id = -1 THEN 1
-                                         ELSE 2
-                                     END,
-                                     m.id ASC
-                                 LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
-$module_id = $module_info ? $module_info['id'] : null;
-
-$can_view = false;
-$can_add = false;
-$can_edit = false;
-$can_delete = false;
-
-if ($module_id) {
-    $perms = get_module_permissions($conn, $module_id);
-    $can_view = $perms['can_view'];
-    $can_add = $perms['can_add'];
-    $can_edit = $perms['can_edit'];
-    $can_delete = $perms['can_delete'];
-}
+// التحقق من صلاحيات المستخدم على شاشة التشغيل
+$page_permissions = check_page_permissions($conn, 'Oprators/oprators.php');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
 
 if (!$can_view) {
     header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+التشغيل+❌");

@@ -7,6 +7,99 @@ $companyId = intval($user['company_id']);
 $error = '';
 $ok = '';
 
+/* ================================================
+   معالجة تعديل المستخدم
+================================================ */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit_user') {
+    if (!verify_csrf_token(isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '')) {
+        $error = 'رمز الحماية غير صالح.';
+    } else {
+        $editUserId = intval(isset($_POST['edit_user_id']) ? $_POST['edit_user_id'] : 0);
+        $editName   = trim(isset($_POST['edit_name'])  ? $_POST['edit_name']  : '');
+        $editEmail  = trim(isset($_POST['edit_email']) ? $_POST['edit_email'] : '');
+        $editPhone  = trim(isset($_POST['edit_phone']) ? $_POST['edit_phone'] : '');
+        $editRoleId = intval(isset($_POST['edit_role_id']) ? $_POST['edit_role_id'] : 0);
+        $editStatus = trim(isset($_POST['edit_status']) ? $_POST['edit_status'] : 'active');
+        $editPass   = isset($_POST['edit_password']) ? $_POST['edit_password'] : '';
+
+        if ($editUserId <= 0) {
+            $error = 'معرف المستخدم غير صالح.';
+        } elseif (!validate_length($editName, 2, 150)) {
+            $error = 'الاسم مطلوب.';
+        } elseif (!validate_email($editEmail) || !validate_length($editEmail, 5, 150)) {
+            $error = 'البريد الإلكتروني غير صالح.';
+        } elseif (!validate_length($editPhone, 6, 30)) {
+            $error = 'رقم الهاتف مطلوب.';
+        } elseif (!in_array($editStatus, array('active', 'inactive', 'suspended'), true)) {
+            $error = 'حالة المستخدم غير صحيحة.';
+        } elseif (!empty($editPass) && !validate_length($editPass, 8, 255)) {
+            $error = 'كلمة المرور يجب أن تكون 8 أحرف على الأقل إذا أردت تغييرها.';
+        } else {
+            // التحقق من أن البريد لا يتكرر عند مستخدم آخر
+            $dupStmt = mysqli_prepare($conn, 'SELECT id FROM users WHERE email = ? AND id != ? LIMIT 1');
+            if ($dupStmt) {
+                mysqli_stmt_bind_param($dupStmt, 'si', $editEmail, $editUserId);
+                mysqli_stmt_execute($dupStmt);
+                $dupRes = mysqli_stmt_get_result($dupStmt);
+                $dupRow = $dupRes ? mysqli_fetch_assoc($dupRes) : null;
+                mysqli_stmt_close($dupStmt);
+                if ($dupRow) {
+                    $error = 'البريد الإلكتروني مستخدم بالفعل.';
+                }
+            }
+
+            if ($error === '') {
+                $editUsername = $editEmail;
+                $editRoleStr  = strval($editRoleId);
+
+                if (!empty($editPass)) {
+                    $newHash = password_hash($editPass, PASSWORD_BCRYPT);
+                    if (company_users_has_column('role_id')) {
+                        $upd = mysqli_prepare($conn, 'UPDATE users SET name=?, username=?, email=?, phone=?, role=?, role_id=?, status=?, password=? WHERE id=? AND company_id=?');
+                        if ($upd) {
+                            mysqli_stmt_bind_param($upd, 'sssssssiii', $editName, $editUsername, $editEmail, $editPhone, $editRoleStr, $editRoleId, $editStatus, $newHash, $editUserId, $companyId);
+                            $done = mysqli_stmt_execute($upd);
+                            mysqli_stmt_close($upd);
+                        }
+                    } else {
+                        $upd = mysqli_prepare($conn, 'UPDATE users SET name=?, username=?, email=?, phone=?, role=?, status=?, password=? WHERE id=? AND company_id=?');
+                        if ($upd) {
+                            mysqli_stmt_bind_param($upd, 'ssssssiii', $editName, $editUsername, $editEmail, $editPhone, $editRoleStr, $editStatus, $newHash, $editUserId, $companyId);
+                            $done = mysqli_stmt_execute($upd);
+                            mysqli_stmt_close($upd);
+                        }
+                    }
+                } else {
+                    if (company_users_has_column('role_id')) {
+                        $upd = mysqli_prepare($conn, 'UPDATE users SET name=?, username=?, email=?, phone=?, role=?, role_id=?, status=? WHERE id=? AND company_id=?');
+                        if ($upd) {
+                            mysqli_stmt_bind_param($upd, 'sssssssii', $editName, $editUsername, $editEmail, $editPhone, $editRoleStr, $editRoleId, $editStatus, $editUserId, $companyId);
+                            $done = mysqli_stmt_execute($upd);
+                            mysqli_stmt_close($upd);
+                        }
+                    } else {
+                        $upd = mysqli_prepare($conn, 'UPDATE users SET name=?, username=?, email=?, phone=?, role=?, status=? WHERE id=? AND company_id=?');
+                        if ($upd) {
+                            mysqli_stmt_bind_param($upd, 'ssssssii', $editName, $editUsername, $editEmail, $editPhone, $editRoleStr, $editStatus, $editUserId, $companyId);
+                            $done = mysqli_stmt_execute($upd);
+                            mysqli_stmt_close($upd);
+                        }
+                    }
+                }
+
+                if (empty($error)) {
+                    if (!isset($done) || !$done) {
+                        $error = 'فشل تعديل المستخدم.';
+                    } else {
+                        company_write_audit(intval($user['id']), $companyId, 'edit_user', $editName, 'تعديل بيانات مستخدم');
+                        $ok = 'تم تعديل بيانات المستخدم بنجاح.';
+                    }
+                }
+            }
+        }
+    }
+}
+
 /**
  * جلب الأدوار من قاعدة البيانات مع الهرمية (مدير → مشرف)
  * يُعيد: [ 'parents' => [...], 'children' => [parentId => [...]], 'flat' => [...] ]
@@ -292,11 +385,12 @@ $csrf = generate_csrf_token();
                         <th>الدور</th>
                         <th>الحالة</th>
                         <th>آخر دخول</th>
+                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($list)): ?>
-                        <tr><td colspan="6">لا يوجد مستخدمون بعد.</td></tr>
+                        <tr><td colspan="7">لا يوجد مستخدمون بعد.</td></tr>
                     <?php else: foreach ($list as $idx => $u): ?>
                         <?php
                         // تحديد IDّ الدور: role_id أولاً، ثم role
@@ -336,6 +430,13 @@ $csrf = generate_csrf_token();
                             </td>
                             <td><span class="status-badge <?php echo $stInfo['cls']; ?>"><?php echo $stInfo['label']; ?></span></td>
                             <td style="color:#94a3b8;font-size:.82rem"><?php echo !empty($u['last_login_at']) ? e(date('d/m/Y H:i', strtotime($u['last_login_at']))) : '—'; ?></td>
+                            <td>
+                                <a href="javascript:void(0)"
+                                   onclick="openEditModal(<?php echo intval($u['id']); ?>, '<?php echo addslashes(e($u['name'])); ?>', '<?php echo addslashes(e($u['email'])); ?>', '<?php echo addslashes(e($u['phone'])); ?>', <?php echo intval(isset($u['role_id']) && intval($u['role_id']) > 0 ? $u['role_id'] : $u['role']); ?>, '<?php echo e(isset($u['status']) ? $u['status'] : 'active'); ?>')"
+                                   style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(16,36,67,.08);color:#30527f;font-size:.8rem;font-weight:700;text-decoration:none;">
+                                    تعديل
+                                </a>
+                            </td>
                         </tr>
                     <?php endforeach; endif; ?>
                 </tbody>
@@ -343,6 +444,88 @@ $csrf = generate_csrf_token();
         </div>
     </div>
 </div>
+
+<!-- مودال تعديل المستخدم -->
+<div id="editModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:14px;padding:24px;width:100%;max-width:480px;margin:auto;box-shadow:0 8px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto;">
+        <h3 style="margin:0 0 18px;color:#102443;font-size:1.1rem;">تعديل بيانات المستخدم</h3>
+        <div id="editAlert" style="display:none;padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:.9rem;"></div>
+
+        <form id="editForm" method="post" action="" autocomplete="off">
+            <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
+            <input type="hidden" name="action" value="edit_user">
+            <input type="hidden" name="edit_user_id" id="edit_user_id">
+
+            <div class="field"><label>الاسم الكامل *</label><input name="edit_name" id="edit_name" required maxlength="150"></div>
+            <div class="field"><label>البريد الإلكتروني *</label><input name="edit_email" id="edit_email" type="email" required maxlength="150"></div>
+            <div class="field"><label>الهاتف *</label><input name="edit_phone" id="edit_phone" required maxlength="30"></div>
+
+            <div class="field">
+                <label>الدور *</label>
+                <select name="edit_role_id" id="edit_role_id" required>
+                    <option value="">— اختر الدور —</option>
+                    <?php
+                    foreach ($rolesData['parents'] as $parent) {
+                        $pid = intval($parent['id']);
+                        $hasKids = !empty($rolesData['children'][strval($pid)]);
+                        if ($hasKids) {
+                            echo '<optgroup label="' . e($parent['name']) . '">';
+                            echo '<option value="' . $pid . '">» ' . e($parent['name']) . '</option>';
+                            foreach ($rolesData['children'][strval($pid)] as $child) {
+                                echo '<option value="' . intval($child['id']) . '">   ' . e($child['name']) . '</option>';
+                            }
+                            echo '</optgroup>';
+                        } else {
+                            echo '<option value="' . $pid . '">' . e($parent['name']) . '</option>';
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>الحالة *</label>
+                <select name="edit_status" id="edit_status" required>
+                    <option value="active">نشط</option>
+                    <option value="inactive">غير نشط</option>
+                    <option value="suspended">موقوف</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>كلمة المرور الجديدة <small style="color:#64748b;font-weight:400;">(اتركها فارغة للإبقاء على الحالية)</small></label>
+                <input name="edit_password" id="edit_password" type="password" maxlength="255" placeholder="اختياري — 8 أحرف على الأقل">
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:18px;">
+                <button type="submit" class="btn" style="flex:1;">حفظ التعديلات</button>
+                <button type="button" onclick="closeEditModal()" style="flex:1;border:1px solid #d1d5db;background:#fff;color:#374151;padding:11px;border-radius:10px;font-family:inherit;font-weight:700;cursor:pointer;">إلغاء</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditModal(id, name, email, phone, roleId, status) {
+    document.getElementById('edit_user_id').value  = id;
+    document.getElementById('edit_name').value     = name;
+    document.getElementById('edit_email').value    = email;
+    document.getElementById('edit_phone').value    = phone;
+    document.getElementById('edit_role_id').value  = roleId;
+    document.getElementById('edit_status').value   = status;
+    document.getElementById('edit_password').value = '';
+    document.getElementById('editAlert').style.display = 'none';
+    var m = document.getElementById('editModal');
+    m.style.display = 'flex';
+}
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+// إغلاق عند النقر على الخلفية
+document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditModal();
+});
+</script>
 </body>
 </html>
 

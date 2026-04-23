@@ -50,46 +50,12 @@ if (!$is_super_admin) {
     }
 }
 
-// التحقق من صلاحيات المستخدم على شاشة التشغيل (مع أولوية سجل الدور الحالي)
-$current_role_id = intval($_SESSION['user']['role']);
-$module_query = "SELECT m.id
-                                 FROM modules m
-                                 LEFT JOIN role_permissions rp
-                                                ON rp.module_id = m.id
-                                             AND rp.role_id = $current_role_id
-                                 WHERE (
-                                                m.code = 'movement/move_oprators.php'
-                                         OR m.code = 'movement/oprators.php'
-                                         OR m.code = 'movement/oprators'
-                                         OR m.code LIKE '%movement/Oprators/oprators.php%'
-                                         OR m.code LIKE '%movement/oprators.php%'
-                                 )
-                                     AND m.owner_role_id IN ($current_role_id, -1)
-                                 ORDER BY
-                                     CASE WHEN rp.module_id IS NOT NULL THEN 0 ELSE 1 END,
-                                     CASE
-                                         WHEN m.owner_role_id = $current_role_id THEN 0
-                                         WHEN m.owner_role_id = -1 THEN 1
-                                         ELSE 2
-                                     END,
-                                     m.id ASC
-                                 LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
-$module_id = $module_info ? $module_info['id'] : null;
-
-$can_view = false;
-$can_add = false;
-$can_edit = false;
-$can_delete = false;
-
-if ($module_id) {
-    $perms = get_module_permissions($conn, $module_id);
-    $can_view = $perms['can_view'];
-    $can_add = $perms['can_add'];
-    $can_edit = $perms['can_edit'];
-    $can_delete = $perms['can_delete'];
-}
+// التحقق من صلاحيات المستخدم على شاشة التشغيل
+$page_permissions = check_page_permissions($conn, 'movement/move_oprators.php');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
 
 if (!$can_view) {
     header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+التشغيل+❌");
@@ -587,11 +553,11 @@ include('../insidebar.php');
                         $operation_id = isset($_POST['operation_id']) ? intval($_POST['operation_id']) : 0;
 
                         if ($operation_id > 0 && !$can_edit) {
-                            echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                            echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
                             exit();
                         }
                         if ($operation_id === 0 && !$can_add) {
-                            echo "<script>alert('❌ ليس لديك صلاحية إضافة تشغيل جديد'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                            echo "<script>alert('❌ ليس لديك صلاحية إضافة تشغيل جديد'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
                             exit();
                         }
 
@@ -627,7 +593,7 @@ include('../insidebar.php');
                                     status = '$status'
                                         WHERE id = $operation_id AND project_id = '$project_id'$operations_company_scope";
                             mysqli_query($conn, $sql);
-                            echo "<script>alert('✅ تم التحديث بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
+                            echo "<script>alert('✅ تم التحديث بنجاح'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
                         } else {
                             // إضافة سجل جديد
                             $insert_company_col = (!$is_super_admin && $operations_has_company) ? ", company_id" : "";
@@ -749,7 +715,7 @@ include('../insidebar.php');
                                                                  data-shift-hours='" . $row['shift_hours'] . "'
                                                                  data-status='" . $row['status'] . "'
                                                                  title='تعديل'><i class='fa fa-edit'></i></a>" : "") . "
-                                                            " . ($can_delete ? "<a href='oprators.php?project_id=" . $selected_project_id . "&delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف التشغيل؟\")' title='حذف'>
+                                                            " . ($can_delete ? "<a href='move_oprators.php?project_id=" . $selected_project_id . "&delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف التشغيل؟\")' title='حذف'>
                                                                 <i class='fa fa-trash'></i>
                                                             </a>" : "") . "
                                                                 </div>

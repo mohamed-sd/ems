@@ -40,42 +40,10 @@ if (!$is_super_admin) {
     }
 }
 
-// صلاحيات الصفحة: نفس صلاحيات شاشة التشغيل
-$current_role_id = intval($_SESSION['user']['role']);
-$module_query = "SELECT m.id
-                 FROM modules m
-                 LEFT JOIN role_permissions rp
-                        ON rp.module_id = m.id
-                     AND rp.role_id = $current_role_id
-                 WHERE (
-                        m.code = 'movement/move_oprators.php'
-                     OR m.code = 'movement/oprators.php'
-                     OR m.code = 'movement/oprators'
-                     OR m.code LIKE '%movement/move_oprators.php%'
-                     OR m.code LIKE '%movement/oprators.php%'
-                 )
-                   AND m.owner_role_id IN ($current_role_id, -1)
-                 ORDER BY
-                    CASE WHEN rp.module_id IS NOT NULL THEN 0 ELSE 1 END,
-                    CASE
-                        WHEN m.owner_role_id = $current_role_id THEN 0
-                        WHEN m.owner_role_id = -1 THEN 1
-                        ELSE 2
-                    END,
-                    m.id ASC
-                 LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
-$module_id = $module_info ? intval($module_info['id']) : 0;
-
-$can_view = false;
-$can_edit = false;
-
-if ($module_id > 0) {
-    $perms = get_module_permissions($conn, $module_id);
-    $can_view = !empty($perms['can_view']);
-    $can_edit = !empty($perms['can_edit']);
-}
+// صلاحيات الصفحة: نفس نمط شاشة التشغيل
+$page_permissions = check_page_permissions($conn, 'movement/project_drivers.php');
+$can_view = !empty($page_permissions['can_view']);
+$can_edit = !empty($page_permissions['can_edit']);
 
 if (!$can_view) {
     header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+شاشة+سائقي+المشروع+❌");

@@ -6,6 +6,18 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once '../config.php';
+require_once '../includes/permissions_helper.php';
+
+$page_permissions = check_page_permissions($conn, 'Suppliers/supplierscontracts.php');
+$can_view = $page_permissions['can_view'];
+$can_add = $page_permissions['can_add'];
+$can_edit = $page_permissions['can_edit'];
+$can_delete = $page_permissions['can_delete'];
+
+if (!$can_view) {
+  header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+عقود+الموردين+❌");
+  exit();
+}
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
@@ -87,6 +99,65 @@ if (!$supplier_check_result || mysqli_num_rows($supplier_check_result) === 0) {
   header('Location: suppliers.php');
   exit();
 }
+
+if (isset($_GET['delete_id'])) {
+  if (!$can_delete) {
+    header("Location: supplierscontracts.php?id=$supplier_id&msg=لا+توجد+صلاحية+حذف+عقود+الموردين+❌");
+    exit();
+  }
+
+  $delete_id = intval($_GET['delete_id']);
+  if ($delete_id > 0) {
+    mysqli_begin_transaction($conn);
+    $delete_ok = true;
+
+    $delete_equipments_sql = "DELETE sce
+                              FROM suppliercontractequipments sce
+                              JOIN supplierscontracts sc ON sc.id = sce.contract_id
+                              WHERE sc.id = $delete_id
+                                AND sc.supplier_id = $supplier_id
+                                AND $supplier_contract_scope_sql";
+    if (!mysqli_query($conn, $delete_equipments_sql)) {
+      $delete_ok = false;
+    }
+
+    if ($delete_ok) {
+      $delete_notes_sql = "DELETE n
+                           FROM supplier_contract_notes n
+                           JOIN supplierscontracts sc ON sc.id = n.contract_id
+                           WHERE sc.id = $delete_id
+                             AND sc.supplier_id = $supplier_id
+                             AND $supplier_contract_scope_sql";
+      if (!mysqli_query($conn, $delete_notes_sql)) {
+        $delete_ok = false;
+      }
+    }
+
+    if ($delete_ok) {
+      $delete_contract_sql = "DELETE sc
+                              FROM supplierscontracts sc
+                              WHERE sc.id = $delete_id
+                                AND sc.supplier_id = $supplier_id
+                                AND $supplier_contract_scope_sql";
+      if (!mysqli_query($conn, $delete_contract_sql) || mysqli_affected_rows($conn) <= 0) {
+        $delete_ok = false;
+      }
+    }
+
+    if ($delete_ok) {
+      mysqli_commit($conn);
+      header("Location: supplierscontracts.php?id=$supplier_id&msg=تم+حذف+العقد+بنجاح+✅");
+      exit();
+    }
+
+    mysqli_rollback($conn);
+    header("Location: supplierscontracts.php?id=$supplier_id&msg=تعذر+حذف+العقد+أو+أنه+خارج+النطاق+❌");
+    exit();
+  }
+
+  header("Location: supplierscontracts.php?id=$supplier_id&msg=معرف+العقد+غير+صحيح+❌");
+  exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -124,9 +195,11 @@ if (!$supplier_check_result || mysqli_num_rows($supplier_check_result) === 0) {
         <h1 class="page-title">عقود المورد</h1>
       </div>
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <?php if ($can_add): ?>
         <a href="javascript:void(0)" id="toggleForm" class="add-btn">
           <i class="fas fa-plus-circle"></i> عقد جديد
         </a>
+        <?php endif; ?>
         <a href="suppliers.php" class="back-btn">
           <i class="fas fa-arrow-right"></i> العودة للموردين
         </a>
@@ -134,6 +207,7 @@ if (!$supplier_check_result || mysqli_num_rows($supplier_check_result) === 0) {
     </div>
 
     <!-- فورم إضافة عقد -->
+    <?php if ($can_add || $can_edit): ?>
     <form id="projectForm" action="" method="post" style="display:none;">
 
       <div class="card">
@@ -646,6 +720,7 @@ if (!$supplier_check_result || mysqli_num_rows($supplier_check_result) === 0) {
         </div>
       </div>
     </form>
+    <?php endif; ?>
     <div class="card">
       <div class="card-header">
         <h5>
@@ -743,6 +818,15 @@ if (!$supplier_check_result || mysqli_num_rows($supplier_check_result) === 0) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['supplier_id']) && !empty($_POST['project_id']) && !empty($_POST['project_contract_id'])) {
 
               $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+              if ($id > 0 && !$can_edit) {
+                echo "<script>alert('❌ ليس لديك صلاحية تعديل عقود الموردين'); window.location.href='supplierscontracts.php?id=$supplier_id';</script>";
+                exit();
+              }
+              if ($id === 0 && !$can_add) {
+                echo "<script>alert('❌ ليس لديك صلاحية إضافة عقود موردين'); window.location.href='supplierscontracts.php?id=$supplier_id';</script>";
+                exit();
+              }
+
               $supplier_id_post = intval($_POST['supplier_id']);
               $project_id = intval($_POST['project_id']);
               $mine_id = isset($_POST['mine_id']) ? intval($_POST['mine_id']) : 0;
@@ -1029,8 +1113,9 @@ if (!$supplier_check_result || mysqli_num_rows($supplier_check_result) === 0) {
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";
 
-              echo "<td class='group-status'>
-                        <a href='javascript:void(0)' class='editBtn'
+              echo "<td class='group-status'>";
+              if ($can_edit) {
+                echo "<a href='javascript:void(0)' class='editBtn'
              data-id='" . $row['id'] . "'
              data-project_id='" . $row['project_id'] . "'
              data-mine_id='" . (isset($row['mine_id']) ? $row['mine_id'] : '') . "'
@@ -1063,9 +1148,12 @@ if (!$supplier_check_result || mysqli_num_rows($supplier_check_result) === 0) {
                   payment_date ='" . (isset($row['payment_date']) ? $row['payment_date'] : '') . "'
                   
              data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
-             class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>
-                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>
-                        <a href='supplierscontracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>
+             class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>";
+              }
+              if ($can_delete) {
+                echo "<a href='supplierscontracts.php?id=" . $supplier_id . "&delete_id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد من حذف العقد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>";
+              }
+              echo "<a href='supplierscontracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>
                       </td>";
               echo "</tr>";
             }
@@ -1120,9 +1208,11 @@ if (!$supplier_check_result || mysqli_num_rows($supplier_check_result) === 0) {
       const toggleContractFormBtn = document.getElementById('toggleForm');
       const contractForm = document.getElementById('projectForm');
 
-      toggleContractFormBtn.addEventListener('click', function () {
-        contractForm.style.display = contractForm.style.display === "none" ? "block" : "none";
-      });
+      if (toggleContractFormBtn && contractForm) {
+        toggleContractFormBtn.addEventListener('click', function () {
+          contractForm.style.display = contractForm.style.display === "none" ? "block" : "none";
+        });
+      }
     })();
 
   </script>
