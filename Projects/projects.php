@@ -109,6 +109,18 @@ $project_scope_sql = $project_has_company_id
         )
     )";
 
+$project_scope_plain_sql = $project_has_company_id
+    ? "company_id = $company_id"
+    : "(
+        EXISTS (SELECT 1 FROM users scope_u WHERE scope_u.id = project.created_by AND scope_u.company_id = $company_id)
+        OR EXISTS (
+            SELECT 1
+            FROM clients scope_c
+            INNER JOIN users scope_uc ON scope_uc.id = scope_c.created_by
+            WHERE scope_c.id = project.$project_client_column AND scope_uc.company_id = $company_id
+        )
+    )";
+
 $client_scope_sql = $clients_has_company_id
     ? "c.company_id = $company_id"
     : "EXISTS (SELECT 1 FROM users scope_u WHERE scope_u.id = c.created_by AND scope_u.company_id = $company_id)";
@@ -181,7 +193,7 @@ if (isset($_GET['delete_id']) && isset($_GET['csrf_token'])) {
         $delete_set[] = "deleted_by = " . intval($deleted_by);
     }
 
-    $delete_query = "UPDATE project SET " . implode(', ', $delete_set) . " WHERE id = $delete_id AND $project_scope_sql AND $project_not_deleted_sql";
+    $delete_query = "UPDATE project SET " . implode(', ', $delete_set) . " WHERE id = $delete_id AND $project_scope_plain_sql AND $project_not_deleted_plain_sql";
     if (mysqli_query($conn, $delete_query)) {
         log_security_event('PROJECT_SOFT_DELETED', "Soft deleted project ID: $delete_id");
         projects_redirect_with_msg('تم حذف المشروع (حذف ناعم) بنجاح ✅');
@@ -263,39 +275,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
             projects_redirect_with_msg('المشروع غير موجود أو لا يتبع لشركتك ❌');
         }
 
-        $new_data = [
-            $project_client_column => $client_id,
-            'name' => $name,
-            'client' => $client,
-            'location' => $location,
-            'project_code' => $project_code,
-            'category' => $category,
-            'sub_sector' => $sub_sector,
-            'state' => $state,
-            'region' => $region,
-            'nearest_market' => $nearest_market,
-            'latitude' => $latitude,
-            'longitude' => $longitude,
-            'total' => $total,
-            'status' => $status,
-            'updated_at' => approval_now()
-        ];
+        $update_sql = "UPDATE project SET
+            $project_client_column = ?,
+            name = ?,
+            client = ?,
+            location = ?,
+            project_code = ?,
+            category = ?,
+            sub_sector = ?,
+            state = ?,
+            region = ?,
+            nearest_market = ?,
+            latitude = ?,
+            longitude = ?,
+            total = ?,
+            status = ?,
+            updated_at = NOW()";
+
+        $update_values = array(
+            $client_id,
+            $name,
+            $client,
+            $location,
+            $project_code,
+            $category,
+            $sub_sector,
+            $state,
+            $region,
+            $nearest_market,
+            $latitude,
+            $longitude,
+            $total,
+            $status
+        );
+        $update_types = 'isssssssssssds';
 
         if ($project_has_company_id) {
-            $new_data['company_id'] = $company_id;
+            $update_sql .= ", company_id = ?";
+            $update_values[] = $company_id;
+            $update_types .= 'i';
         }
 
-        $payload = approval_build_simple_update_payload('project', ['id' => $id], $new_data, $old_project);
-        $approval_action = ($old_project['status'] == '1' && $status == '0') ? 'deactivate' : 'update';
-        $result = approval_create_request('project', $id, $approval_action, $payload, approval_get_user_id(), $conn);
+        $update_sql .= " WHERE id = ? AND $project_scope_plain_sql AND $project_not_deleted_plain_sql";
+        $update_values[] = $id;
+        $update_types .= 'i';
 
-        if (!empty($result['success'])) {
-            log_security_event('PROJECT_UPDATE_REQUESTED', "Update approval requested for project: $name (ID: $id)");
-            $msg = ((isset($result['status']) ? $result['status'] : 'pending') === 'approved') ? 'تم اعتماد التعديل وتنفيذه ✅' : 'تم إرسال طلب تعديل المشروع للمواففقة ✅';
-            projects_redirect_with_msg($msg);
+        $stmt = mysqli_prepare($conn, $update_sql);
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, $update_types, ...$update_values);
+            $executed = mysqli_stmt_execute($stmt);
+        } else {
+            $executed = false;
         }
 
-        projects_redirect_with_msg((isset($result['message']) ? $result['message'] : 'حدث خطأ أثناء إنشاء طلب التعديل') . ' ❌');
+        if ($stmt && $executed) {
+            log_security_event('PROJECT_UPDATED', "Updated project: $name (ID: $id)");
+            projects_redirect_with_msg('تم تعديل المشروع بنجاح ✅');
+        }
+
+        $error_message = $stmt ? mysqli_stmt_error($stmt) : mysqli_error($conn);
+        projects_redirect_with_msg('حدث خطأ أثناء تعديل المشروع ❌' . (!empty($error_message) ? ' - ' . $error_message : ''));
     } else {
         // إضافة مع Prepared Statement
         $insert_columns = "$project_client_column, name, client, location, project_code, category, sub_sector, state, region, nearest_market, latitude, longitude, total, status, created_by";

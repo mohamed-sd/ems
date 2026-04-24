@@ -1328,3 +1328,99 @@ Stack trace:
 [24-Apr-2026 01:38:53 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\ems\Suppliers\suppliers.php on line 823
 [24-Apr-2026 01:39:22 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): No connection could be made because the target machine actively refused it in C:\xampp\htdocs\ems\config.php on line 124
 [24-Apr-2026 01:39:22 Europe/Berlin] Database Connection Failed: No connection could be made because the target machine actively refused it
+[24-Apr-2026 16:09:01 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/1045): Access denied for user 'u359449619_ems'@'156.193.243.194' (using password: YES) in C:\xampp\htdocs\ems\config.php on line 124
+[24-Apr-2026 16:09:01 Europe/Berlin] Database Connection Failed: Access denied for user 'u359449619_ems'@'156.193.243.194' (using password: YES)
+[24-Apr-2026 16:13:32 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:13:32 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:13:40 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:13:40 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:13:49 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:13:49 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:13:56 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:13:56 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:14:36 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:14:36 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:17:56 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:17:56 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:18:12 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:18:12 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:18:25 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:18:25 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:18:26 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:18:26 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:31:45 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:31:45 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:32:08 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:32:08 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:32:08 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:32:08 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[24-Apr-2026 16:32:15 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[24-Apr-2026 16:32:15 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[24-Apr-2026 16:32:24 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:32:24 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:32:27 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:32:27 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:32:30 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:32:30 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:34:38 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:34:38 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:35:01 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:35:01 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:35:05 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:35:05 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:45:35 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:45:35 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:48:56 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:48:56 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:49:01 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:49:01 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:50:48 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:50:48 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:53:43 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 16:53:43 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 17:18:06 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\ems\Oprators\oprators.php on line 1224
+[24-Apr-2026 17:18:06 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp\htdocs\ems\config.php:163) in C:\xampp\htdocs\ems\config.php on line 173
+[24-Apr-2026 17:18:08 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\ems\Oprators\oprators.php on line 1224
+[24-Apr-2026 17:18:08 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp\htdocs\ems\config.php:163) in C:\xampp\htdocs\ems\config.php on line 173
+[24-Apr-2026 17:18:12 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\ems\Oprators\oprators.php on line 1224
+[24-Apr-2026 17:18:12 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp\htdocs\ems\config.php:163) in C:\xampp\htdocs\ems\config.php on line 173
+[24-Apr-2026 17:18:27 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 17:18:27 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 17:18:35 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 17:18:35 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 17:18:40 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 17:18:40 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 17:18:45 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 17:18:45 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 17:19:06 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\ems\Oprators\oprators.php on line 1224
+[24-Apr-2026 17:19:06 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp\htdocs\ems\config.php:163) in C:\xampp\htdocs\ems\config.php on line 173
+[24-Apr-2026 17:19:08 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\ems\Oprators\oprators.php on line 1224
+[24-Apr-2026 17:19:08 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp\htdocs\ems\config.php:163) in C:\xampp\htdocs\ems\config.php on line 173
+[24-Apr-2026 17:19:10 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\ems\Oprators\oprators.php on line 1224
+[24-Apr-2026 17:19:10 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp\htdocs\ems\config.php:163) in C:\xampp\htdocs\ems\config.php on line 173
+[24-Apr-2026 17:22:40 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 17:22:40 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[24-Apr-2026 17:23:14 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\ems\Oprators\oprators.php on line 1227
+[24-Apr-2026 17:23:14 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp\htdocs\ems\config.php:163) in C:\xampp\htdocs\ems\config.php on line 173
+[24-Apr-2026 17:24:33 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\ems\Oprators\oprators.php on line 1225
+[24-Apr-2026 17:24:33 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp\htdocs\ems\config.php:163) in C:\xampp\htdocs\ems\config.php on line 173
+[24-Apr-2026 17:25:17 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\ems\Oprators\oprators.php on line 1225
+[24-Apr-2026 17:25:17 Europe/Berlin] PHP Fatal error:  Cannot redeclare ems_table_has_column_raw() (previously declared in C:\xampp\htdocs\ems\config.php:163) in C:\xampp\htdocs\ems\config.php on line 173
+[24-Apr-2026 18:09:00 Europe/Berlin] Database prepare error: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '\
+            client_id = ?, \
+            name = ?, \
+            client ...' at line 1
+[24-Apr-2026 18:09:16 Europe/Berlin] Database prepare error: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '\
+            client_id = ?, \
+            name = ?, \
+            client ...' at line 1
+[24-Apr-2026 18:10:25 Europe/Berlin] Database prepare error: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '\
+            client_id = ?, \
+            name = ?, \
+            client ...' at line 1
+[24-Apr-2026 18:11:03 Europe/Berlin] Database prepare error: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '\
+            client_id = ?, \
+            name = ?, \
+            client ...' at line 1
+[24-Apr-2026 18:13:48 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/1045): Access denied for user 'u359449619_ems'@'156.193.243.194' (using password: YES) in C:\xampp\htdocs\ems\config.php on line 124
+[24-Apr-2026 18:13:48 Europe/Berlin] Database Connection Failed: Access denied for user 'u359449619_ems'@'156.193.243.194' (using password: YES)
