@@ -29,6 +29,7 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 $equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
+$equipments_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
 
 enforce_module_permission_json($conn, 'equipments', 'edit', 'لا توجد صلاحية تعديل حالة الآليات');
 
@@ -49,7 +50,8 @@ if ($equipment_id <= 0) {
 
 // الحصول على بيانات الآلية الحالية
 $equipment_scope = ($is_super_admin || !$equipments_has_company) ? '' : " AND company_id = $company_id";
-$equipment_query = "SELECT id, code, name, availability_status FROM equipments WHERE id = $equipment_id$equipment_scope";
+$availability_state_select = $equipments_has_availability_state ? ', availability_state' : '';
+$equipment_query = "SELECT id, code, name, availability_status$availability_state_select FROM equipments WHERE id = $equipment_id$equipment_scope";
 $equipment_result = mysqli_query($conn, $equipment_query);
 
 if (!$equipment_result || mysqli_num_rows($equipment_result) === 0) {
@@ -57,6 +59,20 @@ if (!$equipment_result || mysqli_num_rows($equipment_result) === 0) {
 }
 
 $equipment = mysqli_fetch_assoc($equipment_result);
+$current_availability_state = ($equipments_has_availability_state && isset($equipment['availability_state']) && $equipment['availability_state'] !== '')
+    ? $equipment['availability_state']
+    : ((empty($equipment['availability_status']) || $equipment['availability_status'] === 'متاحة للعمل' || $equipment['availability_status'] === 'قيد الاستخدام') ? 'متوفرة' : 'غير متوفرة');
+$current_availability_status = $equipment['availability_status'];
+if ($current_availability_status === 'موقوفة للصيانة') {
+    $current_availability_status = 'تحت الصيانة';
+} elseif ($current_availability_status === 'مبيعة/مسحوبة') {
+    $current_availability_status = 'مسحوبة';
+} elseif ($current_availability_status === 'معطلة مؤقتاً') {
+    $current_availability_status = 'معطلة';
+}
+if ($current_availability_state === 'متوفرة') {
+    $current_availability_status = 'قيد الاستخدام';
+}
 
 // التحقق من التصاريح
 $user_role = approval_get_user_role();
@@ -68,12 +84,19 @@ if ($user_role !== '10') {
 }
 
 // التحقق من حالة الآلية الحالية
-if ($action === 'deactivate_equipment' && $equipment['availability_status'] === 'موقوفة للصيانة') {
-    die(json_encode(['success' => false, 'message' => 'الآلية موقوفة بالفعل']));
+if ($action === 'deactivate_equipment' && $current_availability_state === 'غير متوفرة') {
+    die(json_encode(['success' => false, 'message' => 'الآلية غير متوفرة بالفعل']));
 }
 
-if ($action === 'reactivate_equipment' && $equipment['availability_status'] !== 'موقوفة للصيانة') {
-    die(json_encode(['success' => false, 'message' => 'الآلية غير موقوفة']));
+if ($action === 'reactivate_equipment' && $current_availability_state !== 'غير متوفرة') {
+    die(json_encode(['success' => false, 'message' => 'الآلية متوفرة بالفعل']));
+}
+
+$updated_equipment_fields = [
+    'availability_status' => $action === 'deactivate_equipment' ? 'تحت الصيانة' : 'قيد الاستخدام'
+];
+if ($equipments_has_availability_state) {
+    $updated_equipment_fields['availability_state'] = $action === 'deactivate_equipment' ? 'غير متوفرة' : 'متوفرة';
 }
 
 // بناء payload الطلب
@@ -82,8 +105,10 @@ $payload = [
         'equipment_id' => $equipment_id,
         'equipment_code' => $equipment['code'],
         'equipment_name' => $equipment['name'],
-        'current_status' => $equipment['availability_status'],
-        'new_status' => $action === 'deactivate_equipment' ? 'موقوفة للصيانة' : 'متاحة للعمل',
+        'current_availability_state' => $current_availability_state,
+        'current_status' => $current_availability_status,
+        'new_availability_state' => $action === 'deactivate_equipment' ? 'غير متوفرة' : 'متوفرة',
+        'new_status' => $action === 'deactivate_equipment' ? 'تحت الصيانة' : 'قيد الاستخدام',
         'reason' => $deactivation_reason,
         'deactivation_date' => $deactivation_date,
         'action_type' => $action
@@ -93,9 +118,7 @@ $payload = [
             'type' => 'UPDATE',
             'table' => 'equipments',
             'where' => "id = $equipment_id" . (($is_super_admin || !$equipments_has_company) ? '' : " AND company_id = $company_id"),
-            'fields' => [
-                'availability_status' => $action === 'deactivate_equipment' ? 'موقوفة للصيانة' : 'متاحة للعمل'
-            ]
+            'fields' => $updated_equipment_fields
         ]
     ]
 ];

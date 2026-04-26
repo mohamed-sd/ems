@@ -59,7 +59,6 @@ $can_view   = $page_permissions['can_view'];
 $can_add    = $page_permissions['can_add'];
 $can_edit   = $page_permissions['can_edit'];
 $can_delete = $page_permissions['can_delete'];
-echo "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh".$current_role.$can_view.$can_add.$can_edit.$can_delete;
 if (!$can_view) {
     header("Location: ../login.php?msg=لا+توجد+صلاحية+عرض+التشغيل+❌");
     exit();
@@ -192,14 +191,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             'requested_by_role' => '10',
                             'reason' => $reason_text,
                             'current_availability_status' => $op_row['availability_status'],
-                            'new_availability_status' => 'موقوفة للصيانة'
+                            'new_availability_state' => 'غير متوفرة',
+                            'new_availability_status' => 'تحت الصيانة',
                         ],
                         'operations' => [
                             [
                                 'db_action' => 'update',
                                 'table' => 'equipments',
                                 'where' => ['id' => $equipment_id],
-                                'data' => ['availability_status' => 'موقوفة للصيانة']
+                                'data' => ['availability_status' => 'تحت الصيانة', 'availability_state' => 'غير متوفرة']
                             ],
                             [
                                 'db_action' => 'update',
@@ -1414,14 +1414,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             'requested_by_role' => '10',
                             'reason' => $reason_text,
                             'current_availability_status' => $op_row['availability_status'],
-                            'new_availability_status' => 'موقوفة للصيانة'
+                            'new_availability_state' => 'غير متوفرة',
+                            'new_availability_status' => 'تحت الصيانة',
                         ],
                         'operations' => [
                             [
                                 'db_action' => 'update',
                                 'table' => 'equipments',
                                 'where' => ['id' => $equipment_id],
-                                'data' => ['availability_status' => 'موقوفة للصيانة']
+                                'data' => ['availability_status' => 'تحت الصيانة', 'availability_state' => 'غير متوفرة']
                             ],
                             [
                                 'db_action' => 'update',

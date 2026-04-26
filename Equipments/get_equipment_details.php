@@ -8,50 +8,58 @@ include '../config.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-$current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
-$is_super_admin = ($current_role === '-1');
-$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+if (!function_exists('normalize_equipment_availability_state')) {
+    function normalize_equipment_availability_state($availability_state, $availability_status)
+    {
+        $availability_state = trim((string) $availability_state);
+        $availability_status = trim((string) $availability_status);
 
-if (!$is_super_admin && $company_id <= 0) {
-    die(json_encode(['success' => false, 'message' => 'معرّف الشركة غير متوفر']));
-}
+        if ($availability_state === 'متوفرة' || $availability_state === 'غير متوفرة') {
+            return $availability_state;
+        }
 
-$equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
-$operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
-$project_has_company = db_table_has_column($conn, 'project', 'company_id');
+        if ($availability_status === '' || $availability_status === 'متاحة للعمل' || $availability_status === 'قيد الاستخدام') {
+            return 'متوفرة';
+        }
 
-$equipment_scope_sql = '1=1';
-if (!$is_super_admin) {
-    if ($equipments_has_company) {
-        $equipment_scope_sql = "e.company_id = $company_id";
-    } elseif ($operations_has_company) {
-        $equipment_scope_sql = "EXISTS (SELECT 1 FROM operations so WHERE so.equipment = e.id AND so.company_id = $company_id)";
-    } elseif ($project_has_company) {
-        $equipment_scope_sql = "EXISTS (
-            SELECT 1
-            FROM operations so
-            JOIN project sp ON sp.id = so.project_id
-            WHERE so.equipment = e.id
-              AND sp.company_id = $company_id
-        )";
-    } else {
-        $equipment_scope_sql = "EXISTS (
-            SELECT 1
-            FROM operations so
-            JOIN project sp ON sp.id = so.project_id
-            WHERE so.equipment = e.id
-              AND (
-                  EXISTS (SELECT 1 FROM users su WHERE su.id = sp.created_by AND su.company_id = $company_id)
-                  OR EXISTS (
-                      SELECT 1
-                      FROM clients sc
-                      JOIN users scu ON scu.id = sc.created_by
-                      WHERE sc.id = sp.company_client_id AND scu.company_id = $company_id
-                  )
-              )
-        )";
+        return 'غير متوفرة';
     }
 }
+
+if (!function_exists('normalize_equipment_availability_status')) {
+    function normalize_equipment_availability_status($availability_state, $availability_status)
+    {
+        $availability_state = normalize_equipment_availability_state($availability_state, $availability_status);
+        $availability_status = trim((string) $availability_status);
+
+        if ($availability_state === 'متوفرة') {
+            return 'قيد الاستخدام';
+        }
+
+        $legacy_map = [
+            'موقوفة للصيانة' => 'تحت الصيانة',
+            'مبيعة/مسحوبة' => 'مسحوبة',
+            'معطلة مؤقتاً' => 'معطلة'
+        ];
+
+        if (isset($legacy_map[$availability_status])) {
+            return $legacy_map[$availability_status];
+        }
+
+        $valid_statuses = ['تحت الصيانة', 'محجوزة', 'مسحوبة', 'في المستودع', 'معطلة'];
+        if (in_array($availability_status, $valid_statuses, true)) {
+            return $availability_status;
+        }
+
+        return 'تحت الصيانة';
+    }
+}
+
+$equipments_has_machine_number = db_table_has_column($conn, 'equipments', 'machine_number');
+$equipments_has_document_type = db_table_has_column($conn, 'equipments', 'document_type');
+$equipments_has_site_supervisor_name = db_table_has_column($conn, 'equipments', 'site_supervisor_name');
+$equipments_has_site_supervisor_contact = db_table_has_column($conn, 'equipments', 'site_supervisor_contact');
+$equipments_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die(json_encode(['success' => false, 'message' => 'معرف المعدة مطلوب']));
@@ -72,7 +80,6 @@ $query = "
     LEFT JOIN project p ON o.project_id = p.id
     LEFT JOIN mines m ON o.mine_id = m.id
         WHERE e.id = $equipment_id
-            AND $equipment_scope_sql
     LIMIT 1
 ";
 
@@ -87,6 +94,18 @@ if (mysqli_num_rows($result) === 0) {
 }
 
 $equipment = mysqli_fetch_assoc($result);
+$equipment['machine_number'] = $equipments_has_machine_number && isset($equipment['machine_number']) ? $equipment['machine_number'] : '';
+$equipment['document_type'] = $equipments_has_document_type && isset($equipment['document_type']) ? $equipment['document_type'] : '';
+$equipment['site_supervisor_name'] = $equipments_has_site_supervisor_name && isset($equipment['site_supervisor_name']) ? $equipment['site_supervisor_name'] : '';
+$equipment['site_supervisor_contact'] = $equipments_has_site_supervisor_contact && isset($equipment['site_supervisor_contact']) ? $equipment['site_supervisor_contact'] : '';
+$equipment['availability_state'] = normalize_equipment_availability_state(
+    $equipments_has_availability_state && isset($equipment['availability_state']) ? $equipment['availability_state'] : '',
+    isset($equipment['availability_status']) ? $equipment['availability_status'] : ''
+);
+$equipment['availability_status'] = normalize_equipment_availability_status(
+    $equipment['availability_state'],
+    isset($equipment['availability_status']) ? $equipment['availability_status'] : ''
+);
 
 echo json_encode([
     'success' => true,

@@ -8,6 +8,59 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+$equipment_has_machine_number = db_table_has_column($conn, 'equipments', 'machine_number');
+$equipment_has_document_type = db_table_has_column($conn, 'equipments', 'document_type');
+$equipment_has_site_supervisor_name = db_table_has_column($conn, 'equipments', 'site_supervisor_name');
+$equipment_has_site_supervisor_contact = db_table_has_column($conn, 'equipments', 'site_supervisor_contact');
+$equipment_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
+
+if (!function_exists('normalize_equipment_availability_state')) {
+    function normalize_equipment_availability_state($availability_state, $availability_status)
+    {
+        $availability_state = trim((string) $availability_state);
+        $availability_status = trim((string) $availability_status);
+
+        if ($availability_state === 'متوفرة' || $availability_state === 'غير متوفرة') {
+            return $availability_state;
+        }
+
+        if ($availability_status === '' || $availability_status === 'متاحة للعمل' || $availability_status === 'قيد الاستخدام') {
+            return 'متوفرة';
+        }
+
+        return 'غير متوفرة';
+    }
+}
+
+if (!function_exists('normalize_equipment_availability_status')) {
+    function normalize_equipment_availability_status($availability_state, $availability_status)
+    {
+        $availability_state = normalize_equipment_availability_state($availability_state, $availability_status);
+        $availability_status = trim((string) $availability_status);
+
+        if ($availability_state === 'متوفرة') {
+            return 'قيد الاستخدام';
+        }
+
+        $legacy_map = [
+            'موقوفة للصيانة' => 'تحت الصيانة',
+            'مبيعة/مسحوبة' => 'مسحوبة',
+            'معطلة مؤقتاً' => 'معطلة'
+        ];
+
+        if (isset($legacy_map[$availability_status])) {
+            return $legacy_map[$availability_status];
+        }
+
+        $valid_statuses = ['تحت الصيانة', 'محجوزة', 'مسحوبة', 'في المستودع', 'معطلة'];
+        if (in_array($availability_status, $valid_statuses, true)) {
+            return $availability_status;
+        }
+
+        return 'تحت الصيانة';
+    }
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // ðŸ” التحقق من صلاحيات المستخدم
 // ════════════════════════════════════════════════════════════════════════════
@@ -151,11 +204,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     $code = mysqli_real_escape_string($conn, trim($_POST['code']));
     $type = mysqli_real_escape_string($conn, $_POST['type']);
     $name = mysqli_real_escape_string($conn, trim($_POST['name']));
-    $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $status = isset($_POST['status']) ? intval($_POST['status']) : 1;
 
     // المعلومات الأساسية والتعريفية
     $serial_number = mysqli_real_escape_string($conn, trim($_POST['serial_number'] ?? ''));
     $chassis_number = mysqli_real_escape_string($conn, trim($_POST['chassis_number'] ?? ''));
+    $machine_number = mysqli_real_escape_string($conn, trim($_POST['machine_number'] ?? ''));
 
     // بيانات الصنع والموديل
     $manufacturer = mysqli_real_escape_string($conn, trim($_POST['manufacturer'] ?? ''));
@@ -178,13 +232,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     // الوثائق والتسجيلات
     $license_number = mysqli_real_escape_string($conn, trim($_POST['license_number'] ?? ''));
     $license_authority = mysqli_real_escape_string($conn, trim($_POST['license_authority'] ?? ''));
+    $document_type = mysqli_real_escape_string($conn, trim($_POST['document_type'] ?? ''));
     $license_expiry_date = !empty($_POST['license_expiry_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['license_expiry_date']) . "'" : 'NULL';
     $inspection_certificate_number = mysqli_real_escape_string($conn, trim($_POST['inspection_certificate_number'] ?? ''));
     $last_inspection_date = !empty($_POST['last_inspection_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['last_inspection_date']) . "'" : 'NULL';
 
     // الموقع والتوفر
     $current_location = mysqli_real_escape_string($conn, trim($_POST['current_location'] ?? ''));
-    $availability_status = mysqli_real_escape_string($conn, $_POST['availability_status'] ?? 'متاحة للعمل');
+    $site_supervisor_name = mysqli_real_escape_string($conn, trim($_POST['site_supervisor_name'] ?? ''));
+    $site_supervisor_contact = mysqli_real_escape_string($conn, trim($_POST['site_supervisor_contact'] ?? ''));
+    $availability_state_input = $_POST['availability_state'] ?? '';
+    $availability_status_input = $_POST['availability_status'] ?? '';
+    $availability_state = mysqli_real_escape_string($conn, normalize_equipment_availability_state($availability_state_input, $availability_status_input));
+    $availability_status = mysqli_real_escape_string($conn, normalize_equipment_availability_status($availability_state_input, $availability_status_input));
 
     // البيانات المالية والقيمة
     $estimated_value = !empty($_POST['estimated_value']) ? floatval($_POST['estimated_value']) : 'NULL';
@@ -232,66 +292,108 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         }
     }
 
+    $equipment_save_fields = [
+        "suppliers='$suppliers'",
+        "code='$code'",
+        "type='$type'",
+        "name='$name'",
+        "status=$status",
+        "serial_number='$serial_number'",
+        "chassis_number='$chassis_number'",
+        "manufacturer='$manufacturer'",
+        "model='$model'",
+        "manufacturing_year=$manufacturing_year",
+        "import_year=$import_year",
+        "equipment_condition='$equipment_condition'",
+        "operating_hours=$operating_hours",
+        "engine_condition='$engine_condition'",
+        "tires_condition='$tires_condition'",
+        "actual_owner_name='$actual_owner_name'",
+        "owner_type='$owner_type'",
+        "owner_phone='$owner_phone'",
+        "owner_supplier_relation='$owner_supplier_relation'",
+        "license_number='$license_number'",
+        "license_authority='$license_authority'",
+        "license_expiry_date=$license_expiry_date",
+        "inspection_certificate_number='$inspection_certificate_number'",
+        "last_inspection_date=$last_inspection_date",
+        "current_location='$current_location'",
+        "availability_status='$availability_status'",
+        "estimated_value=$estimated_value",
+        "daily_rental_price=$daily_rental_price",
+        "monthly_rental_price=$monthly_rental_price",
+        "insurance_status='$insurance_status'",
+        "general_notes='$general_notes'",
+        "last_maintenance_date=$last_maintenance_date"
+    ];
+
+    if ($equipment_has_machine_number) {
+        $equipment_save_fields[] = "machine_number='$machine_number'";
+    }
+    if ($equipment_has_document_type) {
+        $equipment_save_fields[] = "document_type='$document_type'";
+    }
+    if ($equipment_has_site_supervisor_name) {
+        $equipment_save_fields[] = "site_supervisor_name='$site_supervisor_name'";
+    }
+    if ($equipment_has_site_supervisor_contact) {
+        $equipment_save_fields[] = "site_supervisor_contact='$site_supervisor_contact'";
+    }
+    if ($equipment_has_availability_state) {
+        $equipment_save_fields[] = "availability_state='$availability_state'";
+    }
+
     if ($edit_id > 0) {
         // تعديل
-        $sql = "UPDATE equipments 
-                SET  
-                    suppliers='$suppliers', 
-                    code='$code', 
-                    type='$type', 
-                    name='$name', 
-                    status='$status',
-                    serial_number='$serial_number',
-                    chassis_number='$chassis_number',
-                    manufacturer='$manufacturer',
-                    model='$model',
-                    manufacturing_year=$manufacturing_year,
-                    import_year=$import_year,
-                    equipment_condition='$equipment_condition',
-                    operating_hours=$operating_hours,
-                    engine_condition='$engine_condition',
-                    tires_condition='$tires_condition',
-                    actual_owner_name='$actual_owner_name',
-                    owner_type='$owner_type',
-                    owner_phone='$owner_phone',
-                    owner_supplier_relation='$owner_supplier_relation',
-                    license_number='$license_number',
-                    license_authority='$license_authority',
-                    license_expiry_date=$license_expiry_date,
-                    inspection_certificate_number='$inspection_certificate_number',
-                    last_inspection_date=$last_inspection_date,
-                    current_location='$current_location',
-                    availability_status='$availability_status',
-                    estimated_value=$estimated_value,
-                    daily_rental_price=$daily_rental_price,
-                    monthly_rental_price=$monthly_rental_price,
-                    insurance_status='$insurance_status',
-                    general_notes='$general_notes',
-                    last_maintenance_date=$last_maintenance_date
-                WHERE id='$edit_id'";
+        $sql = "UPDATE equipments SET\n                    " . implode(",\n                    ", $equipment_save_fields) . "\n                WHERE id='$edit_id'";
         $msg = "تم+تعديل+المعدة+بنجاح+✅";
     } else {
         // إضافة
-        $sql = "INSERT INTO equipments 
-                (suppliers, code, type, name, status, serial_number, chassis_number, 
-                 manufacturer, model, manufacturing_year, import_year, 
-                 equipment_condition, operating_hours, engine_condition, tires_condition,
-                 actual_owner_name, owner_type, owner_phone, owner_supplier_relation,
-                 license_number, license_authority, license_expiry_date, 
-                 inspection_certificate_number, last_inspection_date,
-                 current_location, availability_status,
-                 estimated_value, daily_rental_price, monthly_rental_price, insurance_status,
-                 general_notes, last_maintenance_date) 
-                VALUES 
-                ('$suppliers', '$code', '$type', '$name', '$status', '$serial_number', '$chassis_number',
-                 '$manufacturer', '$model', $manufacturing_year, $import_year,
-                 '$equipment_condition', $operating_hours, '$engine_condition', '$tires_condition',
-                 '$actual_owner_name', '$owner_type', '$owner_phone', '$owner_supplier_relation',
-                 '$license_number', '$license_authority', $license_expiry_date,
-                 '$inspection_certificate_number', $last_inspection_date,
-                 '$current_location', '$availability_status',
-                 $estimated_value, $daily_rental_price, $monthly_rental_price, '$insurance_status',
-                 '$general_notes', $last_maintenance_date)";
+        $insert_columns = [
+            'suppliers', 'code', 'type', 'name', 'status', 'serial_number', 'chassis_number',
+            'manufacturer', 'model', 'manufacturing_year', 'import_year',
+            'equipment_condition', 'operating_hours', 'engine_condition', 'tires_condition',
+            'actual_owner_name', 'owner_type', 'owner_phone', 'owner_supplier_relation',
+            'license_number', 'license_authority', 'license_expiry_date',
+            'inspection_certificate_number', 'last_inspection_date',
+            'current_location', 'availability_status',
+            'estimated_value', 'daily_rental_price', 'monthly_rental_price', 'insurance_status',
+            'general_notes', 'last_maintenance_date'
+        ];
+        $insert_values = [
+            "'$suppliers'", "'$code'", "'$type'", "'$name'", "$status", "'$serial_number'", "'$chassis_number'",
+            "'$manufacturer'", "'$model'", "$manufacturing_year", "$import_year",
+            "'$equipment_condition'", "$operating_hours", "'$engine_condition'", "'$tires_condition'",
+            "'$actual_owner_name'", "'$owner_type'", "'$owner_phone'", "'$owner_supplier_relation'",
+            "'$license_number'", "'$license_authority'", "$license_expiry_date",
+            "'$inspection_certificate_number'", "$last_inspection_date",
+            "'$current_location'", "'$availability_status'",
+            "$estimated_value", "$daily_rental_price", "$monthly_rental_price", "'$insurance_status'",
+            "'$general_notes'", "$last_maintenance_date"
+        ];
+
+        if ($equipment_has_machine_number) {
+            $insert_columns[] = 'machine_number';
+            $insert_values[] = "'$machine_number'";
+        }
+        if ($equipment_has_document_type) {
+            $insert_columns[] = 'document_type';
+            $insert_values[] = "'$document_type'";
+        }
+        if ($equipment_has_site_supervisor_name) {
+            $insert_columns[] = 'site_supervisor_name';
+            $insert_values[] = "'$site_supervisor_name'";
+        }
+        if ($equipment_has_site_supervisor_contact) {
+            $insert_columns[] = 'site_supervisor_contact';
+            $insert_values[] = "'$site_supervisor_contact'";
+        }
+        if ($equipment_has_availability_state) {
+            $insert_columns[] = 'availability_state';
+            $insert_values[] = "'$availability_state'";
+        }
+
+        $sql = "INSERT INTO equipments (" . implode(', ', $insert_columns) . ") VALUES (" . implode(', ', $insert_values) . ")";
         $msg = "تمت+إضافة+المعدة+بنجاح+✅";
     }
 
@@ -313,6 +415,21 @@ if (isset($_GET['edit']) && $can_edit) {
     if ($res && mysqli_num_rows($res) > 0) {
         $editData = mysqli_fetch_assoc($res);
     }
+}
+
+if (!empty($editData)) {
+    $editData['machine_number'] = isset($editData['machine_number']) ? $editData['machine_number'] : '';
+    $editData['document_type'] = isset($editData['document_type']) ? $editData['document_type'] : '';
+    $editData['site_supervisor_name'] = isset($editData['site_supervisor_name']) ? $editData['site_supervisor_name'] : '';
+    $editData['site_supervisor_contact'] = isset($editData['site_supervisor_contact']) ? $editData['site_supervisor_contact'] : '';
+    $editData['availability_state'] = normalize_equipment_availability_state(
+        isset($editData['availability_state']) ? $editData['availability_state'] : '',
+        isset($editData['availability_status']) ? $editData['availability_status'] : ''
+    );
+    $editData['availability_status'] = normalize_equipment_availability_status(
+        $editData['availability_state'],
+        isset($editData['availability_status']) ? $editData['availability_status'] : ''
+    );
 }
 ?>
 
@@ -456,6 +573,15 @@ if (isset($_GET['edit']) && $can_edit) {
                             <input type="text" name="chassis_number" id="chassis_number"
                                 placeholder="مثال: CAT320-ABC123456"
                                 value="<?php echo isset($editData['chassis_number']) ? htmlspecialchars($editData['chassis_number']) : ''; ?>" />
+                        </div>
+
+                        <div>
+                            <label>
+                                <i class="fas fa-microchip"></i>
+                                رقم الماكينة
+                            </label>
+                            <input type="text" name="machine_number" id="machine_number" placeholder="رقم الماكينة او المحرك"
+                                value="<?php echo isset($editData['machine_number']) ? htmlspecialchars($editData['machine_number']) : ''; ?>" />
                         </div>
 
                         <!-- ================================= -->
@@ -603,6 +729,7 @@ if (isset($_GET['edit']) && $can_edit) {
                                 <option value="مالك فردي" <?php echo (!empty($editData) && $editData['owner_type'] == "مالك فردي") ? "selected" : ""; ?>>مالك فردي</option>
                                 <option value="شركة متخصصة" <?php echo (!empty($editData) && $editData['owner_type'] == "شركة متخصصة") ? "selected" : ""; ?>>شركة متخصصة</option>
                                 <option value="مؤسسة" <?php echo (!empty($editData) && $editData['owner_type'] == "مؤسسة") ? "selected" : ""; ?>>مؤسسة</option>
+                                <option value="شركة إيكوبيشن" <?php echo (!empty($editData) && $editData['owner_type'] == "شركة إيكوبيشن") ? "selected" : ""; ?>>شركة إيكوبيشن</option>
                                 <option value="أخرى" <?php echo (!empty($editData) && $editData['owner_type'] == "أخرى") ? "selected" : ""; ?>>أخرى</option>
                             </select>
                         </div>
@@ -660,6 +787,19 @@ if (isset($_GET['edit']) && $can_edit) {
 
                         <div>
                             <label>
+                                <i class="fas fa-file-alt"></i>
+                                نوع الوثيقة
+                            </label>
+                            <select name="document_type" id="document_type">
+                                <option value="">-- اختر نوع الوثيقة --</option>
+                                <option value="شهادة وارد" <?php echo (!empty($editData) && $editData['document_type'] == "شهادة وارد") ? "selected" : ""; ?>>شهادة وارد</option>
+                                <option value="ترخيص ( شهادة بحث)" <?php echo (!empty($editData) && $editData['document_type'] == "ترخيص ( شهادة بحث)") ? "selected" : ""; ?>>ترخيص ( شهادة بحث)</option>
+                                <option value="عقد بيع" <?php echo (!empty($editData) && $editData['document_type'] == "عقد بيع") ? "selected" : ""; ?>>عقد بيع</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>
                                 <i class="fas fa-calendar-times"></i>
                                 تاريخ انتهاء الترخيص
                             </label>
@@ -706,22 +846,49 @@ if (isset($_GET['edit']) && $can_edit) {
                         <div>
                             <label>
                                 <i class="fas fa-traffic-light"></i>
-                                حالة التوفر
+                                التوفر
+                            </label>
+                            <select name="availability_state" id="availability_state">
+                                <option value="متوفرة" <?php echo (empty($editData) || $editData['availability_state'] == "متوفرة") ? "selected" : ""; ?>>متوفرة</option>
+                                <option value="غير متوفرة" <?php echo (!empty($editData) && $editData['availability_state'] == "غير متوفرة") ? "selected" : ""; ?>>غير متوفرة</option>
+                            </select>
+                            <small style="display:block; margin-top:6px; color:#64748b; font-size:0.82rem;">المعدات غير المتوفرة لن تظهر في جداول التشغيل.</small>
+                        </div>
+
+                        <div>
+                            <label>
+                                <i class="fas fa-exclamation-circle"></i>
+                                الحالة الحالية
                             </label>
                             <select name="availability_status" id="availability_status">
-                                <option value="متاحة للعمل" <?php echo (empty($editData) || $editData['availability_status'] == "متاحة للعمل") ? "selected" : ""; ?>>متاحة للعمل
-                                </option>
-                                <option value="قيد الاستخدام" <?php echo (!empty($editData) && $editData['availability_status'] == "قيد الاستخدام") ? "selected" : ""; ?>>قيد الاستخدام
-                                </option>
-                                <option value="تحت الصيانة" <?php echo (!empty($editData) && $editData['availability_status'] == "تحت الصيانة") ? "selected" : ""; ?>>تحت الصيانة
-                                </option>
+                                <option value="قيد الاستخدام" <?php echo (empty($editData) || $editData['availability_status'] == "قيد الاستخدام") ? "selected" : ""; ?>>قيد الاستخدام</option>
+                                <option value="تحت الصيانة" <?php echo (!empty($editData) && $editData['availability_status'] == "تحت الصيانة") ? "selected" : ""; ?>>تحت الصيانة</option>
                                 <option value="محجوزة" <?php echo (!empty($editData) && $editData['availability_status'] == "محجوزة") ? "selected" : ""; ?>>محجوزة</option>
                                 <option value="معطلة" <?php echo (!empty($editData) && $editData['availability_status'] == "معطلة") ? "selected" : ""; ?>>معطلة</option>
-                                <option value="في المستودع" <?php echo (!empty($editData) && $editData['availability_status'] == "في المستودع") ? "selected" : ""; ?>>في المستودع
-                                </option>
-                                <option value="مبيعة/مسحوبة" <?php echo (!empty($editData) && $editData['availability_status'] == "مبيعة/مسحوبة") ? "selected" : ""; ?>>مبيعة/مسحوبة
-                                </option>
+                                <option value="في المستودع" <?php echo (!empty($editData) && $editData['availability_status'] == "في المستودع") ? "selected" : ""; ?>>في المستودع</option>
+                                <option value="مسحوبة" <?php echo (!empty($editData) && $editData['availability_status'] == "مسحوبة") ? "selected" : ""; ?>>مسحوبة</option>
                             </select>
+                            <small id="availabilityStatusHint" style="display:block; margin-top:6px; color:#64748b; font-size:0.82rem;"></small>
+                        </div>
+
+                        <div>
+                            <label>
+                                <i class="fas fa-user-hard-hat"></i>
+                                بيانات المهندس أو المشرف في الموقع
+                            </label>
+                            <input type="text" name="site_supervisor_name" id="site_supervisor_name"
+                                placeholder="اسم المهندس أو المشرف المسؤول"
+                                value="<?php echo isset($editData['site_supervisor_name']) ? htmlspecialchars($editData['site_supervisor_name']) : ''; ?>" />
+                        </div>
+
+                        <div>
+                            <label>
+                                <i class="fas fa-address-book"></i>
+                                بيانات الاتصال بالمشرف
+                            </label>
+                            <input type="text" name="site_supervisor_contact" id="site_supervisor_contact"
+                                placeholder="رقم الهاتف أو أي وسيلة تواصل مباشرة"
+                                value="<?php echo isset($editData['site_supervisor_contact']) ? htmlspecialchars($editData['site_supervisor_contact']) : ''; ?>" />
                         </div>
 
                         <!-- ================================= -->
@@ -805,12 +972,12 @@ if (isset($_GET['edit']) && $can_edit) {
                         <div>
                             <label>
                                 <i class="fas fa-toggle-on"></i>
-                                الحالة <span class="required-indicator">*</span>
+                                حالة السجل <span class="required-indicator">*</span>
                             </label>
                             <select name="status" id="status" required>
                                 <option value="">-- اختر الحالة --</option>
-                                <option value="1" <?php echo (!empty($editData) && $editData['status'] == "1") ? "selected" : ""; ?>>متاحة</option>
-                                <option value="0" <?php echo (!empty($editData) && $editData['status'] == "0") ? "selected" : ""; ?>>مشغولة</option>
+                                <option value="1" <?php echo (empty($editData) || $editData['status'] == "1") ? "selected" : ""; ?>>نشط</option>
+                                <option value="0" <?php echo (!empty($editData) && $editData['status'] == "0") ? "selected" : ""; ?>>غير نشط</option>
                             </select>
                         </div>
 
@@ -882,8 +1049,12 @@ if (isset($_GET['edit']) && $can_edit) {
                         <label><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
                         <select id="filterStatus" class="filter-select">
                             <option value="">— جميع الحالات —</option>
-                            <option value="نشط">نشط</option>
-                            <option value="غير نشط">غير نشط</option>
+                            <option value="قيد الاستخدام">قيد الاستخدام</option>
+                            <option value="تحت الصيانة">تحت الصيانة</option>
+                            <option value="محجوزة">محجوزة</option>
+                            <option value="معطلة">معطلة</option>
+                            <option value="في المستودع">في المستودع</option>
+                            <option value="مسحوبة">مسحوبة</option>
                         </select>
                     </div>
 
@@ -891,10 +1062,8 @@ if (isset($_GET['edit']) && $can_edit) {
                         <label><i class="fas fa-traffic-light"></i> فلترة بالتوفر</label>
                         <select id="filterAvailability" class="filter-select">
                             <option value="">— جميع حالات التوفر —</option>
-                            <option value="متاحة للعمل">متاحة للعمل</option>
-                            <option value="مشغولة حالياً">مشغولة حالياً</option>
-                            <option value="تحت الصيانة">تحت الصيانة</option>
-                            <option value="معطلة مؤقتاً">معطلة مؤقتاً</option>
+                            <option value="متوفرة">متوفرة</option>
+                            <option value="غير متوفرة">غير متوفرة</option>
                         </select>
                     </div>
                 </div>
@@ -944,13 +1113,16 @@ if (isset($_GET['edit']) && $can_edit) {
                         <th data-group="manufacturing"><i class="fas fa-calendar"></i> سنة الصنع</th>
                         <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
                         <th data-group="ownership"><i class="fas fa-user"></i> المالك</th>
-                        <th data-group="technical"><i class="fas fa-traffic-light"></i> التوفر</th>
+                        <th data-group="status"><i class="fas fa-traffic-light"></i> التوفر</th>
                         <th data-group="status"><i class="fas fa-toggle-on"></i> الحالة</th>
                         <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
+                    $availability_state_select = $equipment_has_availability_state
+                        ? "m.availability_state,"
+                        : "NULL AS availability_state,";
                     $query2 = "
                         SELECT 
                             m.id, 
@@ -965,6 +1137,7 @@ if (isset($_GET['edit']) && $can_edit) {
                             m.equipment_condition,
                             m.actual_owner_name,
                             m.availability_status,
+                            $availability_state_select
                             o.project_id, 
                             o.status AS operation_status,
                             COUNT(DISTINCT d.id) AS drivers_count
@@ -1004,8 +1177,8 @@ if (isset($_GET['edit']) && $can_edit) {
                         $name_display = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
 
                         // المشروع النشط
-                        if (!empty($row['project'])) {
-                            $p_res = mysqli_query($conn, "SELECT name FROM project WHERE id='" . $row['project'] . "'");
+                        if (!empty($row['project_id'])) {
+                            $p_res = mysqli_query($conn, "SELECT name FROM project WHERE id='" . intval($row['project_id']) . "'");
                             if ($p_res && mysqli_num_rows($p_res) > 0) {
                                 $p = mysqli_fetch_assoc($p_res);
                                 $name_display .= "<br><span class='project-link'><i class='fas fa-project-diagram'></i> " . htmlspecialchars($p['name']) . "</span>";
@@ -1035,19 +1208,35 @@ if (isset($_GET['edit']) && $can_edit) {
                         $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $owner . "</td>";
 
+                        $row_availability_state = normalize_equipment_availability_state(
+                            isset($row['availability_state']) ? $row['availability_state'] : '',
+                            isset($row['availability_status']) ? $row['availability_status'] : ''
+                        );
+                        $row_availability_status = normalize_equipment_availability_status(
+                            $row_availability_state,
+                            isset($row['availability_status']) ? $row['availability_status'] : ''
+                        );
+
                         // التوفر
-                        $availability = !empty($row['availability_status']) ? htmlspecialchars($row['availability_status']) : "متاحة للعمل";
-                        echo "<td>" . $availability . "</td>";
+                        if ($row_availability_state === 'متوفرة') {
+                            echo "<td><span class='badge-available'><i class='fas fa-check-circle'></i> متوفرة</span></td>";
+                        } else {
+                            echo "<td><span class='badge-busy'><i class='fas fa-ban'></i> غير متوفرة</span></td>";
+                        }
 
                         // الحالة
-                        if (!empty($row['project_id']) && $row['operation_status'] == "1") {
-                            echo "<td><span class='badge-working'><i class='fas fa-spinner fa-spin'></i> قيد التشغيل</span></td>";
+                        if ($row_availability_status === 'قيد الاستخدام') {
+                            echo "<td><span class='badge-working'><i class='fas fa-spinner fa-spin'></i> قيد الاستخدام</span></td>";
+                        } elseif ($row_availability_status === 'تحت الصيانة') {
+                            echo "<td><span class='badge-busy'><i class='fas fa-tools'></i> تحت الصيانة</span></td>";
+                        } elseif ($row_availability_status === 'محجوزة') {
+                            echo "<td><span class='badge-type'><i class='fas fa-bookmark'></i> محجوزة</span></td>";
+                        } elseif ($row_availability_status === 'في المستودع') {
+                            echo "<td><span class='badge-type'><i class='fas fa-warehouse'></i> في المستودع</span></td>";
+                        } elseif ($row_availability_status === 'مسحوبة') {
+                            echo "<td><span class='badge-busy'><i class='fas fa-arrow-alt-circle-down'></i> مسحوبة</span></td>";
                         } else {
-                            if ($row['status'] == "1") {
-                                echo "<td><span class='badge-available'><i class='fas fa-check-circle'></i> متاحة</span></td>";
-                            } else {
-                                echo "<td><span class='badge-busy'><i class='fas fa-times-circle'></i> مشغولة</span></td>";
-                            }
+                            echo "<td><span class='badge-busy'><i class='fas fa-exclamation-triangle'></i> معطلة</span></td>";
                         }
 
                         // الإجراءات
@@ -1112,6 +1301,10 @@ if (isset($_GET['edit']) && $can_edit) {
                         <div class="view-item-value" id="view_eq_chassis">-</div>
                     </div>
                     <div class="view-item">
+                        <div class="view-item-label"><i class="fas fa-microchip"></i> رقم الماكينة</div>
+                        <div class="view-item-value" id="view_eq_machine_number">-</div>
+                    </div>
+                    <div class="view-item">
                         <div class="view-item-label"><i class="fas fa-industry"></i> الشركة المصنعة</div>
                         <div class="view-item-value" id="view_eq_manufacturer">-</div>
                     </div>
@@ -1168,6 +1361,10 @@ if (isset($_GET['edit']) && $can_edit) {
                         <div class="view-item-value" id="view_eq_license_authority">-</div>
                     </div>
                     <div class="view-item">
+                        <div class="view-item-label"><i class="fas fa-file-alt"></i> نوع الوثيقة</div>
+                        <div class="view-item-value" id="view_eq_document_type">-</div>
+                    </div>
+                    <div class="view-item">
                         <div class="view-item-label"><i class="fas fa-calendar-times"></i> انتهاء الترخيص</div>
                         <div class="view-item-value" id="view_eq_license_expiry">-</div>
                     </div>
@@ -1184,7 +1381,15 @@ if (isset($_GET['edit']) && $can_edit) {
                         <div class="view-item-value" id="view_eq_location">-</div>
                     </div>
                     <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-traffic-light"></i> حالة التوفر</div>
+                        <div class="view-item-label"><i class="fas fa-user-hard-hat"></i> مهندس/مشرف الموقع</div>
+                        <div class="view-item-value" id="view_eq_supervisor_name">-</div>
+                    </div>
+                    <div class="view-item">
+                        <div class="view-item-label"><i class="fas fa-address-book"></i> اتصال المشرف</div>
+                        <div class="view-item-value" id="view_eq_supervisor_contact">-</div>
+                    </div>
+                    <div class="view-item">
+                        <div class="view-item-label"><i class="fas fa-traffic-light"></i> التوفر</div>
                         <div class="view-item-value" id="view_eq_availability">-</div>
                     </div>
                     <div class="view-item">
@@ -1212,7 +1417,7 @@ if (isset($_GET['edit']) && $can_edit) {
                         <div class="view-item-value" id="view_eq_last_maintenance">-</div>
                     </div>
                     <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-toggle-on"></i> الحالة</div>
+                        <div class="view-item-label"><i class="fas fa-toggle-on"></i> الحالة الحالية</div>
                         <div class="view-item-value" id="view_eq_status">-</div>
                     </div>
                 </div>
@@ -1267,9 +1472,9 @@ if (isset($_GET['edit']) && $can_edit) {
                     'basic': [0, 1, 2, 4, 5],        // #، المورد، كود المعدة، النوع، الاسم
                     'identification': [3],            // رقم تسلسلي
                     'manufacturing': [6, 7],          // الموديل، سنة الصنع
-                    'technical': [8, 10],             // حالة المعدة، التوفر
+                    'technical': [8],                 // حالة المعدة
                     'ownership': [9],                 // المالك
-                    'status': [11, 12]                // الحالة، الإجراءات
+                    'status': [10, 11, 12]             // التوفر، الحالة، الإجراءات
                 };
 
                 // حفظ حالة المجموعات (الصنع والفنية مخفيتين بشكل افتراضي)
@@ -1335,9 +1540,13 @@ if (isset($_GET['edit']) && $can_edit) {
                                 statusMatch = data[11].indexOf(activeFilters.status) !== -1;
                             }
 
-                            // فلترة التوفر
+                            // فلترة التوفر (مطابقة دقيقة لتجنب تشابه "متوفرة" مع "غير متوفرة")
                             if (activeFilters.availability !== '') {
-                                availabilityMatch = data[10].indexOf(activeFilters.availability) !== -1;
+                                if (activeFilters.availability === 'متوفرة') {
+                                    availabilityMatch = data[10].indexOf('غير متوفرة') === -1 && data[10].indexOf('متوفرة') !== -1;
+                                } else {
+                                    availabilityMatch = data[10].indexOf(activeFilters.availability) !== -1;
+                                }
                             }
 
                             return supplierMatch && typeMatch && statusMatch && availabilityMatch;
@@ -1448,6 +1657,9 @@ if (isset($_GET['edit']) && $can_edit) {
             const toggleFormBtn = document.getElementById('toggleForm');
             const equipmentForm = document.getElementById('projectForm');
             const projectSelect = document.getElementById('selected_project_id');
+            const availabilityStateInput = document.getElementById('availability_state');
+            const availabilityStatusInput = document.getElementById('availability_status');
+            const availabilityStatusHint = document.getElementById('availabilityStatusHint');
 
             if (toggleFormBtn && equipmentForm) {
                 toggleFormBtn.addEventListener('click', function () {
@@ -1461,6 +1673,73 @@ if (isset($_GET['edit']) && $can_edit) {
                         document.getElementById('projectSelectForm').submit();
                     }
                 });
+            }
+
+            function normalizeAvailabilityState(value, statusValue) {
+                if (value === 'متوفرة' || value === 'غير متوفرة') {
+                    return value;
+                }
+
+                if (!statusValue || statusValue === 'متاحة للعمل' || statusValue === 'قيد الاستخدام') {
+                    return 'متوفرة';
+                }
+
+                return 'غير متوفرة';
+            }
+
+            function normalizeAvailabilityStatus(stateValue, statusValue) {
+                const normalizedState = normalizeAvailabilityState(stateValue, statusValue);
+                if (normalizedState === 'متوفرة') {
+                    return 'قيد الاستخدام';
+                }
+
+                const legacyMap = {
+                    'موقوفة للصيانة': 'تحت الصيانة',
+                    'مبيعة/مسحوبة': 'مسحوبة',
+                    'معطلة مؤقتاً': 'معطلة'
+                };
+
+                if (legacyMap[statusValue]) {
+                    return legacyMap[statusValue];
+                }
+
+                const validStatuses = ['تحت الصيانة', 'محجوزة', 'مسحوبة', 'في المستودع', 'معطلة'];
+                return validStatuses.indexOf(statusValue) !== -1 ? statusValue : 'تحت الصيانة';
+            }
+
+            function syncAvailabilityFields() {
+                if (!availabilityStateInput || !availabilityStatusInput) {
+                    return;
+                }
+
+                const normalizedState = normalizeAvailabilityState(availabilityStateInput.value, availabilityStatusInput.value);
+                availabilityStateInput.value = normalizedState;
+
+                if (normalizedState === 'متوفرة') {
+                    availabilityStatusInput.value = 'قيد الاستخدام';
+                    availabilityStatusInput.setAttribute('disabled', 'disabled');
+                    if (availabilityStatusHint) {
+                        availabilityStatusHint.textContent = 'عند توفر الآلية يتم تثبيت الحالة تلقائياً على قيد الاستخدام.';
+                    }
+                } else {
+                    availabilityStatusInput.value = normalizeAvailabilityStatus(normalizedState, availabilityStatusInput.value);
+                    availabilityStatusInput.removeAttribute('disabled');
+                    if (availabilityStatusHint) {
+                        availabilityStatusHint.textContent = 'عند عدم التوفر اختر سبب الحالة الفعلية للآلية.';
+                    }
+                }
+            }
+
+            if (availabilityStateInput && availabilityStatusInput) {
+                syncAvailabilityFields();
+                availabilityStateInput.addEventListener('change', syncAvailabilityFields);
+                availabilityStatusInput.addEventListener('change', syncAvailabilityFields);
+                if (equipmentForm) {
+                    equipmentForm.addEventListener('submit', function () {
+                        availabilityStatusInput.removeAttribute('disabled');
+                        syncAvailabilityFields();
+                    });
+                }
             }
 
             // تحميل بيانات التعديل عند تحميل الصفحة
@@ -1504,9 +1783,12 @@ if (isset($_GET['edit']) && $can_edit) {
                 return String(value) === '1' ? 'حفار' : 'قلاب';
             }
 
-            function formatStatus(value) {
-                if (value === null || value === undefined || value === '') return 'غير محدد';
-                return String(value) === '1' ? 'متاحة' : 'مشغولة';
+            function formatAvailabilityState(value, fallbackStatus) {
+                return normalizeAvailabilityState(value, fallbackStatus);
+            }
+
+            function formatAvailabilityStatus(stateValue, statusValue) {
+                return normalizeAvailabilityStatus(stateValue, statusValue);
             }
 
             $(document).on('click', '.viewEquipmentBtn', function () {
@@ -1518,11 +1800,11 @@ if (isset($_GET['edit']) && $can_edit) {
                 const loadingText = 'جار التحميل...';
                 [
                     'view_eq_code', 'view_eq_name', 'view_eq_type', 'view_eq_supplier', 'view_eq_project', 'view_eq_mine',
-                    'view_eq_serial', 'view_eq_chassis', 'view_eq_manufacturer', 'view_eq_model', 'view_eq_year',
+                    'view_eq_serial', 'view_eq_chassis', 'view_eq_machine_number', 'view_eq_manufacturer', 'view_eq_model', 'view_eq_year',
                     'view_eq_import_year', 'view_eq_condition', 'view_eq_hours', 'view_eq_engine', 'view_eq_tires',
                     'view_eq_owner', 'view_eq_owner_type', 'view_eq_owner_phone', 'view_eq_owner_relation',
-                    'view_eq_license', 'view_eq_license_authority', 'view_eq_license_expiry', 'view_eq_inspection',
-                    'view_eq_last_inspection', 'view_eq_location', 'view_eq_availability', 'view_eq_value',
+                    'view_eq_license', 'view_eq_license_authority', 'view_eq_document_type', 'view_eq_license_expiry', 'view_eq_inspection',
+                    'view_eq_last_inspection', 'view_eq_location', 'view_eq_supervisor_name', 'view_eq_supervisor_contact', 'view_eq_availability', 'view_eq_value',
                     'view_eq_daily', 'view_eq_monthly', 'view_eq_insurance', 'view_eq_notes', 'view_eq_last_maintenance',
                     'view_eq_status'
                 ].forEach(id => setViewValue(id, loadingText));
@@ -1569,6 +1851,7 @@ if (isset($_GET['edit']) && $can_edit) {
                         setViewValue('view_eq_mine', data.mine_name);
                         setViewValue('view_eq_serial', data.serial_number);
                         setViewValue('view_eq_chassis', data.chassis_number);
+                        setViewValue('view_eq_machine_number', data.machine_number);
                         setViewValue('view_eq_manufacturer', data.manufacturer);
                         setViewValue('view_eq_model', data.model);
                         setViewValue('view_eq_year', data.manufacturing_year);
@@ -1583,18 +1866,21 @@ if (isset($_GET['edit']) && $can_edit) {
                         setViewValue('view_eq_owner_relation', data.owner_supplier_relation);
                         setViewValue('view_eq_license', data.license_number);
                         setViewValue('view_eq_license_authority', data.license_authority);
+                        setViewValue('view_eq_document_type', data.document_type);
                         setViewValue('view_eq_license_expiry', data.license_expiry_date);
                         setViewValue('view_eq_inspection', data.inspection_certificate_number);
                         setViewValue('view_eq_last_inspection', data.last_inspection_date);
                         setViewValue('view_eq_location', data.current_location);
-                        setViewValue('view_eq_availability', data.availability_status);
+                        setViewValue('view_eq_supervisor_name', data.site_supervisor_name);
+                        setViewValue('view_eq_supervisor_contact', data.site_supervisor_contact);
+                        setViewValue('view_eq_availability', formatAvailabilityState(data.availability_state, data.availability_status));
                         setViewValue('view_eq_value', formatCurrency(data.estimated_value));
                         setViewValue('view_eq_daily', formatCurrency(data.daily_rental_price));
                         setViewValue('view_eq_monthly', formatCurrency(data.monthly_rental_price));
                         setViewValue('view_eq_insurance', data.insurance_status);
                         setViewValue('view_eq_notes', data.general_notes);
                         setViewValue('view_eq_last_maintenance', data.last_maintenance_date);
-                        setViewValue('view_eq_status', formatStatus(data.status));
+                        setViewValue('view_eq_status', formatAvailabilityStatus(data.availability_state, data.availability_status));
                     },
                     error: function () {
                         setViewValue('view_eq_name', 'تعذر الاتصال بالخادم');
