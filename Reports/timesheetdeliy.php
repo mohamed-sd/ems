@@ -4,6 +4,14 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
     exit();
 }
+include '../config.php';
+$_ts_current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$_ts_is_super_admin = ($_ts_current_role === '-1');
+$_ts_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$_ts_suppliers_has_company_id = db_table_has_column($conn, 'suppliers', 'company_id');
+$_ts_supplier_company_where = (!$_ts_is_super_admin && $_ts_suppliers_has_company_id && $_ts_company_id > 0)
+    ? " AND company_id = '$_ts_company_id'"
+    : "";
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -226,7 +234,7 @@ WHERE 1=1
                         <select name="supplier">
                             <option value="">-- الكل --</option>
                             <?php
-                            $sup = mysqli_query($conn, "SELECT id, name FROM suppliers where status = '1' ");
+                            $sup = mysqli_query($conn, "SELECT id, name FROM suppliers where status = '1'$_ts_supplier_company_where ");
                             while ($row = mysqli_fetch_assoc($sup)) {
                                 $selected = ($supplier_filter == $row['id']) ? "selected" : "";
                                 echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";

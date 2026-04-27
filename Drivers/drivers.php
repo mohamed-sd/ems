@@ -20,11 +20,23 @@ if (!$is_super_admin && $company_id <= 0) {
 $drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
 $suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
 $drivercontracts_has_company = db_table_has_column($conn, 'drivercontracts', 'company_id');
+$drivers_has_driver_photo = db_table_has_column($conn, 'drivers', 'driver_photo');
+$drivers_has_identity_photo = db_table_has_column($conn, 'drivers', 'identity_photo');
 
 if (!$drivers_has_company) {
     @mysqli_query($conn, "ALTER TABLE drivers ADD COLUMN company_id INT NULL AFTER id");
     @mysqli_query($conn, "ALTER TABLE drivers ADD INDEX idx_drivers_company_id (company_id)");
     $drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
+}
+
+if (!$drivers_has_driver_photo) {
+    @mysqli_query($conn, "ALTER TABLE drivers ADD COLUMN driver_photo VARCHAR(255) NULL AFTER identity_expiry_date");
+    $drivers_has_driver_photo = db_table_has_column($conn, 'drivers', 'driver_photo');
+}
+
+if (!$drivers_has_identity_photo) {
+    @mysqli_query($conn, "ALTER TABLE drivers ADD COLUMN identity_photo VARCHAR(255) NULL AFTER driver_photo");
+    $drivers_has_identity_photo = db_table_has_column($conn, 'drivers', 'identity_photo');
 }
 
 if (!$is_super_admin && !$drivers_has_company) {
@@ -91,6 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $identity_type = mysqli_real_escape_string($conn, $_POST['identity_type']);
     $identity_number = mysqli_real_escape_string($conn, trim($_POST['identity_number']));
     $identity_expiry_date = !empty($_POST['identity_expiry_date']) ? mysqli_real_escape_string($conn, $_POST['identity_expiry_date']) : NULL;
+    $driver_photo = mysqli_real_escape_string($conn, trim(isset($_POST['driver_photo']) ? $_POST['driver_photo'] : ''));
+    $identity_photo = mysqli_real_escape_string($conn, trim(isset($_POST['identity_photo']) ? $_POST['identity_photo'] : ''));
     
     // 3. رخصة القيادة والمهارات
     $license_number = mysqli_real_escape_string($conn, trim($_POST['license_number']));
@@ -143,6 +157,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $status = mysqli_real_escape_string($conn, $_POST['status']);
 
     if ($id > 0) {
+        // التحقق من فرادة كود المشغل على مستوى الشركة (عند التعديل)
+        if (!empty($driver_code)) {
+            $code_company_scope = $drivers_has_company ? " AND company_id = $company_id" : "";
+            $code_check_edit = mysqli_query($conn, "SELECT id FROM drivers WHERE driver_code = '$driver_code' AND id != $id$code_company_scope LIMIT 1");
+            if ($code_check_edit && mysqli_num_rows($code_check_edit) > 0) {
+                header("Location: drivers.php?msg=كود+المشغل+موجود+مسبقاً+❌");
+                exit;
+            }
+        }
         // تحديث
         $identity_expiry_sql = $identity_expiry_date ? "'$identity_expiry_date'" : "NULL";
         $license_expiry_sql = $license_expiry_date ? "'$license_expiry_date'" : "NULL";
@@ -156,6 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $update_query = "UPDATE drivers SET 
             name='$name', driver_code='$driver_code', nickname='$nickname',
             identity_type='$identity_type', identity_number='$identity_number', identity_expiry_date=$identity_expiry_sql,
+            driver_photo='$driver_photo', identity_photo='$identity_photo',
             license_number='$license_number', license_type='$license_type', license_expiry_date=$license_expiry_sql, license_issuer='$license_issuer',
             specialized_equipment='$specialized_equipment',
             years_in_field=$years_in_field_sql, years_on_equipment=$years_on_equipment_sql, skill_level='$skill_level', certificates='$certificates',
@@ -184,10 +208,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $years_on_equipment_sql = $years_on_equipment !== NULL ? $years_on_equipment : "NULL";
         $supplier_id_sql = $supplier_id !== NULL ? $supplier_id : "NULL";
         $monthly_salary_sql = $monthly_salary !== NULL ? $monthly_salary : "NULL";
-        
+
+        // التحقق من فرادة كود المشغل على مستوى الشركة (عند الإضافة)
+        if (!empty($driver_code)) {
+            $code_company_scope = $drivers_has_company ? " AND company_id = $company_id" : "";
+            $code_check_insert = mysqli_query($conn, "SELECT id FROM drivers WHERE driver_code = '$driver_code'$code_company_scope LIMIT 1");
+            if ($code_check_insert && mysqli_num_rows($code_check_insert) > 0) {
+                header("Location: drivers.php?msg=كود+المشغل+موجود+مسبقاً+❌");
+                exit;
+            }
+        }
+
         $insert_query = "INSERT INTO drivers (
             name, driver_code, nickname,
-            identity_type, identity_number, identity_expiry_date,
+            identity_type, identity_number, identity_expiry_date, driver_photo, identity_photo,
             license_number, license_type, license_expiry_date, license_issuer,
             specialized_equipment,
             years_in_field, years_on_equipment, skill_level, certificates,
@@ -199,7 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             driver_status, start_date, status$driver_insert_col
         ) VALUES (
             '$name', '$driver_code', '$nickname',
-            '$identity_type', '$identity_number', $identity_expiry_sql,
+            '$identity_type', '$identity_number', $identity_expiry_sql, '$driver_photo', '$identity_photo',
             '$license_number', '$license_type', $license_expiry_sql, '$license_issuer',
             '$specialized_equipment',
             $years_in_field_sql, $years_on_equipment_sql, '$skill_level', '$certificates',
@@ -543,6 +577,14 @@ include('../insidebar.php');
                                 <label><i class="fas fa-calendar-times"></i> تاريخ انتهاء الهوية</label>
                                 <input type="date" name="identity_expiry_date" id="identity_expiry_date" />
                             </div>
+                            <div>
+                                <label><i class="fas fa-camera"></i> صورة السائق (تجهيزي - غير مفعلة الآن)</label>
+                                <input type="text" name="driver_photo" id="driver_photo" placeholder="سيتم تفعيل رفع صورة السائق لاحقاً" readonly />
+                            </div>
+                            <div>
+                                <label><i class="fas fa-id-card"></i> صورة هوية السائق (تجهيزي - غير مفعلة الآن)</label>
+                                <input type="text" name="identity_photo" id="identity_photo" placeholder="سيتم تفعيل رفع صورة الهوية لاحقاً" readonly />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -862,10 +904,10 @@ include('../insidebar.php');
                                 <label><i class="fas fa-info-circle"></i> حالة المشغل <span style="color: red;">*</span></label>
                                 <select name="driver_status" id="driver_status" required>
                                     <option value="">-- اختر الحالة --</option>
-                                    <option value="نشط">ðŸŸ¢ نشط</option>
+                                    <option value="نشط"> نشط</option>
                                     <option value="معلق">⏸️ معلق</option>
-                                    <option value="مفصول">ðŸ”´ مفصول</option>
-                                    <option value="في إجازة">ðŸ–️ في إجازة</option>
+                                    <option value="مفصول"> مفصول</option>
+                                    <option value="في إجازة"> في إجازة</option>
                                     <option value="تحت التقييم">⏳ تحت التقييم</option>
                                 </select>
                             </div>
@@ -877,8 +919,8 @@ include('../insidebar.php');
                                 <label><i class="fas fa-power-off"></i> حالة النظام <span style="color: red;">*</span></label>
                                 <select name="status" id="status" required>
                                     <option value="">-- اختر الحالة --</option>
-                                    <option value="1">ðŸŸ¢ مفعّل</option>
-                                    <option value="0">ðŸ”´ موقف</option>
+                                    <option value="1">✅ مفعل</option>
+                                    <option value="0">❌ موقف</option>
                                 </select>
                             </div>
                         </div>
@@ -916,6 +958,7 @@ include('../insidebar.php');
                         <th>اسم المشغل</th>
                         <th>رقم الهاتف</th>
                         <th>المورد</th>
+                        <th>الصور</th>
                         <th>مستوى الكفاءة</th>
                         <th>عدد العقود</th>
                         <th>الحالة</th>
@@ -955,7 +998,7 @@ include('../insidebar.php');
                     $i = 1;
                     
                     while ($row = mysqli_fetch_assoc($result)) {
-                        $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">ðŸŸ¢ مفعّل</span>' : '<span class="status-pill status-inactive">ðŸ”´ موقف</span>';
+                        $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">✅ مفعّل</span>' : '<span class="status-pill status-inactive">❌ موقف</span>';
                         $driver_name_cell = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
                         if (intval($row['numcontracts']) === 0) {
                             $driver_name_cell .= " <span class='link-alert-chip' title='المشغل ليس لديه عقد'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
@@ -967,6 +1010,9 @@ include('../insidebar.php');
                         echo "<td>" . $driver_name_cell . "</td>";
                         echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['supplier_name'] ?: '-') . "</td>";
+                        $driver_photo_status = !empty($row['driver_photo']) ? '✅ صورة السائق' : '⏳ صورة السائق';
+                        $identity_photo_status = !empty($row['identity_photo']) ? '✅ صورة الهوية' : '⏳ صورة الهوية';
+                        echo "<td><small>" . $driver_photo_status . "<br>" . $identity_photo_status . "</small></td>";
                         echo "<td>" . htmlspecialchars($row['skill_level'] ?: 'غير محدد') . "</td>";
                         echo "<td><span class='badge badge-info'>" . $row['numcontracts'] . " عقد</span></td>";
                         echo "<td>" . $statusBadge . "</td>";
@@ -983,6 +1029,11 @@ include('../insidebar.php');
                                        class='action-btn view' 
                                        title='عرض العقود'>
                                         <i class='fas fa-file-contract'></i>
+                                    </a>
+                                    <a href='driver_profile.php?id=" . $row['id'] . "' 
+                                       class='action-btn view' 
+                                       title='بطاقة وبيانات السائق'>
+                                        <i class='fas fa-id-card-alt'></i>
                                     </a>
                                     <a href='driver_truck_history.php?id=" . $row['id'] . "' 
                                        class='action-btn history' 
@@ -1047,7 +1098,6 @@ include('../insidebar.php');
         // تشغيل DataTable بالعربية
         $(document).ready(function () {
             $('#driversTable').DataTable({
-                responsive: true,
                 dom: 'Bfrtip',
                 buttons: [
                     { extend: 'copy', text: 'نسخ' },
@@ -1108,6 +1158,8 @@ include('../insidebar.php');
                         $("#identity_type").val(driver.identity_type);
                         $("#identity_number").val(driver.identity_number);
                         $("#identity_expiry_date").val(driver.identity_expiry_date);
+                        $("#driver_photo").val(driver.driver_photo || '');
+                        $("#identity_photo").val(driver.identity_photo || '');
                         $("#license_number").val(driver.license_number);
                         $("#license_type").val(driver.license_type);
                         $("#license_expiry_date").val(driver.license_expiry_date);

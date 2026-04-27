@@ -49,9 +49,7 @@ $project_id = intval($contract['project_id']);
 
 $active_equipment_query = "SELECT COUNT(*) as active_count
                           FROM operations o
-                          JOIN equipments e ON o.equipment = e.id
                           WHERE o.status = 1
-                          AND e.status = 1
                           AND o.contract_id = $contract_id";
 $active_equipment_result = mysqli_query($conn, $active_equipment_query);
 $active_equipment_count = 0;
@@ -100,9 +98,8 @@ if ($suppliers_result) {
 
             $added_query = "SELECT COUNT(*) as added_count
                            FROM operations o
-                           JOIN equipments e ON o.equipment = e.id
+                           LEFT JOIN equipments e ON o.equipment = e.id
                            WHERE o.status = 1
-                           AND e.status = 1
                            AND o.project_id = $project_id
                            AND o.supplier_id = " . intval($row['supplier_id']) . "
                            AND (o.equipment_type = $equip_type_id OR e.type = $equip_type_id)";

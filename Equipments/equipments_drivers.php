@@ -8,6 +8,44 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 
+$equipment_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
+
+if (!function_exists('normalize_equipment_availability_state')) {
+    function normalize_equipment_availability_state($availability_state, $availability_status)
+    {
+        $availability_state  = trim((string) $availability_state);
+        $availability_status = trim((string) $availability_status);
+        if ($availability_state === 'متوفرة' || $availability_state === 'غير متوفرة') {
+            return $availability_state;
+        }
+        if ($availability_status === '' || $availability_status === 'متاحة للعمل' || $availability_status === 'قيد الاستخدام') {
+            return 'متوفرة';
+        }
+        return 'غير متوفرة';
+    }
+}
+
+if (!function_exists('normalize_equipment_availability_status')) {
+    function normalize_equipment_availability_status($availability_state, $availability_status)
+    {
+        $availability_state  = normalize_equipment_availability_state($availability_state, $availability_status);
+        $availability_status = trim((string) $availability_status);
+        if ($availability_state === 'متوفرة') {
+            return 'قيد الاستخدام';
+        }
+        $legacy_map = [
+            'موقوفة للصيانة' => 'تحت الصيانة',
+            'مبيعة/مسحوبة'         => 'مسحوبة',
+            'معطلة مؤقتاً'       => 'معطلة'
+        ];
+        if (isset($legacy_map[$availability_status])) {
+            return $legacy_map[$availability_status];
+        }
+        $valid = ['تحت الصيانة', 'محجوزة', 'مسحوبة', 'في المستودع', 'معطلة'];
+        return in_array($availability_status, $valid, true) ? $availability_status : 'تحت الصيانة';
+    }
+}
+
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
@@ -870,8 +908,11 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         <label><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
                         <select id="filterStatus" class="filter-select">
                             <option value="">— جميع الحالات —</option>
-                            <option value="نشط">نشط</option>
-                            <option value="غير نشط">غير نشط</option>
+                            <option value="متاحة">متاحة</option>
+                            <option value="تحت الصيانة">تحت الصيانة</option>
+                            <option value="محجوزة">محجوزة</option>
+                            <option value="معطلة">معطلة</option>
+                            <option value="مسحوبة">مسحوبة</option>
                         </select>
                     </div>
                     
@@ -879,10 +920,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         <label><i class="fas fa-traffic-light"></i> فلترة بالتوفر</label>
                         <select id="filterAvailability" class="filter-select">
                             <option value="">— جميع حالات التوفر —</option>
-                            <option value="متاحة للعمل">متاحة للعمل</option>
-                            <option value="مشغولة حالياً">مشغولة حالياً</option>
-                            <option value="تحت الصيانة">تحت الصيانة</option>
-                            <option value="معطلة مؤقتاً">معطلة مؤقتاً</option>
+                            <option value="متوفرة">متوفرة</option>
+                            <option value="غير متوفرة">غير متوفرة</option>
                         </select>
                     </div>
                 </div>
@@ -962,6 +1001,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             m.equipment_condition,
                             m.actual_owner_name,
                             m.availability_status,
+                            " . ($equipment_has_availability_state ? "m.availability_state," : "NULL AS availability_state,") . "
                             o.project_id, 
                             o.status AS operation_status,
                             COUNT(DISTINCT d.id) AS drivers_count
@@ -1033,20 +1073,29 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $owner . "</td>";
                         
-                        // التوفر
-                        $availability = !empty($row['availability_status']) ? htmlspecialchars($row['availability_status']) : "متاحة للعمل";
-                        echo "<td>" . $availability . "</td>";
+                        // التوفر - نفس نمط equipments_fleet
+                        $avail_state_raw  = isset($row['availability_state'])  ? $row['availability_state']  : '';
+                        $avail_status_raw = isset($row['availability_status']) ? $row['availability_status'] : '';
+                        $row_availability_state  = normalize_equipment_availability_state($avail_state_raw, $avail_status_raw);
+                        $row_availability_status = normalize_equipment_availability_status($row_availability_state, $avail_status_raw);
 
-                        // الحالة
-                        if (!empty($row['project_id']) && $row['operation_status'] == "1") {
-                            echo "<td><span class='badge-working'><i class='fas fa-spinner fa-spin'></i> قيد التشغيل</span></td>";
+                        if ($row_availability_state === 'متوفرة') {
+                            echo "<td><span class='badge-available'><i class='fas fa-check-circle'></i> متوفرة</span></td>";
                         } else {
-                            if ($row['status'] == "1") {
-                                echo "<td><span class='badge-available'><i class='fas fa-check-circle'></i> متاحة</span></td>";
-                            } else {
-                                echo "<td><span class='badge-busy'><i class='fas fa-times-circle'></i> مشغولة</span></td>";
-                            }
+                            echo "<td><span class='badge-busy'><i class='fas fa-ban'></i> غير متوفرة</span></td>";
                         }
+
+                        // حالة المعدة - نفس status_map من equipments_fleet
+                        $eq_status = isset($row['status']) ? intval($row['status']) : 0;
+                        $status_map = [
+                            0 => ["badge-working",  "fa-spinner fa-spin",         "متاحة"],
+                            1 => ["badge-busy",     "fa-tools",                   "تحت الصيانة"],
+                            2 => ["badge-type",     "fa-bookmark",                "محجوزة"],
+                            3 => ["badge-busy",     "fa-exclamation-triangle",    "معطلة"],
+                            5 => ["badge-busy",     "fa-arrow-alt-circle-down",   "مسحوبة"],
+                        ];
+                        $s = isset($status_map[$eq_status]) ? $status_map[$eq_status] : ["badge-type", "fa-question-circle", "غير محدد"];
+                        echo "<td><span class='{$s[0]}'><i class='fas {$s[1]}'></i> {$s[2]}</span></td>";
 
                         // الإجراءات
                                                 echo "<td>";
@@ -1311,7 +1360,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     function(settings, data, dataIndex) {
                         // data[1] = المورد
                         // data[4] = النوع (يحتوي على نص مثل "حفار" أو "قلاب")
-                        // data[11] = الحالة (يحتوي على "نشط" أو "غير نشط")
+                        // data[11] = الحالة
                         // data[10] = التوفر
                         
                         var supplierMatch = true;
@@ -1334,9 +1383,13 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             statusMatch = data[11].indexOf(activeFilters.status) !== -1;
                         }
                         
-                        // فلترة التوفر
+                        // فلترة التوفر (مطابقة دقيقة لتجنب تشابه "متوفرة" مع "غير متوفرة")
                         if (activeFilters.availability !== '') {
-                            availabilityMatch = data[10].indexOf(activeFilters.availability) !== -1;
+                            if (activeFilters.availability === 'متوفرة') {
+                                availabilityMatch = data[10].indexOf('غير متوفرة') === -1 && data[10].indexOf('متوفرة') !== -1;
+                            } else {
+                                availabilityMatch = data[10].indexOf(activeFilters.availability) !== -1;
+                            }
                         }
                         
                         return supplierMatch && typeMatch && statusMatch && availabilityMatch;

@@ -122,9 +122,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     $operation_id = intval($_POST['operation_id']);
     $new_status = intval($_POST['new_status']);
-    $allowed_statuses = [1, 3, 4];
+    $allowed_statuses = [0, 1];
 
     if (!empty($operation_id) && in_array($new_status, $allowed_statuses, true)) {
+        // إذا كان الطلب لتفعيل السجل (status = 1)، تحقق أن المعدة ليس لها سجل ساري آخر
+        if ($new_status === 1) {
+            // جلب معرف المعدة للسجل الحالي
+            $eq_res = mysqli_query($conn, "SELECT equipment FROM operations WHERE id = $operation_id LIMIT 1");
+            $eq_id = 0;
+            if ($eq_res && mysqli_num_rows($eq_res) > 0) {
+                $eq_row = mysqli_fetch_assoc($eq_res);
+                $eq_id = intval($eq_row['equipment']);
+            }
+            if ($eq_id <= 0) {
+                $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
+                echo "<script>alert('❌ لا يمكن تحديد الآلية المرتبطة بهذا السجل'); window.location.href='move_oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+                exit();
+            }
+            // التحقق من عدم وجود سجل ساري آخر لنفس المعدة
+            $conflict_res = mysqli_query($conn, "SELECT id FROM operations WHERE equipment = $eq_id AND status = 1 AND id != $operation_id LIMIT 1");
+            if ($conflict_res && mysqli_num_rows($conflict_res) > 0) {
+                $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
+                echo "<script>alert('❌ لا يمكن إعادة تشغيل المعدة وهي تعمل بالفعل في سجل آخر'); window.location.href='move_oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+                exit();
+            }
+        }
+
         $update_sql = "UPDATE operations SET status = $new_status WHERE id = $operation_id AND project_id = $selected_project_id$operations_company_scope";
         $update_result = mysqli_query($conn, $update_sql);
 
@@ -447,10 +470,8 @@ include('../insidebar.php');
                     </div>
                     
                     <select name="status" id="status" required>
-                        <option value="1">تعمل</option>
-                        <option value="0">متاحة</option>
-                        <option value="3">متوقفة</option>
-                        <option value="4">معطلة</option>
+                        <option value="1">ساري</option>
+                        <option value="0">منتهي</option>
                     </select>
                     <input type="hidden" name="action" value="save_operation" />
                     <button type="submit" name="save_operation_submit" id="save_operation_submit">حفظ التشغيل</button>
@@ -574,7 +595,19 @@ include('../insidebar.php');
                         $hours = floatval($_POST['hours']);
                         $total_equipment_hours = floatval($_POST['total_equipment_hours']);
                         $shift_hours = floatval($_POST['shift_hours']);
-                        $status = mysqli_real_escape_string($conn, $_POST['status']);
+                        $status = intval($_POST['status']);
+
+                        // التحقق من عدم وجود سجل ساري آخر لنفس المعدة
+                        if ($status === 1 && $equipment > 0) {
+                            $exclude_id = $operation_id > 0 ? " AND id != $operation_id" : "";
+                            $conflict_check = mysqli_query($conn, "SELECT id FROM operations WHERE equipment = $equipment AND status = 1$exclude_id LIMIT 1");
+                            if ($conflict_check && mysqli_num_rows($conflict_check) > 0) {
+                                echo "<script>alert('❌ لا يمكن تشغيل المعدة وهي تعمل بالفعل في تشغيل آخر'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
+                                exit();
+                            }
+                        }
+
+                        $status_escaped = mysqli_real_escape_string($conn, $status);
 
                         if ($operation_id > 0) {
                             // تعديل سجل موجود
@@ -590,7 +623,7 @@ include('../insidebar.php');
                                     days = '$hours',
                                     total_equipment_hours = '$total_equipment_hours',
                                     shift_hours = '$shift_hours',
-                                    status = '$status'
+                                    status = '$status_escaped'
                                         WHERE id = $operation_id AND project_id = '$project_id'$operations_company_scope";
                             mysqli_query($conn, $sql);
                             echo "<script>alert('✅ تم التحديث بنجاح'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
@@ -599,7 +632,7 @@ include('../insidebar.php');
                             $insert_company_col = (!$is_super_admin && $operations_has_company) ? ", company_id" : "";
                             $insert_company_val = (!$is_super_admin && $operations_has_company) ? ", '$company_id'" : "";
                             mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, mine_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, status$insert_company_col) 
-                                         VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$mine_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$status'$insert_company_val)");
+                                         VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$mine_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$status_escaped'$insert_company_val)");
                             echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
                         }
                     }
@@ -611,7 +644,7 @@ include('../insidebar.php');
                           $operations_scope_sql = (!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "";
 
                           $query = "SELECT o.id, o.equipment, o.equipment_type, o.equipment_category, o.mine_id, o.contract_id, o.supplier_id,
-                             o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.status, 
+                             o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.status, o.reason,
                              e.code AS equipment_code, e.name AS equipment_name,
                              p.name AS project_name, s.name AS suppliers_name,
                              IFNULL(GROUP_CONCAT(DISTINCT d.name SEPARATOR ', '), '') AS driver_names
@@ -647,60 +680,52 @@ include('../insidebar.php');
                         // echo "<td>" . $row['hours'] . "</td>";
                         $status_value = intval($row['status']);
                         if ($status_value === 1) {
-                            $status_label = 'تعمل';
+                            $status_label = 'ساري';
                             $status_class = 'status-running';
-                        } elseif ($status_value === 0) {
-                            $status_label = 'متاحة';
-                            $status_class = 'status-idle';
-                        } elseif ($status_value === 3) {
-                            $status_label = 'متوقفة';
-                            $status_class = 'status-stopped';
                         } else {
-                            $status_label = 'معطلة';
-                            $status_class = 'status-down';
+                            $status_label = 'منتهي';
+                            $status_class = 'status-idle';
                         }
 
                         $status_cell = "<td><span class='status-pill $status_class'>$status_label</span></td>";
 
                         $action_buttons = "";
-                        if ($status_value === 1 && $can_edit) {
-                            if ($is_role10) {
-                                $action_buttons .= "<form method='post' style='display:inline;'>
-                                        <input type='hidden' name='action' value='request_equipment_stop'>
-                                        <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
-                                        <input type='hidden' name='request_reason' value='طلب إيقاف آلية من جدول التشغيل'>
-                                        <button type='submit' class='btn btn-sm btn-warning' onclick='return confirm(\"تأكيد إرسال طلب إيقاف الآلية لمدير الأسطول؟\")'>طلب إيقاف آلية</button>
-                                    </form> ";
-                            } else {
-                                $action_buttons .= "<form method='post' style='display:inline;'>
-                                    <input type='hidden' name='action' value='change_status'>
-                                    <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
-                                    <input type='hidden' name='new_status' value='3'>
-                                    <button type='submit' name='status_stop_submit' class='btn btn-sm btn-warning' onclick='return confirm(\"تأكيد إيقاف الآلية؟\")'>إيقاف</button>
-                                </form> ";
-                            }
-                            $action_buttons .= "<form method='post' style='display:inline;'>
-                                    <input type='hidden' name='action' value='change_status'>
-                                    <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
-                                    <input type='hidden' name='new_status' value='4'>
-                                    <button type='submit' name='status_down_submit' class='btn btn-sm btn-danger' onclick='return confirm(\"تأكيد تعطل الآلية؟\")'>تعطلت</button>
-                                </form> ";
-                        } elseif (($status_value === 3 || $status_value === 4) && $can_edit) {
+                        if ($status_value === 1 && $_SESSION['user']['role'] != "10" && $can_edit) {
+                            $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-outline-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
+                        } elseif ($status_value === 0 && $can_edit) {
                             $action_buttons .= "<form method='post' style='display:inline;'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='1'>
-                                    <button type='submit' name='status_resume_submit' class='btn btn-sm btn-success' onclick='return confirm(\"تأكيد استئناف العمل؟\")'>استئناف</button>
                                 </form> ";
                         }
 
-                        if ($status_value !== 0 && $_SESSION['user']['role'] != "10" && $can_edit) {
-                            $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-outline-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
-                        }
+                        // جلب اسم المنجم
+                        $mine_name_res = mysqli_query($conn, "SELECT mine_name FROM mines WHERE id = " . intval($row['mine_id']) . " LIMIT 1");
+                        $mine_name_val = ($mine_name_res && mysqli_num_rows($mine_name_res) > 0) ? mysqli_fetch_assoc($mine_name_res)['mine_name'] : '-';
+                        // جلب رقم العقد
+                        $contract_code_res = mysqli_query($conn, "SELECT contract_signing_date FROM contracts WHERE id = " . intval($row['contract_id']) . " LIMIT 1");
+                        $contract_code_val = ($contract_code_res && mysqli_num_rows($contract_code_res) > 0) ? mysqli_fetch_assoc($contract_code_res)['contract_signing_date'] : '-';
 
                                                 echo $status_cell;
                                                 echo "<td>
                                                                 <div class='action-btns'>
+                                                            " . ($can_view ? "<a href='javascript:void(0)' class='action-btn view viewOperationBtn'
+                                                                 data-id='" . $row['id'] . "'
+                                                                 data-equipment='" . htmlspecialchars($row['equipment_code'] . ' - ' . $row['equipment_name'], ENT_QUOTES) . "'
+                                                                 data-supplier='" . htmlspecialchars($row['suppliers_name'] ?? '-', ENT_QUOTES) . "'
+                                                                 data-mine='" . htmlspecialchars($mine_name_val, ENT_QUOTES) . "'
+                                                                 data-contract='" . htmlspecialchars($contract_code_val, ENT_QUOTES) . "'
+                                                                 data-drivers='" . htmlspecialchars(!empty($row['driver_names']) ? $row['driver_names'] : '-', ENT_QUOTES) . "'
+                                                                 data-start='" . $row['start'] . "'
+                                                                 data-end='" . $row['end'] . "'
+                                                                 data-total-hours='" . $row['total_equipment_hours'] . "'
+                                                                 data-shift-hours='" . $row['shift_hours'] . "'
+                                                                 data-category='" . htmlspecialchars($row['equipment_category'], ENT_QUOTES) . "'
+                                                                 data-status='" . $status_label . "'
+                                                                 data-status-class='" . $status_class . "'
+                                                                 data-reason='" . htmlspecialchars($row['reason'] ?? '', ENT_QUOTES) . "'
+                                                                 title='عرض التفاصيل'><i class='fa fa-eye'></i></a>" : "") . "
                                                             " . ($can_edit ? "<a href='javascript:void(0)' class='action-btn edit editOperationBtn' 
                                                                  data-id='" . $row['id'] . "'
                                                                  data-equipment='" . $row['equipment'] . "'
@@ -736,6 +761,78 @@ include('../insidebar.php');
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- ملفات DataTables -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+
+<!-- مودال عرض بيانات التشغيل -->
+<div id="viewOperationModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;">
+    <div class="modal-content" style="background:#fff;border-radius:12px;max-width:700px;width:95%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+        <div class="modal-header" style="padding:20px 24px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#1e40af,#2563eb);border-radius:12px 12px 0 0;">
+            <h5 style="margin:0;font-weight:700;color:#ffffff;"><i class="fas fa-eye" style="color:#ffffff;margin-left:8px;"></i> تفاصيل سجل التشغيل</h5>
+            <button onclick="closeViewOperationModal()" style="background:rgba(255,255,255,.2);border:none;font-size:1.4rem;cursor:pointer;color:#ffffff;line-height:1;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;">&times;</button>
+        </div>
+        <div class="modal-body" style="padding:24px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
+                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-cogs"></i> المعدة</div>
+                    <div style="font-weight:700;color:#1e293b;" id="view_op_equipment">-</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
+                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-truck"></i> المورد</div>
+                    <div style="font-weight:700;color:#1e293b;" id="view_op_supplier">-</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
+                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-mountain"></i> المنجم</div>
+                    <div style="font-weight:700;color:#1e293b;" id="view_op_mine">-</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
+                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-file-contract"></i> تاريخ توقيع العقد</div>
+                    <div style="font-weight:700;color:#1e293b;" id="view_op_contract">-</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
+                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-id-badge"></i> السائقون</div>
+                    <div style="font-weight:700;color:#1e293b;" id="view_op_drivers">-</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
+                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-check-circle"></i> نوع المعدة</div>
+                    <div style="font-weight:700;color:#1e293b;" id="view_op_category">-</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
+                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-calendar-alt"></i> تاريخ البداية</div>
+                    <div style="font-weight:700;color:#1e293b;" id="view_op_start">-</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
+                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-calendar-check"></i> تاريخ النهاية</div>
+                    <div style="font-weight:700;color:#1e293b;" id="view_op_end">-</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
+                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-clock"></i> ساعات العمل الكلية</div>
+                    <div style="font-weight:700;color:#1e293b;" id="view_op_total_hours">-</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
+                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-hourglass-half"></i> ساعات الوردية</div>
+                    <div style="font-weight:700;color:#1e293b;" id="view_op_shift_hours">-</div>
+                </div>
+                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;grid-column:span 2;">
+                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-toggle-on"></i> الحالة</div>
+                    <div id="view_op_status">-</div>
+                </div>
+                <div id="view_op_reason_block" style="background:#fff3cd;border-radius:8px;padding:14px;border:1px solid #ffc107;grid-column:span 2;display:none;">
+                    <div style="font-size:.75rem;color:#92400e;margin-bottom:4px;"><i class="fas fa-info-circle"></i> سبب الإنهاء</div>
+                    <div style="font-weight:600;color:#92400e;" id="view_op_reason">-</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:16px 24px;border-top:1px solid #e5e7eb;display:flex;justify-content:flex-end;gap:10px;">
+            <?php if ($can_edit): ?>
+            <button type="button" id="viewOpEditBtn" onclick="triggerEditFromView()" style="background:#2563eb;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-weight:600;cursor:pointer;">
+                <i class="fas fa-edit"></i> تعديل
+            </button>
+            <?php endif; ?>
+            <button type="button" onclick="closeViewOperationModal()" style="background:#6b7280;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-weight:600;cursor:pointer;">
+                <i class="fas fa-times"></i> إغلاق
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- موديل إنهاء الخدمة -->
 <div class="modal fade" id="endServiceModal" tabindex="-1" aria-labelledby="endServiceLabel" aria-hidden="true">
@@ -832,7 +929,6 @@ include('../insidebar.php');
         // تشغيل DataTable بالعربية
         $(document).ready(function () {
             $('#projectsTable').DataTable({
-                responsive: true,
                 dom: 'Bfrtip', // أزرار + بحث + ترقيم الصفحات
                 buttons: [
                     { extend: 'copy', text: 'نسخ' },
@@ -1216,6 +1312,70 @@ include('../insidebar.php');
             } else {
                 console.warn('⚠️ النوع أو المورد غير محدد');
             }
+        }
+
+        // ── مودال عرض بيانات التشغيل ──────────────────────────────────────
+        var _viewOpEditData = {};
+
+        $(document).on('click', '.viewOperationBtn', function () {
+            var btn = $(this);
+            $('#view_op_equipment').text(btn.data('equipment') || '-');
+            $('#view_op_supplier').text(btn.data('supplier') || '-');
+            $('#view_op_mine').text(btn.data('mine') || '-');
+            $('#view_op_contract').text(btn.data('contract') || '-');
+            $('#view_op_drivers').text(btn.data('drivers') || '-');
+            $('#view_op_start').text(btn.data('start') || '-');
+            $('#view_op_end').text(btn.data('end') || '-');
+            $('#view_op_total_hours').text(btn.data('total-hours') || '0');
+            $('#view_op_shift_hours').text(btn.data('shift-hours') || '0');
+            $('#view_op_category').text(btn.data('category') || '-');
+
+            var statusLabel = btn.data('status') || '-';
+            var statusClass = btn.data('status-class') || '';
+            $('#view_op_status').html("<span class='status-pill " + statusClass + "'>" + statusLabel + "</span>");
+
+            // سبب الإنهاء - يظهر فقط للسجلات المنتهية
+            var reason = btn.data('reason') || '';
+            if (statusClass === 'status-idle' && reason !== '') {
+                $('#view_op_reason').text(reason);
+                $('#view_op_reason_block').show();
+            } else {
+                $('#view_op_reason').text('-');
+                $('#view_op_reason_block').hide();
+            }
+
+            // حفظ data-id للتعديل
+            _viewOpEditData = { id: btn.data('id') };
+
+            $('#viewOperationModal').css('display', 'flex').hide().fadeIn(300);
+        });
+    });
+
+    function closeViewOperationModal() {
+        $('#viewOperationModal').fadeOut(300);
+    }
+
+    function triggerEditFromView() {
+        closeViewOperationModal();
+        setTimeout(function () {
+            var editBtn = $('.editOperationBtn[data-id="' + _viewOpEditData.id + '"]');
+            if (editBtn.length) {
+                editBtn.trigger('click');
+            }
+        }, 350);
+    }
+
+    // إغلاق عند الضغط خارج المودال
+    $(document).on('click', '#viewOperationModal', function (e) {
+        if ($(e.target).is('#viewOperationModal')) {
+            closeViewOperationModal();
+        }
+    });
+
+    // إغلاق بـ ESC
+    $(document).on('keydown', function (e) {
+        if (e.key === 'Escape' && $('#viewOperationModal').is(':visible')) {
+            closeViewOperationModal();
         }
     });
 

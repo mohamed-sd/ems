@@ -32,16 +32,14 @@ if (strlen($username) < 3) {
 $username_escaped = mysqli_real_escape_string($conn, $username);
 
 if ($uid > 0) {
-    // في حالة التعديل، نتجاهل السجل الحالي
+    // في حالة التعديل، نتجاهل السجل الحالي - التحقق عالمي عبر جميع الشركات
     $query = "SELECT id FROM users WHERE username = '$username_escaped' AND id != $uid AND $users_not_deleted_sql";
 } else {
-    // في حالة الإضافة
+    // في حالة الإضافة - التحقق عالمي عبر جميع الشركات
     $query = "SELECT id FROM users WHERE username = '$username_escaped' AND $users_not_deleted_sql";
 }
 
-if ($users_has_company_id && $current_company_id > 0) {
-    $query .= " AND company_id = $current_company_id";
-}
+// لا نضيف فلتر company_id - الفحص عالمي لمنع تكرار أسماء المستخدمين عبر كل الشركات
 
 $query .= " LIMIT 1";
 
@@ -52,17 +50,17 @@ if (!$result) {
 }
 
 if (mysqli_num_rows($result) > 0) {
-    // اسم المستخدم موجود بالفعل
+    // اسم المستخدم محجوز
     die(json_encode([
         'available' => false,
-        'message' => '❌ اسم المستخدم موجود مسبقاً يرجى اختيار اسم آخر',
+        'message' => 'اسم المستخدم محجوز',
         'taken' => true
     ]));
 } else {
-    // اسم المستخدم متوفر
+    // اسم المستخدم متاح
     die(json_encode([
         'available' => true,
-        'message' => '✅ اسم المستخدم متوفر',
+        'message' => 'اسم المستخدم متاح',
         'taken' => false
     ]));
 }

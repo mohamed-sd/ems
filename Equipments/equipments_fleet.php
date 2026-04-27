@@ -13,6 +13,12 @@ $equipment_has_document_type = db_table_has_column($conn, 'equipments', 'documen
 $equipment_has_site_supervisor_name = db_table_has_column($conn, 'equipments', 'site_supervisor_name');
 $equipment_has_site_supervisor_contact = db_table_has_column($conn, 'equipments', 'site_supervisor_contact');
 $equipment_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
+$equipment_has_company_id = db_table_has_column($conn, 'equipments', 'company_id');
+
+// company isolation (SaaS)
+$current_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$equipment_company_filter = ($equipment_has_company_id && $current_company_id > 0) ? " AND m.company_id = $current_company_id" : "";
+$equipment_company_filter_plain = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
 
 if (!function_exists('normalize_equipment_availability_state')) {
     function normalize_equipment_availability_state($availability_state, $availability_status)
@@ -93,7 +99,7 @@ if (isset($_GET['delete_id'])) {
         exit();
     }
     
-    if (mysqli_query($conn, "DELETE FROM equipments WHERE id = $delete_id")) {
+    if (mysqli_query($conn, "DELETE FROM equipments WHERE id = $delete_id $equipment_company_filter_plain")) {
         header("Location: equipments_fleet.php?msg=تم+حذف+المعدة+بنجاح+✅");
         exit();
     } else {
@@ -204,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     $code = mysqli_real_escape_string($conn, trim($_POST['code']));
     $type = mysqli_real_escape_string($conn, $_POST['type']);
     $name = mysqli_real_escape_string($conn, trim($_POST['name']));
-    $status = isset($_POST['status']) ? intval($_POST['status']) : 1;
+    $status = isset($_POST['status']) ? intval($_POST['status']) : 0;
 
     // المعلومات الأساسية والتعريفية
     $serial_number = mysqli_real_escape_string($conn, trim($_POST['serial_number'] ?? ''));
@@ -344,8 +350,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     }
 
     if ($edit_id > 0) {
+        // التحقق: إذا كانت المعدة تعمل في مشروع نشط، لا يُسمح بتغيير الحالة
+        $old_status_res = mysqli_query($conn, "SELECT status FROM equipments WHERE id = $edit_id LIMIT 1");
+        $old_status_row = $old_status_res ? mysqli_fetch_assoc($old_status_res) : null;
+        $old_status = $old_status_row ? intval($old_status_row['status']) : -1;
+
+        if ($old_status !== $status) {
+            $active_ops = mysqli_query($conn, "SELECT COUNT(*) as cnt FROM operations WHERE equipment = $edit_id AND status = '1'");
+            $active_ops_row = $active_ops ? mysqli_fetch_assoc($active_ops) : null;
+            if ($active_ops_row && intval($active_ops_row['cnt']) > 0) {
+                $success_msg = "❌ لا يمكن تغيير حالة المعدة وهي تعمل في مشروع نشط";
+                goto skip_save;
+            }
+        }
+
         // تعديل
-        $sql = "UPDATE equipments SET\n                    " . implode(",\n                    ", $equipment_save_fields) . "\n                WHERE id='$edit_id'";
+        $company_where = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id='$current_company_id'" : "";
+        $sql = "UPDATE equipments SET\n                    " . implode(",\n                    ", $equipment_save_fields) . "\n                WHERE id='$edit_id'$company_where";
         $msg = "تم+تعديل+المعدة+بنجاح+✅";
     } else {
         // إضافة
@@ -392,6 +413,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
             $insert_columns[] = 'availability_state';
             $insert_values[] = "'$availability_state'";
         }
+        if ($equipment_has_company_id && $current_company_id > 0) {
+            $insert_columns[] = 'company_id';
+            $insert_values[] = "'$current_company_id'";
+        }
 
         $sql = "INSERT INTO equipments (" . implode(', ', $insert_columns) . ") VALUES (" . implode(', ', $insert_values) . ")";
         $msg = "تمت+إضافة+المعدة+بنجاح+✅";
@@ -411,7 +436,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
 $editData = [];
 if (isset($_GET['edit']) && $can_edit) {
     $editId = intval($_GET['edit']);
-    $res = mysqli_query($conn, "SELECT * FROM equipments WHERE id='$editId'");
+    $edit_company_where = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id='$current_company_id'" : "";
+    $res = mysqli_query($conn, "SELECT * FROM equipments WHERE id='$editId'$edit_company_where");
     if ($res && mysqli_num_rows($res) > 0) {
         $editData = mysqli_fetch_assoc($res);
     }
@@ -499,7 +525,8 @@ if (!empty($editData)) {
                             <select name="suppliers" id="suppliers" required>
                                 <option value="">-- اختر المورد --</option>
                                 <?php
-                                $supplier_query = "SELECT id, name FROM suppliers WHERE status = 1 ORDER BY name";
+                                $supplier_company_where = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
+                                $supplier_query = "SELECT id, name FROM suppliers WHERE status = 1$supplier_company_where ORDER BY name";
                                 $supplier_result = mysqli_query($conn, $supplier_query);
                                 while ($supplier = mysqli_fetch_assoc($supplier_result)) {
                                     $selected = (!empty($editData) && $editData['suppliers'] == $supplier['id']) ? 'selected' : '';
@@ -972,12 +999,15 @@ if (!empty($editData)) {
                         <div>
                             <label>
                                 <i class="fas fa-toggle-on"></i>
-                                حالة السجل <span class="required-indicator">*</span>
+                                حالة المعدة <span class="required-indicator">*</span>
                             </label>
                             <select name="status" id="status" required>
                                 <option value="">-- اختر الحالة --</option>
-                                <option value="1" <?php echo (empty($editData) || $editData['status'] == "1") ? "selected" : ""; ?>>نشط</option>
-                                <option value="0" <?php echo (!empty($editData) && $editData['status'] == "0") ? "selected" : ""; ?>>غير نشط</option>
+                                <option value="0" <?php echo (empty($editData) || $editData['status'] == "0") ? "selected" : ""; ?>>متاحة</option>
+                                <option value="1" <?php echo (!empty($editData) && $editData['status'] == "1") ? "selected" : ""; ?>>تحت الصيانة</option>
+                                <option value="2" <?php echo (!empty($editData) && $editData['status'] == "2") ? "selected" : ""; ?>>محجوزة</option>
+                                <option value="3" <?php echo (!empty($editData) && $editData['status'] == "3") ? "selected" : ""; ?>>معطلة</option>
+                                <option value="5" <?php echo (!empty($editData) && $editData['status'] == "5") ? "selected" : ""; ?>>مسحوبة</option>
                             </select>
                         </div>
 
@@ -1022,7 +1052,8 @@ if (!empty($editData)) {
                         <select id="filterSupplier" class="filter-select">
                             <option value="">— جميع الموردين —</option>
                             <?php
-                            $supplier_filter_query = "SELECT id, name FROM suppliers WHERE status = 1 ORDER BY name";
+                            $supplier_company_filter_where = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
+                            $supplier_filter_query = "SELECT id, name FROM suppliers WHERE status = 1$supplier_company_filter_where ORDER BY name";
                             $supplier_filter_result = mysqli_query($conn, $supplier_filter_query);
                             while ($supplier = mysqli_fetch_assoc($supplier_filter_result)) {
                                 echo "<option value='" . htmlspecialchars($supplier['name']) . "'>" . htmlspecialchars($supplier['name']) . "</option>";
@@ -1049,11 +1080,10 @@ if (!empty($editData)) {
                         <label><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
                         <select id="filterStatus" class="filter-select">
                             <option value="">— جميع الحالات —</option>
-                            <option value="قيد الاستخدام">قيد الاستخدام</option>
+                            <option value="متاحة">متاحة</option>
                             <option value="تحت الصيانة">تحت الصيانة</option>
                             <option value="محجوزة">محجوزة</option>
                             <option value="معطلة">معطلة</option>
-                            <option value="في المستودع">في المستودع</option>
                             <option value="مسحوبة">مسحوبة</option>
                         </select>
                     </div>
@@ -1114,7 +1144,7 @@ if (!empty($editData)) {
                         <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
                         <th data-group="ownership"><i class="fas fa-user"></i> المالك</th>
                         <th data-group="status"><i class="fas fa-traffic-light"></i> التوفر</th>
-                        <th data-group="status"><i class="fas fa-toggle-on"></i> الحالة</th>
+                        <th data-group="status"><i class="fas fa-toggle-on"></i> حالة المعدة</th>
                         <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
                     </tr>
                 </thead>
@@ -1151,6 +1181,7 @@ if (!empty($editData)) {
                         LEFT JOIN drivers d 
                             ON d.id = ed.driver_id 
                             AND ed.status = '1'
+                        WHERE 1=1 $equipment_company_filter
                         GROUP BY m.id
                         ORDER BY m.id DESC
                     ";
@@ -1224,20 +1255,17 @@ if (!empty($editData)) {
                             echo "<td><span class='badge-busy'><i class='fas fa-ban'></i> غير متوفرة</span></td>";
                         }
 
-                        // الحالة
-                        if ($row_availability_status === 'قيد الاستخدام') {
-                            echo "<td><span class='badge-working'><i class='fas fa-spinner fa-spin'></i> قيد الاستخدام</span></td>";
-                        } elseif ($row_availability_status === 'تحت الصيانة') {
-                            echo "<td><span class='badge-busy'><i class='fas fa-tools'></i> تحت الصيانة</span></td>";
-                        } elseif ($row_availability_status === 'محجوزة') {
-                            echo "<td><span class='badge-type'><i class='fas fa-bookmark'></i> محجوزة</span></td>";
-                        } elseif ($row_availability_status === 'في المستودع') {
-                            echo "<td><span class='badge-type'><i class='fas fa-warehouse'></i> في المستودع</span></td>";
-                        } elseif ($row_availability_status === 'مسحوبة') {
-                            echo "<td><span class='badge-busy'><i class='fas fa-arrow-alt-circle-down'></i> مسحوبة</span></td>";
-                        } else {
-                            echo "<td><span class='badge-busy'><i class='fas fa-exclamation-triangle'></i> معطلة</span></td>";
-                        }
+                        // حالة المعدة (من حقل status الرقمي)
+                        $eq_status = isset($row['status']) ? intval($row['status']) : 0;
+                        $status_map = [
+                            0 => ["badge-working",  "fa-spinner fa-spin",         "متاحة"],
+                            1 => ["badge-busy",     "fa-tools",                   "تحت الصيانة"],
+                            2 => ["badge-type",     "fa-bookmark",                "محجوزة"],
+                            3 => ["badge-busy",     "fa-exclamation-triangle",    "معطلة"],
+                            5 => ["badge-busy",     "fa-arrow-alt-circle-down",   "مسحوبة"],
+                        ];
+                        $s = isset($status_map[$eq_status]) ? $status_map[$eq_status] : ["badge-type", "fa-question-circle", "غير محدد"];
+                        echo "<td><span class='{$s[0]}'><i class='fas {$s[1]}'></i> {$s[2]}</span></td>";
 
                         // الإجراءات
                         echo "<td>";

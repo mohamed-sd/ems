@@ -1482,3 +1482,45 @@ Stack trace:
 [26-Apr-2026 15:57:56 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
 [26-Apr-2026 15:57:56 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
 [26-Apr-2026 15:57:56 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[26-Apr-2026 23:09:24 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/1045): Access denied for user 'u359449619_ems'@'41.238.31.33' (using password: YES) in C:\xampp\htdocs\ems\config.php on line 124
+[26-Apr-2026 23:09:24 Europe/Berlin] Database Connection Failed: Access denied for user 'u359449619_ems'@'41.238.31.33' (using password: YES)
+[26-Apr-2026 23:10:14 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[26-Apr-2026 23:10:14 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[26-Apr-2026 23:10:50 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[26-Apr-2026 23:10:50 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[27-Apr-2026 10:57:48 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[27-Apr-2026 10:57:48 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[27-Apr-2026 10:57:56 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[27-Apr-2026 10:57:56 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[27-Apr-2026 10:58:02 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[27-Apr-2026 10:58:02 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[27-Apr-2026 10:58:02 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[27-Apr-2026 10:58:02 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[27-Apr-2026 11:09:23 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[27-Apr-2026 11:09:23 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\modules.php on line 9
+[27-Apr-2026 11:09:30 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 11:09:30 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 11:09:49 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 11:09:49 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 11:09:57 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 11:09:57 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 11:23:36 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_num_rows(): Argument #1 ($result) must be of type mysqli_result, bool given in Command line code:1
+Stack trace:
+#0 Command line code(1): mysqli_num_rows(false)
+#1 {main}
+  thrown in Command line code on line 1
+[27-Apr-2026 11:27:31 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 11:27:31 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 11:27:33 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 11:27:33 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 11:27:38 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 11:27:38 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\role_permissions.php on line 9
+[27-Apr-2026 14:08:32 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[27-Apr-2026 14:08:32 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[27-Apr-2026 14:08:41 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[27-Apr-2026 14:08:41 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[27-Apr-2026 14:08:50 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[27-Apr-2026 14:08:50 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[27-Apr-2026 14:08:50 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[27-Apr-2026 14:08:50 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ems\admin\permissions\roles.php on line 9
+[27-Apr-2026 15:12:36 Europe/Berlin] PHP Warning:  Undefined variable $monthly_executed in C:\xampp\htdocs\ems\Drivers\driver_profile.php on line 935

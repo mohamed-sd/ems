@@ -6,6 +6,14 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 
+$_current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$_is_super_admin = ($_current_role === '-1');
+$_report_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$_suppliers_has_company_id = db_table_has_column($conn, 'suppliers', 'company_id');
+$_supplier_company_where = (!$_is_super_admin && $_suppliers_has_company_id && $_report_company_id > 0)
+    ? " AND company_id = '$_report_company_id'"
+    : "";
+
 $supplier_filter = isset($_GET['supplier']) ? $_GET['supplier'] : '';
 $project_filter = isset($_GET['project']) ? $_GET['project'] : '';
 $mine_filter = isset($_GET['mine']) ? $_GET['mine'] : '';
@@ -117,7 +125,7 @@ $result = mysqli_query($conn, $sql);
                         <select name="supplier">
                             <option value="">-- الكل --</option>
                             <?php
-                            $sup = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE status = '1' ORDER BY name");
+                            $sup = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE status = '1'$_supplier_company_where ORDER BY name");
                             while ($row = mysqli_fetch_assoc($sup)) {
                                 $selected = ($supplier_filter == $row['id']) ? "selected" : "";
                                 echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";

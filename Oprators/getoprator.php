@@ -6,22 +6,26 @@ if (isset($_GET['type'])) {
     $supplier_id = isset($_GET['supplier_id']) ? intval($_GET['supplier_id']) : 0;
     $current_equipment = isset($_GET['current_equipment']) ? intval($_GET['current_equipment']) : 0;
     $supplier_filter = $supplier_id > 0 ? " AND suppliers = $supplier_id" : "";
-    $equipments_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
 
-    // استثناء المعدات المستخدمة الأخرى مع الإبقاء على المعدة الحالية عند التعديل
-    $equipment_exclude = "id NOT IN ( SELECT operations.equipment FROM `operations` WHERE `status` LIKE '1'";
+    // الشرط الأول: الآلية متاحة (status = 0 في جدول equipments)
+    // الشرط الثاني: ليس لديها تشغيل ساري (لا يوجد سجل في operations بحالة 1)
+    // استثناء: إذا كانت هذه هي الآلية الحالية عند التعديل، تظهر دائماً
     if ($current_equipment > 0) {
-        $equipment_exclude .= " AND equipment != $current_equipment";
+        $where = "(
+            (e.status = 0 AND e.id NOT IN (
+                SELECT equipment FROM operations WHERE status = '1'
+            ))
+            OR e.id = $current_equipment
+        )";
+    } else {
+        $where = "e.status = 0 AND e.id NOT IN (
+            SELECT equipment FROM operations WHERE status = '1'
+        )";
     }
-    $equipment_exclude .= ")";
-
-    $availability_filter = $equipments_has_availability_state
-        ? " AND (availability_state = 'متوفرة'" . ($current_equipment > 0 ? " OR id = $current_equipment" : "") . ")"
-        : " AND ((availability_status IS NULL OR availability_status IN ('متاحة للعمل', 'قيد الاستخدام'))" . ($current_equipment > 0 ? " OR id = $current_equipment" : "") . ")";
 
     $result = mysqli_query(
         $conn,
-        "SELECT id, code, name FROM equipments WHERE $equipment_exclude AND status = '1' AND type = $type$supplier_filter$availability_filter"
+        "SELECT e.id, e.code, e.name FROM equipments e WHERE $where AND e.type = $type$supplier_filter"
     );
 
     echo "<option value=''>-- اختر الالية --</option>";

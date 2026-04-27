@@ -117,9 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         echo "<script>alert('⚠️ هذا الدور مرتبط بمنجم محدد، يرجى اختيار المشروع والمنجم والعقد');</script>";
     } elseif ($uid > 0) {
 
-        // تحقق من التكرار عند التعديل (يتجاهل السجل الحالي)
-        $check_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
-        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' AND id != '$uid' AND $users_not_deleted_sql $check_scope LIMIT 1");
+        // تحقق من التكرار عند التعديل (يتجاهل السجل الحالي) - التحقق عالمي عبر جميع الشركات
+        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' AND id != '$uid' AND $users_not_deleted_sql LIMIT 1");
         if (!$check) {
             echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
         } elseif (mysqli_num_rows($check) > 0) {
@@ -146,9 +145,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             }
         }
     } else {
-        // تحقق من التكرار عند الإضافة
-        $check_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
-        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' AND $users_not_deleted_sql $check_scope LIMIT 1");
+        // تحقق من التكرار عند الإضافة - التحقق عالمي عبر جميع الشركات
+        $check = mysqli_query($conn, "SELECT id FROM users WHERE username='$username' AND $users_not_deleted_sql LIMIT 1");
         if (!$check) {
             echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
         } elseif (mysqli_num_rows($check) > 0) {
