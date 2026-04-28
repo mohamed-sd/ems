@@ -25,6 +25,16 @@ if (isset($_SESSION['user']) && isset($conn)) {
     <ul>
       <li><a href="../main/dashboard.php"><i class="fa-solid fa-house"></i> <span>الرئيسية</span></a></li>
 
+      <li>
+        <a href="../chats/index.php" id="sidebarChatLink">
+          <i class="fa fa-comments"></i>
+          <span>المراسلات
+            <span id="nav-unread-badge"
+              style="display:none; background:#dc3545; color:#fff; font-size:0.65rem; font-weight:700; border-radius:10px; padding:1px 5px; margin-right:4px; vertical-align:middle;"></span>
+          </span>
+        </a>
+      </li>
+
       <?php
       // عرض الروابط الديناميكية من جدول modules بناءً على دور المستخدم
       if (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && isset($conn)) {
@@ -225,4 +235,27 @@ if (isset($_SESSION['user']) && isset($conn)) {
       closeSidebar();
     }
   });
+
+  // ===== شارة الرسائل غير المقروءة =====
+  function updateChatNavBadge() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/ems/chats/get_unread_count.php', true);
+    xhr.onload = function() {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        var badge = document.getElementById('nav-unread-badge');
+        if (badge) {
+          if (data.count > 0) {
+            badge.textContent = data.count > 99 ? '99+' : data.count;
+            badge.style.display = 'inline';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      } catch(e) {}
+    };
+    xhr.send();
+  }
+  updateChatNavBadge();
+  setInterval(updateChatNavBadge, 30000);
 </script>

@@ -1403,9 +1403,9 @@ foreach ($equipmentTypes as $equipmentType) {
 
         if (countInput && targetInput) {
           const countBasic = num(countBasicInput ? countBasicInput.value : 0);
-          const countBackup = num(countBackupInput ? countBackupInput.value : 0);
+          // المعدات الاحتياطية لا تدخل في الحساب (للتوثيق فقط)
           const rawCount = num(countInput.value);
-          const count = (countBasic + countBackup) > 0 ? (countBasic + countBackup) : rawCount;
+          const count = countBasic > 0 ? countBasic : rawCount;
           const target = num(targetInput.value);
           const sectionMonth = count * target;
           const sectionMonthlyUnits = count > 0 ? (sectionMonth * 30) / count : 0;

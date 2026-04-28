@@ -1460,12 +1460,16 @@ if (isset($_GET['delete_id'])) {
       document.querySelectorAll('.equipment-section').forEach(section => {
         const index = section.getAttribute('data-index');
         const countInput = section.querySelector(`input[name="equip_count_${index}"]`);
+        const countBasicInput = section.querySelector(`input[name="equip_count_basic_${index}"]`);
         const targetInput = section.querySelector(`input[name="shift_hours_${index}"]`);
         const monthInput = section.querySelector(`input[name="equip_total_month_${index}"]`);
         const contractInput = section.querySelector(`input[name="equip_total_contract_${index}"]`);
 
         if (countInput && targetInput) {
-          const count = num(countInput.value);
+          const countBasic = num(countBasicInput ? countBasicInput.value : 0);
+          // المعدات الاحتياطية لا تدخل في الحساب (للتوثيق فقط)
+          const rawCount = num(countInput.value);
+          const count = countBasic > 0 ? countBasic : rawCount;
           const target = num(targetInput.value);
           const sectionMonth = count * target;
           // حساب إجمالي الساعات على أساس الأيام بدلاً من الشهور
