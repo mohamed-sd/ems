@@ -132,17 +132,16 @@ case 'drivers_timesheet': {
     if ($fDriverId   > 0) $where[] = "d.id = $fDriverId";
     $ws = implode(' AND ', $where);
 
-    $isOperatorTimesheetReport = in_array($REPORT_CODE, ['timesheet_by_driver', 'drivers_timesheet']);
-    $workField   = $isOperatorTimesheetReport ? 't.operator_hours' : 't.total_work_hours';
-    $standbyField = $isOperatorTimesheetReport ? 't.operator_standby_hours' : 't.total_fault_hours';
-    $workLabel    = $isOperatorTimesheetReport ? 'ساعات التنفيذ' : 'ساعات العمل';
-    $standbyLabel = $isOperatorTimesheetReport ? 'ساعات الاستعداد' : 'ساعات الأعطال';
+    $executedField = 't.executed_hours';
+    $standbyField  = 't.standby_hours';
+    $workField     = '(IFNULL(t.executed_hours,0) + IFNULL(t.standby_hours,0))';
 
     // KPI aggregate
     $kpiSql = "SELECT COUNT(t.id) AS cnt,
+                      ROUND(IFNULL(SUM($executedField),0),2) AS executed_hours,
+                      ROUND(IFNULL(SUM($standbyField),0),2) AS standby_hours,
                       ROUND(IFNULL(SUM($workField),0),2) AS twh,
-                      ROUND(IFNULL(SUM($standbyField),0),2) AS tfh,
-                      ROUND(IFNULL(SUM(t.standby_hours),0),2) AS tsh,
+                      ROUND(IFNULL(SUM(t.total_fault_hours),0),2) AS tfh,
                       COUNT(DISTINCT o.project_id) AS proj_cnt,
                       COUNT(DISTINCT t.driver) AS driver_cnt
                FROM timesheet t
@@ -152,31 +151,32 @@ case 'drivers_timesheet': {
                WHERE $ws";
     $kpiRes = mysqli_query($conn, $kpiSql);
     $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
+    $executedHours = floatval($kpiRow['executed_hours'] ?? 0);
+    $standbyHours = floatval($kpiRow['standby_hours'] ?? 0);
     $twh = floatval($kpiRow['twh'] ?? 0);
     $tfh = floatval($kpiRow['tfh'] ?? 0);
     $eff = ($twh + $tfh) > 0 ? round($twh / ($twh + $tfh) * 100, 1) : 0;
 
-    $tsh = floatval($kpiRow['tsh'] ?? 0);
     $kpi = [
         ['icon'=>'fa-list-ul',       'value'=> number_format($kpiRow['cnt'] ?? 0),     'label'=>'إجمالي السجلات',  'color'=>'blue'],
-        ['icon'=>'fa-clock',         'value'=> number_format($twh,1) . ' س',           'label'=>$workLabel,         'color'=>'green'],
-        ['icon'=>'fa-exclamation-triangle','value'=> number_format($tfh,1) . ' س',     'label'=>$standbyLabel,      'color'=>'red'],
+        ['icon'=>'fa-play-circle',   'value'=> number_format($executedHours,1) . ' س', 'label'=>'الساعات المنفذة', 'color'=>'green'],
+        ['icon'=>'fa-pause-circle',  'value'=> number_format($standbyHours,1) . ' س',  'label'=>'ساعات استعداد العميل', 'color'=>'orange'],
+        ['icon'=>'fa-clock',         'value'=> number_format($twh,1) . ' س',           'label'=>'ع.العمل',         'color'=>'teal'],
+        ['icon'=>'fa-exclamation-triangle','value'=> number_format($tfh,1) . ' س',     'label'=>'ساعات الأعطال',   'color'=>'red'],
     ];
-    if (!$isOperatorTimesheetReport) {
-        $kpi[] = ['icon'=>'fa-pause-circle', 'value'=> number_format($tsh,1) . ' س', 'label'=>'ساعات الاستعداد', 'color'=>'orange'];
-    }
     $kpi[] = ['icon'=>'fa-percentage',    'value'=> $eff . '%',                              'label'=>'كفاءة التشغيل',  'color'=>'gold'];
     $kpi[] = ['icon'=>'fa-project-diagram','value'=> number_format($kpiRow['proj_cnt'] ?? 0),'label'=>'المشاريع',        'color'=>'teal'];
 
     if ($REPORT_CODE === 'timesheet_by_project') {
-        $headers = ['المشروع','عدد السجلات','ساعات العمل','ساعات الاستعداد','ساعات الأعطال','الكفاءة%'];
+        $headers = ['المشروع','عدد السجلات','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%'];
         $sql = "SELECT IFNULL(p.name,'غير محدد') AS project_name,
                        COUNT(t.id) AS entries_count,
-                       ROUND(IFNULL(SUM(t.total_work_hours),0),2)  AS twh,
-                       ROUND(IFNULL(SUM(t.standby_hours),0),2)     AS tsh,
+                       ROUND(IFNULL(SUM(t.executed_hours),0),2)    AS executed_hours,
+                       ROUND(IFNULL(SUM(t.standby_hours),0),2)     AS standby_hours,
+                       ROUND(IFNULL(SUM(t.executed_hours + t.standby_hours),0),2) AS twh,
                        ROUND(IFNULL(SUM(t.total_fault_hours),0),2) AS tfh,
-                       CASE WHEN (IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))>0
-                            THEN ROUND(IFNULL(SUM(t.total_work_hours),0)/(IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))*100,1)
+                       CASE WHEN (IFNULL(SUM(t.executed_hours + t.standby_hours),0)+IFNULL(SUM(t.total_fault_hours),0))>0
+                            THEN ROUND(IFNULL(SUM(t.executed_hours + t.standby_hours),0)/(IFNULL(SUM(t.executed_hours + t.standby_hours),0)+IFNULL(SUM(t.total_fault_hours),0))*100,1)
                             ELSE 0 END AS eff_pct
                 FROM timesheet t
                 LEFT JOIN operations o ON o.id=t.operator
@@ -185,16 +185,17 @@ case 'drivers_timesheet': {
                 LEFT JOIN drivers    d ON d.id=t.driver
                 WHERE $ws GROUP BY p.id,p.name ORDER BY twh DESC";
     } elseif (in_array($REPORT_CODE,['timesheet_by_equipment','fleet_timesheet'])) {
-        $headers = ['الكود','المعدة','المورد','عدد السجلات','ساعات العمل','ساعات الاستعداد','ساعات الأعطال','الكفاءة%'];
+           $headers = ['الكود','المعدة','المورد','عدد السجلات','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%'];
         $sql = "SELECT IFNULL(e.code,'-') AS code,
                        IFNULL(e.name,'غير محدد') AS equipment_name,
                        IFNULL(s.name,'—') AS supplier_name,
                        COUNT(t.id) AS entries_count,
-                       ROUND(IFNULL(SUM(t.total_work_hours),0),2)  AS twh,
-                       ROUND(IFNULL(SUM(t.standby_hours),0),2)     AS tsh,
+                       ROUND(IFNULL(SUM(t.executed_hours),0),2)    AS executed_hours,
+                       ROUND(IFNULL(SUM(t.standby_hours),0),2)     AS standby_hours,
+                       ROUND(IFNULL(SUM(t.executed_hours + t.standby_hours),0),2) AS twh,
                        ROUND(IFNULL(SUM(t.total_fault_hours),0),2) AS tfh,
-                       CASE WHEN (IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))>0
-                            THEN ROUND(IFNULL(SUM(t.total_work_hours),0)/(IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))*100,1)
+                       CASE WHEN (IFNULL(SUM(t.executed_hours + t.standby_hours),0)+IFNULL(SUM(t.total_fault_hours),0))>0
+                           THEN ROUND(IFNULL(SUM(t.executed_hours + t.standby_hours),0)/(IFNULL(SUM(t.executed_hours + t.standby_hours),0)+IFNULL(SUM(t.total_fault_hours),0))*100,1)
                             ELSE 0 END AS eff_pct
                 FROM timesheet t
                 LEFT JOIN operations o ON o.id=t.operator
@@ -203,14 +204,16 @@ case 'drivers_timesheet': {
                 LEFT JOIN drivers    d ON d.id=t.driver
                 WHERE $ws GROUP BY e.id ORDER BY twh DESC";
     } elseif (in_array($REPORT_CODE,['timesheet_by_driver','drivers_timesheet'])) {
-        $headers = ['المشغل','المورد','عدد الورديات','ساعات التنفيذ','ساعات الاستعداد','الكفاءة%'];
+           $headers = ['المشغل','المورد','عدد الورديات','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%'];
         $sql = "SELECT IFNULL(d.name,'غير محدد') AS driver_name,
                        IFNULL(s.name,'—') AS supplier_name,
                        COUNT(t.id) AS entries_count,
-                       ROUND(IFNULL(SUM(t.operator_hours),0),2)  AS twh,
-                       ROUND(IFNULL(SUM(t.operator_standby_hours),0),2) AS tfh,
-                       CASE WHEN (IFNULL(SUM(t.operator_hours),0)+IFNULL(SUM(t.operator_standby_hours),0))>0
-                            THEN ROUND(IFNULL(SUM(t.operator_hours),0)/(IFNULL(SUM(t.operator_hours),0)+IFNULL(SUM(t.operator_standby_hours),0))*100,1)
+                       ROUND(IFNULL(SUM(t.executed_hours),0),2)    AS executed_hours,
+                       ROUND(IFNULL(SUM(t.standby_hours),0),2)     AS standby_hours,
+                       ROUND(IFNULL(SUM(t.executed_hours + t.standby_hours),0),2) AS twh,
+                       ROUND(IFNULL(SUM(t.total_fault_hours),0),2) AS tfh,
+                       CASE WHEN (IFNULL(SUM(t.executed_hours + t.standby_hours),0)+IFNULL(SUM(t.total_fault_hours),0))>0
+                           THEN ROUND(IFNULL(SUM(t.executed_hours + t.standby_hours),0)/(IFNULL(SUM(t.executed_hours + t.standby_hours),0)+IFNULL(SUM(t.total_fault_hours),0))*100,1)
                             ELSE 0 END AS eff_pct
                 FROM timesheet t
                 LEFT JOIN operations o ON o.id=t.operator
@@ -218,14 +221,15 @@ case 'drivers_timesheet': {
                 LEFT JOIN drivers    d ON d.id=t.driver
                 WHERE $ws GROUP BY d.id ORDER BY twh DESC";
     } elseif ($REPORT_CODE === 'supplier_timesheet') {
-        $headers = ['المورد','عدد السجلات','ساعات العمل','ساعات الاستعداد','ساعات الأعطال','الكفاءة%'];
+           $headers = ['المورد','عدد السجلات','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%'];
         $sql = "SELECT IFNULL(s.name,'غير محدد') AS supplier_name,
                        COUNT(t.id) AS entries_count,
-                       ROUND(IFNULL(SUM(t.total_work_hours),0),2)  AS twh,
-                       ROUND(IFNULL(SUM(t.standby_hours),0),2)     AS tsh,
+                       ROUND(IFNULL(SUM(t.executed_hours),0),2)    AS executed_hours,
+                       ROUND(IFNULL(SUM(t.standby_hours),0),2)     AS standby_hours,
+                       ROUND(IFNULL(SUM(t.executed_hours + t.standby_hours),0),2) AS twh,
                        ROUND(IFNULL(SUM(t.total_fault_hours),0),2) AS tfh,
-                       CASE WHEN (IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))>0
-                            THEN ROUND(IFNULL(SUM(t.total_work_hours),0)/(IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))*100,1)
+                       CASE WHEN (IFNULL(SUM(t.executed_hours + t.standby_hours),0)+IFNULL(SUM(t.total_fault_hours),0))>0
+                           THEN ROUND(IFNULL(SUM(t.executed_hours + t.standby_hours),0)/(IFNULL(SUM(t.executed_hours + t.standby_hours),0)+IFNULL(SUM(t.total_fault_hours),0))*100,1)
                             ELSE 0 END AS eff_pct
                 FROM timesheet t
                 LEFT JOIN operations o ON o.id=t.operator
@@ -241,20 +245,21 @@ case 'drivers_timesheet': {
             if ($fMineId  > 0)   $where[] = "o.mine_id = $fMineId";
             $ws = implode(' AND ', $where);
 
-            $headers = ['#','التاريخ','الوردية','البداية','النهاية','ع.عمل','ع.استعداد','ع.أعطال','ع.تنفيذ','ع.استعداد.مشغل','ع.وردية','كفاءة%','المشروع','المنجم','المعدة','كود المعدة','المورد','المشغل','نوع الخلل','ملاحظات'];
+              $headers = ['#','التاريخ','الوردية','البداية','النهاية','ع.المنفذة','ع.الاستعداد','ع.العمل','ع.أعطال','ع.تنفيذ مشغل','ع.استعداد مشغل','ع.وردية','كفاءة%','المشروع','المنجم','المعدة','كود المعدة','المورد','المشغل','نوع الخلل','ملاحظات'];
             $sql = "SELECT t.id,
                            t.date,
                            CASE WHEN t.shift='D' THEN 'D' WHEN t.shift='N' THEN 'N' ELSE IFNULL(t.shift,'-') END AS shift_txt,
                            CONCAT(LPAD(IFNULL(t.start_hours,0),2,'0'),':',LPAD(IFNULL(t.start_minutes,0),2,'0')) AS start_t,
                            CONCAT(LPAD(IFNULL(t.end_hours,0),2,'0'),':',LPAD(IFNULL(t.end_minutes,0),2,'0'))   AS end_t,
-                           ROUND(IFNULL(t.total_work_hours,0),2)   AS twh,
-                           ROUND(IFNULL(t.standby_hours,0),2)      AS standby_h,
+                          ROUND(IFNULL(t.executed_hours,0),2)     AS executed_hours,
+                          ROUND(IFNULL(t.standby_hours,0),2)      AS standby_hours,
+                          ROUND(IFNULL(t.executed_hours + t.standby_hours,0),2) AS twh,
                            ROUND(IFNULL(t.total_fault_hours,0),2)  AS tfh,
                            ROUND(IFNULL(t.operator_hours,0),2)     AS op_h,
                            ROUND(IFNULL(t.operator_standby_hours,0),2) AS op_sb,
                            ROUND(IFNULL(t.shift_hours,0),2)        AS sh_h,
-                           CASE WHEN (IFNULL(t.total_work_hours,0)+IFNULL(t.total_fault_hours,0))>0
-                                THEN ROUND(IFNULL(t.total_work_hours,0)/(IFNULL(t.total_work_hours,0)+IFNULL(t.total_fault_hours,0))*100,1)
+                          CASE WHEN (IFNULL(t.executed_hours + t.standby_hours,0)+IFNULL(t.total_fault_hours,0))>0
+                              THEN ROUND(IFNULL(t.executed_hours + t.standby_hours,0)/(IFNULL(t.executed_hours + t.standby_hours,0)+IFNULL(t.total_fault_hours,0))*100,1)
                                 ELSE 0 END AS eff_pct,
                            IFNULL(p.name,'—')  AS project_name,
                            IFNULL(mn.mine_name,'—') AS mine_name,
@@ -274,15 +279,16 @@ case 'drivers_timesheet': {
                     WHERE $ws ORDER BY STR_TO_DATE(t.date,'%Y-%m-%d') DESC, t.id DESC";
         } else {
             // timesheet_summary
-            $headers = ['التاريخ','البداية','النهاية','ساعات العمل','ساعات الاستعداد','ساعات الأعطال','الكفاءة%','المشروع','المعدة','المورد','المشغل'];
+              $headers = ['التاريخ','البداية','النهاية','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%','المشروع','المعدة','المورد','المشغل'];
             $sql = "SELECT t.date,
                            CONCAT(LPAD(IFNULL(t.start_hours,0),2,'0'),':',LPAD(IFNULL(t.start_minutes,0),2,'0')) AS start_t,
                            CONCAT(LPAD(IFNULL(t.end_hours,0),2,'0'),':',LPAD(IFNULL(t.end_minutes,0),2,'0'))   AS end_t,
-                           ROUND(IFNULL(t.total_work_hours,0),2)  AS twh,
-                           ROUND(IFNULL(t.standby_hours,0),2)     AS tsh,
+                          ROUND(IFNULL(t.executed_hours,0),2)    AS executed_hours,
+                          ROUND(IFNULL(t.standby_hours,0),2)     AS standby_hours,
+                          ROUND(IFNULL(t.executed_hours + t.standby_hours,0),2) AS twh,
                            ROUND(IFNULL(t.total_fault_hours,0),2) AS tfh,
-                           CASE WHEN (IFNULL(t.total_work_hours,0)+IFNULL(t.total_fault_hours,0))>0
-                                THEN ROUND(IFNULL(t.total_work_hours,0)/(IFNULL(t.total_work_hours,0)+IFNULL(t.total_fault_hours,0))*100,1)
+                          CASE WHEN (IFNULL(t.executed_hours + t.standby_hours,0)+IFNULL(t.total_fault_hours,0))>0
+                              THEN ROUND(IFNULL(t.executed_hours + t.standby_hours,0)/(IFNULL(t.executed_hours + t.standby_hours,0)+IFNULL(t.total_fault_hours,0))*100,1)
                                 ELSE 0 END AS eff_pct,
                            IFNULL(p.name,'—') AS project_name,
                            IFNULL(e.name,'—') AS equipment_name,
@@ -1747,6 +1753,97 @@ body {
 <script>
 $(function(){
     var tbl = $('#rTable');
+    var isTimesheetReport = <?php echo (strpos($REPORT_CODE, 'timesheet') !== false) ? 'true' : 'false'; ?>;
+
+    function normText(value) {
+        return String(value || '').replace(/\s+/g, '').replace(/\./g, '').toLowerCase();
+    }
+
+    function htmlToText(value) {
+        return $('<div>').html(value || '').text().trim();
+    }
+
+    function parseNum(value) {
+        var cleaned = String(value || '').replace(/,/g, '').replace(/[^0-9.\-]/g, '');
+        var parsed = parseFloat(cleaned);
+        return isNaN(parsed) ? 0 : parsed;
+    }
+
+    function formatNumber(value, decimals) {
+        return Number(value || 0).toLocaleString('en-US', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+    }
+
+    function setKpiByLabel(label, renderedValue) {
+        $('.rpt-kpi').each(function(){
+            var $card = $(this);
+            var lbl = $card.find('.rpt-kpi-lbl').text().trim();
+            if (lbl === label) {
+                $card.find('.rpt-kpi-val').text(renderedValue);
+            }
+        });
+    }
+
+    function findIndex(headersNorm, candidates) {
+        for (var i = 0; i < candidates.length; i++) {
+            var idx = headersNorm.indexOf(normText(candidates[i]));
+            if (idx !== -1) return idx;
+        }
+        return -1;
+    }
+
+    function refreshTimesheetKpis(dt) {
+        if (!isTimesheetReport || !$('.rpt-kpi-grid').length) return;
+
+        var headersNorm = [];
+        $('#rTable thead th').each(function(){
+            headersNorm.push(normText($(this).text()));
+        });
+
+        var idxExecuted = findIndex(headersNorm, ['executed_hours', 'الساعاتالمنفذة', 'عتنفيذ']);
+        var idxStandby  = findIndex(headersNorm, ['standby_hours', 'ساعاتاستعدادالعميل', 'عاستعداد']);
+        var idxWork     = findIndex(headersNorm, ['عالعمل', 'ساعاتالعمل']);
+        var idxFault    = findIndex(headersNorm, ['ساعاتالأعطال', 'عأعطال']);
+        var idxProject  = findIndex(headersNorm, ['المشروع']);
+
+        var data = dt.rows({ search: 'applied' }).data().toArray();
+        var rowsCount = data.length;
+        var sumExecuted = 0;
+        var sumStandby = 0;
+        var sumWork = 0;
+        var sumFault = 0;
+        var projects = {};
+
+        for (var r = 0; r < data.length; r++) {
+            var row = data[r] || [];
+            if (idxExecuted >= 0 && row[idxExecuted] !== undefined) sumExecuted += parseNum(htmlToText(row[idxExecuted]));
+            if (idxStandby >= 0 && row[idxStandby] !== undefined) sumStandby += parseNum(htmlToText(row[idxStandby]));
+            if (idxWork >= 0 && row[idxWork] !== undefined) sumWork += parseNum(htmlToText(row[idxWork]));
+            if (idxFault >= 0 && row[idxFault] !== undefined) sumFault += parseNum(htmlToText(row[idxFault]));
+            if (idxProject >= 0 && row[idxProject] !== undefined) {
+                var pName = htmlToText(row[idxProject]);
+                if (pName !== '' && pName !== '—' && pName !== '-') projects[pName] = true;
+            }
+        }
+
+        if (idxWork === -1) sumWork = sumExecuted + sumStandby;
+
+        var eff = (sumWork + sumFault) > 0 ? ((sumWork / (sumWork + sumFault)) * 100) : 0;
+
+        setKpiByLabel('إجمالي السجلات', formatNumber(rowsCount, 0));
+        setKpiByLabel('الساعات المنفذة', formatNumber(sumExecuted, 1) + ' س');
+        setKpiByLabel('ساعات استعداد العميل', formatNumber(sumStandby, 1) + ' س');
+        setKpiByLabel('ع.العمل', formatNumber(sumWork, 1) + ' س');
+        setKpiByLabel('ساعات الأعطال', formatNumber(sumFault, 1) + ' س');
+        setKpiByLabel('كفاءة التشغيل', formatNumber(eff, 1) + '%');
+
+        if ($('.rpt-kpi-lbl:contains("المشاريع")').length && idxProject >= 0) {
+            setKpiByLabel('المشاريع', formatNumber(Object.keys(projects).length, 0));
+        }
+    }
+
     if (tbl.length) {
         var dt = tbl.DataTable({
             language: { url: '/ems/assets/i18n/datatables/ar.json' },
@@ -1788,6 +1885,11 @@ $(function(){
                     exportOptions: { columns: ':visible' }
                 }
             ]
+        });
+
+        refreshTimesheetKpis(dt);
+        dt.on('draw.dt', function() {
+            refreshTimesheetKpis(dt);
         });
 
         setTimeout(function(){ dt.columns.adjust().draw(false); }, 120);
