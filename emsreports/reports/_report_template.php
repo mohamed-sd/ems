@@ -142,6 +142,7 @@ case 'drivers_timesheet': {
     $kpiSql = "SELECT COUNT(t.id) AS cnt,
                       ROUND(IFNULL(SUM($workField),0),2) AS twh,
                       ROUND(IFNULL(SUM($standbyField),0),2) AS tfh,
+                      ROUND(IFNULL(SUM(t.standby_hours),0),2) AS tsh,
                       COUNT(DISTINCT o.project_id) AS proj_cnt,
                       COUNT(DISTINCT t.driver) AS driver_cnt
                FROM timesheet t
@@ -155,19 +156,24 @@ case 'drivers_timesheet': {
     $tfh = floatval($kpiRow['tfh'] ?? 0);
     $eff = ($twh + $tfh) > 0 ? round($twh / ($twh + $tfh) * 100, 1) : 0;
 
+    $tsh = floatval($kpiRow['tsh'] ?? 0);
     $kpi = [
         ['icon'=>'fa-list-ul',       'value'=> number_format($kpiRow['cnt'] ?? 0),     'label'=>'إجمالي السجلات',  'color'=>'blue'],
         ['icon'=>'fa-clock',         'value'=> number_format($twh,1) . ' س',           'label'=>$workLabel,         'color'=>'green'],
         ['icon'=>'fa-exclamation-triangle','value'=> number_format($tfh,1) . ' س',     'label'=>$standbyLabel,      'color'=>'red'],
-        ['icon'=>'fa-percentage',    'value'=> $eff . '%',                              'label'=>'كفاءة التشغيل',  'color'=>'gold'],
-        ['icon'=>'fa-project-diagram','value'=> number_format($kpiRow['proj_cnt'] ?? 0),'label'=>'المشاريع',        'color'=>'teal'],
     ];
+    if (!$isOperatorTimesheetReport) {
+        $kpi[] = ['icon'=>'fa-pause-circle', 'value'=> number_format($tsh,1) . ' س', 'label'=>'ساعات الاستعداد', 'color'=>'orange'];
+    }
+    $kpi[] = ['icon'=>'fa-percentage',    'value'=> $eff . '%',                              'label'=>'كفاءة التشغيل',  'color'=>'gold'];
+    $kpi[] = ['icon'=>'fa-project-diagram','value'=> number_format($kpiRow['proj_cnt'] ?? 0),'label'=>'المشاريع',        'color'=>'teal'];
 
     if ($REPORT_CODE === 'timesheet_by_project') {
-        $headers = ['المشروع','عدد السجلات','ساعات العمل','ساعات الأعطال','الكفاءة%'];
+        $headers = ['المشروع','عدد السجلات','ساعات العمل','ساعات الاستعداد','ساعات الأعطال','الكفاءة%'];
         $sql = "SELECT IFNULL(p.name,'غير محدد') AS project_name,
                        COUNT(t.id) AS entries_count,
                        ROUND(IFNULL(SUM(t.total_work_hours),0),2)  AS twh,
+                       ROUND(IFNULL(SUM(t.standby_hours),0),2)     AS tsh,
                        ROUND(IFNULL(SUM(t.total_fault_hours),0),2) AS tfh,
                        CASE WHEN (IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))>0
                             THEN ROUND(IFNULL(SUM(t.total_work_hours),0)/(IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))*100,1)
@@ -179,12 +185,13 @@ case 'drivers_timesheet': {
                 LEFT JOIN drivers    d ON d.id=t.driver
                 WHERE $ws GROUP BY p.id,p.name ORDER BY twh DESC";
     } elseif (in_array($REPORT_CODE,['timesheet_by_equipment','fleet_timesheet'])) {
-        $headers = ['الكود','المعدة','المورد','عدد السجلات','ساعات العمل','ساعات الأعطال','الكفاءة%'];
+        $headers = ['الكود','المعدة','المورد','عدد السجلات','ساعات العمل','ساعات الاستعداد','ساعات الأعطال','الكفاءة%'];
         $sql = "SELECT IFNULL(e.code,'-') AS code,
                        IFNULL(e.name,'غير محدد') AS equipment_name,
                        IFNULL(s.name,'—') AS supplier_name,
                        COUNT(t.id) AS entries_count,
                        ROUND(IFNULL(SUM(t.total_work_hours),0),2)  AS twh,
+                       ROUND(IFNULL(SUM(t.standby_hours),0),2)     AS tsh,
                        ROUND(IFNULL(SUM(t.total_fault_hours),0),2) AS tfh,
                        CASE WHEN (IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))>0
                             THEN ROUND(IFNULL(SUM(t.total_work_hours),0)/(IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))*100,1)
@@ -196,7 +203,7 @@ case 'drivers_timesheet': {
                 LEFT JOIN drivers    d ON d.id=t.driver
                 WHERE $ws GROUP BY e.id ORDER BY twh DESC";
     } elseif (in_array($REPORT_CODE,['timesheet_by_driver','drivers_timesheet'])) {
-        $headers = ['المشغل','المورد','عدد السجلات','ساعات التنفيذ','ساعات الاستعداد','الكفاءة%'];
+        $headers = ['المشغل','المورد','عدد الورديات','ساعات التنفيذ','ساعات الاستعداد','الكفاءة%'];
         $sql = "SELECT IFNULL(d.name,'غير محدد') AS driver_name,
                        IFNULL(s.name,'—') AS supplier_name,
                        COUNT(t.id) AS entries_count,
@@ -211,10 +218,11 @@ case 'drivers_timesheet': {
                 LEFT JOIN drivers    d ON d.id=t.driver
                 WHERE $ws GROUP BY d.id ORDER BY twh DESC";
     } elseif ($REPORT_CODE === 'supplier_timesheet') {
-        $headers = ['المورد','عدد السجلات','ساعات العمل','ساعات الأعطال','الكفاءة%'];
+        $headers = ['المورد','عدد السجلات','ساعات العمل','ساعات الاستعداد','ساعات الأعطال','الكفاءة%'];
         $sql = "SELECT IFNULL(s.name,'غير محدد') AS supplier_name,
                        COUNT(t.id) AS entries_count,
                        ROUND(IFNULL(SUM(t.total_work_hours),0),2)  AS twh,
+                       ROUND(IFNULL(SUM(t.standby_hours),0),2)     AS tsh,
                        ROUND(IFNULL(SUM(t.total_fault_hours),0),2) AS tfh,
                        CASE WHEN (IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))>0
                             THEN ROUND(IFNULL(SUM(t.total_work_hours),0)/(IFNULL(SUM(t.total_work_hours),0)+IFNULL(SUM(t.total_fault_hours),0))*100,1)
@@ -233,13 +241,14 @@ case 'drivers_timesheet': {
             if ($fMineId  > 0)   $where[] = "o.mine_id = $fMineId";
             $ws = implode(' AND ', $where);
 
-            $headers = ['#','التاريخ','الوردية','البداية','النهاية','ع.عمل','ع.أعطال','ع.تنفيذ','ع.استعداد','ع.وردية','كفاءة%','المشروع','المنجم','المعدة','كود المعدة','المورد','المشغل','نوع الخلل','ملاحظات'];
+            $headers = ['#','التاريخ','الوردية','البداية','النهاية','ع.عمل','ع.استعداد','ع.أعطال','ع.تنفيذ','ع.استعداد.مشغل','ع.وردية','كفاءة%','المشروع','المنجم','المعدة','كود المعدة','المورد','المشغل','نوع الخلل','ملاحظات'];
             $sql = "SELECT t.id,
                            t.date,
-                           CASE WHEN t.shift='D' THEN 'نهاري' WHEN t.shift='N' THEN 'ليلي' ELSE IFNULL(t.shift,'-') END AS shift_txt,
+                           CASE WHEN t.shift='D' THEN 'D' WHEN t.shift='N' THEN 'N' ELSE IFNULL(t.shift,'-') END AS shift_txt,
                            CONCAT(LPAD(IFNULL(t.start_hours,0),2,'0'),':',LPAD(IFNULL(t.start_minutes,0),2,'0')) AS start_t,
                            CONCAT(LPAD(IFNULL(t.end_hours,0),2,'0'),':',LPAD(IFNULL(t.end_minutes,0),2,'0'))   AS end_t,
                            ROUND(IFNULL(t.total_work_hours,0),2)   AS twh,
+                           ROUND(IFNULL(t.standby_hours,0),2)      AS standby_h,
                            ROUND(IFNULL(t.total_fault_hours,0),2)  AS tfh,
                            ROUND(IFNULL(t.operator_hours,0),2)     AS op_h,
                            ROUND(IFNULL(t.operator_standby_hours,0),2) AS op_sb,
@@ -265,11 +274,12 @@ case 'drivers_timesheet': {
                     WHERE $ws ORDER BY STR_TO_DATE(t.date,'%Y-%m-%d') DESC, t.id DESC";
         } else {
             // timesheet_summary
-            $headers = ['التاريخ','البداية','النهاية','ساعات العمل','ساعات الأعطال','الكفاءة%','المشروع','المعدة','المورد','المشغل'];
+            $headers = ['التاريخ','البداية','النهاية','ساعات العمل','ساعات الاستعداد','ساعات الأعطال','الكفاءة%','المشروع','المعدة','المورد','المشغل'];
             $sql = "SELECT t.date,
                            CONCAT(LPAD(IFNULL(t.start_hours,0),2,'0'),':',LPAD(IFNULL(t.start_minutes,0),2,'0')) AS start_t,
                            CONCAT(LPAD(IFNULL(t.end_hours,0),2,'0'),':',LPAD(IFNULL(t.end_minutes,0),2,'0'))   AS end_t,
-                           ROUND(IFNULL(t.total_work_hours,0),2) AS twh,
+                           ROUND(IFNULL(t.total_work_hours,0),2)  AS twh,
+                           ROUND(IFNULL(t.standby_hours,0),2)     AS tsh,
                            ROUND(IFNULL(t.total_fault_hours,0),2) AS tfh,
                            CASE WHEN (IFNULL(t.total_work_hours,0)+IFNULL(t.total_fault_hours,0))>0
                                 THEN ROUND(IFNULL(t.total_work_hours,0)/(IFNULL(t.total_work_hours,0)+IFNULL(t.total_fault_hours,0))*100,1)
