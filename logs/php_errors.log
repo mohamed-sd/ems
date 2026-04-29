@@ -1541,3 +1541,124 @@ Stack trace:
 [28-Apr-2026 14:34:02 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\ems\Suppliers\suppliers.php on line 823
 [28-Apr-2026 15:20:07 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\ems\Suppliers\suppliers.php on line 823
 [28-Apr-2026 15:20:16 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\ems\Suppliers\suppliers.php on line 823
+[28-Apr-2026 15:26:18 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/1045): Access denied for user 'u359449619_ems'@'41.238.31.33' (using password: YES) in C:\xampp\htdocs\ems\config.php on line 124
+[28-Apr-2026 15:26:18 Europe/Berlin] Database Connection Failed: Access denied for user 'u359449619_ems'@'41.238.31.33' (using password: YES)
+[28-Apr-2026 15:26:19 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/1045): Access denied for user 'u359449619_ems'@'41.238.31.33' (using password: YES) in C:\xampp\htdocs\ems\config.php on line 124
+[28-Apr-2026 15:26:19 Europe/Berlin] Database Connection Failed: Access denied for user 'u359449619_ems'@'41.238.31.33' (using password: YES)
+[28-Apr-2026 15:26:20 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/1045): Access denied for user 'u359449619_ems'@'41.238.31.33' (using password: YES) in C:\xampp\htdocs\ems\config.php on line 124
+[28-Apr-2026 15:26:20 Europe/Berlin] Database Connection Failed: Access denied for user 'u359449619_ems'@'41.238.31.33' (using password: YES)
+[28-Apr-2026 20:55:10 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xampp\htdocs\ems\Suppliers\suppliers.php on line 823
+[28-Apr-2026 21:06:26 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): No connection could be made because the target machine actively refused it in C:\xampp\htdocs\ems\config.php on line 124
+[28-Apr-2026 21:06:26 Europe/Berlin] Database Connection Failed: No connection could be made because the target machine actively refused it
+[28-Apr-2026 21:06:56 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): No connection could be made because the target machine actively refused it in C:\xampp\htdocs\ems\config.php on line 124
+[28-Apr-2026 21:06:56 Europe/Berlin] Database Connection Failed: No connection could be made because the target machine actively refused it
+[28-Apr-2026 21:07:26 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): No connection could be made because the target machine actively refused it in C:\xampp\htdocs\ems\config.php on line 124
+[28-Apr-2026 21:07:26 Europe/Berlin] Database Connection Failed: No connection could be made because the target machine actively refused it
+[28-Apr-2026 21:08:12 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): No connection could be made because the target machine actively refused it in C:\xampp\htdocs\ems\config.php on line 124
+[28-Apr-2026 21:08:12 Europe/Berlin] Database Connection Failed: No connection could be made because the target machine actively refused it
+[28-Apr-2026 21:09:33 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): No connection could be made because the target machine actively refused it in C:\xampp\htdocs\ems\config.php on line 124
+[28-Apr-2026 21:09:33 Europe/Berlin] Database Connection Failed: No connection could be made because the target machine actively refused it
+[28-Apr-2026 21:10:03 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): No connection could be made because the target machine actively refused it in C:\xampp\htdocs\ems\config.php on line 124
+[28-Apr-2026 21:10:03 Europe/Berlin] Database Connection Failed: No connection could be made because the target machine actively refused it
+[28-Apr-2026 21:10:29 Europe/Berlin] PHP Warning:  mysqli::__construct(): (HY000/2002): No connection could be made because the target machine actively refused it in C:\xampp\htdocs\ems\config.php on line 124
+[28-Apr-2026 21:10:29 Europe/Berlin] Database Connection Failed: No connection could be made because the target machine actively refused it
+[28-Apr-2026 22:45:49 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xamppv0.001\htdocs\ems\emsreports\reports\report_supplier_contracts_summary.php:63
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\report_supplier_contracts_summary.php(63): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\reports\report_supplier_contracts_summary.php on line 63
+[28-Apr-2026 22:45:54 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xamppv0.001\htdocs\ems\emsreports\reports\report_supplier_contracts_summary.php:63
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\report_supplier_contracts_summary.php(63): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\reports\report_supplier_contracts_summary.php on line 63
+[28-Apr-2026 22:46:32 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xamppv0.001\htdocs\ems\emsreports\reports\report_supplier_contracts_summary.php:63
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\report_supplier_contracts_summary.php(63): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\reports\report_supplier_contracts_summary.php on line 63
+[28-Apr-2026 22:48:09 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xamppv0.001\htdocs\ems\emsreports\reports\report_project_detailed.php:65
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\report_project_detailed.php(65): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\reports\report_project_detailed.php on line 65
+[28-Apr-2026 22:48:13 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, bool given in C:\xamppv0.001\htdocs\ems\emsreports\reports\report_project_detailed.php:65
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\report_project_detailed.php(65): mysqli_fetch_assoc(false)
+#1 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\reports\report_project_detailed.php on line 65
+[29-Apr-2026 05:43:42 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:43:55 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:44:12 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:44:18 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:44:26 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:44:31 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:44:34 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:44:45 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:44:57 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:45:08 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:45:30 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:45:40 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:46:33 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:46:43 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:46:51 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:47:17 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:48:45 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:48:46 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:49:46 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:49:50 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 05:52:58 Europe/Berlin] PHP Fatal error:  Cannot redeclare db_table_has_column() (previously declared in C:\xamppv0.001\htdocs\ems\config.php:283) in C:\xamppv0.001\htdocs\ems\emsreports\includes\functions.php on line 400
+[29-Apr-2026 07:03:10 Europe/Berlin] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.25. in C:\xamppv0.001\htdocs\ems\vendor\composer\platform_check.php on line 28
+[29-Apr-2026 07:08:25 Europe/Berlin] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.25. in C:\xamppv0.001\htdocs\ems\vendor\composer\platform_check.php on line 28
+[29-Apr-2026 07:12:04 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::getCellByColumnAndRow() in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php:29
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\_report_template.php(995): exportToExcel('operations_deta...', '\xD8\xAA\xD9\x81\xD8\xA7\xD8\xB5\xD9\x8A\xD9\x84 \xD8\xA7...', Array, Array)
+#1 C:\xamppv0.001\htdocs\ems\emsreports\reports\operations_detailed.php(3): require('C:\\xamppv0.001\\...')
+#2 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php on line 29
+[29-Apr-2026 07:14:34 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.001\htdocs\ems\admin\permissions\modules.php on line 9
+[29-Apr-2026 07:14:34 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.001\php\PEAR') in C:\xamppv0.001\htdocs\ems\admin\permissions\modules.php on line 9
+[29-Apr-2026 07:20:20 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::getCellByColumnAndRow() in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php:29
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\_report_template.php(1016): exportToExcel('fleet_equipment...', '\xD8\xAA\xD9\x81\xD8\xA7\xD8\xB5\xD9\x8A\xD9\x84 \xD8\xA7...', Array, Array)
+#1 C:\xamppv0.001\htdocs\ems\emsreports\reports\fleet_equipment_detailed.php(3): require('C:\\xamppv0.001\\...')
+#2 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php on line 29
+[29-Apr-2026 07:22:47 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.001\htdocs\ems\admin\permissions\modules.php on line 9
+[29-Apr-2026 07:22:47 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.001\php\PEAR') in C:\xamppv0.001\htdocs\ems\admin\permissions\modules.php on line 9
+[29-Apr-2026 07:25:22 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class "Mpdf\Mpdf" not found in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php:79
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\_report_template.php(1017): exportToPDF('fleet_equipment...', '\xD9\x85\xD9\x84\xD8\xAE\xD8\xB5 \xD8\xA7\xD9\x84\xD9\x85...', '<table border="...')
+#1 C:\xamppv0.001\htdocs\ems\emsreports\reports\fleet_equipment_summary.php(3): require('C:\\xamppv0.001\\...')
+#2 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php on line 79
+[29-Apr-2026 07:36:57 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::getCellByColumnAndRow() in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php:29
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\_report_template.php(1017): exportToExcel('supplier_timesh...', '\xD8\xB3\xD8\xA7\xD8\xB9\xD8\xA7\xD8\xAA \xD8\xA7\xD9\x84...', Array, Array)
+#1 C:\xamppv0.001\htdocs\ems\emsreports\reports\supplier_timesheet.php(3): require('C:\\xamppv0.001\\...')
+#2 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php on line 29
+[29-Apr-2026 07:37:02 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class "Mpdf\Mpdf" not found in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php:79
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\_report_template.php(1018): exportToPDF('supplier_timesh...', '\xD8\xB3\xD8\xA7\xD8\xB9\xD8\xA7\xD8\xAA \xD8\xA7\xD9\x84...', '<table border="...')
+#1 C:\xamppv0.001\htdocs\ems\emsreports\reports\supplier_timesheet.php(3): require('C:\\xamppv0.001\\...')
+#2 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php on line 79
+[29-Apr-2026 07:44:43 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::getCellByColumnAndRow() in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php:29
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\_report_template.php(1017): exportToExcel('fleet_equipment...', '\xD8\xAA\xD9\x81\xD8\xA7\xD8\xB5\xD9\x8A\xD9\x84 \xD8\xA7...', Array, Array)
+#1 C:\xamppv0.001\htdocs\ems\emsreports\reports\fleet_equipment_detailed.php(3): require('C:\\xamppv0.001\\...')
+#2 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php on line 29
+[29-Apr-2026 09:03:34 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::getCellByColumnAndRow() in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php:29
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\_report_template.php(1017): exportToExcel('fleet_equipment...', '\xD9\x85\xD9\x84\xD8\xAE\xD8\xB5 \xD8\xA7\xD9\x84\xD9\x85...', Array, Array)
+#1 C:\xamppv0.001\htdocs\ems\emsreports\reports\fleet_equipment_summary.php(3): require('C:\\xamppv0.001\\...')
+#2 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php on line 29
+[29-Apr-2026 09:08:58 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::getCellByColumnAndRow() in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php:29
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\emsreports\reports\_report_template.php(1017): exportToExcel('operations_summ...', '\xD9\x85\xD9\x84\xD8\xAE\xD8\xB5 \xD8\xA7\xD9\x84\xD8\xB9...', Array, Array)
+#1 C:\xamppv0.001\htdocs\ems\emsreports\reports\operations_summary.php(3): require('C:\\xamppv0.001\\...')
+#2 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php on line 29

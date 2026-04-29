@@ -28,8 +28,9 @@ $_admin_nav = [
     ['slug' => 'subscriptions', 'label' => 'طلبات الاشتراك',  'icon' => 'fa-file-circle-check', 'url' => 'subscriptions/requests', 'badge' => $_admin_pending_badge],
     ['slug' => 'plans',         'label' => 'خطط الاشتراك',    'icon' => 'fa-layer-group',       'url' => 'plans'],
     ['slug' => 'support',       'label' => 'الدعم الفني',     'icon' => 'fa-headset',           'url' => 'support/view'],
-    ['slug' => 'audit-log',     'label' => 'سجل المراجعة',    'icon' => 'fa-scroll',            'url' => 'audit-log'],
-    ['slug' => 'settings',      'label' => 'الإعدادات',       'icon' => 'fa-gear',              'url' => 'settings'],
+    ['slug' => 'audit-log',          'label' => 'سجل المراجعة',         'icon' => 'fa-scroll',            'url' => 'audit-log'],
+    ['slug' => 'report-permissions', 'label' => 'صلاحيات التقارير',     'icon' => 'fa-chart-pie',         'url' => 'reports-permissions'],
+    ['slug' => 'settings',           'label' => 'الإعدادات',            'icon' => 'fa-gear',              'url' => 'settings'],
 ];
 ?>
 <!DOCTYPE html>

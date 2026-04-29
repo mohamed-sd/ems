@@ -68,9 +68,8 @@ if (!$is_super_admin && $equipment_drivers_has_company) {
 
 $stats_sql = "SELECT
                 COUNT(*) AS shifts_count,
-                IFNULL(SUM(t.total_work_hours), 0) AS total_work_hours,
                 IFNULL(SUM(t.operator_hours), 0) AS total_operator_hours,
-                IFNULL(SUM(t.standby_hours), 0) AS total_standby_hours,
+                                IFNULL(SUM(t.operator_standby_hours), 0) AS total_standby_hours,
                 COUNT(DISTINCT t.operator) AS operations_count,
                 MIN(t.date) AS first_shift_date,
                 MAX(t.date) AS last_shift_date
@@ -97,7 +96,7 @@ $top_equipment_sql = "SELECT
                         e.id,
                         e.name,
                         e.code,
-                        IFNULL(SUM(t.total_work_hours), 0) AS total_hours,
+                                                IFNULL(SUM(t.operator_hours), 0) AS total_hours,
                         COUNT(t.id) AS times_used
                       FROM timesheet t
                       INNER JOIN operations o ON o.id = t.operator
@@ -111,7 +110,7 @@ $top_equipment = ($top_equipment_result && mysqli_num_rows($top_equipment_result
 
 $equipment_breakdown_sql = "SELECT
                               CONCAT(IFNULL(e.name, 'بدون اسم'), ' (', IFNULL(e.code, '-'), ')') AS equipment_label,
-                              IFNULL(SUM(t.total_work_hours), 0) AS total_hours
+                                                            IFNULL(SUM(t.operator_hours), 0) AS total_hours
                             FROM timesheet t
                             INNER JOIN operations o ON o.id = t.operator
                             INNER JOIN equipments e ON e.id = o.equipment
@@ -131,9 +130,9 @@ if ($equipment_breakdown_result) {
 
 $monthly_sql = "SELECT
                   DATE_FORMAT(STR_TO_DATE(t.date, '%Y-%m-%d'), '%Y-%m') AS ym,
-                  IFNULL(SUM(t.total_work_hours), 0) AS total_hours,
+                                    IFNULL(SUM(t.operator_hours + t.operator_standby_hours), 0) AS total_hours,
                                     IFNULL(SUM(t.operator_hours), 0) AS operator_hours,
-                  IFNULL(SUM(t.standby_hours), 0) AS standby_hours
+                                    IFNULL(SUM(t.operator_standby_hours), 0) AS standby_hours
                 FROM timesheet t
                 INNER JOIN operations o ON o.id = t.operator
                 WHERE $timesheet_scope AND $operations_scope
@@ -155,7 +154,7 @@ if ($monthly_result) {
 
 $project_breakdown_sql = "SELECT
                             IFNULL(p.name, 'مشروع غير محدد') AS project_name,
-                            IFNULL(SUM(t.total_work_hours), 0) AS total_hours,
+                                                        IFNULL(SUM(t.operator_hours), 0) AS total_hours,
                             COUNT(t.id) AS shifts_count
                           FROM timesheet t
                           INNER JOIN operations o ON o.id = t.operator
@@ -179,7 +178,8 @@ if ($project_breakdown_result) {
 $movement_sql = "SELECT
                    t.date,
                    t.shift,
-                   t.total_work_hours,
+                   t.operator_hours,
+                   t.operator_standby_hours,
                    IFNULL(p.name, 'مشروع غير محدد') AS project_name,
                    IFNULL(m.mine_name, 'منجم غير محدد') AS mine_name,
                    IFNULL(e.name, 'معدة غير محددة') AS equipment_name,
@@ -738,12 +738,12 @@ canvas {
 
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-label">إجمالي ساعات العمل</div>
-            <div class="stat-value"><?php echo number_format(floatval(isset($stats['total_work_hours']) ? $stats['total_work_hours'] : 0), 2); ?></div>
+            <div class="stat-label">إجمالي ساعات التنفيذ</div>
+            <div class="stat-value"><?php echo number_format(floatval(isset($stats['total_operator_hours']) ? $stats['total_operator_hours'] : 0), 2); ?></div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">ساعات المشغل المنفذة</div>
-            <div class="stat-value"><?php echo number_format(floatval(isset($stats['total_operator_hours']) ? $stats['total_operator_hours'] : 0), 2); ?></div>
+            <div class="stat-label">ساعات الاستعداد</div>
+            <div class="stat-value"><?php echo number_format(floatval(isset($stats['total_standby_hours']) ? $stats['total_standby_hours'] : 0), 2); ?></div>
         </div>
         <div class="stat-card">
             <div class="stat-label">مرات التشغيل (عدد الورديات)</div>
@@ -875,7 +875,8 @@ canvas {
                                 مشروع: <?php echo htmlspecialchars($mv['project_name']); ?> |
                                 منجم: <?php echo htmlspecialchars($mv['mine_name']); ?> |
                                 آلية: <?php echo htmlspecialchars($mv['equipment_name']); ?> (<?php echo htmlspecialchars($mv['equipment_code']); ?>) |
-                                ساعات: <?php echo number_format(floatval($mv['total_work_hours']), 2); ?>
+                                تنفيذ: <?php echo number_format(floatval($mv['operator_hours']), 2); ?> |
+                                استعداد: <?php echo number_format(floatval($mv['operator_standby_hours']), 2); ?>
                             </div>
                         </li>
                     <?php endwhile; ?>

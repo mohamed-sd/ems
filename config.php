@@ -110,15 +110,15 @@ if (function_exists('mysqli_report')) {
     mysqli_report(MYSQLI_REPORT_OFF);
 }
 
-$host = "srv1986.hstgr.io";
-$user = "u359449619_ems";
-$pass = "Aaammm@1110"; // ← كلمة المرور الصحيحة
-$db   = "u359449619_ems";
+// $host = "srv1986.hstgr.io";
+// $user = "u359449619_ems";
+// $pass = "Aaammm@1110"; // ← كلمة المرور الصحيحة
+// $db   = "u359449619_ems";
 
-//  $host = "localhost";
-//  $user = "root";
-//  $pass = ""; // ← كلمة المرور الصحيحة
-//  $db   = "equipation_manage";
+ $host = "localhost";
+ $user = "root";
+ $pass = ""; // ← كلمة المرور الصحيحة
+ $db   = "equipation_manage";
 
 // Establish Secure Connection
 $conn = new mysqli($host, $user, $pass, $db);

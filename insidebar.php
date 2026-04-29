@@ -137,6 +137,8 @@ if (isset($_SESSION['user']) && isset($conn)) {
         <!-- <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a> -->
         <?php } ?>
 
+      <li><a href="../emsreports/index.php"><i class="fas fa-chart-pie"></i> <span>التقارير</span></a></li>
+
       <li><a href="../Settings/settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
 
 

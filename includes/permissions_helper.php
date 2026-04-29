@@ -468,6 +468,36 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
         return;
     }
 
+    // صفحات نظام التقارير الجديد تعتمد على جدول report_role_permissions
+    // وليس على جدول modules العام.
+    $script_name = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
+    $relative_script = function_exists('ems_relative_path')
+        ? ems_relative_path($script_name)
+        : ltrim(str_replace('\\', '/', $script_name), '/');
+
+    // صفحات المراسلات متاحة لجميع المستخدمين المسجّلين دخولهم
+    if (strpos($relative_script, 'chats/') !== false) {
+        return;
+    }
+
+    if (strpos($relative_script, 'emsreports/') === 0) {
+        $role_id = intval($_SESSION['user']['role']);
+        $has_reports_permission = false;
+
+        $query = "SELECT id FROM report_role_permissions WHERE role_id = $role_id LIMIT 1";
+        $result = @mysqli_query($conn, $query);
+        if ($result && mysqli_num_rows($result) > 0) {
+            $has_reports_permission = true;
+        }
+
+        if (!$has_reports_permission) {
+            header('Location: ' . $redirect_path . '?msg=' . urlencode('لا توجد صلاحية عرض للتقارير ❌'));
+            exit();
+        }
+
+        return;
+    }
+
     $current = get_current_page_permissions($conn);
     if ($current['id'] !== null && !$current['can_view']) {
         header('Location: ' . $redirect_path . '?msg=' . urlencode('لا توجد صلاحية عرض لهذه الصفحة ❌'));

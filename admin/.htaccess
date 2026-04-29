@@ -15,8 +15,9 @@ RewriteRule ^companies/(\d+)/?$  companies/view.php?id=$1 [L,QSA]
 RewriteRule ^subscriptions/requests/?$  subscriptions/requests.php [L,QSA]
 RewriteRule ^plans/?$            plans.php           [L,QSA]
 RewriteRule ^support/view/?$     support/view.php    [L,QSA]
-RewriteRule ^audit-log/?$        audit_log.php       [L,QSA]
-RewriteRule ^settings/?$         settings.php        [L,QSA]
+RewriteRule ^audit-log/?$              audit_log.php              [L,QSA]
+RewriteRule ^reports-permissions/?$    reports_permissions.php    [L,QSA]
+RewriteRule ^settings/?$               settings.php               [L,QSA]
 
 # Sensitive one-time setup script must only be accessed locally
 <Files "setup_once.php">

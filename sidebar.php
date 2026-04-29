@@ -119,6 +119,8 @@
         <!-- <li><a href="Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li> -->
       <?php } ?>
 
+      <li><a href="emsreports/index.php"><i class="fas fa-chart-pie"></i> <span>التقارير</span></a></li>
+
       <li><a href="Settings/settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
 
 
