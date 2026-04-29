@@ -1019,6 +1019,37 @@ default:
     $rows    = [['هذا التقرير غير مدعوم: ' . htmlspecialchars($REPORT_CODE, ENT_QUOTES, 'UTF-8')]];
 }
 
+// ─── توحيد الأعمدة: ضمان أن th = td في كل التقارير ─────────────────────
+if (!empty($rows) && is_array($rows)) {
+    $firstRow = reset($rows);
+    if (is_array($firstRow) && !empty($firstRow)) {
+        $rowKeys   = array_keys($firstRow);
+        $rowCount  = count($rowKeys);
+        $headCount = count($headers);
+
+        // عند اختلاف العدد، أنشئ عناوين مكافئة لحقول الصف الأول.
+        if ($headCount !== $rowCount) {
+            $headers = [];
+            foreach ($rowKeys as $k) {
+                $label = is_string($k) ? trim(str_replace('_', ' ', $k)) : '';
+                $headers[] = ($label !== '') ? $label : 'عمود';
+            }
+        }
+
+        // ترتيب الحقول بنفس ترتيب الصف الأول لضمان التطابق التام مع العناوين.
+        $normalizedRows = [];
+        foreach ($rows as $row) {
+            if (!is_array($row)) continue;
+            $ordered = [];
+            foreach ($rowKeys as $k) {
+                $ordered[] = array_key_exists($k, $row) ? $row[$k] : '';
+            }
+            $normalizedRows[] = $ordered;
+        }
+        $rows = $normalizedRows;
+    }
+}
+
 // ─── معالجة التصدير (POST) ───────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['export_format'])) {
     $fmt        = $_POST['export_format'];
@@ -1263,17 +1294,27 @@ body {
 .btn-pdf   { background: linear-gradient(120deg, var(--red), #f87171); border: none; color: #fff; }
 .btn-pdf:hover { background: linear-gradient(120deg, #b91c1c, #ef4444); color: #fff; }
 .rpt-data-body { padding: 6px 8px 8px; }
+.rpt-table-wrap { width: 100%; }
 
 /* ── Table ──────────────────────────────── */
-#rTable { margin-bottom: 0 !important; }
+#rTable { margin-bottom: 0 !important; width: 100% !important; }
 #rTable thead th {
     background: linear-gradient(120deg, var(--navy), var(--navy-l));
     color: #fff; font-size: .8rem; font-weight: 800;
-    border: none; white-space: nowrap; padding: 11px 12px;
+    border: none; white-space: nowrap; padding: 11px 14px;
+    text-align: center !important;
 }
 #rTable tbody td {
     font-size: .82rem; color: var(--ink);
-    vertical-align: middle; border-color: rgba(12,28,62,.06); padding: 9px 12px;
+    vertical-align: middle; border-color: rgba(12,28,62,.06); padding: 9px 14px;
+    text-align: center !important;
+    white-space: nowrap;
+}
+#rTable.dataTable thead th,
+#rTable.dataTable tbody td,
+.dataTables_scrollHead table.dataTable thead th,
+.dataTables_scrollBody table.dataTable tbody td {
+    text-align: center !important;
 }
 #rTable tbody tr:nth-child(even) { background: #f8fafd; }
 #rTable tbody tr:hover { background: #edf3ff; }
@@ -1281,6 +1322,22 @@ body {
 .dataTables_wrapper .dataTables_length select {
     border: 1px solid rgba(12,28,62,.14); border-radius: 8px;
     background: #fff; padding: 4px 8px; font-size: .82rem;
+}
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 6px;
+}
+.dataTables_wrapper .dataTables_filter {
+    text-align: left !important;
+}
+.dataTables_wrapper .dataTables_length {
+    text-align: right !important;
+}
+.dataTables_wrapper .dataTables_filter label,
+.dataTables_wrapper .dataTables_length label {
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--txt);
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
     background: linear-gradient(120deg, var(--blue), var(--blue-l)) !important;
@@ -1297,8 +1354,10 @@ body {
 .dt-button.btn { font-size: .8rem !important; padding: 5px 12px !important; }
 .dt-button-collection { z-index: 9999 !important; }
 /* ── Scroll fix ─────────────────────────── */
-.dataTables_scrollBody { overflow-x: auto !important; }
-.dataTables_wrapper { overflow-x: auto; }
+.dataTables_wrapper { width: 100%; }
+.rpt-table-wrap { overflow-x: auto; width: 100%; }
+#rTable thead th,
+#rTable tbody td { min-width: 90px; }
 
 @media (max-width: 768px) {
     .rpt-page { padding: 10px; }
@@ -1638,7 +1697,7 @@ body {
             <?php endif; ?>
         </div>
         <div class="rpt-data-body">
-            <div style="overflow-x:auto">
+            <div class="rpt-table-wrap">
                 <table class="table table-hover nowrap" id="rTable" style="width:100%">
                     <thead>
                         <tr>
@@ -1650,8 +1709,9 @@ body {
                     <tbody>
                     <?php foreach ($rows as $row): ?>
                         <tr>
-                            <?php foreach ($row as $cell): ?>
+                            <?php for ($i = 0; $i < count($headers); $i++): ?>
                             <?php
+                            $cell = isset($row[$i]) ? $row[$i] : '—';
                             $cv = ($cell === null || $cell === '') ? '—' : (string)$cell;
                             if ($cv === 'نشط') {
                                 echo '<td><span class="badge rounded-pill" style="background:rgba(22,163,74,.1);color:#15803d;border:1px solid rgba(22,163,74,.25);font-size:.78rem;font-weight:800;padding:4px 10px;">نشط</span></td>';
@@ -1661,7 +1721,7 @@ body {
                                 echo '<td>' . rr($cv) . '</td>';
                             }
                             ?>
-                            <?php endforeach; ?>
+                            <?php endfor; ?>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>
@@ -1688,13 +1748,13 @@ body {
 $(function(){
     var tbl = $('#rTable');
     if (tbl.length) {
-        tbl.DataTable({
-            language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json' },
+        var dt = tbl.DataTable({
+            language: { url: '/ems/assets/i18n/datatables/ar.json' },
             pageLength: 25,
             lengthMenu: [[10, 25, 50, 100, -1],[10, 25, 50, 100, 'الكل']],
             order: [],
-            scrollX: true,
             autoWidth: false,
+            processing: true,
             dom: '<"row align-items-center mb-2"<"col-sm-6"B><"col-sm-6 d-flex justify-content-end gap-2"lf>>'
                + 'rt'
                + '<"row align-items-center mt-2"<"col-sm-5"i><"col-sm-7"p>>',
@@ -1729,6 +1789,9 @@ $(function(){
                 }
             ]
         });
+
+        setTimeout(function(){ dt.columns.adjust().draw(false); }, 120);
+        $(window).on('resize', function(){ dt.columns.adjust(); });
     }
 });
 

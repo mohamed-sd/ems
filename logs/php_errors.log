@@ -1663,3 +1663,5 @@ Stack trace:
 #2 {main}
   thrown in C:\xamppv0.001\htdocs\ems\emsreports\includes\export.php on line 29
 [29-Apr-2026 10:56:00 Europe/Berlin] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.25. in C:\xamppv0.001\htdocs\ems\vendor\composer\platform_check.php on line 28
+[29-Apr-2026 11:03:52 Europe/Berlin] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.25. in C:\xamppv0.001\htdocs\ems\vendor\composer\platform_check.php on line 28
+[29-Apr-2026 11:03:57 Europe/Berlin] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.25. in C:\xamppv0.001\htdocs\ems\vendor\composer\platform_check.php on line 28
