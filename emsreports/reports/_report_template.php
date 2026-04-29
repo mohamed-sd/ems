@@ -23,7 +23,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === '1'
     && isset($_GET['action']) && $_GET['action'] === 'get_equipments_by_type') {
     header('Content-Type: application/json; charset=utf-8');
     $sc_e = rptCompanyScope($conn, 'e', 'equipments', $companyId, $isSuperAdmin);
-    $ajaxWhere = ["($sc_e)", "e.status=1"];
+    $ajaxWhere = ["($sc_e)"];
     if (isset($_GET['type']) && $_GET['type'] !== '') {
         $ajaxWhere[] = "e.type=" . intval($_GET['type']);
     }
@@ -1040,7 +1040,8 @@ $exportQs = http_build_query(array_filter($_GET, function($v){ return $v !== '';
 <link rel="stylesheet" href="/ems/assets/css/bootstrap.rtl.min.css">
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.bootstrap5.min.css">
 <script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
 <style>
 /* ════════════════════════════════════════
@@ -1290,6 +1291,14 @@ body {
     color: var(--blue) !important; border-radius: 8px !important;
 }
 .dataTables_wrapper .dataTables_info { font-size: .8rem; color: var(--muted); }
+/* ── Buttons ────────────────────────────── */
+.dt-buttons { display: flex; flex-wrap: wrap; gap: 5px; }
+.dt-button { font-family: Cairo, sans-serif !important; }
+.dt-button.btn { font-size: .8rem !important; padding: 5px 12px !important; }
+.dt-button-collection { z-index: 9999 !important; }
+/* ── Scroll fix ─────────────────────────── */
+.dataTables_scrollBody { overflow-x: auto !important; }
+.dataTables_wrapper { overflow-x: auto; }
 
 @media (max-width: 768px) {
     .rpt-page { padding: 10px; }
@@ -1370,14 +1379,14 @@ body {
     // جلب المناجم للقائمة المنسدلة
     $minesList = [];
     if ($showMine) {
-        $minesQ = "SELECT id, mine_name, mine_code FROM mines WHERE ({$sc['m']}) AND status=1 ORDER BY mine_name ASC";
+        $minesQ = "SELECT id, mine_name, mine_code FROM mines WHERE ({$sc['m']}) ORDER BY mine_name ASC";
         $minesR = mysqli_query($conn, $minesQ);
         if ($minesR) while ($mr = mysqli_fetch_assoc($minesR)) $minesList[] = $mr;
     }
     // جلب المعدات للقائمة المنسدلة (عمليات/تايمشيت)
     $equipsList = [];
     if ($showEquip) {
-        $equQ = "SELECT e.id, e.name, e.code FROM equipments e WHERE ({$sc['e']}) AND e.status=1 ORDER BY e.name ASC";
+        $equQ = "SELECT e.id, e.name, e.code FROM equipments e WHERE ({$sc['e']}) ORDER BY e.name ASC";
         if ($fSupplierId > 0) $equQ = str_replace('ORDER BY', "AND e.suppliers=$fSupplierId ORDER BY", $equQ);
         $equR = mysqli_query($conn, $equQ);
         if ($equR) while ($er = mysqli_fetch_assoc($equR)) $equipsList[] = $er;
@@ -1385,7 +1394,7 @@ body {
     // جلب المعدات لتقارير الأسطول (مفلترة بالنوع إن وُجد)
     $fleetEquipsList = [];
     if ($showEquipName) {
-        $feQ = "SELECT e.id, e.name, e.code FROM equipments e WHERE ({$sc['e']}) AND e.status=1";
+        $feQ = "SELECT e.id, e.name, e.code FROM equipments e WHERE ({$sc['e']})";
         if ($fSupplierId > 0) $feQ .= " AND e.suppliers=$fSupplierId";
         if ($fCategory !== '') $feQ .= " AND e.type=" . intval($fCategory);
         $feQ .= " ORDER BY e.name ASC";
@@ -1629,8 +1638,8 @@ body {
             <?php endif; ?>
         </div>
         <div class="rpt-data-body">
-            <div class="table-responsive">
-                <table class="table table-hover" id="rTable" style="width:100%">
+            <div style="overflow-x:auto">
+                <table class="table table-hover nowrap" id="rTable" style="width:100%">
                     <thead>
                         <tr>
                             <?php foreach ($headers as $h): ?>
@@ -1665,18 +1674,60 @@ body {
 </main>
 
 <!-- ═══ SCRIPTS ══════════════════════════════════════════════════════════ -->
-<script src="/ems/assets/js/jquery.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.bootstrap5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
 <script>
 $(function(){
     var tbl = $('#rTable');
-    if (tbl.find('tbody tr').length > 0) {
+    if (tbl.length) {
         tbl.DataTable({
             language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json' },
             pageLength: 25,
+            lengthMenu: [[10, 25, 50, 100, -1],[10, 25, 50, 100, 'الكل']],
             order: [],
-            responsive: true
+            scrollX: true,
+            autoWidth: false,
+            dom: '<"row align-items-center mb-2"<"col-sm-6"B><"col-sm-6 d-flex justify-content-end gap-2"lf>>'
+               + 'rt'
+               + '<"row align-items-center mt-2"<"col-sm-5"i><"col-sm-7"p>>',
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    text: '<i class="fas fa-copy me-1"></i> نسخ',
+                    className: 'btn btn-sm btn-outline-secondary',
+                    exportOptions: { columns: ':visible' }
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                    className: 'btn btn-sm btn-success',
+                    exportOptions: { columns: ':visible' },
+                    title: '<?php echo addslashes($page_title); ?>'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                    className: 'btn btn-sm btn-danger',
+                    exportOptions: { columns: ':visible' },
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    title: '<?php echo addslashes($page_title); ?>'
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fas fa-print me-1"></i> طباعة',
+                    className: 'btn btn-sm btn-outline-secondary',
+                    exportOptions: { columns: ':visible' }
+                }
+            ]
         });
     }
 });

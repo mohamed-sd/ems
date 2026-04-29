@@ -342,7 +342,7 @@ function rptCompanyScope($conn, $alias, $tableName, $companyId, $isSuperAdmin) {
  */
 function getProjectsForDropdown($conn, $companyId, $isSuperAdmin) {
     $scope = rptCompanyScope($conn, 'p', 'project', $companyId, $isSuperAdmin);
-    $sql   = "SELECT p.id, p.name, p.project_code FROM project p WHERE p.status = 1 AND ($scope) ORDER BY p.name ASC";
+    $sql   = "SELECT p.id, p.name, p.project_code FROM project p WHERE ($scope) ORDER BY p.name ASC";
     $res   = mysqli_query($conn, $sql);
     $list  = [];
     if ($res) while ($r = mysqli_fetch_assoc($res)) $list[] = $r;
@@ -354,7 +354,7 @@ function getProjectsForDropdown($conn, $companyId, $isSuperAdmin) {
  */
 function getSuppliersForDropdown($conn, $companyId, $isSuperAdmin) {
     $scope = rptCompanyScope($conn, 's', 'suppliers', $companyId, $isSuperAdmin);
-    $sql   = "SELECT id, name FROM suppliers s WHERE status = 1 AND ($scope) ORDER BY name ASC";
+    $sql   = "SELECT id, name FROM suppliers s WHERE ($scope) ORDER BY name ASC";
     $res   = mysqli_query($conn, $sql);
     $list  = [];
     if ($res) while ($r = mysqli_fetch_assoc($res)) $list[] = $r;
@@ -366,7 +366,7 @@ function getSuppliersForDropdown($conn, $companyId, $isSuperAdmin) {
  */
 function getDriversForDropdown($conn, $companyId, $isSuperAdmin) {
     $scope = rptCompanyScope($conn, 'd', 'drivers', $companyId, $isSuperAdmin);
-    $sql   = "SELECT id, name, driver_code FROM drivers d WHERE status = 1 AND ($scope) ORDER BY name ASC";
+    $sql   = "SELECT id, name, driver_code FROM drivers d WHERE ($scope) ORDER BY name ASC";
     $res   = mysqli_query($conn, $sql);
     $list  = [];
     if ($res) while ($r = mysqli_fetch_assoc($res)) $list[] = $r;
