@@ -149,14 +149,15 @@ while ($row = mysqli_fetch_assoc($result)) {
         ? "<span style='background: #ffeaa7; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #2d3436;'><i class='fas fa-sun'></i> صباحية</span>" 
         : "<span style='background: #2d3436; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #fff;'><i class='fas fa-moon'></i> مسائية</span>";
 
+        //   <a href='aprovment.php?t=$type&type=1&id={$row['id']}' title='قبول' style='color: #27ae60; font-size: 1.1rem; margin: 0 3px;'>
+        //     <i class='fas fa-check-circle'></i>
+        // </a>
+        // <a href='aprovment.php?t=$type&type=2&id={$row['id']}' title='رفض' style='color: #e74c3c; font-size: 1.1rem; margin: 0 3px;'>
+        //     <i class='fas fa-times-circle'></i>
+        // </a>
     // Action buttons
     $actions = "
-        <a href='aprovment.php?t=$type&type=1&id={$row['id']}' title='قبول' style='color: #27ae60; font-size: 1.1rem; margin: 0 3px;'>
-            <i class='fas fa-check-circle'></i>
-        </a>
-        <a href='aprovment.php?t=$type&type=2&id={$row['id']}' title='رفض' style='color: #e74c3c; font-size: 1.1rem; margin: 0 3px;'>
-            <i class='fas fa-times-circle'></i>
-        </a>
+      
         <a href='javascript:void(0)' class='editBtn' data-id='{$row['id']}' title='تعديل' style='color:#3498db; font-size: 1.1rem; margin: 0 3px;'>
             <i class='fas fa-edit'></i>
         </a>

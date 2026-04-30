@@ -343,6 +343,23 @@ include('../insidebar.php');
       </div>
     </a>
 
+
+
+       <!-- شاحنات -->
+    <a href="timesheet.php?type=3" class="type-card"
+       style="--icon-color:#2563eb; --icon-bg:rgba(37,99,235,.12); --icon-glow:rgba(37,99,235,.09);">
+      <div class="type-card-inner">
+        <div class="type-card-icon">
+          <i class="fas fa-truck"></i>
+        </div>
+        <div class="type-card-label">خرمات</div>
+        <div class="type-card-desc">قلابات، شاحنات نقل<br>وجميع مركبات النقل</div>
+        <span class="type-card-arrow">
+          <i class="fas fa-arrow-left"></i> ابدأ الإدخال
+        </span>
+      </div>
+    </a>
+
   </div>
 
   <!-- Back -->
