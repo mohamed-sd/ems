@@ -170,6 +170,7 @@ $scopeOperationsByProject = $companyId > 0
   : '1=1';
 
 if ($dashboardRole=="0"||$dashboardRole=="1") {
+  // مدير المشاريع
   $c=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM clients WHERE status='نشط' AND $scopeClients", 't');
   $p=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM project WHERE status='1' AND $scopeProjects", 't');
   $m=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM mines WHERE status='1' AND project_id IN (SELECT id FROM project WHERE $scopeProjects)", 't');
@@ -178,25 +179,30 @@ if ($dashboardRole=="0"||$dashboardRole=="1") {
     : dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE parent_id='0' AND role!='-1'", 't');
   $stats=[['fa-users',$c,'العملاء','gold'],['fa-project-diagram',$p,'المشاريع','blue'],['fa-mountain',$m,'المناجم','teal'],['fa-user-shield',$u,'المستخدمين','purple']];
 } elseif ($dashboardRole=="2") {
-  $s=dashboard_scalar($conn, "SELECT COUNT(DISTINCT s.id) AS t FROM suppliers s JOIN equipments e ON e.suppliers=s.id JOIN operations o ON o.equipment=e.id WHERE s.status='1' AND $scopeOperationsByProject", 't');
-  $e=dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e JOIN operations o ON o.equipment=e.id WHERE e.status='1' AND $scopeOperationsByProject", 't');
-  $co=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM supplierscontracts WHERE status='1' AND project_id IN (SELECT id FROM project WHERE $scopeProjects)", 't');
+  // مدير الموردين
+  $s=dashboard_scalar($conn, "SELECT COUNT(DISTINCT s.id) AS t FROM suppliers s WHERE company_id = $companyId" , 't');
+  $e=dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE company_id = $companyId", 't');
+  $co=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM supplierscontracts WHERE project_id IN (SELECT id FROM project WHERE $scopeProjects)", 't');
   $stats=[['fa-truck',$s,'الموردين','gold'],['fa-tools',$e,'الآليات','blue'],['fa-file-contract',$co,'العقود','teal']];
-} elseif ($dashboardRole=="4") {
-  $eq=dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e JOIN operations o ON o.equipment=e.id WHERE e.status='1' AND $scopeOperationsByProject", 't');
-  $ao=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM operations WHERE status='1' AND $scopeOperationsByProject", 't');
-  $bo=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM operations WHERE status='0' AND $scopeOperationsByProject", 't');
-  $stats=[['fa-tools',$eq,'إجمالي المعدات','gold'],['fa-play-circle',$ao,'تعمل الآن','blue'],['fa-exclamation-triangle',$bo,'معطلة','orange']];
 } elseif ($dashboardRole=="3") {
-  $dr=dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM drivers d JOIN equipment_drivers ed ON ed.driver_id=d.id JOIN operations o ON o.equipment=ed.equipment_id WHERE d.status='1' AND $scopeOperationsByProject", 't');
-  $ad=dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM drivers d JOIN timesheet t ON d.id=t.driver JOIN operations o ON t.operator=o.id WHERE t.status='1' AND $scopeOperationsByProject", 't');
+  // مدير الاسطول
+  $s=dashboard_scalar($conn, "SELECT COUNT(DISTINCT s.id) AS t FROM suppliers s WHERE company_id = $companyId" , 't');
+  $eq=dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE company_id = $companyId ", 't');
+  $ao=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM operations WHERE status='1' AND company_id = $companyId AND $scopeOperationsByProject", 't');
+  $bo=dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM equipments WHERE status='3' AND company_id = $companyId", 't');
+  $stats=[['fa-tools',$eq,'إجمالي المعدات','gold'],['fa-play-circle',$ao,'تعمل الآن','blue'],['fa-exclamation-triangle',$bo,'معطلة','orange'],['fa-truck',$s,'الموردين','gold']];
+} elseif ($dashboardRole=="4") {
+  // مدير المشغلين
+  $dr=dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM drivers d WHERE company_id = $companyId ",'t');
+  $ad=dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM drivers d JOIN equipment_drivers ed ON d.id=ed.driver_id WHERE ed.status='1' AND d.company_id = $companyId", 't');
   $stats=[['fa-id-badge',$dr,'المشغلين','gold'],['fa-user-check',$ad,'يعملون الآن','blue'],['fa-user-clock',$dr-$ad,'خاملين','orange']];
 } elseif ($dashboardRole=="5") {
+  // مدير الموقع
   $sv=($companyId > 0)
     ? dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE company_id = $companyId AND role IN ('6','7','8','9')", 't')
     : dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE role IN ('6','7','8','9')", 't');
-  $h=dashboard_scalar($conn, "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN operations o ON t.operator=o.id WHERE $scopeOperationsByProject", 't');
-  $ah=dashboard_scalar($conn, "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN operations o ON t.operator=o.id WHERE t.status='1' AND $scopeOperationsByProject", 't');
+  $h=dashboard_scalar($conn, "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN operations o ON t.operator=o.id WHERE o.company_id = $companyId", 't');
+  $ah=dashboard_scalar($conn, "SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN timesheet_approvals ta ON t.id=ta.timesheet_id and approval_level = '4'  WHERE t.company_id = $companyId", 't');
   $stats=[['fa-users-cog',$sv,'المشرفين','gold'],['fa-clock',(int)$h,'ساعات العمل','blue'],['fa-check-circle',(int)$ah,'الساعات المعتمدة','teal']];
 } elseif ($dashboardRole=="6") {
   $projectScopeSql = $projectId > 0 ? "o.project_id = '$projectId'" : "1=0";

@@ -1665,3 +1665,67 @@ Stack trace:
 [29-Apr-2026 10:56:00 Europe/Berlin] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.25. in C:\xamppv0.001\htdocs\ems\vendor\composer\platform_check.php on line 28
 [29-Apr-2026 11:03:52 Europe/Berlin] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.25. in C:\xamppv0.001\htdocs\ems\vendor\composer\platform_check.php on line 28
 [29-Apr-2026 11:03:57 Europe/Berlin] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.25. in C:\xamppv0.001\htdocs\ems\vendor\composer\platform_check.php on line 28
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_shift_h in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 708
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_project in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 709
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_equip in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 710
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_supplier in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 711
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_driver in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 712
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_work_total in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 714
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_total in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 715
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_standby in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 716
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_depend in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 717
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_extra in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 718
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_op_hours in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 719
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_maintenance in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 720
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_hr_fault in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 721
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_other_fault in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 722
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_counter in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 723
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_type in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 724
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_dept in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 725
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_work_notes in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 726
+[29-Apr-2026 17:23:36 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_notes in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 727
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_shift_h in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 708
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_project in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 709
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_equip in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 710
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_supplier in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 711
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_driver in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 712
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_work_total in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 714
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_total in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 715
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_standby in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 716
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_depend in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 717
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_extra in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 718
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_op_hours in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 719
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_maintenance in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 720
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_hr_fault in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 721
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_other_fault in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 722
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_counter in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 723
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_type in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 724
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_dept in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 725
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_work_notes in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 726
+[29-Apr-2026 17:24:17 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_notes in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 727
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_shift_h in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 708
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_project in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 709
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_equip in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 710
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_supplier in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 711
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_driver in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 712
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_work_total in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 714
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_total in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 715
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_standby in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 716
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_depend in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 717
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_extra in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 718
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_op_hours in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 719
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_maintenance in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 720
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_hr_fault in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 721
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_other_fault in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 722
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_counter in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 723
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_type in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 724
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_dept in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 725
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_work_notes in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 726
+[29-Apr-2026 17:24:47 Europe/Berlin] PHP Warning:  Undefined variable $c_fault_notes in C:\xamppv0.001\htdocs\ems\Approvals\hours_approval.php on line 727
+[30-Apr-2026 12:12:16 Europe/Berlin] PHP Fatal error:  Uncaught ArgumentCountError: Too few arguments to function dashboard_scalar(), 2 passed in C:\xamppv0.001\htdocs\ems\main\dashboard.php on line 191 and exactly 3 expected in C:\xamppv0.001\htdocs\ems\main\dashboard.php:31
+Stack trace:
+#0 C:\xamppv0.001\htdocs\ems\main\dashboard.php(191): dashboard_scalar(Object(mysqli), 'SELECT COUNT(DI...')
+#1 {main}
+  thrown in C:\xamppv0.001\htdocs\ems\main\dashboard.php on line 31
+[30-Apr-2026 13:36:55 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.001\htdocs\ems\Suppliers\suppliers.php on line 823
+[30-Apr-2026 13:40:45 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.001\htdocs\ems\Suppliers\suppliers.php on line 823

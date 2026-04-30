@@ -22,6 +22,81 @@ if (isset($_SESSION['user']) && isset($conn)) {
     <div class="toggle-btn" id="toggleBtn"><i class="fa fa-bars"></i></div>
     <h2 class="logo">Equipation</h2>
 
+    <?php
+    $hoursApprovalPendingCount = 0;
+    if (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && isset($conn)) {
+      $sb_role         = strval($_SESSION['user']['role']);
+      $sb_company_id   = intval($_SESSION['user']['company_id'] ?? 0);
+      $sb_session_proj = intval($_SESSION['user']['project_id'] ?? 0);
+      $sb_session_mine = intval($_SESSION['user']['mine_id'] ?? 0);
+
+      $sb_allowed_roles = ['-1', '1', '2', '3', '4', '5'];
+      if (in_array($sb_role, $sb_allowed_roles)) {
+        $sb_role_level_map = ['1' => 1, '2' => 2, '3' => 3, '4' => 4];
+        $sb_my_level       = $sb_role_level_map[$sb_role] ?? 0;
+        $sb_prev_level     = $sb_my_level - 1;
+        $sb_is_admin       = ($sb_role === '-1');
+        $sb_is_site_manager = ($sb_role === '5');
+
+        $sb_company_scope = '';
+        if (!$sb_is_admin && $sb_company_id > 0) {
+          $sb_company_scope = " AND (t.company_id = $sb_company_id OR t.company_id IS NULL)";
+        }
+
+        $sb_ops_project_col = (function_exists('db_table_has_column') && db_table_has_column($conn, 'operations', 'project_id'))
+          ? 'project_id' : 'project';
+
+        $sb_site_scope = '';
+        if ($sb_is_site_manager) {
+          if ($sb_session_proj > 0) {
+            $sb_site_scope .= " AND o.$sb_ops_project_col = $sb_session_proj";
+          }
+          if ($sb_session_mine > 0 && function_exists('db_table_has_column') && db_table_has_column($conn, 'operations', 'mine_id')) {
+            $sb_site_scope .= " AND o.mine_id = $sb_session_mine";
+          }
+        }
+
+        if ($sb_is_site_manager) {
+          $sb_pending_condition = '1=1';
+        } elseif ($sb_is_admin) {
+          $sb_pending_condition = "NOT EXISTS (
+            SELECT 1 FROM timesheet_approvals ta2
+            WHERE ta2.timesheet_id = t.id AND ta2.approval_level = 4 AND ta2.status = 1
+          )";
+        } elseif ($sb_my_level === 1) {
+          $sb_pending_condition = "NOT EXISTS (
+            SELECT 1 FROM timesheet_approvals ta2
+            WHERE ta2.timesheet_id = t.id AND ta2.approval_level = 1 AND ta2.status = 1
+          )";
+        } elseif ($sb_my_level > 1) {
+          $sb_pending_condition = "EXISTS (
+            SELECT 1 FROM timesheet_approvals ta2
+            WHERE ta2.timesheet_id = t.id AND ta2.approval_level = $sb_prev_level AND ta2.status = 1
+          ) AND NOT EXISTS (
+            SELECT 1 FROM timesheet_approvals ta3
+            WHERE ta3.timesheet_id = t.id AND ta3.approval_level = $sb_my_level AND ta3.status = 1
+          )";
+        } else {
+          $sb_pending_condition = '0=1';
+        }
+
+        $sb_cnt_sql = "
+          SELECT COUNT(*) AS cnt
+          FROM timesheet t
+          LEFT JOIN operations o ON o.id = t.operator
+          WHERE t.status = 1
+            AND $sb_pending_condition
+            $sb_company_scope
+            $sb_site_scope
+        ";
+        $sb_cnt_res = $conn->query($sb_cnt_sql);
+        if ($sb_cnt_res && ($sb_cnt_row = $sb_cnt_res->fetch_assoc())) {
+          $hoursApprovalPendingCount = intval($sb_cnt_row['cnt'] ?? 0);
+        }
+      }
+    }
+    ?>
+
     <ul>
       <li><a href="../main/dashboard.php"><i class="fa-solid fa-house"></i> <span>الرئيسية</span></a></li>
 
@@ -64,6 +139,14 @@ if (isset($_SESSION['user']) && isset($conn)) {
         <?php 
       }
       ?>
+
+      <?php if (in_array($_SESSION['user']['role'], ["-1", "1", "2", "3", "4", "5"])) { ?>
+      <li><a href="../Approvals/hours_approval.php"><i class="fa fa-check-double"></i> <span>اعتماد الساعات
+        <?php if ($hoursApprovalPendingCount > 0): ?>
+        <span style="display:inline-block; background:#dc3545; color:#fff; font-size:0.65rem; font-weight:700; border-radius:10px; padding:1px 5px; margin-right:4px; vertical-align:middle;"><?php echo ($hoursApprovalPendingCount > 99 ? '99+' : $hoursApprovalPendingCount); ?></span>
+        <?php endif; ?>
+      </span></a></li>
+      <?php } ?>
 
       <?php // صلاحيات مدير المشاريع === 1
       if ($_SESSION['user']['role'] == "1") { ?>

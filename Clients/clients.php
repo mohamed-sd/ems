@@ -184,6 +184,28 @@ if (empty($_SESSION['clients_csrf_token'])) {
 $clients_csrf_token = $_SESSION['clients_csrf_token'];
 
 // ══════════════════════════════════════════════════════════════════════════════
+// توليد الكود المقترح التالي للعميل (CLT-NNNN)
+// يجلب آخر كود من جدول العملاء بصيغة CLT-NNNN ويزيده بمقدار 1
+// هذا للعرض فقط ولا يُخزَّن في قاعدة البيانات
+// ══════════════════════════════════════════════════════════════════════════════
+$next_client_code = 'CLT-0001'; // القيمة الافتراضية
+$last_code_scope  = $clients_has_company_id ? "AND company_id = $company_id" : '';
+$last_code_deleted = $clients_has_is_deleted ? "AND is_deleted = 0" : ($clients_has_deleted_at ? "AND deleted_at IS NULL" : "");
+$last_code_sql = "SELECT client_code FROM clients
+                  WHERE client_code REGEXP '^CLT-[0-9]+$'
+                  $last_code_scope
+                  $last_code_deleted
+                  ORDER BY CAST(SUBSTRING(client_code, 5) AS UNSIGNED) DESC
+                  LIMIT 1";
+$last_code_res = @mysqli_query($conn, $last_code_sql);
+if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
+    $last_code_row = mysqli_fetch_assoc($last_code_res);
+    $last_num      = intval(substr($last_code_row['client_code'], 4)); // بعد "CLT-"
+    $next_num      = $last_num + 1;
+    $next_client_code = 'CLT-' . str_pad($next_num, 4, '0', STR_PAD_LEFT);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // ðŸ” التحقق من صلاحيات المستخدم على وحدة العملاء
 // ══════════════════════════════════════════════════════════════════════════════
 
@@ -620,6 +642,23 @@ include('../insidebar.php');
                 <input type="hidden" name="client_id"   id="client_id"   value="">
                 <input type="hidden" name="csrf_token"  value="<?php echo clients_e($clients_csrf_token); ?>">
                 <div class="form-grid">
+
+                 <!-- ══ حقل الكود المولد تلقائياً (قراءة فقط - لا يُرسَل لقاعدة البيانات) ══ -->
+                    <div id="generated_code_wrapper">
+                        <label><i class="fas fa-magic"></i> كود العميل المولد  <i class="fas fa-info-circle" style="color:#3b82f6;"></i></label>
+                        <input type="text"
+                               id="generated_client_code"
+                               class="generated-code-field"
+                               value="<?php echo clients_e($next_client_code); ?>"
+                               readonly
+                               tabindex="-1"
+                               title="هذا الكود للعرض فقط، يمكنك نسخه واستخدامه في حقل كود العميل" />
+                        <div class="generated-code-hint">
+                           
+                        </div>
+                    </div>
+                    <!-- ══════════════════════════════════════════════════════ -->
+
                     <div>
                         <label><i class="fas fa-barcode"></i> كود العميل *</label>
                         <input type="text" name="client_code" id="client_code"
@@ -656,6 +695,7 @@ include('../insidebar.php');
                             <option value="طاقة">طاقة</option>
                             <option value="مياه وصرف صحي">مياه وصرف صحي</option>
                             <option value="نقل ومواصلات">نقل ومواصلات</option>
+                            <option value="مقاولات">مقاولات</option>
                             <option value="أخرى">أخرى</option>
                         </select>
                     </div>
