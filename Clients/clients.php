@@ -546,6 +546,75 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
     exit();
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// بيانات العملاء + الإحصائيات العامة
+// ══════════════════════════════════════════════════════════════════════════════
+$clients_rows = array();
+
+$clients_total_count      = 0;
+$clients_active_count     = 0;
+$clients_stopped_count    = 0;
+$clients_companies_count  = 0;
+$clients_individuals_count = 0;
+$clients_unknown_entity_count = 0;
+$clients_projects_total   = 0;
+$clients_without_projects = 0;
+
+$sector_counts = array();
+
+$clients_query  = "SELECT cc.*, u.name as creator_name, $projects_count_select_sql AS projects_count
+                  FROM clients cc
+                  LEFT JOIN users u ON cc.created_by = u.id
+                  WHERE $scope_clients_sql AND $not_deleted_cc_sql
+                  ORDER BY cc.id DESC";
+$clients_result = mysqli_query($conn, $clients_query);
+
+if ($clients_result) {
+    while ($row = mysqli_fetch_assoc($clients_result)) {
+        $clients_rows[] = $row;
+
+        $clients_total_count++;
+        if (isset($row['status']) && trim($row['status']) === 'نشط') {
+            $clients_active_count++;
+        }
+
+        $projects_count_value = intval($row['projects_count']);
+        $clients_projects_total += $projects_count_value;
+        if ($projects_count_value === 0) {
+            $clients_without_projects++;
+        }
+
+        $entity_type_value = isset($row['entity_type']) ? trim($row['entity_type']) : '';
+        if ($entity_type_value === '') {
+            $clients_unknown_entity_count++;
+        } elseif (
+            strpos($entity_type_value, 'فرد') !== false ||
+            strpos($entity_type_value, 'شخص') !== false ||
+            in_array($entity_type_value, array('فرد', 'أفراد', 'فردي', 'شخصي'), true)
+        ) {
+            $clients_individuals_count++;
+        } else {
+            $clients_companies_count++;
+        }
+
+        $sector_value = isset($row['sector_category']) ? trim($row['sector_category']) : '';
+        if ($sector_value === '') {
+            $sector_value = 'غير مصنف';
+        }
+        if (!isset($sector_counts[$sector_value])) {
+            $sector_counts[$sector_value] = 0;
+        }
+        $sector_counts[$sector_value]++;
+    }
+}
+
+$clients_stopped_count = max(0, $clients_total_count - $clients_active_count);
+$sector_mining_count      = isset($sector_counts['تعدين']) ? intval($sector_counts['تعدين']) : 0;
+$sector_contracting_count = isset($sector_counts['مقاولات']) ? intval($sector_counts['مقاولات']) : 0;
+$sector_services_count    = isset($sector_counts['خدمات']) ? intval($sector_counts['خدمات']) : 0;
+
+arsort($sector_counts);
+
 $page_title = "قائمة العملاء";
 include("../inheader.php");
 include('../insidebar.php');
@@ -561,6 +630,113 @@ include('../insidebar.php');
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <style>
+    .stats-section {
+        margin-bottom: 20px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .stats-card {
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        padding: 14px;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+        min-height: 106px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .stats-card .stats-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .95rem;
+    }
+
+    .stats-card .stats-title {
+        margin-top: 10px;
+        color: #475569;
+        font-size: .78rem;
+        font-weight: 700;
+    }
+
+    .stats-card .stats-value {
+        margin-top: 6px;
+        color: #0f172a;
+        font-size: 1.55rem;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: .2px;
+    }
+
+    .stats-primary .stats-icon { background: rgba(37, 99, 235, 0.14); color: #1d4ed8; }
+    .stats-success .stats-icon { background: rgba(22, 163, 74, 0.14); color: #15803d; }
+    .stats-danger .stats-icon { background: rgba(220, 38, 38, 0.14); color: #b91c1c; }
+    .stats-purple .stats-icon { background: rgba(124, 58, 237, 0.14); color: #6d28d9; }
+    .stats-orange .stats-icon { background: rgba(217, 119, 6, 0.14); color: #b45309; }
+    .stats-cyan .stats-icon { background: rgba(8, 145, 178, 0.14); color: #0e7490; }
+    .stats-slate .stats-icon { background: rgba(51, 65, 85, 0.12); color: #334155; }
+    .stats-emerald .stats-icon { background: rgba(5, 150, 105, 0.14); color: #047857; }
+
+    .sector-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .sector-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .sector-card .label {
+        color: #475569;
+        font-size: .8rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .sector-card .value {
+        color: #0f172a;
+        font-weight: 900;
+        font-size: 1.2rem;
+    }
+
+    .sector-tags {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .sector-tag {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 999px;
+        padding: 4px 10px;
+        color: #334155;
+        font-size: .74rem;
+        font-weight: 700;
+    }
+
     .link-alert-chip {
         display: inline-flex;
         align-items: center;
@@ -586,6 +762,28 @@ include('../insidebar.php');
     @keyframes linkAlertPulse {
         0%, 100% { transform: translateY(0); box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18); }
         50% { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28); }
+    }
+
+    @media (max-width: 1200px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 992px) {
+        .sector-cards-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-card {
+            min-height: 95px;
+        }
     }
 </style>
 
@@ -631,6 +829,74 @@ include('../insidebar.php');
             <?php echo clients_e($_GET['msg']); ?>
         </div>
     <?php endif; ?>
+
+    <div class="stats-section">
+        <div class="stats-grid">
+            <div class="stats-card stats-primary">
+                <div class="stats-icon"><i class="fas fa-users"></i></div>
+                <div class="stats-title">إجمالي العملاء</div>
+                <div class="stats-value"><?php echo $clients_total_count; ?></div>
+            </div>
+            <div class="stats-card stats-success">
+                <div class="stats-icon"><i class="fas fa-user-check"></i></div>
+                <div class="stats-title">العملاء النشطون</div>
+                <div class="stats-value"><?php echo $clients_active_count; ?></div>
+            </div>
+            <div class="stats-card stats-danger">
+                <div class="stats-icon"><i class="fas fa-user-slash"></i></div>
+                <div class="stats-title">العملاء المتوقفون</div>
+                <div class="stats-value"><?php echo $clients_stopped_count; ?></div>
+            </div>
+            <div class="stats-card stats-purple">
+                <div class="stats-icon"><i class="fas fa-diagram-project"></i></div>
+                <div class="stats-title">إجمالي المشاريع المرتبطة</div>
+                <div class="stats-value"><?php echo $clients_projects_total; ?></div>
+            </div>
+            <div class="stats-card stats-orange">
+                <div class="stats-icon"><i class="fas fa-building"></i></div>
+                <div class="stats-title">عدد الشركات</div>
+                <div class="stats-value"><?php echo $clients_companies_count; ?></div>
+            </div>
+            <div class="stats-card stats-cyan">
+                <div class="stats-icon"><i class="fas fa-user"></i></div>
+                <div class="stats-title">عدد الأفراد</div>
+                <div class="stats-value"><?php echo $clients_individuals_count; ?></div>
+            </div>
+            <div class="stats-card stats-slate">
+                <div class="stats-icon"><i class="fas fa-question-circle"></i></div>
+                <div class="stats-title">كيان غير محدد</div>
+                <div class="stats-value"><?php echo $clients_unknown_entity_count; ?></div>
+            </div>
+            <div class="stats-card stats-emerald">
+                <div class="stats-icon"><i class="fas fa-link-slash"></i></div>
+                <div class="stats-title">عملاء بلا مشاريع</div>
+                <div class="stats-value"><?php echo $clients_without_projects; ?></div>
+            </div>
+        </div>
+
+        <div class="sector-cards-grid">
+            <div class="sector-card">
+                <div class="label"><i class="fas fa-mountain"></i> قطاع التعدين</div>
+                <div class="value"><?php echo $sector_mining_count; ?></div>
+            </div>
+            <div class="sector-card">
+                <div class="label"><i class="fas fa-hard-hat"></i> قطاع المقاولات</div>
+                <div class="value"><?php echo $sector_contracting_count; ?></div>
+            </div>
+            <div class="sector-card">
+                <div class="label"><i class="fas fa-handshake"></i> قطاع الخدمات</div>
+                <div class="value"><?php echo $sector_services_count; ?></div>
+            </div>
+        </div>
+
+        <?php if (!empty($sector_counts)): ?>
+            <div class="sector-tags">
+                <?php foreach ($sector_counts as $sector_name => $sector_count): ?>
+                    <span class="sector-tag"><?php echo clients_e($sector_name); ?>: <?php echo intval($sector_count); ?></span>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
 
     <!-- فورم إضافة / تعديل عميل -->
     <form id="clientForm" action="" method="post" style="display:none; margin-bottom:20px;">
@@ -761,14 +1027,7 @@ include('../insidebar.php');
                     </thead>
                     <tbody>
                         <?php
-                        $query  = "SELECT cc.*, u.name as creator_name, $projects_count_select_sql AS projects_count
-                                  FROM clients cc 
-                                  LEFT JOIN users u ON cc.created_by = u.id 
-                                  WHERE $scope_clients_sql AND $not_deleted_cc_sql
-                                  ORDER BY cc.id DESC";
-                        $result = mysqli_query($conn, $query);
-
-                        while ($row = mysqli_fetch_assoc($result)) {
+                        foreach ($clients_rows as $row) {
                             $client_name_cell = "<a class='client-name-link' href='../Projects/projects.php?client_id=" . urlencode($row['id']) . "'>" . clients_e($row['client_name']) . "</a>";
                             if (intval($row['projects_count']) === 0) {
                                 $client_name_cell .= " <span class='link-alert-chip' title='العميل ليس مشترك في مشروع'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";

@@ -222,7 +222,7 @@ if (!empty($approved_ids)) {
 }
 
 // ─── بيانات الفلاتر (قوائم فريدة) ───────────────────────────
-$_all_rows = array_merge($pending_rows, $approved_rows);
+$_all_rows = $pending_rows;
 $filter_projects = array_values(array_unique(array_filter(array_column($_all_rows, 'project_name'))));
 $filter_suppliers = array_values(array_unique(array_filter(array_column($_all_rows, 'supplier_name'))));
 $filter_drivers  = array_values(array_unique(array_filter(array_column($_all_rows, 'driver_name'))));
@@ -760,9 +760,14 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
 
   <!-- ── شريط التنقل العلوي ── -->
   <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-    <a href="<?= $is_admin ? '../admin/dashboard.php' : '../main/dashboard.php' ?>" class="btn btn-outline-secondary btn-sm fw-semibold">
-      <i class="fa fa-home me-1"></i> لوحة التحكم
-    </a>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <a href="<?= $is_admin ? '../admin/dashboard.php' : '../main/dashboard.php' ?>" class="btn btn-outline-secondary btn-sm fw-semibold">
+        <i class="fa fa-home me-1"></i> لوحة التحكم
+      </a>
+      <a href="hours_approval_followup.php" class="btn btn-primary btn-sm fw-semibold">
+        <i class="fa fa-route me-1"></i> متابعة الاعتمادات المنقولة
+      </a>
+    </div>
   </div>
 
   <!-- ── عنوان الصفحة ── -->
