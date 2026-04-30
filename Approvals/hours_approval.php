@@ -221,6 +221,19 @@ if (!empty($approved_ids)) {
     }
 }
 
+// ─── بيانات الفلاتر (قوائم فريدة) ───────────────────────────
+$_all_rows = array_merge($pending_rows, $approved_rows);
+$filter_projects = array_values(array_unique(array_filter(array_column($_all_rows, 'project_name'))));
+$filter_suppliers = array_values(array_unique(array_filter(array_column($_all_rows, 'supplier_name'))));
+$filter_drivers  = array_values(array_unique(array_filter(array_column($_all_rows, 'driver_name'))));
+$filter_equips   = [];
+foreach ($_all_rows as $_r) {
+    $_en = trim(($_r['equip_code'] ?? '') . ' ' . ($_r['equip_name'] ?? ''));
+    if ($_en) $filter_equips[] = $_en;
+}
+$filter_equips = array_values(array_unique($filter_equips));
+sort($filter_projects); sort($filter_suppliers); sort($filter_drivers); sort($filter_equips);
+
 // ─── إحصاءات سريعة ──────────────────────────────────────────
 $stats = [
     'pending'  => count($pending_rows),
@@ -291,6 +304,7 @@ body { background: #f0f4f8; }
 .page-wrapper {
   padding: 20px 24px;
   min-height: 100vh;
+  width: 100%;
 }
 
 /* ── بطاقات الإحصاء ── */
@@ -483,6 +497,107 @@ table.ha-table td {
   flex-wrap   : wrap;
   gap         : 10px;
   margin-bottom: 14px;
+}
+
+/* ── شريط الفلاتر ── */
+.filters-bar {
+  background   : #fff;
+  border-radius: 14px;
+  box-shadow   : 0 2px 12px rgba(0,0,0,.07);
+  padding      : 14px 18px;
+  margin-bottom: 18px;
+  display      : flex;
+  align-items  : flex-end;
+  flex-wrap    : wrap;
+  gap          : 12px;
+  border-right : 4px solid #0d6efd;
+}
+.filters-bar .filter-group {
+  display      : flex;
+  flex-direction: column;
+  gap          : 4px;
+  min-width    : 160px;
+  flex         : 1 1 160px;
+}
+.filters-bar .filter-group label {
+  font-size    : .75rem;
+  font-weight  : 700;
+  color        : #495057;
+  margin-bottom: 0;
+}
+.filters-bar .filter-group select {
+  font-size    : .82rem;
+  border-radius: 8px;
+  border       : 1.5px solid #dee2e6;
+  padding      : 5px 8px;
+  color        : #212529;
+  background   : #f8f9fa;
+  transition   : border-color .15s;
+}
+.filters-bar .filter-group select:focus {
+  border-color : #0d6efd;
+  outline      : none;
+  background   : #fff;
+}
+.filters-bar .filter-actions {
+  display      : flex;
+  align-items  : flex-end;
+  gap          : 8px;
+  flex-shrink  : 0;
+}
+.filters-bar .btn-filter-apply {
+  background   : #0d6efd;
+  color        : #fff;
+  border       : none;
+  border-radius: 8px;
+  padding      : 6px 14px;
+  font-size    : .82rem;
+  font-weight  : 700;
+  cursor       : pointer;
+  transition   : background .15s;
+  display      : inline-flex;
+  align-items  : center;
+  gap          : 5px;
+}
+.filters-bar .btn-filter-apply:hover { background: #0b5ed7; }
+.filters-bar .btn-filter-reset {
+  background   : transparent;
+  color        : #6c757d;
+  border       : 1.5px solid #dee2e6;
+  border-radius: 8px;
+  padding      : 5px 12px;
+  font-size    : .82rem;
+  cursor       : pointer;
+  transition   : all .15s;
+}
+.filters-bar .btn-filter-reset:hover { border-color:#dc3545; color:#dc3545; }
+.active-filters-info {
+  font-size  : .75rem;
+  color      : #0d47a1;
+  background : #e8f0ff;
+  border-radius: 8px;
+  padding    : 4px 10px;
+  font-weight: 600;
+  display    : none;
+}
+
+/* ── تحسينات الريسبونسيف ── */
+@media(max-width:992px){
+  .filters-bar .filter-group { min-width: 140px; }
+}
+@media(max-width:576px){
+  .filters-bar { padding: 12px; gap: 8px; }
+  .filters-bar .filter-group { min-width: 100%; flex: 1 1 100%; }
+  .filters-bar .filter-actions { width: 100%; }
+  .filters-bar .btn-filter-apply,
+  .filters-bar .btn-filter-reset { flex: 1; justify-content: center; }
+  .cg-bar { padding: 10px; gap: 6px; }
+  .cg-btn { font-size: .72rem; padding: 4px 8px; }
+  .table-card { padding: 12px; }
+  .card-header-custom h5 { font-size: .95rem; }
+  .stat-card { padding: 12px 14px; gap: 10px; }
+  .stat-card .stat-val { font-size: 1.5rem; }
+  .approval-steps { display: none; }
 }
 
 /* ── تمييز الصفوف المحددة ── */
@@ -772,6 +887,67 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
     </small>
   </div>
 
+  <!-- ── شريط الفلاتر ── -->
+  <div class="filters-bar" id="main-filters-bar">
+    <div style="font-size:.8rem;font-weight:700;color:#0d6efd;flex-basis:100%;margin-bottom:2px;">
+      <i class="fa fa-filter me-1"></i> فلاتر البحث
+    </div>
+
+    <div class="filter-group">
+      <label for="filter-project"><i class="fa fa-project-diagram me-1"></i>المشروع</label>
+      <select id="filter-project">
+        <option value="">— كل المشاريع —</option>
+        <?php foreach ($filter_projects as $fp_val): ?>
+        <option value="<?= htmlspecialchars($fp_val) ?>"><?= htmlspecialchars($fp_val) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filter-supplier"><i class="fa fa-truck me-1"></i>المورد</label>
+      <select id="filter-supplier">
+        <option value="">— كل الموردين —</option>
+        <?php foreach ($filter_suppliers as $fs_val): ?>
+        <option value="<?= htmlspecialchars($fs_val) ?>"><?= htmlspecialchars($fs_val) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filter-driver"><i class="fa fa-user-hard-hat me-1"></i>المشغل</label>
+      <select id="filter-driver">
+        <option value="">— كل المشغلين —</option>
+        <?php foreach ($filter_drivers as $fd_val): ?>
+        <option value="<?= htmlspecialchars($fd_val) ?>"><?= htmlspecialchars($fd_val) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filter-equip"><i class="fa fa-cogs me-1"></i>الآلية</label>
+      <select id="filter-equip">
+        <option value="">— كل الآليات —</option>
+        <?php foreach ($filter_equips as $fe_val): ?>
+        <option value="<?= htmlspecialchars($fe_val) ?>"><?= htmlspecialchars($fe_val) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn-filter-apply" onclick="applyFilters()">
+        <i class="fa fa-search"></i> تطبيق
+      </button>
+      <button class="btn-filter-reset" onclick="resetFilters()">
+        <i class="fa fa-rotate-left"></i> إلغاء
+      </button>
+    </div>
+
+    <span class="active-filters-info" id="active-filters-info">
+      <i class="fa fa-check-circle me-1"></i>
+      <span id="active-filters-text"></span>
+    </span>
+  </div>
+
   <!-- ══════════════════════════════════════════════════════════
        جدول ١: التايمشيت قيد الاعتماد
   ══════════════════════════════════════════════════════════ -->
@@ -826,10 +1002,10 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <th>المورد</th>
             <th>الآلية</th>
             <th>المشغل</th>
-            <th>الساعات المنفذة</th>
-            <th>ساعات الانتظار</th>
-            <th>إجمالي الأعطال</th>
-            <th>مجموع العمل</th>
+            <th>المنفذة</th>
+            <th>الانتظار</th>
+            <th>الأعطال</th>
+            <th>المجموع </th>
             <th class="col-g-hours nosort">ساعات الوردية</th>
             <th class="col-g-hours nosort">ساعات الاعتماد</th>
             <th class="col-g-hours nosort">ساعات إضافية</th>
@@ -854,8 +1030,13 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
               $ad_res = $conn->query("SELECT approval_level, approved_by_name, approved_at FROM timesheet_approvals WHERE timesheet_id = ".intval($row['id'])." AND status = 1 ORDER BY approval_level ASC");
               if ($ad_res) while ($ad = $ad_res->fetch_assoc()) $approval_details[$ad['approval_level']] = $ad;
           }
+          $_prow_equip = trim(($row['equip_code'] ?? '') . ' ' . ($row['equip_name'] ?? ''));
         ?>
-          <tr data-id="<?= $row['id'] ?>">
+          <tr data-id="<?= $row['id'] ?>"
+              data-project="<?= htmlspecialchars($row['project_name'] ?? '') ?>"
+              data-supplier="<?= htmlspecialchars($row['supplier_name'] ?? '') ?>"
+              data-driver="<?= htmlspecialchars($row['driver_name'] ?? '') ?>"
+              data-equip="<?= htmlspecialchars($_prow_equip) ?>">
             <?php if (!$is_admin && !$is_site_manager): ?>
             <td>
               <input type="checkbox" class="row-chk" value="<?= $row['id'] ?>"
@@ -961,10 +1142,10 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <th>المورد</th>
             <th>الآلية</th>
             <th>المشغل</th>
-            <th>الساعات المنفذة</th>
-            <th>ساعات الانتظار</th>
-            <th>إجمالي الأعطال</th>
-            <th>مجموع العمل</th>
+            <th> المنفذة</th>
+            <th> الانتظار</th>
+            <th> الأعطال</th>
+            <th>المجموع </th>
             <th class="col-g-hours nosort">ساعات الوردية</th>
             <th class="col-g-hours nosort">ساعات الاعتماد</th>
             <th class="col-g-hours nosort">ساعات إضافية</th>
@@ -987,8 +1168,12 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
         <?php $idx = 1; foreach ($approved_rows as $row):
           // تفاصيل اعتمادات هذا السجل (تم جلبها مسبقاً دفعة واحدة)
           $row_approvals = $all_approval_details[intval($row['id'])] ?? [];
+          $_arow_equip = trim(($row['equip_code'] ?? '') . ' ' . ($row['equip_name'] ?? ''));
         ?>
-          <tr>
+          <tr data-project="<?= htmlspecialchars($row['project_name'] ?? '') ?>"
+              data-supplier="<?= htmlspecialchars($row['supplier_name'] ?? '') ?>"
+              data-driver="<?= htmlspecialchars($row['driver_name'] ?? '') ?>"
+              data-equip="<?= htmlspecialchars($_arow_equip) ?>">
             <td><?= $idx++ ?></td>
             <td><?= htmlspecialchars($row['date'] ?? '') ?></td>
             <td>
@@ -1444,4 +1629,64 @@ function escHtml(str) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
 }
+
+// ── الفلاتر ──────────────────────────────────────────────────
+// دالة مخصصة لـ DataTables تفلتر بناءً على data attributes في <tr>
+$.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+  var tblId = settings.nTable.id;
+  if (tblId !== 'tbl-pending' && tblId !== 'tbl-approved') return true;
+
+  var nTr = settings.aoData[dataIndex] ? settings.aoData[dataIndex].nTr : null;
+  if (!nTr) return true;
+
+  var $tr = $(nTr);
+  var fp  = $('#filter-project').val();
+  var fs  = $('#filter-supplier').val();
+  var fd  = $('#filter-driver').val();
+  var fe  = $('#filter-equip').val();
+
+  if (fp && $tr.data('project')  !== fp) return false;
+  if (fs && $tr.data('supplier') !== fs) return false;
+  if (fd && $tr.data('driver')   !== fd) return false;
+  if (fe && $tr.data('equip')    !== fe) return false;
+  return true;
+});
+
+function applyFilters() {
+  if (dtPending)  dtPending.draw();
+  if (dtApproved) dtApproved.draw();
+  updateFilterInfo();
+}
+
+function resetFilters() {
+  $('#filter-project').val('');
+  $('#filter-supplier').val('');
+  $('#filter-driver').val('');
+  $('#filter-equip').val('');
+  applyFilters();
+}
+
+function updateFilterInfo() {
+  var fp = $('#filter-project').val();
+  var fs = $('#filter-supplier').val();
+  var fd = $('#filter-driver').val();
+  var fe = $('#filter-equip').val();
+  var parts = [];
+  if (fp) parts.push('مشروع: ' + fp);
+  if (fs) parts.push('مورد: ' + fs);
+  if (fd) parts.push('مشغل: ' + fd);
+  if (fe) parts.push('آلية: ' + fe);
+  var info = $('#active-filters-info');
+  if (parts.length > 0) {
+    $('#active-filters-text').text(parts.join(' | '));
+    info.show();
+  } else {
+    info.hide();
+  }
+}
+
+// تطبيق الفلاتر عند تغيير أي قائمة منسدلة
+$(document).on('change', '#filter-project, #filter-supplier, #filter-driver, #filter-equip', function(){
+  applyFilters();
+});
 </script>

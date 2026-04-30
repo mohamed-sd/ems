@@ -1729,3 +1729,65 @@ Stack trace:
   thrown in C:\xamppv0.001\htdocs\ems\main\dashboard.php on line 31
 [30-Apr-2026 13:36:55 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.001\htdocs\ems\Suppliers\suppliers.php on line 823
 [30-Apr-2026 13:40:45 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.001\htdocs\ems\Suppliers\suppliers.php on line 823
+[30-Apr-2026 15:28:46 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class "ZipArchive" not found in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php:61
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php(174): PhpOffice\PhpSpreadsheet\Shared\File::fileExists('zip://C:\\xamppv...')
+#1 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Reader\Xlsx.php(93): PhpOffice\PhpSpreadsheet\Shared\File::testFileNoThrow('C:\\xamppv0.002\\...', '_rels/.rels')
+#2 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\IOFactory.php(199): PhpOffice\PhpSpreadsheet\Reader\Xlsx->canRead('C:\\xamppv0.002\\...')
+#3 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\IOFactory.php(137): PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile('C:\\xamppv0.002\\...', NULL)
+#4 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(165): PhpOffice\PhpSpreadsheet\IOFactory::load('C:\\xamppv0.002\\...')
+#5 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php on line 61
+[30-Apr-2026 15:57:31 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class "ZipArchive" not found in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php:61
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php(174): PhpOffice\PhpSpreadsheet\Shared\File::fileExists('zip://C:\\xamppv...')
+#1 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Reader\Xlsx.php(93): PhpOffice\PhpSpreadsheet\Shared\File::testFileNoThrow('C:\\xamppv0.002\\...', '_rels/.rels')
+#2 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\IOFactory.php(199): PhpOffice\PhpSpreadsheet\Reader\Xlsx->canRead('C:\\xamppv0.002\\...')
+#3 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(217): PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile('C:\\xamppv0.002\\...')
+#4 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php on line 61
+[30-Apr-2026 15:59:04 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_detect_encoding(): Argument #2 ($encodings) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:67
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(67): mb_detect_encoding('\xB4\xAF\x96\rW\xA0\xC0\x10Ai\xAC\x01\xA8\xB1E...', Array, true)
+#1 [internal function]: fix_encoding('\xB4\xAF\x96\rW\xA0\xC0\x10Ai\xAC\x01\xA8\xB1E...')
+#2 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(195): array_map('fix_encoding', Array)
+#3 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 67
+[30-Apr-2026 16:01:47 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class "ZipArchive" not found in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php:61
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php(174): PhpOffice\PhpSpreadsheet\Shared\File::fileExists('zip://C:\\xamppv...')
+#1 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Reader\Xlsx.php(93): PhpOffice\PhpSpreadsheet\Shared\File::testFileNoThrow('C:\\xamppv0.002\\...', '_rels/.rels')
+#2 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\IOFactory.php(199): PhpOffice\PhpSpreadsheet\Reader\Xlsx->canRead('C:\\xamppv0.002\\...')
+#3 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(217): PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile('C:\\xamppv0.002\\...')
+#4 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php on line 61
+[30-Apr-2026 16:02:30 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_detect_encoding(): Argument #2 ($encodings) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:67
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(67): mb_detect_encoding('\xB4\xAF\x96\rW\xA0\xC0\x10Ai\xAC\x01\xA8\xB1E...', Array, true)
+#1 [internal function]: fix_encoding('\xB4\xAF\x96\rW\xA0\xC0\x10Ai\xAC\x01\xA8\xB1E...')
+#2 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(195): array_map('fix_encoding', Array)
+#3 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 67
+[30-Apr-2026 16:05:55 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_detect_encoding(): Argument #2 ($encodings) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:67
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(67): mb_detect_encoding('\xB4\xAF\x96\rW\xA0\xC0\x10Ai\xAC\x01\xA8\xB1E...', Array, true)
+#1 [internal function]: fix_encoding('\xB4\xAF\x96\rW\xA0\xC0\x10Ai\xAC\x01\xA8\xB1E...')
+#2 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(195): array_map('fix_encoding', Array)
+#3 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 67
+[30-Apr-2026 16:06:12 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class "ZipArchive" not found in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php:61
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php(174): PhpOffice\PhpSpreadsheet\Shared\File::fileExists('zip://C:\\xamppv...')
+#1 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Reader\Xlsx.php(93): PhpOffice\PhpSpreadsheet\Shared\File::testFileNoThrow('C:\\xamppv0.002\\...', '_rels/.rels')
+#2 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\IOFactory.php(199): PhpOffice\PhpSpreadsheet\Reader\Xlsx->canRead('C:\\xamppv0.002\\...')
+#3 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(217): PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile('C:\\xamppv0.002\\...')
+#4 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php on line 61
+[30-Apr-2026 16:06:55 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_detect_encoding(): Argument #2 ($encodings) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:67
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(67): mb_detect_encoding('\xB4\xAF\x96\rW\xA0\xC0\x10Ai\xAC\x01\xA8\xB1E...', Array, true)
+#1 [internal function]: fix_encoding('\xB4\xAF\x96\rW\xA0\xC0\x10Ai\xAC\x01\xA8\xB1E...')
+#2 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(195): array_map('fix_encoding', Array)
+#3 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 67
+[30-Apr-2026 16:21:45 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
