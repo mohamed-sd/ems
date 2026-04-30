@@ -17,7 +17,7 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 $type = isset($_GET['type']) ? trim($_GET['type']) : '';
-if ($type !== '1' && $type !== '2') {
+if ($type !== '1' && $type !== '2' && $type !== '3') {
     echo "<option value=''>-- اختر نوع الآلية أولاً --</option>";
     exit;
 }

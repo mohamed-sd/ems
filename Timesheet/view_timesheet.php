@@ -45,9 +45,9 @@ $operation_id = isset($_GET['operation_id']) ? intval($_GET['operation_id']) : 0
 $driver_id = isset($_GET['driver_id']) ? intval($_GET['driver_id']) : 0;
 $equipment_type_raw = isset($_GET['equipment_type']) ? mysqli_real_escape_string($conn, trim($_GET['equipment_type'])) : '';
 $type_from_url = isset($_GET['type']) ? trim($_GET['type']) : '';
-$equipment_type = ($equipment_type_raw === '1' || $equipment_type_raw === '2')
+$equipment_type = ($equipment_type_raw === '1' || $equipment_type_raw === '2' || $equipment_type_raw === '3')
     ? $equipment_type_raw
-    : (($type_from_url === '1' || $type_from_url === '2') ? $type_from_url : '');
+    : (($type_from_url === '1' || $type_from_url === '2' || $type_from_url === '3') ? $type_from_url : '');
 $shift_filter = isset($_GET['shift']) ? mysqli_real_escape_string($conn, trim($_GET['shift'])) : '';
 $status_filter = isset($_GET['status']) ? mysqli_real_escape_string($conn, trim($_GET['status'])) : '';
 $export_all = isset($_GET['export_all']) && $_GET['export_all'] === '1';
@@ -114,7 +114,7 @@ if ($driver_id > 0) {
     $where_parts[] = "d.id = $driver_id";
 }
 
-if ($equipment_type === '1' || $equipment_type === '2') {
+if ($equipment_type === '1' || $equipment_type === '2' || $equipment_type === '3') {
     $where_parts[] = "t.type = '$equipment_type'";
 }
 
@@ -346,7 +346,7 @@ if ($export_all) {
         while ($row = mysqli_fetch_assoc($export_result)) {
             $total_exec_standby = floatval($row['executed_hours']) + floatval($row['standby_hours']);
             $shift_text = $row['shift'] === 'D' ? 'صباحية' : 'مسائية';
-            $equipment_type_text = $row['type'] === '1' ? 'معدات ثقيلة' : 'شاحنات';
+            $equipment_type_text = $row['type'] === '1' ? 'حفار' : ($row['type'] === '2' ? 'قلاب' : ($row['type'] === '3' ? 'خرامة' : 'غير محدد'));
             $status_text = $row['status'] === '1' ? 'قيد المراجعة' : ($row['status'] === '2' ? 'معتمد' : ($row['status'] === '3' ? 'مرفوض' : 'غير معروف'));
 
             fputcsv($out, [
@@ -517,6 +517,8 @@ include('../insidebar.php');
                         <option value="">-- اختر نوع الآلية --</option>
                         <option value="1" <?= $equipment_type === '1' ? 'selected' : '' ?>>معدات ثقيلة</option>
                         <option value="2" <?= $equipment_type === '2' ? 'selected' : '' ?>>شاحنات</option>
+                      <option value="3" <?= $equipment_type === '3' ? 'selected' : '' ?>>خرمات</option>
+
                     </select>
                 </div>
                 <div>
@@ -697,7 +699,7 @@ include('../insidebar.php');
                             }
 
                             $shift_text = $row['shift'] === 'D' ? '☀️ صباحية' : '🌙 مسائية';
-                            $equipment_type_text = $row['type'] === '1' ? 'معدات ثقيلة' : 'شاحنات';
+                            $equipment_type_text = $row['type'] === '1' ? 'حفار' : ($row['type'] === '2' ? 'قلاب' : ($row['type'] === '3' ? 'خرامة' : 'غير محدد'));
                             $total_exec_standby = floatval($row['executed_hours']) + floatval($row['standby_hours']);
 
                             echo '<tr>';
@@ -783,7 +785,7 @@ $(document).ready(function () {
         operationSelect.html("<option value=''>-- جاري تحميل الآليات... --</option>");
         driverSelect.html("<option value=''>-- اختر الآلية أولاً --</option>");
 
-        if (typeVal !== '1' && typeVal !== '2') {
+        if (typeVal !== '1' && typeVal !== '2' && typeVal !== '3') {
             operationSelect.html("<option value=''>-- اختر نوع الآلية أولاً --</option>");
             return;
         }
