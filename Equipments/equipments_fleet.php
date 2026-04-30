@@ -1157,7 +1157,8 @@ if (!empty($editData)) {
                         SELECT 
                             m.id, 
                             s.name AS supplier_name, 
-                            m.type, 
+                            m.type,
+                            et.type AS equipment_type_name,
                             m.code, 
                             m.name, 
                             m.status,
@@ -1173,6 +1174,7 @@ if (!empty($editData)) {
                             COUNT(DISTINCT d.id) AS drivers_count
                         FROM equipments m
                         JOIN suppliers s ON m.suppliers = s.id
+                        LEFT JOIN equipments_types et ON m.type = et.id
                         LEFT JOIN operations o 
                             ON o.equipment = m.id 
                             AND o.status = '1'
@@ -1199,9 +1201,23 @@ if (!empty($editData)) {
                             : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $serial . "</td>";
 
-                        // نوع المعدة
-                        $type_icon = $row['type'] == "1" ? "fa-tractor" : "fa-truck-moving";
-                        $type_text = $row['type'] == "1" ? "حفار" : "قلاب";
+                        // نوع المعدة - من جدول equipments_types
+                        $type_text = !empty($row['equipment_type_name']) ? htmlspecialchars($row['equipment_type_name']) : 'غير محدد';
+                        
+                        // تحديد الأيقونة بناءً على النوع
+                        $type_icon = "fa-tools"; // أيقونة افتراضية
+                        if (stripos($type_text, 'حفار') !== false) {
+                            $type_icon = "fa-tractor";
+                        } elseif (stripos($type_text, 'قلاب') !== false) {
+                            $type_icon = "fa-truck-moving";
+                        } elseif (stripos($type_text, 'خرامه') !== false || stripos($type_text, 'حفر') !== false) {
+                            $type_icon = "fa-drill";
+                        } elseif (stripos($type_text, 'رافعة') !== false) {
+                            $type_icon = "fa-dolly";
+                        } elseif (stripos($type_text, 'شاحنة') !== false) {
+                            $type_icon = "fa-truck";
+                        }
+                        
                         echo "<td><span class='badge-type'><i class='fas $type_icon'></i> $type_text</span></td>";
 
                         // اسم المعدة (تهيئة المتغير)

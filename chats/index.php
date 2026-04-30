@@ -588,6 +588,338 @@ $page_title = "المراسلات الداخلية";
             font-family: 'Cairo', sans-serif;
         }
 
+        /* Broadcast Button */
+        .broadcast-btn {
+            background: linear-gradient(135deg, #e8b800 0%, #d4a600 100%);
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(232, 184, 0, 0.3);
+        }
+
+        .broadcast-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(232, 184, 0, 0.4);
+        }
+
+        .broadcast-btn:active { transform: scale(0.95); }
+
+        /* Broadcast Modal */
+        .broadcast-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(12, 28, 62, 0.75);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s;
+        }
+
+        .broadcast-modal.show { display: flex; }
+
+        .broadcast-dialog {
+            background: #fff;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+            overflow: hidden;
+        }
+
+        .broadcast-header {
+            background: linear-gradient(135deg, #1b2f6e 0%, #0c1c3e 100%);
+            color: #fff;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .broadcast-header h5 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .broadcast-header h5 i { color: #e8b800; }
+
+        .broadcast-close {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .broadcast-close:hover { background: rgba(255,255,255,0.2); }
+
+        .broadcast-body {
+            padding: 24px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .broadcast-body label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .broadcast-body label i {
+            color: #e8b800;
+            margin-left: 4px;
+        }
+
+        /* Recipients Selection */
+        .recipients-type {
+            margin-bottom: 20px;
+        }
+
+        .recipients-type-options {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .type-option {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            background: #fff;
+        }
+
+        .type-option:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .type-option.active {
+            border-color: #1b2f6e;
+            background: #eff6ff;
+            color: #1b2f6e;
+        }
+
+        .type-option i {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+            color: #e8b800;
+        }
+
+        .recipients-list {
+            display: none;
+            margin-top: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+            background: #f8fafc;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+
+        .recipients-list::-webkit-scrollbar { width: 6px; }
+        .recipients-list::-webkit-scrollbar-track { background: transparent; }
+        .recipients-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+        .recipients-list.show { display: block; }
+
+        .recipients-search {
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: 'Cairo', sans-serif;
+            outline: none;
+        }
+
+        .recipients-search:focus { border-color: #1b2f6e; }
+
+        .recipient-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            margin-bottom: 4px;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .recipient-item:hover { background: #eff6ff; }
+
+        .recipient-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .recipient-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .recipient-info { flex: 1; }
+
+        .recipient-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .recipient-role {
+            font-size: 0.72rem;
+            color: #94a3b8;
+        }
+
+        .select-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .select-btn {
+            padding: 4px 12px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.15s;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .select-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .selected-count {
+            margin-top: 8px;
+            padding: 6px 10px;
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: #15803d;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        .selected-count.show { display: block; }
+
+        .broadcast-body textarea {
+            width: 100%;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 140px;
+            font-family: 'Cairo', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .broadcast-body textarea:focus { border-color: #1b2f6e; }
+
+        .broadcast-char-count {
+            text-align: left;
+            margin-top: 6px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .broadcast-footer {
+            padding: 16px 24px;
+            background: #f8fafc;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .broadcast-cancel-btn,
+        .broadcast-send-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .broadcast-cancel-btn {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .broadcast-cancel-btn:hover { background: #cbd5e1; }
+
+        .broadcast-send-btn {
+            background: linear-gradient(135deg, #1b2f6e 0%, #0c1c3e 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .broadcast-send-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(27, 47, 110, 0.3); }
+        .broadcast-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
         /* Main wrapper override to fit inside sidebar layout */
         body { display: flex; }
         .main { flex: 1; overflow: hidden; padding: 0 !important; }
@@ -604,7 +936,12 @@ $page_title = "المراسلات الداخلية";
 
         <!-- Header -->
         <div class="contacts-header">
-            <h5><i class="fas fa-comments"></i> المراسلات الداخلية</h5>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h5 style="margin: 0;"><i class="fas fa-comments"></i> المراسلات الداخلية</h5>
+                <button class="broadcast-btn" onclick="openBroadcastModal()" title="إرسال رسالة للجميع">
+                    <i class="fas fa-bullhorn"></i>
+                </button>
+            </div>
             <div class="search-box">
                 <i class="fas fa-search"></i>
                 <input type="text" id="contactSearch" placeholder="ابحث عن مستخدم...">
@@ -721,6 +1058,78 @@ $page_title = "المراسلات الداخلية";
     </div>
 </div><!-- .chat-wrapper -->
 </div><!-- .main -->
+
+<!-- ===== Broadcast Modal ===== -->
+<div class="broadcast-modal" id="broadcastModal">
+    <div class="broadcast-dialog">
+        <div class="broadcast-header">
+            <h5><i class="fas fa-bullhorn"></i> إرسال رسالة جماعية</h5>
+            <button class="broadcast-close" onclick="closeBroadcastModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="broadcast-body">
+            <!-- اختيار نوع المستلمين -->
+            <div class="recipients-type">
+                <label>
+                    <i class="fas fa-users"></i>
+                    المستلمين
+                </label>
+                <div class="recipients-type-options">
+                    <div class="type-option active" data-type="all" onclick="selectRecipientType('all')">
+                        <i class="fas fa-users"></i>
+                        الكل (<?php echo count($contacts); ?>)
+                    </div>
+                    <div class="type-option" data-type="specific" onclick="selectRecipientType('specific')">
+                        <i class="fas fa-user-check"></i>
+                        تحديد مستخدمين
+                    </div>
+                </div>
+            </div>
+
+            <!-- قائمة المستخدمين -->
+            <div class="recipients-list" id="recipientsList">
+                <div class="select-actions">
+                    <button class="select-btn" onclick="selectAllRecipients()"><i class="fas fa-check-double"></i> تحديد الكل</button>
+                    <button class="select-btn" onclick="deselectAllRecipients()"><i class="fas fa-times"></i> إلغاء الكل</button>
+                </div>
+                <input type="text" class="recipients-search" id="recipientsSearch" placeholder="ابحث عن مستخدم...">
+                <div id="recipientsContainer">
+                    <?php foreach ($contacts as $contact): ?>
+                        <div class="recipient-item" data-name="<?php echo htmlspecialchars($contact['name']); ?>" data-role="<?php echo htmlspecialchars($contact['role_name']); ?>" onclick="toggleRecipient(<?php echo $contact['id']; ?>)">
+                            <input type="checkbox" value="<?php echo $contact['id']; ?>" class="recipient-checkbox" onclick="event.stopPropagation();">
+                            <div class="recipient-avatar" style="background: <?php echo htmlspecialchars($contact['role_color']); ?>">
+                                <?php echo htmlspecialchars($contact['avatar']); ?>
+                            </div>
+                            <div class="recipient-info">
+                                <div class="recipient-name"><?php echo htmlspecialchars($contact['name']); ?></div>
+                                <div class="recipient-role"><?php echo htmlspecialchars($contact['role_name']); ?></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="selected-count" id="selectedCount">تم تحديد 0 مستخدم</div>
+            </div>
+
+            <!-- الرسالة -->
+            <label style="margin-top: 20px;">
+                <i class="fas fa-envelope"></i>
+                الرسالة
+            </label>
+            <textarea id="broadcastMessage" placeholder="اكتب رسالتك هنا..."></textarea>
+            <div class="broadcast-char-count">
+                <span id="broadcastCharCount">0</span> / 2000 حرف
+            </div>
+        </div>
+        <div class="broadcast-footer">
+            <button class="broadcast-cancel-btn" onclick="closeBroadcastModal()">إلغاء</button>
+            <button class="broadcast-send-btn" id="broadcastSendBtn" onclick="sendBroadcast()">
+                <i class="fas fa-paper-plane"></i>
+                إرسال
+            </button>
+        </div>
+    </div>
+</div>
 
 <script>
 (function() {
@@ -1051,6 +1460,19 @@ $page_title = "المراسلات الداخلية";
         setTimeout(function() { if (toast.parentNode) toast.remove(); }, 4000);
     }
 
+    // دالة إظهار إشعار بسيط
+    function simpleToast(msg, icon) {
+        var old = document.getElementById('chatToast');
+        if (old) old.remove();
+        var toast = document.createElement('div');
+        toast.id = 'chatToast';
+        toast.className = 'chat-toast';
+        var iconHtml = icon || 'fas fa-info-circle';
+        toast.innerHTML = '<i class="' + iconHtml + '"></i><div>' + escapeHtml(msg) + '</div>';
+        document.body.appendChild(toast);
+        setTimeout(function() { if (toast.parentNode) toast.remove(); }, 4000);
+    }
+
     // ===== فلترة جهات الاتصال بالقسم =====
     document.querySelectorAll('.dept-tab').forEach(function(tab) {
         tab.addEventListener('click', function() {
@@ -1098,6 +1520,165 @@ $page_title = "المراسلات الداخلية";
             openConversation(targetEl);
         }
     }
+
+    // ===== Broadcast Modal Functions =====
+    window.openBroadcastModal = function() {
+        document.getElementById('broadcastModal').classList.add('show');
+        document.getElementById('broadcastMessage').value = '';
+        document.getElementById('broadcastCharCount').textContent = '0';
+        // إعادة تعيين نوع المستلمين للكل
+        selectRecipientType('all');
+        document.getElementById('broadcastMessage').focus();
+    };
+
+    window.closeBroadcastModal = function() {
+        document.getElementById('broadcastModal').classList.remove('show');
+    };
+
+    // عداد الأحرف
+    document.getElementById('broadcastMessage').addEventListener('input', function() {
+        var len = this.value.length;
+        document.getElementById('broadcastCharCount').textContent = len;
+        if (len > 2000) {
+            this.value = this.value.substring(0, 2000);
+            document.getElementById('broadcastCharCount').textContent = '2000';
+        }
+    });
+
+    // إغلاق Modal عند الضغط خارجها
+    document.getElementById('broadcastModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeBroadcastModal();
+        }
+    });
+
+    // اختيار نوع المستلمين
+    window.selectRecipientType = function(type) {
+        document.querySelectorAll('.type-option').forEach(function(el) {
+            el.classList.remove('active');
+        });
+        document.querySelector('.type-option[data-type="' + type + '"]').classList.add('active');
+        
+        if (type === 'specific') {
+            document.getElementById('recipientsList').classList.add('show');
+        } else {
+            document.getElementById('recipientsList').classList.remove('show');
+        }
+    };
+
+    // تحديد جميع المستخدمين
+    window.selectAllRecipients = function() {
+        document.querySelectorAll('.recipient-checkbox').forEach(function(cb) {
+            cb.checked = true;
+        });
+        updateSelectedCount();
+    };
+
+    // إلغاء تحديد الكل
+    window.deselectAllRecipients = function() {
+        document.querySelectorAll('.recipient-checkbox').forEach(function(cb) {
+            cb.checked = false;
+        });
+        updateSelectedCount();
+    };
+
+    // تبديل تحديد مستخدم
+    window.toggleRecipient = function(id) {
+        var cb = document.querySelector('.recipient-checkbox[value="' + id + '"]');
+        if (cb) {
+            cb.checked = !cb.checked;
+            updateSelectedCount();
+        }
+    };
+
+    // تحديث عدد المستخدمين المحددين
+    function updateSelectedCount() {
+        var count = document.querySelectorAll('.recipient-checkbox:checked').length;
+        var countEl = document.getElementById('selectedCount');
+        if (count > 0) {
+            countEl.textContent = 'تم تحديد ' + count + ' مستخدم';
+            countEl.classList.add('show');
+        } else {
+            countEl.classList.remove('show');
+        }
+    }
+
+    // البحث في المستخدمين
+    document.getElementById('recipientsSearch').addEventListener('input', function() {
+        var q = this.value.trim().toLowerCase();
+        document.querySelectorAll('.recipient-item').forEach(function(item) {
+            var name = item.getAttribute('data-name').toLowerCase();
+            var role = item.getAttribute('data-role').toLowerCase();
+            item.style.display = (!q || name.indexOf(q) !== -1 || role.indexOf(q) !== -1) ? '' : 'none';
+        });
+    });
+
+    // تحديث العداد عند تغيير الـ checkboxes
+    document.querySelectorAll('.recipient-checkbox').forEach(function(cb) {
+        cb.addEventListener('change', updateSelectedCount);
+    });
+
+    // إرسال الرسالة الجماعية
+    window.sendBroadcast = function() {
+        var textarea = document.getElementById('broadcastMessage');
+        var msg = textarea.value.trim();
+        if (!msg) {
+            simpleToast('الرجاء كتابة رسالة أولاً', 'fas fa-exclamation-circle');
+            return;
+        }
+
+        // جمع المستلمين
+        var recipientType = document.querySelector('.type-option.active').getAttribute('data-type');
+        var recipients = [];
+        
+        if (recipientType === 'specific') {
+            document.querySelectorAll('.recipient-checkbox:checked').forEach(function(cb) {
+                recipients.push(cb.value);
+            });
+            
+            if (recipients.length === 0) {
+                simpleToast('الرجاء تحديد مستلم واحد على الأقل', 'fas fa-exclamation-circle');
+                return;
+            }
+        }
+
+        var btn = document.getElementById('broadcastSendBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'send_broadcast.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال';
+            try {
+                var data = JSON.parse(xhr.responseText);
+                if (data.success) {
+                    simpleToast(data.message, 'fas fa-check-circle');
+                    closeBroadcastModal();
+                    // تحديث قائمة جهات الاتصال
+                    setTimeout(function() { location.reload(); }, 1500);
+                } else {
+                    simpleToast(data.message || 'فشل في إرسال الرسائل', 'fas fa-exclamation-triangle');
+                }
+            } catch(e) {
+                simpleToast('حدث خطأ غير متوقع', 'fas fa-exclamation-triangle');
+                console.error('Broadcast error:', e);
+            }
+        };
+        xhr.onerror = function() {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال';
+            simpleToast('فشل الاتصال بالخادم', 'fas fa-exclamation-triangle');
+        };
+        
+        var params = 'message=' + encodeURIComponent(msg);
+        if (recipientType === 'specific') {
+            params += '&recipients=' + encodeURIComponent(JSON.stringify(recipients));
+        }
+        xhr.send(params);
+    };
 })();
 </script>
 </body>

@@ -94,6 +94,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         font-size: 0.85rem;
         display: inline-block;
     }
+
+    .badge-drill {
+        background-color: #9333ea;
+        color: #fff;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
+
+    .badge-default {
+        background-color: #6b7280;
+        color: #fff;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
 </style>
 
 <div class="main">
@@ -144,6 +164,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <option value="">-- اختر الفئة --</option>
                             <option value="1"  <?= (!empty($editData) && $editData['form'] === '1') ? 'selected' : ''; ?>> معدات ثقيلة </option>
                             <option value="2" <?= (!empty($editData) && $editData['form'] === '2') ? 'selected' : ''; ?>> شاحنات </option>
+                            <option value="3" <?= (!empty($editData) && $editData['form'] === '3') ? 'selected' : ''; ?>> خرمات </option>
+
                         </select>
                     </div>
                     <div>                           
@@ -203,9 +225,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <tr>
                                 <td><?= $i++; ?></td>
                                 <td>
-                                   <?= $row['form'] === '1'
-                                    ? "<span class='badge-heavy'>معدات ثقيلة</span>"
-                                    : "<span class='badge-truck'>شاحنات</span>"; ?>
+                                   <?php
+                                   $form_badges = [
+                                       '1' => ['class' => 'badge-heavy', 'icon' => 'fa-tractor', 'text' => 'معدات ثقيلة'],
+                                       '2' => ['class' => 'badge-truck', 'icon' => 'fa-truck-moving', 'text' => 'شاحنات'],
+                                       '3' => ['class' => 'badge-drill', 'icon' => 'fa-drill', 'text' => 'خرمات']
+                                   ];
+                                   
+                                   $form_value = $row['form'];
+                                   if (isset($form_badges[$form_value])) {
+                                       $badge = $form_badges[$form_value];
+                                       echo "<span class='{$badge['class']}'><i class='fas {$badge['icon']}'></i> {$badge['text']}</span>";
+                                   } else {
+                                       echo "<span class='badge-default'><i class='fas fa-question'></i> غير محدد</span>";
+                                   }
+                                   ?>
                                 </td>
                                 <td><?= htmlspecialchars($row['type'], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td>

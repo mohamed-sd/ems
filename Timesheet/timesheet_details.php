@@ -1010,6 +1010,96 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
     </div>
 
+    <!-- ============================= 8. الأطنان والنقلات (النوع 2 فقط) ============================= -->
+    <?php if(isset($row['type']) && $row['type'] == '2'): ?>
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-truck-loading"></i></div>
+            <h4>الأطنان والنقلات</h4>
+        </div>
+        <div class="cards-grid grid-2">
+
+            <!-- عدد الأطنان -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon success"><i class="fas fa-weight-hanging"></i></div>
+                    <span class="detail-card-title">عدد الأطنان</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-balance-scale"></i> الأطنان</span>
+                        <span class="detail-value">
+                            <span class="chip-success"><?php echo htmlspecialchars($row['tons_count'] ? number_format($row['tons_count'], 2) : '0.00'); ?> طن</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- عدد النقلات -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon info"><i class="fas fa-truck"></i></div>
+                    <span class="detail-card-title">عدد النقلات</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-road"></i> النقلات</span>
+                        <span class="detail-value">
+                            <span class="chip-info"><?php echo htmlspecialchars($row['trips_count'] ? $row['trips_count'] : '0'); ?> نقلة</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- ============================= 9. الأمتار (النوع 3 فقط) ============================= -->
+    <?php if(isset($row['type']) && $row['type'] == '3'): ?>
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-ruler-vertical"></i></div>
+            <h4>الأمتار</h4>
+        </div>
+        <div class="cards-grid grid-2">
+
+            <!-- نوع الأمتار -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon warning"><i class="fas fa-tools"></i></div>
+                    <span class="detail-card-title">نوع الأمتار</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-cog"></i> النوع</span>
+                        <span class="detail-value">
+                            <span class="chip-warning"><?php echo htmlspecialchars($row['meters_type'] ? $row['meters_type'] : 'غير محدد'); ?></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- عدد الأمتار -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon primary"><i class="fas fa-ruler-combined"></i></div>
+                    <span class="detail-card-title">عدد الأمتار</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-ruler"></i> الأمتار</span>
+                        <span class="detail-value">
+                            <span class="chip-primary"><?php echo htmlspecialchars($row['meters_count'] ? number_format($row['meters_count'], 2) : '0.00'); ?> متر</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <?php endif; ?>
+
 <?php } ?>
 
 </div><!-- end .main -->
