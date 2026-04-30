@@ -1791,3 +1791,9 @@ Stack trace:
 #3 {main}
   thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 67
 [30-Apr-2026 16:21:45 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[30-Apr-2026 17:19:52 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[30-Apr-2026 17:20:08 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[30-Apr-2026 17:20:19 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[30-Apr-2026 17:23:57 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[30-Apr-2026 17:25:20 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[30-Apr-2026 17:25:46 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823

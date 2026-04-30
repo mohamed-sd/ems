@@ -104,16 +104,30 @@ if ($is_admin) {
         WHERE tf.timesheet_id = t.id AND tf.approval_level = 4 AND tf.status = 1
     )";
 } elseif ($my_level >= 1 && $my_level <= 3) {
+    // كل مستوى يرى السجلات التي وصلت إليه (اعتمدها هو أو أي شخص في مستواه)
+    // وتبقى مرئية حتى يكتمل الاعتماد النهائي (المستوى 4)
     $my_followup_where = "EXISTS (
         SELECT 1 FROM timesheet_approvals tm
         WHERE tm.timesheet_id = t.id
           AND tm.approval_level = $my_level
-          AND tm.approved_by = $user_id
           AND tm.status = 1
     ) AND NOT EXISTS (
         SELECT 1 FROM timesheet_approvals tn
         WHERE tn.timesheet_id = t.id
-          AND tn.approval_level = $next_level
+          AND tn.approval_level = 4
+          AND tn.status = 1
+    )";
+} elseif ($my_level === 4) {
+    // المستوى الرابع: يرى السجلات التي وصلت إليه ولم يعتمدها بعد
+    $my_followup_where = "EXISTS (
+        SELECT 1 FROM timesheet_approvals tm
+        WHERE tm.timesheet_id = t.id
+          AND tm.approval_level = 3
+          AND tm.status = 1
+    ) AND NOT EXISTS (
+        SELECT 1 FROM timesheet_approvals tn
+        WHERE tn.timesheet_id = t.id
+          AND tn.approval_level = 4
           AND tn.status = 1
     )";
 }
@@ -218,6 +232,27 @@ sort($filter_projects_final);
 sort($filter_suppliers_final);
 sort($filter_drivers_final);
 sort($filter_equips_final);
+
+// بناء خريطة الاعتمادات لكل سجل (استعلام واحد لكل السجلات)
+$approvals_map = array();
+$_all_ts_ids = array();
+foreach ($followup_rows as $_r) { $_all_ts_ids[] = intval($_r['id']); }
+foreach ($final_rows   as $_r) { $_all_ts_ids[] = intval($_r['id']); }
+$_all_ts_ids = array_values(array_unique($_all_ts_ids));
+if (!empty($_all_ts_ids)) {
+    $_ids_sql = implode(',', $_all_ts_ids);
+    $_app_res = $conn->query("SELECT timesheet_id, approval_level, approved_by_name, approved_at
+                               FROM timesheet_approvals
+                               WHERE timesheet_id IN ($_ids_sql) AND status = 1");
+    if ($_app_res) {
+        while ($_app_row = $_app_res->fetch_assoc()) {
+            $approvals_map[intval($_app_row['timesheet_id'])][intval($_app_row['approval_level'])] = array(
+                'name' => $_app_row['approved_by_name'],
+                'at'   => $_app_row['approved_at'],
+            );
+        }
+    }
+}
 
 // قائمة الأعمدة المتاحة للتعليق (مطابقة لشاشة الاعتماد الرئيسية)
 $column_labels = array(
@@ -401,6 +436,75 @@ body { background: var(--ha-bg); }
   margin-right: 4px;
 }
 
+/* دوائر مسار الاعتماد */
+.approval-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  direction: ltr;
+}
+.approval-track .ap-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+.approval-track .ap-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: -13px;
+  width: 13px;
+  height: 2px;
+  background: #cbd5e1;
+  z-index: 0;
+}
+.approval-track .ap-step:not(:last-child).done::after {
+  background: #16a34a;
+}
+.ap-circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .65rem;
+  font-weight: 800;
+  cursor: default;
+  position: relative;
+  z-index: 1;
+  border: 2px solid #cbd5e1;
+  background: #f1f5f9;
+  color: #94a3b8;
+  transition: all .2s;
+}
+.ap-circle.done {
+  border-color: #16a34a;
+  background: #16a34a;
+  color: #fff;
+}
+.ap-circle .ap-lbl {
+  font-size: .55rem;
+  font-weight: 700;
+  margin-top: 2px;
+  color: #64748b;
+  white-space: nowrap;
+}
+.ap-step-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.ap-connector {
+  width: 14px;
+  height: 2px;
+  background: #cbd5e1;
+}
+.ap-connector.done {
+  background: #16a34a;
+}
+
 .modal-content { border-radius: 12px; }
 .note-item {
   border: 1px solid #e2e8f0;
@@ -528,8 +632,7 @@ body { background: var(--ha-bg); }
             <th>المشغل</th>
             <th>ساعات منفذة</th>
             <th>إجمالي العمل</th>
-            <th>تم اعتماده منك</th>
-            <th>آخر مستوى وصل له</th>
+            <th>مسار الاعتماد</th>
             <th>ملاحظات</th>
             <th>تفاصيل</th>
           </tr>
@@ -553,8 +656,31 @@ body { background: var(--ha-bg); }
             <td><?= htmlspecialchars($row['driver_name'] ?? '—') ?></td>
             <td><?= floatval($row['executed_hours'] ?? 0) ?></td>
             <td><strong><?= floatval($row['total_work_hours'] ?? 0) ?></strong></td>
-            <td><?= !empty($row['my_approved_at']) ? date('Y-m-d H:i', strtotime($row['my_approved_at'])) : '—' ?></td>
-            <td><span class="lvl-pill">L<?= $_max ?></span></td>
+            <td>
+              <?php
+                $_ts_id  = intval($row['id']);
+                $_ap_levels = array(
+                  1 => array('label'=>'L1','title'=>'مدير المشاريع'),
+                  2 => array('label'=>'L2','title'=>'مدير الموردين'),
+                  3 => array('label'=>'L3','title'=>'مدير الأسطول'),
+                  4 => array('label'=>'L4','title'=>'مدير المشغلين'),
+                );
+              ?>
+              <div class="approval-track">
+                <?php foreach ($_ap_levels as $_lv => $_linfo): ?>
+                  <?php if ($_lv > 1): ?><div class="ap-connector <?= isset($approvals_map[$_ts_id][$_lv - 1]) ? 'done' : '' ?>"></div><?php endif; ?>
+                  <?php
+                    $_is_done   = isset($approvals_map[$_ts_id][$_lv]);
+                    $_tip_name  = $_is_done ? htmlspecialchars($approvals_map[$_ts_id][$_lv]['name']) : 'لم يعتمد بعد';
+                    $_tip_at    = $_is_done ? date('Y-m-d H:i', strtotime($approvals_map[$_ts_id][$_lv]['at'])) : '';
+                    $_tooltip   = $_linfo['title'] . ': ' . $_tip_name . ($_tip_at ? ' — ' . $_tip_at : '');
+                  ?>
+                  <div class="ap-circle <?= $_is_done ? 'done' : '' ?>" title="<?= $_tooltip ?>">
+                    <?= $_is_done ? '<i class="fa fa-check" style="font-size:.6rem"></i>' : $_linfo['label'] ?>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            </td>
             <td>
               <button class="note-btn" onclick="openNotes(<?= intval($row['id']) ?>)">
                 <i class="fa fa-comment"></i>
