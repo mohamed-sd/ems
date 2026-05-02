@@ -94,6 +94,14 @@ if ($is_site_manager) {
     }
 }
 
+// فلتر نوع المعدة: 0=الكل، 1=حفارات، 2=قلابات، 3=خرامات
+$equip_type_filter = intval($_GET['equip_type'] ?? 0);
+if (!in_array($equip_type_filter, [0, 1, 2, 3], true)) {
+    $equip_type_filter = 0;
+}
+$equip_type_where = ($equip_type_filter > 0) ? " AND e.type = $equip_type_filter" : '';
+$equip_type_label = ($equip_type_filter === 1) ? 'حفارات' : (($equip_type_filter === 2) ? 'قلابات' : (($equip_type_filter === 3) ? 'خرامات' : 'الكل'));
+
 $my_followup_where = '1=0';
 if ($is_admin) {
     $my_followup_where = "EXISTS (
@@ -137,6 +145,7 @@ $followup_sql = "
            d.name AS driver_name,
            e.code AS equip_code,
            e.name AS equip_name,
+           e.type AS equip_type,
            s.name AS supplier_name,
            p.name AS project_name,
            (SELECT COUNT(*) FROM timesheet_approval_notes n WHERE n.timesheet_id = t.id AND n.status = 1) AS notes_count,
@@ -154,6 +163,7 @@ $followup_sql = "
       AND $my_followup_where
       $company_scope_ts
       $site_scope_ts
+      $equip_type_where
     ORDER BY COALESCE(my_approved_at, t.date) DESC, t.id DESC
     LIMIT 700
 ";
@@ -171,6 +181,7 @@ $final_sql = "
            d.name AS driver_name,
            e.code AS equip_code,
            e.name AS equip_name,
+           e.type AS equip_type,
            s.name AS supplier_name,
            p.name AS project_name,
            ta_final.approved_by_name AS final_approver,
@@ -189,6 +200,7 @@ $final_sql = "
     WHERE t.status = 1
       $company_scope_ts
       $site_scope_ts
+      $equip_type_where
     ORDER BY ta_final.approved_at DESC
     LIMIT 250
 ";
@@ -548,6 +560,27 @@ body { background: var(--ha-bg); }
     </div>
   </div>
 
+  <div class="toolbar-row mb-3">
+    <form method="get" class="d-flex align-items-center gap-2">
+      <label for="equip_type" class="fw-semibold mb-0">نوع المعدة:</label>
+      <select name="equip_type" id="equip_type" class="form-select form-select-sm" style="max-width:200px;">
+        <option value="0" <?= $equip_type_filter === 0 ? 'selected' : '' ?>>الكل</option>
+        <option value="1" <?= $equip_type_filter === 1 ? 'selected' : '' ?>>حفارات</option>
+        <option value="2" <?= $equip_type_filter === 2 ? 'selected' : '' ?>>قلابات</option>
+        <option value="3" <?= $equip_type_filter === 3 ? 'selected' : '' ?>>خرامات</option>
+      </select>
+      <button type="submit" class="btn btn-sm btn-primary fw-semibold">
+        <i class="fa fa-filter me-1"></i> تطبيق الفلتر
+      </button>
+      <?php if ($equip_type_filter > 0): ?>
+        <a href="?" class="btn btn-sm btn-outline-secondary">
+          <i class="fa fa-times me-1"></i> إلغاء الفلتر
+        </a>
+      <?php endif; ?>
+      <span class="badge bg-info ms-2">عرض: <?= htmlspecialchars($equip_type_label) ?></span>
+    </form>
+  </div>
+
   <div class="quick-stats">
     <div class="quick-stat">
       <div class="label">سجلات قيد المتابعة</div>
@@ -568,6 +601,15 @@ body { background: var(--ha-bg); }
   </div>
 
   <div class="filters-wrap">
+    <div class="fg">
+      <label>نوع المعدة</label>
+      <select id="f-equipment-type">
+        <option value="">الكل</option>
+        <option value="1">حفارات</option>
+        <option value="2">قلابات</option>
+        <option value="3">خرامات</option>
+      </select>
+    </div>
     <div class="fg">
       <label>فلتر المشروع (قيد المتابعة)</label>
       <select id="f-project">
@@ -646,6 +688,7 @@ body { background: var(--ha-bg); }
               data-supplier="<?= htmlspecialchars($row['supplier_name'] ?? '') ?>"
               data-driver="<?= htmlspecialchars($row['driver_name'] ?? '') ?>"
               data-equip="<?= htmlspecialchars($_equip) ?>"
+              data-type="<?= intval($row['equip_type'] ?? 0) ?>"
               data-date="<?= htmlspecialchars($row['date'] ?? '') ?>"
               data-id="<?= intval($row['id']) ?>">
             <td><?= $idx++ ?></td>
@@ -705,6 +748,15 @@ body { background: var(--ha-bg); }
     <h5 class="card-title"><i class="fa fa-check-circle text-success"></i> سجلات مكتملة الاعتماد النهائي</h5>
 
     <div class="filters-wrap" style="margin-bottom: 12px;">
+      <div class="fg">
+        <label>نوع المعدة</label>
+        <select id="ff-equipment-type">
+          <option value="">الكل</option>
+          <option value="1">حفارات</option>
+          <option value="2">قلابات</option>
+          <option value="3">خرامات</option>
+        </select>
+      </div>
       <div class="fg">
         <label>فلتر المشروع (الاعتماد النهائي)</label>
         <select id="ff-project">
@@ -780,6 +832,7 @@ body { background: var(--ha-bg); }
               data-supplier="<?= htmlspecialchars($row['supplier_name'] ?? '') ?>"
               data-driver="<?= htmlspecialchars($row['driver_name'] ?? '') ?>"
               data-equip="<?= htmlspecialchars($_equip) ?>"
+              data-type="<?= intval($row['equip_type'] ?? 0) ?>"
               data-date="<?= htmlspecialchars($row['date'] ?? '') ?>"
               data-id="<?= intval($row['id']) ?>">
             <td><?= $idx++ ?></td>
@@ -875,6 +928,7 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
   var s = '';
   var d = '';
   var e = '';
+  var equipType = '';
   var fromVal = '';
   var toVal = '';
 
@@ -883,6 +937,7 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
     s = $('#f-supplier').val();
     d = $('#f-driver').val();
     e = $('#f-equip').val();
+    equipType = $('#f-equipment-type').val();
     fromVal = $('#f-date-from').val();
     toVal = $('#f-date-to').val();
   } else if (id === 'tbl-final') {
@@ -890,6 +945,7 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
     s = $('#ff-supplier').val();
     d = $('#ff-driver').val();
     e = $('#ff-equip').val();
+    equipType = $('#ff-equipment-type').val();
     fromVal = $('#ff-date-from').val();
     toVal = $('#ff-date-to').val();
   }
@@ -898,6 +954,7 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
   if (s && String($tr.data('supplier') || '') !== s) return false;
   if (d && String($tr.data('driver') || '') !== d) return false;
   if (e && String($tr.data('equip') || '') !== e) return false;
+  if (equipType && String($tr.data('type') || '') !== equipType) return false;
 
   if (fromVal || toVal) {
     var rowDate = normalizeDateValue($tr.data('date'));
@@ -922,11 +979,11 @@ $(function() {
   dtFollow = $('#tbl-followup').DataTable(opts);
   dtFinal = $('#tbl-final').DataTable(opts);
 
-  $('#f-project, #f-supplier, #f-driver, #f-equip, #f-date-from, #f-date-to').on('change', function(){
+  $('#f-project, #f-supplier, #f-driver, #f-equip, #f-equipment-type, #f-date-from, #f-date-to').on('change', function(){
     applyFollowupFilters();
   });
 
-  $('#ff-project, #ff-supplier, #ff-driver, #ff-equip, #ff-date-from, #ff-date-to').on('change', function(){
+  $('#ff-project, #ff-supplier, #ff-driver, #ff-equip, #ff-equipment-type, #ff-date-from, #ff-date-to').on('change', function(){
     applyFinalFilters();
   });
 });
@@ -936,6 +993,7 @@ function applyFollowupFilters() {
 }
 
 function resetFollowupFilters() {
+  $('#f-equipment-type').val('');
   $('#f-project').val('');
   $('#f-supplier').val('');
   $('#f-driver').val('');
@@ -950,6 +1008,7 @@ function applyFinalFilters() {
 }
 
 function resetFinalFilters() {
+  $('#ff-equipment-type').val('');
   $('#ff-project').val('');
   $('#ff-supplier').val('');
   $('#ff-driver').val('');

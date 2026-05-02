@@ -25,11 +25,11 @@ $session_proj   = intval($_SESSION['user']['project_id'] ?? 0);
 $session_mine   = intval($_SESSION['user']['mine_id']    ?? 0);
 
 $equip_type_filter = intval($_GET['equip_type'] ?? 0);
-if (!in_array($equip_type_filter, [0, 1, 2], true)) {
+if (!in_array($equip_type_filter, [0, 1, 2, 3], true)) {
   $equip_type_filter = 0;
 }
 $equip_type_where = ($equip_type_filter > 0) ? " AND e.type = $equip_type_filter" : '';
-$equip_type_label = ($equip_type_filter === 1) ? 'حفارات' : (($equip_type_filter === 2) ? 'قلابات' : 'الكل');
+$equip_type_label = ($equip_type_filter === 1) ? 'حفارات' : (($equip_type_filter === 2) ? 'قلابات' : (($equip_type_filter === 3) ? 'خرامات' : 'الكل'));
 
 // role 5 = مدير الموقع (عرض فقط مقيّد بمشروعه ومنجمه)
 $is_site_manager = ($role === '5');
@@ -860,6 +860,7 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
         <option value="0" <?= $equip_type_filter === 0 ? 'selected' : '' ?>>الكل</option>
         <option value="1" <?= $equip_type_filter === 1 ? 'selected' : '' ?>>حفارات</option>
         <option value="2" <?= $equip_type_filter === 2 ? 'selected' : '' ?>>قلابات</option>
+        <option value="3" <?= $equip_type_filter === 3 ? 'selected' : '' ?>>خرامات</option>
       </select>
       <button type="submit" class="btn btn-sm btn-primary fw-semibold">
         <i class="fa fa-filter me-1"></i> تطبيق الفلتر
