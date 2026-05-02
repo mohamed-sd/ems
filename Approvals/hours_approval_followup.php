@@ -683,7 +683,7 @@ body { background: var(--ha-bg); }
             </td>
             <td>
               <button class="note-btn" onclick="openNotes(<?= intval($row['id']) ?>)">
-                <i class="fa fa-comment"></i>
+                <i class="fa fa-comment" <?php if (intval($row['notes_count']) > 0): ?>style="color:#ffaa33;"<?php endif; ?>></i>
                 <?php if (intval($row['notes_count']) > 0): ?>
                 <span class="note-badge"><?= intval($row['notes_count']) ?></span>
                 <?php endif; ?>
@@ -793,7 +793,7 @@ body { background: var(--ha-bg); }
             <td><?= !empty($row['final_approved_at']) ? date('Y-m-d H:i', strtotime($row['final_approved_at'])) : '—' ?></td>
             <td>
               <button class="note-btn" onclick="openNotes(<?= intval($row['id']) ?>)">
-                <i class="fa fa-comment"></i>
+                <i class="fa fa-comment" <?php if (intval($row['notes_count']) > 0): ?>style="color:#ffaa33;"<?php endif; ?>></i>
                 <?php if (intval($row['notes_count']) > 0): ?>
                 <span class="note-badge"><?= intval($row['notes_count']) ?></span>
                 <?php endif; ?>

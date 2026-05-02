@@ -803,20 +803,24 @@ include('../insidebar.php');
                 </a>
                 <a href="javascript:void(0)" id="openImportModal" class="add-btn"
                     style="background:linear-gradient(135deg,#064e3b,#065f46);color:#fff;border-color:transparent;">
-                    <i class="fas fa-file-excel"></i> استيراد من Excel
+                    <i class="fas fa-file-upload"></i> استيراد من Excel
                 </a>
             <?php else: ?>
                 <button class="add-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
                     <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحيات)
                 </button>
             <?php endif; ?>
-            <a href="download_clients_template.php" class="add-btn"
-                style="background:linear-gradient(135deg,var(--orange),#f59e0b);color:#fff;border-color:transparent;">
-                <i class="fas fa-download"></i> تحميل نموذج Excel
+            <!-- تصدير البيانات الحالية إلى Excel -->
+            <a href="export_clients_excel.php" class="add-btn"
+                style="background:linear-gradient(135deg,#1a6e3c,#2d9656);color:#fff;border-color:transparent;"
+                title="تصدير جميع العملاء إلى ملف Excel">
+                <i class="fas fa-file-excel"></i> تصدير إلى Excel
             </a>
-            <a href="download_clients_template_csv.php" class="add-btn"
-                style="background:linear-gradient(135deg,var(--blue),#3b82f6);color:#fff;border-color:transparent;">
-                <i class="fas fa-file-csv"></i> تحميل نموذج CSV
+            <!-- تحميل نموذج فارغ للاستيراد -->
+            <a href="download_clients_template.php" class="add-btn"
+                style="background:linear-gradient(135deg,var(--orange),#f59e0b);color:#fff;border-color:transparent;"
+                title="تحميل نموذج Excel فارغ للاستيراد">
+                <i class="fas fa-download"></i> نموذج الاستيراد
             </a>
         </div>
     </div>
@@ -1108,41 +1112,56 @@ include('../insidebar.php');
 
 <!-- ══ Modal استيراد من Excel ════════════════════════════════════════════════ -->
 <div id="importExcelModal" class="modal">
-    <div class="modal-content" style="max-width: 600px;">
+    <div class="modal-content" style="max-width: 620px;">
         <div class="modal-header">
-            <h5><i class="fas fa-file-excel"></i> استيراد عملاء من Excel</h5>
+            <h5><i class="fas fa-file-upload"></i> استيراد عملاء من Excel / CSV</h5>
             <button class="close-modal" onclick="closeImportModal()">&times;</button>
         </div>
         <form id="importExcelForm" enctype="multipart/form-data">
             <div class="modal-body">
-                <div style="background:var(--blue-soft);border:1px solid rgba(37,99,235,.18);padding:16px 18px;border-radius:var(--radius);margin-bottom:18px;">
-                    <h6 style="color:var(--blue);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                        <i class="fas fa-info-circle"></i> تعليمات الاستيراد:
-                    </h6>
-                    <ul style="color:var(--navy);line-height:2;margin:0;padding-right:20px;font-size:.82rem;">
-                        <li>قم بتحميل نموذج Excel أو CSV أولاً</li>
-                        <li>املأ البيانات حسب الأعمدة المحددة</li>
-                        <li>كود العميل يجب أن يكون فريداً</li>
-                        <li>الحقول المطلوبة: كود العميل، اسم العميل، الحالة</li>
-                        <li>صيغة الملف المدعومة: .xlsx, .xls, .csv</li>
-                        <li><strong>ملاحظة:</strong> إذا لم تكن مكتبة PhpSpreadsheet مثبتة، استخدم ملف CSV</li>
-                    </ul>
-                </div>
-
-                <div class="form-group-modal">
-                    <label><i class="fas fa-file-upload"></i> اختر ملف Excel أو CSV (.xlsx, .xls, .csv) *</label>
-                    <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" required
-                        style="padding:14px;border:2px dashed rgba(22,163,74,.4);border-radius:var(--radius);background:rgba(22,163,74,.04);cursor:pointer;width:100%;transition:border-color var(--ease);">
-                </div>
-
-                <div id="importProgress" style="display: none; margin-top: 18px;">
-                    <div style="background:var(--blue-soft);border-radius:var(--radius);padding:16px;text-align:center;border:1px solid rgba(37,99,235,.18);">
-                        <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:var(--blue);"></i>
-                        <p style="margin:10px 0 0;color:var(--blue);font-weight:700;">جاري الاستيراد...</p>
+                <!-- معلومات الحقول -->
+                <div style="background:#eef6ff;border:1px solid #bfdbfe;padding:14px 16px;border-radius:8px;margin-bottom:16px;font-size:.82rem;">
+                    <div style="font-weight:700;color:#1e3a5f;margin-bottom:8px;font-size:.88rem;">
+                        <i class="fas fa-table" style="color:#2563eb;"></i> &nbsp;ترتيب الأعمدة في الملف:
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px 16px;color:#374151;">
+                        <div><span style="color:#dc2626;font-weight:700;">A</span> — كود العميل <span style="color:#dc2626;">(مطلوب)</span></div>
+                        <div><span style="color:#dc2626;font-weight:700;">B</span> — اسم العميل <span style="color:#dc2626;">(مطلوب)</span></div>
+                        <div><span style="color:#6b7280;">C</span> — نوع الكيان</div>
+                        <div><span style="color:#6b7280;">D</span> — تصنيف القطاع</div>
+                        <div><span style="color:#6b7280;">E</span> — رقم الهاتف</div>
+                        <div><span style="color:#6b7280;">F</span> — البريد الإلكتروني</div>
+                        <div><span style="color:#6b7280;">G</span> — واتساب</div>
+                        <div><span style="color:#6b7280;">H</span> — الحالة (نشط / متوقف)</div>
+                    </div>
+                    <div style="margin-top:10px;padding-top:8px;border-top:1px solid #bfdbfe;color:#4b5563;">
+                        <i class="fas fa-lightbulb" style="color:#d97706;"></i>
+                        حمّل <a href="download_clients_template.php" style="color:#2563eb;font-weight:600;" target="_blank">نموذج Excel</a>
+                        أو <a href="download_clients_template_csv.php" style="color:#2563eb;font-weight:600;" target="_blank">نموذج CSV</a>
+                        لمعرفة الترتيب الصحيح.
                     </div>
                 </div>
 
-                <div id="importResult" style="display: none; margin-top: 18px;"></div>
+                <div class="form-group-modal">
+                    <label style="font-weight:600;margin-bottom:6px;display:block;">
+                        <i class="fas fa-file-excel" style="color:#16a34a;"></i> اختر ملف Excel أو CSV
+                    </label>
+                    <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" required
+                        style="padding:14px;border:2px dashed rgba(22,163,74,.4);border-radius:8px;
+                               background:rgba(22,163,74,.04);cursor:pointer;width:100%;
+                               box-sizing:border-box;font-size:.9rem;">
+                    <small style="color:#6b7280;margin-top:4px;display:block;">
+                        الصيغ المدعومة: .xlsx, .xls, .csv &nbsp;|&nbsp; الحد الأقصى: 1000 عميل / 5 ميجابايت
+                    </small>
+                </div>
+
+                <div id="importProgress" style="display:none;margin-top:16px;text-align:center;
+                     background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:20px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:1.8rem;color:#2563eb;"></i>
+                    <p style="margin:10px 0 0;color:#1e40af;font-weight:700;">جاري معالجة الملف والاستيراد...</p>
+                </div>
+
+                <div id="importResult" style="display:none;margin-top:16px;"></div>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn-modal btn-modal-save"
@@ -1590,10 +1609,10 @@ include('../insidebar.php');
 
         const formData = new FormData();
         formData.append('excel_file', fileInput.files[0]);
-        formData.append('action', 'import_excel');
 
         $('#importProgress').show();
         $('#importResult').hide();
+        $(this).find('[type="submit"]').prop('disabled', true);
 
         $.ajax({
             url:         'import_clients_excel.php',
@@ -1604,60 +1623,63 @@ include('../insidebar.php');
             dataType:    'json',
             success: function (response) {
                 $('#importProgress').hide();
+                $('#importExcelForm [type="submit"]').prop('disabled', false);
 
-                let resultHtml = '<div style="padding:16px;border-radius:var(--radius);border:1.5px solid;';
+                let resultHtml = '';
 
                 if (response.success) {
-                    resultHtml += 'background:var(--green-soft);border-color:rgba(22,163,74,.22);color:var(--green)">';
-                    resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-check-circle"></i> تم الاستيراد بنجاح!</h6>';
-                    resultHtml += '<p style="margin:4px 0;">✅ تم إضافة: <strong>' + response.added + '</strong> عميل</p>';
+                    resultHtml = '<div style="padding:16px;border-radius:8px;border:1.5px solid #a7f3d0;background:#ecfdf5;color:#065f46;">';
+                    resultHtml += '<h6 style="font-weight:700;margin-bottom:10px;font-size:.95rem;">'
+                               +  '<i class="fas fa-check-circle" style="color:#059669;"></i> &nbsp;تم الاستيراد بنجاح</h6>';
+                    resultHtml += '<p style="margin:4px 0;">✅ العملاء المضافون: <strong>' + response.added + '</strong></p>';
+
                     if (response.skipped > 0) {
-                        resultHtml += '<p style="margin:4px 0;color:#854d0e;">⚠️ تم تخطي: <strong>' + response.skipped + '</strong> عميل (مكرر)</p>';
+                        resultHtml += '<p style="margin:4px 0;color:#92400e;">⚠️ تم تخطي: <strong>' + response.skipped + '</strong> (مكرر أو بيانات ناقصة)</p>';
                     }
-                    if (response.errors.length > 0) {
-                        resultHtml += '<p style="margin:8px 0 4px;"><strong>الأخطاء:</strong></p><ul style="margin:0;padding-right:20px;">';
-                        response.errors.forEach(function (error) {
-                            resultHtml += '<li>' + error + '</li>';
+
+                    if (response.errors && response.errors.length > 0) {
+                        resultHtml += '<details style="margin-top:8px;">';
+                        resultHtml += '<summary style="cursor:pointer;font-weight:600;color:#b45309;">تفاصيل الأخطاء (' + response.errors.length + ')</summary>';
+                        resultHtml += '<ul style="margin:6px 0 0;padding-right:20px;font-size:.82rem;max-height:150px;overflow-y:auto;">';
+                        response.errors.forEach(function (err) {
+                            resultHtml += '<li style="margin:3px 0;">' + $('<span>').text(err).html() + '</li>';
                         });
-                        resultHtml += '</ul>';
+                        resultHtml += '</ul></details>';
                     }
+
+                    if (response.added > 0) {
+                        resultHtml += '<p style="margin-top:10px;font-size:.82rem;color:#6b7280;">سيتم تحديث الصفحة خلال 3 ثوان...</p>';
+                        setTimeout(function () { location.reload(); }, 3000);
+                    }
+
                     resultHtml += '</div>';
-                    setTimeout(function () { location.reload(); }, 3000);
                 } else {
-                    resultHtml += 'background:var(--red-soft);border-color:rgba(220,38,38,.22);color:var(--red)">';
-                    resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> فشل الاستيراد</h6>';
-                    resultHtml += '<p style="margin:0;">' + response.message + '</p>';
+                    resultHtml = '<div style="padding:16px;border-radius:8px;border:1.5px solid #fecaca;background:#fef2f2;color:#991b1b;">';
+                    resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> &nbsp;فشل الاستيراد</h6>';
+                    resultHtml += '<p style="margin:0;">' + $('<span>').text(response.message).html() + '</p>';
                     resultHtml += '</div>';
                 }
 
                 $('#importResult').html(resultHtml).fadeIn(300);
             },
-            error: function (xhr, status, error) {
+            error: function (xhr) {
                 $('#importProgress').hide();
+                $('#importExcelForm [type="submit"]').prop('disabled', false);
 
                 let errorMsg = 'حدث خطأ أثناء رفع الملف. الرجاء المحاولة مرة أخرى.';
-
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMsg = xhr.responseJSON.message;
-                } else if (xhr.responseText) {
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response.message) { errorMsg = response.message; }
-                    } catch (e) {
-                        errorMsg += '<br><small>تفاصيل الخطأ: ' + status + '</small>';
-                    }
+                } else if (xhr.responseText && xhr.responseText.trim() !== '') {
+                    // عرض أول جزء من استجابة الخادم غير-JSON للمساعدة في التشخيص
+                    errorMsg = xhr.responseText.trim().substring(0, 300);
                 }
 
-                const errorHtml = '<div style="padding:16px;border-radius:var(--radius);background:var(--red-soft);color:var(--red);border:1.5px solid rgba(220,38,38,.22);">' +
-                    '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> حدث خطأ</h6>' +
-                    '<p style="margin:0;">'             + errorMsg + '</p>' +
-                    '<p style="margin:10px 0 4px;"><strong>نصائح:</strong></p>' +
-                    '<ul style="font-size:.8rem;margin:0;padding-right:20px;">' +
-                    '<li>تأكد من أن الملف بصيغة .xlsx, .xls أو .csv</li>'    +
-                    '<li>تأكد من أن حجم الملف أقل من 5 ميجا</li>'            +
-                    '<li>تأكد من أن الملف يحتوي على بيانات صحيحة</li>'       +
-                    '<li>إذا كنت تستخدم Excel، جرب حفظ الملف كـ CSV</li>'   +
-                    '</ul></div>';
+                const errorHtml = '<div style="padding:16px;border-radius:8px;background:#fef2f2;color:#991b1b;border:1.5px solid #fecaca;">'
+                    + '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> &nbsp;خطأ في الرفع</h6>'
+                    + '<p style="margin:0 0 8px;">' + $('<span>').text(errorMsg).html() + '</p>'
+                    + '<small style="color:#6b7280;">تأكد من: صيغة الملف (xlsx/csv) · الحجم (أقل من 5MB) · البيانات الصحيحة</small>'
+                    + '</div>';
+
 
                 $('#importResult').html(errorHtml).fadeIn(300);
             }

@@ -1,46 +1,58 @@
 <?php
+/**
+ * تحميل نموذج CSV لاستيراد العملاء
+ * مع دعم كامل لترميز UTF-8 والعربية
+ */
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
     exit();
 }
 
-// إعداد الترويسة لتحميل ملف CSV
-header('Content-Type: text/csv; charset=utf-8');
-header('Content-Disposition: attachment; filename="نموذج_العملاء_' . date('Y-m-d') . '.csv"');
+// تنظيف أي مخرجات سابقة
+while (ob_get_level()) {
+    ob_end_clean();
+}
 
-// فتح مخرج الملف
+$ascii_name = 'clients_import_template_' . date('Y-m-d') . '.csv';
+$utf8_name  = 'نموذج_استيراد_العملاء_' . date('Y-m-d') . '.csv';
+
+header('Content-Type: text/csv; charset=UTF-8');
+header('Content-Disposition: attachment; filename="' . $ascii_name . '"; filename*=UTF-8\'\'' . rawurlencode($utf8_name));
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+
+// فتح مجرى الإخراج
 $output = fopen('php://output', 'w');
 
-// إضافة BOM لدعم UTF-8 في Excel
-fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+// BOM لضمان ظهور العربية بشكل صحيح في Excel
+fputs($output, "\xEF\xBB\xBF");
 
-// إضافة صف الرأس
-$headers = [
-    'كود العميل',
-    'اسم العميل',
-    'نوع الكيان',
-    'تصنيف القطاع',
-    'الهاتف',
-    'البريد الإلكتروني',
-    'واتساب',
-    'الحالة'
+// صف الرأس - بنفس ترتيب حقول جدول clients
+fputcsv($output, [
+    'كود العميل',        // A - client_code  (مطلوب)
+    'اسم العميل',        // B - client_name  (مطلوب)
+    'نوع الكيان',        // C - entity_type
+    'تصنيف القطاع',      // D - sector_category
+    'رقم الهاتف',        // E - phone
+    'البريد الإلكتروني', // F - email
+    'واتساب',            // G - whatsapp
+    'الحالة',            // H - status (نشط / متوقف)
+]);
+
+// صفوف أمثلة
+$samples = [
+    ['CLT-0001', 'شركة النيل للمقاولات',          'حكومي', 'بنية تحتية',    '+249123456789', 'nile@example.com',     '+249123456789', 'نشط'],
+    ['CLT-0002', 'مؤسسة الخرطوم التجارية',        'خاص',   'خدمات',         '+249987654321', 'khartoum@example.com', '+249987654321', 'نشط'],
+    ['CLT-0003', 'الهيئة العامة للطرق والجسور',   'حكومي', 'نقل ومواصلات',  '+249111222333', 'roads@gov.sd',         '',             'نشط'],
 ];
 
-fputcsv($output, $headers);
-
-// إضافة بيانات نموذجية (3 صفوف كمثال)
-$sample_data = [
-    ['CL-001', 'شركة المستقبل للمقاولات', 'حكومي', 'بنية تحتية', '+249123456789', 'info@future-co.com', '+249123456789', 'نشط'],
-    ['CL-002', 'مؤسسة النهضة التجارية', 'خاص', 'خدمات', '+249987654321', 'contact@nahda.com', '+249987654321', 'نشط'],
-    ['CL-003', 'الهيئة العامة للطرق', 'حكومي', 'بنية تحتية', '+249111222333', 'roads@gov.sd', '+249111222333', 'نشط']
-];
-
-foreach ($sample_data as $row) {
+foreach ($samples as $row) {
     fputcsv($output, $row);
 }
 
 fclose($output);
 exit();
-?>
+
 

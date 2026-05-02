@@ -1,8 +1,17 @@
 <?php
+/**
+ * تحميل نموذج Excel لاستيراد العملاء
+ * يدعم العربية بالكامل مع PhpSpreadsheet
+ */
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
     exit();
+}
+
+// تنظيف أي مخرجات سابقة
+while (ob_get_level()) {
+    ob_end_clean();
 }
 
 require_once '../vendor/autoload.php';
@@ -12,177 +21,164 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Font;
 
-// إنشاء ملف Excel جديد
+// ── إنشاء الملف ──
 $spreadsheet = new Spreadsheet();
-$sheet = $spreadsheet->getActiveSheet();
+$spreadsheet->getProperties()
+    ->setCreator('EMS System')
+    ->setTitle('نموذج استيراد العملاء')
+    ->setDescription('نموذج Excel لاستيراد بيانات العملاء');
 
-// تعيين اتجاه RTL
+// ════════════════════════════════════════════
+// ورقة 1: نموذج البيانات
+// ════════════════════════════════════════════
+$sheet = $spreadsheet->getActiveSheet();
+$sheet->setTitle('نموذج العملاء');
 $sheet->setRightToLeft(true);
 
-// تعيين عنوان الملف
-$sheet->setTitle('نموذج العملاء');
-
-// تحديد عرض الأعمدة
-$sheet->getColumnDimension('A')->setWidth(20);
-$sheet->getColumnDimension('B')->setWidth(30);
-$sheet->getColumnDimension('C')->setWidth(20);
-$sheet->getColumnDimension('D')->setWidth(25);
-$sheet->getColumnDimension('E')->setWidth(20);
-$sheet->getColumnDimension('F')->setWidth(30);
-$sheet->getColumnDimension('G')->setWidth(20);
-$sheet->getColumnDimension('H')->setWidth(15);
+// عرض الأعمدة
+$colWidths = ['A' => 18, 'B' => 35, 'C' => 20, 'D' => 25, 'E' => 20, 'F' => 35, 'G' => 20, 'H' => 15];
+foreach ($colWidths as $col => $width) {
+    $sheet->getColumnDimension($col)->setWidth($width);
+}
+$sheet->getRowDimension('1')->setRowHeight(35);
 
 // تنسيق صف الرأس
 $headerStyle = [
-    'font' => [
-        'bold' => true,
-        'color' => ['rgb' => 'FFFFFF'],
-        'size' => 12
-    ],
-    'fill' => [
-        'fillType' => Fill::FILL_SOLID,
-        'startColor' => ['rgb' => '667eea']
-    ],
-    'alignment' => [
-        'horizontal' => Alignment::HORIZONTAL_CENTER,
-        'vertical' => Alignment::VERTICAL_CENTER
-    ],
-    'borders' => [
-        'allBorders' => [
-            'borderStyle' => Border::BORDER_THIN,
-            'color' => ['rgb' => '000000']
-        ]
-    ]
+    'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF'], 'size' => 11, 'name' => 'Arial'],
+    'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '1e3a5f']],
+    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true],
+    'borders'   => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '2c5282']]],
 ];
 
-// إضافة رؤوس الأعمدة
+// رؤوس الأعمدة - تطابق تماماً حقول جدول clients
 $headers = [
-    'A1' => 'كود العميل *',
-    'B1' => 'اسم العميل *',
-    'C1' => 'نوع الكيان',
-    'D1' => 'تصنيف القطاع',
-    'E1' => 'رقم الهاتف',
-    'F1' => 'البريد الإلكتروني',
-    'G1' => 'واتساب',
-    'H1' => 'الحالة *'
+    'A1' => "كود العميل\n(مطلوب - فريد)",
+    'B1' => "اسم العميل\n(مطلوب)",
+    'C1' => "نوع الكيان",
+    'D1' => "تصنيف القطاع",
+    'E1' => "رقم الهاتف",
+    'F1' => "البريد الإلكتروني",
+    'G1' => "واتساب",
+    'H1' => "الحالة\n(نشط / متوقف)",
 ];
 
-foreach ($headers as $cell => $header) {
-    $sheet->setCellValue($cell, $header);
+foreach ($headers as $cell => $value) {
+    $sheet->setCellValue($cell, $value);
 }
-
-// تطبيق تنسيق الرأس
 $sheet->getStyle('A1:H1')->applyFromArray($headerStyle);
-$sheet->getRowDimension('1')->setRowHeight(30);
 
-// إضافة صفوف مثال مع البيانات
-$exampleData = [
-    ['CL-001', 'شركة المستقبل للمقاولات', 'حكومي', 'بنية تحتية', '+249123456789', 'info@future-co.com', '+249123456789', 'نشط'],
-    ['CL-002', 'مؤسسة النهضة التجارية', 'خاص', 'خدمات', '+249987654321', 'contact@nahda.com', '+249987654321', 'نشط'],
-    ['CL-003', 'الهيئة العامة للطرق', 'حكومي', 'بنية تحتية', '+249111222333', 'roads@gov.sd', '+249111222333', 'نشط']
+// ── صفوف أمثلة ──
+$examples = [
+    ['CLT-0001', 'شركة النيل للمقاولات', 'حكومي', 'بنية تحتية', '+249123456789', 'nile@example.com', '+249123456789', 'نشط'],
+    ['CLT-0002', 'مؤسسة الخرطوم التجارية', 'خاص', 'خدمات', '+249987654321', 'khartoum@example.com', '+249987654321', 'نشط'],
+    ['CLT-0003', 'الهيئة العامة للطرق والجسور', 'حكومي', 'نقل ومواصلات', '+249111222333', 'roads@gov.sd', '', 'نشط'],
 ];
 
-$row = 2;
-foreach ($exampleData as $data) {
-    $col = 'A';
-    foreach ($data as $value) {
-        $sheet->setCellValue($col . $row, $value);
-        $col++;
-    }
-    $row++;
-}
-
-// تنسيق صفوف البيانات
 $dataStyle = [
-    'alignment' => [
-        'horizontal' => Alignment::HORIZONTAL_CENTER,
-        'vertical' => Alignment::VERTICAL_CENTER
-    ],
-    'borders' => [
-        'allBorders' => [
-            'borderStyle' => Border::BORDER_THIN,
-            'color' => ['rgb' => 'CCCCCC']
-        ]
-    ]
+    'font'      => ['name' => 'Arial', 'size' => 10],
+    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+    'borders'   => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'CBD5E0']]],
+    'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F7FAFC']],
 ];
 
-$sheet->getStyle('A2:H' . ($row - 1))->applyFromArray($dataStyle);
+$r = 2;
+foreach ($examples as $ex) {
+    $c = 'A';
+    foreach ($ex as $val) {
+        $sheet->setCellValue($c . $r, $val);
+        $c++;
+    }
+    $sheet->getRowDimension($r)->setRowHeight(25);
+    $r++;
+}
+$sheet->getStyle('A2:H' . ($r - 1))->applyFromArray($dataStyle);
 
-// إضافة ورقة تعليمات
-$instructionsSheet = $spreadsheet->createSheet();
-$instructionsSheet->setTitle('التعليمات');
-$instructionsSheet->setRightToLeft(true);
+// تجميد الصف الأول
+$sheet->freezePane('A2');
 
-$instructionsSheet->getColumnDimension('A')->setWidth(80);
+// ════════════════════════════════════════════
+// ورقة 2: التعليمات
+// ════════════════════════════════════════════
+$guide = $spreadsheet->createSheet();
+$guide->setTitle('التعليمات');
+$guide->setRightToLeft(true);
+$guide->getColumnDimension('A')->setWidth(10);
+$guide->getColumnDimension('B')->setWidth(90);
+$guide->getRowDimension(1)->setRowHeight(40);
 
-$instructions = [
-    ['تعليمات استيراد العملاء'],
-    [''],
-    ['الحقول المطلوبة (يجب ملؤها):'],
-    ['1. كود العميل: رمز فريد لكل عميل (مثال: CL-001)'],
-    ['2. اسم العميل: الاسم الكامل للعميل'],
-    ['3. الحالة: نشط أو متوقف'],
-    [''],
-    ['الحقول الاختيارية:'],
-    ['- نوع الكيان: حكومي، خاص، مختلط، دولي، غير ربحي'],
-    ['- تصنيف القطاع: بنية تحتية، نفط وغاز، تعدين، زراعة، خدمات، تجارة، صناعة، طاقة، مياه وصرف صحي، نقل ومواصلات، أخرى'],
-    ['- رقم الهاتف: رقم الاتصال (مثال: +249123456789)'],
-    ['- البريد الإلكتروني: عنوان البريد الإلكتروني'],
-    ['- واتساب: رقم الواتساب'],
-    [''],
-    ['ملاحظات مهمة:'],
-    ['✓ كود العميل يجب أن يكون فريداً ولا يتكرر'],
-    ['✓ استخدم ورقة "نموذج العملاء" لإضافة البيانات'],
-    ['✓ احذف الصفوف المثالية قبل الاستيراد أو استبدلها ببياناتك'],
-    ['✓ تأكد من ملء جميع الحقول المطلوبة المشار إليها بـ *'],
-    ['✓ الصيغة المدعومة: .xlsx أو .xls أو .csv'],
+// عنوان
+$guide->mergeCells('A1:B1');
+$guide->setCellValue('A1', 'تعليمات استيراد العملاء - نظام EMS');
+$guide->getStyle('A1')->applyFromArray([
+    'font'      => ['bold' => true, 'size' => 16, 'color' => ['rgb' => 'FFFFFF'], 'name' => 'Arial'],
+    'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '1e3a5f']],
+    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+]);
+
+$rows_guide = [
+    [3,  'العمود', 'الوصف والقيم المقبولة'],
+    [4,  'A - كود العميل', 'مطلوب - يجب أن يكون فريداً (مثال: CLT-0001)'],
+    [5,  'B - اسم العميل', 'مطلوب - الاسم الكامل للعميل أو الشركة'],
+    [6,  'C - نوع الكيان', 'اختياري - مثال: حكومي / خاص / مختلط / دولي / غير ربحي'],
+    [7,  'D - تصنيف القطاع', 'اختياري - مثال: بنية تحتية / تعدين / خدمات / نفط وغاز / زراعة'],
+    [8,  'E - رقم الهاتف', 'اختياري - رقم الهاتف الكامل مع رمز الدولة (مثال: +249123456789)'],
+    [9,  'F - البريد الإلكتروني', 'اختياري - يجب أن يكون بصيغة صحيحة (مثال: name@domain.com)'],
+    [10, 'G - واتساب', 'اختياري - رقم الواتساب (مثال: +249123456789)'],
+    [11, 'H - الحالة', 'اختياري - نشط (افتراضي) أو متوقف'],
+    [13, 'ملاحظات مهمة:', ''],
+    [14, '1.', 'احذف صفوف الأمثلة في ورقة "نموذج العملاء" قبل رفع الملف'],
+    [15, '2.', 'كود العميل يجب أن يكون فريداً - أي كود مكرر سيتم تخطيه'],
+    [16, '3.', 'الحقول المطلوبة: كود العميل + اسم العميل فقط'],
+    [17, '4.', 'الصيغ المدعومة للرفع: .xlsx أو .csv'],
+    [18, '5.', 'الحد الأقصى للصفوف في الاستيراد الواحد: 1000 عميل'],
 ];
 
-$instructionRow = 1;
-foreach ($instructions as $instruction) {
-    $instructionsSheet->setCellValue('A' . $instructionRow, $instruction[0]);
-    $instructionRow++;
+$headerRowStyle = [
+    'font'      => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF'], 'name' => 'Arial'],
+    'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '2d6a4f']],
+    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+    'borders'   => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '1b4332']]],
+];
+$noteStyle = [
+    'font'      => ['bold' => true, 'size' => 11, 'color' => ['rgb' => '9b2226'], 'name' => 'Arial'],
+    'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'fff3cd']],
+];
+$cellStyle = [
+    'font'      => ['size' => 10, 'name' => 'Arial'],
+    'alignment' => ['vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true],
+    'borders'   => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'CBD5E0']]],
+];
+
+foreach ($rows_guide as $row_data) {
+    [$row_num, $col_a, $col_b] = $row_data;
+    $guide->setCellValue('A' . $row_num, $col_a);
+    $guide->setCellValue('B' . $row_num, $col_b);
+    $guide->getRowDimension($row_num)->setRowHeight(28);
+
+    if ($row_num === 3) {
+        $guide->getStyle('A3:B3')->applyFromArray($headerRowStyle);
+    } elseif ($row_num === 13) {
+        $guide->getStyle('A13:B13')->applyFromArray($noteStyle);
+    } else {
+        $guide->getStyle('A' . $row_num . ':B' . $row_num)->applyFromArray($cellStyle);
+    }
 }
 
-// تنسيق العنوان الرئيسي
-$instructionsSheet->getStyle('A1')->applyFromArray([
-    'font' => [
-        'bold' => true,
-        'size' => 16,
-        'color' => ['rgb' => '667eea']
-    ],
-    'alignment' => [
-        'horizontal' => Alignment::HORIZONTAL_CENTER
-    ]
-]);
-
-// تنسيق العناوين الفرعية
-$instructionsSheet->getStyle('A3')->applyFromArray([
-    'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '764ba2']]
-]);
-$instructionsSheet->getStyle('A8')->applyFromArray([
-    'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '764ba2']]
-]);
-$instructionsSheet->getStyle('A15')->applyFromArray([
-    'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => 'fc4a1a']]
-]);
-
-// العودة إلى الورقة الأولى
+// العودة للورقة الأولى
 $spreadsheet->setActiveSheetIndex(0);
 
-// تحديد اسم الملف
-$filename = 'نموذج_استيراد_العملاء_' . date('Y-m-d') . '.xlsx';
+// ── إرسال الملف للمتصفح ──
+$ascii_name  = 'clients_import_template_' . date('Y-m-d') . '.xlsx';
+$utf8_name   = 'نموذج_استيراد_العملاء_' . date('Y-m-d') . '.xlsx';
 
-// تعيين الهيدرات لتحميل الملف
-header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment;filename="' . $filename . '"');
-header('Cache-Control: max-age=0');
+header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=utf-8');
+header('Content-Disposition: attachment; filename="' . $ascii_name . '"; filename*=UTF-8\'\'' . rawurlencode($utf8_name));
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 
-// إنشاء الملف وإرساله للمتصفح
 $writer = new Xlsx($spreadsheet);
 $writer->save('php://output');
 exit;
-?>
 

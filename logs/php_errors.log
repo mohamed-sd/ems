@@ -1797,3 +1797,729 @@ Stack trace:
 [30-Apr-2026 17:23:57 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
 [30-Apr-2026 17:25:20 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
 [30-Apr-2026 17:25:46 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[01-May-2026 20:51:15 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class "ZipArchive" not found in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php:61
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php(174): PhpOffice\PhpSpreadsheet\Shared\File::fileExists('zip://C:\\xamppv...')
+#1 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Reader\Xlsx.php(93): PhpOffice\PhpSpreadsheet\Shared\File::testFileNoThrow('C:\\xamppv0.002\\...', '_rels/.rels')
+#2 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\IOFactory.php(199): PhpOffice\PhpSpreadsheet\Reader\Xlsx->canRead('C:\\xamppv0.002\\...')
+#3 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(146): PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile('C:\\xamppv0.002\\...')
+#4 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php on line 61
+[01-May-2026 20:53:18 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class "ZipArchive" not found in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php:61
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php(174): PhpOffice\PhpSpreadsheet\Shared\File::fileExists('zip://C:\\xamppv...')
+#1 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Reader\Xlsx.php(93): PhpOffice\PhpSpreadsheet\Shared\File::testFileNoThrow('C:\\xamppv0.002\\...', '_rels/.rels')
+#2 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\IOFactory.php(199): PhpOffice\PhpSpreadsheet\Reader\Xlsx->canRead('C:\\xamppv0.002\\...')
+#3 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(146): PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile('C:\\xamppv0.002\\...')
+#4 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php on line 61
+[01-May-2026 20:56:25 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:120
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(120): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 120
+[01-May-2026 20:57:01 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:120
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(120): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 120
+[01-May-2026 20:57:39 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:120
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(120): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 120
+[01-May-2026 20:58:46 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class "ZipArchive" not found in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php:61
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php(174): PhpOffice\PhpSpreadsheet\Shared\File::fileExists('zip://C:\\xamppv...')
+#1 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Reader\Xlsx.php(93): PhpOffice\PhpSpreadsheet\Shared\File::testFileNoThrow('C:\\xamppv0.002\\...', '_rels/.rels')
+#2 C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\IOFactory.php(199): PhpOffice\PhpSpreadsheet\Reader\Xlsx->canRead('C:\\xamppv0.002\\...')
+#3 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(146): PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile('C:\\xamppv0.002\\...')
+#4 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php on line 61
+[01-May-2026 21:02:50 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:02:52 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:02:53 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:02:56 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:02:57 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:02:57 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:02:57 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:03:00 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:03:17 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:03:17 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:03:18 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:03:18 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:03:35 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:05:47 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:06 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:07 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:08 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:09 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:09 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:09 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:09 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:09 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:09 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:10 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:11 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:11 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:11 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:11 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:11 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:11 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:12 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:12 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:12 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:12 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:12 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:12 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:13 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:14 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:14 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:14 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:14 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:14 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:14 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:15 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:15 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:15 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:15 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:15 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:15 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:16 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:16 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:16 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:16 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:16 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:16 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:19 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:20 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:21 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:22 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:23 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:24 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:25 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:10:57 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('??? ??????\t??? ...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[01-May-2026 21:11:09 Europe/Berlin] PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 193
+[01-May-2026 21:11:46 Europe/Berlin] PHP Fatal error:  Uncaught ValueError: mb_convert_encoding(): Argument #3 ($from_encoding) contains invalid encoding "Windows-1256" in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php:119
+Stack trace:
+#0 C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php(119): mb_convert_encoding('PK\x03\x04\x14\x00\x06\x00\x08\x00\x00\x00!\x00\x12...', 'UTF-8', 'Windows-1256')
+#1 {main}
+  thrown in C:\xamppv0.002\htdocs\ems\Clients\import_clients_excel.php on line 119
+[02-May-2026 10:25:59 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:25:59 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:26:13 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:26:13 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:26:35 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:26:35 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:26:35 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:26:35 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:28:23 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:28:23 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:29:24 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:29:24 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:29:24 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:29:24 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 10:45:51 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:01:25 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:01:57 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:01:57 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:02:15 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:02:15 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:02:40 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:02:40 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:02:40 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:02:40 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:02:51 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:05:08 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:05:21 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:06:35 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:07:09 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:07:46 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:07:46 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:08:05 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:08:05 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:08:16 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:08:16 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:08:16 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:08:16 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:24:17 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:24:17 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:31:53 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:31:53 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:35:45 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:37:32 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:42:36 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:42:36 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:42:36 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:42:36 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:46:38 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:53:49 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:53:52 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:57:25 Europe/Berlin] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\xamppv0.002\htdocs\ems\Suppliers\suppliers.php on line 823
+[02-May-2026 11:59:22 Europe/Berlin] PHP Warning:  include(../config.php): Failed to open stream: No such file or directory in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
+[02-May-2026 11:59:22 Europe/Berlin] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='C:\xamppv0.002\php\PEAR') in C:\xamppv0.002\htdocs\ems\admin\permissions\modules.php on line 9
