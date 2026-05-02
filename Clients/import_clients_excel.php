@@ -1,261 +1,284 @@
 <?php
-// إيقاف عرض الأخطاء في المخرجات
+/**
+ * استيراد العملاء من ملف Excel أو CSV
+ * يدعم الترميز العربي بالكامل مع PhpSpreadsheet
+ */
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
 // تنظيف أي مخرجات سابقة
-if (ob_get_level()) {
+while (ob_get_level()) {
     ob_end_clean();
 }
-ob_start();
 
 session_start();
 
-// التحقق من تسجيل الدخول
-if (!isset($_SESSION['user'])) {
-    ob_end_clean();
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['success' => false, 'message' => 'غير مصرح']);
+header('Content-Type: application/json; charset=utf-8');
+
+// دالة للخروج بخطأ
+function import_fail($msg) {
+    echo json_encode(['success' => false, 'message' => $msg], JSON_UNESCAPED_UNICODE);
     exit;
 }
+
+// التحقق من تسجيل الدخول
+if (!isset($_SESSION['user'])) {
+    import_fail('غير مصرح - يرجى تسجيل الدخول');
+}
+
+// التحقق من معرف الشركة
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+if ($company_id <= 0) {
+    import_fail('الحساب غير مرتبط بشركة');
+}
+
+$created_by = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 // الاتصال بقاعدة البيانات
 require_once '../config.php';
 require_once '../includes/permissions_helper.php';
 
-// التحقق من صلاحية الإضافة على شاشة العملاء
-$module_query = "SELECT id FROM modules 
-                 WHERE code = 'Clients/clients.php' 
-                    OR code = 'clients' 
-                    OR code LIKE '%clients.php%'
-                    OR name LIKE '%عملاء%'
-                 LIMIT 1";
-$module_result = $conn->query($module_query);
+// التحقق من صلاحية الإضافة
+$module_result = $conn->query(
+    "SELECT id FROM modules 
+     WHERE code = 'Clients/clients.php' OR code = 'clients'
+        OR code LIKE '%clients.php%' OR name LIKE '%عملاء%'
+     LIMIT 1"
+);
 $module_info = $module_result ? $module_result->fetch_assoc() : null;
-$module_id = $module_info ? $module_info['id'] : null;
+$module_id   = $module_info ? $module_info['id'] : null;
 
 $can_add = false;
 if ($module_id) {
-    $perms = get_module_permissions($conn, $module_id);
+    $perms   = get_module_permissions($conn, $module_id);
     $can_add = $perms['can_add'];
 }
 
 if (!$can_add) {
-    ob_end_clean();
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['success' => false, 'message' => 'لا توجد صلاحية لإضافة العملاء']);
-    exit;
+    import_fail('لا توجد صلاحية لاستيراد العملاء');
 }
 
-// تنظيف أي مخرجات
-ob_end_clean();
+// التحقق من طريقة الطلب
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    import_fail('طريقة الطلب غير صحيحة');
+}
 
-// تعيين الترويسة
-header('Content-Type: application/json; charset=utf-8');
+// التحقق من وجود الملف
+if (!isset($_FILES['excel_file']) || $_FILES['excel_file']['error'] !== UPLOAD_ERR_OK) {
+    $upload_errors = [
+        UPLOAD_ERR_INI_SIZE  => 'حجم الملف يتجاوز الحد المسموح به في إعدادات الخادم',
+        UPLOAD_ERR_FORM_SIZE => 'حجم الملف يتجاوز الحد المسموح',
+        UPLOAD_ERR_PARTIAL   => 'تم رفع الملف جزئياً فقط',
+        UPLOAD_ERR_NO_FILE   => 'لم يتم اختيار ملف',
+        UPLOAD_ERR_NO_TMP_DIR => 'مجلد الملفات المؤقتة غير موجود',
+        UPLOAD_ERR_CANT_WRITE => 'فشل حفظ الملف المؤقت',
+    ];
+    $err_code = isset($_FILES['excel_file']) ? $_FILES['excel_file']['error'] : UPLOAD_ERR_NO_FILE;
+    import_fail($upload_errors[$err_code] ?? 'خطأ غير معروف في رفع الملف');
+}
+
+$tmp_file  = $_FILES['excel_file']['tmp_name'];
+$orig_name = $_FILES['excel_file']['name'];
+$file_ext  = strtolower(pathinfo($orig_name, PATHINFO_EXTENSION));
+
+if (!file_exists($tmp_file) || !is_readable($tmp_file)) {
+    import_fail('لا يمكن قراءة الملف المرفوع');
+}
+
+if ($_FILES['excel_file']['size'] === 0) {
+    import_fail('الملف فارغ');
+}
+
+if ($_FILES['excel_file']['size'] > 5 * 1024 * 1024) {
+    import_fail('حجم الملف يتجاوز الحد الأقصى (5 ميجابايت)');
+}
+
+if (!in_array($file_ext, ['xlsx', 'xls', 'csv'])) {
+    import_fail('صيغة الملف غير مدعومة. الصيغ المقبولة: xlsx, xls, csv');
+}
+
+// ════════════════════════════════════════════
+// قراءة بيانات الملف
+// ════════════════════════════════════════════
+$rows = [];
 
 try {
-    // التحقق من طريقة الطلب
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        throw new Exception('طريقة الطلب غير صحيحة');
-    }
-
-    // التحقق من وجود الملف
-    if (!isset($_FILES['excel_file'])) {
-        throw new Exception('لم يتم رفع ملف');
-    }
-
-    // التحقق من خطأ الرفع
-    $upload_error = $_FILES['excel_file']['error'];
-    if ($upload_error !== UPLOAD_ERR_OK) {
-        $error_messages = [
-            UPLOAD_ERR_INI_SIZE => 'حجم الملف أكبر من الحد المسموح به في الإعدادات',
-            UPLOAD_ERR_FORM_SIZE => 'حجم الملف أكبر من الحد المسموح',
-            UPLOAD_ERR_PARTIAL => 'تم رفع الملف جزئياً فقط',
-            UPLOAD_ERR_NO_FILE => 'لم يتم رفع أي ملف',
-            UPLOAD_ERR_NO_TMP_DIR => 'المجلد المؤقت غير موجود',
-            UPLOAD_ERR_CANT_WRITE => 'فشل حفظ الملف',
-            UPLOAD_ERR_EXTENSION => 'امتداد PHP أوقف رفع الملف'
-        ];
-        $error_msg = isset($error_messages[$upload_error]) ? $error_messages[$upload_error] : 'خطأ غير معروف في رفع الملف';
-        throw new Exception($error_msg);
-    }
-
-    // التحقق من وجود الملف المؤقت
-    if (!isset($_FILES['excel_file']['tmp_name']) || empty($_FILES['excel_file']['tmp_name'])) {
-        throw new Exception('لم يتم العثور على الملف المؤقت');
-    }
-
-    $file = $_FILES['excel_file']['tmp_name'];
-    $file_name = $_FILES['excel_file']['name'];
-    $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-
-    // التحقق من وجود الملف
-    if (!file_exists($file)) {
-        throw new Exception('الملف المرفوع غير موجود');
-    }
-
-    // التحقق من امتداد الملف
-    if (!in_array($file_ext, ['xlsx', 'xls', 'csv'])) {
-        throw new Exception('صيغة الملف غير مدعومة. استخدم .xlsx, .xls أو .csv');
-    }
-
-    // التحقق من صلاحيات قراءة الملف
-    if (!is_readable($file)) {
-        throw new Exception('لا يمكن قراءة الملف المرفوع');
-    }
-
-    // التحقق من حجم الملف (الحد الأقصى 5 ميجا)
-    $file_size = $_FILES['excel_file']['size'];
-    $max_size = 5 * 1024 * 1024; // 5MB
-    if ($file_size > $max_size) {
-        throw new Exception('حجم الملف كبير جداً. الحد الأقصى 5 ميجا');
-    }
-
-    if ($file_size === 0) {
-        throw new Exception('الملف فارغ');
-    }
-
-    $added = 0;
-    $skipped = 0;
-    $errors = [];
-    $created_by = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
-
-    $rows = [];
-
-    // محاولة قراءة الملف
     if ($file_ext === 'csv') {
-        // قراءة CSV
-        $handle = @fopen($file, "r");
-        if ($handle === FALSE) {
-            throw new Exception('فشل فتح ملف CSV');
+        // ── قراءة CSV مع دعم كامل لـ UTF-8 والعربية ──
+        $csv_content = file_get_contents($tmp_file);
+
+        // إزالة BOM (UTF-8) إن وُجد
+        if (substr($csv_content, 0, 3) === "\xEF\xBB\xBF") {
+            $csv_content = substr($csv_content, 3);
         }
 
-        // قراءة صف الرأس
-        $header = fgetcsv($handle, 10000, ",");
-        if ($header === FALSE) {
-            fclose($handle);
-            throw new Exception('ملف CSV فارغ أو تالف');
-        }
-
-        // قراءة البيانات
-        $row_count = 0;
-        while (($data = fgetcsv($handle, 10000, ",")) !== FALSE) {
-            $rows[] = $data;
-            $row_count++;
-
-            // حد أقصى 1000 صف
-            if ($row_count > 1000) {
-                fclose($handle);
-                throw new Exception('الملف يحتوي على أكثر من 1000 صف. قم بتقسيمه إلى ملفات أصغر');
+        // تحويل الترميز إذا لم يكن UTF-8 (في حال توفر mbstring)
+        if (function_exists('mb_check_encoding') && function_exists('mb_convert_encoding')) {
+            if (!mb_check_encoding($csv_content, 'UTF-8')) {
+                $csv_content = mb_convert_encoding($csv_content, 'UTF-8', 'Windows-1256');
             }
         }
-        fclose($handle);
 
-        if (empty($rows)) {
-            throw new Exception('الملف لا يحتوي على بيانات');
+        // تحليل CSV
+        $lines = explode("\n", str_replace("\r\n", "\n", str_replace("\r", "\n", $csv_content)));
+        $first_line = true;
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') continue;
+
+            // تحليل السطر مع دعم القيم المحاطة بعلامات اقتباس
+            $parsed = str_getcsv($line, ',', '"');
+
+            if ($first_line) {
+                // تخطي صف الرأس
+                $first_line = false;
+                continue;
+            }
+            $rows[] = $parsed;
+
+            if (count($rows) > 1000) {
+                import_fail('الملف يحتوي على أكثر من 1000 صف. يرجى تقسيمه إلى ملفات أصغر');
+            }
         }
-
     } else {
-        // محاولة استخدام PhpSpreadsheet لملفات Excel
-        if (file_exists('../vendor/autoload.php')) {
-            require_once '../vendor/autoload.php';
-            
-            // استخدام الاسم الكامل بدلاً من use
-            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
-            $worksheet = $spreadsheet->getActiveSheet();
-            $rows = $worksheet->toArray();
-            
-            // إزالة صف الرأس
-            array_shift($rows);
-            
-        } else {
-            throw new Exception('مكتبة PhpSpreadsheet غير مثبتة. الرجاء تحويل الملف إلى CSV أولاً، أو تثبيت المكتبة باستخدام: composer require phpoffice/phpspreadsheet');
+        // ── قراءة XLSX / XLS مع دعم العربية ──
+        if (!class_exists('ZipArchive')) {
+            import_fail('لا يمكن قراءة ملفات Excel حالياً لأن إضافة ZIP غير مفعلة على الخادم. استخدم CSV الآن أو فعّل php_zip ثم أعد المحاولة.');
         }
+
+        if (!file_exists('../vendor/autoload.php')) {
+            import_fail('مكتبة PhpSpreadsheet غير متوفرة. استخدم CSV الآن أو ثبّت الاعتمادات عبر Composer.');
+        }
+
+        require_once '../vendor/autoload.php';
+
+        $reader      = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($tmp_file);
+        $reader->setReadDataOnly(true);
+        $spreadsheet = $reader->load($tmp_file);
+        $worksheet   = $spreadsheet->getActiveSheet();
+
+        $all_rows = $worksheet->toArray(null, true, true, false);
+
+        if (empty($all_rows)) {
+            import_fail('الملف لا يحتوي على بيانات');
+        }
+
+        // إزالة صف الرأس (الصف الأول)
+        array_shift($all_rows);
+        $rows = $all_rows;
     }
-
-    // معالجة البيانات
-    foreach ($rows as $index => $row) {
-        $row_num = $index + 2; // +2 لأننا بدأنا من الصف 2 (بعد الهيدر)
-
-        // تخطي الصفوف الفارغة
-        if (empty($row[0]) && empty($row[1])) {
-            continue;
-        }
-
-        // استخراج البيانات
-        $client_code = trim($row[0] ?? '');
-        $client_name = trim($row[1] ?? '');
-        $entity_type = trim($row[2] ?? '');
-        $sector_category = trim($row[3] ?? '');
-        $phone = trim($row[4] ?? '');
-        $email = trim($row[5] ?? '');
-        $whatsapp = trim($row[6] ?? '');
-        $status = trim($row[7] ?? 'نشط');
-
-        // التحقق من الحقول المطلوبة
-        if (empty($client_code)) {
-            $errors[] = "الصف $row_num: كود العميل مطلوب";
-            $skipped++;
-            continue;
-        }
-
-        if (empty($client_name)) {
-            $errors[] = "الصف $row_num: اسم العميل مطلوب";
-            $skipped++;
-            continue;
-        }
-
-        // تنظيف البيانات
-        $client_code = mysqli_real_escape_string($conn, $client_code);
-        $client_name = mysqli_real_escape_string($conn, $client_name);
-        $entity_type = mysqli_real_escape_string($conn, $entity_type);
-        $sector_category = mysqli_real_escape_string($conn, $sector_category);
-        $phone = mysqli_real_escape_string($conn, $phone);
-        $email = mysqli_real_escape_string($conn, $email);
-        $whatsapp = mysqli_real_escape_string($conn, $whatsapp);
-        $status = mysqli_real_escape_string($conn, $status);
-
-        // التحقق من عدم تكرار كود العميل
-        $check_query = "SELECT id FROM clients WHERE client_code = '$client_code'";
-        $check_result = mysqli_query($conn, $check_query);
-
-        if (mysqli_num_rows($check_result) > 0) {
-            $errors[] = "الصف $row_num: كود العميل '$client_code' موجود مسبقاً";
-            $skipped++;
-            continue;
-        }
-
-        // إدراج العميل
-        $insert_query = "INSERT INTO clients 
-            (client_code, client_name, entity_type, sector_category, phone, email, whatsapp, status, created_by) 
-            VALUES 
-            ('$client_code', '$client_name', '$entity_type', '$sector_category', '$phone', '$email', '$whatsapp', '$status', '$created_by')";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $added++;
-        } else {
-            $errors[] = "الصف $row_num: خطأ في إضافة العميل - " . mysqli_error($conn);
-            $skipped++;
-        }
-    }
-
-    // إرسال النتيجة
-    echo json_encode([
-        'success' => true,
-        'message' => 'تم الاستيراد بنجاح',
-        'added' => $added,
-        'skipped' => $skipped,
-        'errors' => $errors
-    ], JSON_UNESCAPED_UNICODE);
-
-} catch (Exception $e) {
-    // معالجة الأخطاء
-    echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+} catch (\Exception $e) {
+    import_fail('فشل قراءة الملف: ' . $e->getMessage());
 }
 
+if (empty($rows)) {
+    import_fail('الملف لا يحتوي على بيانات بعد صف الرأس');
+}
+
+// ════════════════════════════════════════════
+// معالجة الصفوف وإدراجها في قاعدة البيانات
+// ════════════════════════════════════════════
+$added   = 0;
+$skipped = 0;
+$errors  = [];
+
+// القيم المقبولة للحالة
+$valid_statuses = ['نشط', 'متوقف'];
+
+foreach ($rows as $index => $row) {
+    $row_num = $index + 2; // رقم الصف الحقيقي في الملف (الهيدر = 1)
+
+    // تخطي الصفوف الفارغة تماماً
+    $row_clean = array_filter(array_map('trim', $row), function($v){ return $v !== '' && $v !== null; });
+    if (empty($row_clean)) {
+        continue;
+    }
+
+    // استخراج وتنظيف الحقول حسب ترتيب الأعمدة في النموذج
+    $client_code     = trim($row[0] ?? '');
+    $client_name     = trim($row[1] ?? '');
+    $entity_type     = trim($row[2] ?? '');
+    $sector_category = trim($row[3] ?? '');
+    $phone           = trim($row[4] ?? '');
+    $email           = trim($row[5] ?? '');
+    $whatsapp        = trim($row[6] ?? '');
+    $status_raw      = trim($row[7] ?? '');
+
+    // إزالة BOM من أول حقل (قد يكون في CSV)
+    $client_code = ltrim($client_code, "\xEF\xBB\xBF");
+
+    // ── التحقق من الحقول المطلوبة ──
+    if ($client_code === '') {
+        $errors[] = "الصف {$row_num}: كود العميل مطلوب ولا يمكن أن يكون فارغاً";
+        $skipped++;
+        continue;
+    }
+
+    if ($client_name === '') {
+        $errors[] = "الصف {$row_num}: اسم العميل مطلوب ولا يمكن أن يكون فارغاً";
+        $skipped++;
+        continue;
+    }
+
+    // تحقق البريد الإلكتروني إن وُجد
+    if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "الصف {$row_num}: صيغة البريد الإلكتروني غير صحيحة ({$email})";
+        $skipped++;
+        continue;
+    }
+
+    // تحديد الحالة: افتراضي "نشط" إذا كانت فارغة أو غير معروفة
+    $status = in_array($status_raw, $valid_statuses) ? $status_raw : 'نشط';
+
+    // ── فحص التكرار بنطاق الشركة ──
+    $esc_code    = mysqli_real_escape_string($conn, $client_code);
+    $check_query = "SELECT id FROM clients 
+                    WHERE client_code = '{$esc_code}' 
+                      AND company_id = {$company_id} 
+                      AND is_deleted = 0 
+                    LIMIT 1";
+    $check_res   = mysqli_query($conn, $check_query);
+
+    if ($check_res && mysqli_num_rows($check_res) > 0) {
+        $errors[] = "الصف {$row_num}: كود العميل «{$client_code}» موجود مسبقاً - تم التخطي";
+        $skipped++;
+        continue;
+    }
+
+    // ── إدراج العميل ──
+    $esc_name     = mysqli_real_escape_string($conn, $client_name);
+    $esc_entity   = mysqli_real_escape_string($conn, $entity_type);
+    $esc_sector   = mysqli_real_escape_string($conn, $sector_category);
+    $esc_phone    = mysqli_real_escape_string($conn, $phone);
+    $esc_email    = mysqli_real_escape_string($conn, $email);
+    $esc_whatsapp = mysqli_real_escape_string($conn, $whatsapp);
+    $esc_status   = mysqli_real_escape_string($conn, $status);
+
+    $insert_sql = "INSERT INTO clients 
+        (company_id, client_code, client_name, entity_type, sector_category,
+         phone, email, whatsapp, status, created_by, is_deleted)
+        VALUES 
+        ({$company_id}, '{$esc_code}', '{$esc_name}', '{$esc_entity}', '{$esc_sector}',
+         '{$esc_phone}', '{$esc_email}', '{$esc_whatsapp}', '{$esc_status}', {$created_by}, 0)";
+
+    if (mysqli_query($conn, $insert_sql)) {
+        $added++;
+    } else {
+        $errors[] = "الصف {$row_num}: فشل إضافة العميل «{$client_name}» - " . mysqli_error($conn);
+        $skipped++;
+    }
+}
+
+// ════════════════════════════════════════════
+// إرسال النتيجة
+// ════════════════════════════════════════════
+echo json_encode([
+    'success' => true,
+    'message' => "تم الاستيراد: {$added} عميل تم إضافتهم" . ($skipped > 0 ? "، {$skipped} تم تخطيهم" : ''),
+    'added'   => $added,
+    'skipped' => $skipped,
+    'errors'  => $errors,
+], JSON_UNESCAPED_UNICODE);
 exit;
-?>
+

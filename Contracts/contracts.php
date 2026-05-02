@@ -70,6 +70,14 @@ if (empty($_SESSION['contracts_csrf_token'])) {
 }
 $contracts_csrf_token = $_SESSION['contracts_csrf_token'];
 
+$mine_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$is_all_mines_view = ($mine_id <= 0);
+$filter_project_id = isset($_GET['filter_project_id']) ? intval($_GET['filter_project_id']) : 0;
+$filter_mine_id = isset($_GET['filter_mine_id']) ? intval($_GET['filter_mine_id']) : 0;
+if ($mine_id > 0) {
+  $filter_mine_id = $mine_id;
+}
+
 $contract_scope_sql = "1=1";
 if (!$is_super_admin) {
   if ($contracts_has_company) {
@@ -137,6 +145,54 @@ foreach ($equipmentTypes as $equipmentType) {
   $typeName = htmlspecialchars($equipmentType['type'], ENT_QUOTES, 'UTF-8');
   $equipmentTypeOptionsHtml .= '<option value="' . $typeId . '">' . $typeName . '</option>';
 }
+
+$project_scope_sql = '1=1';
+if (!$is_super_admin) {
+  if ($project_has_company_id) {
+    $project_scope_sql = 'p.company_id = ' . $company_id;
+  } else {
+    $project_scope_sql = "EXISTS (
+      SELECT 1
+      FROM users su
+      WHERE su.project_id = p.id
+        AND su.company_id = " . $company_id . "
+    )";
+  }
+}
+
+$form_projects = array();
+$form_projects_query = "SELECT p.id, p.name FROM project p WHERE p.status = 1 AND $project_scope_sql ORDER BY p.name ASC";
+$form_projects_result = mysqli_query($conn, $form_projects_query);
+if ($form_projects_result) {
+  while ($project_row = mysqli_fetch_assoc($form_projects_result)) {
+    $form_projects[] = $project_row;
+  }
+}
+
+// جلب قائمة المشاريع للفلتر من جدول المشاريع مباشرة
+$projects_filter_options = array();
+$projects_filter_query = "SELECT p.id, p.name FROM project p WHERE p.status = 1 AND $project_scope_sql ORDER BY p.name ASC";
+$projects_filter_result = mysqli_query($conn, $projects_filter_query);
+if ($projects_filter_result) {
+  while ($project_filter_row = mysqli_fetch_assoc($projects_filter_result)) {
+    $projects_filter_options[intval($project_filter_row['id'])] = $project_filter_row['name'];
+  }
+}
+
+// جلب مناجم الفلتر بناءً على المشروع المختار (server-side للتحميل الأولي)
+$mines_filter_options = array();
+if ($filter_project_id > 0) {
+  $mines_filter_query = "SELECT m.id, m.mine_name, m.mine_code FROM mines m
+                         WHERE m.project_id = $filter_project_id AND m.status = 1
+                         ORDER BY m.mine_name ASC";
+  $mines_filter_result = mysqli_query($conn, $mines_filter_query);
+  if ($mines_filter_result) {
+    while ($mine_filter_row = mysqli_fetch_assoc($mines_filter_result)) {
+      $mine_code_suffix = isset($mine_filter_row['mine_code']) && $mine_filter_row['mine_code'] !== '' ? ' (' . $mine_filter_row['mine_code'] . ')' : '';
+      $mines_filter_options[intval($mine_filter_row['id'])] = $mine_filter_row['mine_name'] . $mine_code_suffix;
+    }
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -200,11 +256,41 @@ foreach ($equipmentTypes as $equipmentType) {
           <input type="hidden" name="id" id="contract_id" value="">
           <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($contracts_csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
 
+          <?php if ($mine_id > 0): ?>
           <input type="hidden" name="mine_id" placeholder="معرف المنجم"
-            value="<?php echo isset($_GET['id']) ? intval($_GET['id']) : 0; ?>" required />
+            value="<?php echo intval($mine_id); ?>" required />
+          <?php else: ?>
+          <div class="section-title"><span class="chip">1</span> اختيار المشروع والمنجم</div>
+          <br>
+
+          <div class="form-grid">
+            <div class="field md-6 sm-6">
+              <label>المشروع <font color="red">*</font></label>
+              <div class="control">
+                <select id="contract_project_id" required>
+                  <option value="">— اختر المشروع —</option>
+                  <?php foreach ($form_projects as $project): ?>
+                  <option value="<?php echo intval($project['id']); ?>"><?php echo htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+            </div>
+
+            <div class="field md-6 sm-6">
+              <label>المنجم <font color="red">*</font></label>
+              <div class="control">
+                <select name="mine_id" id="contract_mine_id" required disabled>
+                  <option value="">— اختر المشروع أولاً —</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <hr class="hr" />
+          <?php endif; ?>
 
           <!-- القسم 1: إجماليات الساعات (يومياً وللعقد) -->
-          <div class="section-title"><span class="chip">1</span> إجماليات الساعات (يومياً وللعقد)</div>
+          <div class="section-title"><span class="chip">2</span> إجماليات الساعات (يومياً وللعقد)</div>
           <br>
 
           <div class="totals">
@@ -234,7 +320,7 @@ foreach ($equipmentTypes as $equipmentType) {
 
           <hr class="hr" />
 
-          <div class="section-title"><span class="chip">2</span> البيانات الأساسية للعميل والعقد</div>
+          <div class="section-title"><span class="chip">3</span> البيانات الأساسية للعميل والعقد</div>
           <br>
 
           <div class="form-grid">
@@ -669,12 +755,57 @@ foreach ($equipmentTypes as $equipmentType) {
         </div>
       </div>
 
+      <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0; background: #f8f9fa;">
+        <form method="get" action="contracts.php" style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
+          <?php if ($mine_id > 0): ?>
+          <input type="hidden" name="id" value="<?php echo intval($mine_id); ?>">
+          <?php endif; ?>
+
+          <div style="min-width:220px;">
+            <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المشروع</label>
+            <select name="filter_project_id" id="filter_project_select" class="form-control">
+              <option value="0">كل المشاريع</option>
+              <?php foreach ($projects_filter_options as $project_option_id => $project_option_name): ?>
+              <option value="<?php echo intval($project_option_id); ?>" <?php echo ($filter_project_id === intval($project_option_id)) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($project_option_name, ENT_QUOTES, 'UTF-8'); ?>
+              </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div style="min-width:220px;">
+            <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المنجم</label>
+            <?php if ($mine_id > 0): ?>
+            <input type="hidden" name="filter_mine_id" value="<?php echo intval($filter_mine_id); ?>">
+            <select class="form-control" disabled>
+              <option value="0">كل المناجم</option>
+            </select>
+            <?php else: ?>
+            <select name="filter_mine_id" id="filter_mine_select" class="form-control" <?php echo $filter_project_id <= 0 ? 'disabled' : ''; ?>>
+              <option value="0">كل المناجم</option>
+              <?php foreach ($mines_filter_options as $mine_option_id => $mine_option_name): ?>
+              <option value="<?php echo intval($mine_option_id); ?>" <?php echo ($filter_mine_id === intval($mine_option_id)) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($mine_option_name, ENT_QUOTES, 'UTF-8'); ?>
+              </option>
+              <?php endforeach; ?>
+            </select>
+            <?php endif; ?>
+          </div>
+
+          <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> تطبيق</button>
+          <a href="contracts.php<?php echo $mine_id > 0 ? '?id=' . intval($mine_id) : ''; ?>" class="btn btn-secondary"><i class="fas fa-undo"></i> مسح</a>
+        </form>
+      </div>
+
       <div class="card-body" style="padding: 2rem; overflow-x: auto;">
         <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
           <thead>
             <tr>
+              <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
               <!-- المعلومات الأساسية -->
               <th class="group-basic"><i class="fas fa-hashtag"></i> رقم العقد</th>
+              <th class="group-basic"><i class="fas fa-mountain"></i> المنجم</th>
+              <th class="group-basic"><i class="fas fa-project-diagram"></i> المشروع</th>
 
               <!-- التواريخ والمدد -->
               <th class="group-dates"><i class="far fa-calendar"></i> تاريخ التوقيع</th>
@@ -712,13 +843,11 @@ foreach ($equipmentTypes as $equipmentType) {
 
               <!-- الحالة والإجراءات -->
               <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
-              <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
             </tr>
           </thead>
           <tbody>
             <?php
             include 'contractequipments_handler.php';
-            $mine_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
             if (isset($_GET['delete_id'])) {
               $delete_id = intval($_GET['delete_id']);
@@ -980,11 +1109,22 @@ foreach ($equipmentTypes as $equipmentType) {
             }
 
             // جلب العقود مع بيانات المنجم والمشروع
-            $query = "SELECT c.*, m.mine_name, m.mine_code, p.name AS project_name 
+            $contracts_where_parts = array($contract_scope_sql);
+            if (!$is_all_mines_view) {
+              $contracts_where_parts[] = "c.mine_id = '$mine_id'";
+            } elseif ($filter_mine_id > 0) {
+              $contracts_where_parts[] = "c.mine_id = '$filter_mine_id'";
+            }
+            if ($filter_project_id > 0) {
+              $contracts_where_parts[] = "m.project_id = '$filter_project_id'";
+            }
+            $contracts_where_sql = implode(' AND ', $contracts_where_parts);
+
+            $query = "SELECT c.*, m.mine_name, m.mine_code, p.name AS project_name, p.id AS project_id 
                       FROM `contracts` c
                       LEFT JOIN mines m ON c.mine_id = m.id
                       LEFT JOIN project p ON m.project_id = p.id
-                      WHERE c.mine_id = '$mine_id' AND $contract_scope_sql
+                      WHERE $contracts_where_sql
                       ORDER BY c.id DESC";
             $result = mysqli_query($conn, $query);
             $i = 1;
@@ -1005,10 +1145,57 @@ foreach ($equipmentTypes as $equipmentType) {
               }
               $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
 
+              $actions_html = '';
+              if ($can_edit) {
+                $actions_html .= "<a href='javascript:void(0)' class='editBtn'
+             data-id='" . $row['id'] . "'
+               data-project_id='" . (isset($row['project_id']) ? intval($row['project_id']) : 0) . "'
+               data-mine_id='" . (isset($row['mine_id']) ? intval($row['mine_id']) : 0) . "'
+             data-contract_signing_date='" . $row['contract_signing_date'] . "'
+             data-grace_period_days='" . $row['grace_period_days'] . "'
+             data-contract_duration_days='" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "'
+             data-actual_start='" . $row['actual_start'] . "'
+             data-actual_end='" . $row['actual_end'] . "'
+             data-hours_monthly_target='" . $row['hours_monthly_target'] . "'
+             daily_work_hours ='" . $row['daily_work_hours'] . "'
+              daily_operators ='" . $row['daily_operators'] . "'
+               first_party ='" . $row['first_party'] . "'
+                second_party ='" . $row['second_party'] . "'
+                 witness_one ='" . $row['witness_one'] . "'
+                  witness_two ='" . $row['witness_two'] . "'
+                  transportation ='" . $row['transportation'] . "'
+                  accommodation ='" . $row['accommodation'] . "'
+                  place_for_living ='" . $row['place_for_living'] . "'
+                  workshop ='" . $row['workshop'] . "'
+                  equip_shifts_contract ='" . (isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0) . "'
+                  shift_contract ='" . (isset($row['shift_contract']) ? $row['shift_contract'] : 0) . "'
+                  equip_total_contract_daily ='" . (isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0) . "'
+                  total_contract_permonth ='" . (isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0) . "'
+                  total_contract_units ='" . (isset($row['total_contract_units']) ? $row['total_contract_units'] : 0) . "'
+                  price_currency_contract ='" . (isset($row['price_currency_contract']) ? $row['price_currency_contract'] : '') . "'
+                  paid_contract ='" . (isset($row['paid_contract']) ? $row['paid_contract'] : '') . "'
+                  payment_time ='" . (isset($row['payment_time']) ? $row['payment_time'] : '') . "'
+                  guarantees ='" . (isset($row['guarantees']) ? $row['guarantees'] : '') . "'
+                  payment_date ='" . (isset($row['payment_date']) ? $row['payment_date'] : '') . "'
+
+             data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
+             class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>";
+              }
+
+              if ($can_delete) {
+                $delete_mine_id = $mine_id > 0 ? $mine_id : intval(isset($row['mine_id']) ? $row['mine_id'] : 0);
+                $actions_html .= "<a href='contracts.php?id=" . $delete_mine_id . "&delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode($contracts_csrf_token) . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>";
+              }
+
+              $actions_html .= "<a href='contracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>";
+
               echo "<tr>";
+              echo "<td class='group-status'>" . $actions_html . "</td>";
 
               // المعلومات الأساسية
               echo "<td class='group-basic'>" . $row['id'] . "</td>";
+              echo "<td class='group-basic'>" . (isset($row['mine_name']) && $row['mine_name'] !== '' ? $row['mine_name'] . ' (' . $row['mine_code'] . ')' : '-') . "</td>";
+              echo "<td class='group-basic'>" . (isset($row['project_name']) && $row['project_name'] !== '' ? $row['project_name'] : '-') . "</td>";
 
               // التواريخ والمدد
               echo "<td class='group-dates'>" . $row['contract_signing_date'] . "</td>";
@@ -1051,49 +1238,6 @@ foreach ($equipmentTypes as $equipmentType) {
 
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";
-
-              echo "<td class='group-status'>";
-
-              if ($can_edit) {
-                echo "<a href='javascript:void(0)' class='editBtn'
-             data-id='" . $row['id'] . "'
-             data-contract_signing_date='" . $row['contract_signing_date'] . "'
-             data-grace_period_days='" . $row['grace_period_days'] . "'
-             data-contract_duration_days='" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "'
-             data-actual_start='" . $row['actual_start'] . "'
-             data-actual_end='" . $row['actual_end'] . "'
-             data-hours_monthly_target='" . $row['hours_monthly_target'] . "'
-             daily_work_hours ='" . $row['daily_work_hours'] . "'
-              daily_operators ='" . $row['daily_operators'] . "'
-               first_party ='" . $row['first_party'] . "'
-                second_party ='" . $row['second_party'] . "'
-                 witness_one ='" . $row['witness_one'] . "'
-                  witness_two ='" . $row['witness_two'] . "'
-                  transportation ='" . $row['transportation'] . "'
-                  accommodation ='" . $row['accommodation'] . "'
-                  place_for_living ='" . $row['place_for_living'] . "'
-                  workshop ='" . $row['workshop'] . "'
-                  equip_shifts_contract ='" . (isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0) . "'
-                  shift_contract ='" . (isset($row['shift_contract']) ? $row['shift_contract'] : 0) . "'
-                  equip_total_contract_daily ='" . (isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0) . "'
-                  total_contract_permonth ='" . (isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0) . "'
-                  total_contract_units ='" . (isset($row['total_contract_units']) ? $row['total_contract_units'] : 0) . "'
-                  price_currency_contract ='" . (isset($row['price_currency_contract']) ? $row['price_currency_contract'] : '') . "'
-                  paid_contract ='" . (isset($row['paid_contract']) ? $row['paid_contract'] : '') . "'
-                  payment_time ='" . (isset($row['payment_time']) ? $row['payment_time'] : '') . "'
-                  guarantees ='" . (isset($row['guarantees']) ? $row['guarantees'] : '') . "'
-                  payment_date ='" . (isset($row['payment_date']) ? $row['payment_date'] : '') . "'
-                  
-             data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
-             class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>";
-              }
-
-              if ($can_delete) {
-                echo "<a href='contracts.php?id=" . intval($mine_id) . "&delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode($contracts_csrf_token) . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>";
-              }
-
-              echo "<a href='contracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>
-                      </td>";
               echo "</tr>";
             }
             ?>
@@ -1152,6 +1296,79 @@ foreach ($equipmentTypes as $equipmentType) {
           contractForm.style.display = contractForm.style.display === "none" ? "block" : "none";
         });
       }
+
+      window.loadContractMines = function (projectId, selectedMineId) {
+        const mineSelect = $('#contract_mine_id');
+        if (!mineSelect.length) {
+          return;
+        }
+
+        if (!projectId) {
+          mineSelect.html('<option value="">— اختر المشروع أولاً —</option>').prop('disabled', true);
+          return;
+        }
+
+        mineSelect.prop('disabled', true).html('<option value="">— جاري التحميل... —</option>');
+        $.ajax({
+          url: '../Suppliers/get_project_mines.php',
+          type: 'POST',
+          data: { project_id: projectId },
+          dataType: 'json',
+          success: function (response) {
+            if (response.success && response.mines && response.mines.length > 0) {
+              let options = '<option value="">— اختر المنجم —</option>';
+              response.mines.forEach(function (mine) {
+                const selected = selectedMineId && parseInt(selectedMineId, 10) === parseInt(mine.id, 10) ? 'selected' : '';
+                options += `<option value="${mine.id}" ${selected}>${mine.display_name}</option>`;
+              });
+              mineSelect.html(options).prop('disabled', false);
+            } else {
+              mineSelect.html('<option value="">— لا توجد مناجم لهذا المشروع —</option>').prop('disabled', true);
+            }
+          },
+          error: function () {
+            mineSelect.html('<option value="">— خطأ في التحميل —</option>').prop('disabled', true);
+          }
+        });
+      }
+
+      $('#contract_project_id').on('change', function () {
+        window.loadContractMines($(this).val(), null);
+      });
+
+      // --- فلتر المناجم يعتمد على فلتر المشروع ---
+      $('#filter_project_select').on('change', function () {
+        const projectId = $(this).val();
+        const mineSelect = $('#filter_mine_select');
+        if (!mineSelect.length) return;
+
+        if (!projectId || projectId === '0') {
+          mineSelect.html('<option value="0">كل المناجم</option>').prop('disabled', true);
+          return;
+        }
+
+        mineSelect.prop('disabled', true).html('<option value="0">جاري التحميل...</option>');
+        $.ajax({
+          url: 'get_project_mines.php',
+          type: 'POST',
+          data: { project_id: projectId },
+          dataType: 'json',
+          success: function (response) {
+            let options = '<option value="0">كل المناجم</option>';
+            if (response.success && response.mines && response.mines.length > 0) {
+              response.mines.forEach(function (mine) {
+                options += `<option value="${mine.id}">${mine.display_name}</option>`;
+              });
+              mineSelect.html(options).prop('disabled', false);
+            } else {
+              mineSelect.html(options).prop('disabled', false);
+            }
+          },
+          error: function () {
+            mineSelect.html('<option value="0">كل المناجم</option>').prop('disabled', false);
+          }
+        });
+      });
     })();
 
   </script>
@@ -1474,6 +1691,14 @@ foreach ($equipmentTypes as $equipmentType) {
     $(document).on("click", ".editBtn", function () {
       $("#projectForm").show();
       $("#contract_id").val($(this).data("id"));
+
+      const projectId = $(this).data("project_id");
+      const mineId = $(this).data("mine_id");
+      if ($('#contract_project_id').length) {
+        $('#contract_project_id').val(projectId || '');
+        window.loadContractMines(projectId, mineId);
+      }
+
       $("#projectForm [name='contract_signing_date']").val($(this).data("contract_signing_date"));
       $("#projectForm [name='grace_period_days']").val($(this).data("grace_period_days"));
       $("#projectForm [name='contract_duration_days']").val($(this).data("contract_duration_days"));

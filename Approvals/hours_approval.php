@@ -1084,7 +1084,7 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <td>
               <button class="btn-note" onclick="openNotes(<?= $row['id'] ?>)"
                       title="عرض / إضافة ملاحظة">
-                <i class="fa fa-comment-dots"></i>
+                <i class="fa fa-comment-dots" <?php if (intval($row['notes_count']) > 0): ?>style="color:#ffaa33;"<?php endif; ?>></i>
                 <?php if (intval($row['notes_count']) > 0): ?>
                   <span class="note-cnt"><?= $row['notes_count'] ?></span>
                 <?php endif; ?>
@@ -1246,7 +1246,7 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <td>
               <button class="btn-note" onclick="openNotes(<?= $row['id'] ?>)"
                       title="عرض الملاحظات">
-                <i class="fa fa-comment-dots"></i>
+                <i class="fa fa-comment-dots" <?php if (intval($row['notes_count']) > 0): ?>style="color:#ffaa33;"<?php endif; ?>></i>
                 <?php if (intval($row['notes_count']) > 0): ?>
                   <span class="note-cnt"><?= $row['notes_count'] ?></span>
                 <?php endif; ?>
