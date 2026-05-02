@@ -79,8 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     "general_notes", "operator_hours", "machine_standby_hours",
     "jackhammer_standby_hours", "bucket_standby_hours",
     "extra_operator_hours", "operator_standby_hours", "operator_notes",
-    "tons_count", "trips_count",
-    "meters_type", "meters_count",
+    "tons_count", "trips_count", "transport_type",
+    "meters_type", "meters_count", "drilling_holes_count", "drilling_depth",
     "type", "user_id"
   ];
 
@@ -97,6 +97,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     exit;
   }
   $values['date'] = mysqli_real_escape_string($conn, $normalized_date);
+
+  // ✅ التحقق من ساعات الأعطال - يجب أن يساوي مجموع حقول الأعطال مجموع ساعات التعطل
+  $total_fault_hours = floatval($values['total_fault_hours']);
+  if ($total_fault_hours > 0) {
+    $hr_fault = floatval($values['hr_fault']);
+    $maintenance_fault = floatval($values['maintenance_fault']);
+    $marketing_fault = floatval($values['marketing_fault']);
+    $approval_fault = floatval($values['approval_fault']);
+    $other_fault_hours = floatval($values['other_fault_hours']);
+    
+    $total_faults_sum = $hr_fault + $maintenance_fault + $marketing_fault + $approval_fault + $other_fault_hours;
+    
+    // يجب أن يكون المجموع مساوياً لمجموع ساعات التعطل
+    if ($total_faults_sum != $total_fault_hours) {
+      echo "<script>alert('❌ خطأ في توزيع ساعات الأعطال!\\n\\nمجموع حقول الأعطال: " . $total_faults_sum . " ساعة\\nمجموع ساعات التعطل: " . $total_fault_hours . " ساعة\\n\\nيجب أن يكون مجموع الحقول التالية مساوياً لمجموع ساعات التعطل:\\n• عطل HR\\n• عطل صيانة\\n• عطل تسويق\\n• عطل اعتماد\\n• ساعات أعطال أخرى');</script>";
+      exit;
+    }
+  }
 
   if ($id > 0) {
     // UPDATE
@@ -349,11 +367,11 @@ if (!$is_super_admin) {
                 </div>
               </div>
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات العمل </h3>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> ساعات العمل </h3>
 
               <div>
-                <label>الساعات المنفذة</label>
-                <input type="number" name="executed_hours" id="executed_hours" value="0">
+                <label>الساعات المنفذة (محسوبة تلقائياً)</label>
+                <input type="number" name="executed_hours" id="executed_hours" value="0" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
               </div>
               <div>
                 <label>ساعات جردل</label>
@@ -387,7 +405,31 @@ if (!$is_super_admin) {
                 <label>ملاحظات ساعات العمل</label>
                 <textarea name="work_notes"></textarea>
               </div>
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات الاعطال </h3>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> ساعات الاعطال </h3>
+
+              <!-- ⚠️ تنبيه مهم للمستخدم -->
+              <div style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
+                <div style="display: flex; align-items: start; gap: 12px;">
+                  <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
+                  <div style="flex: 1;">
+                    <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى القراءة</h4>
+                    <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
+                      <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
+                      <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل تماماً:</strong>
+                    </p>
+                    <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
+                      <li><strong>عطل HR</strong></li>
+                      <li><strong>عطل صيانة</strong></li>
+                      <li><strong>عطل تسويق</strong></li>
+                      <li><strong>عطل اعتماد</strong></li>
+                      <li><strong>ساعات أعطال أخرى</strong></li>
+                    </ul>
+                    <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
+                      ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               <div>
                 <label>عطل HR</label>
@@ -447,8 +489,6 @@ if (!$is_super_admin) {
               <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>
 
 
-              <div></div>
-              <div></div>
 
 
               <div>
@@ -638,11 +678,14 @@ if (!$is_super_admin) {
 
               <input type="hidden" name="bucket_hours" id="bucket_hours" value="0">
               <input type="hidden" name="jackhammer_hours" id="jackhammer_hours" value="0">
-              <input type="hidden" name="extra_hours" id="extra_hours" value="0">
+               <div>
+                <label>ساعات إضافية </label>
+              <input type="number" name="extra_hours" id="extra_hours" value="0">
+              </div>
 
               <div>
-                <label>مجموع الساعات الإضافية</label>
-                <input type="number" name="extra_hours_total" id="extra_hours_total" value="0">
+                <label>مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
+                <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
               </div>
               <div>
                 <label>ساعات الاستعداد (بسبب العميل)</label>
@@ -661,7 +704,52 @@ if (!$is_super_admin) {
                 <textarea name="work_notes" id="work_notes"></textarea>
               </div>
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات الاعطال </h3>
+
+                    <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> 🚚 الأوزان والنقلات </h3>
+              <div>
+                <label>🔄 نوع النقل</label>
+                <select name="transport_type" id="transport_type">
+                  <option value="">-- اختر نوع النقل --</option>
+                  <option value="Waste">Waste (نفايات)</option>
+                  <option value="Ore">Ore (خام)</option>
+                </select>
+              </div>
+              <div>
+                <label>⚖️ وزن القلاب</label>
+                <input type="number" step="0.01" name="tons_count" id="tons_count" value="0" placeholder="0.00">
+              </div>
+              <div>
+                <label>🚛 عدد النقلات</label>
+                <input type="number" name="trips_count" id="trips_count" value="0" placeholder="0">
+              </div>
+
+
+
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> ساعات الاعطال </h3>
+
+              <!-- ⚠️ تنبيه مهم للمستخدم -->
+              <div style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
+                <div style="display: flex; align-items: start; gap: 12px;">
+                  <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
+                  <div style="flex: 1;">
+                    <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى القراءة</h4>
+                    <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
+                      <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
+                      <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل تماماً:</strong>
+                    </p>
+                    <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
+                      <li><strong>عطل HR</strong></li>
+                      <li><strong>عطل صيانة</strong></li>
+                      <li><strong>عطل تسويق</strong></li>
+                      <li><strong>عطل اعتماد</strong></li>
+                      <li><strong>ساعات أعطال أخرى</strong></li>
+                    </ul>
+                    <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
+                      ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               <div>
                 <label>عطل HR</label>
@@ -735,9 +823,9 @@ if (!$is_super_admin) {
 
 
               <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات عمل المشغل </h3>
-              <div></div>
-              <div></div>
-              <div></div>
+        
+          
+             
               <div></div>
 
               <div>
@@ -760,15 +848,7 @@ if (!$is_super_admin) {
                 <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
               </div>
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> 🚚 الأطنان والنقلات </h3>
-              <div>
-                <label>⚖️ عدد الأطنان</label>
-                <input type="number" step="0.01" name="tons_count" id="tons_count" value="0" placeholder="0.00">
-              </div>
-              <div>
-                <label>🚛 عدد النقلات</label>
-                <input type="number" name="trips_count" id="trips_count" value="0" placeholder="0">
-              </div>
+        
               <div></div>
               <div></div>
 
@@ -867,27 +947,24 @@ if (!$is_super_admin) {
                 </div>
               </div>
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات العمل </h3>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> ساعات العمل </h3>
 
               <div>
                 <label>الساعات المنفذة</label>
                 <input type="number" name="executed_hours" id="executed_hours" value="0">
               </div>
-              <div>
-                <label>ساعات جردل</label>
-                <input type="number" name="bucket_hours" id="bucket_hours" value="0">
-              </div>
-              <div>
-                <label>ساعات جاك همر</label>
-                <input type="number" name="jackhammer_hours" id="jackhammer_hours" value="0">
-              </div>
+             
+                <input type="hidden"  name="bucket_hours" id="bucket_hours" value="0">
+              
+                <input type="hidden" name="jackhammer_hours" id="jackhammer_hours" value="0">
+             
               <div>
                 <label>ساعات إضافية</label>
                 <input type="number" name="extra_hours" id="extra_hours" value="0">
               </div>
               <div>
-                <label>مجموع الساعات الإضافية</label>
-                <input type="number" name="extra_hours_total" id="extra_hours_total" value="0">
+                <label>مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
+                <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
               </div>
               <div>
                 <label>ساعات الاستعداد (بسبب العميل)</label>
@@ -905,7 +982,53 @@ if (!$is_super_admin) {
                 <label>ملاحظات ساعات العمل</label>
                 <textarea name="work_notes"></textarea>
               </div>
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات الاعطال </h3>
+               <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> 📏 الأمتار </h3>
+              <div>
+                <label>🔧 نوع الأمتار</label>
+                <select name="meters_type" id="meters_type">
+                  <option value="">-- اختر نوع الأمتار --</option>
+                  <option value="أمتار الخام">أمتار الخام</option>
+                  <option value="أمتار الوست">أمتار الوست</option>
+                  <option value="امتار اخذ العينات">امتار اخذ العينات</option>
+                </select>
+              </div>
+              <div>
+                <label>📐 عدد الأمتار (محسوبة تلقائياً)</label>
+                <input type="number" step="0.01" name="meters_count" id="meters_count" value="0" placeholder="0.00" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
+              </div>
+              <div>
+                <label>⛏️ عدد الحفر المخرمة</label>
+                <input type="number" name="drilling_holes_count" id="drilling_holes_count" value="0" placeholder="0">
+              </div>
+              <div>
+                <label>📊 أعماق الحفر (متر)</label>
+                <input type="number" step="0.01" name="drilling_depth" id="drilling_depth" value="0" placeholder="0.00">
+              </div>
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> ساعات الاعطال </h3>
+
+              <!-- ⚠️ تنبيه مهم للمستخدم -->
+              <div style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
+                <div style="display: flex; align-items: start; gap: 12px;">
+                  <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
+                  <div style="flex: 1;">
+                    <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى القراءة</h4>
+                    <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
+                      <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
+                      <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل تماماً:</strong>
+                    </p>
+                    <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
+                      <li><strong>عطل HR</strong></li>
+                      <li><strong>عطل صيانة</strong></li>
+                      <li><strong>عطل تسويق</strong></li>
+                      <li><strong>عطل اعتماد</strong></li>
+                      <li><strong>ساعات أعطال أخرى</strong></li>
+                    </ul>
+                    <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
+                      ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               <div>
                 <label>عطل HR</label>
@@ -965,8 +1088,7 @@ if (!$is_super_admin) {
               <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>
 
 
-              <div></div>
-              <div></div>
+            
 
 
               <div>
@@ -1022,21 +1144,7 @@ if (!$is_super_admin) {
                 <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
               </div>
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> 📏 الأمتار </h3>
-              <div>
-                <label>🔧 نوع الأمتار</label>
-                <select name="meters_type" id="meters_type">
-                  <option value="">-- اختر نوع الأمتار --</option>
-                  <option value="أمتار الخام">أمتار الخام</option>
-                  <option value="أمتار الوست">أمتار الوست</option>
-                  <option value="امتار اخذ العينات">امتار اخذ العينات</option>
-                </select>
-              </div>
-              <div>
-                <label>📐 عدد الأمتار</label>
-                <input type="number" step="0.01" name="meters_count" id="meters_count" value="0" placeholder="0.00">
-              </div>
-              <div></div>
+             
               <div></div>
 
               <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
@@ -1198,6 +1306,46 @@ if (!$is_super_admin) {
       .catch(err => console.error("خطأ في جلب البيانات:", err));
   }
 
+  // ✅ التحقق من ساعات الأعطال قبل إرسال النموذج
+  const projectForm = document.getElementById('projectForm');
+  if (projectForm) {
+    projectForm.addEventListener('submit', function(e) {
+      const totalFaultHours = parseFloat(document.querySelector("input[name='total_fault_hours']").value) || 0;
+      
+      if (totalFaultHours > 0) {
+        const hrFault = parseFloat(document.querySelector("input[name='hr_fault']").value) || 0;
+        const maintenanceFault = parseFloat(document.querySelector("input[name='maintenance_fault']").value) || 0;
+        const marketingFault = parseFloat(document.querySelector("input[name='marketing_fault']").value) || 0;
+        const approvalFault = parseFloat(document.querySelector("input[name='approval_fault']").value) || 0;
+        const otherFaultHours = parseFloat(document.querySelector("input[name='other_fault_hours']").value) || 0;
+        
+        const totalFaultsSum = hrFault + maintenanceFault + marketingFault + approvalFault + otherFaultHours;
+        
+        // يجب أن يكون المجموع مساوياً لمجموع ساعات التعطل
+        if (totalFaultsSum !== totalFaultHours) {
+          e.preventDefault(); // منع إرسال النموذج
+          alert('❌ خطأ في توزيع ساعات الأعطال!\n\n' +
+                'مجموع حقول الأعطال: ' + totalFaultsSum.toFixed(2) + ' ساعة\n' +
+                'مجموع ساعات التعطل: ' + totalFaultHours.toFixed(2) + ' ساعة\n\n' +
+                'يجب أن يكون مجموع الحقول التالية مساوياً لمجموع ساعات التعطل:\n' +
+                '• عطل HR\n' +
+                '• عطل صيانة\n' +
+                '• عطل تسويق\n' +
+                '• عطل اعتماد\n' +
+                '• ساعات أعطال أخرى');
+          
+          // التمرير إلى قسم الأعطال
+          const faultsSection = document.querySelector("input[name='hr_fault']");
+          if (faultsSection) {
+            faultsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => faultsSection.focus(), 500);
+          }
+          return false;
+        }
+      }
+    });
+  }
+
   document.querySelectorAll("#start_minutes, #start_seconds, #end_minutes, #end_seconds")
     .forEach(inp => {
       inp.addEventListener("input", function () {
@@ -1210,20 +1358,55 @@ if (!$is_super_admin) {
 
   // ✅ دالة لحساب العمليات الثلاثة
   function calculateCustomHours() {
-    let dependence = parseFloat(document.querySelector("input[name='dependence_hours']").value) || 0;
-    let executed = parseFloat(document.querySelector("input[name='executed_hours']").value) || 0;
-    let extraTotal = parseFloat(document.querySelector("input[name='extra_hours_total']").value) || 0;
-    let standby = parseFloat(document.querySelector("input[name='standby_hours']").value) || 0;
+    var machineType = "<?php echo $_GET['type']; ?>";
+    let executed = 0;
+    
+    // حساب الساعات المنفذة تلقائياً فقط للحفارات (type=1)
+    if (machineType === "1") {
+      let bucketHours = parseFloat(document.querySelector("input[name='bucket_hours']").value) || 0;
+      let jackhammer = parseFloat(document.querySelector("input[name='jackhammer_hours']").value) || 0;
+      let extraHours = parseFloat(document.querySelector("input[name='extra_hours']").value) || 0;
+      let standby = parseFloat(document.querySelector("input[name='standby_hours']").value) || 0;
+      let dependence = parseFloat(document.querySelector("input[name='dependence_hours']").value) || 0;
+      
+      // الساعات المنفذة = ساعات الجردل + ساعات الجاك همر + الساعات الإضافية + ساعات الاستعداد (بسبب العميل) + ساعات الاستعداد (اعتماد)
+      executed = bucketHours + jackhammer + extraHours + standby + dependence;
+      document.querySelector("input[name='executed_hours']").value = executed;
+    } else {
+      // بالنسبة للقلابات (type=2) والخرامات (type=3)، نأخذ القيمة المدخلة يدوياً
+      executed = parseFloat(document.querySelector("input[name='executed_hours']").value) || 0;
+    }
+    
+    // ✅ نسخ قيمة ساعات إضافية إلى مجموع الساعات الإضافية تلقائياً
+    let extraHours = parseFloat(document.querySelector("input[name='extra_hours']").value) || 0;
+    document.querySelector("input[name='extra_hours_total']").value = extraHours;
+    let extraTotal = extraHours;
     let shift = parseFloat(document.querySelector("input[name='shift_hours']").value) || 0;
     let maintenance = parseFloat(document.querySelector("input[name='maintenance_fault']").value) || 0;
     let marketing = parseFloat(document.querySelector("input[name='marketing_fault']").value) || 0;
+    let standby = parseFloat(document.querySelector("input[name='standby_hours']").value) || 0;
+    let dependence = parseFloat(document.querySelector("input[name='dependence_hours']").value) || 0;
 
     // العملية الأولى: مجموع ساعات العمل
-    let totalWork = executed + extraTotal + standby;
+    let totalWork;
+    if (machineType === "1") {
+      // للحفارات فقط: executed يتضمن standby و dependence
+      totalWork = executed + extraTotal;
+    } else {
+      // للقلابات والخرامات: executed منفصل عن standby
+      totalWork = executed + extraTotal + standby;
+    }
     document.querySelector("input[name='total_work_hours']").value = totalWork;
 
     // العملية الثانية: ساعات أعطال أخرى
-    let otherFault = shift - executed - standby - dependence;
+    let otherFault;
+    if (machineType === "1") {
+      // للحفارات فقط: executed يتضمن standby و dependence
+      otherFault = shift - executed;
+    } else {
+      // للقلابات والخرامات
+      otherFault = shift - executed - standby - dependence;
+    }
     if (otherFault < 0) otherFault = 0;
     document.querySelector("input[name='total_fault_hours']").value = otherFault;
 
@@ -1239,13 +1422,32 @@ if (!$is_super_admin) {
   }
 
   // شغل الحساب عند أي تغيير في الحقول
-  document.querySelectorAll("input[name='executed_hours'], input[name='extra_hours_total'], input[name='standby_hours'], input[name='shift_hours'], input[name='maintenance_fault'], input[name='marketing_fault'] , input[name='dependence_hours'] , input[name='machine_standby_hours']  ")
+  document.querySelectorAll("input[name='executed_hours'], input[name='bucket_hours'], input[name='jackhammer_hours'], input[name='extra_hours'], input[name='standby_hours'], input[name='shift_hours'], input[name='maintenance_fault'], input[name='marketing_fault'] , input[name='dependence_hours'] , input[name='machine_standby_hours']  ")
     .forEach(el => el.addEventListener("input", calculateCustomHours));
 
   // ✅ استدعاء أول مرة
   calculateCustomHours();
 
+  // ✅ دالة حساب عدد الأمتار للخرامات (type=3)
   var machineType = "<?php echo $_GET['type']; ?>";
+  if (machineType === "3") {
+    function calculateMetersCount() {
+      let holesCount = parseFloat(document.querySelector("input[name='drilling_holes_count']").value) || 0;
+      let drillingDepth = parseFloat(document.querySelector("input[name='drilling_depth']").value) || 0;
+      
+      // عدد الأمتار = عدد الحفر × عمق الحفر
+      let metersCount = holesCount * drillingDepth;
+      document.querySelector("input[name='meters_count']").value = metersCount.toFixed(2);
+    }
+
+    // ربط الدالة بحقلي عدد الحفر وأعماق الحفر
+    document.querySelectorAll("input[name='drilling_holes_count'], input[name='drilling_depth']")
+      .forEach(el => el.addEventListener("input", calculateMetersCount));
+    
+    // استدعاء أول مرة
+    calculateMetersCount();
+  }
+
   if (machineType === "1") {
     function calculateDiff() {
       // اجمع البداية
@@ -1408,8 +1610,11 @@ if (!$is_super_admin) {
       $("#operator_notes").val(data.operator_notes);
       $("#tons_count").val(data.tons_count || 0);
       $("#trips_count").val(data.trips_count || 0);
+      $("#transport_type").val(data.transport_type || '');
       $("#meters_type").val(data.meters_type || '');
       $("#meters_count").val(data.meters_count || 0);
+      $("#drilling_holes_count").val(data.drilling_holes_count || 0);
+      $("#drilling_depth").val(data.drilling_depth || 0);
 
       $("#projectForm").show();
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
