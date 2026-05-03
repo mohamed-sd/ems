@@ -77,6 +77,32 @@ $fMineId         = isset($_GET['mine_id'])         ? intval($_GET['mine_id'])   
 $fContractStatus = isset($_GET['contract_status']) ? trim($_GET['contract_status']) : '';
 $fCategory       = isset($_GET['category'])        ? trim($_GET['category'])        : '';
 
+// ─── سياسة التحميل الافتراضي: آخر 500 سجل قبل أي فلترة ────────────────
+$INITIAL_LOAD_LIMIT = 1000;
+$hasAnyFilter = (
+    $fDateFrom !== '' ||
+    $fDateTo !== '' ||
+    $fProjectId > 0 ||
+    $fSupplierId > 0 ||
+    $fDriverId > 0 ||
+    $fStatus >= 0 ||
+    $fSearch !== '' ||
+    $fShift !== '' ||
+    $fEquipId > 0 ||
+    $fMineId > 0 ||
+    $fContractStatus !== '' ||
+    $fCategory !== ''
+);
+$applyInitialLimit = ($_SERVER['REQUEST_METHOD'] === 'GET' && !$hasAnyFilter);
+
+if (!function_exists('rptApplyInitialLimit')) {
+    function rptApplyInitialLimit($sql, $applyLimit, $limit = 500) {
+        if (!$applyLimit) return $sql;
+        if (preg_match('/\\blimit\\s+\\d+/i', $sql)) return $sql;
+        return rtrim($sql, " \t\n\r;") . " LIMIT " . intval($limit);
+    }
+}
+
 // ─── بيانات القوائم المنسدلة (company-scoped) ────────────────────────────
 $projectsList  = getProjectsForDropdown($conn, $companyId, $isSuperAdmin);
 $suppliersList = getSuppliersForDropdown($conn, $companyId, $isSuperAdmin);
@@ -125,8 +151,8 @@ case 'supplier_timesheet':
 case 'fleet_timesheet':
 case 'drivers_timesheet': {
     $where = ["({$sc['t']})", "({$sc['o']})"];
-    if ($fDateFrom) $where[] = "STR_TO_DATE(t.date,'%Y-%m-%d') >= '" . mysqli_real_escape_string($conn, $fDateFrom) . "'";
-    if ($fDateTo)   $where[] = "STR_TO_DATE(t.date,'%Y-%m-%d') <= '" . mysqli_real_escape_string($conn, $fDateTo) . "'";
+    if ($fDateFrom) $where[] = "t.date >= '" . mysqli_real_escape_string($conn, $fDateFrom) . "'";
+    if ($fDateTo)   $where[] = "t.date <= '" . mysqli_real_escape_string($conn, $fDateTo) . "'";
     if ($fProjectId  > 0) $where[] = "o.project_id = $fProjectId";
     if ($fSupplierId > 0) $where[] = "s.id = $fSupplierId";
     if ($fDriverId   > 0) $where[] = "d.id = $fDriverId";
@@ -276,7 +302,7 @@ case 'drivers_timesheet': {
                     LEFT JOIN equipments e ON e.id=o.equipment
                     LEFT JOIN suppliers  s ON s.id=o.supplier_id
                     LEFT JOIN drivers    d ON d.id=t.driver
-                    WHERE $ws ORDER BY STR_TO_DATE(t.date,'%Y-%m-%d') DESC, t.id DESC";
+                    WHERE $ws ORDER BY t.date DESC, t.id DESC";
         } else {
             // timesheet_summary
               $headers = ['التاريخ','البداية','النهاية','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%','المشروع','المعدة','المورد','المشغل'];
@@ -300,9 +326,10 @@ case 'drivers_timesheet': {
                     LEFT JOIN equipments e ON e.id=o.equipment
                     LEFT JOIN suppliers  s ON s.id=o.supplier_id
                     LEFT JOIN drivers    d ON d.id=t.driver
-                    WHERE $ws ORDER BY STR_TO_DATE(t.date,'%Y-%m-%d') DESC, t.id DESC";
+                    WHERE $ws ORDER BY t.date DESC, t.id DESC";
         }
     }
+    $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
     $result = mysqli_query($conn, $sql);
     if (!$result) die('خطأ في الاستعلام: ' . mysqli_error($conn));
     while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
@@ -434,6 +461,7 @@ case 'project_detailed': {
                        CASE WHEN p.status=1 THEN 'نشط' ELSE 'غير نشط' END AS status_txt
                 FROM project p WHERE $ws ORDER BY p.status DESC, p.name ASC";
     }
+    $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
     $result = mysqli_query($conn, $sql);
     if (!$result) die('خطأ: ' . mysqli_error($conn));
     while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
@@ -537,6 +565,7 @@ case 'contracts_detailed': {
                 LEFT JOIN project p ON p.id=m.project_id
                 WHERE $ws ORDER BY c.contract_signing_date DESC";
     }
+    $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
     $result = mysqli_query($conn, $sql);
     if (!$result) die('خطأ: ' . mysqli_error($conn));
     while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
@@ -644,6 +673,7 @@ case 'supplier_equipment_performance': {
                 LEFT JOIN project   p ON p.id=sc.project_id
                 WHERE $ws ORDER BY sc.contract_signing_date DESC";
     }
+    $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
     $result = mysqli_query($conn, $sql);
     if (!$result) die('خطأ: ' . mysqli_error($conn));
     while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
@@ -730,6 +760,7 @@ case 'fleet_equipment_detailed': {
                 FROM equipments e LEFT JOIN suppliers s ON s.id=e.suppliers
                 WHERE $ws ORDER BY total_wh DESC, e.id DESC";
     }
+    $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
     $result = mysqli_query($conn, $sql);
     if (!$result) die('خطأ: ' . mysqli_error($conn));
     while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
@@ -826,6 +857,7 @@ case 'fleet_operations': {
                 LEFT JOIN equipments e ON e.id=o.equipment
                 WHERE $ws ORDER BY o.id DESC";
     }
+    $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
     $result = mysqli_query($conn, $sql);
     if (!$result) die('خطأ: ' . mysqli_error($conn));
     while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
@@ -911,6 +943,7 @@ case 'drivers_detailed': {
                 FROM drivers d LEFT JOIN suppliers s ON s.id=d.supplier_id
                 WHERE $ws ORDER BY total_wh DESC, d.id DESC";
     }
+    $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
     $result = mysqli_query($conn, $sql);
     if (!$result) die('خطأ: ' . mysqli_error($conn));
     while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
@@ -1005,6 +1038,7 @@ case 'drivers_contracts': {
             LEFT JOIN project p  ON p.id=dc.project_id
             LEFT JOIN mines  mn  ON mn.id=dc.mine_id
             WHERE $ws ORDER BY dc.contract_signing_date DESC";
+            $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
     $result = mysqli_query($conn, $sql);
     if (!$result) die('خطأ: ' . mysqli_error($conn));
     while ($r = mysqli_fetch_assoc($result)) $rows[] = $r;
@@ -1690,6 +1724,9 @@ body {
                 <i class="fas fa-table"></i>
                 <?php echo rr($page_title); ?>
                 <span class="cnt-badge"><?php echo count($rows); ?> سجل</span>
+                <?php if ($applyInitialLimit): ?>
+                <span class="cnt-badge" style="background:linear-gradient(120deg,#0d9488,#14b8a6)">عرض آخر <?php echo intval($INITIAL_LOAD_LIMIT); ?> سجل (افتراضيًا)</span>
+                <?php endif; ?>
             </div>
             <?php if (!empty($rows) && !empty($headers)): ?>
             <form method="POST" action="?<?php echo rr($exportQs); ?>" class="rpt-export-group">
