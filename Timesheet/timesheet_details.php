@@ -352,6 +352,17 @@ if (!isset($_SESSION['user'])) {
             display: inline-block;
         }
 
+        .chip-secondary {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1.5px solid #d1d5db;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
         /* Shift badge */
         .shift-badge {
             display: inline-flex;
@@ -1017,17 +1028,51 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="section-header-icon"><i class="fas fa-truck-loading"></i></div>
             <h4>الأطنان والنقلات</h4>
         </div>
-        <div class="cards-grid grid-2">
+        <div class="cards-grid grid-3">
 
-            <!-- عدد الأطنان -->
+            <!-- نوع النقل -->
             <div class="detail-card">
                 <div class="detail-card-header">
-                    <div class="detail-card-icon success"><i class="fas fa-weight-hanging"></i></div>
-                    <span class="detail-card-title">عدد الأطنان</span>
+                    <div class="detail-card-icon warning"><i class="fas fa-exchange-alt"></i></div>
+                    <span class="detail-card-title">نوع النقل</span>
                 </div>
                 <div class="detail-card-body">
                     <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-balance-scale"></i> الأطنان</span>
+                        <span class="detail-label"><i class="fas fa-tag"></i> النوع</span>
+                        <span class="detail-value">
+                            <?php 
+                            $transport_type = isset($row['transport_type']) && !empty($row['transport_type']) ? $row['transport_type'] : 'غير محدد';
+                            $transport_class = '';
+                            $transport_icon = '';
+                            if($transport_type === 'Waste') {
+                                $transport_class = 'chip-danger';
+                                $transport_icon = '<i class="fas fa-trash"></i> ';
+                                $transport_label = 'Waste (نفايات)';
+                            } elseif($transport_type === 'Ore') {
+                                $transport_class = 'chip-success';
+                                $transport_icon = '<i class="fas fa-gem"></i> ';
+                                $transport_label = 'Ore (خام)';
+                            } else {
+                                $transport_class = 'chip-secondary';
+                                $transport_icon = '<i class="fas fa-question"></i> ';
+                                $transport_label = 'غير محدد';
+                            }
+                            ?>
+                            <span class="<?php echo $transport_class; ?>"><?php echo $transport_icon . htmlspecialchars($transport_label); ?></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- وزن القلاب -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon success"><i class="fas fa-weight-hanging"></i></div>
+                    <span class="detail-card-title">وزن القلاب</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-balance-scale"></i> الوزن</span>
                         <span class="detail-value">
                             <span class="chip-success"><?php echo htmlspecialchars($row['tons_count'] ? number_format($row['tons_count'], 2) : '0.00'); ?> طن</span>
                         </span>
@@ -1060,9 +1105,9 @@ while ($row = mysqli_fetch_assoc($result)) {
     <div class="section-block">
         <div class="section-header">
             <div class="section-header-icon"><i class="fas fa-ruler-vertical"></i></div>
-            <h4>الأمتار</h4>
+            <h4>الأمتار والحفر</h4>
         </div>
-        <div class="cards-grid grid-2">
+        <div class="cards-grid grid-4">
 
             <!-- نوع الأمتار -->
             <div class="detail-card">
@@ -1091,6 +1136,38 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <span class="detail-label"><i class="fas fa-ruler"></i> الأمتار</span>
                         <span class="detail-value">
                             <span class="chip-primary"><?php echo htmlspecialchars($row['meters_count'] ? number_format($row['meters_count'], 2) : '0.00'); ?> متر</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- عدد الحفر المخرمة -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon success"><i class="fas fa-hammer"></i></div>
+                    <span class="detail-card-title">عدد الحفر المخرمة</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-circle-notch"></i> الحفر</span>
+                        <span class="detail-value">
+                            <span class="chip-success"><?php echo htmlspecialchars($row['drilling_holes_count'] ? $row['drilling_holes_count'] : '0'); ?> حفرة</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أعماق الحفر -->
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-icon info"><i class="fas fa-arrows-alt-v"></i></div>
+                    <span class="detail-card-title">أعماق الحفر</span>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-long-arrow-alt-down"></i> العمق</span>
+                        <span class="detail-value">
+                            <span class="chip-info"><?php echo htmlspecialchars($row['drilling_depth'] ? number_format($row['drilling_depth'], 2) : '0.00'); ?> متر</span>
                         </span>
                     </div>
                 </div>
