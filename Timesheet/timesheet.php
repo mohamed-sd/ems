@@ -488,26 +488,46 @@ if (!$is_super_admin) {
               </div>
               <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>
 
+              <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم الإضافة) -->
+              <div style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
+                    <select id="fc_event_type" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
+                      <option value="">-- اختر نوع الحدث --</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
+                    <select id="fc_main_cat" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                      <option value="">-- اختر الفئة --</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
+                    <select id="fc_sub_cat" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                      <option value="">-- اختر الجزء --</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
+                    <select id="fc_detail" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                      <option value="">-- اختر التفصيل --</option>
+                    </select>
+                  </div>
+                </div>
+                <div id="fc_code_display_add" style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
+                  <strong>كود العطل:</strong> <span id="fc_code_text_add"></span>
+                </div>
+              </div>
 
+              <!-- الحقول المخفية التي تُحفظ في قاعدة البيانات -->
+              <input type="hidden" name="fault_type"       id="fault_type" />
+              <input type="hidden" name="fault_department" id="fault_department" />
+              <input type="hidden" name="fault_part"       id="fault_part" />
+              <input type="hidden" name="fault_details"    id="fault_details" />
 
-
-              <div>
-                <label>نوع العطل</label>
-                <input type="text" name="fault_type" id="fault_type" />
-              </div>
-              <div>
-                <label>قسم العطل</label>
-                <input type="text" name="fault_department" id="fault_department" />
-              </div>
-              <div>
-                <label>الجزء المعطل</label>
-                <input type="text" name="fault_part" id="fault_part" />
-              </div>
-              <div>
-                <label>تفاصيل العطل</label>
-                <textarea name="fault_details" id="fault_details"></textarea>
-              </div>
-              <div>
+              <div style="grid-column: 1/-1;">
                 <label>ملاحظات عامة</label>
                 <textarea name="general_notes" id="general_notes"></textarea>
               </div>
@@ -800,23 +820,54 @@ if (!$is_super_admin) {
               <div></div>
 
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>              <div>
-                <label>نوع العطل</label>
-                <input type="text" name="fault_type" id="fault_type" />
+              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>
+
+              <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم التعديل) -->
+              <div style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
+                    <select id="fc_event_type_edit" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
+                      <option value="">-- اختر نوع الحدث --</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
+                    <select id="fc_main_cat_edit" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                      <option value="">-- اختر الفئة --</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
+                    <select id="fc_sub_cat_edit" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                      <option value="">-- اختر الجزء --</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
+                    <select id="fc_detail_edit" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                      <option value="">-- اختر التفصيل --</option>
+                    </select>
+                  </div>
+
+                </div>
+
+                <div id="fc_code_display_edit" style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
+                  <strong>كود العطل:</strong> <span id="fc_code_text_edit"></span>
+                </div>
               </div>
-              <div>
-                <label>قسم العطل</label>
-                <input type="text" name="fault_department" id="fault_department" />
-              </div>
-              <div>
-                <label>الجزء المعطل</label>
-                <input type="text" name="fault_part" id="fault_part" />
-              </div>
-              <div>
-                <label>تفاصيل العطل</label>
-                <textarea name="fault_details" id="fault_details"></textarea>
-              </div>
-              <div>
+
+              <!-- الحقول المخفية -->
+              <input type="hidden" name="fault_type"       id="fault_type" />
+              <input type="hidden" name="fault_department" id="fault_department" />
+              <input type="hidden" name="fault_part"       id="fault_part" />
+              <input type="hidden" name="fault_details"    id="fault_details" />
+
+              <div style="grid-column: 1/-1;">
                 <label>ملاحظات عامة</label>
                 <textarea name="general_notes" id="general_notes"></textarea>
               </div>
@@ -1087,27 +1138,46 @@ if (!$is_super_admin) {
               </div>
               <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>
 
+              <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم الإضافة 2) -->
+              <div style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
+                    <select id="fc_event_type_f3" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
+                      <option value="">-- اختر نوع الحدث --</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
+                    <select id="fc_main_cat_f3" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                      <option value="">-- اختر الفئة --</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
+                    <select id="fc_sub_cat_f3" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                      <option value="">-- اختر الجزء --</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
+                    <select id="fc_detail_f3" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                      <option value="">-- اختر التفصيل --</option>
+                    </select>
+                  </div>
+                </div>
+                <div id="fc_code_display_f3" style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
+                  <strong>كود العطل:</strong> <span id="fc_code_text_f3"></span>
+                </div>
+              </div>
 
-            
+              <!-- الحقول المخفية -->
+              <input type="hidden" name="fault_type"       id="fault_type" />
+              <input type="hidden" name="fault_department" id="fault_department" />
+              <input type="hidden" name="fault_part"       id="fault_part" />
+              <input type="hidden" name="fault_details"    id="fault_details" />
 
-
-              <div>
-                <label>نوع العطل</label>
-                <input type="text" name="fault_type" id="fault_type" />
-              </div>
-              <div>
-                <label>قسم العطل</label>
-                <input type="text" name="fault_department" id="fault_department" />
-              </div>
-              <div>
-                <label>الجزء المعطل</label>
-                <input type="text" name="fault_part" id="fault_part" />
-              </div>
-              <div>
-                <label>تفاصيل العطل</label>
-                <textarea name="fault_details" id="fault_details"></textarea>
-              </div>
-              <div>
+              <div style="grid-column: 1/-1;">
                 <label>ملاحظات عامة</label>
                 <textarea name="general_notes" id="general_notes"></textarea>
               </div>
@@ -1624,10 +1694,230 @@ if (!$is_super_admin) {
       });
   });
 
-
 </script>
 
+<!-- ==================== نظام الأعطال المتتالي ==================== -->
+<script>
+(function() {
+  // نوع المعدة من PHP (1=حفار, 2=قلاب, 3=خرامة)
+  var equipType = parseInt('<?= intval($type) ?>') || 1;
 
+  var BASE_URL = '<?= (strpos($_SERVER['PHP_SELF'], '/Timesheet/') !== false) ? '' : 'Timesheet/' ?>get_failure_codes.php';
+
+  // ============================
+  // دالة مساعدة: ملء القائمة
+  // ============================
+  function fillSelect(sel, options, placeholder) {
+    sel.empty().append($('<option>').val('').text(placeholder)).prop('disabled', false).css('opacity', 1);
+    $.each(options, function(i, o) {
+      sel.append($('<option>').val(o.value).text(o.label).data('extra', o.extra || ''));
+    });
+  }
+  function resetSelect(sel, placeholder) {
+    sel.empty().append($('<option>').val('').text(placeholder)).prop('disabled', true).css('opacity', 0.6);
+  }
+
+  // ============================
+  // وظيفة إنشاء نظام لفورم معين
+  // ============================
+  function initFailureSystem(opts) {
+    var eqType   = opts.eqType;
+    var selEvent = $(opts.selEvent);
+    var selMain  = $(opts.selMain);
+    var selSub   = $(opts.selSub);
+    var selDet   = $(opts.selDet);
+    var codeDisp = $(opts.codeDisp);
+    var codeTxt  = $(opts.codeTxt);
+    var hidType  = $(opts.hidType);
+    var hidDept  = $(opts.hidDept);
+    var hidPart  = $(opts.hidPart);
+    var hidDet   = $(opts.hidDet);
+
+    // 1. تحميل أنواع الأحداث
+    $.getJSON(BASE_URL, { action: 'get_event_types', equipment_type: eqType }, function(res) {
+      if (res && res.length) {
+        fillSelect(selEvent, res.map(function(r) {
+          return { value: r.event_type_code, label: r.event_type_name };
+        }), '-- اختر نوع الحدث --');
+      }
+    });
+
+    // 2. تغيير نوع الحدث → تحميل الفئات
+    selEvent.on('change', function() {
+      resetSelect(selMain, '-- اختر الفئة --');
+      resetSelect(selSub, '-- اختر الجزء --');
+      resetSelect(selDet, '-- اختر التفصيل --');
+      codeDisp.hide();
+      hidType.val($(this).find('option:selected').text());
+      hidDept.val(''); hidPart.val(''); hidDet.val('');
+      var code = $(this).val();
+      if (!code) return;
+      $.getJSON(BASE_URL, { action: 'get_main_cats', equipment_type: eqType, event_type_code: code }, function(res) {
+        if (res && res.length) {
+          fillSelect(selMain, res.map(function(r) {
+            return { value: r.main_category_code, label: r.main_category_name };
+          }), '-- اختر الفئة --');
+        }
+      });
+    });
+
+    // 3. تغيير الفئة الرئيسية → تحميل الأجزاء
+    selMain.on('change', function() {
+      resetSelect(selSub, '-- اختر الجزء --');
+      resetSelect(selDet, '-- اختر التفصيل --');
+      codeDisp.hide();
+      hidDept.val($(this).find('option:selected').text());
+      hidPart.val(''); hidDet.val('');
+      var mainCode = $(this).val();
+      if (!mainCode) return;
+      $.getJSON(BASE_URL, { action: 'get_sub_cats', equipment_type: eqType, event_type_code: selEvent.val(), main_cat_code: mainCode }, function(res) {
+        if (res && res.length) {
+          fillSelect(selSub, res.map(function(r) {
+            return { value: r, label: r };
+          }), '-- اختر الجزء --');
+        }
+      });
+    });
+
+    // 4. تغيير الجزء → تحميل التفصيل
+    selSub.on('change', function() {
+      resetSelect(selDet, '-- اختر التفصيل --');
+      codeDisp.hide();
+      hidPart.val($(this).val());
+      hidDet.val('');
+      var sub = $(this).val();
+      if (!sub) return;
+      $.getJSON(BASE_URL, { action: 'get_details', equipment_type: eqType, event_type_code: selEvent.val(), main_cat_code: selMain.val(), sub_cat: sub }, function(res) {
+        if (res && res.length) {
+          fillSelect(selDet, res.map(function(r) {
+            return { value: r.full_code, label: r.failure_detail };
+          }), '-- اختر التفصيل --');
+        }
+      });
+    });
+
+    // 5. تغيير التفصيل → تعبئة الحقول المخفية وعرض الكود
+    selDet.on('change', function() {
+      var fullCode = $(this).val();
+      var detText  = $(this).find('option:selected').text();
+      if (!fullCode) { codeDisp.hide(); hidDet.val(''); return; }
+      hidDet.val(fullCode + ' | ' + detText);
+      codeTxt.text(fullCode);
+      codeDisp.show();
+    });
+
+    // 6. دالة تحميل قيم موجودة (للتعديل)
+    return {
+      load: function(ft, fd, fp, fdet) {
+        if (!fdet) return;
+        var fullCode = fdet.split(' | ')[0].trim();
+        $.getJSON(BASE_URL, { action: 'get_by_code', full_code: fullCode }, function(r) {
+          if (!r) return;
+          $.getJSON(BASE_URL, { action: 'get_event_types', equipment_type: eqType }, function(res2) {
+            if (!res2 || !res2.length) return;
+            fillSelect(selEvent, res2.map(function(x) {
+              return { value: x.event_type_code, label: x.event_type_name };
+            }), '-- اختر نوع الحدث --');
+            selEvent.val(r.event_type_code);
+            hidType.val(selEvent.find('option:selected').text());
+            $.getJSON(BASE_URL, { action: 'get_main_cats', equipment_type: eqType, event_type_code: r.event_type_code }, function(res3) {
+              if (!res3 || !res3.length) return;
+              fillSelect(selMain, res3.map(function(x) {
+                return { value: x.main_category_code, label: x.main_category_name };
+              }), '-- اختر الفئة --');
+              selMain.val(r.main_category_code);
+              hidDept.val(selMain.find('option:selected').text());
+              $.getJSON(BASE_URL, { action: 'get_sub_cats', equipment_type: eqType, event_type_code: r.event_type_code, main_cat_code: r.main_category_code }, function(res4) {
+                if (!res4 || !res4.length) return;
+                fillSelect(selSub, res4.map(function(x) {
+                  return { value: x, label: x };
+                }), '-- اختر الجزء --');
+                selSub.val(r.sub_category);
+                hidPart.val(r.sub_category);
+                $.getJSON(BASE_URL, { action: 'get_details', equipment_type: eqType, event_type_code: r.event_type_code, main_cat_code: r.main_category_code, sub_cat: r.sub_category }, function(res5) {
+                  if (!res5 || !res5.length) return;
+                  fillSelect(selDet, res5.map(function(x) {
+                    return { value: x.full_code, label: x.failure_detail };
+                  }), '-- اختر التفصيل --');
+                  selDet.val(r.full_code);
+                  hidDet.val(r.full_code + ' | ' + r.failure_detail);
+                  codeTxt.text(r.full_code);
+                  codeDisp.show();
+                });
+              });
+            });
+          });
+        });
+      }
+    };
+  }
+
+  // ============================
+  // تهيئة الأنظمة الثلاثة
+  // ============================
+  var sys1 = initFailureSystem({
+    eqType:   equipType === 3 ? 1 : equipType, // الفورم 1 للحفار أو القلاب
+    selEvent: '#fc_event_type',
+    selMain:  '#fc_main_cat',
+    selSub:   '#fc_sub_cat',
+    selDet:   '#fc_detail',
+    codeDisp: '#fc_code_display_add',
+    codeTxt:  '#fc_code_text_add',
+    hidType:  '#fault_type',
+    hidDept:  '#fault_department',
+    hidPart:  '#fault_part',
+    hidDet:   '#fault_details'
+  });
+
+  var sys3 = initFailureSystem({
+    eqType:   3, // الفورم 3 للخرامة دائماً
+    selEvent: '#fc_event_type_f3',
+    selMain:  '#fc_main_cat_f3',
+    selSub:   '#fc_sub_cat_f3',
+    selDet:   '#fc_detail_f3',
+    codeDisp: '#fc_code_display_f3',
+    codeTxt:  '#fc_code_text_f3',
+    hidType:  'input[name="fault_type"]:last',
+    hidDept:  'input[name="fault_department"]:last',
+    hidPart:  'input[name="fault_part"]:last',
+    hidDet:   'input[name="fault_details"]:last'
+  });
+
+  var sysEdit = initFailureSystem({
+    eqType:   equipType,
+    selEvent: '#fc_event_type_edit',
+    selMain:  '#fc_main_cat_edit',
+    selSub:   '#fc_sub_cat_edit',
+    selDet:   '#fc_detail_edit',
+    codeDisp: '#fc_code_display_edit',
+    codeTxt:  '#fc_code_text_edit',
+    hidType:  '#fault_type',
+    hidDept:  '#fault_department',
+    hidPart:  '#fault_part',
+    hidDet:   '#fault_details'
+  });
+
+  // ============================
+  // تحميل بيانات التعديل عند فتح فورم التعديل
+  // ============================
+  $(document).on('click', '.editBtn', function() {
+    var row = $(this).closest('tr');
+    // الانتظار قليلاً حتى تُحمل بيانات السجل في الحقول
+    setTimeout(function() {
+      var ft   = $('#fault_type').val();
+      var fd   = $('#fault_department').val();
+      var fp   = $('#fault_part').val();
+      var fdet = $('#fault_details').val();
+      if (fdet) {
+        // تحديد نوع المعدة من حقل مخفي إن وجد أو استخدام equipType
+        var rowType = row.data('type') || equipType;
+        sysEdit.load(ft, fd, fp, fdet);
+      }
+    }, 400);
+  });
+
+})();
+</script>
 
 </body>
 
