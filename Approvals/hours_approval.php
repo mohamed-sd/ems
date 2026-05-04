@@ -202,6 +202,26 @@ if ($approved_result) {
     while ($r = $approved_result->fetch_assoc()) $approved_rows[] = $r;
 }
 
+// جلب أعداد الأعطال من جدول الأعطال لجميع السجلات دفعة واحدة
+$fault_counts_map = [];
+$_all_ts_for_faults = array_merge(
+    array_column($pending_rows, 'id'),
+    array_column($approved_rows, 'id')
+);
+$_all_ts_for_faults = array_values(array_unique(array_filter(array_map('intval', $_all_ts_for_faults))));
+if (!empty($_all_ts_for_faults)) {
+    $_fc_tbl_ha = @$conn->query("SHOW TABLES LIKE 'timesheet_failure_hours'");
+    if ($_fc_tbl_ha && $_fc_tbl_ha->num_rows > 0) {
+        $_fc_ids_ha = implode(',', $_all_ts_for_faults);
+        $_fc_res_ha = $conn->query("SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_failure_hours WHERE timesheet_id IN ($_fc_ids_ha) AND status = 1 GROUP BY timesheet_id");
+        if ($_fc_res_ha) {
+            while ($_fc_ha = $_fc_res_ha->fetch_assoc()) {
+                $fault_counts_map[intval($_fc_ha['timesheet_id'])] = intval($_fc_ha['cnt']);
+            }
+        }
+    }
+}
+
 // ─── جلب تفاصيل كل مستويات الاعتماد للسجلات المعتمدة نهائياً ───
 // نجلب دفعة واحدة لكل السجلات لتفادي N+1 queries
 $approved_ids = array_column($approved_rows, 'id');
@@ -1012,6 +1032,7 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <th>الانتظار</th>
             <th>الأعطال</th>
             <th>المجموع </th>
+            <th class="nosort">الأعطال المصنفة</th>
             <th class="col-g-hours nosort">ساعات الوردية</th>
             <th class="col-g-hours nosort">ساعات الاعتماد</th>
             <th class="col-g-hours nosort">ساعات إضافية</th>
@@ -1020,8 +1041,7 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <th class="col-g-faults nosort">عطل بشري</th>
             <th class="col-g-faults nosort">أعطال أخرى</th>
             <th class="col-g-faults nosort">فرق العداد</th>
-            <th class="col-g-faults nosort">نوع العطل</th>
-            <th class="col-g-faults nosort">القسم المسؤول</th>
+            <th class="col-g-faults nosort">الأعطال</th>
             <th class="col-g-notes nosort">ملاحظات العمل</th>
             <th class="col-g-faults nosort">ملاحظات الأعطال</th>
             <th class="nosort">ملاحظات</th>
@@ -1069,6 +1089,21 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <td><?= floatval($row['standby_hours'] ?? 0) ?></td>
             <td><?= floatval($row['total_fault_hours'] ?? 0) ?></td>
             <td><strong><?= floatval($row['total_work_hours'] ?? 0) ?></strong></td>
+            <?php
+              $_fc_c = intval($fault_counts_map[$row['id']] ?? 0);
+              $_has_leg = !empty($row['fault_type']) || !empty($row['fault_part']);
+              $_bc = $_fc_c > 0 ? $_fc_c : ($_has_leg ? 1 : 0);
+            ?>
+            <td style="text-align:center;">
+              <?php if ($_bc > 0): ?>
+                <button class="btn-fault-badge" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
+                  <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
+                  <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc ?></span>
+                </button>
+              <?php else: ?>
+                <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+              <?php endif; ?>
+            </td>
             <td><?= floatval($row['shift_hours'] ?? 0) ?></td>
             <td><?= floatval($row['dependence_hours'] ?? 0) ?></td>
             <td><?= floatval($row['extra_hours'] ?? 0) ?></td>
@@ -1077,8 +1112,16 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <td><?= floatval($row['hr_fault'] ?? 0) ?></td>
             <td><?= floatval($row['other_fault_hours'] ?? 0) ?></td>
             <td><?= floatval($row['counter_diff'] ?? 0) ?></td>
-            <td><?= htmlspecialchars($row['fault_type'] ?? '—') ?></td>
-            <td><?= htmlspecialchars($row['fault_department'] ?? '—') ?></td>
+            <td style="text-align:center;">
+              <?php if ($_bc > 0): ?>
+                <button class="btn-fault-badge" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
+                  <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
+                  <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc ?></span>
+                </button>
+              <?php else: ?>
+                <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+              <?php endif; ?>
+            </td>
             <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['work_notes'] ?? '') ?>"><?= htmlspecialchars($row['work_notes'] ?? '—') ?></td>
             <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['fault_notes'] ?? '') ?>"><?= htmlspecialchars($row['fault_notes'] ?? '—') ?></td>
             <td>
@@ -1152,6 +1195,7 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <th> الانتظار</th>
             <th> الأعطال</th>
             <th>المجموع </th>
+            <th class="nosort">الأعطال المصنفة</th>
             <th class="col-g-hours nosort">ساعات الوردية</th>
             <th class="col-g-hours nosort">ساعات الاعتماد</th>
             <th class="col-g-hours nosort">ساعات إضافية</th>
@@ -1160,8 +1204,7 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <th class="col-g-faults nosort">عطل بشري</th>
             <th class="col-g-faults nosort">أعطال أخرى</th>
             <th class="col-g-faults nosort">فرق العداد</th>
-            <th class="col-g-faults nosort">نوع العطل</th>
-            <th class="col-g-faults nosort">القسم المسؤول</th>
+            <th class="col-g-faults nosort">الأعطال</th>
             <th class="col-g-notes nosort">ملاحظات العمل</th>
             <th class="col-g-faults nosort">ملاحظات الأعطال</th>
             <th class="nosort">اعتمد بواسطة</th>
@@ -1200,6 +1243,21 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <td><?= floatval($row['standby_hours'] ?? 0) ?></td>
             <td><?= floatval($row['total_fault_hours'] ?? 0) ?></td>
             <td><strong><?= floatval($row['total_work_hours'] ?? 0) ?></strong></td>
+            <?php
+              $_fc_c2 = intval($fault_counts_map[$row['id']] ?? 0);
+              $_has_leg2 = !empty($row['fault_type']) || !empty($row['fault_part']);
+              $_bc2 = $_fc_c2 > 0 ? $_fc_c2 : ($_has_leg2 ? 1 : 0);
+            ?>
+            <td style="text-align:center;">
+              <?php if ($_bc2 > 0): ?>
+                <button class="btn-fault-badge" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
+                  <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
+                  <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc2 ?></span>
+                </button>
+              <?php else: ?>
+                <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+              <?php endif; ?>
+            </td>
             <td><?= floatval($row['shift_hours'] ?? 0) ?></td>
             <td><?= floatval($row['dependence_hours'] ?? 0) ?></td>
             <td><?= floatval($row['extra_hours'] ?? 0) ?></td>
@@ -1208,8 +1266,16 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <td><?= floatval($row['hr_fault'] ?? 0) ?></td>
             <td><?= floatval($row['other_fault_hours'] ?? 0) ?></td>
             <td><?= floatval($row['counter_diff'] ?? 0) ?></td>
-            <td><?= htmlspecialchars($row['fault_type'] ?? '—') ?></td>
-            <td><?= htmlspecialchars($row['fault_department'] ?? '—') ?></td>
+            <td style="text-align:center;">
+              <?php if ($_bc2 > 0): ?>
+                <button class="btn-fault-badge" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
+                  <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
+                  <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc2 ?></span>
+                </button>
+              <?php else: ?>
+                <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+              <?php endif; ?>
+            </td>
             <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['work_notes'] ?? '') ?>"><?= htmlspecialchars($row['work_notes'] ?? '—') ?></td>
             <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['fault_notes'] ?? '') ?>"><?= htmlspecialchars($row['fault_notes'] ?? '—') ?></td>
 
@@ -1276,6 +1342,24 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
   </div>
 
 </div><!-- end page-wrapper -->
+
+<!-- ══ Modal: عرض الأعطال ══ -->
+<div class="modal fade" id="faultDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content" dir="rtl">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">
+          <i class="fa fa-exclamation-triangle text-danger me-2"></i>
+          تفاصيل الأعطال — سجل #<span id="faultModal_ts_id_ha">—</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="faultModalBody_ha">
+        <div class="text-center py-4"><i class="fa fa-spinner fa-spin fa-2x text-muted"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════════════════════════════════════════════════════════
      Modal: الملاحظات
@@ -1635,6 +1719,37 @@ function escHtml(str) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
 }
+
+// ── الأعطال badge handler ────────────────────────────────────
+$(document).on('click', '.btn-fault-badge', function() {
+  var tsId = $(this).data('ts-id');
+  $('#faultModal_ts_id_ha').text(tsId);
+  $('#faultModalBody_ha').html('<div class="text-center py-4"><i class="fa fa-spinner fa-spin fa-2x text-muted"></i></div>');
+  var modal = new bootstrap.Modal(document.getElementById('faultDetailModal'));
+  modal.show();
+  $.getJSON('../Timesheet/get_timesheet_failures.php?timesheet_id=' + tsId, function(res) {
+    if (res && res.success && res.data && res.data.length > 0) {
+      var html = '<div class="table-responsive"><table class="table table-sm table-hover table-bordered">';
+      html += '<thead class="table-dark"><tr><th>#</th><th>الكود الكامل</th><th>نوع الحدث</th><th>الفئة الرئيسية</th><th>الفئة الفرعية</th><th>تفصيل العطل</th></tr></thead><tbody>';
+      $.each(res.data, function(i, f) {
+        html += '<tr>';
+        html += '<td>' + (i+1) + '</td>';
+        html += '<td><span class="badge rounded-pill bg-danger">' + escHtml(f.full_code || '—') + '</span></td>';
+        html += '<td>' + escHtml(f.event_type_name || '—') + '</td>';
+        html += '<td>' + escHtml(f.main_category_name || '—') + '</td>';
+        html += '<td>' + escHtml(f.sub_category || '—') + '</td>';
+        html += '<td>' + escHtml(f.failure_detail || '—') + '</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      $('#faultModalBody_ha').html(html);
+    } else {
+      $('#faultModalBody_ha').html('<div class="alert alert-warning">لا توجد أعطال مصنفة من منظومة الأعطال. <small class="text-muted">قد تكون البيانات محفوظة بالنظام القديم.</small></div>');
+    }
+  }).fail(function() {
+    $('#faultModalBody_ha').html('<div class="alert alert-danger">تعذر تحميل بيانات الأعطال.</div>');
+  });
+});
 
 // ── الفلاتر ──────────────────────────────────────────────────
 // دالة مخصصة لـ DataTables تفلتر بناءً على data attributes في <tr>

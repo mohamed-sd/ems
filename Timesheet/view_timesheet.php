@@ -404,6 +404,46 @@ if ($export_all) {
 
 $result = mysqli_query($conn, $select_sql . $display_limit_sql);
 
+// Pre-fetch all rows into array + batch-load fault counts from bridge table
+$all_rows = [];
+if ($result) {
+    while ($_r = mysqli_fetch_assoc($result)) {
+        $all_rows[] = $_r;
+    }
+}
+$fault_counts_map = [];
+// Pre-load recorded notes and failures for each timesheet
+$notes_map = [];
+$failures_map = [];
+if (!empty($all_rows)) {
+    $_ts_ids = array_filter(array_map('intval', array_column($all_rows, 'id')));
+    if (!empty($_ts_ids)) {
+        $_ids_in = implode(',', $_ts_ids);
+        
+        // Load failure counts
+        $_fc_tbl = @$conn->query("SHOW TABLES LIKE 'timesheet_failure_hours'");
+        if ($_fc_tbl && $_fc_tbl->num_rows > 0) {
+            $_fc_res = $conn->query("SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_failure_hours WHERE timesheet_id IN ($_ids_in) AND status = 1 GROUP BY timesheet_id");
+            if ($_fc_res) {
+                while ($_fc = $_fc_res->fetch_assoc()) {
+                    $fault_counts_map[intval($_fc['timesheet_id'])] = intval($_fc['cnt']);
+                }
+            }
+        }
+        
+        // Load recorded notes
+        $_an_tbl = @$conn->query("SHOW TABLES LIKE 'timesheet_approval_notes'");
+        if ($_an_tbl && $_an_tbl->num_rows > 0) {
+            $_an_res = $conn->query("SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_approval_notes WHERE timesheet_id IN ($_ids_in) AND status = 1 GROUP BY timesheet_id");
+            if ($_an_res) {
+                while ($_an = $_an_res->fetch_assoc()) {
+                    $notes_map[intval($_an['timesheet_id'])] = intval($_an['cnt']);
+                }
+            }
+        }
+    }
+}
+
 $export_params = $_GET;
 $export_params['export_all'] = '1';
 $export_all_url = 'view_timesheet.php?' . http_build_query($export_params);
@@ -660,10 +700,9 @@ include('../insidebar.php');
                         <th data-group="counter">عداد النهاية</th>
                         <th data-group="counter">فرق العداد</th>
 
-                        <th data-group="fault_details">نوع العطل</th>
-                        <th data-group="fault_details">قسم العطل</th>
-                        <th data-group="fault_details">الجزء المعطل</th>
-                        <th data-group="fault_details">تفاصيل العطل</th>
+                        <th data-group="fault_details">الأعطال المصنفة</th>
+
+                        <th data-group="recorded">الملاحظات المسجلة</th>
 
                         <th data-group="operator">ساعات عمل المشغل</th>
                         <th data-group="operator">استعداد الآلية</th>
@@ -685,8 +724,8 @@ include('../insidebar.php');
                 <tbody>
                     <?php
                     $i = 1;
-                    if ($result) {
-                        while ($row = mysqli_fetch_assoc($result)) {
+                    if (!empty($all_rows)) {
+                        foreach ($all_rows as $row) {
                             $status_badge = '';
                             if ($row['status'] === '1') {
                                 $status_badge = '<span class="status-pill" style="background: rgba(232,184,0,.13); color: var(--gold); border: 1px solid rgba(232,184,0,.22);">قيد المراجعة</span>';
@@ -736,10 +775,21 @@ include('../insidebar.php');
                             echo '<td>' . htmlspecialchars($end_counter_text) . '</td>';
                             echo '<td>' . htmlspecialchars($row['counter_diff']) . '</td>';
 
-                            echo '<td>' . htmlspecialchars($row['fault_type']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['fault_department']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['fault_part']) . '</td>';
-                            echo '<td>' . htmlspecialchars($row['fault_details']) . '</td>';
+                            $_fc_cnt = intval($fault_counts_map[$row['id']] ?? 0);
+                            $_legacy_has = !empty($row['fault_type']) || !empty($row['fault_part']);
+                            $_badge_cnt = $_fc_cnt > 0 ? $_fc_cnt : ($_legacy_has ? 1 : 0);
+                            if ($_badge_cnt > 0) {
+                                echo '<td style="text-align:center;"><button class="btn-fault-badge" data-ts-id="' . intval($row['id']) . '" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;"><i class="fas fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i> <span class="badge rounded-pill" style="background:#dc3545;color:#fff;font-size:.68rem;">' . $_badge_cnt . '</span></button></td>';
+                            } else {
+                                echo '<td style="text-align:center;" title="لا توجد أعطال"><i class="fas fa-check-circle" style="color:#059669;font-size:.9rem;"></i></td>';
+                            }
+
+                            $_notes_cnt = intval($notes_map[$row['id']] ?? 0);
+                            if ($_notes_cnt > 0) {
+                                echo '<td style="text-align:center;"><span class="badge rounded-pill" style="background:#0f2444;color:#fff;font-size:.68rem;"><i class="fas fa-clipboard-check"></i> ' . $_notes_cnt . '</span></td>';
+                            } else {
+                                echo '<td style="text-align:center;"><span style="color:#adb5bd;font-size:.75rem;">—</span></td>';
+                            }
 
                             echo '<td>' . htmlspecialchars($row['operator_hours']) . '</td>';
                             echo '<td>' . htmlspecialchars($row['machine_standby_hours']) . '</td>';
@@ -940,6 +990,56 @@ $(document).ready(function () {
     });
 
     syncGroupToggles();
+});
+</script>
+
+<!-- ══ Modal: عرض الأعطال ══ -->
+<div class="modal fade" id="faultDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content" dir="rtl">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">
+          <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+          تفاصيل الأعطال — سجل #<span id="faultModal_ts_id">—</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="faultModalBody">
+        <div class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).on('click', '.btn-fault-badge', function() {
+    var tsId = $(this).data('ts-id');
+    $('#faultModal_ts_id').text(tsId);
+    $('#faultModalBody').html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>');
+    var modal = new bootstrap.Modal(document.getElementById('faultDetailModal'));
+    modal.show();
+    $.getJSON('get_timesheet_failures.php?timesheet_id=' + tsId, function(res) {
+        if (res && res.success && res.data && res.data.length > 0) {
+            var html = '<div class="table-responsive"><table class="table table-sm table-hover table-bordered">';
+            html += '<thead class="table-dark"><tr><th>#</th><th>الكود الكامل</th><th>نوع الحدث</th><th>الفئة الرئيسية</th><th>الفئة الفرعية</th><th>تفصيل العطل</th></tr></thead><tbody>';
+            $.each(res.data, function(i, f) {
+                html += '<tr>';
+                html += '<td>' + (i+1) + '</td>';
+                html += '<td><span class="badge rounded-pill bg-danger">' + (f.full_code || '—') + '</span></td>';
+                html += '<td>' + (f.event_type_name || '—') + '</td>';
+                html += '<td>' + (f.main_category_name || '—') + '</td>';
+                html += '<td>' + (f.sub_category || '—') + '</td>';
+                html += '<td>' + (f.failure_detail || '—') + '</td>';
+                html += '</tr>';
+            });
+            html += '</tbody></table></div>';
+            $('#faultModalBody').html(html);
+        } else {
+            $('#faultModalBody').html('<div class="alert alert-warning">لا توجد أعطال مصنفة من منظومة الأعطال. <small class="text-muted">قد تكون البيانات محفوظة بالنظام القديم.</small></div>');
+        }
+    }).fail(function() {
+        $('#faultModalBody').html('<div class="alert alert-danger">تعذر تحميل بيانات الأعطال.</div>');
+    });
 });
 </script>
 

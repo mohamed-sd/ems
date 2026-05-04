@@ -44,6 +44,158 @@ if (!function_exists('normalize_timesheet_date')) {
   }
 }
 
+if (!function_exists('sanitize_fault_item_text')) {
+  function sanitize_fault_item_text($value)
+  {
+    return trim((string)$value);
+  }
+}
+
+if (!function_exists('parse_fault_items_json')) {
+  function parse_fault_items_json($raw_json)
+  {
+    $decoded = json_decode((string)$raw_json, true);
+    if (!is_array($decoded)) {
+      return [];
+    }
+
+    $items = [];
+    foreach ($decoded as $row) {
+      if (!is_array($row)) {
+        continue;
+      }
+
+      $failure_code_id = isset($row['failure_code_id']) ? intval($row['failure_code_id']) : 0;
+      $full_code = sanitize_fault_item_text(isset($row['full_code']) ? $row['full_code'] : '');
+      if ($failure_code_id <= 0 && $full_code === '') {
+        continue;
+      }
+
+      $items[] = [
+        'failure_code_id'     => $failure_code_id,
+        'event_type_code'     => sanitize_fault_item_text(isset($row['event_type_code']) ? $row['event_type_code'] : ''),
+        'event_type_name'     => sanitize_fault_item_text(isset($row['event_type_name']) ? $row['event_type_name'] : ''),
+        'main_category_code'  => sanitize_fault_item_text(isset($row['main_category_code']) ? $row['main_category_code'] : ''),
+        'main_category_name'  => sanitize_fault_item_text(isset($row['main_category_name']) ? $row['main_category_name'] : ''),
+        'sub_category'        => sanitize_fault_item_text(isset($row['sub_category']) ? $row['sub_category'] : ''),
+        'failure_detail'      => sanitize_fault_item_text(isset($row['failure_detail']) ? $row['failure_detail'] : ''),
+        'full_code'           => $full_code,
+      ];
+    }
+
+    return $items;
+  }
+}
+
+if (!function_exists('enrich_fault_items_from_failure_codes')) {
+  function enrich_fault_items_from_failure_codes($conn, $equipment_type, $items)
+  {
+    $has_failure_codes = db_table_has_column($conn, 'failure_codes', 'id');
+    if (!$has_failure_codes || empty($items)) {
+      return $items;
+    }
+
+    $equipment_type = intval($equipment_type);
+
+    foreach ($items as $i => $item) {
+      $failure_code_id = isset($item['failure_code_id']) ? intval($item['failure_code_id']) : 0;
+      $full_code = mysqli_real_escape_string($conn, isset($item['full_code']) ? $item['full_code'] : '');
+
+      if ($failure_code_id > 0) {
+        $where = "id = $failure_code_id";
+      } elseif ($full_code !== '') {
+        $where = "full_code = '$full_code'";
+      } else {
+        continue;
+      }
+
+      $type_filter = $equipment_type > 0 ? " AND equipment_type = $equipment_type" : '';
+      $sql = "SELECT id, event_type_code, event_type_name, main_category_code, main_category_name, sub_category, failure_detail, full_code
+              FROM failure_codes
+              WHERE $where$type_filter AND status = 1
+              LIMIT 1";
+      $res = mysqli_query($conn, $sql);
+      if ($res && mysqli_num_rows($res) > 0) {
+        $row = mysqli_fetch_assoc($res);
+        $items[$i]['failure_code_id'] = intval($row['id']);
+        $items[$i]['event_type_code'] = $row['event_type_code'];
+        $items[$i]['event_type_name'] = $row['event_type_name'];
+        $items[$i]['main_category_code'] = $row['main_category_code'];
+        $items[$i]['main_category_name'] = $row['main_category_name'];
+        $items[$i]['sub_category'] = $row['sub_category'];
+        $items[$i]['failure_detail'] = $row['failure_detail'];
+        $items[$i]['full_code'] = $row['full_code'];
+      }
+    }
+
+    return $items;
+  }
+}
+
+if (!function_exists('save_timesheet_failure_hours')) {
+  function save_timesheet_failure_hours($conn, $timesheet_id, $operation_id, $timesheet_date, $equipment_type, $company_id, $user_id, $items)
+  {
+    $has_failures_table = db_table_has_column($conn, 'timesheet_failure_hours', 'id');
+    if (!$has_failures_table) {
+      return true;
+    }
+
+    $timesheet_id = intval($timesheet_id);
+    $operation_id = intval($operation_id);
+    $equipment_type = intval($equipment_type);
+    $company_id = intval($company_id);
+    $user_id = intval($user_id);
+    $timesheet_date = mysqli_real_escape_string($conn, (string)$timesheet_date);
+
+    $equipment_id = 0;
+    if ($operation_id > 0) {
+      $eq_res = mysqli_query($conn, "SELECT equipment FROM operations WHERE id = $operation_id LIMIT 1");
+      if ($eq_res && mysqli_num_rows($eq_res) > 0) {
+        $eq_row = mysqli_fetch_assoc($eq_res);
+        $equipment_id = intval($eq_row['equipment']);
+      }
+    }
+
+    if (!mysqli_query($conn, "DELETE FROM timesheet_failure_hours WHERE timesheet_id = $timesheet_id")) {
+      return false;
+    }
+
+    if (empty($items)) {
+      return true;
+    }
+
+    foreach ($items as $item) {
+      $failure_code_id = isset($item['failure_code_id']) ? intval($item['failure_code_id']) : 0;
+      if ($failure_code_id <= 0) {
+        continue;
+      }
+
+      $event_type_code = mysqli_real_escape_string($conn, isset($item['event_type_code']) ? $item['event_type_code'] : '');
+      $event_type_name = mysqli_real_escape_string($conn, isset($item['event_type_name']) ? $item['event_type_name'] : '');
+      $main_category_code = mysqli_real_escape_string($conn, isset($item['main_category_code']) ? $item['main_category_code'] : '');
+      $main_category_name = mysqli_real_escape_string($conn, isset($item['main_category_name']) ? $item['main_category_name'] : '');
+      $sub_category = mysqli_real_escape_string($conn, isset($item['sub_category']) ? $item['sub_category'] : '');
+      $failure_detail = mysqli_real_escape_string($conn, isset($item['failure_detail']) ? $item['failure_detail'] : '');
+      $full_code = mysqli_real_escape_string($conn, isset($item['full_code']) ? $item['full_code'] : '');
+
+      $sql = "INSERT INTO timesheet_failure_hours
+              (timesheet_id, operation_id, equipment_id, failure_code_id, equipment_type,
+               event_type_code, event_type_name, main_category_code, main_category_name,
+               sub_category, failure_detail, full_code, timesheet_date, company_id, created_by)
+              VALUES
+              ($timesheet_id, $operation_id, $equipment_id, $failure_code_id, $equipment_type,
+               '$event_type_code', '$event_type_name', '$main_category_code', '$main_category_name',
+               '$sub_category', '$failure_detail', '$full_code', '$timesheet_date', $company_id, $user_id)";
+
+      if (!mysqli_query($conn, $sql)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+}
+
 // If user doesn't have a project assigned, get the first available project from the company
 if ($session_project_id <= 0) {
   if ($is_super_admin) {
@@ -65,6 +217,7 @@ if ($session_project_id <= 0) {
 // Handle POST submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
   $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+  $posted_fault_items_json = isset($_POST['fault_items_json']) ? $_POST['fault_items_json'] : '[]';
   
   // Secure form values
   $fields = [
@@ -97,6 +250,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     exit;
   }
   $values['date'] = mysqli_real_escape_string($conn, $normalized_date);
+
+  // Parse multiple failure items from hidden JSON; fallback to legacy single fault field.
+  $fault_items = parse_fault_items_json($posted_fault_items_json);
+  if (empty($fault_items)) {
+    $legacy_code = '';
+    if (!empty($values['fault_details'])) {
+      $parts = explode('|', $values['fault_details']);
+      $legacy_code = trim($parts[0]);
+    }
+
+    if ($legacy_code !== '') {
+      $fault_items[] = [
+        'failure_code_id' => 0,
+        'event_type_code' => '',
+        'event_type_name' => isset($values['fault_type']) ? $values['fault_type'] : '',
+        'main_category_code' => '',
+        'main_category_name' => isset($values['fault_department']) ? $values['fault_department'] : '',
+        'sub_category' => isset($values['fault_part']) ? $values['fault_part'] : '',
+        'failure_detail' => trim(str_replace($legacy_code, '', isset($values['fault_details']) ? $values['fault_details'] : ''), " |"),
+        'full_code' => $legacy_code,
+      ];
+    }
+  }
+
+  $fault_items = enrich_fault_items_from_failure_codes($conn, isset($values['type']) ? $values['type'] : 0, $fault_items);
 
   // ✅ التحقق من ساعات الأعطال - يجب أن يساوي مجموع حقول الأعطال مجموع ساعات التعطل
   $total_fault_hours = floatval($values['total_fault_hours']);
@@ -148,11 +326,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
             VALUES ('" . implode("','", $values) . "'" . $insert_company_val . ")";
   }
 
-  if (mysqli_query($conn, $sql)) {
+  mysqli_begin_transaction($conn);
+  $ok = mysqli_query($conn, $sql);
+  if ($ok) {
+    $saved_timesheet_id = ($id > 0) ? $id : intval(mysqli_insert_id($conn));
+    $operation_id = isset($values['operator']) ? intval($values['operator']) : 0;
+    $equipment_type = isset($values['type']) ? intval($values['type']) : 0;
+    $created_by = isset($values['user_id']) ? intval($values['user_id']) : (isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0);
+    $saved = save_timesheet_failure_hours(
+      $conn,
+      $saved_timesheet_id,
+      $operation_id,
+      $values['date'],
+      $equipment_type,
+      $company_id,
+      $created_by,
+      $fault_items
+    );
+
+    if (!$saved) {
+      mysqli_rollback($conn);
+      echo "<script>alert('❌ تم إلغاء الحفظ بسبب خطأ في حفظ تفاصيل الأعطال المتعددة');</script>";
+      exit;
+    }
+
+    mysqli_commit($conn);
     $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
     echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
     exit;
   } else {
+    mysqli_rollback($conn);
     echo "<script>alert('❌ خطأ في الحفظ: " . addslashes(mysqli_error($conn)) . "');</script>";
   }
 }
@@ -526,6 +729,32 @@ if (!$is_super_admin) {
               <input type="hidden" name="fault_department" id="fault_department" />
               <input type="hidden" name="fault_part"       id="fault_part" />
               <input type="hidden" name="fault_details"    id="fault_details" />
+              <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
+
+              <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                  <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
+                  <button type="button" id="addFaultBtn" style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+ إضافة العطل الحالي</button>
+                </div>
+                <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
+                <div style="overflow:auto;">
+                  <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+                    <thead>
+                      <tr style="background:#f8f9fa;">
+                        <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
+                      </tr>
+                    </thead>
+                    <tbody id="faultsSelectedBody">
+                      <tr><td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا توجد أعطال مضافة بعد</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
               <div style="grid-column: 1/-1;">
                 <label>ملاحظات عامة</label>
@@ -866,6 +1095,32 @@ if (!$is_super_admin) {
               <input type="hidden" name="fault_department" id="fault_department" />
               <input type="hidden" name="fault_part"       id="fault_part" />
               <input type="hidden" name="fault_details"    id="fault_details" />
+              <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
+
+              <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                  <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
+                  <button type="button" id="addFaultBtn" style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+ إضافة العطل الحالي</button>
+                </div>
+                <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
+                <div style="overflow:auto;">
+                  <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+                    <thead>
+                      <tr style="background:#f8f9fa;">
+                        <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
+                      </tr>
+                    </thead>
+                    <tbody id="faultsSelectedBody">
+                      <tr><td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا توجد أعطال مضافة بعد</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
               <div style="grid-column: 1/-1;">
                 <label>ملاحظات عامة</label>
@@ -1176,6 +1431,32 @@ if (!$is_super_admin) {
               <input type="hidden" name="fault_department" id="fault_department" />
               <input type="hidden" name="fault_part"       id="fault_part" />
               <input type="hidden" name="fault_details"    id="fault_details" />
+              <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
+
+              <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                  <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
+                  <button type="button" id="addFaultBtn" style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+ إضافة العطل الحالي</button>
+                </div>
+                <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
+                <div style="overflow:auto;">
+                  <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+                    <thead>
+                      <tr style="background:#f8f9fa;">
+                        <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
+                        <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
+                      </tr>
+                    </thead>
+                    <tbody id="faultsSelectedBody">
+                      <tr><td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا توجد أعطال مضافة بعد</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
               <div style="grid-column: 1/-1;">
                 <label>ملاحظات عامة</label>
@@ -1686,6 +1967,10 @@ if (!$is_super_admin) {
       $("#drilling_holes_count").val(data.drilling_holes_count || 0);
       $("#drilling_depth").val(data.drilling_depth || 0);
 
+      if (typeof window.loadTimesheetFaultItems === 'function') {
+        window.loadTimesheetFaultItems(data.id);
+      }
+
       $("#projectForm").show();
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
     })
@@ -1701,6 +1986,7 @@ if (!$is_super_admin) {
 (function() {
   // نوع المعدة من PHP (1=حفار, 2=قلاب, 3=خرامة)
   var equipType = parseInt('<?= intval($type) ?>') || 1;
+  var faultItems = [];
 
   var BASE_URL = '<?= (strpos($_SERVER['PHP_SELF'], '/Timesheet/') !== false) ? '' : 'Timesheet/' ?>get_failure_codes.php';
 
@@ -1715,6 +2001,111 @@ if (!$is_super_admin) {
   }
   function resetSelect(sel, placeholder) {
     sel.empty().append($('<option>').val('').text(placeholder)).prop('disabled', true).css('opacity', 0.6);
+  }
+
+  function firstExistingSelector(candidates) {
+    for (var i = 0; i < candidates.length; i++) {
+      if ($(candidates[i]).length) {
+        return candidates[i];
+      }
+    }
+    return null;
+  }
+
+  function getActiveFaultControls() {
+    var selectors = {
+      event: firstExistingSelector(['#fc_event_type', '#fc_event_type_edit', '#fc_event_type_f3']),
+      main: firstExistingSelector(['#fc_main_cat', '#fc_main_cat_edit', '#fc_main_cat_f3']),
+      sub: firstExistingSelector(['#fc_sub_cat', '#fc_sub_cat_edit', '#fc_sub_cat_f3']),
+      detail: firstExistingSelector(['#fc_detail', '#fc_detail_edit', '#fc_detail_f3'])
+    };
+
+    if (!selectors.event || !selectors.main || !selectors.sub || !selectors.detail) {
+      return null;
+    }
+
+    return {
+      event: $(selectors.event),
+      main: $(selectors.main),
+      sub: $(selectors.sub),
+      detail: $(selectors.detail)
+    };
+  }
+
+  function syncLegacyFaultFields() {
+    if (!faultItems.length) {
+      $('#fault_type').val('');
+      $('#fault_department').val('');
+      $('#fault_part').val('');
+      $('#fault_details').val('');
+      return;
+    }
+
+    var first = faultItems[0];
+    $('#fault_type').val(first.event_type_name || '');
+    $('#fault_department').val(first.main_category_name || '');
+    $('#fault_part').val(first.sub_category || '');
+    $('#fault_details').val((first.full_code || '') + ' | ' + (first.failure_detail || ''));
+  }
+
+  function renderFaultItemsTable() {
+    var body = $('#faultsSelectedBody');
+    if (!body.length) {
+      return;
+    }
+
+    body.empty();
+    if (!faultItems.length) {
+      body.append('<tr><td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا توجد أعطال مضافة بعد</td></tr>');
+    } else {
+      $.each(faultItems, function(i, item) {
+        var rowHtml = '' +
+          '<tr>' +
+          '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.full_code || '') + '</td>' +
+          '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.event_type_name || '') + '</td>' +
+          '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.main_category_name || '') + '</td>' +
+          '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.sub_category || '') + '</td>' +
+          '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.failure_detail || '') + '</td>' +
+          '<td style="padding:6px; border:1px solid #e9ecef; text-align:center;">' +
+            '<button type="button" class="removeFaultBtn" data-index="' + i + '" style="padding:4px 8px; border-radius:4px; border:1px solid #dc3545; background:#fff; color:#dc3545;">حذف</button>' +
+          '</td>' +
+          '</tr>';
+        body.append(rowHtml);
+      });
+    }
+
+    $('#fault_items_json').val(JSON.stringify(faultItems));
+    syncLegacyFaultFields();
+  }
+
+  function getCurrentFaultSelection() {
+    var controls = getActiveFaultControls();
+    if (!controls) {
+      return null;
+    }
+
+    var eventVal = controls.event.val();
+    var mainVal = controls.main.val();
+    var subVal = controls.sub.val();
+    var fullCode = controls.detail.val();
+
+    if (!eventVal || !mainVal || !subVal || !fullCode) {
+      return null;
+    }
+
+    var detailOpt = controls.detail.find('option:selected');
+    var failureCodeId = parseInt(detailOpt.data('extra')) || 0;
+
+    return {
+      failure_code_id: failureCodeId,
+      event_type_code: eventVal,
+      event_type_name: controls.event.find('option:selected').text(),
+      main_category_code: mainVal,
+      main_category_name: controls.main.find('option:selected').text(),
+      sub_category: subVal,
+      failure_detail: detailOpt.text(),
+      full_code: fullCode
+    };
   }
 
   // ============================
@@ -1790,7 +2181,7 @@ if (!$is_super_admin) {
       $.getJSON(BASE_URL, { action: 'get_details', equipment_type: eqType, event_type_code: selEvent.val(), main_cat_code: selMain.val(), sub_cat: sub }, function(res) {
         if (res && res.length) {
           fillSelect(selDet, res.map(function(r) {
-            return { value: r.full_code, label: r.failure_detail };
+            return { value: r.full_code, label: r.failure_detail, extra: r.id };
           }), '-- اختر التفصيل --');
         }
       });
@@ -1837,7 +2228,7 @@ if (!$is_super_admin) {
                 $.getJSON(BASE_URL, { action: 'get_details', equipment_type: eqType, event_type_code: r.event_type_code, main_cat_code: r.main_category_code, sub_cat: r.sub_category }, function(res5) {
                   if (!res5 || !res5.length) return;
                   fillSelect(selDet, res5.map(function(x) {
-                    return { value: x.full_code, label: x.failure_detail };
+                    return { value: x.full_code, label: x.failure_detail, extra: x.id };
                   }), '-- اختر التفصيل --');
                   selDet.val(r.full_code);
                   hidDet.val(r.full_code + ' | ' + r.failure_detail);
@@ -1896,6 +2287,67 @@ if (!$is_super_admin) {
     hidPart:  '#fault_part',
     hidDet:   '#fault_details'
   });
+
+  $(document).on('click', '#addFaultBtn', function() {
+    var selected = getCurrentFaultSelection();
+    if (!selected) {
+      alert('يرجى اختيار تسلسل العطل كاملاً قبل الإضافة.');
+      return;
+    }
+
+    var exists = false;
+    for (var i = 0; i < faultItems.length; i++) {
+      if (faultItems[i].full_code === selected.full_code) {
+        exists = true;
+        break;
+      }
+    }
+    if (exists) {
+      alert('هذا العطل مضاف مسبقاً في نفس التايم شيت.');
+      return;
+    }
+
+    faultItems.push(selected);
+    renderFaultItemsTable();
+  });
+
+  $(document).on('click', '.removeFaultBtn', function() {
+    var idx = parseInt($(this).data('index'));
+    if (isNaN(idx) || idx < 0 || idx >= faultItems.length) {
+      return;
+    }
+    faultItems.splice(idx, 1);
+    renderFaultItemsTable();
+  });
+
+  window.loadTimesheetFaultItems = function(timesheetId) {
+    faultItems = [];
+    renderFaultItemsTable();
+    if (!timesheetId) {
+      return;
+    }
+
+    $.getJSON('get_timesheet_failures.php', { timesheet_id: timesheetId }, function(res) {
+      if (!res || !res.success || !res.data || !res.data.length) {
+        return;
+      }
+      faultItems = res.data.map(function(r) {
+        return {
+          failure_code_id: parseInt(r.failure_code_id) || 0,
+          event_type_code: r.event_type_code || '',
+          event_type_name: r.event_type_name || '',
+          main_category_code: r.main_category_code || '',
+          main_category_name: r.main_category_name || '',
+          sub_category: r.sub_category || '',
+          failure_detail: r.failure_detail || '',
+          full_code: r.full_code || ''
+        };
+      });
+      renderFaultItemsTable();
+    });
+  };
+
+  renderFaultItemsTable();
 
   // ============================
   // تحميل بيانات التعديل عند فتح فورم التعديل

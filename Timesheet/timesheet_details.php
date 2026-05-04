@@ -520,6 +520,27 @@ $sql = "SELECT  * , t.id,
         ORDER BY t.date DESC";
 
 $result = mysqli_query($conn, $sql);
+
+// Pre-load fault records from bridge table
+$ts_fault_records = [];
+$_fc_tbl_check = @$conn->query("SHOW TABLES LIKE 'timesheet_failure_hours'");
+if ($_fc_tbl_check && $_fc_tbl_check->num_rows > 0) {
+    $_fault_res2 = $conn->query("SELECT * FROM timesheet_failure_hours WHERE timesheet_id = " . intval($project) . " AND status = 1 ORDER BY id ASC");
+    if ($_fault_res2) {
+        while ($_fr = $_fault_res2->fetch_assoc()) $ts_fault_records[] = $_fr;
+    }
+}
+
+// Pre-load approval notes
+$ts_approval_notes = [];
+$_an_tbl_check = @$conn->query("SHOW TABLES LIKE 'timesheet_approval_notes'");
+if ($_an_tbl_check && $_an_tbl_check->num_rows > 0) {
+    $_an_res2 = $conn->query("SELECT * FROM timesheet_approval_notes WHERE timesheet_id = " . intval($project) . " AND status = 1 ORDER BY created_at ASC");
+    if ($_an_res2) {
+        while ($_an = $_an_res2->fetch_assoc()) $ts_approval_notes[] = $_an;
+    }
+}
+
 while ($row = mysqli_fetch_assoc($result)) {
     $shift_display = $row['shift'] == "D" ? "صباح" : "مساء";
     $shift_class   = $row['shift'] == "D" ? "day" : "night";
@@ -834,64 +855,95 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
     </div>
 
-    <!-- ============================= 5. تفاصيل الأعطال ============================= -->
+    <!-- ============================= 5. تفاصيل الأعطال (منظومة الأعطال) ============================= -->
     <div class="section-block">
         <div class="section-header">
             <div class="section-header-icon"><i class="fas fa-clipboard-list"></i></div>
-            <h4>تفاصيل الأعطال</h4>
+            <h4>تفاصيل الأعطال المصنفة</h4>
         </div>
-        <div class="cards-grid grid-3">
-
-            <div class="detail-card">
-                <div class="detail-card-header">
-                    <div class="detail-card-icon danger"><i class="fas fa-bug"></i></div>
-                    <span class="detail-card-title">نوع العطل</span>
+        <div style="padding: 20px 24px;">
+            <?php if (!empty($ts_fault_records)): ?>
+                <div style="overflow-x:auto;">
+                    <table class="table table-sm table-hover table-bordered" style="font-size:13.5px;">
+                        <thead>
+                            <tr style="background:var(--primary);color:#fff;">
+                                <th style="padding:8px 12px;">#</th>
+                                <th style="padding:8px 12px;">الكود الكامل</th>
+                                <th style="padding:8px 12px;">نوع الحدث</th>
+                                <th style="padding:8px 12px;">الفئة الرئيسية</th>
+                                <th style="padding:8px 12px;">الفئة الفرعية</th>
+                                <th style="padding:8px 12px;">تفصيل العطل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $fi = 1; foreach ($ts_fault_records as $_flt): ?>
+                            <tr>
+                                <td style="padding:7px 12px;"><?= $fi++ ?></td>
+                                <td style="padding:7px 12px;">
+                                    <span style="background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">
+                                        <?= htmlspecialchars($_flt['full_code'] ?? '—') ?>
+                                    </span>
+                                </td>
+                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['event_type_name'] ?? '—') ?></td>
+                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['main_category_name'] ?? '—') ?></td>
+                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['sub_category'] ?? '—') ?></td>
+                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['failure_detail'] ?? '—') ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="detail-card-body">
-                    <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-tag"></i> النوع</span>
-                        <span class="detail-value">
-                            <?php if($row['fault_type']): ?>
-                                <span class="chip-danger"><?php echo htmlspecialchars($row['fault_type']); ?></span>
-                            <?php else: ?>
-                                <span class="no-data">—</span>
-                            <?php endif; ?>
-                        </span>
+            <?php elseif (!empty($row['fault_type']) || !empty($row['fault_part']) || !empty($row['fault_details'])): ?>
+                <div class="cards-grid grid-3" style="padding:0;">
+                    <?php if (!empty($row['fault_type'])): ?>
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-icon danger"><i class="fas fa-bug"></i></div>
+                            <span class="detail-card-title">نوع العطل</span>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-tag"></i> النوع</span>
+                                <span class="detail-value"><span class="chip-danger"><?= htmlspecialchars($row['fault_type']) ?></span></span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="detail-card">
-                <div class="detail-card-header">
-                    <div class="detail-card-icon danger"><i class="fas fa-cogs"></i></div>
-                    <span class="detail-card-title">الجزء المعطل</span>
-                </div>
-                <div class="detail-card-body">
-                    <div class="detail-row">
-                        <span class="detail-label"><i class="fas fa-puzzle-piece"></i> الجزء</span>
-                        <span class="detail-value">
-                            <?php if($row['fault_part']): ?>
-                                <span class="chip-danger"><?php echo htmlspecialchars($row['fault_part']); ?></span>
-                            <?php else: ?>
-                                <span class="no-data">—</span>
-                            <?php endif; ?>
-                        </span>
+                    <?php endif; ?>
+                    <?php if (!empty($row['fault_part'])): ?>
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-icon danger"><i class="fas fa-cogs"></i></div>
+                            <span class="detail-card-title">الجزء المعطل</span>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <span class="detail-label"><i class="fas fa-puzzle-piece"></i> الجزء</span>
+                                <span class="detail-value"><span class="chip-danger"><?= htmlspecialchars($row['fault_part']) ?></span></span>
+                            </div>
+                        </div>
                     </div>
+                    <?php endif; ?>
+                    <?php if (!empty($row['fault_details'])): ?>
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-icon danger"><i class="fas fa-file-alt"></i></div>
+                            <span class="detail-card-title">تفاصيل العطل</span>
+                        </div>
+                        <div class="detail-card-body">
+                            <span class="detail-value note-text"><?= htmlspecialchars($row['fault_details']) ?></span>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
-            </div>
-
-            <div class="detail-card">
-                <div class="detail-card-header">
-                    <div class="detail-card-icon danger"><i class="fas fa-file-alt"></i></div>
-                    <span class="detail-card-title">تفاصيل العطل</span>
+                <p style="margin-top:12px;font-size:12px;color:var(--text-muted);">
+                    <i class="fas fa-info-circle"></i> هذه بيانات من النظام القديم. الأعطال المصنفة من المنظومة الجديدة ستظهر هنا عند إدخالها.
+                </p>
+            <?php else: ?>
+                <div style="text-align:center;padding:32px;color:var(--text-muted);">
+                    <i class="fas fa-check-circle" style="font-size:36px;color:var(--success);display:block;margin-bottom:12px;"></i>
+                    <p style="font-size:14px;font-weight:600;">لا توجد أعطال مصنفة لهذا السجل</p>
                 </div>
-                <div class="detail-card-body">
-                    <span class="detail-value note-text">
-                        <?php echo htmlspecialchars($row['fault_details'] ? $row['fault_details'] : 'لا توجد تفاصيل'); ?>
-                    </span>
-                </div>
-            </div>
-
+            <?php endif; ?>
         </div>
     </div>
 
@@ -1020,6 +1072,50 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         </div>
     </div>
+
+    <!-- ملاحظات الاعتماد المسجلة -->
+    <?php if (!empty($ts_approval_notes)): ?>
+    <div class="section-block">
+        <div class="section-header">
+            <div class="section-header-icon"><i class="fas fa-clipboard-check"></i></div>
+            <h4>الملاحظات المسجلة أثناء الاعتماد</h4>
+        </div>
+        <div style="padding: 20px 24px;">
+            <div style="overflow-x:auto;">
+                <table class="table table-sm table-hover table-bordered" style="font-size:13.5px;margin-bottom:0;">
+                    <thead>
+                        <tr style="background:var(--primary);color:#fff;">
+                            <th style="padding:8px 12px;width:15%;">#</th>
+                            <th style="padding:8px 12px;width:20%;">الحقل المعدّل</th>
+                            <th style="padding:8px 12px;width:35%;">الملاحظة</th>
+                            <th style="padding:8px 12px;width:15%;">المعدِّل</th>
+                            <th style="padding:8px 12px;width:15%;">التاريخ والوقت</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $an_idx = 1; foreach ($ts_approval_notes as $_note): ?>
+                        <tr>
+                            <td style="padding:8px 12px;text-align:center;"><?= $an_idx++ ?></td>
+                            <td style="padding:8px 12px;">
+                                <span style="background:var(--info-bg);color:var(--info);border:1px solid var(--info-border);padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block;">
+                                    <?= htmlspecialchars($_note['column_label'] ?? $_note['column_name'] ?? '—') ?>
+                                </span>
+                            </td>
+                            <td style="padding:8px 12px;line-height:1.6;"><?= htmlspecialchars($_note['note_text'] ?? '—') ?></td>
+                            <td style="padding:8px 12px;">
+                                <i class="fas fa-user"></i> <?= htmlspecialchars($_note['created_by_name'] ?? '—') ?>
+                            </td>
+                            <td style="padding:8px 12px;white-space:nowrap;font-size:12px;">
+                                <i class="fas fa-calendar-alt"></i> <?= htmlspecialchars(isset($_note['created_at']) ? date('Y-m-d H:i', strtotime($_note['created_at'])) : '—') ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <!-- ============================= 8. الأطنان والنقلات (النوع 2 فقط) ============================= -->
     <?php if(isset($row['type']) && $row['type'] == '2'): ?>

@@ -266,6 +266,32 @@ if (!empty($_all_ts_ids)) {
     }
 }
 
+// أعداد الأعطال لكل تايم شيت (جدول timesheet_failure_hours)
+$fault_counts_map_fup = array();
+$notes_counts_map_fup = array();
+$_fup_fc_check = @$conn->query("SHOW TABLES LIKE 'timesheet_failure_hours'");
+if ($_fup_fc_check && $_fup_fc_check->num_rows > 0 && !empty($_all_ts_ids)) {
+    $_fup_fc_ids = implode(',', $_all_ts_ids);
+    $_fup_fc_res = $conn->query("SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_failure_hours WHERE timesheet_id IN ($_fup_fc_ids) AND status = 1 GROUP BY timesheet_id");
+    if ($_fup_fc_res) {
+        while ($_fup_fc_row = $_fup_fc_res->fetch_assoc()) {
+            $fault_counts_map_fup[intval($_fup_fc_row['timesheet_id'])] = intval($_fup_fc_row['cnt']);
+        }
+    }
+}
+
+// تحميل عدد الملاحظات المسجلة لكل تايم شيت
+$_fup_notes_check = @$conn->query("SHOW TABLES LIKE 'timesheet_approval_notes'");
+if ($_fup_notes_check && $_fup_notes_check->num_rows > 0 && !empty($_all_ts_ids)) {
+    $_fup_notes_ids = implode(',', $_all_ts_ids);
+    $_fup_notes_res = $conn->query("SELECT timesheet_id, COUNT(*) AS cnt FROM timesheet_approval_notes WHERE timesheet_id IN ($_fup_notes_ids) AND status = 1 GROUP BY timesheet_id");
+    if ($_fup_notes_res) {
+        while ($_fup_notes_row = $_fup_notes_res->fetch_assoc()) {
+            $notes_counts_map_fup[intval($_fup_notes_row['timesheet_id'])] = intval($_fup_notes_row['cnt']);
+        }
+    }
+}
+
 // قائمة الأعمدة المتاحة للتعليق (مطابقة لشاشة الاعتماد الرئيسية)
 $column_labels = array(
   'date'              => 'التاريخ',
@@ -675,7 +701,8 @@ body { background: var(--ha-bg); }
             <th>ساعات منفذة</th>
             <th>إجمالي العمل</th>
             <th>مسار الاعتماد</th>
-            <th>ملاحظات</th>
+            <th>الأعطال المصنفة</th>
+            <th>الملاحظات المسجلة</th>
             <th>تفاصيل</th>
           </tr>
         </thead>
@@ -723,6 +750,21 @@ body { background: var(--ha-bg); }
                   </div>
                 <?php endforeach; ?>
               </div>
+            </td>
+            <td style="text-align:center;">
+              <?php
+                $_fup_fc_cnt = intval($fault_counts_map_fup[$row['id']] ?? 0);
+                $_fup_leg_has = !empty($row['fault_type']) || !empty($row['fault_part']);
+                $_fup_badge = $_fup_fc_cnt > 0 ? $_fup_fc_cnt : ($_fup_leg_has ? 1 : 0);
+              ?>
+              <?php if ($_fup_badge > 0): ?>
+              <button class="note-btn fup-fault-btn" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="border-color:#dc3545;color:#dc3545;">
+                <i class="fa fa-exclamation-triangle" style="color:#dc3545;"></i>
+                <span class="note-badge" style="background:#dc3545;"><?= $_fup_badge ?></span>
+              </button>
+              <?php else: ?>
+              <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+              <?php endif; ?>
             </td>
             <td>
               <button class="note-btn" onclick="openNotes(<?= intval($row['id']) ?>)">
@@ -820,6 +862,7 @@ body { background: var(--ha-bg); }
             <th>إجمالي العمل</th>
             <th>المعتمد النهائي</th>
             <th>تاريخ الاعتماد النهائي</th>
+            <th>الأعطال</th>
             <th>ملاحظات</th>
             <th>تفاصيل</th>
           </tr>
@@ -844,6 +887,21 @@ body { background: var(--ha-bg); }
             <td><strong><?= floatval($row['total_work_hours'] ?? 0) ?></strong></td>
             <td><?= htmlspecialchars($row['final_approver'] ?? '—') ?></td>
             <td><?= !empty($row['final_approved_at']) ? date('Y-m-d H:i', strtotime($row['final_approved_at'])) : '—' ?></td>
+            <td style="text-align:center;">
+              <?php
+                $_fin_fc_cnt = intval($fault_counts_map_fup[$row['id']] ?? 0);
+                $_fin_leg_has = !empty($row['fault_type']) || !empty($row['fault_part']);
+                $_fin_badge = $_fin_fc_cnt > 0 ? $_fin_fc_cnt : ($_fin_leg_has ? 1 : 0);
+              ?>
+              <?php if ($_fin_badge > 0): ?>
+              <button class="note-btn fup-fault-btn" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="border-color:#dc3545;color:#dc3545;">
+                <i class="fa fa-exclamation-triangle" style="color:#dc3545;"></i>
+                <span class="note-badge" style="background:#dc3545;"><?= $_fin_badge ?></span>
+              </button>
+              <?php else: ?>
+              <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+              <?php endif; ?>
+            </td>
             <td>
               <button class="note-btn" onclick="openNotes(<?= intval($row['id']) ?>)">
                 <i class="fa fa-comment" <?php if (intval($row['notes_count']) > 0): ?>style="color:#ffaa33;"<?php endif; ?>></i>
@@ -861,6 +919,21 @@ body { background: var(--ha-bg); }
         <?php endforeach; ?>
         </tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: عرض الأعطال -->
+<div class="modal fade" id="fupFaultModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content" dir="rtl">
+      <div class="modal-header" style="background:linear-gradient(135deg,#7f1d1d,#b91c1c);color:#fff;">
+        <h5 class="modal-title fw-bold"><i class="fa fa-exclamation-triangle me-2"></i> تفاصيل الأعطال — التايم شيت #<span id="fup-fault-ts-id">—</span></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="fupFaultModalBody">
+        <div class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1101,4 +1174,51 @@ function escHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+// ====== نظام عرض الأعطال ======
+$(document).on('click', '.fup-fault-btn', function() {
+  var tsId = $(this).data('ts-id');
+  if (!tsId) return;
+  $('#fup-fault-ts-id').text(tsId);
+  $('#fupFaultModalBody').html('<div class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-muted"></i></div>');
+  var modal = new bootstrap.Modal(document.getElementById('fupFaultModal'));
+  modal.show();
+
+  $.getJSON('../Timesheet/get_timesheet_failures.php?timesheet_id=' + tsId, function(res) {
+    if (!res || !res.success || !res.data || res.data.length === 0) {
+      $('#fupFaultModalBody').html(
+        '<div class="text-center py-5" style="color:#6c757d;">' +
+        '<i class="fas fa-check-circle" style="font-size:48px;color:#198754;display:block;margin-bottom:12px;"></i>' +
+        '<p style="font-size:15px;font-weight:600;">لا توجد أعطال مصنفة من المنظومة الجديدة</p>' +
+        '</div>'
+      );
+      return;
+    }
+    var html = '<div style="overflow-x:auto;">';
+    html += '<table class="table table-sm table-hover" style="font-size:13px;min-width:650px;">';
+    html += '<thead style="background:linear-gradient(135deg,#7f1d1d,#b91c1c);color:#fff;">' +
+            '<tr>' +
+            '<th style="padding:8px 12px;">#</th>' +
+            '<th style="padding:8px 12px;">الكود الكامل</th>' +
+            '<th style="padding:8px 12px;">نوع الحدث</th>' +
+            '<th style="padding:8px 12px;">الفئة الرئيسية</th>' +
+            '<th style="padding:8px 12px;">الفئة الفرعية</th>' +
+            '<th style="padding:8px 12px;">تفصيل العطل</th>' +
+            '</tr></thead><tbody>';
+    res.data.forEach(function(f, i) {
+      html += '<tr>' +
+              '<td style="padding:7px 12px;color:#6c757d;">' + (i + 1) + '</td>' +
+              '<td style="padding:7px 12px;"><span style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">' + escHtml(f.full_code || '—') + '</span></td>' +
+              '<td style="padding:7px 12px;">' + escHtml(f.event_type_name || '—') + '</td>' +
+              '<td style="padding:7px 12px;">' + escHtml(f.main_category_name || '—') + '</td>' +
+              '<td style="padding:7px 12px;">' + escHtml(f.sub_category || '—') + '</td>' +
+              '<td style="padding:7px 12px;font-weight:600;">' + escHtml(f.failure_detail || '—') + '</td>' +
+              '</tr>';
+    });
+    html += '</tbody></table></div>';
+    $('#fupFaultModalBody').html(html);
+  }).fail(function() {
+    $('#fupFaultModalBody').html('<div class="alert alert-danger">فشل الاتصال بالخادم</div>');
+  });
+});
 </script>
