@@ -22,6 +22,9 @@ $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '..
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
+    <link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
+    <link rel="stylesheet" href="/ems/assets/css/brand-identity.css">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
     <link rel="stylesheet" href="../assets/css/admin-style.css">

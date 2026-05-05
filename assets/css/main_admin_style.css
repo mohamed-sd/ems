@@ -1,7 +1,11 @@
+@import url('/ems/assets/css/brand-identity.css');
+
 /* ═══════════════════════════════════════════════════
    DESIGN TOKENS — shared admin system
 ═══════════════════════════════════════════════════ */
 :root {
+    --brand-black: #1A1A1A;
+    --brand-black-soft: #242424;
     --navy:        #0c1c3e;
     --navy-m:      #132050;
     --navy-l:      #1b2f6e;
@@ -11,7 +15,7 @@
     --bg:          #f0f2f8;
     --surface:     #ffffff;
     --border:      rgba(12,28,62,.07);
-    --txt:         #0c1c3e;
+    --txt:         #1A1A1A;
     --sub:         #64748b;
     --green:       #16a34a;
     --green-soft:  rgba(22,163,74,.11);
@@ -62,14 +66,14 @@
     gap: 12px;
     font-size: 1.35rem;
     font-weight: 900;
-    color: var(--txt);
+    color: var(--brand-black);
     margin: 0;
     font-family: 'Cairo', sans-serif;
 }
 .page-title .title-icon {
     width: 44px; height: 44px;
     border-radius: 12px;
-    background: linear-gradient(135deg, var(--navy), var(--navy-l));
+    background: linear-gradient(135deg, var(--brand-black), var(--brand-black-soft));
     display: flex; align-items: center; justify-content: center;
     font-size: 1.05rem; color: var(--gold);
     box-shadow: var(--shadow-md);
@@ -80,7 +84,7 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: linear-gradient(135deg, var(--navy), var(--navy-l));
+    background: linear-gradient(135deg, var(--brand-black), var(--brand-black-soft));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -135,21 +139,21 @@
     align-items: center;
     gap: 7px;
     padding: 9px 18px;
-    background: var(--blue-soft);
-    color: var(--blue);
+    background: rgba(26,26,26,.06);
+    color: var(--brand-black);
     text-decoration: none;
     border-radius: 50px;
     font-weight: 700;
     font-size: .82rem;
-    border: 1.5px solid rgba(37,99,235,.18);
+    border: 1.5px solid rgba(26,26,26,.12);
     transition: all var(--ease);
     cursor: pointer;
     font-family: 'Cairo', sans-serif;
 }
 .back-btn:hover {
-    background: var(--blue);
+    background: var(--brand-black);
     color: #fff;
-    box-shadow: 0 5px 16px rgba(37,99,235,.32);
+    box-shadow: 0 5px 16px rgba(26,26,26,.24);
     transform: translateY(-2px);
 }
 .back-btn i { transition: transform var(--ease); }
@@ -324,12 +328,13 @@
 }
 
 .suppliers-table thead th {
-    background: var(--navy);
-    color: var(--gold);
+    background: var(--gray-50, #FAFAF9);
+    color: var(--gray-900, #1C1917);
     padding: 12px 10px;
     text-align: center;
-    font-weight: 800;
+    font-weight: 600;
     white-space: nowrap;
+    border-bottom: 2px solid var(--gray-200, #E7E5E4);
 }
 
 .suppliers-table tbody td,
@@ -723,14 +728,14 @@
 
 .form-grid button[type="submit"],
 .btn-success {
-    background: linear-gradient(135deg, var(--navy), var(--navy-l));
+    background: linear-gradient(135deg, var(--brand-black), var(--brand-black-soft));
     color: #fff;
-    box-shadow: 0 4px 16px rgba(12,28,62,.22);
+    box-shadow: 0 4px 16px rgba(26,26,26,.22);
 }
 .form-grid button[type="submit"]:hover,
 .btn-success:hover {
     transform: translateY(-2px);
-    box-shadow: 0 7px 22px rgba(12,28,62,.28);
+    box-shadow: 0 7px 22px rgba(26,26,26,.28);
 }
 
 .form-grid button[type="reset"],
@@ -765,13 +770,13 @@ div[style*="flex"][style*="gap"][style*="margin-top"] {
 #clientsTable thead th,
 #projectsTable thead th,
 #projectsTable table thead th {
-    background: var(--navy) !important;
-    color: var(--gold) !important;
+    background: var(--gray-50, #FAFAF9) !important;
+    color: var(--gray-900, #1C1917) !important;
     padding: 14px 12px !important;
-    font-weight: 700 !important;
+    font-weight: 600 !important;
     font-size: .8rem !important;
     text-align: center !important;
-    border: none !important;
+    border-bottom: 2px solid var(--gray-200, #E7E5E4) !important;
     white-space: nowrap;
 }
 #clientsTable thead th:first-child,
@@ -840,7 +845,7 @@ table.dataTable.no-footer { border: none !important; }
 /* DT export buttons */
 .dt-buttons { margin-bottom: 14px; display: flex; gap: 6px; flex-wrap: wrap; }
 .dt-button {
-    background: blue;
+    background: linear-gradient(135deg, var(--brand-black), var(--brand-black-soft)) !important;
     color: #fff !important;
     border: none !important;
     border-radius: 50px !important;
@@ -852,7 +857,7 @@ table.dataTable.no-footer { border: none !important; }
 }
 .dt-button:hover {
     background: var(--gold) !important;
-    color: var(--navy) !important;
+    color: var(--brand-black) !important;
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 12px rgba(232,184,0,.3) !important;
 }
@@ -865,26 +870,26 @@ table.dataTable.no-footer { border: none !important; }
     align-items: center;
     gap: 5px;
     padding: 5px 13px;
-    background: var(--green-soft);
-    color: var(--green);
-    border: 1px solid rgba(22,163,74,.22);
+    background: var(--success-100);
+    color: var(--success-deep);
+    border: 1px solid rgba(91,127,30,.20);
     border-radius: 50px;
     font-weight: 700;
     font-size: .75rem;
-    font-family: 'Cairo', sans-serif;
+    font-family: var(--font-ar, 'Tajawal', 'Cairo', sans-serif);
 }
 .status-inactive {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     padding: 5px 13px;
-    background: var(--red-soft);
-    color: var(--red);
-    border: 1px solid rgba(220,38,38,.22);
+    background: var(--danger-100);
+    color: var(--danger-deep);
+    border: 1px solid rgba(153,27,27,.18);
     border-radius: 50px;
     font-weight: 700;
     font-size: .75rem;
-    font-family: 'Cairo', sans-serif;
+    font-family: var(--font-ar, 'Tajawal', 'Cairo', sans-serif);
 }
 
 /* ══════════════════════════════════
@@ -1211,16 +1216,18 @@ table.dataTable.no-footer { border: none !important; }
 }
 
 .modern-table thead {
-    background: linear-gradient(135deg, var(--navy), var(--navy-l));
-    color: #fff;
+    background: var(--gray-50, #FAFAF9);
+    color: var(--gray-900, #1C1917);
+    border-bottom: 2px solid var(--gray-200, #E7E5E4);
 }
 
 .modern-table thead th {
     padding: 12px;
-    font-weight: 800;
+    font-weight: 600;
     text-align: center;
     font-size: .9rem;
-    border-left: 1px solid rgba(255,255,255,.12);
+    border-left: 1px solid var(--gray-200, #E7E5E4);
+    color: var(--gray-900, #1C1917);
 }
 
 .modern-table thead th:first-child { border-left: 0; }

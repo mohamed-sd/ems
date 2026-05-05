@@ -1,1 +1,0 @@
-﻿<?php ob_start(); require_once "includes/security.php"; $b1=ob_get_clean(); ob_start(); require_once "includes/performance.php"; $b2=ob_get_clean(); echo "security: ".strlen($b1)." | performance: ".strlen($b2); ?>

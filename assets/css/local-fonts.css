@@ -1,6 +1,8 @@
+@import url('/ems/assets/css/brand-identity.css');
+
 /* Offline-safe font stack fallback used instead of Google Fonts */
 :root {
-  --app-font-family: "Cairo", "Tajawal", "Barlow Condensed", "Segoe UI", Tahoma, Arial, sans-serif;
+  --app-font-family: "Tajawal", "Cairo", "Barlow Condensed", "Segoe UI", Tahoma, Arial, sans-serif;
 }
 
 body,

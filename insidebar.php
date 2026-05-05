@@ -105,7 +105,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
           <i class="fa fa-comments"></i>
           <span>المراسلات
             <span id="nav-unread-badge"
-              style="display:none; background:#dc3545; color:#fff; font-size:0.65rem; font-weight:700; border-radius:10px; padding:1px 5px; margin-right:4px; vertical-align:middle;"></span>
+              class="nav-count-badge" style="display:none;"></span>
           </span>
         </a>
       </li>
@@ -143,7 +143,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
       <?php if (in_array($_SESSION['user']['role'], ["-1", "1", "2", "3", "4", "5"])) { ?>
       <li><a href="../Approvals/hours_approval.php"><i class="fa fa-check-double"></i> <span>اعتماد الساعات
         <?php if ($hoursApprovalPendingCount > 0): ?>
-        <span style="display:inline-block; background:#dc3545; color:#fff; font-size:0.65rem; font-weight:700; border-radius:10px; padding:1px 5px; margin-right:4px; vertical-align:middle;"><?php echo ($hoursApprovalPendingCount > 99 ? '99+' : $hoursApprovalPendingCount); ?></span>
+        <span class="nav-count-badge"><?php echo ($hoursApprovalPendingCount > 99 ? '99+' : $hoursApprovalPendingCount); ?></span>
         <?php endif; ?>
       </span></a></li>
       <?php } ?>

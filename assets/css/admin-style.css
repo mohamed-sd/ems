@@ -1,3 +1,5 @@
+@import url('/ems/assets/css/brand-identity.css');
+
   @import url('/ems/assets/css/local-fonts.css');
 
   :root {
@@ -11,6 +13,76 @@
   body {
       background: var(--border-color);
   }
+
+    /* Unified back navigation button across the project */
+    a.back-btn,
+    a.btn-back,
+    a.back {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
+      min-height: 40px !important;
+      padding: 9px 18px !important;
+      border-radius: 999px !important;
+      border: 1.5px solid rgba(26, 26, 26, 0.16) !important;
+      background: linear-gradient(135deg, #1a1a1a, #2a2a2a) !important;
+      color: #ffffff !important;
+      font-size: 0.84rem !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+      white-space: nowrap !important;
+      cursor: pointer !important;
+      box-shadow: 0 4px 14px rgba(26, 26, 26, 0.22) !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+    }
+
+    a.back-btn i,
+    a.btn-back i,
+    a.back i {
+      color: #e5a82e !important;
+      transition: transform 0.2s ease !important;
+    }
+
+    a.back-btn:hover,
+    a.btn-back:hover,
+    a.back:hover {
+      background: linear-gradient(135deg, #242424, #343434) !important;
+      color: #ffffff !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 8px 20px rgba(26, 26, 26, 0.28) !important;
+    }
+
+    a.back-btn:hover i,
+    a.btn-back:hover i,
+    a.back:hover i {
+      transform: translateX(3px) !important;
+    }
+
+    .page-header a.back-btn,
+    .page-header a.btn-back,
+    .page-header a.back,
+    .page-header-actions a.back-btn,
+    .page-header-actions a.btn-back,
+    .page-header-actions a.back,
+    .header-actions a.back-btn,
+    .header-actions a.btn-back,
+    .header-actions a.back,
+    .page-hero a.back-btn,
+    .page-hero a.btn-back,
+    .page-hero a.back {
+      order: -10 !important;
+    }
+
+    @media (max-width: 768px) {
+      a.back-btn,
+      a.btn-back,
+      a.back {
+        min-height: 38px !important;
+        padding: 8px 14px !important;
+        font-size: 0.8rem !important;
+      }
+    }
 
   .main{
     padding: 20px;

@@ -1,0 +1,338 @@
+/* EMS unified brand identity based on Equipation logo palette */
+:root {
+  --ems-black: #0f1115;
+  --ems-black-soft: #1a1f28;
+  --ems-orange: #f7931a;
+  --ems-orange-deep: #e67e00;
+  --ems-orange-soft: #fff2df;
+  --ems-white: #ffffff;
+  --ems-text: #131722;
+  --ems-muted: #5f6778;
+  --ems-line: #e8ecf3;
+  --ems-surface: #ffffff;
+  --ems-surface-alt: #f8fafd;
+  --ems-shadow-sm: 0 2px 8px rgba(15, 17, 21, 0.08);
+  --ems-shadow-md: 0 10px 30px rgba(15, 17, 21, 0.12);
+  --ems-radius-md: 12px;
+  --ems-radius-lg: 18px;
+  --bs-primary: var(--ems-orange);
+  --bs-primary-rgb: 247, 147, 26;
+}
+
+html,
+body {
+  background:
+    radial-gradient(circle at 92% 12%, rgba(247, 147, 26, 0.16) 0%, rgba(247, 147, 26, 0) 28%),
+    radial-gradient(circle at 10% 86%, rgba(26, 31, 40, 0.08) 0%, rgba(26, 31, 40, 0) 35%),
+    var(--ems-surface-alt);
+  color: var(--ems-text);
+}
+
+.main,
+.container-fluid,
+.content-wrap {
+  color: var(--ems-text);
+}
+
+.card,
+.report,
+.login-container,
+.dataTables_wrapper .dataTables_scroll,
+.table-responsive,
+.modal-content {
+  border: 1px solid var(--ems-line);
+  border-radius: var(--ems-radius-md);
+  background: var(--ems-surface);
+  box-shadow: var(--ems-shadow-sm);
+}
+
+.sidebar {
+  background:
+    linear-gradient(180deg, rgba(15, 17, 21, 0.98) 0%, rgba(26, 31, 40, 0.98) 100%),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.015) 0,
+      rgba(255, 255, 255, 0.015) 2px,
+      rgba(255, 255, 255, 0) 2px,
+      rgba(255, 255, 255, 0) 10px
+    );
+}
+
+.sidebar .logo,
+.sidebar .toggle-btn,
+.sidebar ul li i,
+.sb-item.active,
+.page-title .title-icon {
+  color: var(--ems-orange);
+}
+
+.btn,
+button,
+.add,
+.add-btn,
+#toggleForm,
+.mobile-menu-btn,
+.dt-buttons .dt-button {
+  border-radius: 10px;
+}
+
+.btn-primary,
+.btn-warning,
+.add,
+.add-btn,
+#toggleForm,
+.dt-buttons .dt-button {
+  background: linear-gradient(135deg, var(--ems-orange) 0%, var(--ems-orange-deep) 100%) !important;
+  border-color: var(--ems-orange-deep) !important;
+  color: #ffffff !important;
+}
+
+.btn-primary:hover,
+.btn-warning:hover,
+.add:hover,
+.add-btn:hover,
+#toggleForm:hover,
+.dt-buttons .dt-button:hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(247, 147, 26, 0.28);
+}
+
+.table,
+table {
+  border-color: var(--ems-line);
+}
+
+.table thead,
+.table thead tr th,
+table thead,
+table thead th {
+  background: #f4f7fb !important;
+  color: var(--ems-text) !important;
+  border-bottom: 2px solid var(--ems-line) !important;
+}
+
+.table tbody tr:hover,
+table tbody tr:hover {
+  background: var(--ems-orange-soft) !important;
+}
+
+input,
+select,
+textarea,
+.form-control,
+.form-select {
+  border: 1px solid #d7deea;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus,
+.form-select:focus {
+  border-color: rgba(247, 147, 26, 0.85);
+  box-shadow: 0 0 0 0.2rem rgba(247, 147, 26, 0.18);
+}
+
+.nav-count-badge,
+.badge.bg-danger,
+.sb-badge {
+  background: var(--ems-orange) !important;
+  color: #fff !important;
+}
+
+.main h1,
+.main h2,
+.main h3,
+.page-title,
+.section-title {
+  color: var(--ems-text);
+}
+
+/* Admin dashboard full brand reflection */
+.admin-dashboard-brand {
+  --hex-clip: polygon(8% 0, 92% 0, 100% 50%, 92% 100%, 8% 100%, 0 50%);
+}
+
+.admin-dashboard-brand .brand-hero {
+  position: relative;
+  margin-bottom: 18px;
+  border: 1px solid rgba(247, 147, 26, 0.28);
+  border-radius: 16px;
+  padding: 22px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background:
+    linear-gradient(120deg, #0f1115 0%, #1a1f28 62%, #2a303d 100%),
+    radial-gradient(circle at 12% 35%, rgba(247, 147, 26, 0.18) 0%, rgba(247, 147, 26, 0) 35%);
+  box-shadow: var(--ems-shadow-md);
+  overflow: hidden;
+}
+
+.admin-dashboard-brand .brand-hero::after {
+  content: "";
+  position: absolute;
+  left: -80px;
+  top: -80px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(247, 147, 26, 0.18) 0%, rgba(247, 147, 26, 0) 70%);
+}
+
+.admin-dashboard-brand .brand-kicker {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.admin-dashboard-brand .brand-title {
+  color: #fff;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.admin-dashboard-brand .brand-desc {
+  color: rgba(255, 255, 255, 0.75);
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+.admin-dashboard-brand .brand-hero-mark {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+}
+
+.admin-dashboard-brand .hex-core,
+.admin-dashboard-brand .hex-ring {
+  position: absolute;
+  inset: 0;
+  clip-path: var(--hex-clip);
+}
+
+.admin-dashboard-brand .hex-core {
+  background: linear-gradient(135deg, var(--ems-orange), var(--ems-orange-deep));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  box-shadow: 0 10px 26px rgba(247, 147, 26, 0.34);
+  z-index: 2;
+}
+
+.admin-dashboard-brand .hex-ring {
+  transform: scale(1.14);
+  border: 2px solid rgba(247, 147, 26, 0.32);
+  background: rgba(247, 147, 26, 0.08);
+}
+
+.admin-dashboard-brand .stat-grid {
+  gap: 16px;
+}
+
+.admin-dashboard-brand .hex-stat-card {
+  position: relative;
+  border: 1px solid rgba(247, 147, 26, 0.22);
+  box-shadow: 0 12px 30px rgba(15, 17, 21, 0.1);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.admin-dashboard-brand .hex-stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  clip-path: var(--hex-clip);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.admin-dashboard-brand .hex-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(15, 17, 21, 0.14);
+}
+
+.admin-dashboard-brand .hex-stat-blue::before { background: linear-gradient(135deg, #1d4ed8, #60a5fa); }
+.admin-dashboard-brand .hex-stat-orange::before { background: linear-gradient(135deg, #b45309, #fb923c); }
+.admin-dashboard-brand .hex-stat-teal::before { background: linear-gradient(135deg, #0f766e, #2dd4bf); }
+.admin-dashboard-brand .hex-stat-violet::before { background: linear-gradient(135deg, #6d28d9, #a78bfa); }
+.admin-dashboard-brand .hex-stat-amber::before { background: linear-gradient(135deg, #b45309, #f59e0b); }
+.admin-dashboard-brand .hex-stat-red::before { background: linear-gradient(135deg, #b91c1c, #f87171); }
+
+.admin-dashboard-brand .hex-stat-blue .stat-ico { background: #1d4ed8 !important; }
+.admin-dashboard-brand .hex-stat-orange .stat-ico { background: #d97706 !important; }
+.admin-dashboard-brand .hex-stat-teal .stat-ico { background: #0f766e !important; }
+.admin-dashboard-brand .hex-stat-violet .stat-ico { background: #7c3aed !important; }
+.admin-dashboard-brand .hex-stat-amber .stat-ico { background: #b45309 !important; }
+.admin-dashboard-brand .hex-stat-red .stat-ico { background: #dc2626 !important; }
+
+.admin-dashboard-brand .stat-ico {
+  clip-path: var(--hex-clip);
+  border-radius: 0;
+}
+
+.admin-dashboard-brand .quick-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-dashboard-brand .quick-link-hex {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  color: var(--ems-text);
+  border: 1px solid #dfe5ef;
+  background: #fff;
+  clip-path: var(--hex-clip);
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.admin-dashboard-brand .quick-link-hex:hover {
+  background: #fff7ec;
+  border-color: rgba(247, 147, 26, 0.42);
+  transform: translateX(-2px);
+}
+
+.admin-dashboard-brand .quick-link-ico {
+  width: 35px;
+  height: 35px;
+  clip-path: var(--hex-clip);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.admin-dashboard-brand .quick-link-label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.admin-dashboard-brand .quick-link-arrow {
+  margin-right: auto;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+@media (max-width: 800px) {
+  .admin-dashboard-brand .brand-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+  }
+
+  .admin-dashboard-brand .brand-title {
+    font-size: 24px;
+  }
+}

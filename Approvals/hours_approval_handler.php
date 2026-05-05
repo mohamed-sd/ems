@@ -216,4 +216,59 @@ if ($action === 'delete_note') {
     exit;
 }
 
+// ─────────────────────────────────────────────────────────────
+// رفض سجل مع ملاحظة — يُعيد السجل إلى أول السلسلة
+// ─────────────────────────────────────────────────────────────
+if ($action === 'reject') {
+    if ($role === '-1') {
+        die(json_encode(['success' => false, 'message' => 'الأدمن لا يرفض مباشرة']));
+    }
+    if (!isset($role_level_map[$role])) {
+        die(json_encode(['success' => false, 'message' => 'ليس لديك صلاحية الرفض']));
+    }
+
+    $ts_id  = intval($_POST['timesheet_id'] ?? 0);
+    $reason = trim($_POST['reason'] ?? '');
+
+    if ($ts_id <= 0) {
+        die(json_encode(['success' => false, 'message' => 'معرّف السجل غير صحيح']));
+    }
+    if ($reason === '') {
+        die(json_encode(['success' => false, 'message' => 'يجب كتابة سبب الرفض']));
+    }
+
+    // التحقق من أن السجل ينتمي لنفس الشركة
+    $scope = ($company_id > 0) ? " AND (company_id = $company_id OR company_id IS NULL)" : '';
+    $chk = $conn->query("SELECT id FROM timesheet WHERE id = $ts_id AND status = 1 $scope");
+    if (!$chk || $chk->num_rows === 0) {
+        die(json_encode(['success' => false, 'message' => 'السجل غير موجود أو لا تملك صلاحية الوصول']));
+    }
+
+    $escaped_reason = mysqli_real_escape_string($conn, $reason);
+    $escaped_name   = mysqli_real_escape_string($conn, $_SESSION['user']['name'] ?? 'غير معروف');
+    $my_level       = $role_level_map[$role];
+
+    // حذف جميع اعتمادات هذا السجل (إعادته إلى الصفر)
+    $del = $conn->query("DELETE FROM timesheet_approvals WHERE timesheet_id = $ts_id");
+
+    // تسجيل سبب الرفض في جدول الملاحظات
+    $rej_label = 'رفض المستوى ' . $my_level . ' — ' . role_label_ar($role);
+    $ins = $conn->query(
+        "INSERT INTO timesheet_approval_notes
+         (timesheet_id, company_id, column_name, column_label, note_text, created_by, created_by_name)
+         VALUES ($ts_id, $company_id, 'rejection', '" . mysqli_real_escape_string($conn, $rej_label) . "',
+                 '$escaped_reason', $user_id, '$escaped_name')"
+    );
+
+    if ($del && $ins) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'تم رفض السجل #' . $ts_id . ' وإعادته إلى أول السلسلة'
+        ]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'فشل تنفيذ الرفض: ' . $conn->error]);
+    }
+    exit;
+}
+
 die(json_encode(['success' => false, 'message' => 'إجراء غير معروف']));

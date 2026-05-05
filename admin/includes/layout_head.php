@@ -40,6 +40,7 @@ $_admin_nav = [
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo e($page_title ?? ''); ?> | لوحة الإدارة العليا</title>
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+<link href="/ems/assets/css/brand-identity.css" rel="stylesheet">
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <style>
 /* ═══════════════════════════ TOKENS ═══════════════════════════ */

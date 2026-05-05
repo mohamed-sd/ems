@@ -70,10 +70,10 @@ $my_level = $role_level_map[$role] ?? 0;
 $next_level = ($my_level > 0 && $my_level < 4) ? $my_level + 1 : 0;
 
 $level_role_name = array(
-    1 => array('label' => 'مدير المشاريع', 'color' => '#0d6efd'),
-    2 => array('label' => 'مدير الموردين', 'color' => '#6f42c1'),
-    3 => array('label' => 'مدير الأسطول', 'color' => '#198754'),
-    4 => array('label' => 'مدير المشغلين', 'color' => '#fd7e14'),
+    1 => array('label' => 'مدير المشاريع', 'color' => '#0B1E3F', 'icon' => 'fa-user-tie'),
+    2 => array('label' => 'مدير الموردين', 'color' => '#A8541C', 'icon' => 'fa-truck-medical'),
+    3 => array('label' => 'مدير الأسطول',  'color' => '#475569', 'icon' => 'fa-truck'),
+    4 => array('label' => 'مدير المشغلين', 'color' => '#5B7F1E', 'icon' => 'fa-shield-halved'),
 );
 
 $ops_project_col = ha_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';

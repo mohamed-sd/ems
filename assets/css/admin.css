@@ -47,7 +47,7 @@
     --ease:          .22s cubic-bezier(.4,0,.2,1);
 
     /* ── Typography ── */
-    --font:          'Cairo', sans-serif;
+    --font:          var(--font-ar, 'Tajawal', 'Cairo', sans-serif);
 }
 
 

@@ -29,6 +29,20 @@ if ($rr) { while ($row = mysqli_fetch_assoc($rr)) $recent_requests[] = $row; }
 require_once __DIR__ . '/includes/layout_head.php';
 ?>
 
+<div class="admin-dashboard-brand">
+
+<div class="brand-hero">
+    <div class="brand-hero-copy">
+        <div class="brand-kicker">EQUIPATION CONTROL CENTER</div>
+        <h1 class="brand-title">لوحة إدارة الشركة</h1>
+        <p class="brand-desc">هوية تشغيل موحدة لمتابعة الشركات والاشتراكات والعمليات الحرجة في لحظة واحدة.</p>
+    </div>
+    <div class="brand-hero-mark" aria-hidden="true">
+        <span class="hex-core"><i class="fas fa-cubes"></i></span>
+        <span class="hex-ring"></span>
+    </div>
+</div>
+
 <!-- ── Welcome header ──────────────────────────────────────────────────── -->
 <div class="phead">
     <div>
@@ -54,26 +68,26 @@ require_once __DIR__ . '/includes/layout_head.php';
 <!-- ── Stat cards ───────────────────────────────────────────────────────── -->
 <div class="stat-grid">
 
-    <div class="stat-card">
+    <div class="stat-card hex-stat-card hex-stat-blue">
         <div class="stat-row">
             <div>
                 <div class="stat-val"><?php echo $cnt_companies; ?></div>
                 <div class="stat-lbl">شركات نشطة</div>
             </div>
-            <div class="stat-ico" style="background:#2563eb"><i class="fas fa-building"></i></div>
+            <div class="stat-ico"><i class="fas fa-building"></i></div>
         </div>
         <div class="stat-foot">
             <a href="<?php echo e(super_admin_url('companies')); ?>" style="color:inherit">عرض الكل ←</a>
         </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card hex-stat-card hex-stat-orange">
         <div class="stat-row">
             <div>
                 <div class="stat-val"><?php echo $cnt_pending; ?></div>
                 <div class="stat-lbl">طلبات معلقة</div>
             </div>
-            <div class="stat-ico" style="background:<?php echo $cnt_pending > 0 ? '#d97706' : '#64748b'; ?>">
+            <div class="stat-ico">
                 <i class="fas fa-hourglass-half"></i>
             </div>
         </div>
@@ -82,46 +96,46 @@ require_once __DIR__ . '/includes/layout_head.php';
         </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card hex-stat-card hex-stat-teal">
         <div class="stat-row">
             <div>
                 <div class="stat-val"><?php echo $cnt_users; ?></div>
                 <div class="stat-lbl">مستخدموا النظام</div>
             </div>
-            <div class="stat-ico" style="background:#0f766e"><i class="fas fa-users"></i></div>
+            <div class="stat-ico"><i class="fas fa-users"></i></div>
         </div>
         <div class="stat-foot">إجمالي الحسابات المسجلة</div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card hex-stat-card hex-stat-violet">
         <div class="stat-row">
             <div>
                 <div class="stat-val"><?php echo $cnt_projects; ?></div>
                 <div class="stat-lbl">مشاريع نشطة</div>
             </div>
-            <div class="stat-ico" style="background:#7c3aed"><i class="fas fa-diagram-project"></i></div>
+            <div class="stat-ico"><i class="fas fa-diagram-project"></i></div>
         </div>
         <div class="stat-foot">في قاعدة بيانات EMS</div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card hex-stat-card hex-stat-amber">
         <div class="stat-row">
             <div>
                 <div class="stat-val"><?php echo $cnt_equip; ?></div>
                 <div class="stat-lbl">معدات مسجلة</div>
             </div>
-            <div class="stat-ico" style="background:#b45309"><i class="fas fa-truck-monster"></i></div>
+            <div class="stat-ico"><i class="fas fa-truck-monster"></i></div>
         </div>
         <div class="stat-foot">في قاعدة بيانات EMS</div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card hex-stat-card hex-stat-red">
         <div class="stat-row">
             <div>
                 <div class="stat-val"><?php echo $cnt_suppliers; ?></div>
                 <div class="stat-lbl">موردون</div>
             </div>
-            <div class="stat-ico" style="background:#dc2626"><i class="fas fa-truck-field"></i></div>
+            <div class="stat-ico"><i class="fas fa-truck-field"></i></div>
         </div>
         <div class="stat-foot">في قاعدة بيانات EMS</div>
     </div>
@@ -174,7 +188,7 @@ require_once __DIR__ . '/includes/layout_head.php';
             <span class="card-hd-title"><i class="fas fa-bolt" style="color:#d6a700;margin-left:6px"></i>وصول سريع</span>
         </div>
         <div class="card-body">
-            <div style="display:grid;gap:10px;">
+            <div class="quick-grid">
                 <?php
                 $quick = [
                     ['url'=>'managers',               'icon'=>'fa-user-shield',       'label'=>'إدارة المدراء',      'clr'=>'#0f2240'],
@@ -188,13 +202,12 @@ require_once __DIR__ . '/includes/layout_head.php';
                 foreach ($quick as $q):
                 ?>
                 <a href="<?php echo e(super_admin_url($q['url'])); ?>"
-                   style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;border:1px solid var(--line);color:var(--ink);transition:background 0.15s;"
-                   onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='transparent'">
-                    <div style="width:34px;height:34px;border-radius:9px;background:<?php echo $q['clr']; ?>;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;flex-shrink:0;">
+                   class="quick-link-hex">
+                    <div class="quick-link-ico" style="background:<?php echo $q['clr']; ?>;">
                         <i class="fas <?php echo $q['icon']; ?>"></i>
                     </div>
-                    <span style="font-weight:600;font-size:0.88rem;"><?php echo e($q['label']); ?></span>
-                    <i class="fas fa-chevron-left" style="margin-right:auto;color:var(--muted);font-size:0.75rem;"></i>
+                    <span class="quick-link-label"><?php echo e($q['label']); ?></span>
+                    <i class="fas fa-chevron-left quick-link-arrow"></i>
                 </a>
                 <?php endforeach; ?>
             </div>
@@ -211,6 +224,8 @@ require_once __DIR__ . '/includes/layout_head.php';
         <strong><?php echo $admin['last_login_at'] ? e($admin['last_login_at']) : 'أول تسجيل'; ?></strong>
         &nbsp;|&nbsp; البريد الإلكتروني: <strong><?php echo e($admin['email']); ?></strong>
     </div>
+</div>
+
 </div>
 
 <?php require_once __DIR__ . '/includes/layout_foot.php'; ?>

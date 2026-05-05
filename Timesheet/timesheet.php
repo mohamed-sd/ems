@@ -18,6 +18,14 @@ if (!$is_super_admin && $company_id <= 0) {
 $timesheet_has_company = db_table_has_column($conn, 'timesheet', 'company_id');
 $operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
 $session_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
+$session_mine_id = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0;
+$operations_has_mine_id = db_table_has_column($conn, 'operations', 'mine_id');
+
+// Detect roles that should filter by mine_id instead of project_id
+// Role 4 = مدير المشغلين (operator manager)
+// Role 5 = مدير الموقع (site manager)
+// Role 10 = مدير الحركة والتشغيل (movement and operation manager)
+$should_use_mine_filter = in_array($current_role, ['4', '5', '10']) && $session_mine_id > 0 && $operations_has_mine_id;
 
 if (!function_exists('normalize_timesheet_date')) {
   function normalize_timesheet_date($date_str)
@@ -499,7 +507,9 @@ if (!$is_super_admin) {
                   <option value="">-- اختر الالية --</option>
                   <?php
                   $project_filter = "";
-                  if ($session_project_id > 0) {
+                  if ($should_use_mine_filter) {
+                    $project_filter = " AND o.mine_id = '" . $session_mine_id . "'";
+                  } elseif ($session_project_id > 0) {
                     $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
                   }
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
@@ -818,7 +828,9 @@ if (!$is_super_admin) {
                   <option value="">-- اختر الالية --</option>
                   <?php
                   $project_filter = "";
-                  if ($session_project_id > 0) {
+                  if ($should_use_mine_filter) {
+                    $project_filter = " AND o.mine_id = '" . $session_mine_id . "'";
+                  } elseif ($session_project_id > 0) {
                     $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
                   }
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, o." . $operations_project_column . " AS project_id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
@@ -1182,7 +1194,9 @@ if (!$is_super_admin) {
                   <option value="">-- اختر الالية --</option>
                   <?php
                   $project_filter = "";
-                  if ($session_project_id > 0) {
+                  if ($should_use_mine_filter) {
+                    $project_filter = " AND o.mine_id = '" . $session_mine_id . "'";
+                  } elseif ($session_project_id > 0) {
                     $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
                   }
                   $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type

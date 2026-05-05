@@ -68,13 +68,14 @@ $conn->query("CREATE TABLE IF NOT EXISTS `timesheet_approval_notes` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci");
 
-// ─── خريطة الأدوار ───────────────────────────────────────────
+// ─── خريطة الأدوار ────────────────────────────────────────────
+// النظام الهرمي الرباعي مع الألوان والأيقونات المحددة في المواصفات
 $role_level_map  = ['1' => 1, '2' => 2, '3' => 3, '4' => 4];
 $level_role_name = [
-    1 => ['label' => 'مدير المشاريع',   'color' => '#0d6efd', 'icon' => 'fa-project-diagram'],
-    2 => ['label' => 'مدير الموردين',   'color' => '#6f42c1', 'icon' => 'fa-truck-loading'],
-  3 => ['label' => 'مدير الأسطول',    'color' => '#198754', 'icon' => 'fa-ship'],
-  4 => ['label' => 'مدير المشغلين',   'color' => '#fd7e14', 'icon' => 'fa-user-cog'],
+    1 => ['label' => 'مدير المشاريع',   'color' => '#0B1E3F', 'icon' => 'fa-user-tie'],
+    2 => ['label' => 'مدير الموردين',   'color' => '#A8541C', 'icon' => 'fa-truck-medical'],
+    3 => ['label' => 'مدير الأسطول',    'color' => '#475569', 'icon' => 'fa-truck'],
+    4 => ['label' => 'مدير المشغلين',   'color' => '#5B7F1E', 'icon' => 'fa-shield-halved'],
 ];
 
 $my_level   = $role_level_map[$role] ?? 0;
@@ -629,56 +630,96 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
   .stat-card .stat-val { font-size: 1.4rem; }
 }
 
-/* ── دوائر حالة الاعتماد ── */
-.apv-circles { display:inline-flex; align-items:center; gap:2px; }
+/* ── دوائر مؤشر التقدم الهرمي الرباعي ── */
+.apv-circles { display:inline-flex; align-items:center; gap:0; }
 .apv-circle {
   display        : inline-flex;
   align-items    : center;
   justify-content: center;
-  width          : 22px;
-  height         : 22px;
+  width          : 14px;
+  height         : 14px;
   border-radius  : 50%;
-  font-size      : .65rem;
+  font-size      : .38rem;
   cursor         : default;
   transition     : transform .15s;
   flex-shrink    : 0;
 }
-.apv-circle:hover { transform: scale(1.18); }
-.apv-pending { background:#e9ecef; color:#adb5bd; border:1.5px solid #ced4da; }
-.apv-done    { background:#198754; color:#fff;    border:1.5px solid #146c43; }
-.apv-sep { color:#dee2e6; font-size:.7rem; margin:0 3px; user-select:none; }
+.apv-circle:hover { transform: scale(1.25); }
+.apv-pending { background:#fff; color:transparent; border:2px solid #ced4da; }
+.apv-done    { color:#fff; border:2px solid transparent; }
+/* خط الربط بين الدوائر */
+.apv-connector {
+  width      : 18px;
+  height     : 2px;
+  background : #dee2e6;
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+.apv-conn-done { background: #198754; }
+/* ── أزرار إجراءات صف الاعتماد (Ghost buttons) ── */
 .apv-eye {
   display        : inline-flex;
   align-items    : center;
   justify-content: center;
-  width          : 24px;
-  height         : 24px;
+  width          : 26px;
+  height         : 26px;
   border-radius  : 6px;
-  color          : #06a530;
-  border         : 1.5px solid #bad50a;
+  color          : #495057;
+  border         : 1.5px solid #adb5bd;
+  background     : transparent;
   font-size      : .72rem;
   text-decoration: none;
-  transition     : background .15s, color .15s;
+  transition     : background .15s, color .15s, border-color .15s;
   flex-shrink    : 0;
 }
-.apv-eye:hover { background:
-#022860; color:#fff; }
+.apv-eye:hover { background:#495057; color:#fff; border-color:#495057; }
 .apv-approve {
   display        : inline-flex;
   align-items    : center;
   justify-content: center;
-  width          : 24px;
-  height         : 24px;
+  width          : 26px;
+  height         : 26px;
   border-radius  : 6px;
-  background     : #198754;
-  color          : #fff;
-  border         : none;
+  background     : transparent;
+  color          : #157347;
+  border         : 1.5px solid #157347;
   font-size      : .72rem;
   cursor         : pointer;
-  transition     : background .15s;
+  transition     : background .15s, color .15s;
   flex-shrink    : 0;
 }
-.apv-approve:hover { background:#146c43; }
+.apv-approve:hover { background:#157347; color:#fff; }
+.apv-reject {
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 26px;
+  height         : 26px;
+  border-radius  : 6px;
+  background     : transparent;
+  color          : #dc3545;
+  border         : 1.5px solid #dc3545;
+  font-size      : .72rem;
+  cursor         : pointer;
+  transition     : background .15s, color .15s;
+  flex-shrink    : 0;
+}
+.apv-reject:hover { background:#dc3545; color:#fff; }
+.apv-action-disabled {
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 26px;
+  height         : 26px;
+  border-radius  : 6px;
+  background     : transparent;
+  color          : #adb5bd;
+  border         : 1.5px solid #dee2e6;
+  font-size      : .72rem;
+  cursor         : not-allowed;
+  flex-shrink    : 0;
+  opacity        : .5;
+}
 
 /* ── أزرار مجموعات الأعمدة ── */
 .cg-btn {
@@ -835,8 +876,8 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
   <!-- ── بطاقات الإحصاء ── -->
   <div class="row g-3 mb-4">
     <div class="col-sm-6 col-lg-3">
-      <div class="stat-card" style="border-color:#fd7e14;">
-        <div class="stat-icon" style="background:#fd7e14;"><i class="fa fa-clock"></i></div>
+      <div class="stat-card" style="border-color:#A8541C;">
+        <div class="stat-icon" style="background:#A8541C;"><i class="fa fa-hourglass-half"></i></div>
         <div>
           <div class="stat-val"><?= count($pending_rows) ?></div>
           <div class="stat-label">قيد الاعتماد</div>
@@ -844,8 +885,8 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-      <div class="stat-card" style="border-color:#198754;">
-        <div class="stat-icon" style="background:#198754;"><i class="fa fa-check-circle"></i></div>
+      <div class="stat-card" style="border-color:#5B7F1E;">
+        <div class="stat-icon" style="background:#5B7F1E;"><i class="fa fa-check-circle"></i></div>
         <div>
           <div class="stat-val"><?= count($approved_rows) ?></div>
           <div class="stat-label">معتمد نهائياً (آخر 100)</div>
@@ -853,8 +894,8 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-      <div class="stat-card" style="border-color:#0d6efd;">
-        <div class="stat-icon" style="background:#0d6efd;"><i class="fa fa-layer-group"></i></div>
+      <div class="stat-card" style="border-color:#0B1E3F;">
+        <div class="stat-icon" style="background:#0B1E3F;"><i class="fa fa-layer-group"></i></div>
         <div>
           <div class="stat-val"><?= $is_admin ? '4' : $my_level ?></div>
           <div class="stat-label">مستوى الاعتماد الحالي</div>
@@ -862,8 +903,8 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-      <div class="stat-card" style="border-color:#6f42c1;">
-        <div class="stat-icon" style="background:#6f42c1;"><i class="fa fa-comment-dots"></i></div>
+      <div class="stat-card" style="border-color:#475569;">
+        <div class="stat-icon" style="background:#475569;"><i class="fa fa-comment-dots"></i></div>
         <div>
           <div class="stat-val" id="total-notes-count">—</div>
           <div class="stat-label">إجمالي الملاحظات</div>
@@ -872,51 +913,54 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
     </div>
   </div>
 
-  <!-- ── فلتر نوع المعدة ── -->
-  <div class="table-card py-3">
-    <form method="get" class="toolbar-row mb-0">
-      <label for="equip_type" class="fw-semibold mb-0">نوع المعدة:</label>
-      <select name="equip_type" id="equip_type" class="form-select form-select-sm" style="max-width:220px;">
+  <!-- ── شريط الأدوات والفلاتر المدمجة ── -->
+  <div class="table-card" style="background:#f8f9fa;border-right:4px solid #0B1E3F;padding-bottom:0;">
+    <!-- التصفية حسب نوع المعدة -->
+    <div class="toolbar-row">
+      <label for="equip_type" class="fw-semibold mb-0" style="min-width:140px;">
+        <i class="fa fa-filter me-1"></i>نوع المعدة:
+      </label>
+      <select name="equip_type" id="equip_type" class="form-select form-select-sm" style="max-width:200px;">
         <option value="0" <?= $equip_type_filter === 0 ? 'selected' : '' ?>>الكل</option>
         <option value="1" <?= $equip_type_filter === 1 ? 'selected' : '' ?>>حفارات</option>
         <option value="2" <?= $equip_type_filter === 2 ? 'selected' : '' ?>>قلابات</option>
         <option value="3" <?= $equip_type_filter === 3 ? 'selected' : '' ?>>خرامات</option>
       </select>
-      <button type="submit" class="btn btn-sm btn-primary fw-semibold">
-        <i class="fa fa-filter me-1"></i> تطبيق الفلتر
+      <button type="button" class="btn btn-sm btn-primary fw-semibold" onclick="applyEquipTypeFilter()">
+        <i class="fa fa-filter me-1"></i> تطبيق
       </button>
       <?php if ($equip_type_filter !== 0): ?>
       <a href="hours_approval.php" class="btn btn-sm btn-outline-secondary">
         <i class="fa fa-rotate-left me-1"></i> إلغاء الفلتر
       </a>
       <?php endif; ?>
-    </form>
+      <span class="badge bg-light text-dark border ms-2"><?= htmlspecialchars($equip_type_label) ?></span>
+    </div>
+
+    <!-- شريط إظهار/إخفاء مجموعات الأعمدة -->
+    <div class="toolbar-row" style="margin-bottom:0;">
+      <span class="fw-semibold text-muted me-2" style="font-size:.82rem;">
+        <i class="fa fa-table-columns me-1"></i> الأعمدة الإضافية:
+      </span>
+      <button class="cg-btn cg-hours" data-group="hours" onclick="toggleColGroup(this)">
+        <i class="fa fa-clock"></i> ساعات تفصيلية
+      </button>
+      <button class="cg-btn cg-faults" data-group="faults" onclick="toggleColGroup(this)">
+        <i class="fa fa-tools"></i> الأعطال
+      </button>
+      <button class="cg-btn cg-notes" data-group="notes" onclick="toggleColGroup(this)">
+        <i class="fa fa-sticky-note"></i> ملاحظات
+      </button>
+      <small class="text-muted ms-auto" style="font-size:.75rem;">
+        <i class="fa fa-info-circle me-1"></i> المجموع = الساعات المنفذة + الانتظار
+      </small>
+    </div>
   </div>
 
-  <!-- ── شريط إظهار/إخفاء مجموعات الأعمدة ── -->
-  <div class="cg-bar">
-    <span class="fw-semibold text-muted" style="font-size:.82rem;">
-      <i class="fa fa-table-columns me-1"></i> إظهار أعمدة إضافية:
-    </span>
-    <button class="cg-btn cg-hours" data-group="hours" onclick="toggleColGroup(this)">
-      <i class="fa fa-clock"></i> ساعات تفصيلية
-    </button>
-    <button class="cg-btn cg-faults" data-group="faults" onclick="toggleColGroup(this)">
-      <i class="fa fa-tools"></i> تفاصيل الأعطال
-    </button>
-    <button class="cg-btn cg-notes" data-group="notes" onclick="toggleColGroup(this)">
-      <i class="fa fa-sticky-note"></i> ملاحظات العمل
-    </button>
-    <small class="text-muted me-auto" style="font-size:.75rem;">
-      <i class="fa fa-info-circle me-1"></i>
-      المجموع = الساعات المنفذة + ساعات الانتظار
-    </small>
-  </div>
-
-  <!-- ── شريط الفلاتر ── -->
+  <!-- ── شريط الفلاتر المتقدمة ── -->
   <div class="filters-bar" id="main-filters-bar">
-    <div style="font-size:.8rem;font-weight:700;color:#0d6efd;flex-basis:100%;margin-bottom:2px;">
-      <i class="fa fa-filter me-1"></i> فلاتر البحث
+    <div style="font-size:.8rem;font-weight:700;color:#0B1E3F;flex-basis:100%;margin-bottom:6px;">
+      <i class="fa fa-filter me-1"></i> فلاتر البحث المتقدمة
     </div>
 
     <div class="filter-group">
@@ -1133,31 +1177,52 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
                 <?php endif; ?>
               </button>
             </td>
-            <!-- عمود الاعتماد والتفاصيل (مدمج) -->
+            <!-- عمود مؤشر التقدم البصري وإجراءات الاعتماد -->
             <td style="white-space:nowrap;">
-              <div class="d-inline-flex align-items-center gap-1">
-                <?php
-                  $max_l = intval($row['max_approved_level'] ?? 0);
-                  for ($lv = 1; $lv <= 4; $lv++):
+              <div class="d-inline-flex align-items-center gap-2">
+                <!-- مؤشر التقدم: 4 دوائر -->
+                <div class="apv-circles">
+                  <?php for ($lv = 1; $lv <= 4; $lv++):
                     $lv_info = $level_role_name[$lv];
-                    $done    = ($max_l >= $lv);
-                ?>
-                <span class="apv-circle <?= $done ? 'apv-done' : 'apv-pending' ?>"
-                      title="<?= $lv_info['label'] ?><?= $done ? '' : ' — لم يعتمد بعد' ?>">
-                  <i class="fa fa-user"></i>
-                </span>
-                <?php endfor; ?>
-                <span class="apv-sep">|</span>
-                <a href="../Timesheet/timesheet_details.php?id=<?= intval($row['id']) ?>" target="_blank"
-                   class="apv-eye" title="عرض تفاصيل التايمشيت">
-                  <i class="fa fa-eye"></i>
-                </a>
-                <?php if (!$is_admin && !$is_site_manager): ?>
-                <button class="apv-approve" onclick="approveSingle(<?= $row['id'] ?>)"
-                        title="اعتماد هذا السجل">
-                  <i class="fa fa-check"></i>
-                </button>
-                <?php endif; ?>
+                    $done    = (intval($row['max_approved_level'] ?? 0) >= $lv);
+                  ?>
+                  <span class="apv-circle-wrap">
+                    <span class="apv-circle <?= $done ? 'apv-done' : 'apv-pending' ?>" 
+                          style="border-color:<?= $lv_info['color'] ?>; 
+                                  <?php if ($done): ?>background:<?= $lv_info['color'] ?>;color:#fff;<?php endif; ?>"
+                          title="<?= $lv_info['label'] ?>">
+                      <i class="fa <?= $lv_info['icon'] ?>" style="font-size:.5rem;"></i>
+                    </span>
+                    <span class="apv-tooltip">
+                      <span class="tt-role"><?= $lv_info['label'] ?></span>
+                      <span class="tt-name"><?= $done ? 'معتمد' : 'قيد الانتظار' ?></span>
+                    </span>
+                  </span>
+                  <?php if ($lv < 4): ?><span class="apv-connector <?= $done ? 'apv-conn-done' : '' ?>"></span><?php endif; ?>
+                  <?php endfor; ?>
+                </div>
+                
+                <!-- أزرار الإجراءات -->
+                <div class="d-inline-flex gap-1">
+                  <a href="../Timesheet/timesheet_details.php?id=<?= intval($row['id']) ?>" target="_blank"
+                     class="apv-eye" title="عرض تفاصيل السجل">
+                    <i class="fa fa-circle-info"></i>
+                  </a>
+                  <?php if (!$is_admin && !$is_site_manager && $my_level <= 4 && (intval($row['max_approved_level'] ?? 0) < $my_level)): ?>
+                  <button class="apv-approve" onclick="approveSingle(<?= $row['id'] ?>)" 
+                          title="اعتماد السجل">
+                    <i class="fa fa-check"></i>
+                  </button>
+                  <button class="apv-reject" onclick="rejectSingle(<?= $row['id'] ?>)" 
+                          title="رفض السجل">
+                    <i class="fa fa-xmark"></i>
+                  </button>
+                  <?php elseif (!$is_admin && !$is_site_manager): ?>
+                  <!-- أزرار معطّلة للأدوار التي لا يطابق مستواها السجل الحالي -->
+                  <span class="apv-action-disabled" title="لا يمكنك الاعتماد في هذا المستوى"><i class="fa fa-check"></i></span>
+                  <span class="apv-action-disabled" title="لا يمكنك الرفض في هذا المستوى"><i class="fa fa-xmark"></i></span>
+                  <?php endif; ?>
+                </div>
               </div>
             </td>
           </tr>
@@ -1172,12 +1237,12 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
   ══════════════════════════════════════════════════════════ -->
   <div class="table-card">
     <div class="card-header-custom">
-      <div class="ch-icon" style="background:#198754;"><i class="fa fa-shield-check"></i></div>
+      <div class="ch-icon" style="background:#5B7F1E;"><i class="fa fa-shield-check"></i></div>
       <div>
         <h5>التايمشيت المعتمد نهائياً</h5>
         <small class="text-muted">آخر 100 سجل حصلوا على اعتماد المستوى الرابع (مدير المشغلين)</small>
       </div>
-      <span class="badge-count badge bg-success"><?= count($approved_rows) ?> سجل</span>
+      <span class="badge-count badge" style="background:#5B7F1E;"><?= count($approved_rows) ?> سجل</span>
     </div>
 
     <div class="table-responsive">
@@ -1279,9 +1344,9 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
             <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['work_notes'] ?? '') ?>"><?= htmlspecialchars($row['work_notes'] ?? '—') ?></td>
             <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['fault_notes'] ?? '') ?>"><?= htmlspecialchars($row['fault_notes'] ?? '—') ?></td>
 
-            <!-- ══ عمود "اعتمد بواسطة": 4 دوائر خضراء بـ tooltip ══ -->
+            <!-- ══ عمود مؤشر التقدم: 4 دوائر بـ tooltip مع معلومات المعتمد ══ -->
             <td style="white-space:nowrap;">
-              <div class="d-inline-flex align-items-center gap-1">
+              <div class="d-inline-flex align-items-center gap-0">
                 <?php for ($lv = 1; $lv <= 4; $lv++):
                   $lv_info  = $level_role_name[$lv];
                   $lv_data  = $row_approvals[$lv] ?? null;
@@ -1290,19 +1355,20 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
                   $apv_role = htmlspecialchars($lv_info['label']);
                 ?>
                 <span class="apv-circle-wrap">
-                  <span class="apv-circle apv-done">
-                    <i class="fa fa-user"></i>
+                  <span class="apv-circle apv-done"
+                        style="background:<?= $lv_info['color'] ?>;border-color:<?= $lv_info['color'] ?>;color:#fff;">
+                    <i class="fa <?= $lv_info['icon'] ?>" style="font-size:.38rem;"></i>
                   </span>
                   <span class="apv-tooltip">
                     <span class="tt-role"><?= $apv_role ?></span>
                     <span class="tt-name"><?= $apv_name ?></span>
-                    <span class="tt-date"><i class="fa fa-calendar-alt" style="margin-left:3px;"></i><?= $apv_date ?></span>
+                    <span class="tt-date"><i class="fa fa-clock" style="margin-right:3px;"></i><?= $apv_date ?></span>
                   </span>
                 </span>
+                <?php if ($lv < 4): ?><span class="apv-connector apv-conn-done"></span><?php endif; ?>
                 <?php endfor; ?>
               </div>
             </td>
-            <!-- ══════════════════════════════════════════════════════ -->
 
             <td>
               <span style="font-size:.78rem;color:#6c757d;">
@@ -1318,21 +1384,10 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
                 <?php endif; ?>
               </button>
               <span class="apv-sep">|</span>
-                <a href="../Timesheet/timesheet_details.php?id=<?= intval($row['id']) ?>" target="_blank"
-                   class="apv-eye" title="عرض تفاصيل التايمشيت">
-                  <i class="fa fa-eye"></i>
-                </a>
-            </td>
-            <td style="white-space:nowrap;">
-              <div class="d-inline-flex align-items-center gap-1">
-                <?php for ($lv = 1; $lv <= 4; $lv++): $lv_info = $level_role_name[$lv]; ?>
-                <span class="apv-circle apv-done"
-                      title="<?= $lv_info['label'] ?> — معتمد">
-                  <i class="fa fa-user"></i>
-                </span>
-                <?php endfor; ?>
-                
-              </div>
+              <a href="../Timesheet/timesheet_details.php?id=<?= intval($row['id']) ?>" target="_blank"
+                 class="apv-eye" title="عرض التفاصيل">
+                <i class="fa fa-circle-info"></i>
+              </a>
             </td>
           </tr>
         <?php endforeach; ?>
@@ -1445,6 +1500,82 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════════
+     Modal: رفض سجل مع ملاحظة
+══════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" dir="rtl">
+      <div class="modal-header" style="border-bottom:2px solid #f8d7da;">
+        <h5 class="modal-title fw-bold">
+          <i class="fa fa-xmark me-2 text-danger"></i> رفض السجل #<span id="reject-ts-id">—</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning d-flex gap-2 align-items-start mb-3">
+          <i class="fa fa-triangle-exclamation mt-1 flex-shrink-0"></i>
+          <div>سيتم إعادة السجل إلى أول سلسلة الاعتماد. يجب كتابة سبب واضح للرفض.</div>
+        </div>
+        <label class="form-label fw-bold">
+          <i class="fa fa-comment-dots me-1 text-danger"></i>
+          سبب الرفض <span class="text-danger">*</span>
+        </label>
+        <textarea id="reject-reason-text" class="form-control" rows="4"
+                  placeholder="اكتب سبب الرفض بالتفصيل..."
+                  style="border-color:#dee2e6;"></textarea>
+        <div id="reject-reason-error" class="text-danger small mt-1" style="display:none;">
+          <i class="fa fa-exclamation-circle me-1"></i> يرجى كتابة سبب الرفض
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger fw-bold" id="btn-confirm-reject">
+          <i class="fa fa-xmark me-1"></i> تأكيد الرفض
+        </button>
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     Modal: رفض سجل مع ملاحظة إلزامية
+══════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" dir="rtl">
+      <div class="modal-header" style="border-bottom:2px solid #f8d7da;">
+        <h5 class="modal-title fw-bold">
+          <i class="fa fa-xmark me-2 text-danger"></i>
+          رفض السجل #<span id="reject-ts-id">—</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning d-flex gap-2 align-items-start mb-3">
+          <i class="fa fa-triangle-exclamation mt-1 flex-shrink-0"></i>
+          <div>سيتم إعادة السجل إلى أول سلسلة الاعتماد. يجب كتابة سبب واضح للرفض.</div>
+        </div>
+        <label class="form-label fw-bold">
+          <i class="fa fa-comment-dots me-1 text-danger"></i>
+          سبب الرفض <span class="text-danger">*</span>
+        </label>
+        <textarea id="reject-reason-text" class="form-control" rows="4"
+                  placeholder="اكتب سبب الرفض بالتفصيل..."></textarea>
+        <div id="reject-reason-error" class="text-danger small mt-1" style="display:none;">
+          <i class="fa fa-exclamation-circle me-1"></i> يرجى كتابة سبب الرفض
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger fw-bold" id="btn-confirm-reject">
+          <i class="fa fa-xmark me-1"></i> تأكيد الرفض
+        </button>
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── Toasts ── -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
   <div id="approvalToast" class="toast align-items-center text-white border-0" role="alert">
@@ -1536,7 +1667,7 @@ $(function () {
   });
 });
 
-// ── دوال الاعتماد ────────────────────────────────────────────
+// ── دوال الاعتماد والرفض ─────────────────────────────────────
 // ── تبديل مجموعات الأعمدة ────────────────────────────────────
 var groupState = { hours: false, faults: false, notes: false };
 function toggleColGroup(btn) {
@@ -1572,6 +1703,52 @@ function approveSelected() {
   var modal = new bootstrap.Modal(document.getElementById('confirmApproveModal'));
   modal.show();
 }
+
+// ── دالة الرفض مع ملاحظة ─────────────────────────────────────
+var rejectTargetId = 0;
+
+function rejectSingle(id) {
+  rejectTargetId = id;
+  $('#reject-ts-id').text(id);
+  $('#reject-reason-text').val('');
+  $('#reject-reason-error').hide();
+  $('#reject-reason-text').css('border-color', '#dee2e6');
+  new bootstrap.Modal(document.getElementById('rejectModal')).show();
+}
+
+$(function() {
+  $('#btn-confirm-reject').on('click', function() {
+    var reason = $('#reject-reason-text').val().trim();
+    if (!reason) {
+      $('#reject-reason-error').show();
+      $('#reject-reason-text').css('border-color', '#dc3545').trigger('focus');
+      return;
+    }
+    var btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> جارٍ الرفض...';
+
+    $.ajax({
+      url      : 'hours_approval_handler.php',
+      method   : 'POST',
+      dataType : 'json',
+      data     : { action: 'reject', timesheet_id: rejectTargetId, reason: reason },
+      success  : function(res) {
+        var modal = bootstrap.Modal.getInstance(document.getElementById('rejectModal'));
+        if (modal) modal.hide();
+        showToast((res.success ? '↩ ' : '❌ ') + res.message, res.success ? 'warning' : 'danger');
+        if (res.success) setTimeout(function(){ location.reload(); }, 1400);
+      },
+      error: function(xhr) {
+        showToast('❌ حدث خطأ في الاتصال: ' + xhr.status, 'danger');
+      },
+      complete: function() {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-xmark me-1"></i> تأكيد الرفض';
+      }
+    });
+  });
+});
 
 // ── دوال تحديد الكل ─────────────────────────────────────────
 function selectAllPending() {

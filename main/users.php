@@ -189,6 +189,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <style>
+    :root {
+        --users-ink: #1A1A1A;
+        --users-ink-soft: #2A2A2A;
+        --users-gold: #D4A017;
+        --users-blue: #1D4ED8;
+        --users-blue-soft: rgba(29, 78, 216, 0.12);
+        --users-red: #DC2626;
+        --users-red-soft: rgba(220, 38, 38, 0.12);
+        --users-muted: #64748B;
+    }
+
     /* أنماط الأدوار بألوان مختلفة */
     .role-badge {
         display: inline-block;
@@ -198,48 +209,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         font-size: 0.85rem;
         text-align: center;
         transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+        box-shadow: inset 0 0 0 1px rgba(26, 26, 26, 0.04);
     }
 
     /* مدير المشاريع */
     .role-badge.role-1 {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        color: white;
-        border-left: 3px solid #1d4ed8;
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        color: #1d4ed8;
+        border-left-color: #1d4ed8;
     }
 
     /* مدير الموردين */
     .role-badge.role-2 {
-        background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-        color: white;
-        border-left: 3px solid #6d28d9;
+        background: linear-gradient(135deg, #f8f5ff, #ede9fe);
+        color: #6d28d9;
+        border-left-color: #6d28d9;
     }
 
     /* مدير المشغلين */
     .role-badge.role-3 {
-        background: linear-gradient(135deg, #ec4899, #be185d);
-        color: white;
-        border-left: 3px solid #be185d;
+        background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+        color: #be185d;
+        border-left-color: #be185d;
     }
 
     /* مدير الاسطول */
     .role-badge.role-4 {
-        background: linear-gradient(135deg, #f97316, #c2410c);
-        color: white;
-        border-left: 3px solid #c2410c;
+        background: linear-gradient(135deg, #fff7ed, #ffedd5);
+        color: #c2410c;
+        border-left-color: #c2410c;
     }
 
     /* مدير الموقع / حركة وتشغيل */
     .role-badge.role-5,
     .role-badge.role-10 {
-        background: linear-gradient(135deg, #06b6d4, #0891b2);
-        color: white;
-        border-left: 3px solid #0891b2;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        color: var(--users-ink);
+        border-left-color: var(--users-gold);
     }
 
     /* إضافة اللون أيضاً للصفوف عند التمرير */
     tr:hover .role-badge {
         transform: translateX(-2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .page-header {
+        margin-bottom: 26px;
+    }
+
+    .page-title {
+        color: var(--users-ink);
+    }
+
+    .page-header > div:last-child {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .password-cell {
+        direction: ltr;
+        unicode-bidi: isolate;
     }
 </style>
 
@@ -596,15 +629,15 @@ document.addEventListener("DOMContentLoaded", function () {
     /* =============================
        DataTable
     ============================== */
-    $('#projectsTable').DataTable({
+        $('#projectsTable').DataTable({
         responsive: true,
         dom: 'Bfrtip',
         buttons: [
-            { extend: 'copy', text: 'نسخ' },
-            { extend: 'excel', text: 'تصدير Excel' },
-            { extend: 'csv', text: 'تصدير CSV' },
-            { extend: 'pdf', text: 'تصدير PDF' },
-            { extend: 'print', text: 'طباعة' }
+            { extend: 'copy', text: 'نسخ', className: 'users-table-action' },
+            { extend: 'excel', text: 'تصدير Excel', className: 'users-table-action' },
+            { extend: 'csv', text: 'تصدير CSV', className: 'users-table-action' },
+            { extend: 'pdf', text: 'تصدير PDF', className: 'users-table-action' },
+            { extend: 'print', text: 'طباعة', className: 'users-table-action' }
         ],
         language: {
             url: "/ems/assets/i18n/datatables/ar.json"
@@ -646,7 +679,7 @@ document.addEventListener("DOMContentLoaded", function () {
         $('#role').val(role).trigger('change');
 
         // إعادة تعيين حالة التحقق من اسم المستخدم
-        usernameFeedback.innerHTML = '<span style="color: #28a745;"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';
+        usernameFeedback.innerHTML = '<span style="color: #1d4ed8;"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';
         usernameInput.style.borderColor = "#e9ecef";
         usernameInput.style.boxShadow = "";
         usernameValid = true;
@@ -689,15 +722,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // التحقق من الطول الأدنى
         if (username.length < 3) {
-            usernameFeedback.innerHTML = '<span style="color: #ffc107;"><i class="fas fa-info-circle"></i> الحد الأدنى 3 أحرف</span>';
-            usernameInput.style.borderColor = "#ffc107";
-            usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(255, 193, 7, 0.25)";
+            usernameFeedback.innerHTML = '<span style="color: #d4a017;"><i class="fas fa-info-circle"></i> الحد الأدنى 3 أحرف</span>';
+            usernameInput.style.borderColor = "#d4a017";
+            usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(212, 160, 23, 0.20)";
             usernameValid = false;
             return;
         }
 
         // إظهار رسالة التحميل
-        usernameFeedback.innerHTML = '<span style="color: #17a2b8;"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>';
+        usernameFeedback.innerHTML = '<span style="color: #1a1a1a;"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>';
 
         try {
             const response = await fetch("check_username_availability.php", {
@@ -711,15 +744,15 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
 
             if (data.available) {
-                usernameFeedback.innerHTML = `<span style="color: #28a745;"><i class="fas fa-check-circle"></i> ${data.message}</span>`;
+                usernameFeedback.innerHTML = `<span style="color: #1d4ed8;"><i class="fas fa-check-circle"></i> ${data.message}</span>`;
                 usernameValid = true;
-                usernameInput.style.borderColor = "#28a745";
-                usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(40, 167, 69, 0.25)";
+                usernameInput.style.borderColor = "#1d4ed8";
+                usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(29, 78, 216, 0.16)";
             } else {
                 usernameFeedback.innerHTML = `<span style="color: #dc3545;"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
                 usernameValid = false;
                 usernameInput.style.borderColor = "#dc3545";
-                usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(220, 53, 69, 0.25)";
+                usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(220, 53, 69, 0.16)";
             }
         } catch (error) {
             usernameFeedback.innerHTML = '<span style="color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> خطأ في التحقق</span>';
