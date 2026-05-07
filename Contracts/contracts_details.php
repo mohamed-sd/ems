@@ -57,6 +57,7 @@ if (!$is_super_admin) {
     <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 
     <style>
         :root {
@@ -927,7 +928,7 @@ if (!$is_super_admin) {
     </style>
 </head>
 
-<body>
+<body class="standalone-brand">
 
     <?php 
     // include('../insidebar.php');

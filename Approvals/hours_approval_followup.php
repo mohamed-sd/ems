@@ -1196,7 +1196,7 @@ $(document).on('click', '.fup-fault-btn', function() {
     }
     var html = '<div style="overflow-x:auto;">';
     html += '<table class="table table-sm table-hover" style="font-size:13px;min-width:650px;">';
-    html += '<thead style="background:linear-gradient(135deg,#7f1d1d,#b91c1c);color:#fff;">' +
+    html += '<thead style="background:linear-gradient(135deg,#0f1115,#1a1f28);color:#f7931a;border-bottom:2px solid #e67e00;">' +
             '<tr>' +
             '<th style="padding:8px 12px;">#</th>' +
             '<th style="padding:8px 12px;">الكود الكامل</th>' +

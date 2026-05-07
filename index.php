@@ -802,8 +802,9 @@ ul{list-style:none}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
+<link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body>
+<body class="standalone-brand">
 
 <!-- ATMOSPHERE -->
 <div class="atm" aria-hidden="true">

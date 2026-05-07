@@ -279,8 +279,9 @@ $csrf = generate_csrf_token();
         .linkbtn{display:inline-block;background:#fff;border:1px solid var(--line);color:#30527f;text-decoration:none;padding:8px 11px;border-radius:10px;font-weight:700;font-size:.84rem}
         @media(max-width:900px){.grid{grid-template-columns:1fr}}
     </style>
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body>
+<body class="standalone-brand">
 <div class="wrap">
     <h1>إدارة فريق الشركة</h1>
     <p class="sub">إضافة المدراء والمستخدمين داخل نفس الشركة مع تحديد الدور والحالة.</p>

@@ -946,8 +946,9 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
 @media (max-width:820px) { .page { grid-template-columns:1fr; } .panel { display:none; } .form-side { padding:24px 16px; } .plans-grid { grid-template-columns:1fr 1fr; } }
 @media (max-width:520px) { .grid2 { grid-template-columns:1fr; } .plans-grid { grid-template-columns:1fr; } .card { padding:22px 16px; } }
     </style>
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body>
+<body class="standalone-brand">
 <div class="page">
 
     <!-- ████ LEFT HERO PANEL ████ -->

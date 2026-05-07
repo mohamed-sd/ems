@@ -4,6 +4,8 @@
 :root {
   --brand-black: #0f1115;
   --brand-black-soft: #1a1f28;
+  --sidebar-width-expanded: 280px;
+  --sidebar-width-collapsed: 80px;
   --sidebar-color : #1A1A1A;
   --main-color: #fff8ef;
   /* Background base */
@@ -32,6 +34,7 @@ body {
   display: flex;
   min-height: 100vh;
   background-color: var(--white, #FFFFFF);
+  overflow-x: hidden;
 }
 
 /* ================== Login Screen ================== */
@@ -103,7 +106,8 @@ body {
 
 /* ================== Sidebar ================== */
 .sidebar {
-  width: 280px;
+  width: var(--sidebar-width-expanded);
+  flex: 0 0 var(--sidebar-width-expanded);
   background: linear-gradient(180deg, var(--brand-black) 0%, var(--brand-black-soft) 100%);
   color: #f8fafc;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -129,7 +133,8 @@ body {
 }
 
 .sidebar.closed {
-  width: 80px;
+  width: var(--sidebar-width-collapsed);
+  flex-basis: var(--sidebar-width-collapsed);
 }
 
 .sidebar .toggle-btn {
@@ -347,8 +352,34 @@ body {
 
 /* ================== Main Content ================== */
 .main {
-  flex: 1;
+  flex: 1 1 auto;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
   padding: 20px;
+}
+
+/* Keep content area stable while sidebar toggles */
+.sidebar ~ .main {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+/* Ensure tables and DataTables wrappers can shrink/grow with content */
+.main .table-responsive,
+.main .dataTables_wrapper,
+.main .dataTables_scroll,
+.main .dataTables_scrollHead,
+.main .dataTables_scrollBody,
+.main .dataTables_scrollFoot {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+.main .dataTables_scrollBody {
+  overflow: auto !important;
 }
 
 .main h2 {
@@ -502,6 +533,7 @@ table {
     top: 0;
     right: 0;
     width: 100% !important;   /* كامل الشاشة عند الفتح */
+    flex-basis: 100% !important;
     height: 100%;
     z-index: 1000;
     transform: translateX(100%); /* مخفي للخارج */

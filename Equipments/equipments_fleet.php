@@ -1130,6 +1130,7 @@ if (!empty($editData)) {
                 </button>
             </div>
 
+            <div class="table-scroll-wrap">
             <table id="projectsTable" class="display nowrap">
                 <thead>
                     <tr>
@@ -1300,6 +1301,7 @@ if (!empty($editData)) {
                     ?>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 
@@ -1499,6 +1501,8 @@ if (!empty($editData)) {
             $(document).ready(function () {
                 var table = $('#projectsTable').DataTable({
                     dom: 'Bfrtip',
+                    scrollX: true,
+                    autoWidth: false,
                     buttons: [
                         { extend: 'copy', text: 'نسخ' },
                         { extend: 'excel', text: 'تصدير Excel' },
@@ -2036,6 +2040,23 @@ if (!empty($editData)) {
     </div>
 
     <style>
+        .table-scroll-wrap {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-scroll-wrap .dataTables_wrapper,
+        .table-scroll-wrap .dataTables_scroll,
+        .table-scroll-wrap .dataTables_scrollHead,
+        .table-scroll-wrap .dataTables_scrollBody,
+        .table-scroll-wrap table {
+            width: 100% !important;
+            min-width: 1100px;
+        }
+
         /* نظام الفلترة الاحترافي */
         .filters-container {
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);

@@ -89,8 +89,9 @@ $csrf = generate_csrf_token();
         button { border:none; border-radius:12px; background:#102443; color:#fff; padding:11px 14px; font-family:inherit; font-weight:800; cursor:pointer; }
         a { color:#30527f; text-decoration:none; font-weight:700; font-size:.88rem; }
     </style>
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body>
+<body class="standalone-brand">
     <div class="card">
         <h1>نسيت كلمة المرور</h1>
         <p>أدخل بريدك الرسمي لاستلام رابط إعادة التعيين الصالح لمدة 60 دقيقة.</p>

@@ -55,8 +55,9 @@ if (!$is_super_admin) {
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
     <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body>
+<body class="standalone-brand">
 
 <?php 
 // include('../insidebar.php'); 
