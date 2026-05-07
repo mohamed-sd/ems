@@ -68,7 +68,7 @@ $suppliers_query = "SELECT
     (SELECT COALESCE(SUM(sce.equip_count_backup), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count_backup
 FROM supplierscontracts sc
 LEFT JOIN suppliers s ON sc.supplier_id = s.id
-WHERE sc.project_id = $project_id AND sc.status = 1
+WHERE sc.mine_id = $contract_mine_id AND sc.status = 1
 ORDER BY s.name";
 
 $suppliers_result = mysqli_query($conn, $suppliers_query);
@@ -100,7 +100,7 @@ if ($suppliers_result) {
                            FROM operations o
                            LEFT JOIN equipments e ON o.equipment = e.id
                            WHERE o.status = 1
-                           AND o.project_id = $project_id
+                           AND o.mine_id = $contract_mine_id
                            AND o.supplier_id = " . intval($row['supplier_id']) . "
                            AND (o.equipment_type = $equip_type_id OR e.type = $equip_type_id)";
             $added_result = mysqli_query($conn, $added_query);

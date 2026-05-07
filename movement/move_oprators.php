@@ -527,20 +527,8 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
                     <!-- المشروع مخفي لأنه محدد مسبقاً -->
                     <input type="hidden" name="project_id" id="project_id" value="<?php echo $selected_project_id; ?>">
 
-                    <!-- المناجم -->
-                    <select name="mine_id" id="mine_id" required>
-                        <option value="">-- اختر المنجم --</option>
-                        <?php
-                        // تحميل المناجم للمشروع المحدد مباشرة
-                        $mines_filter = $is_role10 && $user_mine_id > 0 ? " AND id = $user_mine_id" : "";
-                        $mines_query = "SELECT id, mine_name FROM mines WHERE project_id = $selected_project_id AND status='1'$mines_filter ORDER BY mine_name";
-                        $mines_result = mysqli_query($conn, $mines_query);
-                        while ($mine = mysqli_fetch_assoc($mines_result)) {
-                            $selected_mine = $is_role10 && $user_mine_id > 0 && $user_mine_id == $mine['id'] ? "selected" : "";
-                            echo "<option value='" . $mine['id'] . "' $selected_mine>" . htmlspecialchars($mine['mine_name']) . "</option>";
-                        }
-                        ?>
-                    </select>
+                    <!-- المنجم مخفي - محدد من الجلسة تلقائياً -->
+                    <input type="hidden" name="mine_id" id="mine_id" value="<?php echo $user_mine_id; ?>">
 
                     <!-- العقود -->
                     <select name="contract_id" id="contract_id" required>
@@ -764,9 +752,8 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
                         }
                     }
 
-                    // جلب بيانات التشغيل - فلتر المنجم إذا كان محدداً في الجلسة
-                    $mine_sql_filter = ($user_mine_id > 0) ? " AND o.mine_id = $user_mine_id" : '';
-                  
+                    // جلب بيانات التشغيل - فلتر المنجم من الجلسة
+                    $mine_primary_filter = ($user_mine_id > 0) ? "o.mine_id = $user_mine_id" : "o.project_id = $selected_project_id";
 
                           $operations_scope_sql = (!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "";
 
@@ -781,7 +768,7 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
                       LEFT JOIN suppliers s ON e.suppliers = s.id
                       LEFT JOIN equipment_drivers ed ON o.equipment = ed.equipment_id
                       LEFT JOIN drivers d ON ed.driver_id = d.id
-                      WHERE o.project_id = $selected_project_id$mine_sql_filter$operations_scope_sql
+                      WHERE $mine_primary_filter$operations_scope_sql
                       GROUP BY o.id
                       ORDER BY o.id DESC";
                     $result = mysqli_query($conn, $query);
@@ -1018,7 +1005,6 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
             }
 
             const operationId = document.getElementById('operation_id');
-            const mineId = document.getElementById('mine_id');
             const contractId = document.getElementById('contract_id');
             const supplierId = document.getElementById('supplier_id');
             const typeId = document.getElementById('type');
@@ -1030,8 +1016,7 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
             const status = document.getElementById('status');
 
             if (operationId) operationId.value = '';
-            if (mineId) mineId.value = '';
-            if (contractId) contractId.innerHTML = '<option value="">-- اختر العقد --</option>';
+            if (contractId) contractId.innerHTML = '<option value="">-- جاري تحميل العقود... --</option>';
             if (supplierId) supplierId.innerHTML = '<option value="">-- اختر المورد --</option>';
             if (typeId) typeId.value = '';
             if (equipmentId) equipmentId.innerHTML = '<option value="">-- اختر المعدة --</option>';
@@ -1043,6 +1028,31 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
 
             form.classList.remove('form-hidden');
             form.style.display = 'block';
+
+            // تحميل عقود المنجم تلقائياً من الجلسة
+            var sessionMineId = <?php echo $user_mine_id; ?>;
+            if (sessionMineId > 0) {
+                $.ajax({
+                    url: "../Oprators/get_mine_contracts.php",
+                    type: "POST",
+                    dataType: "json",
+                    data: { mine_id: sessionMineId },
+                    success: function(response) {
+                        if (response.success) {
+                            var opts = "<option value=''>-- اختر العقد --</option>";
+                            response.contracts.forEach(function(c) {
+                                opts += "<option value='" + c.id + "' data-end='" + c.end_date + "'>" + c.display_name + "</option>";
+                            });
+                            $("#contract_id").html(opts);
+                        } else {
+                            $("#contract_id").html("<option value=''>-- لا توجد عقود --</option>");
+                        }
+                    },
+                    error: function() {
+                        $("#contract_id").html("<option value=''>-- خطأ في تحميل العقود --</option>");
+                    }
+                });
+            }
         } else {
             form.classList.add('form-hidden');
             form.style.display = 'none';
@@ -1216,35 +1226,7 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
             }
         }
 
-        // لم نعد بحاجة لـ event listener للمشروع لأنه محدد مسبقاً من الصفحة السابقة
-        
-        $("#mine_id").change(function () {
-            var mineId = $(this).val();
-            $("#contract_id").html("<option value=''>-- اختر العقد --</option>");
-            resetSupplier();
-            $("#type").val("");
-            resetEquipment();
-            resetStats();
-            $("#end_date").val("");
-
-            if (mineId !== "") {
-                $.ajax({
-                    url: "../Oprators/get_mine_contracts.php",
-                    type: "POST",
-                    dataType: "json",
-                    data: { mine_id: mineId },
-                    success: function (response) {
-                        if (response.success) {
-                            var options = "<option value=''>-- اختر العقد --</option>";
-                            response.contracts.forEach(function (contract) {
-                                options += "<option value='" + contract.id + "' data-end='" + contract.end_date + "'>" + contract.display_name + "</option>";
-                            });
-                            $("#contract_id").html(options);
-                        }
-                    }
-                });
-            }
-        });
+        // لم نعد بحاجة لـ event listener للمنجم - المنجم محدد من الجلسة تلقائياً
 
         $("#contract_id").change(function () {
             var contractId = $(this).val();
@@ -1336,9 +1318,8 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
             
             console.log('✅ تم ملء البيانات الأساسية');
             
-            // تحميل المنجم
-            var mineId = btn.data('mine');
-            $('#mine_id').val(mineId);
+            // mine_id محدد من الجلسة تلقائياً
+            var mineId = <?php echo $user_mine_id; ?>;
             
             console.log('ðŸ“ تحميل العقود للمنجم:', mineId);
             
