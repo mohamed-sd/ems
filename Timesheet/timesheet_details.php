@@ -20,6 +20,7 @@ if (!isset($_SESSION['user'])) {
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
     <!-- Google Fonts -->
     <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 
     <style>
         :root {
@@ -455,7 +456,7 @@ if (!isset($_SESSION['user'])) {
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body>
+<body class="standalone-brand">
 
 <div class="main">
 

@@ -304,8 +304,9 @@ body {
     .brand-info .sys { display: none; }
 }
 </style>
+<link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body>
+<body class="standalone-brand">
 
 <div class="topbar-lite d-flex align-items-center justify-content-between">
     <div class="brand">

@@ -35,8 +35,9 @@ $companyName = isset($user['company_name']) ? $user['company_name'] : '';
         .links{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
         @media(max-width:760px){.grid{grid-template-columns:1fr}}
     </style>
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body>
+<body class="standalone-brand">
 <div class="wrap">
     <div class="top">
         <div class="title">

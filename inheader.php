@@ -27,9 +27,9 @@ $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '..
     <link rel="stylesheet" href="/ems/assets/css/brand-identity.css">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-    <link rel="stylesheet" href="../assets/css/admin-style.css">
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
     <script src="../assets/js/performance-boost.js" defer></script>
 
 </head>
-<body>
+<body class="ems-site">
 

@@ -116,8 +116,9 @@ $csrf = generate_csrf_token();
         button { border:none; border-radius:12px; background:#102443; color:#fff; padding:11px 14px; font-family:inherit; font-weight:800; cursor:pointer; }
         a { display:inline-block; margin-top:12px; color:#30527f; text-decoration:none; font-weight:700; font-size:.88rem; }
     </style>
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body>
+<body class="standalone-brand">
     <div class="card">
         <h1>تعيين كلمة مرور جديدة</h1>
         <p>رابط إعادة التعيين صالح لمدة 60 دقيقة فقط.</p>

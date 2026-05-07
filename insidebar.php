@@ -269,19 +269,39 @@ if (isset($_SESSION['user']) && isset($conn)) {
   const toggleBtn     = document.getElementById('toggleBtn');
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const SIDEBAR_ANIMATION_MS = 420;
 
   function isMobile() { return window.innerWidth <= 768; }
+
+  function refreshPageLayout() {
+    // Notify listeners and recalculate DataTables widths after layout changes.
+    window.dispatchEvent(new Event('resize'));
+
+    if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) {
+      const tablesApi = window.jQuery.fn.dataTable.tables({ visible: true, api: true });
+      tablesApi.columns.adjust();
+      if (typeof tablesApi.responsive === 'function') {
+        tablesApi.responsive.recalc();
+      }
+    }
+  }
+
+  function refreshPageLayoutAfterAnimation() {
+    setTimeout(refreshPageLayout, SIDEBAR_ANIMATION_MS);
+  }
 
   function openSidebar() {
     sidebar.classList.add('active');
     sidebarOverlay.classList.add('active');
     document.body.style.overflow = 'hidden'; // منع التمرير خلف السايدبار
+    refreshPageLayoutAfterAnimation();
   }
 
   function closeSidebar() {
     sidebar.classList.remove('active');
     sidebarOverlay.classList.remove('active');
     document.body.style.overflow = '';
+    refreshPageLayoutAfterAnimation();
   }
 
   // زر السهم داخل السايدبار (للحاسوب فقط)
@@ -289,23 +309,28 @@ if (isset($_SESSION['user']) && isset($conn)) {
     toggleBtn.addEventListener('click', () => {
       if (!isMobile()) {
         sidebar.classList.toggle('closed');
+        refreshPageLayoutAfterAnimation();
       }
     });
   }
 
   // زر الهامبرغر الخارجي (للموبايل)
-  mobileMenuBtn.addEventListener('click', () => {
-    if (sidebar.classList.contains('active')) {
-      closeSidebar();
-    } else {
-      openSidebar();
-    }
-  });
+  if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', () => {
+      if (sidebar.classList.contains('active')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+  }
 
   // إغلاق عند النقر على الخلفية المعتمة
-  sidebarOverlay.addEventListener('click', () => {
-    closeSidebar();
-  });
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', () => {
+      closeSidebar();
+    });
+  }
 
   // إغلاق عند الضغط على أي رابط داخل السايدبار (موبايل)
   sidebar.querySelectorAll('a').forEach(link => {
@@ -319,6 +344,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
     if (!isMobile()) {
       closeSidebar();
     }
+    refreshPageLayoutAfterAnimation();
   });
 
   // ===== شارة الرسائل غير المقروءة =====
@@ -343,4 +369,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
   }
   updateChatNavBadge();
   setInterval(updateChatNavBadge, 30000);
+
+  // Initial pass after page load to ensure any table wrapper starts with correct width.
+  refreshPageLayoutAfterAnimation();
 </script>

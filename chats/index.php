@@ -924,8 +924,9 @@ $page_title = "المراسلات الداخلية";
         body { display: flex; }
         .main { flex: 1; overflow: hidden; padding: 0 !important; }
     </style>
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body>
+<body class="ems-site">
 <?php include('../insidebar.php'); ?>
 
 <div class="main" style="padding:0; overflow:hidden;">

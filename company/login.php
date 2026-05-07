@@ -361,8 +361,9 @@ $csrf = generate_csrf_token();
             line-height: 1.7;
         }
     </style>
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body>
+<body class="standalone-brand">
     <div class="card">
         <span class="badge"><i class="fas fa-building-shield"></i> بوابة مستخدمي الشركات</span>
         <h1>تسجيل الدخول</h1>

@@ -278,8 +278,9 @@ a{text-decoration:none;color:inherit}
   .card-head h2{font-size:1.2rem}
 }
   </style>
+  <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body>
+<body class="standalone-brand">
 <div class="page">
 
   <!-- LEFT PANEL -->

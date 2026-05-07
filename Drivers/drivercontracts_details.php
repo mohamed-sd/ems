@@ -42,6 +42,7 @@ if (!$is_super_admin) {
     <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
+    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
     
     <style>
         @import url('/ems/assets/css/local-fonts.css');

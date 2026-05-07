@@ -94,6 +94,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
   <!-- CSS الموقع -->
   <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
   <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
+  <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
 <style>
   @import url('/ems/assets/css/local-fonts.css');
