@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -339,164 +339,32 @@ include('../insidebar.php');
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
-:root{--bg:#F5F0E8;--s0:#1A1208;--s1:#FFFFFF;--s2:#FDF8F0;--s3:#FFF4E6;--bdr:#E8DCC8;--bdr2:#F0E8D8;--or:#F7931A;--or2:#E67E00;--or3:#C96A00;--ord:rgba(247,147,26,.15);--orb:rgba(247,147,26,.08);--t1:#1A1208;--t2:#6B4E2A;--t3:#A07848;--ok:#16A34A;--warn:#D97706;--err:#DC2626;--r:8px;--rl:12px;--hex:polygon(8% 0,92% 0,100% 50%,92% 100%,8% 100%,0 50%);--sh:0 1px 3px rgba(26,18,8,.08),0 4px 12px rgba(26,18,8,.06);--sh2:0 2px 8px rgba(26,18,8,.1),0 8px 24px rgba(26,18,8,.08)}
-body,.main{font-family:'Tajawal',sans-serif!important;background:var(--bg)!important;color:var(--t1)!important}
-/* ══ HERO ══ */
-.ems-hero{background:var(--s0);border-bottom:2px solid var(--or);position:relative;overflow:hidden}
-.ems-hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(247,147,26,.05) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
-.ems-hero-inner{position:relative;z-index:1;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.ems-hero-sup{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:5px;display:flex;align-items:center;gap:7px}
-.ems-hero-sup::before{content:'';width:20px;height:2px;background:var(--or);border-radius:1px;flex-shrink:0}
-.ems-hero-name{font-size:clamp(1.1rem,2vw,1.6rem);font-weight:900;color:#fff;line-height:1.1}
-.ems-hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.ems-hero-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;font-size:.73rem;font-weight:700;white-space:nowrap}
-.ems-hero-tag i{font-size:.6rem}
-.ems-tag-or{background:rgba(247,147,26,.18);border:1px solid rgba(247,147,26,.35);color:var(--or)}
-.ems-tag-ok{background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.25);color:#4ADE80}
-.ems-tag-info{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6)}
-.ems-hero-deco{display:flex;align-items:center;gap:5px;flex-shrink:0}
-.ems-hx{clip-path:var(--hex);display:flex;align-items:center;justify-content:center;color:#fff}
-.ems-hx-xl{width:56px;height:56px;font-size:1.4rem;background:linear-gradient(135deg,var(--or),var(--or2));box-shadow:0 0 24px rgba(247,147,26,.4)}
-.ems-hx-md{width:30px;height:30px;font-size:.8rem;background:rgba(247,147,26,.25)}
-.ems-hero-actions{position:relative;z-index:1;padding:0 22px 14px;display:flex;flex-wrap:wrap;gap:8px}
-/* ══ BUTTONS ══ */
-.add-btn,.back-btn{display:inline-flex!important;align-items:center!important;gap:7px!important;padding:7px 17px!important;border-radius:var(--r)!important;font-family:'Tajawal',sans-serif!important;font-size:.82rem!important;font-weight:700!important;text-decoration:none!important;transition:all .15s!important;cursor:pointer!important;white-space:nowrap!important;border:none!important}
-.add-btn{background:var(--or)!important;color:#fff!important;box-shadow:0 2px 8px rgba(247,147,26,.3)!important}
-.add-btn:hover{background:var(--or2)!important;transform:translateY(-1px)!important;color:#fff!important}
-.back-btn{background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.15)!important;color:rgba(255,255,255,.8)!important}
-.back-btn:hover{background:rgba(255,255,255,.15)!important;color:#fff!important}
-/* ══ CONTENT WRAP ══ */
-.ems-content{padding:18px 22px}
-/* ══ ALERTS ══ */
-.success-message{padding:12px 18px!important;border-radius:var(--r)!important;margin-bottom:16px!important;font-weight:700!important;font-size:.88rem!important;display:flex!important;align-items:center!important;gap:10px!important}
-.is-success{background:rgba(22,163,74,.1)!important;border:1px solid rgba(22,163,74,.25)!important;color:var(--ok)!important}
-.is-error{background:rgba(220,38,38,.08)!important;border:1px solid rgba(220,38,38,.2)!important;color:var(--err)!important}
-/* ══ SECTION LABEL ══ */
-.ems-sec{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
-.ems-sec i{color:var(--or);font-size:.72rem}
-.ems-sec::after{content:'';flex:1;height:1px;background:var(--bdr)}
-.section-title{font-size:.88rem;font-weight:800;color:var(--t1);display:flex;align-items:center;gap:8px;margin:0 0 16px;padding-bottom:8px;border-bottom:1px solid var(--bdr)}
-.section-title i{color:var(--or)}
-/* ══ CARDS ══ */
-.card{background:var(--s1)!important;border:1px solid var(--bdr)!important;border-radius:var(--rl)!important;box-shadow:var(--sh)!important;margin-bottom:20px!important;overflow:visible!important}
-.card-header{background:var(--s2)!important;border-bottom:1px solid var(--bdr)!important;padding:12px 18px!important;border-radius:var(--rl) var(--rl) 0 0!important;overflow:hidden!important}
-.card-header h5{margin:0!important;font-size:.9rem!important;font-weight:800!important;color:var(--t1)!important;display:flex!important;align-items:center!important;gap:8px!important}
-.card-header h5 i{color:var(--or)!important}
-.card-body{padding:18px!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
-.tbl-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;border-radius:0 0 var(--rl) var(--rl)}
-/* ══ FORMS ══ */
-.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
-.form-grid select,.form-grid input[type=date],.form-grid input[type=number],.form-grid input[type=text]{width:100%!important;padding:9px 12px!important;border:1.5px solid var(--bdr)!important;border-radius:var(--r)!important;font-family:'Tajawal',sans-serif!important;font-size:.85rem!important;background:var(--s2)!important;color:var(--t1)!important;transition:border-color .15s!important}
-.form-grid select:focus,.form-grid input:focus{outline:none!important;border-color:var(--or)!important;background:var(--s1)!important}
-.form-grid label{display:block!important;font-size:.78rem!important;font-weight:700!important;color:var(--t3)!important;margin-bottom:5px!important}
-.form-grid button[type=submit]{background:var(--or)!important;color:#fff!important;border:none!important;padding:10px 22px!important;border-radius:var(--r)!important;font-family:'Tajawal',sans-serif!important;font-weight:800!important;font-size:.88rem!important;cursor:pointer!important;transition:all .15s!important}
-.form-grid button[type=submit]:hover{background:var(--or2)!important;transform:translateY(-1px)!important}
-.form-hidden{display:none!important}
-/* ══ STATUS BADGES ══ */
-.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 12px;border-radius:50px;font-size:.75rem;font-weight:700}
-.status-running{background:rgba(22,163,74,.1);color:var(--ok);border:1px solid rgba(22,163,74,.2)}
-.status-idle{background:rgba(160,120,72,.1);color:var(--t3);border:1px solid rgba(160,120,72,.2)}
-.category-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:50px;font-size:.75rem;font-weight:700}
-.category-badge.basic{background:var(--orb);color:var(--or3);border:1px solid var(--ord)}
-.category-badge.backup{background:rgba(59,130,246,.08);color:#2563eb;border:1px solid rgba(59,130,246,.2)}
-/* ══ ACTION BUTTONS ══ */
-.action-btns{display:flex;gap:6px;align-items:center}
-.action-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:32px!important;height:32px!important;border-radius:var(--r)!important;font-size:.8rem!important;transition:all .15s!important;text-decoration:none!important}
-.action-btn.view{background:var(--orb);color:var(--or);border:1px solid var(--ord)}
-.action-btn.view:hover{background:var(--or);color:#fff}
-.action-btn.edit{background:rgba(37,99,235,.08);color:#2563eb;border:1px solid rgba(37,99,235,.2)}
-.action-btn.edit:hover{background:#2563eb;color:#fff}
-.action-btn.delete{background:rgba(220,38,38,.08);color:var(--err);border:1px solid rgba(220,38,38,.2)}
-.action-btn.delete:hover{background:var(--err);color:#fff}
-/* ══ DATATABLES ══ */
-.dataTables_wrapper{font-family:'Tajawal',sans-serif!important;color:var(--t2)!important}
-table.dataTable thead th{background:var(--s2)!important;color:var(--t3)!important;font-size:.78rem!important;font-weight:800!important;border-bottom:2px solid var(--bdr)!important;padding:10px 12px!important;white-space:nowrap!important}
-table.dataTable tbody tr{background:var(--s1)!important}
-table.dataTable tbody tr:hover{background:var(--s3)!important}
-table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;border-bottom:1px solid var(--bdr2)!important;vertical-align:middle!important;color:var(--t2)!important}
-.dataTables_filter input{border:1.5px solid var(--bdr)!important;border-radius:var(--r)!important;padding:7px 12px!important;font-family:'Tajawal',sans-serif!important;background:var(--s2)!important;color:var(--t1)!important}
-.dt-buttons .dt-button{background:var(--s2)!important;border:1px solid var(--bdr)!important;color:var(--t2)!important;border-radius:var(--r)!important;font-family:'Tajawal',sans-serif!important;padding:6px 14px!important;font-size:.78rem!important;font-weight:700!important}
-.dt-buttons .dt-button:hover{background:var(--or)!important;color:#fff!important;border-color:var(--or)!important}
-/* ══ CONTRACT STATS ══ */
-.contract-stats{background:var(--s1);border:1px solid var(--bdr);border-radius:var(--rl);box-shadow:var(--sh);padding:18px;margin-bottom:20px}
-.contract-stats.is-hidden{display:none}
-.stats-title{font-size:.88rem;font-weight:800;color:var(--t1);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.stats-title i{color:var(--or)}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:14px}
-.stat-card{background:var(--s2);border:1px solid var(--bdr);border-radius:var(--rl);padding:14px;text-align:center}
-.stat-card-icon{font-size:1.4rem;color:var(--or);margin-bottom:6px}
-.stat-card-value{font-size:1.8rem;font-weight:900;color:var(--t1)}
-.stat-card-label{font-size:.78rem;color:var(--t3);font-weight:600;margin-top:4px}
-.table-scroll{overflow-x:auto;border-radius:var(--rl);border:1px solid var(--bdr)}
-.suppliers-table{width:100%;border-collapse:collapse}
-.suppliers-table thead th{background:var(--s2);color:var(--t3);font-size:.78rem;font-weight:800;padding:10px 12px;border-bottom:2px solid var(--bdr)}
-.suppliers-table tbody td{padding:9px 12px;font-size:.83rem;color:var(--t2);border-bottom:1px solid var(--bdr2);background:var(--s1)}
-.suppliers-table tbody tr:hover td{background:var(--s3)}
-.suppliers-total-row td{font-weight:700;color:var(--t1);border-top:2px solid var(--bdr);background:var(--s2)!important}
-.suppliers-total-label{font-weight:800;color:var(--or3)}
-.suppliers-empty{text-align:center;color:var(--t3);font-size:.85rem;padding:20px}
-.legend-basic{color:var(--or)}.legend-backup{color:#2563eb}
-.suppliers-basic-count{color:var(--or3);font-weight:700}.suppliers-backup-count{color:#2563eb;font-weight:700}
-.breakdown-item{margin-bottom:4px;font-size:.78rem;color:var(--t2)}
-.breakdown-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.72rem;font-weight:700;margin:0 2px}
-.breakdown-tag.is-basic{background:var(--orb);color:var(--or3)}.breakdown-tag.is-backup{background:rgba(37,99,235,.08);color:#2563eb}
-.breakdown-count.is-active{color:var(--ok);font-weight:700}.breakdown-count.is-warning{color:var(--warn);font-weight:700}.breakdown-count.is-muted{color:var(--t3)}
-.breakdown-empty{color:var(--t3);font-size:.78rem}
-.badge-available{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:50px;font-size:.78rem;font-weight:700;background:rgba(22,163,74,.1);color:var(--ok);border:1px solid rgba(22,163,74,.2)}
-.badge-working{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:50px;font-size:.78rem;font-weight:700;background:rgba(217,119,6,.1);color:var(--warn);border:1px solid rgba(217,119,6,.2)}
-.badge-busy{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:50px;font-size:.78rem;font-weight:700;background:rgba(220,38,38,.08);color:var(--err);border:1px solid rgba(220,38,38,.2)}
-/* ══ VIEW MODAL WARM THEME ══ */
-#viewOperationModal .modal-content{background:var(--s1)!important;border-radius:var(--rl)!important}
-#viewOperationModal .modal-header{background:linear-gradient(135deg,var(--s0),#2a1c08)!important;border-bottom:2px solid var(--or)!important;border-radius:var(--rl) var(--rl) 0 0!important}
-</style>
-
-<div class="main">
-  <!-- ══ HERO HEADER ══ -->
-  <div class="ems-hero">
-    <div class="ems-hero-inner">
-      <div class="ems-hero-body">
-        <div class="ems-hero-sup">
-          <i class="fas fa-project-diagram"></i>
-          <?php echo htmlspecialchars($selected_project['name']); ?>
-          <?php if ($selected_mine): ?> &middot; <?php echo htmlspecialchars($selected_mine['mine_name']); ?><?php endif; ?>
+<div class="main movement-page movement-ops-page">
+    <div class="movement-topbar">
+        <div class="movement-topbar-left">
+            <?php if ($can_add): ?>
+            <a href="javascript:void(0)" id="toggleForm" class="movement-topbar-btn movement-topbar-btn-primary add-btn"><i class="fa fa-plus-circle"></i> إضافة تشغيل جديد</a>
+            <?php endif; ?>
+            <a href="project_drivers.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn"><i class="fas fa-id-badge"></i> سائقي المشروع</a>
+            <?php if($_SESSION['user']['role'] != "10"): ?>
+            <a href="select_project.php" class="movement-topbar-btn"><i class="fas fa-exchange-alt"></i> تغيير المشروع</a>
+            <?php endif; ?>
         </div>
-        <div class="ems-hero-name">إدارة التشغيل</div>
-        <div class="ems-hero-meta">
-          <?php if (!empty($selected_project['project_code'])): ?>
-          <span class="ems-hero-tag ems-tag-or"><i class="fas fa-barcode"></i> <?php echo htmlspecialchars($selected_project['project_code']); ?></span>
-          <?php endif; ?>
-          <?php if ($selected_mine): ?>
-          <span class="ems-hero-tag ems-tag-ok"><i class="fas fa-mountain"></i> <?php echo htmlspecialchars($selected_mine['mine_name']); ?></span>
-          <?php if (!empty($selected_mine['mine_code'])): ?>
-          <span class="ems-hero-tag ems-tag-info"><i class="fas fa-hashtag"></i> <?php echo htmlspecialchars($selected_mine['mine_code']); ?></span>
-          <?php endif; ?>
-          <?php else: ?>
-          <span class="ems-hero-tag ems-tag-info"><i class="fas fa-layer-group"></i> جميع مناجم المشروع</span>
-          <?php endif; ?>
-          <span class="ems-hero-tag ems-tag-info"><i class="fas fa-cogs"></i> تنظيم التشغيل</span>
+        <div class="movement-topbar-right">
+            <div class="movement-topbar-title">
+                <span class="movement-topbar-icon"><i class="fas fa-cogs"></i></span>
+                <div class="movement-topbar-title-text">
+                    <h1>إدارة التشغيل</h1>
+                    <p>
+                        <i class="fas fa-project-diagram"></i>
+                        <?php echo htmlspecialchars($selected_project['name']); ?>
+                        <?php if ($selected_mine): ?> · <?php echo htmlspecialchars($selected_mine['mine_name']); ?><?php endif; ?>
+                    </p>
+                </div>
+            </div>
+            <a href="../main/dashboard.php" class="movement-topbar-btn movement-topbar-btn-back back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
         </div>
-      </div>
-      <div class="ems-hero-deco">
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <div class="ems-hx ems-hx-md"><i class="fas fa-mountain"></i></div>
-          <div class="ems-hx ems-hx-md"><i class="fas fa-cog"></i></div>
-        </div>
-        <div class="ems-hx ems-hx-xl"><i class="fas fa-hard-hat"></i></div>
-      </div>
     </div>
-    <div class="ems-hero-actions">
-      <a href="../main/dashboard.php" class="back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
-      <a href="project_drivers.php?project_id=<?php echo intval($selected_project_id); ?>" class="back-btn"><i class="fas fa-id-badge"></i> سائقي المشروع</a>
-      <?php if($_SESSION['user']['role'] != "10"): ?>
-      <a href="select_project.php" class="back-btn"><i class="fas fa-exchange-alt"></i> تغيير المشروع</a>
-      <?php endif; ?>
-      <?php if ($can_add): ?>
-      <a href="javascript:void(0)" id="toggleForm" class="add-btn"><i class="fa fa-plus"></i> اضافة تشغيل</a>
-      <?php endif; ?>
-    </div>
-  </div><!-- /.ems-hero -->
 
   <div class="ems-content">
     <?php if (!empty($_GET['msg'])):
@@ -659,9 +527,9 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
         <div class="card-header">
             <h5><i class="fas fa-cogs"></i> قائمة التشغيل</h5>
         </div>
-        <div class="card-body" style="padding:0!important">
-          <div class="tbl-scroll-wrap" style="padding:0">
-            <table id="projectsTable" class="display nowrap" style="width:100%">
+                <div class="card-body card-body-zero">
+                    <div class="tbl-scroll-wrap tbl-scroll-zero">
+                        <table id="projectsTable" class="display nowrap table-full-width">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -676,7 +544,7 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
                         <th>تاريخ البداية</th>
                         <th>تاريخ النهاية</th>
                         <th>النوع</th>
-                        <!-- <th style="text-align:right;">عدد الساعات</th> -->
+                        <!-- <th>عدد الساعات</th> -->
                         <th>الحالة</th>
                         <th>إجراءات</th>
 
@@ -807,7 +675,7 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
                         if ($status_value === 1 && $_SESSION['user']['role'] != "10" && $can_edit) {
                             $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-outline-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
                         } elseif ($status_value === 0 && $can_edit) {
-                            $action_buttons .= "<form method='post' style='display:inline;'>
+                            $action_buttons .= "<form method='post' class='operation-inline-form'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='1'>
@@ -877,71 +745,71 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 
 <!-- مودال عرض بيانات التشغيل -->
-<div id="viewOperationModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;">
-    <div class="modal-content" style="background:#fff;border-radius:12px;max-width:700px;width:95%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);">
-        <div class="modal-header" style="padding:20px 24px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#1e40af,#2563eb);border-radius:12px 12px 0 0;">
-            <h5 style="margin:0;font-weight:700;color:#ffffff;"><i class="fas fa-eye" style="color:#ffffff;margin-left:8px;"></i> تفاصيل سجل التشغيل</h5>
-            <button onclick="closeViewOperationModal()" style="background:rgba(255,255,255,.2);border:none;font-size:1.4rem;cursor:pointer;color:#ffffff;line-height:1;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;">&times;</button>
+<div id="viewOperationModal" class="modal movement-view-modal">
+    <div class="modal-content movement-view-modal-content">
+        <div class="modal-header movement-view-modal-header">
+            <h5 class="movement-view-modal-title"><i class="fas fa-eye movement-view-modal-title-icon"></i> تفاصيل سجل التشغيل</h5>
+            <button onclick="closeViewOperationModal()" class="movement-view-modal-close">&times;</button>
         </div>
-        <div class="modal-body" style="padding:24px;">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
-                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-cogs"></i> المعدة</div>
-                    <div style="font-weight:700;color:#1e293b;" id="view_op_equipment">-</div>
+        <div class="modal-body movement-view-modal-body">
+            <div class="movement-view-modal-grid">
+                <div class="movement-view-modal-item">
+                    <div class="movement-view-modal-label"><i class="fas fa-cogs"></i> المعدة</div>
+                    <div class="movement-view-modal-value" id="view_op_equipment">-</div>
                 </div>
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
-                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-truck"></i> المورد</div>
-                    <div style="font-weight:700;color:#1e293b;" id="view_op_supplier">-</div>
+                <div class="movement-view-modal-item">
+                    <div class="movement-view-modal-label"><i class="fas fa-truck"></i> المورد</div>
+                    <div class="movement-view-modal-value" id="view_op_supplier">-</div>
                 </div>
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
-                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-mountain"></i> المنجم</div>
-                    <div style="font-weight:700;color:#1e293b;" id="view_op_mine">-</div>
+                <div class="movement-view-modal-item">
+                    <div class="movement-view-modal-label"><i class="fas fa-mountain"></i> المنجم</div>
+                    <div class="movement-view-modal-value" id="view_op_mine">-</div>
                 </div>
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
-                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-file-contract"></i> تاريخ توقيع العقد</div>
-                    <div style="font-weight:700;color:#1e293b;" id="view_op_contract">-</div>
+                <div class="movement-view-modal-item">
+                    <div class="movement-view-modal-label"><i class="fas fa-file-contract"></i> تاريخ توقيع العقد</div>
+                    <div class="movement-view-modal-value" id="view_op_contract">-</div>
                 </div>
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
-                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-id-badge"></i> السائقون</div>
-                    <div style="font-weight:700;color:#1e293b;" id="view_op_drivers">-</div>
+                <div class="movement-view-modal-item">
+                    <div class="movement-view-modal-label"><i class="fas fa-id-badge"></i> السائقون</div>
+                    <div class="movement-view-modal-value" id="view_op_drivers">-</div>
                 </div>
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
-                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-check-circle"></i> نوع المعدة</div>
-                    <div style="font-weight:700;color:#1e293b;" id="view_op_category">-</div>
+                <div class="movement-view-modal-item">
+                    <div class="movement-view-modal-label"><i class="fas fa-check-circle"></i> نوع المعدة</div>
+                    <div class="movement-view-modal-value" id="view_op_category">-</div>
                 </div>
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
-                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-calendar-alt"></i> تاريخ البداية</div>
-                    <div style="font-weight:700;color:#1e293b;" id="view_op_start">-</div>
+                <div class="movement-view-modal-item">
+                    <div class="movement-view-modal-label"><i class="fas fa-calendar-alt"></i> تاريخ البداية</div>
+                    <div class="movement-view-modal-value" id="view_op_start">-</div>
                 </div>
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
-                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-calendar-check"></i> تاريخ النهاية</div>
-                    <div style="font-weight:700;color:#1e293b;" id="view_op_end">-</div>
+                <div class="movement-view-modal-item">
+                    <div class="movement-view-modal-label"><i class="fas fa-calendar-check"></i> تاريخ النهاية</div>
+                    <div class="movement-view-modal-value" id="view_op_end">-</div>
                 </div>
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
-                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-clock"></i> ساعات العمل الكلية</div>
-                    <div style="font-weight:700;color:#1e293b;" id="view_op_total_hours">-</div>
+                <div class="movement-view-modal-item">
+                    <div class="movement-view-modal-label"><i class="fas fa-clock"></i> ساعات العمل الكلية</div>
+                    <div class="movement-view-modal-value" id="view_op_total_hours">-</div>
                 </div>
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;">
-                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-hourglass-half"></i> ساعات الوردية</div>
-                    <div style="font-weight:700;color:#1e293b;" id="view_op_shift_hours">-</div>
+                <div class="movement-view-modal-item">
+                    <div class="movement-view-modal-label"><i class="fas fa-hourglass-half"></i> ساعات الوردية</div>
+                    <div class="movement-view-modal-value" id="view_op_shift_hours">-</div>
                 </div>
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1px solid #e2e8f0;grid-column:span 2;">
-                    <div style="font-size:.75rem;color:#64748b;margin-bottom:4px;"><i class="fas fa-toggle-on"></i> الحالة</div>
+                <div class="movement-view-modal-item movement-view-modal-item-wide">
+                    <div class="movement-view-modal-label"><i class="fas fa-toggle-on"></i> الحالة</div>
                     <div id="view_op_status">-</div>
                 </div>
-                <div id="view_op_reason_block" style="background:#fff3cd;border-radius:8px;padding:14px;border:1px solid #ffc107;grid-column:span 2;display:none;">
-                    <div style="font-size:.75rem;color:#92400e;margin-bottom:4px;"><i class="fas fa-info-circle"></i> سبب الإنهاء</div>
-                    <div style="font-weight:600;color:#92400e;" id="view_op_reason">-</div>
+                <div id="view_op_reason_block" class="movement-view-modal-reason movement-view-modal-item-wide">
+                    <div class="movement-view-modal-reason-label"><i class="fas fa-info-circle"></i> سبب الإنهاء</div>
+                    <div class="movement-view-modal-reason-value" id="view_op_reason">-</div>
                 </div>
             </div>
         </div>
-        <div class="modal-footer" style="padding:16px 24px;border-top:1px solid #e5e7eb;display:flex;justify-content:flex-end;gap:10px;">
+        <div class="modal-footer movement-view-modal-footer">
             <?php if ($can_edit): ?>
-            <button type="button" id="viewOpEditBtn" onclick="triggerEditFromView()" style="background:#2563eb;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-weight:600;cursor:pointer;">
+            <button type="button" id="viewOpEditBtn" onclick="triggerEditFromView()" class="movement-view-modal-btn movement-view-modal-btn-primary">
                 <i class="fas fa-edit"></i> تعديل
             </button>
             <?php endif; ?>
-            <button type="button" onclick="closeViewOperationModal()" style="background:#6b7280;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-weight:600;cursor:pointer;">
+            <button type="button" onclick="closeViewOperationModal()" class="movement-view-modal-btn movement-view-modal-btn-secondary">
                 <i class="fas fa-times"></i> إغلاق
             </button>
         </div>
@@ -1494,5 +1362,7 @@ table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;
 </body>
 
 </html>
+
+
 
 

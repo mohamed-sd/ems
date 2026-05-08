@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -385,107 +385,30 @@ include '../insidebar.php';
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
-:root{--bg:#F5F0E8;--s0:#1A1208;--s1:#FFFFFF;--s2:#FDF8F0;--s3:#FFF4E6;--bdr:#E8DCC8;--bdr2:#F0E8D8;--or:#F7931A;--or2:#E67E00;--or3:#C96A00;--ord:rgba(247,147,26,.15);--orb:rgba(247,147,26,.08);--t1:#1A1208;--t2:#6B4E2A;--t3:#A07848;--ok:#16A34A;--warn:#D97706;--err:#DC2626;--r:8px;--rl:12px;--hex:polygon(8% 0,92% 0,100% 50%,92% 100%,8% 100%,0 50%);--sh:0 1px 3px rgba(26,18,8,.08),0 4px 12px rgba(26,18,8,.06);--sh2:0 2px 8px rgba(26,18,8,.1),0 8px 24px rgba(26,18,8,.08)}
-body,.main{font-family:'Tajawal',sans-serif!important;background:var(--bg)!important;color:var(--t1)!important}
-/* ══ HERO ══ */
-.ems-hero{background:var(--s0);border-bottom:2px solid var(--or);position:relative;overflow:hidden}
-.ems-hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(247,147,26,.05) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
-.ems-hero-inner{position:relative;z-index:1;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.ems-hero-sup{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:5px;display:flex;align-items:center;gap:7px}
-.ems-hero-sup::before{content:'';width:20px;height:2px;background:var(--or);border-radius:1px;flex-shrink:0}
-.ems-hero-name{font-size:clamp(1.1rem,2vw,1.6rem);font-weight:900;color:#fff;line-height:1.1}
-.ems-hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.ems-hero-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;font-size:.73rem;font-weight:700;white-space:nowrap}
-.ems-hero-tag i{font-size:.6rem}
-.ems-tag-or{background:rgba(247,147,26,.18);border:1px solid rgba(247,147,26,.35);color:var(--or)}
-.ems-tag-ok{background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.25);color:#4ADE80}
-.ems-tag-info{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6)}
-.ems-hero-deco{display:flex;align-items:center;gap:5px;flex-shrink:0}
-.ems-hx{clip-path:var(--hex);display:flex;align-items:center;justify-content:center;color:#fff}
-.ems-hx-xl{width:56px;height:56px;font-size:1.4rem;background:linear-gradient(135deg,var(--or),var(--or2));box-shadow:0 0 24px rgba(247,147,26,.4)}
-.ems-hx-md{width:30px;height:30px;font-size:.8rem;background:rgba(247,147,26,.25)}
-.ems-hero-actions{position:relative;z-index:1;padding:0 22px 14px;display:flex;flex-wrap:wrap;gap:8px}
-/* ══ BUTTONS ══ */
-.add-btn,.back-btn{display:inline-flex!important;align-items:center!important;gap:7px!important;padding:7px 17px!important;border-radius:var(--r)!important;font-family:'Tajawal',sans-serif!important;font-size:.82rem!important;font-weight:700!important;text-decoration:none!important;transition:all .15s!important;cursor:pointer!important;white-space:nowrap!important;border:none!important}
-.add-btn{background:var(--or)!important;color:#fff!important;box-shadow:0 2px 8px rgba(247,147,26,.3)!important}
-.add-btn:hover{background:var(--or2)!important;transform:translateY(-1px)!important;color:#fff!important}
-.back-btn{background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.15)!important;color:rgba(255,255,255,.8)!important}
-.back-btn:hover{background:rgba(255,255,255,.15)!important;color:#fff!important}
-/* ══ CONTENT ══ */
-.ems-content{padding:18px 22px}
-/* ══ ALERTS ══ */
-.success-message{padding:12px 18px!important;border-radius:var(--r)!important;margin-bottom:16px!important;font-weight:700!important;font-size:.88rem!important;display:flex!important;align-items:center!important;gap:10px!important}
-.is-success{background:rgba(22,163,74,.1)!important;border:1px solid rgba(22,163,74,.25)!important;color:var(--ok)!important}
-.is-error{background:rgba(220,38,38,.08)!important;border:1px solid rgba(220,38,38,.2)!important;color:var(--err)!important}
-/* ══ CARDS ══ */
-.card{background:var(--s1)!important;border:1px solid var(--bdr)!important;border-radius:var(--rl)!important;box-shadow:var(--sh)!important;margin-bottom:20px!important;overflow:visible!important}
-.card-header{background:var(--s2)!important;border-bottom:1px solid var(--bdr)!important;padding:12px 18px!important;border-radius:var(--rl) var(--rl) 0 0!important;overflow:hidden!important}
-.card-header h5{margin:0!important;font-size:.9rem!important;font-weight:800!important;color:var(--t1)!important;display:flex!important;align-items:center!important;gap:8px!important}
-.card-header h5 i{color:var(--or)!important}
-.card-body{padding:18px!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
-.table-container{overflow-x:auto!important;-webkit-overflow-scrolling:touch!important;width:100%!important}
-/* ══ FORMS ══ */
-.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
-.form-grid select,.form-grid input[type=date],.form-grid input[type=number],.form-grid input[type=text]{width:100%!important;padding:9px 12px!important;border:1.5px solid var(--bdr)!important;border-radius:var(--r)!important;font-family:'Tajawal',sans-serif!important;font-size:.85rem!important;background:var(--s2)!important;color:var(--t1)!important;transition:border-color .15s!important}
-.form-grid select:focus,.form-grid input:focus{outline:none!important;border-color:var(--or)!important;background:var(--s1)!important}
-.form-grid label{display:block!important;font-size:.78rem!important;font-weight:700!important;color:var(--t3)!important;margin-bottom:5px!important}
-.form-hidden{display:none!important}
-/* ══ STATUS ══ */
-.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 12px;border-radius:50px;font-size:.75rem;font-weight:700}
-.status-running{background:rgba(22,163,74,.1);color:var(--ok);border:1px solid rgba(22,163,74,.2)}
-.status-idle{background:rgba(160,120,72,.1);color:var(--t3);border:1px solid rgba(160,120,72,.2)}
-/* ══ DATATABLES ══ */
-.dataTables_wrapper{font-family:'Tajawal',sans-serif!important;color:var(--t2)!important}
-table.dataTable thead th{background:var(--s2)!important;color:var(--t3)!important;font-size:.78rem!important;font-weight:800!important;border-bottom:2px solid var(--bdr)!important;padding:10px 12px!important;white-space:nowrap!important}
-table.dataTable tbody tr{background:var(--s1)!important}
-table.dataTable tbody tr:hover{background:var(--s3)!important}
-table.dataTable tbody td{padding:10px 12px!important;font-size:.85rem!important;border-bottom:1px solid var(--bdr2)!important;vertical-align:middle!important;color:var(--t2)!important}
-.dataTables_filter input{border:1.5px solid var(--bdr)!important;border-radius:var(--r)!important;padding:7px 12px!important;font-family:'Tajawal',sans-serif!important;background:var(--s2)!important;color:var(--t1)!important}
-/* ══ INLINE FORM CONTROLS ══ */
-select{border:1.5px solid var(--bdr)!important;border-radius:var(--r)!important;padding:6px 10px!important;font-family:'Tajawal',sans-serif!important;background:var(--s2)!important;color:var(--t1)!important}
-input[type=date]{border:1.5px solid var(--bdr)!important;border-radius:var(--r)!important;padding:6px 10px!important;font-family:'Tajawal',sans-serif!important;background:var(--s2)!important;color:var(--t1)!important}
-.btn.btn-sm.btn-danger{background:var(--err)!important;border:none!important;border-radius:var(--r)!important;font-family:'Tajawal',sans-serif!important;font-weight:700!important;font-size:.78rem!important}
-.btn.btn-sm.btn-primary{background:var(--or)!important;border:none!important;border-radius:var(--r)!important;font-family:'Tajawal',sans-serif!important;font-weight:700!important;font-size:.78rem!important}
-.btn.btn-sm.btn-primary:hover{background:var(--or2)!important}
-.btn.btn-success{background:var(--ok)!important;border:none!important;border-radius:var(--r)!important;font-family:'Tajawal',sans-serif!important;font-weight:700!important}
-.btn.btn-secondary{background:var(--s2)!important;border:1px solid var(--bdr)!important;color:var(--t2)!important;border-radius:var(--r)!important;font-family:'Tajawal',sans-serif!important;font-weight:700!important}
-</style>
-
-<div class="main">
-  <!-- ══ HERO HEADER ══ -->
-  <div class="ems-hero">
-    <div class="ems-hero-inner">
-      <div class="ems-hero-body">
-        <div class="ems-hero-sup">
-          <i class="fas fa-project-diagram"></i>
-          <?php echo htmlspecialchars($selected_project['name']); ?>
+<div class="main movement-page movement-drivers-page">
+    <div class="movement-topbar">
+        <div class="movement-topbar-left">
+            <?php if ($can_edit): ?>
+            <a href="javascript:void(0)" id="toggleAddDriverForm" class="movement-topbar-btn movement-topbar-btn-primary add-btn"><i class="fas fa-plus-circle"></i> إضافة تشغيل سائق</a>
+            <?php endif; ?>
+            <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn"><i class="fas fa-cogs"></i> إدارة التشغيل</a>
+            <a href="../main/dashboard.php" class="movement-topbar-btn"><i class="fas fa-home"></i> لوحة التحكم</a>
         </div>
-        <div class="ems-hero-name">سائقو المشروع</div>
-        <div class="ems-hero-meta">
-          <?php if (!empty($selected_project['project_code'])): ?>
-          <span class="ems-hero-tag ems-tag-or"><i class="fas fa-barcode"></i> <?php echo htmlspecialchars($selected_project['project_code']); ?></span>
-          <?php endif; ?>
-          <span class="ems-hero-tag ems-tag-info"><i class="fas fa-id-badge"></i> إدارة المشغلين</span>
-          <span class="ems-hero-tag ems-tag-info"><i class="fas fa-link"></i> ربط السائقين بالآليات</span>
+        <div class="movement-topbar-right">
+            <div class="movement-topbar-title">
+                <span class="movement-topbar-icon"><i class="fas fa-id-badge"></i></span>
+                <div class="movement-topbar-title-text">
+                    <h1>إدارة سائقي المشروع</h1>
+                    <p>
+                        <i class="fas fa-project-diagram"></i>
+                        <?php echo htmlspecialchars($selected_project['name']); ?>
+                        <?php if (!empty($selected_project['project_code'])): ?> · <?php echo htmlspecialchars($selected_project['project_code']); ?><?php endif; ?>
+                    </p>
+                </div>
+            </div>
+            <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn movement-topbar-btn-back back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
         </div>
-      </div>
-      <div class="ems-hero-deco">
-        <div style="display:flex;flex-direction:column;gap:5px">
-          <div class="ems-hx ems-hx-md"><i class="fas fa-id-card"></i></div>
-          <div class="ems-hx ems-hx-md"><i class="fas fa-cog"></i></div>
-        </div>
-        <div class="ems-hx ems-hx-xl"><i class="fas fa-id-badge"></i></div>
-      </div>
     </div>
-    <div class="ems-hero-actions">
-      <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>" class="back-btn"><i class="fas fa-arrow-right"></i> رجوع للتشغيل</a>
-      <?php if ($can_edit): ?>
-      <a href="javascript:void(0)" id="toggleAddDriverForm" class="add-btn"><i class="fas fa-plus-circle"></i> إضافة تشغيل سائق</a>
-      <?php endif; ?>
-    </div>
-  </div><!-- /.ems-hero -->
 
   <div class="ems-content">
     <?php if ($msg !== ''): ?>
@@ -496,7 +419,7 @@ input[type=date]{border:1.5px solid var(--bdr)!important;border-radius:var(--r)!
     <?php endif; ?>
 
     <?php if ($can_edit): ?>
-    <form id="addDriverForm" action="" method="post" class="form-hidden" style="display:none; margin-bottom: 16px;">
+    <form id="addDriverForm" action="" method="post" class="form-hidden add-driver-form">
         <input type="hidden" name="action" value="add_driver_assignment">
         <div class="card">
             <div class="card-header">
@@ -537,12 +460,12 @@ input[type=date]{border:1.5px solid var(--bdr)!important;border-radius:var(--r)!
                         <input type="date" name="end_date" value="">
                     </div>
 
-                    <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="driver-form-check-row">
                         <input type="checkbox" id="auto_replace" name="auto_replace" value="1" checked>
-                        <label for="auto_replace" style="margin:0;">إيقاف أي تشغيل نشط لنفس السائق داخل المشروع تلقائيًا</label>
+                        <label for="auto_replace" class="driver-form-check-label">إيقاف أي تشغيل نشط لنفس السائق داخل المشروع تلقائيًا</label>
                     </div>
 
-                    <div style="grid-column: 1 / -1; display:flex; gap:10px; justify-content:center;">
+                    <div class="driver-form-actions">
                         <button type="button" id="cancelAddDriverForm" class="btn btn-secondary">إلغاء</button>
                         <button type="submit" class="btn btn-success">حفظ التشغيل</button>
                     </div>
@@ -558,7 +481,7 @@ input[type=date]{border:1.5px solid var(--bdr)!important;border-radius:var(--r)!
         </div>
         <div class="card-body">
             <div class="table-container">
-                <table id="projectDriversTable" class="display nowrap" style="width:100%;">
+                <table id="projectDriversTable" class="display nowrap table-full-width">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -595,17 +518,17 @@ input[type=date]{border:1.5px solid var(--bdr)!important;border-radius:var(--r)!
                                 echo '<td>';
                                 if ($can_edit) {
                                     if ($is_active) {
-                                        echo '<form method="post" style="display:inline-block; margin-left:6px;">';
+                                        echo '<form method="post" class="driver-action-form-stop">';
                                         echo '<input type="hidden" name="action" value="stop_driver">';
                                         echo '<input type="hidden" name="relation_id" value="' . intval($row['id']) . '">';
                                         echo '<button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'تأكيد إيقاف السائق؟\')">إيقاف</button>';
                                         echo '</form>';
                                     }
 
-                                    echo '<form method="post" style="display:inline-flex; gap:6px; align-items:center; flex-wrap:wrap;">';
+                                    echo '<form method="post" class="driver-action-form-move">';
                                     echo '<input type="hidden" name="action" value="move_driver">';
                                     echo '<input type="hidden" name="relation_id" value="' . intval($row['id']) . '">';
-                                    echo '<select name="new_equipment_id" required style="min-width:170px;">';
+                                    echo '<select name="new_equipment_id" required class="driver-move-equipment-select">';
                                     echo '<option value="">اختر آلية جديدة</option>';
                                     foreach ($project_equipments as $eq) {
                                         $eq_id = intval($eq['id']);
@@ -620,7 +543,7 @@ input[type=date]{border:1.5px solid var(--bdr)!important;border-radius:var(--r)!
                                     echo '<button type="submit" class="btn btn-sm btn-primary">تشغيل على آلية أخرى</button>';
                                     echo '</form>';
                                 } else {
-                                    echo '<span style="color:#9ca3af;">لا توجد صلاحية تعديل</span>';
+                                    echo '<span class="driver-no-permission">لا توجد صلاحية تعديل</span>';
                                 }
                                 echo '</td>';
                                 echo '</tr>';
@@ -661,3 +584,5 @@ $(document).ready(function () {
 
 </body>
 </html>
+
+

@@ -274,507 +274,30 @@ $page_title = "خريطة الموقع | " . htmlspecialchars($selected_project[
 <?php include '../inheader.php'; ?>
 <?php include '../insidebar.php'; ?>
 
-<style>
-/* ===================================================
-   خريطة الموقع — نسخة محسّنة
-   =================================================== */
-
-/* ── وعاء الصفحة ── */
-.map-page {
-    padding: 26px 30px 56px;
-    font-family: 'Cairo', sans-serif;
-    min-height: 100vh;
-    width: 100%;
-    max-width: none;
-    box-sizing: border-box;
-    background: #f0f2f5;
-}
-
-.main-content#main-content {
-    width: 100% !important;
-    max-width: none !important;
-}
-
-/* ── رأس الصفحة ── */
-.map-header {
-    background: linear-gradient(135deg, #000022 0%, #0d1a5c 60%, #1a0a3e 100%);
-    border-radius: 18px;
-    padding: 22px 30px;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    box-shadow: 0 6px 28px rgba(0,0,34,.45);
-    position: relative;
-    overflow: hidden;
-}
-.map-header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 80% 50%, rgba(255,204,0,.08) 0%, transparent 70%);
-    pointer-events: none;
-}
-.map-header-icon {
-    width: 62px; height: 62px;
-    background: rgba(255,204,0,.15);
-    border: 2px solid rgba(255,204,0,.3);
-    border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px;
-    color: #ffcc00;
-    flex-shrink: 0;
-    box-shadow: 0 0 20px rgba(255,204,0,.2);
-}
-.map-header-text h1 {
-    margin: 0; font-size: 22px; font-weight: 800; color: #ffcc00; line-height: 1.2;
-}
-.map-header-text .sub {
-    font-size: 13px; color: rgba(255,255,210,.65); margin-top: 5px;
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-}
-.map-header-text .sub span { display: flex; align-items: center; gap: 5px; }
-.map-live {
-    margin-right: auto;
-    background: rgba(40,167,69,.2);
-    border: 1px solid rgba(40,167,69,.5);
-    border-radius: 24px;
-    padding: 7px 20px;
-    color: #6de890;
-    font-size: 13px;
-    font-weight: 700;
-    display: flex; align-items: center; gap: 8px;
-}
-.live-dot {
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    background: #28a745;
-    animation: livePulse 1.6s ease-in-out infinite;
-}
-@keyframes livePulse {
-    0%,100% { opacity:1; transform:scale(1); }
-    50%      { opacity:.3; transform:scale(.75); }
-}
-
-/* ── شريط الإحصائيات ── */
-.stats-row {
-    display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 28px;
-}
-.stat-tile {
-    flex: 1 1 170px;
-    background: #fff;
-    border-radius: 16px;
-    padding: 18px 22px;
-    box-shadow: 0 3px 14px rgba(0,0,0,.07);
-    display: flex; align-items: center; gap: 16px;
-    border-right: 5px solid var(--equipation-gold, #ffcc00);
-    transition: transform .2s, box-shadow .2s;
-}
-.stat-tile:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.12); }
-.stat-tile-icon {
-    width: 54px; height: 54px;
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px; flex-shrink: 0;
-}
-.stat-tile-icon.c-gold   { background: rgba(255,204,0,.13); color: #a07700; }
-.stat-tile-icon.c-blue   { background: rgba(0,100,220,.10); color: #0064dc; }
-.stat-tile-icon.c-green  { background: rgba(40,167,69,.10); color: #1a7a35; }
-.stat-tile-icon.c-red    { background: rgba(220,53,69,.10); color: #b52535; }
-.stat-tile-icon.c-purple { background: rgba(111,66,193,.10); color: #5a1099; }
-.stat-tile-val  { font-size: 32px; font-weight: 800; color: #000022; line-height: 1; }
-.stat-tile-lbl  { font-size: 12px; color: #777; margin-top: 4px; }
-
-/* ── مؤشر الألوان ── */
-.legend-row {
-    display: flex; gap: 22px; flex-wrap: wrap; align-items: center;
-    font-size: 12.5px; color: #555; margin-bottom: 26px;
-    background: #fff; border-radius: 12px; padding: 12px 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.06);
-}
-.legend-item { display: flex; align-items: center; gap: 7px; }
-.ldot { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; }
-.ldot.green  { background: #28a745; }
-.ldot.red    { background: #dc3545; }
-.ldot.blue   { background: #1565c0; }
-.ldot.gray   { background: #b0bec5; }
-.leq-icon { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; }
-
-/* ── شبكة المناجم ── */
-.mines-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 26px;
-    width: 100%;
-}
-
-/* ── بطاقة المنجم ── */
-.mine-card {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 22px rgba(0,0,34,.09);
-    border: 2px solid transparent;
-    transition: border-color .3s, box-shadow .3s;
-    width: 100%;
-}
-.mine-card:hover {
-    border-color: rgba(255,204,0,.5);
-    box-shadow: 0 8px 36px rgba(255,204,0,.18);
-}
-
-/* رأس بطاقة المنجم */
-.mine-hdr {
-    background: linear-gradient(135deg, #07081e 0%, #1a1660 100%);
-    padding: 18px 22px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    position: relative;
-    border-radius: 18px 18px 0 0;
-}
-.mine-hdr::after {
-    content: '';
-    position: absolute;
-    bottom: 0; right: 0;
-    width: 120px; height: 60px;
-    background: radial-gradient(ellipse at bottom right, rgba(255,204,0,.12), transparent 70%);
-    pointer-events: none;
-}
-.mine-hdr-icon {
-    width: 50px; height: 50px;
-    background: rgba(255,204,0,.15);
-    border: 1.5px solid rgba(255,204,0,.3);
-    border-radius: 13px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: #ffcc00; flex-shrink: 0;
-}
-.mine-hdr-name {
-    font-size: 17px; font-weight: 800; color: #fff; cursor: default;
-}
-.mine-hdr-name:hover { color: #ffcc00; }
-.mine-hdr-code { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 3px; }
-.mine-hdr-badges { margin-right: auto; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.m-badge {
-    font-size: 11px; border-radius: 20px; padding: 4px 12px; font-weight: 700;
-    display: flex; align-items: center; gap: 5px;
-}
-.m-badge.gold  { background: rgba(255,204,0,.2); color: #ffd700; border: 1px solid rgba(255,204,0,.35); }
-.m-badge.green { background: rgba(40,167,69,.2); color: #6de870; border: 1px solid rgba(40,167,69,.35); }
-.m-badge.red   { background: rgba(220,53,69,.2); color: #ff8a94; border: 1px solid rgba(220,53,69,.35); }
-
-/* شريط إحصائيات المنجم */
-.mine-stats-strip {
-    display: flex;
-    background: #f7f8fa;
-    border-bottom: 1px solid #eaeef2;
-}
-.mss-item {
-    flex: 1; text-align: center;
-    padding: 12px 8px;
-    border-left: 1px solid #eaeef2;
-    font-size: 11.5px; color: #666;
-}
-.mss-item:last-child { border-left: none; }
-.mss-item .mss-n {
-    font-size: 22px; font-weight: 800; display: block; line-height: 1.1; color: #000022;
-}
-.mss-item .mss-n.green  { color: #1a7a35; }
-.mss-item .mss-n.red    { color: #b52535; }
-.mss-item .mss-n.blue   { color: #0a60cc; }
-.mss-item .mss-n.purple { color: #5a1099; }
-.mss-item .mss-n.gold   { color: #a07000; }
-
-/* جسم بطاقة المنجم */
-.mine-body {
-    padding: 20px;
-}
-
-/* تقسيم الأقسام */
-.section-sep {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 12px; font-weight: 700; color: #777;
-    margin-bottom: 14px; margin-top: 4px;
-}
-.section-sep::after { content: ''; flex: 1; height: 1px; background: #eaeef2; }
-.section-sep.working-sep { color: #1a7a35; }
-.section-sep.stopped-sep { color: #b52535; margin-top: 18px; }
-.section-sep i { font-size: 13px; }
-
-/* ── شبكة المعدات ── */
-.eq-grid {
-    display: flex; flex-wrap: wrap; gap: 12px;
-}
-
-/* ── بطاقة المعدة ── */
-.eq-card {
-    width: 120px;
-    border-radius: 14px;
-    overflow: visible;
-    cursor: default;
-    transition: transform .22s, z-index 0s;
-    position: relative;
-}
-.eq-card:hover { transform: translateY(-5px); z-index: 20; }
-.eq-inner {
-    border-radius: 14px;
-    border: 2px solid transparent;
-    box-shadow: 0 3px 12px rgba(0,0,0,.1);
-    transition: box-shadow .2s;
-    overflow: visible;
-}
-.eq-card:hover .eq-inner { box-shadow: 0 8px 28px rgba(0,0,0,.2); }
-
-/* الشريط العلوي للمعدة */
-.eq-top-bar {
-    height: 6px;
-    width: 100%;
-    border-radius: 12px 12px 0 0;
-}
-.eq-card.working .eq-inner  { border-color: #43a047; background: linear-gradient(175deg,#edfced,#d4f5d4); }
-.eq-card.stopped .eq-inner  { border-color: #e53935; background: linear-gradient(175deg,#fdf0f0,#fad7d7); }
-.eq-card.working .eq-top-bar { background: linear-gradient(90deg,#43a047,#66bb6a); }
-.eq-card.stopped .eq-top-bar { background: linear-gradient(90deg,#e53935,#ef5350); }
-
-/* داخل البطاقة */
-.eq-content {
-    padding: 10px 8px 8px;
-    text-align: center;
-}
-
-/* أيقونة المعدة */
-.eq-machine-icon {
-    width: 54px; height: 54px;
-    border-radius: 12px;
-    margin: 0 auto 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px;
-    transition: transform .2s;
-}
-.eq-card.working .eq-machine-icon { background: rgba(67,160,71,.15); color: #2e7d32; }
-.eq-card.stopped .eq-machine-icon { background: rgba(229,57,53,.12); color: #b71c1c; filter: grayscale(30%); }
-.eq-card:hover .eq-machine-icon { transform: scale(1.08); }
-
-.eq-code {
-    font-size: 11px; font-weight: 800; color: #1a1a2e;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.eq-type-lbl {
-    font-size: 9.5px; color: #888; margin-top: 2px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-/* مؤشر حالة الشاحنة */
-.eq-status-dot {
-    position: absolute; top: 10px; left: 8px;
-    width: 10px; height: 10px;
-    border-radius: 50%; border: 2px solid #fff;
-    z-index: 2;
-}
-.eq-card.working .eq-status-dot { background: #28a745; box-shadow: 0 0 6px rgba(40,167,69,.6); }
-.eq-card.stopped .eq-status-dot { background: #dc3545; }
-
-/* ── صف المشغلين ── */
-.op-row {
-    display: flex; justify-content: center; flex-wrap: wrap;
-    gap: 4px;
-    padding: 7px 6px 9px;
-    background: rgba(0,0,0,.03);
-    border-top: 1px solid rgba(0,0,0,.06);
-    min-height: 38px;
-}
-.no-op-label {
-    font-size: 9.5px; color: #aaa; align-self: center;
-    display: flex; align-items: center; gap: 4px;
-}
-
-/* أفاتار المشغل */
-.op-av {
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px;
-    cursor: default;
-    transition: transform .15s, box-shadow .15s;
-    flex-shrink: 0;
-    border: 2px solid rgba(255,255,255,.8);
-    position: relative;
-}
-.op-av.active  { background: linear-gradient(135deg,#1565c0,#42a5f5); color: #fff; box-shadow: 0 2px 6px rgba(21,101,192,.35); }
-.op-av.reserve { background: #e0e0e0; color: #999; }
-.op-av:hover   { transform: scale(1.35); z-index: 50; }
-
-/* ── ساعات التشغيل في البطاقة ── */
-.eq-hours-row {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 5px 8px 7px;
-    background: rgba(0,0,0,.04);
-    border-top: 1px dashed rgba(0,0,0,.1);
-    gap: 4px;
-}
-.eq-hours-item {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    flex: 1;
-    min-width: 0;
-}
-.eq-hours-sep {
-    width: 1px;
-    background: rgba(0,0,0,.12);
-    align-self: stretch;
-    flex-shrink: 0;
-    margin: 2px 0;
-}
-.eq-hours-val {
-    font-size: 13px;
-    font-weight: 800;
-    color: #1a1a2e;
-    line-height: 1.15;
-    white-space: nowrap;
-}
-.eq-hours-val.today-val { color: #0a60cc; }
-.eq-hours-lbl {
-    font-size: 9px;
-    color: #999;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* ═══════════════════════════════════════════
-   نظام Tooltip — JS يتحكم بـ .tt-show
-   ═══════════════════════════════════════════ */
-.tt-trigger { position: relative; }
-
-.tt-box {
-    visibility: hidden;
-    opacity: 0;
-    position: absolute;
-    bottom: calc(100% + 12px);
-    right: 50%;
-    transform: translateX(50%);
-    background: #07081e;
-    color: #e8e8f0;
-    border-radius: 12px;
-    padding: 12px 16px;
-    min-width: 210px;
-    max-width: 280px;
-    font-size: 12px;
-    line-height: 1.75;
-    z-index: 99999;
-    box-shadow: 0 10px 36px rgba(0,0,34,.6);
-    border: 1px solid rgba(255,204,0,.25);
-    pointer-events: none;
-    transition: opacity .18s ease, visibility .18s ease;
-    white-space: normal;
-    text-align: right;
-}
-.tt-box::after {
-    content: '';
-    position: absolute;
-    top: 100%; right: 50%;
-    transform: translateX(50%);
-    border: 8px solid transparent;
-    border-top-color: #07081e;
-}
-/* إظهار عبر JS */
-.tt-box.tt-show {
-    visibility: visible;
-    opacity: 1;
-}
-/* عندما يكون تحت العنصر */
-.tt-box.tt-below {
-    bottom: auto;
-    top: calc(100% + 12px);
-}
-.tt-box.tt-below::after {
-    top: auto; bottom: 100%;
-    border-top-color: transparent;
-    border-bottom-color: #07081e;
-}
-/* عنوان الـ tooltip */
-.tt-title {
-    font-size: 13px; font-weight: 700; color: #ffcc00;
-    margin-bottom: 8px;
-    padding-bottom: 7px;
-    border-bottom: 1px solid rgba(255,204,0,.2);
-    display: flex; align-items: center; gap: 7px;
-}
-.tt-row {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
-    border-bottom: 1px solid rgba(255,255,255,.04);
-    padding: 2px 0;
-}
-.tt-row:last-child { border-bottom: none; }
-.tt-k { color: #8888aa; font-size: 11px; white-space: nowrap; }
-.tt-v { color: #e0e0f0; font-weight: 600; text-align: left; font-size: 11.5px; }
-
-/* ── حالة فارغة ── */
-.empty-mine-body {
-    text-align: center; padding: 30px 20px; color: #b0b8c8;
-}
-.empty-mine-body i { font-size: 38px; margin-bottom: 10px; display: block; opacity: .4; }
-.empty-mine-body p { font-size: 13px; opacity: .7; }
-
-/* ── قسم معدات بلا منجم ── */
-.orphan-section {
-    margin-top: 28px;
-    background: #fff;
-    border-radius: 18px;
-    border: 2px dashed #d0d7e2;
-    padding: 22px;
-    box-shadow: 0 2px 12px rgba(0,0,0,.05);
-}
-.orphan-title {
-    font-size: 14px; font-weight: 700; color: #888;
-    margin-bottom: 16px; display: flex; align-items: center; gap: 9px;
-}
-
-/* ── حالة لا مناجم ── */
-.zero-state {
-    text-align: center; padding: 80px 20px; color: #b0b8c8;
-}
-.zero-state i { font-size: 80px; display: block; margin-bottom: 18px; opacity: .25; }
-.zero-state h3 { font-size: 20px; color: #c0c8d8; }
-.zero-state p  { font-size: 14px; margin-top: 8px; opacity: .6; }
-
-/* ── Responsive ── */
-@media (max-width: 820px) {
-    .mines-grid { grid-template-columns: 1fr; }
-    .eq-card    { width: 104px; }
-    .stat-tile  { flex: 1 1 145px; }
-    .map-header h1 { font-size: 18px; }
-    .map-live   { display: none; }
-}
-@media (max-width: 480px) {
-    .map-page  { padding: 16px 14px 40px; }
-    .eq-card   { width: 90px; }
-    .eq-machine-icon { width: 44px; height: 44px; font-size: 22px; }
-}
-</style>
-
 <div class="main-content" id="main-content">
-<div class="map-page">
+<div class="map-page movement-page movement-map-page">
 
-<!-- ═══ رأس الصفحة ═══ -->
-<div class="map-header">
-    <div class="map-header-icon"><i class="fas fa-map-marked-alt"></i></div>
-    <div class="map-header-text">
-        <h1>خريطة الموقع</h1>
-        <div class="sub">
-            <span><i class="fas fa-project-diagram"></i><?php echo htmlspecialchars($selected_project['name']); ?></span>
-            <?php if (!empty($selected_project['project_code'])): ?>
-            <span><i class="fas fa-hashtag"></i><?php echo htmlspecialchars($selected_project['project_code']); ?></span>
-            <?php endif; ?>
-            <?php if (!empty($selected_project['location'])): ?>
-            <span><i class="fas fa-map-pin"></i><?php echo htmlspecialchars($selected_project['location']); ?></span>
-            <?php endif; ?>
-        </div>
+<div class="movement-topbar">
+    <div class="movement-topbar-left">
+        <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn movement-topbar-btn-primary add-btn"><i class="fas fa-cogs"></i> إدارة التشغيل</a>
+        <a href="project_drivers.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn"><i class="fas fa-id-badge"></i> سائقي المشروع</a>
+        <span class="movement-topbar-btn movement-topbar-live"><span class="live-dot"></span> عرض مباشر</span>
     </div>
-    <div class="map-live"><span class="live-dot"></span> عرض مباشر</div>
+    <div class="movement-topbar-right">
+        <div class="movement-topbar-title">
+            <span class="movement-topbar-icon"><i class="fas fa-map-marked-alt"></i></span>
+            <div class="movement-topbar-title-text">
+                <h1>خريطة الموقع</h1>
+                <p>
+                    <i class="fas fa-project-diagram"></i>
+                    <?php echo htmlspecialchars($selected_project['name']); ?>
+                    <?php if (!empty($selected_project['project_code'])): ?> · <?php echo htmlspecialchars($selected_project['project_code']); ?><?php endif; ?>
+                    <?php if (!empty($selected_project['location'])): ?> · <?php echo htmlspecialchars($selected_project['location']); ?><?php endif; ?>
+                </p>
+            </div>
+        </div>
+        <a href="../main/dashboard.php" class="movement-topbar-btn movement-topbar-btn-back back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
+    </div>
 </div>
 
 <!-- ═══ الإحصائيات ═══ -->
@@ -788,7 +311,7 @@ $page_title = "خريطة الموقع | " . htmlspecialchars($selected_project[
         <div><div class="stat-tile-val"><?php echo $total_equip; ?></div><div class="stat-tile-lbl">إجمالي الآليات</div></div>
     </div>
     <div class="stat-tile">
-        <div class="stat-tile-icon c-green"><i class="fas fa-cog fa-spin" style="animation-duration:3s;"></i></div>
+        <div class="stat-tile-icon c-green"><i class="fas fa-cog fa-spin slow-spin"></i></div>
         <div><div class="stat-tile-val"><?php echo $total_working; ?></div><div class="stat-tile-lbl">آليات عاملة</div></div>
     </div>
     <div class="stat-tile">
@@ -803,18 +326,18 @@ $page_title = "خريطة الموقع | " . htmlspecialchars($selected_project[
 
 <!-- ═══ مفتاح الألوان ═══ -->
 <div class="legend-row">
-    <strong style="color:#333; font-size:12px; margin-left:6px;">المفتاح:</strong>
+    <strong class="legend-label">المفتاح:</strong>
     <div class="legend-item"><div class="ldot green"></div> آلية عاملة</div>
     <div class="legend-item"><div class="ldot red"></div> آلية متوقفة</div>
     <div class="legend-item">
-        <div class="op-av active" style="width:18px;height:18px;font-size:9px;border:0;"><i class="fas fa-user" style="font-size:8px;"></i></div>
+        <div class="op-av active legend-op-avatar"><i class="fas fa-user legend-op-avatar-icon"></i></div>
         مشغّل أساسي
     </div>
     <div class="legend-item">
-        <div class="op-av reserve" style="width:18px;height:18px;font-size:9px;border:0;"><i class="fas fa-user" style="font-size:8px;"></i></div>
+        <div class="op-av reserve legend-op-avatar"><i class="fas fa-user legend-op-avatar-icon"></i></div>
         احتياطي (قريباً)
     </div>
-    <div class="legend-item" style="margin-right:auto; color:#aaa; font-size:11px;">
+    <div class="legend-item legend-hint">
         <i class="fas fa-hand-pointer fa-xs"></i> مرّر على أي عنصر لعرض تفاصيله
     </div>
 </div>
@@ -832,7 +355,7 @@ $page_title = "خريطة الموقع | " . htmlspecialchars($selected_project[
 <div class="mines-grid">
 
 <?php
-$mine_colors = ['#1a1660','#0a3a60','#1a3a00','#3a0a20','#1a2a1a'];
+$mine_colors = ['mine-accent-0','mine-accent-1','mine-accent-2','mine-accent-3','mine-accent-4'];
 $mi = 0;
 foreach ($mines_data as $mine_id => $mine):
     $mine_equips  = $mine['equipments'];
@@ -857,11 +380,11 @@ foreach ($mines_data as $mine_id => $mine):
 
 <div class="mine-card">
     <!-- رأس المنجم -->
-    <div class="mine-hdr" style="background: linear-gradient(135deg, #07081e, <?php echo htmlspecialchars($hdr_accent); ?>);">
+    <div class="mine-hdr <?php echo htmlspecialchars($hdr_accent); ?>">
         <div class="mine-hdr-icon"><i class="fas fa-mountain"></i></div>
         <div>
             <!-- الاسم قابل للـ tooltip -->
-            <div class="mine-hdr-name tt-trigger" style="display:inline-block; cursor:default;">
+            <div class="mine-hdr-name tt-trigger mine-hdr-name-static">
                 <?php echo htmlspecialchars($mine['mine_name']); ?>
                 <div class="tt-box">
                     <div class="tt-title"><i class="fas fa-mountain"></i> <?php echo htmlspecialchars($mine['mine_name']); ?></div>
@@ -893,7 +416,7 @@ foreach ($mines_data as $mine_id => $mine):
         <div class="mss-item"><span class="mss-n red"><?php echo $mine_stopped; ?></span>متوقفة</div>
         <div class="mss-item"><span class="mss-n blue"><?php echo $mine_ops; ?></span>مشغّلون</div>
         <?php if (!empty($mine['mineral_type'])): ?>
-        <div class="mss-item"><span class="mss-n gold" style="font-size:13px;">⛏</span><?php echo htmlspecialchars($mine['mineral_type']); ?></div>
+        <div class="mss-item"><span class="mss-n gold mss-mineral-icon">⛏</span><?php echo htmlspecialchars($mine['mineral_type']); ?></div>
         <?php endif; ?>
     </div>
 
@@ -936,7 +459,7 @@ foreach ($mines_data as $mine_id => $mine):
                     <!-- صف المشغلين -->
                     <div class="op-row">
                         <?php if ($drv_count === 0): ?>
-                        <span class="no-op-label"><i class="fas fa-user-slash" style="font-size:9px;"></i> لا مشغّل</span>
+                        <span class="no-op-label"><i class="fas fa-user-slash no-op-icon"></i> لا مشغّل</span>
                         <?php else:
                             foreach ($op['drivers'] as $drv):
                                 $dn = htmlspecialchars($drv['driver_name']);
@@ -946,8 +469,8 @@ foreach ($mines_data as $mine_id => $mine):
                                 $dy = htmlspecialchars($drv['years_in_field'] ?? '0');
                         ?>
                         <div class="op-av active tt-trigger" title="<?php echo $dn; ?>">
-                            <i class="fas fa-user" style="font-size:10px;"></i>
-                            <div class="tt-box" style="min-width:190px;">
+                            <i class="fas fa-user op-avatar-icon"></i>
+                            <div class="tt-box tt-box-sm">
                                 <div class="tt-title"><i class="fas fa-dharmachakra"></i> <?php echo $dn; ?></div>
                                 <div class="tt-row"><span class="tt-k">الكود</span><span class="tt-v"><?php echo $dc; ?></span></div>
                                 <div class="tt-row"><span class="tt-k">الهاتف</span><span class="tt-v"><?php echo $dp; ?></span></div>
@@ -1010,7 +533,7 @@ foreach ($mines_data as $mine_id => $mine):
                     </div>
                     <div class="op-row">
                         <?php if ($drv_count === 0): ?>
-                        <span class="no-op-label"><i class="fas fa-user-slash" style="font-size:9px;"></i> لا مشغّل</span>
+                        <span class="no-op-label"><i class="fas fa-user-slash no-op-icon"></i> لا مشغّل</span>
                         <?php else:
                             foreach ($op['drivers'] as $drv):
                                 $dn = htmlspecialchars($drv['driver_name']);
@@ -1020,8 +543,8 @@ foreach ($mines_data as $mine_id => $mine):
                                 $dy = htmlspecialchars($drv['years_in_field'] ?? '0');
                         ?>
                         <div class="op-av active tt-trigger" title="<?php echo $dn; ?>">
-                            <i class="fas fa-user" style="font-size:10px;"></i>
-                            <div class="tt-box" style="min-width:190px;">
+                            <i class="fas fa-user op-avatar-icon"></i>
+                            <div class="tt-box tt-box-sm">
                                 <div class="tt-title"><i class="fas fa-dharmachakra"></i> <?php echo $dn; ?></div>
                                 <div class="tt-row"><span class="tt-k">الكود</span><span class="tt-v"><?php echo $dc; ?></span></div>
                                 <div class="tt-row"><span class="tt-k">الهاتف</span><span class="tt-v"><?php echo $dp; ?></span></div>
@@ -1070,7 +593,7 @@ foreach ($mines_data as $mine_id => $mine):
 <?php if (!empty($no_mine_equipments)): ?>
 <div class="orphan-section">
     <div class="orphan-title">
-        <i class="fas fa-exclamation-triangle" style="color:#e09900;"></i>
+        <i class="fas fa-exclamation-triangle orphan-title-icon"></i>
         آليات غير مرتبطة بمنجم محدد (<?php echo count($no_mine_equipments); ?>)
     </div>
     <div class="eq-grid">
@@ -1095,14 +618,14 @@ foreach ($mines_data as $mine_id => $mine):
                 </div>
                 <div class="op-row">
                     <?php if ($drv_count === 0): ?>
-                    <span class="no-op-label"><i class="fas fa-user-slash" style="font-size:9px;"></i> لا مشغّل</span>
+                    <span class="no-op-label"><i class="fas fa-user-slash no-op-icon"></i> لا مشغّل</span>
                     <?php else:
                         foreach ($op['drivers'] as $drv):
                             $dn = htmlspecialchars($drv['driver_name']);
                     ?>
                     <div class="op-av active tt-trigger" title="<?php echo $dn; ?>">
-                        <i class="fas fa-user" style="font-size:10px;"></i>
-                        <div class="tt-box" style="min-width:190px;">
+                        <i class="fas fa-user op-avatar-icon"></i>
+                        <div class="tt-box tt-box-sm">
                             <div class="tt-title"><i class="fas fa-dharmachakra"></i> <?php echo $dn; ?></div>
                             <div class="tt-row"><span class="tt-k">الكود</span><span class="tt-v"><?php echo htmlspecialchars($drv['driver_code'] ?? '-'); ?></span></div>
                             <div class="tt-row"><span class="tt-k">الهاتف</span><span class="tt-v"><?php echo htmlspecialchars($drv['phone'] ?? '-'); ?></span></div>
@@ -1258,3 +781,4 @@ foreach ($mines_data as $mine_id => $mine):
 <script src="/ems/assets/js/sidebar.js"></script>
 </body>
 </html>
+

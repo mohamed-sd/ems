@@ -156,155 +156,6 @@ include '../inheader.php';
 include '../insidebar.php';
 ?>
 
-<link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-
-<style>
-/* ── Page Hero Header ── */
-.fc-page .page-header {
-    background: linear-gradient(140deg, #0c1c3e 0%, #1b2f6e 65%, #243a84 100%);
-    border-radius: 18px;
-    padding: 18px 20px;
-    margin-bottom: 18px;
-    box-shadow: 0 10px 30px rgba(12,28,62,.22);
-}
-.fc-page .page-title { color: #fff; }
-.fc-page .page-title .title-icon {
-    background: rgba(255,255,255,.13);
-    color: #ffd740;
-    border: 1px solid rgba(255,255,255,.22);
-}
-.fc-hero-sub {
-    color: #b8c8ff;
-    font-size: .88rem;
-    font-weight: 600;
-    margin-top: 6px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-}
-
-/* ── Cards ── */
-.fc-page .card {
-    border: 1px solid rgba(12,28,62,.08);
-    border-radius: 14px;
-    box-shadow: 0 4px 18px rgba(12,28,62,.07);
-    margin-bottom: 18px;
-}
-.fc-page .card .card-header {
-    background: #fff;
-    border-bottom: 1px solid rgba(12,28,62,.08);
-    padding: 14px 18px;
-    border-radius: 14px 14px 0 0;
-}
-.fc-page .card .card-header h5 {
-    margin: 0; color: #0c1c3e; font-weight: 800; font-size: 1rem;
-}
-
-/* ── Form Grid ── */
-.fc-form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 14px;
-}
-.fc-form-grid label {
-    display: block;
-    font-size: .82rem;
-    font-weight: 700;
-    color: #0c1c3e;
-    margin-bottom: 5px;
-}
-.fc-form-grid input,
-.fc-form-grid select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid rgba(12,28,62,.18);
-    border-radius: 9px;
-    font-size: .9rem;
-    color: #0c1c3e;
-    transition: border-color .2s;
-}
-.fc-form-grid input:focus,
-.fc-form-grid select:focus {
-    outline: none;
-    border-color: #e8b800;
-    box-shadow: 0 0 0 3px rgba(232,184,0,.13);
-}
-.fc-form-grid .span2 { grid-column: span 2; }
-.fc-form-grid .span3 { grid-column: 1 / -1; }
-
-/* ── Badges ── */
-.badge-eq-1 { background: #1b2f6e; color:#fff; padding:3px 10px; border-radius:20px; font-size:.78rem; font-weight:700; }
-.badge-eq-2 { background: #e8b800; color:#0c1c3e; padding:3px 10px; border-radius:20px; font-size:.78rem; font-weight:700; }
-.badge-eq-3 { background: #16a34a; color:#fff; padding:3px 10px; border-radius:20px; font-size:.78rem; font-weight:700; }
-.badge-code {
-    font-family: monospace;
-    background: rgba(12,28,62,.08);
-    color: #0c1c3e;
-    padding: 3px 8px;
-    border-radius: 7px;
-    font-size: .82rem;
-    font-weight: 700;
-    letter-spacing: .5px;
-}
-.badge-active   { background: rgba(22,163,74,.12); color:#16a34a; border:1px solid rgba(22,163,74,.25); padding:3px 10px; border-radius:20px; font-size:.78rem; font-weight:700; }
-.badge-inactive { background: rgba(220,38,38,.1);  color:#dc2626; border:1px solid rgba(220,38,38,.2);  padding:3px 10px; border-radius:20px; font-size:.78rem; font-weight:700; }
-
-/* ── Action Buttons ── */
-.btn-edit-row {
-    background: rgba(37,99,235,.1); color:#2563eb; border:1px solid rgba(37,99,235,.25);
-    padding:4px 12px; border-radius:8px; font-size:.8rem; font-weight:700;
-    cursor:pointer; transition:all .2s; white-space:nowrap;
-}
-.btn-edit-row:hover { background:#2563eb; color:#fff; }
-.btn-del-row {
-    background: rgba(220,38,38,.09); color:#dc2626; border:1px solid rgba(220,38,38,.2);
-    padding:4px 12px; border-radius:8px; font-size:.8rem; font-weight:700;
-    cursor:pointer; transition:all .2s; white-space:nowrap;
-}
-.btn-del-row:hover { background:#dc2626; color:#fff; }
-.btn-restore-row {
-    background: rgba(22,163,74,.1); color:#16a34a; border:1px solid rgba(22,163,74,.25);
-    padding:4px 12px; border-radius:8px; font-size:.8rem; font-weight:700;
-    cursor:pointer; transition:all .2s; white-space:nowrap;
-}
-.btn-restore-row:hover { background:#16a34a; color:#fff; }
-
-/* ── Stats Strip ── */
-.fc-stats {
-    display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px;
-}
-.fc-stat-card {
-    flex:1; min-width:120px;
-    background:#fff; border-radius:12px; padding:12px 16px;
-    border:1px solid rgba(12,28,62,.08);
-    box-shadow:0 2px 10px rgba(12,28,62,.06);
-    display:flex; flex-direction:column; gap:4px;
-}
-.fc-stat-card .sc-num { font-size:1.6rem; font-weight:900; color:#0c1c3e; line-height:1; }
-.fc-stat-card .sc-lbl { font-size:.78rem; font-weight:700; color:#64748b; }
-
-/* ── Filter bar ── */
-.fc-filter-bar {
-    display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:14px;
-}
-.fc-filter-bar select, .fc-filter-bar input {
-    padding:7px 11px; border:1px solid rgba(12,28,62,.18); border-radius:9px;
-    font-size:.85rem; color:#0c1c3e; min-width:160px;
-}
-.fc-filter-bar select:focus, .fc-filter-bar input:focus {
-    outline:none; border-color:#e8b800;
-    box-shadow:0 0 0 3px rgba(232,184,0,.13);
-}
-
-/* ── Table inside DataTables ── */
-.fc-page table.dataTable thead th { white-space:nowrap; font-size:.82rem; }
-.fc-page table.dataTable tbody td { font-size:.85rem; vertical-align:middle; }
-</style>
-
 <?php
 // ── حساب إحصائيات سريعة
 $stat_total  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes"))['c'];
@@ -314,10 +165,18 @@ $stat_eq2    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
 $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE equipment_type=3 AND status=1"))['c'];
 ?>
 
-<div class="main fc-page">
+<div class="main fc-page ems-unified-page-shell">
 
     <!-- ══ Page Header ══ -->
     <div class="page-header">
+        <div class="page-header-actions">
+            <?php if ($can_add): ?>
+            <button id="toggleFormBtn" class="add-btn" onclick="toggleForm()">
+                <i class="fas fa-plus-circle"></i> <span>إضافة كود جديد</span>
+            </button>
+            <?php endif; ?>
+           <a href="fleet_failures.php" class="btn-gold"><i class="fas fa-chart-line"></i> تقرير الاخطاء </a>
+        </div>
         <div>
             <h1 class="page-title">
                 <div class="title-icon"><i class="fas fa-exclamation-triangle"></i></div>
@@ -328,15 +187,7 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
                 مكتبة مرجعية شاملة لتصنيف الأعطال — نوع الحدث &rsaquo; الفئة الرئيسية &rsaquo; الفرعية &rsaquo; التفصيل
             </div>
         </div>
-        <div class="page-header-actions">
-            <a href="../main/dashboard.php" class="back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
-            <?php if ($can_add): ?>
-            <button id="toggleFormBtn" class="add-btn" onclick="toggleForm()">
-                <i  class="fas fa-plus-circle" style="color:white"></i>  <span style="color:white">إضافة كود جديد </span>
-            </button>
-            <?php endif; ?>
-           <a href="fleet_failures.php" class="back-btn"><i class="fas fa-arrow-right"></i> تقرير الاخطاء </a>
-        </div>
+        <a href="../main/dashboard.php" class="back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
     </div>
 
     <!-- ══ رسائل ══ -->
@@ -354,26 +205,26 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
             <div class="sc-lbl"><i class="fas fa-database"></i> إجمالي الأكواد</div>
         </div>
         <div class="fc-stat-card">
-            <div class="sc-num" style="color:#16a34a"><?= number_format($stat_active) ?></div>
+            <div class="sc-num sc-num-ok"><?= number_format($stat_active) ?></div>
             <div class="sc-lbl"><i class="fas fa-check-circle"></i> كود نشط</div>
         </div>
         <div class="fc-stat-card">
-            <div class="sc-num" style="color:#1b2f6e"><?= number_format($stat_eq1) ?></div>
+            <div class="sc-num sc-num-navy"><?= number_format($stat_eq1) ?></div>
             <div class="sc-lbl"><i class="fas fa-tractor"></i> حفار</div>
         </div>
         <div class="fc-stat-card">
-            <div class="sc-num" style="color:#e8b800"><?= number_format($stat_eq2) ?></div>
+            <div class="sc-num sc-num-gold"><?= number_format($stat_eq2) ?></div>
             <div class="sc-lbl"><i class="fas fa-truck-moving"></i> قلاب</div>
         </div>
         <div class="fc-stat-card">
-            <div class="sc-num" style="color:#16a34a"><?= number_format($stat_eq3) ?></div>
+            <div class="sc-num sc-num-ok"><?= number_format($stat_eq3) ?></div>
             <div class="sc-lbl"><i class="fas fa-cogs"></i> خرامة</div>
         </div>
     </div>
 
     <!-- ══ نموذج الإضافة / التعديل ══ -->
     <?php if ($can_add): ?>
-    <div class="card" id="addEditCard" style="display:<?= ($edit_data || $error_msg) ? 'block' : 'none'; ?>">
+    <div class="card <?= ($edit_data || $error_msg) ? '' : 'fc-hidden' ?>" id="addEditCard">
         <div class="card-header">
             <h5>
                 <i class="fas fa-<?= $edit_data ? 'edit' : 'plus-circle' ?>"></i>
@@ -390,7 +241,7 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
 
                     <!-- نوع المعدة -->
                     <div>
-                        <label><i class="fas fa-cog"></i> نوع المعدة <span style="color:red">*</span></label>
+                        <label><i class="fas fa-cog"></i> نوع المعدة <span class="required-indicator">*</span></label>
                         <select name="equipment_type" id="f_equipment_type" required>
                             <option value="">-- اختر --</option>
                             <option value="1" <?= ($edit_data['equipment_type']??'')=='1' ? 'selected':'' ?>>حفار (Excavator)</option>
@@ -401,55 +252,55 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
 
                     <!-- كود نوع الحدث -->
                     <div>
-                        <label><i class="fas fa-tag"></i> كود نوع الحدث <span style="color:red">*</span></label>
+                           <label><i class="fas fa-tag"></i> كود نوع الحدث <span class="required-indicator">*</span></label>
                         <input type="text" name="event_type_code" maxlength="10" placeholder="مثال: EQF"
                                value="<?= htmlspecialchars($edit_data['event_type_code'] ?? '') ?>"
-                               style="text-transform:uppercase" required>
+                               class="fc-uppercase" required>
                     </div>
 
                     <!-- اسم نوع الحدث -->
                     <div>
-                        <label><i class="fas fa-align-right"></i> اسم نوع الحدث <span style="color:red">*</span></label>
+                        <label><i class="fas fa-align-right"></i> اسم نوع الحدث <span class="required-indicator">*</span></label>
                         <input type="text" name="event_type_name" maxlength="100" placeholder="مثال: عطل معدة"
                                value="<?= htmlspecialchars($edit_data['event_type_name'] ?? '') ?>" required>
                     </div>
 
                     <!-- كود الفئة الرئيسية -->
                     <div>
-                        <label><i class="fas fa-folder"></i> كود الفئة الرئيسية <span style="color:red">*</span></label>
+                           <label><i class="fas fa-folder"></i> كود الفئة الرئيسية <span class="required-indicator">*</span></label>
                         <input type="text" name="main_category_code" maxlength="10" placeholder="مثال: MEC"
                                value="<?= htmlspecialchars($edit_data['main_category_code'] ?? '') ?>"
-                               style="text-transform:uppercase" required>
+                               class="fc-uppercase" required>
                     </div>
 
                     <!-- اسم الفئة الرئيسية -->
                     <div>
-                        <label><i class="fas fa-folder-open"></i> اسم الفئة الرئيسية <span style="color:red">*</span></label>
+                        <label><i class="fas fa-folder-open"></i> اسم الفئة الرئيسية <span class="required-indicator">*</span></label>
                         <input type="text" name="main_category_name" maxlength="100" placeholder="مثال: أعطال الميكانيكا"
                                value="<?= htmlspecialchars($edit_data['main_category_name'] ?? '') ?>" required>
                     </div>
 
                     <!-- الفئة الفرعية -->
                     <div>
-                        <label><i class="fas fa-sitemap"></i> الفئة الفرعية (الجزء المعطل) <span style="color:red">*</span></label>
+                        <label><i class="fas fa-sitemap"></i> الفئة الفرعية (الجزء المعطل) <span class="required-indicator">*</span></label>
                         <input type="text" name="sub_category" maxlength="100" placeholder="مثال: المحرك"
                                value="<?= htmlspecialchars($edit_data['sub_category'] ?? '') ?>" required>
                     </div>
 
                     <!-- تفصيل العطل -->
                     <div class="span2">
-                        <label><i class="fas fa-info-circle"></i> تفصيل العطل <span style="color:red">*</span></label>
+                        <label><i class="fas fa-info-circle"></i> تفصيل العطل <span class="required-indicator">*</span></label>
                         <input type="text" name="failure_detail" maxlength="200" placeholder="مثال: منظومة الهواء"
                                value="<?= htmlspecialchars($edit_data['failure_detail'] ?? '') ?>" required>
                     </div>
 
                     <!-- الكود الكامل -->
                     <div>
-                        <label><i class="fas fa-barcode"></i> الكود الكامل <span style="color:red">*</span></label>
+                           <label><i class="fas fa-barcode"></i> الكود الكامل <span class="required-indicator">*</span></label>
                         <input type="text" name="full_code" id="f_full_code" maxlength="30"
                                placeholder="مثال: EX-EQF-MEC-01-01"
                                value="<?= htmlspecialchars($edit_data['full_code'] ?? '') ?>"
-                               style="text-transform:uppercase; font-family:monospace; font-weight:700;" required>
+                               class="fc-code-input" required>
                     </div>
 
                     <!-- الحالة -->
@@ -462,7 +313,7 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
                     </div>
 
                     <!-- أزرار -->
-                    <div class="span3" style="display:flex; gap:10px; justify-content:flex-start; margin-top:4px;">
+                    <div class="span3 fc-form-actions">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> <?= $edit_data ? 'حفظ التعديلات' : 'إضافة الكود' ?>
                         </button>
@@ -482,11 +333,11 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h5><i class="fas fa-list-alt"></i> قائمة أكواد الأعطال
-                    <span style="background:rgba(12,28,62,.07);color:#0c1c3e;border-radius:20px;padding:2px 10px;font-size:.8rem;margin-right:6px;">
+                    <span class="fc-count-badge">
                         <?= number_format($total_count) ?> كود
                     </span>
                 </h5>
-                <div style="display:flex;gap:8px;">
+                <div class="fc-status-switch">
                     <a href="manage_failure_codes.php?f_stat=1" class="btn btn-sm <?= $filter_stat===1?'btn-primary':'btn-light border' ?>">نشط</a>
                     <a href="manage_failure_codes.php?f_stat=0" class="btn btn-sm <?= $filter_stat===0?'btn-danger':'btn-light border' ?>">معطل</a>
                     <a href="manage_failure_codes.php?f_stat=-1" class="btn btn-sm <?= $filter_stat===-1?'btn-secondary':'btn-light border' ?>">الكل</a>
@@ -495,11 +346,11 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
         </div>
 
         <!-- شريط الفلاتر السريعة -->
-        <div class="card-body" style="padding-bottom:0; border-bottom:1px solid rgba(12,28,62,.07);">
+        <div class="card-body fc-filter-body">
             <form method="GET" action="" class="fc-filter-bar" id="filterBarForm">
                 <input type="hidden" name="f_stat" value="<?= $filter_stat ?>">
                 <div>
-                    <label style="font-size:.78rem;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">نوع المعدة</label>
+                    <label class="fc-filter-label">نوع المعدة</label>
                     <select name="f_eq" onchange="this.form.submit()">
                         <option value="0">-- الكل --</option>
                         <option value="1" <?= $filter_eq==1?'selected':'' ?>>حفار</option>
@@ -508,7 +359,7 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
                     </select>
                 </div>
                 <div>
-                    <label style="font-size:.78rem;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">نوع الحدث</label>
+                    <label class="fc-filter-label">نوع الحدث</label>
                     <select name="f_evt" onchange="this.form.submit()">
                         <option value="">-- الكل --</option>
                         <?php if ($evt_list): while ($e = mysqli_fetch_assoc($evt_list)): ?>
@@ -520,7 +371,7 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
                     </select>
                 </div>
                 <div>
-                    <label style="font-size:.78rem;font-weight:700;color:#64748b;display:block;margin-bottom:3px;">الفئة الرئيسية</label>
+                    <label class="fc-filter-label">الفئة الرئيسية</label>
                     <select name="f_mc" onchange="this.form.submit()">
                         <option value="">-- الكل --</option>
                         <?php if ($mc_list): while ($m = mysqli_fetch_assoc($mc_list)): ?>
@@ -532,9 +383,9 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
                     </select>
                 </div>
                 <?php if ($filter_eq || $filter_evt || $filter_mc): ?>
-                    <div style="display:flex;align-items:flex-end;">
+                    <div class="fc-filter-actions">
                         <a href="manage_failure_codes.php?f_stat=<?= $filter_stat ?>"
-                           style="padding:7px 14px;background:rgba(220,38,38,.09);color:#dc2626;border:1px solid rgba(220,38,38,.2);border-radius:9px;font-size:.83rem;font-weight:700;text-decoration:none;">
+                           class="fc-clear-link">
                             <i class="fas fa-times"></i> مسح الفلاتر
                         </a>
                     </div>
@@ -544,10 +395,10 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
 
         <div class="card-body">
             <div class="table-responsive">
-                <table id="fcTable" class="display table table-bordered table-hover" style="width:100%">
+                <table id="fcTable" class="display table table-bordered table-hover fc-table">
                     <thead class="table-dark">
                         <tr>
-                            <th style="width:40px">#</th>
+                            <th class="fc-col-id">#</th>
                             <th>نوع المعدة</th>
                             <th>كود الحدث</th>
                             <th>نوع الحدث</th>
@@ -557,7 +408,7 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
                             <th>تفصيل العطل</th>
                             <th>الكود الكامل</th>
                             <th>الحالة</th>
-                            <th style="width:120px">إجراءات</th>
+                            <th class="fc-col-actions">إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -590,7 +441,7 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                                <div class="fc-row-actions">
                                     <?php if ($can_edit): ?>
                                     <button class="btn-edit-row"
                                             onclick="editRow(<?= htmlspecialchars(json_encode($row), ENT_QUOTES) ?>)">
@@ -599,13 +450,13 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
                                     <?php endif; ?>
                                     <?php if ($can_delete): ?>
                                         <?php if ($is_active): ?>
-                                        <form method="POST" style="display:inline" onsubmit="return confirm('تأكيد تعطيل هذا الكود؟')">
+                                        <form method="POST" class="fc-inline-form" onsubmit="return confirm('تأكيد تعطيل هذا الكود؟')">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="del_id" value="<?= $row['id'] ?>">
                                             <button type="submit" class="btn-del-row"><i class="fas fa-ban"></i></button>
                                         </form>
                                         <?php else: ?>
-                                        <form method="POST" style="display:inline">
+                                        <form method="POST" class="fc-inline-form">
                                             <input type="hidden" name="action" value="restore">
                                             <input type="hidden" name="res_id" value="<?= $row['id'] ?>">
                                             <button type="submit" class="btn-restore-row"><i class="fas fa-redo"></i></button>
@@ -647,6 +498,8 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
     </div>
 </div>
 
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
@@ -698,21 +551,21 @@ $(document).ready(function () {
 
 function toggleForm() {
     var card = document.getElementById('addEditCard');
-    if (card.style.display === 'none' || card.style.display === '') {
-        card.style.display = 'block';
+    if (card.classList.contains('fc-hidden')) {
+        card.classList.remove('fc-hidden');
         card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         // مسح التعديل إن وجد
         document.querySelector('[name="edit_id"]') && (document.querySelector('[name="edit_id"]').value = '');
         document.getElementById('fcForm').reset();
         card.querySelector('.card-header h5').innerHTML = '<i class="fas fa-plus-circle"></i> إضافة كود عطل جديد';
     } else {
-        card.style.display = 'none';
+        card.classList.add('fc-hidden');
     }
 }
 
 function editRow(data) {
     var card = document.getElementById('addEditCard');
-    card.style.display = 'block';
+    card.classList.remove('fc-hidden');
     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
     card.querySelector('.card-header h5').innerHTML = '<i class="fas fa-edit"></i> تعديل كود العطل';
 

@@ -775,3 +775,148 @@ label {
   border-bottom: solid 1px #000022;
   font-weight: 700;
 }
+
+/* ================== Unified UI Controls ================== */
+:root {
+  --ems-accent: #f4a100;
+  --ems-accent-hover: #d48806;
+  --ems-ink: #182230;
+  --ems-surface: #ffffff;
+  --ems-border: #e5e7eb;
+  --ems-success: #0f7b6c;
+  --ems-success-hover: #0c6155;
+}
+
+.ems-inline-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.ems-inline-actions-left,
+.ems-inline-actions-right {
+  display: flex;
+  align-items: center;
+}
+
+.ems-top-action-btn {
+  border: 0;
+  border-radius: 12px;
+  min-height: 44px;
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.ems-top-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.18);
+}
+
+.ems-top-action-add {
+  background: linear-gradient(135deg, var(--ems-success), #169b88);
+  color: #fff;
+}
+
+.ems-top-action-add:hover {
+  background: linear-gradient(135deg, var(--ems-success-hover), #127d6f);
+}
+
+.ems-top-action-back {
+  background: linear-gradient(135deg, var(--ems-accent), #ffbf3f);
+  color: var(--ems-ink);
+}
+
+.ems-top-action-back:hover {
+  background: linear-gradient(135deg, var(--ems-accent-hover), #f1a500);
+}
+
+.main .btn:not(.paginate_button):not(.dt-button),
+.main button,
+.main input[type="submit"],
+.main input[type="button"],
+.main a.add,
+.main .add,
+.ems-btn-unified {
+  border-radius: 10px;
+  font-weight: 700;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.main .btn:not(.paginate_button):not(.dt-button):hover,
+.main button:hover,
+.main input[type="submit"]:hover,
+.main input[type="button"]:hover,
+.main a.add:hover,
+.main .add:hover,
+.ems-btn-unified:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12);
+}
+
+.ems-btn-add {
+  background-color: var(--ems-success) !important;
+  color: #fff !important;
+  border-color: var(--ems-success) !important;
+}
+
+.ems-btn-add:hover {
+  background-color: var(--ems-success-hover) !important;
+  border-color: var(--ems-success-hover) !important;
+}
+
+.ems-btn-back {
+  background-color: var(--ems-accent) !important;
+  color: var(--ems-ink) !important;
+  border-color: var(--ems-accent) !important;
+}
+
+.ems-btn-back:hover {
+  background-color: var(--ems-accent-hover) !important;
+  border-color: var(--ems-accent-hover) !important;
+}
+
+.main .table,
+.main table {
+  border: 1px solid var(--ems-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+  background: var(--ems-surface);
+}
+
+.main .table thead th,
+.main table thead th {
+  background: #f8fafc;
+  color: #1f2937;
+  border-bottom: 1px solid var(--ems-border);
+}
+
+.main .table tbody tr:nth-child(even),
+.main table tbody tr:nth-child(even) {
+  background-color: #fcfcfd;
+}
+
+.main .table tbody tr:hover,
+.main table tbody tr:hover {
+  background-color: #fff8e8;
+}
+
+@media (max-width: 768px) {
+  .ems-top-action-btn {
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .ems-inline-actions {
+    margin-bottom: 8px;
+  }
+}

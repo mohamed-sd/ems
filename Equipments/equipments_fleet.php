@@ -179,16 +179,6 @@ if (isset($_GET['msg'])) {
     $success_msg = htmlspecialchars($_GET['msg']);
 }
 ?>
-
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-<link rel="stylesheet" href="../assets/css/admin-style.css">
-<link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<!-- Font Awesome من CDN لضمان ظهور الأيقونات بشكل صحيح -->
-<link rel="stylesheet" href="/ems/assets/css/all.min.css">
-<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-
 <?php
 
 // معالجة الحفظ أو التعديل
@@ -459,36 +449,33 @@ if (!empty($editData)) {
 }
 ?>
 
-<div class="main">
+<div class="main equipments-fleet-main ems-unified-page-shell">
     <!-- عنوان الصفحة -->
     <div class="page-header">
+        <div class="page-header-actions">
+            <?php if ($can_add) { ?>
+                <a href="javascript:void(0)" id="toggleForm" class="add-btn" onclick="toggleFleetForm(event)">
+                    <i class="fas fa-plus-circle"></i> إضافة معدة جديدة
+                </a>
+                <!-- أزرار الاستيراد من Excel -->
+                <a href="download_equipments_template.php" class="btn fleet-action-btn fleet-action-btn-excel">
+                    <i class="fas fa-file-excel"></i> تحميل نموذج Excel
+                </a>
+                <a href="download_equipments_template_csv.php" class="btn fleet-action-btn fleet-action-btn-csv">
+                    <i class="fas fa-file-csv"></i> تحميل نموذج CSV
+                </a>
+                <a href="javascript:void(0)" id="openImportModal" class="btn fleet-action-btn fleet-action-btn-import">
+                    <i class="fas fa-file-import"></i> استيراد من Excel
+                </a>
+            <?php } ?>
+        </div>
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-cogs"></i></div>
             إدارة المعدات
         </h1>
-        <div class="page-header-actions">
-            <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-            <?php if ($can_add) { ?>
-                <!-- أزرار الاستيراد من Excel -->
-                <a href="download_equipments_template.php" class="btn"
-                    style="background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;">
-                    <i class="fas fa-file-excel"></i> تحميل نموذج Excel
-                </a>
-                <a href="download_equipments_template_csv.php" class="btn"
-                    style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;">
-                    <i class="fas fa-file-csv"></i> تحميل نموذج CSV
-                </a>
-                <a href="javascript:void(0)" id="openImportModal" class="btn"
-                    style="background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease;">
-                    <i class="fas fa-file-import"></i> استيراد من Excel
-                </a>
-                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                    <i class="fas fa-plus-circle"></i> إضافة معدة جديدة
-                </a>
-            <?php } ?>
-        </div>
+        <a href="../main/dashboard.php" class="back-btn">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </a>
     </div>
 
     <?php if (!empty($success_msg)):
@@ -502,7 +489,7 @@ if (!empty($editData)) {
 
     <?php if ($can_add || $can_edit) { ?>
         <!-- فورم إضافة / تعديل معدة -->
-        <form id="projectForm" action="" method="post" style="display:<?php echo !empty($editData) ? 'block' : 'none'; ?>;">
+        <form id="projectForm" action="" method="post" class="<?php echo !empty($editData) ? '' : 'fleet-hidden'; ?>">
             <div class="card">
                 <div class="card-header">
                     <h5>
@@ -879,7 +866,7 @@ if (!empty($editData)) {
                                 <option value="متوفرة" <?php echo (empty($editData) || $editData['availability_state'] == "متوفرة") ? "selected" : ""; ?>>متوفرة</option>
                                 <option value="غير متوفرة" <?php echo (!empty($editData) && $editData['availability_state'] == "غير متوفرة") ? "selected" : ""; ?>>غير متوفرة</option>
                             </select>
-                            <small style="display:block; margin-top:6px; color:#64748b; font-size:0.82rem;">المعدات غير المتوفرة لن تظهر في جداول التشغيل.</small>
+                            <small class="availability-note">المعدات غير المتوفرة لن تظهر في جداول التشغيل.</small>
                         </div>
 
                         <div>
@@ -895,7 +882,7 @@ if (!empty($editData)) {
                                 <option value="في المستودع" <?php echo (!empty($editData) && $editData['availability_status'] == "في المستودع") ? "selected" : ""; ?>>في المستودع</option>
                                 <option value="مسحوبة" <?php echo (!empty($editData) && $editData['availability_status'] == "مسحوبة") ? "selected" : ""; ?>>مسحوبة</option>
                             </select>
-                            <small id="availabilityStatusHint" style="display:block; margin-top:6px; color:#64748b; font-size:0.82rem;"></small>
+                            <small id="availabilityStatusHint" class="availability-note"></small>
                         </div>
 
                         <div>
@@ -1017,7 +1004,7 @@ if (!empty($editData)) {
                                 <?php echo !empty($editData) ? "تحديث المعدة" : "حفظ المعدة"; ?>
                             </button>
                             <button type="button" class="btn-secondary"
-                                onclick="document.getElementById('projectForm').style.display='none'; document.getElementById('projectForm').reset();">
+                                onclick="document.getElementById('projectForm').classList.add('fleet-hidden'); document.getElementById('projectForm').reset();">
                                 <i class="fas fa-times"></i>
                                 إلغاء
                             </button>
@@ -1098,7 +1085,7 @@ if (!empty($editData)) {
                     </div>
                 </div>
 
-                <div class="filters-summary" id="filtersSummary" style="display: none;">
+                <div class="filters-summary fleet-hidden" id="filtersSummary">
                     <span class="summary-icon"><i class="fas fa-check-circle"></i></span>
                     <span class="summary-text"></span>
                 </div>
@@ -1470,11 +1457,11 @@ if (!empty($editData)) {
             </div>
             <div class="modal-footer">
 
-                <a id="viewEquipmentEditBtn" class="btn-modal btn-modal-save" style="text-decoration: none;">
+                <a id="viewEquipmentEditBtn" class="btn-modal btn-modal-save fleet-btn-link">
                     <i class="fas fa-edit"></i> تعديل المعدة
                 </a>
 
-                <a id="viewEquipmentDeleteBtn" class="btn-modal btn-modal-danger" style="text-decoration: none; display: none;" onclick="return confirm('هل أنت متأكد من حذف هذه المعدة؟');">
+                <a id="viewEquipmentDeleteBtn" class="btn-modal btn-modal-danger fleet-btn-link fleet-hidden" onclick="return confirm('هل أنت متأكد من حذف هذه المعدة؟');">
                     <i class="fas fa-trash"></i> حذف المعدة
                 </a>
 
@@ -1511,7 +1498,7 @@ if (!empty($editData)) {
                         { extend: 'print', text: 'طباعة' }
                     ],
                     "language": {
-                        "url": "https:/ems/assets/i18n/datatables/ar.json"
+                        "url": "/ems/assets/i18n/datatables/ar.json"
                     }
                 });
 
@@ -1709,11 +1696,32 @@ if (!empty($editData)) {
             const availabilityStatusInput = document.getElementById('availability_status');
             const availabilityStatusHint = document.getElementById('availabilityStatusHint');
 
-            if (toggleFormBtn && equipmentForm) {
-                toggleFormBtn.addEventListener('click', function () {
-                    equipmentForm.style.display = equipmentForm.style.display === "none" ? "block" : "none";
-                });
-            }
+            window.toggleFleetForm = function (event) {
+                if (event && typeof event.preventDefault === 'function') {
+                    event.preventDefault();
+                }
+
+                if (!equipmentForm) {
+                    return false;
+                }
+
+                const isHidden = equipmentForm.classList.contains('fleet-hidden');
+                if (isHidden) {
+                    equipmentForm.classList.remove('fleet-hidden');
+                    equipmentForm.style.display = 'block';
+                    $('html, body').animate({
+                        scrollTop: $('#projectForm').offset().top - 100
+                    }, 300);
+                } else {
+                    equipmentForm.classList.add('fleet-hidden');
+                    equipmentForm.style.display = 'none';
+                }
+
+                return false;
+            };
+
+            // يستخدم الزر onclick="toggleFleetForm(event)" داخل HTML،
+            // لذلك نتجنب ربط مستمع إضافي هنا حتى لا يتم التبديل مرتين لكل نقرة.
 
             if (projectSelect) {
                 projectSelect.addEventListener('change', function () {
@@ -1843,7 +1851,7 @@ if (!empty($editData)) {
                 const equipmentId = $(this).data('id');
                 if (!equipmentId || !viewEquipmentModal) return;
 
-                viewEquipmentModal.style.display = 'flex';
+                viewEquipmentModal.classList.add('is-open');
 
                 const loadingText = 'جار التحميل...';
                 [
@@ -1862,9 +1870,9 @@ if (!empty($editData)) {
                     editBtn.setAttribute('href', 'equipments_fleet.php?edit=' + equipmentId);
                     // التحكم في ظهور الزر بناءً على الصلاحيات
                     if (canEdit) {
-                        editBtn.style.display = '';
+                        editBtn.classList.remove('fleet-hidden');
                     } else {
-                        editBtn.style.display = 'none';
+                        editBtn.classList.add('fleet-hidden');
                     }
                 }
 
@@ -1873,9 +1881,9 @@ if (!empty($editData)) {
                     deleteBtn.setAttribute('href', 'equipments_fleet.php?delete_id=' + equipmentId);
                     // التحكم في ظهور الزر بناءً على الصلاحيات
                     if (canDelete) {
-                        deleteBtn.style.display = '';
+                        deleteBtn.classList.remove('fleet-hidden');
                     } else {
-                        deleteBtn.style.display = 'none';
+                        deleteBtn.classList.add('fleet-hidden');
                     }
                 }
 
@@ -1938,7 +1946,7 @@ if (!empty($editData)) {
 
             function closeEquipmentModal() {
                 if (viewEquipmentModal) {
-                    viewEquipmentModal.style.display = 'none';
+                    viewEquipmentModal.classList.remove('is-open');
                 }
             }
 
@@ -1965,54 +1973,46 @@ if (!empty($editData)) {
     <!-- ========================================== -->
     <!-- Modal استيراد من Excel/CSV -->
     <!-- ========================================== -->
-    <div id="importExcelModal"
-        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:9999; align-items:center; justify-content:center;">
-        <div
-            style="background:white; border-radius:16px; width:90%; max-width:650px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; animation:modalSlideIn 0.3s ease;">
+    <div id="importExcelModal" class="fleet-import-modal">
+        <div class="fleet-import-dialog">
             <!-- رأس Modal -->
-            <div
-                style="background:linear-gradient(135deg, #0c1c3e 0%, #1e3a5f 100%); color:white; padding:24px 32px; display:flex; justify-content:space-between; align-items:center;">
-                <h5 style="margin:0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:12px;">
-                    <i class="fas fa-file-import" style="color:#e8b800;"></i>
+            <div class="fleet-import-header">
+                <h5 class="fleet-import-title">
+                    <i class="fas fa-file-import fleet-import-title-icon"></i>
                     استيراد المعدات من Excel/CSV
                 </h5>
-                <button onclick="closeImportModal()"
-                    style="background:rgba(255,255,255,0.1); border:none; color:white; font-size:1.5rem; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;">
+                <button onclick="closeImportModal()" class="fleet-import-close-btn">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
             <!-- جسم Modal -->
-            <div style="padding:32px;">
+            <div class="fleet-import-body">
                 <form id="importExcelForm" enctype="multipart/form-data">
                     <!-- منطقة رفع الملف -->
-                    <div style="margin-bottom:24px;">
-                        <label
-                            style="display:block; font-weight:600; margin-bottom:12px; color:#0c1c3e; font-size:1rem;">
-                            <i class="fas fa-upload" style="color:#e8b800; margin-left:6px;"></i>
+                    <div class="fleet-import-upload-wrap">
+                        <label class="fleet-import-upload-label">
+                            <i class="fas fa-upload fleet-import-upload-label-icon"></i>
                             اختر ملف Excel أو CSV
                         </label>
-                        <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" required
-                            style="width:100%; padding:14px; border:2px dashed #cbd5e1; border-radius:10px; font-size:0.95rem; cursor:pointer; transition:all 0.3s; background:#f8fafc;">
+                        <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" required class="fleet-import-file-input">
                     </div>
 
                     <!-- مؤشر التحميل -->
-                    <div id="importProgress"
-                        style="display:none; padding:16px; background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:10px; margin-bottom:20px; text-align:center; color:#1e40af;">
-                        <i class="fas fa-spinner fa-spin" style="font-size:1.5rem; margin-bottom:8px;"></i>
-                        <p style="margin:0; font-weight:600;">جاري معالجة الملف... يرجى الانتظار</p>
+                    <div id="importProgress" class="fleet-import-progress fleet-hidden">
+                        <i class="fas fa-spinner fa-spin fleet-import-progress-icon"></i>
+                        <p class="fleet-import-progress-text">جاري معالجة الملف... يرجى الانتظار</p>
                     </div>
 
                     <!-- نتيجة الاستيراد -->
-                    <div id="importResult" style="display:none; margin-bottom:20px;"></div>
+                    <div id="importResult" class="fleet-import-result fleet-hidden"></div>
 
                     <!-- التعليمات -->
-                    <div
-                        style="background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:10px; padding:18px; margin-bottom:24px;">
-                        <h6 style="margin:0 0 12px 0; color:#1e40af; font-weight:700; font-size:0.95rem;">
+                    <div class="fleet-import-instructions">
+                        <h6 class="fleet-import-instructions-title">
                             <i class="fas fa-info-circle"></i> تعليمات الاستيراد:
                         </h6>
-                        <ul style="margin:0; padding-right:20px; color:#475569; font-size:0.9rem; line-height:1.8;">
+                        <ul class="fleet-import-instructions-list">
                             <li>قم بتحميل نموذج Excel أو CSV أولاً</li>
                             <li>املأ البيانات في النموذج (الحقول المطلوبة: كود المعدة، اسم المورد، نوع المعدة، اسم
                                 المعدة)</li>
@@ -2024,13 +2024,11 @@ if (!empty($editData)) {
                     </div>
 
                     <!-- أزرار التحكم -->
-                    <div style="display:flex; gap:12px; justify-content:flex-end;">
-                        <button type="button" onclick="closeImportModal()"
-                            style="padding:12px 28px; border:2px solid #e2e8f0; background:white; color:#64748b; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.3s; font-size:0.95rem;">
+                    <div class="fleet-import-actions">
+                        <button type="button" onclick="closeImportModal()" class="fleet-import-cancel-btn">
                             <i class="fas fa-times"></i> إلغاء
                         </button>
-                        <button type="submit"
-                            style="padding:12px 28px; background:linear-gradient(135deg, #16a34a 0%, #059669 100%); color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.3s; box-shadow:0 2px 8px rgba(22,163,74,0.25); font-size:0.95rem;">
+                        <button type="submit" class="fleet-import-submit-btn">
                             <i class="fas fa-file-import"></i> رفع واستيراد
                         </button>
                     </div>
@@ -2039,236 +2037,15 @@ if (!empty($editData)) {
         </div>
     </div>
 
-    <style>
-        .table-scroll-wrap {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .table-scroll-wrap .dataTables_wrapper,
-        .table-scroll-wrap .dataTables_scroll,
-        .table-scroll-wrap .dataTables_scrollHead,
-        .table-scroll-wrap .dataTables_scrollBody,
-        .table-scroll-wrap table {
-            width: 100% !important;
-            min-width: 1100px;
-        }
-
-        /* نظام الفلترة الاحترافي */
-        .filters-container {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            margin-bottom: 22px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .filters-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .filters-header h6 {
-            margin: 0;
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--navy);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .filters-header h6 i {
-            color: var(--gold);
-            font-size: 1.2rem;
-        }
-
-        .btn-clear-filters {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 8px 18px;
-            background: var(--red-soft);
-            color: var(--red);
-            border: 1.5px solid rgba(220, 38, 38, .18);
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.82rem;
-            cursor: pointer;
-            transition: all var(--ease);
-            font-family: 'Cairo', sans-serif;
-        }
-
-        .btn-clear-filters:hover {
-            background: var(--red);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 16px rgba(220, 38, 38, .35);
-        }
-
-        .btn-clear-active {
-            animation: btnClearPulse 0.3s ease;
-        }
-
-        @keyframes btnClearPulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.08);
-            }
-        }
-
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 16px;
-            margin-bottom: 12px;
-        }
-
-        .filter-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .filter-item label {
-            font-weight: 700;
-            color: var(--txt);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.88rem;
-        }
-
-        .filter-item label i {
-            color: var(--gold);
-        }
-
-        .filter-select {
-            padding: 11px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 0.92rem;
-            font-family: 'Cairo', sans-serif;
-            transition: all var(--ease);
-            background: var(--surface);
-            color: var(--txt);
-            cursor: pointer;
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px var(--gold-soft);
-        }
-
-        .filter-select:hover {
-            border-color: var(--navy);
-        }
-
-        .filters-summary {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 18px;
-            background: var(--blue-soft);
-            border: 1.5px solid rgba(37, 99, 235, .25);
-            border-radius: var(--radius);
-            margin-top: 16px;
-            animation: slideDown 0.3s ease;
-        }
-
-        .filters-summary .summary-icon {
-            flex-shrink: 0;
-            color: var(--blue);
-            font-size: 1.1rem;
-        }
-
-        .filters-summary .summary-text {
-            color: var(--blue);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .filters-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .filters-header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-            }
-
-            .btn-clear-filters {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px) scale(0.95);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        #importExcelModal input[type="file"]:hover {
-            border-color: #94a3b8;
-            background: #f1f5f9;
-        }
-
-        #importExcelModal button[type="submit"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.35);
-        }
-
-        #importExcelModal button[type="button"]:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-    </style>
-
     <script>
         // فتح Modal الاستيراد
         $('#openImportModal').on('click', function () {
-            $('#importExcelModal').css('display', 'flex').hide().fadeIn(300);
+            $('#importExcelModal').addClass('is-open');
         });
 
         // إغلاق Modal الاستيراد
         function closeImportModal() {
-            $('#importExcelModal').fadeOut(300);
+            $('#importExcelModal').removeClass('is-open');
             $('#importExcelForm')[0].reset();
             $('#importProgress').hide();
             $('#importResult').hide();
@@ -2308,32 +2085,32 @@ if (!empty($editData)) {
                 success: function (response) {
                     $('#importProgress').hide();
 
-                    let resultHtml = '<div style="padding:16px;border-radius:10px;border:1.5px solid;';
+                    let resultHtml = '<div class="fleet-import-result-card">';
 
                     if (response.success) {
-                        resultHtml += 'background:#dcfce7;border-color:rgba(22,163,74,.22);color:#15803d">';
-                        resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-check-circle"></i> تم الاستيراد بنجاح!</h6>';
-                        resultHtml += '<p style="margin:4px 0;">✅ تم إضافة: <strong>' + response.added + '</strong> معدة</p>';
+                        resultHtml = '<div class="fleet-import-result-card fleet-import-result-success">';
+                        resultHtml += '<h6 class="fleet-import-result-title"><i class="fas fa-check-circle"></i> تم الاستيراد بنجاح!</h6>';
+                        resultHtml += '<p class="fleet-import-result-line">✅ تم إضافة: <strong>' + response.added + '</strong> معدة</p>';
                         if (response.skipped > 0) {
-                            resultHtml += '<p style="margin:4px 0;color:#854d0e;">⚠️ تم تخطي: <strong>' + response.skipped + '</strong> معدة</p>';
+                            resultHtml += '<p class="fleet-import-result-line fleet-import-result-warn">⚠️ تم تخطي: <strong>' + response.skipped + '</strong> معدة</p>';
                         }
                         if (response.errors.length > 0) {
-                            resultHtml += '<p style="margin:8px 0 4px;"><strong>الأخطاء:</strong></p><ul style="margin:0;padding-right:20px;max-height:200px;overflow-y:auto;">';
+                            resultHtml += '<p class="fleet-import-result-errors-label"><strong>الأخطاء:</strong></p><ul class="fleet-import-result-errors-list">';
                             response.errors.forEach(function (error) {
-                                resultHtml += '<li style="margin:4px 0;">' + error + '</li>';
+                                resultHtml += '<li class="fleet-import-result-error-item">' + error + '</li>';
                             });
                             resultHtml += '</ul>';
                         }
                         resultHtml += '</div>';
                         setTimeout(function () { location.reload(); }, 3000);
                     } else {
-                        resultHtml += 'background:#fee2e2;border-color:rgba(220,38,38,.22);color:#991b1b">';
-                        resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> فشل الاستيراد</h6>';
-                        resultHtml += '<p style="margin:0;">' + response.message + '</p>';
+                        resultHtml = '<div class="fleet-import-result-card fleet-import-result-error">';
+                        resultHtml += '<h6 class="fleet-import-result-title"><i class="fas fa-times-circle"></i> فشل الاستيراد</h6>';
+                        resultHtml += '<p class="fleet-import-result-line fleet-import-result-line-zero">' + response.message + '</p>';
                         if (response.errors && response.errors.length > 0) {
-                            resultHtml += '<ul style="margin:8px 0 0;padding-right:20px;max-height:200px;overflow-y:auto;">';
+                            resultHtml += '<ul class="fleet-import-result-errors-list fleet-import-result-errors-list-spaced">';
                             response.errors.forEach(function (error) {
-                                resultHtml += '<li style="margin:4px 0;">' + error + '</li>';
+                                resultHtml += '<li class="fleet-import-result-error-item">' + error + '</li>';
                             });
                             resultHtml += '</ul>';
                         }
@@ -2358,11 +2135,11 @@ if (!empty($editData)) {
                         }
                     }
 
-                    const errorHtml = '<div style="padding:16px;border-radius:10px;background:#fee2e2;color:#991b1b;border:1.5px solid rgba(220,38,38,.22);">' +
-                        '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> حدث خطأ</h6>' +
-                        '<p style="margin:0;">' + errorMsg + '</p>' +
-                        '<p style="margin:10px 0 4px;"><strong>نصائح:</strong></p>' +
-                        '<ul style="font-size:.85rem;margin:0;padding-right:20px;">' +
+                    const errorHtml = '<div class="fleet-import-result-card fleet-import-result-error">' +
+                        '<h6 class="fleet-import-result-title"><i class="fas fa-times-circle"></i> حدث خطأ</h6>' +
+                        '<p class="fleet-import-result-line fleet-import-result-line-zero">' + errorMsg + '</p>' +
+                        '<p class="fleet-import-result-errors-label fleet-import-result-errors-label-space"><strong>نصائح:</strong></p>' +
+                        '<ul class="fleet-import-result-tips-list">' +
                         '<li>تأكد من أن الملف بصيغة .xlsx, .xls أو .csv</li>' +
                         '<li>تأكد من أن حجم الملف أقل من 5 ميجا</li>' +
                         '<li>تأكد من أن الملف يحتوي على بيانات صحيحة</li>' +

@@ -208,43 +208,19 @@ if (isset($_GET['delete_id'])) {
   exit();
 }
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<?php
+$page_title = "إيكوبيشن | عقود المورد";
+include("../inheader.php");
+include('../insidebar.php');
+?>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إيكوبيشن | عقود المورد</title>
-  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-  <!-- DataTables CSS -->
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-  <!-- Call bootstrap 5 -->
-  <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- DataTables CSS -->
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-  <!-- CSS الموقع -->
-  <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
-  <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
-  <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
-</head>
-<body class="standalone-brand">
-
-  <?php 
-  // include('../insidebar.php'); 
-  ?>
-
-  <div class="main">
-    <div class="page-header">
-      <div style="display: flex; align-items: center; gap: 12px;">
+  <div class="main supplier-contracts-main ems-unified-page-shell">
+    <div class="page-header contracts-header-shell">
+      <div class="contracts-header-brand">
         <div class="title-icon"><i class="fas fa-file-contract"></i></div>
         <h1 class="page-title">عقود المورد</h1>
       </div>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <div class="page-header-actions contracts-header-actions">
         <?php if ($can_add): ?>
         <a href="javascript:void(0)" id="toggleForm" class="add-btn">
           <i class="fas fa-plus-circle"></i> عقد جديد
@@ -261,7 +237,7 @@ if (isset($_GET['delete_id'])) {
 
     <!-- فورم إضافة عقد -->
     <?php if ($can_add || $can_edit): ?>
-    <form id="projectForm" action="" method="post" style="display:none;">
+    <form id="projectForm" action="" method="post" class="contracts-hidden contracts-form-block">
 
       <div class="card">
         <div class="card-header">
@@ -332,33 +308,28 @@ if (isset($_GET['delete_id'])) {
           </div>
 
           <!-- عرض معلومات ساعات العقد -->
-          <div id="projectHoursInfo"
-            style="display:none; margin: 1rem 0; padding: 1.5rem; background: linear-gradient(135deg, #fff7d1 0%, #ffe8a3 100%); border-radius: 15px; border-right: 4px solid var(--navy); box-shadow: var(--shadow-md);">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-              <div
-                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                <strong style="color: #1976d2; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+          <div id="projectHoursInfo" class="contracts-hidden project-hours-info">
+            <div class="project-hours-grid">
+              <div class="project-hours-card">
+                <strong class="project-hours-label project-hours-label-blue">
                   <i class="fas fa-clock"></i> إجمالي ساعات العقد
                 </strong>
-                <div style="font-size: 2rem; color: #0d47a1; font-weight: 700;" id="contractTotalHours">0</div>
-                <div id="equipmentBreakdown"
-                  style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 2px dashed #e3f2fd; font-size: 0.85rem;">
+                <div class="project-hours-value project-hours-value-blue" id="contractTotalHours">0</div>
+                <div id="equipmentBreakdown" class="project-hours-breakdown">
                   <!-- سيتم ملء التفصيل هنا -->
                 </div>
               </div>
-              <div
-                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                <strong style="color: #d32f2f; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+              <div class="project-hours-card">
+                <strong class="project-hours-label project-hours-label-red">
                   <i class="fas fa-handshake"></i> المتعاقد عليه مع موردين
                 </strong>
-                <div style="font-size: 2rem; color: #c62828; font-weight: 700;" id="suppliersContractedHours">0</div>
+                <div class="project-hours-value project-hours-value-red" id="suppliersContractedHours">0</div>
               </div>
-              <div
-                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                <strong style="color: #388e3c; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+              <div class="project-hours-card">
+                <strong class="project-hours-label project-hours-label-green">
                   <i class="fas fa-chart-line"></i> الساعات المتبقية
                 </strong>
-                <div style="font-size: 2rem; color: #2e7d32; font-weight: 700;" id="remainingHours">0</div>
+                <div class="project-hours-value project-hours-value-green" id="remainingHours">0</div>
               </div>
             </div>
           </div>
@@ -386,9 +357,8 @@ if (isset($_GET['delete_id'])) {
             </div>
           </div>
 
-          <div
-            style="margin-top: 2rem; padding: 1rem; background: var(--gold-soft); border-radius: 10px; border-right: 4px solid var(--navy);">
-            <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+          <div class="contracts-note-box">
+            <p class="contracts-note-text">
               <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
               البيانات المدخلة في الأقسام التالية
             </p>
@@ -581,9 +551,8 @@ if (isset($_GET['delete_id'])) {
             </div>
             <br>
             <div class="equipment-section" data-index="1">
-              <div
-                style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-                <h6 style="margin: 0 0 15px 0;">المعدات رقم 1</h6>
+              <div class="equipment-card">
+                <h6 class="equipment-card-title">المعدات رقم 1</h6>
                 <div class="form-grid">
                   <div class="field md-3 sm-6">
                     <label>نوع المعدة</label>
@@ -603,13 +572,13 @@ if (isset($_GET['delete_id'])) {
                   </div>
 
                   <div class="field md-3 sm-6">
-                    <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
-                    <div class="control"><input name="equip_count_basic_1" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+                    <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
+                    <div class="control"><input name="equip_count_basic_1" type="number" min="0" class="equip-basic-input"></div>
                   </div>
 
                   <div class="field md-3 sm-6">
-                    <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
-                    <div class="control"><input name="equip_count_backup_1" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+                    <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
+                    <div class="control"><input name="equip_count_backup_1" type="number" min="0" class="equip-backup-input"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>عدد المشغلين</label>
@@ -722,9 +691,9 @@ if (isset($_GET['delete_id'])) {
             </div>
           </div>
 
-          <div style="margin: 15px 0; display: flex; gap: 10px;">
+          <div class="equipment-add-row">
             <button type="button" class="primary" id="addEquipmentBtn"
-              style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
+              class="equipment-add-btn">
               <i class="fas fa-plus-circle"></i> إضافة مزيد من المعدات
             </button>
           </div>
@@ -735,7 +704,7 @@ if (isset($_GET['delete_id'])) {
 
           <div class="form-grid">
 
-            <div class="field md-3 sm-6" style="display: none;">
+            <div class="field md-3 sm-6 contracts-hidden-field">
               <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
               <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
                   placeholder="مثال: 8" value="20"></div>
@@ -777,12 +746,11 @@ if (isset($_GET['delete_id'])) {
           </div>
 
 
-          <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
-            <button type="reset"
-              style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+          <div class="contracts-form-actions">
+            <button type="reset" class="contracts-btn-reset">
               <i class="fas fa-eraser"></i> تفريغ الحقول
             </button>
-            <button type="submit" class="primary" style="padding: 0.75rem 3rem;">
+            <button type="submit" class="primary contracts-btn-submit-wide">
               <i class="fas fa-save"></i> حفظ البيانات
             </button>
           </div>
@@ -798,9 +766,9 @@ if (isset($_GET['delete_id'])) {
       </div>
 
       <!-- أزرار التحكم في المجموعات -->
-      <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0;">
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-          <span style="font-weight: 700; color: var(--navy); margin-left: 10px;">
+      <div class="card-body contracts-group-toolbar-wrap">
+        <div class="contracts-group-toolbar">
+          <span class="contracts-group-toolbar-label">
             <i class="fas fa-filter"></i> عرض المجموعات:
           </span>
           <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
@@ -830,14 +798,14 @@ if (isset($_GET['delete_id'])) {
         </div>
       </div>
 
-      <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0; background: #f8f9fa;">
-        <form method="get" action="supplierscontracts.php" style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
+      <div class="card-body contracts-table-filter-wrap">
+        <form method="get" action="supplierscontracts.php" class="contracts-table-filter-form">
           <?php if ($has_supplier_filter): ?>
           <input type="hidden" name="id" value="<?php echo intval($supplier_id); ?>">
           <?php endif; ?>
 
-          <div style="min-width:220px;">
-            <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المورد</label>
+          <div class="contracts-filter-field">
+            <label class="contracts-filter-label">فلتر المورد</label>
             <select name="filter_supplier_id" class="form-control" <?php echo $has_supplier_filter ? 'disabled' : ''; ?>>
               <option value="0">كل الموردين</option>
               <?php foreach ($suppliers_filter_options as $supplier_option_id => $supplier_option_name): ?>
@@ -851,8 +819,8 @@ if (isset($_GET['delete_id'])) {
             <?php endif; ?>
           </div>
 
-          <div style="min-width:220px;">
-            <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المشروع</label>
+          <div class="contracts-filter-field">
+            <label class="contracts-filter-label">فلتر المشروع</label>
             <select name="filter_project_id" id="sc_filter_project_select" class="form-control">
               <option value="0">كل المشاريع</option>
               <?php foreach ($projects_filter_options as $project_option_id => $project_option_name): ?>
@@ -863,8 +831,8 @@ if (isset($_GET['delete_id'])) {
             </select>
           </div>
 
-          <div style="min-width:220px;">
-            <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المنجم</label>
+          <div class="contracts-filter-field">
+            <label class="contracts-filter-label">فلتر المنجم</label>
             <select name="filter_mine_id" id="sc_filter_mine_select" class="form-control" <?php echo $filter_project_id <= 0 ? 'disabled' : ''; ?>>
               <option value="0">كل المناجم</option>
               <?php foreach ($mines_filter_options as $mine_option_id => $mine_option_name): ?>
@@ -880,8 +848,8 @@ if (isset($_GET['delete_id'])) {
         </form>
       </div>
 
-      <div class="card-body" style="padding: 2rem; overflow-x: auto;">
-        <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
+      <div class="card-body contracts-table-wrap">
+        <table id="projectsTable" class="display nowrap contracts-table">
           <thead>
             <tr>
               <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
@@ -1352,7 +1320,7 @@ if (isset($_GET['delete_id'])) {
 
       if (toggleContractFormBtn && contractForm) {
         toggleContractFormBtn.addEventListener('click', function () {
-          contractForm.style.display = contractForm.style.display === "none" ? "block" : "none";
+          contractForm.classList.toggle('contracts-hidden');
         });
       }
     })();
@@ -1445,11 +1413,10 @@ if (isset($_GET['delete_id'])) {
       newSection.className = 'equipment-section';
       newSection.setAttribute('data-index', equipmentIndex);
       newSection.innerHTML = `
-        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
-            <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}" 
-              style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+        <div class="equipment-card">
+          <div class="equipment-card-head">
+            <h6 class="equipment-card-title is-inline">المعدات رقم ${equipmentIndex}</h6>
+            <button type="button" class="removeEquipmentBtn remove-equipment-btn" data-index="${equipmentIndex}">
               <i class="fa fa-trash"></i> حذف
             </button>
           </div>
@@ -1472,13 +1439,13 @@ if (isset($_GET['delete_id'])) {
             </div>
 
             <div class="field md-3 sm-6">
-              <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
-              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+              <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
+              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="equip-basic-input"></div>
             </div>
 
             <div class="field md-3 sm-6">
-              <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
-              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+              <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
+              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="equip-backup-input"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المساعدين</label>
@@ -1772,19 +1739,19 @@ if (isset($_GET['delete_id'])) {
               breakdownDiv.empty();
 
               if (response.equipment_breakdown && response.equipment_breakdown.length > 0) {
-                var breakdownHtml = '<div style="color: #555;"><strong style="color: #1976d2; display: block; margin-bottom: 0.5rem;">تفصيل الساعات:</strong>';
+                var breakdownHtml = '<div class="project-hours-breakdown-root"><strong class="project-hours-breakdown-title">تفصيل الساعات:</strong>';
 
                 response.equipment_breakdown.forEach(function (item) {
                   var percentage = ((item.hours / response.contract_total_hours) * 100).toFixed(1);
-                  breakdownHtml += '<div style="display: flex; flex-direction: column; margin-bottom: 0.6rem; padding: 0.5rem; background: #f8f9fa; border-radius: 6px;">';
-                  breakdownHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">';
-                  breakdownHtml += '<span><i class="fas fa-tools" style="color: #1976d2; margin-left: 0.3rem;"></i>' + item.type + '</span>';
-                  breakdownHtml += '<span style="font-weight: 600; color: #0d47a1;">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
+                  breakdownHtml += '<div class="project-hours-breakdown-row">';
+                  breakdownHtml += '<div class="project-hours-breakdown-row-head">';
+                  breakdownHtml += '<span class="project-hours-breakdown-type"><i class="fas fa-tools"></i>' + item.type + '</span>';
+                  breakdownHtml += '<span class="project-hours-breakdown-hours">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
                   breakdownHtml += '</div>';
-                  breakdownHtml += '<div style="display: flex; gap: 1rem; font-size: 0.85rem; padding-top: 0.3rem; border-top: 1px dashed #ddd;">';
-                  breakdownHtml += '<span><span style="background: #007bff; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">أساسية</span> ' + item.count_basic + '</span>';
-                  breakdownHtml += '<span><span style="background: #ffc107; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">احتياطية</span> ' + item.count_backup + '</span>';
-                  breakdownHtml += '<span><span style="background: #667eea; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">إجمالي</span> ' + item.count + '</span>';
+                  breakdownHtml += '<div class="project-hours-breakdown-meta">';
+                  breakdownHtml += '<span><span class="project-hours-badge project-hours-badge-basic">أساسية</span> ' + item.count_basic + '</span>';
+                  breakdownHtml += '<span><span class="project-hours-badge project-hours-badge-backup">احتياطية</span> ' + item.count_backup + '</span>';
+                  breakdownHtml += '<span><span class="project-hours-badge project-hours-badge-total">إجمالي</span> ' + item.count + '</span>';
                   breakdownHtml += '</div>';
                   breakdownHtml += '</div>';
                 });
@@ -1792,7 +1759,7 @@ if (isset($_GET['delete_id'])) {
                 breakdownHtml += '</div>';
                 breakdownDiv.html(breakdownHtml);
               } else {
-                breakdownDiv.html('<span style="color: #999; font-style: italic;">لا توجد معدات مسجلة لهذا العقد</span>');
+                breakdownDiv.html('<span class="project-hours-breakdown-empty">لا توجد معدات مسجلة لهذا العقد</span>');
               }
 
               $('#projectHoursInfo').fadeIn();
@@ -1811,7 +1778,7 @@ if (isset($_GET['delete_id'])) {
 
     // تعبئة الفورم عند التعديل
     $(document).on("click", ".editBtn", function () {
-      $("#projectForm").show();
+    $("#projectForm").removeClass('contracts-hidden').show();
       $("#contract_id").val($(this).data("id"));
 
       // تحميل المشروع والمنجم والعقد
@@ -1955,11 +1922,10 @@ if (isset($_GET['delete_id'])) {
                 newSection.className = 'equipment-section';
                 newSection.setAttribute('data-index', equipmentIndex);
                 newSection.innerHTML = `
-                  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                      <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
-                      <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}" 
-                        style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                  <div class="equipment-card">
+                    <div class="equipment-card-head">
+                      <h6 class="equipment-card-title is-inline">المعدات رقم ${equipmentIndex}</h6>
+                      <button type="button" class="removeEquipmentBtn remove-equipment-btn" data-index="${equipmentIndex}">
                         <i class="fa fa-trash"></i> حذف
                       </button>
                     </div>
@@ -1982,13 +1948,13 @@ if (isset($_GET['delete_id'])) {
                       </div>
 
                       <div class="field md-3 sm-6">
-                        <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
-                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;" value="${equip.equip_count_basic || 0}"></div>
+                        <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
+                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="equip-basic-input" value="${equip.equip_count_basic || 0}"></div>
                       </div>
 
                       <div class="field md-3 sm-6">
-                        <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
-                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;" value="${equip.equip_count_backup || 0}"></div>
+                        <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
+                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="equip-backup-input" value="${equip.equip_count_backup || 0}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المساعدين</label>

@@ -194,43 +194,20 @@ if ($filter_project_id > 0) {
   }
 }
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<?php
+$page_title = "إيكوبيشن | العقود";
+include("../inheader.php");
+include('../insidebar.php');
+?>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إيكوبيشن | العقود</title>
-  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-  <!-- DataTables CSS -->
+  <div class="main contracts-main ems-unified-page-shell">
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-  <!-- Call bootstrap 5 -->
-  <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- DataTables CSS -->
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-  <!-- CSS الموقع -->
-  <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
-  <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
-
-</head>
-
-<body>
-
-  <?php include('../insidebar.php'); ?>
-
-  <div class="main">
-
-    <div class="page-header">
-      <div style="display: flex; align-items: center; gap: 12px;">
+    <div class="page-header contracts-header-shell">
+      <div class="contracts-header-brand">
         <div class="title-icon"><i class="fas fa-file-contract"></i></div>
         <h1 class="page-title">إدارة العقود</h1>
       </div>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <div class="page-header-actions contracts-header-actions">
         <a href="../main/dashboard.php" class="back-btn">
           <i class="fas fa-arrow-right"></i> رجوع
         </a>
@@ -243,7 +220,7 @@ if ($filter_project_id > 0) {
     </div>
 
     <!-- فورم إضافة عقد -->
-    <form id="projectForm" action="" method="post" style="display:none;">
+    <form id="projectForm" action="" method="post" class="contracts-hidden contracts-form-block">
 
       <div class="card">
         <div class="card-header">
@@ -310,9 +287,8 @@ if ($filter_project_id > 0) {
             </div>
           </div>
 
-          <div
-            style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px; border-right: 4px solid #667eea;">
-            <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+          <div class="contracts-note-box">
+            <p class="contracts-note-text">
               <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
               البيانات المدخلة في الأقسام التالية
             </p>
@@ -505,9 +481,8 @@ if ($filter_project_id > 0) {
             </div>
             <br>
             <div class="equipment-section" data-index="1">
-              <div
-                style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-                <h6 style="margin: 0 0 15px 0;">المعدات رقم 1</h6>
+              <div class="equipment-card">
+                <h6 class="equipment-card-title">المعدات رقم 1</h6>
                 <div class="form-grid">
                   <div class="field md-3 sm-6">
                     <label>نوع المعدة</label>
@@ -527,15 +502,15 @@ if ($filter_project_id > 0) {
                   </div>
 
                   <div class="field md-3 sm-6">
-                    <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+                    <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
                     <div class="control"><input name="equip_count_basic_1" type="number" min="0"
-                        style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+                      class="equip-basic-input"></div>
                   </div>
 
                   <div class="field md-3 sm-6">
-                    <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+                    <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
                     <div class="control"><input name="equip_count_backup_1" type="number" min="0"
-                        style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+                      class="equip-backup-input"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>عدد المشغلين</label>
@@ -648,9 +623,9 @@ if ($filter_project_id > 0) {
             </div>
           </div>
 
-          <div style="margin: 15px 0; display: flex; gap: 10px;">
+          <div class="equipment-add-row">
             <button type="button" class="primary" id="addEquipmentBtn"
-              style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
+              class="equipment-add-btn">
               <i class="fas fa-plus-circle"></i> إضافة مزيد من المعدات
             </button>
           </div>
@@ -661,7 +636,7 @@ if ($filter_project_id > 0) {
 
           <div class="form-grid">
 
-            <div class="field md-3 sm-6" style="display: none;">
+            <div class="field md-3 sm-6 contracts-hidden-field">
               <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
               <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
                   placeholder="مثال: 8" value="20"></div>
@@ -703,12 +678,11 @@ if ($filter_project_id > 0) {
           </div>
 
 
-          <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
-            <button type="reset"
-              style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+          <div class="contracts-form-actions">
+            <button type="reset" class="contracts-btn-reset">
               <i class="fas fa-eraser"></i> تفريغ الحقول
             </button>
-            <button type="submit" class="primary" style="padding: 0.75rem 3rem;">
+            <button type="submit" class="primary contracts-btn-submit-wide">
               <i class="fas fa-save"></i> حفظ البيانات
             </button>
           </div>
@@ -723,9 +697,9 @@ if ($filter_project_id > 0) {
       </div>
 
       <!-- أزرار التحكم في المجموعات -->
-      <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0;">
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-          <span style="font-weight: 700; color: #667eea; margin-left: 10px;">
+      <div class="card-body contracts-group-toolbar-wrap">
+        <div class="contracts-group-toolbar">
+          <span class="contracts-group-toolbar-label">
             <i class="fas fa-filter"></i> عرض المجموعات:
           </span>
           <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
@@ -755,14 +729,14 @@ if ($filter_project_id > 0) {
         </div>
       </div>
 
-      <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0; background: #f8f9fa;">
-        <form method="get" action="contracts.php" style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
+      <div class="card-body contracts-table-filter-wrap">
+        <form method="get" action="contracts.php" class="contracts-table-filter-form">
           <?php if ($mine_id > 0): ?>
           <input type="hidden" name="id" value="<?php echo intval($mine_id); ?>">
           <?php endif; ?>
 
-          <div style="min-width:220px;">
-            <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المشروع</label>
+          <div class="contracts-filter-field">
+            <label class="contracts-filter-label">فلتر المشروع</label>
             <select name="filter_project_id" id="filter_project_select" class="form-control">
               <option value="0">كل المشاريع</option>
               <?php foreach ($projects_filter_options as $project_option_id => $project_option_name): ?>
@@ -773,8 +747,8 @@ if ($filter_project_id > 0) {
             </select>
           </div>
 
-          <div style="min-width:220px;">
-            <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المنجم</label>
+          <div class="contracts-filter-field">
+            <label class="contracts-filter-label">فلتر المنجم</label>
             <?php if ($mine_id > 0): ?>
             <input type="hidden" name="filter_mine_id" value="<?php echo intval($filter_mine_id); ?>">
             <select class="form-control" disabled>
@@ -797,8 +771,8 @@ if ($filter_project_id > 0) {
         </form>
       </div>
 
-      <div class="card-body" style="padding: 2rem; overflow-x: auto;">
-        <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
+      <div class="card-body contracts-table-wrap">
+        <table id="projectsTable" class="display nowrap contracts-table">
           <thead>
             <tr>
               <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
@@ -1293,7 +1267,7 @@ if ($filter_project_id > 0) {
 
       if (toggleContractFormBtn && contractForm) {
         toggleContractFormBtn.addEventListener('click', function () {
-          contractForm.style.display = contractForm.style.display === "none" ? "block" : "none";
+          contractForm.classList.toggle('contracts-hidden');
         });
       }
 
@@ -1458,11 +1432,10 @@ if ($filter_project_id > 0) {
       newSection.className = 'equipment-section';
       newSection.setAttribute('data-index', equipmentIndex);
       newSection.innerHTML = `
-        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
-            <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}" 
-              style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+        <div class="equipment-card">
+          <div class="equipment-card-head">
+            <h6 class="equipment-card-title is-inline">المعدات رقم ${equipmentIndex}</h6>
+            <button type="button" class="removeEquipmentBtn remove-equipment-btn" data-index="${equipmentIndex}">
               <i class="fa fa-trash"></i> حذف
             </button>
           </div>
@@ -1486,12 +1459,12 @@ if ($filter_project_id > 0) {
               <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
-              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+              <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
+              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="equip-basic-input"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
-              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+              <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
+              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="equip-backup-input"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -1689,7 +1662,7 @@ if ($filter_project_id > 0) {
 
     // تعبئة الفورم عند التعديل
     $(document).on("click", ".editBtn", function () {
-      $("#projectForm").show();
+    $("#projectForm").removeClass('contracts-hidden').show();
       $("#contract_id").val($(this).data("id"));
 
       const projectId = $(this).data("project_id");
@@ -1784,11 +1757,10 @@ if ($filter_project_id > 0) {
                 newSection.className = 'equipment-section';
                 newSection.setAttribute('data-index', equipmentIndex);
                 newSection.innerHTML = `
-                  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                      <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
-                      <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}" 
-                        style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                  <div class="equipment-card">
+                    <div class="equipment-card-head">
+                      <h6 class="equipment-card-title is-inline">المعدات رقم ${equipmentIndex}</h6>
+                      <button type="button" class="removeEquipmentBtn remove-equipment-btn" data-index="${equipmentIndex}">
                         <i class="fa fa-trash"></i> حذف
                       </button>
                     </div>
@@ -1812,12 +1784,12 @@ if ($filter_project_id > 0) {
                         <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
                       </div>
                       <div class="field md-3 sm-6">
-                        <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
-                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;" value="${equip.equip_count_basic || 0}"></div>
+                        <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
+                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="equip-basic-input" value="${equip.equip_count_basic || 0}"></div>
                       </div>
                       <div class="field md-3 sm-6">
-                        <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
-                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;" value="${equip.equip_count_backup || 0}"></div>
+                        <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
+                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="equip-backup-input" value="${equip.equip_count_backup || 0}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المشغلين</label>

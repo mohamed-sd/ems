@@ -17,7 +17,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
 <!-- طبقة الخلفية المعتمة (للموبايل) -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<div class="sidebar" id="sidebar">
+<div class="sidebar closed" id="sidebar">
   <div>
     <div class="toggle-btn" id="toggleBtn"><i class="fa fa-bars"></i></div>
     <h2 class="logo">Equipation</h2>

@@ -242,26 +242,23 @@ include("../inheader.php");
 include('../insidebar.php');
 ?>
 
-<link rel="stylesheet" href="/ems/assets/css/all.min.css">
-<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/main_admin_style.css">
-
-<div class="main">
+<div class="main project-users-main ems-unified-page-shell">
     <div class="page-header">
-        <h1 class="page-title">
-            <div class="title-icon"><i class="fas fa-users-cog"></i></div>
-            إدارة مشرفين <?php echo !empty($roleName) ? '- ' . $roleName : ''; ?>
-        </h1>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
+        <div class="pu-page-header-actions">
             <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة مشرف جديد
             </a>
             <?php endif; ?>
         </div>
+         <a href="../main/dashboard.php" class="back-btn">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </a>
+        <h1 class="page-title">
+            <div class="title-icon"><i class="fas fa-users-cog"></i></div>
+            إدارة مشرفين <?php echo !empty($roleName) ? '- ' . $roleName : ''; ?>
+        </h1>
+       
     </div>
 
     <?php if (!empty($_GET['msg'])): 
@@ -274,10 +271,10 @@ include('../insidebar.php');
     <?php endif; ?>
 
     <!-- فورم إضافة / تعديل مستخدم -->
-    <form id="projectForm" action="" method="post" style="display:none; margin-bottom:20px;">
+    <form id="projectForm" action="" method="post" class="pu-hidden pu-form-block">
         <input type="hidden" id="action"  name="action"  value="add">
         <input type="hidden" id="user_id" name="user_id" value="">
-        <div class="card shadow-sm">
+        <div class="card shadow-sm pu-form-card">
             <div class="card-header">
                 <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة مستخدم جديد</span></h5>
             </div>
@@ -290,12 +287,12 @@ include('../insidebar.php');
                     <div>
                         <label><i class="fas fa-at"></i> اسم المستخدم *</label>
                         <input type="text" name="username" id="username" placeholder="أدخل اسم المستخدم" value="" required autocomplete="off" />
-                        <small id="usernameFeedback" style="display:block; margin-top:6px; font-weight:600;"></small>
+                        <small id="usernameFeedback" class="pu-username-feedback"></small>
                     </div>
                     <div>
                         <label><i class="fas fa-lock"></i> كلمة المرور <span id="passwordRequired">*</span></label>
                         <input type="password" name="password" id="password" placeholder="أدخل كلمة المرور" value=""/>
-                        <small id="passwordHint" style="color: #999; display:none;">اتركه فارغاً للاحتفاظ بكلمة المرور الحالية</small>
+                        <small id="passwordHint" class="pu-password-hint pu-hidden">اتركه فارغاً للاحتفاظ بكلمة المرور الحالية</small>
                     </div>
                     <div>
                         <label><i class="fas fa-phone"></i> رقم الهاتف *</label>
@@ -327,11 +324,11 @@ include('../insidebar.php');
                         </select>
                     </div>
                 </div>
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <div class="pu-form-actions">
                     <button type="submit" class="btn-submit">
                         <i class="fas fa-save"></i> <span id="submitBtnText">حفظ المستخدم</span>
                     </button>
-                    <button type="button" class="btn-cancel" onclick="document.getElementById('projectForm').style.display='none';">
+                    <button type="button" class="btn-cancel" onclick="document.getElementById('projectForm').classList.add('pu-hidden');">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>
@@ -382,13 +379,13 @@ include('../insidebar.php');
                     while ($row = mysqli_fetch_assoc($result)) {
                         $roleText = !empty($row['role_name'])
                             ? htmlspecialchars($row['role_name'], ENT_QUOTES, 'UTF-8')
-                            : '<span style="color: #999;">غير معروف</span>';
+                            : '<span class="pu-text-muted">غير معروف</span>';
                         $createdDate = date('Y-m-d', strtotime($row['created_at']));
 
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
                         echo "<td><strong>" . htmlspecialchars($row['name']) . "</strong></td>";
-                        echo "<td><code style=\"background: #f0f2f8; padding: 4px 8px; border-radius: 6px;\">" . htmlspecialchars($row['username']) . "</code></td>";
+                        echo "<td><code class='pu-code'>" . htmlspecialchars($row['username']) . "</code></td>";
                         echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
                         echo "<td>" . $roleText . "</td>";
                         echo "<td>" . $createdDate . "</td>";
@@ -450,7 +447,7 @@ include('../insidebar.php');
                     { extend: 'print', text: 'طباعة'        }
                 ],
                 "language": {
-                    "url": "https:/ems/assets/i18n/datatables/ar.json"
+                    "url": "/ems/assets/i18n/datatables/ar.json"
                 }
             });
         });
@@ -461,9 +458,9 @@ include('../insidebar.php');
 
         if (toggleFormBtn) {
             toggleFormBtn.addEventListener('click', function () {
-                projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
+                projectForm.classList.toggle('pu-hidden');
                 // تنظيف الحقول عند الإضافة
-                if (projectForm.style.display === "block") {
+                if (!projectForm.classList.contains('pu-hidden')) {
                     resetForm();
                     $("html, body").animate({ scrollTop: $("#projectForm").offset().top - 100 }, 500);
                 }
@@ -474,6 +471,11 @@ include('../insidebar.php');
         const usernameFeedback = document.getElementById('usernameFeedback');
         let usernameValid = true;
 
+        function setUsernameFeedback(state, message) {
+            usernameFeedback.className = 'pu-username-feedback pu-feedback-' + state;
+            usernameFeedback.innerHTML = message;
+        }
+
         // تحقق اسم المستخدم أثناء الكتابة
         usernameInput.addEventListener('input', async function () {
             const username = this.value.trim();
@@ -481,19 +483,19 @@ include('../insidebar.php');
 
             if (username === '') {
                 usernameFeedback.innerHTML = '';
-                usernameInput.style.borderColor = '#e9ecef';
-                usernameInput.style.boxShadow = '';
+                usernameFeedback.className = 'pu-username-feedback';
+                usernameInput.classList.remove('pu-input-warn', 'pu-input-success', 'pu-input-error');
                 usernameValid = true;
                 return;
             }
             if (username.length < 3) {
-                usernameFeedback.innerHTML = '<span style="color: #ffc107;"><i class="fas fa-info-circle"></i> الحد الأدنى 3 أحرف</span>';
-                usernameInput.style.borderColor = '#ffc107';
-                usernameInput.style.boxShadow = '0 0 0 0.2rem rgba(255, 193, 7, 0.25)';
+                setUsernameFeedback('warn', '<span><i class="fas fa-info-circle"></i> الحد الأدنى 3 أحرف</span>');
+                usernameInput.classList.remove('pu-input-success', 'pu-input-error');
+                usernameInput.classList.add('pu-input-warn');
                 usernameValid = false;
                 return;
             }
-            usernameFeedback.innerHTML = '<span style="color: #17a2b8;"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>';
+            setUsernameFeedback('info', '<span><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>');
             try {
                 const response = await fetch('check_username_availability.php', {
                     method: 'POST',
@@ -502,18 +504,20 @@ include('../insidebar.php');
                 });
                 const data = await response.json();
                 if (data.available) {
-                    usernameFeedback.innerHTML = `<span style="color: #28a745;"><i class="fas fa-check-circle"></i> ${data.message}</span>`;
-                    usernameInput.style.borderColor = '#28a745';
-                    usernameInput.style.boxShadow = '0 0 0 0.2rem rgba(40, 167, 69, 0.25)';
+                    setUsernameFeedback('ok', `<span><i class="fas fa-check-circle"></i> ${data.message}</span>`);
+                    usernameInput.classList.remove('pu-input-warn', 'pu-input-error');
+                    usernameInput.classList.add('pu-input-success');
                     usernameValid = true;
                 } else {
-                    usernameFeedback.innerHTML = `<span style="color: #dc3545;"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
-                    usernameInput.style.borderColor = '#dc3545';
-                    usernameInput.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+                    setUsernameFeedback('error', `<span><i class="fas fa-times-circle"></i> ${data.message}</span>`);
+                    usernameInput.classList.remove('pu-input-warn', 'pu-input-success');
+                    usernameInput.classList.add('pu-input-error');
                     usernameValid = false;
                 }
             } catch (error) {
-                usernameFeedback.innerHTML = '<span style="color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> خطأ في التحقق</span>';
+                setUsernameFeedback('error', '<span><i class="fas fa-exclamation-triangle"></i> خطأ في التحقق</span>');
+                usernameInput.classList.remove('pu-input-warn', 'pu-input-success');
+                usernameInput.classList.add('pu-input-error');
                 usernameValid = false;
             }
         });
@@ -544,18 +548,18 @@ include('../insidebar.php');
             document.getElementById('action').value              = 'edit';
 
             // إعادة تعيين حالة التحقق من اسم المستخدم
-            usernameFeedback.innerHTML = '<span style="color: #28a745;"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';
-            usernameInput.style.borderColor = '#e9ecef';
-            usernameInput.style.boxShadow = '';
+            setUsernameFeedback('ok', '<span><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>');
+            usernameInput.classList.remove('pu-input-warn', 'pu-input-error');
+            usernameInput.classList.add('pu-input-success');
             usernameValid = true;
 
             // كلمة المرور اختيارية عند التعديل
-            document.getElementById('passwordRequired').style.display = 'none';
-            document.getElementById('passwordHint').style.display     = 'block';
+            document.getElementById('passwordRequired').classList.add('pu-hidden');
+            document.getElementById('passwordHint').classList.remove('pu-hidden');
             document.getElementById('password').removeAttribute('required');
             
             // عرض الفورم والتمرير إليه
-            projectForm.style.display = 'block';
+            projectForm.classList.remove('pu-hidden');
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top - 100 }, 500);
         };
 
@@ -566,13 +570,13 @@ include('../insidebar.php');
             document.getElementById('action').value              = 'add';
             document.getElementById('formTitle').textContent     = 'إضافة مستخدم جديد';
             document.getElementById('submitBtnText').textContent = 'حفظ المستخدم';
-            document.getElementById('passwordRequired').style.display = 'inline';
-            document.getElementById('passwordHint').style.display     = 'none';
+            document.getElementById('passwordRequired').classList.remove('pu-hidden');
+            document.getElementById('passwordHint').classList.add('pu-hidden');
             document.getElementById('password').setAttribute('required', 'required');
 
             usernameFeedback.innerHTML = '';
-            usernameInput.style.borderColor = '#e9ecef';
-            usernameInput.style.boxShadow = '';
+            usernameFeedback.className = 'pu-username-feedback';
+            usernameInput.classList.remove('pu-input-warn', 'pu-input-success', 'pu-input-error');
             usernameValid = true;
         };
 

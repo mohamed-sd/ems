@@ -255,330 +255,64 @@ if (isset($_GET['delete_id'])) {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | الموردون</title>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="../assets/css/all.min.css">
-    <!-- Bootstrap 5 -->
-    <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
-    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-    <!-- CSS الموقع -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
-    <link rel="stylesheet" type="text/css" href="../assets/css/admin-style.css" />
-    <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
-    
-    <style>
-        /* ── قسم الفورم ── */
-        .form-section {
-            background: var(--bg);
-            padding: 1.2rem;
-            border-radius: var(--radius);
-            margin-bottom: 1.2rem;
-            border: 1.5px solid var(--border);
-        }
+<?php
+$page_title = 'إيكوبيشن | الموردون';
+include '../inheader.php';
+include '../insidebar.php';
+?>
 
-        .form-section h6 {
-            color: var(--txt);
-            font-weight: 800;
-            font-size: .95rem;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--gold);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .form-section h6 i {
-            color: var(--gold);
-            font-size: 1rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .form-group label {
-            font-weight: 700;
-            color: var(--sub);
-            font-size: .8rem;
-        }
-
-        .form-group label .required {
-            color: var(--red);
-            font-weight: 700;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 10px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius);
-            font-size: .88rem;
-            font-weight: 500;
-            color: var(--txt);
-            background: var(--bg);
-            transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
-            outline: none;
-            font-family: 'Cairo', sans-serif;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: var(--gold);
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(232,184,0,.14);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        /* ── شبكة المعدات (checkbox) ── */
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 10px;
-            padding: 12px;
-            background: #fff;
-            border-radius: var(--radius);
-            border: 1.5px solid var(--border);
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 10px;
-            background: var(--bg);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all var(--ease);
-            border: 1.5px solid transparent;
-        }
-
-        .checkbox-label:hover {
-            border-color: rgba(232,184,0,.3);
-        }
-
-        .checkbox-label input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--gold);
-        }
-
-        .checkbox-label span {
-            font-weight: 500;
-            color: var(--txt);
-        }
-
-        /* ── أزرار الفورم ── */
-        .form-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-top: 18px;
-            padding-top: 12px;
-        }
-
-        .btn-save {
-            background: linear-gradient(135deg, var(--navy), var(--navy-l));
-            color: #fff;
-            border: none;
-            padding: 12px 26px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: .9rem;
-            cursor: pointer;
-            transition: all var(--ease);
-            box-shadow: 0 4px 16px rgba(12,28,62,.22);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 22px rgba(12,28,62,.28);
-        }
-
-        .btn-cancel {
-            background: rgba(100,116,139,.12);
-            color: var(--sub);
-            border: none;
-            padding: 12px 26px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: .9rem;
-            cursor: pointer;
-            transition: all var(--ease);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-cancel:hover {
-            background: var(--sub);
-            color: #fff;
-            transform: translateY(-2px);
-        }
-
-        /* ── قسم عرض المعلومات في المودال ── */
-        .info-section {
-            background: var(--bg);
-            padding: 1.2rem;
-            border-radius: var(--radius);
-            margin-bottom: 1.2rem;
-            border: 1.5px solid var(--border);
-        }
-
-        .section-title {
-            color: var(--txt);
-            font-weight: 800;
-            font-size: .95rem;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--gold);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-title i { color: var(--gold); }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 12px;
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            padding: 12px;
-            background: #fff;
-            border-radius: var(--radius);
-            border: 1.5px solid var(--border);
-        }
-
-        .info-label {
-            font-weight: 700;
-            color: var(--sub);
-            font-size: .75rem;
-            text-transform: uppercase;
-        }
-
-        .info-value {
-            font-weight: 700;
-            color: var(--txt);
-            font-size: .9rem;
-        }
-
-        .stat-cell {
-            background: var(--navy);
-            padding: 4px 12px;
-            border-radius: 50px;
-            width: fit-content;
-            font-weight: 800;
-            color: var(--gold);
-            font-size: .85rem;
-        }
-
-        .phone-icon {
-            color: var(--gold);
-            margin-left: 6px;
-        }
-
-        @media (max-width: 768px) {
-            .form-actions   { flex-direction: column; }
-            .checkbox-grid  { grid-template-columns: 1fr; }
-        }
-
-        .link-alert-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-right: 6px;
-            padding: 2px 9px;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #fff7d6, #ffe8bf);
-            color: #7c2d12;
-            border: 1px solid rgba(217, 119, 6, 0.28);
-            font-size: .72rem;
-            font-weight: 800;
-            box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
-            animation: linkAlertPulse 1.6s ease-in-out infinite;
-            vertical-align: middle;
-        }
-
-        .link-alert-chip i {
-            color: #b45309;
-            font-size: .75rem;
-        }
-
-        @keyframes linkAlertPulse {
-            0%, 100% { transform: translateY(0); box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18); }
-            50% { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28); }
-        }
-    </style>
-</head>
-<body>
-<?php include('../insidebar.php'); ?>
-
-<div class="main">
+<div class="main suppliers-main ems-unified-page-shell">
     <div class="page-header">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <div class="title-icon"><i class="fas fa-truck-loading"></i></div>
-            <h1 class="page-title">إدارة الموردين</h1>
-        </div>
-        <div>
-            <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
+    
+    
+
+        <!-- اقصي اليمين: زر الإضافة + عنوان الصفحة -->
+        <div class="suppliers-header-start">
             <?php if ($can_add): ?>
-            <a href="javascript:void(0)" id="toggleForm" class="add">
-                <i class="fa fa-plus-circle"></i> إضافة مورد جديد
-            </a>
-            <a href="javascript:void(0)" id="openImportModal" class="add"
-                style="background:linear-gradient(135deg,#064e3b,#065f46);color:#fff;border-color:transparent;">
-                <i class="fas fa-file-excel"></i> استيراد من Excel
+            <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+                <i class="fas fa-plus-circle"></i> إضافة مورد جديد
             </a>
             <?php endif; ?>
-            <a href="download_suppliers_template.php" class="add"
-                style="background:linear-gradient(135deg,var(--orange),#f59e0b);color:#fff;border-color:transparent;">
-                <i class="fas fa-download"></i> تحميل نموذج Excel
-            </a>
-            <a href="download_suppliers_template_csv.php" class="add"
-                style="background:linear-gradient(135deg,var(--blue),#3b82f6);color:#fff;border-color:transparent;">
+            <h1 class="page-title">
+                <div class="title-icon"><i class="fas fa-truck-loading"></i></div>
+                إدارة الموردين
+            </h1>
+        </div>
+
+   
+
+        <!-- المنتصف: بقية الأزرار -->
+        <div class="page-header-actions">
+            
+            <a href="download_suppliers_template_csv.php" class="suppliers-header-link suppliers-header-link-csv">
                 <i class="fas fa-file-csv"></i> تحميل نموذج CSV
             </a>
+            <a href="download_suppliers_template.php" class="suppliers-header-link suppliers-header-link-excel">
+                <i class="fas fa-file-excel"></i> تحميل نموذج Excel
+            </a>
+            <?php if ($can_add): ?>
+            <a href="javascript:void(0)" id="openImportModal" class="suppliers-header-link suppliers-header-link-import">
+                <i class="fas fa-file-import"></i> استيراد من Excel
+            </a>
+            <?php endif; ?>
+            
         </div>
+
+       
+       
     </div>
 
-    <?php if (!empty($_GET['msg'])): ?>
-        <div class="success-message">
-            <i class="fas fa-check-circle"></i>
+    <?php if (!empty($_GET['msg'])):
+        $isSuccess = strpos($_GET['msg'], '✅') !== false;
+    ?>
+        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
+            <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
             <?php echo htmlspecialchars($_GET['msg']); ?>
         </div>
     <?php endif; ?>
 
     <!-- ══ فورم إضافة / تعديل مورد ══════════════════════════════════════════ -->
-    <form id="projectForm" action="" method="post" style="display:none;">
+    <form id="projectForm" action="" method="post" class="suppliers-hidden suppliers-form-block">
         <div class="card">
             <div class="card-header">
                 <h5><i class="fas fa-edit"></i> إضافة / تعديل مورد</h5>
@@ -623,7 +357,7 @@ if (isset($_GET['delete_id'])) {
                     </div>
                     
                     <!-- أنواع المعدات (يمكن اختيار أكثر من نوع) -->
-                    <div class="form-group" style="grid-column: 1 / -1;">
+                    <div class="form-group suppliers-span-full">
                         <label>المعدات (يمكن اختيار أكثر من نوع)</label>
                         <div class="checkbox-grid">
                             <label class="checkbox-label">
@@ -722,7 +456,7 @@ if (isset($_GET['delete_id'])) {
                                 <option value="معفى من التسجيل">معفى من التسجيل</option>
                             </select>
                         </div>
-                        <div class="form-group" style="grid-column: 1 / -1;">
+                        <div class="form-group suppliers-span-full">
                             <label>العنوان الكامل</label>
                             <textarea name="full_address" id="full_address" rows="3"></textarea>
                         </div>
@@ -756,7 +490,7 @@ if (isset($_GET['delete_id'])) {
         </div>
         <div class="card-body">
             <div class="table-container">
-                <table id="projectsTable" class="display" style="width:100%;">
+                <table id="projectsTable" class="display suppliers-table">
                     <thead>
                         <tr>
                             <th><i class="fas fa-hashtag"></i> #</th>
@@ -813,21 +547,21 @@ if (isset($_GET['delete_id'])) {
                             $data_attrs =
                                 "data-id='"                            . $row['id']                                                               . "' " .
                                 "data-name='"                          . htmlspecialchars($row['name'],                          ENT_QUOTES)       . "' " .
-                                "data-supplier_code='"                 . htmlspecialchars($row['supplier_code'],                 ENT_QUOTES)       . "' " .
-                                "data-supplier_type='"                 . htmlspecialchars($row['supplier_type'],                 ENT_QUOTES)       . "' " .
-                                "data-dealing_nature='"                . htmlspecialchars($row['dealing_nature'],                ENT_QUOTES)       . "' " .
-                                "data-equipment_types='"               . htmlspecialchars($row['equipment_types'],               ENT_QUOTES)       . "' " .
-                                "data-commercial_registration='"       . htmlspecialchars($row['commercial_registration'],       ENT_QUOTES)       . "' " .
-                                "data-identity_type='"                 . htmlspecialchars($row['identity_type'],                 ENT_QUOTES)       . "' " .
-                                "data-identity_number='"               . htmlspecialchars($row['identity_number'],               ENT_QUOTES)       . "' " .
-                                "data-identity_expiry_date='"          . htmlspecialchars($row['identity_expiry_date'],          ENT_QUOTES)       . "' " .
-                                "data-email='"                         . htmlspecialchars($row['email'],                        ENT_QUOTES)       . "' " .
-                                "data-phone='"                         . htmlspecialchars($row['phone'],                        ENT_QUOTES)       . "' " .
-                                "data-phone_alternative='"             . htmlspecialchars($row['phone_alternative'],             ENT_QUOTES)       . "' " .
-                                "data-full_address='"                  . htmlspecialchars($row['full_address'],                  ENT_QUOTES)       . "' " .
-                                "data-contact_person_name='"           . htmlspecialchars($row['contact_person_name'],           ENT_QUOTES)       . "' " .
-                                "data-contact_person_phone='"          . htmlspecialchars($row['contact_person_phone'],          ENT_QUOTES)       . "' " .
-                                "data-financial_registration_status='" . htmlspecialchars($row['financial_registration_status'], ENT_QUOTES)       . "' " .
+                                "data-supplier_code='"                 . htmlspecialchars((string) ($row['supplier_code'] ?? ''),                 ENT_QUOTES) . "' " .
+                                "data-supplier_type='"                 . htmlspecialchars((string) ($row['supplier_type'] ?? ''),                 ENT_QUOTES) . "' " .
+                                "data-dealing_nature='"                . htmlspecialchars((string) ($row['dealing_nature'] ?? ''),                ENT_QUOTES) . "' " .
+                                "data-equipment_types='"               . htmlspecialchars((string) ($row['equipment_types'] ?? ''),               ENT_QUOTES) . "' " .
+                                "data-commercial_registration='"       . htmlspecialchars((string) ($row['commercial_registration'] ?? ''),       ENT_QUOTES) . "' " .
+                                "data-identity_type='"                 . htmlspecialchars((string) ($row['identity_type'] ?? ''),                 ENT_QUOTES) . "' " .
+                                "data-identity_number='"               . htmlspecialchars((string) ($row['identity_number'] ?? ''),               ENT_QUOTES) . "' " .
+                                "data-identity_expiry_date='"          . htmlspecialchars((string) ($row['identity_expiry_date'] ?? ''),          ENT_QUOTES) . "' " .
+                                "data-email='"                         . htmlspecialchars((string) ($row['email'] ?? ''),                         ENT_QUOTES) . "' " .
+                                "data-phone='"                         . htmlspecialchars((string) ($row['phone'] ?? ''),                         ENT_QUOTES) . "' " .
+                                "data-phone_alternative='"             . htmlspecialchars((string) ($row['phone_alternative'] ?? ''),             ENT_QUOTES) . "' " .
+                                "data-full_address='"                  . htmlspecialchars((string) ($row['full_address'] ?? ''),                  ENT_QUOTES) . "' " .
+                                "data-contact_person_name='"           . htmlspecialchars((string) ($row['contact_person_name'] ?? ''),           ENT_QUOTES) . "' " .
+                                "data-contact_person_phone='"          . htmlspecialchars((string) ($row['contact_person_phone'] ?? ''),          ENT_QUOTES) . "' " .
+                                "data-financial_registration_status='" . htmlspecialchars((string) ($row['financial_registration_status'] ?? ''), ENT_QUOTES) . "' " .
                                 "data-status='"                        . $row['status']                                                           . "'";
                             
                             echo "<tr>";
@@ -840,9 +574,9 @@ if (isset($_GET['delete_id'])) {
 
                             // عرض الحالة بالألوان
                             if ($row['status'] == "1") {
-                                echo "<td><span class='status-active'><i class='fas fa-check-circle' style='margin-left:6px;'></i>نشط</span></td>";
+                                echo "<td><span class='status-active'><i class='fas fa-check-circle suppliers-status-icon'></i>نشط</span></td>";
                             } else {
-                                echo "<td><span class='status-inactive'><i class='fas fa-times-circle' style='margin-left:6px;'></i>معلق</span></td>";
+                                echo "<td><span class='status-inactive'><i class='fas fa-times-circle suppliers-status-icon'></i>معلق</span></td>";
                             }
 
                             // أزرار الإجراءات
@@ -895,7 +629,7 @@ if (isset($_GET['delete_id'])) {
                             <span class="info-label">طبيعة التعامل:</span>
                             <span class="info-value" id="view_dealing_nature">-</span>
                         </div>
-                        <div class="info-item" style="grid-column: 1 / -1;">
+                        <div class="info-item suppliers-span-full">
                             <span class="info-label">المعدات:</span>
                             <span class="info-value" id="view_equipment_types">-</span>
                         </div>
@@ -953,7 +687,7 @@ if (isset($_GET['delete_id'])) {
                             <span class="info-label">حالة التسجيل المالي:</span>
                             <span class="info-value" id="view_financial_registration_status">-</span>
                         </div>
-                        <div class="info-item" style="grid-column: 1 / -1;">
+                        <div class="info-item suppliers-span-full">
                             <span class="info-label">العنوان الكامل:</span>
                             <span class="info-value" id="view_full_address">-</span>
                         </div>
@@ -964,7 +698,7 @@ if (isset($_GET['delete_id'])) {
                     </div>
                 </div>
             </div>
-            <div class="modal-footer" style="padding:1.5rem;border-top:2px solid #e0e0e0;display:flex;gap:10px;justify-content:flex-end;">
+            <div class="modal-footer suppliers-modal-footer">
                 <button onclick="closeViewModal()" class="btn-cancel">
                     <i class="fas fa-times"></i> إغلاق
                 </button>
@@ -974,19 +708,19 @@ if (isset($_GET['delete_id'])) {
     
     <!-- ══ Modal استيراد من Excel ════════════════════════════════════════════ -->
     <div id="importExcelModal" class="modal">
-        <div class="modal-content" style="max-width: 650px;">
+        <div class="modal-content suppliers-import-modal-content">
             <div class="modal-header">
                 <h5><i class="fas fa-file-excel"></i> استيراد موردين من Excel</h5>
                 <button class="close-modal" onclick="closeImportModal()">&times;</button>
             </div>
             <form id="importExcelForm" enctype="multipart/form-data">
                 <div class="modal-body">
-                    <div style="background:linear-gradient(135deg,rgba(102,126,234,.06),rgba(118,75,162,.06));padding:18px;border-radius:var(--radius);margin-bottom:18px;border:1.5px solid rgba(102,126,234,.18);">
-                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                            <i class="fas fa-info-circle" style="color:var(--navy);font-size:1.2rem;"></i>
-                            <strong style="color:var(--navy);font-size:.92rem;">تعليمات الاستيراد:</strong>
+                    <div class="suppliers-import-notice">
+                        <div class="suppliers-import-notice-head">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>تعليمات الاستيراد:</strong>
                         </div>
-                        <ul style="margin:0;padding-right:28px;color:var(--sub);font-size:.84rem;line-height:1.8;">
+                        <ul class="suppliers-import-list">
                             <li>قم بتحميل نموذج Excel أو CSV أولاً</li>
                             <li>املأ البيانات في النموذج (كود المورد، الاسم، رقم الهاتف مطلوبة)</li>
                             <li>احفظ الملف ثم قم برفعه هنا</li>
@@ -995,24 +729,23 @@ if (isset($_GET['delete_id'])) {
                         </ul>
                     </div>
                     
-                    <div style="margin-bottom:18px;">
-                        <label style="display:block;font-weight:700;color:var(--txt);margin-bottom:8px;font-size:.88rem;">
+                    <div class="suppliers-import-upload-wrap">
+                        <label class="suppliers-import-upload-label">
                             <i class="fas fa-file-upload"></i> اختر ملف Excel أو CSV
                         </label>
                         <input type="file" name="excel_file" id="excelFileInput" accept=".xlsx,.xls,.csv"
-                            style="width:100%;padding:12px;border:2px dashed var(--border);border-radius:var(--radius);background:var(--bg);cursor:pointer;font-family:'Cairo',sans-serif;" required>
+                            class="suppliers-import-file-input" required>
                     </div>
                     
-                    <div id="importProgress" style="display:none;margin-top:18px;">
-                        <div style="background:linear-gradient(90deg,var(--navy),var(--gold));height:6px;border-radius:50px;overflow:hidden;animation:progressAnim 1.5s ease-in-out infinite;"></div>
-                        <p style="margin:10px 0 0;color:var(--blue);font-weight:700;">جاري الاستيراد...</p>
+                    <div id="importProgress" class="suppliers-hidden suppliers-import-progress">
+                        <div class="suppliers-import-progress-bar"></div>
+                        <p>جاري الاستيراد...</p>
                     </div>
                     
-                    <div id="importResult" style="display:none;margin-top:18px;"></div>
+                    <div id="importResult" class="suppliers-hidden suppliers-import-result"></div>
                 </div>
-                <div class="modal-footer" style="display:flex;gap:10px;justify-content:flex-end;padding:1.5rem;border-top:2px solid #e0e0e0;">
-                    <button type="submit" class="btn-save"
-                        style="background:linear-gradient(135deg,#064e3b,#059669)!important;">
+                <div class="modal-footer suppliers-modal-footer">
+                    <button type="submit" class="btn-save suppliers-import-submit-btn">
                         <i class="fas fa-upload"></i> رفع واستيراد
                     </button>
                     <button type="button" class="btn-cancel" onclick="closeImportModal()">
@@ -1023,13 +756,6 @@ if (isset($_GET['delete_id'])) {
         </div>
     </div>
 </div>
-
-<style>
-@keyframes progressAnim {
-    0%   { transform: translateX(-100%); }
-    100% { transform: translateX(100%);  }
-}
-</style>
 
 <!-- jQuery -->
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
@@ -1073,7 +799,7 @@ if (isset($_GET['delete_id'])) {
     const supplierForm          = document.getElementById('projectForm');
     if (toggleSupplierFormBtn && supplierForm) {
         toggleSupplierFormBtn.addEventListener('click', function () {
-            supplierForm.style.display = supplierForm.style.display === "none" ? "block" : "none";
+            supplierForm.classList.toggle('suppliers-hidden');
             // تنظيف الحقول عند الإضافة
             $("#supplier_id").val("");
             $("#supplier_name").val("");
@@ -1121,7 +847,7 @@ if (isset($_GET['delete_id'])) {
         $("#supplier_status").val($this.data("status"));
 
         // عرض الفورم والتمرير إليه
-        $("#projectForm").show();
+        $("#projectForm").removeClass('suppliers-hidden');
         $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
     });
     
@@ -1177,8 +903,9 @@ if (isset($_GET['delete_id'])) {
     // ════════════════════════════════════════════════
     window.toggleForm = function () {
         var form = $("#projectForm");
-        if (form.is(":visible")) {
+        if (!form.hasClass('suppliers-hidden')) {
             form.slideUp();
+            form.addClass('suppliers-hidden');
         } else {
             // مسح جميع الحقول
             $("#supplier_id").val("");
@@ -1199,6 +926,7 @@ if (isset($_GET['delete_id'])) {
             $("#contact_person_phone").val("");
             $("#financial_registration_status").val("");
             $("#supplier_status").val("");
+            form.removeClass('suppliers-hidden');
             form.slideDown();
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
         }
@@ -1211,7 +939,7 @@ if (isset($_GET['delete_id'])) {
     // فتح المودال
     $('#openImportModal').on('click', function () {
         $('#importExcelModal').fadeIn(300);
-        $('#importResult').hide();
+        $('#importResult').addClass('suppliers-hidden').empty();
         $('#excelFileInput').val('');
     });
     
@@ -1219,8 +947,8 @@ if (isset($_GET['delete_id'])) {
     window.closeImportModal = function () {
         $('#importExcelModal').fadeOut(300);
         $('#importExcelForm')[0].reset();
-        $('#importProgress').hide();
-        $('#importResult').hide();
+        $('#importProgress').addClass('suppliers-hidden');
+        $('#importResult').addClass('suppliers-hidden').empty();
     };
     
     // إغلاق عند الضغط خارج المحتوى
@@ -1242,8 +970,8 @@ if (isset($_GET['delete_id'])) {
         formData.append('excel_file', fileInput.files[0]);
         formData.append('action', 'import_excel');
 
-        $('#importProgress').show();
-        $('#importResult').hide();
+        $('#importProgress').removeClass('suppliers-hidden');
+        $('#importResult').addClass('suppliers-hidden').empty();
 
         $.ajax({
             url:         'import_suppliers_excel.php',
@@ -1253,58 +981,58 @@ if (isset($_GET['delete_id'])) {
             contentType: false,
             dataType:    'json',
             success: function (response) {
-                $('#importProgress').hide();
+                $('#importProgress').addClass('suppliers-hidden');
 
-                let resultHtml = '<div style="padding:16px;border-radius:var(--radius);border:1.5px solid;';
+                let resultHtml = '<div class="suppliers-import-result-card';
 
                 if (response.success) {
-                    resultHtml += 'border-color:#10b981;background:rgba(16,185,129,.06);">';
-                    resultHtml += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">';
-                    resultHtml += '<i class="fas fa-check-circle" style="color:#10b981;font-size:1.4rem;"></i>';
-                    resultHtml += '<strong style="color:#059669;font-size:1rem;">' + response.message + '</strong>';
+                    resultHtml += ' suppliers-import-result-card-success">';
+                    resultHtml += '<div class="suppliers-import-result-head">';
+                    resultHtml += '<i class="fas fa-check-circle suppliers-import-result-icon"></i>';
+                    resultHtml += '<strong class="suppliers-import-result-title">' + response.message + '</strong>';
                     resultHtml += '</div>';
-                    resultHtml += '<div style="color:#047857;font-size:.88rem;line-height:1.6;">';
-                    resultHtml += '<p style="margin:6px 0;"><strong>✅ تمت الإضافة:</strong> ' + response.added + ' مورد</p>';
+                    resultHtml += '<div class="suppliers-import-result-body">';
+                    resultHtml += '<p><strong>✅ تمت الإضافة:</strong> ' + response.added + ' مورد</p>';
                     if (response.skipped > 0) {
-                        resultHtml += '<p style="margin:6px 0;"><strong>⭕ تم التخطي:</strong> ' + response.skipped + ' مورد</p>';
+                        resultHtml += '<p><strong>⭕ تم التخطي:</strong> ' + response.skipped + ' مورد</p>';
                     }
                     if (response.errors && response.errors.length > 0) {
-                        resultHtml += '<details style="margin-top:12px;padding:10px;background:#fff;border-radius:8px;">';
-                        resultHtml += '<summary style="cursor:pointer;font-weight:700;color:#dc2626;">عرض الأخطاء (' + response.errors.length + ')</summary>';
-                        resultHtml += '<ul style="margin:10px 0 0;padding-right:20px;">';
+                        resultHtml += '<details class="suppliers-import-result-details">';
+                        resultHtml += '<summary>عرض الأخطاء (' + response.errors.length + ')</summary>';
+                        resultHtml += '<ul>';
                         response.errors.forEach(function (error) {
-                            resultHtml += '<li style="margin:4px 0;color:#b91c1c;font-size:.82rem;">' + error + '</li>';
+                            resultHtml += '<li>' + error + '</li>';
                         });
                         resultHtml += '</ul></details>';
                     }
                     resultHtml += '</div>';
-                    resultHtml += '<button onclick="location.reload()" style="margin-top:14px;padding:10px 20px;background:#10b981;color:#fff;border:none;border-radius:50px;cursor:pointer;font-weight:700;font-family:Cairo,sans-serif;">تحديث الصفحة</button>';
+                    resultHtml += '<button type="button" onclick="location.reload()" class="suppliers-import-refresh-btn">تحديث الصفحة</button>';
                 } else {
-                    resultHtml += 'border-color:#ef4444;background:rgba(239,68,68,.06);">';
-                    resultHtml += '<div style="display:flex;align-items:center;gap:10px;">';
-                    resultHtml += '<i class="fas fa-exclamation-circle" style="color:#ef4444;font-size:1.4rem;"></i>';
-                    resultHtml += '<div><strong style="color:#dc2626;font-size:1rem;display:block;margin-bottom:6px;">فشل الاستيراد</strong>';
-                    resultHtml += '<p style="color:#b91c1c;font-size:.88rem;margin:0;">' + response.message + '</p></div>';
+                    resultHtml += ' suppliers-import-result-card-error">';
+                    resultHtml += '<div class="suppliers-import-result-head">';
+                    resultHtml += '<i class="fas fa-exclamation-circle suppliers-import-result-icon"></i>';
+                    resultHtml += '<div><strong class="suppliers-import-result-title">فشل الاستيراد</strong>';
+                    resultHtml += '<p class="suppliers-import-result-error-text">' + response.message + '</p></div>';
                     resultHtml += '</div>';
                 }
 
                 resultHtml += '</div>';
-                $('#importResult').html(resultHtml).fadeIn();
+                $('#importResult').html(resultHtml).removeClass('suppliers-hidden').hide().fadeIn();
             },
             error: function (xhr) {
-                $('#importProgress').hide();
+                $('#importProgress').addClass('suppliers-hidden');
                 let errorMsg = 'حدث خطأ غير متوقع';
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMsg = xhr.responseJSON.message;
                 }
                 $('#importResult').html(
-                    '<div style="padding:16px;border-radius:var(--radius);border:1.5px solid #ef4444;background:rgba(239,68,68,.06);">' +
-                    '<div style="display:flex;align-items:center;gap:10px;">' +
-                    '<i class="fas fa-times-circle" style="color:#ef4444;font-size:1.4rem;"></i>' +
-                    '<div><strong style="color:#dc2626;">خطأ في الاتصال</strong>' +
-                    '<p style="color:#b91c1c;margin:6px 0 0;font-size:.88rem;">' + errorMsg + '</p></div>' +
+                    '<div class="suppliers-import-result-card suppliers-import-result-card-error">' +
+                    '<div class="suppliers-import-result-head">' +
+                    '<i class="fas fa-times-circle suppliers-import-result-icon"></i>' +
+                    '<div><strong class="suppliers-import-result-title">خطأ في الاتصال</strong>' +
+                    '<p class="suppliers-import-result-error-text">' + errorMsg + '</p></div>' +
                     '</div></div>'
-                ).fadeIn();
+                ).removeClass('suppliers-hidden').hide().fadeIn();
             }
         });
     });

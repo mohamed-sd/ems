@@ -620,48 +620,52 @@ include("../inheader.php");
 include('../insidebar.php');
 ?>
 
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-<link rel="stylesheet" href="../assets/css/allstyle.css">
-<!-- Font Awesome من CDN لضمان ظهور الأيقونات بشكل صحيح -->
-<link rel="stylesheet" href="/ems/assets/css/all.min.css">
-<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-
-<div class="main">
-    <div class="page-header">
-        <h1 class="page-title">
-            <div class="title-icon"><i class="fas fa-users"></i></div>
-            إدارة العملاء
-        </h1>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="../main/dashboard.php" class="back-btn">
+<div class="main clients-main ems-unified-page-shell">
+    <div class="page-header clients-header-shell">
+        <div class="clients-header-brand">
+            <h1 class="page-title">
+                <div class="title-icon"><i class="fas fa-users"></i></div>
+                إدارة العملاء
+            </h1>
+            <a href="../main/dashboard.php" class="back-btn clients-header-back">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
+        </div>
+
+        <div class="page-header-actions clients-header-actions">
             <?php if ($can_add): ?>
-                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                    <i class="fas fa-plus-circle"></i> إضافة عميل جديد
-                </a>
-                <a href="javascript:void(0)" id="openImportModal" class="add-btn"
-                    style="background:linear-gradient(135deg,#064e3b,#065f46);color:#fff;border-color:transparent;">
-                    <i class="fas fa-file-upload"></i> استيراد من Excel
+                <a href="javascript:void(0)" id="toggleForm" class="add-btn clients-header-add">
+                    <i class="fas fa-plus-circle"></i>
+                    <span class="clients-toggle-form-text">إضافة عميل جديد</span>
                 </a>
             <?php else: ?>
-                <button class="add-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
+                <button class="add-btn clients-btn-disabled" disabled>
                     <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحيات)
                 </button>
             <?php endif; ?>
-            <!-- تصدير البيانات الحالية إلى Excel -->
-            <a href="export_clients_excel.php" class="add-btn"
-                style="background:linear-gradient(135deg,#1a6e3c,#2d9656);color:#fff;border-color:transparent;"
-                title="تصدير جميع العملاء إلى ملف Excel">
-                <i class="fas fa-file-excel"></i> تصدير إلى Excel
+
+            <a href="javascript:void(0)" id="toggleStats" class="clients-header-link clients-header-link-stats"
+                title="إظهار أو إخفاء الإحصائيات">
+                <i class="fas fa-chart-pie"></i>
+                <span class="clients-toggle-stats-text">إخفاء الإحصائيات</span>
             </a>
-            <!-- تحميل نموذج فارغ للاستيراد -->
-            <a href="download_clients_template.php" class="add-btn"
-                style="background:linear-gradient(135deg,var(--orange),#f59e0b);color:#fff;border-color:transparent;"
+
+            <a href="download_clients_template_csv.php" class="clients-header-link clients-header-link-csv"
+                title="تحميل نموذج CSV فارغ للاستيراد">
+                <i class="fas fa-file-csv"></i> تحميل نموذج CSV
+            </a>
+            <a href="download_clients_template.php" class="clients-header-link clients-header-link-excel"
                 title="تحميل نموذج Excel فارغ للاستيراد">
-                <i class="fas fa-download"></i> نموذج الاستيراد
+                <i class="fas fa-file-excel"></i> تحميل نموذج Excel
+            </a>
+            <?php if ($can_add): ?>
+                <a href="javascript:void(0)" id="openImportModal" class="clients-header-link clients-header-link-import">
+                    <i class="fas fa-file-upload"></i> استيراد من Excel
+                </a>
+            <?php endif; ?>
+            <a href="export_clients_excel.php" class="clients-header-link clients-header-link-export"
+                title="تصدير جميع العملاء إلى ملف Excel">
+                <i class="fas fa-download"></i> تصدير Excel
             </a>
         </div>
     </div>
@@ -675,7 +679,7 @@ include('../insidebar.php');
         </div>
     <?php endif; ?>
 
-    <div class="stats-section">
+    <div class="stats-section" id="clientsStatsSection">
         <div class="stats-grid">
             <div class="stats-card stats-primary">
                 <div class="stats-icon"><i class="fas fa-users"></i></div>
@@ -744,19 +748,19 @@ include('../insidebar.php');
     </div>
 
     <!-- فورم إضافة / تعديل عميل -->
-    <form id="clientForm" action="" method="post" style="display:none; margin-bottom:20px;">
-        <div class="card shadow-sm">
+    <form id="clientForm" action="" method="post" class="clients-hidden clients-form-block">
+        <input type="hidden" name="client_id" id="client_id" value="">
+        <input type="hidden" name="csrf_token" value="<?php echo clients_e($clients_csrf_token); ?>">
+        <div class="card shadow-sm pu-form-card">
             <div class="card-header">
-                <h5><i class="fas fa-edit"></i> إضافة / تعديل عميل</h5>
+                <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة عميل جديد</span></h5>
             </div>
             <div class="card-body">
-                <input type="hidden" name="client_id"   id="client_id"   value="">
-                <input type="hidden" name="csrf_token"  value="<?php echo clients_e($clients_csrf_token); ?>">
                 <div class="form-grid">
 
                  <!-- ══ حقل الكود المولد تلقائياً (قراءة فقط - لا يُرسَل لقاعدة البيانات) ══ -->
                     <div id="generated_code_wrapper">
-                        <label><i class="fas fa-magic"></i> كود العميل المولد  <i class="fas fa-info-circle" style="color:#3b82f6;"></i></label>
+                        <label><i class="fas fa-magic"></i> كود العميل المولد  <i class="fas fa-info-circle clients-info-icon"></i></label>
                         <input type="text"
                                id="generated_client_code"
                                class="generated-code-field"
@@ -829,8 +833,13 @@ include('../insidebar.php');
                             <option value="متوقف">متوقف ⏸</option>
                         </select>
                     </div>
-                    <button type="submit">
-                        <i class="fas fa-save"></i> حفظ العميل
+                </div>
+                <div class="pu-form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i> <span id="submitBtnText">حفظ العميل</span>
+                    </button>
+                    <button type="button" id="clientFormCancelBtn" class="btn-cancel">
+                        <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>
             </div>
@@ -842,15 +851,15 @@ include('../insidebar.php');
             <h5><i class="fas fa-list"></i> جميع العملاء</h5>
         </div>
         <div class="card-body">
-            <div class="row" style="margin-bottom: 16px;">
-                <div class="col-md-4 col-sm-6" style="margin-bottom:10px;">
-                    <label for="filterEntityType" style="font-weight:600;">فلتر نوع الكيان</label>
+            <div class="row clients-filter-row">
+                <div class="col-md-4 col-sm-6 clients-filter-col">
+                    <label for="filterEntityType" class="clients-filter-label">فلتر نوع الكيان</label>
                     <select id="filterEntityType" class="form-control">
                         <option value="">الكل</option>
                     </select>
                 </div>
-                <div class="col-md-4 col-sm-6" style="margin-bottom:10px;">
-                    <label for="filterSectorCategory" style="font-weight:600;">فلتر تصنيف القطاع</label>
+                <div class="col-md-4 col-sm-6 clients-filter-col">
+                    <label for="filterSectorCategory" class="clients-filter-label">فلتر تصنيف القطاع</label>
                     <select id="filterSectorCategory" class="form-control">
                         <option value="">الكل</option>
                     </select>
@@ -879,11 +888,11 @@ include('../insidebar.php');
                             }
 
                             echo "<tr>";
-                            echo "<td><strong style='font-family:monospace;letter-spacing:.03em'>" . clients_e($row['client_code']) . "</strong></td>";
+                            echo "<td><strong class='clients-code-cell'>" . clients_e($row['client_code']) . "</strong></td>";
                             echo "<td>" . $client_name_cell . "</td>";
                             echo "<td>" . clients_e($row['entity_type']) . "</td>";
                             echo "<td>" . clients_e($row['sector_category']) . "</td>";
-                            echo "<td><span class='status-active' style='display:inline-flex;align-items:center;gap:5px'><i class='fas fa-briefcase'></i> " . intval($row['projects_count']) . "</span></td>";
+                            echo "<td><span class='status-active clients-inline-pill'><i class='fas fa-briefcase'></i> " . intval($row['projects_count']) . "</span></td>";
                             echo "<td>" . clients_e($row['phone']) . "</td>";
 
                             // عرض الحالة بألوان
@@ -953,7 +962,7 @@ include('../insidebar.php');
 
 <!-- ══ Modal استيراد من Excel ════════════════════════════════════════════════ -->
 <div id="importExcelModal" class="modal">
-    <div class="modal-content" style="max-width: 620px;">
+    <div class="modal-content clients-import-modal-content">
         <div class="modal-header">
             <h5><i class="fas fa-file-upload"></i> استيراد عملاء من Excel / CSV</h5>
             <button class="close-modal" onclick="closeImportModal()">&times;</button>
@@ -961,52 +970,48 @@ include('../insidebar.php');
         <form id="importExcelForm" enctype="multipart/form-data">
             <div class="modal-body">
                 <!-- معلومات الحقول -->
-                <div style="background:#eef6ff;border:1px solid #bfdbfe;padding:14px 16px;border-radius:8px;margin-bottom:16px;font-size:.82rem;">
-                    <div style="font-weight:700;color:#1e3a5f;margin-bottom:8px;font-size:.88rem;">
-                        <i class="fas fa-table" style="color:#2563eb;"></i> &nbsp;ترتيب الأعمدة في الملف:
+                <div class="clients-import-notice">
+                    <div class="clients-import-notice-head">
+                        <i class="fas fa-table"></i> &nbsp;ترتيب الأعمدة في الملف:
                     </div>
-                    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px 16px;color:#374151;">
-                        <div><span style="color:#dc2626;font-weight:700;">A</span> — كود العميل <span style="color:#dc2626;">(مطلوب)</span></div>
-                        <div><span style="color:#dc2626;font-weight:700;">B</span> — اسم العميل <span style="color:#dc2626;">(مطلوب)</span></div>
-                        <div><span style="color:#6b7280;">C</span> — نوع الكيان</div>
-                        <div><span style="color:#6b7280;">D</span> — تصنيف القطاع</div>
-                        <div><span style="color:#6b7280;">E</span> — رقم الهاتف</div>
-                        <div><span style="color:#6b7280;">F</span> — البريد الإلكتروني</div>
-                        <div><span style="color:#6b7280;">G</span> — واتساب</div>
-                        <div><span style="color:#6b7280;">H</span> — الحالة (نشط / متوقف)</div>
+                    <div class="clients-import-cols-grid">
+                        <div><span class="clients-col-required">A</span> — كود العميل <span class="clients-col-required-text">(مطلوب)</span></div>
+                        <div><span class="clients-col-required">B</span> — اسم العميل <span class="clients-col-required-text">(مطلوب)</span></div>
+                        <div><span class="clients-col-optional">C</span> — نوع الكيان</div>
+                        <div><span class="clients-col-optional">D</span> — تصنيف القطاع</div>
+                        <div><span class="clients-col-optional">E</span> — رقم الهاتف</div>
+                        <div><span class="clients-col-optional">F</span> — البريد الإلكتروني</div>
+                        <div><span class="clients-col-optional">G</span> — واتساب</div>
+                        <div><span class="clients-col-optional">H</span> — الحالة (نشط / متوقف)</div>
                     </div>
-                    <div style="margin-top:10px;padding-top:8px;border-top:1px solid #bfdbfe;color:#4b5563;">
-                        <i class="fas fa-lightbulb" style="color:#d97706;"></i>
-                        حمّل <a href="download_clients_template.php" style="color:#2563eb;font-weight:600;" target="_blank">نموذج Excel</a>
-                        أو <a href="download_clients_template_csv.php" style="color:#2563eb;font-weight:600;" target="_blank">نموذج CSV</a>
+                    <div class="clients-import-tip">
+                        <i class="fas fa-lightbulb clients-import-tip-icon"></i>
+                        حمّل <a href="download_clients_template.php" class="clients-import-link" target="_blank">نموذج Excel</a>
+                        أو <a href="download_clients_template_csv.php" class="clients-import-link" target="_blank">نموذج CSV</a>
                         لمعرفة الترتيب الصحيح.
                     </div>
                 </div>
 
                 <div class="form-group-modal">
-                    <label style="font-weight:600;margin-bottom:6px;display:block;">
-                        <i class="fas fa-file-excel" style="color:#16a34a;"></i> اختر ملف Excel أو CSV
+                    <label class="clients-import-upload-label">
+                        <i class="fas fa-file-excel clients-import-upload-label-icon"></i> اختر ملف Excel أو CSV
                     </label>
                     <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" required
-                        style="padding:14px;border:2px dashed rgba(22,163,74,.4);border-radius:8px;
-                               background:rgba(22,163,74,.04);cursor:pointer;width:100%;
-                               box-sizing:border-box;font-size:.9rem;">
-                    <small style="color:#6b7280;margin-top:4px;display:block;">
+                        class="clients-import-file-input">
+                    <small class="clients-import-help-text">
                         الصيغ المدعومة: .xlsx, .xls, .csv &nbsp;|&nbsp; الحد الأقصى: 1000 عميل / 5 ميجابايت
                     </small>
                 </div>
 
-                <div id="importProgress" style="display:none;margin-top:16px;text-align:center;
-                     background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:20px;">
-                    <i class="fas fa-spinner fa-spin" style="font-size:1.8rem;color:#2563eb;"></i>
-                    <p style="margin:10px 0 0;color:#1e40af;font-weight:700;">جاري معالجة الملف والاستيراد...</p>
+                <div id="importProgress" class="clients-hidden clients-import-progress">
+                    <i class="fas fa-spinner fa-spin clients-import-progress-icon"></i>
+                    <p class="clients-import-progress-text">جاري معالجة الملف والاستيراد...</p>
                 </div>
 
-                <div id="importResult" style="display:none;margin-top:16px;"></div>
+                <div id="importResult" class="clients-hidden clients-import-result"></div>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn-modal btn-modal-save"
-                    style="background:linear-gradient(135deg,#064e3b,#059669)!important;">
+                <button type="submit" class="btn-modal btn-modal-save clients-import-submit-btn">
                     <i class="fas fa-upload"></i> رفع واستيراد
                 </button>
                 <button type="button" class="btn-modal btn-modal-cancel" onclick="closeImportModal()">
@@ -1018,73 +1023,73 @@ include('../insidebar.php');
 </div>
 
 <!-- ══ Modal عرض العميل ═══════════════════════════════════════════════════════ -->
-<div id="viewClientModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
+<div id="viewClientModal" class="modal ems-view-modal clients-view-modal">
+    <div class="modal-content ems-view-modal__content clients-view-modal-content">
+        <div class="modal-header ems-view-modal__header clients-view-modal-header">
             <h5><i class="fas fa-eye"></i> عرض بيانات العميل</h5>
-            <button class="close-modal" onclick="closeViewModal()">&times;</button>
+            <button class="close-modal ems-view-modal__close" onclick="closeViewModal()">&times;</button>
         </div>
-        <div class="modal-body">
-            <div class="view-modal-body">
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-barcode"></i> كود العميل</div>
-                    <div class="view-item-value" id="view_client_code">-</div>
+        <div class="modal-body ems-view-modal__body clients-view-modal-body">
+            <div class="view-modal-body ems-view-grid clients-view-grid">
+                <div class="view-item ems-view-item">
+                    <div class="view-item-label ems-view-item-label"><i class="fas fa-barcode"></i> كود العميل</div>
+                    <div class="view-item-value ems-view-item-value" id="view_client_code">-</div>
                 </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-user"></i> اسم العميل</div>
-                    <div class="view-item-value" id="view_client_name">-</div>
+                <div class="view-item ems-view-item">
+                    <div class="view-item-label ems-view-item-label"><i class="fas fa-user"></i> اسم العميل</div>
+                    <div class="view-item-value ems-view-item-value" id="view_client_name">-</div>
                 </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-building"></i> نوع الكيان</div>
-                    <div class="view-item-value" id="view_entity_type">-</div>
+                <div class="view-item ems-view-item">
+                    <div class="view-item-label ems-view-item-label"><i class="fas fa-building"></i> نوع الكيان</div>
+                    <div class="view-item-value ems-view-item-value" id="view_entity_type">-</div>
                 </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-industry"></i> تصنيف القطاع</div>
-                    <div class="view-item-value" id="view_sector_category">-</div>
+                <div class="view-item ems-view-item">
+                    <div class="view-item-label ems-view-item-label"><i class="fas fa-industry"></i> تصنيف القطاع</div>
+                    <div class="view-item-value ems-view-item-value" id="view_sector_category">-</div>
                 </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-project-diagram"></i> عدد المشاريع المرتبطة</div>
-                    <div class="view-item-value" id="view_projects_count">0</div>
+                <div class="view-item ems-view-item">
+                    <div class="view-item-label ems-view-item-label"><i class="fas fa-project-diagram"></i> عدد المشاريع المرتبطة</div>
+                    <div class="view-item-value ems-view-item-value" id="view_projects_count">0</div>
                 </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-phone"></i> الهاتف</div>
-                    <div class="view-item-value" id="view_phone">-</div>
+                <div class="view-item ems-view-item">
+                    <div class="view-item-label ems-view-item-label"><i class="fas fa-phone"></i> الهاتف</div>
+                    <div class="view-item-value ems-view-item-value" id="view_phone">-</div>
                 </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-envelope"></i> البريد الإلكتروني</div>
-                    <div class="view-item-value" id="view_email">-</div>
+                <div class="view-item ems-view-item">
+                    <div class="view-item-label ems-view-item-label"><i class="fas fa-envelope"></i> البريد الإلكتروني</div>
+                    <div class="view-item-value ems-view-item-value" id="view_email">-</div>
                 </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fab fa-whatsapp"></i> واتساب</div>
-                    <div class="view-item-value" id="view_whatsapp">-</div>
+                <div class="view-item ems-view-item">
+                    <div class="view-item-label ems-view-item-label"><i class="fab fa-whatsapp"></i> واتساب</div>
+                    <div class="view-item-value ems-view-item-value" id="view_whatsapp">-</div>
                 </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> الحالة</div>
-                    <div class="view-item-value" id="view_status">-</div>
+                <div class="view-item ems-view-item">
+                    <div class="view-item-label ems-view-item-label"><i class="fas fa-toggle-on"></i> الحالة</div>
+                    <div class="view-item-value ems-view-item-value" id="view_status">-</div>
                 </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-user-plus"></i> أضيف بواسطة</div>
-                    <div class="view-item-value" id="view_created_by">-</div>
+                <div class="view-item ems-view-item">
+                    <div class="view-item-label ems-view-item-label"><i class="fas fa-user-plus"></i> أضيف بواسطة</div>
+                    <div class="view-item-value ems-view-item-value" id="view_created_by">-</div>
                 </div>
             </div>
 
-            <hr style="margin:20px 0;" />
-            <h6 style="font-weight:700;margin-bottom:12px;"><i class="fas fa-folder-open"></i> المشاريع المرتبطة بالعميل</h6>
+            <hr class="clients-modal-separator" />
+            <h6 class="clients-related-projects-title"><i class="fas fa-folder-open"></i> المشاريع المرتبطة بالعميل</h6>
 
-            <div id="clientProjectsSummary" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-                <span class="status-active" style="padding:6px 10px;">المشاريع: <strong id="summary_projects_count">0</strong></span>
-                <span class="status-active" style="padding:6px 10px;">المناجم: <strong id="summary_mines_count">0</strong></span>
-                <span class="status-active" style="padding:6px 10px;">الموردون: <strong id="summary_suppliers_count">0</strong></span>
-                <span class="status-active" style="padding:6px 10px;">الآليات: <strong id="summary_equipments_count">0</strong></span>
-                <span class="status-active" style="padding:6px 10px;">المشغلون: <strong id="summary_operators_count">0</strong></span>
+            <div id="clientProjectsSummary" class="clients-projects-summary">
+                <span class="status-active clients-summary-pill">المشاريع: <strong id="summary_projects_count">0</strong></span>
+                <span class="status-active clients-summary-pill">المناجم: <strong id="summary_mines_count">0</strong></span>
+                <span class="status-active clients-summary-pill">الموردون: <strong id="summary_suppliers_count">0</strong></span>
+                <span class="status-active clients-summary-pill">الآليات: <strong id="summary_equipments_count">0</strong></span>
+                <span class="status-active clients-summary-pill">المشغلون: <strong id="summary_operators_count">0</strong></span>
             </div>
 
-            <div id="clientProjectsLoading" style="display:none;color:#2563eb;font-weight:600;margin-bottom:8px;">
+            <div id="clientProjectsLoading" class="clients-hidden clients-projects-loading">
                 <i class="fas fa-spinner fa-spin"></i> جاري تحميل بيانات المشاريع...
             </div>
 
             <div class="table-responsive">
-                <table class="table table-bordered table-sm" style="margin-bottom:0;">
+                <table class="table table-bordered table-sm clients-projects-table">
                     <thead>
                         <tr>
                             <th>المشروع</th>
@@ -1100,19 +1105,19 @@ include('../insidebar.php');
                     </thead>
                     <tbody id="clientProjectsTableBody">
                         <tr>
-                            <td colspan="9" style="text-align:center;color:#6b7280;">لا توجد بيانات بعد</td>
+                            <td colspan="9" class="clients-table-empty">لا توجد بيانات بعد</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer ems-view-modal__footer clients-view-modal-footer">
             <?php if ($can_edit): ?>
-                <button type="button" class="btn-modal btn-modal-save editClientBtn" id="viewEditBtn">
+                <button type="button" class="btn-modal ems-view-btn ems-view-btn--primary btn-modal-save editClientBtn" id="viewEditBtn">
                     <i class="fas fa-edit"></i> تعديل البيانات
                 </button>
             <?php endif; ?>
-            <button type="button" class="btn-modal btn-modal-cancel" onclick="closeViewModal()">
+            <button type="button" class="btn-modal ems-view-btn ems-view-btn--secondary btn-modal-cancel" onclick="closeViewModal()">
                 <i class="fas fa-times"></i> إغلاق
             </button>
         </div>
@@ -1174,13 +1179,119 @@ include('../insidebar.php');
         });
     });
 
-    // إظهار / إخفاء فورم الإضافة
-    $('#toggleForm').on('click', function () {
-        $('#clientForm').slideToggle(400);
-        // إعادة تعيين الفورم عند الإغلاق
-        if (!$('#clientForm').is(':visible')) {
-            $('#clientForm')[0].reset();
-            $('#client_id').val('');
+    // إظهار / إخفاء فورم الإضافة + إظهار / إخفاء الإحصائيات
+    const formToggleBtn = $('#toggleForm');
+    const clientForm = $('#clientForm');
+    const formTitle = $('#formTitle');
+    const submitBtnText = $('#submitBtnText');
+    const generatedCodeWrapper = $('#generated_code_wrapper');
+    const formCancelBtn = $('#clientFormCancelBtn');
+    const statsToggleBtn = $('#toggleStats');
+    const statsSection = $('#clientsStatsSection');
+
+    function setClientFormAddMode() {
+        formTitle.text('إضافة عميل جديد');
+        submitBtnText.text('حفظ العميل');
+        generatedCodeWrapper.show();
+    }
+
+    function setClientFormEditMode() {
+        formTitle.text('تعديل العميل');
+        submitBtnText.text('تحديث العميل');
+        generatedCodeWrapper.hide();
+    }
+
+    function resetClientForm() {
+        if (!clientForm.length) {
+            return;
+        }
+
+        clientForm[0].reset();
+        $('#client_id').val('');
+        setClientFormAddMode();
+    }
+
+    function updateFormToggleState(isOpen) {
+        if (!formToggleBtn.length) {
+            return;
+        }
+
+        formToggleBtn.toggleClass('is-active', isOpen);
+        formToggleBtn.attr('aria-expanded', isOpen ? 'true' : 'false');
+        formToggleBtn.find('.clients-toggle-form-text').text(isOpen ? 'إخفاء فورم الإضافة' : 'إضافة عميل جديد');
+
+        const icon = formToggleBtn.find('i').first();
+        icon.toggleClass('fa-plus-circle', !isOpen);
+        icon.toggleClass('fa-minus-circle', isOpen);
+    }
+
+    function updateStatsToggleState(isVisible) {
+        if (!statsToggleBtn.length) {
+            return;
+        }
+
+        statsToggleBtn.toggleClass('is-active', isVisible);
+        statsToggleBtn.attr('aria-expanded', isVisible ? 'true' : 'false');
+        statsToggleBtn.find('.clients-toggle-stats-text').text(isVisible ? 'إخفاء الإحصائيات' : 'إظهار الإحصائيات');
+
+        const icon = statsToggleBtn.find('i').first();
+        icon.toggleClass('fa-chart-pie', isVisible);
+        icon.toggleClass('fa-eye', !isVisible);
+    }
+
+    setClientFormAddMode();
+    updateFormToggleState(clientForm.is(':visible'));
+    updateStatsToggleState(statsSection.is(':visible'));
+
+    formToggleBtn.on('click', function (e) {
+        e.preventDefault();
+
+        if (!clientForm.length) {
+            return;
+        }
+
+        if (clientForm.is(':visible')) {
+            clientForm.stop(true, true).slideUp(250, function () {
+                clientForm.addClass('clients-hidden');
+                resetClientForm();
+                updateFormToggleState(false);
+            });
+        } else {
+            resetClientForm();
+            clientForm.removeClass('clients-hidden').hide();
+            clientForm.stop(true, true).slideDown(250, function () {
+                updateFormToggleState(true);
+            });
+        }
+    });
+
+    formCancelBtn.on('click', function () {
+        if (!clientForm.length || !clientForm.is(':visible')) {
+            return;
+        }
+
+        clientForm.stop(true, true).slideUp(250, function () {
+            clientForm.addClass('clients-hidden');
+            resetClientForm();
+            updateFormToggleState(false);
+        });
+    });
+
+    statsToggleBtn.on('click', function (e) {
+        e.preventDefault();
+
+        if (!statsSection.length) {
+            return;
+        }
+
+        if (statsSection.is(':visible')) {
+            statsSection.stop(true, true).slideUp(250, function () {
+                updateStatsToggleState(false);
+            });
+        } else {
+            statsSection.stop(true, true).slideDown(250, function () {
+                updateStatsToggleState(true);
+            });
         }
     });
 
@@ -1208,10 +1319,16 @@ include('../insidebar.php');
         $('#email').val(clientData.email);
         $('#whatsapp').val(clientData.whatsapp);
         $('#status').val(clientData.status);
+        setClientFormEditMode();
 
         // عرض الفورم إذا كان مخفياً
-        if (!$('#clientForm').is(':visible')) {
-            $('#clientForm').slideDown(400);
+        if (!clientForm.is(':visible')) {
+            clientForm.removeClass('clients-hidden').hide();
+            clientForm.stop(true, true).slideDown(250, function () {
+                updateFormToggleState(true);
+            });
+        } else {
+            updateFormToggleState(true);
         }
 
         // التمرير إلى الفورم
@@ -1300,7 +1417,7 @@ include('../insidebar.php');
         tbody.empty();
 
         if (!projects.length) {
-            tbody.append('<tr><td colspan="9" style="text-align:center;color:#6b7280;">لا توجد مشاريع مرتبطة بهذا العميل</td></tr>');
+            tbody.append('<tr><td colspan="9" class="clients-table-empty clients-table-empty-muted">لا توجد مشاريع مرتبطة بهذا العميل</td></tr>');
             setProjectsSummary([]);
             return;
         }
@@ -1312,11 +1429,11 @@ include('../insidebar.php');
                 '<td>' + (project.mines_count || 0) + '</td>' +
                 '<td>' + (project.suppliers_count || 0) + '</td>' +
                 '<td>' + (project.equipments_total || 0) + '</td>' +
-                '<td style="color:#065f46;font-weight:700;">' + (project.equipments_working || 0) + '</td>' +
-                '<td style="color:#b91c1c;font-weight:700;">' + (project.equipments_stopped || 0) + '</td>' +
+                '<td class="clients-num-positive">' + (project.equipments_working || 0) + '</td>' +
+                '<td class="clients-num-negative">' + (project.equipments_stopped || 0) + '</td>' +
                 '<td>' + (project.operators_total || 0) + '</td>' +
-                '<td style="color:#065f46;font-weight:700;">' + (project.operators_working || 0) + '</td>' +
-                '<td style="color:#b91c1c;font-weight:700;">' + (project.operators_stopped || 0) + '</td>' +
+                '<td class="clients-num-positive">' + (project.operators_working || 0) + '</td>' +
+                '<td class="clients-num-negative">' + (project.operators_stopped || 0) + '</td>' +
             '</tr>';
 
             tbody.append(rowHtml);
@@ -1327,7 +1444,7 @@ include('../insidebar.php');
 
     function loadClientProjectsStats(clientId) {
         $('#clientProjectsLoading').show();
-        $('#clientProjectsTableBody').html('<tr><td colspan="9" style="text-align:center;color:#6b7280;">جاري التحميل...</td></tr>');
+        $('#clientProjectsTableBody').html('<tr><td colspan="9" class="clients-table-empty clients-table-empty-muted">جاري التحميل...</td></tr>');
 
         $.ajax({
             url: 'clients.php',
@@ -1340,7 +1457,7 @@ include('../insidebar.php');
             success: function (response) {
                 $('#clientProjectsLoading').hide();
                 if (!response || !response.success) {
-                    $('#clientProjectsTableBody').html('<tr><td colspan="9" style="text-align:center;color:#b91c1c;">تعذر تحميل بيانات المشاريع</td></tr>');
+                    $('#clientProjectsTableBody').html('<tr><td colspan="9" class="clients-table-empty clients-table-empty-error">تعذر تحميل بيانات المشاريع</td></tr>');
                     setProjectsSummary([]);
                     return;
                 }
@@ -1349,7 +1466,7 @@ include('../insidebar.php');
             },
             error: function () {
                 $('#clientProjectsLoading').hide();
-                $('#clientProjectsTableBody').html('<tr><td colspan="9" style="text-align:center;color:#b91c1c;">حدث خطأ أثناء تحميل بيانات المشاريع</td></tr>');
+                $('#clientProjectsTableBody').html('<tr><td colspan="9" class="clients-table-empty clients-table-empty-error">حدث خطأ أثناء تحميل بيانات المشاريع</td></tr>');
                 setProjectsSummary([]);
             }
         });
@@ -1402,8 +1519,13 @@ include('../insidebar.php');
         $('#status').val(clientData.status);
 
         // عرض الفورم إذا كان مخفياً
-        if (!$('#clientForm').is(':visible')) {
-            $('#clientForm').slideDown(400);
+        if (!clientForm.is(':visible')) {
+            clientForm.removeClass('clients-hidden').hide();
+            clientForm.stop(true, true).slideDown(250, function () {
+                updateFormToggleState(true);
+            });
+        } else {
+            updateFormToggleState(true);
         }
 
         // التمرير إلى الفورم
@@ -1469,35 +1591,35 @@ include('../insidebar.php');
                 let resultHtml = '';
 
                 if (response.success) {
-                    resultHtml = '<div style="padding:16px;border-radius:8px;border:1.5px solid #a7f3d0;background:#ecfdf5;color:#065f46;">';
-                    resultHtml += '<h6 style="font-weight:700;margin-bottom:10px;font-size:.95rem;">'
-                               +  '<i class="fas fa-check-circle" style="color:#059669;"></i> &nbsp;تم الاستيراد بنجاح</h6>';
-                    resultHtml += '<p style="margin:4px 0;">✅ العملاء المضافون: <strong>' + response.added + '</strong></p>';
+                    resultHtml = '<div class="clients-import-result-card clients-import-result-success">';
+                    resultHtml += '<h6 class="clients-import-result-title">'
+                               +  '<i class="fas fa-check-circle clients-import-result-icon-success"></i> &nbsp;تم الاستيراد بنجاح</h6>';
+                    resultHtml += '<p class="clients-import-result-line">✅ العملاء المضافون: <strong>' + response.added + '</strong></p>';
 
                     if (response.skipped > 0) {
-                        resultHtml += '<p style="margin:4px 0;color:#92400e;">⚠️ تم تخطي: <strong>' + response.skipped + '</strong> (مكرر أو بيانات ناقصة)</p>';
+                        resultHtml += '<p class="clients-import-result-line clients-import-result-line-warn">⚠️ تم تخطي: <strong>' + response.skipped + '</strong> (مكرر أو بيانات ناقصة)</p>';
                     }
 
                     if (response.errors && response.errors.length > 0) {
-                        resultHtml += '<details style="margin-top:8px;">';
-                        resultHtml += '<summary style="cursor:pointer;font-weight:600;color:#b45309;">تفاصيل الأخطاء (' + response.errors.length + ')</summary>';
-                        resultHtml += '<ul style="margin:6px 0 0;padding-right:20px;font-size:.82rem;max-height:150px;overflow-y:auto;">';
+                        resultHtml += '<details class="clients-import-result-details">';
+                        resultHtml += '<summary class="clients-import-result-summary">تفاصيل الأخطاء (' + response.errors.length + ')</summary>';
+                        resultHtml += '<ul class="clients-import-result-errors">';
                         response.errors.forEach(function (err) {
-                            resultHtml += '<li style="margin:3px 0;">' + $('<span>').text(err).html() + '</li>';
+                            resultHtml += '<li class="clients-import-result-error-item">' + $('<span>').text(err).html() + '</li>';
                         });
                         resultHtml += '</ul></details>';
                     }
 
                     if (response.added > 0) {
-                        resultHtml += '<p style="margin-top:10px;font-size:.82rem;color:#6b7280;">سيتم تحديث الصفحة خلال 3 ثوان...</p>';
+                        resultHtml += '<p class="clients-import-result-hint">سيتم تحديث الصفحة خلال 3 ثوان...</p>';
                         setTimeout(function () { location.reload(); }, 3000);
                     }
 
                     resultHtml += '</div>';
                 } else {
-                    resultHtml = '<div style="padding:16px;border-radius:8px;border:1.5px solid #fecaca;background:#fef2f2;color:#991b1b;">';
-                    resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> &nbsp;فشل الاستيراد</h6>';
-                    resultHtml += '<p style="margin:0;">' + $('<span>').text(response.message).html() + '</p>';
+                    resultHtml = '<div class="clients-import-result-card clients-import-result-error">';
+                    resultHtml += '<h6 class="clients-import-result-title"><i class="fas fa-times-circle"></i> &nbsp;فشل الاستيراد</h6>';
+                    resultHtml += '<p class="clients-import-result-line clients-import-result-line-no-margin">' + $('<span>').text(response.message).html() + '</p>';
                     resultHtml += '</div>';
                 }
 
@@ -1515,10 +1637,10 @@ include('../insidebar.php');
                     errorMsg = xhr.responseText.trim().substring(0, 300);
                 }
 
-                const errorHtml = '<div style="padding:16px;border-radius:8px;background:#fef2f2;color:#991b1b;border:1.5px solid #fecaca;">'
-                    + '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> &nbsp;خطأ في الرفع</h6>'
-                    + '<p style="margin:0 0 8px;">' + $('<span>').text(errorMsg).html() + '</p>'
-                    + '<small style="color:#6b7280;">تأكد من: صيغة الملف (xlsx/csv) · الحجم (أقل من 5MB) · البيانات الصحيحة</small>'
+                const errorHtml = '<div class="clients-import-result-card clients-import-result-error">'
+                    + '<h6 class="clients-import-result-title"><i class="fas fa-times-circle"></i> &nbsp;خطأ في الرفع</h6>'
+                    + '<p class="clients-import-result-line">' + $('<span>').text(errorMsg).html() + '</p>'
+                    + '<small class="clients-import-result-small">تأكد من: صيغة الملف (xlsx/csv) · الحجم (أقل من 5MB) · البيانات الصحيحة</small>'
                     + '</div>';
 
 

@@ -2,7 +2,6 @@
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
-
 $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '../assets/css/all.min.css';
 ?>
 <!DOCTYPE html>
@@ -24,11 +23,14 @@ $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '..
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
     <link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
-    <link rel="stylesheet" href="/ems/assets/css/brand-identity.css">
+    <!-- <link rel="stylesheet" href="/ems/assets/css/brand-identity.css"> -->
     <!-- CSS الموقع -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/> -->
+    <!-- <link rel="stylesheet" href="/ems/assets/css/site-identity.css"> -->
+    <!-- Unified page styles: Dashboard + Chat -->
+    <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
     <script src="../assets/js/performance-boost.js" defer></script>
+    <script src="/ems/assets/js/ui-unification.js" defer></script>
 
 </head>
 <body class="ems-site">

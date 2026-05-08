@@ -473,17 +473,17 @@ if (!$is_super_admin) {
 }
 </style>
 
-<div class="main">
+<div class="main timesheet-entry-page ems-unified-page-shell">
     <div class="page-header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-clock"></i></div>
             إدارة ساعات العمل
         </h1>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div class="page-header-actions">
             <a href="timesheet_type.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
-          <a href="view_timesheet.php?type=<?= urlencode($type) ?>" class="back-btn" style="background: var(--green-soft); color: var(--green); border-color: rgba(22,163,74,.22);">
+          <a href="view_timesheet.php?type=<?= urlencode($type) ?>" class="back-btn ts-view-link">
             <i class="fas fa-table"></i> شاشة العرض الكاملة
           </a>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">

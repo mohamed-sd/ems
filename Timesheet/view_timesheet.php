@@ -497,20 +497,20 @@ include('../insidebar.php');
 }
 </style>
 
-<div class="main">
+<div class="main timesheet-view-page ems-unified-page-shell">
     <div class="page-header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-table"></i></div>
             شاشة عرض ساعات العمل
         </h1>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div class="page-header-actions">
             <a href="javascript:void(0);" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='../main/dashboard.php'; }" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
-            <a href="view_timesheet.php" class="back-btn" style="background: var(--green-soft); color: var(--green); border-color: rgba(22,163,74,.22);">
+            <a href="view_timesheet.php" class="back-btn ts-reset-link">
                 <i class="fas fa-redo"></i> إعادة تعيين
             </a>
-            <a href="<?= htmlspecialchars($export_all_url) ?>" class="back-btn" style="background: #0c4a6e; color: #fff; border-color: #0c4a6e;">
+            <a href="<?= htmlspecialchars($export_all_url) ?>" class="back-btn ts-export-link">
                 <i class="fas fa-file-export"></i> تصدير كل البيانات حسب الفلترة
             </a>
         </div>
@@ -522,7 +522,7 @@ include('../insidebar.php');
         </div>
     <?php } ?>
 
-    <div class="stats-grid" style="margin-bottom: 24px;">
+    <div class="stats-grid ts-stats-grid">
         <div class="stat-card">
             <div class="stat-card-icon"><i class="fas fa-check-circle"></i></div>
             <div class="stat-card-value"><?= number_format((float) $stats['executed_sum'], 2) ?></div>
@@ -628,7 +628,7 @@ include('../insidebar.php');
         </div>
     </div>
 
-    <div class="card" style="margin-top: 16px;">
+    <div class="card ts-mt-card">
         <div class="card-header">
             <h5><i class="fas fa-layer-group"></i> إظهار وإخفاء مجموعات الحقول</h5>
         </div>
@@ -647,7 +647,7 @@ include('../insidebar.php');
         </div>
     </div>
 
-    <div class="card" style="margin-top: 16px;">
+    <div class="card ts-mt-card">
         <div class="card-header">
             <h5><i class="fas fa-columns"></i> اختيار الحقول المعروضة</h5>
         </div>

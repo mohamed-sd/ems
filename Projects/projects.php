@@ -369,53 +369,22 @@ include('../insidebar.php');
 
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/main_admin_style.css">
-
-<style>
-    .link-alert-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        margin-right: 6px;
-        padding: 2px 9px;
-        border-radius: 999px;
-        background: linear-gradient(135deg, #fff7d6, #ffe8bf);
-        color: #7c2d12;
-        border: 1px solid rgba(217, 119, 6, 0.28);
-        font-size: .72rem;
-        font-weight: 800;
-        box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
-        animation: linkAlertPulse 1.6s ease-in-out infinite;
-        vertical-align: middle;
-    }
-
-    .link-alert-chip i {
-        color: #b45309;
-        font-size: .75rem;
-    }
-
-    @keyframes linkAlertPulse {
-        0%, 100% { transform: translateY(0); box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18); }
-        50% { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28); }
-    }
-</style>
-
-<div class="main">
-    <div class="page-header">
-        <div style="display: flex; align-items: center; gap: 12px;">
+<div class="main projects-main ems-unified-page-shell">
+    <div class="page-header projects-header-shell">
+        <div class="projects-header-brand">
             <div class="title-icon"><i class="fas fa-project-diagram"></i></div>
             <h1 class="page-title">إدارة المشاريع</h1>
         </div>
-        <div>
+        <div class="projects-header-actions page-header-actions">
             <a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
             <?php if ($can_add): ?>
-                <a href="javascript:void(0)" id="toggleForm" class="add">
+                <a href="javascript:void(0)" id="toggleForm" class="add-btn projects-header-add">
                     <i class="fas fa-plus-circle"></i> إضافة مشروع
                 </a>
             <?php else: ?>
-                <button class="add" disabled style="opacity: .6; cursor: not-allowed;">
+                <button class="add-btn projects-btn-disabled" disabled>
                     <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحية)
                 </button>
             <?php endif; ?>
@@ -423,18 +392,19 @@ include('../insidebar.php');
     </div>
 
     <?php if (!empty($_GET['msg'])): ?>
-        <div class="success-message">
-            <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($_GET['msg']); ?>
+        <?php $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
+        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
+            <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i> <?php echo htmlspecialchars($_GET['msg']); ?>
         </div>
     <?php endif; ?>
 
 
 
     <!-- فورم إضافة / تعديل مشروع -->
-    <form id="projectForm" action="" method="post" style="display:none;">
-        <div class="card">
+    <form id="projectForm" action="" method="post" class="projects-hidden projects-form-block">
+        <div class="card shadow-sm pu-form-card">
             <div class="card-header">
-                <h5><i class="fas fa-edit"></i> إضافة / تعديل مشروع</h5>
+                <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة مشروع جديد</span></h5>
             </div>
             <div class="card-body">
                 <input type="hidden" name="id" id="project_id" value="">
@@ -502,8 +472,13 @@ include('../insidebar.php');
                             <option value="0">❌ غير نشط</option>
                         </select>
                     </div>
-                    <button type="submit">
-                        <i class="fas fa-save"></i> <span>حفظ المشروع</span>
+                </div>
+                <div class="pu-form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i> <span id="submitBtnText">حفظ المشروع</span>
+                    </button>
+                    <button type="button" id="projectFormCancelBtn" class="btn-cancel">
+                        <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>
             </div>
@@ -512,8 +487,8 @@ include('../insidebar.php');
 
     <!-- جدول المشاريع -->
     <div class="card">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h5 style="margin: 0;"><i class="fas fa-list"></i> قائمة المشاريع</h5>
+        <div class="card-header projects-table-header">
+            <h5><i class="fas fa-list"></i> قائمة المشاريع</h5>
 
                 <?php
 
@@ -527,13 +502,12 @@ include('../insidebar.php');
 
                 ?>
 
-            </h5>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-sm btn-success" id="exportBtn" title="تحميل النموذج">
+            <div class="projects-table-actions">
+                <button class="btn btn-sm btn-success projects-btn projects-btn-export" id="exportBtn" title="تحميل النموذج">
                     <i class="fas fa-download"></i> تحميل النموذج
                 </button>
                 <?php if ($can_add): ?>
-                    <button class="btn btn-sm btn-info" id="importBtn" title="استيراد ملف">
+                    <button class="btn btn-sm btn-info projects-btn projects-btn-import" id="importBtn" title="استيراد ملف">
                         <i class="fas fa-upload"></i> استيراد من Excel
                     </button>
                 <?php endif; ?>
@@ -685,14 +659,14 @@ include('../insidebar.php');
 </div>
 
 <!-- Modal عرض تفاصيل المشروع -->
-<div id="viewProjectModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
+<div id="viewProjectModal" class="modal projects-view-modal">
+    <div class="modal-content projects-view-modal-content">
+        <div class="modal-header projects-view-modal-header">
             <h5><i class="fas fa-eye"></i> عرض تفاصيل المشروع</h5>
             <button class="close-modal" onclick="closeViewModal()">&times;</button>
         </div>
-        <div class="modal-body">
-            <div class="view-modal-body">
+        <div class="modal-body projects-view-modal-body">
+            <div class="view-modal-body projects-view-grid">
                 <div class="view-item">
                     <div class="view-item-label"><i class="fas fa-user-tie"></i>  العميل</div>
                     <div class="view-item-value" id="view_client_name">-</div>
@@ -757,8 +731,8 @@ include('../insidebar.php');
                 </div>
             </div>
         </div>
-        <div class="modal-footer">
-            <a id="viewMinesBtn" class="btn-modal btn-modal-save" style="text-decoration: none;">
+        <div class="modal-footer projects-view-modal-footer">
+            <a id="viewMinesBtn" class="btn-modal btn-modal-save">
                 <i class="fas fa-mountain"></i> مناجم المشروع
             </a>
             <?php if ($can_edit): ?>
@@ -814,25 +788,80 @@ include('../insidebar.php');
         // اظهار/اخفاء الفورم
         const toggleProjectFormBtn = document.getElementById('toggleForm');
         const projectForm = document.getElementById('projectForm');
+        const projectFormCancelBtn = document.getElementById('projectFormCancelBtn');
+        const projectFormTitle = document.getElementById('formTitle');
+        const projectSubmitBtnText = document.getElementById('submitBtnText');
+
+        function setProjectFormAddMode() {
+            if (projectFormTitle) {
+                projectFormTitle.textContent = 'إضافة مشروع جديد';
+            }
+            if (projectSubmitBtnText) {
+                projectSubmitBtnText.textContent = 'حفظ المشروع';
+            }
+        }
+
+        function setProjectFormEditMode() {
+            if (projectFormTitle) {
+                projectFormTitle.textContent = 'تعديل المشروع';
+            }
+            if (projectSubmitBtnText) {
+                projectSubmitBtnText.textContent = 'تحديث المشروع';
+            }
+        }
+
+        function resetProjectForm() {
+            $("#project_id").val("");
+            $("#project_name").val("");
+            $("#client_id").val("");
+            $("#project_location").val("");
+            $("#project_code").val("");
+            $("#project_category").val("");
+            $("#project_sub_sector").val("");
+            $("#project_state").val("");
+            $("#project_region").val("");
+            $("#project_nearest_market").val("");
+            $("#project_latitude").val("");
+            $("#project_longitude").val("");
+            $("#project_status").val("");
+            setProjectFormAddMode();
+        }
+
         if (toggleProjectFormBtn) {
             toggleProjectFormBtn.addEventListener('click', function () {
-                projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
-                // تنظيف الحقول عند الإضافة
-                $("#project_id").val("");
-                $("#project_name").val("");
-                $("#client_id").val("");
-                $("#project_location").val("");
-                $("#project_code").val("");
-                $("#project_category").val("");
-                $("#project_sub_sector").val("");
-                $("#project_state").val("");
-                $("#project_region").val("");
-                $("#project_nearest_market").val("");
-                $("#project_latitude").val("");
-                $("#project_longitude").val("");
-                $("#project_status").val("");
+                if (!projectForm) {
+                    return;
+                }
+
+                const $projectForm = $('#projectForm');
+                if ($projectForm.is(':visible')) {
+                    $projectForm.stop(true, true).slideUp(250, function () {
+                        $projectForm.addClass('projects-hidden');
+                        resetProjectForm();
+                    });
+                } else {
+                    resetProjectForm();
+                    $projectForm.removeClass('projects-hidden').hide();
+                    $projectForm.stop(true, true).slideDown(250);
+                }
             });
         }
+
+        if (projectFormCancelBtn) {
+            projectFormCancelBtn.addEventListener('click', function () {
+                const $projectForm = $('#projectForm');
+                if (!$projectForm.is(':visible')) {
+                    return;
+                }
+
+                $projectForm.stop(true, true).slideUp(250, function () {
+                    $projectForm.addClass('projects-hidden');
+                    resetProjectForm();
+                });
+            });
+        }
+
+        setProjectFormAddMode();
 
         // عرض Modal عند الضغط على زر العرض
         $(document).on("click", ".viewBtn", function () {
@@ -891,7 +920,15 @@ include('../insidebar.php');
             editBtn.data('id', projectData.id);
             editBtn.data('company-project-id', $(this).data('company-project-id'));
             editBtn.data('client-id', $(this).data('client-id'));
-            editBtn.data('name', $(this).data('name'));
+            editBtn.data('project-name', projectData.projectName);
+            editBtn.data('project-code', projectData.projectCode);
+            editBtn.data('category', projectData.category);
+            editBtn.data('sub-sector', projectData.subSector);
+            editBtn.data('state', projectData.state);
+            editBtn.data('region', projectData.region);
+            editBtn.data('nearest-market', projectData.nearestMarket);
+            editBtn.data('latitude', projectData.latitude);
+            editBtn.data('longitude', projectData.longitude);
             editBtn.data('location', projectData.location);
             editBtn.data('status', projectData.status);
 
@@ -920,11 +957,22 @@ include('../insidebar.php');
             $("#project_id").val($(this).data('id'));
             $("#company_project_id").val($(this).data('company-project-id'));
             $("#client_id").val($(this).data('client-id'));
+            $("#project_name").val($(this).data('project-name'));
             $("#project_location").val($(this).data('location'));
+            $("#project_code").val($(this).data('project-code'));
+            $("#project_category").val($(this).data('category'));
+            $("#project_sub_sector").val($(this).data('sub-sector'));
+            $("#project_state").val($(this).data('state'));
+            $("#project_region").val($(this).data('region'));
+            $("#project_nearest_market").val($(this).data('nearest-market'));
+            $("#project_latitude").val($(this).data('latitude'));
+            $("#project_longitude").val($(this).data('longitude'));
             $("#project_status").val($(this).data('status'));
 
+            setProjectFormEditMode();
+
             closeViewModal();
-            $("#projectForm").show();
+            $("#projectForm").removeClass('projects-hidden').hide().stop(true, true).slideDown(250);
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
         });
 
@@ -944,7 +992,9 @@ include('../insidebar.php');
             $("#project_longitude").val($(this).data("longitude"));
             $("#project_status").val($(this).data("status"));
 
-            $("#projectForm").show();
+            setProjectFormEditMode();
+
+            $("#projectForm").removeClass('projects-hidden').hide().stop(true, true).slideDown(250);
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
         });
 
@@ -955,7 +1005,8 @@ include('../insidebar.php');
             const clientId = urlParams.get('client_id');
 
             if (clientId) {
-                $('#projectForm').show();
+                setProjectFormAddMode();
+                $('#projectForm').removeClass('projects-hidden').hide().stop(true, true).slideDown(250);
                 $('#client_id').val(clientId);
             }
         });
