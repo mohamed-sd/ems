@@ -40,67 +40,59 @@ if (!$is_super_admin) {
         )";
     }
 }
+ 
+$page_title = 'الإيكوبيشن | تفاصيل عقد المورد';
+include '../inheader.php';
+include '../insidebar.php';
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | تفاصيل عقد المورد</title>
+<div class="main contracts-main contracts-details-page ems-unified-page-shell">
+    <div class="page-wrapper">
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-    <!-- Bootstrap 5 -->
-    <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
-    <!-- CSS الموقع -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-    <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
-    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
-</head>
-<body class="standalone-brand">
-
-<?php 
-// include('../insidebar.php'); 
-?>
-
-<div class="main">
-
-    <div class="page-header">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <div class="title-icon"><i class="fas fa-file-contract"></i></div>
-            <h1 class="page-title">تفاصيل عقد المورد</h1>
+        <div class="page-hero">
+            <div class="page-hero-inner">
+                <div class="hero-left">
+                    <div class="hero-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <div>
+                        <h1 class="hero-title">تفاصيل عقد المورد</h1>
+                        <p class="hero-subtitle">عرض وإدارة بيانات عقد المورد والمعدات المرتبطة</p>
+                    </div>
+                </div>
+                <a href="javascript:history.back()" class="back-btn">
+                    <i class="fas fa-arrow-right"></i> رجوع
+                </a>
+            </div>
         </div>
-        <a href="javascript:history.back()" class="back-btn">
-            <i class="fas fa-arrow-right"></i> رجوع
-        </a>
-    </div>
 
-    <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-cogs"></i> إجراءات العقد</h5>
-        </div>
-        <div class="card-body">
+        <div class="actions-section">
+            <div class="actions-header">
+                <div class="actions-header-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h5>إجراءات العقد</h5>
+            </div>
             <?php if ($can_edit): ?>
             <div class="action-bar">
-                <button class="add-btn" id="renewalBtn" title="تجديد مدة العقد" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+                <button class="add-btn cd-btn-renewal" id="renewalBtn" title="تجديد مدة العقد">
                     <i class="fas fa-sync-alt"></i> تجديد العقد
                 </button>
-                <button class="add-btn" id="settlementBtn" title="تسوية الساعات المتبقية" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);">
+                <button class="add-btn cd-btn-settlement" id="settlementBtn" title="تسوية الساعات المتبقية">
                     <i class="fas fa-balance-scale"></i> تسوية
                 </button>
-                <button class="add-btn" id="pauseBtn" title="إيقاف مؤقت للعقد" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
+                <button class="add-btn cd-btn-pause" id="pauseBtn" title="إيقاف مؤقت للعقد">
                     <i class="fas fa-pause-circle"></i> إيقاف
                 </button>
-                <button class="add-btn" id="resumeBtn" title="استئناف العقد المتوقف" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%);">
+                <button class="add-btn cd-btn-resume" id="resumeBtn" title="استئناف العقد المتوقف">
                     <i class="fas fa-play-circle"></i> استئناف
                 </button>
-                <button class="add-btn" id="terminateBtn" title="إنهاء العقد" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                <button class="add-btn cd-btn-terminate" id="terminateBtn" title="إنهاء العقد">
                     <i class="fas fa-times-circle"></i> إنهاء
                 </button>
-                <button class="add-btn" id="mergeBtn" title="دمج هذا العقد مع عقد آخر" style="background: linear-gradient(135deg, #e83e8c 0%, #d63384 100%);">
+                <button class="add-btn cd-btn-merge" id="mergeBtn" title="دمج هذا العقد مع عقد آخر">
                     <i class="fas fa-object-group"></i> دمج
                 </button>
-                <button class="add-btn" id="completeBtn" title="تسجيل انتهاء العقد" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+                <button class="add-btn cd-btn-complete" id="completeBtn" title="تسجيل انتهاء العقد">
                     <i class="fas fa-check-circle"></i> انتهاء العقد
                 </button>
             </div>
@@ -110,7 +102,6 @@ if (!$is_super_admin) {
             </div>
             <?php endif; ?>
         </div>
-    </div>
 
 <?php
 
@@ -171,263 +162,290 @@ while ($row = mysqli_fetch_assoc($result)) {
     } else {
         $row['status'] = 1;
     }
+    $remaining_class = $remaining_days > 30 ? 'remaining-positive' : ($remaining_days > 0 ? 'remaining-warning' : 'remaining-danger');
 ?>
-    <!-- بطاقات ملخص العقد -->
-    <div class="info-cards-grid">
-        <!-- بطاقة معلومات المورد -->
-        <div class="info-card" style="border-right-color: #ff6b6b;">
-            <h5><i class="fas fa-industry"></i> معلومات المورد</h5>
-            <div class="info-item">
-                <span class="info-label">اسم المورد</span>
-                <span class="info-value"><?php echo htmlspecialchars($row['supplier_name']); ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-value">
-                    <?php 
-                    echo htmlspecialchars($row['project_name']);
-                    if (!empty($row['mine_name'])) {
-                        echo ' - ' . htmlspecialchars($row['mine_name']);
-                        if (!empty($row['mine_code'])) {
-                            echo ' (' . htmlspecialchars($row['mine_code']) . ')';
-                        }
-                    }
-                    if (!empty($row['project_contract_id'])) {
-                        echo ' - عقد #' . htmlspecialchars($row['project_contract_id']);
-                    }
-                    ?>
-                </span>
-            </div>
-        </div>
+    <!-- ===== SUMMARY CARDS ===== -->
+    <div class="cards-grid">
 
-        <!-- بطاقة الحالة -->
-        <div class="info-card <?php echo ($row['status'] == 1) ? 'success' : 'danger'; ?>">
-            <h5><i class="fas fa-info-circle"></i> حالة العقد</h5>
-            <div class="text-center py-3">
+        <div class="summary-card <?php echo ($row['status'] == 1) ? 'card-success' : 'card-danger'; ?>">
+            <div class="card-head">
+                <div class="card-head-icon <?php echo ($row['status'] == 1) ? 'success' : 'danger'; ?>">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <h5>حالة العقد</h5>
+            </div>
+            <div class="cd-status-centered">
                 <span class="status-badge <?php echo ($row['status'] == 1) ? 'active' : 'inactive'; ?>">
                     <?php echo $status_text; ?>
                 </span>
             </div>
         </div>
 
-        <!-- بطاقة المدة -->
-        <div class="info-card primary">
-            <h5><i class="fas fa-calendar-alt"></i> مدة العقد</h5>
-            <div class="info-item">
-                <span class="info-label">إجمالي المدة</span>
+        <div class="summary-card card-primary">
+            <div class="card-head">
+                <div class="card-head-icon primary">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h5>مدة العقد</h5>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fas fa-ruler-horizontal"></i> إجمالي المدة</span>
                 <span class="info-value"><?php echo $row['contract_duration_days']; ?> يوم</span>
             </div>
-            <div class="info-item">
+            <div class="info-row">
                 <span class="info-label"><i class="fas fa-hourglass-half"></i> المتبقي</span>
-                <span class="info-value" style="color: <?php echo $remaining_days > 30 ? '#28a745' : ($remaining_days > 0 ? '#ffc107' : '#dc3545'); ?>; font-weight: 700;">
-                    <?php echo $remaining_days; ?> يوم
-                </span>
+                <span class="info-value <?php echo $remaining_class; ?>"><?php echo $remaining_days; ?> يوم</span>
             </div>
         </div>
 
-        <!-- بطاقة التواريخ -->
-        <div class="info-card info">
-            <h5><i class="fas fa-calendar-check"></i> التواريخ الأساسية</h5>
-            <div class="info-item">
-                <span class="info-label">التوقيع</span>
+        <div class="summary-card card-info">
+            <div class="card-head">
+                <div class="card-head-icon info">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h5>التواريخ الأساسية</h5>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fas fa-pen-nib"></i> التوقيع</span>
                 <span class="info-value"><?php echo $row['contract_signing_date']; ?></span>
             </div>
-            <div class="info-item">
-                <span class="info-label">البدء الفعلي</span>
+            <div class="info-row">
+                <span class="info-label"><i class="fas fa-play"></i> البدء الفعلي</span>
                 <span class="info-value"><?php echo $row['actual_start']; ?></span>
             </div>
-            <div class="info-item">
-                <span class="info-label">الانتهاء المتوقع</span>
+            <div class="info-row">
+                <span class="info-label"><i class="fas fa-flag-checkered"></i> الانتهاء</span>
                 <span class="info-value"><?php echo $row['actual_end']; ?></span>
             </div>
         </div>
 
-        <!-- بطاقة الساعات -->
-        <div class="info-card warning">
-            <h5><i class="fas fa-clock"></i> الساعات التعاقدية</h5>
-            <div class="info-item">
-                <span class="info-label">الهدف الشهري</span>
+        <div class="summary-card card-warning">
+            <div class="card-head">
+                <div class="card-head-icon warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h5>الساعات التعاقدية</h5>
+            </div>
+            <div class="info-row">
+                <span class="info-label"><i class="fas fa-bullseye"></i> الهدف الشهري</span>
                 <span class="info-value"><?php echo $row['hours_monthly_target'] * 30; ?> ساعة</span>
             </div>
-            <div class="info-item">
-                <span class="info-label">الساعات المتوقعة</span>
+            <div class="info-row">
+                <span class="info-label"><i class="fas fa-chart-line"></i> المتوقعة</span>
                 <span class="info-value"><?php echo $row['forecasted_contracted_hours']; ?> ساعة</span>
             </div>
-            <div class="info-item">
-                <span class="info-label">ساعات العمل اليومية</span>
+            <div class="info-row">
+                <span class="info-label"><i class="fas fa-sun"></i> اليومية</span>
                 <span class="info-value"><?php echo $row['daily_work_hours']; ?> ساعة</span>
             </div>
         </div>
 
-        <!-- بطاقة البيانات الإضافية للعقد -->
-        <div class="info-card" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <h5 style="color: white;"><i class="fas fa-file-contract"></i> بيانات العقد الإضافية</h5>
-            <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">عدد الورديات</span>
-                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">ساعات الوردية</span>
-                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['shift_contract']) ? $row['shift_contract'] : 0; ?> ساعة</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">الوحدات يومياً</span>
-                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">وحدات الشهر</span>
-                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">إجمالي الوحدات</span>
-                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['total_contract_units']) ? $row['total_contract_units'] : 0; ?></span>
-            </div>
-        </div>
-    <!-- بطاقات تفاصيل العقد -->
-        <!-- معلومات المشروع -->
-        <div class="info-card primary">
-            <h5>
-                <i class="fas fa-project-diagram"></i> معلومات المشروع
-                <?php if ($can_edit): ?>
-                <button class="btn btn-sm btn-outline-primary ms-auto" id="editProjectInfoBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                    <i class="fas fa-edit"></i> تعديل
-                </button>
-                <?php endif; ?>
-            </h5>
-            <div class="info-item">
-                <span class="info-label">المشروع</span>
-                <span class="info-value" id="projectDisplay"><?php echo htmlspecialchars($row['project_name']); ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">فترة السماح</span>
-                <span class="info-value" id="graceDisplay"><?php echo $row['grace_period_days']; ?> يوم</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">عدد المشغلين</span>
-                <span class="info-value" id="operatorsDisplay"><?php echo $row['daily_operators']; ?></span>
-            </div>
-        </div>
-
-
-        <!-- الخدمات -->
-        <div class="info-card success">
-            <h5>
-                <i class="fas fa-concierge-bell"></i> الخدمات المقدمة
-                <?php if ($can_edit): ?>
-                <button class="btn btn-sm btn-outline-success ms-auto" id="editServicesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                    <i class="fas fa-edit"></i> تعديل
-                </button>
-                <?php endif; ?>
-            </h5>
-            <div class="info-item">
-                <span class="info-label"><i class="fas fa-bus"></i> النقل</span>
-                <span class="info-value" id="transportationDisplay"><?php echo $row['transportation']; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label"><i class="fas fa-hotel"></i> السكن</span>
-                <span class="info-value" id="accommodationDisplay"><?php echo $row['accommodation']; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label"><i class="fas fa-map-marker-alt"></i> مكان السكن</span>
-                <span class="info-value" id="placeLivingDisplay"><?php echo $row['place_for_living']; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label"><i class="fas fa-wrench"></i> الورشة</span>
-                <span class="info-value" id="workshopDisplay"><?php echo $row['workshop']; ?></span>
-            </div>
-        </div>
-
-        <!-- أطراف العقد -->
-        <div class="info-card info">
-            <h5>
-                <i class="fas fa-users"></i> أطراف العقد
-                <?php if ($can_edit): ?>
-                <button class="btn btn-sm btn-outline-info ms-auto" id="editPartiesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                    <i class="fas fa-edit"></i> تعديل
-                </button>
-                <?php endif; ?>
-            </h5>
-            <div class="info-item">
-                <span class="info-label">الطرف الأول</span>
-                <span class="info-value" id="firstPartyDisplay"><?php echo $row['first_party']; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">الطرف الثاني</span>
-                <span class="info-value" id="secondPartyDisplay"><?php echo $row['second_party']; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">الشاهد الأول</span>
-                <span class="info-value" id="witnessOneDisplay"><?php echo $row['witness_one']; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">الشاهد الثاني</span>
-                <span class="info-value" id="witnessTwoDisplay"><?php echo $row['witness_two']; ?></span>
-            </div>
-        </div>
-
-        <!-- البيانات المالية -->
-        <div class="info-card warning">
-            <h5>
-                <i class="fas fa-money-bill-wave"></i> البيانات المالية
-                <?php if ($can_edit): ?>
-                <button class="btn btn-sm btn-outline-warning ms-auto" id="editPaymentBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
-                    <i class="fas fa-edit"></i> تعديل
-                </button>
-                <?php endif; ?>
-            </h5>
-            <div class="info-item">
-                <span class="info-label"><i class="fas fa-dollar-sign"></i> العملة</span>
-                <span class="info-value" id="currencyDisplay"><?php echo !empty($row['price_currency_contract']) ? $row['price_currency_contract'] : '-'; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label"><i class="fas fa-money-check-alt"></i> المبلغ المدفوع</span>
-                <span class="info-value" id="paidAmountDisplay"><?php echo !empty($row['paid_contract']) ? $row['paid_contract'] : '-'; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label"><i class="fas fa-clock"></i> وقت الدفع</span>
-                <span class="info-value" id="paymentTimeDisplay"><?php echo !empty($row['payment_time']) ? $row['payment_time'] : '-'; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label"><i class="fas fa-shield-alt"></i> الضمانات</span>
-                <span class="info-value" id="guaranteesDisplay"><?php echo !empty($row['guarantees']) ? $row['guarantees'] : '-'; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label"><i class="fas fa-calendar-check"></i> تاريخ الدفع</span>
-                <span class="info-value" id="paymentDateDisplay"><?php echo !empty($row['payment_date']) ? $row['payment_date'] : '-'; ?></span>
-            </div>
-        </div>
-
-        <!-- معلومات النظام -->
-        <div class="info-card" style="border-right-color: #6c757d;">
-            <h5><i class="fas fa-database"></i> معلومات النظام</h5>
-            <div class="info-item">
-                <span class="info-label">تاريخ الإنشاء</span>
-                <span class="info-value"><?php echo $row['created_at']; ?></span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">آخر تحديث</span>
-                <span class="info-value"><?php echo $row['updated_at']; ?></span>
-            </div>
-        </div>
     </div>
 
-    <?php if ((isset($row['pause_reason']) && !empty($row['pause_reason'])) || (isset($row['termination_reason']) && !empty($row['termination_reason']))): ?>
-    <!-- بطاقة التحذيرات والملاحظات -->
-    <div class="info-card danger" style="margin-bottom: 2rem;">
-        <h5><i class="fas fa-exclamation-triangle"></i> تحذيرات وملاحظات هامة</h5>
-        <?php if (isset($row['pause_reason']) && !empty($row['pause_reason'])): ?>
-        <div class="info-item">
-            <span class="info-label">سبب الإيقاف</span>
-            <span class="info-value"><?php echo $row['pause_reason']; ?></span>
+    <div class="section-wrapper">
+        <div class="section-header">
+            <div class="section-header-icon">
+                <i class="fas fa-layer-group"></i>
+            </div>
+            <h4>بيانات عقد المورد التفصيلية</h4>
+        </div>
+
+        <div class="detail-grid">
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-header-left">
+                        <div class="detail-card-icon primary"><i class="fas fa-industry"></i></div>
+                        <span class="detail-card-title">معلومات المورد والمشروع</span>
+                    </div>
+                    <?php if ($can_edit): ?>
+                    <button class="edit-btn-small" id="editProjectInfoBtn">
+                        <i class="fas fa-pen"></i> تعديل
+                    </button>
+                    <?php endif; ?>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-industry"></i> المورد</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($row['supplier_name']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-project-diagram"></i> المشروع</span>
+                        <span class="detail-value" id="projectDisplay"><?php echo htmlspecialchars($row['project_name']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-mountain"></i> المنجم</span>
+                        <span class="detail-value">
+                            <?php
+                            if (!empty($row['mine_name'])) {
+                                echo htmlspecialchars($row['mine_name']);
+                                if (!empty($row['mine_code'])) {
+                                    echo ' (' . htmlspecialchars($row['mine_code']) . ')';
+                                }
+                            } else {
+                                echo '-';
+                            }
+                            ?>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-file-contract"></i> عقد المشروع المرتبط</span>
+                        <span class="detail-value"><?php echo !empty($row['project_contract_id']) ? ('#' . htmlspecialchars($row['project_contract_id'])) : '-'; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-calendar-day"></i> فترة السماح</span>
+                        <span class="detail-value" id="graceDisplay"><?php echo $row['grace_period_days']; ?> يوم</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-users-cog"></i> عدد المشغلين</span>
+                        <span class="detail-value" id="operatorsDisplay"><?php echo $row['daily_operators']; ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-header-left">
+                        <div class="detail-card-icon success"><i class="fas fa-concierge-bell"></i></div>
+                        <span class="detail-card-title">الخدمات المقدمة</span>
+                    </div>
+                    <?php if ($can_edit): ?>
+                    <button class="edit-btn-small" id="editServicesBtn">
+                        <i class="fas fa-pen"></i> تعديل
+                    </button>
+                    <?php endif; ?>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-bus"></i> النقل</span>
+                        <span class="detail-value" id="transportationDisplay"><?php echo $row['transportation']; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-hotel"></i> السكن</span>
+                        <span class="detail-value" id="accommodationDisplay"><?php echo $row['accommodation']; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-map-marker-alt"></i> مكان السكن</span>
+                        <span class="detail-value" id="placeLivingDisplay"><?php echo $row['place_for_living']; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-wrench"></i> الورشة</span>
+                        <span class="detail-value" id="workshopDisplay"><?php echo $row['workshop']; ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-header-left">
+                        <div class="detail-card-icon info"><i class="fas fa-users"></i></div>
+                        <span class="detail-card-title">أطراف العقد</span>
+                    </div>
+                    <?php if ($can_edit): ?>
+                    <button class="edit-btn-small" id="editPartiesBtn">
+                        <i class="fas fa-pen"></i> تعديل
+                    </button>
+                    <?php endif; ?>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-user-tie"></i> الطرف الأول</span>
+                        <span class="detail-value" id="firstPartyDisplay"><?php echo $row['first_party']; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-user-check"></i> الطرف الثاني</span>
+                        <span class="detail-value" id="secondPartyDisplay"><?php echo $row['second_party']; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-eye"></i> الشاهد الأول</span>
+                        <span class="detail-value" id="witnessOneDisplay"><?php echo $row['witness_one']; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-eye"></i> الشاهد الثاني</span>
+                        <span class="detail-value" id="witnessTwoDisplay"><?php echo $row['witness_two']; ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-header-left">
+                        <div class="detail-card-icon warning"><i class="fas fa-money-bill-wave"></i></div>
+                        <span class="detail-card-title">البيانات المالية</span>
+                    </div>
+                    <?php if ($can_edit): ?>
+                    <button class="edit-btn-small" id="editPaymentBtn">
+                        <i class="fas fa-pen"></i> تعديل
+                    </button>
+                    <?php endif; ?>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-dollar-sign"></i> العملة</span>
+                        <span class="detail-value" id="currencyDisplay"><?php echo !empty($row['price_currency_contract']) ? $row['price_currency_contract'] : '-'; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-money-check-alt"></i> المبلغ المدفوع</span>
+                        <span class="detail-value" id="paidAmountDisplay"><?php echo !empty($row['paid_contract']) ? $row['paid_contract'] : '-'; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-clock"></i> وقت الدفع</span>
+                        <span class="detail-value" id="paymentTimeDisplay"><?php echo !empty($row['payment_time']) ? $row['payment_time'] : '-'; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-shield-alt"></i> الضمانات</span>
+                        <span class="detail-value" id="guaranteesDisplay"><?php echo !empty($row['guarantees']) ? $row['guarantees'] : '-'; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-calendar-check"></i> تاريخ الدفع</span>
+                        <span class="detail-value" id="paymentDateDisplay"><?php echo !empty($row['payment_date']) ? $row['payment_date'] : '-'; ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <div class="detail-card-header-left">
+                        <div class="detail-card-icon system"><i class="fas fa-database"></i></div>
+                        <span class="detail-card-title">معلومات النظام</span>
+                    </div>
+                </div>
+                <div class="detail-card-body">
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-plus-circle"></i> تاريخ الإنشاء</span>
+                        <span class="detail-value"><?php echo $row['created_at']; ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-edit"></i> آخر تحديث</span>
+                        <span class="detail-value"><?php echo $row['updated_at']; ?></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <?php if ((isset($row['pause_reason']) && !empty($row['pause_reason'])) || (isset($row['termination_reason']) && !empty($row['termination_reason']))): ?>
+        <div class="alert-section">
+            <div class="alert-section-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                تحذيرات وملاحظات هامة
+            </div>
+            <?php if (isset($row['pause_reason']) && !empty($row['pause_reason'])): ?>
+            <div class="detail-row cd-detail-row-tight">
+                <span class="detail-label cd-text-danger"><i class="fas fa-pause-circle"></i> سبب الإيقاف</span>
+                <span class="detail-value"><?php echo $row['pause_reason']; ?></span>
+            </div>
+            <?php endif; ?>
+            <?php if (isset($row['termination_reason']) && !empty($row['termination_reason'])): ?>
+            <div class="detail-row cd-detail-row-tight">
+                <span class="detail-label cd-text-danger"><i class="fas fa-times-circle"></i> سبب الإنهاء</span>
+                <span class="detail-value"><?php echo $row['termination_reason']; ?></span>
+            </div>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
-        <?php if (isset($row['termination_reason']) && !empty($row['termination_reason'])): ?>
-        <div class="info-item">
-            <span class="info-label">سبب الإنهاء</span>
-            <span class="info-value"><?php echo $row['termination_reason']; ?></span>
-        </div>
-        <?php endif; ?>
+
     </div>
-    <?php endif; ?>
 <?php 
 $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
 $supplier_id = $row['supplier_id'];
@@ -458,17 +476,21 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 ?>
 
 <!-- جدول معدات العقد (بما فيها معدات العقد المدموج) -->
-<div style="background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-top: 2rem;">
-    <h4 style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: #667eea; font-weight: 700;">
-        <i class="fas fa-boxes"></i>
-        معدات العقد
-        <?php 
-        if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
-            echo "<span style='font-size: 0.9rem; color: #6c757d;'>(العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")</span>";
-        }
-        ?>
-    </h4>
-    <div style="overflow-x: auto;">
+<div class="table-section">
+    <div class="section-header">
+        <div class="section-header-icon">
+            <i class="fas fa-boxes"></i>
+        </div>
+        <h4>
+            معدات العقد
+            <?php 
+            if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
+                echo "<span class='badge-pill'>(العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")</span>";
+            }
+            ?>
+        </h4>
+    </div>
+    <div class="table-responsive-wrapper">
         <table class="modern-table">
             <thead>
                 <tr>
@@ -578,12 +600,14 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
     <br/><br/><br/>
 
     <!-- جدول الملاحظات -->
-    <div style="background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-top: 2rem; margin-bottom: 3rem;">
-        <h4 style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: #667eea; font-weight: 700;">
-            <i class="fas fa-history"></i>
-            سجل الملاحظات والتغييرات
-        </h4>
-        <div style="overflow-x: auto;">
+    <div class="table-section">
+        <div class="section-header">
+            <div class="section-header-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <h4>سجل الملاحظات والتغييرات</h4>
+        </div>
+        <div class="table-responsive-wrapper">
             <table class="modern-table">
                 <thead>
                     <tr>
@@ -683,7 +707,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="renewalModal" tabindex="-1" aria-labelledby="renewalModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+            <div class="modal-header cd-modal-head-renewal">
                 <h5 class="modal-title" id="renewalModalLabel">
                     <i class="fas fa-sync-alt"></i>
                     تجديد العقد
@@ -720,7 +744,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> الغاء
                 </button>
-                <button type="button" class="btn" id="confirmRenewal" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; border: none;">
+                <button type="button" class="btn cd-btn-renewal-confirm" id="confirmRenewal">
                     <i class="fas fa-check"></i> تجديد
                 </button>
             </div>
@@ -732,7 +756,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="settlementModal" tabindex="-1" aria-labelledby="settlementModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);">
+            <div class="modal-header cd-modal-head-settlement">
                 <h5 class="modal-title" id="settlementModalLabel">
                     <i class="fas fa-balance-scale"></i>
                     تسوية العقد
@@ -774,7 +798,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn" id="confirmSettlement" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none;">
+                <button type="button" class="btn cd-btn-settlement-confirm" id="confirmSettlement">
                     <i class="fas fa-check"></i> تسوية
                 </button>
             </div>
@@ -786,7 +810,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="pauseModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
+            <div class="modal-header cd-modal-head-pause">
                 <h5 class="modal-title" id="pauseModalLabel">
                     <i class="fas fa-pause-circle"></i>
                     إيقاف العقد
@@ -817,7 +841,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn" id="confirmPause" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white; border: none;">
+                <button type="button" class="btn cd-btn-pause-confirm" id="confirmPause">
                     <i class="fas fa-pause-circle"></i> إيقاف
                 </button>
             </div>
@@ -829,7 +853,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="resumeModal" tabindex="-1" aria-labelledby="resumeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+            <div class="modal-header cd-modal-head-resume">
                 <h5 class="modal-title" id="resumeModalLabel">
                     <i class="fas fa-play-circle"></i>
                     استئناف العقد
@@ -922,7 +946,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn" id="confirmResume" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none;">
+                <button type="button" class="btn cd-btn-resume-confirm" id="confirmResume">
                     <i class="fas fa-play-circle"></i> استئناف
                 </button>
             </div>
@@ -934,7 +958,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="terminateModal" tabindex="-1" aria-labelledby="terminateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+            <div class="modal-header cd-modal-head-terminate">
                 <h5 class="modal-title" id="terminateModalLabel">
                     <i class="fas fa-times-circle"></i>
                     إنهاء العقد
@@ -981,7 +1005,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="mergeModal" tabindex="-1" aria-labelledby="mergeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+            <div class="modal-header cd-modal-head-merge">
                 <h5 class="modal-title" id="mergeModalLabel">
                     <i class="fas fa-object-group"></i>
                     دمج العقود
@@ -1067,7 +1091,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn" id="confirmMerge" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); color: white; border: none;">
+                <button type="button" class="btn cd-btn-merge" id="confirmMerge">
                     <i class="fas fa-object-group"></i> دمج العقد
                 </button>
             </div>
@@ -1079,7 +1103,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+            <div class="modal-header cd-modal-head-merge">
                 <h5 class="modal-title" id="completeModalLabel">
                     <i class="fas fa-check-circle"></i>
                     انتهاء العقد
@@ -1103,7 +1127,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); color: white;" id="confirmComplete">
+                <button type="button" class="btn cd-btn-complete" id="confirmComplete">
                     <i class="fas fa-check-circle"></i> تسجيل الانتهاء
                 </button>
             </div>
@@ -1115,7 +1139,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="editProjectInfoModal" tabindex="-1" aria-labelledby="editProjectInfoLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="modal-header cd-modal-head-primary">
                 <h5 class="modal-title" id="editProjectInfoLabel">
                     <i class="fas fa-edit"></i> تعديل معلومات المشروع
                 </h5>
@@ -1897,8 +1921,8 @@ $('#confirmMerge').click(function() {
 });
 </script>
 
-</body>
-</html>
+    </div><!-- /.page-wrapper -->
+</div><!-- /.main -->
 
 
 

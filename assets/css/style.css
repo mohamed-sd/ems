@@ -121,7 +121,7 @@ body {
 }
 
 .sidebar .logo {
-  color: var(--gold, #e8b800);
+  color: var(--equipation-gold, #f7931a);
   font-size: 22px;
   font-weight: 900;
   text-align: center;
@@ -148,11 +148,11 @@ body {
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  color: var(--gold, #e8b800);
+  color: var(--equipation-gold, #f7931a);
 }
 
 .sidebar .toggle-btn:hover {
-  background: rgba(232, 184, 0, 0.12);
+  background: rgba(247, 147, 26, 0.12);
   transform: scale(1.03);
 }
 
@@ -178,7 +178,7 @@ body {
   flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(232, 184, 0, 0.45) transparent;
+  scrollbar-color: rgba(247, 147, 26, 0.45) transparent;
 }
 
 .sidebar ul::-webkit-scrollbar {
@@ -190,12 +190,12 @@ body {
 }
 
 .sidebar ul::-webkit-scrollbar-thumb {
-  background: rgba(232, 184, 0, 0.45);
+  background: rgba(247, 147, 26, 0.45);
   border-radius: 3px;
 }
 
 .sidebar ul::-webkit-scrollbar-thumb:hover {
-  background: rgba(232, 184, 0, 0.7);
+  background: rgba(247, 147, 26, 0.7);
 }
 
 .sidebar ul li {
@@ -219,7 +219,7 @@ body {
   transform: translateY(-50%);
   width: 4px;
   height: 0;
-  background: var(--gold, #e8b800);
+  background: var(--equipation-gold, #f7931a);
   border-radius: 2px;
   transition: height 0.3s ease;
 }
@@ -232,7 +232,7 @@ body {
 
 .sidebar ul li.active,
 .sidebar ul li.active:hover {
-  background: linear-gradient(90deg, rgba(232, 184, 0, 0.18), rgba(255, 255, 255, 0.08));
+  background: linear-gradient(90deg, rgba(247, 147, 26, 0.18), rgba(255, 255, 255, 0.08));
   color: #ffffff;
   padding-right: 16px;
 }
@@ -253,7 +253,7 @@ body {
   font-size: 18px;
   width: 26px;
   text-align: center;
-  color: var(--gold, #e8b800);
+  color: var(--equipation-gold, #f7931a);
   transition: all 0.3s ease;
   margin-left: 10px;
 }

@@ -14,10 +14,16 @@ $companyName = '';
 
 if (!function_exists('dashboard_has_column')) {
   function dashboard_has_column($conn,$t,$c){
+    static $hasColumnCache = [];
     $t=preg_replace('/[^a-zA-Z0-9_]/','', $t);
     $c=preg_replace('/[^a-zA-Z0-9_]/','', $c);
+    $cacheKey = $t . ':' . $c;
+    if (array_key_exists($cacheKey, $hasColumnCache)) {
+      return $hasColumnCache[$cacheKey];
+    }
     $r=@mysqli_query($conn,"SHOW COLUMNS FROM $t LIKE '".mysqli_real_escape_string($conn,$c)."'");
-    return $r && mysqli_num_rows($r)>0;
+    $hasColumnCache[$cacheKey] = ($r && mysqli_num_rows($r)>0);
+    return $hasColumnCache[$cacheKey];
   }
 }
 if (!function_exists('dashboard_scalar')) {

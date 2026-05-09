@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -42,898 +42,14 @@ if (!$is_super_admin) {
         )";
     }
 }
+
+$page_title = 'الإيكوبيشن | تفاصيل العقد';
+include '../inheader.php';
+include '../insidebar.php';
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<div class="main contracts-main contracts-details-page ems-unified-page-shell">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | تفاصيل العقد</title>
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-    <!-- Bootstrap 5 -->
-    <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
-
-    <style>
-        :root {
-            --primary: #0f2444;
-            --primary-light: #1a3a6e;
-            --accent: #e8b84b;
-            --accent-light: #f5d080;
-            --surface: #f8f9fc;
-            --surface-2: #ffffff;
-            --text-primary: #0f1a2e;
-            --text-secondary: #5a6a82;
-            --text-muted: #9aa5b4;
-            --border: #e2e8f4;
-            --success: #059669;
-            --success-bg: #ecfdf5;
-            --warning: #d97706;
-            --warning-bg: #fffbeb;
-            --danger: #dc2626;
-            --danger-bg: #fef2f2;
-            --info: #0369a1;
-            --info-bg: #eff6ff;
-            --purple: #7c3aed;
-            --purple-bg: #f5f3ff;
-            --shadow-sm: 0 1px 3px rgba(15,36,68,0.08), 0 1px 2px rgba(15,36,68,0.04);
-            --shadow-md: 0 4px 16px rgba(15,36,68,0.10), 0 2px 6px rgba(15,36,68,0.06);
-            --shadow-lg: 0 10px 40px rgba(15,36,68,0.14), 0 4px 12px rgba(15,36,68,0.08);
-            --radius-sm: 10px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background: var(--surface);
-            color: var(--text-primary);
-            direction: rtl;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
-        /* ========== LAYOUT ========== */
-        .page-wrapper {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px 20px;
-        }
-
-        /* ========== PAGE HEADER ========== */
-        .page-hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, #2a5298 100%);
-            border-radius: var(--radius-lg);
-            padding: 32px 40px;
-            margin-bottom: 28px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .page-hero::before {
-            content: '';
-            position: absolute;
-            top: -60px; left: -60px;
-            width: 220px; height: 220px;
-            background: rgba(232,184,75,0.12);
-            border-radius: 50%;
-        }
-
-        .page-hero::after {
-            content: '';
-            position: absolute;
-            bottom: -80px; left: 120px;
-            width: 300px; height: 300px;
-            background: rgba(255,255,255,0.04);
-            border-radius: 50%;
-        }
-
-        .page-hero-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            position: relative;
-            z-index: 1;
-            flex-wrap: wrap;
-        }
-
-        .hero-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .hero-icon {
-            width: 64px; height: 64px;
-            background: rgba(232,184,75,0.2);
-            border: 2px solid rgba(232,184,75,0.4);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            color: var(--accent);
-            flex-shrink: 0;
-        }
-
-        .hero-title {
-            color: #fff;
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.3px;
-            line-height: 1.2;
-        }
-
-        .hero-subtitle {
-            color: rgba(255,255,255,0.65);
-            font-size: 14px;
-            margin-top: 4px;
-            font-weight: 400;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #fff;
-            padding: 10px 22px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s;
-            font-family: 'Tajawal', sans-serif;
-        }
-
-        .back-btn:hover {
-            background: rgba(255,255,255,0.22);
-            color: #fff;
-            transform: translateX(3px);
-        }
-
-        /* ========== ACTIONS BAR ========== */
-        .actions-section {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            padding: 24px 28px;
-            margin-bottom: 28px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border);
-        }
-
-        .actions-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 18px;
-        }
-
-        .actions-header-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--accent);
-            font-size: 15px;
-        }
-
-        .actions-header h5 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin: 0;
-        }
-
-        .action-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .add-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 50px;
-            border: none;
-            font-family: 'Tajawal', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.22s;
-            color: #fff;
-            letter-spacing: 0.2px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-        }
-
-        .add-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.18);
-            filter: brightness(1.08);
-        }
-
-        .add-btn:active { transform: translateY(0); }
-
-        /* ========== SUMMARY CARDS ========== */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 18px;
-            margin-bottom: 28px;
-        }
-
-        .summary-card {
-            background: var(--surface-2);
-            border-radius: var(--radius-md);
-            padding: 22px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            transition: all 0.25s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .summary-card::before {
-            content: '';
-            position: absolute;
-            top: 0; right: 0;
-            width: 4px;
-            height: 100%;
-            border-radius: 0 var(--radius-md) var(--radius-md) 0;
-        }
-
-        .summary-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
-
-        .summary-card.card-success::before { background: var(--success); }
-        .summary-card.card-primary::before { background: var(--primary); }
-        .summary-card.card-info::before { background: var(--info); }
-        .summary-card.card-warning::before { background: var(--warning); }
-        .summary-card.card-danger::before { background: var(--danger); }
-
-        .card-head {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .card-head-icon {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-        .card-head-icon.success { background: var(--success-bg); color: var(--success); }
-        .card-head-icon.primary { background: #eef2ff; color: var(--primary); }
-        .card-head-icon.info { background: var(--info-bg); color: var(--info); }
-        .card-head-icon.warning { background: var(--warning-bg); color: var(--warning); }
-        .card-head-icon.danger { background: var(--danger-bg); color: var(--danger); }
-
-        .card-head h5 {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Status badge */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 15px;
-        }
-
-        .status-badge.active {
-            background: var(--success-bg);
-            color: var(--success);
-            border: 1.5px solid #6ee7b7;
-        }
-
-        .status-badge.inactive {
-            background: var(--danger-bg);
-            color: var(--danger);
-            border: 1.5px solid #fca5a5;
-        }
-
-        .status-badge::before {
-            content: '';
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .status-badge.active::before { background: var(--success); box-shadow: 0 0 0 3px #a7f3d0; animation: pulse-green 2s infinite; }
-        .status-badge.inactive::before { background: var(--danger); }
-
-        @keyframes pulse-green {
-            0%, 100% { box-shadow: 0 0 0 3px #a7f3d0; }
-            50% { box-shadow: 0 0 0 6px #d1fae5; }
-        }
-
-        /* Info rows inside cards */
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px dashed var(--border);
-            gap: 12px;
-        }
-
-        .info-row:last-child { border-bottom: none; padding-bottom: 0; }
-        .info-row:first-of-type { padding-top: 0; }
-
-        .info-label {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-
-        .info-value {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-primary);
-            text-align: left;
-        }
-
-        .remaining-positive { color: var(--success) !important; }
-        .remaining-warning { color: var(--warning) !important; }
-        .remaining-danger { color: var(--danger) !important; }
-
-        /* ========== SECTION WRAPPER ========== */
-        .section-wrapper {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            margin-bottom: 28px;
-        }
-
-        .section-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            padding: 20px 28px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .section-header-icon {
-            width: 40px; height: 40px;
-            background: rgba(232,184,75,0.2);
-            border: 1.5px solid rgba(232,184,75,0.4);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--accent);
-            font-size: 17px;
-        }
-
-        .section-header h4 {
-            color: #fff;
-            font-size: 17px;
-            font-weight: 800;
-            margin: 0;
-        }
-
-        .section-header .badge-pill {
-            margin-right: auto;
-            background: rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.9);
-            padding: 4px 14px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* ========== DETAIL CARDS GRID ========== */
-        .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 28px;
-        }
-
-        .detail-card {
-            background: var(--surface);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            transition: all 0.25s;
-        }
-
-        .detail-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
-
-        .detail-card-header {
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .detail-card-header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .detail-card-icon {
-            width: 32px; height: 32px;
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px;
-        }
-
-        .detail-card-icon.primary { background: #eef2ff; color: var(--primary); }
-        .detail-card-icon.success { background: var(--success-bg); color: var(--success); }
-        .detail-card-icon.info { background: var(--info-bg); color: var(--info); }
-        .detail-card-icon.warning { background: var(--warning-bg); color: var(--warning); }
-        .detail-card-icon.system { background: #f1f5f9; color: #64748b; }
-
-        .detail-card-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .edit-btn-small {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: transparent;
-            border: 1.5px solid var(--border);
-            color: var(--text-secondary);
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Tajawal', sans-serif;
-        }
-
-        .edit-btn-small:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: #eef2ff;
-        }
-
-        .detail-card-body { padding: 16px 18px; }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 7px 0;
-            border-bottom: 1px dashed var(--border);
-            gap: 10px;
-        }
-
-        .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
-
-        .detail-label {
-            font-size: 12.5px;
-            color: var(--text-muted);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .detail-value {
-            font-size: 13.5px;
-            font-weight: 700;
-            color: var(--text-primary);
-            text-align: left;
-            word-break: break-word;
-        }
-
-        /* ========== ALERT CARDS ========== */
-        .alert-section {
-            margin: 0 28px 28px;
-            background: var(--danger-bg);
-            border: 1.5px solid #fca5a5;
-            border-radius: var(--radius-md);
-            padding: 20px;
-        }
-
-        .alert-section-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 14px;
-            color: var(--danger);
-            font-weight: 800;
-            font-size: 15px;
-        }
-
-        /* ========== TABLE ========== */
-        .table-section {
-            background: var(--surface-2);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            margin-bottom: 28px;
-        }
-
-        .table-responsive-wrapper { overflow-x: auto; }
-
-        .modern-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        .modern-table thead tr {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-        }
-
-        .modern-table thead th {
-            color: rgba(255,255,255,0.9);
-            padding: 13px 14px;
-            text-align: right;
-            font-weight: 700;
-            font-size: 12.5px;
-            white-space: nowrap;
-            letter-spacing: 0.3px;
-            border: none;
-        }
-
-        .modern-table tbody tr {
-            border-bottom: 1px solid var(--border);
-            transition: background 0.15s;
-        }
-
-        .modern-table tbody tr:last-child { border-bottom: none; }
-        .modern-table tbody tr:hover { background: #f0f4ff; }
-
-        .modern-table tbody td {
-            padding: 12px 14px;
-            color: var(--text-primary);
-            vertical-align: middle;
-        }
-
-        .badge-count {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: #fff;
-            padding: 3px 12px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 12px;
-        }
-
-        .badge-basic {
-            background: var(--info-bg);
-            color: var(--info);
-            border: 1px solid #bae6fd;
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 12px;
-        }
-
-        .badge-backup {
-            background: var(--warning-bg);
-            color: var(--warning);
-            border: 1px solid #fde68a;
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 12px;
-        }
-
-        .badge-shifts {
-            background: var(--success-bg);
-            color: var(--success);
-            border: 1px solid #a7f3d0;
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 12px;
-        }
-
-        .price-chip {
-            background: var(--success-bg);
-            color: var(--success);
-            padding: 4px 12px;
-            border-radius: 8px;
-            font-weight: 800;
-            font-size: 13px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: var(--text-muted);
-        }
-
-        .empty-state i {
-            font-size: 42px;
-            color: var(--border);
-            display: block;
-            margin-bottom: 14px;
-        }
-
-        .empty-state p {
-            font-size: 15px;
-            margin: 0;
-        }
-
-        /* ========== NOTES TABLE ========== */
-        .action-badge-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 14px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 12px;
-            color: #fff;
-        }
-
-        /* ========== MODALS ========== */
-        .modal-content {
-            border-radius: var(--radius-lg) !important;
-            border: none !important;
-            box-shadow: var(--shadow-lg) !important;
-            font-family: 'Tajawal', sans-serif;
-            overflow: hidden;
-        }
-
-        .modal-header {
-            padding: 20px 24px !important;
-            border-bottom: none !important;
-        }
-
-        .modal-title {
-            font-size: 17px !important;
-            font-weight: 800 !important;
-            color: #fff !important;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .modal-body {
-            padding: 24px !important;
-        }
-
-        .modal-footer {
-            padding: 16px 24px !important;
-            border-top: 1px solid var(--border) !important;
-            background: var(--surface) !important;
-            gap: 10px;
-        }
-
-        .form-label {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .form-control, .form-select {
-            border: 1.5px solid var(--border) !important;
-            border-radius: 10px !important;
-            padding: 10px 14px !important;
-            font-size: 14px !important;
-            font-family: 'Tajawal', sans-serif !important;
-            color: var(--text-primary) !important;
-            background: var(--surface-2) !important;
-            transition: all 0.2s !important;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary) !important;
-            box-shadow: 0 0 0 3px rgba(15,36,68,0.1) !important;
-            outline: none !important;
-        }
-
-        .btn {
-            font-family: 'Tajawal', sans-serif !important;
-            font-weight: 700 !important;
-            border-radius: 10px !important;
-            padding: 10px 20px !important;
-            font-size: 14px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 7px !important;
-            transition: all 0.2s !important;
-        }
-
-        .btn:hover { transform: translateY(-1px); }
-
-        .btn-secondary {
-            background: var(--surface) !important;
-            border: 1.5px solid var(--border) !important;
-            color: var(--text-secondary) !important;
-        }
-
-        .btn-secondary:hover {
-            background: var(--border) !important;
-        }
-
-        .alert {
-            border-radius: 12px !important;
-            border: none !important;
-            padding: 14px 18px !important;
-            font-size: 13.5px !important;
-            font-weight: 500 !important;
-            display: flex !important;
-            align-items: flex-start !important;
-            gap: 10px !important;
-        }
-
-        .alert i { margin-top: 2px; flex-shrink: 0; }
-
-        .alert-info { background: var(--info-bg) !important; color: var(--info) !important; }
-        .alert-warning { background: var(--warning-bg) !important; color: var(--warning) !important; }
-        .alert-danger { background: var(--danger-bg) !important; color: var(--danger) !important; }
-        .alert-success { background: var(--success-bg) !important; color: var(--success) !important; }
-
-        /* ========== RADIO BUTTONS ========== */
-        .pause-option {
-            background: var(--surface);
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .pause-option:hover { border-color: var(--primary); }
-        .pause-option.selected { border-color: var(--primary); background: #eef2ff; }
-
-        .form-check-input:checked { background-color: var(--primary) !important; border-color: var(--primary) !important; }
-
-        /* ========== DURATION DISPLAY ========== */
-        .duration-display {
-            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-            border: 1.5px solid #c7d2fe;
-            border-radius: 12px;
-            padding: 14px 18px;
-            margin-top: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--primary-light);
-            font-weight: 700;
-        }
-
-        /* ========== PAUSE INFO ========== */
-        .pause-info-box {
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-            border: 1.5px solid #fde68a;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .pause-info-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #92400e;
-            font-weight: 800;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .pause-info-date {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #92400e;
-            font-size: 13px;
-        }
-
-        .pause-info-date span {
-            background: #fff;
-            padding: 4px 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            color: #d97706;
-        }
-
-        .pause-info-reason {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed #fde68a;
-            font-size: 12.5px;
-            color: #92400e;
-        }
-
-        /* ========== MERGE CONTRACT EQUIPMENTS ========== */
-        .equip-section-title {
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .equip-section-title.current { background: #eef2ff; color: var(--primary); border-right: 3px solid var(--primary); }
-        .equip-section-title.selected { background: var(--success-bg); color: var(--success); border-right: 3px solid var(--success); }
-
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 768px) {
-            .page-wrapper { padding: 16px 12px; }
-            .page-hero { padding: 24px 20px; border-radius: var(--radius-md); }
-            .hero-title { font-size: 20px; }
-            .hero-icon { width: 50px; height: 50px; font-size: 20px; }
-            .page-hero-inner { gap: 14px; }
-            .actions-section { padding: 18px 16px; }
-            .action-bar { gap: 8px; }
-            .add-btn { padding: 9px 14px; font-size: 13px; }
-            .cards-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-            .detail-grid { padding: 16px; gap: 14px; }
-            .section-header { padding: 16px 18px; }
-            .table-section { border-radius: var(--radius-md); }
-            .modern-table thead th { padding: 10px 10px; font-size: 11.5px; }
-            .modern-table tbody td { padding: 10px 10px; font-size: 12.5px; }
-        }
-
-        @media (max-width: 480px) {
-            .cards-grid { grid-template-columns: 1fr; }
-            .detail-grid { grid-template-columns: 1fr; padding: 14px; }
-            .back-btn { padding: 8px 14px; font-size: 13px; }
-            .hero-title { font-size: 18px; }
-            .add-btn { padding: 8px 12px; font-size: 12.5px; }
-        }
-
-        @media (min-width: 1200px) {
-            .cards-grid { grid-template-columns: repeat(4, 1fr); }
-            .detail-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        /* ========== SCROLLBAR ========== */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--surface); }
-        ::-webkit-scrollbar-thumb { background: #c1cfe0; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
-</head>
-
-<body class="standalone-brand">
-
-    <?php 
-    // include('../insidebar.php');
-    ?>
-
+    
     <div class="page-wrapper">
 
         <!-- ===== PAGE HERO ===== -->
@@ -964,25 +80,25 @@ if (!$is_super_admin) {
                 <h5>إجراءات العقد</h5>
             </div>
             <div class="action-bar">
-                <button class="add-btn" id="renewalBtn" title="تجديد مدة العقد" style="background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);">
+                <button class="add-btn" id="renewalBtn" title="تجديد مدة العقد">
                     <i class="fas fa-sync-alt"></i> تجديد العقد
                 </button>
-                <button class="add-btn" id="settlementBtn" title="تسوية الساعات المتبقية" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);">
+                <button class="add-btn" id="settlementBtn" title="تسوية الساعات المتبقية">
                     <i class="fas fa-balance-scale"></i> تسوية
                 </button>
-                <button class="add-btn" id="pauseBtn" title="إيقاف مؤقت للعقد" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
+                <button class="add-btn" id="pauseBtn" title="إيقاف مؤقت للعقد">
                     <i class="fas fa-pause-circle"></i> إيقاف
                 </button>
-                <button class="add-btn" id="resumeBtn" title="استئناف العقد المتوقف" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                <button class="add-btn" id="resumeBtn" title="استئناف العقد المتوقف">
                     <i class="fas fa-play-circle"></i> استئناف
                 </button>
-                <button class="add-btn" id="terminateBtn" title="إنهاء العقد" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+                <button class="add-btn" id="terminateBtn" title="إنهاء العقد">
                     <i class="fas fa-times-circle"></i> إنهاء
                 </button>
-                <button class="add-btn" id="mergeBtn" title="دمج هذا العقد مع عقد آخر" style="background: linear-gradient(135deg, #db2777 0%, #be185d 100%);">
+                <button class="add-btn" id="mergeBtn" title="دمج هذا العقد مع عقد آخر">
                     <i class="fas fa-object-group"></i> دمج
                 </button>
-                <button class="add-btn" id="completeBtn" title="تسجيل انتهاء العقد" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
+                <button class="add-btn" id="completeBtn" title="تسجيل انتهاء العقد">
                     <i class="fas fa-check-circle"></i> انتهاء العقد
                 </button>
             </div>
@@ -1062,7 +178,7 @@ if (!$is_super_admin) {
                         </div>
                         <h5>حالة العقد</h5>
                     </div>
-                    <div style="padding: 10px 0 4px; display: flex; justify-content: center;">
+                    <div class="cd-status-centered">
                         <span class="status-badge <?php echo ($row['status'] == 1) ? 'active' : 'inactive'; ?>">
                             <?php echo $status_text; ?>
                         </span>
@@ -1309,14 +425,14 @@ if (!$is_super_admin) {
                         تحذيرات وملاحظات هامة
                     </div>
                     <?php if (isset($row['pause_reason']) && !empty($row['pause_reason'])): ?>
-                    <div class="detail-row" style="padding: 8px 0;">
-                        <span class="detail-label" style="color: var(--danger);"><i class="fas fa-pause-circle"></i> سبب الإيقاف</span>
+                    <div class="detail-row cd-detail-row-tight">
+                        <span class="detail-label cd-text-danger"><i class="fas fa-pause-circle"></i> سبب الإيقاف</span>
                         <span class="detail-value"><?php echo $row['pause_reason']; ?></span>
                     </div>
                     <?php endif; ?>
                     <?php if (isset($row['termination_reason']) && !empty($row['termination_reason'])): ?>
-                    <div class="detail-row" style="padding: 8px 0;">
-                        <span class="detail-label" style="color: var(--danger);"><i class="fas fa-times-circle"></i> سبب الإنهاء</span>
+                    <div class="detail-row cd-detail-row-tight">
+                        <span class="detail-label cd-text-danger"><i class="fas fa-times-circle"></i> سبب الإنهاء</span>
                         <span class="detail-value"><?php echo $row['termination_reason']; ?></span>
                     </div>
                     <?php endif; ?>
@@ -1552,7 +668,7 @@ if (!$is_super_admin) {
     <div class="modal fade" id="renewalModal" tabindex="-1" aria-labelledby="renewalModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);">
+                <div class="modal-header cd-modal-head-renewal">
                     <h5 class="modal-title" id="renewalModalLabel">
                         <i class="fas fa-sync-alt"></i> تجديد العقد
                     </h5>
@@ -1565,19 +681,19 @@ if (!$is_super_admin) {
                     </div>
                     <div class="mb-4">
                         <label for="renewalStartDate" class="form-label">
-                            <i class="far fa-calendar-alt"></i> تاريخ بدء التجديد <span style="color: red;">*</span>
+                            <i class="far fa-calendar-alt"></i> تاريخ بدء التجديد <span class="cd-required">*</span>
                         </label>
                         <input type="date" id="renewalStartDate" class="form-control">
                     </div>
                     <div class="mb-3">
                         <label for="renewalEndDate" class="form-label">
-                            <i class="far fa-calendar-check"></i> تاريخ انتهاء التجديد <span style="color: red;">*</span>
+                            <i class="far fa-calendar-check"></i> تاريخ انتهاء التجديد <span class="cd-required">*</span>
                         </label>
                         <input type="date" id="renewalEndDate" class="form-control">
                     </div>
-                    <div id="renewalDurationDisplay" style="display: none;">
+                    <div id="renewalDurationDisplay" class="cd-display-none">
                         <div class="duration-display">
-                            <i class="fas fa-calendar-days" style="font-size: 18px;"></i>
+                            <i class="fas fa-calendar-days cd-icon-lg"></i>
                             <span>مدة العقد الجديدة: <strong id="calculatedDays">0</strong> يوم</span>
                         </div>
                     </div>
@@ -1587,7 +703,7 @@ if (!$is_super_admin) {
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmRenewal"
-                        style="background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%); color: white; border: none;">
+                        class="cd-btn-gradient">
                         <i class="fas fa-check"></i> تجديد
                     </button>
                 </div>
@@ -1599,7 +715,7 @@ if (!$is_super_admin) {
     <div class="modal fade" id="settlementModal" tabindex="-1" aria-labelledby="settlementModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);">
+                <div class="modal-header cd-modal-head-settlement">
                     <h5 class="modal-title" id="settlementModalLabel">
                         <i class="fas fa-balance-scale"></i> تسوية العقد
                     </h5>
@@ -1612,7 +728,7 @@ if (!$is_super_admin) {
                     </div>
                     <div class="mb-4">
                         <label for="settlementType" class="form-label">
-                            <i class="fas fa-exchange-alt"></i> نوع التسوية <span style="color: red;">*</span>
+                            <i class="fas fa-exchange-alt"></i> نوع التسوية <span class="cd-required">*</span>
                         </label>
                         <select id="settlementType" class="form-select">
                             <option value="">-- اختر --</option>
@@ -1622,7 +738,7 @@ if (!$is_super_admin) {
                     </div>
                     <div class="mb-4">
                         <label for="settlementHours" class="form-label">
-                            <i class="far fa-clock"></i> عدد الساعات <span style="color: red;">*</span>
+                            <i class="far fa-clock"></i> عدد الساعات <span class="cd-required">*</span>
                         </label>
                         <input type="number" id="settlementHours" class="form-control" min="1" placeholder="أدخل عدد الساعات">
                     </div>
@@ -1638,7 +754,7 @@ if (!$is_super_admin) {
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmSettlement"
-                        style="background: linear-gradient(135deg, #475569 0%, #334155 100%); color: white; border: none;">
+                        class="cd-btn-gradient">
                         <i class="fas fa-check"></i> تسوية
                     </button>
                 </div>
@@ -1650,7 +766,7 @@ if (!$is_super_admin) {
     <div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="pauseModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
+                <div class="modal-header cd-modal-head-pause">
                     <h5 class="modal-title" id="pauseModalLabel">
                         <i class="fas fa-pause-circle"></i> إيقاف العقد
                     </h5>
@@ -1663,13 +779,13 @@ if (!$is_super_admin) {
                     </div>
                     <div class="mb-4">
                         <label for="pauseDate" class="form-label">
-                            <i class="far fa-calendar-alt"></i> تاريخ الإيقاف <span style="color: red;">*</span>
+                            <i class="far fa-calendar-alt"></i> تاريخ الإيقاف <span class="cd-required">*</span>
                         </label>
                         <input type="date" id="pauseDate" class="form-control" value="<?php echo date('Y-m-d'); ?>">
                     </div>
                     <div class="mb-3">
                         <label for="pauseReason" class="form-label">
-                            <i class="fas fa-comment-alt"></i> سبب الإيقاف <span style="color: red;">*</span>
+                            <i class="fas fa-comment-alt"></i> سبب الإيقاف <span class="cd-required">*</span>
                         </label>
                         <textarea id="pauseReason" class="form-control" rows="4" placeholder="أدخل السبب المفصل للإيقاف"></textarea>
                     </div>
@@ -1678,8 +794,7 @@ if (!$is_super_admin) {
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
-                    <button type="button" class="btn" id="confirmPause"
-                        style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%); color: white; border: none;">
+                    <button type="button" class="btn cd-btn-pause-confirm" id="confirmPause">
                         <i class="fas fa-pause-circle"></i> إيقاف
                     </button>
                 </div>
@@ -1691,7 +806,7 @@ if (!$is_super_admin) {
     <div class="modal fade" id="resumeModal" tabindex="-1" aria-labelledby="resumeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                <div class="modal-header cd-modal-head-resume">
                     <h5 class="modal-title" id="resumeModalLabel">
                         <i class="fas fa-play-circle"></i> استئناف العقد
                     </h5>
@@ -1722,22 +837,22 @@ if (!$is_super_admin) {
 
                     <div class="mb-4">
                         <label for="resumeDate" class="form-label">
-                            <i class="far fa-calendar-check" style="color: var(--success);"></i>
-                            تاريخ استئناف العقد <span style="color: red;">*</span>
+                            <i class="far fa-calendar-check cd-icon-success"></i>
+                            تاريخ استئناف العقد <span class="cd-required">*</span>
                         </label>
                         <input type="date" id="resumeDate" class="form-control" value="<?php echo date('Y-m-d'); ?>">
-                        <small class="text-muted" style="font-size: 12px; margin-top: 5px; display: block;">
+                        <small class="text-muted cd-small-hint">
                             <i class="fas fa-info-circle"></i> التاريخ الافتراضي هو اليوم، يمكنك تعديله حسب الحاجة
                         </small>
                     </div>
 
-                    <div id="pauseDurationDisplay" style="display: none;">
-                        <div class="duration-display" style="margin-bottom: 14px;">
-                            <i class="fas fa-clock" style="font-size: 18px;"></i>
+                    <div id="pauseDurationDisplay" class="cd-hidden">
+                        <div class="duration-display cd-duration-box">
+                            <i class="fas fa-clock cd-icon-lg"></i>
                             <span>مدة الإيقاف: <strong id="calculatedPauseDays">0</strong> يوم</span>
                         </div>
-                        <div style="background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 16px;">
-                            <div style="font-weight: 700; color: var(--primary); margin-bottom: 12px; font-size: 14px;">
+                        <div class="cd-pause-options-box">
+                            <div class="cd-pause-options-header">
                                 <i class="fas fa-question-circle"></i> كيف تريد معالجة أيام الإيقاف؟
                             </div>
                             <div class="pause-option" onclick="selectPauseOption(this, 'extend')">
@@ -1772,8 +887,7 @@ if (!$is_super_admin) {
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
-                    <button type="button" class="btn" id="confirmResume"
-                        style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; border: none;">
+                    <button type="button" class="btn cd-btn-resume-confirm" id="confirmResume">
                         <i class="fas fa-play-circle"></i> استئناف
                     </button>
                 </div>
@@ -1785,7 +899,7 @@ if (!$is_super_admin) {
     <div class="modal fade" id="terminateModal" tabindex="-1" aria-labelledby="terminateModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+                <div class="modal-header cd-modal-head-terminate">
                     <h5 class="modal-title" id="terminateModalLabel">
                         <i class="fas fa-times-circle"></i> إنهاء العقد
                     </h5>
@@ -1798,7 +912,7 @@ if (!$is_super_admin) {
                     </div>
                     <div class="mb-4">
                         <label for="terminationType" class="form-label">
-                            <i class="fas fa-list-ul"></i> نوع الإنهاء <span style="color: red;">*</span>
+                            <i class="fas fa-list-ul"></i> نوع الإنهاء <span class="cd-required">*</span>
                         </label>
                         <select id="terminationType" class="form-select">
                             <option value="">-- اختر النوع --</option>
@@ -1808,7 +922,7 @@ if (!$is_super_admin) {
                     </div>
                     <div class="mb-3">
                         <label for="terminationReason" class="form-label">
-                            <i class="fas fa-comment-alt"></i> السبب المفصل <span style="color: red;">*</span>
+                            <i class="fas fa-comment-alt"></i> السبب المفصل <span class="cd-required">*</span>
                         </label>
                         <textarea id="terminationReason" class="form-control" rows="4" placeholder="أدخل السبب المفصل لإنهاء العقد" required></textarea>
                     </div>
@@ -1829,7 +943,7 @@ if (!$is_super_admin) {
     <div class="modal fade" id="mergeModal" tabindex="-1" aria-labelledby="mergeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
+                <div class="modal-header cd-modal-head-merge">
                     <h5 class="modal-title" id="mergeModalLabel">
                         <i class="fas fa-object-group"></i> دمج العقود
                     </h5>
@@ -1842,7 +956,7 @@ if (!$is_super_admin) {
                     </div>
                     <div class="mb-4">
                         <label for="mergeWithId" class="form-label">
-                            <i class="fas fa-file-contract"></i> اختر العقد للدمج معه <span style="color: red;">*</span>
+                            <i class="fas fa-file-contract"></i> اختر العقد للدمج معه <span class="cd-required">*</span>
                         </label>
                         <select id="mergeWithId" class="form-select">
                             <option value="">-- اختر عقد --</option>
@@ -1860,15 +974,15 @@ if (!$is_super_admin) {
                         </select>
                     </div>
 
-                    <div id="mergeEquipmentsContainer" style="margin-top: 20px;">
-                        <h6 style="font-weight: 700; color: var(--text-primary); margin-bottom: 14px;">معدات العقود:</h6>
+                    <div id="mergeEquipmentsContainer" class="cd-mt-5">
+                        <h6 class="cd-merge-title">معدات العقود:</h6>
 
                         <div class="mb-4">
                             <div class="equip-section-title current">
                                 <i class="fa fa-cube"></i> معدات العقد الحالي (#<?php echo $contract_id; ?>)
                             </div>
                             <div id="currentContractEquipments">
-                                <table class="table table-sm table-bordered" style="font-size: 13px;">
+                                <table class="table table-sm table-bordered cd-table-compact">
                                     <thead class="table-light">
                                         <tr>
                                             <th>نوع المعدة</th><th>الحجم</th><th>العدد</th><th>الساعات/الشهر</th><th>وحدات/الشهر</th>
@@ -1914,7 +1028,7 @@ if (!$is_super_admin) {
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmMerge"
-                        style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; border: none;">
+                        class="cd-btn-gradient">
                         <i class="fas fa-object-group"></i> دمج العقد
                     </button>
                 </div>
@@ -1926,7 +1040,7 @@ if (!$is_super_admin) {
     <div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
+                <div class="modal-header">
                     <h5 class="modal-title" id="completeModalLabel">
                         <i class="fas fa-check-circle"></i> انتهاء العقد
                     </h5>
@@ -1939,7 +1053,7 @@ if (!$is_super_admin) {
                     </div>
                     <div class="mb-3">
                         <label for="completeNote" class="form-label">
-                            <i class="fas fa-comment-alt"></i> ملاحظات الانتهاء <span style="color: red;">*</span>
+                            <i class="fas fa-comment-alt"></i> ملاحظات الانتهاء <span class="cd-required">*</span>
                         </label>
                         <textarea id="completeNote" class="form-control" rows="4" placeholder="أدخل ملاحظات حول انتهاء العقد" required></textarea>
                     </div>
@@ -1949,7 +1063,7 @@ if (!$is_super_admin) {
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn" id="confirmComplete"
-                        style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); color: white; border: none;">
+                        class="cd-btn-gradient">
                         <i class="fas fa-check-circle"></i> تسجيل الانتهاء
                     </button>
                 </div>
@@ -1961,7 +1075,7 @@ if (!$is_super_admin) {
     <div class="modal fade" id="editProjectInfoModal" tabindex="-1" aria-labelledby="editProjectInfoLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a6e 0%, #2a5298 100%);">
+                <div class="modal-header">
                     <h5 class="modal-title" id="editProjectInfoLabel">
                         <i class="fas fa-edit"></i> تعديل معلومات المشروع
                     </h5>
@@ -1997,7 +1111,7 @@ if (!$is_super_admin) {
     <div class="modal fade" id="editServicesModal" tabindex="-1" aria-labelledby="editServicesLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                <div class="modal-header">
                     <h5 class="modal-title" id="editServicesLabel">
                         <i class="fas fa-edit"></i> تعديل الخدمات
                     </h5>
@@ -2065,7 +1179,7 @@ if (!$is_super_admin) {
     <div class="modal fade" id="editPartiesModal" tabindex="-1" aria-labelledby="editPartiesLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);">
+                <div class="modal-header">
                     <h5 class="modal-title" id="editPartiesLabel">
                         <i class="fas fa-edit"></i> تعديل أطراف العقد
                     </h5>
@@ -2113,7 +1227,7 @@ if (!$is_super_admin) {
     <div class="modal fade" id="editPaymentModal" tabindex="-1" aria-labelledby="editPaymentLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
+                <div class="modal-header">
                     <h5 class="modal-title" id="editPaymentLabel">
                         <i class="fas fa-edit"></i> تعديل البيانات المالية
                     </h5>
@@ -2762,9 +1876,9 @@ if (!$is_super_admin) {
             }
         }
     </script>
+    </div><!-- /.page-wrapper -->
+    </div><!-- /.main -->
 
-</body>
 
-</html>
 
 

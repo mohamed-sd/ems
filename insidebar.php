@@ -32,6 +32,22 @@ if (isset($_SESSION['user']) && isset($conn)) {
 
       $sb_allowed_roles = ['-1', '1', '2', '3', '4', '5'];
       if (in_array($sb_role, $sb_allowed_roles)) {
+        $sb_cache_key = implode('|', [$sb_role, $sb_company_id, $sb_session_proj, $sb_session_mine]);
+        $sb_cache_ttl = 60;
+        $sb_cache_ok  = false;
+        if (isset($_SESSION['hours_approval_pending_cache']) && is_array($_SESSION['hours_approval_pending_cache'])) {
+          $sb_cache = $_SESSION['hours_approval_pending_cache'];
+          if (
+            isset($sb_cache['key'], $sb_cache['value'], $sb_cache['ts']) &&
+            $sb_cache['key'] === $sb_cache_key &&
+            (time() - intval($sb_cache['ts'])) <= $sb_cache_ttl
+          ) {
+            $hoursApprovalPendingCount = intval($sb_cache['value']);
+            $sb_cache_ok = true;
+          }
+        }
+
+        if (!$sb_cache_ok) {
         $sb_role_level_map = ['1' => 1, '2' => 2, '3' => 3, '4' => 4];
         $sb_my_level       = $sb_role_level_map[$sb_role] ?? 0;
         $sb_prev_level     = $sb_my_level - 1;
@@ -92,6 +108,12 @@ if (isset($_SESSION['user']) && isset($conn)) {
         $sb_cnt_res = $conn->query($sb_cnt_sql);
         if ($sb_cnt_res && ($sb_cnt_row = $sb_cnt_res->fetch_assoc())) {
           $hoursApprovalPendingCount = intval($sb_cnt_row['cnt'] ?? 0);
+        }
+          $_SESSION['hours_approval_pending_cache'] = [
+            'key' => $sb_cache_key,
+            'value' => $hoursApprovalPendingCount,
+            'ts' => time()
+          ];
         }
       }
     }
@@ -270,13 +292,13 @@ if (isset($_SESSION['user']) && isset($conn)) {
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const sidebarOverlay = document.getElementById('sidebarOverlay');
   const SIDEBAR_ANIMATION_MS = 420;
+  let layoutRefreshTimer = null;
+  let lastLayoutRefreshAt = 0;
 
   function isMobile() { return window.innerWidth <= 768; }
 
   function refreshPageLayout() {
-    // Notify listeners and recalculate DataTables widths after layout changes.
-    window.dispatchEvent(new Event('resize'));
-
+    // Recalculate DataTables widths after layout changes.
     if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) {
       const tablesApi = window.jQuery.fn.dataTable.tables({ visible: true, api: true });
       tablesApi.columns.adjust();
@@ -287,7 +309,14 @@ if (isset($_SESSION['user']) && isset($conn)) {
   }
 
   function refreshPageLayoutAfterAnimation() {
-    setTimeout(refreshPageLayout, SIDEBAR_ANIMATION_MS);
+    if (layoutRefreshTimer) {
+      clearTimeout(layoutRefreshTimer);
+    }
+    layoutRefreshTimer = setTimeout(function() {
+      layoutRefreshTimer = null;
+      refreshPageLayout();
+      lastLayoutRefreshAt = Date.now();
+    }, SIDEBAR_ANIMATION_MS);
   }
 
   function openSidebar() {
@@ -344,11 +373,20 @@ if (isset($_SESSION['user']) && isset($conn)) {
     if (!isMobile()) {
       closeSidebar();
     }
-    refreshPageLayoutAfterAnimation();
+    // Prevent resize storms from triggering endless expensive reflows.
+    if (Date.now() - lastLayoutRefreshAt > 250) {
+      refreshPageLayoutAfterAnimation();
+    }
   });
 
   // ===== شارة الرسائل غير المقروءة =====
+  let navBadgeReqInFlight = false;
+
   function updateChatNavBadge() {
+    if (document.hidden || navBadgeReqInFlight) {
+      return;
+    }
+    navBadgeReqInFlight = true;
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/ems/chats/get_unread_count.php', true);
     xhr.onload = function() {
@@ -364,11 +402,19 @@ if (isset($_SESSION['user']) && isset($conn)) {
           }
         }
       } catch(e) {}
+      navBadgeReqInFlight = false;
     };
+    xhr.onerror = function() { navBadgeReqInFlight = false; };
+    xhr.onabort = function() { navBadgeReqInFlight = false; };
     xhr.send();
   }
   updateChatNavBadge();
-  setInterval(updateChatNavBadge, 30000);
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      updateChatNavBadge();
+    }
+  });
+  setInterval(updateChatNavBadge, 60000);
 
   // Initial pass after page load to ensure any table wrapper starts with correct width.
   refreshPageLayoutAfterAnimation();

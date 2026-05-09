@@ -52,7 +52,7 @@ $csrfH=htmlspecialchars($csrf,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Barlow+Condensed:wght@700;800;900&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Barlow+Condensed:wght@700;800;900&display=swap'); */
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 

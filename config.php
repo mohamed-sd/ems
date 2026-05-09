@@ -31,6 +31,11 @@ if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
 
+if (!defined('EMS_DIGIT_SYSTEM')) {
+    // Allowed values: arabic-indic | latin
+    define('EMS_DIGIT_SYSTEM', 'arabic-indic');
+}
+
 if (!function_exists('ems_fix_mojibake_output')) {
     function ems_fix_mojibake_output($buffer)
     {
@@ -67,7 +72,25 @@ if (!function_exists('ems_fix_mojibake_output')) {
             return $m[0];
         }, $buffer);
 
-        return is_string($fixed) ? $fixed : $buffer;
+        $fixed = is_string($fixed) ? $fixed : $buffer;
+
+        if (stripos($fixed, 'number-format-unifier.js') === false) {
+            $digitSystem = defined('EMS_DIGIT_SYSTEM') ? EMS_DIGIT_SYSTEM : 'arabic-indic';
+            $scriptPath = function_exists('ems_url')
+                ? ems_url('assets/js/number-format-unifier.js')
+                : '/ems/assets/js/number-format-unifier.js';
+
+            $inject = '<script>window.EMS_DIGIT_SYSTEM=' . json_encode($digitSystem) . ';</script>'
+                . '<script src="' . htmlspecialchars($scriptPath, ENT_QUOTES, 'UTF-8') . '" defer></script>';
+
+            if (stripos($fixed, '</body>') !== false) {
+                $fixed = preg_replace('/<\/body>/i', $inject . '</body>', $fixed, 1);
+            } else {
+                $fixed .= $inject;
+            }
+        }
+
+        return $fixed;
     }
 }
 

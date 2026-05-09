@@ -180,117 +180,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 // إذا أردت أفعّل الحذف أضيفه لك هنا بأمان مع تحقق الصلاحيات.
 ?>
 
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-<link rel="stylesheet" href="../assets/css/admin-style.css">
-<link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<link rel="stylesheet" href="/ems/assets/css/all.min.css">
-<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+    <div class="main project-users-main ems-unified-page-shell">
 
-<style>
-    :root {
-        --users-ink: #1A1A1A;
-        --users-ink-soft: #2A2A2A;
-        --users-gold: #D4A017;
-        --users-blue: #1D4ED8;
-        --users-blue-soft: rgba(29, 78, 216, 0.12);
-        --users-red: #DC2626;
-        --users-red-soft: rgba(220, 38, 38, 0.12);
-        --users-muted: #64748B;
-    }
-
-    /* أنماط الأدوار بألوان مختلفة */
-    .role-badge {
-        display: inline-block;
-        padding: 8px 14px;
-        border-radius: 20px;
-        font-weight: 700;
-        font-size: 0.85rem;
-        text-align: center;
-        transition: all 0.3s ease;
-        border-left: 3px solid transparent;
-        box-shadow: inset 0 0 0 1px rgba(26, 26, 26, 0.04);
-    }
-
-    /* مدير المشاريع */
-    .role-badge.role-1 {
-        background: linear-gradient(135deg, #eff6ff, #dbeafe);
-        color: #1d4ed8;
-        border-left-color: #1d4ed8;
-    }
-
-    /* مدير الموردين */
-    .role-badge.role-2 {
-        background: linear-gradient(135deg, #f8f5ff, #ede9fe);
-        color: #6d28d9;
-        border-left-color: #6d28d9;
-    }
-
-    /* مدير المشغلين */
-    .role-badge.role-3 {
-        background: linear-gradient(135deg, #fff1f2, #ffe4e6);
-        color: #be185d;
-        border-left-color: #be185d;
-    }
-
-    /* مدير الاسطول */
-    .role-badge.role-4 {
-        background: linear-gradient(135deg, #fff7ed, #ffedd5);
-        color: #c2410c;
-        border-left-color: #c2410c;
-    }
-
-    /* مدير الموقع / حركة وتشغيل */
-    .role-badge.role-5,
-    .role-badge.role-10 {
-        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-        color: var(--users-ink);
-        border-left-color: var(--users-gold);
-    }
-
-    /* إضافة اللون أيضاً للصفوف عند التمرير */
-    tr:hover .role-badge {
-        transform: translateX(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .page-header {
-        margin-bottom: 26px;
-    }
-
-    .page-title {
-        color: var(--users-ink);
-    }
-
-    .page-header > div:last-child {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .password-cell {
-        direction: ltr;
-        unicode-bidi: isolate;
-    }
-</style>
-
-<body>
-
-    <div class="main">
-
-        <div class="page-header">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div class="title-icon"><i class="fas fa-users-cog"></i></div>
-                <h1 class="page-title">إدارة المستخدمين</h1>
-            </div>
-            <div>
+        <div class="page-header users-header-shell">
+            <div class="users-toolbar-actions users-toolbar-actions-right">
                 <a href="dashboard.php" class="back-btn">
                     <i class="fas fa-arrow-right"></i> رجوع
                 </a>
-                <button id="toggleForm" class="add">
-                    <i class="fas fa-plus-circle"></i> إضافة مستخدم
+            </div>
+
+            <div class="users-header-brand-wrap">
+                <div class="users-header-brand">
+                    <div class="title-icon"><i class="fas fa-cogs"></i></div>
+                    <h1 class="page-title">إدارة المستخدمين</h1>
+                </div>
+            </div>
+
+            <div class="users-toolbar-actions users-toolbar-actions-left">
+                <div id="usersExportButtons" class="dt-buttons"></div>
+                <button id="toggleForm" class="add users-add-btn" type="button">
+                    <i class="fas fa-plus-circle"></i> إضافة مستخدم جديد
                 </button>
             </div>
         </div>
@@ -302,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $roleText = isset($roles[$userRole]) ? $roles[$userRole] : "غير معروف";
         ?>
 
-        <form id="projectForm" action="" method="post" style="display:none;">
+        <form id="projectForm" action="" method="post" class="pu-hidden">
             <input type="hidden" name="uid" id="uid" value="0" />
             <div class="card">
                 <div class="card-header">
@@ -317,7 +226,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         <div>
                             <label><i class="fas fa-id-badge"></i> اسم المستخدم</label>
                             <input type="text" name="username" id="username" placeholder="اسم المستخدم (الحد الأدنى 3 أحرف)" value="username" required autocomplete="off" />
-                            <small id="usernameFeedback" style="display:block; margin-top:5px; min-height:20px;"></small>
+                            <small id="usernameFeedback" class="pu-username-feedback"></small>
                         </div>
                         <div>
                             <label><i class="fas fa-lock"></i> كلمة المرور</label>
@@ -339,9 +248,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             <input type="text" name="phone" id="phone" placeholder="رقم الهاتف" required value="09209303903" />
                         </div>
 
-                        <div id="projectDiv" style="display:none;">
+                        <div id="projectDiv" class="pu-hidden">
                             <label><i class="fas fa-project-diagram"></i> المشروع <span
-                                    style="color: red;">*</span></label>
+                                    class="pu-required-star">*</span></label>
                             <select id="project_id" name="project_id" class="form-control">
                                 <option value="">-- اختر المشروع --</option>
                                 <?php
@@ -356,21 +265,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             </select>
                         </div>
 
-                        <div id="mineDiv" style="display:none;">
-                            <label><i class="fas fa-mountain"></i> المنجم <span style="color: red;">*</span></label>
+                        <div id="mineDiv" class="pu-hidden">
+                            <label><i class="fas fa-mountain"></i> المنجم <span class="pu-required-star">*</span></label>
                             <select id="mine_id" name="mine_id" class="form-control">
                                 <option value="">-- اختر المنجم --</option>
                             </select>
                         </div>
 
-                        <div id="contractDiv" style="display:none;">
-                            <label><i class="fas fa-file-contract"></i> العقد <span style="color: red;">*</span></label>
+                        <div id="contractDiv" class="pu-hidden">
+                            <label><i class="fas fa-file-contract"></i> العقد <span class="pu-required-star">*</span></label>
                             <select id="contract_id" name="contract_id" class="form-control">
                                 <option value="">-- اختر العقد --</option>
                             </select>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
+                    <div class="pu-form-actions">
                         <button type="reset" class="btn btn-secondary">
                             <i class="fas fa-eraser"></i> مسح الحقول
                         </button>
@@ -387,8 +296,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 <h5><i class="fas fa-list"></i> قائمة المستخدمين</h5>
             </div>
             <div class="card-body">
+                <div class="users-table-actions-row">
+                    <div class="users-table-note">عرض وإدارة المستخدمين مع التصدير السريع من الشريط العلوي</div>
+                </div>
                 <div class="table-container">
-                <table id="projectsTable" class="display" style="width:100%;">
+                <table id="projectsTable" class="display pu-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -422,7 +334,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                 if ($project_id > 0) {
                                     $select_project = mysqli_query($conn, "SELECT name, project_code FROM `project` WHERE `id` = $project_id");
                                     if ($project_row = mysqli_fetch_array($select_project)) {
-                                        $project_info = "<div style='margin-top: 5px;'><i class='fas fa-project-diagram' style='color: var(--accent-color);'></i> " . htmlspecialchars($project_row['name'], ENT_QUOTES, 'UTF-8') . " (" . $project_row['project_code'] . ")";
+                                        $project_info = "<div class='pu-project-meta'><div class='pu-project-meta-item'><i class='fas fa-project-diagram pu-meta-icon'></i> " . htmlspecialchars($project_row['name'], ENT_QUOTES, 'UTF-8') . " (" . $project_row['project_code'] . ")";
                                     }
                                 }
 
@@ -430,7 +342,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                 if ($mine_id > 0) {
                                     $select_mine = mysqli_query($conn, "SELECT mine_name, mine_code FROM `mines` WHERE `id` = $mine_id");
                                     if ($mine_row = mysqli_fetch_array($select_mine)) {
-                                        $project_info .= "<br><i class='fas fa-mountain' style='color: var(--accent-color);'></i> " . htmlspecialchars($mine_row['mine_name'], ENT_QUOTES, 'UTF-8') . " (" . $mine_row['mine_code'] . ")";
+                                        $project_info .= "</div><div class='pu-project-meta-item'><i class='fas fa-mountain pu-meta-icon'></i> " . htmlspecialchars($mine_row['mine_name'], ENT_QUOTES, 'UTF-8') . " (" . $mine_row['mine_code'] . ")";
                                     }
                                 }
 
@@ -438,12 +350,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                 if ($contract_id > 0) {
                                     $select_contract = mysqli_query($conn, "SELECT contract_signing_date FROM `contracts` WHERE `id` = $contract_id");
                                     if ($contract_row = mysqli_fetch_array($select_contract)) {
-                                        $project_info .= "<br><i class='fas fa-file-contract' style='color: var(--accent-color);'></i> عقد #" . $contract_id . " - " . $contract_row['contract_signing_date'];
+                                        $project_info .= "</div><div class='pu-project-meta-item'><i class='fas fa-file-contract pu-meta-icon'></i> عقد #" . $contract_id . " - " . $contract_row['contract_signing_date'];
                                     }
                                 }
 
                                 if (!empty($project_info)) {
-                                    $project_info = "<div style='font-size: 0.85rem; color: #6c757d; margin-top: 5px;'>" . $project_info . "</div></div>";
+                                    $project_info = $project_info . "</div>";
                                 }
                             }
 
@@ -451,7 +363,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             echo "<td><strong>" . $i++ . "</strong></td>";
                             echo "<td>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . $project_info . "</td>";
                             echo "<td><strong>" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "</strong></td>";
-                            echo "<td><span class='password-cell' style='letter-spacing:2px;color:#94a3b8;'>••••••••</span></td>";
+                            echo "<td><span class='password-cell pu-password-cell'>••••••••</span></td>";
                             echo "<td><span class='role-badge role-" . $row['role'] . "'>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</span></td>";
                             echo "<td><i class='fas fa-phone'></i>" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
                             echo "<td>
@@ -525,9 +437,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (roleNeedsMineScope(this.value)) {
 
-            projectDiv.style.display = "block";
-            mineDiv.style.display = "block";
-            contractDiv.style.display = "block";
+            projectDiv.classList.remove("pu-hidden");
+            mineDiv.classList.remove("pu-hidden");
+            contractDiv.classList.remove("pu-hidden");
 
             projectSelect.required = true;
             mineSelect.required = true;
@@ -535,9 +447,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         } else {
 
-            projectDiv.style.display = "none";
-            mineDiv.style.display = "none";
-            contractDiv.style.display = "none";
+            projectDiv.classList.add("pu-hidden");
+            mineDiv.classList.add("pu-hidden");
+            contractDiv.classList.add("pu-hidden");
 
             projectSelect.required = false;
             mineSelect.required = false;
@@ -629,20 +541,22 @@ document.addEventListener("DOMContentLoaded", function () {
     /* =============================
        DataTable
     ============================== */
-        $('#projectsTable').DataTable({
+        const usersTable = $('#projectsTable').DataTable({
         responsive: true,
         dom: 'Bfrtip',
         buttons: [
-            { extend: 'copy', text: 'نسخ', className: 'users-table-action' },
-            { extend: 'excel', text: 'تصدير Excel', className: 'users-table-action' },
-            { extend: 'csv', text: 'تصدير CSV', className: 'users-table-action' },
-            { extend: 'pdf', text: 'تصدير PDF', className: 'users-table-action' },
-            { extend: 'print', text: 'طباعة', className: 'users-table-action' }
+            { extend: 'copy', text: '<i class="fas fa-copy"></i> نسخ', className: 'users-table-action' },
+            { extend: 'excel', text: '<i class="fas fa-file-excel"></i> Excel', className: 'users-table-action' },
+            { extend: 'csv', text: '<i class="fas fa-file-csv"></i> CSV', className: 'users-table-action' },
+            { extend: 'pdf', text: '<i class="fas fa-file-pdf"></i> PDF', className: 'users-table-action' },
+            { extend: 'print', text: '<i class="fas fa-print"></i> طباعة', className: 'users-table-action' }
         ],
         language: {
             url: "/ems/assets/i18n/datatables/ar.json"
         }
     });
+
+    usersTable.buttons().container().appendTo('#usersExportButtons');
 
     /* =============================
        إظهار / إخفاء النموذج
@@ -651,10 +565,9 @@ document.addEventListener("DOMContentLoaded", function () {
         form.reset();
         document.getElementById("uid").value = 0;
         usernameFeedback.innerHTML = "";
-        usernameInput.style.borderColor = "#e9ecef";
-        usernameInput.style.boxShadow = "";
+        usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");
         usernameValid = true;
-        form.style.display = (form.style.display === "none") ? "block" : "none";
+        form.classList.toggle("pu-hidden");
     });
 
     /* =============================
@@ -679,9 +592,8 @@ document.addEventListener("DOMContentLoaded", function () {
         $('#role').val(role).trigger('change');
 
         // إعادة تعيين حالة التحقق من اسم المستخدم
-        usernameFeedback.innerHTML = '<span style="color: #1d4ed8;"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';
-        usernameInput.style.borderColor = "#e9ecef";
-        usernameInput.style.boxShadow = "";
+        usernameFeedback.innerHTML = '<span class="pu-feedback-ok"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';
+        usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");
         usernameValid = true;
 
         if (roleNeedsMineScope(role)) {
@@ -697,7 +609,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         $('#password').val("");
-        form.style.display = "block";
+        form.classList.remove("pu-hidden");
 
         $('html, body').animate({
             scrollTop: $(form).offset().top - 20
@@ -714,23 +626,22 @@ document.addEventListener("DOMContentLoaded", function () {
         // إعادة تعيين الحالة إذا كان المدخل فارغاً
         if (username === "") {
             usernameFeedback.innerHTML = "";
-            usernameInput.style.borderColor = "#e9ecef";
-            usernameInput.style.boxShadow = "";
+            usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");
             usernameValid = true;
             return;
         }
 
         // التحقق من الطول الأدنى
         if (username.length < 3) {
-            usernameFeedback.innerHTML = '<span style="color: #d4a017;"><i class="fas fa-info-circle"></i> الحد الأدنى 3 أحرف</span>';
-            usernameInput.style.borderColor = "#d4a017";
-            usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(212, 160, 23, 0.20)";
+            usernameFeedback.innerHTML = '<span class="pu-feedback-warn"><i class="fas fa-info-circle"></i> الحد الأدنى 3 أحرف</span>';
+            usernameInput.classList.remove("pu-input-success", "pu-input-error");
+            usernameInput.classList.add("pu-input-warn");
             usernameValid = false;
             return;
         }
 
         // إظهار رسالة التحميل
-        usernameFeedback.innerHTML = '<span style="color: #1a1a1a;"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>';
+        usernameFeedback.innerHTML = '<span class="pu-feedback-loading"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>';
 
         try {
             const response = await fetch("check_username_availability.php", {
@@ -744,18 +655,18 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
 
             if (data.available) {
-                usernameFeedback.innerHTML = `<span style="color: #1d4ed8;"><i class="fas fa-check-circle"></i> ${data.message}</span>`;
+                usernameFeedback.innerHTML = `<span class="pu-feedback-ok"><i class="fas fa-check-circle"></i> ${data.message}</span>`;
                 usernameValid = true;
-                usernameInput.style.borderColor = "#1d4ed8";
-                usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(29, 78, 216, 0.16)";
+                usernameInput.classList.remove("pu-input-warn", "pu-input-error");
+                usernameInput.classList.add("pu-input-success");
             } else {
-                usernameFeedback.innerHTML = `<span style="color: #dc3545;"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
+                usernameFeedback.innerHTML = `<span class="pu-feedback-error"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
                 usernameValid = false;
-                usernameInput.style.borderColor = "#dc3545";
-                usernameInput.style.boxShadow = "0 0 0 0.2rem rgba(220, 53, 69, 0.16)";
+                usernameInput.classList.remove("pu-input-warn", "pu-input-success");
+                usernameInput.classList.add("pu-input-error");
             }
         } catch (error) {
-            usernameFeedback.innerHTML = '<span style="color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> خطأ في التحقق</span>';
+            usernameFeedback.innerHTML = '<span class="pu-feedback-error"><i class="fas fa-exclamation-triangle"></i> خطأ في التحقق</span>';
             console.error("خطأ:", error);
             usernameValid = false;
         }
