@@ -502,10 +502,7 @@
 
 .is-hidden { display: none; }
 
-.form-hidden {
-    display: none;
-    margin-top: 20px;
-}
+/* Moved to allforms in ems.main.all.style.css - legacy CSS removed */
 
 .category-badge {
     display: inline-flex;

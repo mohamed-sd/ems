@@ -413,7 +413,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 
     <?php if ($_SESSION['user']['role'] != "10") { ?>
     <!-- فورم إضافة / تعديل معدة -->
-    <form id="projectForm" action="" method="post" style="display:<?php echo !empty($editData) ? 'block' : 'none'; ?>;">
+    <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
         <div class="card">
             <div class="card-header">
                 <h5>
@@ -842,7 +842,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <i class="fas fa-save"></i>
                             <?php echo !empty($editData) ? "تحديث المعدة" : "حفظ المعدة"; ?>
                         </button>
-                        <button type="button" class="btn-secondary" onclick="document.getElementById('projectForm').style.display='none'; document.getElementById('projectForm').reset();">
+                        <button type="button" class="btn-secondary" onclick="document.getElementById('projectForm').classList.remove('allforms-visible'); document.getElementById('projectForm').reset();">
                             <i class="fas fa-times"></i>
                             إلغاء
                         </button>
@@ -1503,7 +1503,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 
         if (toggleFormBtn && equipmentForm) {
             toggleFormBtn.addEventListener('click', function () {
-                equipmentForm.style.display = equipmentForm.style.display === "none" ? "block" : "none";
+                equipmentForm.classList.toggle('allforms-visible');
             });
         }
 
@@ -1519,7 +1519,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
         <?php if (!empty($editData)) { ?>
         $(document).ready(function() {
             // عرض الفورم
-            $('#projectForm').show();
+            $('#projectForm').addClass('allforms-visible');
             
             // التمرير للفورم
             $('html, body').animate({

@@ -312,7 +312,7 @@ include '../insidebar.php';
     <?php endif; ?>
 
     <!-- ══ فورم إضافة / تعديل مورد ══════════════════════════════════════════ -->
-    <form id="projectForm" action="" method="post" class="suppliers-hidden suppliers-form-block">
+    <form id="projectForm" action="" method="post" class="allforms">
         <div class="card">
             <div class="card-header">
                 <h5><i class="fas fa-edit"></i> إضافة / تعديل مورد</h5>
@@ -357,7 +357,7 @@ include '../insidebar.php';
                     </div>
                     
                     <!-- أنواع المعدات (يمكن اختيار أكثر من نوع) -->
-                    <div class="form-group suppliers-span-full">
+                    <div class="form-group allforms-span-full">
                         <label>المعدات (يمكن اختيار أكثر من نوع)</label>
                         <div class="checkbox-grid">
                             <label class="checkbox-label">
@@ -456,7 +456,7 @@ include '../insidebar.php';
                                 <option value="معفى من التسجيل">معفى من التسجيل</option>
                             </select>
                         </div>
-                        <div class="form-group suppliers-span-full">
+                        <div class="form-group allforms-span-full">
                             <label>العنوان الكامل</label>
                             <textarea name="full_address" id="full_address" rows="3"></textarea>
                         </div>
@@ -799,7 +799,7 @@ include '../insidebar.php';
     const supplierForm          = document.getElementById('projectForm');
     if (toggleSupplierFormBtn && supplierForm) {
         toggleSupplierFormBtn.addEventListener('click', function () {
-            supplierForm.classList.toggle('suppliers-hidden');
+            supplierForm.classList.toggle('allforms-visible');
             // تنظيف الحقول عند الإضافة
             $("#supplier_id").val("");
             $("#supplier_name").val("");
@@ -847,7 +847,7 @@ include '../insidebar.php';
         $("#supplier_status").val($this.data("status"));
 
         // عرض الفورم والتمرير إليه
-        $("#projectForm").removeClass('suppliers-hidden');
+        $("#projectForm").addClass('allforms-visible');
         $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
     });
     
@@ -903,9 +903,9 @@ include '../insidebar.php';
     // ════════════════════════════════════════════════
     window.toggleForm = function () {
         var form = $("#projectForm");
-        if (!form.hasClass('suppliers-hidden')) {
+        if (form.hasClass('allforms-visible')) {
             form.slideUp();
-            form.addClass('suppliers-hidden');
+            form.removeClass('allforms-visible');
         } else {
             // مسح جميع الحقول
             $("#supplier_id").val("");
@@ -926,7 +926,7 @@ include '../insidebar.php';
             $("#contact_person_phone").val("");
             $("#financial_registration_status").val("");
             $("#supplier_status").val("");
-            form.removeClass('suppliers-hidden');
+            form.addClass('allforms-visible');
             form.slideDown();
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
         }

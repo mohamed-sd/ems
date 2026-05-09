@@ -237,7 +237,7 @@ include('../insidebar.php');
 
     <!-- فورم إضافة عقد -->
     <?php if ($can_add || $can_edit): ?>
-    <form id="projectForm" action="" method="post" class="contracts-hidden contracts-form-block">
+    <form id="projectForm" action="" method="post" class="allforms">
 
       <div class="card">
         <div class="card-header">
@@ -1320,7 +1320,7 @@ include('../insidebar.php');
 
       if (toggleContractFormBtn && contractForm) {
         toggleContractFormBtn.addEventListener('click', function () {
-          contractForm.classList.toggle('contracts-hidden');
+          contractForm.classList.toggle('allforms-visible');
         });
       }
     })();
@@ -1778,7 +1778,7 @@ include('../insidebar.php');
 
     // تعبئة الفورم عند التعديل
     $(document).on("click", ".editBtn", function () {
-    $("#projectForm").removeClass('contracts-hidden').show();
+    $("#projectForm").addClass('allforms-visible');
       $("#contract_id").val($(this).data("id"));
 
       // تحميل المشروع والمنجم والعقد

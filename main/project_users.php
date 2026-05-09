@@ -271,7 +271,7 @@ include('../insidebar.php');
     <?php endif; ?>
 
     <!-- فورم إضافة / تعديل مستخدم -->
-    <form id="projectForm" action="" method="post" class="pu-hidden pu-form-block">
+    <form id="projectForm" action="" method="post" class="allforms">
         <input type="hidden" id="action"  name="action"  value="add">
         <input type="hidden" id="user_id" name="user_id" value="">
         <div class="card shadow-sm pu-form-card">
@@ -328,7 +328,7 @@ include('../insidebar.php');
                     <button type="submit" class="btn-submit">
                         <i class="fas fa-save"></i> <span id="submitBtnText">حفظ المستخدم</span>
                     </button>
-                    <button type="button" class="btn-cancel" onclick="document.getElementById('projectForm').classList.add('pu-hidden');">
+                    <button type="button" class="btn-cancel" onclick="document.getElementById('projectForm').classList.remove('allforms-visible');">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>
@@ -458,9 +458,9 @@ include('../insidebar.php');
 
         if (toggleFormBtn) {
             toggleFormBtn.addEventListener('click', function () {
-                projectForm.classList.toggle('pu-hidden');
+                projectForm.classList.toggle('allforms-visible');
                 // تنظيف الحقول عند الإضافة
-                if (!projectForm.classList.contains('pu-hidden')) {
+                if (projectForm.classList.contains('allforms-visible')) {
                     resetForm();
                     $("html, body").animate({ scrollTop: $("#projectForm").offset().top - 100 }, 500);
                 }
@@ -559,7 +559,7 @@ include('../insidebar.php');
             document.getElementById('password').removeAttribute('required');
             
             // عرض الفورم والتمرير إليه
-            projectForm.classList.remove('pu-hidden');
+            projectForm.classList.add('allforms-visible');
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top - 100 }, 500);
         };
 

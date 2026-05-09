@@ -567,7 +567,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
     </div>
 
     <!-- فورم إضافة عقد -->
-    <form id="projectForm" action="" method="post" style="display:none;">
+    <form id="projectForm" action="" method="post" class="allforms">
 
       <div class="card">
         <div class="card-header">
@@ -1551,7 +1551,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
       const contractForm = document.getElementById('projectForm');
 
       toggleContractFormBtn.addEventListener('click', function () {
-        contractForm.style.display = contractForm.style.display === "none" ? "block" : "none";
+        contractForm.classList.toggle('allforms-visible');
       });
     })();
 
@@ -1932,7 +1932,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
     // تعبئة الفورم عند التعديل
     $(document).on("click", ".editBtn", function () {
-      $("#projectForm").show();
+      $("#projectForm").addClass('allforms-visible');
       $("#contract_id").val($(this).data("id"));
       
       // تحميل المشروع والمنجم والعقد

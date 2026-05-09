@@ -401,7 +401,7 @@ include('../insidebar.php');
 
 
     <!-- فورم إضافة / تعديل مشروع -->
-    <form id="projectForm" action="" method="post" class="projects-hidden projects-form-block">
+    <form id="projectForm" action="" method="post" class="allforms">
         <div class="card shadow-sm pu-form-card">
             <div class="card-header">
                 <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة مشروع جديد</span></h5>
@@ -834,15 +834,12 @@ include('../insidebar.php');
                 }
 
                 const $projectForm = $('#projectForm');
-                if ($projectForm.is(':visible')) {
-                    $projectForm.stop(true, true).slideUp(250, function () {
-                        $projectForm.addClass('projects-hidden');
-                        resetProjectForm();
-                    });
+                if ($projectForm.hasClass('allforms-visible')) {
+                    $projectForm.removeClass('allforms-visible');
+                    resetProjectForm();
                 } else {
                     resetProjectForm();
-                    $projectForm.removeClass('projects-hidden').hide();
-                    $projectForm.stop(true, true).slideDown(250);
+                    $projectForm.addClass('allforms-visible');
                 }
             });
         }
@@ -850,14 +847,12 @@ include('../insidebar.php');
         if (projectFormCancelBtn) {
             projectFormCancelBtn.addEventListener('click', function () {
                 const $projectForm = $('#projectForm');
-                if (!$projectForm.is(':visible')) {
+                if (!$projectForm.hasClass('allforms-visible')) {
                     return;
                 }
 
-                $projectForm.stop(true, true).slideUp(250, function () {
-                    $projectForm.addClass('projects-hidden');
-                    resetProjectForm();
-                });
+                $projectForm.removeClass('allforms-visible');
+                resetProjectForm();
             });
         }
 
@@ -972,7 +967,7 @@ include('../insidebar.php');
             setProjectFormEditMode();
 
             closeViewModal();
-            $("#projectForm").removeClass('projects-hidden').hide().stop(true, true).slideDown(250);
+            $("#projectForm").addClass('allforms-visible');
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
         });
 
@@ -994,7 +989,7 @@ include('../insidebar.php');
 
             setProjectFormEditMode();
 
-            $("#projectForm").removeClass('projects-hidden').hide().stop(true, true).slideDown(250);
+            $("#projectForm").addClass('allforms-visible');
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
         });
 
@@ -1006,7 +1001,7 @@ include('../insidebar.php');
 
             if (clientId) {
                 setProjectFormAddMode();
-                $('#projectForm').removeClass('projects-hidden').hide().stop(true, true).slideDown(250);
+                $('#projectForm').addClass('allforms-visible');
                 $('#client_id').val(clientId);
             }
         });

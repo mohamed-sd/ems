@@ -364,7 +364,7 @@ include('../insidebar.php');
 
     <!-- فورم إضافة تشغيل -->
     <?php if ($can_add || $can_edit): ?>
-    <form id="projectForm" action="" method="post" class="form-hidden">
+    <form id="projectForm" action="" method="post" class="allforms">
         <div class="card">
             <div class="card-header">
                 <h5 id="formTitle">
@@ -788,7 +788,7 @@ include('../insidebar.php');
             return false;
         }
 
-        if (form.classList.contains('form-hidden')) {
+        if (!form.classList.contains('allforms-visible')) {
             const formTitle = document.getElementById('formTitle');
             if (formTitle) {
                 formTitle.innerHTML = '<i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد';
@@ -818,11 +818,9 @@ include('../insidebar.php');
             if (shiftHours) shiftHours.value = '0';
             if (status) status.value = '1';
 
-            form.classList.remove('form-hidden');
-            form.style.display = 'block';
+            form.classList.add('allforms-visible');
         } else {
-            form.classList.add('form-hidden');
-            form.style.display = 'none';
+            form.classList.remove('allforms-visible');
         }
 
         return false;
@@ -1097,7 +1095,7 @@ include('../insidebar.php');
             $('#formTitle').html('<i class="fa fa-edit"></i> تعديل بيانات التشغيل');
             
             // إظهار النموذج
-            $('#projectForm').removeClass('form-hidden').show();
+            $('#projectForm').addClass('allforms-visible').show();
             $('html, body').animate({scrollTop: $('#projectForm').offset().top - 100}, 500);
             
             // ملء البيانات الأساسية
@@ -1587,7 +1585,7 @@ include('../insidebar.php');
 
     <!-- فورم إضافة تشغيل -->
     <?php if ($can_add || $can_edit): ?>
-    <form id="projectForm" action="" method="post" class="form-hidden">
+    <form id="projectForm" action="" method="post" class="allforms">
         <div class="card">
             <div class="card-header">
                 <h5 id="formTitle">
@@ -2011,7 +2009,7 @@ include('../insidebar.php');
             return false;
         }
 
-        if (form.classList.contains('form-hidden')) {
+        if (!form.classList.contains('allforms-visible')) {
             const formTitle = document.getElementById('formTitle');
             if (formTitle) {
                 formTitle.innerHTML = '<i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد';
@@ -2041,11 +2039,9 @@ include('../insidebar.php');
             if (shiftHours) shiftHours.value = '0';
             if (status) status.value = '1';
 
-            form.classList.remove('form-hidden');
-            form.style.display = 'block';
+            form.classList.add('allforms-visible');
         } else {
-            form.classList.add('form-hidden');
-            form.style.display = 'none';
+            form.classList.remove('allforms-visible');
         }
 
         return false;
@@ -2320,7 +2316,7 @@ include('../insidebar.php');
             $('#formTitle').html('<i class="fa fa-edit"></i> تعديل بيانات التشغيل');
             
             // إظهار النموذج
-            $('#projectForm').removeClass('form-hidden').show();
+            $('#projectForm').addClass('allforms-visible').show();
             $('html, body').animate({scrollTop: $('#projectForm').offset().top - 100}, 500);
             
             // ملء البيانات الأساسية

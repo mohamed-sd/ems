@@ -419,7 +419,7 @@ include '../insidebar.php';
     <?php endif; ?>
 
     <?php if ($can_edit): ?>
-    <form id="addDriverForm" action="" method="post" class="form-hidden add-driver-form">
+    <form id="addDriverForm" action="" method="post" class="allforms add-driver-form">
         <input type="hidden" name="action" value="add_driver_assignment">
         <div class="card">
             <div class="card-header">
@@ -570,11 +570,16 @@ $(document).ready(function () {
     });
 
     $('#toggleAddDriverForm').on('click', function () {
-        $('#addDriverForm').slideToggle(250);
+        var $form = $('#addDriverForm');
+        if ($form.hasClass('allforms-visible')) {
+            $form.removeClass('allforms-visible').slideUp(200);
+        } else {
+            $form.addClass('allforms-visible').hide().slideDown(250);
+        }
     });
 
     $('#cancelAddDriverForm').on('click', function () {
-        $('#addDriverForm').slideUp(200);
+        $('#addDriverForm').removeClass('allforms-visible').slideUp(200);
     });
 });
 </script>

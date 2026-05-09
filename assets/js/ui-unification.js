@@ -265,6 +265,11 @@
                 madeVisible = true;
             }
 
+            if (projectForm.classList.contains('allforms') && !projectForm.classList.contains('allforms-visible')) {
+                projectForm.classList.add('allforms-visible');
+                madeVisible = true;
+            }
+
             if (projectForm.style && projectForm.style.display === 'none') {
                 projectForm.style.display = 'block';
                 madeVisible = true;

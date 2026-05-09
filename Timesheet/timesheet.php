@@ -491,7 +491,7 @@ if (!$is_super_admin) {
             </a>
         </div>
     </div>
-    <form id="projectForm" action="" method="post" style="display:none;">
+    <form id="projectForm" action="" method="post" class="allforms">
         <?php if ($_GET['type'] == "1") {
           // نوع المعدة كان حفار 
           ?>
@@ -1641,14 +1641,8 @@ if (!$is_super_admin) {
       if (toggleFormBtn && form) {
         toggleFormBtn.addEventListener('click', function (e) {
           e.preventDefault();
-          console.log('Toggle clicked, current display:', form.style.display);
-          if (form.style.display === "none" || form.style.display === "") {
-            form.style.display = "block";
-            console.log('Form shown');
-          } else {
-            form.style.display = "none";
-            console.log('Form hidden');
-          }
+          console.log('Toggle clicked, current state:', form.classList.contains('allforms-visible'));
+          form.classList.toggle('allforms-visible');
         });
       } else {
         console.error('Toggle button or form not found!');
@@ -1985,7 +1979,7 @@ if (!$is_super_admin) {
         window.loadTimesheetFaultItems(data.id);
       }
 
-      $("#projectForm").show();
+      $("#projectForm").addClass('allforms-visible');
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
     })
       .fail(function () {

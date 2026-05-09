@@ -142,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <!-- نموذج إضافة / تعديل -->
-    <form id="projectForm" method="post" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>">
+    <form id="projectForm" method="post" class="allforms<?= !empty($editData) ? ' allforms-visible' : ''; ?>">
 
         <div class="card">
             <div class="card-header">
@@ -290,7 +290,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
 
         $('#toggleForm').on('click', function () {
-            $('#projectForm').slideToggle();
+            const $form = $('#projectForm');
+            if ($form.hasClass('allforms-visible')) {
+                $form.removeClass('allforms-visible').slideUp(200);
+            } else {
+                $form.addClass('allforms-visible').hide().slideDown(250);
+            }
         });
 
         $('.delete-disabled').on('click', function () {

@@ -516,7 +516,7 @@ include('../insidebar.php');
     </div>
 
     <!-- فورم إضافة / تعديل مشغل -->
-    <form id="projectForm" action="" method="post" style="display:none; margin-bottom:20px;">
+    <form id="projectForm" action="" method="post" class="allforms">
         <div class="card shadow-sm">
             <div class="card-header" style="background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff;">
                 <h5><i class="fas fa-edit"></i> إضافة / تعديل مشغل - نموذج شامل</h5>
@@ -931,7 +931,7 @@ include('../insidebar.php');
                     <button type="submit" class="btn-submit" style="padding: 15px 40px; font-size: 1.1rem;">
                         <i class="fas fa-save"></i> حفظ المشغل
                     </button>
-                    <button type="button" class="btn-cancel" onclick="document.getElementById('projectForm').style.display='none';">
+                    <button type="button" class="btn-cancel" onclick="document.getElementById('projectForm').classList.remove('allforms-visible');">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn-submit" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="expandAllSections()">
@@ -1118,9 +1118,9 @@ include('../insidebar.php');
         
         if (toggleFormBtn) {
             toggleFormBtn.addEventListener('click', function () {
-                projectForm.style.display = projectForm.style.display === "none" ? "block" : "none";
+                projectForm.classList.toggle('allforms-visible');
                 
-                if (projectForm.style.display === "block") {
+                if (projectForm.classList.contains('allforms-visible')) {
                     // تنظيف جميع الحقول
                     projectForm.reset();
                     $("#drivers_id").val("");
@@ -1200,7 +1200,7 @@ include('../insidebar.php');
                         $("#status").val(driver.status);
                         
                         // عرض الفورم وفتح جميع المجموعات
-                        projectForm.style.display = "block";
+                        projectForm.classList.add('allforms-visible');
                         expandAllSections();
                         $("html, body").animate({ scrollTop: $("#projectForm").offset().top - 100 }, 500);
                     } else {

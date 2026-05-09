@@ -748,7 +748,7 @@ include('../insidebar.php');
     </div>
 
     <!-- فورم إضافة / تعديل عميل -->
-    <form id="clientForm" action="" method="post" class="clients-hidden clients-form-block">
+    <form id="clientForm" action="" method="post" class="allforms">
         <input type="hidden" name="client_id" id="client_id" value="">
         <input type="hidden" name="csrf_token" value="<?php echo clients_e($clients_csrf_token); ?>">
         <div class="card shadow-sm pu-form-card">
@@ -1252,13 +1252,13 @@ include('../insidebar.php');
 
         if (clientForm.is(':visible')) {
             clientForm.stop(true, true).slideUp(250, function () {
-                clientForm.addClass('clients-hidden');
+                clientForm.removeClass('allforms-visible');
                 resetClientForm();
                 updateFormToggleState(false);
             });
         } else {
             resetClientForm();
-            clientForm.removeClass('clients-hidden').hide();
+            clientForm.addClass('allforms-visible').hide();
             clientForm.stop(true, true).slideDown(250, function () {
                 updateFormToggleState(true);
             });
@@ -1271,7 +1271,7 @@ include('../insidebar.php');
         }
 
         clientForm.stop(true, true).slideUp(250, function () {
-            clientForm.addClass('clients-hidden');
+            clientForm.removeClass('allforms-visible');
             resetClientForm();
             updateFormToggleState(false);
         });
@@ -1323,7 +1323,7 @@ include('../insidebar.php');
 
         // عرض الفورم إذا كان مخفياً
         if (!clientForm.is(':visible')) {
-            clientForm.removeClass('clients-hidden').hide();
+            clientForm.addClass('allforms-visible').hide();
             clientForm.stop(true, true).slideDown(250, function () {
                 updateFormToggleState(true);
             });
@@ -1520,7 +1520,7 @@ include('../insidebar.php');
 
         // عرض الفورم إذا كان مخفياً
         if (!clientForm.is(':visible')) {
-            clientForm.removeClass('clients-hidden').hide();
+            clientForm.addClass('allforms-visible').hide();
             clientForm.stop(true, true).slideDown(250, function () {
                 updateFormToggleState(true);
             });

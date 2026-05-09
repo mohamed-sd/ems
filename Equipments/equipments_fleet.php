@@ -489,7 +489,7 @@ if (!empty($editData)) {
 
     <?php if ($can_add || $can_edit) { ?>
         <!-- فورم إضافة / تعديل معدة -->
-        <form id="projectForm" action="" method="post" class="<?php echo !empty($editData) ? '' : 'fleet-hidden'; ?>">
+        <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
             <div class="card">
                 <div class="card-header">
                     <h5>
@@ -1004,7 +1004,7 @@ if (!empty($editData)) {
                                 <?php echo !empty($editData) ? "تحديث المعدة" : "حفظ المعدة"; ?>
                             </button>
                             <button type="button" class="btn-secondary"
-                                onclick="document.getElementById('projectForm').classList.add('fleet-hidden'); document.getElementById('projectForm').reset();">
+                                onclick="document.getElementById('projectForm').classList.remove('allforms-visible'); document.getElementById('projectForm').reset();">
                                 <i class="fas fa-times"></i>
                                 إلغاء
                             </button>
@@ -1705,16 +1705,14 @@ if (!empty($editData)) {
                     return false;
                 }
 
-                const isHidden = equipmentForm.classList.contains('fleet-hidden');
+                const isHidden = !equipmentForm.classList.contains('allforms-visible');
                 if (isHidden) {
-                    equipmentForm.classList.remove('fleet-hidden');
-                    equipmentForm.style.display = 'block';
+                    equipmentForm.classList.add('allforms-visible');
                     $('html, body').animate({
                         scrollTop: $('#projectForm').offset().top - 100
                     }, 300);
                 } else {
-                    equipmentForm.classList.add('fleet-hidden');
-                    equipmentForm.style.display = 'none';
+                    equipmentForm.classList.remove('allforms-visible');
                 }
 
                 return false;

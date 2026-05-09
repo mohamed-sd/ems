@@ -211,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $roleText = isset($roles[$userRole]) ? $roles[$userRole] : "غير معروف";
         ?>
 
-        <form id="projectForm" action="" method="post" class="pu-hidden">
+        <form id="projectForm" action="" method="post" class="allforms">
             <input type="hidden" name="uid" id="uid" value="0" />
             <div class="card">
                 <div class="card-header">
@@ -567,7 +567,7 @@ document.addEventListener("DOMContentLoaded", function () {
         usernameFeedback.innerHTML = "";
         usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");
         usernameValid = true;
-        form.classList.toggle("pu-hidden");
+        form.classList.toggle("allforms-visible");
     });
 
     /* =============================
@@ -609,7 +609,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         $('#password').val("");
-        form.classList.remove("pu-hidden");
+        form.classList.add("allforms-visible");
 
         $('html, body').animate({
             scrollTop: $(form).offset().top - 20
