@@ -1,7 +1,8 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    die(json_encode(['error' => 'Unauthorized']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['error' => 'Unauthorized'], JSON_UNESCAPED_UNICODE));
 }
 
 include '../config.php';
@@ -10,7 +11,8 @@ $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user'][
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    die(json_encode(['error' => 'Unauthorized company context']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['error' => 'Unauthorized company context'], JSON_UNESCAPED_UNICODE));
 }
 
 $tenant_scope = "";
@@ -62,15 +64,15 @@ if ($_SESSION['user']['role'] == "6") {
 
 // Add search filter
 if (!empty($search)) {
-    $where .= " AND (e.code LIKE '%$search%' 
-                OR e.name LIKE '%$search%' 
-                OR d.name LIKE '%$search%' 
+    $where .= " AND (e.code LIKE '%$search%'
+                OR e.name LIKE '%$search%'
+                OR d.name LIKE '%$search%'
                 OR t.date LIKE '%$search%'
                 OR p.name LIKE '%$search%')";
 }
 
 // Count total records (without filtering)
-$totalQuery = "SELECT COUNT(*) as total 
+$totalQuery = "SELECT COUNT(*) as total
                FROM timesheet t
                JOIN operations o ON t.operator = o.id
                JOIN equipments e ON o.equipment = e.id
@@ -86,7 +88,7 @@ $totalResult = mysqli_query($conn, $totalQuery);
 $totalRecords = mysqli_fetch_assoc($totalResult)['total'];
 
 // Count filtered records
-$filteredQuery = "SELECT COUNT(*) as total 
+$filteredQuery = "SELECT COUNT(*) as total
                   FROM timesheet t
                   JOIN operations o ON t.operator = o.id
                   JOIN equipments e ON o.equipment = e.id
@@ -100,12 +102,12 @@ $filteredRecords = mysqli_fetch_assoc($filteredResult)['total'];
 // Fetch data
 $query = "SELECT t.id, t.shift, t.date, t.executed_hours,
           t.standby_hours, t.total_fault_hours, t.bucket_hours, t.jackhammer_hours,
-          t.extra_hours, t.extra_hours_total, t.dependence_hours, t.total_work_hours, 
+          t.extra_hours, t.extra_hours_total, t.dependence_hours, t.total_work_hours,
           t.status, t.work_notes, t.hr_fault,
           e.code AS eq_code, e.name AS eq_name,
           p.name AS project_name,
           o.id AS operation_id,
-          d.name AS driver_name 
+          d.name AS driver_name
           FROM timesheet t
           JOIN operations o ON t.operator = o.id
           JOIN equipments e ON o.equipment = e.id
@@ -125,7 +127,7 @@ $data = [];
 $i = $start + 1;
 
 while ($row = mysqli_fetch_assoc($result)) {
-    $totalwork = $row['standby_hours'] + $row['bucket_hours'] + $row['jackhammer_hours'] + 
+    $totalwork = $row['standby_hours'] + $row['bucket_hours'] + $row['jackhammer_hours'] +
                  $row['extra_hours'] + $row['dependence_hours'];
     $totalall = $row['total_work_hours'] + $row['total_fault_hours'];
 
@@ -145,8 +147,8 @@ while ($row = mysqli_fetch_assoc($result)) {
     }
 
     // Shift badge
-    $shiftBadge = $row['shift'] == "D" 
-        ? "<span style='background: #ffeaa7; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #2d3436;'><i class='fas fa-sun'></i> صباحية</span>" 
+    $shiftBadge = $row['shift'] == "D"
+        ? "<span style='background: #ffeaa7; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #2d3436;'><i class='fas fa-sun'></i> صباحية</span>"
         : "<span style='background: #2d3436; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #fff;'><i class='fas fa-moon'></i> مسائية</span>";
 
         //   <a href='aprovment.php?t=$type&type=1&id={$row['id']}' title='قبول' style='color: #27ae60; font-size: 1.1rem; margin: 0 3px;'>
@@ -157,7 +159,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         // </a>
     // Action buttons
     $actions = "
-      
+
         <a href='javascript:void(0)' class='editBtn' data-id='{$row['id']}' title='تعديل' style='color:#3498db; font-size: 1.1rem; margin: 0 3px;'>
             <i class='fas fa-edit'></i>
         </a>
@@ -196,6 +198,7 @@ $response = [
     "data" => $data
 ];
 
+while (ob_get_level()) ob_end_clean();
 header('Content-Type: application/json; charset=utf-8');
-echo json_encode($response);
+echo json_encode($response, JSON_UNESCAPED_UNICODE);
 exit;

@@ -1,5 +1,8 @@
 <?php
 session_start();
+
+while (ob_get_level()) ob_end_clean();
+
 if (!isset($_SESSION['user'])) {
     die(json_encode(['success' => false, 'message' => 'Unauthorized']));
 }
@@ -10,23 +13,23 @@ header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_id'])) {
     $project_id = intval($_POST['project_id']);
-    
+
     // جلب عقود المشروع المحدد عبر المناجم
-    $contracts_query = "SELECT 
-        c.id, 
+    $contracts_query = "SELECT
+        c.id,
         CONCAT('عقد رقم ', c.id, ' - ', m.mine_name, ' - ', DATE_FORMAT(c.actual_start, '%Y/%m/%d'), ' - ', c.forecasted_contracted_hours, ' ساعة') as display_name,
         c.forecasted_contracted_hours
         FROM contracts c
         LEFT JOIN mines m ON c.mine_id = m.id
         WHERE m.project_id = $project_id AND c.status = 1
         ORDER BY c.actual_start DESC";
-    
+
     $result = mysqli_query($conn, $contracts_query);
-    
+
     if (!$result) {
         die(json_encode(['success' => false, 'message' => 'خطأ في جلب العقود']));
     }
-    
+
     $contracts = [];
     while ($row = mysqli_fetch_assoc($result)) {
         $contracts[] = [
@@ -35,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_id'])) {
             'hours' => floatval($row['forecasted_contracted_hours'])
         ];
     }
-    
+
     echo json_encode([
         'success' => true,
         'contracts' => $contracts

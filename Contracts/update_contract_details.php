@@ -3,6 +3,8 @@ include '../config.php';
 require_login();
 require_once '../includes/approval_workflow.php';
 
+while (ob_get_level()) ob_end_clean();
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
 }

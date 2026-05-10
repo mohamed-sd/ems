@@ -1,5 +1,8 @@
 <?php
 session_start();
+
+while (ob_get_level()) ob_end_clean();
+
 if (!isset($_SESSION['user'])) {
     echo json_encode(['success' => false, 'message' => 'غير مصرح']);
     exit;
@@ -85,7 +88,7 @@ $contract_query = "SELECT c.*, m.mine_name, m.project_id, p.name as project_name
                    (SELECT COALESCE(SUM(ce.equip_count), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count,
                    (SELECT COALESCE(SUM(ce.equip_count_basic), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count_basic,
                    (SELECT COALESCE(SUM(ce.equip_count_backup), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count_backup
-                   FROM contracts c 
+                   FROM contracts c
                    LEFT JOIN mines m ON c.mine_id = m.id
                    LEFT JOIN project p ON m.project_id = p.id
                                      WHERE c.id = $contract_id
@@ -108,7 +111,7 @@ $project_id = $contract['project_id'];
 
 // جلب عقود الموردين المرتبطة بنفس المشروع مع عدد المعدات
 $project_id = $contract['project_id'];
-$suppliers_query = "SELECT 
+$suppliers_query = "SELECT
     sc.id,
     sc.supplier_id,
     s.name as supplier_name,
@@ -130,7 +133,7 @@ $total_supplier_equipment = 0;
 if ($suppliers_result) {
     while ($row = mysqli_fetch_assoc($suppliers_result)) {
         // جلب تفاصيل المعدات لهذا المورد
-        $equip_details_query = "SELECT 
+        $equip_details_query = "SELECT
                                         et.type as type_name,
                                         sce.equip_type,
                                         SUM(sce.equip_count) as total_count,
@@ -142,9 +145,9 @@ if ($suppliers_result) {
                                  WHERE sce.contract_id = " . $row['id'] . "
                                  GROUP BY sce.equip_type, et.type";
         $equip_details_result = mysqli_query($conn, $equip_details_query);
-        
+
         $equipment_breakdown = [];
-        
+
         while ($equip = mysqli_fetch_assoc($equip_details_result)) {
             // حساب عدد الآليات المشغّلة فعليًا من جدول operations
                         $operating_count_query = "SELECT COUNT(DISTINCT o.equipment) as operating_count
@@ -157,10 +160,10 @@ if ($suppliers_result) {
             $operating_result = mysqli_query($conn, $operating_count_query);
             $operating_row = mysqli_fetch_assoc($operating_result);
             $operating_count = intval($operating_row['operating_count']);
-            
+
             $contracted_count = intval($equip['total_count']);
             $remaining_count = max(0, $contracted_count - $operating_count);
-            
+
             $equipment_breakdown[] = [
                 'type' => $equip['type_name'] ?: 'غير محدد',
                 'type_id' => $equip['equip_type'],
@@ -172,7 +175,7 @@ if ($suppliers_result) {
                 'hours' => floatval($equip['total_hours'])
             ];
         }
-        
+
         $suppliers[] = [
             'id' => $row['id'],
             'supplier_id' => $row['supplier_id'],

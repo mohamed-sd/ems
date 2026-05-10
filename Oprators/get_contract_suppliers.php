@@ -1,5 +1,8 @@
 <?php
 session_start();
+
+while (ob_get_level()) ob_end_clean();
+
 if (!isset($_SESSION['user'])) {
     die(json_encode(['success' => false, 'message' => 'Unauthorized']));
 }

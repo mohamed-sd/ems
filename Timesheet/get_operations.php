@@ -1,6 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
+    while (ob_get_level()) ob_end_clean();
     exit;
 }
 
@@ -13,11 +14,13 @@ $project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'c
 $session_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
+    while (ob_get_level()) ob_end_clean();
     exit;
 }
 
 $type = isset($_GET['type']) ? trim($_GET['type']) : '';
 if ($type !== '1' && $type !== '2' && $type !== '3') {
+    while (ob_get_level()) ob_end_clean();
     echo "<option value=''>-- اختر نوع الآلية أولاً --</option>";
     exit;
 }
@@ -57,6 +60,7 @@ $query = "SELECT o.id, e.code, e.name
 
 $result = mysqli_query($conn, $query);
 
+while (ob_get_level()) ob_end_clean();
 echo "<option value=''>-- اختر الآلية --</option>";
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {

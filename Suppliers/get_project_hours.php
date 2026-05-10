@@ -1,5 +1,8 @@
 <?php
 session_start();
+
+while (ob_get_level()) ob_end_clean();
+
 if (!isset($_SESSION['user'])) {
     die(json_encode(['success' => false, 'message' => 'Unauthorized']));
 }
@@ -11,9 +14,9 @@ header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id'])) {
     $project_contract_id = intval($_POST['project_contract_id']); // معرف العقد من جدول contracts
     $supplier_contract_id = isset($_POST['supplier_contract_id']) ? intval($_POST['supplier_contract_id']) : 0;
-    
+
     // جلب إجمالي ساعات العقد المحدد من جدول contracts
-    $contract_query = "SELECT 
+    $contract_query = "SELECT
         c.forecasted_contracted_hours as contract_total_hours,
         m.project_id
         FROM contracts c
@@ -22,13 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
         LIMIT 1";
     $contract_result = mysqli_query($conn, $contract_query);
     $contract_data = mysqli_fetch_assoc($contract_result);
-    
+
     if (!$contract_data) {
         die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
     }
-    
+
     // جلب تفصيل ساعات المعدات حسب النوع للعقد المحدد
-    $equipment_details_query = "SELECT 
+    $equipment_details_query = "SELECT
         ce.equip_type,
         et.type AS equip_type_name,
         COALESCE(SUM(ce.equip_total_contract), 0) as total_hours,
@@ -51,25 +54,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
             'count_backup' => intval($row['equipment_count_backup']) ?: 0
         ];
     }
-    
+
     // جلب مجموع ساعات عقود الموردين لهذا العقد المحدد (باستثناء العقد الحالي عند التعديل)
-    $suppliers_query = "SELECT 
+    $suppliers_query = "SELECT
         COALESCE(SUM(forecasted_contracted_hours), 0) as suppliers_contracted_hours
-        FROM supplierscontracts 
+        FROM supplierscontracts
         WHERE project_contract_id = $project_contract_id";
-    
+
     // استثناء عقد المورد الحالي عند التعديل
     if ($supplier_contract_id > 0) {
         $suppliers_query .= " AND id != $supplier_contract_id";
     }
-    
+
     $suppliers_result = mysqli_query($conn, $suppliers_query);
     $suppliers_data = mysqli_fetch_assoc($suppliers_result);
-    
+
     $contract_hours = floatval($contract_data['contract_total_hours']);
     $suppliers_hours = floatval($suppliers_data['suppliers_contracted_hours']);
     $remaining = $contract_hours - $suppliers_hours;
-    
+
     echo json_encode([
         'success' => true,
         'contract_total_hours' => $contract_hours,
