@@ -1187,8 +1187,8 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
                     $done    = (intval($row['max_approved_level'] ?? 0) >= $lv);
                   ?>
                   <span class="apv-circle-wrap">
-                    <span class="apv-circle <?= $done ? 'apv-done' : 'apv-pending' ?>" 
-                          style="border-color:<?= $lv_info['color'] ?>; 
+                    <span class="apv-circle <?= $done ? 'apv-done' : 'apv-pending' ?>"
+                          style="border-color:<?= $lv_info['color'] ?>;
                                   <?php if ($done): ?>background:<?= $lv_info['color'] ?>;color:#fff;<?php endif; ?>"
                           title="<?= $lv_info['label'] ?>">
                       <i class="fa <?= $lv_info['icon'] ?>" style="font-size:.5rem;"></i>
@@ -1201,7 +1201,7 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
                   <?php if ($lv < 4): ?><span class="apv-connector <?= $done ? 'apv-conn-done' : '' ?>"></span><?php endif; ?>
                   <?php endfor; ?>
                 </div>
-                
+
                 <!-- أزرار الإجراءات -->
                 <div class="d-inline-flex gap-1">
                   <a href="../Timesheet/timesheet_details.php?id=<?= intval($row['id']) ?>" target="_blank"
@@ -1209,11 +1209,11 @@ table.ha-table tr.selected-row td { background: #e8f4ff !important; }
                     <i class="fa fa-circle-info"></i>
                   </a>
                   <?php if (!$is_admin && !$is_site_manager && $my_level <= 4 && (intval($row['max_approved_level'] ?? 0) < $my_level)): ?>
-                  <button class="apv-approve" onclick="approveSingle(<?= $row['id'] ?>)" 
+                  <button class="apv-approve" onclick="approveSingle(<?= $row['id'] ?>)"
                           title="اعتماد السجل">
                     <i class="fa fa-check"></i>
                   </button>
-                  <button class="apv-reject" onclick="rejectSingle(<?= $row['id'] ?>)" 
+                  <button class="apv-reject" onclick="rejectSingle(<?= $row['id'] ?>)"
                           title="رفض السجل">
                     <i class="fa fa-xmark"></i>
                   </button>
@@ -1987,4 +1987,11 @@ function updateFilterInfo() {
 $(document).on('change', '#filter-project, #filter-supplier, #filter-driver, #filter-equip', function(){
   applyFilters();
 });
+
+// ── فلتر نوع المعدة ──────────────────────────────────────────
+function applyEquipTypeFilter() {
+  var equipType = $('#equip_type').val();
+  // إعادة تحميل الصفحة مع معامل الفلتر
+  window.location.href = 'hours_approval.php?equip_type=' + equipType;
+}
 </script>
