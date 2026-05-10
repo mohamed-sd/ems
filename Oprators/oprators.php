@@ -313,11 +313,14 @@ include('../insidebar.php');
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <div class="main">
-    <div class="page-header">
+    <div class="header">
+        <a href="../main/dashboard.php" class="back-btn">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </a>
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-hard-hat"></i></div>
             <div>
-                <div><?php echo htmlspecialchars($selected_project['name']); ?></div>
+            <div><?php echo htmlspecialchars($selected_project['name']); ?></div>
                 <?php if (!empty($selected_project['project_code'])) { ?>
                     <small class="page-subtitle">
                         <i class="fas fa-barcode"></i>
@@ -330,10 +333,7 @@ include('../insidebar.php');
                 </small>
             </div>
         </h1>
-        <div class="page-header-actions">
-             <a href="../main/dashboard.php" class="back-btn">
-                    <i class="fas fa-arrow-right"></i> رجوع
-                </a>
+        <div class="header -actions">
             <?php if ($can_view): ?>
             <a href="select_project.php" class="back-btn">
                 <i class="fas fa-exchange-alt"></i>
@@ -470,7 +470,7 @@ include('../insidebar.php');
 
         <div id="suppliersSection" class="suppliers-section">
             <div class="table-scroll">
-                <table class="suppliers-table">
+                <table class="alltables">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -1534,11 +1534,14 @@ include('../insidebar.php');
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <div class="main">
-    <div class="page-header">
+    <div class="header">
+        <a href="../main/dashboard.php" class="back-btn">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </a>
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-hard-hat"></i></div>
             <div>
-                <div><?php echo htmlspecialchars($selected_project['name']); ?></div>
+            <div><?php echo htmlspecialchars($selected_project['name']); ?></div>
                 <?php if (!empty($selected_project['project_code'])) { ?>
                     <small class="page-subtitle">
                         <i class="fas fa-barcode"></i>
@@ -1551,10 +1554,7 @@ include('../insidebar.php');
                 </small>
             </div>
         </h1>
-        <div class="page-header-actions">
-             <a href="../main/dashboard.php" class="back-btn">
-                    <i class="fas fa-arrow-right"></i> رجوع
-                </a>
+        <div class="header -actions">
             <?php if ($can_view): ?>
             <a href="select_project.php" class="back-btn">
                 <i class="fas fa-exchange-alt"></i>
@@ -1691,7 +1691,7 @@ include('../insidebar.php');
 
         <div id="suppliersSection" class="suppliers-section">
             <div class="table-scroll">
-                <table class="suppliers-table">
+                <table class="alltables">
                     <thead>
                         <tr>
                             <th>#</th>

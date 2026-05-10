@@ -1,0 +1,104 @@
+{
+    // ========================================
+    // ENCODING PROTECTION - CRITICAL SETTINGS
+    // These settings PREVENT encoding issues
+    // ========================================
+
+    // Force UTF-8 without BOM for all files
+    "files.encoding": "utf8",
+
+    // Detect encoding automatically but always write UTF-8
+    "files.autoGuessEncoding": false,
+
+    // Force LF line endings (Unix style) for all files
+    "files.eol": "\n",
+
+    // Remove trailing whitespace on save
+    "files.trimTrailingWhitespace": true,
+
+    // Insert final newline on save
+    "files.insertFinalNewline": true,
+
+    // Trim final newlines on save
+    "files.trimFinalNewlines": true,
+
+    // Format on save for consistent style
+    "editor.formatOnSave": false,
+
+    // Show encoding in status bar so you can always see it
+    "workbench.statusBar.visible": true,
+
+    // PHP-specific settings
+    "[php]": {
+        "files.encoding": "utf8",
+        "files.eol": "\n",
+        "editor.defaultFormatter": null,
+        "files.trimTrailingWhitespace": true
+    },
+
+    // JavaScript-specific settings
+    "[javascript]": {
+        "files.encoding": "utf8",
+        "files.eol": "\n",
+        "files.trimTrailingWhitespace": true
+    },
+
+    // CSS-specific settings
+    "[css]": {
+        "files.encoding": "utf8",
+        "files.eol": "\n",
+        "files.trimTrailingWhitespace": true
+    },
+
+    // SQL-specific settings
+    "[sql]": {
+        "files.encoding": "utf8",
+        "files.eol": "\n",
+        "files.trimTrailingWhitespace": true
+    },
+
+    // JSON-specific settings
+    "[json]": {
+        "files.encoding": "utf8",
+        "files.eol": "\n"
+    },
+
+    // Markdown-specific settings
+    "[markdown]": {
+        "files.encoding": "utf8",
+        "files.eol": "\n",
+        "files.trimTrailingWhitespace": false
+    },
+
+    // HTML-specific settings
+    "[html]": {
+        "files.encoding": "utf8",
+        "files.eol": "\n",
+        "files.trimTrailingWhitespace": true
+    },
+
+    // Files to exclude from search/watch (not from encoding protection)
+    "files.exclude": {
+        "**/vendor/**": false,
+        "**/.git": true
+    },
+
+    // Search exclusions
+    "search.exclude": {
+        "**/vendor/**": true,
+        "**/.git/**": true,
+        "**/node_modules/**": true
+    },
+
+    // Git settings - never convert line endings
+    "git.eol": "\n",
+
+    // Terminal encoding
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+
+    // PowerShell encoding in terminal
+    "terminal.integrated.env.windows": {
+        "PYTHONIOENCODING": "utf-8",
+        "LANG": "ar_SA.UTF-8"
+    }
+}

@@ -301,7 +301,7 @@ include('../insidebar.php');
 </style>
 
 <div class="main">
-    <div class="page-header">
+    <div class="header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-layer-group"></i></div>
             إدارة الصفحات والموديولات

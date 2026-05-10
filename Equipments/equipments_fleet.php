@@ -451,8 +451,15 @@ if (!empty($editData)) {
 
 <div class="main equipments-fleet-main ems-unified-page-shell">
     <!-- عنوان الصفحة -->
-    <div class="page-header">
-        <div class="page-header-actions">
+    <div class="header">
+        <a href="../main/dashboard.php" class="back-btn">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </a>
+        <h1 class="page-title">
+            <div class="title-icon"><i class="fas fa-cogs"></i></div>
+            إدارة المعدات
+        </h1>
+        <div class="header -actions">
             <?php if ($can_add) { ?>
                 <a href="javascript:void(0)" id="toggleForm" class="add-btn" onclick="toggleFleetForm(event)">
                     <i class="fas fa-plus-circle"></i> إضافة معدة جديدة
@@ -469,13 +476,6 @@ if (!empty($editData)) {
                 </a>
             <?php } ?>
         </div>
-        <h1 class="page-title">
-            <div class="title-icon"><i class="fas fa-cogs"></i></div>
-            إدارة المعدات
-        </h1>
-        <a href="../main/dashboard.php" class="back-btn">
-            <i class="fas fa-arrow-right"></i> رجوع
-        </a>
     </div>
 
     <?php if (!empty($success_msg)):

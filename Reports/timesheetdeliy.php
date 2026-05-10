@@ -192,7 +192,7 @@ WHERE 1=1
 
     <div class="main">
 
-        <div class="page-header">
+        <div class="header">
             <h1 class="page-title">
                 <div class="title-icon"><i class="fa-solid fa-chart-column"></i></div>
                 تقرير التايم شيت اليومي

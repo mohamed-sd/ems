@@ -551,12 +551,12 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
   <div class="main">
 
-    <div class="page-header">
+    <div class="header">
       <div style="display: flex; align-items: center; gap: 12px;">
         <div class="title-icon"><i class="fas fa-file-contract"></i></div>
         <h1 class="page-title">إدارة عقود السائق</h1>
       </div>
-      <div class="page-header-actions">
+      <div class="header -actions">
         <a href="drivers.php" class="back-btn">
           <i class="fas fa-arrow-right"></i> رجوع للسائقين
         </a>

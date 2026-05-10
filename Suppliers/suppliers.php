@@ -262,27 +262,22 @@ include '../insidebar.php';
 ?>
 
 <div class="main suppliers-main ems-unified-page-shell">
-    <div class="page-header">
-    
-    
+    <div class="header">
+        <a href="../main/dashboard.php" class="back-btn">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </a>
 
-        <!-- اقصي اليمين: زر الإضافة + عنوان الصفحة -->
-        <div class="suppliers-header-start">
+        <h1 class="page-title">
+            <div class="title-icon"><i class="fas fa-truck-loading"></i></div>
+            إدارة الموردين
+        </h1>
+
+        <div class="header -actions">
             <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة مورد جديد
             </a>
             <?php endif; ?>
-            <h1 class="page-title">
-                <div class="title-icon"><i class="fas fa-truck-loading"></i></div>
-                إدارة الموردين
-            </h1>
-        </div>
-
-   
-
-        <!-- المنتصف: بقية الأزرار -->
-        <div class="page-header-actions">
             
             <a href="download_suppliers_template_csv.php" class="suppliers-header-link suppliers-header-link-csv">
                 <i class="fas fa-file-csv"></i> تحميل نموذج CSV
@@ -295,11 +290,7 @@ include '../insidebar.php';
                 <i class="fas fa-file-import"></i> استيراد من Excel
             </a>
             <?php endif; ?>
-            
         </div>
-
-       
-       
     </div>
 
     <?php if (!empty($_GET['msg'])):
@@ -490,7 +481,7 @@ include '../insidebar.php';
         </div>
         <div class="card-body">
             <div class="table-container">
-                <table id="projectsTable" class="display suppliers-table">
+                <table id="projectsTable" class="display alltables">
                     <thead>
                         <tr>
                             <th><i class="fas fa-hashtag"></i> #</th>

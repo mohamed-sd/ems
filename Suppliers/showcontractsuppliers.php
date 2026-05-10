@@ -26,7 +26,7 @@ if (!isset($_SESSION['user'])) {
 
 <div class="main">
 
-    <div class="page-header">
+    <div class="header">
         <div style="display: flex; align-items: center; gap: 12px;">
             <div class="title-icon"><i class="fas fa-file-contract"></i></div>
             <h1 class="page-title">تفاصيل عقد المورد</h1>

@@ -110,7 +110,7 @@ if (!$result) {
 
 <div class="main">
 
-    <div class="page-header">
+    <div class="header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fa-solid fa-truck"></i></div>
             تقرير ساعات عمل السائقين

@@ -182,21 +182,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
     <div class="main project-users-main ems-unified-page-shell">
 
-        <div class="page-header users-header-shell">
-            <div class="users-toolbar-actions users-toolbar-actions-right">
-                <a href="dashboard.php" class="back-btn">
-                    <i class="fas fa-arrow-right"></i> رجوع
-                </a>
-            </div>
+        <div class="header users-header-shell">
+            <a href="dashboard.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
 
-            <div class="users-header-brand-wrap">
-                <div class="users-header-brand">
-                    <div class="title-icon"><i class="fas fa-cogs"></i></div>
-                    <h1 class="page-title">إدارة المستخدمين</h1>
-                </div>
-            </div>
+            <h1 class="page-title">
+                <div class="title-icon"><i class="fas fa-cogs"></i></div>
+                إدارة المستخدمين
+            </h1>
 
-            <div class="users-toolbar-actions users-toolbar-actions-left">
+            <div class="header -actions">
                 <div id="usersExportButtons" class="dt-buttons"></div>
                 <button id="toggleForm" class="add users-add-btn" type="button">
                     <i class="fas fa-plus-circle"></i> إضافة مستخدم جديد

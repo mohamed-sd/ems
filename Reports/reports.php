@@ -78,7 +78,7 @@ $result = mysqli_query($conn, $sql);
     ?>
 
     <div class="main">
-        <div class="page-header">
+        <div class="header">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
                 <h1 class="page-title">التقارير</h1>

@@ -370,15 +370,15 @@ include('../insidebar.php');
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <div class="main projects-main ems-unified-page-shell">
-    <div class="page-header projects-header-shell">
-        <div class="projects-header-brand">
+    <div class="header projects-header-shell">
+        <a href="../main/dashboard.php" class="back-btn">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </a>
+        <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-project-diagram"></i></div>
-            <h1 class="page-title">إدارة المشاريع</h1>
-        </div>
-        <div class="projects-header-actions page-header-actions">
-            <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
+            إدارة المشاريع
+        </h1>
+        <div class="header -actions">
             <?php if ($can_add): ?>
                 <a href="javascript:void(0)" id="toggleForm" class="add-btn projects-header-add">
                     <i class="fas fa-plus-circle"></i> إضافة مشروع

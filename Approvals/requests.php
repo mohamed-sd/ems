@@ -65,7 +65,7 @@ $result = mysqli_query($conn, $sql);
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 
 <div class="main">
-    <div class="page-header">
+    <div class="header">
         <div style="display:flex;align-items:center;gap:12px;">
             <div class="title-icon"><i class="fas fa-check-double"></i></div>
             <h1 class="page-title">طلبات الموافقات</h1>

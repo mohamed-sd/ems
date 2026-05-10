@@ -112,7 +112,7 @@ $executed_hours  = $total_row['executed_hours'];
 
 <div class="main">
 
-	<div class="page-header">
+	<div class="header">
 		<h1 class="page-title">
 			<div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
 			تقرير ساعات العمل اليومية

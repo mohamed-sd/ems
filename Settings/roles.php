@@ -94,7 +94,7 @@ include('../insidebar.php');
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <div class="main">
-    <div class="page-header">
+    <div class="header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-shield-alt"></i></div>
             إدارة الصلاحيات والأدوار

@@ -1,9 +1,20 @@
 (function () {
     'use strict';
 
+    /* =========================================================
+       EMS Unified Header & Table Normalizer
+       Design: dark bar | right=back | center=title | left=actions
+    ========================================================= */
+
     var inlineActionsId = 'emsInlineActions';
     var sourceHiddenClass = 'ems-source-action-hidden';
 
+    /* ── Inject styles once ─────────────────────────────────── */
+    function injectStyles() {
+        return;
+    }
+
+    /* ── Utilities ──────────────────────────────────────────── */
     function normalizeArabic(text) {
         return (text || '')
             .toString()
@@ -16,381 +27,302 @@
     }
 
     function getElementText(el) {
-        if (!el) {
-            return '';
-        }
-
-        if (el.tagName === 'INPUT') {
-            return el.value || el.getAttribute('value') || '';
-        }
-
+        if (!el) return '';
+        if (el.tagName === 'INPUT') return el.value || el.getAttribute('value') || '';
         return el.textContent || '';
     }
 
     function isVisible(el) {
-        if (!el) {
-            return false;
-        }
-
+        if (!el) return false;
         var style = window.getComputedStyle(el);
         return style.display !== 'none' && style.visibility !== 'hidden' && el.offsetParent !== null;
     }
 
     function isCandidate(el) {
-        if (!isVisible(el)) {
-            return false;
-        }
-
-        if (el.closest('#' + inlineActionsId)) {
-            return false;
-        }
-
-        if (el.closest('.modal, .dropdown-menu, .dataTables_paginate, .dt-buttons')) {
-            return false;
-        }
-
+        if (!isVisible(el)) return false;
+        if (el.closest('#' + inlineActionsId)) return false;
+        if (el.closest('.modal, .dropdown-menu, .dataTables_paginate, .dt-buttons')) return false;
         return true;
     }
 
-    function findActionElement(type) {
-        if (type === 'add') {
-            var preferredAddSelectors = [
-                '.main #toggleForm',
-                '.main #toggleFormBtn',
-                '.main .add-btn',
-                '.main a.add',
-                '.main button.add'
-            ];
-
-            for (var pa = 0; pa < preferredAddSelectors.length; pa++) {
-                var preferredAdd = document.querySelector(preferredAddSelectors[pa]);
-                if (preferredAdd && isCandidate(preferredAdd)) {
-                    return preferredAdd;
-                }
-            }
-        }
-
-        if (type === 'back') {
-            var preferredBackSelectors = [
-                '.main .back-btn',
-                '.main a[href*="dashboard.php"]'
-            ];
-
-            for (var pb = 0; pb < preferredBackSelectors.length; pb++) {
-                var preferredBack = document.querySelector(preferredBackSelectors[pb]);
-                if (preferredBack && isCandidate(preferredBack)) {
-                    return preferredBack;
-                }
-            }
-        }
-
-        var selectors = '.main a, .main button, .main input[type="button"], .main input[type="submit"], a.add, button.add';
-        var elements = document.querySelectorAll(selectors);
-
-        for (var i = 0; i < elements.length; i++) {
-            var el = elements[i];
-            if (!isCandidate(el)) {
-                continue;
-            }
-
-            var text = normalizeArabic(getElementText(el));
-            if (!text) {
-                continue;
-            }
-
-            if (type === 'add') {
-                if (text.indexOf('اضافة') !== -1 || text.indexOf('اضف') !== -1) {
-                    return el;
-                }
-            }
-
-            if (type === 'back') {
-                if (text.indexOf('رجوع') !== -1 || text.indexOf('الرجوع') !== -1 || text.indexOf('عودة') !== -1 || text.indexOf('back') !== -1) {
-                    return el;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    function createActionButton(type, label, iconClass) {
-        var button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'ems-top-action-btn ems-top-action-' + type;
-
-        var icon = document.createElement('i');
-        icon.className = iconClass;
-
-        var span = document.createElement('span');
-        span.textContent = label;
-
-        button.appendChild(icon);
-        button.appendChild(span);
-        return button;
-    }
-
-    function findHeaderActionsContainer(header) {
-        if (!header) {
-            return null;
-        }
-
-        var existing = header.querySelector('.page-header-actions, .pu-page-header-actions, .ems-page-header-actions');
-        if (existing) {
-            existing.classList.add('ems-page-header-actions');
-            return existing;
-        }
-
-        var created = document.createElement('div');
-        created.className = 'ems-page-header-actions';
-        header.appendChild(created);
-        return created;
-    }
-
+    /* ── Header normalization ───────────────────────────────── */
     function normalizeHeaderActions() {
-        var headers = document.querySelectorAll('.main .page-header');
+        var headers = document.querySelectorAll('.main .page-header, .main .header');
         if (!headers.length) {
             return false;
         }
 
-        headers.forEach(function (header) {
-            var title = header.querySelector('.page-title, h1, h2, h3');
-            var titleHost = null;
-            if (title) {
-                title.classList.add('ems-page-title');
+        function stripLegacyHeaderClasses(node) {
+            if (!node || !node.classList) {
+                return;
+            }
 
-                titleHost = title;
+            var removablePrefixes = [
+                'page-header',
+                'allheaders',
+                'projects-',
+                'clients-',
+                'suppliers-',
+                'contracts-',
+                'equipments-',
+                'project-users-',
+                'users-',
+                'pu-',
+                'fc-',
+                'fleet-',
+                'ts-',
+                'movement-',
+                'header-shell',
+                'toolbar',
+                'brand',
+                'shell'
+            ];
+
+            Array.prototype.slice.call(node.classList).forEach(function (cls) {
+                var shouldRemove = false;
+
+                if (cls === 'page-title' || cls === 'page-header-actions' || cls === 'pu-page-header-actions') {
+                    shouldRemove = true;
+                }
+
+                for (var i = 0; i < removablePrefixes.length; i++) {
+                    if (cls.indexOf(removablePrefixes[i]) === 0 || cls.indexOf(removablePrefixes[i]) !== -1) {
+                        shouldRemove = true;
+                        break;
+                    }
+                }
+
+                if (shouldRemove && cls !== 'add-btn' && cls !== 'btn' && cls !== 'dt-buttons' && cls !== 'dt-button') {
+                    node.classList.remove(cls);
+                }
+            });
+        }
+
+        headers.forEach(function (header) {
+            if (header.dataset.emsUnifiedHeader === '1') {
+                return;
+            }
+
+            header.dataset.emsUnifiedHeader = '1';
+
+            var titleCandidate = header.querySelector('.page-title, h1, h2, h3, .title');
+            var titleHost = null;
+
+            if (titleCandidate) {
+                titleHost = titleCandidate;
                 while (titleHost && titleHost.parentElement !== header) {
                     titleHost = titleHost.parentElement;
                 }
-            }
 
-            var actionsContainer = findHeaderActionsContainer(header);
-            if (!actionsContainer) {
-                return;
-            }
-
-            var backInHeader = header.querySelector('.back-btn');
-            if (backInHeader) {
-                backInHeader.classList.add('ems-unified-back');
-
-                // Place back button at the far right, directly before the title in RTL flow.
-                if (titleHost && backInHeader.parentNode !== header) {
-                    header.insertBefore(backInHeader, titleHost);
+                if (!titleHost) {
+                    titleHost = titleCandidate;
                 }
             }
 
-            var actionItems = actionsContainer.querySelectorAll('a, button, input[type="button"], input[type="submit"]');
-            if (!actionItems.length) {
-                return;
-            }
+            var actionCandidates = header.querySelectorAll(
+                'a, button, input[type="button"], input[type="submit"], .dt-buttons, [id$="ExportButtons"]'
+            );
+            var seen = [];
+            var backAction = null;
+            var extraActions = [];
 
-            var primaryAdd = null;
-
-            actionItems.forEach(function (item) {
-                item.classList.add('ems-header-action');
-
-                if (item.classList.contains('back-btn') || item.classList.contains('ems-unified-back')) {
+            actionCandidates.forEach(function (item) {
+                if (!item || seen.indexOf(item) !== -1) {
                     return;
                 }
 
-                var isAdd = item.classList.contains('add-btn')
-                    || item.id === 'toggleForm'
-                    || item.id === 'toggleFormBtn'
-                    || item.classList.contains('add')
-                    || normalizeArabic(getElementText(item)).indexOf('اضافة') !== -1
-                    || normalizeArabic(getElementText(item)).indexOf('اضف') !== -1;
+                seen.push(item);
 
-                if (isAdd && !primaryAdd) {
-                    primaryAdd = item;
-                    item.classList.add('ems-unified-add');
+                if (item.closest('.modal, .dropdown-menu')) {
+                    return;
                 }
+
+                if (titleHost && titleHost.contains(item) && item !== titleHost) {
+                    return;
+                }
+
+                var itemText = normalizeArabic(getElementText(item));
+                var isBack = item.classList.contains('back-btn')
+                    || itemText.indexOf('رجوع') !== -1
+                    || itemText.indexOf('الرجوع') !== -1
+                    || itemText.indexOf('عودة') !== -1
+                    || itemText.indexOf('back') !== -1;
+
+                if (isBack && !backAction) {
+                    backAction = item;
+                    return;
+                }
+
+                if (item === titleHost) {
+                    return;
+                }
+
+                extraActions.push(item);
             });
 
-            if (primaryAdd && primaryAdd.parentNode === actionsContainer) {
-                // Keep add action at far left by making it the highest-order item.
-                primaryAdd.style.order = '100';
+            var titleWrap = document.createElement('div');
+            titleWrap.className = 'title';
+
+            var actionsWrap = document.createElement('div');
+            actionsWrap.className = 'actions';
+
+            var backWrap = document.createElement('div');
+            backWrap.className = 'back';
+
+            while (header.firstChild) {
+                header.removeChild(header.firstChild);
+            }
+
+            if (titleHost) {
+                stripLegacyHeaderClasses(titleHost);
+                titleHost.classList.add('title-content');
+                Array.prototype.slice.call(titleHost.querySelectorAll('*')).forEach(stripLegacyHeaderClasses);
+                titleWrap.appendChild(titleHost);
+            }
+
+            if (backAction) {
+                stripLegacyHeaderClasses(backAction);
+                backAction.classList.add('back-btn');
+                backWrap.appendChild(backAction);
+            }
+
+            extraActions.forEach(function (item) {
+                stripLegacyHeaderClasses(item);
+                if (item.classList.contains('dt-buttons')) {
+                    item.classList.add('header-actions-group');
+                }
+                actionsWrap.appendChild(item);
+            });
+
+            header.className = 'header';
+            header.appendChild(actionsWrap);
+            header.appendChild(titleWrap);
+            header.appendChild(backWrap);
+
+            if (!backAction) {
+                backWrap.style.display = 'none';
+            }
+
+            if (!extraActions.length) {
+                actionsWrap.style.display = 'none';
+            }
+
+            if (!titleHost) {
+                titleWrap.style.display = 'none';
             }
         });
 
         return true;
     }
 
-    function decorateSourceButton(el, type) {
-        if (!el) {
-            return;
-        }
-
-        el.classList.add('ems-btn-unified');
-
-        if (type === 'add') {
-            el.classList.add('ems-btn-add');
-        }
-
-        if (type === 'back') {
-            el.classList.add('ems-btn-back');
-        }
-    }
-
-    function clickSource(source, fallback) {
-        return function () {
-            if (source && source.isConnected) {
-                source.click();
-
-                // Resilient fallback for pages where source click might not wire correctly.
-                setTimeout(function () {
-                    if (!ensureKnownFormVisible()) {
-                        return;
-                    }
-                }, 0);
-                return;
-            }
-
-            fallback();
-        };
-    }
-
-    function ensureKnownFormVisible() {
-        var projectForm = document.getElementById('projectForm');
-        if (projectForm) {
-            var madeVisible = false;
-
-            if (projectForm.classList.contains('fleet-hidden')) {
-                projectForm.classList.remove('fleet-hidden');
-                madeVisible = true;
-            }
-
-            if (projectForm.classList.contains('pu-hidden')) {
-                projectForm.classList.remove('pu-hidden');
-                madeVisible = true;
-            }
-
-            if (projectForm.classList.contains('allforms') && !projectForm.classList.contains('allforms-visible')) {
-                projectForm.classList.add('allforms-visible');
-                madeVisible = true;
-            }
-
-            if (projectForm.style && projectForm.style.display === 'none') {
-                projectForm.style.display = 'block';
-                madeVisible = true;
-            }
-
-            if (madeVisible && typeof projectForm.scrollIntoView === 'function') {
-                projectForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-
-            if (madeVisible) {
-                return true;
-            }
-        }
-
-        var addEditCard = document.getElementById('addEditCard');
-        if (addEditCard && addEditCard.classList.contains('fc-hidden')) {
-            addEditCard.classList.remove('fc-hidden');
-            if (typeof addEditCard.scrollIntoView === 'function') {
-                addEditCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-            return true;
-        }
-
-        return false;
-    }
-
+    /* ── Action bar entry point ─────────────────────────────── */
     function ensureActionBar() {
         if (document.querySelector('.movement-page')) {
             return;
         }
 
-        var root = document.querySelector('.main') || document.body;
-        if (!root) {
-            return;
-        }
+        document.querySelectorAll('.main .page-header[data-ems-unified-header], .main .header[data-ems-unified-header]')
+            .forEach(function (h) {
+                h.removeAttribute('data-ems-unified-header');
+            });
 
-        // Preferred mode: normalize existing page header actions.
-        if (normalizeHeaderActions()) {
-            var oldInlineActions = document.getElementById(inlineActionsId);
-            if (oldInlineActions) {
-                oldInlineActions.remove();
-            }
-            return;
-        }
-
-        // Reset any hidden source actions from previous render before rebuilding.
         var previouslyHidden = document.querySelectorAll('.' + sourceHiddenClass);
         for (var ph = 0; ph < previouslyHidden.length; ph++) {
             previouslyHidden[ph].classList.remove(sourceHiddenClass);
         }
 
-        var existingInlineActions = document.getElementById(inlineActionsId);
-        if (existingInlineActions) {
-            existingInlineActions.remove();
-        }
+        var oldInlineActions = document.getElementById(inlineActionsId);
+        if (oldInlineActions) oldInlineActions.remove();
 
-        var addSource = findActionElement('add');
-        var backSource = findActionElement('back');
+        normalizeHeaderActions();
+    }
 
-        if (!addSource && !backSource) {
+    /* ── Tables ─────────────────────────────────────────────── */
+    function ensureUnifiedTableClass(tableEl) {
+        if (!tableEl || tableEl.tagName !== 'TABLE') return;
+        tableEl.classList.add('alltables', 'alltable');
+        if (tableEl.hasAttribute('style')) tableEl.removeAttribute('style');
+    }
+
+    function normalizeAllTables() {
+        document.querySelectorAll('table').forEach(ensureUnifiedTableClass);
+    }
+
+    function initializeMissingDataTables() {
+        if (!window.jQuery || !window.jQuery.fn || !window.jQuery.fn.dataTable) return;
+        var $ = window.jQuery;
+        $('table').each(function () {
+            var table = this;
+            var $table = $(table);
+            ensureUnifiedTableClass(table);
+            if (table.classList.contains('dtr-details')) return;
+            if (!table.tHead || !table.tBodies || !table.tBodies.length) return;
+            if ($.fn.dataTable.isDataTable(table)) return;
+            if ($table.closest('.dataTables_wrapper').length) return;
+            $table.addClass('display');
+            try {
+                $table.DataTable({
+                    responsive: true,
+                    autoWidth: false,
+                    language: { url: '/ems/assets/i18n/datatables/ar.json' }
+                });
+            } catch (e) { /* legacy tables may be initialized later */ }
+        });
+    }
+
+    function loadScriptOnce(src, done) {
+        var existing = document.querySelector('script[src="' + src + '"]');
+        if (existing) {
+            if (typeof done === 'function') {
+                if (existing.dataset.loaded === '1') { done(); }
+                else { existing.addEventListener('load', function () { existing.dataset.loaded = '1'; done(); }, { once: true }); }
+            }
             return;
         }
-
-        decorateSourceButton(addSource, 'add');
-        decorateSourceButton(backSource, 'back');
-
-        var inlineActions = document.createElement('div');
-        var addWrap = document.createElement('div');
-        var backWrap = document.createElement('div');
-        var title = root.querySelector('h1, h2, h3');
-
-        inlineActions.id = inlineActionsId;
-        inlineActions.className = 'ems-inline-actions';
-        addWrap.className = 'ems-inline-actions-left';
-        backWrap.className = 'ems-inline-actions-right';
-
-        if (addSource) {
-            var addButton = createActionButton('add', 'إضافة', 'fa fa-plus');
-            addButton.addEventListener('click', clickSource(addSource, function () {}));
-            addWrap.appendChild(addButton);
-            addSource.classList.add(sourceHiddenClass);
-        }
-
-        if (backSource) {
-            var backButton = createActionButton('back', 'رجوع', 'fa fa-arrow-right');
-
-            backButton.addEventListener('click', clickSource(backSource, function () {
-                if (window.history.length > 1) {
-                    window.history.back();
-                } else {
-                    window.location.href = '/ems/main/dashboard.php';
-                }
-            }));
-            backWrap.appendChild(backButton);
-            backSource.classList.add(sourceHiddenClass);
-        }
-
-        inlineActions.appendChild(addWrap);
-        inlineActions.appendChild(backWrap);
-
-        if (title) {
-            title.parentNode.insertBefore(inlineActions, title);
-        } else {
-            root.insertBefore(inlineActions, root.firstChild);
-        }
+        var script = document.createElement('script');
+        script.src = src;
+        script.async = false;
+        script.onload = function () { script.dataset.loaded = '1'; if (typeof done === 'function') done(); };
+        document.head.appendChild(script);
     }
 
-    function debounce(fn, delay) {
-        var timer;
-        return function () {
-            clearTimeout(timer);
-            timer = setTimeout(fn, delay);
+    function ensureDataTablesReady(done) {
+        if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) { done(); return; }
+        var jquerySrc = '/ems/assets/vendor/jquery-3.7.1.min.js';
+        var dtSrc = '/ems/assets/vendor/datatables/js/jquery.dataTables.min.js';
+        var dtResponsiveSrc = '/ems/assets/vendor/datatables/js/dataTables.responsive.min.js';
+        var loadDataTables = function () {
+            if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) { done(); return; }
+            loadScriptOnce(dtSrc, function () { loadScriptOnce(dtResponsiveSrc, done); });
         };
+        if (!window.jQuery) { loadScriptOnce(jquerySrc, loadDataTables); return; }
+        loadDataTables();
     }
 
-    var refreshActionBar = debounce(ensureActionBar, 120);
+    function bootUnifiedTables() {
+        normalizeAllTables();
+        ensureDataTablesReady(initializeMissingDataTables);
+        setTimeout(function () { normalizeAllTables(); ensureDataTablesReady(initializeMissingDataTables); }, 250);
+        setTimeout(function () { normalizeAllTables(); ensureDataTablesReady(initializeMissingDataTables); }, 900);
+        if (window.MutationObserver) {
+            var observer = new MutationObserver(function () {
+                normalizeAllTables();
+                ensureDataTablesReady(initializeMissingDataTables);
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+    }
+
+    /* ── Boot ───────────────────────────────────────────────── */
+    var refreshActionBar = (function () {
+        var timer;
+        return function () { clearTimeout(timer); timer = setTimeout(ensureActionBar, 120); };
+    })();
 
     function boot() {
         ensureActionBar();
+        bootUnifiedTables();
 
-        // Retry a few times after load for pages that render controls late.
         setTimeout(ensureActionBar, 200);
         setTimeout(ensureActionBar, 700);
         setTimeout(ensureActionBar, 1400);
@@ -403,4 +335,5 @@
     } else {
         boot();
     }
+
 })();

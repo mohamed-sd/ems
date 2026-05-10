@@ -215,12 +215,12 @@ include('../insidebar.php');
 ?>
 
   <div class="main supplier-contracts-main ems-unified-page-shell">
-    <div class="page-header contracts-header-shell">
+    <div class="header contracts-header-shell">
       <div class="contracts-header-brand">
         <div class="title-icon"><i class="fas fa-file-contract"></i></div>
         <h1 class="page-title">عقود المورد</h1>
       </div>
-      <div class="page-header-actions contracts-header-actions">
+      <div class="header -actions contracts-header-actions">
         <?php if ($can_add): ?>
         <a href="javascript:void(0)" id="toggleForm" class="add-btn">
           <i class="fas fa-plus-circle"></i> عقد جديد

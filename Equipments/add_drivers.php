@@ -811,7 +811,7 @@ table.dataTable tbody tr:hover {
 <?php include('../insidebar.php'); ?>
 
 <div class="main">
-    <div class="page-header">
+    <div class="header">
         <div>
             <h1 class="page-title">
                 <div class="title-icon"><i class="fas fa-users-cog"></i></div>

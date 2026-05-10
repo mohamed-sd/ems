@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "editorconfig.editorconfig",
+        "streetsidesoftware.code-spell-checker-arabic",
+        "bmewburn.vscode-intelephense-client",
+        "formulahendry.auto-close-tag"
+    ],
+    "unwantedRecommendations": []
+}

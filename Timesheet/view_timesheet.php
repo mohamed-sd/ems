@@ -498,12 +498,12 @@ include('../insidebar.php');
 </style>
 
 <div class="main timesheet-view-page ems-unified-page-shell">
-    <div class="page-header">
+    <div class="header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-table"></i></div>
             شاشة عرض ساعات العمل
         </h1>
-        <div class="page-header-actions">
+        <div class="header -actions">
             <a href="javascript:void(0);" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='../main/dashboard.php'; }" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
