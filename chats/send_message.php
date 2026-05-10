@@ -7,11 +7,13 @@ session_start();
 header('Content-Type: application/json; charset=utf-8');
 
 if (!isset($_SESSION['user'])) {
-    die(json_encode(['success' => false, 'message' => 'غير مصرح']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'غير مصرح'], JSON_UNESCAPED_UNICODE));
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة'], JSON_UNESCAPED_UNICODE));
 }
 
 require_once '../config.php';
@@ -23,16 +25,20 @@ $message     = isset($_POST['message']) ? trim($_POST['message']) : '';
 
 // التحقق من المدخلات
 if ($receiver_id <= 0) {
-    die(json_encode(['success' => false, 'message' => 'المستلم غير محدد']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'المستلم غير محدد'], JSON_UNESCAPED_UNICODE));
 }
 if (empty($message)) {
-    die(json_encode(['success' => false, 'message' => 'الرسالة فارغة']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'الرسالة فارغة'], JSON_UNESCAPED_UNICODE));
 }
 if (mb_strlen($message) > 2000) {
-    die(json_encode(['success' => false, 'message' => 'الرسالة طويلة جداً (الحد الأقصى 2000 حرف)']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'الرسالة طويلة جداً (الحد الأقصى 2000 حرف)'], JSON_UNESCAPED_UNICODE));
 }
 if ($receiver_id === $sender_id) {
-    die(json_encode(['success' => false, 'message' => 'لا يمكنك مراسلة نفسك']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'لا يمكنك مراسلة نفسك'], JSON_UNESCAPED_UNICODE));
 }
 
 // التأكد من أن المستلم في نفس الشركة
@@ -40,7 +46,8 @@ $safe_receiver = intval($receiver_id);
 $safe_company  = intval($company_id);
 $check = mysqli_query($conn, "SELECT id FROM users WHERE id = $safe_receiver AND company_id = $safe_company AND is_deleted = 0 AND status = 'active'");
 if (!$check || mysqli_num_rows($check) === 0) {
-    die(json_encode(['success' => false, 'message' => 'المستلم غير موجود']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'المستلم غير موجود'], JSON_UNESCAPED_UNICODE));
 }
 
 // إدراج الرسالة
@@ -50,15 +57,22 @@ $sql = "INSERT INTO messages (company_id, sender_id, receiver_id, message, creat
 
 $result = mysqli_query($conn, $sql);
 if (!$result) {
-    die(json_encode(['success' => false, 'message' => 'خطأ في إرسال الرسالة: ' . mysqli_error($conn)]));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'خطأ في إرسال الرسالة: ' . mysqli_error($conn)], JSON_UNESCAPED_UNICODE));
 }
 
 $new_id = mysqli_insert_id($conn);
+
+// إيقاف جميع output buffers قبل إرجاع JSON
+while (ob_get_level()) {
+    ob_end_clean();
+}
+header('Content-Type: application/json; charset=utf-8');
 
 echo json_encode([
     'success'    => true,
     'message'    => 'تم إرسال الرسالة',
     'message_id' => $new_id,
     'created_at' => date('Y-m-d H:i:s')
-]);
+], JSON_UNESCAPED_UNICODE);
 exit;

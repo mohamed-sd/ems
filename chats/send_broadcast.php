@@ -7,11 +7,13 @@ session_start();
 header('Content-Type: application/json; charset=utf-8');
 
 if (!isset($_SESSION['user'])) {
-    die(json_encode(['success' => false, 'message' => 'غير مصرح']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'غير مصرح'], JSON_UNESCAPED_UNICODE));
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة'], JSON_UNESCAPED_UNICODE));
 }
 
 require_once '../config.php';
@@ -23,10 +25,12 @@ $recipients_json = isset($_POST['recipients']) ? $_POST['recipients'] : '';
 
 // التحقق من المدخلات
 if (empty($message)) {
-    die(json_encode(['success' => false, 'message' => 'الرسالة فارغة']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'الرسالة فارغة'], JSON_UNESCAPED_UNICODE));
 }
 if (mb_strlen($message) > 2000) {
-    die(json_encode(['success' => false, 'message' => 'الرسالة طويلة جداً (الحد الأقصى 2000 حرف)']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'الرسالة طويلة جداً (الحد الأقصى 2000 حرف)'], JSON_UNESCAPED_UNICODE));
 }
 
 $safe_company  = intval($company_id);
@@ -38,7 +42,6 @@ if (!empty($recipients_json)) {
     // قائمة محددة
     $recipients_array = json_decode($recipients_json, true);
     if (is_array($recipients_array) && count($recipients_array) > 0) {
-        // تنظيف وتحويل IDs لأرقام صحيحة
         foreach ($recipients_array as $id) {
             $clean_id = intval($id);
             if ($clean_id > 0 && $clean_id != $sender_id) {
@@ -48,7 +51,8 @@ if (!empty($recipients_json)) {
     }
     
     if (empty($recipient_ids)) {
-        die(json_encode(['success' => false, 'message' => 'لم يتم تحديد مستلمين صالحين']));
+        while (ob_get_level()) ob_end_clean();
+        die(json_encode(['success' => false, 'message' => 'لم يتم تحديد مستلمين صالحين'], JSON_UNESCAPED_UNICODE));
     }
     
     // التحقق من أن جميع المستلمين في نفس الشركة
@@ -61,7 +65,8 @@ if (!empty($recipients_json)) {
     $verify_result = mysqli_query($conn, $verify_query);
     
     if (!$verify_result) {
-        die(json_encode(['success' => false, 'message' => 'خطأ في التحقق من المستلمين']));
+        while (ob_get_level()) ob_end_clean();
+        die(json_encode(['success' => false, 'message' => 'خطأ في التحقق من المستلمين'], JSON_UNESCAPED_UNICODE));
     }
     
     // إعادة بناء القائمة من النتائج الصحيحة فقط
@@ -71,7 +76,8 @@ if (!empty($recipients_json)) {
     }
     
     if (empty($recipient_ids)) {
-        die(json_encode(['success' => false, 'message' => 'لا يوجد مستلمون صالحون']));
+        while (ob_get_level()) ob_end_clean();
+        die(json_encode(['success' => false, 'message' => 'لا يوجد مستلمون صالحون'], JSON_UNESCAPED_UNICODE));
     }
 } else {
     // إرسال للجميع
@@ -83,7 +89,8 @@ if (!empty($recipients_json)) {
     $users_result = mysqli_query($conn, $users_query);
     
     if (!$users_result) {
-        die(json_encode(['success' => false, 'message' => 'خطأ في جلب المستخدمين: ' . mysqli_error($conn)]));
+        while (ob_get_level()) ob_end_clean();
+        die(json_encode(['success' => false, 'message' => 'خطأ في جلب المستخدمين: ' . mysqli_error($conn)], JSON_UNESCAPED_UNICODE));
     }
     
     while ($user = mysqli_fetch_assoc($users_result)) {
@@ -91,7 +98,8 @@ if (!empty($recipients_json)) {
     }
     
     if (empty($recipient_ids)) {
-        die(json_encode(['success' => false, 'message' => 'لا يوجد مستخدمون آخرون في شركتك']));
+        while (ob_get_level()) ob_end_clean();
+        die(json_encode(['success' => false, 'message' => 'لا يوجد مستخدمون آخرون في شركتك'], JSON_UNESCAPED_UNICODE));
     }
 }
 
@@ -118,14 +126,26 @@ if ($inserted_count > 0) {
         ? "تم إرسال الرسالة بنجاح لمستخدم واحد" 
         : "تم إرسال الرسالة بنجاح لـ {$inserted_count} مستخدم";
     
+    // إيقاف جميع output buffers قبل إرجاع JSON
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    header('Content-Type: application/json; charset=utf-8');
+    
     echo json_encode([
         'success'          => true,
         'message'          => $message_text,
         'recipients_count' => $inserted_count,
         'failed_count'     => $failed_count
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
 } else {
-    die(json_encode(['success' => false, 'message' => 'فشل في إرسال الرسائل']));
+    // إيقاف جميع output buffers قبل إرجاع JSON
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    header('Content-Type: application/json; charset=utf-8');
+    
+    die(json_encode(['success' => false, 'message' => 'فشل في إرسال الرسائل'], JSON_UNESCAPED_UNICODE));
 }
 
 exit;

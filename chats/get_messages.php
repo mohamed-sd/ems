@@ -7,7 +7,8 @@ session_start();
 header('Content-Type: application/json; charset=utf-8');
 
 if (!isset($_SESSION['user'])) {
-    die(json_encode(['success' => false, 'message' => 'غير مصرح']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'غير مصرح'], JSON_UNESCAPED_UNICODE));
 }
 
 require_once '../config.php';
@@ -18,7 +19,8 @@ $with_user   = isset($_REQUEST['with_user_id']) ? intval($_REQUEST['with_user_id
 $last_id     = isset($_REQUEST['last_id'])      ? intval($_REQUEST['last_id'])      : 0;
 
 if ($with_user <= 0) {
-    die(json_encode(['success' => false, 'message' => 'المستخدم غير محدد']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'المستخدم غير محدد'], JSON_UNESCAPED_UNICODE));
 }
 
 // التأكد من أن المستخدم الآخر في نفس الشركة
@@ -26,7 +28,8 @@ $safe_with    = intval($with_user);
 $safe_company = intval($company_id);
 $check = mysqli_query($conn, "SELECT id, name FROM users WHERE id = $safe_with AND company_id = $safe_company AND is_deleted = 0");
 if (!$check || mysqli_num_rows($check) === 0) {
-    die(json_encode(['success' => false, 'message' => 'المستخدم غير موجود']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'المستخدم غير موجود'], JSON_UNESCAPED_UNICODE));
 }
 
 // بناء شرط التحديث التزايدي
@@ -54,7 +57,8 @@ $sql = "SELECT
 
 $result = mysqli_query($conn, $sql);
 if (!$result) {
-    die(json_encode(['success' => false, 'message' => 'خطأ في قراءة الرسائل']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'خطأ في قراءة الرسائل'], JSON_UNESCAPED_UNICODE));
 }
 
 $messages = [];
@@ -73,5 +77,11 @@ while ($row = mysqli_fetch_assoc($result)) {
     ];
 }
 
-echo json_encode(['success' => true, 'messages' => $messages]);
+// إيقاف جميع output buffers قبل إرجاع JSON
+while (ob_get_level()) {
+    ob_end_clean();
+}
+header('Content-Type: application/json; charset=utf-8');
+
+echo json_encode(['success' => true, 'messages' => $messages], JSON_UNESCAPED_UNICODE);
 exit;
