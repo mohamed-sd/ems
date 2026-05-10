@@ -281,7 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="main">
 
         <!-- رأس الصفحة -->
-        <div class="page-header">
+        <div class="header">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="title-icon"><i class="fas fa-key"></i></div>
                 <h1 class="page-title">تغيير كلمة السر</h1>

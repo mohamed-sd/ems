@@ -339,12 +339,12 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 
 <div class="main">
     <!-- عنوان الصفحة -->
-    <div class="page-header">
+    <div class="header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-cogs"></i></div>
             إدارة المعدات
         </h1>
-        <div class="page-header-actions">
+        <div class="header -actions">
             <a href="../main/dashboard.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>

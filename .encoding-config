@@ -1,0 +1,17 @@
+# Encoding Monitoring Configuration
+# System-wide encoding validation settings
+
+# Configuration for encoding checks
+ENCODING_STANDARD=utf-8
+BOM_FORBIDDEN=true
+LINE_ENDING=lf
+AUTO_FIX_ON_COMMIT=true
+
+# Files to exclude from encoding checks
+EXCLUDE_PATTERNS=vendor,node_modules,.git,.vscode,logs
+
+# Strict mode - fail on any encoding issue
+STRICT_MODE=true
+
+# Auto-repair on pre-commit
+AUTO_REPAIR=true

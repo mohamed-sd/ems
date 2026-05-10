@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -243,8 +243,8 @@ include('../insidebar.php');
 ?>
 
 <div class="main project-users-main ems-unified-page-shell">
-    <div class="page-header">
-        <div class="pu-page-header-actions">
+    <div class="header">
+        <div class="pu- header -actions">
             <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة مشرف جديد

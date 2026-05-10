@@ -243,7 +243,7 @@ if (!isset($_SESSION['user'])) {
     ?>
 
     <div class="main">
-        <div class="page-header">
+        <div class="header">
             <h1 class="page-title">
                 <div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
                 تقارير تفصيلية للعقد

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -472,7 +472,7 @@ include('../insidebar.php');
 
         <div id="suppliersSection" class="suppliers-section">
             <div class="table-scroll">
-                <table class="suppliers-table">
+                <table class="alltables">
                     <thead>
                         <tr>
                             <th>#</th>

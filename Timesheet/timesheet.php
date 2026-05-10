@@ -474,12 +474,12 @@ if (!$is_super_admin) {
 </style>
 
 <div class="main timesheet-entry-page ems-unified-page-shell">
-    <div class="page-header">
+    <div class="header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-clock"></i></div>
             إدارة ساعات العمل
         </h1>
-        <div class="page-header-actions">
+        <div class="header -actions">
             <a href="timesheet_type.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>

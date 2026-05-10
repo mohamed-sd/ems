@@ -426,7 +426,7 @@ include('../insidebar.php');
 ?>
 
 <div class="main">
-    <div class="page-header">
+    <div class="header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-id-card"></i></div>
             إدارة المشغلين - النظام الشامل

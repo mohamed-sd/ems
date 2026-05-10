@@ -621,7 +621,7 @@ include('../insidebar.php');
 ?>
 
 <div class="main clients-main ems-unified-page-shell">
-    <div class="page-header clients-header-shell">
+    <div class="header clients-header-shell">
         <div class="clients-header-brand">
             <h1 class="page-title">
                 <div class="title-icon"><i class="fas fa-users"></i></div>
@@ -632,7 +632,7 @@ include('../insidebar.php');
             </a>
         </div>
 
-        <div class="page-header-actions clients-header-actions">
+        <div class="header -actions clients-header-actions">
             <?php if ($can_add): ?>
                 <a href="javascript:void(0)" id="toggleForm" class="add-btn clients-header-add">
                     <i class="fas fa-plus-circle"></i>

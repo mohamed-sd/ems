@@ -345,7 +345,7 @@ $event_types_result = mysqli_query($conn, $event_types_query);
 ?>
 
 <div class="main failures-page">
-    <div class="page-header">
+    <div class="header">
         <div>
             <h1 class="page-title">
                 <div class="title-icon"><i class="fas fa-tools"></i></div>
@@ -356,7 +356,7 @@ $event_types_result = mysqli_query($conn, $event_types_query);
                 شاشة متابعة وتحليل أعطال الأسطول مع فلترة ذكية وسريعة
             </div>
         </div>
-        <div class="page-header-actions">
+        <div class="header -actions">
             <a href="manage_failure_codes.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>

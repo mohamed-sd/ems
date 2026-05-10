@@ -202,15 +202,15 @@ include('../insidebar.php');
 
   <div class="main contracts-main ems-unified-page-shell">
 
-    <div class="page-header contracts-header-shell">
-      <div class="contracts-header-brand">
+    <div class="header contracts-header-shell">
+      <a href="../main/dashboard.php" class="back-btn">
+        <i class="fas fa-arrow-right"></i> رجوع
+      </a>
+      <h1 class="page-title">
         <div class="title-icon"><i class="fas fa-file-contract"></i></div>
-        <h1 class="page-title">إدارة العقود</h1>
-      </div>
-      <div class="page-header-actions contracts-header-actions">
-        <a href="../main/dashboard.php" class="back-btn">
-          <i class="fas fa-arrow-right"></i> رجوع
-        </a>
+        إدارة العقود
+      </h1>
+      <div class="header -actions contracts-header-actions">
         <?php if ($can_add): ?>
         <a href="javascript:void(0)" id="toggleForm" class="add-btn">
           <i class="fas fa-plus-circle"></i> عقد جديد

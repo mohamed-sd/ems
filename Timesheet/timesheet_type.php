@@ -10,7 +10,7 @@ include('../insidebar.php');
 ?>
 
 <div class="main timesheet-type-page ems-unified-page-shell">
-  <div class="page-header">
+  <div class="header">
     <div>
       <h1 class="page-title">
         <span class="title-icon"><i class="fas fa-clock"></i></span>
@@ -22,7 +22,7 @@ include('../insidebar.php');
       </div>
     </div>
 
-    <div class="page-header-actions">
+    <div class="header -actions">
       <a href="../main/dashboard.php" class="back-btn">
         <i class="fas fa-arrow-right"></i> رجوع
       </a>

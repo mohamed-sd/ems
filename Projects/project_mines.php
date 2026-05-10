@@ -553,7 +553,7 @@ include '../inheader.php';
 </style>
 
 <div class="main">
-    <div class="page-header">
+    <div class="header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-mountain"></i></div>
             إدارة المناجم - <?php echo htmlspecialchars($project['name']); ?>

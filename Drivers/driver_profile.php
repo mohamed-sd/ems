@@ -675,7 +675,7 @@ canvas {
 </style>
 
 <div class="main driver-profile-page">
-    <div class="page-header">
+    <div class="header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fas fa-id-card-alt"></i></div>
             بطاقة وبيانات السائق التفصيلية

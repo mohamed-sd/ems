@@ -136,7 +136,7 @@ if ($contract_filter > 0) {
 ?>
 
 <div class="main">
-    <div class="page-header">
+    <div class="header">
         <h1 class="page-title">
             <div class="title-icon"><i class="fa-solid fa-file-contract"></i></div>
             تقرير إحصائية العقود
