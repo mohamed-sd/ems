@@ -131,10 +131,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 $sql_pass = ", password='$hashedPass'";
             }
 
-                $company_update = ($users_has_company_id && $current_company_id > 0) ? ", company_id='$current_company_id'" : "";
-                $update_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
+            $company_update = ($users_has_company_id && $current_company_id > 0) ? ", company_id='$current_company_id'" : "";
+            $update_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
 
-                $sql = "UPDATE users 
+            $sql = "UPDATE users
                     SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', mine_id='$mine', contract_id='$contract', updated_at=NOW() $sql_pass
                     $company_update
                     WHERE id='$uid' AND $users_not_deleted_sql $update_scope";
@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 $hashedPass = mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_BCRYPT));
 
                 $insert_columns = "name, username, password, phone, role, project_id, mine_id, contract_id, parent_id, created_at, updated_at";
-                $insert_values  = "'$name', '$username', '$hashedPass', '$phone', '$role', '$project', '$mine', '$contract', '0', NOW(), NOW()";
+                $insert_values = "'$name', '$username', '$hashedPass', '$phone', '$role', '$project', '$mine', '$contract', '0', NOW(), NOW()";
 
                 if ($users_has_company_id && $current_company_id > 0) {
                     $insert_columns .= ", company_id";
@@ -180,122 +180,127 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 // إذا أردت أفعّل الحذف أضيفه لك هنا بأمان مع تحقق الصلاحيات.
 ?>
 
-    <div class="main project-users-main ems-unified-page-shell">
+<div class="main project-users-main ems-unified-page-shell">
 
-        <div class="header users-header-shell">
-            <a href="dashboard.php" class="back-btn">
+    <div class="main_head">
+        <div class="head_actions">
+            <button id="toggleForm" class="add users-add-btn" type="button">
+                <i class="fas fa-plus-circle"></i> إضافة مستخدم جديد
+            </button>
+        </div>
+        <h1 class="head-title">
+            <div class="title-icon"><i class="fas fa-cogs"></i></div>
+            إدارة المستخدمين
+        </h1>
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
-
-            <h1 class="page-title">
-                <div class="title-icon"><i class="fas fa-cogs"></i></div>
-                إدارة المستخدمين
-            </h1>
-
-            <div class="header -actions">
-                <div id="usersExportButtons" class="dt-buttons"></div>
-                <button id="toggleForm" class="add users-add-btn" type="button">
-                    <i class="fas fa-plus-circle"></i> إضافة مستخدم جديد
-                </button>
-            </div>
         </div>
+    </div>
 
-        <?php
+    <?php
 
-        $userRole = $_SESSION['user']['role'];
-        $userName = $_SESSION['user']['name'];
-        $roleText = isset($roles[$userRole]) ? $roles[$userRole] : "غير معروف";
-        ?>
+    $userRole = $_SESSION['user']['role'];
+    $userName = $_SESSION['user']['name'];
+    $roleText = isset($roles[$userRole]) ? $roles[$userRole] : "غير معروف";
+    ?>
 
-        <form id="projectForm" action="" method="post" class="allforms">
-            <input type="hidden" name="uid" id="uid" value="0" />
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-user-edit"></i> إضافة / تعديل مستخدم</h5>
-                </div>
-                <div class="card-body">
-                    <div class="form-grid">
-                        <div>
-                            <label><i class="fas fa-user"></i> الاسم الثلاثي</label>
-                            <input type="text" name="name" id="name" placeholder="الاسم الثلاثي" value="مستخدم" required />
-                        </div>
-                        <div>
-                            <label><i class="fas fa-id-badge"></i> اسم المستخدم</label>
-                            <input type="text" name="username" id="username" placeholder="اسم المستخدم (الحد الأدنى 3 أحرف)" value="username" required autocomplete="off" />
-                            <small id="usernameFeedback" class="pu-username-feedback"></small>
-                        </div>
-                        <div>
-                            <label><i class="fas fa-lock"></i> كلمة المرور</label>
-                            <input type="password" name="password" id="password" placeholder="كلمة المرور" value="12345678" />
-                            <small class="text-muted"><i class="fas fa-info-circle"></i> اتركه فارغاً إذا لا تريد تغييره
-                                عند التعديل</small>
-                        </div>
-                        <div>
-                            <label><i class="fas fa-user-shield"></i> الدور / الصلاحية</label>
-                            <select name="role" id="role" class="form-control" required>
-                                <option value="">-- حدد الصلاحية --</option>
-                                <?php foreach ($roles as $role_id => $role_name): ?>
-                                    <option value="<?php echo htmlspecialchars((string) $role_id, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($role_name, ENT_QUOTES, 'UTF-8'); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div>
-                            <label><i class="fas fa-phone"></i> رقم الهاتف</label>
-                            <input type="text" name="phone" id="phone" placeholder="رقم الهاتف" required value="09209303903" />
-                        </div>
-
-                        <div id="projectDiv" class="pu-hidden">
-                            <label><i class="fas fa-project-diagram"></i> المشروع <span
-                                    class="pu-required-star">*</span></label>
-                            <select id="project_id" name="project_id" class="form-control">
-                                <option value="">-- اختر المشروع --</option>
-                                <?php
-                                $project_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
-                                $project_not_deleted = db_table_has_column($conn, 'project', 'is_deleted') ? " AND COALESCE(is_deleted,0)=0" : "";
-                                $sql = "SELECT id, name, project_code FROM project WHERE status = '1' $project_not_deleted $project_scope ORDER BY name ASC";
-                                $result = mysqli_query($conn, $sql);
-                                while ($row = mysqli_fetch_assoc($result)) {
-                                    echo "<option value='{$row['id']}'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . " ({$row['project_code']})</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-
-                        <div id="mineDiv" class="pu-hidden">
-                            <label><i class="fas fa-mountain"></i> المنجم <span class="pu-required-star">*</span></label>
-                            <select id="mine_id" name="mine_id" class="form-control">
-                                <option value="">-- اختر المنجم --</option>
-                            </select>
-                        </div>
-
-                        <div id="contractDiv" class="pu-hidden">
-                            <label><i class="fas fa-file-contract"></i> العقد <span class="pu-required-star">*</span></label>
-                            <select id="contract_id" name="contract_id" class="form-control">
-                                <option value="">-- اختر العقد --</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="pu-form-actions">
-                        <button type="reset" class="btn btn-secondary">
-                            <i class="fas fa-eraser"></i> مسح الحقول
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save"></i> حفظ المستخدم
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </form>
-
+    <form id="projectForm" action="" method="post" class="allforms">
+        <input type="hidden" name="uid" id="uid" value="0" />
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-list"></i> قائمة المستخدمين</h5>
+                <h5><i class="fas fa-user-edit"></i> إضافة / تعديل مستخدم</h5>
             </div>
             <div class="card-body">
-                <div class="users-table-actions-row">
-                    <div class="users-table-note">عرض وإدارة المستخدمين مع التصدير السريع من الشريط العلوي</div>
+                <div class="form-grid">
+                    <div>
+                        <label><i class="fas fa-user"></i> الاسم الثلاثي</label>
+                        <input type="text" name="name" id="name" placeholder="الاسم الثلاثي" value="مستخدم" required />
+                    </div>
+                    <div>
+                        <label><i class="fas fa-id-badge"></i> اسم المستخدم</label>
+                        <input type="text" name="username" id="username" placeholder="اسم المستخدم (الحد الأدنى 3 أحرف)"
+                            value="username" required autocomplete="off" />
+                        <small id="usernameFeedback" class="pu-username-feedback"></small>
+                    </div>
+                    <div>
+                        <label><i class="fas fa-lock"></i> كلمة المرور</label>
+                        <input type="password" name="password" id="password" placeholder="كلمة المرور"
+                            value="12345678" />
+                        <small class="text-muted"><i class="fas fa-info-circle"></i> اتركه فارغاً إذا لا تريد تغييره
+                            عند التعديل</small>
+                    </div>
+                    <div>
+                        <label><i class="fas fa-user-shield"></i> الدور / الصلاحية</label>
+                        <select name="role" id="role" class="form-control" required>
+                            <option value="">-- حدد الصلاحية --</option>
+                            <?php foreach ($roles as $role_id => $role_name): ?>
+                                <option value="<?php echo htmlspecialchars((string) $role_id, ENT_QUOTES, 'UTF-8'); ?>">
+                                    <?php echo htmlspecialchars($role_name, ENT_QUOTES, 'UTF-8'); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label><i class="fas fa-phone"></i> رقم الهاتف</label>
+                        <input type="text" name="phone" id="phone" placeholder="رقم الهاتف" required
+                            value="09209303903" />
+                    </div>
+
+                    <div id="projectDiv" class="pu-hidden">
+                        <label><i class="fas fa-project-diagram"></i> المشروع <span
+                                class="pu-required-star">*</span></label>
+                        <select id="project_id" name="project_id" class="form-control">
+                            <option value="">-- اختر المشروع --</option>
+                            <?php
+                            $project_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
+                            $project_not_deleted = db_table_has_column($conn, 'project', 'is_deleted') ? " AND COALESCE(is_deleted,0)=0" : "";
+                            $sql = "SELECT id, name, project_code FROM project WHERE status = '1' $project_not_deleted $project_scope ORDER BY name ASC";
+                            $result = mysqli_query($conn, $sql);
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<option value='{$row['id']}'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . " ({$row['project_code']})</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div id="mineDiv" class="pu-hidden">
+                        <label><i class="fas fa-mountain"></i> المنجم <span class="pu-required-star">*</span></label>
+                        <select id="mine_id" name="mine_id" class="form-control">
+                            <option value="">-- اختر المنجم --</option>
+                        </select>
+                    </div>
+
+                    <div id="contractDiv" class="pu-hidden">
+                        <label><i class="fas fa-file-contract"></i> العقد <span
+                                class="pu-required-star">*</span></label>
+                        <select id="contract_id" name="contract_id" class="form-control">
+                            <option value="">-- اختر العقد --</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="table-container">
+                <div class="pu-form-actions">
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-eraser"></i> مسح الحقول
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> حفظ المستخدم
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-list"></i> قائمة المستخدمين</h5>
+        </div>
+        <div class="card-body">
+            <div class="users-table-actions-row">
+                <div class="users-table-note">عرض وإدارة المستخدمين مع التصدير السريع من الشريط العلوي</div>
+            </div>
+            <div class="table-container">
                 <table id="projectsTable" class="display pu-table">
                     <thead>
                         <tr>
@@ -364,16 +369,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             echo "<td><i class='fas fa-phone'></i>" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
                             echo "<td>
                                 <div class='action-btns'>
-                                <a href='javascript:void(0)' class='editBtn action-btn edit' 
-                                   data-id='{$row['id']}' 
-                                   data-name='" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "' 
-                                   data-username='" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "' 
-                                   data-phone='" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "' 
+                                <a href='javascript:void(0)' class='editBtn action-btn edit'
+                                   data-id='{$row['id']}'
+                                   data-name='" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "'
+                                   data-username='" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "'
+                                   data-phone='" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "'
                                    data-role='{$row['role']}'
                                    data-project='{$row['project_id']}'
                                    data-mine='{$row['mine_id']}'
                                    data-contract='{$row['contract_id']}'
-                                   title='تعديل'><i class='fas fa-edit'></i></a> 
+                                   title='تعديل'><i class='fas fa-edit'></i></a>
                                 <a href='?delete={$row['id']}' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>
                                 </div>
                               </td>";
@@ -382,317 +387,316 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         ?>
                     </tbody>
                 </table>
-                </div>
             </div>
         </div>
-
     </div>
 
-    <!-- jQuery + DataTables -->
-    <script src="../includes/js/jquery-3.7.1.main.js"></script>
-    <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-    <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
-    <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
-    <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
-    <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
-    <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
-    <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
-    <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
+</div>
 
-    <script>
-document.addEventListener("DOMContentLoaded", function () {
+<!-- jQuery + DataTables -->
+<script src="../includes/js/jquery-3.7.1.main.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
-    const roleScopes = <?php echo json_encode($roles_scope, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
 
-    const roleSelect = document.getElementById("role");
-    const projectDiv = document.getElementById("projectDiv");
-    const mineDiv = document.getElementById("mineDiv");
-    const contractDiv = document.getElementById("contractDiv");
+        const roleScopes = <?php echo json_encode($roles_scope, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
 
-    const projectSelect = document.getElementById("project_id");
-    const mineSelect = document.getElementById("mine_id");
-    const contractSelect = document.getElementById("contract_id");
+        const roleSelect = document.getElementById("role");
+        const projectDiv = document.getElementById("projectDiv");
+        const mineDiv = document.getElementById("mineDiv");
+        const contractDiv = document.getElementById("contractDiv");
 
-    const form = document.getElementById('projectForm');
-    const usernameInput = document.getElementById("username");
-    const usernameFeedback = document.getElementById("usernameFeedback");
+        const projectSelect = document.getElementById("project_id");
+        const mineSelect = document.getElementById("mine_id");
+        const contractSelect = document.getElementById("contract_id");
 
-    let usernameValid = true;
+        const form = document.getElementById('projectForm');
+        const usernameInput = document.getElementById("username");
+        const usernameFeedback = document.getElementById("usernameFeedback");
 
-    function roleNeedsMineScope(roleId) {
-        if (!roleId) {
-            return false;
+        let usernameValid = true;
+
+        function roleNeedsMineScope(roleId) {
+            if (!roleId) {
+                return false;
+            }
+            return roleScopes[String(roleId)] === "mine";
         }
-        return roleScopes[String(roleId)] === "mine";
-    }
 
-    /* =============================
-       إظهار الحقول حسب الدور
-    ============================== */
-    roleSelect.addEventListener("change", function () {
+        /* =============================
+           إظهار الحقول حسب الدور
+        ============================== */
+        roleSelect.addEventListener("change", function () {
 
-        if (roleNeedsMineScope(this.value)) {
+            if (roleNeedsMineScope(this.value)) {
 
-            projectDiv.classList.remove("pu-hidden");
-            mineDiv.classList.remove("pu-hidden");
-            contractDiv.classList.remove("pu-hidden");
+                projectDiv.classList.remove("pu-hidden");
+                mineDiv.classList.remove("pu-hidden");
+                contractDiv.classList.remove("pu-hidden");
 
-            projectSelect.required = true;
-            mineSelect.required = true;
-            contractSelect.required = true;
+                projectSelect.required = true;
+                mineSelect.required = true;
+                contractSelect.required = true;
 
-        } else {
+            } else {
 
-            projectDiv.classList.add("pu-hidden");
-            mineDiv.classList.add("pu-hidden");
-            contractDiv.classList.add("pu-hidden");
+                projectDiv.classList.add("pu-hidden");
+                mineDiv.classList.add("pu-hidden");
+                contractDiv.classList.add("pu-hidden");
 
-            projectSelect.required = false;
-            mineSelect.required = false;
-            contractSelect.required = false;
+                projectSelect.required = false;
+                mineSelect.required = false;
+                contractSelect.required = false;
 
-            projectSelect.value = "";
+                projectSelect.value = "";
+                mineSelect.innerHTML = '<option value="">-- اختر المنجم --</option>';
+                contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+            }
+        });
+
+        /* =============================
+           تحميل المناجم
+        ============================== */
+        async function loadMines(projectId, selectedMine = null) {
+
             mineSelect.innerHTML = '<option value="">-- اختر المنجم --</option>';
             contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
-        }
-    });
 
-    /* =============================
-       تحميل المناجم
-    ============================== */
-    async function loadMines(projectId, selectedMine = null) {
+            if (!projectId) return;
 
-        mineSelect.innerHTML = '<option value="">-- اختر المنجم --</option>';
-        contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+            try {
+                const response = await fetch(`../Projects/get_project_mines_ajax.php?project_id=${projectId}`);
+                const data = await response.json();
 
-        if (!projectId) return;
+                if (data.success && data.mines.length > 0) {
+                    data.mines.forEach(mine => {
+                        const option = document.createElement('option');
+                        option.value = mine.id;
+                        option.textContent = `${mine.mine_name} (${mine.mine_code})`;
+                        mineSelect.appendChild(option);
+                    });
 
-        try {
-            const response = await fetch(`../Projects/get_project_mines_ajax.php?project_id=${projectId}`);
-            const data = await response.json();
-
-            if (data.success && data.mines.length > 0) {
-                data.mines.forEach(mine => {
-                    const option = document.createElement('option');
-                    option.value = mine.id;
-                    option.textContent = `${mine.mine_name} (${mine.mine_code})`;
-                    mineSelect.appendChild(option);
-                });
-
-                if (selectedMine) {
-                    mineSelect.value = selectedMine;
+                    if (selectedMine) {
+                        mineSelect.value = selectedMine;
+                    }
                 }
+
+            } catch (error) {
+                console.error("خطأ في تحميل المناجم:", error);
             }
-
-        } catch (error) {
-            console.error("خطأ في تحميل المناجم:", error);
         }
-    }
 
-    /* =============================
-       تحميل العقود
-    ============================== */
-    async function loadContracts(mineId, selectedContract = null) {
+        /* =============================
+           تحميل العقود
+        ============================== */
+        async function loadContracts(mineId, selectedContract = null) {
 
-        contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+            contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
 
-        if (!mineId) return;
+            if (!mineId) return;
 
-        try {
-            const response = await fetch(`../Contracts/get_mine_contracts_ajax.php?mine_id=${mineId}`);
-            const data = await response.json();
+            try {
+                const response = await fetch(`../Contracts/get_mine_contracts_ajax.php?mine_id=${mineId}`);
+                const data = await response.json();
 
-            if (data.success && data.contracts.length > 0) {
-                data.contracts.forEach(contract => {
-                    const option = document.createElement('option');
-                    option.value = contract.id;
-                    option.textContent = `عقد #${contract.id} - ${contract.contract_signing_date}`;
-                    contractSelect.appendChild(option);
-                });
+                if (data.success && data.contracts.length > 0) {
+                    data.contracts.forEach(contract => {
+                        const option = document.createElement('option');
+                        option.value = contract.id;
+                        option.textContent = `عقد #${contract.id} - ${contract.contract_signing_date}`;
+                        contractSelect.appendChild(option);
+                    });
 
-                if (selectedContract) {
-                    contractSelect.value = selectedContract;
+                    if (selectedContract) {
+                        contractSelect.value = selectedContract;
+                    }
                 }
+
+            } catch (error) {
+                console.error("خطأ في تحميل العقود:", error);
             }
-
-        } catch (error) {
-            console.error("خطأ في تحميل العقود:", error);
         }
-    }
 
-    /* =============================
-       عند تغيير المشروع
-    ============================== */
-    projectSelect.addEventListener("change", async function () {
-        await loadMines(this.value);
-    });
+        /* =============================
+           عند تغيير المشروع
+        ============================== */
+        projectSelect.addEventListener("change", async function () {
+            await loadMines(this.value);
+        });
 
-    /* =============================
-       عند تغيير المنجم
-    ============================== */
-    mineSelect.addEventListener("change", async function () {
-        await loadContracts(this.value);
-    });
+        /* =============================
+           عند تغيير المنجم
+        ============================== */
+        mineSelect.addEventListener("change", async function () {
+            await loadContracts(this.value);
+        });
 
-    /* =============================
-       DataTable
-    ============================== */
+        /* =============================
+           DataTable
+        ============================== */
         const usersTable = $('#projectsTable').DataTable({
-        responsive: true,
-        dom: 'Bfrtip',
-        buttons: [
-            { extend: 'copy', text: '<i class="fas fa-copy"></i> نسخ', className: 'users-table-action' },
-            { extend: 'excel', text: '<i class="fas fa-file-excel"></i> Excel', className: 'users-table-action' },
-            { extend: 'csv', text: '<i class="fas fa-file-csv"></i> CSV', className: 'users-table-action' },
-            { extend: 'pdf', text: '<i class="fas fa-file-pdf"></i> PDF', className: 'users-table-action' },
-            { extend: 'print', text: '<i class="fas fa-print"></i> طباعة', className: 'users-table-action' }
-        ],
-        language: {
-            url: "/ems/assets/i18n/datatables/ar.json"
-        }
-    });
-
-    usersTable.buttons().container().appendTo('#usersExportButtons');
-
-    /* =============================
-       إظهار / إخفاء النموذج
-    ============================== */
-    document.getElementById('toggleForm').addEventListener('click', function () {
-        form.reset();
-        document.getElementById("uid").value = 0;
-        usernameFeedback.innerHTML = "";
-        usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");
-        usernameValid = true;
-        form.classList.toggle("allforms-visible");
-    });
-
-    /* =============================
-       تعبئة الفورم عند التعديل
-    ============================== */
-    $(document).on('click', '.editBtn', async function () {
-
-        const id = $(this).data('id');
-        const name = $(this).data('name');
-        const username = $(this).data('username');
-        const phone = $(this).data('phone');
-        const role = $(this).data('role');
-
-        const projectId = $(this).data('project');
-        const mineId = $(this).data('mine');
-        const contractId = $(this).data('contract');
-
-        $('#uid').val(id);
-        $('#name').val(name);
-        $('#username').val(username);
-        $('#phone').val(phone);
-        $('#role').val(role).trigger('change');
-
-        // إعادة تعيين حالة التحقق من اسم المستخدم
-        usernameFeedback.innerHTML = '<span class="pu-feedback-ok"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';
-        usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");
-        usernameValid = true;
-
-        if (roleNeedsMineScope(role)) {
-
-            if (projectId) {
-                $('#project_id').val(projectId);
-                await loadMines(projectId, mineId);
-
-                if (mineId) {
-                    await loadContracts(mineId, contractId);
-                }
+            responsive: true,
+            dom: 'Bfrtip',
+            buttons: [
+                { extend: 'copy', text: '<i class="fas fa-copy"></i> نسخ', className: 'users-table-action' },
+                { extend: 'excel', text: '<i class="fas fa-file-excel"></i> Excel', className: 'users-table-action' },
+                { extend: 'csv', text: '<i class="fas fa-file-csv"></i> CSV', className: 'users-table-action' },
+                { extend: 'pdf', text: '<i class="fas fa-file-pdf"></i> PDF', className: 'users-table-action' },
+                { extend: 'print', text: '<i class="fas fa-print"></i> طباعة', className: 'users-table-action' }
+            ],
+            language: {
+                url: "/ems/assets/i18n/datatables/ar.json"
             }
-        }
+        });
 
-        $('#password').val("");
-        form.classList.add("allforms-visible");
+        usersTable.buttons().container().appendTo('#usersExportButtons');
 
-        $('html, body').animate({
-            scrollTop: $(form).offset().top - 20
-        }, 500);
-    });
-
-    /* =============================
-       تحقق Ajax من اسم المستخدم أثناء الكتابة
-    ============================== */
-    usernameInput.addEventListener("input", async function () {
-        const username = this.value.trim();
-        const uid = document.getElementById("uid").value;
-
-        // إعادة تعيين الحالة إذا كان المدخل فارغاً
-        if (username === "") {
+        /* =============================
+           إظهار / إخفاء النموذج
+        ============================== */
+        document.getElementById('toggleForm').addEventListener('click', function () {
+            form.reset();
+            document.getElementById("uid").value = 0;
             usernameFeedback.innerHTML = "";
             usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");
             usernameValid = true;
-            return;
-        }
+            form.classList.toggle("allforms-visible");
+        });
 
-        // التحقق من الطول الأدنى
-        if (username.length < 3) {
-            usernameFeedback.innerHTML = '<span class="pu-feedback-warn"><i class="fas fa-info-circle"></i> الحد الأدنى 3 أحرف</span>';
-            usernameInput.classList.remove("pu-input-success", "pu-input-error");
-            usernameInput.classList.add("pu-input-warn");
-            usernameValid = false;
-            return;
-        }
+        /* =============================
+           تعبئة الفورم عند التعديل
+        ============================== */
+        $(document).on('click', '.editBtn', async function () {
 
-        // إظهار رسالة التحميل
-        usernameFeedback.innerHTML = '<span class="pu-feedback-loading"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>';
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+            const username = $(this).data('username');
+            const phone = $(this).data('phone');
+            const role = $(this).data('role');
 
-        try {
-            const response = await fetch("check_username_availability.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: `username=${encodeURIComponent(username)}&uid=${uid}`
-            });
+            const projectId = $(this).data('project');
+            const mineId = $(this).data('mine');
+            const contractId = $(this).data('contract');
 
-            const data = await response.json();
+            $('#uid').val(id);
+            $('#name').val(name);
+            $('#username').val(username);
+            $('#phone').val(phone);
+            $('#role').val(role).trigger('change');
 
-            if (data.available) {
-                usernameFeedback.innerHTML = `<span class="pu-feedback-ok"><i class="fas fa-check-circle"></i> ${data.message}</span>`;
-                usernameValid = true;
-                usernameInput.classList.remove("pu-input-warn", "pu-input-error");
-                usernameInput.classList.add("pu-input-success");
-            } else {
-                usernameFeedback.innerHTML = `<span class="pu-feedback-error"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
-                usernameValid = false;
-                usernameInput.classList.remove("pu-input-warn", "pu-input-success");
-                usernameInput.classList.add("pu-input-error");
+            // إعادة تعيين حالة التحقق من اسم المستخدم
+            usernameFeedback.innerHTML = '<span class="pu-feedback-ok"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';
+            usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");
+            usernameValid = true;
+
+            if (roleNeedsMineScope(role)) {
+
+                if (projectId) {
+                    $('#project_id').val(projectId);
+                    await loadMines(projectId, mineId);
+
+                    if (mineId) {
+                        await loadContracts(mineId, contractId);
+                    }
+                }
             }
-        } catch (error) {
-            usernameFeedback.innerHTML = '<span class="pu-feedback-error"><i class="fas fa-exclamation-triangle"></i> خطأ في التحقق</span>';
-            console.error("خطأ:", error);
-            usernameValid = false;
-        }
+
+            $('#password').val("");
+            form.classList.add("allforms-visible");
+
+            $('html, body').animate({
+                scrollTop: $(form).offset().top - 20
+            }, 500);
+        });
+
+        /* =============================
+           تحقق Ajax من اسم المستخدم أثناء الكتابة
+        ============================== */
+        usernameInput.addEventListener("input", async function () {
+            const username = this.value.trim();
+            const uid = document.getElementById("uid").value;
+
+            // إعادة تعيين الحالة إذا كان المدخل فارغاً
+            if (username === "") {
+                usernameFeedback.innerHTML = "";
+                usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");
+                usernameValid = true;
+                return;
+            }
+
+            // التحقق من الطول الأدنى
+            if (username.length < 3) {
+                usernameFeedback.innerHTML = '<span class="pu-feedback-warn"><i class="fas fa-info-circle"></i> الحد الأدنى 3 أحرف</span>';
+                usernameInput.classList.remove("pu-input-success", "pu-input-error");
+                usernameInput.classList.add("pu-input-warn");
+                usernameValid = false;
+                return;
+            }
+
+            // إظهار رسالة التحميل
+            usernameFeedback.innerHTML = '<span class="pu-feedback-loading"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</span>';
+
+            try {
+                const response = await fetch("check_username_availability.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: `username=${encodeURIComponent(username)}&uid=${uid}`
+                });
+
+                const data = await response.json();
+
+                if (data.available) {
+                    usernameFeedback.innerHTML = `<span class="pu-feedback-ok"><i class="fas fa-check-circle"></i> ${data.message}</span>`;
+                    usernameValid = true;
+                    usernameInput.classList.remove("pu-input-warn", "pu-input-error");
+                    usernameInput.classList.add("pu-input-success");
+                } else {
+                    usernameFeedback.innerHTML = `<span class="pu-feedback-error"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
+                    usernameValid = false;
+                    usernameInput.classList.remove("pu-input-warn", "pu-input-success");
+                    usernameInput.classList.add("pu-input-error");
+                }
+            } catch (error) {
+                usernameFeedback.innerHTML = '<span class="pu-feedback-error"><i class="fas fa-exclamation-triangle"></i> خطأ في التحقق</span>';
+                console.error("خطأ:", error);
+                usernameValid = false;
+            }
+        });
+
+        /* =============================
+           منع الإرسال إذا كان اسم المستخدم غير متاح
+        ============================== */
+        document.getElementById('projectForm').addEventListener('submit', function (e) {
+            const username = usernameInput.value.trim();
+
+            if (username !== "" && !usernameValid) {
+                e.preventDefault();
+                alert("⚠️ اسم المستخدم غير متاح، يرجى اختيار اسم آخر");
+                usernameInput.focus();
+                return false;
+            }
+
+            if (username === "") {
+                e.preventDefault();
+                alert("⚠️ يرجى إدخال اسم المستخدم");
+                usernameInput.focus();
+                return false;
+            }
+        });
+
     });
-
-    /* =============================
-       منع الإرسال إذا كان اسم المستخدم غير متاح
-    ============================== */
-    document.getElementById('projectForm').addEventListener('submit', function (e) {
-        const username = usernameInput.value.trim();
-        
-        if (username !== "" && !usernameValid) {
-            e.preventDefault();
-            alert("⚠️ اسم المستخدم غير متاح، يرجى اختيار اسم آخر");
-            usernameInput.focus();
-            return false;
-        }
-
-        if (username === "") {
-            e.preventDefault();
-            alert("⚠️ يرجى إدخال اسم المستخدم");
-            usernameInput.focus();
-            return false;
-        }
-    });
-
-});
 </script>
 
 </body>
 
 </html>
-

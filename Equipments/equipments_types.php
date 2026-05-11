@@ -8,7 +8,7 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 
-$perms = get_page_permissions($conn );
+$perms = get_page_permissions($conn);
 
 // التحقق من صلاحية عرض هذه الصفحة
 if (!$perms['can_view']) {
@@ -118,23 +118,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="main">
 
-    <div class="header">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <div class="title-icon"><i class="fas fa-cubes"></i></div>
-            <h1 class="page-title">إدارة أنواع المعدات</h1>
-        </div>
-        <div>
-            <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
+    <div class="main_head">
+        <div class="head_actions">
             <?php if ($perms['can_add']): ?>
-            <button id="toggleForm" class="add">
-                <i class="fa-solid fa-plus-circle"></i> إضافة نوع جديد
-            </button>
+                <button id="toggleForm" class="add">
+                    <i class="fa-solid fa-plus-circle"></i> إضافة نوع جديد
+                </button>
             <?php endif; ?>
         </div>
+        <h1 class="head-title">
+            <div class="title-icon"><i class="fas fa-cubes"></i></div>
+            إدارة أنواع المعدات
+        </h1>
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+        </div>
     </div>
-
     <!-- تنبيه الحذف (معطل) -->
     <div id="deleteAlert" class="alert alert-warning text-center" style="display:none;">
         <i class="fa-solid fa-circle-info"></i>
@@ -160,15 +161,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div>
                         <label>الفئة</label>
-                          <select name="form" required>
+                        <select name="form" required>
                             <option value="">-- اختر الفئة --</option>
-                            <option value="1"  <?= (!empty($editData) && $editData['form'] === '1') ? 'selected' : ''; ?>> معدات ثقيلة </option>
-                            <option value="2" <?= (!empty($editData) && $editData['form'] === '2') ? 'selected' : ''; ?>> شاحنات </option>
-                            <option value="3" <?= (!empty($editData) && $editData['form'] === '3') ? 'selected' : ''; ?>> خرمات </option>
+                            <option value="1" <?= (!empty($editData) && $editData['form'] === '1') ? 'selected' : ''; ?>>
+                                معدات ثقيلة </option>
+                            <option value="2" <?= (!empty($editData) && $editData['form'] === '2') ? 'selected' : ''; ?>>
+                                شاحنات </option>
+                            <option value="3" <?= (!empty($editData) && $editData['form'] === '3') ? 'selected' : ''; ?>>
+                                خرمات </option>
 
                         </select>
                     </div>
-                    <div>                           
+                    <div>
 
                         <label>نوع المعدة</label>
                         <input type="text" name="type" required
@@ -225,41 +229,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <tr>
                                 <td><?= $i++; ?></td>
                                 <td>
-                                   <?php
-                                   $form_badges = [
-                                       '1' => ['class' => 'badge-heavy', 'icon' => 'fa-tractor', 'text' => 'معدات ثقيلة'],
-                                       '2' => ['class' => 'badge-truck', 'icon' => 'fa-truck-moving', 'text' => 'شاحنات'],
-                                       '3' => ['class' => 'badge-drill', 'icon' => 'fa-drill', 'text' => 'خرمات']
-                                   ];
-                                   
-                                   $form_value = $row['form'];
-                                   if (isset($form_badges[$form_value])) {
-                                       $badge = $form_badges[$form_value];
-                                       echo "<span class='{$badge['class']}'><i class='fas {$badge['icon']}'></i> {$badge['text']}</span>";
-                                   } else {
-                                       echo "<span class='badge-default'><i class='fas fa-question'></i> غير محدد</span>";
-                                   }
-                                   ?>
+                                    <?php
+                                    $form_badges = [
+                                        '1' => ['class' => 'badge-heavy', 'icon' => 'fa-tractor', 'text' => 'معدات ثقيلة'],
+                                        '2' => ['class' => 'badge-truck', 'icon' => 'fa-truck-moving', 'text' => 'شاحنات'],
+                                        '3' => ['class' => 'badge-drill', 'icon' => 'fa-drill', 'text' => 'خرمات']
+                                    ];
+
+                                    $form_value = $row['form'];
+                                    if (isset($form_badges[$form_value])) {
+                                        $badge = $form_badges[$form_value];
+                                        echo "<span class='{$badge['class']}'><i class='fas {$badge['icon']}'></i> {$badge['text']}</span>";
+                                    } else {
+                                        echo "<span class='badge-default'><i class='fas fa-question'></i> غير محدد</span>";
+                                    }
+                                    ?>
                                 </td>
                                 <td><?= htmlspecialchars($row['type'], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td>
                                     <?= $row['status'] === 'active'
-                                    ? "<span class='status-active'>نشط</span>"
-                                    : "<span class='status-inactive'>غير نشط</span>"; ?>
+                                        ? "<span class='status-active'>نشط</span>"
+                                        : "<span class='status-inactive'>غير نشط</span>"; ?>
                                 </td>
                                 <td class="text-center">
 
                                     <div class="action-btns">
                                         <?php if ($perms['can_edit']): ?>
-                                        <a href="equipments_types.php?edit_id=<?= $row['id']; ?>" class="action-btn edit"
-                                            title="تعديل">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </a>
+                                            <a href="equipments_types.php?edit_id=<?= $row['id']; ?>" class="action-btn edit"
+                                                title="تعديل">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
                                         <?php endif; ?>
                                         <?php if ($perms['can_delete']): ?>
-                                        <button type="button" class="action-btn delete delete-disabled" title="حذف">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
+                                            <button type="button" class="action-btn delete delete-disabled" title="حذف">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
                                         <?php endif; ?>
                                     </div>
 
@@ -313,5 +317,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 </html>
-
-

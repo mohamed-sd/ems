@@ -240,13 +240,17 @@ include('../insidebar.php');
 </style>
 
 <div class="main">
-    <div class="header">
-        <h1 class="page-title">
+
+
+    <div class="main_head">
+        <div class="head_actions">
+        </div>
+        <h1 class="head-title">
             <div class="title-icon"><i class="fas fa-gear"></i></div>
             الإعدادات
         </h1>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="../main/dashboard.php" class="back-btn">
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
         </div>
@@ -261,7 +265,8 @@ include('../insidebar.php');
                     <i class="fas fa-shield-halved"></i> مركز التحكم
                 </span>
                 <h2>إدارة إعدادات الحساب والنظام</h2>
-                <p>اختر القسم المطلوب لإدارة كلمة المرور أو إعدادات الصلاحيات والموديولات بنفس تصميم صفحات الإدارة داخل النظام.</p>
+                <p>اختر القسم المطلوب لإدارة كلمة المرور أو إعدادات الصلاحيات والموديولات بنفس تصميم صفحات الإدارة داخل
+                    النظام.</p>
             </div>
         </div>
 

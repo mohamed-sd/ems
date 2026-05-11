@@ -38,29 +38,29 @@ if ($users_has_company_id && $current_company_id <= 0) {
 $_currentUserRole = intval($_SESSION['user']['role']);
 
 // البحث عن معرف الوحدة مع مراعاة دور المستخدم الحالي
-$module_query = "SELECT id FROM modules 
-                WHERE (code = 'main/project_users.php' 
-                    OR code = 'project_users' 
+$module_query = "SELECT id FROM modules
+                WHERE (code = 'main/project_users.php'
+                    OR code = 'project_users'
                     OR code LIKE '%project_users%')
                 AND owner_role_id = $_currentUserRole
                 LIMIT 1";
 $module_result = $conn->query($module_query);
-$module_info   = $module_result ? $module_result->fetch_assoc() : null;
-$module_id     = $module_info ? $module_info['id'] : null;
+$module_info = $module_result ? $module_result->fetch_assoc() : null;
+$module_id = $module_info ? $module_info['id'] : null;
 
 // إذا لم يوجد سجل خاص بهذا الدور، افترض جميع الصلاحيات (للتوافق مع الأدوار القديمة)
 if (!$module_id) {
     $can_view = $can_add = $can_edit = $can_delete = true;
 } else {
-    $can_view   = false;
-    $can_add    = false;
-    $can_edit   = false;
+    $can_view = false;
+    $can_add = false;
+    $can_edit = false;
     $can_delete = false;
 
-    $perms      = get_module_permissions($conn, $module_id);
-    $can_view   = $perms['can_view'];
-    $can_add    = $perms['can_add'];
-    $can_edit   = $perms['can_edit'];
+    $perms = get_module_permissions($conn, $module_id);
+    $can_view = $perms['can_view'];
+    $can_add = $perms['can_add'];
+    $can_edit = $perms['can_edit'];
     $can_delete = $perms['can_delete'];
 }
 
@@ -91,20 +91,20 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     }
     $deleteId = intval($_GET['delete']);
     $userid = $_SESSION['user']['id'];
-    
+
     // التحقق من أن المستخدم المراد حذفه تابع للمستخدم الحالي أو من دور تابع
-    $verifyQuery = "SELECT u.id FROM users u 
-                    WHERE u.id = $deleteId 
+    $verifyQuery = "SELECT u.id FROM users u
+                    WHERE u.id = $deleteId
                     " . ($users_has_company_id ? "AND u.company_id = $current_company_id" : "") . "
                     AND $users_not_deleted_sql
                     AND (u.parent_id = '$userid' OR u.role IN (
-                        SELECT r.id FROM roles r 
-                        WHERE r.parent_role_id = {$_SESSION['user']['role']} 
+                        SELECT r.id FROM roles r
+                        WHERE r.parent_role_id = {$_SESSION['user']['role']}
                         AND (r.status = '1' OR r.status = 1)
                     ))";
-    
+
     $verifyResult = mysqli_query($conn, $verifyQuery);
-    
+
     if (mysqli_num_rows($verifyResult) > 0) {
         $deleteBy = intval($_SESSION['user']['id']);
         $delete_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
@@ -130,32 +130,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         header("Location: project_users.php?msg=لا+توجد+صلاحية+تعديل+المستخدمين+❌");
         exit();
     }
-    $userId   = intval($_POST['user_id']);
-    $name     = mysqli_real_escape_string($conn, trim($_POST['name']));
+    $userId = intval($_POST['user_id']);
+    $name = mysqli_real_escape_string($conn, trim($_POST['name']));
     $username = mysqli_real_escape_string($conn, trim($_POST['username']));
     $password = !empty($_POST['password']) ? mysqli_real_escape_string($conn, $_POST['password']) : '';
-    $phone    = mysqli_real_escape_string($conn, trim($_POST['phone']));
-    $role     = mysqli_real_escape_string($conn, $_POST['role']);
-    $userid   = $_SESSION['user']['id'];
-    
+    $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
+    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $userid = $_SESSION['user']['id'];
+
     // التحقق من أن المستخدم المراد تعديله تابع للمستخدم الحالي
-    $verifyQuery = "SELECT u.id FROM users u 
-                    WHERE u.id = $userId 
+    $verifyQuery = "SELECT u.id FROM users u
+                    WHERE u.id = $userId
                     " . ($users_has_company_id ? "AND u.company_id = $current_company_id" : "") . "
                     AND $users_not_deleted_sql
                     AND (u.parent_id = '$userid' OR u.role IN (
-                        SELECT r.id FROM roles r 
-                        WHERE r.parent_role_id = {$_SESSION['user']['role']} 
+                        SELECT r.id FROM roles r
+                        WHERE r.parent_role_id = {$_SESSION['user']['role']}
                         AND (r.status = '1' OR r.status = 1)
                     ))";
-    
+
     $verifyResult = mysqli_query($conn, $verifyQuery);
-    
+
     if (mysqli_num_rows($verifyResult) === 0) {
         header("Location: project_users.php?msg=ليس+لديك+صلاحية+لتعديل+هذا+المستخدم+❌");
         exit;
     }
-    
+
     // تحقق من تكرار اسم المستخدم (ما عدا المستخدم الحالي)
     $check_query = "SELECT id FROM users WHERE username = '$username' AND id != $userId AND COALESCE(is_deleted,0)=0";
     if ($users_has_company_id) {
@@ -174,13 +174,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $passwordUpdate = ", password = '$hashedPassword'";
     }
-    
+
     $updateSQL = "UPDATE users SET name = '$name', username = '$username', phone = '$phone', role = '$role', updated_at = NOW() $passwordUpdate";
     if ($users_has_company_id && $current_company_id > 0) {
         $updateSQL .= ", company_id = '$current_company_id'";
     }
     $updateSQL .= " WHERE id = $userId";
-    
+
     if (mysqli_query($conn, $updateSQL)) {
         header("Location: project_users.php?msg=تم+تعديل+المستخدم+بنجاح+✅");
         exit;
@@ -198,13 +198,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
         header("Location: project_users.php?msg=لا+توجد+صلاحية+إضافة+مستخدمين+جدد+❌");
         exit();
     }
-    $name      = mysqli_real_escape_string($conn, trim($_POST['name']));
-    $username  = mysqli_real_escape_string($conn, trim($_POST['username']));
-    $password  = mysqli_real_escape_string($conn, $_POST['password']);
+    $name = mysqli_real_escape_string($conn, trim($_POST['name']));
+    $username = mysqli_real_escape_string($conn, trim($_POST['username']));
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-    $phone     = mysqli_real_escape_string($conn, trim($_POST['phone']));
-    $role      = mysqli_real_escape_string($conn, $_POST['role']);
-    $project   = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
+    $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
+    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $project = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
     $parent_id = intval($_SESSION['user']['id']);
 
     // تحقق من تكرار اسم المستخدم
@@ -227,7 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
         $insert_values .= ", '$current_company_id'";
     }
     $sql = "INSERT INTO users ($insert_columns) VALUES ($insert_values)";
-    
+
     if (mysqli_query($conn, $sql)) {
         header("Location: project_users.php?msg=تم+إضافة+المستخدم+بنجاح+✅");
         exit;
@@ -243,27 +243,29 @@ include('../insidebar.php');
 ?>
 
 <div class="main project-users-main ems-unified-page-shell">
-    <div class="header">
-        <div class="pu- header -actions">
+
+    <div class="main_head">
+        <div class="head_actions">
             <?php if ($can_add): ?>
-            <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fas fa-plus-circle"></i> إضافة مشرف جديد
-            </a>
+                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+                    <i class="fas fa-plus-circle"></i> إضافة مشرف جديد
+                </a>
             <?php endif; ?>
         </div>
-         <a href="../main/dashboard.php" class="back-btn">
-            <i class="fas fa-arrow-right"></i> رجوع
-        </a>
-        <h1 class="page-title">
+        <h1 class="head-title">
             <div class="title-icon"><i class="fas fa-users-cog"></i></div>
             إدارة مشرفين <?php echo !empty($roleName) ? '- ' . $roleName : ''; ?>
         </h1>
-       
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+        </div>
     </div>
 
-    <?php if (!empty($_GET['msg'])): 
+    <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;
-    ?>
+        ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
             <?php echo htmlspecialchars($_GET['msg']); ?>
@@ -272,7 +274,7 @@ include('../insidebar.php');
 
     <!-- فورم إضافة / تعديل مستخدم -->
     <form id="projectForm" action="" method="post" class="allforms">
-        <input type="hidden" id="action"  name="action"  value="add">
+        <input type="hidden" id="action" name="action" value="add">
         <input type="hidden" id="user_id" name="user_id" value="">
         <div class="card shadow-sm pu-form-card">
             <div class="card-header">
@@ -286,13 +288,15 @@ include('../insidebar.php');
                     </div>
                     <div>
                         <label><i class="fas fa-at"></i> اسم المستخدم *</label>
-                        <input type="text" name="username" id="username" placeholder="أدخل اسم المستخدم" value="" required autocomplete="off" />
+                        <input type="text" name="username" id="username" placeholder="أدخل اسم المستخدم" value=""
+                            required autocomplete="off" />
                         <small id="usernameFeedback" class="pu-username-feedback"></small>
                     </div>
                     <div>
                         <label><i class="fas fa-lock"></i> كلمة المرور <span id="passwordRequired">*</span></label>
-                        <input type="password" name="password" id="password" placeholder="أدخل كلمة المرور" value=""/>
-                        <small id="passwordHint" class="pu-password-hint pu-hidden">اتركه فارغاً للاحتفاظ بكلمة المرور الحالية</small>
+                        <input type="password" name="password" id="password" placeholder="أدخل كلمة المرور" value="" />
+                        <small id="passwordHint" class="pu-password-hint pu-hidden">اتركه فارغاً للاحتفاظ بكلمة المرور
+                            الحالية</small>
                     </div>
                     <div>
                         <label><i class="fas fa-phone"></i> رقم الهاتف *</label>
@@ -302,20 +306,20 @@ include('../insidebar.php');
                         <label><i class="fas fa-shield-alt"></i> الصلاحية / الدور *</label>
                         <select name="role" id="role" required>
                             <option value="">-- اختر الصلاحية --</option>
-                            <?php 
+                            <?php
                             // جلب الأدوار التابعة للدور الحالي من قاعدة البيانات
                             $currentRole = $_SESSION['user']['role'];
-                            $rolesQuery  = "SELECT id, name FROM roles 
-                                           WHERE parent_role_id = $currentRole 
+                            $rolesQuery = "SELECT id, name FROM roles
+                                           WHERE parent_role_id = $currentRole
                                            AND (status = '1' OR status = 1)
                                            ORDER BY id ASC";
                             $rolesResult = mysqli_query($conn, $rolesQuery);
-                            
+
                             if ($rolesResult && mysqli_num_rows($rolesResult) > 0) {
                                 while ($roleRow = mysqli_fetch_assoc($rolesResult)) {
-                                    echo '<option value="' . $roleRow['id'] . '">' . 
-                                         htmlspecialchars($roleRow['name'], ENT_QUOTES, 'UTF-8') . 
-                                         '</option>';
+                                    echo '<option value="' . $roleRow['id'] . '">' .
+                                        htmlspecialchars($roleRow['name'], ENT_QUOTES, 'UTF-8') .
+                                        '</option>';
                                 }
                             } else {
                                 echo '<option value="" disabled>لا توجد صلاحيات متاحة</option>';
@@ -328,7 +332,8 @@ include('../insidebar.php');
                     <button type="submit" class="btn-submit">
                         <i class="fas fa-save"></i> <span id="submitBtnText">حفظ المستخدم</span>
                     </button>
-                    <button type="button" class="btn-cancel" onclick="document.getElementById('projectForm').classList.remove('allforms-visible');">
+                    <button type="button" class="btn-cancel"
+                        onclick="document.getElementById('projectForm').classList.remove('allforms-visible');">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>
@@ -358,7 +363,7 @@ include('../insidebar.php');
                     // جلب المستخدمين التابعين للمدير الحالي
                     // 1. المستخدمون الذين parent_id = المستخدم الحالي
                     // 2. المستخدمون من الأدوار التابعة للدور الحالي
-                    $userid      = $_SESSION['user']['id'];
+                    $userid = $_SESSION['user']['id'];
                     $currentRole = $_SESSION['user']['role'];
 
                     $query = "SELECT DISTINCT u.id, u.name, u.username, u.phone, u.role, u.created_at, ro.name AS role_name
@@ -392,16 +397,16 @@ include('../insidebar.php');
 
                         $action_btns = "<td><div class='action-btns'>";
                         if ($can_edit) {
-                            $action_btns .= "<a href='javascript:void(0)' 
-                                       class='action-btn edit' 
-                                       onclick='editUser({$row['id']}, \"" . htmlspecialchars($row['name'],     ENT_QUOTES, 'UTF-8') . "\", \"" 
-                                                                           . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "\", \"" 
-                                                                           . htmlspecialchars($row['phone'],    ENT_QUOTES, 'UTF-8') . "\", {$row['role']})'
+                            $action_btns .= "<a href='javascript:void(0)'
+                                       class='action-btn edit'
+                                       onclick='editUser({$row['id']}, \"" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "\", \""
+                                . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "\", \""
+                                . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "\", {$row['role']})'
                                        title='تعديل'><i class='fas fa-edit'></i></a>";
                         }
                         if ($can_delete) {
-                            $action_btns .= "<a href='project_users.php?delete={$row['id']}' 
-                                       class='action-btn delete' 
+                            $action_btns .= "<a href='project_users.php?delete={$row['id']}'
+                                       class='action-btn delete'
                                        onclick=\"return confirm('هل أنت متأكد من حذف هذا المستخدم؟')\"
                                        title='حذف'><i class='fas fa-trash'></i></a>";
                         }
@@ -440,11 +445,11 @@ include('../insidebar.php');
                 responsive: true,
                 dom: 'Bfrtip', // أزرار + بحث + ترقيم الصفحات
                 buttons: [
-                    { extend: 'copy',  text: 'نسخ'         },
-                    { extend: 'excel', text: 'تصدير Excel'  },
-                    { extend: 'csv',   text: 'تصدير CSV'    },
-                    { extend: 'pdf',   text: 'تصدير PDF'    },
-                    { extend: 'print', text: 'طباعة'        }
+                    { extend: 'copy', text: 'نسخ' },
+                    { extend: 'excel', text: 'تصدير Excel' },
+                    { extend: 'csv', text: 'تصدير CSV' },
+                    { extend: 'pdf', text: 'تصدير PDF' },
+                    { extend: 'print', text: 'طباعة' }
                 ],
                 "language": {
                     "url": "/ems/assets/i18n/datatables/ar.json"
@@ -454,7 +459,7 @@ include('../insidebar.php');
 
         // التحكم في إظهار وإخفاء الفورم
         const toggleFormBtn = document.getElementById('toggleForm');
-        const projectForm   = document.getElementById('projectForm');
+        const projectForm = document.getElementById('projectForm');
 
         if (toggleFormBtn) {
             toggleFormBtn.addEventListener('click', function () {
@@ -534,18 +539,18 @@ include('../insidebar.php');
         });
 
         // دالة تعديل المستخدم — تملأ الفورم ببيانات المستخدم المحدد
-        window.editUser = function(userId, name, username, phone, role) {
-            document.getElementById('user_id').value  = userId;
-            document.getElementById('name').value     = name;
+        window.editUser = function (userId, name, username, phone, role) {
+            document.getElementById('user_id').value = userId;
+            document.getElementById('name').value = name;
             document.getElementById('username').value = username;
-            document.getElementById('phone').value    = phone;
-            document.getElementById('role').value     = role;
+            document.getElementById('phone').value = phone;
+            document.getElementById('role').value = role;
             document.getElementById('password').value = '';
-            
+
             // تغيير نص الفورم والزر ليدل على التعديل
-            document.getElementById('formTitle').textContent     = 'تعديل المستخدم';
+            document.getElementById('formTitle').textContent = 'تعديل المستخدم';
             document.getElementById('submitBtnText').textContent = 'تحديث المستخدم';
-            document.getElementById('action').value              = 'edit';
+            document.getElementById('action').value = 'edit';
 
             // إعادة تعيين حالة التحقق من اسم المستخدم
             setUsernameFeedback('ok', '<span><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>');
@@ -557,18 +562,18 @@ include('../insidebar.php');
             document.getElementById('passwordRequired').classList.add('pu-hidden');
             document.getElementById('passwordHint').classList.remove('pu-hidden');
             document.getElementById('password').removeAttribute('required');
-            
+
             // عرض الفورم والتمرير إليه
             projectForm.classList.add('allforms-visible');
             $("html, body").animate({ scrollTop: $("#projectForm").offset().top - 100 }, 500);
         };
 
         // دالة إعادة تعيين الفورم لحالة الإضافة
-        window.resetForm = function() {
+        window.resetForm = function () {
             document.getElementById('projectForm').reset();
-            document.getElementById('user_id').value             = '';
-            document.getElementById('action').value              = 'add';
-            document.getElementById('formTitle').textContent     = 'إضافة مستخدم جديد';
+            document.getElementById('user_id').value = '';
+            document.getElementById('action').value = 'add';
+            document.getElementById('formTitle').textContent = 'إضافة مستخدم جديد';
             document.getElementById('submitBtnText').textContent = 'حفظ المستخدم';
             document.getElementById('passwordRequired').classList.remove('pu-hidden');
             document.getElementById('passwordHint').classList.add('pu-hidden');
@@ -584,5 +589,5 @@ include('../insidebar.php');
 </script>
 
 </body>
-</html>
 
+</html>
