@@ -1,7 +1,6 @@
 <?php
 include '../config.php';
 require_login();
-require_once '../includes/approval_workflow.php';
 require_once '../includes/permissions_helper.php';
 
 header('Content-Type: application/json; charset=utf-8');
@@ -44,7 +43,7 @@ function contractTenantScopeSql($conn, $is_super_admin, $company_id, $alias)
 
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 $contract_id = isset($_POST['contract_id']) ? intval($_POST['contract_id']) : 0;
-$user_id = approval_get_user_id();
+$user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 
 if (!$contract_id) {
     die(json_encode(['success' => false, 'message' => 'معرف العقد غير صحيح']));
@@ -57,27 +56,78 @@ function getContractData($contract_id, $conn, $is_super_admin, $company_id) {
     return $result ? mysqli_fetch_assoc($result) : null;
 }
 
-function contractNoteOperation($contract_id, $note, $user_id) {
-    return [
-        'db_action' => 'insert',
-        'table' => 'contract_notes',
-        'data' => [
-            'contract_id' => intval($contract_id),
-            'note' => $note,
-            'user_id' => intval($user_id),
-            'created_at' => approval_now()
-        ]
-    ];
+function addContractNote($contract_id, $note, $user_id, $conn) {
+    $note_esc = mysqli_real_escape_string($conn, $note);
+    $sql = "INSERT INTO contract_notes (contract_id, note, user_id, created_at) VALUES ($contract_id, '$note_esc', $user_id, NOW())";
+    return mysqli_query($conn, $sql);
 }
 
-function enqueueContractApproval($contract_id, $action, $payload_summary, $operations, $conn) {
-    $requested_by = approval_get_user_id();
-    $payload = [
-        'summary' => $payload_summary,
-        'operations' => $operations
-    ];
+function executeOperations($operations, $conn) {
+    mysqli_begin_transaction($conn);
 
-    return approval_create_request('contract', intval($contract_id), $action, $payload, $requested_by, $conn);
+    try {
+        foreach ($operations as $op) {
+            if ($op['db_action'] === 'update') {
+                $table = $op['table'];
+                $data = $op['data'];
+                $where = $op['where'];
+
+                $set_parts = [];
+                foreach ($data as $key => $value) {
+                    if ($value === null) {
+                        $set_parts[] = "$key = NULL";
+                    } elseif (is_numeric($value)) {
+                        $set_parts[] = "$key = $value";
+                    } else {
+                        $value_esc = mysqli_real_escape_string($conn, $value);
+                        $set_parts[] = "$key = '$value_esc'";
+                    }
+                }
+                $set_clause = implode(', ', $set_parts);
+
+                $where_parts = [];
+                foreach ($where as $key => $value) {
+                    $where_parts[] = "$key = $value";
+                }
+                $where_clause = implode(' AND ', $where_parts);
+
+                $sql = "UPDATE $table SET $set_clause WHERE $where_clause";
+                if (!mysqli_query($conn, $sql)) {
+                    throw new Exception('فشل في تحديث البيانات: ' . mysqli_error($conn));
+                }
+            } elseif ($op['db_action'] === 'insert') {
+                $table = $op['table'];
+                $data = $op['data'];
+
+                $columns = [];
+                $values = [];
+                foreach ($data as $key => $value) {
+                    $columns[] = $key;
+                    if ($value === null) {
+                        $values[] = 'NULL';
+                    } elseif (is_numeric($value)) {
+                        $values[] = $value;
+                    } else {
+                        $value_esc = mysqli_real_escape_string($conn, $value);
+                        $values[] = "'$value_esc'";
+                    }
+                }
+                $columns_clause = implode(', ', $columns);
+                $values_clause = implode(', ', $values);
+
+                $sql = "INSERT INTO $table ($columns_clause) VALUES ($values_clause)";
+                if (!mysqli_query($conn, $sql)) {
+                    throw new Exception('فشل في إضافة البيانات: ' . mysqli_error($conn));
+                }
+            }
+        }
+
+        mysqli_commit($conn);
+        return ['success' => true, 'message' => 'تم تنفيذ العملية بنجاح'];
+    } catch (Exception $e) {
+        mysqli_rollback($conn);
+        return ['success' => false, 'message' => $e->getMessage()];
+    }
 }
 
 $current_contract_scope = getContractData($contract_id, $conn, $is_super_admin, $company_id);
@@ -124,7 +174,7 @@ if ($action === 'renewal') {
         'contract_duration_months' => intval($months),
         'contract_duration_days' => intval($contract_duration_days),
         'status' => 1,
-        'updated_at' => approval_now()
+        'updated_at' => date('Y-m-d H:i:s')
     ];
 
     $note_text = "تم تجديد العقد من $new_start_date إلى $new_end_date (مدة: $months شهور / $contract_duration_days يوم)";
@@ -135,18 +185,13 @@ if ($action === 'renewal') {
             'table' => 'contracts',
             'where' => ['id' => $contract_id],
             'data' => $new_data
-        ],
-        contractNoteOperation($contract_id, $note_text, $user_id)
+        ]
     ];
 
-    $result = enqueueContractApproval($contract_id, 'renewal', [
-        'old_values' => [
-            'actual_start' => $contract_before['actual_start'],
-            'actual_end' => $contract_before['actual_end'],
-            'status' => $contract_before['status']
-        ],
-        'new_values' => $new_data
-    ], $operations, $conn);
+    $result = executeOperations($operations, $conn);
+    if ($result['success']) {
+        addContractNote($contract_id, $note_text, $user_id, $conn);
+    }
 
     echo json_encode($result);
 }
@@ -185,7 +230,7 @@ else if ($action === 'settlement') {
 
     $new_data = [
         'forecasted_contracted_hours' => intval($new_hours),
-        'updated_at' => approval_now()
+        'updated_at' => date('Y-m-d H:i:s')
     ];
 
     $operations = [
@@ -194,15 +239,13 @@ else if ($action === 'settlement') {
             'table' => 'contracts',
             'where' => ['id' => $contract_id],
             'data' => $new_data
-        ],
-        contractNoteOperation($contract_id, $note, $user_id)
+        ]
     ];
 
-    $result = enqueueContractApproval($contract_id, 'settlement', [
-        'old_values' => ['forecasted_contracted_hours' => $current_hours],
-        'new_values' => ['forecasted_contracted_hours' => $new_hours],
-        'settlement_type' => $settlement_type
-    ], $operations, $conn);
+    $result = executeOperations($operations, $conn);
+    if ($result['success']) {
+        addContractNote($contract_id, $note, $user_id, $conn);
+    }
 
     echo json_encode($result);
 }
@@ -232,7 +275,7 @@ else if ($action === 'pause') {
         'status' => 0,
         'pause_reason' => $pause_reason,
         'pause_date' => $pause_date,
-        'updated_at' => approval_now()
+        'updated_at' => date('Y-m-d H:i:s')
     ];
 
     $note = "تم إيقاف العقد بتاريخ $pause_date - السبب: $pause_reason";
@@ -243,14 +286,13 @@ else if ($action === 'pause') {
             'table' => 'contracts',
             'where' => ['id' => $contract_id],
             'data' => $new_data
-        ],
-        contractNoteOperation($contract_id, $note, $user_id)
+        ]
     ];
 
-    $result = enqueueContractApproval($contract_id, 'pause', [
-        'old_values' => ['status' => $contract_before['status'], 'pause_reason' => $contract_before['pause_reason']],
-        'new_values' => $new_data
-    ], $operations, $conn);
+    $result = executeOperations($operations, $conn);
+    if ($result['success']) {
+        addContractNote($contract_id, $note, $user_id, $conn);
+    }
 
     echo json_encode($result);
 }
@@ -290,7 +332,7 @@ else if ($action === 'resume') {
         'pause_reason' => null,
         'resume_date' => $resume_date,
         'actual_end' => $new_end_date,
-        'updated_at' => approval_now()
+        'updated_at' => date('Y-m-d H:i:s')
     ];
 
     $note = "تم استئناف العقد بتاريخ $resume_date";
@@ -308,19 +350,13 @@ else if ($action === 'resume') {
             'table' => 'contracts',
             'where' => ['id' => $contract_id],
             'data' => $new_data
-        ],
-        contractNoteOperation($contract_id, $note, $user_id)
+        ]
     ];
 
-    $result = enqueueContractApproval($contract_id, 'resume', [
-        'old_values' => [
-            'status' => $contract_before['status'],
-            'actual_end' => $contract_before['actual_end']
-        ],
-        'new_values' => $new_data,
-        'pause_days' => $pause_days,
-        'pause_handling' => $pause_handling
-    ], $operations, $conn);
+    $result = executeOperations($operations, $conn);
+    if ($result['success']) {
+        addContractNote($contract_id, $note, $user_id, $conn);
+    }
 
     echo json_encode($result);
 }
@@ -351,7 +387,7 @@ else if ($action === 'terminate') {
         'status' => 0,
         'termination_type' => $termination_type,
         'termination_reason' => $termination_reason,
-        'updated_at' => approval_now()
+        'updated_at' => date('Y-m-d H:i:s')
     ];
 
     $note = "تم إنهاء العقد ($termination_type_ar) بتاريخ $termination_date - تاريخ الانتهاء السابق: $old_end_date";
@@ -365,17 +401,13 @@ else if ($action === 'terminate') {
             'table' => 'contracts',
             'where' => ['id' => $contract_id],
             'data' => $new_data
-        ],
-        contractNoteOperation($contract_id, $note, $user_id)
+        ]
     ];
 
-    $result = enqueueContractApproval($contract_id, 'terminate', [
-        'old_values' => [
-            'status' => $contract_before['status'],
-            'termination_type' => $contract_before['termination_type']
-        ],
-        'new_values' => $new_data
-    ], $operations, $conn);
+    $result = executeOperations($operations, $conn);
+    if ($result['success']) {
+        addContractNote($contract_id, $note, $user_id, $conn);
+    }
 
     echo json_encode($result);
 }
@@ -411,7 +443,7 @@ else if ($action === 'merge') {
             'data' => [
                 'forecasted_contracted_hours' => $merged_hours,
                 'merged_with' => $merge_with_id,
-                'updated_at' => approval_now()
+                'updated_at' => date('Y-m-d H:i:s')
             ]
         ]
     ];
@@ -447,7 +479,7 @@ else if ($action === 'merge') {
         'where' => ['id' => $merge_with_id],
         'data' => [
             'status' => 0,
-            'updated_at' => approval_now()
+            'updated_at' => date('Y-m-d H:i:s')
         ]
     ];
 
@@ -458,21 +490,11 @@ else if ($action === 'merge') {
 
     $merge_note_2 = "تم دمج هذا العقد مع العقد رقم $contract_id - تم تحويل العقد إلى غير ساري";
 
-    $operations[] = contractNoteOperation($contract_id, $merge_note_1, $user_id);
-    $operations[] = contractNoteOperation($merge_with_id, $merge_note_2, $user_id);
-
-    $result = enqueueContractApproval($contract_id, 'merge', [
-        'merge_with_id' => $merge_with_id,
-        'old_values' => [
-            'current_contract_hours' => $current_hours,
-            'merge_contract_hours' => $merge_hours
-        ],
-        'new_values' => [
-            'current_contract_hours' => $merged_hours,
-            'merged_contract_status' => 0
-        ],
-        'copied_equipments' => $copied_equipments
-    ], $operations, $conn);
+    $result = executeOperations($operations, $conn);
+    if ($result['success']) {
+        addContractNote($contract_id, $merge_note_1, $user_id, $conn);
+        addContractNote($merge_with_id, $merge_note_2, $user_id, $conn);
+    }
 
     echo json_encode($result);
 }
@@ -487,13 +509,9 @@ else if ($action === 'complete') {
 
     $note_text = 'انتهاء العقد: ' . $complete_note;
 
-    $operations = [
-        contractNoteOperation($contract_id, $note_text, $user_id)
-    ];
+    addContractNote($contract_id, $note_text, $user_id, $conn);
 
-    $result = enqueueContractApproval($contract_id, 'complete', [
-        'new_values' => ['note' => $note_text]
-    ], $operations, $conn);
+    $result = ['success' => true, 'message' => 'تم تسجيل انتهاء العقد بنجاح'];
 
     echo json_encode($result);
 }

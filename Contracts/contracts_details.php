@@ -49,7 +49,7 @@ include '../insidebar.php';
 ?>
 <div class="main contracts-main contracts-details-page ems-unified-page-shell">
 
-    
+
     <div class="page-wrapper">
 
         <!-- ===== PAGE HERO ===== -->
@@ -71,7 +71,6 @@ include '../insidebar.php';
         </div>
 
         <!-- ===== ACTIONS SECTION ===== -->
-        <?php if ($can_add): ?>
         <div class="actions-section">
             <div class="actions-header">
                 <div class="actions-header-icon">
@@ -103,7 +102,6 @@ include '../insidebar.php';
                 </button>
             </div>
         </div>
-        <?php endif; ?>
 
         <?php
 
@@ -118,11 +116,11 @@ include '../insidebar.php';
 
         $contract_id = intval($_GET['id']);
 
-        $sql = "SELECT 
+        $sql = "SELECT
             c.id, c.mine_id, c.contract_signing_date, c.grace_period_days, c.contract_duration_months, c.contract_duration_days,
-            c.actual_start, c.actual_end, c.transportation, c.accommodation, c.place_for_living, 
+            c.actual_start, c.actual_end, c.transportation, c.accommodation, c.place_for_living,
             c.workshop, c.hours_monthly_target, c.forecasted_contracted_hours, c.created_at, c.updated_at,
-            c.daily_work_hours, c.daily_operators, c.first_party, c.second_party, 
+            c.daily_work_hours, c.daily_operators, c.first_party, c.second_party,
             c.witness_one, c.witness_two, c.status, c.pause_reason, c.pause_date, c.resume_date, c.termination_type, c.termination_reason, c.merged_with,
             c.equip_shifts_contract, c.shift_contract, c.equip_total_contract_daily, c.total_contract_permonth, c.total_contract_units,
             c.price_currency_contract, c.paid_contract, c.payment_time, c.guarantees, c.payment_date,
@@ -589,9 +587,9 @@ include '../insidebar.php';
                     </thead>
                     <tbody>
                         <?php
-                        $notes_query = "SELECT cn.*, u.name as user_name 
-                                    FROM contract_notes cn 
-                                    LEFT JOIN users u ON cn.user_id = u.id 
+                        $notes_query = "SELECT cn.*, u.name as user_name
+                                    FROM contract_notes cn
+                                    LEFT JOIN users u ON cn.user_id = u.id
                                     JOIN contracts c ON c.id = cn.contract_id
                                     WHERE cn.contract_id = $contract_id AND $contracts_scope_sql
                                     ORDER BY cn.created_at DESC";
@@ -961,7 +959,7 @@ include '../insidebar.php';
                         <select id="mergeWithId" class="form-select">
                             <option value="">-- اختر عقد --</option>
                             <?php
-                            $merge_query = "SELECT c.id, c.contract_signing_date, m.mine_name 
+                            $merge_query = "SELECT c.id, c.contract_signing_date, m.mine_name
                                             FROM contracts c
                                             LEFT JOIN mines m ON c.mine_id = m.id
                                             WHERE c.mine_id = $mine_id AND c.id != $contract_id AND $contracts_scope_sql
@@ -1299,11 +1297,6 @@ include '../insidebar.php';
 
         // دالة عامة للإجراءات
         function performAction(action, data = {}) {
-            if (!canAddActions) {
-                alert('لا توجد صلاحية تنفيذ إجراءات العقد');
-                return;
-            }
-
             $.ajax({
                 url: 'contract_actions_handler.php',
                 type: 'POST',
@@ -1324,31 +1317,8 @@ include '../insidebar.php';
             });
         }
 
-        // دالة للتحقق من إمكانية تنفيذ الإجراء
+        // دالة للتحقق من إمكانية تنفيذ الإجراء (معطلة - جميع الإجراءات مسموحة)
         function canPerformAction(action) {
-            const activeStatuses = {
-                'renewal': [1],
-                'settlement': [1],
-                'pause': [1],
-                'resume': [0],
-                'terminate': [1, 0],
-                'merge': [1]
-            };
-
-            if (!activeStatuses[action]) return true;
-
-            if (!activeStatuses[action].includes(contractStatus)) {
-                const statusMsg = {
-                    'renewal': 'العقد يجب أن يكون ساري لتجديده',
-                    'settlement': 'العقد يجب أن يكون ساري لتسويته',
-                    'pause': 'العقد يجب أن يكون ساري لإيقافه',
-                    'resume': 'العقد يجب أن يكون غير ساري لاستئنافه',
-                    'terminate': 'العقد يجب أن يكون ساري أو غير ساري لإنهاؤه',
-                    'merge': 'العقد يجب أن يكون ساري للدمج'
-                };
-                alert(statusMsg[action] || 'لا يمكن تنفيذ هذا الإجراء في الحالة الحالية');
-                return false;
-            }
             return true;
         }
 
@@ -1878,7 +1848,3 @@ include '../insidebar.php';
     </script>
     </div><!-- /.page-wrapper -->
     </div><!-- /.main -->
-
-
-
-

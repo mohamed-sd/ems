@@ -207,60 +207,42 @@ if (isset($_GET['delete_id'])) {
   header("Location: supplierscontracts.php?id=$supplier_id&msg=معرف+العقد+غير+صحيح+❌");
   exit();
 }
+
+$page_title = 'إيكوبيشن | عقود المورد';
+include('../inheader.php');
+include('../insidebar.php');
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إيكوبيشن | عقود المورد</title>
-  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-  <!-- DataTables CSS -->
+<div class="main contracts-main ems-unified-page-shell">
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-  <!-- Call bootstrap 5 -->
-  <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
+  <div class="main_head">
 
-  <!-- DataTables CSS -->
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
-  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-  <!-- CSS الموقع -->
-  <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
-  <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
-</head>
-<body>
-
-  <?php
-  // include('../insidebar.php');
-  ?>
-
-  <div class="main">
-    <div class="page-header">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div class="title-icon"><i class="fas fa-file-contract"></i></div>
-        <h1 class="page-title">عقود المورد</h1>
-      </div>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <?php if ($can_add): ?>
+    <div class="head_actions">
+      <?php if ($can_add): ?>
         <a href="javascript:void(0)" id="toggleForm" class="add-btn">
           <i class="fas fa-plus-circle"></i> عقد جديد
         </a>
-        <?php endif; ?>
-        <a href="suppliers.php" class="back-btn">
-          <i class="fas fa-arrow-right"></i> العودة للموردين
-        </a>
-          <a href="../main/dashboard.php" class="back-btn">
-          <i class="fa-solid fa-house"></i> الرئيسية
-        </a>
-      </div>
+      <?php endif; ?>
     </div>
 
-    <!-- فورم إضافة عقد -->
-    <?php if ($can_add || $can_edit): ?>
-    <form id="projectForm" action="" method="post" style="display:none;">
+    <h1 class="head-title">
+      <div class="title-icon"><i class="fas fa-file-contract"></i></div>
+      عقود المورد
+    </h1>
+
+    <div class="head_back">
+      <a href="suppliers.php" class="back-btn">
+        <i class="fas fa-arrow-right"></i> العودة للموردين
+      </a>
+      <a href="../main/dashboard.php" class="back-btn">
+        <i class="fa-solid fa-house"></i> الرئيسية
+      </a>
+    </div>
+  </div>
+
+  <!-- فورم إضافة عقد -->
+  <?php if ($can_add || $can_edit): ?>
+  <form id="projectForm" action="" method="post" class="allforms">
 
       <div class="card">
         <div class="card-header">
@@ -331,33 +313,28 @@ if (isset($_GET['delete_id'])) {
           </div>
 
           <!-- عرض معلومات ساعات العقد -->
-          <div id="projectHoursInfo"
-            style="display:none; margin: 1rem 0; padding: 1.5rem; background: linear-gradient(135deg, #fff7d1 0%, #ffe8a3 100%); border-radius: 15px; border-right: 4px solid var(--navy); box-shadow: var(--shadow-md);">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-              <div
-                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                <strong style="color: #1976d2; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+          <div id="projectHoursInfo" class="project-hours-info" style="display:none;">
+            <div class="project-hours-grid">
+              <div class="project-hours-card">
+                <strong class="project-hours-label project-hours-label-blue">
                   <i class="fas fa-clock"></i> إجمالي ساعات العقد
                 </strong>
-                <div style="font-size: 2rem; color: #0d47a1; font-weight: 700;" id="contractTotalHours">0</div>
-                <div id="equipmentBreakdown"
-                  style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 2px dashed #e3f2fd; font-size: 0.85rem;">
+                <div class="project-hours-value project-hours-value-blue" id="contractTotalHours">0</div>
+                <div id="equipmentBreakdown" class="project-hours-breakdown">
                   <!-- سيتم ملء التفصيل هنا -->
                 </div>
               </div>
-              <div
-                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                <strong style="color: #d32f2f; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+              <div class="project-hours-card">
+                <strong class="project-hours-label project-hours-label-red">
                   <i class="fas fa-handshake"></i> المتعاقد عليه مع موردين
                 </strong>
-                <div style="font-size: 2rem; color: #c62828; font-weight: 700;" id="suppliersContractedHours">0</div>
+                <div class="project-hours-value project-hours-value-red" id="suppliersContractedHours">0</div>
               </div>
-              <div
-                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                <strong style="color: #388e3c; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+              <div class="project-hours-card">
+                <strong class="project-hours-label project-hours-label-green">
                   <i class="fas fa-chart-line"></i> الساعات المتبقية
                 </strong>
-                <div style="font-size: 2rem; color: #2e7d32; font-weight: 700;" id="remainingHours">0</div>
+                <div class="project-hours-value project-hours-value-green" id="remainingHours">0</div>
               </div>
             </div>
           </div>
@@ -385,9 +362,8 @@ if (isset($_GET['delete_id'])) {
             </div>
           </div>
 
-          <div
-            style="margin-top: 2rem; padding: 1rem; background: var(--gold-soft); border-radius: 10px; border-right: 4px solid var(--navy);">
-            <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+          <div class="contracts-note-box">
+            <p class="contracts-note-text">
               <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
               البيانات المدخلة في الأقسام التالية
             </p>
@@ -1342,6 +1318,89 @@ if (isset($_GET['delete_id'])) {
             "url": "/ems/assets/i18n/datatables/ar.json"
           }
         });
+
+        // ==================== Group Toggle Functionality ====================
+        // حفظ حالة المجموعات في localStorage
+        const groupStates = JSON.parse(localStorage.getItem('supplierContractGroupStates')) || {
+          basic: true,
+          dates: true,
+          hours: true,
+          parties: false,
+          services: false,
+          operations: false,
+          status: true
+        };
+
+        // تطبيق الحالة المحفوظة عند تحميل الصفحة
+        function applyGroupStates() {
+          Object.keys(groupStates).forEach(group => {
+            const isActive = groupStates[group];
+            const btn = $(`.btn-group-toggle[data-group="${group}"]`);
+            const columns = $(`.group-${group}`);
+
+            if (isActive) {
+              btn.addClass('active');
+              columns.removeClass('group-hidden');
+            } else {
+              btn.removeClass('active');
+              columns.addClass('group-hidden');
+            }
+          });
+        }
+
+        // تطبيق الحالة بعد تهيئة DataTables
+        setTimeout(applyGroupStates, 100);
+
+        // التحكم في إظهار/إخفاء المجموعات
+        $('.btn-group-toggle').on('click', function () {
+          const group = $(this).data('group');
+          const isActive = $(this).hasClass('active');
+
+          if (isActive) {
+            // إخفاء المجموعة
+            $(this).removeClass('active');
+            $(`.group-${group}`).addClass('group-hidden');
+            groupStates[group] = false;
+          } else {
+            // إظهار المجموعة
+            $(this).addClass('active');
+            $(`.group-${group}`).removeClass('group-hidden');
+            groupStates[group] = true;
+          }
+
+          // حفظ الحالة
+          localStorage.setItem('supplierContractGroupStates', JSON.stringify(groupStates));
+        });
+
+        // زر إظهار/إخفاء الكل
+        $('.btn-group-toggle-all').on('click', function () {
+          const allActive = Object.values(groupStates).every(state => state);
+
+          if (allActive) {
+            // إخفاء الكل
+            $('.btn-group-toggle').removeClass('active');
+            $('[class*="group-"]').addClass('group-hidden');
+            Object.keys(groupStates).forEach(key => groupStates[key] = false);
+            $(this).html('<i class="fas fa-eye-slash"></i> إخفاء الكل');
+          } else {
+            // إظهار الكل
+            $('.btn-group-toggle').addClass('active');
+            $('[class*="group-"]').removeClass('group-hidden');
+            Object.keys(groupStates).forEach(key => groupStates[key] = true);
+            $(this).html('<i class="fas fa-eye"></i> الكل');
+          }
+
+          // حفظ الحالة
+          localStorage.setItem('supplierContractGroupStates', JSON.stringify(groupStates));
+        });
+
+        // تحديث نص زر "الكل" عند التحميل
+        const allActive = Object.values(groupStates).every(state => state);
+        if (allActive) {
+          $('.btn-group-toggle-all').html('<i class="fas fa-eye"></i> الكل');
+        } else {
+          $('.btn-group-toggle-all').html('<i class="fas fa-eye-slash"></i> إظهار الكل');
+        }
       });
 
 
@@ -2097,91 +2156,6 @@ if (isset($_GET['delete_id'])) {
       });
 
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
-    });
-
-    // ==================== Group Toggle Functionality ====================
-    // حفظ حالة المجموعات في localStorage
-    const groupStates = JSON.parse(localStorage.getItem('supplierContractGroupStates')) || {
-      basic: true,
-      dates: true,
-      hours: true,
-      parties: false,
-      services: false,
-      operations: false,
-      status: true
-    };
-
-    // تطبيق الحالة المحفوظة عند تحميل الصفحة
-    function applyGroupStates() {
-      Object.keys(groupStates).forEach(group => {
-        const isActive = groupStates[group];
-        const btn = $(`.btn-group-toggle[data-group="${group}"]`);
-        const columns = $(`.group-${group}`);
-
-        if (isActive) {
-          btn.addClass('active');
-          columns.removeClass('group-hidden');
-        } else {
-          btn.removeClass('active');
-          columns.addClass('group-hidden');
-        }
-      });
-    }
-
-    // تطبيق الحالة عند تحميل الصفحة
-    applyGroupStates();
-
-    // التحكم في إظهار/إخفاء المجموعات
-    $('.btn-group-toggle').on('click', function () {
-      const group = $(this).data('group');
-      const isActive = $(this).hasClass('active');
-
-      if (isActive) {
-        // إخفاء المجموعة
-        $(this).removeClass('active');
-        $(`.group-${group}`).addClass('group-hidden');
-        groupStates[group] = false;
-      } else {
-        // إظهار المجموعة
-        $(this).addClass('active');
-        $(`.group-${group}`).removeClass('group-hidden');
-        groupStates[group] = true;
-      }
-
-      // حفظ الحالة
-      localStorage.setItem('supplierContractGroupStates', JSON.stringify(groupStates));
-    });
-
-    // زر إظهار/إخفاء الكل
-    $('.btn-group-toggle-all').on('click', function () {
-      const allActive = Object.values(groupStates).every(state => state);
-
-      if (allActive) {
-        // إخفاء الكل
-        $('.btn-group-toggle').removeClass('active');
-        $('[class*="group-"]').addClass('group-hidden');
-        Object.keys(groupStates).forEach(key => groupStates[key] = false);
-        $(this).html('<i class="fas fa-eye-slash"></i> إخفاء الكل');
-      } else {
-        // إظهار الكل
-        $('.btn-group-toggle').addClass('active');
-        $('[class*="group-"]').removeClass('group-hidden');
-        Object.keys(groupStates).forEach(key => groupStates[key] = true);
-        $(this).html('<i class="fas fa-eye"></i> الكل');
-      }
-
-      // حفظ الحالة
-      localStorage.setItem('supplierContractGroupStates', JSON.stringify(groupStates));
-    });
-
-    // تحديث نص زر "الكل" عند التحميل
-    $(document).ready(function () {
-      const allActive = Object.values(groupStates).every(state => state);
-      if (allActive) {
-        $('.btn-group-toggle-all').html('<i class="fas fa-eye"></i> الكل');
-      } else {
-        $('.btn-group-toggle-all').html('<i class="fas fa-eye-slash"></i> إظهار الكل');
-      }
     });
   </script>
 
