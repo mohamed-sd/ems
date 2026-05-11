@@ -8739,3 +8739,60 @@ table.d-bd {
     padding-bottom: 4px;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   GROUP TOGGLE BUTTONS (Contracts Tables)
+   أزرار التحكم في مجموعات أعمدة الجداول
+══════════════════════════════════════════════════════════════ */
+.btn-group-toggle {
+  padding: 6px 12px;
+  border: 1.5px solid var(--bdr);
+  background: #fff;
+  color: var(--t2);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: .8rem;
+  font-weight: 700;
+  transition: all 0.22s cubic-bezier(.4,0,.2,1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-group-toggle:hover {
+  border-color: var(--or);
+  color: var(--s0);
+  transform: translateY(-1px);
+  box-shadow: var(--sh);
+}
+
+.btn-group-toggle.active {
+  background: linear-gradient(135deg, var(--s0), #2A2010);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: var(--sh);
+}
+
+.btn-group-toggle-all {
+  padding: 6px 14px;
+  border: 1.5px solid var(--ok);
+  background: linear-gradient(135deg, var(--ok), #20c997);
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: .8rem;
+  font-weight: 800;
+  transition: all 0.22s cubic-bezier(.4,0,.2,1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-group-toggle-all:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--sh);
+}
+
+.group-hidden {
+  display: none !important;
+}
