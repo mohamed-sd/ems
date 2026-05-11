@@ -199,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
         $mine_area_value = $mine_area !== null ? $mine_area : "NULL";
         $mining_depth_value = $mining_depth !== null ? $mining_depth : "NULL";
 
-        $update_query = "UPDATE mines SET 
+        $update_query = "UPDATE mines SET
             mine_code = '$mine_code',
             mine_name = '$mine_name',
             manager_name = '$manager_name',
@@ -217,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
             WHERE id = $mine_id AND project_id = $project_id AND $mines_not_deleted_sql";
 
         if ($mines_has_company_id && $company_id > 0) {
-            $update_query = "UPDATE mines SET 
+            $update_query = "UPDATE mines SET
             mine_code = '$mine_code',
             mine_name = '$mine_name',
             manager_name = '$manager_name',
@@ -235,7 +235,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
             company_id = $company_id
             WHERE id = $mine_id AND project_id = $project_id AND $mines_not_deleted_sql";
         }
-        
+
         if (mysqli_query($conn, $update_query)) {
             header("Location: project_mines.php?project_id=$project_id&msg=تم+تعديل+المنجم+بنجاح+✅");
             exit();
@@ -249,23 +249,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_name'])) {
         $mining_depth_value = $mining_depth !== null ? $mining_depth : "NULL";
         $created_by = $_SESSION['user']['id'];
 
-        $insert_query = "INSERT INTO mines 
-            (project_id, mine_code, mine_name, manager_name, mineral_type, mine_type, mine_type_other, 
-             ownership_type, ownership_type_other, mine_area, mine_area_unit, mining_depth, contract_nature, 
-             status, notes, created_by) 
-            VALUES 
-            ($project_id, '$mine_code', '$mine_name', '$manager_name', '$mineral_type', '$mine_type', 
-             '$mine_type_other', '$ownership_type', '$ownership_type_other', $mine_area_value, '$mine_area_unit', 
+        $insert_query = "INSERT INTO mines
+            (project_id, mine_code, mine_name, manager_name, mineral_type, mine_type, mine_type_other,
+             ownership_type, ownership_type_other, mine_area, mine_area_unit, mining_depth, contract_nature,
+             status, notes, created_by)
+            VALUES
+            ($project_id, '$mine_code', '$mine_name', '$manager_name', '$mineral_type', '$mine_type',
+             '$mine_type_other', '$ownership_type', '$ownership_type_other', $mine_area_value, '$mine_area_unit',
              $mining_depth_value, '$contract_nature', $status, '$notes', $created_by)";
 
         if ($mines_has_company_id && $company_id > 0) {
-            $insert_query = "INSERT INTO mines 
-            (company_id, project_id, mine_code, mine_name, manager_name, mineral_type, mine_type, mine_type_other, 
-             ownership_type, ownership_type_other, mine_area, mine_area_unit, mining_depth, contract_nature, 
-             status, notes, created_by) 
-            VALUES 
-            ($company_id, $project_id, '$mine_code', '$mine_name', '$manager_name', '$mineral_type', '$mine_type', 
-             '$mine_type_other', '$ownership_type', '$ownership_type_other', $mine_area_value, '$mine_area_unit', 
+            $insert_query = "INSERT INTO mines
+            (company_id, project_id, mine_code, mine_name, manager_name, mineral_type, mine_type, mine_type_other,
+             ownership_type, ownership_type_other, mine_area, mine_area_unit, mining_depth, contract_nature,
+             status, notes, created_by)
+            VALUES
+            ($company_id, $project_id, '$mine_code', '$mine_name', '$manager_name', '$mineral_type', '$mine_type',
+             '$mine_type_other', '$ownership_type', '$ownership_type_other', $mine_area_value, '$mine_area_unit',
              $mining_depth_value, '$contract_nature', $status, '$notes', $created_by)";
         }
 
@@ -553,20 +553,23 @@ include '../inheader.php';
 </style>
 
 <div class="main">
-    <div class="header">
-        <h1 class="page-title">
-            <div class="title-icon"><i class="fas fa-mountain"></i></div>
-            إدارة المناجم - <?php echo htmlspecialchars($project['name']); ?>
-        </h1>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="projects.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
+
+      <div class="main_head">
+        <div class="head_actions">
             <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة منجم جديد
             </a>
             <?php endif; ?>
+        </div>
+        <h1 class="head-title">
+              <div class="title-icon"><i class="fas fa-mountain"></i></div>
+            إدارة المناجم - <?php echo htmlspecialchars($project['name']); ?>
+        </h1>
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
         </div>
     </div>
 
@@ -709,7 +712,7 @@ include '../inheader.php';
             </thead>
             <tbody>
                 <?php
-                $mines_query = "SELECT m.*, 
+                $mines_query = "SELECT m.*,
                                (SELECT COUNT(*) FROM contracts c WHERE c.mine_id = m.id) AS contract_count
                                FROM mines m
                                WHERE m.project_id = $project_id AND " . str_replace('is_deleted', 'm.is_deleted', str_replace('deleted_at', 'm.deleted_at', $mines_not_deleted_sql)) . "
@@ -745,9 +748,9 @@ include '../inheader.php';
                     echo "<td>{$mine['mine_type']}</td>";
                     echo "<td>{$area_display}</td>";
                     echo "<td>{$depth_display}</td>";
-                    echo "<td>{$contracts_count}</td>"; 
-                    echo "<td> 
-                     <a href='../Contracts/contracts.php?id=" . $mine['id'] . "' 
+                    echo "<td>{$contracts_count}</td>";
+                    echo "<td>
+                     <a href='../Contracts/contracts.php?id=" . $mine['id'] . "'
                                class='action-btn contracts'
                                title='عرض عقود المنجم'>
                                <i class='fas fa-file-contract'></i>
@@ -1141,5 +1144,3 @@ include '../inheader.php';
 </body>
 
 </html>
-
-

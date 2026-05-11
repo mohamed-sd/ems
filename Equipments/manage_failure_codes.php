@@ -167,26 +167,26 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
 
 <div class="main fc-page ems-unified-page-shell">
 
-    <!-- ══ Page Header ══ -->
-    <div class="header">
-        <a href="../main/dashboard.php" class="back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
-        <div>
-            <h1 class="page-title">
-                <div class="title-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                إدارة أكواد الأعطال
-            </h1>
-            <div class="fc-hero-sub">
-                <i class="fas fa-layer-group"></i>
-                مكتبة مرجعية شاملة لتصنيف الأعطال — نوع الحدث &rsaquo; الفئة الرئيسية &rsaquo; الفرعية &rsaquo; التفصيل
-            </div>
-        </div>
-        <div class="header -actions">
-            <?php if ($can_add): ?>
+
+   <!-- عنوان الصفحة -->
+    <div class="main_head">
+        <div class="head_actions">
+           <?php if ($can_add): ?>
             <button id="toggleFormBtn" class="add-btn" onclick="toggleForm()">
                 <i class="fas fa-plus-circle"></i> <span>إضافة كود جديد</span>
             </button>
             <?php endif; ?>
            <a href="fleet_failures.php" class="btn-gold"><i class="fas fa-chart-line"></i> تقرير الاخطاء </a>
+        </div>
+        <h1 class="head-title">
+          <div class="title-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                إدارة أكواد الأعطال
+
+        </h1>
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
         </div>
     </div>
 

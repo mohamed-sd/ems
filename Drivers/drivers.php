@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     // التحقق من الصلاحية (إضافة أو تعديل)
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
     $is_editing = $id > 0;
-    
+
     if ($is_editing && !$can_edit) {
         header("Location: drivers.php?msg=لا+توجد+صلاحية+تعديل+المشغلين+❌");
         exit();
@@ -93,64 +93,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         exit();
     }
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-    
+
     // 1. المعلومات الأساسية والتعريفية
     $name = mysqli_real_escape_string($conn, trim($_POST['name']));
     $driver_code = mysqli_real_escape_string($conn, trim($_POST['driver_code']));
     $nickname = mysqli_real_escape_string($conn, trim($_POST['nickname']));
-    
+
     // 2. بيانات الهوية والتوثيق
     $identity_type = mysqli_real_escape_string($conn, $_POST['identity_type']);
     $identity_number = mysqli_real_escape_string($conn, trim($_POST['identity_number']));
     $identity_expiry_date = !empty($_POST['identity_expiry_date']) ? mysqli_real_escape_string($conn, $_POST['identity_expiry_date']) : NULL;
     $driver_photo = mysqli_real_escape_string($conn, trim(isset($_POST['driver_photo']) ? $_POST['driver_photo'] : ''));
     $identity_photo = mysqli_real_escape_string($conn, trim(isset($_POST['identity_photo']) ? $_POST['identity_photo'] : ''));
-    
+
     // 3. رخصة القيادة والمهارات
     $license_number = mysqli_real_escape_string($conn, trim($_POST['license_number']));
     $license_type = mysqli_real_escape_string($conn, $_POST['license_type']);
     $license_expiry_date = !empty($_POST['license_expiry_date']) ? mysqli_real_escape_string($conn, $_POST['license_expiry_date']) : NULL;
     $license_issuer = mysqli_real_escape_string($conn, trim($_POST['license_issuer']));
-    
+
     // 4. التخصص والمهارات
     $specialized_equipment = isset($_POST['specialized_equipment']) ? implode(', ', $_POST['specialized_equipment']) : '';
     $specialized_equipment = mysqli_real_escape_string($conn, $specialized_equipment);
-    
+
     // 5. سنوات الخبرة والكفاءة
     $years_in_field = !empty($_POST['years_in_field']) ? intval($_POST['years_in_field']) : NULL;
     $years_on_equipment = !empty($_POST['years_on_equipment']) ? intval($_POST['years_on_equipment']) : NULL;
     $skill_level = mysqli_real_escape_string($conn, $_POST['skill_level']);
     $certificates = mysqli_real_escape_string($conn, trim($_POST['certificates']));
-    
+
     // 6. علاقة العمل والتبعية
     $owner_supervisor = mysqli_real_escape_string($conn, trim($_POST['owner_supervisor']));
     $supplier_id = !empty($_POST['supplier_id']) ? intval($_POST['supplier_id']) : NULL;
     $employment_affiliation = mysqli_real_escape_string($conn, $_POST['employment_affiliation']);
     $salary_type = mysqli_real_escape_string($conn, $_POST['salary_type']);
     $monthly_salary = !empty($_POST['monthly_salary']) ? floatval($_POST['monthly_salary']) : NULL;
-    
+
     // 7. البيانات التواصلية
     $email = mysqli_real_escape_string($conn, trim($_POST['email']));
     $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
     $phone_alternative = mysqli_real_escape_string($conn, trim($_POST['phone_alternative']));
     $address = mysqli_real_escape_string($conn, trim($_POST['address']));
-    
+
     // 8. تقييم الأداء والسلوك
     $performance_rating = mysqli_real_escape_string($conn, $_POST['performance_rating']);
     $behavior_record = mysqli_real_escape_string($conn, $_POST['behavior_record']);
     $accident_record = mysqli_real_escape_string($conn, $_POST['accident_record']);
-    
+
     // 9. الصحة والسلامة
     $health_status = mysqli_real_escape_string($conn, $_POST['health_status']);
     $health_issues = mysqli_real_escape_string($conn, trim($_POST['health_issues']));
     $vaccinations_status = mysqli_real_escape_string($conn, $_POST['vaccinations_status']);
-    
+
     // 10. المراجع والسجل
     $previous_employer = mysqli_real_escape_string($conn, trim($_POST['previous_employer']));
     $employment_duration = mysqli_real_escape_string($conn, trim($_POST['employment_duration']));
     $reference_contact = mysqli_real_escape_string($conn, trim($_POST['reference_contact']));
     $general_notes = mysqli_real_escape_string($conn, trim($_POST['general_notes']));
-    
+
     // 11. الحالة والتفعيل
     $driver_status = mysqli_real_escape_string($conn, $_POST['driver_status']);
     $start_date = !empty($_POST['start_date']) ? mysqli_real_escape_string($conn, $_POST['start_date']) : NULL;
@@ -174,24 +174,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $years_on_equipment_sql = $years_on_equipment !== NULL ? $years_on_equipment : "NULL";
         $supplier_id_sql = $supplier_id !== NULL ? $supplier_id : "NULL";
         $monthly_salary_sql = $monthly_salary !== NULL ? $monthly_salary : "NULL";
-        
+
         $scope_where = sprintf($driver_scope_where, $id);
-        $update_query = "UPDATE drivers SET 
+        $update_query = "UPDATE drivers SET
             name='$name', driver_code='$driver_code', nickname='$nickname',
             identity_type='$identity_type', identity_number='$identity_number', identity_expiry_date=$identity_expiry_sql,
             driver_photo='$driver_photo', identity_photo='$identity_photo',
             license_number='$license_number', license_type='$license_type', license_expiry_date=$license_expiry_sql, license_issuer='$license_issuer',
             specialized_equipment='$specialized_equipment',
             years_in_field=$years_in_field_sql, years_on_equipment=$years_on_equipment_sql, skill_level='$skill_level', certificates='$certificates',
-            owner_supervisor='$owner_supervisor', supplier_id=$supplier_id_sql, employment_affiliation='$employment_affiliation', 
+            owner_supervisor='$owner_supervisor', supplier_id=$supplier_id_sql, employment_affiliation='$employment_affiliation',
             salary_type='$salary_type', monthly_salary=$monthly_salary_sql,
             email='$email', phone='$phone', phone_alternative='$phone_alternative', address='$address',
             performance_rating='$performance_rating', behavior_record='$behavior_record', accident_record='$accident_record',
             health_status='$health_status', health_issues='$health_issues', vaccinations_status='$vaccinations_status',
             previous_employer='$previous_employer', employment_duration='$employment_duration', reference_contact='$reference_contact', general_notes='$general_notes',
-            driver_status='$driver_status', start_date=$start_date_sql, status='$status' 
+            driver_status='$driver_status', start_date=$start_date_sql, status='$status'
             WHERE $scope_where";
-            
+
         if (mysqli_query($conn, $update_query)) {
             header("Location: drivers.php?msg=تم+تعديل+المشغل+بنجاح+✅");
             exit;
@@ -244,7 +244,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             '$previous_employer', '$employment_duration', '$reference_contact', '$general_notes',
             '$driver_status', $start_date_sql, '$status'$driver_insert_val
         )";
-        
+
         if (mysqli_query($conn, $insert_query)) {
             header("Location: drivers.php?msg=تم+إضافة+المشغل+بنجاح+✅");
             exit;
@@ -308,153 +308,168 @@ include("../inheader.php");
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 
 <style>
-.form-section {
-    background: var(--bg);
-    padding: 1rem;
-    border-radius: var(--radius);
-    margin-bottom: 1rem;
-    border: 2px solid var(--border);
-}
+    .form-section {
+        background: var(--bg);
+        padding: 1rem;
+        border-radius: var(--radius);
+        margin-bottom: 1rem;
+        border: 2px solid var(--border);
+    }
 
-.form-section-header {
-    background: linear-gradient(135deg, var(--navy), var(--navy-l));
-    color: #fff;
-    padding: 12px 15px;
-    border-radius: var(--radius);
-    margin-bottom: 15px;
-    font-weight: 700;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    user-select: none;
-    transition: all var(--ease);
-}
+    .form-section-header {
+        background: linear-gradient(135deg, var(--navy), var(--navy-l));
+        color: #fff;
+        padding: 12px 15px;
+        border-radius: var(--radius);
+        margin-bottom: 15px;
+        font-weight: 700;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        user-select: none;
+        transition: all var(--ease);
+    }
 
-.form-section-header:hover {
-    transform: translateX(-3px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
+    .form-section-header:hover {
+        transform: translateX(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
 
-.form-section-header i {
-    font-size: 1.2rem;
-}
+    .form-section-header i {
+        font-size: 1.2rem;
+    }
 
-.form-section-header .toggle-icon {
-    margin-right: auto;
-    transition: transform 0.3s ease;
-}
+    .form-section-header .toggle-icon {
+        margin-right: auto;
+        transition: transform 0.3s ease;
+    }
 
-.form-section-header.collapsed .toggle-icon {
-    transform: rotate(-90deg);
-}
+    .form-section-header.collapsed .toggle-icon {
+        transform: rotate(-90deg);
+    }
 
-.form-section-body {
-    padding: 5px;
-    max-height: 1000px;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-}
+    .form-section-body {
+        padding: 5px;
+        max-height: 1000px;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
 
-.form-section-body.collapsed {
-    max-height: 0;
-    padding: 0;
-}
+    .form-section-body.collapsed {
+        max-height: 0;
+        padding: 0;
+    }
 
-.checkbox-group {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-}
+    .checkbox-group {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+    }
 
-.checkbox-group label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px;
-    margin-bottom: 5px;
-    background: #fff;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
+    .checkbox-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        margin-bottom: 5px;
+        background: #fff;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
 
-.checkbox-group label:hover {
-    background: var(--gold-light);
-    transform: translateX(-3px);
-}
+    .checkbox-group label:hover {
+        background: var(--gold-light);
+        transform: translateX(-3px);
+    }
 
-.checkbox-group input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    accent-color: var(--gold);
-}
+    .checkbox-group input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: var(--gold);
+    }
 
-.link-alert-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    margin-right: 6px;
-    padding: 2px 9px;
-    border-radius: 999px;
-    background: linear-gradient(135deg, #fff7d6, #ffe8bf);
-    color: #7c2d12;
-    border: 1px solid rgba(217, 119, 6, 0.28);
-    font-size: .72rem;
-    font-weight: 800;
-    box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
-    animation: linkAlertPulse 1.6s ease-in-out infinite;
-    vertical-align: middle;
-}
+    .link-alert-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-right: 6px;
+        padding: 2px 9px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #fff7d6, #ffe8bf);
+        color: #7c2d12;
+        border: 1px solid rgba(217, 119, 6, 0.28);
+        font-size: .72rem;
+        font-weight: 800;
+        box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
+        animation: linkAlertPulse 1.6s ease-in-out infinite;
+        vertical-align: middle;
+    }
 
-.link-alert-chip i {
-    color: #b45309;
-    font-size: .75rem;
-}
+    .link-alert-chip i {
+        color: #b45309;
+        font-size: .75rem;
+    }
 
-@keyframes linkAlertPulse {
-    0%, 100% { transform: translateY(0); box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18); }
-    50% { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28); }
-}
+    @keyframes linkAlertPulse {
+
+        0%,
+        100% {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
+        }
+
+        50% {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28);
+        }
+    }
 </style>
 
-<?php 
-include('../insidebar.php'); 
+<?php
+include('../insidebar.php');
 ?>
 
 <div class="main">
-    <div class="header">
-        <h1 class="page-title">
-            <div class="title-icon"><i class="fas fa-id-card"></i></div>
-            إدارة المشغلين - النظام الشامل
-        </h1>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
+
+    <div class="main_head">
+        <div class="head_actions">
             <?php if ($can_add): ?>
-            <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fas fa-plus-circle"></i> إضافة مشغل جديد
-            </a>
+                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+                    <i class="fas fa-plus-circle"></i> إضافة مشغل جديد
+                </a>
             <?php endif; ?>
-            <a href="download_drivers_template.php" class="btn btn-success" style="display: flex; align-items: center; gap: 8px; padding: 10px 20px;">
+            <a href="download_drivers_template.php" class="btn btn-success"
+                style="display: flex; align-items: center; gap: 8px; padding: 10px 20px;">
                 <i class="fas fa-file-excel"></i> تحميل نموذج Excel
             </a>
-            <a href="download_drivers_template_csv.php" class="btn btn-info" style="display: flex; align-items: center; gap: 8px; padding: 10px 20px;">
+            <a href="download_drivers_template_csv.php" class="btn btn-info"
+                style="display: flex; align-items: center; gap: 8px; padding: 10px 20px;">
                 <i class="fas fa-file-csv"></i> تحميل نموذج CSV
             </a>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal" style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal"
+                style="display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-file-upload"></i> استيراد من Excel/CSV
             </button>
         </div>
+        <h1 class="head-title">
+            <div class="title-icon"><i class="fas fa-id-card"></i></div>
+            إدارة المشغلين
+        </h1>
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+        </div>
     </div>
 
-    <?php if (!empty($_GET['msg'])): 
+    <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;
-    ?>
+        ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
             <?php echo htmlspecialchars($_GET['msg']); ?>
@@ -476,7 +491,8 @@ include('../insidebar.php');
                         <i class="fas fa-info-circle"></i>
                         <strong>ملاحظات هامة:</strong>
                         <ul style="margin-top: 10px; padding-right: 20px;">
-                            <li>يدعم النظام الملفات من نوع: <code>.xlsx</code>، <code>.xls</code>، <code>.csv</code></li>
+                            <li>يدعم النظام الملفات من نوع: <code>.xlsx</code>، <code>.xls</code>، <code>.csv</code>
+                            </li>
                             <li>الحد الأقصى لحجم الملف: <strong>5 ميجا</strong></li>
                             <li>الحد الأقصى لعدد الصفوف: <strong>1000 صف</strong></li>
                             <li>تأكد من صحة البيانات وتطابقها مع نموذج الاستيراد</li>
@@ -490,12 +506,14 @@ include('../insidebar.php');
                             <label for="importFile" class="form-label" style="font-weight: 600;">
                                 <i class="fas fa-file-alt"></i> اختر ملف Excel أو CSV
                             </label>
-                            <input type="file" class="form-control" id="importFile" name="file" accept=".xlsx,.xls,.csv" required>
+                            <input type="file" class="form-control" id="importFile" name="file" accept=".xlsx,.xls,.csv"
+                                required>
                         </div>
 
                         <div id="importProgress" style="display: none;">
                             <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                                    style="width: 100%"></div>
                             </div>
                             <p class="text-center mt-2">جاري معالجة الملف، يرجى الانتظار...</p>
                         </div>
@@ -523,7 +541,7 @@ include('../insidebar.php');
             </div>
             <div class="card-body">
                 <input type="hidden" name="id" id="drivers_id" value="">
-                
+
                 <!-- 1. المعلومات الأساسية والتعريفية -->
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
@@ -534,12 +552,14 @@ include('../insidebar.php');
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-user"></i> اسم المشغل/السائق <span style="color: red;">*</span></label>
+                                <label><i class="fas fa-user"></i> اسم المشغل/السائق <span
+                                        style="color: red;">*</span></label>
                                 <input type="text" name="name" id="name" placeholder="مثال: محمد أحمد علي" required />
                             </div>
                             <div>
                                 <label><i class="fas fa-barcode"></i> الرمز/الكود الفريد</label>
-                                <input type="text" name="driver_code" id="driver_code" placeholder="مثال: OPR-001-2026" />
+                                <input type="text" name="driver_code" id="driver_code"
+                                    placeholder="مثال: OPR-001-2026" />
                             </div>
                             <div>
                                 <label><i class="fas fa-signature"></i> اسم الشهرة/الكنية</label>
@@ -571,7 +591,8 @@ include('../insidebar.php');
                             </div>
                             <div>
                                 <label><i class="fas fa-hashtag"></i> رقم الهوية</label>
-                                <input type="text" name="identity_number" id="identity_number" placeholder="مثال: 123456789123" />
+                                <input type="text" name="identity_number" id="identity_number"
+                                    placeholder="مثال: 123456789123" />
                             </div>
                             <div>
                                 <label><i class="fas fa-calendar-times"></i> تاريخ انتهاء الهوية</label>
@@ -579,11 +600,13 @@ include('../insidebar.php');
                             </div>
                             <div>
                                 <label><i class="fas fa-camera"></i> صورة السائق (تجهيزي - غير مفعلة الآن)</label>
-                                <input type="text" name="driver_photo" id="driver_photo" placeholder="سيتم تفعيل رفع صورة السائق لاحقاً" readonly />
+                                <input type="text" name="driver_photo" id="driver_photo"
+                                    placeholder="سيتم تفعيل رفع صورة السائق لاحقاً" readonly />
                             </div>
                             <div>
                                 <label><i class="fas fa-id-card"></i> صورة هوية السائق (تجهيزي - غير مفعلة الآن)</label>
-                                <input type="text" name="identity_photo" id="identity_photo" placeholder="سيتم تفعيل رفع صورة الهوية لاحقاً" readonly />
+                                <input type="text" name="identity_photo" id="identity_photo"
+                                    placeholder="سيتم تفعيل رفع صورة الهوية لاحقاً" readonly />
                             </div>
                         </div>
                     </div>
@@ -600,7 +623,8 @@ include('../insidebar.php');
                         <div class="form-grid">
                             <div>
                                 <label><i class="fas fa-id-badge"></i> رقم رخصة القيادة</label>
-                                <input type="text" name="license_number" id="license_number" placeholder="مثال: DL-2024-456789" />
+                                <input type="text" name="license_number" id="license_number"
+                                    placeholder="مثال: DL-2024-456789" />
                             </div>
                             <div>
                                 <label><i class="fas fa-certificate"></i> نوع رخصة القيادة</label>
@@ -621,7 +645,8 @@ include('../insidebar.php');
                             </div>
                             <div>
                                 <label><i class="fas fa-building"></i> جهة إصدار الرخصة</label>
-                                <input type="text" name="license_issuer" id="license_issuer" placeholder="مثال: إدارة المرور - الخرطوم" />
+                                <input type="text" name="license_issuer" id="license_issuer"
+                                    placeholder="مثال: إدارة المرور - الخرطوم" />
                             </div>
                         </div>
                     </div>
@@ -640,14 +665,24 @@ include('../insidebar.php');
                                 <i class="fas fa-tools"></i> نوع المعدة المتخصص فيها (يمكن اختيار أكثر من واحد)
                             </label>
                             <div class="checkbox-group">
-                                <label><input type="checkbox" name="specialized_equipment[]" value="حفارة (Excavator)"> حفارة (Excavator)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]" value="مثقاب/مكنة تخريم (Drill Machine)"> مثقاب/مكنة تخريم (Drill Machine)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]" value="دوزر (Dozer)"> دوزر (Dozer)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]" value="شاحنة قلابة (Dump Truck)"> شاحنة قلابة (Dump Truck)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]" value="شاحنة تناكر/صهريج (Tanker Truck)"> شاحنة تناكر/صهريج (Tanker Truck)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]" value="جرافة (Loader)"> جرافة (Loader)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]" value="ممهدة (Grader)"> ممهدة (Grader)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]" value="معدات أخرى"> معدات أخرى</label>
+                                <label><input type="checkbox" name="specialized_equipment[]" value="حفارة (Excavator)">
+                                    حفارة (Excavator)</label>
+                                <label><input type="checkbox" name="specialized_equipment[]"
+                                        value="مثقاب/مكنة تخريم (Drill Machine)"> مثقاب/مكنة تخريم (Drill
+                                    Machine)</label>
+                                <label><input type="checkbox" name="specialized_equipment[]" value="دوزر (Dozer)"> دوزر
+                                    (Dozer)</label>
+                                <label><input type="checkbox" name="specialized_equipment[]"
+                                        value="شاحنة قلابة (Dump Truck)"> شاحنة قلابة (Dump Truck)</label>
+                                <label><input type="checkbox" name="specialized_equipment[]"
+                                        value="شاحنة تناكر/صهريج (Tanker Truck)"> شاحنة تناكر/صهريج (Tanker
+                                    Truck)</label>
+                                <label><input type="checkbox" name="specialized_equipment[]" value="جرافة (Loader)">
+                                    جرافة (Loader)</label>
+                                <label><input type="checkbox" name="specialized_equipment[]" value="ممهدة (Grader)">
+                                    ممهدة (Grader)</label>
+                                <label><input type="checkbox" name="specialized_equipment[]" value="معدات أخرى"> معدات
+                                    أخرى</label>
                             </div>
                         </div>
                     </div>
@@ -664,11 +699,13 @@ include('../insidebar.php');
                         <div class="form-grid">
                             <div>
                                 <label><i class="fas fa-briefcase"></i> سنوات العمل في المجال</label>
-                                <input type="number" name="years_in_field" id="years_in_field" placeholder="مثال: 8" min="0" max="50" />
+                                <input type="number" name="years_in_field" id="years_in_field" placeholder="مثال: 8"
+                                    min="0" max="50" />
                             </div>
                             <div>
                                 <label><i class="fas fa-wrench"></i> سنوات العمل على هذه المعدات</label>
-                                <input type="number" name="years_on_equipment" id="years_on_equipment" placeholder="مثال: 5" min="0" max="50" />
+                                <input type="number" name="years_on_equipment" id="years_on_equipment"
+                                    placeholder="مثال: 5" min="0" max="50" />
                             </div>
                             <div>
                                 <label><i class="fas fa-star"></i> مستوى الكفاءة المهنية</label>
@@ -683,7 +720,8 @@ include('../insidebar.php');
                             </div>
                             <div style="grid-column: 1 / -1;">
                                 <label><i class="fas fa-graduation-cap"></i> الشهادات والتدريبات</label>
-                                <textarea name="certificates" id="certificates" rows="3" placeholder="مثال: شهادة تشغيل حفارات من معهد التعدين، دورة السلامة الصناعية"></textarea>
+                                <textarea name="certificates" id="certificates" rows="3"
+                                    placeholder="مثال: شهادة تشغيل حفارات من معهد التعدين، دورة السلامة الصناعية"></textarea>
                             </div>
                         </div>
                     </div>
@@ -700,7 +738,8 @@ include('../insidebar.php');
                         <div class="form-grid">
                             <div>
                                 <label><i class="fas fa-user-tie"></i> اسم المالك/المشرف المباشر</label>
-                                <input type="text" name="owner_supervisor" id="owner_supervisor" placeholder="مثال: محمد علي (مالك المعدة)" />
+                                <input type="text" name="owner_supervisor" id="owner_supervisor"
+                                    placeholder="مثال: محمد علي (مالك المعدة)" />
                             </div>
                             <div>
                                 <label><i class="fas fa-building"></i> المورد الذي يعمل معه</label>
@@ -742,7 +781,8 @@ include('../insidebar.php');
                             </div>
                             <div>
                                 <label><i class="fas fa-dollar-sign"></i> المبلغ الشهري التقريبي</label>
-                                <input type="number" step="0.01" name="monthly_salary" id="monthly_salary" placeholder="مثال: 1500" />
+                                <input type="number" step="0.01" name="monthly_salary" id="monthly_salary"
+                                    placeholder="مثال: 1500" />
                             </div>
                         </div>
                     </div>
@@ -762,16 +802,19 @@ include('../insidebar.php');
                                 <input type="email" name="email" id="email" placeholder="operator@example.com" />
                             </div>
                             <div>
-                                <label><i class="fas fa-phone"></i> رقم الهاتف الأساسي <span style="color: red;">*</span></label>
+                                <label><i class="fas fa-phone"></i> رقم الهاتف الأساسي <span
+                                        style="color: red;">*</span></label>
                                 <input type="tel" name="phone" id="phone" placeholder="+249-9-123-4567" required />
                             </div>
                             <div>
                                 <label><i class="fas fa-phone-alt"></i> رقم هاتف بديل</label>
-                                <input type="tel" name="phone_alternative" id="phone_alternative" placeholder="+249-9-765-4321" />
+                                <input type="tel" name="phone_alternative" id="phone_alternative"
+                                    placeholder="+249-9-765-4321" />
                             </div>
                             <div style="grid-column: 1 / -1;">
                                 <label><i class="fas fa-map-marker-alt"></i> العنوان</label>
-                                <textarea name="address" id="address" rows="2" placeholder="مثال: شارع النيل، الخرطوم"></textarea>
+                                <textarea name="address" id="address" rows="2"
+                                    placeholder="مثال: شارع النيل، الخرطوم"></textarea>
                             </div>
                         </div>
                     </div>
@@ -856,7 +899,8 @@ include('../insidebar.php');
                             </div>
                             <div style="grid-column: 1 / -1;">
                                 <label><i class="fas fa-notes-medical"></i> المشاكل الصحية المعروفة</label>
-                                <textarea name="health_issues" id="health_issues" rows="2" placeholder="مثال: ضعف البصر الطفيف، مشاكل الظهر"></textarea>
+                                <textarea name="health_issues" id="health_issues" rows="2"
+                                    placeholder="مثال: ضعف البصر الطفيف، مشاكل الظهر"></textarea>
                             </div>
                         </div>
                     </div>
@@ -873,19 +917,23 @@ include('../insidebar.php');
                         <div class="form-grid">
                             <div>
                                 <label><i class="fas fa-building"></i> اسم جهة التوظيف السابقة</label>
-                                <input type="text" name="previous_employer" id="previous_employer" placeholder="مثال: شركة الذهب للتعدين" />
+                                <input type="text" name="previous_employer" id="previous_employer"
+                                    placeholder="مثال: شركة الذهب للتعدين" />
                             </div>
                             <div>
                                 <label><i class="fas fa-clock"></i> مدة العمل معهم</label>
-                                <input type="text" name="employment_duration" id="employment_duration" placeholder="مثال: 3 سنوات" />
+                                <input type="text" name="employment_duration" id="employment_duration"
+                                    placeholder="مثال: 3 سنوات" />
                             </div>
                             <div style="grid-column: 1 / -1;">
                                 <label><i class="fas fa-user-friends"></i> مرجع للاتصال</label>
-                                <input type="text" name="reference_contact" id="reference_contact" placeholder="مثال: محمود أحمد - مدير الأسطول (09-123-4567)" />
+                                <input type="text" name="reference_contact" id="reference_contact"
+                                    placeholder="مثال: محمود أحمد - مدير الأسطول (09-123-4567)" />
                             </div>
                             <div style="grid-column: 1 / -1;">
                                 <label><i class="fas fa-comment-dots"></i> ملاحظات عامة</label>
-                                <textarea name="general_notes" id="general_notes" rows="3" placeholder="مثال: مشغل موثوق وذو كفاءة عالية، يحتاج إلى تدريب على السلامة"></textarea>
+                                <textarea name="general_notes" id="general_notes" rows="3"
+                                    placeholder="مثال: مشغل موثوق وذو كفاءة عالية، يحتاج إلى تدريب على السلامة"></textarea>
                             </div>
                         </div>
                     </div>
@@ -901,7 +949,8 @@ include('../insidebar.php');
                     <div class="form-section-body">
                         <div class="form-grid">
                             <div>
-                                <label><i class="fas fa-info-circle"></i> حالة المشغل <span style="color: red;">*</span></label>
+                                <label><i class="fas fa-info-circle"></i> حالة المشغل <span
+                                        style="color: red;">*</span></label>
                                 <select name="driver_status" id="driver_status" required>
                                     <option value="">-- اختر الحالة --</option>
                                     <option value="نشط"> نشط</option>
@@ -916,7 +965,8 @@ include('../insidebar.php');
                                 <input type="date" name="start_date" id="start_date" />
                             </div>
                             <div>
-                                <label><i class="fas fa-power-off"></i> حالة النظام <span style="color: red;">*</span></label>
+                                <label><i class="fas fa-power-off"></i> حالة النظام <span
+                                        style="color: red;">*</span></label>
                                 <select name="status" id="status" required>
                                     <option value="">-- اختر الحالة --</option>
                                     <option value="1">✅ مفعل</option>
@@ -927,17 +977,21 @@ include('../insidebar.php');
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border); justify-content: center;">
+                <div
+                    style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border); justify-content: center;">
                     <button type="submit" class="btn-submit" style="padding: 15px 40px; font-size: 1.1rem;">
                         <i class="fas fa-save"></i> حفظ المشغل
                     </button>
-                    <button type="button" class="btn-cancel" onclick="document.getElementById('projectForm').classList.remove('allforms-visible');">
+                    <button type="button" class="btn-cancel"
+                        onclick="document.getElementById('projectForm').classList.remove('allforms-visible');">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
-                    <button type="button" class="btn-submit" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="expandAllSections()">
+                    <button type="button" class="btn-submit"
+                        style="background: linear-gradient(135deg, #10b981, #059669);" onclick="expandAllSections()">
                         <i class="fas fa-expand-alt"></i> فتح جميع المجموعات
                     </button>
-                    <button type="button" class="btn-submit" style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="collapseAllSections()">
+                    <button type="button" class="btn-submit"
+                        style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="collapseAllSections()">
                         <i class="fas fa-compress-alt"></i> إغلاق جميع المجموعات
                     </button>
                 </div>
@@ -996,14 +1050,14 @@ include('../insidebar.php');
                              ORDER BY d.id DESC";
                     $result = mysqli_query($conn, $query);
                     $i = 1;
-                    
+
                     while ($row = mysqli_fetch_assoc($result)) {
                         $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">✅ مفعّل</span>' : '<span class="status-pill status-inactive">❌ موقف</span>';
                         $driver_name_cell = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
                         if (intval($row['numcontracts']) === 0) {
                             $driver_name_cell .= " <span class='link-alert-chip' title='المشغل ليس لديه عقد'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
                         }
-                        
+
                         echo "<tr>";
                         echo "<td>" . $i++ . "</td>";
                         echo "<td><code>" . htmlspecialchars($row['driver_code'] ?: 'N/A') . "</code></td>";
@@ -1018,25 +1072,25 @@ include('../insidebar.php');
                         echo "<td>" . $statusBadge . "</td>";
                         echo "<td><div class='action-btns'>";
                         if ($can_edit) {
-                            echo "<a href='javascript:void(0)' 
-                                       class='action-btn edit editBtn' 
-                                       data-id='" . $row['id'] . "' 
+                            echo "<a href='javascript:void(0)'
+                                       class='action-btn edit editBtn'
+                                       data-id='" . $row['id'] . "'
                                        title='تعديل'>
                                         <i class='fas fa-edit'></i>
                                     </a>";
                         }
-                        echo "<a href='drivercontracts.php?id=" . $row['id'] . "' 
-                                       class='action-btn view' 
+                        echo "<a href='drivercontracts.php?id=" . $row['id'] . "'
+                                       class='action-btn view'
                                        title='عرض العقود'>
                                         <i class='fas fa-file-contract'></i>
                                     </a>
-                                    <a href='driver_profile.php?id=" . $row['id'] . "' 
-                                       class='action-btn view' 
+                                    <a href='driver_profile.php?id=" . $row['id'] . "'
+                                       class='action-btn view'
                                        title='بطاقة وبيانات السائق'>
                                         <i class='fas fa-id-card-alt'></i>
                                     </a>
-                                    <a href='driver_truck_history.php?id=" . $row['id'] . "' 
-                                       class='action-btn history' 
+                                    <a href='driver_truck_history.php?id=" . $row['id'] . "'
+                                       class='action-btn history'
                                        title='تاريخ القيادة'>
                                         <i class='fas fa-history'></i>
                                     </a>";
@@ -1115,11 +1169,11 @@ include('../insidebar.php');
         // التحكم في إظهار وإخفاء الفورم
         const toggleFormBtn = document.getElementById('toggleForm');
         const projectForm = document.getElementById('projectForm');
-        
+
         if (toggleFormBtn) {
             toggleFormBtn.addEventListener('click', function () {
                 projectForm.classList.toggle('allforms-visible');
-                
+
                 if (projectForm.classList.contains('allforms-visible')) {
                     // تنظيف جميع الحقول
                     projectForm.reset();
@@ -1128,7 +1182,7 @@ include('../insidebar.php');
                     collapseAllSections();
                     document.querySelector('.form-section-header').classList.remove('collapsed');
                     document.querySelector('.form-section-body').classList.remove('collapsed');
-                    
+
                     // التمرير للفورم
                     $("html, body").animate({ scrollTop: $("#projectForm").offset().top - 100 }, 500);
                     $("#name").focus();
@@ -1139,17 +1193,17 @@ include('../insidebar.php');
         // عند الضغط على زر تعديل - تحميل البيانات عبر AJAX
         $(document).on("click", ".editBtn", function () {
             const id = $(this).data("id");
-            
+
             // جلب البيانات الكاملة عبر AJAX
             $.ajax({
                 url: 'get_driver_data.php',
                 type: 'GET',
                 data: { id: id },
                 dataType: 'json',
-                success: function(data) {
+                success: function (data) {
                     if (data.success) {
                         const driver = data.driver;
-                        
+
                         // ملء جميع الحقول
                         $("#drivers_id").val(driver.id);
                         $("#name").val(driver.name);
@@ -1164,14 +1218,14 @@ include('../insidebar.php');
                         $("#license_type").val(driver.license_type);
                         $("#license_expiry_date").val(driver.license_expiry_date);
                         $("#license_issuer").val(driver.license_issuer);
-                        
+
                         // المعدات المتخصصة (checkboxes)
                         const equipment = driver.specialized_equipment ? driver.specialized_equipment.split(', ') : [];
                         $("input[name='specialized_equipment[]']").prop("checked", false);
-                        equipment.forEach(function(eq) {
+                        equipment.forEach(function (eq) {
                             $("input[name='specialized_equipment[]'][value='" + eq.trim() + "']").prop("checked", true);
                         });
-                        
+
                         $("#years_in_field").val(driver.years_in_field);
                         $("#years_on_equipment").val(driver.years_on_equipment);
                         $("#skill_level").val(driver.skill_level);
@@ -1198,7 +1252,7 @@ include('../insidebar.php');
                         $("#driver_status").val(driver.driver_status);
                         $("#start_date").val(driver.start_date);
                         $("#status").val(driver.status);
-                        
+
                         // عرض الفورم وفتح جميع المجموعات
                         projectForm.classList.add('allforms-visible');
                         expandAllSections();
@@ -1207,7 +1261,7 @@ include('../insidebar.php');
                         alert('خطأ في تحميل البيانات');
                     }
                 },
-                error: function() {
+                error: function () {
                     alert('حدث خطأ في الاتصال بالخادم');
                 }
             });
@@ -1216,40 +1270,40 @@ include('../insidebar.php');
     })();
 
     // معالجة الاستيراد من Excel/CSV
-    $(document).ready(function() {
-        $('#startImportBtn').on('click', function() {
+    $(document).ready(function () {
+        $('#startImportBtn').on('click', function () {
             const fileInput = document.getElementById('importFile');
             const file = fileInput.files[0];
-            
+
             if (!file) {
                 alert('يرجى اختيار ملف للاستيراد');
                 return;
             }
-            
+
             // التحقق من نوع الملف
             const allowedExtensions = ['xlsx', 'xls', 'csv'];
             const fileExtension = file.name.split('.').pop().toLowerCase();
-            
+
             if (!allowedExtensions.includes(fileExtension)) {
                 alert('نوع الملف غير مدعوم. يرجى رفع ملف Excel أو CSV');
                 return;
             }
-            
+
             // التحقق من حجم الملف (5 ميجا)
             if (file.size > 5 * 1024 * 1024) {
                 alert('حجم الملف كبير جداً (الحد الأقصى 5 ميجا)');
                 return;
             }
-            
+
             // إنشاء FormData
             const formData = new FormData();
             formData.append('file', file);
-            
+
             // إخفاء زر البدء وعرض شريط التقدم
             $('#startImportBtn').prop('disabled', true);
             $('#importProgress').show();
             $('#importResult').html('');
-            
+
             // إرسال الطلب عبر AJAX
             $.ajax({
                 url: 'import_drivers_excel.php',
@@ -1258,59 +1312,59 @@ include('../insidebar.php');
                 processData: false,
                 contentType: false,
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     $('#importProgress').hide();
                     $('#startImportBtn').prop('disabled', false);
-                    
+
                     if (response.success) {
                         // عرض رسالة النجاح
                         let resultHTML = '<div class="alert alert-success" style="text-align: right; direction: rtl;">';
                         resultHTML += '<i class="fas fa-check-circle"></i> <strong>' + response.message + '</strong>';
-                        
+
                         // إذا كانت هناك أخطاء، عرضها
                         if (response.errors && response.errors.length > 0) {
                             resultHTML += '<hr><strong>تفاصيل الأخطاء:</strong><ul class="mb-0">';
-                            response.errors.forEach(function(error) {
+                            response.errors.forEach(function (error) {
                                 resultHTML += '<li>الصف ' + error.row + ': ' + error.error + '</li>';
                             });
                             resultHTML += '</ul>';
                         }
-                        
+
                         resultHTML += '</div>';
                         resultHTML += '<button type="button" class="btn btn-success" onclick="location.reload();">';
                         resultHTML += '<i class="fas fa-sync-alt"></i> تحديث الصفحة لعرض البيانات الجديدة';
                         resultHTML += '</button>';
-                        
+
                         $('#importResult').html(resultHTML);
-                        
+
                         // إعادة تعيين الفورم
                         $('#importForm')[0].reset();
-                        
+
                     } else {
                         // عرض رسالة الخطأ
                         let resultHTML = '<div class="alert alert-danger" style="text-align: right; direction: rtl;">';
                         resultHTML += '<i class="fas fa-exclamation-triangle"></i> <strong>' + response.message + '</strong>';
                         resultHTML += '</div>';
-                        
+
                         $('#importResult').html(resultHTML);
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     $('#importProgress').hide();
                     $('#startImportBtn').prop('disabled', false);
-                    
+
                     let resultHTML = '<div class="alert alert-danger" style="text-align: right; direction: rtl;">';
                     resultHTML += '<i class="fas fa-exclamation-triangle"></i> <strong>حدث خطأ أثناء الاتصال بالخادم</strong>';
                     resultHTML += '<br>تفاصيل الخطأ: ' + error;
                     resultHTML += '</div>';
-                    
+
                     $('#importResult').html(resultHTML);
                 }
             });
         });
-        
+
         // إعادة تعيين المودال عند إغلاقه
-        $('#importModal').on('hidden.bs.modal', function() {
+        $('#importModal').on('hidden.bs.modal', function () {
             $('#importForm')[0].reset();
             $('#importProgress').hide();
             $('#importResult').html('');
@@ -1320,7 +1374,5 @@ include('../insidebar.php');
 </script>
 
 </body>
+
 </html>
-
-
-
