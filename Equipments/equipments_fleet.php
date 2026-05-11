@@ -89,16 +89,16 @@ if (isset($_GET['delete_id'])) {
         exit();
     }
     $delete_id = intval($_GET['delete_id']);
-    
+
     // التحقق من عدم استخدام المعدة في عمليات نشطة
     $check_ops = mysqli_query($conn, "SELECT COUNT(*) as count FROM operations WHERE equipment = $delete_id AND status = '1'");
     $ops_count = mysqli_fetch_assoc($check_ops)['count'];
-    
+
     if ($ops_count > 0) {
         header("Location: equipments_fleet.php?msg=لا+يمكن+حذف+المعدة+لأنها+بصدد+التشغيل+حالياً+❌");
         exit();
     }
-    
+
     if (mysqli_query($conn, "DELETE FROM equipments WHERE id = $delete_id $equipment_company_filter_plain")) {
         header("Location: equipments_fleet.php?msg=تم+حذف+المعدة+بنجاح+✅");
         exit();
@@ -184,7 +184,7 @@ if (isset($_GET['msg'])) {
 // معالجة الحفظ أو التعديل
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     $edit_id = isset($_POST['edit_id']) ? intval($_POST['edit_id']) : 0;
-    
+
     // فحص الصلاحيات
     if ($edit_id > 0 && !$can_edit) {
         $success_msg = "❌ ليس لديك صلاحية لتعديل المعدات";
@@ -260,7 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         $supplier_contract_query = "SELECT sc.id, sce.equip_count
                                    FROM supplierscontracts sc
                                    JOIN suppliercontractequipments sce ON sc.id = sce.contract_id
-                                   WHERE sc.supplier_id = $suppliers 
+                                   WHERE sc.supplier_id = $suppliers
                                    AND sce.equip_type = '$type'
                                    AND sc.status = 1
                                    LIMIT 1";
@@ -271,9 +271,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
             $contracted_count = intval($supplier_contract['equip_count']);
 
             // حساب عدد المعدات المضافة حالياً
-            $added_count_query = "SELECT COUNT(*) as added_count 
-                                 FROM equipments 
-                                 WHERE suppliers = $suppliers 
+            $added_count_query = "SELECT COUNT(*) as added_count
+                                 FROM equipments
+                                 WHERE suppliers = $suppliers
                                  AND type = '$type'
                                  AND status = 1";
             $added_count_result = mysqli_query($conn, $added_count_query);
@@ -361,26 +361,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     } else {
         // إضافة
         $insert_columns = [
-            'suppliers', 'code', 'type', 'name', 'status', 'serial_number', 'chassis_number',
-            'manufacturer', 'model', 'manufacturing_year', 'import_year',
-            'equipment_condition', 'operating_hours', 'engine_condition', 'tires_condition',
-            'actual_owner_name', 'owner_type', 'owner_phone', 'owner_supplier_relation',
-            'license_number', 'license_authority', 'license_expiry_date',
-            'inspection_certificate_number', 'last_inspection_date',
-            'current_location', 'availability_status',
-            'estimated_value', 'daily_rental_price', 'monthly_rental_price', 'insurance_status',
-            'general_notes', 'last_maintenance_date'
+            'suppliers',
+            'code',
+            'type',
+            'name',
+            'status',
+            'serial_number',
+            'chassis_number',
+            'manufacturer',
+            'model',
+            'manufacturing_year',
+            'import_year',
+            'equipment_condition',
+            'operating_hours',
+            'engine_condition',
+            'tires_condition',
+            'actual_owner_name',
+            'owner_type',
+            'owner_phone',
+            'owner_supplier_relation',
+            'license_number',
+            'license_authority',
+            'license_expiry_date',
+            'inspection_certificate_number',
+            'last_inspection_date',
+            'current_location',
+            'availability_status',
+            'estimated_value',
+            'daily_rental_price',
+            'monthly_rental_price',
+            'insurance_status',
+            'general_notes',
+            'last_maintenance_date'
         ];
         $insert_values = [
-            "'$suppliers'", "'$code'", "'$type'", "'$name'", "$status", "'$serial_number'", "'$chassis_number'",
-            "'$manufacturer'", "'$model'", "$manufacturing_year", "$import_year",
-            "'$equipment_condition'", "$operating_hours", "'$engine_condition'", "'$tires_condition'",
-            "'$actual_owner_name'", "'$owner_type'", "'$owner_phone'", "'$owner_supplier_relation'",
-            "'$license_number'", "'$license_authority'", "$license_expiry_date",
-            "'$inspection_certificate_number'", "$last_inspection_date",
-            "'$current_location'", "'$availability_status'",
-            "$estimated_value", "$daily_rental_price", "$monthly_rental_price", "'$insurance_status'",
-            "'$general_notes'", "$last_maintenance_date"
+            "'$suppliers'",
+            "'$code'",
+            "'$type'",
+            "'$name'",
+            "$status",
+            "'$serial_number'",
+            "'$chassis_number'",
+            "'$manufacturer'",
+            "'$model'",
+            "$manufacturing_year",
+            "$import_year",
+            "'$equipment_condition'",
+            "$operating_hours",
+            "'$engine_condition'",
+            "'$tires_condition'",
+            "'$actual_owner_name'",
+            "'$owner_type'",
+            "'$owner_phone'",
+            "'$owner_supplier_relation'",
+            "'$license_number'",
+            "'$license_authority'",
+            "$license_expiry_date",
+            "'$inspection_certificate_number'",
+            "$last_inspection_date",
+            "'$current_location'",
+            "'$availability_status'",
+            "$estimated_value",
+            "$daily_rental_price",
+            "$monthly_rental_price",
+            "'$insurance_status'",
+            "'$general_notes'",
+            "$last_maintenance_date"
         ];
 
         if ($equipment_has_machine_number) {
@@ -450,17 +496,11 @@ if (!empty($editData)) {
 ?>
 
 <div class="main equipments-fleet-main ems-unified-page-shell">
-    <!-- عنوان الصفحة -->
-    <div class="header">
-        <a href="../main/dashboard.php" class="back-btn">
-            <i class="fas fa-arrow-right"></i> رجوع
-        </a>
-        <h1 class="page-title">
-            <div class="title-icon"><i class="fas fa-cogs"></i></div>
-            إدارة المعدات
-        </h1>
-        <div class="header -actions">
-            <?php if ($can_add) { ?>
+
+   <!-- عنوان الصفحة -->
+    <div class="main_head">
+        <div class="head_actions">
+             <?php if ($can_add) { ?>
                 <a href="javascript:void(0)" id="toggleForm" class="add-btn" onclick="toggleFleetForm(event)">
                     <i class="fas fa-plus-circle"></i> إضافة معدة جديدة
                 </a>
@@ -476,7 +516,18 @@ if (!empty($editData)) {
                 </a>
             <?php } ?>
         </div>
+        <h1 class="head-title">
+             <div class="title-icon"><i class="fas fa-cogs"></i></div>
+            إدارة المعدات
+        </h1>
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+        </div>
     </div>
+
+
 
     <?php if (!empty($success_msg)):
         $isSuccess = strpos($success_msg, '✅') !== false;
@@ -489,7 +540,8 @@ if (!empty($editData)) {
 
     <?php if ($can_add || $can_edit) { ?>
         <!-- فورم إضافة / تعديل معدة -->
-        <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
+        <form id="projectForm" action="" method="post"
+            class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
             <div class="card">
                 <div class="card-header">
                     <h5>
@@ -594,7 +646,8 @@ if (!empty($editData)) {
                                 <i class="fas fa-microchip"></i>
                                 رقم الماكينة
                             </label>
-                            <input type="text" name="machine_number" id="machine_number" placeholder="رقم الماكينة او المحرك"
+                            <input type="text" name="machine_number" id="machine_number"
+                                placeholder="رقم الماكينة او المحرك"
                                 value="<?php echo isset($editData['machine_number']) ? htmlspecialchars($editData['machine_number']) : ''; ?>" />
                         </div>
 
@@ -807,7 +860,8 @@ if (!empty($editData)) {
                             <select name="document_type" id="document_type">
                                 <option value="">-- اختر نوع الوثيقة --</option>
                                 <option value="شهادة وارد" <?php echo (!empty($editData) && $editData['document_type'] == "شهادة وارد") ? "selected" : ""; ?>>شهادة وارد</option>
-                                <option value="ترخيص ( شهادة بحث)" <?php echo (!empty($editData) && $editData['document_type'] == "ترخيص ( شهادة بحث)") ? "selected" : ""; ?>>ترخيص ( شهادة بحث)</option>
+                                <option value="ترخيص ( شهادة بحث)" <?php echo (!empty($editData) && $editData['document_type'] == "ترخيص ( شهادة بحث)") ? "selected" : ""; ?>>ترخيص ( شهادة
+                                    بحث)</option>
                                 <option value="عقد بيع" <?php echo (!empty($editData) && $editData['document_type'] == "عقد بيع") ? "selected" : ""; ?>>عقد بيع</option>
                             </select>
                         </div>
@@ -875,11 +929,14 @@ if (!empty($editData)) {
                                 الحالة الحالية
                             </label>
                             <select name="availability_status" id="availability_status">
-                                <option value="قيد الاستخدام" <?php echo (empty($editData) || $editData['availability_status'] == "قيد الاستخدام") ? "selected" : ""; ?>>قيد الاستخدام</option>
-                                <option value="تحت الصيانة" <?php echo (!empty($editData) && $editData['availability_status'] == "تحت الصيانة") ? "selected" : ""; ?>>تحت الصيانة</option>
+                                <option value="قيد الاستخدام" <?php echo (empty($editData) || $editData['availability_status'] == "قيد الاستخدام") ? "selected" : ""; ?>>قيد الاستخدام
+                                </option>
+                                <option value="تحت الصيانة" <?php echo (!empty($editData) && $editData['availability_status'] == "تحت الصيانة") ? "selected" : ""; ?>>تحت الصيانة
+                                </option>
                                 <option value="محجوزة" <?php echo (!empty($editData) && $editData['availability_status'] == "محجوزة") ? "selected" : ""; ?>>محجوزة</option>
                                 <option value="معطلة" <?php echo (!empty($editData) && $editData['availability_status'] == "معطلة") ? "selected" : ""; ?>>معطلة</option>
-                                <option value="في المستودع" <?php echo (!empty($editData) && $editData['availability_status'] == "في المستودع") ? "selected" : ""; ?>>في المستودع</option>
+                                <option value="في المستودع" <?php echo (!empty($editData) && $editData['availability_status'] == "في المستودع") ? "selected" : ""; ?>>في المستودع
+                                </option>
                                 <option value="مسحوبة" <?php echo (!empty($editData) && $editData['availability_status'] == "مسحوبة") ? "selected" : ""; ?>>مسحوبة</option>
                             </select>
                             <small id="availabilityStatusHint" class="availability-note"></small>
@@ -1118,37 +1175,37 @@ if (!empty($editData)) {
             </div>
 
             <div class="table-scroll-wrap">
-            <table id="projectsTable" class="display nowrap">
-                <thead>
-                    <tr>
-                        <th data-group="basic"><i class="fas fa-hashtag"></i> #</th>
-                        <th data-group="basic"><i class="fas fa-truck-loading"></i> المورد</th>
-                        <th data-group="basic"><i class="fas fa-barcode"></i> كود المعدة</th>
-                        <th data-group="identification"><i class="fas fa-hashtag"></i> رقم تسلسلي</th>
-                        <th data-group="basic"><i class="fas fa-list-alt"></i> النوع</th>
-                        <th data-group="basic"><i class="fas fa-tag"></i> الاسم</th>
-                        <th data-group="manufacturing"><i class="fas fa-car"></i> الموديل</th>
-                        <th data-group="manufacturing"><i class="fas fa-calendar"></i> سنة الصنع</th>
-                        <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
-                        <th data-group="ownership"><i class="fas fa-user"></i> المالك</th>
-                        <th data-group="status"><i class="fas fa-traffic-light"></i> التوفر</th>
-                        <th data-group="status"><i class="fas fa-toggle-on"></i> حالة المعدة</th>
-                        <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $availability_state_select = $equipment_has_availability_state
-                        ? "m.availability_state,"
-                        : "NULL AS availability_state,";
-                    $query2 = "
-                        SELECT 
-                            m.id, 
-                            s.name AS supplier_name, 
+                <table id="projectsTable" class="display nowrap">
+                    <thead>
+                        <tr>
+                            <th data-group="basic"><i class="fas fa-hashtag"></i> #</th>
+                            <th data-group="basic"><i class="fas fa-truck-loading"></i> المورد</th>
+                            <th data-group="basic"><i class="fas fa-barcode"></i> كود المعدة</th>
+                            <th data-group="identification"><i class="fas fa-hashtag"></i> رقم تسلسلي</th>
+                            <th data-group="basic"><i class="fas fa-list-alt"></i> النوع</th>
+                            <th data-group="basic"><i class="fas fa-tag"></i> الاسم</th>
+                            <th data-group="manufacturing"><i class="fas fa-car"></i> الموديل</th>
+                            <th data-group="manufacturing"><i class="fas fa-calendar"></i> سنة الصنع</th>
+                            <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
+                            <th data-group="ownership"><i class="fas fa-user"></i> المالك</th>
+                            <th data-group="status"><i class="fas fa-traffic-light"></i> التوفر</th>
+                            <th data-group="status"><i class="fas fa-toggle-on"></i> حالة المعدة</th>
+                            <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $availability_state_select = $equipment_has_availability_state
+                            ? "m.availability_state,"
+                            : "NULL AS availability_state,";
+                        $query2 = "
+                        SELECT
+                            m.id,
+                            s.name AS supplier_name,
                             m.type,
                             et.type AS equipment_type_name,
-                            m.code, 
-                            m.name, 
+                            m.code,
+                            m.name,
                             m.status,
                             m.serial_number,
                             m.model,
@@ -1157,137 +1214,137 @@ if (!empty($editData)) {
                             m.actual_owner_name,
                             m.availability_status,
                             $availability_state_select
-                            o.project_id, 
+                            o.project_id,
                             o.status AS operation_status,
                             COUNT(DISTINCT d.id) AS drivers_count
                         FROM equipments m
                         JOIN suppliers s ON m.suppliers = s.id
                         LEFT JOIN equipments_types et ON m.type = et.id
-                        LEFT JOIN operations o 
-                            ON o.equipment = m.id 
+                        LEFT JOIN operations o
+                            ON o.equipment = m.id
                             AND o.status = '1'
-                        LEFT JOIN equipment_drivers ed 
+                        LEFT JOIN equipment_drivers ed
                             ON ed.equipment_id = m.id
-                        LEFT JOIN drivers d 
-                            ON d.id = ed.driver_id 
+                        LEFT JOIN drivers d
+                            ON d.id = ed.driver_id
                             AND ed.status = '1'
                         WHERE 1=1 $equipment_company_filter
                         GROUP BY m.id
                         ORDER BY m.id DESC
                     ";
-                    $result = mysqli_query($conn, $query2);
-                    $i = 1;
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<tr>";
-                        echo "<td><strong>" . $i++ . "</strong></td>";
-                        echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
-                        echo "<td><span class='mono code-badge'>" . htmlspecialchars($row['code']) . "</span></td>";
+                        $result = mysqli_query($conn, $query2);
+                        $i = 1;
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<tr>";
+                            echo "<td><strong>" . $i++ . "</strong></td>";
+                            echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
+                            echo "<td><span class='mono code-badge'>" . htmlspecialchars($row['code']) . "</span></td>";
 
-                        // رقم تسلسلي
-                        $serial = !empty($row['serial_number'])
-                            ? "<span class='mono'>" . htmlspecialchars($row['serial_number']) . "</span>"
-                            : "<span class='text-muted'>غير محدد</span>";
-                        echo "<td>" . $serial . "</td>";
+                            // رقم تسلسلي
+                            $serial = !empty($row['serial_number'])
+                                ? "<span class='mono'>" . htmlspecialchars($row['serial_number']) . "</span>"
+                                : "<span class='text-muted'>غير محدد</span>";
+                            echo "<td>" . $serial . "</td>";
 
-                        // نوع المعدة - من جدول equipments_types
-                        $type_text = !empty($row['equipment_type_name']) ? htmlspecialchars($row['equipment_type_name']) : 'غير محدد';
-                        
-                        // تحديد الأيقونة بناءً على النوع
-                        $type_icon = "fa-tools"; // أيقونة افتراضية
-                        if (stripos($type_text, 'حفار') !== false) {
-                            $type_icon = "fa-tractor";
-                        } elseif (stripos($type_text, 'قلاب') !== false) {
-                            $type_icon = "fa-truck-moving";
-                        } elseif (stripos($type_text, 'خرامه') !== false || stripos($type_text, 'حفر') !== false) {
-                            $type_icon = "fa-drill";
-                        } elseif (stripos($type_text, 'رافعة') !== false) {
-                            $type_icon = "fa-dolly";
-                        } elseif (stripos($type_text, 'شاحنة') !== false) {
-                            $type_icon = "fa-truck";
-                        }
-                        
-                        echo "<td><span class='badge-type'><i class='fas $type_icon'></i> $type_text</span></td>";
+                            // نوع المعدة - من جدول equipments_types
+                            $type_text = !empty($row['equipment_type_name']) ? htmlspecialchars($row['equipment_type_name']) : 'غير محدد';
 
-                        // اسم المعدة (تهيئة المتغير)
-                        $name_display = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
-
-                        // المشروع النشط
-                        if (!empty($row['project_id'])) {
-                            $p_res = mysqli_query($conn, "SELECT name FROM project WHERE id='" . intval($row['project_id']) . "'");
-                            if ($p_res && mysqli_num_rows($p_res) > 0) {
-                                $p = mysqli_fetch_assoc($p_res);
-                                $name_display .= "<br><span class='project-link'><i class='fas fa-project-diagram'></i> " . htmlspecialchars($p['name']) . "</span>";
+                            // تحديد الأيقونة بناءً على النوع
+                            $type_icon = "fa-tools"; // أيقونة افتراضية
+                            if (stripos($type_text, 'حفار') !== false) {
+                                $type_icon = "fa-tractor";
+                            } elseif (stripos($type_text, 'قلاب') !== false) {
+                                $type_icon = "fa-truck-moving";
+                            } elseif (stripos($type_text, 'خرامه') !== false || stripos($type_text, 'حفر') !== false) {
+                                $type_icon = "fa-drill";
+                            } elseif (stripos($type_text, 'رافعة') !== false) {
+                                $type_icon = "fa-dolly";
+                            } elseif (stripos($type_text, 'شاحنة') !== false) {
+                                $type_icon = "fa-truck";
                             }
-                        }
 
-                        // عدد السائقين النشطين
-                        if ($row['drivers_count'] > 0) {
-                            $name_display .= "<br><span class='extra-info'><i class='fas fa-users'></i> " . $row['drivers_count'] . " سائق</span>";
-                        }
+                            echo "<td><span class='badge-type'><i class='fas $type_icon'></i> $type_text</span></td>";
 
-                        echo "<td>" . $name_display . "</td>";
+                            // اسم المعدة (تهيئة المتغير)
+                            $name_display = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
 
-                        // الموديل
-                        $model = !empty($row['model']) ? htmlspecialchars($row['model']) : "<span class='text-muted'>غير محدد</span>";
-                        echo "<td>" . $model . "</td>";
+                            // المشروع النشط
+                            if (!empty($row['project_id'])) {
+                                $p_res = mysqli_query($conn, "SELECT name FROM project WHERE id='" . intval($row['project_id']) . "'");
+                                if ($p_res && mysqli_num_rows($p_res) > 0) {
+                                    $p = mysqli_fetch_assoc($p_res);
+                                    $name_display .= "<br><span class='project-link'><i class='fas fa-project-diagram'></i> " . htmlspecialchars($p['name']) . "</span>";
+                                }
+                            }
 
-                        // سنة الصنع
-                        $manufacturing_year = !empty($row['manufacturing_year']) ? $row['manufacturing_year'] : "<span class='text-muted'>غير محدد</span>";
-                        echo "<td>" . $manufacturing_year . "</td>";
+                            // عدد السائقين النشطين
+                            if ($row['drivers_count'] > 0) {
+                                $name_display .= "<br><span class='extra-info'><i class='fas fa-users'></i> " . $row['drivers_count'] . " سائق</span>";
+                            }
 
-                        // حالة المعدة
-                        $equipment_condition = !empty($row['equipment_condition']) ? htmlspecialchars($row['equipment_condition']) : "<span class='text-muted'>غير محدد</span>";
-                        echo "<td>" . $equipment_condition . "</td>";
+                            echo "<td>" . $name_display . "</td>";
 
-                        // المالك
-                        $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span class='text-muted'>غير محدد</span>";
-                        echo "<td>" . $owner . "</td>";
+                            // الموديل
+                            $model = !empty($row['model']) ? htmlspecialchars($row['model']) : "<span class='text-muted'>غير محدد</span>";
+                            echo "<td>" . $model . "</td>";
 
-                        $row_availability_state = normalize_equipment_availability_state(
-                            isset($row['availability_state']) ? $row['availability_state'] : '',
-                            isset($row['availability_status']) ? $row['availability_status'] : ''
-                        );
-                        $row_availability_status = normalize_equipment_availability_status(
-                            $row_availability_state,
-                            isset($row['availability_status']) ? $row['availability_status'] : ''
-                        );
+                            // سنة الصنع
+                            $manufacturing_year = !empty($row['manufacturing_year']) ? $row['manufacturing_year'] : "<span class='text-muted'>غير محدد</span>";
+                            echo "<td>" . $manufacturing_year . "</td>";
 
-                        // التوفر
-                        if ($row_availability_state === 'متوفرة') {
-                            echo "<td><span class='badge-available'><i class='fas fa-check-circle'></i> متوفرة</span></td>";
-                        } else {
-                            echo "<td><span class='badge-busy'><i class='fas fa-ban'></i> غير متوفرة</span></td>";
-                        }
+                            // حالة المعدة
+                            $equipment_condition = !empty($row['equipment_condition']) ? htmlspecialchars($row['equipment_condition']) : "<span class='text-muted'>غير محدد</span>";
+                            echo "<td>" . $equipment_condition . "</td>";
 
-                        // حالة المعدة (من حقل status الرقمي)
-                        $eq_status = isset($row['status']) ? intval($row['status']) : 0;
-                        $status_map = [
-                            0 => ["badge-working",  "fa-spinner fa-spin",         "متاحة"],
-                            1 => ["badge-busy",     "fa-tools",                   "تحت الصيانة"],
-                            2 => ["badge-type",     "fa-bookmark",                "محجوزة"],
-                            3 => ["badge-busy",     "fa-exclamation-triangle",    "معطلة"],
-                            5 => ["badge-busy",     "fa-arrow-alt-circle-down",   "مسحوبة"],
-                        ];
-                        $s = isset($status_map[$eq_status]) ? $status_map[$eq_status] : ["badge-type", "fa-question-circle", "غير محدد"];
-                        echo "<td><span class='{$s[0]}'><i class='fas {$s[1]}'></i> {$s[2]}</span></td>";
+                            // المالك
+                            $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span class='text-muted'>غير محدد</span>";
+                            echo "<td>" . $owner . "</td>";
 
-                        // الإجراءات
-                        echo "<td>";
-                        echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
+                            $row_availability_state = normalize_equipment_availability_state(
+                                isset($row['availability_state']) ? $row['availability_state'] : '',
+                                isset($row['availability_status']) ? $row['availability_status'] : ''
+                            );
+                            $row_availability_status = normalize_equipment_availability_status(
+                                $row_availability_state,
+                                isset($row['availability_status']) ? $row['availability_status'] : ''
+                            );
+
+                            // التوفر
+                            if ($row_availability_state === 'متوفرة') {
+                                echo "<td><span class='badge-available'><i class='fas fa-check-circle'></i> متوفرة</span></td>";
+                            } else {
+                                echo "<td><span class='badge-busy'><i class='fas fa-ban'></i> غير متوفرة</span></td>";
+                            }
+
+                            // حالة المعدة (من حقل status الرقمي)
+                            $eq_status = isset($row['status']) ? intval($row['status']) : 0;
+                            $status_map = [
+                                0 => ["badge-working", "fa-spinner fa-spin", "متاحة"],
+                                1 => ["badge-busy", "fa-tools", "تحت الصيانة"],
+                                2 => ["badge-type", "fa-bookmark", "محجوزة"],
+                                3 => ["badge-busy", "fa-exclamation-triangle", "معطلة"],
+                                5 => ["badge-busy", "fa-arrow-alt-circle-down", "مسحوبة"],
+                            ];
+                            $s = isset($status_map[$eq_status]) ? $status_map[$eq_status] : ["badge-type", "fa-question-circle", "غير محدد"];
+                            echo "<td><span class='{$s[0]}'><i class='fas {$s[1]}'></i> {$s[2]}</span></td>";
+
+                            // الإجراءات
+                            echo "<td>";
+                            echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
                                                         <i class='fas fa-eye'></i>
                                                     </a>";
-                        if ($can_edit) {
-                            echo "<a href='equipments_fleet.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
+                            if ($can_edit) {
+                                echo "<a href='equipments_fleet.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
                                                                         <i class='fas fa-edit'></i>
                                                                     </a>";
-                        }
-                        echo "</td>";
+                            }
+                            echo "</td>";
 
-                        echo "</tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+                            echo "</tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -1461,7 +1518,8 @@ if (!empty($editData)) {
                     <i class="fas fa-edit"></i> تعديل المعدة
                 </a>
 
-                <a id="viewEquipmentDeleteBtn" class="btn-modal btn-modal-danger fleet-btn-link fleet-hidden" onclick="return confirm('هل أنت متأكد من حذف هذه المعدة؟');">
+                <a id="viewEquipmentDeleteBtn" class="btn-modal btn-modal-danger fleet-btn-link fleet-hidden"
+                    onclick="return confirm('هل أنت متأكد من حذف هذه المعدة؟');">
                     <i class="fas fa-trash"></i> حذف المعدة
                 </a>
 
@@ -1993,7 +2051,8 @@ if (!empty($editData)) {
                             <i class="fas fa-upload fleet-import-upload-label-icon"></i>
                             اختر ملف Excel أو CSV
                         </label>
-                        <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" required class="fleet-import-file-input">
+                        <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" required
+                            class="fleet-import-file-input">
                     </div>
 
                     <!-- مؤشر التحميل -->
@@ -2154,5 +2213,3 @@ if (!empty($editData)) {
 </body>
 
 </html>
-
-

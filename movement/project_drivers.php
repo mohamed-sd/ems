@@ -386,208 +386,211 @@ include '../insidebar.php';
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <div class="main movement-page movement-drivers-page">
-    <div class="movement-topbar">
-        <div class="movement-topbar-left">
-            <?php if ($can_edit): ?>
-            <a href="javascript:void(0)" id="toggleAddDriverForm" class="movement-topbar-btn movement-topbar-btn-primary add-btn"><i class="fas fa-plus-circle"></i> إضافة تشغيل سائق</a>
+
+
+    <div class="main_head">
+        <div class="head_actions">
+             <?php if ($can_edit): ?>
+                <a href="javascript:void(0)" id="toggleAddDriverForm"
+                    class="movement-topbar-btn movement-topbar-btn-primary add-btn"><i class="fas fa-plus-circle"></i> إضافة
+                    تشغيل سائق</a>
             <?php endif; ?>
-            <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn"><i class="fas fa-cogs"></i> إدارة التشغيل</a>
+            <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>"
+                class="movement-topbar-btn"><i class="fas fa-cogs"></i> إدارة التشغيل</a>
             <a href="../main/dashboard.php" class="movement-topbar-btn"><i class="fas fa-home"></i> لوحة التحكم</a>
         </div>
-        <div class="movement-topbar-right">
-            <div class="movement-topbar-title">
-                <span class="movement-topbar-icon"><i class="fas fa-id-badge"></i></span>
-                <div class="movement-topbar-title-text">
-                    <h1>إدارة سائقي المشروع</h1>
-                    <p>
-                        <i class="fas fa-project-diagram"></i>
-                        <?php echo htmlspecialchars($selected_project['name']); ?>
-                        <?php if (!empty($selected_project['project_code'])): ?> · <?php echo htmlspecialchars($selected_project['project_code']); ?><?php endif; ?>
-                    </p>
-                </div>
-            </div>
-            <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn movement-topbar-btn-back back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
+        <h1 class="head-title">
+            <div class="title-icon"><i class="fas fa-id-badge"></i></div>
+           إدارة سائقي المشروع
+             <i class="fas fa-project-diagram"></i>
+           <?php echo htmlspecialchars($selected_project['name']); ?>
+        </h1>
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
         </div>
     </div>
 
-  <div class="ems-content">
-    <?php if ($msg !== ''): ?>
-        <div class="success-message <?php echo $is_success ? 'is-success' : 'is-error'; ?>">
-            <i class="fas <?php echo $is_success ? 'fa-check-circle' : 'fa-exclamation-circle'; ?>"></i>
-            <?php echo htmlspecialchars($msg, ENT_QUOTES, 'UTF-8'); ?>
-        </div>
-    <?php endif; ?>
+    <div class="ems-content">
+        <?php if ($msg !== ''): ?>
+            <div class="success-message <?php echo $is_success ? 'is-success' : 'is-error'; ?>">
+                <i class="fas <?php echo $is_success ? 'fa-check-circle' : 'fa-exclamation-circle'; ?>"></i>
+                <?php echo htmlspecialchars($msg, ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+        <?php endif; ?>
 
-    <?php if ($can_edit): ?>
-    <form id="addDriverForm" action="" method="post" class="allforms add-driver-form">
-        <input type="hidden" name="action" value="add_driver_assignment">
+        <?php if ($can_edit): ?>
+            <form id="addDriverForm" action="" method="post" class="allforms add-driver-form">
+                <input type="hidden" name="action" value="add_driver_assignment">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user-plus"></i> تشغيل سائق جديد</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div>
+                                <label><i class="fas fa-id-card"></i> السائق *</label>
+                                <select name="driver_id" required>
+                                    <option value="">-- اختر السائق --</option>
+                                    <?php foreach ($available_drivers as $drv): ?>
+                                        <option value="<?php echo intval($drv['id']); ?>">
+                                            <?php echo htmlspecialchars($drv['name'] . ' - ' . $drv['phone'], ENT_QUOTES, 'UTF-8'); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label><i class="fas fa-truck"></i> الآلية *</label>
+                                <select name="equipment_id" required>
+                                    <option value="">-- اختر الآلية --</option>
+                                    <?php foreach ($project_equipments as $eq): ?>
+                                        <?php $eqLabel = trim((string) $eq['code']) . ' - ' . trim((string) $eq['name']); ?>
+                                        <option value="<?php echo intval($eq['id']); ?>">
+                                            <?php echo htmlspecialchars($eqLabel, ENT_QUOTES, 'UTF-8'); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label><i class="fas fa-calendar-plus"></i> تاريخ البداية *</label>
+                                <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" required>
+                            </div>
+
+                            <div>
+                                <label><i class="fas fa-calendar-times"></i> تاريخ النهاية (اختياري)</label>
+                                <input type="date" name="end_date" value="">
+                            </div>
+
+                            <div class="driver-form-check-row">
+                                <input type="checkbox" id="auto_replace" name="auto_replace" value="1" checked>
+                                <label for="auto_replace" class="driver-form-check-label">إيقاف أي تشغيل نشط لنفس السائق
+                                    داخل المشروع تلقائيًا</label>
+                            </div>
+
+                            <div class="driver-form-actions">
+                                <button type="button" id="cancelAddDriverForm" class="btn btn-secondary">إلغاء</button>
+                                <button type="submit" class="btn btn-success">حفظ التشغيل</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        <?php endif; ?>
+
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-user-plus"></i> تشغيل سائق جديد</h5>
+                <h5><i class="fas fa-users"></i> السائقون المرتبطون بآليات المشروع</h5>
             </div>
             <div class="card-body">
-                <div class="form-grid">
-                    <div>
-                        <label><i class="fas fa-id-card"></i> السائق *</label>
-                        <select name="driver_id" required>
-                            <option value="">-- اختر السائق --</option>
-                            <?php foreach ($available_drivers as $drv): ?>
-                                <option value="<?php echo intval($drv['id']); ?>">
-                                    <?php echo htmlspecialchars($drv['name'] . ' - ' . $drv['phone'], ENT_QUOTES, 'UTF-8'); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                <div class="table-container">
+                    <table id="projectDriversTable" class="display nowrap table-full-width">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>السائق</th>
+                                <th>الهاتف</th>
+                                <th>الآلية الحالية</th>
+                                <th>تاريخ البداية</th>
+                                <th>تاريخ النهاية</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $idx = 1;
+                            if ($drivers_result) {
+                                while ($row = mysqli_fetch_assoc($drivers_result)) {
+                                    $is_active = intval($row['status']) === 1;
+                                    echo '<tr>';
+                                    echo '<td>' . $idx++ . '</td>';
+                                    echo '<td><strong>' . htmlspecialchars($row['driver_name'], ENT_QUOTES, 'UTF-8') . '</strong></td>';
+                                    echo '<td>' . htmlspecialchars($row['driver_phone'], ENT_QUOTES, 'UTF-8') . '</td>';
+                                    echo '<td>' . htmlspecialchars($row['equipment_code'] . ' - ' . $row['equipment_name'], ENT_QUOTES, 'UTF-8') . '</td>';
+                                    echo '<td>' . htmlspecialchars($row['start_date'], ENT_QUOTES, 'UTF-8') . '</td>';
+                                    echo '<td>' . htmlspecialchars($row['end_date'], ENT_QUOTES, 'UTF-8') . '</td>';
+                                    echo '<td>';
+                                    if ($is_active) {
+                                        echo '<span class="status-pill status-running">يعمل</span>';
+                                    } else {
+                                        echo '<span class="status-pill status-idle">موقوف</span>';
+                                    }
+                                    echo '</td>';
 
-                    <div>
-                        <label><i class="fas fa-truck"></i> الآلية *</label>
-                        <select name="equipment_id" required>
-                            <option value="">-- اختر الآلية --</option>
-                            <?php foreach ($project_equipments as $eq): ?>
-                                <?php $eqLabel = trim((string) $eq['code']) . ' - ' . trim((string) $eq['name']); ?>
-                                <option value="<?php echo intval($eq['id']); ?>"><?php echo htmlspecialchars($eqLabel, ENT_QUOTES, 'UTF-8'); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                                    echo '<td>';
+                                    if ($can_edit) {
+                                        if ($is_active) {
+                                            echo '<form method="post" class="driver-action-form-stop">';
+                                            echo '<input type="hidden" name="action" value="stop_driver">';
+                                            echo '<input type="hidden" name="relation_id" value="' . intval($row['id']) . '">';
+                                            echo '<button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'تأكيد إيقاف السائق؟\')">إيقاف</button>';
+                                            echo '</form>';
+                                        }
 
-                    <div>
-                        <label><i class="fas fa-calendar-plus"></i> تاريخ البداية *</label>
-                        <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" required>
-                    </div>
-
-                    <div>
-                        <label><i class="fas fa-calendar-times"></i> تاريخ النهاية (اختياري)</label>
-                        <input type="date" name="end_date" value="">
-                    </div>
-
-                    <div class="driver-form-check-row">
-                        <input type="checkbox" id="auto_replace" name="auto_replace" value="1" checked>
-                        <label for="auto_replace" class="driver-form-check-label">إيقاف أي تشغيل نشط لنفس السائق داخل المشروع تلقائيًا</label>
-                    </div>
-
-                    <div class="driver-form-actions">
-                        <button type="button" id="cancelAddDriverForm" class="btn btn-secondary">إلغاء</button>
-                        <button type="submit" class="btn btn-success">حفظ التشغيل</button>
-                    </div>
+                                        echo '<form method="post" class="driver-action-form-move">';
+                                        echo '<input type="hidden" name="action" value="move_driver">';
+                                        echo '<input type="hidden" name="relation_id" value="' . intval($row['id']) . '">';
+                                        echo '<select name="new_equipment_id" required class="driver-move-equipment-select">';
+                                        echo '<option value="">اختر آلية جديدة</option>';
+                                        foreach ($project_equipments as $eq) {
+                                            $eq_id = intval($eq['id']);
+                                            if ($eq_id === intval($row['equipment_id'])) {
+                                                continue;
+                                            }
+                                            $eq_label = trim((string) $eq['code']) . ' - ' . trim((string) $eq['name']);
+                                            echo '<option value="' . $eq_id . '">' . htmlspecialchars($eq_label, ENT_QUOTES, 'UTF-8') . '</option>';
+                                        }
+                                        echo '</select>';
+                                        echo '<input type="date" name="move_start_date" value="' . date('Y-m-d') . '" required>';
+                                        echo '<button type="submit" class="btn btn-sm btn-primary">تشغيل على آلية أخرى</button>';
+                                        echo '</form>';
+                                    } else {
+                                        echo '<span class="driver-no-permission">لا توجد صلاحية تعديل</span>';
+                                    }
+                                    echo '</td>';
+                                    echo '</tr>';
+                                }
+                            }
+                            ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </form>
-    <?php endif; ?>
-
-    <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-users"></i> السائقون المرتبطون بآليات المشروع</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-container">
-                <table id="projectDriversTable" class="display nowrap table-full-width">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>السائق</th>
-                            <th>الهاتف</th>
-                            <th>الآلية الحالية</th>
-                            <th>تاريخ البداية</th>
-                            <th>تاريخ النهاية</th>
-                            <th>الحالة</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $idx = 1;
-                        if ($drivers_result) {
-                            while ($row = mysqli_fetch_assoc($drivers_result)) {
-                                $is_active = intval($row['status']) === 1;
-                                echo '<tr>';
-                                echo '<td>' . $idx++ . '</td>';
-                                echo '<td><strong>' . htmlspecialchars($row['driver_name'], ENT_QUOTES, 'UTF-8') . '</strong></td>';
-                                echo '<td>' . htmlspecialchars($row['driver_phone'], ENT_QUOTES, 'UTF-8') . '</td>';
-                                echo '<td>' . htmlspecialchars($row['equipment_code'] . ' - ' . $row['equipment_name'], ENT_QUOTES, 'UTF-8') . '</td>';
-                                echo '<td>' . htmlspecialchars($row['start_date'], ENT_QUOTES, 'UTF-8') . '</td>';
-                                echo '<td>' . htmlspecialchars($row['end_date'], ENT_QUOTES, 'UTF-8') . '</td>';
-                                echo '<td>';
-                                if ($is_active) {
-                                    echo '<span class="status-pill status-running">يعمل</span>';
-                                } else {
-                                    echo '<span class="status-pill status-idle">موقوف</span>';
-                                }
-                                echo '</td>';
-
-                                echo '<td>';
-                                if ($can_edit) {
-                                    if ($is_active) {
-                                        echo '<form method="post" class="driver-action-form-stop">';
-                                        echo '<input type="hidden" name="action" value="stop_driver">';
-                                        echo '<input type="hidden" name="relation_id" value="' . intval($row['id']) . '">';
-                                        echo '<button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'تأكيد إيقاف السائق؟\')">إيقاف</button>';
-                                        echo '</form>';
-                                    }
-
-                                    echo '<form method="post" class="driver-action-form-move">';
-                                    echo '<input type="hidden" name="action" value="move_driver">';
-                                    echo '<input type="hidden" name="relation_id" value="' . intval($row['id']) . '">';
-                                    echo '<select name="new_equipment_id" required class="driver-move-equipment-select">';
-                                    echo '<option value="">اختر آلية جديدة</option>';
-                                    foreach ($project_equipments as $eq) {
-                                        $eq_id = intval($eq['id']);
-                                        if ($eq_id === intval($row['equipment_id'])) {
-                                            continue;
-                                        }
-                                        $eq_label = trim((string) $eq['code']) . ' - ' . trim((string) $eq['name']);
-                                        echo '<option value="' . $eq_id . '">' . htmlspecialchars($eq_label, ENT_QUOTES, 'UTF-8') . '</option>';
-                                    }
-                                    echo '</select>';
-                                    echo '<input type="date" name="move_start_date" value="' . date('Y-m-d') . '" required>';
-                                    echo '<button type="submit" class="btn btn-sm btn-primary">تشغيل على آلية أخرى</button>';
-                                    echo '</form>';
-                                } else {
-                                    echo '<span class="driver-no-permission">لا توجد صلاحية تعديل</span>';
-                                }
-                                echo '</td>';
-                                echo '</tr>';
-                            }
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
     </div>
-</div>
 
-<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
-<script>
-$(document).ready(function () {
-    $('#projectDriversTable').DataTable({
-        responsive: true,
-        language: {
-            url: '/ems/assets/i18n/datatables/ar.json'
-        }
-    });
+    <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+    <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#projectDriversTable').DataTable({
+                responsive: true,
+                language: {
+                    url: '/ems/assets/i18n/datatables/ar.json'
+                }
+            });
 
-    $('#toggleAddDriverForm').on('click', function () {
-        var $form = $('#addDriverForm');
-        if ($form.hasClass('allforms-visible')) {
-            $form.removeClass('allforms-visible').slideUp(200);
-        } else {
-            $form.addClass('allforms-visible').hide().slideDown(250);
-        }
-    });
+            $('#toggleAddDriverForm').on('click', function () {
+                var $form = $('#addDriverForm');
+                if ($form.hasClass('allforms-visible')) {
+                    $form.removeClass('allforms-visible').slideUp(200);
+                } else {
+                    $form.addClass('allforms-visible').hide().slideDown(250);
+                }
+            });
 
-    $('#cancelAddDriverForm').on('click', function () {
-        $('#addDriverForm').removeClass('allforms-visible').slideUp(200);
-    });
-});
-</script>
+            $('#cancelAddDriverForm').on('click', function () {
+                $('#addDriverForm').removeClass('allforms-visible').slideUp(200);
+            });
+        });
+    </script>
 
-  </div><!-- /.ems-content -->
+</div><!-- /.ems-content -->
 </div><!-- /.main -->
 
 </body>
+
 </html>
-
-

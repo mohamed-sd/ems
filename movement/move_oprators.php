@@ -63,8 +63,8 @@ if (!$can_view) {
 }
 
 $is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
-$user_project_id  = $is_role10 ? intval($_SESSION['user']['project_id']) : 0;
-$user_mine_id     = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0; // يُستخدم لجميع الأدوار
+$user_project_id = $is_role10 ? intval($_SESSION['user']['project_id']) : 0;
+$user_mine_id = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0; // يُستخدم لجميع الأدوار
 $user_contract_id = $is_role10 ? intval($_SESSION['user']['contract_id']) : 0;
 
 $session_user_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
@@ -295,7 +295,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         $update_sql = "UPDATE operations SET status = 0, `end` = '$end_date', reason = '$reason', days = $days_value WHERE id = $operation_id AND project_id = $selected_project_id$operations_company_scope";
         $update_result = mysqli_query($conn, $update_sql);
-        
+
         if ($update_result) {
             // الحفاظ على المشروع المحدد بعد إنهاء الخدمة
             $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
@@ -331,270 +331,270 @@ if (isset($_GET['delete_id'])) {
 
 ?>
 
-<?php 
+<?php
 include("../inheader.php");
-include('../insidebar.php'); 
+include('../insidebar.php');
 ?>
 
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <div class="main movement-page movement-ops-page">
-    <div class="movement-topbar">
-        <div class="movement-topbar-left">
-            <?php if ($can_add): ?>
+
+    <div class="main_head">
+        <div class="head_actions">
+           <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="movement-topbar-btn movement-topbar-btn-primary add-btn"><i class="fa fa-plus-circle"></i> إضافة تشغيل جديد</a>
             <?php endif; ?>
             <a href="project_drivers.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn"><i class="fas fa-id-badge"></i> سائقي المشروع</a>
             <?php if($_SESSION['user']['role'] != "10"): ?>
-            <a href="select_project.php" class="movement-topbar-btn"><i class="fas fa-exchange-alt"></i> تغيير المشروع</a>
+            <!-- <a href="select_project.php" class="movement-topbar-btn"><i class="fas fa-exchange-alt"></i> تغيير المشروع</a> -->
             <?php endif; ?>
         </div>
-        <div class="movement-topbar-right">
-            <div class="movement-topbar-title">
-                <span class="movement-topbar-icon"><i class="fas fa-cogs"></i></span>
-                <div class="movement-topbar-title-text">
-                    <h1>إدارة التشغيل</h1>
-                    <p>
-                        <i class="fas fa-project-diagram"></i>
-                        <?php echo htmlspecialchars($selected_project['name']); ?>
-                        <?php if ($selected_mine): ?> · <?php echo htmlspecialchars($selected_mine['mine_name']); ?><?php endif; ?>
-                    </p>
-                </div>
-            </div>
-            <a href="../main/dashboard.php" class="movement-topbar-btn movement-topbar-btn-back back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
+        <h1 class="head-title">
+            <div class="title-icon"><i class="fas fa-cogs"></i></div>
+            إدارة التشغيل  <i class="fas fa-project-diagram"></i> <?php echo htmlspecialchars($selected_project['name']); ?>
+        </h1>
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
         </div>
     </div>
 
-  <div class="ems-content">
-    <?php if (!empty($_GET['msg'])):
-        $isSuccess = strpos($_GET['msg'], '✅') !== false;
-    ?>
-        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
-            <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
-            <?php echo htmlspecialchars($_GET['msg']); ?>
-        </div>
-    <?php endif; ?>
-
-    <div class="ems-sec"><i class="fas fa-cogs"></i> إدارة التشغيل</div>
-
-    <!-- فورم إضافة تشغيل -->
-    <?php if ($can_add || $can_edit): ?>
-    <form id="projectForm" action="" method="post" class="allforms">
-        <div class="card">
-            <div class="card-header">
-                <h5 id="formTitle">
-                    <i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد
-                </h5>
+    <div class="ems-content">
+        <?php if (!empty($_GET['msg'])):
+            $isSuccess = strpos($_GET['msg'], '✅') !== false;
+            ?>
+            <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
+                <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
+                <?php echo htmlspecialchars($_GET['msg']); ?>
             </div>
-            <div class="card-body">
-                <div class="form-grid">
-                    <!-- المعرّف أثناء التعديل -->
-                    <input type="hidden" name="operation_id" id="operation_id" value="">
+        <?php endif; ?>
 
-                    <!-- المشروع مخفي لأنه محدد مسبقاً -->
-                    <input type="hidden" name="project_id" id="project_id" value="<?php echo $selected_project_id; ?>">
+        <div class="ems-sec"><i class="fas fa-cogs"></i> إدارة التشغيل</div>
 
-                    <!-- المنجم مخفي - محدد من الجلسة تلقائياً -->
-                    <input type="hidden" name="mine_id" id="mine_id" value="<?php echo $user_mine_id; ?>">
+        <!-- فورم إضافة تشغيل -->
+        <?php if ($can_add || $can_edit): ?>
+            <form id="projectForm" action="" method="post" class="allforms">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 id="formTitle">
+                            <i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <!-- المعرّف أثناء التعديل -->
+                            <input type="hidden" name="operation_id" id="operation_id" value="">
 
-                    <!-- العقود -->
-                    <select name="contract_id" id="contract_id" required>
-                        <option value="">-- اختر العقد --</option>
-                    </select>
+                            <!-- المشروع مخفي لأنه محدد مسبقاً -->
+                            <input type="hidden" name="project_id" id="project_id"
+                                value="<?php echo $selected_project_id; ?>">
 
-                    <!-- المورد -->
-                    <select name="supplier_id" id="supplier_id" required>
-                        <option value="">-- اختر المورد --</option>
-                    </select>
+                            <!-- المنجم مخفي - محدد من الجلسة تلقائياً -->
+                            <input type="hidden" name="mine_id" id="mine_id" value="<?php echo $user_mine_id; ?>">
 
-                    <select name="type" id="type" required>
-                        <option value=""> -- حدد نوع المعدة --- </option>
-                        <?php
-                        $type_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
-                        $type_result = mysqli_query($conn, $type_query);
-                        if ($type_result) {
-                            while($type_row = mysqli_fetch_assoc($type_result)) {
-                                echo "<option value='" . intval($type_row['id']) . "'> " . htmlspecialchars($type_row['type']) . " </option>";
-                            }
-                        }
-                        ?>
-                    </select>
-
-                    <select name="equipment" id="equipment" required>
-                        <option value="">-- اختر المعدة --</option>
-                        <!-- سيتم ملؤها ديناميكيًا عبر AJAX -->
-                    </select>
-
-                    <div>
-                        <div>
-                            <label><i class="fas fa-check-circle"></i> نوع المعدة</label>
-                            <select name="equipment_category" id="equipment_category" required>
-                                <option value="">-- أساسي / احتياطي --</option>
-                                <option value="أساسي"> أساسي</option>
-                                <option value="احتياطي"> احتياطي</option>
+                            <!-- العقود -->
+                            <select name="contract_id" id="contract_id" required>
+                                <option value="">-- اختر العقد --</option>
                             </select>
+
+                            <!-- المورد -->
+                            <select name="supplier_id" id="supplier_id" required>
+                                <option value="">-- اختر المورد --</option>
+                            </select>
+
+                            <select name="type" id="type" required>
+                                <option value=""> -- حدد نوع المعدة --- </option>
+                                <?php
+                                $type_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
+                                $type_result = mysqli_query($conn, $type_query);
+                                if ($type_result) {
+                                    while ($type_row = mysqli_fetch_assoc($type_result)) {
+                                        echo "<option value='" . intval($type_row['id']) . "'> " . htmlspecialchars($type_row['type']) . " </option>";
+                                    }
+                                }
+                                ?>
+                            </select>
+
+                            <select name="equipment" id="equipment" required>
+                                <option value="">-- اختر المعدة --</option>
+                                <!-- سيتم ملؤها ديناميكيًا عبر AJAX -->
+                            </select>
+
+                            <div>
+                                <div>
+                                    <label><i class="fas fa-check-circle"></i> نوع المعدة</label>
+                                    <select name="equipment_category" id="equipment_category" required>
+                                        <option value="">-- أساسي / احتياطي --</option>
+                                        <option value="أساسي"> أساسي</option>
+                                        <option value="احتياطي"> احتياطي</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <input type="date" name="start" id="start_date" required placeholder="تاريخ البداية" />
+                            <input type="date" name="end" id="end_date" required placeholder="تاريخ النهاية" />
+                            <input type="hidden" step="0.01" name="hours" placeholder="عدد الساعات" value="0" />
+
+                            <div>
+                                <label><i class="fa fa-clock"></i> عدد ساعات العمل للآلية</label>
+                                <input type="number" name="total_equipment_hours" id="total_equipment_hours" step="0.01"
+                                    placeholder="إجمالي ساعات العمل" value="0" required />
+                            </div>
+
+                            <div>
+                                <label><i class="fa fa-hourglass-half"></i> عدد ساعات الوردية</label>
+                                <input type="number" name="shift_hours" id="shift_hours" step="0.01"
+                                    placeholder="ساعات الوردية" value="0" required />
+                            </div>
+
+                            <select name="status" id="status" required>
+                                <option value="1">ساري</option>
+                                <option value="0">منتهي</option>
+                            </select>
+                            <input type="hidden" name="action" value="save_operation" />
+                            <button type="submit" name="save_operation_submit" id="save_operation_submit">حفظ
+                                التشغيل</button>
                         </div>
                     </div>
+                </div>
+            </form>
+        <?php endif; ?>
 
-                    <input type="date" name="start" id="start_date" required placeholder="تاريخ البداية" />
-                    <input type="date" name="end" id="end_date" required placeholder="تاريخ النهاية" />
-                    <input type="hidden" step="0.01" name="hours" placeholder="عدد الساعات" value="0" />
-                    
-                    <div>
-                        <label><i class="fa fa-clock"></i> عدد ساعات العمل  للآلية</label>
-                        <input type="number" name="total_equipment_hours" id="total_equipment_hours" step="0.01" placeholder="إجمالي ساعات العمل" value="0" required />
-                    </div>
-                    
-                    <div>
-                        <label><i class="fa fa-hourglass-half"></i> عدد ساعات الوردية</label>
-                        <input type="number" name="shift_hours" id="shift_hours" step="0.01" placeholder="ساعات الوردية" value="0" required />
-                    </div>
-                    
-                    <select name="status" id="status" required>
-                        <option value="1">ساري</option>
-                        <option value="0">منتهي</option>
-                    </select>
-                    <input type="hidden" name="action" value="save_operation" />
-                    <button type="submit" name="save_operation_submit" id="save_operation_submit">حفظ التشغيل</button>
+        <!-- قسم الإحصائيات -->
+        <div id="contractStats" class="contract-stats is-hidden">
+            <h5 class="stats-title">
+                <i class="fas fa-chart-line"></i>
+                إحصائيات عقد المنجم
+            </h5>
+
+            <div id="suppliersSection" class="suppliers-section">
+                <div class="table-scroll">
+                    <table class="alltables">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>المورد</th>
+                                <th>الساعات المتعاقد عليها</th>
+                                <th>عدد المعدات المتعاقد عليها</th>
+                                <th><span class="legend-dot legend-basic">■</span> أساسية</th>
+                                <th><span class="legend-dot legend-backup">■</span> احتياطية</th>
+                                <th>المعدات المضافة</th>
+                                <th>المتبقي للإضافة</th>
+                                <th>توزيع المعدات والساعات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliersTableBody">
+                            <tr>
+                                <td colspan="9" class="suppliers-empty">
+                                    <i class="fas fa-info-circle"></i> لا توجد بيانات
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="suppliers-total-row">
+                                <td colspan="2" class="suppliers-total-label">الإجمالي</td>
+                                <td id="total_supplier_hours" class="suppliers-total-value">0</td>
+                                <td id="total_supplier_equipment" class="suppliers-total-value">0</td>
+                                <td id="total_supplier_basic" class="suppliers-total-value">0</td>
+                                <td id="total_supplier_backup" class="suppliers-total-value">0</td>
+                                <td id="total_added_equipment" class="suppliers-total-value">0</td>
+                                <td id="total_remaining_equipment" class="suppliers-total-value">0</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-card-value" id="stat_total_hours">0</div>
+                    <div class="stat-card-label">إجمالي الساعات المتعاقد عليها</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-icon"><i class="fas fa-cogs"></i></div>
+                    <div class="stat-card-value" id="stat_equipment_count">0</div>
+                    <div class="stat-card-label">عدد المعدات المشغلة</div>
                 </div>
             </div>
         </div>
-    </form>
-    <?php endif; ?>
-
-    <!-- قسم الإحصائيات -->
-    <div id="contractStats" class="contract-stats is-hidden">
-        <h5 class="stats-title">
-            <i class="fas fa-chart-line"></i>
-            إحصائيات عقد المنجم
-        </h5>
-
-        <div id="suppliersSection" class="suppliers-section">
-            <div class="table-scroll">
-                <table class="alltables">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>المورد</th>
-                            <th>الساعات المتعاقد عليها</th>
-                            <th>عدد المعدات المتعاقد عليها</th>
-                            <th><span class="legend-dot legend-basic">■</span> أساسية</th>
-                            <th><span class="legend-dot legend-backup">■</span> احتياطية</th>
-                            <th>المعدات المضافة</th>
-                            <th>المتبقي للإضافة</th>
-                            <th>توزيع المعدات والساعات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="suppliersTableBody">
-                        <tr>
-                            <td colspan="9" class="suppliers-empty">
-                                <i class="fas fa-info-circle"></i> لا توجد بيانات
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr class="suppliers-total-row">
-                            <td colspan="2" class="suppliers-total-label">الإجمالي</td>
-                            <td id="total_supplier_hours" class="suppliers-total-value">0</td>
-                            <td id="total_supplier_equipment" class="suppliers-total-value">0</td>
-                            <td id="total_supplier_basic" class="suppliers-total-value">0</td>
-                            <td id="total_supplier_backup" class="suppliers-total-value">0</td>
-                            <td id="total_added_equipment" class="suppliers-total-value">0</td>
-                            <td id="total_remaining_equipment" class="suppliers-total-value">0</td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
-                </table>
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-cogs"></i> قائمة التشغيل</h5>
             </div>
-        </div>
+            <div class="card-body card-body-zero">
+                <div class="tbl-scroll-wrap tbl-scroll-zero">
+                    <table id="projectsTable" class="display nowrap table-full-width">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>المعدة</th>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-card-icon"><i class="fas fa-clock"></i></div>
-                <div class="stat-card-value" id="stat_total_hours">0</div>
-                <div class="stat-card-label">إجمالي الساعات المتعاقد عليها</div>
-            </div>
+                                <th>السائقين</th>
 
-            <div class="stat-card">
-                <div class="stat-card-icon"><i class="fas fa-cogs"></i></div>
-                <div class="stat-card-value" id="stat_equipment_count">0</div>
-                <div class="stat-card-label">عدد المعدات المشغلة</div>
-            </div>
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-cogs"></i> قائمة التشغيل</h5>
-        </div>
-                <div class="card-body card-body-zero">
-                    <div class="tbl-scroll-wrap tbl-scroll-zero">
-                        <table id="projectsTable" class="display nowrap table-full-width">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>المعدة</th>
+                                <th>المورد</th>
+                                <th>ساعات العمل الكلية</th>
+                                <th>ساعات الوردية</th>
 
-                        <th>السائقين</th>
+                                <th>تاريخ البداية</th>
+                                <th>تاريخ النهاية</th>
+                                <th>النوع</th>
+                                <!-- <th>عدد الساعات</th> -->
+                                <th>الحالة</th>
+                                <th>إجراءات</th>
 
-                        <th>المورد</th>
-                        <th>ساعات العمل الكلية</th>
-                        <th>ساعات الوردية</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            // إضافة أو تعديل تشغيل
+                            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_operation' && !empty($_POST['equipment'])) {
+                                $operation_id = isset($_POST['operation_id']) ? intval($_POST['operation_id']) : 0;
 
-                        <th>تاريخ البداية</th>
-                        <th>تاريخ النهاية</th>
-                        <th>النوع</th>
-                        <!-- <th>عدد الساعات</th> -->
-                        <th>الحالة</th>
-                        <th>إجراءات</th>
+                                if ($operation_id > 0 && !$can_edit) {
+                                    echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
+                                    exit();
+                                }
+                                if ($operation_id === 0 && !$can_add) {
+                                    echo "<script>alert('❌ ليس لديك صلاحية إضافة تشغيل جديد'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
+                                    exit();
+                                }
 
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    // إضافة أو تعديل تشغيل
-                    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save_operation' && !empty($_POST['equipment'])) {
-                        $operation_id = isset($_POST['operation_id']) ? intval($_POST['operation_id']) : 0;
+                                $equipment = intval($_POST['equipment']);
+                                $project_id = intval($_POST['project_id']);
+                                $mine_id = intval($_POST['mine_id']);
+                                $contract_id = intval($_POST['contract_id']);
+                                $supplier_id = intval($_POST['supplier_id']);
+                                $equipment_type = intval($_POST['type']);
+                                $equipment_category = mysqli_real_escape_string($conn, $_POST['equipment_category']);
 
-                        if ($operation_id > 0 && !$can_edit) {
-                            echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
-                            exit();
-                        }
-                        if ($operation_id === 0 && !$can_add) {
-                            echo "<script>alert('❌ ليس لديك صلاحية إضافة تشغيل جديد'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
-                            exit();
-                        }
+                                $start = mysqli_real_escape_string($conn, $_POST['start']);
+                                $end = mysqli_real_escape_string($conn, $_POST['end']);
+                                $hours = floatval($_POST['hours']);
+                                $total_equipment_hours = floatval($_POST['total_equipment_hours']);
+                                $shift_hours = floatval($_POST['shift_hours']);
+                                $status = intval($_POST['status']);
 
-                        $equipment = intval($_POST['equipment']);
-                        $project_id = intval($_POST['project_id']);
-                        $mine_id = intval($_POST['mine_id']);
-                        $contract_id = intval($_POST['contract_id']);
-                        $supplier_id = intval($_POST['supplier_id']);
-                        $equipment_type = intval($_POST['type']);
-                        $equipment_category = mysqli_real_escape_string($conn, $_POST['equipment_category']);
-                        
-                        $start = mysqli_real_escape_string($conn, $_POST['start']);
-                        $end = mysqli_real_escape_string($conn, $_POST['end']);
-                        $hours = floatval($_POST['hours']);
-                        $total_equipment_hours = floatval($_POST['total_equipment_hours']);
-                        $shift_hours = floatval($_POST['shift_hours']);
-                        $status = intval($_POST['status']);
+                                // التحقق من عدم وجود سجل ساري آخر لنفس المعدة
+                                if ($status === 1 && $equipment > 0) {
+                                    $exclude_id = $operation_id > 0 ? " AND id != $operation_id" : "";
+                                    $conflict_check = mysqli_query($conn, "SELECT id FROM operations WHERE equipment = $equipment AND status = 1$exclude_id LIMIT 1");
+                                    if ($conflict_check && mysqli_num_rows($conflict_check) > 0) {
+                                        echo "<script>alert('❌ لا يمكن تشغيل المعدة وهي تعمل بالفعل في تشغيل آخر'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
+                                        exit();
+                                    }
+                                }
 
-                        // التحقق من عدم وجود سجل ساري آخر لنفس المعدة
-                        if ($status === 1 && $equipment > 0) {
-                            $exclude_id = $operation_id > 0 ? " AND id != $operation_id" : "";
-                            $conflict_check = mysqli_query($conn, "SELECT id FROM operations WHERE equipment = $equipment AND status = 1$exclude_id LIMIT 1");
-                            if ($conflict_check && mysqli_num_rows($conflict_check) > 0) {
-                                echo "<script>alert('❌ لا يمكن تشغيل المعدة وهي تعمل بالفعل في تشغيل آخر'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
-                                exit();
-                            }
-                        }
+                                $status_escaped = mysqli_real_escape_string($conn, $status);
 
-                        $status_escaped = mysqli_real_escape_string($conn, $status);
-
-                        if ($operation_id > 0) {
-                            // تعديل سجل موجود
-                                $sql = "UPDATE operations SET 
+                                if ($operation_id > 0) {
+                                    // تعديل سجل موجود
+                                    $sql = "UPDATE operations SET
                                     equipment = '$equipment',
                                     equipment_type = '$equipment_type',
                                     equipment_category = '$equipment_category',
@@ -608,24 +608,24 @@ include('../insidebar.php');
                                     shift_hours = '$shift_hours',
                                     status = '$status_escaped'
                                         WHERE id = $operation_id AND project_id = '$project_id'$operations_company_scope";
-                            mysqli_query($conn, $sql);
-                            echo "<script>alert('✅ تم التحديث بنجاح'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
-                        } else {
-                            // إضافة سجل جديد
-                            $insert_company_col = (!$is_super_admin && $operations_has_company) ? ", company_id" : "";
-                            $insert_company_val = (!$is_super_admin && $operations_has_company) ? ", '$company_id'" : "";
-                            mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, mine_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, status$insert_company_col) 
+                                    mysqli_query($conn, $sql);
+                                    echo "<script>alert('✅ تم التحديث بنجاح'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
+                                } else {
+                                    // إضافة سجل جديد
+                                    $insert_company_col = (!$is_super_admin && $operations_has_company) ? ", company_id" : "";
+                                    $insert_company_val = (!$is_super_admin && $operations_has_company) ? ", '$company_id'" : "";
+                                    mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, mine_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, status$insert_company_col)
                                          VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$mine_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$status_escaped'$insert_company_val)");
-                            echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
-                        }
-                    }
+                                    echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
+                                }
+                            }
 
-                    // جلب بيانات التشغيل - فلتر المنجم من الجلسة
-                    $mine_primary_filter = ($user_mine_id > 0) ? "o.mine_id = $user_mine_id" : "o.project_id = $selected_project_id";
+                            // جلب بيانات التشغيل - فلتر المنجم من الجلسة
+                            $mine_primary_filter = ($user_mine_id > 0) ? "o.mine_id = $user_mine_id" : "o.project_id = $selected_project_id";
 
-                          $operations_scope_sql = (!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "";
+                            $operations_scope_sql = (!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "";
 
-                          $query = "SELECT o.id, o.equipment, o.equipment_type, o.equipment_category, o.mine_id, o.contract_id, o.supplier_id,
+                            $query = "SELECT o.id, o.equipment, o.equipment_type, o.equipment_category, o.mine_id, o.contract_id, o.supplier_id,
                              o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.status, o.reason,
                              e.code AS equipment_code, e.name AS equipment_name,
                              p.name AS project_name, s.name AS suppliers_name,
@@ -639,58 +639,58 @@ include('../insidebar.php');
                       WHERE $mine_primary_filter$operations_scope_sql
                       GROUP BY o.id
                       ORDER BY o.id DESC";
-                    $result = mysqli_query($conn, $query);
-                    $i = 1;
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<tr>";
-                        echo "<td>" . $i++ . "</td>";
-                        echo "<td>" . $row['equipment_code'] . " - " . $row['equipment_name'] . "</td>";
-                        echo "<td>" . (!empty($row['driver_names']) ? $row['driver_names'] : "-") . "</td>";
+                            $result = mysqli_query($conn, $query);
+                            $i = 1;
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<tr>";
+                                echo "<td>" . $i++ . "</td>";
+                                echo "<td>" . $row['equipment_code'] . " - " . $row['equipment_name'] . "</td>";
+                                echo "<td>" . (!empty($row['driver_names']) ? $row['driver_names'] : "-") . "</td>";
 
-                        echo "<td>" . $row['suppliers_name'] . "</td>";
+                                echo "<td>" . $row['suppliers_name'] . "</td>";
 
-                        echo "<td>" . (!empty($row['total_equipment_hours']) ? $row['total_equipment_hours'] : '0') . "</td>";
-                        echo "<td>" . (!empty($row['shift_hours']) ? $row['shift_hours'] : '0') . "</td>";
-                        echo "<td>" . $row['start'] . "</td>";
-                        echo "<td>" . $row['end'] . "</td>";
-                        
-                        // عرض نوع المعدة (أساسي/احتياطي)
-                        $categoryText = ($row['equipment_category'] === 'أساسي') ? 'أساسي' : 'احتياطي';
-                        $categoryClass = ($row['equipment_category'] === 'أساسي') ? 'basic' : 'backup';
-                        echo "<td><span class='category-badge $categoryClass'>$categoryText</span></td>";
-                        
-                        // echo "<td>" . $row['hours'] . "</td>";
-                        $status_value = intval($row['status']);
-                        if ($status_value === 1) {
-                            $status_label = 'ساري';
-                            $status_class = 'status-running';
-                        } else {
-                            $status_label = 'منتهي';
-                            $status_class = 'status-idle';
-                        }
+                                echo "<td>" . (!empty($row['total_equipment_hours']) ? $row['total_equipment_hours'] : '0') . "</td>";
+                                echo "<td>" . (!empty($row['shift_hours']) ? $row['shift_hours'] : '0') . "</td>";
+                                echo "<td>" . $row['start'] . "</td>";
+                                echo "<td>" . $row['end'] . "</td>";
 
-                        $status_cell = "<td><span class='status-pill $status_class'>$status_label</span></td>";
+                                // عرض نوع المعدة (أساسي/احتياطي)
+                                $categoryText = ($row['equipment_category'] === 'أساسي') ? 'أساسي' : 'احتياطي';
+                                $categoryClass = ($row['equipment_category'] === 'أساسي') ? 'basic' : 'backup';
+                                echo "<td><span class='category-badge $categoryClass'>$categoryText</span></td>";
 
-                        $action_buttons = "";
-                        if ($status_value === 1 && $_SESSION['user']['role'] != "10" && $can_edit) {
-                            $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-outline-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
-                        } elseif ($status_value === 0 && $can_edit) {
-                            $action_buttons .= "<form method='post' class='operation-inline-form'>
+                                // echo "<td>" . $row['hours'] . "</td>";
+                                $status_value = intval($row['status']);
+                                if ($status_value === 1) {
+                                    $status_label = 'ساري';
+                                    $status_class = 'status-running';
+                                } else {
+                                    $status_label = 'منتهي';
+                                    $status_class = 'status-idle';
+                                }
+
+                                $status_cell = "<td><span class='status-pill $status_class'>$status_label</span></td>";
+
+                                $action_buttons = "";
+                                if ($status_value === 1 && $_SESSION['user']['role'] != "10" && $can_edit) {
+                                    $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-outline-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
+                                } elseif ($status_value === 0 && $can_edit) {
+                                    $action_buttons .= "<form method='post' class='operation-inline-form'>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='1'>
                                 </form> ";
-                        }
+                                }
 
-                        // جلب اسم المنجم
-                        $mine_name_res = mysqli_query($conn, "SELECT mine_name FROM mines WHERE id = " . intval($row['mine_id']) . " LIMIT 1");
-                        $mine_name_val = ($mine_name_res && mysqli_num_rows($mine_name_res) > 0) ? mysqli_fetch_assoc($mine_name_res)['mine_name'] : '-';
-                        // جلب رقم العقد
-                        $contract_code_res = mysqli_query($conn, "SELECT contract_signing_date FROM contracts WHERE id = " . intval($row['contract_id']) . " LIMIT 1");
-                        $contract_code_val = ($contract_code_res && mysqli_num_rows($contract_code_res) > 0) ? mysqli_fetch_assoc($contract_code_res)['contract_signing_date'] : '-';
+                                // جلب اسم المنجم
+                                $mine_name_res = mysqli_query($conn, "SELECT mine_name FROM mines WHERE id = " . intval($row['mine_id']) . " LIMIT 1");
+                                $mine_name_val = ($mine_name_res && mysqli_num_rows($mine_name_res) > 0) ? mysqli_fetch_assoc($mine_name_res)['mine_name'] : '-';
+                                // جلب رقم العقد
+                                $contract_code_res = mysqli_query($conn, "SELECT contract_signing_date FROM contracts WHERE id = " . intval($row['contract_id']) . " LIMIT 1");
+                                $contract_code_val = ($contract_code_res && mysqli_num_rows($contract_code_res) > 0) ? mysqli_fetch_assoc($contract_code_res)['contract_signing_date'] : '-';
 
-                                                echo $status_cell;
-                                                echo "<td>
+                                echo $status_cell;
+                                echo "<td>
                                                                 <div class='action-btns'>
                                                             " . ($can_view ? "<a href='javascript:void(0)' class='action-btn view viewOperationBtn'
                                                                  data-id='" . $row['id'] . "'
@@ -708,7 +708,7 @@ include('../insidebar.php');
                                                                  data-status-class='" . $status_class . "'
                                                                  data-reason='" . htmlspecialchars($row['reason'] ?? '', ENT_QUOTES) . "'
                                                                  title='عرض التفاصيل'><i class='fa fa-eye'></i></a>" : "") . "
-                                                            " . ($can_edit ? "<a href='javascript:void(0)' class='action-btn edit editOperationBtn' 
+                                                            " . ($can_edit ? "<a href='javascript:void(0)' class='action-btn edit editOperationBtn'
                                                                  data-id='" . $row['id'] . "'
                                                                  data-equipment='" . $row['equipment'] . "'
                                                                  data-equipment-type='" . $row['equipment_type'] . "'
@@ -728,639 +728,646 @@ include('../insidebar.php');
                                                                 </div>
                                                                 " . $action_buttons . "
                                                             </td>";
-                        echo "</tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- مكتبة jQuery (مطلوبة أولاً) -->
-<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
-<!-- حزمة Bootstrap (تشمل Popper) -->
-<script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- ملفات DataTables -->
-<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-
-<!-- مودال عرض بيانات التشغيل -->
-<div id="viewOperationModal" class="modal movement-view-modal">
-    <div class="modal-content movement-view-modal-content">
-        <div class="modal-header movement-view-modal-header">
-            <h5 class="movement-view-modal-title"><i class="fas fa-eye movement-view-modal-title-icon"></i> تفاصيل سجل التشغيل</h5>
-            <button onclick="closeViewOperationModal()" class="movement-view-modal-close">&times;</button>
-        </div>
-        <div class="modal-body movement-view-modal-body">
-            <div class="movement-view-modal-grid">
-                <div class="movement-view-modal-item">
-                    <div class="movement-view-modal-label"><i class="fas fa-cogs"></i> المعدة</div>
-                    <div class="movement-view-modal-value" id="view_op_equipment">-</div>
-                </div>
-                <div class="movement-view-modal-item">
-                    <div class="movement-view-modal-label"><i class="fas fa-truck"></i> المورد</div>
-                    <div class="movement-view-modal-value" id="view_op_supplier">-</div>
-                </div>
-                <div class="movement-view-modal-item">
-                    <div class="movement-view-modal-label"><i class="fas fa-mountain"></i> المنجم</div>
-                    <div class="movement-view-modal-value" id="view_op_mine">-</div>
-                </div>
-                <div class="movement-view-modal-item">
-                    <div class="movement-view-modal-label"><i class="fas fa-file-contract"></i> تاريخ توقيع العقد</div>
-                    <div class="movement-view-modal-value" id="view_op_contract">-</div>
-                </div>
-                <div class="movement-view-modal-item">
-                    <div class="movement-view-modal-label"><i class="fas fa-id-badge"></i> السائقون</div>
-                    <div class="movement-view-modal-value" id="view_op_drivers">-</div>
-                </div>
-                <div class="movement-view-modal-item">
-                    <div class="movement-view-modal-label"><i class="fas fa-check-circle"></i> نوع المعدة</div>
-                    <div class="movement-view-modal-value" id="view_op_category">-</div>
-                </div>
-                <div class="movement-view-modal-item">
-                    <div class="movement-view-modal-label"><i class="fas fa-calendar-alt"></i> تاريخ البداية</div>
-                    <div class="movement-view-modal-value" id="view_op_start">-</div>
-                </div>
-                <div class="movement-view-modal-item">
-                    <div class="movement-view-modal-label"><i class="fas fa-calendar-check"></i> تاريخ النهاية</div>
-                    <div class="movement-view-modal-value" id="view_op_end">-</div>
-                </div>
-                <div class="movement-view-modal-item">
-                    <div class="movement-view-modal-label"><i class="fas fa-clock"></i> ساعات العمل الكلية</div>
-                    <div class="movement-view-modal-value" id="view_op_total_hours">-</div>
-                </div>
-                <div class="movement-view-modal-item">
-                    <div class="movement-view-modal-label"><i class="fas fa-hourglass-half"></i> ساعات الوردية</div>
-                    <div class="movement-view-modal-value" id="view_op_shift_hours">-</div>
-                </div>
-                <div class="movement-view-modal-item movement-view-modal-item-wide">
-                    <div class="movement-view-modal-label"><i class="fas fa-toggle-on"></i> الحالة</div>
-                    <div id="view_op_status">-</div>
-                </div>
-                <div id="view_op_reason_block" class="movement-view-modal-reason movement-view-modal-item-wide">
-                    <div class="movement-view-modal-reason-label"><i class="fas fa-info-circle"></i> سبب الإنهاء</div>
-                    <div class="movement-view-modal-reason-value" id="view_op_reason">-</div>
+                                echo "</tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <div class="modal-footer movement-view-modal-footer">
-            <?php if ($can_edit): ?>
-            <button type="button" id="viewOpEditBtn" onclick="triggerEditFromView()" class="movement-view-modal-btn movement-view-modal-btn-primary">
-                <i class="fas fa-edit"></i> تعديل
-            </button>
-            <?php endif; ?>
-            <button type="button" onclick="closeViewOperationModal()" class="movement-view-modal-btn movement-view-modal-btn-secondary">
-                <i class="fas fa-times"></i> إغلاق
-            </button>
-        </div>
-    </div>
-</div>
 
-<!-- موديل إنهاء الخدمة -->
-<div class="modal fade" id="endServiceModal" tabindex="-1" aria-labelledby="endServiceLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="post" action="">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="endServiceLabel">إنهاء الخدمة</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- مكتبة jQuery (مطلوبة أولاً) -->
+        <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+        <!-- حزمة Bootstrap (تشمل Popper) -->
+        <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!-- ملفات DataTables -->
+        <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+
+        <!-- مودال عرض بيانات التشغيل -->
+        <div id="viewOperationModal" class="modal movement-view-modal">
+            <div class="modal-content movement-view-modal-content">
+                <div class="modal-header movement-view-modal-header">
+                    <h5 class="movement-view-modal-title"><i class="fas fa-eye movement-view-modal-title-icon"></i>
+                        تفاصيل سجل التشغيل</h5>
+                    <button onclick="closeViewOperationModal()" class="movement-view-modal-close">&times;</button>
                 </div>
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="end_service" />
-                    <input type="hidden" name="operation_id" id="modal_operation_id" />
-                    <div class="mb-3">
-                        <label for="service_end_date" class="form-label">تاريخ الإنهاء</label>
-                        <input type="date" class="form-control" name="end_date" id="service_end_date" required />
+                <div class="modal-body movement-view-modal-body">
+                    <div class="movement-view-modal-grid">
+                        <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-cogs"></i> المعدة</div>
+                            <div class="movement-view-modal-value" id="view_op_equipment">-</div>
+                        </div>
+                        <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-truck"></i> المورد</div>
+                            <div class="movement-view-modal-value" id="view_op_supplier">-</div>
+                        </div>
+                        <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-mountain"></i> المنجم</div>
+                            <div class="movement-view-modal-value" id="view_op_mine">-</div>
+                        </div>
+                        <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-file-contract"></i> تاريخ توقيع
+                                العقد</div>
+                            <div class="movement-view-modal-value" id="view_op_contract">-</div>
+                        </div>
+                        <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-id-badge"></i> السائقون</div>
+                            <div class="movement-view-modal-value" id="view_op_drivers">-</div>
+                        </div>
+                        <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-check-circle"></i> نوع المعدة</div>
+                            <div class="movement-view-modal-value" id="view_op_category">-</div>
+                        </div>
+                        <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-calendar-alt"></i> تاريخ البداية
+                            </div>
+                            <div class="movement-view-modal-value" id="view_op_start">-</div>
+                        </div>
+                        <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-calendar-check"></i> تاريخ النهاية
+                            </div>
+                            <div class="movement-view-modal-value" id="view_op_end">-</div>
+                        </div>
+                        <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-clock"></i> ساعات العمل الكلية</div>
+                            <div class="movement-view-modal-value" id="view_op_total_hours">-</div>
+                        </div>
+                        <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-hourglass-half"></i> ساعات الوردية
+                            </div>
+                            <div class="movement-view-modal-value" id="view_op_shift_hours">-</div>
+                        </div>
+                        <div class="movement-view-modal-item movement-view-modal-item-wide">
+                            <div class="movement-view-modal-label"><i class="fas fa-toggle-on"></i> الحالة</div>
+                            <div id="view_op_status">-</div>
+                        </div>
+                        <div id="view_op_reason_block" class="movement-view-modal-reason movement-view-modal-item-wide">
+                            <div class="movement-view-modal-reason-label"><i class="fas fa-info-circle"></i> سبب الإنهاء
+                            </div>
+                            <div class="movement-view-modal-reason-value" id="view_op_reason">-</div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="service_reason" class="form-label">سبب الإنهاء</label>
-                        <textarea class="form-control" name="reason" id="service_reason" rows="3"></textarea>
-                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" name="end_service_cancel" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-                    <button type="submit" name="end_service_submit" class="btn btn-danger">تأكيد الإنهاء</button>
+                <div class="modal-footer movement-view-modal-footer">
+                    <?php if ($can_edit): ?>
+                        <button type="button" id="viewOpEditBtn" onclick="triggerEditFromView()"
+                            class="movement-view-modal-btn movement-view-modal-btn-primary">
+                            <i class="fas fa-edit"></i> تعديل
+                        </button>
+                    <?php endif; ?>
+                    <button type="button" onclick="closeViewOperationModal()"
+                        class="movement-view-modal-btn movement-view-modal-btn-secondary">
+                        <i class="fas fa-times"></i> إغلاق
+                    </button>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
-</div>
 
-<!-- إضافات DataTables للاستجابة والأزرار -->
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
-<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
-<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
-<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
+        <!-- موديل إنهاء الخدمة -->
+        <div class="modal fade" id="endServiceModal" tabindex="-1" aria-labelledby="endServiceLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="post" action="">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="endServiceLabel">إنهاء الخدمة</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="action" value="end_service" />
+                            <input type="hidden" name="operation_id" id="modal_operation_id" />
+                            <div class="mb-3">
+                                <label for="service_end_date" class="form-label">تاريخ الإنهاء</label>
+                                <input type="date" class="form-control" name="end_date" id="service_end_date"
+                                    required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="service_reason" class="form-label">سبب الإنهاء</label>
+                                <textarea class="form-control" name="reason" id="service_reason" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" name="end_service_cancel" class="btn btn-secondary"
+                                data-bs-dismiss="modal">إغلاق</button>
+                            <button type="submit" name="end_service_submit" class="btn btn-danger">تأكيد
+                                الإنهاء</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-<script>
-    function toggleOperationForm(event) {
-        if (event) {
-            event.preventDefault();
-        }
+        <!-- إضافات DataTables للاستجابة والأزرار -->
+        <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+        <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+        <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+        <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+        <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+        <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+        <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
-        const form = document.getElementById('projectForm');
-        if (!form) {
-            return false;
-        }
+        <script>
+            function toggleOperationForm(event) {
+                if (event) {
+                    event.preventDefault();
+                }
 
-        if (!form.classList.contains('allforms-visible')) {
-            const formTitle = document.getElementById('formTitle');
-            if (formTitle) {
-                formTitle.innerHTML = '<i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد';
+                const form = document.getElementById('projectForm');
+                if (!form) {
+                    return false;
+                }
+
+                if (!form.classList.contains('allforms-visible')) {
+                    const formTitle = document.getElementById('formTitle');
+                    if (formTitle) {
+                        formTitle.innerHTML = '<i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد';
+                    }
+
+                    const operationId = document.getElementById('operation_id');
+                    const contractId = document.getElementById('contract_id');
+                    const supplierId = document.getElementById('supplier_id');
+                    const typeId = document.getElementById('type');
+                    const equipmentId = document.getElementById('equipment');
+                    const startDate = document.getElementById('start_date');
+                    const endDate = document.getElementById('end_date');
+                    const totalEquipmentHours = document.getElementById('total_equipment_hours');
+                    const shiftHours = document.getElementById('shift_hours');
+                    const status = document.getElementById('status');
+
+                    if (operationId) operationId.value = '';
+                    if (contractId) contractId.innerHTML = '<option value="">-- جاري تحميل العقود... --</option>';
+                    if (supplierId) supplierId.innerHTML = '<option value="">-- اختر المورد --</option>';
+                    if (typeId) typeId.value = '';
+                    if (equipmentId) equipmentId.innerHTML = '<option value="">-- اختر المعدة --</option>';
+                    if (startDate) startDate.value = '';
+                    if (endDate) endDate.value = '';
+                    if (totalEquipmentHours) totalEquipmentHours.value = '0';
+                    if (shiftHours) shiftHours.value = '0';
+                    if (status) status.value = '1';
+
+                    form.classList.add('allforms-visible');
+
+                    // تحميل عقود المنجم تلقائياً من الجلسة
+                    var sessionMineId = <?php echo $user_mine_id; ?>;
+                    if (sessionMineId > 0) {
+                        $.ajax({
+                            url: "../Oprators/get_mine_contracts.php",
+                            type: "POST",
+                            dataType: "json",
+                            data: { mine_id: sessionMineId },
+                            success: function (response) {
+                                if (response.success) {
+                                    var opts = "<option value=''>-- اختر العقد --</option>";
+                                    response.contracts.forEach(function (c) {
+                                        opts += "<option value='" + c.id + "' data-end='" + c.end_date + "'>" + c.display_name + "</option>";
+                                    });
+                                    $("#contract_id").html(opts);
+                                } else {
+                                    $("#contract_id").html("<option value=''>-- لا توجد عقود --</option>");
+                                }
+                            },
+                            error: function () {
+                                $("#contract_id").html("<option value=''>-- خطأ في تحميل العقود --</option>");
+                            }
+                        });
+                    }
+                } else {
+                    form.classList.remove('allforms-visible');
+                }
+
+                return false;
             }
 
-            const operationId = document.getElementById('operation_id');
-            const contractId = document.getElementById('contract_id');
-            const supplierId = document.getElementById('supplier_id');
-            const typeId = document.getElementById('type');
-            const equipmentId = document.getElementById('equipment');
-            const startDate = document.getElementById('start_date');
-            const endDate = document.getElementById('end_date');
-            const totalEquipmentHours = document.getElementById('total_equipment_hours');
-            const shiftHours = document.getElementById('shift_hours');
-            const status = document.getElementById('status');
-
-            if (operationId) operationId.value = '';
-            if (contractId) contractId.innerHTML = '<option value="">-- جاري تحميل العقود... --</option>';
-            if (supplierId) supplierId.innerHTML = '<option value="">-- اختر المورد --</option>';
-            if (typeId) typeId.value = '';
-            if (equipmentId) equipmentId.innerHTML = '<option value="">-- اختر المعدة --</option>';
-            if (startDate) startDate.value = '';
-            if (endDate) endDate.value = '';
-            if (totalEquipmentHours) totalEquipmentHours.value = '0';
-            if (shiftHours) shiftHours.value = '0';
-            if (status) status.value = '1';
-
-            form.classList.add('allforms-visible');
-
-            // تحميل عقود المنجم تلقائياً من الجلسة
-            var sessionMineId = <?php echo $user_mine_id; ?>;
-            if (sessionMineId > 0) {
-                $.ajax({
-                    url: "../Oprators/get_mine_contracts.php",
-                    type: "POST",
-                    dataType: "json",
-                    data: { mine_id: sessionMineId },
-                    success: function(response) {
-                        if (response.success) {
-                            var opts = "<option value=''>-- اختر العقد --</option>";
-                            response.contracts.forEach(function(c) {
-                                opts += "<option value='" + c.id + "' data-end='" + c.end_date + "'>" + c.display_name + "</option>";
-                            });
-                            $("#contract_id").html(opts);
-                        } else {
-                            $("#contract_id").html("<option value=''>-- لا توجد عقود --</option>");
+            (function () {
+                // تشغيل DataTable بالعربية
+                // تشغيل DataTable بالعربية
+                $(document).ready(function () {
+                    $('#projectsTable').DataTable({
+                        dom: 'Bfrtip', // أزرار + بحث + ترقيم الصفحات
+                        buttons: [
+                            { extend: 'copy', text: 'نسخ' },
+                            { extend: 'excel', text: 'تصدير Excel' },
+                            { extend: 'csv', text: 'تصدير CSV' },
+                            { extend: 'pdf', text: 'تصدير PDF' },
+                            { extend: 'print', text: 'طباعة' }
+                        ],
+                        "language": {
+                            "url": "https:/ems/assets/i18n/datatables/ar.json"
                         }
-                    },
-                    error: function() {
-                        $("#contract_id").html("<option value=''>-- خطأ في تحميل العقود --</option>");
+                    });
+                });
+
+            })();
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const toggleFormBtn = document.getElementById('toggleForm');
+                if (!toggleFormBtn) {
+                    return;
+                }
+
+                toggleFormBtn.addEventListener('click', function (event) {
+                    toggleOperationForm(event);
+                });
+            });
+
+            $(document).ready(function () {
+                function resetEquipment() {
+                    $("#equipment").html("<option value=''>-- اختر المعدة --</option>");
+                }
+
+                function resetSupplier() {
+                    $("#supplier_id").html("<option value=''>-- اختر المورد --</option>");
+                }
+
+                function resetStats() {
+                    $("#contractStats").hide();
+                    $("#suppliersSection").hide();
+                    $("#suppliersTableBody").html("<tr><td colspan='9' class='suppliers-empty'><i class='fas fa-info-circle'></i> لا توجد بيانات</td></tr>");
+                    $("#stat_total_hours").text("0");
+                    $("#stat_equipment_count").text("0");
+                    $("#total_supplier_hours").text("0");
+                    $("#total_supplier_equipment").text("0");
+                    $("#total_supplier_basic").text("0");
+                    $("#total_supplier_backup").text("0");
+                    $("#total_added_equipment").text("0");
+                    $("#total_remaining_equipment").text("0");
+                }
+
+                function renderStats(response) {
+                    if (!response || !response.success) {
+                        resetStats();
+                        return;
+                    }
+
+                    $("#contractStats").show();
+                    $("#stat_total_hours").text(parseFloat(response.contract.total_hours || 0).toLocaleString());
+                    $("#stat_equipment_count").text(parseInt(response.contract.equipment_count || 0, 10).toLocaleString());
+
+                    if (response.suppliers && response.suppliers.length > 0) {
+                        $("#suppliersSection").show();
+                        var rows = "";
+                        var totalAdded = 0;
+                        var totalRemaining = 0;
+                        var totalBasic = 0;
+                        var totalBackup = 0;
+
+                        response.suppliers.forEach(function (supplier, index) {
+                            var breakdownHtml = "";
+                            if (supplier.equipment_breakdown && supplier.equipment_breakdown.length > 0) {
+                                breakdownHtml = supplier.equipment_breakdown.map(function (item) {
+                                    var addedCount = item.added_count || 0;
+                                    var remaining = item.remaining || 0;
+                                    var statusClass = remaining === 0 ? 'is-active' : (addedCount > 0 ? 'is-warning' : 'is-muted');
+                                    var basicInfo = item.count_basic > 0 ? '<span class="breakdown-tag is-basic">أساسي:' + item.count_basic + '</span>' : '';
+                                    var backupInfo = item.count_backup > 0 ? '<span class="breakdown-tag is-backup">احتياطي:' + item.count_backup + '</span>' : '';
+
+                                    return '<div class="breakdown-item">' +
+                                        '<i class="fas fa-tools"></i> <strong>' + (item.type || 'غير محدد') + '</strong>: ' +
+                                        item.count + ' متعاقد ' + basicInfo + ' ' + backupInfo + ' | ' +
+                                        '<span class="breakdown-count ' + statusClass + '">' + addedCount + ' مضاف</span> | ' +
+                                        '<span class="breakdown-count ' + (remaining === 0 ? 'is-active' : 'is-warning') + '">' + remaining + ' متبقي</span> | ' +
+                                        '<i class="fas fa-clock"></i> ' + parseFloat(item.hours || 0).toLocaleString() + ' ساعة' +
+                                        '</div>';
+                                }).join('');
+                            } else {
+                                breakdownHtml = '<span class="breakdown-empty">لا توجد تفاصيل</span>';
+                            }
+
+                            var addedEquipment = supplier.added_to_equipments || 0;
+                            var remainingEquipment = supplier.remaining_to_add || 0;
+                            var supplierBasic = supplier.equipment_count_basic || 0;
+                            var supplierBackup = supplier.equipment_count_backup || 0;
+
+                            totalAdded += addedEquipment;
+                            totalRemaining += remainingEquipment;
+                            totalBasic += supplierBasic;
+                            totalBackup += supplierBackup;
+
+                            var addedBadgeClass = 'badge-available';
+                            var remainingBadgeClass = 'badge-busy';
+
+                            if (remainingEquipment === 0) {
+                                addedBadgeClass = 'badge-available';
+                                remainingBadgeClass = 'badge-available';
+                            } else if (addedEquipment > 0) {
+                                addedBadgeClass = 'badge-working';
+                                remainingBadgeClass = 'badge-working';
+                            }
+
+                            rows += '<tr>' +
+                                '<td class="text-center">' + (index + 1) + '</td>' +
+                                '<td><strong>' + (supplier.supplier_name || '-') + '</strong></td>' +
+                                '<td class="text-center">' + parseFloat(supplier.hours || 0).toLocaleString() + '</td>' +
+                                '<td class="text-center">' + (supplier.equipment_count || 0) + '</td>' +
+                                '<td class="suppliers-basic-count">' + supplierBasic + '</td>' +
+                                '<td class="suppliers-backup-count">' + supplierBackup + '</td>' +
+                                '<td class="text-center">' +
+                                '<span class="' + addedBadgeClass + '"><i class="fas fa-check"></i> ' + addedEquipment + '</span>' +
+                                '</td>' +
+                                '<td class="text-center">' +
+                                '<span class="' + remainingBadgeClass + '"><i class="fas fa-' + (remainingEquipment === 0 ? 'check-circle' : 'exclamation-triangle') + '"></i> ' + remainingEquipment + '</span>' +
+                                '</td>' +
+                                '<td class="suppliers-breakdown">' + breakdownHtml + '</td>' +
+                                '</tr>';
+                        });
+
+                        $("#suppliersTableBody").html(rows);
+                        $("#total_supplier_hours").text(parseFloat(response.summary.total_supplier_hours || 0).toLocaleString());
+                        $("#total_supplier_equipment").text(response.summary.total_supplier_equipment || 0);
+                        $("#total_supplier_basic").text(totalBasic);
+                        $("#total_supplier_backup").text(totalBackup);
+                        $("#total_added_equipment").text(totalAdded);
+                        $("#total_remaining_equipment").text(totalRemaining);
+                    } else {
+                        $("#suppliersSection").hide();
+                    }
+                }
+
+                function loadEquipments() {
+                    var type = $("#type").val();
+                    var supplierId = $("#supplier_id").val();
+                    if (type !== "" && supplierId !== "") {
+                        $.ajax({
+                            url: "../Oprators/getoprator.php",
+                            type: "GET",
+                            data: { type: type, supplier_id: supplierId },
+                            success: function (response) {
+                                $("#equipment").html(response);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("❌ AJAX Error:", error);
+                            }
+                        });
+                    } else {
+                        resetEquipment();
+                    }
+                }
+
+                // لم نعد بحاجة لـ event listener للمنجم - المنجم محدد من الجلسة تلقائياً
+
+                $("#contract_id").change(function () {
+                    var contractId = $(this).val();
+                    var endDate = $(this).find(":selected").data("end") || "";
+                    resetSupplier();
+                    $("#type").val("");
+                    resetEquipment();
+                    resetStats();
+                    if (endDate !== "") {
+                        $("#end_date").val(endDate);
+                    }
+
+                    if (contractId !== "") {
+                        $.ajax({
+                            url: "../Oprators/get_contract_suppliers.php",
+                            type: "POST",
+                            dataType: "json",
+                            data: { contract_id: contractId },
+                            success: function (response) {
+                                if (response.success) {
+                                    var options = "<option value=''>-- اختر المورد --</option>";
+                                    response.suppliers.forEach(function (supplier) {
+                                        options += "<option value='" + supplier.id + "'>" + supplier.name + "</option>";
+                                    });
+                                    $("#supplier_id").html(options);
+                                }
+                            }
+                        });
+
+                        $.ajax({
+                            url: "../Oprators/get_contract_stats.php",
+                            type: "GET",
+                            dataType: "json",
+                            data: { contract_id: contractId },
+                            success: function (response) {
+                                renderStats(response);
+                            },
+                            error: function () {
+                                resetStats();
+                            }
+                        });
                     }
                 });
+
+                $("#type").change(function () {
+                    loadEquipments();
+                });
+
+                $("#supplier_id").change(function () {
+                    loadEquipments();
+                });
+
+                $(document).on("click", ".end-service-btn", function (e) {
+                    e.preventDefault();
+                    var opId = $(this).data('id');
+                    console.log('ðŸ”´ زر إنهاء الخدمة - ID:', opId);
+                });
+
+                $("#endServiceModal").on("show.bs.modal", function (event) {
+                    var button = $(event.relatedTarget);
+                    var opId = button.data("id") || "";
+                    console.log('ðŸš¨ إنهاء خدمة التشغيل رقم:', opId);
+                    $("#modal_operation_id").val(opId);
+                    $("#service_end_date").val("");
+                    $("#service_reason").val("");
+                });
+
+                // وظيفة التعديل
+                $(document).on('click', '.editOperationBtn', function () {
+                    var btn = $(this);
+
+                    console.log('ðŸ”§ بدء التعديل - ID:', btn.data('id'));
+
+                    // تغيير عنوان النموذج
+                    $('#formTitle').html('<i class="fa fa-edit"></i> تعديل بيانات التشغيل');
+
+                    // إظهار النموذج
+                    $('#projectForm').addClass('allforms-visible').show();
+                    $('html, body').animate({ scrollTop: $('#projectForm').offset().top - 100 }, 500);
+
+                    // ملء البيانات الأساسية
+                    $('#operation_id').val(btn.data('id'));
+                    $('#start_date').val(btn.data('start'));
+                    $('#end_date').val(btn.data('end'));
+                    $('#total_equipment_hours').val(btn.data('total-hours'));
+                    $('#shift_hours').val(btn.data('shift-hours'));
+                    $('#status').val(btn.data('status'));
+                    $('#equipment_category').val(btn.data('equipment-category'));
+
+                    console.log('✅ تم ملء البيانات الأساسية');
+
+                    // mine_id محدد من الجلسة تلقائياً
+                    var mineId = <?php echo $user_mine_id; ?>;
+
+                    console.log('ðŸ“ تحميل العقود للمنجم:', mineId);
+
+                    // تحميل العقود للمنجم المحدد
+                    setTimeout(function () {
+                        $.ajax({
+                            url: "../Oprators/get_mine_contracts.php",
+                            type: "POST",
+                            dataType: "json",
+                            data: { mine_id: mineId },
+                            success: function (response) {
+                                console.log('ðŸ“‹ استجابة العقود:', response);
+                                if (response.success) {
+                                    var options = "<option value=''>-- اختر العقد --</option>";
+                                    response.contracts.forEach(function (contract) {
+                                        var selected = (contract.id == btn.data('contract')) ? 'selected' : '';
+                                        options += "<option value='" + contract.id + "' data-end='" + contract.end_date + "' " + selected + ">" + contract.display_name + "</option>";
+                                    });
+                                    $('#contract_id').html(options);
+
+                                    console.log('✅ تم تحميل العقود');
+
+                                    // تحميل الموردين للعقد المحدد
+                                    setTimeout(function () {
+                                        var contractId = btn.data('contract');
+                                        console.log('ðŸ¢ تحميل الموردين للعقد:', contractId);
+
+                                        $.ajax({
+                                            url: "../Oprators/get_contract_suppliers.php",
+                                            type: "POST",
+                                            dataType: "json",
+                                            data: { contract_id: contractId },
+                                            success: function (response) {
+                                                console.log('ðŸª استجابة الموردين:', response);
+                                                if (response.success) {
+                                                    var options = "<option value=''>-- اختر المورد --</option>";
+                                                    response.suppliers.forEach(function (supplier) {
+                                                        var selected = (supplier.id == btn.data('supplier')) ? 'selected' : '';
+                                                        options += "<option value='" + supplier.id + "' " + selected + ">" + supplier.name + "</option>";
+                                                    });
+                                                    $('#supplier_id').html(options);
+
+                                                    console.log('✅ تم تحميل الموردين');
+
+                                                    // تحديد نوع المعدة
+                                                    $('#type').val(btn.data('equipment-type'));
+
+                                                    console.log('ðŸ”§ نوع المعدة:', btn.data('equipment-type'));
+
+                                                    // تحميل المعدات
+                                                    setTimeout(function () {
+                                                        console.log('ðŸšœ تحميل المعدات...');
+                                                        loadEquipmentsForEdit(btn.data('equipment'));
+                                                    }, 300);
+                                                }
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.error('❌ خطأ في تحميل الموردين:', error);
+                                            }
+                                        });
+                                    }, 300);
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('❌ خطأ في تحميل العقود:', error);
+                            }
+                        });
+                    }, 300);
+                });
+
+                // دالة تحميل المعدات مع تحديد المعدة المختارة
+                function loadEquipmentsForEdit(selectedEquipmentId) {
+                    var typeId = $("#type").val();
+                    var supplierId = $("#supplier_id").val();
+
+                    console.log('ðŸšœ تحميل المعدات - النوع:', typeId, '| المورد:', supplierId, '| المعدة المختارة:', selectedEquipmentId);
+
+                    if (typeId && supplierId) {
+                        $.ajax({
+                            url: "../Oprators/getoprator.php",
+                            type: "GET",
+                            data: {
+                                type: typeId,
+                                supplier_id: supplierId,
+                                current_equipment: selectedEquipmentId
+                            },
+                            success: function (data) {
+                                console.log('✅ تم تحميل المعدات بنجاح');
+                                $("#equipment").html(data);
+                                $("#equipment").val(selectedEquipmentId);
+                                console.log('✅ تم تحديد المعدة:', selectedEquipmentId);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("❌ خطأ في تحميل المعدات:", error);
+                                $("#equipment").html("<option value=''>خطأ في التحميل</option>");
+                            }
+                        });
+                    } else {
+                        console.warn('⚠️ النوع أو المورد غير محدد');
+                    }
+                }
+
+                // ── مودال عرض بيانات التشغيل ──────────────────────────────────────
+                var _viewOpEditData = {};
+
+                $(document).on('click', '.viewOperationBtn', function () {
+                    var btn = $(this);
+                    $('#view_op_equipment').text(btn.data('equipment') || '-');
+                    $('#view_op_supplier').text(btn.data('supplier') || '-');
+                    $('#view_op_mine').text(btn.data('mine') || '-');
+                    $('#view_op_contract').text(btn.data('contract') || '-');
+                    $('#view_op_drivers').text(btn.data('drivers') || '-');
+                    $('#view_op_start').text(btn.data('start') || '-');
+                    $('#view_op_end').text(btn.data('end') || '-');
+                    $('#view_op_total_hours').text(btn.data('total-hours') || '0');
+                    $('#view_op_shift_hours').text(btn.data('shift-hours') || '0');
+                    $('#view_op_category').text(btn.data('category') || '-');
+
+                    var statusLabel = btn.data('status') || '-';
+                    var statusClass = btn.data('status-class') || '';
+                    $('#view_op_status').html("<span class='status-pill " + statusClass + "'>" + statusLabel + "</span>");
+
+                    // سبب الإنهاء - يظهر فقط للسجلات المنتهية
+                    var reason = btn.data('reason') || '';
+                    if (statusClass === 'status-idle' && reason !== '') {
+                        $('#view_op_reason').text(reason);
+                        $('#view_op_reason_block').show();
+                    } else {
+                        $('#view_op_reason').text('-');
+                        $('#view_op_reason_block').hide();
+                    }
+
+                    // حفظ data-id للتعديل
+                    _viewOpEditData = { id: btn.data('id') };
+
+                    $('#viewOperationModal').css('display', 'flex').hide().fadeIn(300);
+                });
+            });
+
+            function closeViewOperationModal() {
+                $('#viewOperationModal').fadeOut(300);
             }
-        } else {
-            form.classList.remove('allforms-visible');
-        }
 
-        return false;
-    }
+            function triggerEditFromView() {
+                closeViewOperationModal();
+                setTimeout(function () {
+                    var editBtn = $('.editOperationBtn[data-id="' + _viewOpEditData.id + '"]');
+                    if (editBtn.length) {
+                        editBtn.trigger('click');
+                    }
+                }, 350);
+            }
 
-    (function () {
-        // تشغيل DataTable بالعربية
-        // تشغيل DataTable بالعربية
-        $(document).ready(function () {
-            $('#projectsTable').DataTable({
-                dom: 'Bfrtip', // أزرار + بحث + ترقيم الصفحات
-                buttons: [
-                    { extend: 'copy', text: 'نسخ' },
-                    { extend: 'excel', text: 'تصدير Excel' },
-                    { extend: 'csv', text: 'تصدير CSV' },
-                    { extend: 'pdf', text: 'تصدير PDF' },
-                    { extend: 'print', text: 'طباعة' }
-                ],
-                "language": {
-                    "url": "https:/ems/assets/i18n/datatables/ar.json"
+            // إغلاق عند الضغط خارج المودال
+            $(document).on('click', '#viewOperationModal', function (e) {
+                if ($(e.target).is('#viewOperationModal')) {
+                    closeViewOperationModal();
                 }
             });
-        });
 
-    })();
+            // إغلاق بـ ESC
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Escape' && $('#viewOperationModal').is(':visible')) {
+                    closeViewOperationModal();
+                }
+            });
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const toggleFormBtn = document.getElementById('toggleForm');
-        if (!toggleFormBtn) {
-            return;
-        }
+        </script>
 
-        toggleFormBtn.addEventListener('click', function (event) {
-            toggleOperationForm(event);
-        });
-    });
+    </div><!-- /.main -->
 
-    $(document).ready(function () {
-        function resetEquipment() {
-            $("#equipment").html("<option value=''>-- اختر المعدة --</option>");
-        }
+    </body>
 
-        function resetSupplier() {
-            $("#supplier_id").html("<option value=''>-- اختر المورد --</option>");
-        }
-
-        function resetStats() {
-            $("#contractStats").hide();
-            $("#suppliersSection").hide();
-            $("#suppliersTableBody").html("<tr><td colspan='9' class='suppliers-empty'><i class='fas fa-info-circle'></i> لا توجد بيانات</td></tr>");
-            $("#stat_total_hours").text("0");
-            $("#stat_equipment_count").text("0");
-            $("#total_supplier_hours").text("0");
-            $("#total_supplier_equipment").text("0");
-            $("#total_supplier_basic").text("0");
-            $("#total_supplier_backup").text("0");
-            $("#total_added_equipment").text("0");
-            $("#total_remaining_equipment").text("0");
-        }
-
-        function renderStats(response) {
-            if (!response || !response.success) {
-                resetStats();
-                return;
-            }
-
-            $("#contractStats").show();
-            $("#stat_total_hours").text(parseFloat(response.contract.total_hours || 0).toLocaleString());
-            $("#stat_equipment_count").text(parseInt(response.contract.equipment_count || 0, 10).toLocaleString());
-
-            if (response.suppliers && response.suppliers.length > 0) {
-                $("#suppliersSection").show();
-                var rows = "";
-                var totalAdded = 0;
-                var totalRemaining = 0;
-                var totalBasic = 0;
-                var totalBackup = 0;
-
-                response.suppliers.forEach(function (supplier, index) {
-                    var breakdownHtml = "";
-                    if (supplier.equipment_breakdown && supplier.equipment_breakdown.length > 0) {
-                        breakdownHtml = supplier.equipment_breakdown.map(function (item) {
-                            var addedCount = item.added_count || 0;
-                            var remaining = item.remaining || 0;
-                            var statusClass = remaining === 0 ? 'is-active' : (addedCount > 0 ? 'is-warning' : 'is-muted');
-                            var basicInfo = item.count_basic > 0 ? '<span class="breakdown-tag is-basic">أساسي:' + item.count_basic + '</span>' : '';
-                            var backupInfo = item.count_backup > 0 ? '<span class="breakdown-tag is-backup">احتياطي:' + item.count_backup + '</span>' : '';
-
-                            return '<div class="breakdown-item">' +
-                                '<i class="fas fa-tools"></i> <strong>' + (item.type || 'غير محدد') + '</strong>: ' +
-                                item.count + ' متعاقد ' + basicInfo + ' ' + backupInfo + ' | ' +
-                                '<span class="breakdown-count ' + statusClass + '">' + addedCount + ' مضاف</span> | ' +
-                                '<span class="breakdown-count ' + (remaining === 0 ? 'is-active' : 'is-warning') + '">' + remaining + ' متبقي</span> | ' +
-                                '<i class="fas fa-clock"></i> ' + parseFloat(item.hours || 0).toLocaleString() + ' ساعة' +
-                                '</div>';
-                        }).join('');
-                    } else {
-                        breakdownHtml = '<span class="breakdown-empty">لا توجد تفاصيل</span>';
-                    }
-
-                    var addedEquipment = supplier.added_to_equipments || 0;
-                    var remainingEquipment = supplier.remaining_to_add || 0;
-                    var supplierBasic = supplier.equipment_count_basic || 0;
-                    var supplierBackup = supplier.equipment_count_backup || 0;
-                    
-                    totalAdded += addedEquipment;
-                    totalRemaining += remainingEquipment;
-                    totalBasic += supplierBasic;
-                    totalBackup += supplierBackup;
-
-                    var addedBadgeClass = 'badge-available';
-                    var remainingBadgeClass = 'badge-busy';
-
-                    if (remainingEquipment === 0) {
-                        addedBadgeClass = 'badge-available';
-                        remainingBadgeClass = 'badge-available';
-                    } else if (addedEquipment > 0) {
-                        addedBadgeClass = 'badge-working';
-                        remainingBadgeClass = 'badge-working';
-                    }
-
-                    rows += '<tr>' +
-                        '<td class="text-center">' + (index + 1) + '</td>' +
-                        '<td><strong>' + (supplier.supplier_name || '-') + '</strong></td>' +
-                        '<td class="text-center">' + parseFloat(supplier.hours || 0).toLocaleString() + '</td>' +
-                        '<td class="text-center">' + (supplier.equipment_count || 0) + '</td>' +
-                        '<td class="suppliers-basic-count">' + supplierBasic + '</td>' +
-                        '<td class="suppliers-backup-count">' + supplierBackup + '</td>' +
-                        '<td class="text-center">' +
-                        '<span class="' + addedBadgeClass + '"><i class="fas fa-check"></i> ' + addedEquipment + '</span>' +
-                        '</td>' +
-                        '<td class="text-center">' +
-                        '<span class="' + remainingBadgeClass + '"><i class="fas fa-' + (remainingEquipment === 0 ? 'check-circle' : 'exclamation-triangle') + '"></i> ' + remainingEquipment + '</span>' +
-                        '</td>' +
-                        '<td class="suppliers-breakdown">' + breakdownHtml + '</td>' +
-                        '</tr>';
-                });
-
-                $("#suppliersTableBody").html(rows);
-                $("#total_supplier_hours").text(parseFloat(response.summary.total_supplier_hours || 0).toLocaleString());
-                $("#total_supplier_equipment").text(response.summary.total_supplier_equipment || 0);
-                $("#total_supplier_basic").text(totalBasic);
-                $("#total_supplier_backup").text(totalBackup);
-                $("#total_added_equipment").text(totalAdded);
-                $("#total_remaining_equipment").text(totalRemaining);
-            } else {
-                $("#suppliersSection").hide();
-            }
-        }
-
-        function loadEquipments() {
-            var type = $("#type").val();
-            var supplierId = $("#supplier_id").val();
-            if (type !== "" && supplierId !== "") {
-                $.ajax({
-                    url: "../Oprators/getoprator.php",
-                    type: "GET",
-                    data: { type: type, supplier_id: supplierId },
-                    success: function (response) {
-                        $("#equipment").html(response);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("❌ AJAX Error:", error);
-                    }
-                });
-            } else {
-                resetEquipment();
-            }
-        }
-
-        // لم نعد بحاجة لـ event listener للمنجم - المنجم محدد من الجلسة تلقائياً
-
-        $("#contract_id").change(function () {
-            var contractId = $(this).val();
-            var endDate = $(this).find(":selected").data("end") || "";
-            resetSupplier();
-            $("#type").val("");
-            resetEquipment();
-            resetStats();
-            if (endDate !== "") {
-                $("#end_date").val(endDate);
-            }
-
-            if (contractId !== "") {
-                $.ajax({
-                    url: "../Oprators/get_contract_suppliers.php",
-                    type: "POST",
-                    dataType: "json",
-                    data: { contract_id: contractId },
-                    success: function (response) {
-                        if (response.success) {
-                            var options = "<option value=''>-- اختر المورد --</option>";
-                            response.suppliers.forEach(function (supplier) {
-                                options += "<option value='" + supplier.id + "'>" + supplier.name + "</option>";
-                            });
-                            $("#supplier_id").html(options);
-                        }
-                    }
-                });
-
-                $.ajax({
-                    url: "../Oprators/get_contract_stats.php",
-                    type: "GET",
-                    dataType: "json",
-                    data: { contract_id: contractId },
-                    success: function (response) {
-                        renderStats(response);
-                    },
-                    error: function () {
-                        resetStats();
-                    }
-                });
-            }
-        });
-
-        $("#type").change(function () {
-            loadEquipments();
-        });
-
-        $("#supplier_id").change(function () {
-            loadEquipments();
-        });
-
-        $(document).on("click", ".end-service-btn", function (e) {
-            e.preventDefault();
-            var opId = $(this).data('id');
-            console.log('ðŸ”´ زر إنهاء الخدمة - ID:', opId);
-        });
-
-        $("#endServiceModal").on("show.bs.modal", function (event) {
-            var button = $(event.relatedTarget);
-            var opId = button.data("id") || "";
-            console.log('ðŸš¨ إنهاء خدمة التشغيل رقم:', opId);
-            $("#modal_operation_id").val(opId);
-            $("#service_end_date").val("");
-            $("#service_reason").val("");
-        });
-        
-        // وظيفة التعديل
-        $(document).on('click', '.editOperationBtn', function() {
-            var btn = $(this);
-            
-            console.log('ðŸ”§ بدء التعديل - ID:', btn.data('id'));
-            
-            // تغيير عنوان النموذج
-            $('#formTitle').html('<i class="fa fa-edit"></i> تعديل بيانات التشغيل');
-            
-            // إظهار النموذج
-            $('#projectForm').addClass('allforms-visible').show();
-            $('html, body').animate({scrollTop: $('#projectForm').offset().top - 100}, 500);
-            
-            // ملء البيانات الأساسية
-            $('#operation_id').val(btn.data('id'));
-            $('#start_date').val(btn.data('start'));
-            $('#end_date').val(btn.data('end'));
-            $('#total_equipment_hours').val(btn.data('total-hours'));
-            $('#shift_hours').val(btn.data('shift-hours'));
-            $('#status').val(btn.data('status'));
-            $('#equipment_category').val(btn.data('equipment-category'));
-            
-            console.log('✅ تم ملء البيانات الأساسية');
-            
-            // mine_id محدد من الجلسة تلقائياً
-            var mineId = <?php echo $user_mine_id; ?>;
-            
-            console.log('ðŸ“ تحميل العقود للمنجم:', mineId);
-            
-            // تحميل العقود للمنجم المحدد
-            setTimeout(function() {
-                $.ajax({
-                    url: "../Oprators/get_mine_contracts.php",
-                    type: "POST",
-                    dataType: "json",
-                    data: { mine_id: mineId },
-                    success: function (response) {
-                        console.log('ðŸ“‹ استجابة العقود:', response);
-                        if (response.success) {
-                            var options = "<option value=''>-- اختر العقد --</option>";
-                            response.contracts.forEach(function (contract) {
-                                var selected = (contract.id == btn.data('contract')) ? 'selected' : '';
-                                options += "<option value='" + contract.id + "' data-end='" + contract.end_date + "' " + selected + ">" + contract.display_name + "</option>";
-                            });
-                            $('#contract_id').html(options);
-                            
-                            console.log('✅ تم تحميل العقود');
-                            
-                            // تحميل الموردين للعقد المحدد
-                            setTimeout(function() {
-                                var contractId = btn.data('contract');
-                                console.log('ðŸ¢ تحميل الموردين للعقد:', contractId);
-                                
-                                $.ajax({
-                                    url: "../Oprators/get_contract_suppliers.php",
-                                    type: "POST",
-                                    dataType: "json",
-                                    data: { contract_id: contractId },
-                                    success: function (response) {
-                                        console.log('ðŸª استجابة الموردين:', response);
-                                        if (response.success) {
-                                            var options = "<option value=''>-- اختر المورد --</option>";
-                                            response.suppliers.forEach(function (supplier) {
-                                                var selected = (supplier.id == btn.data('supplier')) ? 'selected' : '';
-                                                options += "<option value='" + supplier.id + "' " + selected + ">" + supplier.name + "</option>";
-                                            });
-                                            $('#supplier_id').html(options);
-                                            
-                                            console.log('✅ تم تحميل الموردين');
-                                            
-                                            // تحديد نوع المعدة
-                                            $('#type').val(btn.data('equipment-type'));
-                                            
-                                            console.log('ðŸ”§ نوع المعدة:', btn.data('equipment-type'));
-                                            
-                                            // تحميل المعدات
-                                            setTimeout(function() {
-                                                console.log('ðŸšœ تحميل المعدات...');
-                                                loadEquipmentsForEdit(btn.data('equipment'));
-                                            }, 300);
-                                        }
-                                    },
-                                    error: function(xhr, status, error) {
-                                        console.error('❌ خطأ في تحميل الموردين:', error);
-                                    }
-                                });
-                            }, 300);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('❌ خطأ في تحميل العقود:', error);
-                    }
-                });
-            }, 300);
-        });
-        
-        // دالة تحميل المعدات مع تحديد المعدة المختارة
-        function loadEquipmentsForEdit(selectedEquipmentId) {
-            var typeId = $("#type").val();
-            var supplierId = $("#supplier_id").val();
-            
-            console.log('ðŸšœ تحميل المعدات - النوع:', typeId, '| المورد:', supplierId, '| المعدة المختارة:', selectedEquipmentId);
-            
-            if (typeId && supplierId) {
-                $.ajax({
-                    url: "../Oprators/getoprator.php",
-                    type: "GET",
-                    data: { 
-                        type: typeId,
-                        supplier_id: supplierId,
-                        current_equipment: selectedEquipmentId
-                    },
-                    success: function (data) {
-                        console.log('✅ تم تحميل المعدات بنجاح');
-                        $("#equipment").html(data);
-                        $("#equipment").val(selectedEquipmentId);
-                        console.log('✅ تم تحديد المعدة:', selectedEquipmentId);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("❌ خطأ في تحميل المعدات:", error);
-                        $("#equipment").html("<option value=''>خطأ في التحميل</option>");
-                    }
-                });
-            } else {
-                console.warn('⚠️ النوع أو المورد غير محدد');
-            }
-        }
-
-        // ── مودال عرض بيانات التشغيل ──────────────────────────────────────
-        var _viewOpEditData = {};
-
-        $(document).on('click', '.viewOperationBtn', function () {
-            var btn = $(this);
-            $('#view_op_equipment').text(btn.data('equipment') || '-');
-            $('#view_op_supplier').text(btn.data('supplier') || '-');
-            $('#view_op_mine').text(btn.data('mine') || '-');
-            $('#view_op_contract').text(btn.data('contract') || '-');
-            $('#view_op_drivers').text(btn.data('drivers') || '-');
-            $('#view_op_start').text(btn.data('start') || '-');
-            $('#view_op_end').text(btn.data('end') || '-');
-            $('#view_op_total_hours').text(btn.data('total-hours') || '0');
-            $('#view_op_shift_hours').text(btn.data('shift-hours') || '0');
-            $('#view_op_category').text(btn.data('category') || '-');
-
-            var statusLabel = btn.data('status') || '-';
-            var statusClass = btn.data('status-class') || '';
-            $('#view_op_status').html("<span class='status-pill " + statusClass + "'>" + statusLabel + "</span>");
-
-            // سبب الإنهاء - يظهر فقط للسجلات المنتهية
-            var reason = btn.data('reason') || '';
-            if (statusClass === 'status-idle' && reason !== '') {
-                $('#view_op_reason').text(reason);
-                $('#view_op_reason_block').show();
-            } else {
-                $('#view_op_reason').text('-');
-                $('#view_op_reason_block').hide();
-            }
-
-            // حفظ data-id للتعديل
-            _viewOpEditData = { id: btn.data('id') };
-
-            $('#viewOperationModal').css('display', 'flex').hide().fadeIn(300);
-        });
-    });
-
-    function closeViewOperationModal() {
-        $('#viewOperationModal').fadeOut(300);
-    }
-
-    function triggerEditFromView() {
-        closeViewOperationModal();
-        setTimeout(function () {
-            var editBtn = $('.editOperationBtn[data-id="' + _viewOpEditData.id + '"]');
-            if (editBtn.length) {
-                editBtn.trigger('click');
-            }
-        }, 350);
-    }
-
-    // إغلاق عند الضغط خارج المودال
-    $(document).on('click', '#viewOperationModal', function (e) {
-        if ($(e.target).is('#viewOperationModal')) {
-            closeViewOperationModal();
-        }
-    });
-
-    // إغلاق بـ ESC
-    $(document).on('keydown', function (e) {
-        if (e.key === 'Escape' && $('#viewOperationModal').is(':visible')) {
-            closeViewOperationModal();
-        }
-    });
-
-</script>
-
-</div><!-- /.main -->
-
-</body>
-
-</html>
-
-
-
-
+    </html>
