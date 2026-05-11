@@ -1,6 +1,9 @@
 <?php
-header('Content-Type: application/json; charset=utf-8');
 session_start();
+
+while (ob_get_level()) ob_end_clean();
+
+header('Content-Type: application/json; charset=utf-8');
 
 // تضمين ملف الاتصال بقاعدة البيانات
 require_once '../config.php';

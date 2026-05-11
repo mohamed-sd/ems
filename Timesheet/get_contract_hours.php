@@ -1,6 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
+    while (ob_get_level()) ob_end_clean();
     echo 0;
     exit;
 }
@@ -12,6 +13,7 @@ $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'][
 $project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
 
 if (!$is_super_admin && $company_id <= 0) {
+    while (ob_get_level()) ob_end_clean();
     echo 0;
     exit;
 }
@@ -35,10 +37,12 @@ if (isset($_GET['operation_id'])) {
 
     $query = "SELECT shift_hours FROM operations WHERE id = $operation_id" . $scope;
     $result = mysqli_query($conn, $query);
-    
+
+    while (ob_get_level()) ob_end_clean();
+
     if ($result && mysqli_num_rows($result) > 0) {
         $op = mysqli_fetch_assoc($result);
-        
+
         // إذا كانت القيمة موجودة ولها قيمة، نرجعها
         if (isset($op['shift_hours']) && $op['shift_hours'] > 0) {
             echo $op['shift_hours'];
@@ -51,6 +55,7 @@ if (isset($_GET['operation_id'])) {
         echo 10;
     }
 } else {
+    while (ob_get_level()) ob_end_clean();
     echo 0;
 }
 ?>

@@ -3,14 +3,15 @@ include '../config.php';
 require_login();
 require_once '../includes/approval_workflow.php';
 
+while (ob_get_level()) ob_end_clean();
 header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
+    die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة'], JSON_UNESCAPED_UNICODE));
 }
 
 if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-    die(json_encode(['success' => false, 'message' => 'رمز التحقق غير صالح']));
+    die(json_encode(['success' => false, 'message' => 'رمز التحقق غير صالح'], JSON_UNESCAPED_UNICODE));
 }
 
 $api_action = isset($_POST['api_action']) ? trim($_POST['api_action']) : '';
@@ -24,7 +25,7 @@ if ($api_action === 'create') {
 
     $payload = json_decode($payload_raw, true);
     if (!is_array($payload)) {
-        die(json_encode(['success' => false, 'message' => 'payload غير صالح']));
+        die(json_encode(['success' => false, 'message' => 'payload غير صالح'], JSON_UNESCAPED_UNICODE));
     }
 
     $result = approval_create_request($entity_type, $entity_id, $action, $payload, $user_id, $conn);

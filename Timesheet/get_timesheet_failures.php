@@ -2,20 +2,23 @@
 session_start();
 if (!isset($_SESSION['user'])) {
     http_response_code(401);
-    die(json_encode(['success' => false, 'message' => 'Unauthorized']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'Unauthorized'], JSON_UNESCAPED_UNICODE));
 }
 
-header('Content-Type: application/json; charset=utf-8');
 include '../config.php';
+
+while (ob_get_level()) ob_end_clean();
+header('Content-Type: application/json; charset=utf-8');
 
 $timesheet_id = isset($_GET['timesheet_id']) ? intval($_GET['timesheet_id']) : 0;
 if ($timesheet_id <= 0) {
-    echo json_encode(['success' => false, 'message' => 'timesheet_id is required', 'data' => []]);
+    echo json_encode(['success' => false, 'message' => 'timesheet_id is required', 'data' => []], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 if (!db_table_has_column($conn, 'timesheet_failure_hours', 'id')) {
-    echo json_encode(['success' => true, 'data' => []]);
+    echo json_encode(['success' => true, 'data' => []], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -37,7 +40,7 @@ $sql = "SELECT id, timesheet_id, operation_id, equipment_id, failure_code_id, eq
 
 $res = mysqli_query($conn, $sql);
 if (!$res) {
-    echo json_encode(['success' => false, 'message' => mysqli_error($conn), 'data' => []]);
+    echo json_encode(['success' => false, 'message' => mysqli_error($conn), 'data' => []], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -46,5 +49,5 @@ while ($row = mysqli_fetch_assoc($res)) {
     $data[] = $row;
 }
 
-echo json_encode(['success' => true, 'data' => $data]);
+echo json_encode(['success' => true, 'data' => $data], JSON_UNESCAPED_UNICODE);
 exit;

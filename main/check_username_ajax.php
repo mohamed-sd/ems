@@ -1,6 +1,8 @@
 <?php
 include '../config.php';
 
+while (ob_get_level()) ob_end_clean();
+
 $response = ['exists' => false];
 
 if (isset($_GET['username'])) {
@@ -10,14 +12,14 @@ if (isset($_GET['username'])) {
 
     if ($uid > 0) {
         // في حالة التعديل
-        $query = "SELECT id FROM users 
-                  WHERE username='$username' 
-                  AND id != '$uid' 
+        $query = "SELECT id FROM users
+                  WHERE username='$username'
+                  AND id != '$uid'
                   LIMIT 1";
     } else {
         // في حالة الإضافة
-        $query = "SELECT id FROM users 
-                  WHERE username='$username' 
+        $query = "SELECT id FROM users
+                  WHERE username='$username'
                   LIMIT 1";
     }
 

@@ -2,7 +2,7 @@
 /**
  * AJAX endpoint للقوائم المنسدلة المتتالية لنظام الأعطال
  * يرجع JSON حسب action المطلوب
- * 
+ *
  * Actions:
  *   get_event_types    - جلب أنواع الأحداث (EQF, MNT, DEP, CST, MST, HRF, MKF)
  *   get_main_cats      - جلب الفئات الرئيسية بناءً على event_type_code
@@ -14,11 +14,14 @@
 session_start();
 if (!isset($_SESSION['user'])) {
     http_response_code(401);
-    die(json_encode(['error' => 'Unauthorized']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['error' => 'Unauthorized'], JSON_UNESCAPED_UNICODE));
 }
 
-header('Content-Type: application/json; charset=utf-8');
 include '../config.php';
+
+while (ob_get_level()) ob_end_clean();
+header('Content-Type: application/json; charset=utf-8');
 
 $action          = isset($_GET['action'])         ? trim($_GET['action'])         : '';
 $equipment_type  = isset($_GET['equipment_type']) ? intval($_GET['equipment_type']) : 0;
@@ -42,7 +45,7 @@ switch ($action) {
         while ($row = mysqli_fetch_assoc($res)) {
             $data[] = $row;
         }
-        echo json_encode($data);
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
         break;
 
     // ── 2. الفئات الرئيسية (القائمة الثانية "قسم العطل")
@@ -60,7 +63,7 @@ switch ($action) {
         while ($row = mysqli_fetch_assoc($res)) {
             $data[] = $row;
         }
-        echo json_encode($data);
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
         break;
 
     // ── 3. الفئات الفرعية (القائمة الثالثة "الجزء / السبب")
@@ -79,7 +82,7 @@ switch ($action) {
         while ($row = mysqli_fetch_assoc($res)) {
             $data[] = $row['sub_category'];
         }
-        echo json_encode($data);
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
         break;
 
     // ── 4. تفاصيل العطل (القائمة الرابعة "التفصيل")
@@ -99,7 +102,7 @@ switch ($action) {
         while ($row = mysqli_fetch_assoc($res)) {
             $data[] = $row;
         }
-        echo json_encode($data);
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
         break;
 
     // ── 5. جلب بيانات صف كامل بالكود (لتعبئة حقول التعديل)
@@ -109,10 +112,10 @@ switch ($action) {
             "SELECT * FROM failure_codes WHERE full_code = '$full_code' AND status = 1 LIMIT 1"
         );
         $row = mysqli_fetch_assoc($res);
-        echo json_encode($row ?: null);
+        echo json_encode($row ?: null, JSON_UNESCAPED_UNICODE);
         break;
 
     default:
-        echo json_encode(['error' => 'Unknown action']);
+        echo json_encode(['error' => 'Unknown action'], JSON_UNESCAPED_UNICODE);
         break;
 }

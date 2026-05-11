@@ -1,5 +1,8 @@
 <?php
 session_start();
+
+while (ob_get_level()) ob_end_clean();
+
 if (!isset($_SESSION['user'])) {
     header('Content-Type: application/json; charset=utf-8');
     die(json_encode(['success' => false, 'message' => 'غير مصرح']));
@@ -15,9 +18,9 @@ if ($project_id <= 0) {
     die(json_encode(['success' => false, 'message' => 'معرف المشروع غير صحيح']));
 }
 
-$query = "SELECT id, mine_name, mine_code 
-          FROM mines 
-          WHERE project_id = $project_id AND status = 1 
+$query = "SELECT id, mine_name, mine_code
+          FROM mines
+          WHERE project_id = $project_id AND status = 1
           ORDER BY mine_name";
 
 $result = mysqli_query($conn, $query);

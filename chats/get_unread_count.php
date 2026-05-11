@@ -30,5 +30,11 @@ if ($result) {
     $count = intval($row['cnt']);
 }
 
-echo json_encode(['count' => $count]);
+// إيقاف جميع output buffers قبل إرجاع JSON
+while (ob_get_level()) {
+    ob_end_clean();
+}
+header('Content-Type: application/json; charset=utf-8');
+
+echo json_encode(['count' => $count], JSON_UNESCAPED_UNICODE);
 exit;

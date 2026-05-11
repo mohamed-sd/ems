@@ -1,11 +1,14 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    echo json_encode([]);
+    while (ob_get_level()) ob_end_clean();
+    echo json_encode([], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 include '../config.php';
+
+while (ob_get_level()) ob_end_clean();
 header('Content-Type: application/json; charset=utf-8');
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
@@ -13,12 +16,12 @@ $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'][
 $project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
 
 if (!$is_super_admin && $company_id <= 0) {
-    echo json_encode([]);
+    echo json_encode([], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 if (!isset($_GET['id'])) {
-    echo json_encode([]);
+    echo json_encode([], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -69,7 +72,7 @@ if (!$is_super_admin) {
 $q = mysqli_query($conn, "SELECT * FROM timesheet WHERE id = $id" . $scope . " LIMIT 1");
 $row = mysqli_fetch_assoc($q);
 if (!$row) {
-    echo json_encode([]);
+    echo json_encode([], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -88,6 +91,6 @@ if (!empty($row['counter_diff'])) {
     $row['counter_diff_display'] = $hours . " ساعة " . $minutes . " دقيقة " . $seconds . " ثانية";
 }
 
-echo json_encode($row);
+echo json_encode($row, JSON_UNESCAPED_UNICODE);
 
 ?>

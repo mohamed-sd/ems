@@ -1,5 +1,6 @@
 <?php
 session_start();
+while (ob_get_level()) ob_end_clean();
 if (!isset($_SESSION['user'])) {
     die(json_encode(['success' => false, 'message' => 'غير مصرح']));
 }
@@ -69,7 +70,7 @@ $equipment_id = intval($_GET['id']);
 
 // جلب جميع بيانات المعدة
 $query = "
-    SELECT 
+    SELECT
         e.*,
         s.name AS supplier_name,
         p.name AS project_name,

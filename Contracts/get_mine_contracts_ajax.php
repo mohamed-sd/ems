@@ -1,5 +1,8 @@
 <?php
 session_start();
+
+while (ob_get_level()) ob_end_clean();
+
 if (!isset($_SESSION['user'])) {
     header('Content-Type: application/json; charset=utf-8');
     die(json_encode(['success' => false, 'message' => 'غير مصرح']));
@@ -15,9 +18,9 @@ if ($mine_id <= 0) {
     die(json_encode(['success' => false, 'message' => 'معرف المنجم غير صحيح']));
 }
 
-$query = "SELECT id, contract_signing_date, actual_start, actual_end 
-          FROM contracts 
-          WHERE mine_id = $mine_id AND status = 1 
+$query = "SELECT id, contract_signing_date, actual_start, actual_end
+          FROM contracts
+          WHERE mine_id = $mine_id AND status = 1
           ORDER BY contract_signing_date DESC";
 
 $result = mysqli_query($conn, $query);

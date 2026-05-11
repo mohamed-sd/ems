@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+while (ob_get_level()) ob_end_clean();
+
 // تعيين نوع المحتوى كـ JSON
 header('Content-Type: application/json; charset=utf-8');
 
@@ -19,18 +21,18 @@ if (!$contract_id) {
 }
 
 // جلب معدات العقد مع جميع الحقول المطلوبة
-$sql = "SELECT 
-    ce.equip_type, 
+$sql = "SELECT
+    ce.equip_type,
     et.type AS equip_type_name,
-    ce.equip_size, 
-    ce.equip_count, 
-    ce.shift_hours, 
+    ce.equip_size,
+    ce.equip_count,
+    ce.shift_hours,
     ce.equip_total_month,
     ce.equip_total_contract,
     ce.equip_monthly_target
 FROM contractequipments ce
 LEFT JOIN equipments_types et ON ce.equip_type = et.id
-WHERE ce.contract_id = $contract_id 
+WHERE ce.contract_id = $contract_id
 ORDER BY ce.id ASC";
 
 $result = mysqli_query($conn, $sql);

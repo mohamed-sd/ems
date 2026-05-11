@@ -7,11 +7,13 @@ session_start();
 header('Content-Type: application/json; charset=utf-8');
 
 if (!isset($_SESSION['user'])) {
-    die(json_encode(['success' => false]));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false], JSON_UNESCAPED_UNICODE));
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    die(json_encode(['success' => false]));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false], JSON_UNESCAPED_UNICODE));
 }
 
 require_once '../config.php';
@@ -21,7 +23,8 @@ $company_id = intval($_SESSION['user']['company_id']);
 $sender_id  = isset($_POST['sender_id']) ? intval($_POST['sender_id']) : 0;
 
 if ($sender_id <= 0) {
-    die(json_encode(['success' => false, 'message' => 'المرسل غير محدد']));
+    while (ob_get_level()) ob_end_clean();
+    die(json_encode(['success' => false, 'message' => 'المرسل غير محدد'], JSON_UNESCAPED_UNICODE));
 }
 
 $safe_sender  = intval($sender_id);
@@ -36,8 +39,14 @@ $sql = "UPDATE messages
 
 $result = mysqli_query($conn, $sql);
 
+// إيقاف جميع output buffers قبل إرجاع JSON
+while (ob_get_level()) {
+    ob_end_clean();
+}
+header('Content-Type: application/json; charset=utf-8');
+
 echo json_encode([
     'success'       => $result ? true : false,
     'rows_affected' => $result ? mysqli_affected_rows($conn) : 0
-]);
+], JSON_UNESCAPED_UNICODE);
 exit;

@@ -1,6 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
+    while (ob_get_level()) ob_end_clean();
     exit;
 }
 
@@ -11,6 +12,7 @@ $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'][
 $project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
 
 if (!$is_super_admin && $company_id <= 0) {
+    while (ob_get_level()) ob_end_clean();
     exit;
 }
 
@@ -33,13 +35,14 @@ if (isset($_GET['operation_id'])) {
     // جلب الآلية من جدول التشغيل ضمن نطاق الشركة
     $op = mysqli_fetch_assoc(mysqli_query($conn, "SELECT equipment FROM operations WHERE id = $operation_id" . $operation_scope));
     if (!$op || !isset($op['equipment'])) {
+        while (ob_get_level()) ob_end_clean();
         echo "<option value=''>-- اختر السائق --</option>";
         exit;
     }
     $equipment_id = $op['equipment'];
 
     // جلب السائقين المرتبطين بهذه الآلية
-    $sql = "SELECT d.id, d.name 
+    $sql = "SELECT d.id, d.name
             FROM equipment_drivers ed
             JOIN drivers d ON ed.driver_id = d.id
             WHERE ed.equipment_id = $equipment_id";
@@ -64,6 +67,7 @@ if (isset($_GET['operation_id'])) {
 
     $result = mysqli_query($conn, $sql);
 
+    while (ob_get_level()) ob_end_clean();
     echo "<option value=''>-- اختر السائق --</option>";
     while ($row = mysqli_fetch_assoc($result)) {
         echo "<option value='{$row['id']}'>{$row['name']}</option>";

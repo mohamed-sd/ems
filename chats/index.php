@@ -388,10 +388,16 @@ include '../insidebar.php';
         var xhr = new XMLHttpRequest();
         xhr.open('GET', 'get_messages.php?' + params, true);
         xhr.onload = function() {
-            if (xhr.status !== 200) return;
+            if (xhr.status !== 200) {
+                showErrorInChat('فشل تحميل الرسائل - كود الخطأ: ' + xhr.status);
+                return;
+            }
             try {
                 var data = JSON.parse(xhr.responseText);
-                if (!data.success) return;
+                if (!data.success) {
+                    showErrorInChat(data.message || 'فشل في تحميل الرسائل');
+                    return;
+                }
                 if (append) {
                     if (data.messages.length > 0) {
                         appendMessages(data.messages);
@@ -404,9 +410,28 @@ include '../insidebar.php';
                 } else {
                     renderMessages(data.messages);
                 }
-            } catch(e) {}
+            } catch(e) {
+                showErrorInChat('حدث خطأ في تحميل الرسائل');
+            }
+        };
+        xhr.onerror = function() {
+            showErrorInChat('فشل الاتصال بالخادم');
+        };
+        xhr.ontimeout = function() {
+            showErrorInChat('انتهت مهلة الطلب - حاول مرة أخرى');
         };
         xhr.send();
+    }
+
+    // ===== إظهار رسالة خطأ في منطقة الرسائل =====
+    function showErrorInChat(message) {
+        var area = document.getElementById('messagesArea');
+        area.innerHTML = '<div style="text-align:center; padding:40px; color:#ef4444;">' +
+                        '<i class="fas fa-exclamation-triangle" style="font-size:2rem; display:block; margin-bottom:10px;"></i>' +
+                        '<strong>' + escapeHtml(message) + '</strong><br><br>' +
+                        '<button onclick="loadMessages(' + activeContactId + ', false)" style="padding:8px 16px; background:#3b82f6; color:white; border:none; border-radius:4px; cursor:pointer;">' +
+                        '<i class="fas fa-redo"></i> إعادة المحاولة</button>' +
+                        '</div>';
     }
 
     // ===== رسم كل الرسائل =====
@@ -848,7 +873,6 @@ include '../insidebar.php';
                 }
             } catch(e) {
                 simpleToast('حدث خطأ غير متوقع', 'fas fa-exclamation-triangle');
-                console.error('Broadcast error:', e);
             }
         };
         xhr.onerror = function() {

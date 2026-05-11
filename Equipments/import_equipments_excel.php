@@ -5,6 +5,9 @@
  */
 
 session_start();
+
+while (ob_get_level()) ob_end_clean();
+
 if (!isset($_SESSION['user'])) {
     header('Content-Type: application/json; charset=utf-8');
     die(json_encode(['success' => false, 'message' => 'غير مصرح']));
@@ -163,33 +166,33 @@ try {
         // البحث عن ID المورد
         $supplier_query = "SELECT id FROM suppliers WHERE name = '$supplier_name' AND status = 1 LIMIT 1";
         $supplier_result = mysqli_query($conn, $supplier_query);
-        
+
         if (!$supplier_result || mysqli_num_rows($supplier_result) == 0) {
             $errors[] = "الصف $rowNumber: المورد '$supplier_name' غير موجود في النظام";
             $skipped++;
             continue;
         }
-        
+
         $supplier_row = mysqli_fetch_assoc($supplier_result);
         $supplier_id = intval($supplier_row['id']);
 
         // البحث عن ID نوع المعدة
         $type_query = "SELECT id FROM equipments_types WHERE type = '$type_name' AND status = 1 LIMIT 1";
         $type_result = mysqli_query($conn, $type_query);
-        
+
         if (!$type_result || mysqli_num_rows($type_result) == 0) {
             $errors[] = "الصف $rowNumber: نوع المعدة '$type_name' غير موجود في النظام";
             $skipped++;
             continue;
         }
-        
+
         $type_row = mysqli_fetch_assoc($type_result);
         $type_id = intval($type_row['id']);
 
         // التحقق من عدم تكرار كود المعدة
         $check_query = "SELECT id FROM equipments WHERE code = '$code' LIMIT 1";
         $check_result = mysqli_query($conn, $check_query);
-        
+
         if ($check_result && mysqli_num_rows($check_result) > 0) {
             $errors[] = "الصف $rowNumber: كود المعدة '$code' موجود مسبقاً";
             $skipped++;
@@ -197,18 +200,18 @@ try {
         }
 
         // إدخال البيانات
-        $insert_query = "INSERT INTO equipments 
-            (suppliers, code, type, name, status, 
-             serial_number, chassis_number, manufacturer, model, 
-             manufacturing_year, import_year, equipment_condition, 
+        $insert_query = "INSERT INTO equipments
+            (suppliers, code, type, name, status,
+             serial_number, chassis_number, manufacturer, model,
+             manufacturing_year, import_year, equipment_condition,
              operating_hours, engine_condition, tires_condition,
              actual_owner_name, owner_type, owner_phone, owner_supplier_relation,
              license_number, license_authority, license_expiry_date,
              inspection_certificate_number, last_inspection_date,
              current_location, availability_status,
-             estimated_value, daily_rental_price, monthly_rental_price, 
-             insurance_status, general_notes, last_maintenance_date) 
-            VALUES 
+             estimated_value, daily_rental_price, monthly_rental_price,
+             insurance_status, general_notes, last_maintenance_date)
+            VALUES
             ($supplier_id, '$code', $type_id, '$name', $status,
              '$serial_number', '$chassis_number', '$manufacturer', '$model',
              $manufacturing_year, $import_year, '$equipment_condition',

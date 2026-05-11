@@ -1,5 +1,8 @@
 <?php
 session_start();
+
+while (ob_get_level()) ob_end_clean();
+
 include '../config.php';
 
 header('Content-Type: application/json; charset=utf-8');
@@ -58,7 +61,7 @@ if ($active_equipment_result && mysqli_num_rows($active_equipment_result) > 0) {
     $active_equipment_count = intval($active_equipment_row['active_count']);
 }
 
-$suppliers_query = "SELECT 
+$suppliers_query = "SELECT
     sc.id,
     sc.supplier_id,
     s.name as supplier_name,
@@ -78,7 +81,7 @@ $total_supplier_equipment = 0;
 
 if ($suppliers_result) {
     while ($row = mysqli_fetch_assoc($suppliers_result)) {
-        $equip_details_query = "SELECT 
+        $equip_details_query = "SELECT
                                         et.type as type_name,
                                         sce.equip_type,
                                         SUM(sce.equip_count) as total_count,

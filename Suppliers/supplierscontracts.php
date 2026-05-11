@@ -208,19 +208,42 @@ if (isset($_GET['delete_id'])) {
   exit();
 }
 ?>
-<?php
-$page_title = "إيكوبيشن | عقود المورد";
-include("../inheader.php");
-include('../insidebar.php');
-?>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 
-  <div class="main supplier-contracts-main ems-unified-page-shell">
-    <div class="header contracts-header-shell">
-      <div class="contracts-header-brand">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إيكوبيشن | عقود المورد</title>
+  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
+  <!-- DataTables CSS -->
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
+  <!-- Call bootstrap 5 -->
+  <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
+  <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
+  <!-- CSS الموقع -->
+  <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
+</head>
+<body>
+
+  <?php
+  // include('../insidebar.php');
+  ?>
+
+  <div class="main">
+    <div class="page-header">
+      <div style="display: flex; align-items: center; gap: 12px;">
         <div class="title-icon"><i class="fas fa-file-contract"></i></div>
         <h1 class="page-title">عقود المورد</h1>
       </div>
-      <div class="header -actions contracts-header-actions">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
         <?php if ($can_add): ?>
         <a href="javascript:void(0)" id="toggleForm" class="add-btn">
           <i class="fas fa-plus-circle"></i> عقد جديد
@@ -237,7 +260,7 @@ include('../insidebar.php');
 
     <!-- فورم إضافة عقد -->
     <?php if ($can_add || $can_edit): ?>
-    <form id="projectForm" action="" method="post" class="allforms">
+    <form id="projectForm" action="" method="post" style="display:none;">
 
       <div class="card">
         <div class="card-header">
@@ -277,7 +300,7 @@ include('../insidebar.php');
                 <select name="project_id" id="project_id" required>
                   <option value="">— اختر المشروع —</option>
                   <?php
-                  
+
                   $projects_query = "SELECT p.id, p.name FROM project p WHERE p.status = 1 AND $project_scope_sql ORDER BY p.name ASC";
                   $projects_result = mysqli_query($conn, $projects_query);
                   while ($project = mysqli_fetch_assoc($projects_result)) {
@@ -308,28 +331,33 @@ include('../insidebar.php');
           </div>
 
           <!-- عرض معلومات ساعات العقد -->
-          <div id="projectHoursInfo" class="contracts-hidden project-hours-info">
-            <div class="project-hours-grid">
-              <div class="project-hours-card">
-                <strong class="project-hours-label project-hours-label-blue">
+          <div id="projectHoursInfo"
+            style="display:none; margin: 1rem 0; padding: 1.5rem; background: linear-gradient(135deg, #fff7d1 0%, #ffe8a3 100%); border-radius: 15px; border-right: 4px solid var(--navy); box-shadow: var(--shadow-md);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+              <div
+                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <strong style="color: #1976d2; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
                   <i class="fas fa-clock"></i> إجمالي ساعات العقد
                 </strong>
-                <div class="project-hours-value project-hours-value-blue" id="contractTotalHours">0</div>
-                <div id="equipmentBreakdown" class="project-hours-breakdown">
+                <div style="font-size: 2rem; color: #0d47a1; font-weight: 700;" id="contractTotalHours">0</div>
+                <div id="equipmentBreakdown"
+                  style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 2px dashed #e3f2fd; font-size: 0.85rem;">
                   <!-- سيتم ملء التفصيل هنا -->
                 </div>
               </div>
-              <div class="project-hours-card">
-                <strong class="project-hours-label project-hours-label-red">
+              <div
+                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <strong style="color: #d32f2f; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
                   <i class="fas fa-handshake"></i> المتعاقد عليه مع موردين
                 </strong>
-                <div class="project-hours-value project-hours-value-red" id="suppliersContractedHours">0</div>
+                <div style="font-size: 2rem; color: #c62828; font-weight: 700;" id="suppliersContractedHours">0</div>
               </div>
-              <div class="project-hours-card">
-                <strong class="project-hours-label project-hours-label-green">
+              <div
+                style="background: white; padding: 1.2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <strong style="color: #388e3c; font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
                   <i class="fas fa-chart-line"></i> الساعات المتبقية
                 </strong>
-                <div class="project-hours-value project-hours-value-green" id="remainingHours">0</div>
+                <div style="font-size: 2rem; color: #2e7d32; font-weight: 700;" id="remainingHours">0</div>
               </div>
             </div>
           </div>
@@ -357,8 +385,9 @@ include('../insidebar.php');
             </div>
           </div>
 
-          <div class="contracts-note-box">
-            <p class="contracts-note-text">
+          <div
+            style="margin-top: 2rem; padding: 1rem; background: var(--gold-soft); border-radius: 10px; border-right: 4px solid var(--navy);">
+            <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
               <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
               البيانات المدخلة في الأقسام التالية
             </p>
@@ -551,8 +580,9 @@ include('../insidebar.php');
             </div>
             <br>
             <div class="equipment-section" data-index="1">
-              <div class="equipment-card">
-                <h6 class="equipment-card-title">المعدات رقم 1</h6>
+              <div
+                style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
+                <h6 style="margin: 0 0 15px 0;">المعدات رقم 1</h6>
                 <div class="form-grid">
                   <div class="field md-3 sm-6">
                     <label>نوع المعدة</label>
@@ -572,13 +602,13 @@ include('../insidebar.php');
                   </div>
 
                   <div class="field md-3 sm-6">
-                    <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
-                    <div class="control"><input name="equip_count_basic_1" type="number" min="0" class="equip-basic-input"></div>
+                    <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+                    <div class="control"><input name="equip_count_basic_1" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
                   </div>
 
                   <div class="field md-3 sm-6">
-                    <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
-                    <div class="control"><input name="equip_count_backup_1" type="number" min="0" class="equip-backup-input"></div>
+                    <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+                    <div class="control"><input name="equip_count_backup_1" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>عدد المشغلين</label>
@@ -691,9 +721,9 @@ include('../insidebar.php');
             </div>
           </div>
 
-          <div class="equipment-add-row">
+          <div style="margin: 15px 0; display: flex; gap: 10px;">
             <button type="button" class="primary" id="addEquipmentBtn"
-              class="equipment-add-btn">
+              style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
               <i class="fas fa-plus-circle"></i> إضافة مزيد من المعدات
             </button>
           </div>
@@ -704,7 +734,7 @@ include('../insidebar.php');
 
           <div class="form-grid">
 
-            <div class="field md-3 sm-6 contracts-hidden-field">
+            <div class="field md-3 sm-6" style="display: none;">
               <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
               <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
                   placeholder="مثال: 8" value="20"></div>
@@ -746,11 +776,12 @@ include('../insidebar.php');
           </div>
 
 
-          <div class="contracts-form-actions">
-            <button type="reset" class="contracts-btn-reset">
+          <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
+            <button type="reset"
+              style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
               <i class="fas fa-eraser"></i> تفريغ الحقول
             </button>
-            <button type="submit" class="primary contracts-btn-submit-wide">
+            <button type="submit" class="primary" style="padding: 0.75rem 3rem;">
               <i class="fas fa-save"></i> حفظ البيانات
             </button>
           </div>
@@ -766,9 +797,9 @@ include('../insidebar.php');
       </div>
 
       <!-- أزرار التحكم في المجموعات -->
-      <div class="card-body contracts-group-toolbar-wrap">
-        <div class="contracts-group-toolbar">
-          <span class="contracts-group-toolbar-label">
+      <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0;">
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+          <span style="font-weight: 700; color: var(--navy); margin-left: 10px;">
             <i class="fas fa-filter"></i> عرض المجموعات:
           </span>
           <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
@@ -798,14 +829,14 @@ include('../insidebar.php');
         </div>
       </div>
 
-      <div class="card-body contracts-table-filter-wrap">
-        <form method="get" action="supplierscontracts.php" class="contracts-table-filter-form">
+      <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0; background: #f8f9fa;">
+        <form method="get" action="supplierscontracts.php" style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
           <?php if ($has_supplier_filter): ?>
           <input type="hidden" name="id" value="<?php echo intval($supplier_id); ?>">
           <?php endif; ?>
 
-          <div class="contracts-filter-field">
-            <label class="contracts-filter-label">فلتر المورد</label>
+          <div style="min-width:220px;">
+            <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المورد</label>
             <select name="filter_supplier_id" class="form-control" <?php echo $has_supplier_filter ? 'disabled' : ''; ?>>
               <option value="0">كل الموردين</option>
               <?php foreach ($suppliers_filter_options as $supplier_option_id => $supplier_option_name): ?>
@@ -819,8 +850,8 @@ include('../insidebar.php');
             <?php endif; ?>
           </div>
 
-          <div class="contracts-filter-field">
-            <label class="contracts-filter-label">فلتر المشروع</label>
+          <div style="min-width:220px;">
+            <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المشروع</label>
             <select name="filter_project_id" id="sc_filter_project_select" class="form-control">
               <option value="0">كل المشاريع</option>
               <?php foreach ($projects_filter_options as $project_option_id => $project_option_name): ?>
@@ -831,8 +862,8 @@ include('../insidebar.php');
             </select>
           </div>
 
-          <div class="contracts-filter-field">
-            <label class="contracts-filter-label">فلتر المنجم</label>
+          <div style="min-width:220px;">
+            <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المنجم</label>
             <select name="filter_mine_id" id="sc_filter_mine_select" class="form-control" <?php echo $filter_project_id <= 0 ? 'disabled' : ''; ?>>
               <option value="0">كل المناجم</option>
               <?php foreach ($mines_filter_options as $mine_option_id => $mine_option_name): ?>
@@ -848,8 +879,8 @@ include('../insidebar.php');
         </form>
       </div>
 
-      <div class="card-body contracts-table-wrap">
-        <table id="projectsTable" class="display nowrap contracts-table">
+      <div class="card-body" style="padding: 2rem; overflow-x: auto;">
+        <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
           <thead>
             <tr>
               <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
@@ -900,7 +931,7 @@ include('../insidebar.php');
           </thead>
           <tbody>
             <?php
-            
+
 
             // إضافة عقد جديد عند إرسال الفورم
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['supplier_id']) && !empty($_POST['project_id']) && !empty($_POST['project_contract_id'])) {
@@ -976,7 +1007,7 @@ include('../insidebar.php');
 
               if ($id > 0) {
                 // تعديل
-                $sql = "UPDATE supplierscontracts sc SET 
+                $sql = "UPDATE supplierscontracts sc SET
             project_id='$project_id',
             mine_id='$mine_id',
             project_contract_id='$project_contract_id',
@@ -1137,14 +1168,14 @@ include('../insidebar.php');
             }
             $supplier_contract_filter_sql = implode(' AND ', $supplier_contract_filter_parts);
 
-            $query = "SELECT sc.*, 
+            $query = "SELECT sc.*,
                       s.name AS supplier_name,
                       op.name AS project_name,
                       m.project_id AS mine_project_id,
                       mp.name AS mine_project_name,
                       m.mine_name,
                       m.mine_code
-                      FROM supplierscontracts sc 
+                      FROM supplierscontracts sc
                       LEFT JOIN suppliers s ON sc.supplier_id = s.id
                       LEFT JOIN project op ON sc.project_id = op.id
                       LEFT JOIN mines m ON sc.mine_id = m.id
@@ -1320,7 +1351,7 @@ include('../insidebar.php');
 
       if (toggleContractFormBtn && contractForm) {
         toggleContractFormBtn.addEventListener('click', function () {
-          contractForm.classList.toggle('allforms-visible');
+          contractForm.style.display = contractForm.style.display === "none" ? "block" : "none";
         });
       }
     })();
@@ -1413,10 +1444,11 @@ include('../insidebar.php');
       newSection.className = 'equipment-section';
       newSection.setAttribute('data-index', equipmentIndex);
       newSection.innerHTML = `
-        <div class="equipment-card">
-          <div class="equipment-card-head">
-            <h6 class="equipment-card-title is-inline">المعدات رقم ${equipmentIndex}</h6>
-            <button type="button" class="removeEquipmentBtn remove-equipment-btn" data-index="${equipmentIndex}">
+        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
+            <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}"
+              style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
               <i class="fa fa-trash"></i> حذف
             </button>
           </div>
@@ -1439,13 +1471,13 @@ include('../insidebar.php');
             </div>
 
             <div class="field md-3 sm-6">
-              <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
-              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="equip-basic-input"></div>
+              <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
             </div>
 
             <div class="field md-3 sm-6">
-              <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
-              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="equip-backup-input"></div>
+              <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المساعدين</label>
@@ -1537,7 +1569,7 @@ include('../insidebar.php');
       // إضافة event listeners للحقول الجديدة المهمة للحسبة
       const countInput = newSection.querySelector(`input[name="equip_count_${equipmentIndex}"]`);
       const shiftHoursInput = newSection.querySelector(`input[name="shift_hours_${equipmentIndex}"]`);
-      
+
       if (countInput) countInput.addEventListener('input', recalc);
       if (shiftHoursInput) shiftHoursInput.addEventListener('input', recalc);
 
@@ -1643,7 +1675,7 @@ include('../insidebar.php');
       const countInput = section.querySelector(`input[name="equip_count_${index}"]`);
       const shiftHoursInput = section.querySelector(`input[name="shift_hours_${index}"]`);
       const equipTypeSelect = section.querySelector(`select[name="equip_type_${index}"]`);
-      
+
       if (countInput) countInput.addEventListener('input', recalc);
       if (shiftHoursInput) shiftHoursInput.addEventListener('input', recalc);
       if (equipTypeSelect) equipTypeSelect.addEventListener('change', updateEquipmentTypeOptions);
@@ -1739,19 +1771,19 @@ include('../insidebar.php');
               breakdownDiv.empty();
 
               if (response.equipment_breakdown && response.equipment_breakdown.length > 0) {
-                var breakdownHtml = '<div class="project-hours-breakdown-root"><strong class="project-hours-breakdown-title">تفصيل الساعات:</strong>';
+                var breakdownHtml = '<div style="color: #555;"><strong style="color: #1976d2; display: block; margin-bottom: 0.5rem;">تفصيل الساعات:</strong>';
 
                 response.equipment_breakdown.forEach(function (item) {
                   var percentage = ((item.hours / response.contract_total_hours) * 100).toFixed(1);
-                  breakdownHtml += '<div class="project-hours-breakdown-row">';
-                  breakdownHtml += '<div class="project-hours-breakdown-row-head">';
-                  breakdownHtml += '<span class="project-hours-breakdown-type"><i class="fas fa-tools"></i>' + item.type + '</span>';
-                  breakdownHtml += '<span class="project-hours-breakdown-hours">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
+                  breakdownHtml += '<div style="display: flex; flex-direction: column; margin-bottom: 0.6rem; padding: 0.5rem; background: #f8f9fa; border-radius: 6px;">';
+                  breakdownHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">';
+                  breakdownHtml += '<span><i class="fas fa-tools" style="color: #1976d2; margin-left: 0.3rem;"></i>' + item.type + '</span>';
+                  breakdownHtml += '<span style="font-weight: 600; color: #0d47a1;">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
                   breakdownHtml += '</div>';
-                  breakdownHtml += '<div class="project-hours-breakdown-meta">';
-                  breakdownHtml += '<span><span class="project-hours-badge project-hours-badge-basic">أساسية</span> ' + item.count_basic + '</span>';
-                  breakdownHtml += '<span><span class="project-hours-badge project-hours-badge-backup">احتياطية</span> ' + item.count_backup + '</span>';
-                  breakdownHtml += '<span><span class="project-hours-badge project-hours-badge-total">إجمالي</span> ' + item.count + '</span>';
+                  breakdownHtml += '<div style="display: flex; gap: 1rem; font-size: 0.85rem; padding-top: 0.3rem; border-top: 1px dashed #ddd;">';
+                  breakdownHtml += '<span><span style="background: #007bff; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">أساسية</span> ' + item.count_basic + '</span>';
+                  breakdownHtml += '<span><span style="background: #ffc107; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">احتياطية</span> ' + item.count_backup + '</span>';
+                  breakdownHtml += '<span><span style="background: #667eea; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">إجمالي</span> ' + item.count + '</span>';
                   breakdownHtml += '</div>';
                   breakdownHtml += '</div>';
                 });
@@ -1759,7 +1791,7 @@ include('../insidebar.php');
                 breakdownHtml += '</div>';
                 breakdownDiv.html(breakdownHtml);
               } else {
-                breakdownDiv.html('<span class="project-hours-breakdown-empty">لا توجد معدات مسجلة لهذا العقد</span>');
+                breakdownDiv.html('<span style="color: #999; font-style: italic;">لا توجد معدات مسجلة لهذا العقد</span>');
               }
 
               $('#projectHoursInfo').fadeIn();
@@ -1778,7 +1810,7 @@ include('../insidebar.php');
 
     // تعبئة الفورم عند التعديل
     $(document).on("click", ".editBtn", function () {
-    $("#projectForm").addClass('allforms-visible');
+      $("#projectForm").show();
       $("#contract_id").val($(this).data("id"));
 
       // تحميل المشروع والمنجم والعقد
@@ -1922,10 +1954,11 @@ include('../insidebar.php');
                 newSection.className = 'equipment-section';
                 newSection.setAttribute('data-index', equipmentIndex);
                 newSection.innerHTML = `
-                  <div class="equipment-card">
-                    <div class="equipment-card-head">
-                      <h6 class="equipment-card-title is-inline">المعدات رقم ${equipmentIndex}</h6>
-                      <button type="button" class="removeEquipmentBtn remove-equipment-btn" data-index="${equipmentIndex}">
+                  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                      <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
+                      <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}"
+                        style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
                         <i class="fa fa-trash"></i> حذف
                       </button>
                     </div>
@@ -1948,13 +1981,13 @@ include('../insidebar.php');
                       </div>
 
                       <div class="field md-3 sm-6">
-                        <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
-                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="equip-basic-input" value="${equip.equip_count_basic || 0}"></div>
+                        <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;" value="${equip.equip_count_basic || 0}"></div>
                       </div>
 
                       <div class="field md-3 sm-6">
-                        <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
-                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="equip-backup-input" value="${equip.equip_count_backup || 0}"></div>
+                        <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;" value="${equip.equip_count_backup || 0}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المساعدين</label>
@@ -1964,7 +1997,7 @@ include('../insidebar.php');
                         <label>عدد الورديات</label>
                         <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}"></div>
                       </div>
-                      
+
                       <!-- أوقات الورديات -->
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
@@ -2192,5 +2225,3 @@ include('../insidebar.php');
 </body>
 
 </html>
-
-

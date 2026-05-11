@@ -6,13 +6,15 @@
  */
 
 session_start();
+
+require_once '../config.php';
+
+while (ob_get_level()) ob_end_clean();
 header('Content-Type: application/json; charset=utf-8');
 
 if (!isset($_SESSION['user'])) {
-    die(json_encode(['success' => false, 'message' => 'غير مصرح']));
+    die(json_encode(['success' => false, 'message' => 'غير مصرح'], JSON_UNESCAPED_UNICODE));
 }
-
-require_once '../config.php';
 
 $role       = strval($_SESSION['user']['role']);
 $user_id    = intval($_SESSION['user']['id']);
@@ -22,11 +24,11 @@ $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 // الأدوار المسموح لها: المدراء الرئيسيون والأدمن
 $allowed_roles = ['-1', '1', '2', '3', '4' , '5'];
 if (!in_array($role, $allowed_roles)) {
-    die(json_encode(['success' => false, 'message' => 'ليس لديك صلاحية']));
+    die(json_encode(['success' => false, 'message' => 'ليس لديك صلاحية'], JSON_UNESCAPED_UNICODE));
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة']));
+    die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة'], JSON_UNESCAPED_UNICODE));
 }
 
 // التأكد من وجود الجداول
@@ -85,7 +87,7 @@ function role_label_ar($role_id) {
 // ─────────────────────────────────────────────────────────────
 if ($action === 'approve') {
     if (!isset($role_level_map[$role])) {
-        die(json_encode(['success' => false, 'message' => 'الأدمن لا يعتمد مباشرة']));
+        die(json_encode(['success' => false, 'message' => 'الأدمن لا يعتمد مباشرة'], JSON_UNESCAPED_UNICODE));
     }
     $my_level = $role_level_map[$role];
     $prev_level = $my_level - 1;
@@ -97,7 +99,7 @@ if ($action === 'approve') {
         if ($i > 0) $ids[] = $i;
     }
     if (empty($ids)) {
-        die(json_encode(['success' => false, 'message' => 'لم يتم تحديد أي سجل']));
+        die(json_encode(['success' => false, 'message' => 'لم يتم تحديد أي سجل'], JSON_UNESCAPED_UNICODE));
     }
 
     $approved  = 0;
@@ -139,7 +141,7 @@ if ($action === 'approve') {
         'message' => "تم اعتماد $approved سجل" . ($skipped ? " (تم تخطي $skipped)" : ''),
         'approved' => $approved,
         'skipped'  => $skipped
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -154,14 +156,14 @@ if ($action === 'add_note') {
     $escaped_name = mysqli_real_escape_string($conn, $_SESSION['user']['name'] ?? 'غير معروف');
 
     if ($ts_id <= 0 || $note_text === '') {
-        die(json_encode(['success' => false, 'message' => 'بيانات ناقصة']));
+        die(json_encode(['success' => false, 'message' => 'بيانات ناقصة'], JSON_UNESCAPED_UNICODE));
     }
 
     // التحقق من أن السجل ينتمي لنفس الشركة
     $scope = ($company_id > 0) ? " AND (company_id = $company_id OR company_id IS NULL)" : '';
     $chk = $conn->query("SELECT id FROM timesheet WHERE id = $ts_id $scope");
     if (!$chk || $chk->num_rows === 0) {
-        die(json_encode(['success' => false, 'message' => 'السجل غير موجود']));
+        die(json_encode(['success' => false, 'message' => 'السجل غير موجود'], JSON_UNESCAPED_UNICODE));
     }
 
     $ins = $conn->query(
@@ -171,9 +173,9 @@ if ($action === 'add_note') {
     );
 
     if ($ins) {
-        echo json_encode(['success' => true, 'message' => 'تمت إضافة الملاحظة']);
+        echo json_encode(['success' => true, 'message' => 'تمت إضافة الملاحظة'], JSON_UNESCAPED_UNICODE);
     } else {
-        echo json_encode(['success' => false, 'message' => 'فشل حفظ الملاحظة: ' . $conn->error]);
+        echo json_encode(['success' => false, 'message' => 'فشل حفظ الملاحظة: ' . $conn->error], JSON_UNESCAPED_UNICODE);
     }
     exit;
 }
@@ -184,7 +186,7 @@ if ($action === 'add_note') {
 if ($action === 'get_notes') {
     $ts_id = intval($_POST['timesheet_id'] ?? 0);
     if ($ts_id <= 0) {
-        die(json_encode(['success' => false, 'message' => 'معرف غير صحيح']));
+        die(json_encode(['success' => false, 'message' => 'معرف غير صحيح'], JSON_UNESCAPED_UNICODE));
     }
 
     $scope = ($company_id > 0) ? " AND (n.company_id = $company_id OR n.company_id IS NULL)" : '';
@@ -204,7 +206,7 @@ if ($action === 'get_notes') {
             $notes[] = $row;
         }
     }
-    echo json_encode(['success' => true, 'notes' => $notes]);
+    echo json_encode(['success' => true, 'notes' => $notes], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -212,7 +214,7 @@ if ($action === 'get_notes') {
 // حذف ملاحظة (للمنشئ فقط)
 // ─────────────────────────────────────────────────────────────
 if ($action === 'delete_note') {
-    echo json_encode(['success' => false, 'message' => 'حذف الملاحظات غير مسموح']);
+    echo json_encode(['success' => false, 'message' => 'حذف الملاحظات غير مسموح'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -221,27 +223,27 @@ if ($action === 'delete_note') {
 // ─────────────────────────────────────────────────────────────
 if ($action === 'reject') {
     if ($role === '-1') {
-        die(json_encode(['success' => false, 'message' => 'الأدمن لا يرفض مباشرة']));
+        die(json_encode(['success' => false, 'message' => 'الأدمن لا يرفض مباشرة'], JSON_UNESCAPED_UNICODE));
     }
     if (!isset($role_level_map[$role])) {
-        die(json_encode(['success' => false, 'message' => 'ليس لديك صلاحية الرفض']));
+        die(json_encode(['success' => false, 'message' => 'ليس لديك صلاحية الرفض'], JSON_UNESCAPED_UNICODE));
     }
 
     $ts_id  = intval($_POST['timesheet_id'] ?? 0);
     $reason = trim($_POST['reason'] ?? '');
 
     if ($ts_id <= 0) {
-        die(json_encode(['success' => false, 'message' => 'معرّف السجل غير صحيح']));
+        die(json_encode(['success' => false, 'message' => 'معرّف السجل غير صحيح'], JSON_UNESCAPED_UNICODE));
     }
     if ($reason === '') {
-        die(json_encode(['success' => false, 'message' => 'يجب كتابة سبب الرفض']));
+        die(json_encode(['success' => false, 'message' => 'يجب كتابة سبب الرفض'], JSON_UNESCAPED_UNICODE));
     }
 
     // التحقق من أن السجل ينتمي لنفس الشركة
     $scope = ($company_id > 0) ? " AND (company_id = $company_id OR company_id IS NULL)" : '';
     $chk = $conn->query("SELECT id FROM timesheet WHERE id = $ts_id AND status = 1 $scope");
     if (!$chk || $chk->num_rows === 0) {
-        die(json_encode(['success' => false, 'message' => 'السجل غير موجود أو لا تملك صلاحية الوصول']));
+        die(json_encode(['success' => false, 'message' => 'السجل غير موجود أو لا تملك صلاحية الوصول'], JSON_UNESCAPED_UNICODE));
     }
 
     $escaped_reason = mysqli_real_escape_string($conn, $reason);
@@ -264,11 +266,11 @@ if ($action === 'reject') {
         echo json_encode([
             'success' => true,
             'message' => 'تم رفض السجل #' . $ts_id . ' وإعادته إلى أول السلسلة'
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
     } else {
-        echo json_encode(['success' => false, 'message' => 'فشل تنفيذ الرفض: ' . $conn->error]);
+        echo json_encode(['success' => false, 'message' => 'فشل تنفيذ الرفض: ' . $conn->error], JSON_UNESCAPED_UNICODE);
     }
     exit;
 }
 
-die(json_encode(['success' => false, 'message' => 'إجراء غير معروف']));
+die(json_encode(['success' => false, 'message' => 'إجراء غير معروف'], JSON_UNESCAPED_UNICODE));
