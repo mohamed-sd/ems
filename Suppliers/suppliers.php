@@ -381,6 +381,17 @@ include '../insidebar.php';
                                 <input type="checkbox" name="equipment_types[]" value="معدات معالجة">
                                 <span>معدات معالجة</span>
                             </label>
+
+                             <label class="checkbox-label">
+                                <input type="checkbox" name="equipment_types[]" value="السيارات والكرفانات">
+                                <span> السيارات والكرفانات</span>
+                            </label>
+
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="equipment_types[]" value="معدات أخرى">
+                                    <span>معدات أخرى</span>
+                            </label>
+
                         </div>
                     </div>
                 </div>
@@ -417,7 +428,7 @@ include '../insidebar.php';
 
                 <!-- 3. البيانات التواصلية -->
                 <div class="form-section">
-                    <h6><i class="fas fa-address-book"></i> البيانات التواصلية</h6>
+                    <h6><i class="fas fa-address-book"></i>  بيانات التواصل</h6>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>البريد الإلكتروني الرئيسي</label>
@@ -432,11 +443,11 @@ include '../insidebar.php';
                             <input type="text" name="phone_alternative" id="phone_alternative" />
                         </div>
                         <div class="form-group">
-                            <label>اسم جهة الاتصال الأساسية</label>
+                            <label>اسم الشخص المفوض</label>
                             <input type="text" name="contact_person_name" id="contact_person_name" />
                         </div>
                         <div class="form-group">
-                            <label>هاتف جهة الاتصال</label>
+                            <label>هاتف الشخص المفوض</label>
                             <input type="text" name="contact_person_phone" id="contact_person_phone" />
                         </div>
                         <div class="form-group">

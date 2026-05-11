@@ -533,7 +533,7 @@ include('../insidebar.php');
             </div>
 
             <div class="field md-3 sm-6">
-              <label>الورشة (Workshop)</label>
+              <label>الصيانة (Workshop)</label>
               <div class="control">
                 <select name="workshop" id="workshop">
                   <option value="">— اختر —</option>
@@ -735,7 +735,6 @@ include('../insidebar.php');
               </div>
             </div>
 
-            <div class="field md-3 sm-6"> </div>
 
             <div class="field md-3 sm-6">
               <label>الشاهد الأول</label>
