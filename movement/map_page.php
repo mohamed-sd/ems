@@ -1,4 +1,14 @@
 <?php
+/**
+ * خريطة الموقع - Map Page
+ *
+ * عرض خريطة تفاعلية للمناجم والمعدات والمشغلين
+ *
+ * آلية الفلترة حسب الأدوار:
+ * - Admin (Role -1): يعرض جميع المناجم
+ * - Movement & Operations Manager (Role 6): يعرض المنجم المخصص له فقط (حسب mine_id في جدول users)
+ * - باقي الأدوار: تعرض جميع المناجم في المشروع (حسب صلاحيات الشركة)
+ */
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -63,6 +73,16 @@ $mines_data = [];
 $mines_has_company = db_table_has_column($conn, 'mines', 'company_id');
 $company_mine_clause = ($mines_has_company && !$is_super_admin) ? " AND m.company_id = $company_id" : "";
 
+// فلترة المناجم حسب صلاحية مدير الحركة والتشغيل (Role 6)
+$user_mine_id = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0;
+$is_movement_manager = ($current_role === '6');
+$mine_filter_clause = "";
+
+// إذا كان مدير حركة وتشغيل وله منجم محدد، يعرض منجمه فقط
+if ($is_movement_manager && $user_mine_id > 0) {
+    $mine_filter_clause = " AND m.id = $user_mine_id";
+}
+
 $mines_q = mysqli_query($conn, "
     SELECT m.id, m.mine_name, m.mine_code, m.manager_name, m.mineral_type,
            m.mine_type, m.ownership_type, m.mine_area, m.mine_area_unit,
@@ -70,6 +90,7 @@ $mines_q = mysqli_query($conn, "
     FROM mines m
     WHERE m.project_id = $selected_project_id AND m.status = 1 AND m.is_deleted = 0
     $company_mine_clause
+    $mine_filter_clause
     ORDER BY m.id ASC
 ");
 
@@ -85,6 +106,12 @@ if ($mines_q) {
 // ============================================================
 $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
 $ops_company_clause = ($operations_has_company && !$is_super_admin) ? " AND o.company_id = $company_id" : "";
+
+// إضافة فلتر المنجم للمعدات (لمدير الحركة Role 6 فقط)
+$ops_mine_filter = "";
+if ($is_movement_manager && $user_mine_id > 0) {
+    $ops_mine_filter = " AND CAST(o.mine_id AS UNSIGNED) = $user_mine_id";
+}
 
 $ops_q = mysqli_query($conn, "
     SELECT o.id AS op_id, o.mine_id, o.status AS op_status,
@@ -103,6 +130,7 @@ $ops_q = mysqli_query($conn, "
     WHERE CAST(o.project_id AS UNSIGNED) = $selected_project_id
       AND o.status = 1
       $ops_company_clause
+      $ops_mine_filter
     ORDER BY o.mine_id ASC, e.code ASC
 ");
 

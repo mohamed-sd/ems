@@ -11,6 +11,10 @@ include '../includes/permissions_helper.php';
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+
+// فلترة المعدات حسب المنجم لمدير الحركة والتشغيل (Role 6)
+$user_mine_id = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0;
+$is_movement_manager = ($current_role === '6');
 $project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
 $project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
 $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
@@ -82,6 +86,12 @@ $ed_company_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND
 $driver_company_scope = (!$is_super_admin && $drivers_has_company) ? " AND d.company_id = $company_id" : "";
 $driver_status_scope = $drivers_has_status ? " AND d.status = 1" : "";
 
+// فلتر المنجم لمدير الحركة والتشغيل (Role 6)
+$ops_mine_filter = "";
+if ($is_movement_manager && $user_mine_id > 0) {
+    $ops_mine_filter = " AND CAST(o.mine_id AS UNSIGNED) = $user_mine_id";
+}
+
 $msg = '';
 $is_success = true;
 
@@ -122,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                             WHERE o.equipment = $equipment_id
                                               AND o.project_id = $selected_project_id
                                               $operations_company_scope
+                                              $ops_mine_filter
                                             LIMIT 1";
                     $equipment_check_res = mysqli_query($conn, $equipment_check_sql);
                     if (!$equipment_check_res || mysqli_num_rows($equipment_check_res) === 0) {
@@ -149,6 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                              WHERE o.equipment = ed.equipment_id
                                                AND o.project_id = $selected_project_id
                                                $operations_company_scope
+                                               $ops_mine_filter
                                          )
                                        LIMIT 1";
                     $active_any_res = mysqli_query($conn, $active_any_sql);
@@ -171,6 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                                 WHERE o.equipment = equipment_drivers.equipment_id
                                                   AND o.project_id = $selected_project_id
                                                   $operations_company_scope
+                                                  $ops_mine_filter
                                             )";
                             mysqli_query($conn, $close_sql);
                         } else {
@@ -211,6 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                     WHERE o.equipment = ed.equipment_id
                                       AND o.project_id = $selected_project_id
                                       $operations_company_scope
+                                      $ops_mine_filter
                                 )
                               LIMIT 1";
                 $check_res = mysqli_query($conn, $check_sql);
@@ -254,6 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                       WHERE o.equipment = ed.equipment_id
                                         AND o.project_id = $selected_project_id
                                         $operations_company_scope
+                                        $ops_mine_filter
                                   )
                                 LIMIT 1";
                     $rel_res = mysqli_query($conn, $rel_sql);
@@ -274,6 +289,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                        WHERE o.equipment = $new_equipment_id
                                          AND o.project_id = $selected_project_id
                                          $operations_company_scope
+                                         $ops_mine_filter
                                        LIMIT 1";
                     $equip_check_res = mysqli_query($conn, $equip_check_sql);
                     if (!$equip_check_res || mysqli_num_rows($equip_check_res) === 0) {
@@ -298,6 +314,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                                WHERE o.equipment = ed.equipment_id
                                                  AND o.project_id = $selected_project_id
                                                  $operations_company_scope
+                                                 $ops_mine_filter
                                            )
                                          LIMIT 1";
                     $active_check_res = mysqli_query($conn, $active_check_sql);
@@ -334,6 +351,7 @@ $equipments_sql = "SELECT DISTINCT e.id, e.code, e.name
                    WHERE o.project_id = $selected_project_id
                      AND o.status <> 0
                      $operations_company_scope
+                     $ops_mine_filter
                    ORDER BY e.code ASC, e.name ASC";
 $equipments_result = mysqli_query($conn, $equipments_sql);
 $project_equipments = [];
@@ -369,6 +387,7 @@ $drivers_sql = "SELECT ed.id, ed.equipment_id, ed.driver_id, ed.start_date, ed.e
                     WHERE o.equipment = ed.equipment_id
                       AND o.project_id = $selected_project_id
                       $operations_company_scope
+                      $ops_mine_filter
                 )
                 $ed_company_scope
                 ORDER BY ed.status DESC, ed.id DESC";
