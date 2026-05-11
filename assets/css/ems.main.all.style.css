@@ -8544,3 +8544,198 @@ table.d-bd {
     justify-content: flex-end !important;
   }
 }
+
+
+/* ---------------------- Section Main Head ---------------------*/
+
+.main_head{
+  direction: ltr;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  background: linear-gradient(180deg, #120d07 0%, #1a1208 48%, #24180d 100%);
+  border: 1px solid rgba(247, 147, 26, 0.24);
+  border-bottom: 2px solid var(--or);
+  border-radius: 14px;
+  box-shadow: var(--sh2);
+  overflow: hidden;
+  color: #fff;
+}
+
+.main_head::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(247, 147, 26, 0.12) 1px, transparent 1px);
+  background-size: 14px 14px;
+  pointer-events: none;
+}
+
+.main_head > *{
+  position: relative;
+  z-index: 1;
+}
+
+.main_head .head_actions,
+.main_head .head_back{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.main_head .head_actions{
+  justify-self: start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.main_head .head_back{
+  justify-self: end;
+  justify-content: flex-end;
+}
+
+.main_head h1{
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+  color: #e5e7eb;
+}
+
+.main_head .head-title{
+  direction: rtl;
+  color: #e3f2fd;
+  font-size: clamp(1rem, 0.92rem + 0.45vw, 1.28rem);
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 10px;
+  justify-self: end;
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.main_head .head-title .title-icon{
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--or), var(--or2));
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.09);
+}
+
+.main_head .head_actions > a,
+.main_head .head_actions > button,
+.main_head .head_actions > input[type="button"],
+.main_head .head_actions > input[type="submit"],
+.main_head .head_back > a,
+.main_head .head_back > button,
+.main_head .head_back > input[type="button"],
+.main_head .head_back > input[type="submit"]{
+  direction: rtl;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform 0.15s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.main_head .head_actions > a:hover,
+.main_head .head_actions > button:hover,
+.main_head .head_actions > input[type="button"]:hover,
+.main_head .head_actions > input[type="submit"]:hover,
+.main_head .head_back > a:hover,
+.main_head .head_back > button:hover,
+.main_head .head_back > input[type="button"]:hover,
+.main_head .head_back > input[type="submit"]:hover{
+  transform: translateY(-1px);
+  border-color: rgba(247, 147, 26, 0.42);
+}
+
+.main_head .add-btn{
+  background: linear-gradient(135deg, var(--or), var(--or2)) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.34) !important;
+}
+
+.main_head .add-btn:hover {
+  background: linear-gradient(135deg, var(--or2), var(--or3)) !important;
+}
+
+.main_head .btn{
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  transition: all 0.2s !important;
+  color: #e5e7eb;
+}
+
+.main_head .head_back{
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px;
+}
+
+.main_head .head_back > a,
+.main_head .head_back > button,
+.main_head .head_back > input[type="button"],
+.main_head .head_back > input[type="submit"]{
+  background: transparent;
+}
+
+@media (max-width: 991px){
+  .main_head{
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .main_head .head_actions,
+  .main_head .head_title,
+  .main_head .head-title,
+  .main_head .head_back{
+    justify-self: stretch;
+  }
+
+  .main_head .head-title{
+    justify-content: center;
+    white-space: normal;
+  }
+
+  .main_head .head_actions{
+    justify-content: flex-start;
+  }
+
+  .main_head .head_back{
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 640px){
+  .main_head .head_actions{
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+  }
+}

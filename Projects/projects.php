@@ -164,7 +164,7 @@ if (isset($_GET['delete_id']) && isset($_GET['csrf_token'])) {
         header('Location: projects.php?error=' . urlencode('خطأ أمني'));
         exit();
     }
-    
+
     $delete_id = intval($_GET['delete_id']);
 
     $old_project = null;
@@ -349,7 +349,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
         $insert_sql = "INSERT INTO project ($insert_columns, create_at) VALUES ($placeholders, NOW())";
 
         $stmt = query_safe($insert_sql, $insert_values);
-        
+
         if ($stmt) {
             log_security_event('PROJECT_CREATED', "Created project: $name");
             projects_redirect_with_msg('تم إضافة المشروع بنجاح ✅');
@@ -370,7 +370,34 @@ include('../insidebar.php');
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <div class="main projects-main ems-unified-page-shell">
-    <div class="header projects-header-shell">
+
+ <div class="main_head">
+
+            <div class="head_actions">
+               <?php if ($can_add): ?>
+                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+                    <i class="fas fa-plus-circle"></i> إضافة مشروع
+                </a>
+            <?php else: ?>
+                <button class="add-btn" disabled>
+                    <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحية)
+                </button>
+            <?php endif; ?>
+        </div>
+
+         <h1 class="head-title">
+             <div class="title-icon"><i class="fas fa-project-diagram"></i></div>
+            إدارة المشاريع
+        </h1>
+
+        <div class="head_back">
+           <a href="../main/dashboard.php" class="back-btn">
+            <i class="fas fa-arrow-right"></i> رجوع
+        </a>
+        </div>
+    </div>
+
+    <!-- <div class="header projects-header-shell">
         <a href="../main/dashboard.php" class="back-btn">
             <i class="fas fa-arrow-right"></i> رجوع
         </a>
@@ -389,7 +416,7 @@ include('../insidebar.php');
                 </button>
             <?php endif; ?>
         </div>
-    </div>
+    </div> -->
 
     <?php if (!empty($_GET['msg'])): ?>
         <?php $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
@@ -543,15 +570,15 @@ include('../insidebar.php');
                         $client_filter = ' WHERE ' . implode(' AND ', $where_clauses);
 
                         // جلب جميع المشاريع من جدول project مع البيانات المدخولة يدويًا
-                        $query = "SELECT op.`id`, op.`name`, op.`client`, op.`location`, op.`total`, op.`status`, op.`create_at`, 
-                      op.`project_code`, op.`category`, op.`sub_sector`, op.`state`, op.`region`, 
+                        $query = "SELECT op.`id`, op.`name`, op.`client`, op.`location`, op.`total`, op.`status`, op.`create_at`,
+                      op.`project_code`, op.`category`, op.`sub_sector`, op.`state`, op.`region`,
                                             op.`nearest_market`, op.`latitude`, op.`longitude`, op.`$project_client_column` AS `client_id`,
                       cc.`client_name`,
-                      (SELECT COUNT(*) 
-                       FROM contracts c 
-                       INNER JOIN mines m ON c.mine_id = m.id 
+                      (SELECT COUNT(*)
+                       FROM contracts c
+                       INNER JOIN mines m ON c.mine_id = m.id
                        WHERE m.project_id = op.id AND $mines_not_deleted_sql) as 'contracts',
-                      (SELECT COUNT(DISTINCT pm.suppliers) 
+                      (SELECT COUNT(DISTINCT pm.suppliers)
                           FROM equipments pm
                           JOIN operations m ON pm.id = m.equipment
                           WHERE m.project_id = op.id) as 'total_suppliers',
@@ -581,10 +608,10 @@ include('../insidebar.php');
                             }
 
                             echo "<td>
-                           
 
-                             <a href='project_mines.php?project_id=" . intval($row['id']) . "' 
-                                       class='mines-count-link' 
+
+                             <a href='project_mines.php?project_id=" . intval($row['id']) . "'
+                                       class='mines-count-link'
                                        title='عرض المناجم'>
                                         <i class='fas fa-mountain'></i>
                                         <span class='mines-count-badge'>" . intval($row['mines_count']) . "</span>
@@ -594,43 +621,43 @@ include('../insidebar.php');
 
                             echo "<td>
                             <div class='action-btns'>
-                                <a href='javascript:void(0)' 
-                                   class='action-btn view viewBtn' 
-                                   data-id='" . $row['id'] . "' 
-                                   data-client-id='" . intval(isset($row['client_id']) ? $row['client_id'] : 0) . "' 
-                                   data-project-name='" . htmlspecialchars($row['name']) . "' 
-                                   data-client-name='" . htmlspecialchars(isset($row['client_name']) && $row['client_name'] !== '' ? $row['client_name'] : $row['client']) . "' 
-                                   data-location='" . htmlspecialchars($row['location']) . "' 
-                                   data-project-code='" . htmlspecialchars(isset($row['project_code']) ? $row['project_code'] : '') . "' 
-                                   data-category='" . htmlspecialchars(isset($row['category']) ? $row['category'] : '') . "' 
-                                   data-sub-sector='" . htmlspecialchars(isset($row['sub_sector']) ? $row['sub_sector'] : '') . "' 
-                                   data-state='" . htmlspecialchars(isset($row['state']) ? $row['state'] : '') . "' 
-                                   data-region='" . htmlspecialchars(isset($row['region']) ? $row['region'] : '') . "' 
-                                   data-nearest-market='" . htmlspecialchars(isset($row['nearest_market']) ? $row['nearest_market'] : '') . "' 
-                                   data-latitude='" . htmlspecialchars(isset($row['latitude']) ? $row['latitude'] : '') . "' 
-                                   data-longitude='" . htmlspecialchars(isset($row['longitude']) ? $row['longitude'] : '') . "' 
-                                   data-status='" . $row['status'] . "' 
-                                   data-contracts='" . $row['contracts'] . "' 
+                                <a href='javascript:void(0)'
+                                   class='action-btn view viewBtn'
+                                   data-id='" . $row['id'] . "'
+                                   data-client-id='" . intval(isset($row['client_id']) ? $row['client_id'] : 0) . "'
+                                   data-project-name='" . htmlspecialchars($row['name']) . "'
+                                   data-client-name='" . htmlspecialchars(isset($row['client_name']) && $row['client_name'] !== '' ? $row['client_name'] : $row['client']) . "'
+                                   data-location='" . htmlspecialchars($row['location']) . "'
+                                   data-project-code='" . htmlspecialchars(isset($row['project_code']) ? $row['project_code'] : '') . "'
+                                   data-category='" . htmlspecialchars(isset($row['category']) ? $row['category'] : '') . "'
+                                   data-sub-sector='" . htmlspecialchars(isset($row['sub_sector']) ? $row['sub_sector'] : '') . "'
+                                   data-state='" . htmlspecialchars(isset($row['state']) ? $row['state'] : '') . "'
+                                   data-region='" . htmlspecialchars(isset($row['region']) ? $row['region'] : '') . "'
+                                   data-nearest-market='" . htmlspecialchars(isset($row['nearest_market']) ? $row['nearest_market'] : '') . "'
+                                   data-latitude='" . htmlspecialchars(isset($row['latitude']) ? $row['latitude'] : '') . "'
+                                   data-longitude='" . htmlspecialchars(isset($row['longitude']) ? $row['longitude'] : '') . "'
+                                   data-status='" . $row['status'] . "'
+                                   data-contracts='" . $row['contracts'] . "'
                                    data-suppliers='" . $row['total_suppliers'] . "'
                                    title='عرض التفاصيل'>
                                    <i class='fas fa-eye'></i>
                                           </a>";
 
                                           if ($can_edit) {
-                                                echo "<a href='javascript:void(0)' 
-                                                    class='action-btn edit editBtn' 
-                                                    data-id='" . intval($row['id']) . "' 
-                                                    data-client-id='" . intval(isset($row['client_id']) ? $row['client_id'] : 0) . "' 
-                                                    data-project-name='" . htmlspecialchars($row['name']) . "' 
-                                                    data-location='" . htmlspecialchars($row['location']) . "' 
-                                                    data-project-code='" . htmlspecialchars(isset($row['project_code']) ? $row['project_code'] : '') . "' 
-                                                    data-category='" . htmlspecialchars(isset($row['category']) ? $row['category'] : '') . "' 
-                                                    data-sub-sector='" . htmlspecialchars(isset($row['sub_sector']) ? $row['sub_sector'] : '') . "' 
-                                                    data-state='" . htmlspecialchars(isset($row['state']) ? $row['state'] : '') . "' 
-                                                    data-region='" . htmlspecialchars(isset($row['region']) ? $row['region'] : '') . "' 
-                                                    data-nearest-market='" . htmlspecialchars(isset($row['nearest_market']) ? $row['nearest_market'] : '') . "' 
-                                                    data-latitude='" . htmlspecialchars(isset($row['latitude']) ? $row['latitude'] : '') . "' 
-                                                    data-longitude='" . htmlspecialchars(isset($row['longitude']) ? $row['longitude'] : '') . "' 
+                                                echo "<a href='javascript:void(0)'
+                                                    class='action-btn edit editBtn'
+                                                    data-id='" . intval($row['id']) . "'
+                                                    data-client-id='" . intval(isset($row['client_id']) ? $row['client_id'] : 0) . "'
+                                                    data-project-name='" . htmlspecialchars($row['name']) . "'
+                                                    data-location='" . htmlspecialchars($row['location']) . "'
+                                                    data-project-code='" . htmlspecialchars(isset($row['project_code']) ? $row['project_code'] : '') . "'
+                                                    data-category='" . htmlspecialchars(isset($row['category']) ? $row['category'] : '') . "'
+                                                    data-sub-sector='" . htmlspecialchars(isset($row['sub_sector']) ? $row['sub_sector'] : '') . "'
+                                                    data-state='" . htmlspecialchars(isset($row['state']) ? $row['state'] : '') . "'
+                                                    data-region='" . htmlspecialchars(isset($row['region']) ? $row['region'] : '') . "'
+                                                    data-nearest-market='" . htmlspecialchars(isset($row['nearest_market']) ? $row['nearest_market'] : '') . "'
+                                                    data-latitude='" . htmlspecialchars(isset($row['latitude']) ? $row['latitude'] : '') . "'
+                                                    data-longitude='" . htmlspecialchars(isset($row['longitude']) ? $row['longitude'] : '') . "'
                                                     data-status='" . htmlspecialchars($row['status']) . "'
                                                     title='تعديل'>
                                                     <i class='fas fa-edit'></i>
@@ -638,14 +665,14 @@ include('../insidebar.php');
                                           }
 
                                           if ($can_delete) {
-                                                echo "<a href='projects.php?delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode(generate_csrf_token()) . "' 
-                                                    class='action-btn delete' 
+                                                echo "<a href='projects.php?delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode(generate_csrf_token()) . "'
+                                                    class='action-btn delete'
                                                     onclick='return confirm(\"هل أنت متأكد من حذف هذا المشروع؟\")'
                                                     title='حذف'>
                                                     <i class='fas fa-trash-alt'></i>
                                                 </a>";
                                           }
-                              
+
                                      echo "</div>
                       </td>";
                             echo "</tr>";
@@ -1007,7 +1034,7 @@ include('../insidebar.php');
         });
 
         // ===== معالجات الاستيراد والتصدير =====
-        
+
         // زر تحميل النموذج
         $('#exportBtn').on('click', function() {
             window.location.href = 'download_projects_template.php';
@@ -1021,7 +1048,7 @@ include('../insidebar.php');
         // معالج رفع الملف
         $('#importFileForm').on('submit', function(e) {
             e.preventDefault();
-            
+
             const fileInput = $('#projectFile')[0];
             if (!fileInput.files.length) {
                 alert('يرجى اختيار ملف');
@@ -1095,6 +1122,3 @@ include('../insidebar.php');
 </body>
 
 </html>
-
-
-

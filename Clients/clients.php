@@ -17,14 +17,52 @@ if (!function_exists('clients_fix_mojibake_output')) {
     function clients_fix_mojibake_output($buffer)
     {
         $map = array(
-            'ا' => 'ا', 'ب' => 'ب', 'ت' => 'ت', 'ث' => 'ث', 'ج' => 'ج', 'ح' => 'ح',
-            'خ' => 'خ', 'د' => 'د', 'ذ' => 'ذ', 'ر' => 'ر', 'ز' => 'ز', 'س' => 'س',
-            'ش' => 'ش', 'ص' => 'ص', 'ض' => 'ض', 'ط' => 'ط', 'ظ' => 'ظ', 'ع' => 'ع',
-            'غ' => 'غ', 'ف' => 'ف', 'ق' => 'ق', 'ك' => 'ك', 'ل' => 'ل', 'م' => 'م',
-            'ن' => 'ن', 'ه' => 'ه', 'و' => 'و', 'ي' => 'ي', 'ى' => 'ى', 'ة' => 'ة',
-            'ء' => 'ء', 'أ' => 'أ', 'إ' => 'إ', 'آ' => 'آ', 'ؤ' => 'ؤ', 'ئ' => 'ئ',
-            '،' => '،', '؛' => '؛', '؟' => '؟', '✅' => '✅', '❌' => '❌', '⏸' => '⏸',
-            'ðŸ”' => 'ðŸ”', 'ðŸ‘‹' => 'ðŸ‘‹', 'ðŸš€' => 'ðŸš€', 'ðŸ†' => 'ðŸ†'
+            'ا' => 'ا',
+            'ب' => 'ب',
+            'ت' => 'ت',
+            'ث' => 'ث',
+            'ج' => 'ج',
+            'ح' => 'ح',
+            'خ' => 'خ',
+            'د' => 'د',
+            'ذ' => 'ذ',
+            'ر' => 'ر',
+            'ز' => 'ز',
+            'س' => 'س',
+            'ش' => 'ش',
+            'ص' => 'ص',
+            'ض' => 'ض',
+            'ط' => 'ط',
+            'ظ' => 'ظ',
+            'ع' => 'ع',
+            'غ' => 'غ',
+            'ف' => 'ف',
+            'ق' => 'ق',
+            'ك' => 'ك',
+            'ل' => 'ل',
+            'م' => 'م',
+            'ن' => 'ن',
+            'ه' => 'ه',
+            'و' => 'و',
+            'ي' => 'ي',
+            'ى' => 'ى',
+            'ة' => 'ة',
+            'ء' => 'ء',
+            'أ' => 'أ',
+            'إ' => 'إ',
+            'آ' => 'آ',
+            'ؤ' => 'ؤ',
+            'ئ' => 'ئ',
+            '،' => '،',
+            '؛' => '؛',
+            '؟' => '؟',
+            '✅' => '✅',
+            '❌' => '❌',
+            '⏸' => '⏸',
+            'ðŸ”' => 'ðŸ”',
+            'ðŸ‘‹' => 'ðŸ‘‹',
+            'ðŸš€' => 'ðŸš€',
+            'ðŸ†' => 'ðŸ†'
         );
         return strtr($buffer, $map);
     }
@@ -41,9 +79,9 @@ if (!function_exists('clients_table_has_column')) {
     function clients_table_has_column($conn, $tableName, $columnName)
     {
         $safeTable = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
-        $safeCol   = preg_replace('/[^a-zA-Z0-9_]/', '', $columnName);
-        $sql       = "SHOW COLUMNS FROM " . $safeTable . " LIKE '" . mysqli_real_escape_string($conn, $safeCol) . "'";
-        $res       = @mysqli_query($conn, $sql);
+        $safeCol = preg_replace('/[^a-zA-Z0-9_]/', '', $columnName);
+        $sql = "SHOW COLUMNS FROM " . $safeTable . " LIKE '" . mysqli_real_escape_string($conn, $safeCol) . "'";
+        $res = @mysqli_query($conn, $sql);
 
         return $res && mysqli_num_rows($res) > 0;
     }
@@ -112,17 +150,17 @@ $clients_has_is_deleted = clients_table_has_column($conn, 'clients', 'is_deleted
 $clients_has_deleted_at = clients_table_has_column($conn, 'clients', 'deleted_at');
 $clients_has_deleted_by = clients_table_has_column($conn, 'clients', 'deleted_by');
 
-$project_has_client_id         = clients_table_has_column($conn, 'project', 'client_id');
+$project_has_client_id = clients_table_has_column($conn, 'project', 'client_id');
 $project_has_company_client_id = clients_table_has_column($conn, 'project', 'company_client_id');
-$project_has_company_id        = clients_table_has_column($conn, 'project', 'company_id');
-$project_has_is_deleted        = clients_table_has_column($conn, 'project', 'is_deleted');
-$project_has_deleted_at        = clients_table_has_column($conn, 'project', 'deleted_at');
+$project_has_company_id = clients_table_has_column($conn, 'project', 'company_id');
+$project_has_is_deleted = clients_table_has_column($conn, 'project', 'is_deleted');
+$project_has_deleted_at = clients_table_has_column($conn, 'project', 'deleted_at');
 
-$operations_has_company_id       = clients_table_has_column($conn, 'operations', 'company_id');
+$operations_has_company_id = clients_table_has_column($conn, 'operations', 'company_id');
 $equipment_drivers_has_company_id = clients_table_has_column($conn, 'equipment_drivers', 'company_id');
-$mines_has_company_id            = clients_table_has_column($conn, 'mines', 'company_id');
-$mines_has_is_deleted            = clients_table_has_column($conn, 'mines', 'is_deleted');
-$mines_has_deleted_at            = clients_table_has_column($conn, 'mines', 'deleted_at');
+$mines_has_company_id = clients_table_has_column($conn, 'mines', 'company_id');
+$mines_has_is_deleted = clients_table_has_column($conn, 'mines', 'is_deleted');
+$mines_has_deleted_at = clients_table_has_column($conn, 'mines', 'deleted_at');
 
 $project_client_link_column = '';
 if ($project_has_company_client_id) {
@@ -156,12 +194,12 @@ if (!$clients_has_is_deleted || !$clients_has_deleted_at || !$clients_has_delete
 // ══════════════════════════════════════════════════════════════════════════════
 // بناء شروط SQL للنطاق والحذف الناعم
 // ══════════════════════════════════════════════════════════════════════════════
-$scope_clients_sql        = clients_build_scope_sql($company_id, $clients_has_company_id, 'cc');
+$scope_clients_sql = clients_build_scope_sql($company_id, $clients_has_company_id, 'cc');
 $scope_clients_update_sql = clients_build_scope_sql($company_id, $clients_has_company_id, '');
-$not_deleted_cc_sql       = clients_not_deleted_sql('cc', $clients_has_is_deleted, $clients_has_deleted_at);
-$not_deleted_plain_sql    = clients_not_deleted_sql('', $clients_has_is_deleted, $clients_has_deleted_at);
+$not_deleted_cc_sql = clients_not_deleted_sql('cc', $clients_has_is_deleted, $clients_has_deleted_at);
+$not_deleted_plain_sql = clients_not_deleted_sql('', $clients_has_is_deleted, $clients_has_deleted_at);
 
-$scope_project_sql      = clients_build_scope_sql($company_id, $project_has_company_id, 'p');
+$scope_project_sql = clients_build_scope_sql($company_id, $project_has_company_id, 'p');
 $not_deleted_project_sql = clients_not_deleted_sql('p', $project_has_is_deleted, $project_has_deleted_at);
 
 $projects_count_select_sql = '0';
@@ -189,7 +227,7 @@ $clients_csrf_token = $_SESSION['clients_csrf_token'];
 // هذا للعرض فقط ولا يُخزَّن في قاعدة البيانات
 // ══════════════════════════════════════════════════════════════════════════════
 $next_client_code = 'CLT-0001'; // القيمة الافتراضية
-$last_code_scope  = $clients_has_company_id ? "AND company_id = $company_id" : '';
+$last_code_scope = $clients_has_company_id ? "AND company_id = $company_id" : '';
 $last_code_deleted = $clients_has_is_deleted ? "AND is_deleted = 0" : ($clients_has_deleted_at ? "AND deleted_at IS NULL" : "");
 $last_code_sql = "SELECT client_code FROM clients
                   WHERE client_code REGEXP '^CLT-[0-9]+$'
@@ -200,8 +238,8 @@ $last_code_sql = "SELECT client_code FROM clients
 $last_code_res = @mysqli_query($conn, $last_code_sql);
 if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
     $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num      = intval(substr($last_code_row['client_code'], 4)); // بعد "CLT-"
-    $next_num      = $last_num + 1;
+    $last_num = intval(substr($last_code_row['client_code'], 4)); // بعد "CLT-"
+    $next_num = $last_num + 1;
     $next_client_code = 'CLT-' . str_pad($next_num, 4, '0', STR_PAD_LEFT);
 }
 
@@ -210,27 +248,27 @@ if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
 // ══════════════════════════════════════════════════════════════════════════════
 
 // الحصول على معرف وحدة العملاء من جدول modules
-$module_query = "SELECT id FROM modules 
-                      WHERE code = 'Clients/clients.php' 
-                          OR code = 'clients' 
+$module_query = "SELECT id FROM modules
+                      WHERE code = 'Clients/clients.php'
+                          OR code = 'clients'
                           OR code LIKE '%clients.php%'
                           OR name LIKE '%عملاء%'
                       LIMIT 1";
 $module_result = $conn->query($module_query);
-$module_info   = $module_result ? $module_result->fetch_assoc() : null;
-$module_id     = $module_info ? $module_info['id'] : null;
+$module_info = $module_result ? $module_result->fetch_assoc() : null;
+$module_id = $module_info ? $module_info['id'] : null;
 
 // تحديد صلاحيات المستخدم على هذه الوحدة
-$can_view   = false;
-$can_add    = false;
-$can_edit   = false;
+$can_view = false;
+$can_add = false;
+$can_edit = false;
 $can_delete = false;
 
 if ($module_id) {
-    $perms      = get_module_permissions($conn, $module_id);
-    $can_view   = $perms['can_view'];
-    $can_add    = $perms['can_add'];
-    $can_edit   = $perms['can_edit'];
+    $perms = get_module_permissions($conn, $module_id);
+    $can_view = $perms['can_view'];
+    $can_add = $perms['can_add'];
+    $can_edit = $perms['can_edit'];
     $can_delete = $perms['can_delete'];
 }
 
@@ -251,9 +289,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
     }
 
     // التحقق من صلاحية التعديل أو الإضافة
-    $client_id  = isset($_POST['client_id']) ? intval($_POST['client_id']) : 0;
+    $client_id = isset($_POST['client_id']) ? intval($_POST['client_id']) : 0;
     $is_editing = $client_id > 0;
-    
+
     if ($is_editing && !$can_edit) {
         clients_redirect_with_msg('لا توجد صلاحية تعديل العملاء ❌');
     } elseif (!$is_editing && !$can_add) {
@@ -267,42 +305,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
     }
 
     // التحقق من صحة حالة العميل
-    $status_raw     = isset($_POST['status']) ? trim($_POST['status']) : '';
+    $status_raw = isset($_POST['status']) ? trim($_POST['status']) : '';
     $allowed_status = array('نشط', 'متوقف');
     if (!in_array($status_raw, $allowed_status, true)) {
         clients_redirect_with_msg('حالة العميل غير صالحة ❌');
     }
 
     // تنظيف البيانات المدخلة
-    $client_code     = mysqli_real_escape_string($conn, $client_code_raw);
-    $client_name     = mysqli_real_escape_string($conn, trim($_POST['client_name']));
-    $entity_type     = mysqli_real_escape_string($conn, trim($_POST['entity_type']));
+    $client_code = mysqli_real_escape_string($conn, $client_code_raw);
+    $client_name = mysqli_real_escape_string($conn, trim($_POST['client_name']));
+    $entity_type = mysqli_real_escape_string($conn, trim($_POST['entity_type']));
     $sector_category = mysqli_real_escape_string($conn, trim($_POST['sector_category']));
-    $phone           = mysqli_real_escape_string($conn, trim($_POST['phone']));
-    $email           = mysqli_real_escape_string($conn, trim($_POST['email']));
-    $whatsapp        = mysqli_real_escape_string($conn, trim($_POST['whatsapp']));
-    $status          = mysqli_real_escape_string($conn, $status_raw);
-    $created_by      = intval($_SESSION['user']['id']);
+    $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
+    $email = mysqli_real_escape_string($conn, trim($_POST['email']));
+    $whatsapp = mysqli_real_escape_string($conn, trim($_POST['whatsapp']));
+    $status = mysqli_real_escape_string($conn, $status_raw);
+    $created_by = intval($_SESSION['user']['id']);
 
     if ($client_id > 0) {
         // ── تعديل عميل موجود ────────────────────────────────────────────────
 
         // التحقق من ملكية العميل للشركة الحالية
-        $owner_check_query  = "SELECT cc.id FROM clients cc WHERE cc.id = $client_id AND $scope_clients_sql AND $not_deleted_cc_sql LIMIT 1";
+        $owner_check_query = "SELECT cc.id FROM clients cc WHERE cc.id = $client_id AND $scope_clients_sql AND $not_deleted_cc_sql LIMIT 1";
         $owner_check_result = mysqli_query($conn, $owner_check_query);
         if (!$owner_check_result || mysqli_num_rows($owner_check_result) === 0) {
             clients_redirect_with_msg('لا يمكنك تعديل عميل لا يتبع لشركتك ❌');
         }
 
         // التحقق من عدم تكرار كود العميل
-        $check_query  = "SELECT cc.id FROM clients cc WHERE cc.client_code = '$client_code' AND cc.id != $client_id AND $scope_clients_sql AND $not_deleted_cc_sql";
+        $check_query = "SELECT cc.id FROM clients cc WHERE cc.client_code = '$client_code' AND cc.id != $client_id AND $scope_clients_sql AND $not_deleted_cc_sql";
         $check_result = mysqli_query($conn, $check_query);
 
         if (mysqli_num_rows($check_result) > 0) {
             clients_redirect_with_msg('كود العميل موجود مسبقاً داخل شركتك ❌');
         }
 
-        $update_query = "UPDATE clients SET 
+        $update_query = "UPDATE clients SET
             client_code      = '$client_code',
             client_name      = '$client_name',
             entity_type      = '$entity_type',
@@ -315,7 +353,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
 
         // إذا كان عمود company_id موجوداً، أضفه للتحديث
         if ($clients_has_company_id) {
-            $update_query = "UPDATE clients SET 
+            $update_query = "UPDATE clients SET
             client_code      = '$client_code',
             client_name      = '$client_name',
             entity_type      = '$entity_type',
@@ -327,7 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
             company_id       = '$company_id'
             WHERE id = $client_id AND $scope_clients_update_sql AND $not_deleted_plain_sql";
         }
-        
+
         if (mysqli_query($conn, $update_query)) {
             clients_redirect_with_msg('تم تعديل العميل بنجاح ✅');
         } else {
@@ -339,23 +377,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
         // ── إضافة عميل جديد ─────────────────────────────────────────────────
 
         // التحقق من عدم تكرار كود العميل
-        $check_query  = "SELECT cc.id FROM clients cc WHERE cc.client_code = '$client_code' AND $scope_clients_sql AND $not_deleted_cc_sql";
+        $check_query = "SELECT cc.id FROM clients cc WHERE cc.client_code = '$client_code' AND $scope_clients_sql AND $not_deleted_cc_sql";
         $check_result = mysqli_query($conn, $check_query);
 
         if (mysqli_num_rows($check_result) > 0) {
             clients_redirect_with_msg('كود العميل موجود مسبقاً داخل شركتك ❌');
         }
 
-        $insert_query = "INSERT INTO clients 
-            (client_code, client_name, entity_type, sector_category, phone, email, whatsapp, status, created_by) 
-            VALUES 
+        $insert_query = "INSERT INTO clients
+            (client_code, client_name, entity_type, sector_category, phone, email, whatsapp, status, created_by)
+            VALUES
             ('$client_code', '$client_name', '$entity_type', '$sector_category', '$phone', '$email', '$whatsapp', '$status', '$created_by')";
 
         // إذا كان عمود company_id موجوداً، أضفه للإدراج
         if ($clients_has_company_id) {
-            $insert_query = "INSERT INTO clients 
-            (client_code, client_name, entity_type, sector_category, phone, email, whatsapp, status, created_by, company_id) 
-            VALUES 
+            $insert_query = "INSERT INTO clients
+            (client_code, client_name, entity_type, sector_category, phone, email, whatsapp, status, created_by, company_id)
+            VALUES
             ('$client_code', '$client_name', '$entity_type', '$sector_category', '$phone', '$email', '$whatsapp', '$status', '$created_by', '$company_id')";
         }
 
@@ -372,9 +410,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
 // معالجة حذف العميل (حذف ناعم)
 // ══════════════════════════════════════════════════════════════════════════════
 if (isset($_GET['delete_id'])) {
-    $delete_id   = intval($_GET['delete_id']);
+    $delete_id = intval($_GET['delete_id']);
     $delete_csrf = isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '';
-    
+
     // التحقق من صلاحية الحذف
     if (!$can_delete) {
         clients_redirect_with_msg('لا توجد صلاحية حذف العملاء ❌');
@@ -404,7 +442,7 @@ if (isset($_GET['delete_id'])) {
         $delete_set[] = "deleted_at = NOW()";
     }
     if ($clients_has_deleted_by) {
-        $deleted_by   = intval($_SESSION['user']['id']);
+        $deleted_by = intval($_SESSION['user']['id']);
         $delete_set[] = "deleted_by = $deleted_by";
     }
 
@@ -433,7 +471,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
     }
 
     $client_check_query = "SELECT cc.id FROM clients cc WHERE cc.id = $client_id AND $scope_clients_sql AND $not_deleted_cc_sql LIMIT 1";
-    $client_check_res   = mysqli_query($conn, $client_check_query);
+    $client_check_res = mysqli_query($conn, $client_check_query);
     if (!$client_check_res || mysqli_num_rows($client_check_res) === 0) {
         echo json_encode(array('success' => false, 'message' => 'العميل غير موجود أو خارج نطاق الشركة'));
         exit();
@@ -525,19 +563,19 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
 
     $projects = array();
     while ($project_row = mysqli_fetch_assoc($projects_result)) {
-        $equipments_total   = intval($project_row['equipments_total']);
+        $equipments_total = intval($project_row['equipments_total']);
         $equipments_working = intval($project_row['equipments_working']);
-        $operators_total    = intval($project_row['operators_total']);
-        $operators_working  = intval($project_row['operators_working']);
+        $operators_total = intval($project_row['operators_total']);
+        $operators_working = intval($project_row['operators_working']);
 
-        $project_row['equipments_total']   = $equipments_total;
+        $project_row['equipments_total'] = $equipments_total;
         $project_row['equipments_working'] = $equipments_working;
         $project_row['equipments_stopped'] = max(0, $equipments_total - $equipments_working);
-        $project_row['operators_total']    = $operators_total;
-        $project_row['operators_working']  = $operators_working;
-        $project_row['operators_stopped']  = max(0, $operators_total - $operators_working);
-        $project_row['mines_count']        = intval($project_row['mines_count']);
-        $project_row['suppliers_count']    = intval($project_row['suppliers_count']);
+        $project_row['operators_total'] = $operators_total;
+        $project_row['operators_working'] = $operators_working;
+        $project_row['operators_stopped'] = max(0, $operators_total - $operators_working);
+        $project_row['mines_count'] = intval($project_row['mines_count']);
+        $project_row['suppliers_count'] = intval($project_row['suppliers_count']);
 
         $projects[] = $project_row;
     }
@@ -551,18 +589,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
 // ══════════════════════════════════════════════════════════════════════════════
 $clients_rows = array();
 
-$clients_total_count      = 0;
-$clients_active_count     = 0;
-$clients_stopped_count    = 0;
-$clients_companies_count  = 0;
+$clients_total_count = 0;
+$clients_active_count = 0;
+$clients_stopped_count = 0;
+$clients_companies_count = 0;
 $clients_individuals_count = 0;
 $clients_unknown_entity_count = 0;
-$clients_projects_total   = 0;
+$clients_projects_total = 0;
 $clients_without_projects = 0;
 
 $sector_counts = array();
 
-$clients_query  = "SELECT cc.*, u.name as creator_name, $projects_count_select_sql AS projects_count
+$clients_query = "SELECT cc.*, u.name as creator_name, $projects_count_select_sql AS projects_count
                   FROM clients cc
                   LEFT JOIN users u ON cc.created_by = u.id
                   WHERE $scope_clients_sql AND $not_deleted_cc_sql
@@ -609,9 +647,9 @@ if ($clients_result) {
 }
 
 $clients_stopped_count = max(0, $clients_total_count - $clients_active_count);
-$sector_mining_count      = isset($sector_counts['تعدين']) ? intval($sector_counts['تعدين']) : 0;
+$sector_mining_count = isset($sector_counts['تعدين']) ? intval($sector_counts['تعدين']) : 0;
 $sector_contracting_count = isset($sector_counts['مقاولات']) ? intval($sector_counts['مقاولات']) : 0;
-$sector_services_count    = isset($sector_counts['خدمات']) ? intval($sector_counts['خدمات']) : 0;
+$sector_services_count = isset($sector_counts['خدمات']) ? intval($sector_counts['خدمات']) : 0;
 
 arsort($sector_counts);
 
@@ -621,58 +659,58 @@ include('../insidebar.php');
 ?>
 
 <div class="main clients-main ems-unified-page-shell">
-    <div class="header clients-header-shell">
-        <div class="clients-header-brand">
-            <h1 class="page-title">
-                <div class="title-icon"><i class="fas fa-users"></i></div>
-                إدارة العملاء
-            </h1>
-            <a href="../main/dashboard.php" class="back-btn clients-header-back">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
 
-        <div class="header -actions clients-header-actions">
+    <div class="main_head">
+
+        <div class="head_actions">
             <?php if ($can_add): ?>
-                <a href="javascript:void(0)" id="toggleForm" class="add-btn clients-header-add">
+                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                     <i class="fas fa-plus-circle"></i>
                     <span class="clients-toggle-form-text">إضافة عميل جديد</span>
                 </a>
             <?php else: ?>
-                <button class="add-btn clients-btn-disabled" disabled>
+                <button class="" disabled>
                     <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحيات)
                 </button>
             <?php endif; ?>
 
-            <a href="javascript:void(0)" id="toggleStats" class="clients-header-link clients-header-link-stats"
-                title="إظهار أو إخفاء الإحصائيات">
+            <a href="javascript:void(0)" id="toggleStats" class="btn" title="إظهار أو إخفاء الإحصائيات">
                 <i class="fas fa-chart-pie"></i>
                 <span class="clients-toggle-stats-text">إخفاء الإحصائيات</span>
             </a>
 
-            <a href="download_clients_template_csv.php" class="clients-header-link clients-header-link-csv"
-                title="تحميل نموذج CSV فارغ للاستيراد">
+            <a href="download_clients_template_csv.php" class="btn" title="تحميل نموذج CSV فارغ للاستيراد">
                 <i class="fas fa-file-csv"></i> تحميل نموذج CSV
             </a>
-            <a href="download_clients_template.php" class="clients-header-link clients-header-link-excel"
-                title="تحميل نموذج Excel فارغ للاستيراد">
+            <a href="download_clients_template.php" class="btn" title="تحميل نموذج Excel فارغ للاستيراد">
                 <i class="fas fa-file-excel"></i> تحميل نموذج Excel
             </a>
             <?php if ($can_add): ?>
-                <a href="javascript:void(0)" id="openImportModal" class="clients-header-link clients-header-link-import">
+                <a href="javascript:void(0)" id="openImportModal" class="">
                     <i class="fas fa-file-upload"></i> استيراد من Excel
                 </a>
             <?php endif; ?>
-            <a href="export_clients_excel.php" class="clients-header-link clients-header-link-export"
-                title="تصدير جميع العملاء إلى ملف Excel">
+            <a href="export_clients_excel.php" class="btn" title="تصدير جميع العملاء إلى ملف Excel">
                 <i class="fas fa-download"></i> تصدير Excel
+            </a>
+
+        </div>
+
+          <h1 class="head-title">
+            <div class="title-icon"><i class="fas fa-users"></i></div>
+            إدارة العملاء
+        </h1>
+
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="">
+                <i class="fas fa-arrow-right"></i> رجوع
             </a>
         </div>
     </div>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;
-    ?>
+        ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
             <?php echo clients_e($_GET['msg']); ?>
@@ -758,32 +796,27 @@ include('../insidebar.php');
             <div class="card-body">
                 <div class="form-grid">
 
-                 <!-- ══ حقل الكود المولد تلقائياً (قراءة فقط - لا يُرسَل لقاعدة البيانات) ══ -->
+                    <!-- ══ حقل الكود المولد تلقائياً (قراءة فقط - لا يُرسَل لقاعدة البيانات) ══ -->
                     <div id="generated_code_wrapper">
-                        <label><i class="fas fa-magic"></i> كود العميل المولد  <i class="fas fa-info-circle clients-info-icon"></i></label>
-                        <input type="text"
-                               id="generated_client_code"
-                               class="generated-code-field"
-                               value="<?php echo clients_e($next_client_code); ?>"
-                               readonly
-                               tabindex="-1"
-                               title="هذا الكود للعرض فقط، يمكنك نسخه واستخدامه في حقل كود العميل" />
+                        <label><i class="fas fa-magic"></i> كود العميل المولد <i
+                                class="fas fa-info-circle clients-info-icon"></i></label>
+                        <input type="text" id="generated_client_code" class="generated-code-field"
+                            value="<?php echo clients_e($next_client_code); ?>" readonly tabindex="-1"
+                            title="هذا الكود للعرض فقط، يمكنك نسخه واستخدامه في حقل كود العميل" />
                         <div class="generated-code-hint">
-                           
+
                         </div>
                     </div>
                     <!-- ══════════════════════════════════════════════════════ -->
 
                     <div>
                         <label><i class="fas fa-barcode"></i> كود العميل *</label>
-                        <input type="text" name="client_code" id="client_code"
-                               placeholder="مثال: CL-001" required
-                               pattern="[A-Za-z0-9-_]+" />
+                        <input type="text" name="client_code" id="client_code" placeholder="مثال: CL-001" required
+                            pattern="[A-Za-z0-9-_]+" />
                     </div>
                     <div>
                         <label><i class="fas fa-user"></i> اسم العميل *</label>
-                        <input type="text" name="client_name" id="client_name"
-                               placeholder="أدخل اسم العميل" required />
+                        <input type="text" name="client_name" id="client_name" placeholder="أدخل اسم العميل" required />
                     </div>
                     <div>
                         <label><i class="fas fa-building"></i> نوع الكيان</label>
@@ -816,15 +849,15 @@ include('../insidebar.php');
                     </div>
                     <div>
                         <label><i class="fas fa-phone"></i> رقم الهاتف</label>
-                        <input type="tel" name="phone" id="phone" placeholder="مثال: +249123456789"/>
+                        <input type="tel" name="phone" id="phone" placeholder="مثال: +249123456789" />
                     </div>
                     <div>
                         <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
-                        <input type="email" name="email" id="email" placeholder="example@company.com"/>
+                        <input type="email" name="email" id="email" placeholder="example@company.com" />
                     </div>
                     <div>
                         <label><i class="fab fa-whatsapp"></i> واتساب</label>
-                        <input type="tel" name="whatsapp" id="whatsapp" placeholder="مثال: +249123456789"/>
+                        <input type="tel" name="whatsapp" id="whatsapp" placeholder="مثال: +249123456789" />
                     </div>
                     <div>
                         <label><i class="fas fa-toggle-on"></i> حالة العميل *</label>
@@ -905,49 +938,49 @@ include('../insidebar.php');
                             // أزرار الإجراءات
                             echo "<td>
                                 <div class='action-btns'>
-                                    <a href='javascript:void(0)' 
-                                       class='action-btn view viewClientBtn' 
-                                       data-id='"       . $row['id']                                                       . "'
-                                       data-code='"     . clients_e($row['client_code'])                                   . "'
-                                       data-name='"     . clients_e($row['client_name'])                                   . "'
-                                       data-entity='"   . clients_e($row['entity_type'])                                   . "'
-                                       data-sector='"   . clients_e($row['sector_category'])                               . "'
-                                       data-phone='"    . clients_e($row['phone'])                                         . "'
-                                       data-email='"    . clients_e($row['email'])                                         . "'
-                                       data-whatsapp='" . clients_e($row['whatsapp'])                                      . "'
-                                       data-status='"   . clients_e($row['status'])                                        . "'
-                                       data-projects-count='" . intval($row['projects_count'])                              . "'
-                                       data-created='"  . clients_e(isset($row['creator_name']) ? $row['creator_name'] : 'غير محدد') . "'
+                                    <a href='javascript:void(0)'
+                                       class='action-btn view viewClientBtn'
+                                       data-id='" . $row['id'] . "'
+                                       data-code='" . clients_e($row['client_code']) . "'
+                                       data-name='" . clients_e($row['client_name']) . "'
+                                       data-entity='" . clients_e($row['entity_type']) . "'
+                                       data-sector='" . clients_e($row['sector_category']) . "'
+                                       data-phone='" . clients_e($row['phone']) . "'
+                                       data-email='" . clients_e($row['email']) . "'
+                                       data-whatsapp='" . clients_e($row['whatsapp']) . "'
+                                       data-status='" . clients_e($row['status']) . "'
+                                       data-projects-count='" . intval($row['projects_count']) . "'
+                                       data-created='" . clients_e(isset($row['creator_name']) ? $row['creator_name'] : 'غير محدد') . "'
                                        title='عرض التفاصيل'>
                                         <i class='fas fa-eye'></i>
                                     </a>";
-                                    
-                                    if ($can_edit) {
-                                        echo "<a href='javascript:void(0)' 
-                                           class='action-btn edit editClientBtn' 
-                                           data-id='"       . $row['id']                        . "'
-                                           data-code='"     . clients_e($row['client_code'])    . "'
-                                           data-name='"     . clients_e($row['client_name'])    . "'
-                                           data-entity='"   . clients_e($row['entity_type'])    . "'
-                                           data-sector='"   . clients_e($row['sector_category']). "'
-                                           data-phone='"    . clients_e($row['phone'])           . "'
-                                           data-email='"    . clients_e($row['email'])           . "'
-                                           data-whatsapp='" . clients_e($row['whatsapp'])        . "'
-                                           data-status='"   . clients_e($row['status'])          . "'
+
+                            if ($can_edit) {
+                                echo "<a href='javascript:void(0)'
+                                           class='action-btn edit editClientBtn'
+                                           data-id='" . $row['id'] . "'
+                                           data-code='" . clients_e($row['client_code']) . "'
+                                           data-name='" . clients_e($row['client_name']) . "'
+                                           data-entity='" . clients_e($row['entity_type']) . "'
+                                           data-sector='" . clients_e($row['sector_category']) . "'
+                                           data-phone='" . clients_e($row['phone']) . "'
+                                           data-email='" . clients_e($row['email']) . "'
+                                           data-whatsapp='" . clients_e($row['whatsapp']) . "'
+                                           data-status='" . clients_e($row['status']) . "'
                                            title='تعديل'>
                                             <i class='fas fa-edit'></i>
                                         </a>";
-                                    }
-                                    
-                                    if ($can_delete) {
-                                        echo "<a href='?delete_id=" . urlencode($row['id']) . "&csrf_token=" . urlencode($clients_csrf_token) . "' 
-                                           class='action-btn delete' 
-                                           onclick='return confirm(\"هل أنت متأكد من حذف هذا العميل؟\")' 
+                            }
+
+                            if ($can_delete) {
+                                echo "<a href='?delete_id=" . urlencode($row['id']) . "&csrf_token=" . urlencode($clients_csrf_token) . "'
+                                           class='action-btn delete'
+                                           onclick='return confirm(\"هل أنت متأكد من حذف هذا العميل؟\")'
                                            title='حذف'>
                                             <i class='fas fa-trash-alt'></i>
                                         </a>";
-                                    }
-                                    
+                            }
+
                             echo "</div>
                             </td>";
                             echo "</tr>";
@@ -975,8 +1008,10 @@ include('../insidebar.php');
                         <i class="fas fa-table"></i> &nbsp;ترتيب الأعمدة في الملف:
                     </div>
                     <div class="clients-import-cols-grid">
-                        <div><span class="clients-col-required">A</span> — كود العميل <span class="clients-col-required-text">(مطلوب)</span></div>
-                        <div><span class="clients-col-required">B</span> — اسم العميل <span class="clients-col-required-text">(مطلوب)</span></div>
+                        <div><span class="clients-col-required">A</span> — كود العميل <span
+                                class="clients-col-required-text">(مطلوب)</span></div>
+                        <div><span class="clients-col-required">B</span> — اسم العميل <span
+                                class="clients-col-required-text">(مطلوب)</span></div>
                         <div><span class="clients-col-optional">C</span> — نوع الكيان</div>
                         <div><span class="clients-col-optional">D</span> — تصنيف القطاع</div>
                         <div><span class="clients-col-optional">E</span> — رقم الهاتف</div>
@@ -986,8 +1021,10 @@ include('../insidebar.php');
                     </div>
                     <div class="clients-import-tip">
                         <i class="fas fa-lightbulb clients-import-tip-icon"></i>
-                        حمّل <a href="download_clients_template.php" class="clients-import-link" target="_blank">نموذج Excel</a>
-                        أو <a href="download_clients_template_csv.php" class="clients-import-link" target="_blank">نموذج CSV</a>
+                        حمّل <a href="download_clients_template.php" class="clients-import-link" target="_blank">نموذج
+                            Excel</a>
+                        أو <a href="download_clients_template_csv.php" class="clients-import-link" target="_blank">نموذج
+                            CSV</a>
                         لمعرفة الترتيب الصحيح.
                     </div>
                 </div>
@@ -1048,7 +1085,8 @@ include('../insidebar.php');
                     <div class="view-item-value ems-view-item-value" id="view_sector_category">-</div>
                 </div>
                 <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fas fa-project-diagram"></i> عدد المشاريع المرتبطة</div>
+                    <div class="view-item-label ems-view-item-label"><i class="fas fa-project-diagram"></i> عدد المشاريع
+                        المرتبطة</div>
                     <div class="view-item-value ems-view-item-value" id="view_projects_count">0</div>
                 </div>
                 <div class="view-item ems-view-item">
@@ -1056,7 +1094,8 @@ include('../insidebar.php');
                     <div class="view-item-value ems-view-item-value" id="view_phone">-</div>
                 </div>
                 <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fas fa-envelope"></i> البريد الإلكتروني</div>
+                    <div class="view-item-label ems-view-item-label"><i class="fas fa-envelope"></i> البريد الإلكتروني
+                    </div>
                     <div class="view-item-value ems-view-item-value" id="view_email">-</div>
                 </div>
                 <div class="view-item ems-view-item">
@@ -1077,11 +1116,16 @@ include('../insidebar.php');
             <h6 class="clients-related-projects-title"><i class="fas fa-folder-open"></i> المشاريع المرتبطة بالعميل</h6>
 
             <div id="clientProjectsSummary" class="clients-projects-summary">
-                <span class="status-active clients-summary-pill">المشاريع: <strong id="summary_projects_count">0</strong></span>
-                <span class="status-active clients-summary-pill">المناجم: <strong id="summary_mines_count">0</strong></span>
-                <span class="status-active clients-summary-pill">الموردون: <strong id="summary_suppliers_count">0</strong></span>
-                <span class="status-active clients-summary-pill">الآليات: <strong id="summary_equipments_count">0</strong></span>
-                <span class="status-active clients-summary-pill">المشغلون: <strong id="summary_operators_count">0</strong></span>
+                <span class="status-active clients-summary-pill">المشاريع: <strong
+                        id="summary_projects_count">0</strong></span>
+                <span class="status-active clients-summary-pill">المناجم: <strong
+                        id="summary_mines_count">0</strong></span>
+                <span class="status-active clients-summary-pill">الموردون: <strong
+                        id="summary_suppliers_count">0</strong></span>
+                <span class="status-active clients-summary-pill">الآليات: <strong
+                        id="summary_equipments_count">0</strong></span>
+                <span class="status-active clients-summary-pill">المشغلون: <strong
+                        id="summary_operators_count">0</strong></span>
             </div>
 
             <div id="clientProjectsLoading" class="clients-hidden clients-projects-loading">
@@ -1113,11 +1157,13 @@ include('../insidebar.php');
         </div>
         <div class="modal-footer ems-view-modal__footer clients-view-modal-footer">
             <?php if ($can_edit): ?>
-                <button type="button" class="btn-modal ems-view-btn ems-view-btn--primary btn-modal-save editClientBtn" id="viewEditBtn">
+                <button type="button" class="btn-modal ems-view-btn ems-view-btn--primary btn-modal-save editClientBtn"
+                    id="viewEditBtn">
                     <i class="fas fa-edit"></i> تعديل البيانات
                 </button>
             <?php endif; ?>
-            <button type="button" class="btn-modal ems-view-btn ems-view-btn--secondary btn-modal-cancel" onclick="closeViewModal()">
+            <button type="button" class="btn-modal ems-view-btn ems-view-btn--secondary btn-modal-cancel"
+                onclick="closeViewModal()">
                 <i class="fas fa-times"></i> إغلاق
             </button>
         </div>
@@ -1298,15 +1344,15 @@ include('../insidebar.php');
     // تعديل عميل — تحميل بياناته في الفورم
     $(document).on('click', '.editClientBtn', function () {
         const clientData = {
-            id:       $(this).data('id'),
-            code:     $(this).data('code'),
-            name:     $(this).data('name'),
-            entity:   $(this).data('entity'),
-            sector:   $(this).data('sector'),
-            phone:    $(this).data('phone'),
-            email:    $(this).data('email'),
+            id: $(this).data('id'),
+            code: $(this).data('code'),
+            name: $(this).data('name'),
+            entity: $(this).data('entity'),
+            sector: $(this).data('sector'),
+            phone: $(this).data('phone'),
+            email: $(this).data('email'),
             whatsapp: $(this).data('whatsapp'),
-            status:   $(this).data('status')
+            status: $(this).data('status')
         };
 
         // ملء الفورم بالبيانات
@@ -1342,27 +1388,27 @@ include('../insidebar.php');
     // ════════════════════════════════════════════════
     $(document).on('click', '.viewClientBtn', function () {
         const clientData = {
-            id:       $(this).data('id'),
-            code:     $(this).data('code'),
-            name:     $(this).data('name'),
-            entity:   $(this).data('entity'),
-            sector:   $(this).data('sector'),
-            phone:    $(this).data('phone'),
-            email:    $(this).data('email'),
+            id: $(this).data('id'),
+            code: $(this).data('code'),
+            name: $(this).data('name'),
+            entity: $(this).data('entity'),
+            sector: $(this).data('sector'),
+            phone: $(this).data('phone'),
+            email: $(this).data('email'),
             whatsapp: $(this).data('whatsapp'),
-            status:   $(this).data('status'),
+            status: $(this).data('status'),
             projectsCount: $(this).data('projects-count'),
-            created:  $(this).data('created')
+            created: $(this).data('created')
         };
 
         // ملء بيانات العرض
-        $('#view_client_code').text(clientData.code    || '-');
-        $('#view_client_name').text(clientData.name    || '-');
-        $('#view_entity_type').text(clientData.entity  || '-');
-        $('#view_sector_category').text(clientData.sector  || '-');
-        $('#view_phone').text(clientData.phone         || '-');
-        $('#view_email').text(clientData.email         || '-');
-        $('#view_whatsapp').text(clientData.whatsapp   || '-');
+        $('#view_client_code').text(clientData.code || '-');
+        $('#view_client_name').text(clientData.name || '-');
+        $('#view_entity_type').text(clientData.entity || '-');
+        $('#view_sector_category').text(clientData.sector || '-');
+        $('#view_phone').text(clientData.phone || '-');
+        $('#view_email').text(clientData.email || '-');
+        $('#view_whatsapp').text(clientData.whatsapp || '-');
         $('#view_projects_count').text(clientData.projectsCount || 0);
 
         // عرض الحالة بألوان
@@ -1373,19 +1419,19 @@ include('../insidebar.php');
             statusHtml = '<span class="status-inactive"><i class="fas fa-times-circle"></i> متوقف</span>';
         }
         $('#view_status').html(statusHtml);
-        $('#view_created_by').text(clientData.created  || '-');
+        $('#view_created_by').text(clientData.created || '-');
 
         // تحضير زر التعديل داخل المودال
         const editBtn = $('#viewEditBtn');
-        editBtn.data('id',       clientData.id);
-        editBtn.data('code',     clientData.code);
-        editBtn.data('name',     clientData.name);
-        editBtn.data('entity',   clientData.entity);
-        editBtn.data('sector',   clientData.sector);
-        editBtn.data('phone',    clientData.phone);
-        editBtn.data('email',    clientData.email);
+        editBtn.data('id', clientData.id);
+        editBtn.data('code', clientData.code);
+        editBtn.data('name', clientData.name);
+        editBtn.data('entity', clientData.entity);
+        editBtn.data('sector', clientData.sector);
+        editBtn.data('phone', clientData.phone);
+        editBtn.data('email', clientData.email);
         editBtn.data('whatsapp', clientData.whatsapp);
-        editBtn.data('status',   clientData.status);
+        editBtn.data('status', clientData.status);
 
         loadClientProjectsStats(clientData.id);
 
@@ -1434,7 +1480,7 @@ include('../insidebar.php');
                 '<td>' + (project.operators_total || 0) + '</td>' +
                 '<td class="clients-num-positive">' + (project.operators_working || 0) + '</td>' +
                 '<td class="clients-num-negative">' + (project.operators_stopped || 0) + '</td>' +
-            '</tr>';
+                '</tr>';
 
             tbody.append(rowHtml);
         });
@@ -1494,15 +1540,15 @@ include('../insidebar.php');
     // تعديل من مودال العرض — تحميل البيانات في الفورم
     $('#viewEditBtn').on('click', function () {
         const clientData = {
-            id:       $(this).data('id'),
-            code:     $(this).data('code'),
-            name:     $(this).data('name'),
-            entity:   $(this).data('entity'),
-            sector:   $(this).data('sector'),
-            phone:    $(this).data('phone'),
-            email:    $(this).data('email'),
+            id: $(this).data('id'),
+            code: $(this).data('code'),
+            name: $(this).data('name'),
+            entity: $(this).data('entity'),
+            sector: $(this).data('sector'),
+            phone: $(this).data('phone'),
+            email: $(this).data('email'),
             whatsapp: $(this).data('whatsapp'),
-            status:   $(this).data('status')
+            status: $(this).data('status')
         };
 
         closeViewModal();
@@ -1578,12 +1624,12 @@ include('../insidebar.php');
         $(this).find('[type="submit"]').prop('disabled', true);
 
         $.ajax({
-            url:         'import_clients_excel.php',
-            type:        'POST',
-            data:        formData,
+            url: 'import_clients_excel.php',
+            type: 'POST',
+            data: formData,
             processData: false,
             contentType: false,
-            dataType:    'json',
+            dataType: 'json',
             success: function (response) {
                 $('#importProgress').hide();
                 $('#importExcelForm [type="submit"]').prop('disabled', false);
@@ -1593,7 +1639,7 @@ include('../insidebar.php');
                 if (response.success) {
                     resultHtml = '<div class="clients-import-result-card clients-import-result-success">';
                     resultHtml += '<h6 class="clients-import-result-title">'
-                               +  '<i class="fas fa-check-circle clients-import-result-icon-success"></i> &nbsp;تم الاستيراد بنجاح</h6>';
+                        + '<i class="fas fa-check-circle clients-import-result-icon-success"></i> &nbsp;تم الاستيراد بنجاح</h6>';
                     resultHtml += '<p class="clients-import-result-line">✅ العملاء المضافون: <strong>' + response.added + '</strong></p>';
 
                     if (response.skipped > 0) {
@@ -1651,5 +1697,5 @@ include('../insidebar.php');
 </script>
 
 </body>
-</html>
 
+</html>

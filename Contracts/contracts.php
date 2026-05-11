@@ -200,43 +200,49 @@ include("../inheader.php");
 include('../insidebar.php');
 ?>
 
-  <div class="main contracts-main ems-unified-page-shell">
+<div class="main contracts-main ems-unified-page-shell">
 
-    <div class="header contracts-header-shell">
-      <a href="../main/dashboard.php" class="back-btn">
-        <i class="fas fa-arrow-right"></i> رجوع
-      </a>
-      <h1 class="page-title">
-        <div class="title-icon"><i class="fas fa-file-contract"></i></div>
-        إدارة العقود
-      </h1>
-      <div class="header -actions contracts-header-actions">
-        <?php if ($can_add): ?>
+  <div class="main_head">
+
+    <div class="head_actions">
+      <?php if ($can_add): ?>
         <a href="javascript:void(0)" id="toggleForm" class="add-btn">
           <i class="fas fa-plus-circle"></i> عقد جديد
         </a>
-        <?php endif; ?>
-      </div>
+      <?php endif; ?>
     </div>
 
-    <!-- فورم إضافة عقد -->
-    <form id="projectForm" action="" method="post" class="allforms">
+    <h1 class="head-title">
+      <div class="title-icon"><i class="fas fa-file-contract"></i></div>
+      إدارة العقود
+    </h1>
 
-      <div class="card">
-        <div class="card-header">
-          <h5>
-            <i class="fas fa-file-signature"></i> إضافة / تعديل العقد
-          </h5>
-        </div>
-        <div class="card-body">
+    <div class="head_back">
+      <a href="../main/dashboard.php" class="back-btn">
+        <i class="fas fa-arrow-right"></i> رجوع
+      </a>
+    </div>
+  </div>
 
-          <input type="hidden" name="id" id="contract_id" value="">
-          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($contracts_csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+  <!-- فورم إضافة عقد -->
+  <form id="projectForm" action="" method="post" class="allforms">
 
-          <?php if ($mine_id > 0): ?>
-          <input type="hidden" name="mine_id" placeholder="معرف المنجم"
-            value="<?php echo intval($mine_id); ?>" required />
-          <?php else: ?>
+    <div class="card">
+      <div class="card-header">
+        <h5>
+          <i class="fas fa-file-signature"></i> إضافة / تعديل العقد
+        </h5>
+      </div>
+      <div class="card-body">
+
+        <input type="hidden" name="id" id="contract_id" value="">
+        <input type="hidden" name="csrf_token"
+          value="<?php echo htmlspecialchars($contracts_csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
+
+        <?php if ($mine_id > 0): ?>
+          <input type="hidden" name="mine_id" placeholder="معرف المنجم" value="<?php echo intval($mine_id); ?>"
+            required />
+        <?php else: ?>
           <div class="section-title"><span class="chip">1</span> اختيار المشروع والمنجم</div>
           <br>
 
@@ -247,7 +253,8 @@ include('../insidebar.php');
                 <select id="contract_project_id" required>
                   <option value="">— اختر المشروع —</option>
                   <?php foreach ($form_projects as $project): ?>
-                  <option value="<?php echo intval($project['id']); ?>"><?php echo htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+                    <option value="<?php echo intval($project['id']); ?>">
+                      <?php echo htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8'); ?></option>
                   <?php endforeach; ?>
                 </select>
               </div>
@@ -264,636 +271,633 @@ include('../insidebar.php');
           </div>
 
           <hr class="hr" />
-          <?php endif; ?>
+        <?php endif; ?>
 
-          <!-- القسم 1: إجماليات الساعات (يومياً وللعقد) -->
-          <div class="section-title"><span class="chip">2</span> إجماليات الساعات (يومياً وللعقد)</div>
+        <!-- القسم 1: إجماليات الساعات (يومياً وللعقد) -->
+        <div class="section-title"><span class="chip">2</span> إجماليات الساعات (يومياً وللعقد)</div>
+        <br>
+
+        <div class="totals">
+          <div class="kpi">
+            <div class="v" id="kpi_month_total">0</div>
+            <div class="t">الساعات اليومية المطلوبة</div>
+            <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
+          </div>
+          <div class="kpi">
+            <div class="v" id="kpi_contract_total">0</div>
+            <div class="t">إجمالي ساعات العقد</div>
+            <input type="hidden" name="forecasted_contracted_hours" id="forecasted_contracted_hours" value="0" />
+          </div>
+          <div class="kpi">
+            <div class="v" id="kpi_equip_month">0</div>
+            <div class="t">معدات × ساعات لليوم</div>
+          </div>
+        </div>
+
+        <div class="contracts-note-box">
+          <p class="contracts-note-text">
+            <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
+            البيانات المدخلة في الأقسام التالية
+          </p>
+        </div>
+
+        <hr class="hr" />
+
+        <div class="section-title"><span class="chip">3</span> البيانات الأساسية للعميل والعقد</div>
+        <br>
+
+        <div class="form-grid">
+
+          <!-- صف 1: 3 خانات -->
+          <div class="field md-3 sm-6">
+            <label>تاريخ توقيع العقد </label>
+            <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
+          </div>
+
+          <div class="field md-3 sm-6">
+            <label>فترة السماح بين التوقيع والتنفيذ </label>
+            <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0"
+                placeholder="عدد الأيام"></div>
+          </div>
+
+          <div class="field md-3 sm-6">
+            <label>بداية التنفيذ الفعلي المتفق عليه</label>
+            <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
+          </div>
+
+
+          <div class="field md-3 sm-6">
+            <label>نهاية التنفيذ الفعلي المتفق عليه</label>
+            <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
+          </div>
+
+
+
+          <!-- خانتان فارغتان -->
+
+
+          <!-- صف 2: 3 خانات -->
+
+          <div class="field md-3 sm-6">
+            <label>مدة العقد بالأيام </label>
+            <div class="control"><input name="contract_duration_days" id="contract_duration_days" type="number" min="0"
+                placeholder="يُحتسب تلقائياً" readonly></div>
+          </div>
+
+
+
+
+
+          <div class="field md-3 sm-6">
+            <label>العملة</label>
+            <div class="control">
+              <select name="price_currency_contract" id="price_currency_contract">
+                <option value="">— اختر —</option>
+                <option value="دولار">دولار</option>
+                <option value="جنيه">جنيه</option>
+              </select>
+            </div>
+          </div>
+          <div class="field md-3 sm-6">
+            <label>المبلغ المدفوع</label>
+            <div class="control"><input name="paid_contract" type="text"></div>
+          </div>
+
+          <div class="field md-3 sm-6">
+            <label>وقت الدفع</label>
+            <div class="control">
+              <select name="payment_time" id="payment_time">
+                <option value="">— اختر —</option>
+                <option value="مقدم">مقدم</option>
+                <option value=" مؤخر">مؤخر </option>
+
+              </select>
+            </div>
+          </div>
+
+          <div class="field md-3 sm-6">
+            <label> الضمانات</label>
+            <div class="control"><input name="guarantees" type="text"></div>
+          </div>
+
+          <div class="field md-3 sm-6">
+            <label> تاريخ الدفع</label>
+            <div class="control"><input name="payment_date" id="payment_date" type="date"></div>
+          </div>
+
+
+
+
+
+
+
+
+
+
+
+          <div class="field md-3 sm-6">
+            <label>عدد الورديات للعقد </label>
+            <div class="control"><input name="equip_shifts_contract" type="number" min="0" placeholder="مثال: 2">
+            </div>
+          </div>
+
+          <div class="field md-3 sm-6">
+            <label> ساعات الوردية للعقد</label>
+            <div class="control"><input name="shift_contract" type="number" min="0"></div>
+          </div>
+          <div class="field md-3 sm-6">
+            <label>إجمالي الوحدات يومياً للعقد </label>
+            <div class="control"><input name="equip_total_contract" type="number" placeholder=" "></div>
+          </div>
+          <div class="field md-3 sm-6">
+            <label>وحدات العمل في الشهر للعقد</label>
+            <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
+          </div>
+
+
+          <div class="field md-3 sm-6">
+            <label>إجمالي وحدات العقد </label>
+            <div class="control"><input name="total_contract" type="number" placeholder=" "></div>
+          </div>
+
+          <div class="field md-3 sm-6">
+            <label>مدراء الموقع </label>
+            <div class="control"><input type="number" name="daily_operators" id="daily_operators" min="0"
+                placeholder="مثال: 3"></div>
+          </div>
+
+
+
+          <div class="field md-3 sm-6">
+            <label>الترحيل (Transportation)</label>
+            <div class="control">
+              <select name="transportation" id="transportation">
+                <option value="">— اختر —</option>
+                <option value="مالك المعدة">مالك المعدة</option>
+                <option value="مالك المشروع">مالك المشروع</option>
+                <option value="بدون">بدون</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field md-3 sm-6">
+            <label>السكن (Place for Living)</label>
+            <div class="control">
+              <select name="place_for_living" id="place_for_living">
+                <option value="">— اختر —</option>
+                <option value="مالك المعدة">مالك المعدة</option>
+                <option value="مالك المشروع">مالك المشروع</option>
+                <option value="بدون">بدون</option>
+              </select>
+            </div>
+          </div>
+          <!-- صف 3: 3 خانات -->
+          <div class="field md-3 sm-6">
+            <label>الإعاشة (Accommodation)</label>
+            <div class="control">
+              <select name="accommodation" id="accommodation">
+                <option value="">— اختر —</option>
+                <option value="مالك المعدة">مالك المعدة</option>
+                <option value="مالك المشروع">مالك المشروع</option>
+                <option value="بدون">بدون</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field md-3 sm-6">
+            <label>الورشة (Workshop)</label>
+            <div class="control">
+              <select name="workshop" id="workshop">
+                <option value="">— اختر —</option>
+                <option value="مالك المعدة">مالك المعدة</option>
+                <option value="مالك المشروع">مالك المشروع</option>
+                <option value="بدون">بدون</option>
+              </select>
+            </div>
+          </div>
+          <!-- خانتان فارغتان -->
+          <div class="field md-3 sm-6"> </div>
+          <div class="field md-3 sm-6"> </div>
+        </div>
+
+        <hr class="hr" />
+
+        <!-- القسم 3: بيانات ساعات العمل المطلوبة للمعدات -->
+        <div id="equipmentSections">
+          <div class="section-title"><span class="chip">3</span> بيانات ساعات العمل المطلوبة <strong>للمعدات</strong>
+          </div>
           <br>
-
-          <div class="totals">
-            <div class="kpi">
-              <div class="v" id="kpi_month_total">0</div>
-              <div class="t">الساعات اليومية المطلوبة</div>
-              <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
-            </div>
-            <div class="kpi">
-              <div class="v" id="kpi_contract_total">0</div>
-              <div class="t">إجمالي ساعات العقد</div>
-              <input type="hidden" name="forecasted_contracted_hours" id="forecasted_contracted_hours" value="0" />
-            </div>
-            <div class="kpi">
-              <div class="v" id="kpi_equip_month">0</div>
-              <div class="t">معدات × ساعات لليوم</div>
-            </div>
-          </div>
-
-          <div class="contracts-note-box">
-            <p class="contracts-note-text">
-              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
-              البيانات المدخلة في الأقسام التالية
-            </p>
-          </div>
-
-          <hr class="hr" />
-
-          <div class="section-title"><span class="chip">3</span> البيانات الأساسية للعميل والعقد</div>
-          <br>
-
-          <div class="form-grid">
-
-            <!-- صف 1: 3 خانات -->
-            <div class="field md-3 sm-6">
-              <label>تاريخ توقيع العقد </label>
-              <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
-            </div>
-
-            <div class="field md-3 sm-6">
-              <label>فترة السماح بين التوقيع والتنفيذ </label>
-              <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0"
-                  placeholder="عدد الأيام"></div>
-            </div>
-
-            <div class="field md-3 sm-6">
-              <label>بداية التنفيذ الفعلي المتفق عليه</label>
-              <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
-            </div>
-
-
-            <div class="field md-3 sm-6">
-              <label>نهاية التنفيذ الفعلي المتفق عليه</label>
-              <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
-            </div>
-
-
-
-            <!-- خانتان فارغتان -->
-
-
-            <!-- صف 2: 3 خانات -->
-
-            <div class="field md-3 sm-6">
-              <label>مدة العقد بالأيام </label>
-              <div class="control"><input name="contract_duration_days" id="contract_duration_days" type="number"
-                  min="0" placeholder="يُحتسب تلقائياً" readonly></div>
-            </div>
-
-
-
-
-
-            <div class="field md-3 sm-6">
-              <label>العملة</label>
-              <div class="control">
-                <select name="price_currency_contract" id="price_currency_contract">
-                  <option value="">— اختر —</option>
-                  <option value="دولار">دولار</option>
-                  <option value="جنيه">جنيه</option>
-                </select>
-              </div>
-            </div>
-            <div class="field md-3 sm-6">
-              <label>المبلغ المدفوع</label>
-              <div class="control"><input name="paid_contract" type="text"></div>
-            </div>
-
-            <div class="field md-3 sm-6">
-              <label>وقت الدفع</label>
-              <div class="control">
-                <select name="payment_time" id="payment_time">
-                  <option value="">— اختر —</option>
-                  <option value="مقدم">مقدم</option>
-                  <option value=" مؤخر">مؤخر </option>
-
-                </select>
-              </div>
-            </div>
-
-            <div class="field md-3 sm-6">
-              <label> الضمانات</label>
-              <div class="control"><input name="guarantees" type="text"></div>
-            </div>
-
-            <div class="field md-3 sm-6">
-              <label> تاريخ الدفع</label>
-              <div class="control"><input name="payment_date" id="payment_date" type="date"></div>
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-            <div class="field md-3 sm-6">
-              <label>عدد الورديات للعقد </label>
-              <div class="control"><input name="equip_shifts_contract" type="number" min="0" placeholder="مثال: 2">
-              </div>
-            </div>
-
-            <div class="field md-3 sm-6">
-              <label> ساعات الوردية للعقد</label>
-              <div class="control"><input name="shift_contract" type="number" min="0"></div>
-            </div>
-            <div class="field md-3 sm-6">
-              <label>إجمالي الوحدات يومياً للعقد </label>
-              <div class="control"><input name="equip_total_contract" type="number" placeholder=" "></div>
-            </div>
-            <div class="field md-3 sm-6">
-              <label>وحدات العمل في الشهر للعقد</label>
-              <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
-            </div>
-
-
-            <div class="field md-3 sm-6">
-              <label>إجمالي وحدات العقد </label>
-              <div class="control"><input name="total_contract" type="number" placeholder=" "></div>
-            </div>
-
-            <div class="field md-3 sm-6">
-              <label>مدراء الموقع </label>
-              <div class="control"><input type="number" name="daily_operators" id="daily_operators" min="0"
-                  placeholder="مثال: 3"></div>
-            </div>
-
-
-
-            <div class="field md-3 sm-6">
-              <label>الترحيل (Transportation)</label>
-              <div class="control">
-                <select name="transportation" id="transportation">
-                  <option value="">— اختر —</option>
-                  <option value="مالك المعدة">مالك المعدة</option>
-                  <option value="مالك المشروع">مالك المشروع</option>
-                  <option value="بدون">بدون</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field md-3 sm-6">
-              <label>السكن (Place for Living)</label>
-              <div class="control">
-                <select name="place_for_living" id="place_for_living">
-                  <option value="">— اختر —</option>
-                  <option value="مالك المعدة">مالك المعدة</option>
-                  <option value="مالك المشروع">مالك المشروع</option>
-                  <option value="بدون">بدون</option>
-                </select>
-              </div>
-            </div>
-            <!-- صف 3: 3 خانات -->
-            <div class="field md-3 sm-6">
-              <label>الإعاشة (Accommodation)</label>
-              <div class="control">
-                <select name="accommodation" id="accommodation">
-                  <option value="">— اختر —</option>
-                  <option value="مالك المعدة">مالك المعدة</option>
-                  <option value="مالك المشروع">مالك المشروع</option>
-                  <option value="بدون">بدون</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field md-3 sm-6">
-              <label>الورشة (Workshop)</label>
-              <div class="control">
-                <select name="workshop" id="workshop">
-                  <option value="">— اختر —</option>
-                  <option value="مالك المعدة">مالك المعدة</option>
-                  <option value="مالك المشروع">مالك المشروع</option>
-                  <option value="بدون">بدون</option>
-                </select>
-              </div>
-            </div>
-            <!-- خانتان فارغتان -->
-            <div class="field md-3 sm-6"> </div>
-            <div class="field md-3 sm-6"> </div>
-          </div>
-
-          <hr class="hr" />
-
-          <!-- القسم 3: بيانات ساعات العمل المطلوبة للمعدات -->
-          <div id="equipmentSections">
-            <div class="section-title"><span class="chip">3</span> بيانات ساعات العمل المطلوبة <strong>للمعدات</strong>
-            </div>
-            <br>
-            <div class="equipment-section" data-index="1">
-              <div class="equipment-card">
-                <h6 class="equipment-card-title">المعدات رقم 1</h6>
-                <div class="form-grid">
-                  <div class="field md-3 sm-6">
-                    <label>نوع المعدة</label>
-                    <div class="control">
-                      <select name="equip_type_1" class="equip-type">
-                        <?php echo $equipmentTypeOptionsHtml; ?>
-                      </select>
-                    </div>
+          <div class="equipment-section" data-index="1">
+            <div class="equipment-card">
+              <h6 class="equipment-card-title">المعدات رقم 1</h6>
+              <div class="form-grid">
+                <div class="field md-3 sm-6">
+                  <label>نوع المعدة</label>
+                  <div class="control">
+                    <select name="equip_type_1" class="equip-type">
+                      <?php echo $equipmentTypeOptionsHtml; ?>
+                    </select>
                   </div>
-                  <div class="field md-3 sm-6">
-                    <label>حجم المعدة (Size)</label>
-                    <div class="control"><input name="equip_size_1" type="number" placeholder="مثال: 340"></div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label>عدد المعدات</label>
-                    <div class="control"><input name="equip_count_1" type="number" min="0"></div>
-                  </div>
-
-                  <div class="field md-3 sm-6">
-                    <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
-                    <div class="control"><input name="equip_count_basic_1" type="number" min="0"
-                      class="equip-basic-input"></div>
-                  </div>
-
-                  <div class="field md-3 sm-6">
-                    <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
-                    <div class="control"><input name="equip_count_backup_1" type="number" min="0"
-                      class="equip-backup-input"></div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label>عدد المشغلين</label>
-                    <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
-                  </div>
-
-
-                  <div class="field md-3 sm-6">
-                    <label>عدد المساعدين</label>
-                    <div class="control"><input name="equip_assistants_1" type="number" min="0"></div>
-                  </div>
-
-
-                  <div class="field md-3 sm-6">
-                    <label>عدد الورديات</label>
-                    <div class="control"><input name="equip_shifts_1" type="number" min="0" placeholder="مثال: 2"></div>
-                  </div>
-                  <!-- أوقات الورديات -->
-                  <div class="field md-3 sm-6">
-                    <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
-                    <div class="control"><input name="shift1_start_1" type="time" placeholder="مثال: 08:00"></div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
-                    <div class="control"><input name="shift1_end_1" type="time" placeholder="مثال: 16:00"></div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
-                    <div class="control"><input name="shift2_start_1" type="time" placeholder="مثال: 16:00"></div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
-                    <div class="control"><input name="shift2_end_1" type="time" placeholder="مثال: 00:00"></div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label>وحدة القياس</label>
-                    <div class="control">
-                      <select name="equip_unit_1" class="equip-unit">
-                        <option value="">— اختر —</option>
-                        <option value="ساعة">ساعة</option>
-                        <option value="طن">طن</option>
-                        <option value="متر طولي">متر طولي</option>
-                        <option value="متر مكعب">متر مكعب</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="field md-3 sm-6">
-                    <label>ساعات الوردية</label>
-                    <div class="control"><input name="shift_hours_1" type="number" min="0"></div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label>إجمالي الوحدات يومياً</label>
-                    <div class="control"><input name="equip_total_month_1" type="number" readonly
-                        placeholder="يُحتسب تلقائياً"></div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label>وحدات العمل في الشهر</label>
-                    <div class="control"><input name="equip_target_per_month_1" type="number" min="0"></div>
-                  </div>
-
-
-                  <div class="field md-3 sm-6">
-                    <label>إجمالي وحدات العقد</label>
-                    <div class="control"><input name="equip_total_contract_1" type="number" readonly
-                        placeholder="يُحتسب تلقائياً"></div>
-                  </div>
-
-
-                  <div class="field md-3 sm-6">
-                    <label>العملة</label>
-                    <div class="control">
-                      <select name="equip_price_currency_1">
-                        <option value="">— اختر —</option>
-                        <option value="دولار">دولار</option>
-                        <option value="جنيه">جنيه</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label>السعر\للوحدة</label>
-                    <div class="control"><input name="equip_price_1" type="number" min="0" step="0.01"
-                        placeholder="0.00"></div>
-                  </div>
-
-                  <div class="field md-3 sm-6">
-
-                  </div>
-
-
-
-
-
-                  <!-- خانتان فارغتان للحفاظ على 3 خانات لكل صف -->
-
-                  <div class="field md-3 sm-6">
-                    <label>عدد المشرفين</label>
-                    <div class="control"><input name="equip_supervisors_1" type="number" min="0"></div>
-                  </div>
-
-                  <div class="field md-3 sm-6">
-                    <label>عدد الفنيين</label>
-                    <div class="control"><input name="equip_technicians_1" type="number" min="0"></div>
-                  </div>
-                  <!-- إكمال الصف بثلاث خانات -->
-                  <div class="field md-3 sm-6"></div>
-                  <div class="field md-3 sm-6"></div>
                 </div>
+                <div class="field md-3 sm-6">
+                  <label>حجم المعدة (Size)</label>
+                  <div class="control"><input name="equip_size_1" type="number" placeholder="مثال: 340"></div>
+                </div>
+                <div class="field md-3 sm-6">
+                  <label>عدد المعدات</label>
+                  <div class="control"><input name="equip_count_1" type="number" min="0"></div>
+                </div>
+
+                <div class="field md-3 sm-6">
+                  <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
+                  <div class="control"><input name="equip_count_basic_1" type="number" min="0"
+                      class="equip-basic-input"></div>
+                </div>
+
+                <div class="field md-3 sm-6">
+                  <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
+                  <div class="control"><input name="equip_count_backup_1" type="number" min="0"
+                      class="equip-backup-input"></div>
+                </div>
+                <div class="field md-3 sm-6">
+                  <label>عدد المشغلين</label>
+                  <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
+                </div>
+
+
+                <div class="field md-3 sm-6">
+                  <label>عدد المساعدين</label>
+                  <div class="control"><input name="equip_assistants_1" type="number" min="0"></div>
+                </div>
+
+
+                <div class="field md-3 sm-6">
+                  <label>عدد الورديات</label>
+                  <div class="control"><input name="equip_shifts_1" type="number" min="0" placeholder="مثال: 2"></div>
+                </div>
+                <!-- أوقات الورديات -->
+                <div class="field md-3 sm-6">
+                  <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
+                  <div class="control"><input name="shift1_start_1" type="time" placeholder="مثال: 08:00"></div>
+                </div>
+                <div class="field md-3 sm-6">
+                  <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
+                  <div class="control"><input name="shift1_end_1" type="time" placeholder="مثال: 16:00"></div>
+                </div>
+                <div class="field md-3 sm-6">
+                  <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
+                  <div class="control"><input name="shift2_start_1" type="time" placeholder="مثال: 16:00"></div>
+                </div>
+                <div class="field md-3 sm-6">
+                  <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
+                  <div class="control"><input name="shift2_end_1" type="time" placeholder="مثال: 00:00"></div>
+                </div>
+                <div class="field md-3 sm-6">
+                  <label>وحدة القياس</label>
+                  <div class="control">
+                    <select name="equip_unit_1" class="equip-unit">
+                      <option value="">— اختر —</option>
+                      <option value="ساعة">ساعة</option>
+                      <option value="طن">طن</option>
+                      <option value="متر طولي">متر طولي</option>
+                      <option value="متر مكعب">متر مكعب</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="field md-3 sm-6">
+                  <label>ساعات الوردية</label>
+                  <div class="control"><input name="shift_hours_1" type="number" min="0"></div>
+                </div>
+                <div class="field md-3 sm-6">
+                  <label>إجمالي الوحدات يومياً</label>
+                  <div class="control"><input name="equip_total_month_1" type="number" readonly
+                      placeholder="يُحتسب تلقائياً"></div>
+                </div>
+                <div class="field md-3 sm-6">
+                  <label>وحدات العمل في الشهر</label>
+                  <div class="control"><input name="equip_target_per_month_1" type="number" min="0"></div>
+                </div>
+
+
+                <div class="field md-3 sm-6">
+                  <label>إجمالي وحدات العقد</label>
+                  <div class="control"><input name="equip_total_contract_1" type="number" readonly
+                      placeholder="يُحتسب تلقائياً"></div>
+                </div>
+
+
+                <div class="field md-3 sm-6">
+                  <label>العملة</label>
+                  <div class="control">
+                    <select name="equip_price_currency_1">
+                      <option value="">— اختر —</option>
+                      <option value="دولار">دولار</option>
+                      <option value="جنيه">جنيه</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field md-3 sm-6">
+                  <label>السعر\للوحدة</label>
+                  <div class="control"><input name="equip_price_1" type="number" min="0" step="0.01" placeholder="0.00">
+                  </div>
+                </div>
+
+                <div class="field md-3 sm-6">
+
+                </div>
+
+
+
+
+
+                <!-- خانتان فارغتان للحفاظ على 3 خانات لكل صف -->
+
+                <div class="field md-3 sm-6">
+                  <label>عدد المشرفين</label>
+                  <div class="control"><input name="equip_supervisors_1" type="number" min="0"></div>
+                </div>
+
+                <div class="field md-3 sm-6">
+                  <label>عدد الفنيين</label>
+                  <div class="control"><input name="equip_technicians_1" type="number" min="0"></div>
+                </div>
+                <!-- إكمال الصف بثلاث خانات -->
+                <div class="field md-3 sm-6"></div>
+                <div class="field md-3 sm-6"></div>
               </div>
             </div>
-          </div>
-
-          <div class="equipment-add-row">
-            <button type="button" class="primary" id="addEquipmentBtn"
-              class="equipment-add-btn">
-              <i class="fas fa-plus-circle"></i> إضافة مزيد من المعدات
-            </button>
-          </div>
-
-          <hr class="hr" />
-          <div class="section-title"><span class="chip">4</span> بيانات إضافية</div>
-          <br>
-
-          <div class="form-grid">
-
-            <div class="field md-3 sm-6 contracts-hidden-field">
-              <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
-              <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
-                  placeholder="مثال: 8" value="20"></div>
-            </div>
-            <!-- Orgnization Break  -->
-
-
-
-            <div class="field md-3 sm-6">
-              <label>الطرف الأول </label>
-              <div class="control"><input type="text" name="first_party" id="first_party"
-                  placeholder="اسم الطرف الاول ">
-              </div>
-            </div>
-
-
-
-            <div class="field md-3 sm-6">
-              <label>الطرف الثاني </label>
-              <div class="control"><input type="text" name="second_party" id="second_party"
-                  placeholder="اسم الطرف الثاني ">
-              </div>
-            </div>
-
-            <div class="field md-3 sm-6"> </div>
-
-            <div class="field md-3 sm-6">
-              <label>الشاهد الأول</label>
-              <div class="control"><input type="text" name="witness_one" id="witness_one"
-                  placeholder="اسم الشاهد الأول">
-              </div>
-            </div>
-            <div class="field md-3 sm-6">
-              <label>الشاهد الثاني</label>
-              <div class="control"><input type="text" name="witness_two" id="witness_two"
-                  placeholder="اسم الشاهد الثاني">
-              </div>
-            </div>
-          </div>
-
-
-          <div class="contracts-form-actions">
-            <button type="reset" class="contracts-btn-reset">
-              <i class="fas fa-eraser"></i> تفريغ الحقول
-            </button>
-            <button type="submit" class="primary contracts-btn-submit-wide">
-              <i class="fas fa-save"></i> حفظ البيانات
-            </button>
           </div>
         </div>
-      </div>
-    </form>
-    <div class="card">
-      <div class="card-header">
-        <h5>
-          <i class="fas fa-list-alt"></i> قائمة العقود
-        </h5>
-      </div>
 
-      <!-- أزرار التحكم في المجموعات -->
-      <div class="card-body contracts-group-toolbar-wrap">
-        <div class="contracts-group-toolbar">
-          <span class="contracts-group-toolbar-label">
-            <i class="fas fa-filter"></i> عرض المجموعات:
-          </span>
-          <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
-            <i class="fas fa-info-circle"></i> أساسية
+        <div class="equipment-add-row">
+          <button type="button" class="primary" id="addEquipmentBtn" class="equipment-add-btn">
+            <i class="fas fa-plus-circle"></i> إضافة مزيد من المعدات
           </button>
-          <button class="btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
-            <i class="far fa-calendar"></i> تواريخ
+        </div>
+
+        <hr class="hr" />
+        <div class="section-title"><span class="chip">4</span> بيانات إضافية</div>
+        <br>
+
+        <div class="form-grid">
+
+          <div class="field md-3 sm-6 contracts-hidden-field">
+            <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
+            <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
+                placeholder="مثال: 8" value="20"></div>
+          </div>
+          <!-- Orgnization Break  -->
+
+
+
+          <div class="field md-3 sm-6">
+            <label>الطرف الأول </label>
+            <div class="control"><input type="text" name="first_party" id="first_party" placeholder="اسم الطرف الاول ">
+            </div>
+          </div>
+
+
+
+          <div class="field md-3 sm-6">
+            <label>الطرف الثاني </label>
+            <div class="control"><input type="text" name="second_party" id="second_party"
+                placeholder="اسم الطرف الثاني ">
+            </div>
+          </div>
+
+          <div class="field md-3 sm-6"> </div>
+
+          <div class="field md-3 sm-6">
+            <label>الشاهد الأول</label>
+            <div class="control"><input type="text" name="witness_one" id="witness_one" placeholder="اسم الشاهد الأول">
+            </div>
+          </div>
+          <div class="field md-3 sm-6">
+            <label>الشاهد الثاني</label>
+            <div class="control"><input type="text" name="witness_two" id="witness_two" placeholder="اسم الشاهد الثاني">
+            </div>
+          </div>
+        </div>
+
+
+        <div class="contracts-form-actions">
+          <button type="reset" class="contracts-btn-reset">
+            <i class="fas fa-eraser"></i> تفريغ الحقول
           </button>
-          <button class="btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
-            <i class="fas fa-clock"></i> ساعات
-          </button>
-          <button class="btn-group-toggle" data-group="parties" title="أطراف العقد">
-            <i class="fas fa-users"></i> أطراف
-          </button>
-          <button class="btn-group-toggle" data-group="services" title="الخدمات المقدمة">
-            <i class="fas fa-hands-helping"></i> خدمات
-          </button>
-          <button class="btn-group-toggle" data-group="operations" title="التشغيل اليومي">
-            <i class="fas fa-cogs"></i> تشغيل
-          </button>
-          <button class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
-            <i class="fas fa-check-circle"></i> حالة
-          </button>
-          <button class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
-            <i class="fas fa-eye"></i> الكل
+          <button type="submit" class="primary contracts-btn-submit-wide">
+            <i class="fas fa-save"></i> حفظ البيانات
           </button>
         </div>
       </div>
+    </div>
+  </form>
+  <div class="card">
+    <div class="card-header">
+      <h5>
+        <i class="fas fa-list-alt"></i> قائمة العقود
+      </h5>
+    </div>
 
-      <div class="card-body contracts-table-filter-wrap">
-        <form method="get" action="contracts.php" class="contracts-table-filter-form">
-          <?php if ($mine_id > 0): ?>
+    <!-- أزرار التحكم في المجموعات -->
+    <div class="card-body contracts-group-toolbar-wrap">
+      <div class="contracts-group-toolbar">
+        <span class="contracts-group-toolbar-label">
+          <i class="fas fa-filter"></i> عرض المجموعات:
+        </span>
+        <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
+          <i class="fas fa-info-circle"></i> أساسية
+        </button>
+        <button class="btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
+          <i class="far fa-calendar"></i> تواريخ
+        </button>
+        <button class="btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
+          <i class="fas fa-clock"></i> ساعات
+        </button>
+        <button class="btn-group-toggle" data-group="parties" title="أطراف العقد">
+          <i class="fas fa-users"></i> أطراف
+        </button>
+        <button class="btn-group-toggle" data-group="services" title="الخدمات المقدمة">
+          <i class="fas fa-hands-helping"></i> خدمات
+        </button>
+        <button class="btn-group-toggle" data-group="operations" title="التشغيل اليومي">
+          <i class="fas fa-cogs"></i> تشغيل
+        </button>
+        <button class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
+          <i class="fas fa-check-circle"></i> حالة
+        </button>
+        <button class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
+          <i class="fas fa-eye"></i> الكل
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body contracts-table-filter-wrap">
+      <form method="get" action="contracts.php" class="contracts-table-filter-form">
+        <?php if ($mine_id > 0): ?>
           <input type="hidden" name="id" value="<?php echo intval($mine_id); ?>">
-          <?php endif; ?>
+        <?php endif; ?>
 
-          <div class="contracts-filter-field">
-            <label class="contracts-filter-label">فلتر المشروع</label>
-            <select name="filter_project_id" id="filter_project_select" class="form-control">
-              <option value="0">كل المشاريع</option>
-              <?php foreach ($projects_filter_options as $project_option_id => $project_option_name): ?>
+        <div class="contracts-filter-field">
+          <label class="contracts-filter-label">فلتر المشروع</label>
+          <select name="filter_project_id" id="filter_project_select" class="form-control">
+            <option value="0">كل المشاريع</option>
+            <?php foreach ($projects_filter_options as $project_option_id => $project_option_name): ?>
               <option value="<?php echo intval($project_option_id); ?>" <?php echo ($filter_project_id === intval($project_option_id)) ? 'selected' : ''; ?>>
                 <?php echo htmlspecialchars($project_option_name, ENT_QUOTES, 'UTF-8'); ?>
               </option>
-              <?php endforeach; ?>
-            </select>
-          </div>
+            <?php endforeach; ?>
+          </select>
+        </div>
 
-          <div class="contracts-filter-field">
-            <label class="contracts-filter-label">فلتر المنجم</label>
-            <?php if ($mine_id > 0): ?>
+        <div class="contracts-filter-field">
+          <label class="contracts-filter-label">فلتر المنجم</label>
+          <?php if ($mine_id > 0): ?>
             <input type="hidden" name="filter_mine_id" value="<?php echo intval($filter_mine_id); ?>">
             <select class="form-control" disabled>
               <option value="0">كل المناجم</option>
             </select>
-            <?php else: ?>
+          <?php else: ?>
             <select name="filter_mine_id" id="filter_mine_select" class="form-control" <?php echo $filter_project_id <= 0 ? 'disabled' : ''; ?>>
               <option value="0">كل المناجم</option>
               <?php foreach ($mines_filter_options as $mine_option_id => $mine_option_name): ?>
-              <option value="<?php echo intval($mine_option_id); ?>" <?php echo ($filter_mine_id === intval($mine_option_id)) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($mine_option_name, ENT_QUOTES, 'UTF-8'); ?>
-              </option>
+                <option value="<?php echo intval($mine_option_id); ?>" <?php echo ($filter_mine_id === intval($mine_option_id)) ? 'selected' : ''; ?>>
+                  <?php echo htmlspecialchars($mine_option_name, ENT_QUOTES, 'UTF-8'); ?>
+                </option>
               <?php endforeach; ?>
             </select>
-            <?php endif; ?>
-          </div>
+          <?php endif; ?>
+        </div>
 
-          <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> تطبيق</button>
-          <a href="contracts.php<?php echo $mine_id > 0 ? '?id=' . intval($mine_id) : ''; ?>" class="btn btn-secondary"><i class="fas fa-undo"></i> مسح</a>
-        </form>
-      </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> تطبيق</button>
+        <a href="contracts.php<?php echo $mine_id > 0 ? '?id=' . intval($mine_id) : ''; ?>" class="btn btn-secondary"><i
+            class="fas fa-undo"></i> مسح</a>
+      </form>
+    </div>
 
-      <div class="card-body contracts-table-wrap">
-        <table id="projectsTable" class="display nowrap contracts-table">
-          <thead>
-            <tr>
-              <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
-              <!-- المعلومات الأساسية -->
-              <th class="group-basic"><i class="fas fa-hashtag"></i> رقم العقد</th>
-              <th class="group-basic"><i class="fas fa-mountain"></i> المنجم</th>
-              <th class="group-basic"><i class="fas fa-project-diagram"></i> المشروع</th>
+    <div class="card-body contracts-table-wrap">
+      <table id="projectsTable" class="display nowrap contracts-table">
+        <thead>
+          <tr>
+            <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
+            <!-- المعلومات الأساسية -->
+            <th class="group-basic"><i class="fas fa-hashtag"></i> رقم العقد</th>
+            <th class="group-basic"><i class="fas fa-mountain"></i> المنجم</th>
+            <th class="group-basic"><i class="fas fa-project-diagram"></i> المشروع</th>
 
-              <!-- التواريخ والمدد -->
-              <th class="group-dates"><i class="far fa-calendar"></i> تاريخ التوقيع</th>
-              <th class="group-dates"><i class="fas fa-hourglass-half"></i> مدة السماح (أيام)</th>
-              <th class="group-dates"><i class="fas fa-calendar-days"></i> مدة العقد (أيام)</th>
-              <th class="group-dates"><i class="fas fa-play-circle"></i> بداية التنفيذ</th>
-              <th class="group-dates"><i class="fas fa-stop-circle"></i> نهاية التنفيذ</th>
+            <!-- التواريخ والمدد -->
+            <th class="group-dates"><i class="far fa-calendar"></i> تاريخ التوقيع</th>
+            <th class="group-dates"><i class="fas fa-hourglass-half"></i> مدة السماح (أيام)</th>
+            <th class="group-dates"><i class="fas fa-calendar-days"></i> مدة العقد (أيام)</th>
+            <th class="group-dates"><i class="fas fa-play-circle"></i> بداية التنفيذ</th>
+            <th class="group-dates"><i class="fas fa-stop-circle"></i> نهاية التنفيذ</th>
 
-              <!-- الساعات والأهداف -->
-              <th class="group-hours"><i class="far fa-clock"></i> هدف ساعات شهري</th>
-              <th class="group-hours"><i class="fas fa-clock"></i> إجمالي ساعات متوقعة</th>
+            <!-- الساعات والأهداف -->
+            <th class="group-hours"><i class="far fa-clock"></i> هدف ساعات شهري</th>
+            <th class="group-hours"><i class="fas fa-clock"></i> إجمالي ساعات متوقعة</th>
 
-              <!-- أطراف العقد -->
-              <th class="group-parties"><i class="fas fa-user-tie"></i> الطرف الأول</th>
-              <th class="group-parties"><i class="fas fa-user-check"></i> الطرف الثاني</th>
-              <th class="group-parties"><i class="fas fa-eye"></i> شاهد أول</th>
-              <th class="group-parties"><i class="fas fa-eye"></i> شاهد ثاني</th>
+            <!-- أطراف العقد -->
+            <th class="group-parties"><i class="fas fa-user-tie"></i> الطرف الأول</th>
+            <th class="group-parties"><i class="fas fa-user-check"></i> الطرف الثاني</th>
+            <th class="group-parties"><i class="fas fa-eye"></i> شاهد أول</th>
+            <th class="group-parties"><i class="fas fa-eye"></i> شاهد ثاني</th>
 
-              <!-- الخدمات المقدمة -->
-              <th class="group-services"><i class="fas fa-truck"></i> النقل</th>
-              <th class="group-services"><i class="fas fa-bed"></i> السكن</th>
-              <th class="group-services"><i class="fas fa-home"></i> مكان المعيشة</th>
-              <th class="group-services"><i class="fas fa-wrench"></i> الورشة</th>
+            <!-- الخدمات المقدمة -->
+            <th class="group-services"><i class="fas fa-truck"></i> النقل</th>
+            <th class="group-services"><i class="fas fa-bed"></i> السكن</th>
+            <th class="group-services"><i class="fas fa-home"></i> مكان المعيشة</th>
+            <th class="group-services"><i class="fas fa-wrench"></i> الورشة</th>
 
-              <!-- التشغيل اليومي -->
-              <th class="group-operations"><i class="fas fa-business-time"></i> ساعات العمل يومياً</th>
-              <th class="group-operations"><i class="fas fa-users-cog"></i> عدد المشغلين يومياً</th>
+            <!-- التشغيل اليومي -->
+            <th class="group-operations"><i class="fas fa-business-time"></i> ساعات العمل يومياً</th>
+            <th class="group-operations"><i class="fas fa-users-cog"></i> عدد المشغلين يومياً</th>
 
-              <!-- البيانات المالية -->
-              <th class="group-basic"><i class="fas fa-money-bill-wave"></i> العملة</th>
-              <th class="group-basic"><i class="fas fa-dollar-sign"></i> المبلغ المدفوع</th>
-              <th class="group-basic"><i class="fas fa-clock"></i> وقت الدفع</th>
-              <th class="group-basic"><i class="fas fa-shield-alt"></i> الضمانات</th>
-              <th class="group-basic"><i class="fas fa-calendar-check"></i> تاريخ الدفع</th>
+            <!-- البيانات المالية -->
+            <th class="group-basic"><i class="fas fa-money-bill-wave"></i> العملة</th>
+            <th class="group-basic"><i class="fas fa-dollar-sign"></i> المبلغ المدفوع</th>
+            <th class="group-basic"><i class="fas fa-clock"></i> وقت الدفع</th>
+            <th class="group-basic"><i class="fas fa-shield-alt"></i> الضمانات</th>
+            <th class="group-basic"><i class="fas fa-calendar-check"></i> تاريخ الدفع</th>
 
-              <!-- الحالة والإجراءات -->
-              <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            include 'contractequipments_handler.php';
+            <!-- الحالة والإجراءات -->
+            <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          include 'contractequipments_handler.php';
 
-            if (isset($_GET['delete_id'])) {
-              $delete_id = intval($_GET['delete_id']);
-              $delete_csrf = isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '';
+          if (isset($_GET['delete_id'])) {
+            $delete_id = intval($_GET['delete_id']);
+            $delete_csrf = isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '';
 
-              if (!$can_delete) {
-                header("Location: contracts.php?id=$mine_id&msg=لا+توجد+صلاحية+حذف+العقود+❌");
-                exit;
-              }
-
-              if (empty($delete_csrf) || !hash_equals($contracts_csrf_token, $delete_csrf)) {
-                header("Location: contracts.php?id=$mine_id&msg=جلسة+الحذف+غير+صالحة+❌");
-                exit;
-              }
-
-              if (!$contracts_has_is_deleted && !$contracts_has_deleted_at) {
-                header("Location: contracts.php?id=$mine_id&msg=تعذر+تفعيل+الحذف+الناعم+للعقود+❌");
-                exit;
-              }
-
-              $delete_scope = (!$is_super_admin && $contracts_has_company)
-                ? " AND company_id = $company_id"
-                : "";
-
-              $delete_set = array("status = '0'");
-              if ($contracts_has_is_deleted) {
-                $delete_set[] = "is_deleted = 1";
-              }
-              if ($contracts_has_deleted_at) {
-                $delete_set[] = "deleted_at = NOW()";
-              }
-              if ($contracts_has_deleted_by) {
-                $delete_set[] = "deleted_by = " . intval(isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0);
-              }
-
-              $delete_sql = "UPDATE contracts SET " . implode(', ', $delete_set) . " WHERE id = $delete_id AND mine_id = $mine_id AND $contract_not_deleted_plain_sql$delete_scope";
-              mysqli_query($conn, $delete_sql);
-              echo "<script>window.location.href='contracts.php?id=$mine_id';</script>";
+            if (!$can_delete) {
+              header("Location: contracts.php?id=$mine_id&msg=لا+توجد+صلاحية+حذف+العقود+❌");
               exit;
             }
 
-            // إضافة عقد جديد عند إرسال الفورم
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_id'])) {
+            if (empty($delete_csrf) || !hash_equals($contracts_csrf_token, $delete_csrf)) {
+              header("Location: contracts.php?id=$mine_id&msg=جلسة+الحذف+غير+صالحة+❌");
+              exit;
+            }
 
-              $posted_csrf = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
-              if (empty($posted_csrf) || !hash_equals($contracts_csrf_token, $posted_csrf)) {
-                echo "<script>alert('❌ جلسة النموذج غير صالحة'); window.location.href='contracts.php?id=$mine_id';</script>";
-                exit;
+            if (!$contracts_has_is_deleted && !$contracts_has_deleted_at) {
+              header("Location: contracts.php?id=$mine_id&msg=تعذر+تفعيل+الحذف+الناعم+للعقود+❌");
+              exit;
+            }
+
+            $delete_scope = (!$is_super_admin && $contracts_has_company)
+              ? " AND company_id = $company_id"
+              : "";
+
+            $delete_set = array("status = '0'");
+            if ($contracts_has_is_deleted) {
+              $delete_set[] = "is_deleted = 1";
+            }
+            if ($contracts_has_deleted_at) {
+              $delete_set[] = "deleted_at = NOW()";
+            }
+            if ($contracts_has_deleted_by) {
+              $delete_set[] = "deleted_by = " . intval(isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 0);
+            }
+
+            $delete_sql = "UPDATE contracts SET " . implode(', ', $delete_set) . " WHERE id = $delete_id AND mine_id = $mine_id AND $contract_not_deleted_plain_sql$delete_scope";
+            mysqli_query($conn, $delete_sql);
+            echo "<script>window.location.href='contracts.php?id=$mine_id';</script>";
+            exit;
+          }
+
+          // إضافة عقد جديد عند إرسال الفورم
+          if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mine_id'])) {
+
+            $posted_csrf = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+            if (empty($posted_csrf) || !hash_equals($contracts_csrf_token, $posted_csrf)) {
+              echo "<script>alert('❌ جلسة النموذج غير صالحة'); window.location.href='contracts.php?id=$mine_id';</script>";
+              exit;
+            }
+
+            $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+            $mine_id = intval($_POST['mine_id']);
+
+            if (!$is_super_admin) {
+              $mine_not_deleted_sql = '1=1';
+              if ($mines_has_is_deleted) {
+                $mine_not_deleted_sql = 'm.is_deleted = 0';
+              } elseif ($mines_has_deleted_at) {
+                $mine_not_deleted_sql = 'm.deleted_at IS NULL';
               }
 
-              $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-              $mine_id = intval($_POST['mine_id']);
+              $mine_scope_or = array();
+              if ($mines_has_company_id) {
+                $mine_scope_or[] = "m.company_id = $company_id";
+              }
+              if ($project_has_company_id) {
+                $mine_scope_or[] = "p.company_id = $company_id";
+              }
+              $mine_scope_or[] = "su.company_id = $company_id";
+              $mine_scope_or[] = "scu.company_id = $company_id";
 
-              if (!$is_super_admin) {
-                $mine_not_deleted_sql = '1=1';
-                if ($mines_has_is_deleted) {
-                  $mine_not_deleted_sql = 'm.is_deleted = 0';
-                } elseif ($mines_has_deleted_at) {
-                  $mine_not_deleted_sql = 'm.deleted_at IS NULL';
-                }
-
-                $mine_scope_or = array();
-                if ($mines_has_company_id) {
-                  $mine_scope_or[] = "m.company_id = $company_id";
-                }
-                if ($project_has_company_id) {
-                  $mine_scope_or[] = "p.company_id = $company_id";
-                }
-                $mine_scope_or[] = "su.company_id = $company_id";
-                $mine_scope_or[] = "scu.company_id = $company_id";
-
-                $mine_scope_query = "SELECT m.id
+              $mine_scope_query = "SELECT m.id
                   FROM mines m
                   INNER JOIN project p ON p.id = m.project_id
                   LEFT JOIN users su ON su.id = p.created_by
@@ -903,75 +907,75 @@ include('../insidebar.php');
                     AND $mine_not_deleted_sql
                     AND (" . implode(' OR ', $mine_scope_or) . ")
                   LIMIT 1";
-                $mine_scope_result = mysqli_query($conn, $mine_scope_query);
-                if (!$mine_scope_result || mysqli_num_rows($mine_scope_result) === 0) {
-                  echo "<script>alert('❌ لا يمكنك الوصول إلى هذا المنجم'); window.location.href='contracts.php?id=$mine_id';</script>";
-                  exit;
-                }
-              }
-
-              if ($id > 0 && !$can_edit) {
-                header("Location: contracts.php?id=$mine_id&msg=لا+توجد+صلاحية+تعديل+العقود+❌");
-                exit;
-              } elseif ($id <= 0 && !$can_add) {
-                header("Location: contracts.php?id=$mine_id&msg=لا+توجد+صلاحية+إضافة+عقود+جديدة+❌");
+              $mine_scope_result = mysqli_query($conn, $mine_scope_query);
+              if (!$mine_scope_result || mysqli_num_rows($mine_scope_result) === 0) {
+                echo "<script>alert('❌ لا يمكنك الوصول إلى هذا المنجم'); window.location.href='contracts.php?id=$mine_id';</script>";
                 exit;
               }
+            }
+
+            if ($id > 0 && !$can_edit) {
+              header("Location: contracts.php?id=$mine_id&msg=لا+توجد+صلاحية+تعديل+العقود+❌");
+              exit;
+            } elseif ($id <= 0 && !$can_add) {
+              header("Location: contracts.php?id=$mine_id&msg=لا+توجد+صلاحية+إضافة+عقود+جديدة+❌");
+              exit;
+            }
 
 
-              $contract_signing_date = $_POST['contract_signing_date'];
-              $grace_period_days = $_POST['grace_period_days'];
+            $contract_signing_date = $_POST['contract_signing_date'];
+            $grace_period_days = $_POST['grace_period_days'];
 
-              // حساب مدة العقد بالأيام من تاريخ البداية والنهاية
-              $actual_start = $_POST['actual_start'];
-              $actual_end = $_POST['actual_end'];
+            // حساب مدة العقد بالأيام من تاريخ البداية والنهاية
+            $actual_start = $_POST['actual_start'];
+            $actual_end = $_POST['actual_end'];
 
-              // حساب عدد الأيام من تاريخ البداية إلى تاريخ الانتهاء (شامل يوم البداية ويوم النهاية)
-              if (!empty($actual_start) && !empty($actual_end)) {
-                $start_date = new DateTime($actual_start);
-                $end_date = new DateTime($actual_end);
-                $interval = $start_date->diff($end_date);
-                $contract_duration_days = $interval->days + 1; // +1 لحساب يوم البداية ويوم النهاية معاً
-              } else {
-                $contract_duration_days = 0;
-              }
+            // حساب عدد الأيام من تاريخ البداية إلى تاريخ الانتهاء (شامل يوم البداية ويوم النهاية)
+            if (!empty($actual_start) && !empty($actual_end)) {
+              $start_date = new DateTime($actual_start);
+              $end_date = new DateTime($actual_end);
+              $interval = $start_date->diff($end_date);
+              $contract_duration_days = $interval->days + 1; // +1 لحساب يوم البداية ويوم النهاية معاً
+            } else {
+              $contract_duration_days = 0;
+            }
 
-              $transportation = $_POST['transportation'];
-              $accommodation = $_POST['accommodation'];
-              $place_for_living = $_POST['place_for_living'];
-              $workshop = $_POST['workshop'];
+            $transportation = $_POST['transportation'];
+            $accommodation = $_POST['accommodation'];
+            $place_for_living = $_POST['place_for_living'];
+            $workshop = $_POST['workshop'];
 
-              $hours_monthly_target = $_POST['hours_monthly_target'];
-              $forecasted_contracted_hours = $_POST['forecasted_contracted_hours'];
+            $hours_monthly_target = $_POST['hours_monthly_target'];
+            $forecasted_contracted_hours = $_POST['forecasted_contracted_hours'];
 
-              $daily_work_hours = $_POST['daily_work_hours'];
-              $daily_operators = $_POST['daily_operators'];
-              $first_party = $_POST['first_party'];
-              $second_party = $_POST['second_party'];
-              $witness_one = $_POST['witness_one'];
-              $witness_two = $_POST['witness_two'];
+            $daily_work_hours = $_POST['daily_work_hours'];
+            $daily_operators = $_POST['daily_operators'];
+            $first_party = $_POST['first_party'];
+            $second_party = $_POST['second_party'];
+            $witness_one = $_POST['witness_one'];
+            $witness_two = $_POST['witness_two'];
 
-              // الحقول المالية الجديدة
-              $price_currency_contract = isset($_POST['price_currency_contract']) ? mysqli_real_escape_string($conn, $_POST['price_currency_contract']) : '';
-              $paid_contract = isset($_POST['paid_contract']) ? mysqli_real_escape_string($conn, $_POST['paid_contract']) : '';
-              $payment_time = isset($_POST['payment_time']) ? mysqli_real_escape_string($conn, $_POST['payment_time']) : '';
-              $guarantees = isset($_POST['guarantees']) ? mysqli_real_escape_string($conn, $_POST['guarantees']) : '';
-              $payment_date = isset($_POST['payment_date']) ? mysqli_real_escape_string($conn, $_POST['payment_date']) : '';
+            // الحقول المالية الجديدة
+            $price_currency_contract = isset($_POST['price_currency_contract']) ? mysqli_real_escape_string($conn, $_POST['price_currency_contract']) : '';
+            $paid_contract = isset($_POST['paid_contract']) ? mysqli_real_escape_string($conn, $_POST['paid_contract']) : '';
+            $payment_time = isset($_POST['payment_time']) ? mysqli_real_escape_string($conn, $_POST['payment_time']) : '';
+            $guarantees = isset($_POST['guarantees']) ? mysqli_real_escape_string($conn, $_POST['guarantees']) : '';
+            $payment_date = isset($_POST['payment_date']) ? mysqli_real_escape_string($conn, $_POST['payment_date']) : '';
 
-              // الحقول الإضافية للعقد
-              $equip_shifts_contract = isset($_POST['equip_shifts_contract']) ? intval($_POST['equip_shifts_contract']) : 0;
-              $shift_contract = isset($_POST['shift_contract']) ? intval($_POST['shift_contract']) : 0;
-              $equip_total_contract_daily = isset($_POST['equip_total_contract']) ? intval($_POST['equip_total_contract']) : 0;
-              $total_contract_permonth = isset($_POST['total_contract_permonth']) ? intval($_POST['total_contract_permonth']) : 0;
-              $total_contract_units = isset($_POST['total_contract']) ? intval($_POST['total_contract']) : 0;
+            // الحقول الإضافية للعقد
+            $equip_shifts_contract = isset($_POST['equip_shifts_contract']) ? intval($_POST['equip_shifts_contract']) : 0;
+            $shift_contract = isset($_POST['shift_contract']) ? intval($_POST['shift_contract']) : 0;
+            $equip_total_contract_daily = isset($_POST['equip_total_contract']) ? intval($_POST['equip_total_contract']) : 0;
+            $total_contract_permonth = isset($_POST['total_contract_permonth']) ? intval($_POST['total_contract_permonth']) : 0;
+            $total_contract_units = isset($_POST['total_contract']) ? intval($_POST['total_contract']) : 0;
 
 
-              if ($id > 0) {
-                // تعديل
-                $contract_update_scope = (!$is_super_admin && $contracts_has_company)
-                  ? " AND company_id = $company_id"
-                  : "";
-                $sql = "UPDATE contracts SET 
+            if ($id > 0) {
+              // تعديل
+              $contract_update_scope = (!$is_super_admin && $contracts_has_company)
+                ? " AND company_id = $company_id"
+                : "";
+              $sql = "UPDATE contracts SET
             contract_signing_date='$contract_signing_date',
             grace_period_days='$grace_period_days',
             contract_duration_days='$contract_duration_days',
@@ -1000,12 +1004,12 @@ include('../insidebar.php');
             guarantees='$guarantees',
             payment_date='$payment_date'
           WHERE id=$id AND $contract_not_deleted_plain_sql$contract_update_scope";
-              } else {
-                // إضافة
+            } else {
+              // إضافة
               $contract_insert_company_id = ($contracts_has_company && $company_id > 0) ? $company_id : 0;
               $contract_insert_col = ($contracts_has_company && $contract_insert_company_id > 0) ? ", company_id" : "";
               $contract_insert_val = ($contracts_has_company && $contract_insert_company_id > 0) ? ", '$contract_insert_company_id'" : "";
-                $sql = "INSERT INTO contracts (
+              $sql = "INSERT INTO contracts (
             contract_signing_date, mine_id, grace_period_days, contract_duration_days,
             equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
             actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
@@ -1020,108 +1024,108 @@ include('../insidebar.php');
             '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two',
             '$price_currency_contract','$paid_contract','$payment_time','$guarantees','$payment_date'$contract_insert_val
         )";
+            }
+            $result = mysqli_query($conn, $sql);
+
+            if ($result) {
+              // الحصول على معرف العقد المُضاف حديثاً أو معرف العقد المُحدّث
+              if ($id > 0) {
+                $contract_id = $id;
+              } else {
+                $contract_id = mysqli_insert_id($conn);
               }
-              $result = mysqli_query($conn, $sql);
 
-              if ($result) {
-                // الحصول على معرف العقد المُضاف حديثاً أو معرف العقد المُحدّث
-                if ($id > 0) {
-                  $contract_id = $id;
-                } else {
-                  $contract_id = mysqli_insert_id($conn);
-                }
-
-                // جمع بيانات المعدات من الفورم
-                $equipment_array = [];
-                $i = 1;
-                // البحث عن أكبر index موجود
-                $max_index = 0;
-                foreach ($_POST as $key => $value) {
-                  if (preg_match('/equip_type_(\d+)/', $key, $matches)) {
-                    $max_index = max($max_index, (int) $matches[1]);
-                  }
-                }
-
-                // جمع البيانات من جميع الأقسام
-                for ($i = 1; $i <= $max_index; $i++) {
-                  if (isset($_POST["equip_type_$i"]) && !empty($_POST["equip_type_$i"])) {
-                    $equipment_array[] = [
-                      'equip_type' => intval($_POST["equip_type_$i"]),
-                      'equip_size' => isset($_POST["equip_size_$i"]) ? $_POST["equip_size_$i"] : 0,
-                      'equip_count' => isset($_POST["equip_count_$i"]) ? $_POST["equip_count_$i"] : 0,
-                      'equip_count_basic' => isset($_POST["equip_count_basic_$i"]) ? intval($_POST["equip_count_basic_$i"]) : 0,
-                      'equip_count_backup' => isset($_POST["equip_count_backup_$i"]) ? intval($_POST["equip_count_backup_$i"]) : 0,
-                      'equip_shifts' => isset($_POST["equip_shifts_$i"]) ? $_POST["equip_shifts_$i"] : 0,
-                      'equip_unit' => isset($_POST["equip_unit_$i"]) ? $_POST["equip_unit_$i"] : '',
-                      'shift1_start' => isset($_POST["shift1_start_$i"]) ? $_POST["shift1_start_$i"] : '',
-                      'shift1_end' => isset($_POST["shift1_end_$i"]) ? $_POST["shift1_end_$i"] : '',
-                      'shift2_start' => isset($_POST["shift2_start_$i"]) ? $_POST["shift2_start_$i"] : '',
-                      'shift2_end' => isset($_POST["shift2_end_$i"]) ? $_POST["shift2_end_$i"] : '',
-                      'shift_hours' => isset($_POST["shift_hours_$i"]) ? $_POST["shift_hours_$i"] : 0,
-                      'equip_total_month' => isset($_POST["equip_total_month_$i"]) ? $_POST["equip_total_month_$i"] : 0,
-                      'equip_monthly_target' => isset($_POST["equip_target_per_month_$i"]) ? $_POST["equip_target_per_month_$i"] : 0,
-                      'equip_total_contract' => isset($_POST["equip_total_contract_$i"]) ? $_POST["equip_total_contract_$i"] : 0,
-                      'equip_price' => isset($_POST["equip_price_$i"]) ? $_POST["equip_price_$i"] : 0,
-                      'equip_price_currency' => isset($_POST["equip_price_currency_$i"]) ? $_POST["equip_price_currency_$i"] : '',
-                      'equip_operators' => isset($_POST["equip_operators_$i"]) ? $_POST["equip_operators_$i"] : 0,
-                      'equip_supervisors' => isset($_POST["equip_supervisors_$i"]) ? $_POST["equip_supervisors_$i"] : 0,
-                      'equip_technicians' => isset($_POST["equip_technicians_$i"]) ? $_POST["equip_technicians_$i"] : 0,
-                      'equip_assistants' => isset($_POST["equip_assistants_$i"]) ? $_POST["equip_assistants_$i"] : 0
-                    ];
-                  }
-                }
-
-                // إضافة بيانات المعدات الجديدة
-                if (!empty($equipment_array)) {
-                  include('contractequipments_handler.php');
-                  saveContractEquipments($contract_id, $equipment_array, $conn);
+              // جمع بيانات المعدات من الفورم
+              $equipment_array = [];
+              $i = 1;
+              // البحث عن أكبر index موجود
+              $max_index = 0;
+              foreach ($_POST as $key => $value) {
+                if (preg_match('/equip_type_(\d+)/', $key, $matches)) {
+                  $max_index = max($max_index, (int) $matches[1]);
                 }
               }
 
-              echo "<script>window.location.href='contracts.php?id=$mine_id';</script>";
-              exit;
+              // جمع البيانات من جميع الأقسام
+              for ($i = 1; $i <= $max_index; $i++) {
+                if (isset($_POST["equip_type_$i"]) && !empty($_POST["equip_type_$i"])) {
+                  $equipment_array[] = [
+                    'equip_type' => intval($_POST["equip_type_$i"]),
+                    'equip_size' => isset($_POST["equip_size_$i"]) ? $_POST["equip_size_$i"] : 0,
+                    'equip_count' => isset($_POST["equip_count_$i"]) ? $_POST["equip_count_$i"] : 0,
+                    'equip_count_basic' => isset($_POST["equip_count_basic_$i"]) ? intval($_POST["equip_count_basic_$i"]) : 0,
+                    'equip_count_backup' => isset($_POST["equip_count_backup_$i"]) ? intval($_POST["equip_count_backup_$i"]) : 0,
+                    'equip_shifts' => isset($_POST["equip_shifts_$i"]) ? $_POST["equip_shifts_$i"] : 0,
+                    'equip_unit' => isset($_POST["equip_unit_$i"]) ? $_POST["equip_unit_$i"] : '',
+                    'shift1_start' => isset($_POST["shift1_start_$i"]) ? $_POST["shift1_start_$i"] : '',
+                    'shift1_end' => isset($_POST["shift1_end_$i"]) ? $_POST["shift1_end_$i"] : '',
+                    'shift2_start' => isset($_POST["shift2_start_$i"]) ? $_POST["shift2_start_$i"] : '',
+                    'shift2_end' => isset($_POST["shift2_end_$i"]) ? $_POST["shift2_end_$i"] : '',
+                    'shift_hours' => isset($_POST["shift_hours_$i"]) ? $_POST["shift_hours_$i"] : 0,
+                    'equip_total_month' => isset($_POST["equip_total_month_$i"]) ? $_POST["equip_total_month_$i"] : 0,
+                    'equip_monthly_target' => isset($_POST["equip_target_per_month_$i"]) ? $_POST["equip_target_per_month_$i"] : 0,
+                    'equip_total_contract' => isset($_POST["equip_total_contract_$i"]) ? $_POST["equip_total_contract_$i"] : 0,
+                    'equip_price' => isset($_POST["equip_price_$i"]) ? $_POST["equip_price_$i"] : 0,
+                    'equip_price_currency' => isset($_POST["equip_price_currency_$i"]) ? $_POST["equip_price_currency_$i"] : '',
+                    'equip_operators' => isset($_POST["equip_operators_$i"]) ? $_POST["equip_operators_$i"] : 0,
+                    'equip_supervisors' => isset($_POST["equip_supervisors_$i"]) ? $_POST["equip_supervisors_$i"] : 0,
+                    'equip_technicians' => isset($_POST["equip_technicians_$i"]) ? $_POST["equip_technicians_$i"] : 0,
+                    'equip_assistants' => isset($_POST["equip_assistants_$i"]) ? $_POST["equip_assistants_$i"] : 0
+                  ];
+                }
+              }
+
+              // إضافة بيانات المعدات الجديدة
+              if (!empty($equipment_array)) {
+                include('contractequipments_handler.php');
+                saveContractEquipments($contract_id, $equipment_array, $conn);
+              }
             }
 
-            // جلب العقود مع بيانات المنجم والمشروع
-            $contracts_where_parts = array($contract_scope_sql);
-            if (!$is_all_mines_view) {
-              $contracts_where_parts[] = "c.mine_id = '$mine_id'";
-            } elseif ($filter_mine_id > 0) {
-              $contracts_where_parts[] = "c.mine_id = '$filter_mine_id'";
-            }
-            if ($filter_project_id > 0) {
-              $contracts_where_parts[] = "m.project_id = '$filter_project_id'";
-            }
-            $contracts_where_sql = implode(' AND ', $contracts_where_parts);
+            echo "<script>window.location.href='contracts.php?id=$mine_id';</script>";
+            exit;
+          }
 
-            $query = "SELECT c.*, m.mine_name, m.mine_code, p.name AS project_name, p.id AS project_id 
+          // جلب العقود مع بيانات المنجم والمشروع
+          $contracts_where_parts = array($contract_scope_sql);
+          if (!$is_all_mines_view) {
+            $contracts_where_parts[] = "c.mine_id = '$mine_id'";
+          } elseif ($filter_mine_id > 0) {
+            $contracts_where_parts[] = "c.mine_id = '$filter_mine_id'";
+          }
+          if ($filter_project_id > 0) {
+            $contracts_where_parts[] = "m.project_id = '$filter_project_id'";
+          }
+          $contracts_where_sql = implode(' AND ', $contracts_where_parts);
+
+          $query = "SELECT c.*, m.mine_name, m.mine_code, p.name AS project_name, p.id AS project_id
                       FROM `contracts` c
                       LEFT JOIN mines m ON c.mine_id = m.id
                       LEFT JOIN project p ON m.project_id = p.id
                       WHERE $contracts_where_sql
                       ORDER BY c.id DESC";
-            $result = mysqli_query($conn, $query);
-            $i = 1;
+          $result = mysqli_query($conn, $query);
+          $i = 1;
 
 
-            while ($row = mysqli_fetch_assoc($result)) {
+          while ($row = mysqli_fetch_assoc($result)) {
 
-              // عرض حالة العقد من status
-              $contractStatus = isset($row['status']) ? $row['status'] : 1;
+            // عرض حالة العقد من status
+            $contractStatus = isset($row['status']) ? $row['status'] : 1;
+            $statusColor = 'green';
+            $statusText = 'ساري';
+            if ($contractStatus == 1) {
               $statusColor = 'green';
               $statusText = 'ساري';
-              if ($contractStatus == 1) {
-                $statusColor = 'green';
-                $statusText = 'ساري';
-              } else {
-                $statusColor = 'red';
-                $statusText = 'غير ساري';
-              }
-              $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
+            } else {
+              $statusColor = 'red';
+              $statusText = 'غير ساري';
+            }
+            $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
 
-              $actions_html = '';
-              if ($can_edit) {
-                $actions_html .= "<a href='javascript:void(0)' class='editBtn'
+            $actions_html = '';
+            if ($can_edit) {
+              $actions_html .= "<a href='javascript:void(0)' class='editBtn'
              data-id='" . $row['id'] . "'
                data-project_id='" . (isset($row['project_id']) ? intval($row['project_id']) : 0) . "'
                data-mine_id='" . (isset($row['mine_id']) ? intval($row['mine_id']) : 0) . "'
@@ -1154,284 +1158,284 @@ include('../insidebar.php');
 
              data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
              class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>";
-              }
-
-              if ($can_delete) {
-                $delete_mine_id = $mine_id > 0 ? $mine_id : intval(isset($row['mine_id']) ? $row['mine_id'] : 0);
-                $actions_html .= "<a href='contracts.php?id=" . $delete_mine_id . "&delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode($contracts_csrf_token) . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>";
-              }
-
-              $actions_html .= "<a href='contracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>";
-
-              echo "<tr>";
-              echo "<td class='group-status'>" . $actions_html . "</td>";
-
-              // المعلومات الأساسية
-              echo "<td class='group-basic'>" . $row['id'] . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['mine_name']) && $row['mine_name'] !== '' ? $row['mine_name'] . ' (' . $row['mine_code'] . ')' : '-') . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['project_name']) && $row['project_name'] !== '' ? $row['project_name'] : '-') . "</td>";
-
-              // التواريخ والمدد
-              echo "<td class='group-dates'>" . $row['contract_signing_date'] . "</td>";
-              echo "<td class='group-dates'>" . (isset($row['grace_period_days']) ? $row['grace_period_days'] : 0) . "</td>";
-              echo "<td class='group-dates'>" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "</td>";
-              echo "<td class='group-dates'>" . $row['actual_start'] . "</td>";
-              echo "<td class='group-dates'>" . $row['actual_end'] . "</td>";
-
-              // الساعات والأهداف
-              echo "<td class='group-hours'>" . $row['hours_monthly_target'] . "</td>";
-              echo "<td class='group-hours'>" . $row['forecasted_contracted_hours'] . "</td>";
-
-              // أطراف العقد
-              echo "<td class='group-parties'>" . (isset($row['first_party']) ? $row['first_party'] : '-') . "</td>";
-              echo "<td class='group-parties'>" . (isset($row['second_party']) ? $row['second_party'] : '-') . "</td>";
-              echo "<td class='group-parties'>" . (isset($row['witness_one']) ? $row['witness_one'] : '-') . "</td>";
-              echo "<td class='group-parties'>" . (isset($row['witness_two']) ? $row['witness_two'] : '-') . "</td>";
-
-              // الخدمات المقدمة
-              $transportationText = isset($row['transportation']) && $row['transportation'] ? $row['transportation'] : '-';
-              $accommodationText = isset($row['accommodation']) && $row['accommodation'] ? $row['accommodation'] : '-';
-              $place_for_livingText = isset($row['place_for_living']) && $row['place_for_living'] ? $row['place_for_living'] : '-';
-              $workshopText = isset($row['workshop']) && $row['workshop'] ? $row['workshop'] : '-';
-
-              echo "<td class='group-services'>" . $transportationText . "</td>";
-              echo "<td class='group-services'>" . $accommodationText . "</td>";
-              echo "<td class='group-services'>" . $place_for_livingText . "</td>";
-              echo "<td class='group-services'>" . $workshopText . "</td>";
-
-              // التشغيل اليومي
-              echo "<td class='group-operations'>" . (isset($row['daily_work_hours']) ? $row['daily_work_hours'] : '-') . "</td>";
-              echo "<td class='group-operations'>" . (isset($row['daily_operators']) ? $row['daily_operators'] : '-') . "</td>";
-
-              // البيانات المالية
-              echo "<td class='group-basic'>" . (isset($row['price_currency_contract']) && $row['price_currency_contract'] ? $row['price_currency_contract'] : '-') . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['paid_contract']) && $row['paid_contract'] ? $row['paid_contract'] : '-') . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['payment_time']) && $row['payment_time'] ? $row['payment_time'] : '-') . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['guarantees']) && $row['guarantees'] ? $row['guarantees'] : '-') . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['payment_date']) && $row['payment_date'] ? $row['payment_date'] : '-') . "</td>";
-
-              // الحالة والإجراءات
-              echo "<td class='group-status'>" . $status . "</td>";
-              echo "</tr>";
             }
-            ?>
-          </tbody>
-        </table>
-      </div>
+
+            if ($can_delete) {
+              $delete_mine_id = $mine_id > 0 ? $mine_id : intval(isset($row['mine_id']) ? $row['mine_id'] : 0);
+              $actions_html .= "<a href='contracts.php?id=" . $delete_mine_id . "&delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode($contracts_csrf_token) . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>";
+            }
+
+            $actions_html .= "<a href='contracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>";
+
+            echo "<tr>";
+            echo "<td class='group-status'>" . $actions_html . "</td>";
+
+            // المعلومات الأساسية
+            echo "<td class='group-basic'>" . $row['id'] . "</td>";
+            echo "<td class='group-basic'>" . (isset($row['mine_name']) && $row['mine_name'] !== '' ? $row['mine_name'] . ' (' . $row['mine_code'] . ')' : '-') . "</td>";
+            echo "<td class='group-basic'>" . (isset($row['project_name']) && $row['project_name'] !== '' ? $row['project_name'] : '-') . "</td>";
+
+            // التواريخ والمدد
+            echo "<td class='group-dates'>" . $row['contract_signing_date'] . "</td>";
+            echo "<td class='group-dates'>" . (isset($row['grace_period_days']) ? $row['grace_period_days'] : 0) . "</td>";
+            echo "<td class='group-dates'>" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "</td>";
+            echo "<td class='group-dates'>" . $row['actual_start'] . "</td>";
+            echo "<td class='group-dates'>" . $row['actual_end'] . "</td>";
+
+            // الساعات والأهداف
+            echo "<td class='group-hours'>" . $row['hours_monthly_target'] . "</td>";
+            echo "<td class='group-hours'>" . $row['forecasted_contracted_hours'] . "</td>";
+
+            // أطراف العقد
+            echo "<td class='group-parties'>" . (isset($row['first_party']) ? $row['first_party'] : '-') . "</td>";
+            echo "<td class='group-parties'>" . (isset($row['second_party']) ? $row['second_party'] : '-') . "</td>";
+            echo "<td class='group-parties'>" . (isset($row['witness_one']) ? $row['witness_one'] : '-') . "</td>";
+            echo "<td class='group-parties'>" . (isset($row['witness_two']) ? $row['witness_two'] : '-') . "</td>";
+
+            // الخدمات المقدمة
+            $transportationText = isset($row['transportation']) && $row['transportation'] ? $row['transportation'] : '-';
+            $accommodationText = isset($row['accommodation']) && $row['accommodation'] ? $row['accommodation'] : '-';
+            $place_for_livingText = isset($row['place_for_living']) && $row['place_for_living'] ? $row['place_for_living'] : '-';
+            $workshopText = isset($row['workshop']) && $row['workshop'] ? $row['workshop'] : '-';
+
+            echo "<td class='group-services'>" . $transportationText . "</td>";
+            echo "<td class='group-services'>" . $accommodationText . "</td>";
+            echo "<td class='group-services'>" . $place_for_livingText . "</td>";
+            echo "<td class='group-services'>" . $workshopText . "</td>";
+
+            // التشغيل اليومي
+            echo "<td class='group-operations'>" . (isset($row['daily_work_hours']) ? $row['daily_work_hours'] : '-') . "</td>";
+            echo "<td class='group-operations'>" . (isset($row['daily_operators']) ? $row['daily_operators'] : '-') . "</td>";
+
+            // البيانات المالية
+            echo "<td class='group-basic'>" . (isset($row['price_currency_contract']) && $row['price_currency_contract'] ? $row['price_currency_contract'] : '-') . "</td>";
+            echo "<td class='group-basic'>" . (isset($row['paid_contract']) && $row['paid_contract'] ? $row['paid_contract'] : '-') . "</td>";
+            echo "<td class='group-basic'>" . (isset($row['payment_time']) && $row['payment_time'] ? $row['payment_time'] : '-') . "</td>";
+            echo "<td class='group-basic'>" . (isset($row['guarantees']) && $row['guarantees'] ? $row['guarantees'] : '-') . "</td>";
+            echo "<td class='group-basic'>" . (isset($row['payment_date']) && $row['payment_date'] ? $row['payment_date'] : '-') . "</td>";
+
+            // الحالة والإجراءات
+            echo "<td class='group-status'>" . $status . "</td>";
+            echo "</tr>";
+          }
+          ?>
+        </tbody>
+      </table>
     </div>
   </div>
+</div>
 
-  <!-- jQuery -->
-  <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
-  <!-- DataTables JS -->
-  <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<!-- jQuery -->
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<!-- DataTables JS -->
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 
-  <!-- JS -->
-  <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-  <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
-  <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-  <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
-  <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
-  <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
-  <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
-  <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
-  <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
-  <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
-
-
-  <script>
-    (function () {
-      // تشغيل DataTable بالعربية
+<!-- JS -->
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
 
-      $(document).ready(function () {
-        $('#projectsTable').DataTable({
-          dom: 'Bfrtip', // Buttons + Search + Pagination
-          buttons: [
-            { extend: 'copy', text: 'نسخ' },
-            { extend: 'excel', text: 'تصدير Excel' },
-            { extend: 'csv', text: 'تصدير CSV' },
-            { extend: 'pdf', text: 'تصدير PDF' },
-            { extend: 'print', text: 'طباعة' }
-          ],
-          "language": {
-            "url": "/ems/assets/i18n/datatables/ar.json"
-          }
-        });
-      });
+<script>
+  (function () {
+    // تشغيل DataTable بالعربية
 
 
-      // التحكم في إظهار وإخفاء الفورم
-      const toggleContractFormBtn = document.getElementById('toggleForm');
-      const contractForm = document.getElementById('projectForm');
-
-      if (toggleContractFormBtn && contractForm) {
-        toggleContractFormBtn.addEventListener('click', function () {
-          contractForm.classList.toggle('allforms-visible');
-        });
-      }
-
-      window.loadContractMines = function (projectId, selectedMineId) {
-        const mineSelect = $('#contract_mine_id');
-        if (!mineSelect.length) {
-          return;
+    $(document).ready(function () {
+      $('#projectsTable').DataTable({
+        dom: 'Bfrtip', // Buttons + Search + Pagination
+        buttons: [
+          { extend: 'copy', text: 'نسخ' },
+          { extend: 'excel', text: 'تصدير Excel' },
+          { extend: 'csv', text: 'تصدير CSV' },
+          { extend: 'pdf', text: 'تصدير PDF' },
+          { extend: 'print', text: 'طباعة' }
+        ],
+        "language": {
+          "url": "/ems/assets/i18n/datatables/ar.json"
         }
-
-        if (!projectId) {
-          mineSelect.html('<option value="">— اختر المشروع أولاً —</option>').prop('disabled', true);
-          return;
-        }
-
-        mineSelect.prop('disabled', true).html('<option value="">— جاري التحميل... —</option>');
-        $.ajax({
-          url: '../Suppliers/get_project_mines.php',
-          type: 'POST',
-          data: { project_id: projectId },
-          dataType: 'json',
-          success: function (response) {
-            if (response.success && response.mines && response.mines.length > 0) {
-              let options = '<option value="">— اختر المنجم —</option>';
-              response.mines.forEach(function (mine) {
-                const selected = selectedMineId && parseInt(selectedMineId, 10) === parseInt(mine.id, 10) ? 'selected' : '';
-                options += `<option value="${mine.id}" ${selected}>${mine.display_name}</option>`;
-              });
-              mineSelect.html(options).prop('disabled', false);
-            } else {
-              mineSelect.html('<option value="">— لا توجد مناجم لهذا المشروع —</option>').prop('disabled', true);
-            }
-          },
-          error: function () {
-            mineSelect.html('<option value="">— خطأ في التحميل —</option>').prop('disabled', true);
-          }
-        });
-      }
-
-      $('#contract_project_id').on('change', function () {
-        window.loadContractMines($(this).val(), null);
       });
+    });
 
-      // --- فلتر المناجم يعتمد على فلتر المشروع ---
-      $('#filter_project_select').on('change', function () {
-        const projectId = $(this).val();
-        const mineSelect = $('#filter_mine_select');
-        if (!mineSelect.length) return;
 
-        if (!projectId || projectId === '0') {
-          mineSelect.html('<option value="0">كل المناجم</option>').prop('disabled', true);
-          return;
-        }
+    // التحكم في إظهار وإخفاء الفورم
+    const toggleContractFormBtn = document.getElementById('toggleForm');
+    const contractForm = document.getElementById('projectForm');
 
-        mineSelect.prop('disabled', true).html('<option value="0">جاري التحميل...</option>');
-        $.ajax({
-          url: 'get_project_mines.php',
-          type: 'POST',
-          data: { project_id: projectId },
-          dataType: 'json',
-          success: function (response) {
-            let options = '<option value="0">كل المناجم</option>';
-            if (response.success && response.mines && response.mines.length > 0) {
-              response.mines.forEach(function (mine) {
-                options += `<option value="${mine.id}">${mine.display_name}</option>`;
-              });
-              mineSelect.html(options).prop('disabled', false);
-            } else {
-              mineSelect.html(options).prop('disabled', false);
-            }
-          },
-          error: function () {
-            mineSelect.html('<option value="0">كل المناجم</option>').prop('disabled', false);
-          }
-        });
+    if (toggleContractFormBtn && contractForm) {
+      toggleContractFormBtn.addEventListener('click', function () {
+        contractForm.classList.toggle('allforms-visible');
       });
-    })();
-
-  </script>
-
-  <script>
-    const $el = (sel) => document.querySelector(sel);
-    let equipmentIndex = 1;
-
-    const fields = {
-      contractDays: $el('#contract_duration_days'),
-      actualStart: $el('#actual_start'),
-      actualEnd: $el('#actual_end'),
-      kpiMonthTotal: $el('#kpi_month_total'),
-      kpiContractTotal: $el('#kpi_contract_total'),
-      kpiEquipMonth: $el('#kpi_equip_month'),
-      hoursMonthlyTarget: $el('#hours_monthly_target'),
-      forecastedContractedHours: $el('#forecasted_contracted_hours'),
-    };
-
-    function num(v) {
-      const n = parseFloat(v);
-      return isFinite(n) ? n : 0;
     }
 
-    function fmt(n) {
-      return new Intl.NumberFormat('ar-EG').format(Math.max(0, Math.round(n)));
-    }
+    window.loadContractMines = function (projectId, selectedMineId) {
+      const mineSelect = $('#contract_mine_id');
+      if (!mineSelect.length) {
+        return;
+      }
 
-    function updateEquipmentTypeOptions() {
-      const selectedValues = new Set();
-      document.querySelectorAll('.equip-type').forEach(select => {
-        if (select.value) {
-          selectedValues.add(select.value);
-        }
-      });
+      if (!projectId) {
+        mineSelect.html('<option value="">— اختر المشروع أولاً —</option>').prop('disabled', true);
+        return;
+      }
 
-      document.querySelectorAll('.equip-type').forEach(select => {
-        const currentValue = select.value;
-        Array.from(select.options).forEach(option => {
-          if (!option.value) {
-            option.hidden = false;
-            option.disabled = false;
-            return;
-          }
-
-          if (option.value === currentValue) {
-            option.hidden = false;
-            option.disabled = false;
-            return;
-          }
-
-          if (selectedValues.has(option.value)) {
-            option.hidden = true;
-            option.disabled = true;
+      mineSelect.prop('disabled', true).html('<option value="">— جاري التحميل... —</option>');
+      $.ajax({
+        url: '../Suppliers/get_project_mines.php',
+        type: 'POST',
+        data: { project_id: projectId },
+        dataType: 'json',
+        success: function (response) {
+          if (response.success && response.mines && response.mines.length > 0) {
+            let options = '<option value="">— اختر المنجم —</option>';
+            response.mines.forEach(function (mine) {
+              const selected = selectedMineId && parseInt(selectedMineId, 10) === parseInt(mine.id, 10) ? 'selected' : '';
+              options += `<option value="${mine.id}" ${selected}>${mine.display_name}</option>`;
+            });
+            mineSelect.html(options).prop('disabled', false);
           } else {
-            option.hidden = false;
-            option.disabled = false;
+            mineSelect.html('<option value="">— لا توجد مناجم لهذا المشروع —</option>').prop('disabled', true);
           }
-        });
+        },
+        error: function () {
+          mineSelect.html('<option value="">— خطأ في التحميل —</option>').prop('disabled', true);
+        }
       });
     }
 
-    // حساب مدة العقد بالأيام من التاريخين
-    function calculateDaysFromDates() {
-      const startDate = fields.actualStart.value;
-      const endDate = fields.actualEnd.value;
+    $('#contract_project_id').on('change', function () {
+      window.loadContractMines($(this).val(), null);
+    });
 
-      if (startDate && endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const diffTime = Math.abs(end - start);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        fields.contractDays.value = diffDays;
-      } else {
-        fields.contractDays.value = '';
+    // --- فلتر المناجم يعتمد على فلتر المشروع ---
+    $('#filter_project_select').on('change', function () {
+      const projectId = $(this).val();
+      const mineSelect = $('#filter_mine_select');
+      if (!mineSelect.length) return;
+
+      if (!projectId || projectId === '0') {
+        mineSelect.html('<option value="0">كل المناجم</option>').prop('disabled', true);
+        return;
       }
+
+      mineSelect.prop('disabled', true).html('<option value="0">جاري التحميل...</option>');
+      $.ajax({
+        url: 'get_project_mines.php',
+        type: 'POST',
+        data: { project_id: projectId },
+        dataType: 'json',
+        success: function (response) {
+          let options = '<option value="0">كل المناجم</option>';
+          if (response.success && response.mines && response.mines.length > 0) {
+            response.mines.forEach(function (mine) {
+              options += `<option value="${mine.id}">${mine.display_name}</option>`;
+            });
+            mineSelect.html(options).prop('disabled', false);
+          } else {
+            mineSelect.html(options).prop('disabled', false);
+          }
+        },
+        error: function () {
+          mineSelect.html('<option value="0">كل المناجم</option>').prop('disabled', false);
+        }
+      });
+    });
+  })();
+
+</script>
+
+<script>
+  const $el = (sel) => document.querySelector(sel);
+  let equipmentIndex = 1;
+
+  const fields = {
+    contractDays: $el('#contract_duration_days'),
+    actualStart: $el('#actual_start'),
+    actualEnd: $el('#actual_end'),
+    kpiMonthTotal: $el('#kpi_month_total'),
+    kpiContractTotal: $el('#kpi_contract_total'),
+    kpiEquipMonth: $el('#kpi_equip_month'),
+    hoursMonthlyTarget: $el('#hours_monthly_target'),
+    forecastedContractedHours: $el('#forecasted_contracted_hours'),
+  };
+
+  function num(v) {
+    const n = parseFloat(v);
+    return isFinite(n) ? n : 0;
+  }
+
+  function fmt(n) {
+    return new Intl.NumberFormat('ar-EG').format(Math.max(0, Math.round(n)));
+  }
+
+  function updateEquipmentTypeOptions() {
+    const selectedValues = new Set();
+    document.querySelectorAll('.equip-type').forEach(select => {
+      if (select.value) {
+        selectedValues.add(select.value);
+      }
+    });
+
+    document.querySelectorAll('.equip-type').forEach(select => {
+      const currentValue = select.value;
+      Array.from(select.options).forEach(option => {
+        if (!option.value) {
+          option.hidden = false;
+          option.disabled = false;
+          return;
+        }
+
+        if (option.value === currentValue) {
+          option.hidden = false;
+          option.disabled = false;
+          return;
+        }
+
+        if (selectedValues.has(option.value)) {
+          option.hidden = true;
+          option.disabled = true;
+        } else {
+          option.hidden = false;
+          option.disabled = false;
+        }
+      });
+    });
+  }
+
+  // حساب مدة العقد بالأيام من التاريخين
+  function calculateDaysFromDates() {
+    const startDate = fields.actualStart.value;
+    const endDate = fields.actualEnd.value;
+
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const diffTime = Math.abs(end - start);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      fields.contractDays.value = diffDays;
+    } else {
+      fields.contractDays.value = '';
     }
+  }
 
-    // تحديث حساب الأيام عند تغيير التواريخ
-    fields.actualStart.addEventListener('change', calculateDaysFromDates);
-    fields.actualEnd.addEventListener('change', calculateDaysFromDates);
+  // تحديث حساب الأيام عند تغيير التواريخ
+  fields.actualStart.addEventListener('change', calculateDaysFromDates);
+  fields.actualEnd.addEventListener('change', calculateDaysFromDates);
 
-    // إضافة قسم معدات جديد
-    function addEquipmentSection() {
-      equipmentIndex++;
-      const newSection = document.createElement('div');
-      newSection.className = 'equipment-section';
-      newSection.setAttribute('data-index', equipmentIndex);
-      newSection.innerHTML = `
+  // إضافة قسم معدات جديد
+  function addEquipmentSection() {
+    equipmentIndex++;
+    const newSection = document.createElement('div');
+    newSection.className = 'equipment-section';
+    newSection.setAttribute('data-index', equipmentIndex);
+    newSection.innerHTML = `
         <div class="equipment-card">
           <div class="equipment-card-head">
             <h6 class="equipment-card-title is-inline">المعدات رقم ${equipmentIndex}</h6>
@@ -1441,7 +1445,7 @@ include('../insidebar.php');
           </div>
           <div class="form-grid">
 
-          
+
             <div class="field md-3 sm-6">
               <label>نوع المعدة</label>
               <div class="control">
@@ -1556,207 +1560,207 @@ include('../insidebar.php');
           </div>
         </div>
       `;
-      document.getElementById('equipmentSections').appendChild(newSection);
+    document.getElementById('equipmentSections').appendChild(newSection);
 
-      // إضافة event listeners للحقول الجديدة
-      newSection.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
-      newSection.querySelectorAll('.equip-type').forEach(el => el.addEventListener('change', updateEquipmentTypeOptions));
+    // إضافة event listeners للحقول الجديدة
+    newSection.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
+    newSection.querySelectorAll('.equip-type').forEach(el => el.addEventListener('change', updateEquipmentTypeOptions));
 
-      // إضافة event listener لزر الحذف
-      newSection.querySelector('.removeEquipmentBtn').addEventListener('click', function () {
-        newSection.remove();
-        recalc();
-        updateEquipmentTypeOptions();
-      });
+    // إضافة event listener لزر الحذف
+    newSection.querySelector('.removeEquipmentBtn').addEventListener('click', function () {
+      newSection.remove();
+      recalc();
+      updateEquipmentTypeOptions();
+    });
 
+    updateEquipmentTypeOptions();
+  }
+
+  function recalc() {
+    const days = num(fields.contractDays.value);
+
+    // حساب إجمالي المعدات
+    let totalEquipMonth = 0;
+    let totalEquipContract = 0;
+    let totalMonthlyUnits = 0;
+
+    // حساب كل قسم معدات
+    document.querySelectorAll('.equipment-section').forEach(section => {
+      const index = section.getAttribute('data-index');
+      const countInput = section.querySelector(`input[name="equip_count_${index}"]`);
+      const countBasicInput = section.querySelector(`input[name="equip_count_basic_${index}"]`);
+      const countBackupInput = section.querySelector(`input[name="equip_count_backup_${index}"]`);
+      const targetInput = section.querySelector(`input[name="shift_hours_${index}"]`);
+      const monthlyTargetInput = section.querySelector(`input[name="equip_target_per_month_${index}"]`);
+      const monthInput = section.querySelector(`input[name="equip_total_month_${index}"]`);
+      const contractInput = section.querySelector(`input[name="equip_total_contract_${index}"]`);
+
+      if (countInput && targetInput) {
+        const countBasic = num(countBasicInput ? countBasicInput.value : 0);
+        // المعدات الاحتياطية لا تدخل في الحساب (للتوثيق فقط)
+        const rawCount = num(countInput.value);
+        const count = countBasic > 0 ? countBasic : rawCount;
+        const target = num(targetInput.value);
+        const sectionMonth = count * target;
+        const sectionMonthlyUnits = count > 0 ? (sectionMonth * 30) / count : 0;
+        // حساب إجمالي الساعات على أساس الأيام بدلاً من الشهور
+        // نفترض أن الـ target هو الساعات اليومية للمعدة
+        const sectionContract = sectionMonth * days;
+
+        monthInput.value = sectionMonth;
+        if (monthlyTargetInput) {
+          monthlyTargetInput.value = sectionMonthlyUnits;
+        }
+        contractInput.value = sectionContract;
+
+        totalEquipMonth += sectionMonth;
+        totalEquipContract += sectionContract;
+        totalMonthlyUnits += sectionMonthlyUnits;
+      }
+    });
+
+    const monthTotal = totalEquipMonth;
+    const contractTotal = totalEquipContract;
+
+    fields.kpiEquipMonth.textContent = fmt(totalEquipMonth);
+    fields.kpiMonthTotal.textContent = fmt(monthTotal);
+    fields.kpiContractTotal.textContent = fmt(contractTotal);
+
+    fields.hoursMonthlyTarget.value = totalMonthlyUnits;
+    fields.forecastedContractedHours.value = contractTotal;
+  }
+
+  // تشغيل الحسبة عند تغيير أي مدخل
+  document.addEventListener('input', function (e) {
+    if (e.target.closest('#projectForm')) {
+      recalc();
+    }
+  });
+
+  document.addEventListener('change', function (e) {
+    if (e.target.classList && e.target.classList.contains('equip-type')) {
       updateEquipmentTypeOptions();
     }
+  });
 
-    function recalc() {
-      const days = num(fields.contractDays.value);
+  // زر إضافة المعدات
+  document.getElementById('addEquipmentBtn').addEventListener('click', function (e) {
+    e.preventDefault();
+    addEquipmentSection();
+  });
 
-      // حساب إجمالي المعدات
-      let totalEquipMonth = 0;
-      let totalEquipContract = 0;
-      let totalMonthlyUnits = 0;
+  // جلب الفورم
+  const contractForm = document.getElementById('projectForm');
+  if (contractForm) {
+    contractForm.addEventListener('reset', () => setTimeout(() => {
+      recalc();
+      updateEquipmentTypeOptions();
+    }, 0));
+  }
 
-      // حساب كل قسم معدات
-      document.querySelectorAll('.equipment-section').forEach(section => {
-        const index = section.getAttribute('data-index');
-        const countInput = section.querySelector(`input[name="equip_count_${index}"]`);
-        const countBasicInput = section.querySelector(`input[name="equip_count_basic_${index}"]`);
-        const countBackupInput = section.querySelector(`input[name="equip_count_backup_${index}"]`);
-        const targetInput = section.querySelector(`input[name="shift_hours_${index}"]`);
-        const monthlyTargetInput = section.querySelector(`input[name="equip_target_per_month_${index}"]`);
-        const monthInput = section.querySelector(`input[name="equip_total_month_${index}"]`);
-        const contractInput = section.querySelector(`input[name="equip_total_contract_${index}"]`);
-
-        if (countInput && targetInput) {
-          const countBasic = num(countBasicInput ? countBasicInput.value : 0);
-          // المعدات الاحتياطية لا تدخل في الحساب (للتوثيق فقط)
-          const rawCount = num(countInput.value);
-          const count = countBasic > 0 ? countBasic : rawCount;
-          const target = num(targetInput.value);
-          const sectionMonth = count * target;
-          const sectionMonthlyUnits = count > 0 ? (sectionMonth * 30) / count : 0;
-          // حساب إجمالي الساعات على أساس الأيام بدلاً من الشهور
-          // نفترض أن الـ target هو الساعات اليومية للمعدة
-          const sectionContract = sectionMonth * days;
-
-          monthInput.value = sectionMonth;
-          if (monthlyTargetInput) {
-            monthlyTargetInput.value = sectionMonthlyUnits;
-          }
-          contractInput.value = sectionContract;
-
-          totalEquipMonth += sectionMonth;
-          totalEquipContract += sectionContract;
-          totalMonthlyUnits += sectionMonthlyUnits;
-        }
-      });
-
-      const monthTotal = totalEquipMonth;
-      const contractTotal = totalEquipContract;
-
-      fields.kpiEquipMonth.textContent = fmt(totalEquipMonth);
-      fields.kpiMonthTotal.textContent = fmt(monthTotal);
-      fields.kpiContractTotal.textContent = fmt(contractTotal);
-
-      fields.hoursMonthlyTarget.value = totalMonthlyUnits;
-      fields.forecastedContractedHours.value = contractTotal;
-    }
-
-    // تشغيل الحسبة عند تغيير أي مدخل
-    document.addEventListener('input', function (e) {
-      if (e.target.closest('#projectForm')) {
-        recalc();
-      }
-    });
-
-    document.addEventListener('change', function (e) {
-      if (e.target.classList && e.target.classList.contains('equip-type')) {
-        updateEquipmentTypeOptions();
-      }
-    });
-
-    // زر إضافة المعدات
-    document.getElementById('addEquipmentBtn').addEventListener('click', function (e) {
-      e.preventDefault();
-      addEquipmentSection();
-    });
-
-    // جلب الفورم
-    const contractForm = document.getElementById('projectForm');
-    if (contractForm) {
-      contractForm.addEventListener('reset', () => setTimeout(() => {
-        recalc();
-        updateEquipmentTypeOptions();
-      }, 0));
-    }
-
-    // أول تشغيل
-    recalc();
-    updateEquipmentTypeOptions();
+  // أول تشغيل
+  recalc();
+  updateEquipmentTypeOptions();
 
 
 
-    // تعبئة الفورم عند التعديل
-    $(document).on("click", ".editBtn", function () {
+  // تعبئة الفورم عند التعديل
+  $(document).on("click", ".editBtn", function () {
     $("#projectForm").addClass('allforms-visible');
-      $("#contract_id").val($(this).data("id"));
+    $("#contract_id").val($(this).data("id"));
 
-      const projectId = $(this).data("project_id");
-      const mineId = $(this).data("mine_id");
-      if ($('#contract_project_id').length) {
-        $('#contract_project_id').val(projectId || '');
-        window.loadContractMines(projectId, mineId);
-      }
+    const projectId = $(this).data("project_id");
+    const mineId = $(this).data("mine_id");
+    if ($('#contract_project_id').length) {
+      $('#contract_project_id').val(projectId || '');
+      window.loadContractMines(projectId, mineId);
+    }
 
-      $("#projectForm [name='contract_signing_date']").val($(this).data("contract_signing_date"));
-      $("#projectForm [name='grace_period_days']").val($(this).data("grace_period_days"));
-      $("#projectForm [name='contract_duration_days']").val($(this).data("contract_duration_days"));
-      $("#projectForm [name='actual_start']").val($(this).data("actual_start"));
-      $("#projectForm [name='actual_end']").val($(this).data("actual_end"));
+    $("#projectForm [name='contract_signing_date']").val($(this).data("contract_signing_date"));
+    $("#projectForm [name='grace_period_days']").val($(this).data("grace_period_days"));
+    $("#projectForm [name='contract_duration_days']").val($(this).data("contract_duration_days"));
+    $("#projectForm [name='actual_start']").val($(this).data("actual_start"));
+    $("#projectForm [name='actual_end']").val($(this).data("actual_end"));
 
 
-      $("#projectForm [name='hours_monthly_target']").val($(this).data("hours_monthly_target"));
-      $("#projectForm [name='forecasted_contracted_hours']").val($(this).data("forecasted_contracted_hours"));
+    $("#projectForm [name='hours_monthly_target']").val($(this).data("hours_monthly_target"));
+    $("#projectForm [name='forecasted_contracted_hours']").val($(this).data("forecasted_contracted_hours"));
 
-      $("#projectForm [name='daily_work_hours']").val($(this).attr("daily_work_hours"));
+    $("#projectForm [name='daily_work_hours']").val($(this).attr("daily_work_hours"));
 
-      $("#projectForm [name='daily_operators']").val($(this).attr("daily_operators"));
+    $("#projectForm [name='daily_operators']").val($(this).attr("daily_operators"));
 
-      // تحميل الحقول الإضافية للعقد
-      $("#projectForm [name='equip_shifts_contract']").val($(this).attr("equip_shifts_contract"));
-      $("#projectForm [name='shift_contract']").val($(this).attr("shift_contract"));
-      $("#projectForm [name='equip_total_contract']").val($(this).attr("equip_total_contract_daily"));
-      $("#projectForm [name='total_contract_permonth']").val($(this).attr("total_contract_permonth"));
-      $("#projectForm [name='total_contract']").val($(this).attr("total_contract_units"));
+    // تحميل الحقول الإضافية للعقد
+    $("#projectForm [name='equip_shifts_contract']").val($(this).attr("equip_shifts_contract"));
+    $("#projectForm [name='shift_contract']").val($(this).attr("shift_contract"));
+    $("#projectForm [name='equip_total_contract']").val($(this).attr("equip_total_contract_daily"));
+    $("#projectForm [name='total_contract_permonth']").val($(this).attr("total_contract_permonth"));
+    $("#projectForm [name='total_contract']").val($(this).attr("total_contract_units"));
 
-      $("#projectForm [name='first_party']").val($(this).attr("first_party"));
-      $("#projectForm [name='second_party']").val($(this).attr("second_party"));
-      $("#projectForm [name='witness_one']").val($(this).attr("witness_one"));
-      $("#projectForm [name='witness_two']").val($(this).attr("witness_two"));
-      $("#projectForm [name='transportation']").val($(this).attr("transportation"));
-      $("#projectForm [name='accommodation']").val($(this).attr("accommodation"));
-      $("#projectForm [name='place_for_living']").val($(this).attr("place_for_living"));
-      $("#projectForm [name='workshop']").val($(this).attr("workshop"));
+    $("#projectForm [name='first_party']").val($(this).attr("first_party"));
+    $("#projectForm [name='second_party']").val($(this).attr("second_party"));
+    $("#projectForm [name='witness_one']").val($(this).attr("witness_one"));
+    $("#projectForm [name='witness_two']").val($(this).attr("witness_two"));
+    $("#projectForm [name='transportation']").val($(this).attr("transportation"));
+    $("#projectForm [name='accommodation']").val($(this).attr("accommodation"));
+    $("#projectForm [name='place_for_living']").val($(this).attr("place_for_living"));
+    $("#projectForm [name='workshop']").val($(this).attr("workshop"));
 
-      // البيانات المالية الجديدة
-      $("#projectForm [name='price_currency_contract']").val($(this).attr("price_currency_contract"));
-      $("#projectForm [name='paid_contract']").val($(this).attr("paid_contract"));
-      $("#projectForm [name='payment_time']").val($(this).attr("payment_time"));
-      $("#projectForm [name='guarantees']").val($(this).attr("guarantees"));
-      $("#projectForm [name='payment_date']").val($(this).attr("payment_date"));
+    // البيانات المالية الجديدة
+    $("#projectForm [name='price_currency_contract']").val($(this).attr("price_currency_contract"));
+    $("#projectForm [name='paid_contract']").val($(this).attr("paid_contract"));
+    $("#projectForm [name='payment_time']").val($(this).attr("payment_time"));
+    $("#projectForm [name='guarantees']").val($(this).attr("guarantees"));
+    $("#projectForm [name='payment_date']").val($(this).attr("payment_date"));
 
-      // تحميل المعدات الخاصة بالعقد
-      const contractId = $(this).data("id");
-      $.ajax({
-        url: 'get_equipments.php',
-        type: 'POST',
-        data: { contract_id: contractId },
-        dataType: 'json',
-        success: function (equipments) {
-          // مسح الأقسام القديمة ما عدا الأول
-          $('#equipmentSections .equipment-section').not(':first').remove();
-          equipmentIndex = 1;
+    // تحميل المعدات الخاصة بالعقد
+    const contractId = $(this).data("id");
+    $.ajax({
+      url: 'get_equipments.php',
+      type: 'POST',
+      data: { contract_id: contractId },
+      dataType: 'json',
+      success: function (equipments) {
+        // مسح الأقسام القديمة ما عدا الأول
+        $('#equipmentSections .equipment-section').not(':first').remove();
+        equipmentIndex = 1;
 
-          // تحميل المعدات
-          if (equipments.length > 0) {
-            equipments.forEach(function (equip, index) {
-              const sectionIndex = index + 1;
+        // تحميل المعدات
+        if (equipments.length > 0) {
+          equipments.forEach(function (equip, index) {
+            const sectionIndex = index + 1;
 
-              if (sectionIndex === 1) {
-                // تحديث القسم الأول
-                $(`select[name="equip_type_1"]`).val(equip.equip_type);
-                $(`input[name="equip_size_1"]`).val(equip.equip_size);
-                $(`input[name="equip_count_1"]`).val(equip.equip_count);
-                $(`input[name="equip_count_basic_1"]`).val(equip.equip_count_basic || 0);
-                $(`input[name="equip_count_backup_1"]`).val(equip.equip_count_backup || 0);
-                $(`input[name="equip_shifts_1"]`).val(equip.equip_shifts);
-                $(`select[name="equip_unit_1"]`).val(equip.equip_unit);
-                $(`input[name="shift1_start_1"]`).val(equip.shift1_start);
-                $(`input[name="shift1_end_1"]`).val(equip.shift1_end);
-                $(`input[name="shift2_start_1"]`).val(equip.shift2_start);
-                $(`input[name="shift2_end_1"]`).val(equip.shift2_end);
-                $(`input[name="shift_hours_1"]`).val(equip.shift_hours);
-                $(`input[name="equip_total_month_1"]`).val(equip.equip_total_month);
-                $(`input[name="equip_total_contract_1"]`).val(equip.equip_total_contract);
-                $(`input[name="equip_price_1"]`).val(equip.equip_price);
-                $(`select[name="equip_price_currency_1"]`).val(equip.equip_price_currency);
-                $(`input[name="equip_operators_1"]`).val(equip.equip_operators);
-                $(`input[name="equip_supervisors_1"]`).val(equip.equip_supervisors);
-                $(`input[name="equip_technicians_1"]`).val(equip.equip_technicians);
-                $(`input[name="equip_assistants_1"]`).val(equip.equip_assistants);
-                equipmentIndex = 1;
-                updateEquipmentTypeOptions();
-              } else {
-                // إضافة أقسام جديدة
-                equipmentIndex++;
-                const newSection = document.createElement('div');
-                newSection.className = 'equipment-section';
-                newSection.setAttribute('data-index', equipmentIndex);
-                newSection.innerHTML = `
+            if (sectionIndex === 1) {
+              // تحديث القسم الأول
+              $(`select[name="equip_type_1"]`).val(equip.equip_type);
+              $(`input[name="equip_size_1"]`).val(equip.equip_size);
+              $(`input[name="equip_count_1"]`).val(equip.equip_count);
+              $(`input[name="equip_count_basic_1"]`).val(equip.equip_count_basic || 0);
+              $(`input[name="equip_count_backup_1"]`).val(equip.equip_count_backup || 0);
+              $(`input[name="equip_shifts_1"]`).val(equip.equip_shifts);
+              $(`select[name="equip_unit_1"]`).val(equip.equip_unit);
+              $(`input[name="shift1_start_1"]`).val(equip.shift1_start);
+              $(`input[name="shift1_end_1"]`).val(equip.shift1_end);
+              $(`input[name="shift2_start_1"]`).val(equip.shift2_start);
+              $(`input[name="shift2_end_1"]`).val(equip.shift2_end);
+              $(`input[name="shift_hours_1"]`).val(equip.shift_hours);
+              $(`input[name="equip_total_month_1"]`).val(equip.equip_total_month);
+              $(`input[name="equip_total_contract_1"]`).val(equip.equip_total_contract);
+              $(`input[name="equip_price_1"]`).val(equip.equip_price);
+              $(`select[name="equip_price_currency_1"]`).val(equip.equip_price_currency);
+              $(`input[name="equip_operators_1"]`).val(equip.equip_operators);
+              $(`input[name="equip_supervisors_1"]`).val(equip.equip_supervisors);
+              $(`input[name="equip_technicians_1"]`).val(equip.equip_technicians);
+              $(`input[name="equip_assistants_1"]`).val(equip.equip_assistants);
+              equipmentIndex = 1;
+              updateEquipmentTypeOptions();
+            } else {
+              // إضافة أقسام جديدة
+              equipmentIndex++;
+              const newSection = document.createElement('div');
+              newSection.className = 'equipment-section';
+              newSection.setAttribute('data-index', equipmentIndex);
+              newSection.innerHTML = `
                   <div class="equipment-card">
                     <div class="equipment-card-head">
                       <h6 class="equipment-card-title is-inline">المعدات رقم ${equipmentIndex}</h6>
@@ -1766,7 +1770,7 @@ include('../insidebar.php');
                     </div>
                     <div class="form-grid">
 
-                    
+
                       <div class="field md-3 sm-6">
                         <label>نوع المعدة</label>
                         <div class="control">
@@ -1803,7 +1807,7 @@ include('../insidebar.php');
                         <label>عدد الورديات</label>
                         <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}"></div>
                       </div>
-                      
+
                       <!-- أوقات الورديات -->
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
@@ -1878,122 +1882,120 @@ include('../insidebar.php');
                     </div>
                   </div>
                 `;
-                document.getElementById('equipmentSections').appendChild(newSection);
+              document.getElementById('equipmentSections').appendChild(newSection);
 
-                const newSelect = newSection.querySelector(`select[name="equip_type_${equipmentIndex}"]`);
-                if (newSelect) {
-                  newSelect.value = equip.equip_type;
-                }
-
-                // إضافة event listeners
-                newSection.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
-                newSection.querySelectorAll('.equip-type').forEach(el => el.addEventListener('change', updateEquipmentTypeOptions));
-                newSection.querySelector('.removeEquipmentBtn').addEventListener('click', function () {
-                  newSection.remove();
-                  recalc();
-                  updateEquipmentTypeOptions();
-                });
+              const newSelect = newSection.querySelector(`select[name="equip_type_${equipmentIndex}"]`);
+              if (newSelect) {
+                newSelect.value = equip.equip_type;
               }
-            });
-          }
 
-          recalc();
-          updateEquipmentTypeOptions();
+              // إضافة event listeners
+              newSection.querySelectorAll('input').forEach(el => el.addEventListener('input', recalc));
+              newSection.querySelectorAll('.equip-type').forEach(el => el.addEventListener('change', updateEquipmentTypeOptions));
+              newSection.querySelector('.removeEquipmentBtn').addEventListener('click', function () {
+                newSection.remove();
+                recalc();
+                updateEquipmentTypeOptions();
+              });
+            }
+          });
         }
-      });
 
-      $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
+        recalc();
+        updateEquipmentTypeOptions();
+      }
     });
 
-    // ==================== Group Toggle Functionality ====================
-    // حفظ حالة المجموعات في localStorage
-    const groupStates = JSON.parse(localStorage.getItem('contractGroupStates')) || {
-      basic: true,
-      dates: true,
-      hours: true,
-      parties: false,
-      services: false,
-      operations: false,
-      status: true
-    };
+    $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
+  });
 
-    // تطبيق الحالة المحفوظة عند تحميل الصفحة
-    function applyGroupStates() {
-      Object.keys(groupStates).forEach(group => {
-        const isActive = groupStates[group];
-        const btn = $(`.btn-group-toggle[data-group="${group}"]`);
-        const columns = $(`.group-${group}`);
+  // ==================== Group Toggle Functionality ====================
+  // حفظ حالة المجموعات في localStorage
+  const groupStates = JSON.parse(localStorage.getItem('contractGroupStates')) || {
+    basic: true,
+    dates: true,
+    hours: true,
+    parties: false,
+    services: false,
+    operations: false,
+    status: true
+  };
 
-        if (isActive) {
-          btn.addClass('active');
-          columns.removeClass('group-hidden');
-        } else {
-          btn.removeClass('active');
-          columns.addClass('group-hidden');
-        }
-      });
-    }
-
-    // تطبيق الحالة عند تحميل الصفحة
-    applyGroupStates();
-
-    // التحكم في إظهار/إخفاء المجموعات
-    $('.btn-group-toggle').on('click', function () {
-      const group = $(this).data('group');
-      const isActive = $(this).hasClass('active');
+  // تطبيق الحالة المحفوظة عند تحميل الصفحة
+  function applyGroupStates() {
+    Object.keys(groupStates).forEach(group => {
+      const isActive = groupStates[group];
+      const btn = $(`.btn-group-toggle[data-group="${group}"]`);
+      const columns = $(`.group-${group}`);
 
       if (isActive) {
-        // إخفاء المجموعة
-        $(this).removeClass('active');
-        $(`.group-${group}`).addClass('group-hidden');
-        groupStates[group] = false;
+        btn.addClass('active');
+        columns.removeClass('group-hidden');
       } else {
-        // إظهار المجموعة
-        $(this).addClass('active');
-        $(`.group-${group}`).removeClass('group-hidden');
-        groupStates[group] = true;
-      }
-
-      // حفظ الحالة
-      localStorage.setItem('contractGroupStates', JSON.stringify(groupStates));
-    });
-
-    // زر إظهار/إخفاء الكل
-    $('.btn-group-toggle-all').on('click', function () {
-      const allActive = Object.values(groupStates).every(state => state);
-
-      if (allActive) {
-        // إخفاء الكل
-        $('.btn-group-toggle').removeClass('active');
-        $('[class*="group-"]').addClass('group-hidden');
-        Object.keys(groupStates).forEach(key => groupStates[key] = false);
-        $(this).html('<i class="fas fa-eye-slash"></i> إخفاء الكل');
-      } else {
-        // إظهار الكل
-        $('.btn-group-toggle').addClass('active');
-        $('[class*="group-"]').removeClass('group-hidden');
-        Object.keys(groupStates).forEach(key => groupStates[key] = true);
-        $(this).html('<i class="fas fa-eye"></i> الكل');
-      }
-
-      // حفظ الحالة
-      localStorage.setItem('contractGroupStates', JSON.stringify(groupStates));
-    });
-
-    // تحديث نص زر "الكل" عند التحميل
-    $(document).ready(function () {
-      const allActive = Object.values(groupStates).every(state => state);
-      if (allActive) {
-        $('.btn-group-toggle-all').html('<i class="fas fa-eye"></i> الكل');
-      } else {
-        $('.btn-group-toggle-all').html('<i class="fas fa-eye-slash"></i> إظهار الكل');
+        btn.removeClass('active');
+        columns.addClass('group-hidden');
       }
     });
-  </script>
+  }
+
+  // تطبيق الحالة عند تحميل الصفحة
+  applyGroupStates();
+
+  // التحكم في إظهار/إخفاء المجموعات
+  $('.btn-group-toggle').on('click', function () {
+    const group = $(this).data('group');
+    const isActive = $(this).hasClass('active');
+
+    if (isActive) {
+      // إخفاء المجموعة
+      $(this).removeClass('active');
+      $(`.group-${group}`).addClass('group-hidden');
+      groupStates[group] = false;
+    } else {
+      // إظهار المجموعة
+      $(this).addClass('active');
+      $(`.group-${group}`).removeClass('group-hidden');
+      groupStates[group] = true;
+    }
+
+    // حفظ الحالة
+    localStorage.setItem('contractGroupStates', JSON.stringify(groupStates));
+  });
+
+  // زر إظهار/إخفاء الكل
+  $('.btn-group-toggle-all').on('click', function () {
+    const allActive = Object.values(groupStates).every(state => state);
+
+    if (allActive) {
+      // إخفاء الكل
+      $('.btn-group-toggle').removeClass('active');
+      $('[class*="group-"]').addClass('group-hidden');
+      Object.keys(groupStates).forEach(key => groupStates[key] = false);
+      $(this).html('<i class="fas fa-eye-slash"></i> إخفاء الكل');
+    } else {
+      // إظهار الكل
+      $('.btn-group-toggle').addClass('active');
+      $('[class*="group-"]').removeClass('group-hidden');
+      Object.keys(groupStates).forEach(key => groupStates[key] = true);
+      $(this).html('<i class="fas fa-eye"></i> الكل');
+    }
+
+    // حفظ الحالة
+    localStorage.setItem('contractGroupStates', JSON.stringify(groupStates));
+  });
+
+  // تحديث نص زر "الكل" عند التحميل
+  $(document).ready(function () {
+    const allActive = Object.values(groupStates).every(state => state);
+    if (allActive) {
+      $('.btn-group-toggle-all').html('<i class="fas fa-eye"></i> الكل');
+    } else {
+      $('.btn-group-toggle-all').html('<i class="fas fa-eye-slash"></i> إظهار الكل');
+    }
+  });
+</script>
 
 
 </body>
 
 </html>
-
-
