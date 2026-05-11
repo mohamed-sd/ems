@@ -30,7 +30,7 @@ $should_use_mine_filter = in_array($current_role, ['4', '5', '10']) && $session_
 if (!function_exists('normalize_timesheet_date')) {
   function normalize_timesheet_date($date_str)
   {
-    $date_str = trim((string)$date_str);
+    $date_str = trim((string) $date_str);
     if ($date_str === '') {
       return '';
     }
@@ -55,14 +55,14 @@ if (!function_exists('normalize_timesheet_date')) {
 if (!function_exists('sanitize_fault_item_text')) {
   function sanitize_fault_item_text($value)
   {
-    return trim((string)$value);
+    return trim((string) $value);
   }
 }
 
 if (!function_exists('parse_fault_items_json')) {
   function parse_fault_items_json($raw_json)
   {
-    $decoded = json_decode((string)$raw_json, true);
+    $decoded = json_decode((string) $raw_json, true);
     if (!is_array($decoded)) {
       return [];
     }
@@ -80,14 +80,14 @@ if (!function_exists('parse_fault_items_json')) {
       }
 
       $items[] = [
-        'failure_code_id'     => $failure_code_id,
-        'event_type_code'     => sanitize_fault_item_text(isset($row['event_type_code']) ? $row['event_type_code'] : ''),
-        'event_type_name'     => sanitize_fault_item_text(isset($row['event_type_name']) ? $row['event_type_name'] : ''),
-        'main_category_code'  => sanitize_fault_item_text(isset($row['main_category_code']) ? $row['main_category_code'] : ''),
-        'main_category_name'  => sanitize_fault_item_text(isset($row['main_category_name']) ? $row['main_category_name'] : ''),
-        'sub_category'        => sanitize_fault_item_text(isset($row['sub_category']) ? $row['sub_category'] : ''),
-        'failure_detail'      => sanitize_fault_item_text(isset($row['failure_detail']) ? $row['failure_detail'] : ''),
-        'full_code'           => $full_code,
+        'failure_code_id' => $failure_code_id,
+        'event_type_code' => sanitize_fault_item_text(isset($row['event_type_code']) ? $row['event_type_code'] : ''),
+        'event_type_name' => sanitize_fault_item_text(isset($row['event_type_name']) ? $row['event_type_name'] : ''),
+        'main_category_code' => sanitize_fault_item_text(isset($row['main_category_code']) ? $row['main_category_code'] : ''),
+        'main_category_name' => sanitize_fault_item_text(isset($row['main_category_name']) ? $row['main_category_name'] : ''),
+        'sub_category' => sanitize_fault_item_text(isset($row['sub_category']) ? $row['sub_category'] : ''),
+        'failure_detail' => sanitize_fault_item_text(isset($row['failure_detail']) ? $row['failure_detail'] : ''),
+        'full_code' => $full_code,
       ];
     }
 
@@ -153,7 +153,7 @@ if (!function_exists('save_timesheet_failure_hours')) {
     $equipment_type = intval($equipment_type);
     $company_id = intval($company_id);
     $user_id = intval($user_id);
-    $timesheet_date = mysqli_real_escape_string($conn, (string)$timesheet_date);
+    $timesheet_date = mysqli_real_escape_string($conn, (string) $timesheet_date);
 
     $equipment_id = 0;
     if ($operation_id > 0) {
@@ -226,23 +226,58 @@ if ($session_project_id <= 0) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
   $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
   $posted_fault_items_json = isset($_POST['fault_items_json']) ? $_POST['fault_items_json'] : '[]';
-  
+
   // Secure form values
   $fields = [
-    "operator", "driver", "shift", "date", "shift_hours", "executed_hours",
-    "bucket_hours", "jackhammer_hours", "extra_hours", "extra_hours_total",
-    "standby_hours", "dependence_hours", "total_work_hours", "work_notes",
-    "hr_fault", "maintenance_fault", "marketing_fault", "approval_fault",
-    "other_fault_hours", "total_fault_hours", "fault_notes",
-    "start_seconds", "start_minutes", "start_hours",
-    "end_seconds", "end_minutes", "end_hours", "counter_diff",
-    "fault_type", "fault_department", "fault_part", "fault_details",
-    "general_notes", "operator_hours", "machine_standby_hours",
-    "jackhammer_standby_hours", "bucket_standby_hours",
-    "extra_operator_hours", "operator_standby_hours", "operator_notes",
-    "tons_count", "trips_count", "transport_type",
-    "meters_type", "meters_count", "drilling_holes_count", "drilling_depth",
-    "type", "user_id"
+    "operator",
+    "driver",
+    "shift",
+    "date",
+    "shift_hours",
+    "executed_hours",
+    "bucket_hours",
+    "jackhammer_hours",
+    "extra_hours",
+    "extra_hours_total",
+    "standby_hours",
+    "dependence_hours",
+    "total_work_hours",
+    "work_notes",
+    "hr_fault",
+    "maintenance_fault",
+    "marketing_fault",
+    "approval_fault",
+    "other_fault_hours",
+    "total_fault_hours",
+    "fault_notes",
+    "start_seconds",
+    "start_minutes",
+    "start_hours",
+    "end_seconds",
+    "end_minutes",
+    "end_hours",
+    "counter_diff",
+    "fault_type",
+    "fault_department",
+    "fault_part",
+    "fault_details",
+    "general_notes",
+    "operator_hours",
+    "machine_standby_hours",
+    "jackhammer_standby_hours",
+    "bucket_standby_hours",
+    "extra_operator_hours",
+    "operator_standby_hours",
+    "operator_notes",
+    "tons_count",
+    "trips_count",
+    "transport_type",
+    "meters_type",
+    "meters_count",
+    "drilling_holes_count",
+    "drilling_depth",
+    "type",
+    "user_id"
   ];
 
   $values = [];
@@ -292,9 +327,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
     $marketing_fault = floatval($values['marketing_fault']);
     $approval_fault = floatval($values['approval_fault']);
     $other_fault_hours = floatval($values['other_fault_hours']);
-    
+
     $total_faults_sum = $hr_fault + $maintenance_fault + $marketing_fault + $approval_fault + $other_fault_hours;
-    
+
     // يجب أن يكون المجموع مساوياً لمجموع ساعات التعطل
     if ($total_faults_sum != $total_fault_hours) {
       echo "<script>alert('❌ خطأ في توزيع ساعات الأعطال!\\n\\nمجموع حقول الأعطال: " . $total_faults_sum . " ساعة\\nمجموع ساعات التعطل: " . $total_fault_hours . " ساعة\\n\\nيجب أن يكون مجموع الحقول التالية مساوياً لمجموع ساعات التعطل:\\n• عطل HR\\n• عطل صيانة\\n• عطل تسويق\\n• عطل اعتماد\\n• ساعات أعطال أخرى');</script>";
@@ -406,113 +441,117 @@ if (!$is_super_admin) {
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
 <style>
-/* Counter Input Group Styling */
-.counter-input-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f8f9fa;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-  width: 100%;
-  max-width: 400px;
-}
+  /* Counter Input Group Styling */
+  .counter-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    width: 100%;
+    max-width: 400px;
+  }
 
-.counter-field {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  flex: 1;
-}
+  .counter-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
 
-.counter-field input {
-  width: 100%;
-  padding: 8px 6px;
-  text-align: center;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #0c1c3e;
-  background: white;
-  transition: all 0.3s ease;
-}
+  .counter-field input {
+    width: 100%;
+    padding: 8px 6px;
+    text-align: center;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0c1c3e;
+    background: white;
+    transition: all 0.3s ease;
+  }
 
-.counter-field input:focus {
-  outline: none;
-  border-color: var(--gold, #e8b800);
-  box-shadow: 0 0 0 3px rgba(232, 184, 0, 0.1);
-}
+  .counter-field input:focus {
+    outline: none;
+    border-color: var(--gold, #e8b800);
+    box-shadow: 0 0 0 3px rgba(232, 184, 0, 0.1);
+  }
 
-.counter-field span {
-  font-size: 11px;
-  color: #6c757d;
-  font-weight: 500;
-  white-space: nowrap;
-}
+  .counter-field span {
+    font-size: 11px;
+    color: #6c757d;
+    font-weight: 500;
+    white-space: nowrap;
+  }
 
-.counter-separator {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--navy, #0c1c3e);
-  margin: 0 4px;
-  padding-bottom: 18px;
-}
+  .counter-separator {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy, #0c1c3e);
+    margin: 0 4px;
+    padding-bottom: 18px;
+  }
 
-/* Remove spinner arrows for counter inputs */
-.counter-field input[type="number"]::-webkit-inner-spin-button,
-.counter-field input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+  /* Remove spinner arrows for counter inputs */
+  .counter-field input[type="number"]::-webkit-inner-spin-button,
+  .counter-field input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 
-.counter-field input[type="number"] {
-  -moz-appearance: textfield;
-}
+  .counter-field input[type="number"] {
+    -moz-appearance: textfield;
+  }
 </style>
 
 <div class="main timesheet-entry-page ems-unified-page-shell">
-    <div class="header">
-        <h1 class="page-title">
-            <div class="title-icon"><i class="fas fa-clock"></i></div>
-            إدارة ساعات العمل
-        </h1>
-        <div class="header -actions">
-            <a href="timesheet_type.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-          <a href="view_timesheet.php?type=<?= urlencode($type) ?>" class="back-btn ts-view-link">
-            <i class="fas fa-table"></i> شاشة العرض الكاملة
-          </a>
-            <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                <i class="fas fa-plus-circle"></i> إضافة ساعات عمل جديدة
-            </a>
-        </div>
+
+  <div class="main_head">
+    <div class="head_actions">
+      <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+        <i class="fas fa-plus-circle"></i> إضافة ساعات عمل جديدة
+      </a>
+      <a href="view_timesheet.php?type=<?= urlencode($type) ?>" class="back-btn ts-view-link">
+        <i class="fas fa-table"></i> شاشة العرض الكاملة
+      </a>
     </div>
-    <form id="projectForm" action="" method="post" class="allforms">
-        <?php if ($_GET['type'] == "1") {
-          // نوع المعدة كان حفار 
-          ?>
-          <div class="card">
-              <div class="card-header">
-                  <h5><i class="fas fa-edit"></i> إضافة / تعديل حفار</h5>
-              </div>
-          <div class="card-body">
-            <div class="form-grid">
-              <div>
-                <label>الالية</label>
-                <select name="operator" id="operator" required>
-                  <option value="">-- اختر الالية --</option>
-                  <?php
-                  $project_filter = "";
-                  if ($should_use_mine_filter) {
-                    $project_filter = " AND o.mine_id = '" . $session_mine_id . "'";
-                  } elseif ($session_project_id > 0) {
-                    $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
-                  }
-                  $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
+    <h1 class="head-title">
+      <div class="title-icon"><i class="fas fa-clock"></i></div>
+      إدارة ساعات العمل
+    </h1>
+    <div class="head_back">
+      <a href="timesheet_type.php" class="">
+        <i class="fas fa-arrow-right"></i> رجوع
+      </a>
+    </div>
+  </div>
+
+  <form id="projectForm" action="" method="post" class="allforms">
+    <?php if ($_GET['type'] == "1") {
+      // نوع المعدة كان حفار
+      ?>
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="fas fa-edit"></i> إضافة / تعديل حفار</h5>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div>
+              <label>الالية</label>
+              <select name="operator" id="operator" required>
+                <option value="">-- اختر الالية --</option>
+                <?php
+                $project_filter = "";
+                if ($should_use_mine_filter) {
+                  $project_filter = " AND o.mine_id = '" . $session_mine_id . "'";
+                } elseif ($session_project_id > 0) {
+                  $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
+                }
+                $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o." . $operations_project_column . " = p.id
@@ -520,320 +559,346 @@ if (!$is_super_admin) {
 
 
 
-                  if ($op_res) {
-                    while ($op = mysqli_fetch_assoc($op_res)) {
-                      echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
-                    }
-                  } else {
-                    error_log('Timesheet operators query failed (type=1): ' . mysqli_error($conn));
+                if ($op_res) {
+                  while ($op = mysqli_fetch_assoc($op_res)) {
+                    echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
                   }
-                  ?>
-                </select>
-              </div>
-              <input type="hidden" name="id" id="timesheet_id" value="">
-              <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
+                } else {
+                  error_log('Timesheet operators query failed (type=1): ' . mysqli_error($conn));
+                }
+                ?>
+              </select>
+            </div>
+            <input type="hidden" name="id" id="timesheet_id" value="">
+            <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
 
-              <div>
-                <label>السائق</label>
-                <select id="driver" name="driver">
-                  <option value="">-- اختر السائق --</option>
-                </select>
-              </div>
-              <div>
-                <label>الوردية</label>
-                <select name="shift" id="shift">
-                  <option value=""> -- اختار الوردية -- </option>
-                  <option value="D"> صباحية </option>
-                  <option value="N"> مسائية </option>
-                </select>
-              </div>
-              <div>
-                <label for="date"> التاريخ </label>
-                <input type="date" name="date" id="date" required />
-              </div>
+            <div>
+              <label>السائق</label>
+              <select id="driver" name="driver">
+                <option value="">-- اختر السائق --</option>
+              </select>
+            </div>
+            <div>
+              <label>الوردية</label>
+              <select name="shift" id="shift">
+                <option value=""> -- اختار الوردية -- </option>
+                <option value="D"> صباحية </option>
+                <option value="N"> مسائية </option>
+              </select>
+            </div>
+            <div>
+              <label for="date"> التاريخ </label>
+              <input type="date" name="date" id="date" required />
+            </div>
 
-              <!-- ********************************************************** -->
+            <!-- ********************************************************** -->
 
-              <div>
-                <label>ساعات الوردية</label>
-                <input type="number" name="shift_hours" id="shift_hours" value="0">
-              </div>
+            <div>
+              <label>ساعات الوردية</label>
+              <input type="number" name="shift_hours" id="shift_hours" value="0">
+            </div>
 
 
-              <div>
-                <label> ⏱️ عداد البداية</label>
-                <div class="counter-input-group">
-                  <div class="counter-field">
-                    <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
-                    <span>ساعات</span>
-                  </div>
-                  <span class="counter-separator">:</span>
-                  <div class="counter-field">
-                    <input type="number" value="0" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="00" required>
-                    <span>دقائق</span>
-                  </div>
-                  <span class="counter-separator">:</span>
-                  <div class="counter-field">
-                    <input type="number" value="0" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="00" required>
-                    <span>ثواني</span>
-                  </div>
+            <div>
+              <label> ⏱️ عداد البداية</label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="00"
+                    required>
+                  <span>دقائق</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="00"
+                    required>
+                  <span>ثواني</span>
                 </div>
               </div>
+            </div>
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> ساعات العمل </h3>
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+              ساعات العمل </h3>
 
-              <div>
-                <label>الساعات المنفذة (محسوبة تلقائياً)</label>
-                <input type="number" name="executed_hours" id="executed_hours" value="0" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
-              </div>
-              <div>
-                <label>ساعات جردل</label>
-                <input type="number" name="bucket_hours" id="bucket_hours" value="0">
-              </div>
-              <div>
-                <label>ساعات جاك همر</label>
-                <input type="number" name="jackhammer_hours" id="jackhammer_hours" value="0">
-              </div>
-              <div>
-                <label>ساعات إضافية</label>
-                <input type="number" name="extra_hours" id="extra_hours" value="0">
-              </div>
-              <div>
-                <label>مجموع الساعات الإضافية</label>
-                <input type="number" name="extra_hours_total" id="extra_hours_total" value="0">
-              </div>
-              <div>
-                <label>ساعات الاستعداد (بسبب العميل)</label>
-                <input type="number" name="standby_hours" id="standby_hours" value="0">
-              </div>
-              <div>
-                <label>ساعات الاستعداد ( اعتماد )</label>
-                <input type="number" name="dependence_hours" id="dependence_hours" value="0">
-              </div>
-              <div>
-                <label>مجموع ساعات العمل</label>
-                <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
-              </div>
-              <div>
-                <label>ملاحظات ساعات العمل</label>
-                <textarea name="work_notes"></textarea>
-              </div>
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> ساعات الاعطال </h3>
+            <div>
+              <label>الساعات المنفذة (محسوبة تلقائياً)</label>
+              <input type="number" name="executed_hours" id="executed_hours" value="0" readonly
+                style="background-color: #f0f0f0; cursor: not-allowed;">
+            </div>
+            <div>
+              <label>ساعات جردل</label>
+              <input type="number" name="bucket_hours" id="bucket_hours" value="0">
+            </div>
+            <div>
+              <label>ساعات جاك همر</label>
+              <input type="number" name="jackhammer_hours" id="jackhammer_hours" value="0">
+            </div>
+            <div>
+              <label>ساعات إضافية</label>
+              <input type="number" name="extra_hours" id="extra_hours" value="0">
+            </div>
+            <div>
+              <label>مجموع الساعات الإضافية</label>
+              <input type="number" name="extra_hours_total" id="extra_hours_total" value="0">
+            </div>
+            <div>
+              <label>ساعات الاستعداد (بسبب العميل)</label>
+              <input type="number" name="standby_hours" id="standby_hours" value="0">
+            </div>
+            <div>
+              <label>ساعات الاستعداد ( اعتماد )</label>
+              <input type="number" name="dependence_hours" id="dependence_hours" value="0">
+            </div>
+            <div>
+              <label>مجموع ساعات العمل</label>
+              <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
+            </div>
+            <div>
+              <label>ملاحظات ساعات العمل</label>
+              <textarea name="work_notes"></textarea>
+            </div>
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+              ساعات الاعطال </h3>
 
-              <!-- ⚠️ تنبيه مهم للمستخدم -->
-              <div style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
-                <div style="display: flex; align-items: start; gap: 12px;">
-                  <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
-                  <div style="flex: 1;">
-                    <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى القراءة</h4>
-                    <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
-                      <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
-                      <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل تماماً:</strong>
-                    </p>
-                    <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
-                      <li><strong>عطل HR</strong></li>
-                      <li><strong>عطل صيانة</strong></li>
-                      <li><strong>عطل تسويق</strong></li>
-                      <li><strong>عطل اعتماد</strong></li>
-                      <li><strong>ساعات أعطال أخرى</strong></li>
-                    </ul>
-                    <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
-                      ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
-                    </p>
-                  </div>
+            <!-- ⚠️ تنبيه مهم للمستخدم -->
+            <div
+              style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
+              <div style="display: flex; align-items: start; gap: 12px;">
+                <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
+                <div style="flex: 1;">
+                  <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى
+                    القراءة</h4>
+                  <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
+                    <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
+                    <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
+                      تماماً:</strong>
+                  </p>
+                  <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
+                    <li><strong>عطل HR</strong></li>
+                    <li><strong>عطل صيانة</strong></li>
+                    <li><strong>عطل تسويق</strong></li>
+                    <li><strong>عطل اعتماد</strong></li>
+                    <li><strong>ساعات أعطال أخرى</strong></li>
+                  </ul>
+                  <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
+                    ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
+                  </p>
                 </div>
               </div>
+            </div>
 
-              <div>
-                <label>عطل HR</label>
-                <input type="number" name="hr_fault" id="hr_fault" value="0">
-              </div>
-              <div>
-                <label>عطل صيانة</label>
-                <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
-              </div>
-              <div>
-                <label>عطل تسويق</label>
-                <input type="number" name="marketing_fault" id="marketing_fault" value="0">
-              </div>
-              <div>
-                <label>عطل اعتماد</label>
-                <input type="number" name="approval_fault" id="approval_fault" value="0">
-              </div>
-              <div>
-                <label>ساعات أعطال أخرى</label>
-                <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
-              </div>
-              <div>
-                <label> مجموع ساعات التعطل</label>
-                <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
-              </div>
-              <div>
-                <label>ملاحظات ساعات الأعطال</label>
-                <textarea name="fault_notes"></textarea>
-              </div>
+            <div>
+              <label>عطل HR</label>
+              <input type="number" name="hr_fault" id="hr_fault" value="0">
+            </div>
+            <div>
+              <label>عطل صيانة</label>
+              <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
+            </div>
+            <div>
+              <label>عطل تسويق</label>
+              <input type="number" name="marketing_fault" id="marketing_fault" value="0">
+            </div>
+            <div>
+              <label>عطل اعتماد</label>
+              <input type="number" name="approval_fault" id="approval_fault" value="0">
+            </div>
+            <div>
+              <label>ساعات أعطال أخرى</label>
+              <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
+            </div>
+            <div>
+              <label> مجموع ساعات التعطل</label>
+              <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
+            </div>
+            <div>
+              <label>ملاحظات ساعات الأعطال</label>
+              <textarea name="fault_notes"></textarea>
+            </div>
 
 
-              <div>
-                <label> ⏱️ عداد النهاية </label>
-                <div class="counter-input-group">
-                  <div class="counter-field">
-                    <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
-                    <span>ساعات</span>
-                  </div>
-                  <span class="counter-separator">:</span>
-                  <div class="counter-field">
-                    <input type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="00">
-                    <span>دقائق</span>
-                  </div>
-                  <span class="counter-separator">:</span>
-                  <div class="counter-field">
-                    <input type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="00">
-                    <span>ثواني</span>
-                  </div>
+            <div>
+              <label> ⏱️ عداد النهاية </label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="00">
+                  <span>دقائق</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="00">
+                  <span>ثواني</span>
                 </div>
               </div>
+            </div>
 
-              <div>
-                <label>⚡ فرق العداد</label>
-                <input type="text" name="counter_diff" id="counter_diff_display" readonly>
-                <input type="hidden" id="counter_diff" />
-              </div>
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>
+            <div>
+              <label>⚡ فرق العداد</label>
+              <input type="text" name="counter_diff" id="counter_diff_display" readonly>
+              <input type="hidden" id="counter_diff" />
+            </div>
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+              الاعطال </h3>
 
-              <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم الإضافة) -->
-              <div style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
-                    <select id="fc_event_type" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
-                      <option value="">-- اختر نوع الحدث --</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
-                    <select id="fc_main_cat" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
-                      <option value="">-- اختر الفئة --</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
-                    <select id="fc_sub_cat" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
-                      <option value="">-- اختر الجزء --</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
-                    <select id="fc_detail" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
-                      <option value="">-- اختر التفصيل --</option>
-                    </select>
-                  </div>
+            <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم الإضافة) -->
+            <div
+              style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
+                  <select id="fc_event_type"
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
+                    <option value="">-- اختر نوع الحدث --</option>
+                  </select>
                 </div>
-                <div id="fc_code_display_add" style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
-                  <strong>كود العطل:</strong> <span id="fc_code_text_add"></span>
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
+                  <select id="fc_main_cat" disabled
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                    <option value="">-- اختر الفئة --</option>
+                  </select>
                 </div>
-              </div>
-
-              <!-- الحقول المخفية التي تُحفظ في قاعدة البيانات -->
-              <input type="hidden" name="fault_type"       id="fault_type" />
-              <input type="hidden" name="fault_department" id="fault_department" />
-              <input type="hidden" name="fault_part"       id="fault_part" />
-              <input type="hidden" name="fault_details"    id="fault_details" />
-              <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
-
-              <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-                  <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
-                  <button type="button" id="addFaultBtn" style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+ إضافة العطل الحالي</button>
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
+                  <select id="fc_sub_cat" disabled
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                    <option value="">-- اختر الجزء --</option>
+                  </select>
                 </div>
-                <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
-                <div style="overflow:auto;">
-                  <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
-                    <thead>
-                      <tr style="background:#f8f9fa;">
-                        <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
-                      </tr>
-                    </thead>
-                    <tbody id="faultsSelectedBody">
-                      <tr><td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا توجد أعطال مضافة بعد</td></tr>
-                    </tbody>
-                  </table>
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
+                  <select id="fc_detail" disabled
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                    <option value="">-- اختر التفصيل --</option>
+                  </select>
                 </div>
               </div>
+              <div id="fc_code_display_add"
+                style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
+                <strong>كود العطل:</strong> <span id="fc_code_text_add"></span>
+              </div>
+            </div>
 
-              <div style="grid-column: 1/-1;">
-                <label>ملاحظات عامة</label>
-                <textarea name="general_notes" id="general_notes"></textarea>
-              </div>
+            <!-- الحقول المخفية التي تُحفظ في قاعدة البيانات -->
+            <input type="hidden" name="fault_type" id="fault_type" />
+            <input type="hidden" name="fault_department" id="fault_department" />
+            <input type="hidden" name="fault_part" id="fault_part" />
+            <input type="hidden" name="fault_details" id="fault_details" />
+            <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
 
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات عمل المشغل </h3>
+            <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
+                <button type="button" id="addFaultBtn"
+                  style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+
+                  إضافة العطل الحالي</button>
+              </div>
+              <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس
+                اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
+              <div style="overflow:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+                  <thead>
+                    <tr style="background:#f8f9fa;">
+                      <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
+                    </tr>
+                  </thead>
+                  <tbody id="faultsSelectedBody">
+                    <tr>
+                      <td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا
+                        توجد أعطال مضافة بعد</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-              <div>
-                <label>⏱️ ساعات عمل المشغل</label>
-                <input type="text" name="operator_hours" id="operator_hours" value="0">
-              </div>
-              <div>
-                <label>⚙️ ساعات استعداد الآلية</label>
-                <input type="text" name="machine_standby_hours" id="machine_standby_hours" value="0" readonly>
-              </div>
-              <div>
-                <label>⚙️ ساعات استعداد الجاك همر</label>
-                <input type="text" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
-              </div>
-              <div>
-                <label>⚙️ ساعات استعداد الجردل</label>
-                <input type="text" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
-              </div>
-              <div>
-                <label>➕ الساعات الإضافية</label>
-                <input type="text" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
-              </div>
-              <div>
-                <label>ðŸ‘· ساعات استعداد المشغل</label>
-                <input type="text" name="operator_standby_hours" id="operator_standby_hours" class="form-control"
-                  value="0">
-              </div>
-              <div>
-                <label>ðŸ“ ملاحظات المشغل</label>
-                <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
+            <div style="grid-column: 1/-1;">
+              <label>ملاحظات عامة</label>
+              <textarea name="general_notes" id="general_notes"></textarea>
+            </div>
 
-              </div>
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+              ساعات عمل المشغل </h3>
 
-              <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
-
-              <button type="submit" style="margin-top: 20px;">
-                <i class="fas fa-save"></i> حفظ الساعات
-              </button>
+            <div>
+              <label>⏱️ ساعات عمل المشغل</label>
+              <input type="text" name="operator_hours" id="operator_hours" value="0">
+            </div>
+            <div>
+              <label>⚙️ ساعات استعداد الآلية</label>
+              <input type="text" name="machine_standby_hours" id="machine_standby_hours" value="0" readonly>
+            </div>
+            <div>
+              <label>⚙️ ساعات استعداد الجاك همر</label>
+              <input type="text" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
+            </div>
+            <div>
+              <label>⚙️ ساعات استعداد الجردل</label>
+              <input type="text" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
+            </div>
+            <div>
+              <label>➕ الساعات الإضافية</label>
+              <input type="text" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
+            </div>
+            <div>
+              <label>ðŸ‘· ساعات استعداد المشغل</label>
+              <input type="text" name="operator_standby_hours" id="operator_standby_hours" class="form-control" value="0">
+            </div>
+            <div>
+              <label>ðŸ“ ملاحظات المشغل</label>
+              <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
 
             </div>
+
+            <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
+
+            <button type="submit" style="margin-top: 20px;">
+              <i class="fas fa-save"></i> حفظ الساعات
+            </button>
+
           </div>
         </div>
-        <?php } elseif ($_GET['type'] == "2") {
-          // نوع المهدةطلع قلاب
-          ?>
-          <div class="card">
-              <div class="card-header">
-                  <h5><i class="fas fa-edit"></i> إضافة / تعديل قلاب</h5>
-              </div>
-              <div class="card-body">
-            <div class="form-grid">
-              <div>
-                <label>الالية</label>
-                <select name="operator" id="operator" required>
-                  <option value="">-- اختر الالية --</option>
-                  <?php
-                  $project_filter = "";
-                  if ($should_use_mine_filter) {
-                    $project_filter = " AND o.mine_id = '" . $session_mine_id . "'";
-                  } elseif ($session_project_id > 0) {
-                    $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
-                  }
-                  $op_res = mysqli_query($conn, "SELECT o.id, o.status, o." . $operations_project_column . " AS project_id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
+      </div>
+    <?php } elseif ($_GET['type'] == "2") {
+      // نوع المهدةطلع قلاب
+      ?>
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="fas fa-edit"></i> إضافة / تعديل قلاب</h5>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div>
+              <label>الالية</label>
+              <select name="operator" id="operator" required>
+                <option value="">-- اختر الالية --</option>
+                <?php
+                $project_filter = "";
+                if ($should_use_mine_filter) {
+                  $project_filter = " AND o.mine_id = '" . $session_mine_id . "'";
+                } elseif ($session_project_id > 0) {
+                  $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
+                }
+                $op_res = mysqli_query($conn, "SELECT o.id, o.status, o." . $operations_project_column . " AS project_id, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o." . $operations_project_column . " = p.id
@@ -841,22 +906,22 @@ if (!$is_super_admin) {
 
 
 
-                  if ($op_res) {
-                    while ($op = mysqli_fetch_assoc($op_res)) {
-                      echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
-                    }
-                  } else {
-                    error_log('Timesheet operators query failed (type=2): ' . mysqli_error($conn));
+                if ($op_res) {
+                  while ($op = mysqli_fetch_assoc($op_res)) {
+                    echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
                   }
-                  ?>
-                </select>
-              </div>
+                } else {
+                  error_log('Timesheet operators query failed (type=2): ' . mysqli_error($conn));
+                }
+                ?>
+              </select>
+            </div>
 
-              <input type="hidden" name="id" id="timesheet_id" value="">
-              <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
-              <div>
-                <label>السائق</label>
-                <!-- <select name="driver"  required>
+            <input type="hidden" name="id" id="timesheet_id" value="">
+            <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
+            <div>
+              <label>السائق</label>
+              <!-- <select name="driver"  required>
             <option value="">-- اختر السائق --</option>
             <?php
             $driver_scope_sql = "1=1";
@@ -886,320 +951,347 @@ if (!$is_super_admin) {
 
 
 
-                <select id="driver" name="driver">
-                  <option value="">-- اختر السائق --</option>
-                </select>
+              <select id="driver" name="driver">
+                <option value="">-- اختر السائق --</option>
+              </select>
 
-
-              </div>
-              <div>
-                <label>الوردية</label>
-                <select name="shift" id="shift">
-                  <option value=""> -- اختار الوردية -- </option>
-                  <option value="D"> صباحية </option>
-                  <option value="N"> مسائية </option>
-                </select>
-              </div>
-              <div>
-                <label> التاريخ </label>
-                <input type="date" name="date" id="date" required />
-              </div>
-
-
-              <!-- ********************************************************** -->
-
-              <div>
-                <label>ساعات الوردية</label>
-                <input type="number" name="shift_hours" id="shift_hours" value="0">
-              </div>
-
-              <div>
-                <label> ⏱️ عداد البداية</label>
-                <div class="counter-input-group">
-                  <div class="counter-field">
-                    <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
-                    <span>ساعات</span>
-                  </div>
-                </div>
-                <input type="hidden" value="0" id="start_minutes" name="start_minutes" min="0" max="59" required>
-                <input type="hidden" value="0" id="start_seconds" name="start_seconds" min="0" max="59" required>
-              </div>
-
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الساعات </h3>
-              <div>
-                <label>الساعات المنفذة</label>
-                <input type="number" name="executed_hours" id="executed_hours" value="0">
-              </div>
-
-
-              <input type="hidden" name="bucket_hours" id="bucket_hours" value="0">
-              <input type="hidden" name="jackhammer_hours" id="jackhammer_hours" value="0">
-               <div>
-                <label>ساعات إضافية </label>
-              <input type="number" name="extra_hours" id="extra_hours" value="0">
-              </div>
-
-              <div>
-                <label>مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
-                <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
-              </div>
-              <div>
-                <label>ساعات الاستعداد (بسبب العميل)</label>
-                <input type="number" name="standby_hours" id="standby_hours" value="0">
-              </div>
-              <div>
-                <label>ساعات الاستعداد ( اعتماد )</label>
-                <input type="number" name="dependence_hours" id="dependence_hours" value="0">
-              </div>
-              <div>
-                <label>مجموع ساعات العمل</label>
-                <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
-              </div>
-              <div>
-                <label>ملاحظات ساعات العمل</label>
-                <textarea name="work_notes" id="work_notes"></textarea>
-              </div>
-
-
-                    <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> 🚚 الأوزان والنقلات </h3>
-              <div>
-                <label>🔄 نوع النقل</label>
-                <select name="transport_type" id="transport_type">
-                  <option value="">-- اختر نوع النقل --</option>
-                  <option value="Waste">Waste (نفايات)</option>
-                  <option value="Ore">Ore (خام)</option>
-                </select>
-              </div>
-              <div>
-                <label>⚖️ وزن القلاب</label>
-                <input type="number" step="0.01" name="tons_count" id="tons_count" value="0" placeholder="0.00">
-              </div>
-              <div>
-                <label>🚛 عدد النقلات</label>
-                <input type="number" name="trips_count" id="trips_count" value="0" placeholder="0">
-              </div>
-
-
-
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> ساعات الاعطال </h3>
-
-              <!-- ⚠️ تنبيه مهم للمستخدم -->
-              <div style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
-                <div style="display: flex; align-items: start; gap: 12px;">
-                  <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
-                  <div style="flex: 1;">
-                    <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى القراءة</h4>
-                    <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
-                      <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
-                      <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل تماماً:</strong>
-                    </p>
-                    <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
-                      <li><strong>عطل HR</strong></li>
-                      <li><strong>عطل صيانة</strong></li>
-                      <li><strong>عطل تسويق</strong></li>
-                      <li><strong>عطل اعتماد</strong></li>
-                      <li><strong>ساعات أعطال أخرى</strong></li>
-                    </ul>
-                    <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
-                      ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label>عطل HR</label>
-                <input type="number" name="hr_fault" id="hr_fault" value="0">
-              </div>
-              <div>
-                <label>عطل صيانة</label>
-                <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
-              </div>
-              <div>
-                <label>عطل تسويق</label>
-                <input type="number" name="marketing_fault" id="marketing_fault" value="0">
-              </div>
-              <div>
-                <label>عطل اعتماد</label>
-                <input type="number" name="approval_fault" id="approval_fault" value="0">
-              </div>
-              <div>
-                <label>ساعات أعطال أخرى</label>
-                <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
-              </div>
-              <div>
-                <label> مجموع ساعات التعطل</label>
-                <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
-              </div>
-              <div>
-                <label>ملاحظات ساعات الأعطال</label>
-                <textarea name="fault_notes" id="fault_notes"></textarea>
-              </div>
-
-              <div>
-                <label> ⏱️ عداد النهاية </label>
-                <div class="counter-input-group">
-                  <div class="counter-field">
-                    <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
-                    <span>ساعات</span>
-                  </div>
-                </div>
-                <input type="hidden" value="0" id="end_minutes" name="end_minutes" min="0" max="59">
-                <input type="hidden" value="0" id="end_seconds" name="end_seconds" min="0" max="59">
-              </div>
-
-              <div>
-                <label>⚡ فرق العداد</label>
-                <input type="text" name="counter_diff" id="counter_diff_display" readonly>
-                <input type="hidden" id="counter_diff" />
-              </div>
-              <div></div>
-
-
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>
-
-              <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم التعديل) -->
-              <div style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
-
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
-                    <select id="fc_event_type_edit" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
-                      <option value="">-- اختر نوع الحدث --</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
-                    <select id="fc_main_cat_edit" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
-                      <option value="">-- اختر الفئة --</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
-                    <select id="fc_sub_cat_edit" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
-                      <option value="">-- اختر الجزء --</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
-                    <select id="fc_detail_edit" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
-                      <option value="">-- اختر التفصيل --</option>
-                    </select>
-                  </div>
-
-                </div>
-
-                <div id="fc_code_display_edit" style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
-                  <strong>كود العطل:</strong> <span id="fc_code_text_edit"></span>
-                </div>
-              </div>
-
-              <!-- الحقول المخفية -->
-              <input type="hidden" name="fault_type"       id="fault_type" />
-              <input type="hidden" name="fault_department" id="fault_department" />
-              <input type="hidden" name="fault_part"       id="fault_part" />
-              <input type="hidden" name="fault_details"    id="fault_details" />
-              <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
-
-              <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-                  <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
-                  <button type="button" id="addFaultBtn" style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+ إضافة العطل الحالي</button>
-                </div>
-                <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
-                <div style="overflow:auto;">
-                  <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
-                    <thead>
-                      <tr style="background:#f8f9fa;">
-                        <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
-                      </tr>
-                    </thead>
-                    <tbody id="faultsSelectedBody">
-                      <tr><td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا توجد أعطال مضافة بعد</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div style="grid-column: 1/-1;">
-                <label>ملاحظات عامة</label>
-                <textarea name="general_notes" id="general_notes"></textarea>
-              </div>
-
-
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات عمل المشغل </h3>
-        
-          
-             
-              <div></div>
-
-              <div>
-                <label>⏱️ ساعات عمل المشغل</label>
-                <input type="text" name="operator_hours" id="operator_hours" value="0">
-              </div>
-              <div>
-                <label>⚙️ ساعات استعداد الآلية</label>
-                <input type="text" name="machine_standby_hours" value="0" readonly>
-              </div>
-              <input type="hidden" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
-              <input type="hidden" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
-              <input type="hidden" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
-              <div>
-                <label>ðŸ‘· ساعات استعداد المشغل</label>
-                <input type="text" name="operator_standby_hours" class="form-control" value="0">
-              </div>
-              <div>
-                <label>ðŸ“ ملاحظات المشغل</label>
-                <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
-              </div>
-
-        
-              <div></div>
-              <div></div>
-
-              <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
-
-              <button type="submit" style="margin-top: 20px;">
-                <i class="fas fa-save"></i> حفظ الساعات
-              </button>
 
             </div>
+            <div>
+              <label>الوردية</label>
+              <select name="shift" id="shift">
+                <option value=""> -- اختار الوردية -- </option>
+                <option value="D"> صباحية </option>
+                <option value="N"> مسائية </option>
+              </select>
+            </div>
+            <div>
+              <label> التاريخ </label>
+              <input type="date" name="date" id="date" required />
+            </div>
+
+
+            <!-- ********************************************************** -->
+
+            <div>
+              <label>ساعات الوردية</label>
+              <input type="number" name="shift_hours" id="shift_hours" value="0">
+            </div>
+
+            <div>
+              <label> ⏱️ عداد البداية</label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+              </div>
+              <input type="hidden" value="0" id="start_minutes" name="start_minutes" min="0" max="59" required>
+              <input type="hidden" value="0" id="start_seconds" name="start_seconds" min="0" max="59" required>
+            </div>
+
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+              الساعات </h3>
+            <div>
+              <label>الساعات المنفذة</label>
+              <input type="number" name="executed_hours" id="executed_hours" value="0">
+            </div>
+
+
+            <input type="hidden" name="bucket_hours" id="bucket_hours" value="0">
+            <input type="hidden" name="jackhammer_hours" id="jackhammer_hours" value="0">
+            <div>
+              <label>ساعات إضافية </label>
+              <input type="number" name="extra_hours" id="extra_hours" value="0">
+            </div>
+
+            <div>
+              <label>مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
+              <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly
+                style="background-color: #f0f0f0; cursor: not-allowed;">
+            </div>
+            <div>
+              <label>ساعات الاستعداد (بسبب العميل)</label>
+              <input type="number" name="standby_hours" id="standby_hours" value="0">
+            </div>
+            <div>
+              <label>ساعات الاستعداد ( اعتماد )</label>
+              <input type="number" name="dependence_hours" id="dependence_hours" value="0">
+            </div>
+            <div>
+              <label>مجموع ساعات العمل</label>
+              <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
+            </div>
+            <div>
+              <label>ملاحظات ساعات العمل</label>
+              <textarea name="work_notes" id="work_notes"></textarea>
+            </div>
+
+
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+              🚚 الأوزان والنقلات </h3>
+            <div>
+              <label>🔄 نوع النقل</label>
+              <select name="transport_type" id="transport_type">
+                <option value="">-- اختر نوع النقل --</option>
+                <option value="Waste">Waste (نفايات)</option>
+                <option value="Ore">Ore (خام)</option>
+              </select>
+            </div>
+            <div>
+              <label>⚖️ وزن القلاب</label>
+              <input type="number" step="0.01" name="tons_count" id="tons_count" value="0" placeholder="0.00">
+            </div>
+            <div>
+              <label>🚛 عدد النقلات</label>
+              <input type="number" name="trips_count" id="trips_count" value="0" placeholder="0">
+            </div>
+
+
+
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+              ساعات الاعطال </h3>
+
+            <!-- ⚠️ تنبيه مهم للمستخدم -->
+            <div
+              style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
+              <div style="display: flex; align-items: start; gap: 12px;">
+                <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
+                <div style="flex: 1;">
+                  <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى
+                    القراءة</h4>
+                  <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
+                    <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
+                    <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
+                      تماماً:</strong>
+                  </p>
+                  <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
+                    <li><strong>عطل HR</strong></li>
+                    <li><strong>عطل صيانة</strong></li>
+                    <li><strong>عطل تسويق</strong></li>
+                    <li><strong>عطل اعتماد</strong></li>
+                    <li><strong>ساعات أعطال أخرى</strong></li>
+                  </ul>
+                  <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
+                    ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label>عطل HR</label>
+              <input type="number" name="hr_fault" id="hr_fault" value="0">
+            </div>
+            <div>
+              <label>عطل صيانة</label>
+              <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
+            </div>
+            <div>
+              <label>عطل تسويق</label>
+              <input type="number" name="marketing_fault" id="marketing_fault" value="0">
+            </div>
+            <div>
+              <label>عطل اعتماد</label>
+              <input type="number" name="approval_fault" id="approval_fault" value="0">
+            </div>
+            <div>
+              <label>ساعات أعطال أخرى</label>
+              <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
+            </div>
+            <div>
+              <label> مجموع ساعات التعطل</label>
+              <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
+            </div>
+            <div>
+              <label>ملاحظات ساعات الأعطال</label>
+              <textarea name="fault_notes" id="fault_notes"></textarea>
+            </div>
+
+            <div>
+              <label> ⏱️ عداد النهاية </label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+              </div>
+              <input type="hidden" value="0" id="end_minutes" name="end_minutes" min="0" max="59">
+              <input type="hidden" value="0" id="end_seconds" name="end_seconds" min="0" max="59">
+            </div>
+
+            <div>
+              <label>⚡ فرق العداد</label>
+              <input type="text" name="counter_diff" id="counter_diff_display" readonly>
+              <input type="hidden" id="counter_diff" />
+            </div>
+            <div></div>
+
+
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+              الاعطال </h3>
+
+            <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم التعديل) -->
+            <div
+              style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
+                  <select id="fc_event_type_edit"
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
+                    <option value="">-- اختر نوع الحدث --</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
+                  <select id="fc_main_cat_edit" disabled
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                    <option value="">-- اختر الفئة --</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
+                  <select id="fc_sub_cat_edit" disabled
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                    <option value="">-- اختر الجزء --</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
+                  <select id="fc_detail_edit" disabled
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                    <option value="">-- اختر التفصيل --</option>
+                  </select>
+                </div>
+
+              </div>
+
+              <div id="fc_code_display_edit"
+                style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
+                <strong>كود العطل:</strong> <span id="fc_code_text_edit"></span>
+              </div>
+            </div>
+
+            <!-- الحقول المخفية -->
+            <input type="hidden" name="fault_type" id="fault_type" />
+            <input type="hidden" name="fault_department" id="fault_department" />
+            <input type="hidden" name="fault_part" id="fault_part" />
+            <input type="hidden" name="fault_details" id="fault_details" />
+            <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
+
+            <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
+                <button type="button" id="addFaultBtn"
+                  style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+
+                  إضافة العطل الحالي</button>
+              </div>
+              <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس
+                اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
+              <div style="overflow:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+                  <thead>
+                    <tr style="background:#f8f9fa;">
+                      <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
+                    </tr>
+                  </thead>
+                  <tbody id="faultsSelectedBody">
+                    <tr>
+                      <td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا
+                        توجد أعطال مضافة بعد</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div style="grid-column: 1/-1;">
+              <label>ملاحظات عامة</label>
+              <textarea name="general_notes" id="general_notes"></textarea>
+            </div>
+
+
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+              ساعات عمل المشغل </h3>
+
+
+
+            <div></div>
+
+            <div>
+              <label>⏱️ ساعات عمل المشغل</label>
+              <input type="text" name="operator_hours" id="operator_hours" value="0">
+            </div>
+            <div>
+              <label>⚙️ ساعات استعداد الآلية</label>
+              <input type="text" name="machine_standby_hours" value="0" readonly>
+            </div>
+            <input type="hidden" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
+            <input type="hidden" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
+            <input type="hidden" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
+            <div>
+              <label>ðŸ‘· ساعات استعداد المشغل</label>
+              <input type="text" name="operator_standby_hours" class="form-control" value="0">
+            </div>
+            <div>
+              <label>ðŸ“ ملاحظات المشغل</label>
+              <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
+            </div>
+
+
+            <div></div>
+            <div></div>
+
+            <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
+
+            <button type="submit" style="margin-top: 20px;">
+              <i class="fas fa-save"></i> حفظ الساعات
+            </button>
+
           </div>
         </div>
+      </div>
     <?php } elseif ($_GET['type'] == "3") {
-          // نوع المعدة خرامات (drilling machines)
-          ?>
-          <div class="card">
-              <div class="card-header">
-                  <h5><i class="fas fa-edit"></i> إضافة / تعديل خرامة</h5>
-              </div>
-          <div class="card-body">
-            <div class="form-grid">
-              <div>
-                <label>الالية</label>
-                <select name="operator" id="operator" required>
-                  <option value="">-- اختر الالية --</option>
-                  <?php
-                  $project_filter = "";
-                  if ($should_use_mine_filter) {
-                    $project_filter = " AND o.mine_id = '" . $session_mine_id . "'";
-                  } elseif ($session_project_id > 0) {
-                    $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
-                  }
-                  $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
+      // نوع المعدة خرامات (drilling machines)
+      ?>
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="fas fa-edit"></i> إضافة / تعديل خرامة</h5>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div>
+              <label>الالية</label>
+              <select name="operator" id="operator" required>
+                <option value="">-- اختر الالية --</option>
+                <?php
+                $project_filter = "";
+                if ($should_use_mine_filter) {
+                  $project_filter = " AND o.mine_id = '" . $session_mine_id . "'";
+                } elseif ($session_project_id > 0) {
+                  $project_filter = " AND o." . $operations_project_column . " = '" . $session_project_id . "'";
+                }
+                $op_res = mysqli_query($conn, "SELECT o.id, o.status, e.code AS eq_code, e.name AS eq_name, p.name AS project_name , e.type
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o." . $operations_project_column . " = p.id
@@ -1207,327 +1299,356 @@ if (!$is_super_admin) {
 
 
 
-                  if ($op_res) {
-                    while ($op = mysqli_fetch_assoc($op_res)) {
-                      echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
-                    }
-                  } else {
-                    error_log('Timesheet operators query failed (type=3): ' . mysqli_error($conn));
+                if ($op_res) {
+                  while ($op = mysqli_fetch_assoc($op_res)) {
+                    echo "<option value='" . $op['id'] . "'>" . $op['eq_code'] . " - " . $op['eq_name'] . "</option>";
                   }
-                  ?>
-                </select>
-              </div>
-              <input type="hidden" name="id" id="timesheet_id" value="">
-              <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
-
-              <div>
-                <label>السائق</label>
-                <select id="driver" name="driver">
-                  <option value="">-- اختر السائق --</option>
-                </select>
-              </div>
-              <div>
-                <label>الوردية</label>
-                <select name="shift" id="shift">
-                  <option value=""> -- اختار الوردية -- </option>
-                  <option value="D"> صباحية </option>
-                  <option value="N"> مسائية </option>
-                </select>
-              </div>
-              <div>
-                <label for="date"> التاريخ </label>
-                <input type="date" name="date" id="date" required />
-              </div>
-
-              <!-- ********************************************************** -->
-
-              <div>
-                <label>ساعات الوردية</label>
-                <input type="number" name="shift_hours" id="shift_hours" value="0">
-              </div>
-
-
-              <div>
-                <label> ⏱️ عداد البداية</label>
-                <div class="counter-input-group">
-                  <div class="counter-field">
-                    <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
-                    <span>ساعات</span>
-                  </div>
-                  <span class="counter-separator">:</span>
-                  <div class="counter-field">
-                    <input type="number" value="0" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="00" required>
-                    <span>دقائق</span>
-                  </div>
-                  <span class="counter-separator">:</span>
-                  <div class="counter-field">
-                    <input type="number" value="0" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="00" required>
-                    <span>ثواني</span>
-                  </div>
-                </div>
-              </div>
-
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> ساعات العمل </h3>
-
-              <div>
-                <label>الساعات المنفذة</label>
-                <input type="number" name="executed_hours" id="executed_hours" value="0">
-              </div>
-             
-                <input type="hidden"  name="bucket_hours" id="bucket_hours" value="0">
-              
-                <input type="hidden" name="jackhammer_hours" id="jackhammer_hours" value="0">
-             
-              <div>
-                <label>ساعات إضافية</label>
-                <input type="number" name="extra_hours" id="extra_hours" value="0">
-              </div>
-              <div>
-                <label>مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
-                <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
-              </div>
-              <div>
-                <label>ساعات الاستعداد (بسبب العميل)</label>
-                <input type="number" name="standby_hours" id="standby_hours" value="0">
-              </div>
-              <div>
-                <label>ساعات الاستعداد ( اعتماد )</label>
-                <input type="number" name="dependence_hours" id="dependence_hours" value="0">
-              </div>
-              <div>
-                <label>مجموع ساعات العمل</label>
-                <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
-              </div>
-              <div>
-                <label>ملاحظات ساعات العمل</label>
-                <textarea name="work_notes"></textarea>
-              </div>
-               <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> 📏 الأمتار </h3>
-              <div>
-                <label>🔧 نوع الأمتار</label>
-                <select name="meters_type" id="meters_type">
-                  <option value="">-- اختر نوع الأمتار --</option>
-                  <option value="أمتار الخام">أمتار الخام</option>
-                  <option value="أمتار الوست">أمتار الوست</option>
-                  <option value="امتار اخذ العينات">امتار اخذ العينات</option>
-                </select>
-              </div>
-              <div>
-                <label>📐 عدد الأمتار (محسوبة تلقائياً)</label>
-                <input type="number" step="0.01" name="meters_count" id="meters_count" value="0" placeholder="0.00" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
-              </div>
-              <div>
-                <label>⛏️ عدد الحفر المخرمة</label>
-                <input type="number" name="drilling_holes_count" id="drilling_holes_count" value="0" placeholder="0">
-              </div>
-              <div>
-                <label>📊 أعماق الحفر (متر)</label>
-                <input type="number" step="0.01" name="drilling_depth" id="drilling_depth" value="0" placeholder="0.00">
-              </div>
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;"> ساعات الاعطال </h3>
-
-              <!-- ⚠️ تنبيه مهم للمستخدم -->
-              <div style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
-                <div style="display: flex; align-items: start; gap: 12px;">
-                  <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
-                  <div style="flex: 1;">
-                    <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى القراءة</h4>
-                    <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
-                      <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
-                      <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل تماماً:</strong>
-                    </p>
-                    <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
-                      <li><strong>عطل HR</strong></li>
-                      <li><strong>عطل صيانة</strong></li>
-                      <li><strong>عطل تسويق</strong></li>
-                      <li><strong>عطل اعتماد</strong></li>
-                      <li><strong>ساعات أعطال أخرى</strong></li>
-                    </ul>
-                    <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
-                      ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label>عطل HR</label>
-                <input type="number" name="hr_fault" id="hr_fault" value="0">
-              </div>
-              <div>
-                <label>عطل صيانة</label>
-                <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
-              </div>
-              <div>
-                <label>عطل تسويق</label>
-                <input type="number" name="marketing_fault" id="marketing_fault" value="0">
-              </div>
-              <div>
-                <label>عطل اعتماد</label>
-                <input type="number" name="approval_fault" id="approval_fault" value="0">
-              </div>
-              <div>
-                <label>ساعات أعطال أخرى</label>
-                <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
-              </div>
-              <div>
-                <label> مجموع ساعات التعطل</label>
-                <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
-              </div>
-              <div>
-                <label>ملاحظات ساعات الأعطال</label>
-                <textarea name="fault_notes"></textarea>
-              </div>
-
-
-              <div>
-                <label> ⏱️ عداد النهاية </label>
-                <div class="counter-input-group">
-                  <div class="counter-field">
-                    <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
-                    <span>ساعات</span>
-                  </div>
-                  <span class="counter-separator">:</span>
-                  <div class="counter-field">
-                    <input type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="00">
-                    <span>دقائق</span>
-                  </div>
-                  <span class="counter-separator">:</span>
-                  <div class="counter-field">
-                    <input type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="00">
-                    <span>ثواني</span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label>⚡ فرق العداد</label>
-                <input type="text" name="counter_diff" id="counter_diff_display" readonly>
-                <input type="hidden" id="counter_diff" />
-              </div>
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> الاعطال </h3>
-
-              <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم الإضافة 2) -->
-              <div style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
-                    <select id="fc_event_type_f3" style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
-                      <option value="">-- اختر نوع الحدث --</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
-                    <select id="fc_main_cat_f3" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
-                      <option value="">-- اختر الفئة --</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
-                    <select id="fc_sub_cat_f3" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
-                      <option value="">-- اختر الجزء --</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
-                    <select id="fc_detail_f3" disabled style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
-                      <option value="">-- اختر التفصيل --</option>
-                    </select>
-                  </div>
-                </div>
-                <div id="fc_code_display_f3" style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
-                  <strong>كود العطل:</strong> <span id="fc_code_text_f3"></span>
-                </div>
-              </div>
-
-              <!-- الحقول المخفية -->
-              <input type="hidden" name="fault_type"       id="fault_type" />
-              <input type="hidden" name="fault_department" id="fault_department" />
-              <input type="hidden" name="fault_part"       id="fault_part" />
-              <input type="hidden" name="fault_details"    id="fault_details" />
-              <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
-
-              <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-                  <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
-                  <button type="button" id="addFaultBtn" style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+ إضافة العطل الحالي</button>
-                </div>
-                <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
-                <div style="overflow:auto;">
-                  <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
-                    <thead>
-                      <tr style="background:#f8f9fa;">
-                        <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
-                        <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
-                      </tr>
-                    </thead>
-                    <tbody id="faultsSelectedBody">
-                      <tr><td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا توجد أعطال مضافة بعد</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div style="grid-column: 1/-1;">
-                <label>ملاحظات عامة</label>
-                <textarea name="general_notes" id="general_notes"></textarea>
-              </div>
-
-              <h3 style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\"> ساعات عمل المشغل </h3>
-
-              <div>
-                <label>⏱️ ساعات عمل المشغل</label>
-                <input type="text" name="operator_hours" id="operator_hours" value="0">
-              </div>
-              <div>
-                <label>⚙️ ساعات استعداد الآلية</label>
-                <input type="text" name="machine_standby_hours" id="machine_standby_hours" value="0" readonly>
-              </div>
-              <div>
-                <label>⚙️ ساعات استعداد الجاك همر</label>
-                <input type="text" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
-              </div>
-              <div>
-                <label>⚙️ ساعات استعداد الجردل</label>
-                <input type="text" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
-              </div>
-              <div>
-                <label>➕ الساعات الإضافية</label>
-                <input type="text" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
-              </div>
-              <div>
-                <label>ðŸ'· ساعات استعداد المشغل</label>
-                <input type="text" name="operator_standby_hours" id="operator_standby_hours" class="form-control"
-                  value="0">
-              </div>
-              <div>
-                <label>ðŸ" ملاحظات المشغل</label>
-                <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
-              </div>
-
-             
-              <div></div>
-
-              <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
-
-              <button type="submit" style="margin-top: 20px;">
-                <i class="fas fa-save"></i> حفظ الساعات
-              </button>
-
+                } else {
+                  error_log('Timesheet operators query failed (type=3): ' . mysqli_error($conn));
+                }
+                ?>
+              </select>
             </div>
+            <input type="hidden" name="id" id="timesheet_id" value="">
+            <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
+
+            <div>
+              <label>السائق</label>
+              <select id="driver" name="driver">
+                <option value="">-- اختر السائق --</option>
+              </select>
+            </div>
+            <div>
+              <label>الوردية</label>
+              <select name="shift" id="shift">
+                <option value=""> -- اختار الوردية -- </option>
+                <option value="D"> صباحية </option>
+                <option value="N"> مسائية </option>
+              </select>
+            </div>
+            <div>
+              <label for="date"> التاريخ </label>
+              <input type="date" name="date" id="date" required />
+            </div>
+
+            <!-- ********************************************************** -->
+
+            <div>
+              <label>ساعات الوردية</label>
+              <input type="number" name="shift_hours" id="shift_hours" value="0">
+            </div>
+
+
+            <div>
+              <label> ⏱️ عداد البداية</label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="00"
+                    required>
+                  <span>دقائق</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="00"
+                    required>
+                  <span>ثواني</span>
+                </div>
+              </div>
+            </div>
+
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+              ساعات العمل </h3>
+
+            <div>
+              <label>الساعات المنفذة</label>
+              <input type="number" name="executed_hours" id="executed_hours" value="0">
+            </div>
+
+            <input type="hidden" name="bucket_hours" id="bucket_hours" value="0">
+
+            <input type="hidden" name="jackhammer_hours" id="jackhammer_hours" value="0">
+
+            <div>
+              <label>ساعات إضافية</label>
+              <input type="number" name="extra_hours" id="extra_hours" value="0">
+            </div>
+            <div>
+              <label>مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
+              <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly
+                style="background-color: #f0f0f0; cursor: not-allowed;">
+            </div>
+            <div>
+              <label>ساعات الاستعداد (بسبب العميل)</label>
+              <input type="number" name="standby_hours" id="standby_hours" value="0">
+            </div>
+            <div>
+              <label>ساعات الاستعداد ( اعتماد )</label>
+              <input type="number" name="dependence_hours" id="dependence_hours" value="0">
+            </div>
+            <div>
+              <label>مجموع ساعات العمل</label>
+              <input type="number" name="total_work_hours" id="total_work_hours" value="0" readonly>
+            </div>
+            <div>
+              <label>ملاحظات ساعات العمل</label>
+              <textarea name="work_notes"></textarea>
+            </div>
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+              📏 الأمتار </h3>
+            <div>
+              <label>🔧 نوع الأمتار</label>
+              <select name="meters_type" id="meters_type">
+                <option value="">-- اختر نوع الأمتار --</option>
+                <option value="أمتار الخام">أمتار الخام</option>
+                <option value="أمتار الوست">أمتار الوست</option>
+                <option value="امتار اخذ العينات">امتار اخذ العينات</option>
+              </select>
+            </div>
+            <div>
+              <label>📐 عدد الأمتار (محسوبة تلقائياً)</label>
+              <input type="number" step="0.01" name="meters_count" id="meters_count" value="0" placeholder="0.00" readonly
+                style="background-color: #f0f0f0; cursor: not-allowed;">
+            </div>
+            <div>
+              <label>⛏️ عدد الحفر المخرمة</label>
+              <input type="number" name="drilling_holes_count" id="drilling_holes_count" value="0" placeholder="0">
+            </div>
+            <div>
+              <label>📊 أعماق الحفر (متر)</label>
+              <input type="number" step="0.01" name="drilling_depth" id="drilling_depth" value="0" placeholder="0.00">
+            </div>
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;">
+              ساعات الاعطال </h3>
+
+            <!-- ⚠️ تنبيه مهم للمستخدم -->
+            <div
+              style="grid-column: 1/-1; background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%); border-right: 5px solid #ffc107; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(255,193,7,0.15);">
+              <div style="display: flex; align-items: start; gap: 12px;">
+                <div style="font-size: 28px; line-height: 1; margin-top: -3px;">⚠️</div>
+                <div style="flex: 1;">
+                  <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 1.05rem; font-weight: 700;">⚠️ تنبيه مهم - يرجى
+                    القراءة</h4>
+                  <p style="margin: 0; color: #856404; font-size: 0.9rem; line-height: 1.6;">
+                    <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
+                    <strong style="color: #d32f2f;">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
+                      تماماً:</strong>
+                  </p>
+                  <ul style="margin: 8px 0 0 0; padding-right: 20px; color: #856404; font-size: 0.85rem;">
+                    <li><strong>عطل HR</strong></li>
+                    <li><strong>عطل صيانة</strong></li>
+                    <li><strong>عطل تسويق</strong></li>
+                    <li><strong>عطل اعتماد</strong></li>
+                    <li><strong>ساعات أعطال أخرى</strong></li>
+                  </ul>
+                  <p style="margin: 8px 0 0 0; color: #d32f2f; font-size: 0.85rem; font-weight: 600;">
+                    ❌ لن يتم قبول التايم شيت إذا كان المجموع غير مطابق!
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label>عطل HR</label>
+              <input type="number" name="hr_fault" id="hr_fault" value="0">
+            </div>
+            <div>
+              <label>عطل صيانة</label>
+              <input type="number" name="maintenance_fault" id="maintenance_fault" value="0">
+            </div>
+            <div>
+              <label>عطل تسويق</label>
+              <input type="number" name="marketing_fault" id="marketing_fault" value="0">
+            </div>
+            <div>
+              <label>عطل اعتماد</label>
+              <input type="number" name="approval_fault" id="approval_fault" value="0">
+            </div>
+            <div>
+              <label>ساعات أعطال أخرى</label>
+              <input type="number" name="other_fault_hours" id="other_fault_hours" value="0">
+            </div>
+            <div>
+              <label> مجموع ساعات التعطل</label>
+              <input type="number" name="total_fault_hours" id="total_fault_hours" value="0" readonly>
+            </div>
+            <div>
+              <label>ملاحظات ساعات الأعطال</label>
+              <textarea name="fault_notes"></textarea>
+            </div>
+
+
+            <div>
+              <label> ⏱️ عداد النهاية </label>
+              <div class="counter-input-group">
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
+                  <span>ساعات</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="00">
+                  <span>دقائق</span>
+                </div>
+                <span class="counter-separator">:</span>
+                <div class="counter-field">
+                  <input type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="00">
+                  <span>ثواني</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label>⚡ فرق العداد</label>
+              <input type="text" name="counter_diff" id="counter_diff_display" readonly>
+              <input type="hidden" id="counter_diff" />
+            </div>
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+              الاعطال </h3>
+
+            <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم الإضافة 2) -->
+            <div
+              style="grid-column: 1/-1; background: var(--card-bg, #f8f9fa); border: 1px solid var(--border, #dee2e6); border-radius: 8px; padding: 16px;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">📋 نوع الحدث</label>
+                  <select id="fc_event_type_f3"
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc;">
+                    <option value="">-- اختر نوع الحدث --</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">🔧 الفئة الرئيسية</label>
+                  <select id="fc_main_cat_f3" disabled
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                    <option value="">-- اختر الفئة --</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">⚙️ الجزء / السبب</label>
+                  <select id="fc_sub_cat_f3" disabled
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                    <option value="">-- اختر الجزء --</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.85rem; font-weight:600;">📝 تفصيل العطل</label>
+                  <select id="fc_detail_f3" disabled
+                    style="width:100%; padding:6px 10px; border-radius:6px; border:1px solid #ccc; opacity:0.6;">
+                    <option value="">-- اختر التفصيل --</option>
+                  </select>
+                </div>
+              </div>
+              <div id="fc_code_display_f3"
+                style="margin-top:10px; padding:8px 12px; background:#e9ecef; border-radius:6px; font-size:0.82rem; color:#495057; display:none;">
+                <strong>كود العطل:</strong> <span id="fc_code_text_f3"></span>
+              </div>
+            </div>
+
+            <!-- الحقول المخفية -->
+            <input type="hidden" name="fault_type" id="fault_type" />
+            <input type="hidden" name="fault_department" id="fault_department" />
+            <input type="hidden" name="fault_part" id="fault_part" />
+            <input type="hidden" name="fault_details" id="fault_details" />
+            <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
+
+            <div style="grid-column: 1/-1; border:1px dashed #ced4da; border-radius:8px; padding:12px; background:#fff;">
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                <strong style="font-size:0.9rem;">الأعطال المضافة لهذا التايم شيت</strong>
+                <button type="button" id="addFaultBtn"
+                  style="padding:6px 12px; border-radius:6px; border:1px solid #0d6efd; background:#0d6efd; color:#fff;">+
+                  إضافة العطل الحالي</button>
+              </div>
+              <div style="font-size:0.8rem; color:#6c757d; margin-bottom:8px;">ملاحظة: يمكنك إضافة أكثر من عطل في نفس
+                اليوم، وسيتم حفظها في جدول ساعات الأعطال للتقارير والصيانة.</div>
+              <div style="overflow:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+                  <thead>
+                    <tr style="background:#f8f9fa;">
+                      <th style="padding:6px; border:1px solid #e9ecef;">الكود</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">نوع الحدث</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">الفئة</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">الجزء</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">التفصيل</th>
+                      <th style="padding:6px; border:1px solid #e9ecef;">إجراء</th>
+                    </tr>
+                  </thead>
+                  <tbody id="faultsSelectedBody">
+                    <tr>
+                      <td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا
+                        توجد أعطال مضافة بعد</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div style="grid-column: 1/-1;">
+              <label>ملاحظات عامة</label>
+              <textarea name="general_notes" id="general_notes"></textarea>
+            </div>
+
+            <h3
+              style="grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\">
+              ساعات عمل المشغل </h3>
+
+            <div>
+              <label>⏱️ ساعات عمل المشغل</label>
+              <input type="text" name="operator_hours" id="operator_hours" value="0">
+            </div>
+            <div>
+              <label>⚙️ ساعات استعداد الآلية</label>
+              <input type="text" name="machine_standby_hours" id="machine_standby_hours" value="0" readonly>
+            </div>
+            <div>
+              <label>⚙️ ساعات استعداد الجاك همر</label>
+              <input type="text" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
+            </div>
+            <div>
+              <label>⚙️ ساعات استعداد الجردل</label>
+              <input type="text" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
+            </div>
+            <div>
+              <label>➕ الساعات الإضافية</label>
+              <input type="text" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
+            </div>
+            <div>
+              <label>ðŸ'· ساعات استعداد المشغل</label>
+              <input type="text" name="operator_standby_hours" id="operator_standby_hours" class="form-control" value="0">
+            </div>
+            <div>
+              <label>ðŸ" ملاحظات المشغل</label>
+              <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
+            </div>
+
+
+            <div></div>
+
+            <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
+
+            <button type="submit" style="margin-top: 20px;">
+              <i class="fas fa-save"></i> حفظ الساعات
+            </button>
+
           </div>
         </div>
+      </div>
     <?php } ?>
   </form>
-    <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-list-alt"></i> قائمة ساعات العمل</h5>
-        </div>
-        <div class="card-body table-container">
+  <div class="card">
+    <div class="card-header">
+      <h5><i class="fas fa-list-alt"></i> قائمة ساعات العمل</h5>
+    </div>
+    <div class="card-body table-container">
       <table id="projectsTable" class="display">
         <thead>
           <tr>
@@ -1552,7 +1673,7 @@ if (!$is_super_admin) {
           <!-- Data will be loaded via AJAX -->
         </tbody>
       </table>
-      
+
     </div>
   </div>
 </div>
@@ -1572,82 +1693,82 @@ if (!$is_super_admin) {
 <script>
   $(document).ready(function () {
     var table = $('#projectsTable').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: {
-          url: 'get_timesheet_data.php',
-          type: 'GET',
-          data: {
-            type: '<?php echo $type; ?>',
-            today_only: '1'
-          },
-          error: function(xhr, error, thrown) {
-            console.error('DataTables AJAX Error:', error, thrown);
-          }
+      processing: true,
+      serverSide: true,
+      ajax: {
+        url: 'get_timesheet_data.php',
+        type: 'GET',
+        data: {
+          type: '<?php echo $type; ?>',
+          today_only: '1'
         },
-        columns: [
-          { data: 0, orderable: false }, // #
-          { data: 1 }, // ID
-          { data: 2 }, // المعدة
-          { data: 3 }, // التاريخ
-          { data: 4, orderable: false }, // الوردية
-          { data: 5 }, // الساعات المنفذة
-          { data: 6 }, // الجردل
-          { data: 7 }, // الجاكهمر
-          { data: 8 }, // الإضافية
-          { data: 9 }, // الاستعداد
-          { data: 10 }, // الأعطال
-          { data: 11 }, // ساعات العمل
-          { data: 12, orderable: false }, // الإجمالي
-          // { data: 13 }, // الحالة
-          { data: 14, orderable: false } // إجراءات
-        ],
-        order: [[3, 'desc']], // Sort by date descending by default
-        pageLength: 10,
-        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "الكل"]],
-        scrollX: true,
-        fixedHeader: true,
-        dom: 'Blfrtip', // Buttons + Length + Search + Table + Info + Pagination
-        buttons: [
-          { extend: 'copy', text: 'نسخ' },
-          { extend: 'excel', text: 'تصدير Excel' },
-          { extend: 'csv', text: 'تصدير CSV' },
-          { extend: 'pdf', text: 'تصدير PDF' },
-          { extend: 'print', text: 'طباعة' }
-        ],
-        language: {
-          url: "https:/ems/assets/i18n/datatables/ar.json",
-          processing: '<i class="fas fa-spinner fa-spin fa-3x"></i><br>جاري التحميل...'
+        error: function (xhr, error, thrown) {
+          console.error('DataTables AJAX Error:', error, thrown);
         }
-      });
-
-      // Update table when sidebar toggles
-      const sidebarToggle = document.getElementById('toggleBtn');
-      if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', function() {
-          setTimeout(function() {
-            table.columns.adjust().draw();
-          }, 400);
-        });
-      }
-
-      // Toggle form visibility
-      const toggleFormBtn = document.getElementById('toggleForm');
-      const form = document.getElementById('projectForm');
-
-      console.log('Toggle button:', toggleFormBtn);
-      console.log('Form element:', form);
-
-      if (toggleFormBtn && form) {
-        toggleFormBtn.addEventListener('click', function (e) {
-          e.preventDefault();
-          console.log('Toggle clicked, current state:', form.classList.contains('allforms-visible'));
-          form.classList.toggle('allforms-visible');
-        });
-      } else {
-        console.error('Toggle button or form not found!');
+      },
+      columns: [
+        { data: 0, orderable: false }, // #
+        { data: 1 }, // ID
+        { data: 2 }, // المعدة
+        { data: 3 }, // التاريخ
+        { data: 4, orderable: false }, // الوردية
+        { data: 5 }, // الساعات المنفذة
+        { data: 6 }, // الجردل
+        { data: 7 }, // الجاكهمر
+        { data: 8 }, // الإضافية
+        { data: 9 }, // الاستعداد
+        { data: 10 }, // الأعطال
+        { data: 11 }, // ساعات العمل
+        { data: 12, orderable: false }, // الإجمالي
+        // { data: 13 }, // الحالة
+        { data: 14, orderable: false } // إجراءات
+      ],
+      order: [[3, 'desc']], // Sort by date descending by default
+      pageLength: 10,
+      lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "الكل"]],
+      scrollX: true,
+      fixedHeader: true,
+      dom: 'Blfrtip', // Buttons + Length + Search + Table + Info + Pagination
+      buttons: [
+        { extend: 'copy', text: 'نسخ' },
+        { extend: 'excel', text: 'تصدير Excel' },
+        { extend: 'csv', text: 'تصدير CSV' },
+        { extend: 'pdf', text: 'تصدير PDF' },
+        { extend: 'print', text: 'طباعة' }
+      ],
+      language: {
+        url: "https:/ems/assets/i18n/datatables/ar.json",
+        processing: '<i class="fas fa-spinner fa-spin fa-3x"></i><br>جاري التحميل...'
       }
     });
+
+    // Update table when sidebar toggles
+    const sidebarToggle = document.getElementById('toggleBtn');
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', function () {
+        setTimeout(function () {
+          table.columns.adjust().draw();
+        }, 400);
+      });
+    }
+
+    // Toggle form visibility
+    const toggleFormBtn = document.getElementById('toggleForm');
+    const form = document.getElementById('projectForm');
+
+    console.log('Toggle button:', toggleFormBtn);
+    console.log('Form element:', form);
+
+    if (toggleFormBtn && form) {
+      toggleFormBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        console.log('Toggle clicked, current state:', form.classList.contains('allforms-visible'));
+        form.classList.toggle('allforms-visible');
+      });
+    } else {
+      console.error('Toggle button or form not found!');
+    }
+  });
 
   function loadMachineData() {
     let id = document.getElementById("cost_code").value;
@@ -1668,31 +1789,31 @@ if (!$is_super_admin) {
   // ✅ التحقق من ساعات الأعطال قبل إرسال النموذج
   const projectForm = document.getElementById('projectForm');
   if (projectForm) {
-    projectForm.addEventListener('submit', function(e) {
+    projectForm.addEventListener('submit', function (e) {
       const totalFaultHours = parseFloat(document.querySelector("input[name='total_fault_hours']").value) || 0;
-      
+
       if (totalFaultHours > 0) {
         const hrFault = parseFloat(document.querySelector("input[name='hr_fault']").value) || 0;
         const maintenanceFault = parseFloat(document.querySelector("input[name='maintenance_fault']").value) || 0;
         const marketingFault = parseFloat(document.querySelector("input[name='marketing_fault']").value) || 0;
         const approvalFault = parseFloat(document.querySelector("input[name='approval_fault']").value) || 0;
         const otherFaultHours = parseFloat(document.querySelector("input[name='other_fault_hours']").value) || 0;
-        
+
         const totalFaultsSum = hrFault + maintenanceFault + marketingFault + approvalFault + otherFaultHours;
-        
+
         // يجب أن يكون المجموع مساوياً لمجموع ساعات التعطل
         if (totalFaultsSum !== totalFaultHours) {
           e.preventDefault(); // منع إرسال النموذج
           alert('❌ خطأ في توزيع ساعات الأعطال!\n\n' +
-                'مجموع حقول الأعطال: ' + totalFaultsSum.toFixed(2) + ' ساعة\n' +
-                'مجموع ساعات التعطل: ' + totalFaultHours.toFixed(2) + ' ساعة\n\n' +
-                'يجب أن يكون مجموع الحقول التالية مساوياً لمجموع ساعات التعطل:\n' +
-                '• عطل HR\n' +
-                '• عطل صيانة\n' +
-                '• عطل تسويق\n' +
-                '• عطل اعتماد\n' +
-                '• ساعات أعطال أخرى');
-          
+            'مجموع حقول الأعطال: ' + totalFaultsSum.toFixed(2) + ' ساعة\n' +
+            'مجموع ساعات التعطل: ' + totalFaultHours.toFixed(2) + ' ساعة\n\n' +
+            'يجب أن يكون مجموع الحقول التالية مساوياً لمجموع ساعات التعطل:\n' +
+            '• عطل HR\n' +
+            '• عطل صيانة\n' +
+            '• عطل تسويق\n' +
+            '• عطل اعتماد\n' +
+            '• ساعات أعطال أخرى');
+
           // التمرير إلى قسم الأعطال
           const faultsSection = document.querySelector("input[name='hr_fault']");
           if (faultsSection) {
@@ -1719,7 +1840,7 @@ if (!$is_super_admin) {
   function calculateCustomHours() {
     var machineType = "<?php echo $_GET['type']; ?>";
     let executed = 0;
-    
+
     // حساب الساعات المنفذة تلقائياً فقط للحفارات (type=1)
     if (machineType === "1") {
       let bucketHours = parseFloat(document.querySelector("input[name='bucket_hours']").value) || 0;
@@ -1727,7 +1848,7 @@ if (!$is_super_admin) {
       let extraHours = parseFloat(document.querySelector("input[name='extra_hours']").value) || 0;
       let standby = parseFloat(document.querySelector("input[name='standby_hours']").value) || 0;
       let dependence = parseFloat(document.querySelector("input[name='dependence_hours']").value) || 0;
-      
+
       // الساعات المنفذة = ساعات الجردل + ساعات الجاك همر + الساعات الإضافية + ساعات الاستعداد (بسبب العميل) + ساعات الاستعداد (اعتماد)
       executed = bucketHours + jackhammer + extraHours + standby + dependence;
       document.querySelector("input[name='executed_hours']").value = executed;
@@ -1735,7 +1856,7 @@ if (!$is_super_admin) {
       // بالنسبة للقلابات (type=2) والخرامات (type=3)، نأخذ القيمة المدخلة يدوياً
       executed = parseFloat(document.querySelector("input[name='executed_hours']").value) || 0;
     }
-    
+
     // ✅ نسخ قيمة ساعات إضافية إلى مجموع الساعات الإضافية تلقائياً
     let extraHours = parseFloat(document.querySelector("input[name='extra_hours']").value) || 0;
     document.querySelector("input[name='extra_hours_total']").value = extraHours;
@@ -1776,7 +1897,7 @@ if (!$is_super_admin) {
     }
     document.querySelector("input[name='operator_standby_hours']").value = operatorStandby;
 
-    // اسناد قيمة استعدات الاليه 
+    // اسناد قيمة استعدات الاليه
     document.querySelector("input[name='machine_standby_hours']").value = standby;
   }
 
@@ -1793,7 +1914,7 @@ if (!$is_super_admin) {
     function calculateMetersCount() {
       let holesCount = parseFloat(document.querySelector("input[name='drilling_holes_count']").value) || 0;
       let drillingDepth = parseFloat(document.querySelector("input[name='drilling_depth']").value) || 0;
-      
+
       // عدد الأمتار = عدد الحفر × عمق الحفر
       let metersCount = holesCount * drillingDepth;
       document.querySelector("input[name='meters_count']").value = metersCount.toFixed(2);
@@ -1802,7 +1923,7 @@ if (!$is_super_admin) {
     // ربط الدالة بحقلي عدد الحفر وأعماق الحفر
     document.querySelectorAll("input[name='drilling_holes_count'], input[name='drilling_depth']")
       .forEach(el => el.addEventListener("input", calculateMetersCount));
-    
+
     // استدعاء أول مرة
     calculateMetersCount();
   }
@@ -1891,7 +2012,7 @@ if (!$is_super_admin) {
           success: function (response) {
             console.log("✅ تم جلب ساعات الوردية:", response);
             $("#shift_hours").val(response); // عرض القيمة داخل input
-            
+
             // إعادة حساب الحقول الأخرى تلقائياً بعد تحميل ساعات الوردية
             calculateCustomHours();
           },
@@ -1991,396 +2112,394 @@ if (!$is_super_admin) {
 
 <!-- ==================== نظام الأعطال المتتالي ==================== -->
 <script>
-(function() {
-  // نوع المعدة من PHP (1=حفار, 2=قلاب, 3=خرامة)
-  var equipType = parseInt('<?= intval($type) ?>') || 1;
-  var faultItems = [];
+  (function () {
+    // نوع المعدة من PHP (1=حفار, 2=قلاب, 3=خرامة)
+    var equipType = parseInt('<?= intval($type) ?>') || 1;
+    var faultItems = [];
 
-  var BASE_URL = '<?= (strpos($_SERVER['PHP_SELF'], '/Timesheet/') !== false) ? '' : 'Timesheet/' ?>get_failure_codes.php';
+    var BASE_URL = '<?= (strpos($_SERVER['PHP_SELF'], '/Timesheet/') !== false) ? '' : 'Timesheet/' ?>get_failure_codes.php';
 
-  // ============================
-  // دالة مساعدة: ملء القائمة
-  // ============================
-  function fillSelect(sel, options, placeholder) {
-    sel.empty().append($('<option>').val('').text(placeholder)).prop('disabled', false).css('opacity', 1);
-    $.each(options, function(i, o) {
-      sel.append($('<option>').val(o.value).text(o.label).data('extra', o.extra || ''));
-    });
-  }
-  function resetSelect(sel, placeholder) {
-    sel.empty().append($('<option>').val('').text(placeholder)).prop('disabled', true).css('opacity', 0.6);
-  }
-
-  function firstExistingSelector(candidates) {
-    for (var i = 0; i < candidates.length; i++) {
-      if ($(candidates[i]).length) {
-        return candidates[i];
-      }
+    // ============================
+    // دالة مساعدة: ملء القائمة
+    // ============================
+    function fillSelect(sel, options, placeholder) {
+      sel.empty().append($('<option>').val('').text(placeholder)).prop('disabled', false).css('opacity', 1);
+      $.each(options, function (i, o) {
+        sel.append($('<option>').val(o.value).text(o.label).data('extra', o.extra || ''));
+      });
     }
-    return null;
-  }
+    function resetSelect(sel, placeholder) {
+      sel.empty().append($('<option>').val('').text(placeholder)).prop('disabled', true).css('opacity', 0.6);
+    }
 
-  function getActiveFaultControls() {
-    var selectors = {
-      event: firstExistingSelector(['#fc_event_type', '#fc_event_type_edit', '#fc_event_type_f3']),
-      main: firstExistingSelector(['#fc_main_cat', '#fc_main_cat_edit', '#fc_main_cat_f3']),
-      sub: firstExistingSelector(['#fc_sub_cat', '#fc_sub_cat_edit', '#fc_sub_cat_f3']),
-      detail: firstExistingSelector(['#fc_detail', '#fc_detail_edit', '#fc_detail_f3'])
-    };
-
-    if (!selectors.event || !selectors.main || !selectors.sub || !selectors.detail) {
+    function firstExistingSelector(candidates) {
+      for (var i = 0; i < candidates.length; i++) {
+        if ($(candidates[i]).length) {
+          return candidates[i];
+        }
+      }
       return null;
     }
 
-    return {
-      event: $(selectors.event),
-      main: $(selectors.main),
-      sub: $(selectors.sub),
-      detail: $(selectors.detail)
-    };
-  }
+    function getActiveFaultControls() {
+      var selectors = {
+        event: firstExistingSelector(['#fc_event_type', '#fc_event_type_edit', '#fc_event_type_f3']),
+        main: firstExistingSelector(['#fc_main_cat', '#fc_main_cat_edit', '#fc_main_cat_f3']),
+        sub: firstExistingSelector(['#fc_sub_cat', '#fc_sub_cat_edit', '#fc_sub_cat_f3']),
+        detail: firstExistingSelector(['#fc_detail', '#fc_detail_edit', '#fc_detail_f3'])
+      };
 
-  function syncLegacyFaultFields() {
-    if (!faultItems.length) {
-      $('#fault_type').val('');
-      $('#fault_department').val('');
-      $('#fault_part').val('');
-      $('#fault_details').val('');
-      return;
+      if (!selectors.event || !selectors.main || !selectors.sub || !selectors.detail) {
+        return null;
+      }
+
+      return {
+        event: $(selectors.event),
+        main: $(selectors.main),
+        sub: $(selectors.sub),
+        detail: $(selectors.detail)
+      };
     }
 
-    var first = faultItems[0];
-    $('#fault_type').val(first.event_type_name || '');
-    $('#fault_department').val(first.main_category_name || '');
-    $('#fault_part').val(first.sub_category || '');
-    $('#fault_details').val((first.full_code || '') + ' | ' + (first.failure_detail || ''));
-  }
+    function syncLegacyFaultFields() {
+      if (!faultItems.length) {
+        $('#fault_type').val('');
+        $('#fault_department').val('');
+        $('#fault_part').val('');
+        $('#fault_details').val('');
+        return;
+      }
 
-  function renderFaultItemsTable() {
-    var body = $('#faultsSelectedBody');
-    if (!body.length) {
-      return;
+      var first = faultItems[0];
+      $('#fault_type').val(first.event_type_name || '');
+      $('#fault_department').val(first.main_category_name || '');
+      $('#fault_part').val(first.sub_category || '');
+      $('#fault_details').val((first.full_code || '') + ' | ' + (first.failure_detail || ''));
     }
 
-    body.empty();
-    if (!faultItems.length) {
-      body.append('<tr><td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا توجد أعطال مضافة بعد</td></tr>');
-    } else {
-      $.each(faultItems, function(i, item) {
-        var rowHtml = '' +
-          '<tr>' +
-          '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.full_code || '') + '</td>' +
-          '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.event_type_name || '') + '</td>' +
-          '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.main_category_name || '') + '</td>' +
-          '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.sub_category || '') + '</td>' +
-          '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.failure_detail || '') + '</td>' +
-          '<td style="padding:6px; border:1px solid #e9ecef; text-align:center;">' +
+    function renderFaultItemsTable() {
+      var body = $('#faultsSelectedBody');
+      if (!body.length) {
+        return;
+      }
+
+      body.empty();
+      if (!faultItems.length) {
+        body.append('<tr><td colspan="6" style="padding:8px; text-align:center; border:1px solid #e9ecef; color:#6c757d;">لا توجد أعطال مضافة بعد</td></tr>');
+      } else {
+        $.each(faultItems, function (i, item) {
+          var rowHtml = '' +
+            '<tr>' +
+            '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.full_code || '') + '</td>' +
+            '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.event_type_name || '') + '</td>' +
+            '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.main_category_name || '') + '</td>' +
+            '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.sub_category || '') + '</td>' +
+            '<td style="padding:6px; border:1px solid #e9ecef;">' + (item.failure_detail || '') + '</td>' +
+            '<td style="padding:6px; border:1px solid #e9ecef; text-align:center;">' +
             '<button type="button" class="removeFaultBtn" data-index="' + i + '" style="padding:4px 8px; border-radius:4px; border:1px solid #dc3545; background:#fff; color:#dc3545;">حذف</button>' +
-          '</td>' +
-          '</tr>';
-        body.append(rowHtml);
-      });
-    }
-
-    $('#fault_items_json').val(JSON.stringify(faultItems));
-    syncLegacyFaultFields();
-  }
-
-  function getCurrentFaultSelection() {
-    var controls = getActiveFaultControls();
-    if (!controls) {
-      return null;
-    }
-
-    var eventVal = controls.event.val();
-    var mainVal = controls.main.val();
-    var subVal = controls.sub.val();
-    var fullCode = controls.detail.val();
-
-    if (!eventVal || !mainVal || !subVal || !fullCode) {
-      return null;
-    }
-
-    var detailOpt = controls.detail.find('option:selected');
-    var failureCodeId = parseInt(detailOpt.data('extra')) || 0;
-
-    return {
-      failure_code_id: failureCodeId,
-      event_type_code: eventVal,
-      event_type_name: controls.event.find('option:selected').text(),
-      main_category_code: mainVal,
-      main_category_name: controls.main.find('option:selected').text(),
-      sub_category: subVal,
-      failure_detail: detailOpt.text(),
-      full_code: fullCode
-    };
-  }
-
-  // ============================
-  // وظيفة إنشاء نظام لفورم معين
-  // ============================
-  function initFailureSystem(opts) {
-    var eqType   = opts.eqType;
-    var selEvent = $(opts.selEvent);
-    var selMain  = $(opts.selMain);
-    var selSub   = $(opts.selSub);
-    var selDet   = $(opts.selDet);
-    var codeDisp = $(opts.codeDisp);
-    var codeTxt  = $(opts.codeTxt);
-    var hidType  = $(opts.hidType);
-    var hidDept  = $(opts.hidDept);
-    var hidPart  = $(opts.hidPart);
-    var hidDet   = $(opts.hidDet);
-
-    // 1. تحميل أنواع الأحداث
-    $.getJSON(BASE_URL, { action: 'get_event_types', equipment_type: eqType }, function(res) {
-      if (res && res.length) {
-        fillSelect(selEvent, res.map(function(r) {
-          return { value: r.event_type_code, label: r.event_type_name };
-        }), '-- اختر نوع الحدث --');
+            '</td>' +
+            '</tr>';
+          body.append(rowHtml);
+        });
       }
-    });
 
-    // 2. تغيير نوع الحدث → تحميل الفئات
-    selEvent.on('change', function() {
-      resetSelect(selMain, '-- اختر الفئة --');
-      resetSelect(selSub, '-- اختر الجزء --');
-      resetSelect(selDet, '-- اختر التفصيل --');
-      codeDisp.hide();
-      hidType.val($(this).find('option:selected').text());
-      hidDept.val(''); hidPart.val(''); hidDet.val('');
-      var code = $(this).val();
-      if (!code) return;
-      $.getJSON(BASE_URL, { action: 'get_main_cats', equipment_type: eqType, event_type_code: code }, function(res) {
+      $('#fault_items_json').val(JSON.stringify(faultItems));
+      syncLegacyFaultFields();
+    }
+
+    function getCurrentFaultSelection() {
+      var controls = getActiveFaultControls();
+      if (!controls) {
+        return null;
+      }
+
+      var eventVal = controls.event.val();
+      var mainVal = controls.main.val();
+      var subVal = controls.sub.val();
+      var fullCode = controls.detail.val();
+
+      if (!eventVal || !mainVal || !subVal || !fullCode) {
+        return null;
+      }
+
+      var detailOpt = controls.detail.find('option:selected');
+      var failureCodeId = parseInt(detailOpt.data('extra')) || 0;
+
+      return {
+        failure_code_id: failureCodeId,
+        event_type_code: eventVal,
+        event_type_name: controls.event.find('option:selected').text(),
+        main_category_code: mainVal,
+        main_category_name: controls.main.find('option:selected').text(),
+        sub_category: subVal,
+        failure_detail: detailOpt.text(),
+        full_code: fullCode
+      };
+    }
+
+    // ============================
+    // وظيفة إنشاء نظام لفورم معين
+    // ============================
+    function initFailureSystem(opts) {
+      var eqType = opts.eqType;
+      var selEvent = $(opts.selEvent);
+      var selMain = $(opts.selMain);
+      var selSub = $(opts.selSub);
+      var selDet = $(opts.selDet);
+      var codeDisp = $(opts.codeDisp);
+      var codeTxt = $(opts.codeTxt);
+      var hidType = $(opts.hidType);
+      var hidDept = $(opts.hidDept);
+      var hidPart = $(opts.hidPart);
+      var hidDet = $(opts.hidDet);
+
+      // 1. تحميل أنواع الأحداث
+      $.getJSON(BASE_URL, { action: 'get_event_types', equipment_type: eqType }, function (res) {
         if (res && res.length) {
-          fillSelect(selMain, res.map(function(r) {
-            return { value: r.main_category_code, label: r.main_category_name };
-          }), '-- اختر الفئة --');
+          fillSelect(selEvent, res.map(function (r) {
+            return { value: r.event_type_code, label: r.event_type_name };
+          }), '-- اختر نوع الحدث --');
         }
       });
-    });
 
-    // 3. تغيير الفئة الرئيسية → تحميل الأجزاء
-    selMain.on('change', function() {
-      resetSelect(selSub, '-- اختر الجزء --');
-      resetSelect(selDet, '-- اختر التفصيل --');
-      codeDisp.hide();
-      hidDept.val($(this).find('option:selected').text());
-      hidPart.val(''); hidDet.val('');
-      var mainCode = $(this).val();
-      if (!mainCode) return;
-      $.getJSON(BASE_URL, { action: 'get_sub_cats', equipment_type: eqType, event_type_code: selEvent.val(), main_cat_code: mainCode }, function(res) {
-        if (res && res.length) {
-          fillSelect(selSub, res.map(function(r) {
-            return { value: r, label: r };
-          }), '-- اختر الجزء --');
-        }
+      // 2. تغيير نوع الحدث → تحميل الفئات
+      selEvent.on('change', function () {
+        resetSelect(selMain, '-- اختر الفئة --');
+        resetSelect(selSub, '-- اختر الجزء --');
+        resetSelect(selDet, '-- اختر التفصيل --');
+        codeDisp.hide();
+        hidType.val($(this).find('option:selected').text());
+        hidDept.val(''); hidPart.val(''); hidDet.val('');
+        var code = $(this).val();
+        if (!code) return;
+        $.getJSON(BASE_URL, { action: 'get_main_cats', equipment_type: eqType, event_type_code: code }, function (res) {
+          if (res && res.length) {
+            fillSelect(selMain, res.map(function (r) {
+              return { value: r.main_category_code, label: r.main_category_name };
+            }), '-- اختر الفئة --');
+          }
+        });
       });
-    });
 
-    // 4. تغيير الجزء → تحميل التفصيل
-    selSub.on('change', function() {
-      resetSelect(selDet, '-- اختر التفصيل --');
-      codeDisp.hide();
-      hidPart.val($(this).val());
-      hidDet.val('');
-      var sub = $(this).val();
-      if (!sub) return;
-      $.getJSON(BASE_URL, { action: 'get_details', equipment_type: eqType, event_type_code: selEvent.val(), main_cat_code: selMain.val(), sub_cat: sub }, function(res) {
-        if (res && res.length) {
-          fillSelect(selDet, res.map(function(r) {
-            return { value: r.full_code, label: r.failure_detail, extra: r.id };
-          }), '-- اختر التفصيل --');
-        }
+      // 3. تغيير الفئة الرئيسية → تحميل الأجزاء
+      selMain.on('change', function () {
+        resetSelect(selSub, '-- اختر الجزء --');
+        resetSelect(selDet, '-- اختر التفصيل --');
+        codeDisp.hide();
+        hidDept.val($(this).find('option:selected').text());
+        hidPart.val(''); hidDet.val('');
+        var mainCode = $(this).val();
+        if (!mainCode) return;
+        $.getJSON(BASE_URL, { action: 'get_sub_cats', equipment_type: eqType, event_type_code: selEvent.val(), main_cat_code: mainCode }, function (res) {
+          if (res && res.length) {
+            fillSelect(selSub, res.map(function (r) {
+              return { value: r, label: r };
+            }), '-- اختر الجزء --');
+          }
+        });
       });
-    });
 
-    // 5. تغيير التفصيل → تعبئة الحقول المخفية وعرض الكود
-    selDet.on('change', function() {
-      var fullCode = $(this).val();
-      var detText  = $(this).find('option:selected').text();
-      if (!fullCode) { codeDisp.hide(); hidDet.val(''); return; }
-      hidDet.val(fullCode + ' | ' + detText);
-      codeTxt.text(fullCode);
-      codeDisp.show();
-    });
+      // 4. تغيير الجزء → تحميل التفصيل
+      selSub.on('change', function () {
+        resetSelect(selDet, '-- اختر التفصيل --');
+        codeDisp.hide();
+        hidPart.val($(this).val());
+        hidDet.val('');
+        var sub = $(this).val();
+        if (!sub) return;
+        $.getJSON(BASE_URL, { action: 'get_details', equipment_type: eqType, event_type_code: selEvent.val(), main_cat_code: selMain.val(), sub_cat: sub }, function (res) {
+          if (res && res.length) {
+            fillSelect(selDet, res.map(function (r) {
+              return { value: r.full_code, label: r.failure_detail, extra: r.id };
+            }), '-- اختر التفصيل --');
+          }
+        });
+      });
 
-    // 6. دالة تحميل قيم موجودة (للتعديل)
-    return {
-      load: function(ft, fd, fp, fdet) {
-        if (!fdet) return;
-        var fullCode = fdet.split(' | ')[0].trim();
-        $.getJSON(BASE_URL, { action: 'get_by_code', full_code: fullCode }, function(r) {
-          if (!r) return;
-          $.getJSON(BASE_URL, { action: 'get_event_types', equipment_type: eqType }, function(res2) {
-            if (!res2 || !res2.length) return;
-            fillSelect(selEvent, res2.map(function(x) {
-              return { value: x.event_type_code, label: x.event_type_name };
-            }), '-- اختر نوع الحدث --');
-            selEvent.val(r.event_type_code);
-            hidType.val(selEvent.find('option:selected').text());
-            $.getJSON(BASE_URL, { action: 'get_main_cats', equipment_type: eqType, event_type_code: r.event_type_code }, function(res3) {
-              if (!res3 || !res3.length) return;
-              fillSelect(selMain, res3.map(function(x) {
-                return { value: x.main_category_code, label: x.main_category_name };
-              }), '-- اختر الفئة --');
-              selMain.val(r.main_category_code);
-              hidDept.val(selMain.find('option:selected').text());
-              $.getJSON(BASE_URL, { action: 'get_sub_cats', equipment_type: eqType, event_type_code: r.event_type_code, main_cat_code: r.main_category_code }, function(res4) {
-                if (!res4 || !res4.length) return;
-                fillSelect(selSub, res4.map(function(x) {
-                  return { value: x, label: x };
-                }), '-- اختر الجزء --');
-                selSub.val(r.sub_category);
-                hidPart.val(r.sub_category);
-                $.getJSON(BASE_URL, { action: 'get_details', equipment_type: eqType, event_type_code: r.event_type_code, main_cat_code: r.main_category_code, sub_cat: r.sub_category }, function(res5) {
-                  if (!res5 || !res5.length) return;
-                  fillSelect(selDet, res5.map(function(x) {
-                    return { value: x.full_code, label: x.failure_detail, extra: x.id };
-                  }), '-- اختر التفصيل --');
-                  selDet.val(r.full_code);
-                  hidDet.val(r.full_code + ' | ' + r.failure_detail);
-                  codeTxt.text(r.full_code);
-                  codeDisp.show();
+      // 5. تغيير التفصيل → تعبئة الحقول المخفية وعرض الكود
+      selDet.on('change', function () {
+        var fullCode = $(this).val();
+        var detText = $(this).find('option:selected').text();
+        if (!fullCode) { codeDisp.hide(); hidDet.val(''); return; }
+        hidDet.val(fullCode + ' | ' + detText);
+        codeTxt.text(fullCode);
+        codeDisp.show();
+      });
+
+      // 6. دالة تحميل قيم موجودة (للتعديل)
+      return {
+        load: function (ft, fd, fp, fdet) {
+          if (!fdet) return;
+          var fullCode = fdet.split(' | ')[0].trim();
+          $.getJSON(BASE_URL, { action: 'get_by_code', full_code: fullCode }, function (r) {
+            if (!r) return;
+            $.getJSON(BASE_URL, { action: 'get_event_types', equipment_type: eqType }, function (res2) {
+              if (!res2 || !res2.length) return;
+              fillSelect(selEvent, res2.map(function (x) {
+                return { value: x.event_type_code, label: x.event_type_name };
+              }), '-- اختر نوع الحدث --');
+              selEvent.val(r.event_type_code);
+              hidType.val(selEvent.find('option:selected').text());
+              $.getJSON(BASE_URL, { action: 'get_main_cats', equipment_type: eqType, event_type_code: r.event_type_code }, function (res3) {
+                if (!res3 || !res3.length) return;
+                fillSelect(selMain, res3.map(function (x) {
+                  return { value: x.main_category_code, label: x.main_category_name };
+                }), '-- اختر الفئة --');
+                selMain.val(r.main_category_code);
+                hidDept.val(selMain.find('option:selected').text());
+                $.getJSON(BASE_URL, { action: 'get_sub_cats', equipment_type: eqType, event_type_code: r.event_type_code, main_cat_code: r.main_category_code }, function (res4) {
+                  if (!res4 || !res4.length) return;
+                  fillSelect(selSub, res4.map(function (x) {
+                    return { value: x, label: x };
+                  }), '-- اختر الجزء --');
+                  selSub.val(r.sub_category);
+                  hidPart.val(r.sub_category);
+                  $.getJSON(BASE_URL, { action: 'get_details', equipment_type: eqType, event_type_code: r.event_type_code, main_cat_code: r.main_category_code, sub_cat: r.sub_category }, function (res5) {
+                    if (!res5 || !res5.length) return;
+                    fillSelect(selDet, res5.map(function (x) {
+                      return { value: x.full_code, label: x.failure_detail, extra: x.id };
+                    }), '-- اختر التفصيل --');
+                    selDet.val(r.full_code);
+                    hidDet.val(r.full_code + ' | ' + r.failure_detail);
+                    codeTxt.text(r.full_code);
+                    codeDisp.show();
+                  });
                 });
               });
             });
           });
-        });
-      }
-    };
-  }
-
-  // ============================
-  // تهيئة الأنظمة الثلاثة
-  // ============================
-  var sys1 = initFailureSystem({
-    eqType:   equipType === 3 ? 1 : equipType, // الفورم 1 للحفار أو القلاب
-    selEvent: '#fc_event_type',
-    selMain:  '#fc_main_cat',
-    selSub:   '#fc_sub_cat',
-    selDet:   '#fc_detail',
-    codeDisp: '#fc_code_display_add',
-    codeTxt:  '#fc_code_text_add',
-    hidType:  '#fault_type',
-    hidDept:  '#fault_department',
-    hidPart:  '#fault_part',
-    hidDet:   '#fault_details'
-  });
-
-  var sys3 = initFailureSystem({
-    eqType:   3, // الفورم 3 للخرامة دائماً
-    selEvent: '#fc_event_type_f3',
-    selMain:  '#fc_main_cat_f3',
-    selSub:   '#fc_sub_cat_f3',
-    selDet:   '#fc_detail_f3',
-    codeDisp: '#fc_code_display_f3',
-    codeTxt:  '#fc_code_text_f3',
-    hidType:  'input[name="fault_type"]:last',
-    hidDept:  'input[name="fault_department"]:last',
-    hidPart:  'input[name="fault_part"]:last',
-    hidDet:   'input[name="fault_details"]:last'
-  });
-
-  var sysEdit = initFailureSystem({
-    eqType:   equipType,
-    selEvent: '#fc_event_type_edit',
-    selMain:  '#fc_main_cat_edit',
-    selSub:   '#fc_sub_cat_edit',
-    selDet:   '#fc_detail_edit',
-    codeDisp: '#fc_code_display_edit',
-    codeTxt:  '#fc_code_text_edit',
-    hidType:  '#fault_type',
-    hidDept:  '#fault_department',
-    hidPart:  '#fault_part',
-    hidDet:   '#fault_details'
-  });
-
-  $(document).on('click', '#addFaultBtn', function() {
-    var selected = getCurrentFaultSelection();
-    if (!selected) {
-      alert('يرجى اختيار تسلسل العطل كاملاً قبل الإضافة.');
-      return;
+        }
+      };
     }
 
-    var exists = false;
-    for (var i = 0; i < faultItems.length; i++) {
-      if (faultItems[i].full_code === selected.full_code) {
-        exists = true;
-        break;
-      }
-    }
-    if (exists) {
-      alert('هذا العطل مضاف مسبقاً في نفس التايم شيت.');
-      return;
-    }
+    // ============================
+    // تهيئة الأنظمة الثلاثة
+    // ============================
+    var sys1 = initFailureSystem({
+      eqType: equipType === 3 ? 1 : equipType, // الفورم 1 للحفار أو القلاب
+      selEvent: '#fc_event_type',
+      selMain: '#fc_main_cat',
+      selSub: '#fc_sub_cat',
+      selDet: '#fc_detail',
+      codeDisp: '#fc_code_display_add',
+      codeTxt: '#fc_code_text_add',
+      hidType: '#fault_type',
+      hidDept: '#fault_department',
+      hidPart: '#fault_part',
+      hidDet: '#fault_details'
+    });
 
-    faultItems.push(selected);
-    renderFaultItemsTable();
-  });
+    var sys3 = initFailureSystem({
+      eqType: 3, // الفورم 3 للخرامة دائماً
+      selEvent: '#fc_event_type_f3',
+      selMain: '#fc_main_cat_f3',
+      selSub: '#fc_sub_cat_f3',
+      selDet: '#fc_detail_f3',
+      codeDisp: '#fc_code_display_f3',
+      codeTxt: '#fc_code_text_f3',
+      hidType: 'input[name="fault_type"]:last',
+      hidDept: 'input[name="fault_department"]:last',
+      hidPart: 'input[name="fault_part"]:last',
+      hidDet: 'input[name="fault_details"]:last'
+    });
 
-  $(document).on('click', '.removeFaultBtn', function() {
-    var idx = parseInt($(this).data('index'));
-    if (isNaN(idx) || idx < 0 || idx >= faultItems.length) {
-      return;
-    }
-    faultItems.splice(idx, 1);
-    renderFaultItemsTable();
-  });
+    var sysEdit = initFailureSystem({
+      eqType: equipType,
+      selEvent: '#fc_event_type_edit',
+      selMain: '#fc_main_cat_edit',
+      selSub: '#fc_sub_cat_edit',
+      selDet: '#fc_detail_edit',
+      codeDisp: '#fc_code_display_edit',
+      codeTxt: '#fc_code_text_edit',
+      hidType: '#fault_type',
+      hidDept: '#fault_department',
+      hidPart: '#fault_part',
+      hidDet: '#fault_details'
+    });
 
-  window.loadTimesheetFaultItems = function(timesheetId) {
-    faultItems = [];
-    renderFaultItemsTable();
-    if (!timesheetId) {
-      return;
-    }
-
-    $.getJSON('get_timesheet_failures.php', { timesheet_id: timesheetId }, function(res) {
-      if (!res || !res.success || !res.data || !res.data.length) {
+    $(document).on('click', '#addFaultBtn', function () {
+      var selected = getCurrentFaultSelection();
+      if (!selected) {
+        alert('يرجى اختيار تسلسل العطل كاملاً قبل الإضافة.');
         return;
       }
-      faultItems = res.data.map(function(r) {
-        return {
-          failure_code_id: parseInt(r.failure_code_id) || 0,
-          event_type_code: r.event_type_code || '',
-          event_type_name: r.event_type_name || '',
-          main_category_code: r.main_category_code || '',
-          main_category_name: r.main_category_name || '',
-          sub_category: r.sub_category || '',
-          failure_detail: r.failure_detail || '',
-          full_code: r.full_code || ''
-        };
-      });
+
+      var exists = false;
+      for (var i = 0; i < faultItems.length; i++) {
+        if (faultItems[i].full_code === selected.full_code) {
+          exists = true;
+          break;
+        }
+      }
+      if (exists) {
+        alert('هذا العطل مضاف مسبقاً في نفس التايم شيت.');
+        return;
+      }
+
+      faultItems.push(selected);
       renderFaultItemsTable();
     });
-  };
 
-  renderFaultItemsTable();
-
-  // ============================
-  // تحميل بيانات التعديل عند فتح فورم التعديل
-  // ============================
-  $(document).on('click', '.editBtn', function() {
-    var row = $(this).closest('tr');
-    // الانتظار قليلاً حتى تُحمل بيانات السجل في الحقول
-    setTimeout(function() {
-      var ft   = $('#fault_type').val();
-      var fd   = $('#fault_department').val();
-      var fp   = $('#fault_part').val();
-      var fdet = $('#fault_details').val();
-      if (fdet) {
-        // تحديد نوع المعدة من حقل مخفي إن وجد أو استخدام equipType
-        var rowType = row.data('type') || equipType;
-        sysEdit.load(ft, fd, fp, fdet);
+    $(document).on('click', '.removeFaultBtn', function () {
+      var idx = parseInt($(this).data('index'));
+      if (isNaN(idx) || idx < 0 || idx >= faultItems.length) {
+        return;
       }
-    }, 400);
-  });
+      faultItems.splice(idx, 1);
+      renderFaultItemsTable();
+    });
 
-})();
+    window.loadTimesheetFaultItems = function (timesheetId) {
+      faultItems = [];
+      renderFaultItemsTable();
+      if (!timesheetId) {
+        return;
+      }
+
+      $.getJSON('get_timesheet_failures.php', { timesheet_id: timesheetId }, function (res) {
+        if (!res || !res.success || !res.data || !res.data.length) {
+          return;
+        }
+        faultItems = res.data.map(function (r) {
+          return {
+            failure_code_id: parseInt(r.failure_code_id) || 0,
+            event_type_code: r.event_type_code || '',
+            event_type_name: r.event_type_name || '',
+            main_category_code: r.main_category_code || '',
+            main_category_name: r.main_category_name || '',
+            sub_category: r.sub_category || '',
+            failure_detail: r.failure_detail || '',
+            full_code: r.full_code || ''
+          };
+        });
+        renderFaultItemsTable();
+      });
+    };
+
+    renderFaultItemsTable();
+
+    // ============================
+    // تحميل بيانات التعديل عند فتح فورم التعديل
+    // ============================
+    $(document).on('click', '.editBtn', function () {
+      var row = $(this).closest('tr');
+      // الانتظار قليلاً حتى تُحمل بيانات السجل في الحقول
+      setTimeout(function () {
+        var ft = $('#fault_type').val();
+        var fd = $('#fault_department').val();
+        var fp = $('#fault_part').val();
+        var fdet = $('#fault_details').val();
+        if (fdet) {
+          // تحديد نوع المعدة من حقل مخفي إن وجد أو استخدام equipType
+          var rowType = row.data('type') || equipType;
+          sysEdit.load(ft, fd, fp, fdet);
+        }
+      }, 400);
+    });
+
+  })();
 </script>
 
 </body>
 
 </html>
-
-

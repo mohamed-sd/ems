@@ -419,7 +419,7 @@ if (!empty($all_rows)) {
     $_ts_ids = array_filter(array_map('intval', array_column($all_rows, 'id')));
     if (!empty($_ts_ids)) {
         $_ids_in = implode(',', $_ts_ids);
-        
+
         // Load failure counts
         $_fc_tbl = @$conn->query("SHOW TABLES LIKE 'timesheet_failure_hours'");
         if ($_fc_tbl && $_fc_tbl->num_rows > 0) {
@@ -430,7 +430,7 @@ if (!empty($all_rows)) {
                 }
             }
         }
-        
+
         // Load recorded notes
         $_an_tbl = @$conn->query("SHOW TABLES LIKE 'timesheet_approval_notes'");
         if ($_an_tbl && $_an_tbl->num_rows > 0) {
@@ -498,23 +498,27 @@ include('../insidebar.php');
 </style>
 
 <div class="main timesheet-view-page ems-unified-page-shell">
-    <div class="header">
-        <h1 class="page-title">
-            <div class="title-icon"><i class="fas fa-table"></i></div>
-            شاشة عرض ساعات العمل
-        </h1>
-        <div class="header -actions">
-            <a href="javascript:void(0);" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='../main/dashboard.php'; }" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
+
+<div class="main_head">
+    <div class="head_actions">
             <a href="view_timesheet.php" class="back-btn ts-reset-link">
                 <i class="fas fa-redo"></i> إعادة تعيين
             </a>
             <a href="<?= htmlspecialchars($export_all_url) ?>" class="back-btn ts-export-link">
                 <i class="fas fa-file-export"></i> تصدير كل البيانات حسب الفلترة
             </a>
-        </div>
     </div>
+    <h1 class="head-title">
+        <div class="title-icon"><i class="fas fa-table"></i></div>
+            شاشة عرض ساعات العمل
+    </h1>
+    <div class="head_back">
+      <a href="timesheet_type.php" class="">
+        <i class="fas fa-arrow-right"></i> رجوع
+      </a>
+    </div>
+  </div>
+
 
     <?php if (!$has_filters) { ?>
         <div class="notice-box">

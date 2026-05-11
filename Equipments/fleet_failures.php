@@ -34,7 +34,7 @@ if ($is_export_request) {
     header('Content-Disposition: attachment; filename="failures_report_' . date('Y-m-d') . '.xls"');
     header('Pragma: no-cache');
     header('Expires: 0');
-    
+
     echo "\xEF\xBB\xBF"; // UTF-8 BOM
 }
 
@@ -43,190 +43,9 @@ include '../insidebar.php';
 
 ?>
 
-<link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-
-<style>
-.failures-page .card {
-    border: 1px solid rgba(12, 28, 62, 0.08);
-    border-radius: 14px;
-    box-shadow: 0 8px 24px rgba(12, 28, 62, 0.07);
-}
-
-.failures-page .page-header {
-    background: linear-gradient(140deg, #0c1c3e 0%, #1b2f6e 68%, #243a84 100%);
-    border-radius: 18px;
-    padding: 16px 18px;
-    margin-bottom: 18px;
-    box-shadow: 0 10px 28px rgba(12, 28, 62, 0.2);
-}
-
-.failures-page .page-title {
-    color: #ffffff;
-}
-
-.failures-page .page-title .title-icon {
-    background: rgba(255, 255, 255, 0.14);
-    color: #ffd740;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-}
-
-.hero-note {
-    margin-top: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: #e7edff;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.failures-page .card .card-header {
-    background: #ffffff;
-    border-bottom: 1px solid rgba(12, 28, 62, 0.08);
-    padding: 14px 18px;
-}
-
-.failures-page .card .card-header h5 {
-    margin: 0;
-    color: #0c1c3e;
-    font-weight: 800;
-    font-size: 1rem;
-}
-
-.filter-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.filter-actions .btn {
-    min-width: 125px;
-}
-
-.btn-gold {
-    background: rgba(232, 184, 0, 0.12);
-    color: #6df463;
-    border: 1px solid rgba(232, 184, 0, 0.35);
-}
-
-.btn-gold:hover {
-    background: #e8b800;
-    color: #0c1c3e;
-}
-
-.summary-card {
-    border-radius: 14px;
-    padding: 14px 16px;
-    color: #fff;
-    min-height: 110px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.summary-card h6 {
-    font-size: 0.9rem;
-    margin-bottom: 6px;
-}
-
-.summary-card .summary-value {
-    font-size: 1.7rem;
-    font-weight: 800;
-    line-height: 1;
-}
-
-.filter-counter {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border-radius: 999px;
-    padding: 6px 12px;
-    background: rgba(232, 184, 0, 0.14);
-    color: #0c1c3e;
-    font-weight: 800;
-    font-size: 0.82rem;
-}
-
-.search-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-}
-
-.search-toolbar .search-input-wrap {
-    min-width: 260px;
-    flex: 1;
-    max-width: 420px;
-    position: relative;
-}
-
-.search-toolbar .search-input-wrap i {
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    color: #64748b;
-}
-
-.search-toolbar .search-input-wrap input {
-    padding-right: 34px;
-    border-radius: 10px;
-    border: 1px solid rgba(12, 28, 62, 0.18);
-}
-
-.initial-load-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.82rem;
-    padding: 6px 10px;
-    border-radius: 10px;
-    background: rgba(37, 99, 235, 0.1);
-    color: #1d4ed8;
-    font-weight: 700;
-}
-
-.summary-primary {
-    background: linear-gradient(135deg, #0c1c3e 0%, #1b2f6e 100%);
-}
-
-.summary-gold {
-    background: linear-gradient(135deg, #e8b800 0%, #cf9f00 100%);
-    color: #0c1c3e;
-}
-
-.failures-page .table thead th {
-    white-space: nowrap;
-}
-
-.failures-page code {
-    color: #0c1c3e;
-    background: rgba(12, 28, 62, 0.08);
-    border-radius: 6px;
-    padding: 2px 6px;
-}
-
-@media (max-width: 768px) {
-    .summary-card {
-        min-height: 96px;
-    }
-
-    .failures-page .page-header {
-        padding: 14px;
-    }
-
-    .search-toolbar .search-input-wrap {
-        max-width: 100%;
-    }
-}
-</style>
 
 <?php
 
@@ -286,7 +105,7 @@ if ($filter_project_id > 0) {
 $where_clause = implode(" AND ", $where_conditions);
 
 $query = "
-    SELECT 
+    SELECT
         tfh.*,
         e.code AS equipment_code,
         e.name AS equipment_name,
@@ -325,8 +144,8 @@ if (!$is_super_admin && $company_id > 0) {
 $projects_query .= " ORDER BY p.name";
 $projects_result = mysqli_query($conn, $projects_query);
 
-$main_categories_query = "SELECT DISTINCT main_category_code, main_category_name 
-                          FROM timesheet_failure_hours 
+$main_categories_query = "SELECT DISTINCT main_category_code, main_category_name
+                          FROM timesheet_failure_hours
                           WHERE status = 1";
 if (!$is_super_admin && $company_id > 0) {
     $main_categories_query .= " AND company_id = " . $company_id;
@@ -334,8 +153,8 @@ if (!$is_super_admin && $company_id > 0) {
 $main_categories_query .= " ORDER BY main_category_name";
 $main_categories_result = mysqli_query($conn, $main_categories_query);
 
-$event_types_query = "SELECT DISTINCT event_type_code, event_type_name 
-                      FROM timesheet_failure_hours 
+$event_types_query = "SELECT DISTINCT event_type_code, event_type_name
+                      FROM timesheet_failure_hours
                       WHERE status = 1";
 if (!$is_super_admin && $company_id > 0) {
     $event_types_query .= " AND company_id = " . $company_id;
@@ -344,26 +163,29 @@ $event_types_query .= " ORDER BY event_type_name";
 $event_types_result = mysqli_query($conn, $event_types_query);
 ?>
 
-<div class="main failures-page">
-    <div class="header">
-        <div>
-            <h1 class="page-title">
-                <div class="title-icon"><i class="fas fa-tools"></i></div>
-                تقرير الأعطال - إدارة الأسطول
-            </h1>
-            <div class="hero-note">
-                <i class="fas fa-chart-line"></i>
-                شاشة متابعة وتحليل أعطال الأسطول مع فلترة ذكية وسريعة
-            </div>
-        </div>
-        <div class="header -actions">
-            <a href="manage_failure_codes.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-            <button type="button" class="btn btn-gold" onclick="exportToExcel()">
+<div class="main failures-page fleet-failures-main">
+    <div class="main_head">
+        <div class="head_actions">
+            <button type="button" class="add-btn btn" onclick="exportToExcel()">
                 <i class="fas fa-file-excel"></i> تصدير Excel
             </button>
         </div>
+
+        <h1 class="head-title">
+            <div class="title-icon"><i class="fas fa-tools"></i></div>
+            تقرير الأعطال - إدارة الأسطول
+        </h1>
+
+        <div class="head_back">
+            <a href="manage_failure_codes.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
+        </div>
+    </div>
+
+    <div class="hero-note">
+        <i class="fas fa-chart-line"></i>
+        شاشة متابعة وتحليل أعطال الأسطول مع فلترة ذكية وسريعة
     </div>
 
     <div class="card mb-3">
@@ -376,11 +198,11 @@ $event_types_result = mysqli_query($conn, $event_types_query);
                 </span>
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body fc-filter-body">
             <form method="GET" action="" id="filterForm">
-                <div class="row">
+            <div class="row fc-filter-bar">
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">نوع المعدة</label>
+                        <label class="form-label fc-filter-label">نوع المعدة</label>
                         <select name="equipment_type" class="form-select">
                             <option value="">-- الكل --</option>
                             <option value="1" <?php echo ($filter_equipment_type == 1) ? 'selected' : ''; ?>>حفار</option>
@@ -390,7 +212,7 @@ $event_types_result = mysqli_query($conn, $event_types_query);
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">المشروع</label>
+                        <label class="form-label fc-filter-label">المشروع</label>
                         <select name="project_id" class="form-select">
                             <option value="">-- الكل --</option>
                             <?php
@@ -409,7 +231,7 @@ $event_types_result = mysqli_query($conn, $event_types_query);
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">نوع الحدث</label>
+                        <label class="form-label fc-filter-label">نوع الحدث</label>
                         <select name="event_type" class="form-select">
                             <option value="">-- الكل --</option>
                             <?php
@@ -428,7 +250,7 @@ $event_types_result = mysqli_query($conn, $event_types_query);
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">الفئة الرئيسية</label>
+                        <label class="form-label fc-filter-label">الفئة الرئيسية</label>
                         <select name="main_category" class="form-select">
                             <option value="">-- الكل --</option>
                             <?php
@@ -447,19 +269,19 @@ $event_types_result = mysqli_query($conn, $event_types_query);
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">التاريخ من</label>
+                        <label class="form-label fc-filter-label">التاريخ من</label>
                         <input type="date" name="date_from" class="form-control"
                             value="<?php echo htmlspecialchars($filter_date_from); ?>">
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">التاريخ إلى</label>
+                        <label class="form-label fc-filter-label">التاريخ إلى</label>
                         <input type="date" name="date_to" class="form-control"
                             value="<?php echo htmlspecialchars($filter_date_to); ?>">
                     </div>
 
                     <div class="col-md-3 mb-3 d-flex align-items-end">
-                        <div class="filter-actions">
+                        <div class="filter-actions fc-filter-actions">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-search"></i> بحث
                             </button>

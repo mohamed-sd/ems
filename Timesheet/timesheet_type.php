@@ -1,8 +1,8 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: ../login.php");
-    exit();
+  header("Location: ../login.php");
+  exit();
 }
 $page_title = "إيكوبيشن | اختر نوع الآلية";
 include("../inheader.php");
@@ -10,23 +10,11 @@ include('../insidebar.php');
 ?>
 
 <div class="main timesheet-type-page ems-unified-page-shell">
-  <div class="header">
-    <div>
-      <h1 class="page-title">
-        <span class="title-icon"><i class="fas fa-clock"></i></span>
-        اختيار نوع الآلية
-      </h1>
-      <div class="hero-note">
-        <i class="fas fa-layer-group"></i>
-        اختر التصنيف المناسب للبدء في إدخال ساعات العمل
-      </div>
-    </div>
 
-    <div class="header -actions">
-      <a href="../main/dashboard.php" class="back-btn">
-        <i class="fas fa-arrow-right"></i> رجوع
-      </a>
-      <a href="timesheet.php?type=1" class="add-btn ts-header-action ts-action-heavy">
+  <div class="main_head">
+
+    <div class="head_actions">
+      <!-- <a href="timesheet.php?type=1" class="add-btn ts-header-action ts-action-heavy">
         <i class="fas fa-tractor"></i> معدات ثقيلة
       </a>
       <a href="timesheet.php?type=2" class="add-btn ts-header-action ts-action-truck">
@@ -34,6 +22,19 @@ include('../insidebar.php');
       </a>
       <a href="timesheet.php?type=3" class="add-btn ts-header-action ts-action-drill">
         <i class="fas fa-hammer"></i> الخرامات
+      </a> -->
+    </div>
+
+    <h1 class="head-title">
+      <span class="title-icon"><i class="fas fa-clock"></i></span>
+      اختيار نوع الآلية
+    <i class="fas fa-layer-group"></i>
+    اختر التصنيف المناسب للبدء في إدخال ساعات العمل
+    </h1>
+
+    <div class="head_back">
+      <a href="../main/dashboard.php" class="">
+        <i class="fas fa-arrow-right"></i> رجوع
       </a>
     </div>
   </div>
@@ -69,7 +70,5 @@ include('../insidebar.php');
 </div>
 
 </body>
+
 </html>
-
-
-

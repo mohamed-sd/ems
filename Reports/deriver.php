@@ -14,7 +14,7 @@ $shift_filter   = isset($_GET['shift']) ? $_GET['shift'] : '';
 $equipment_id   = isset($_GET['equipment_id']) ? $_GET['equipment_id'] : '';
 
 $sql = "
-SELECT 
+SELECT
     d.name AS driver_name,
     p.name AS project_name,
     e.name AS equipment_name,
@@ -23,7 +23,7 @@ SELECT
 FROM timesheet t
 JOIN drivers d ON t.driver = d.id
 JOIN operations o ON t.operator = o.id
-JOIN equipments e ON o.equipment = e.id 
+JOIN equipments e ON o.equipment = e.id
 JOIN project p ON o.project_id = p.id
 WHERE 1=1
 ";
@@ -59,21 +59,24 @@ $result = mysqli_query($conn, $sql);
     <!-- Bootstrap 5 -->
     <link href="/ems/assets/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-    <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
+    <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
+    <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
 </head>
 <body>
 
 <?php include('../insidebar.php'); ?>
 
-<div class="main">
+<div class="main reports-main driver-report-main">
 
-    <div class="header">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div class="title-icon"><i class="fas fa-user-clock"></i></div>
-        <h1 class="page-title">تقرير ساعات عمل السائقين</h1>
-      </div>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div class="main_head">
+            <div class="head_actions"></div>
+
+            <h1 class="head-title">
+                <div class="title-icon"><i class="fas fa-user-clock"></i></div>
+                تقرير ساعات عمل السائقين
+            </h1>
+
+            <div class="head_back">
         <a href="reports.php" class="back-btn">
           <i class="fas fa-arrow-right"></i> رجوع
         </a>
@@ -86,12 +89,12 @@ $result = mysqli_query($conn, $sql);
                 <i class="fas fa-filter"></i> فلاتر البحث
             </h5>
         </div>
-        <div class="card-body">
+        <div class="card-body fc-filter-body">
 
             <!-- فورم الفلاتر -->
-            <form method="GET" class="form-grid" style="margin-bottom: 2rem;">
+            <form method="GET" class="form-grid fc-filter-bar">
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-project-diagram" style="margin-left: 5px;"></i> المشروع</label>
+                    <label class="fc-filter-label"><i class="fas fa-project-diagram" style="margin-left: 5px;"></i> المشروع</label>
                     <div class="control"><select name="project">
                         <option value="">-- الكل --</option>
                         <?php
@@ -105,7 +108,7 @@ $result = mysqli_query($conn, $sql);
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-user-tie" style="margin-left: 5px;"></i> السائق</label>
+                    <label class="fc-filter-label"><i class="fas fa-user-tie" style="margin-left: 5px;"></i> السائق</label>
                     <div class="control"><select name="driver">
                         <option value="">-- الكل --</option>
                         <?php
@@ -119,17 +122,17 @@ $result = mysqli_query($conn, $sql);
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> من تاريخ</label>
+                    <label class="fc-filter-label"><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> من تاريخ</label>
                     <div class="control"><input type="date" name="start_date" value="<?php echo $start_date; ?>"></div>
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> إلى تاريخ</label>
+                    <label class="fc-filter-label"><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> إلى تاريخ</label>
                     <div class="control"><input type="date" name="end_date" value="<?php echo $end_date; ?>"></div>
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-moon" style="margin-left: 5px;"></i> الوردية</label>
+                    <label class="fc-filter-label"><i class="fas fa-moon" style="margin-left: 5px;"></i> الوردية</label>
                     <div class="control"><select name="shift">
                         <option value="">-- الكل --</option>
                         <option value="D" <?php if ($shift_filter == "D") echo "selected"; ?>>صباحية</option>
@@ -138,12 +141,12 @@ $result = mysqli_query($conn, $sql);
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label><i class="fas fa-cogs" style="margin-left: 5px;"></i> الآلية</label>
+                    <label class="fc-filter-label"><i class="fas fa-cogs" style="margin-left: 5px;"></i> الآلية</label>
                     <div class="control"><select name="equipment_id">
                         <option value="">-- الكل --</option>
                         <?php
                         $res = mysqli_query($conn, "
-                            SELECT DISTINCT e.id, e.name 
+                            SELECT DISTINCT e.id, e.name
                             FROM operations o
                             JOIN equipments e ON o.equipment = e.id
                         ");
@@ -155,10 +158,13 @@ $result = mysqli_query($conn, $sql);
                     </select></div>
                 </div>
 
-                <div class="field md-12" style="text-align: center; margin-top: 1rem;">
-                    <button class="primary" type="submit" style="padding: 10px 40px;">
+                <div class="field md-12 fc-filter-actions driver-filter-actions">
+                    <button class="btn btn-primary" type="submit">
                         <i class="fa fa-search"></i> بحث
                     </button>
+                    <a href="deriver.php" class="fc-clear-link">
+                        <i class="fa fa-redo"></i> إعادة تعيين
+                    </a>
                 </div>
             </form>
         </div>
@@ -170,7 +176,7 @@ $result = mysqli_query($conn, $sql);
                 <i class="fas fa-table"></i> نتائج التقرير
             </h5>
         </div>
-        <div class="card-body" style="padding: 2rem; overflow-x: auto;">
+        <div class="card-body table-container driver-table-wrap">
             <table id="projectsTable" class="display nowrap" style="width:100%;">
                 <thead>
                     <tr>
@@ -201,7 +207,7 @@ $result = mysqli_query($conn, $sql);
     </div>
 
     <!-- المجموع -->
-    <div class="card" style="margin-top: 1.5rem;">
+    <div class="card driver-kpi-card">
         <div class="card-body">
             <div class="totals">
                 <div class="kpi">
@@ -216,101 +222,5 @@ $result = mysqli_query($conn, $sql);
 <!-- Bootstrap JS -->
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-<style>
-  /* Form Grid */
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
-    align-items: start;
-  }
-
-  .field.md-12 {
-    grid-column: 1 / -1;
-  }
-
-  /* DataTable styling */
-  table.dataTable {
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  
-  table.dataTable thead th {
-    background: linear-gradient(125deg, var(--navy) 0%, var(--navy-l) 100%);
-    color: white;
-    font-weight: 700;
-    padding: 1rem;
-    text-align: center;
-    border-left: 1px solid rgba(255,255,255,0.1);
-    white-space: nowrap;
-    font-size: 0.9rem;
-  }
-  
-  table.dataTable thead th:first-child {
-    border-left: none;
-  }
-  
-  table.dataTable tbody tr {
-    transition: all 0.3s ease;
-  }
-  
-  table.dataTable tbody tr:hover {
-    background: var(--gold-soft);
-    transform: scale(1.002);
-    box-shadow: var(--shadow-sm);
-  }
-  
-  table.dataTable tbody td {
-    padding: 12px;
-    text-align: center;
-    vertical-align: middle;
-    font-size: .83rem;
-    color: var(--txt);
-    border: none;
-  }
-
-  /* Totals KPI */
-  .totals {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .kpi {
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: var(--shadow-md);
-    transition: all 0.3s ease;
-    border-right: 5px solid var(--gold);
-    min-width: 250px;
-  }
-  
-  .kpi:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
-  }
-  
-  .kpi .v {
-    font-weight: 900;
-    font-size: 2.5rem;
-    color: var(--navy);
-    margin-bottom: 0.5rem;
-  }
-  
-  .kpi .t {
-    color: var(--sub);
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
-</style>
-
 </body>
 </html>
-
-
-

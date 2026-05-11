@@ -322,268 +322,33 @@ include('../inheader.php');
 ?>
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
-<link rel="stylesheet" href="../assets/css/admin-style.css">
-<link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<link rel="stylesheet" href="/ems/assets/css/all.min.css">
-<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
-<style>
-:root {
-  --ha-primary: #0f4c81;
-  --ha-accent: #f59e0b;
-  --ha-ok: #15803d;
-  --ha-muted: #64748b;
-  --ha-bg: #f1f5f9;
-}
-body { background: var(--ha-bg); }
-.page-wrapper { 
-    padding: 18px; 
-    width: 100%;
-}
-
-.top-head {
-  background: linear-gradient(135deg, #0f4c81, #1d6fa5);
-  border-radius: 16px;
-  padding: 16px;
-  color: #fff;
-  margin-bottom: 16px;
-  box-shadow: 0 8px 26px rgba(15, 76, 129, 0.22);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.top-head .title { font-size: 1.1rem; font-weight: 800; margin: 0; }
-.top-head .sub { font-size: .82rem; opacity: .95; }
-
-.quick-stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.quick-stat {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 12px;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
-}
-.quick-stat .label { font-size: .78rem; color: var(--ha-muted); font-weight: 700; }
-.quick-stat .value { font-size: 1.5rem; font-weight: 900; color: #0f172a; line-height: 1.1; }
-
-.filters-wrap {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 12px;
-  margin-bottom: 14px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 10px;
-}
-.filters-wrap .fg {
-  min-width: 150px;
-  flex: 1 1 150px;
-}
-.filters-wrap label {
-  display: block;
-  font-size: .74rem;
-  color: #475569;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-.filters-wrap select,
-.filters-wrap input[type="date"] {
-  width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  min-height: 36px;
-  padding: 5px 8px;
-  background: #fff;
-}
-.filters-wrap .btns {
-  display: flex;
-  gap: 8px;
-}
-.filters-wrap .btns .btn {
-  min-height: 36px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: .8rem;
-}
-
-.table-card {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 16px;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-}
-.card-title {
-  margin: 0 0 12px;
-  font-size: .98rem;
-  font-weight: 800;
-  color: #0f172a;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.table-wrap { overflow-x: auto; }
-.ha-table { width: 100% !important; font-size: .82rem; }
-.ha-table thead th {
-  background: #0f172a;
-  color: #fff;
-  white-space: nowrap;
-  font-weight: 700;
-}
-.ha-table td { white-space: nowrap; }
-
-.lvl-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: .72rem;
-  font-weight: 700;
-  background: #e2e8f0;
-  color: #334155;
-}
-.note-btn {
-  border: 1px solid #cbd5e1;
-  background: #fff;
-  color: #334155;
-  border-radius: 6px;
-  padding: 3px 7px;
-}
-.note-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: #dc2626;
-  color: #fff;
-  font-size: .66rem;
-  font-weight: 800;
-  margin-right: 4px;
-}
-
-/* دوائر مسار الاعتماد */
-.approval-track {
-  display: inline-flex;
-  align-items: center;
-  gap: 0;
-  direction: ltr;
-}
-.approval-track .ap-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-}
-.approval-track .ap-step:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  top: 12px;
-  right: -13px;
-  width: 13px;
-  height: 2px;
-  background: #cbd5e1;
-  z-index: 0;
-}
-.approval-track .ap-step:not(:last-child).done::after {
-  background: #16a34a;
-}
-.ap-circle {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: .65rem;
-  font-weight: 800;
-  cursor: default;
-  position: relative;
-  z-index: 1;
-  border: 2px solid #cbd5e1;
-  background: #f1f5f9;
-  color: #94a3b8;
-  transition: all .2s;
-}
-.ap-circle.done {
-  border-color: #16a34a;
-  background: #16a34a;
-  color: #fff;
-}
-.ap-circle .ap-lbl {
-  font-size: .55rem;
-  font-weight: 700;
-  margin-top: 2px;
-  color: #64748b;
-  white-space: nowrap;
-}
-.ap-step-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
-.ap-connector {
-  width: 14px;
-  height: 2px;
-  background: #cbd5e1;
-}
-.ap-connector.done {
-  background: #16a34a;
-}
-
-.modal-content { border-radius: 12px; }
-.note-item {
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  background: #f8fafc;
-  padding: 10px;
-  margin-bottom: 8px;
-}
-
-@media (max-width: 1024px) {
-  .quick-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 640px) {
-  .page-wrapper { padding: 10px; }
-  .quick-stats { grid-template-columns: 1fr; }
-  .filters-wrap .fg { min-width: 100%; flex: 1 1 100%; }
-  .filters-wrap .btns { width: 100%; }
-  .filters-wrap .btns .btn { flex: 1; }
-}
-</style>
-
+<div class="main hours-approval-followup-main">
 <div class="page-wrapper">
-  <div class="top-head">
-    <div>
-      <h3 class="title"><i class="fa fa-route"></i> متابعة الاعتمادات المنقولة</h3>
-      <div class="sub">
-        <?php if ($is_admin): ?>
-          عرض إداري للسجلات المنقولة بين المستويات ولم تصل للاعتماد النهائي بعد
-        <?php elseif ($my_level >= 1 && $my_level <= 3): ?>
-          تعرض السجلات التي اعتمدتها شخصياً وما زالت بانتظار اعتماد مستوى: <?= htmlspecialchars($level_role_name[$next_level]['label']) ?>
-        <?php elseif ($my_level === 4): ?>
-          لا توجد مستويات أدنى بعد مستواك، ستجد فقط سجلات الاعتماد النهائي بالأسفل
-        <?php else: ?>
-          عرض متابعة عام
-        <?php endif; ?>
-      </div>
-    </div>
-    <div class="d-flex gap-2">
-      <a href="hours_approval.php" class="btn btn-light btn-sm fw-bold"><i class="fa fa-arrow-right"></i> شاشة الاعتماد</a>
+  <div class="main_head">
+    <div class="head_actions">
+      <a href="hours_approval.php" class="add-btn btn btn-light btn-sm fw-bold"><i class="fa fa-arrow-right"></i> شاشة الاعتماد</a>
       <a href="<?= $is_admin ? '../admin/dashboard.php' : '../main/dashboard.php' ?>" class="btn btn-outline-light btn-sm fw-bold"><i class="fa fa-home"></i> لوحة التحكم</a>
     </div>
+
+    <h1 class="head-title">
+      <div class="title-icon"><i class="fa fa-route"></i></div>
+      متابعة الاعتمادات المنقولة
+    </h1>
+
+    <div class="head_back"></div>
+  </div>
+
+  <div class="mb-3 text-muted" style="font-size:.85rem;">
+    <?php if ($is_admin): ?>
+      عرض إداري للسجلات المنقولة بين المستويات ولم تصل للاعتماد النهائي بعد
+    <?php elseif ($my_level >= 1 && $my_level <= 3): ?>
+      تعرض السجلات التي اعتمدتها شخصياً وما زالت بانتظار اعتماد مستوى: <?= htmlspecialchars($level_role_name[$next_level]['label']) ?>
+    <?php elseif ($my_level === 4): ?>
+      لا توجد مستويات أدنى بعد مستواك، ستجد فقط سجلات الاعتماد النهائي بالأسفل
+    <?php else: ?>
+      عرض متابعة عام
+    <?php endif; ?>
   </div>
 
   <div class="toolbar-row mb-3">
@@ -921,6 +686,7 @@ body { background: var(--ha-bg); }
       </table>
     </div>
   </div>
+</div>
 </div>
 
 <!-- Modal: عرض الأعطال -->

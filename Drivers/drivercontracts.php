@@ -7,7 +7,7 @@ if (!isset($_SESSION['user'])) {
 
 require_once '../config.php';
 
-$is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
+$is_super_admin = isset($_SESSION['user']['role']) && (string) $_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
@@ -80,10 +80,6 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>إيكوبيشن | عقود السائق</title>
   <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-  <!-- DataTables CSS -->
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="/ems/assets/css/all.min.css">
   <!-- Call bootstrap 5 -->
   <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
 
@@ -91,477 +87,30 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
   <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
   <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-  <!-- CSS الموقع -->
-  <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
-  <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
-  <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
+  <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
+  <link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
+  <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
 </head>
-<style>
-  @import url('/ems/assets/css/local-fonts.css');
-  
-  * {
-    font-family: 'Cairo', sans-serif;
-  }
-  
-  body {
-    background: var(--bg);
-  }
-  
-  .main {
-    padding: 20px;
-    background: var(--bg);
-    min-height: 100vh;
-  }
-  
-  /* Action Buttons - استخدام التصميم الموحد */
-  .page-header-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  
-  /* Form Styling */
-  #projectForm {
-    animation: fadeInUp 0.6s ease;
-  }
-  
-  /* Section Titles */
-  .chip {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-l) 100%);
-    color: var(--gold);
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1.1rem;
-    box-shadow: var(--shadow-md);
-  }
-  
-  /* Form Fields - استخدام التصميم الموحد */
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
-    margin-bottom: 1.5rem;
-  }
-  
-  .field label {
-    font-size: .7rem;
-    font-weight: 700;
-    color: var(--sub);
-    letter-spacing: .06em;
-    text-transform: uppercase;
-  }
-  
-  .field input,
-  .field select,
-  .field textarea {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    font-size: .88rem;
-    font-weight: 500;
-    color: var(--txt);
-    background: var(--bg);
-    transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
-    outline: none;
-  }
-  
-  .field input:focus,
-  .field select:focus,
-  .field textarea:focus {
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px var(--gold-soft);
-    background: var(--surface);
-  }
-  
-  .field input[readonly] {
-    background: #f8f9fa;
-    cursor: not-allowed;
-    opacity: 0.7;
-  }
-  
-  /* KPI Cards - استخدام التصميم الموحد */
-  .totals {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin: 2rem 0;
-  }
-  
-  .kpi {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: var(--shadow-md);
-    transition: all 0.3s ease;
-    border-right: 5px solid var(--gold);
-  }
-  
-  .kpi:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
-  }
-  
-  .kpi .v {
-    font-weight: 900;
-    font-size: 2rem;
-    color: var(--navy);
-    margin-bottom: 0.5rem;
-  }
-  
-  .kpi .t {
-    color: var(--sub);
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
-  
-  /* Buttons - استخدام التصميم الموحد */
-  button.primary,
-  .btn-primary {
-    background: var(--gold-soft);
-    color: var(--navy);
-    border: 1.5px solid rgba(232,184,0,.28);
-    padding: 9px 18px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: .82rem;
-    cursor: pointer;
-    transition: all var(--ease);
-    font-family: 'Cairo', sans-serif;
-  }
-  
-  button.primary:hover,
-  .btn-primary:hover {
-    background: var(--gold);
-    color: var(--navy);
-    box-shadow: 0 5px 16px rgba(232,184,0,.35);
-    transform: translateY(-2px);
-  }
-  
-  #addEquipmentBtn {
-    background: var(--blue-soft);
-    color: var(--blue);
-    border-color: rgba(37,99,235,.18);
-  }
-  
-  #addEquipmentBtn:hover {
-    background: var(--blue);
-    color: #fff;
-    box-shadow: 0 5px 16px rgba(37,99,235,.32);
-  }
-  
-  /* HR Separator */
-  .hr {
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    margin: 2rem 0;
-    border: none;
-    opacity: 0.5;
-  }
-  
-  /* Equipment Sections */
-  .equipment-section {
-    background: var(--surface);
-    padding: 1.5rem;
-    border-radius: var(--radius-lg);
-    margin-bottom: 1.5rem;
-    border: 1.5px solid var(--border);
-    position: relative;
-    box-shadow: var(--shadow-sm);
-  }
-  
-  .equipment-section h4 {
-    color: var(--navy);
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .remove-equipment {
-    background: var(--red-soft);
-    color: var(--red);
-    border: 1.5px solid rgba(220,38,38,.18);
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all var(--ease);
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-  }
-  
-  .remove-equipment:hover {
-    background: var(--red);
-    color: #fff;
-    box-shadow: 0 5px 16px rgba(220,38,38,.32);
-    transform: translateY(-2px);
-  }
-  
-  /* DataTable Styling */
-  .dataTables_wrapper {
-    padding: 1rem;
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-  }
-  
-  table.dataTable {
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  
-  table.dataTable thead th {
-    background: linear-gradient(125deg, var(--navy) 0%, var(--navy-l) 100%);
-    color: white;
-    font-weight: 700;
-    padding: 1rem;
-    text-align: center;
-    border-left: 1px solid rgba(255,255,255,0.1);
-    white-space: nowrap;
-    font-size: 0.9rem;
-  }
-  
-  table.dataTable thead th:first-child {
-    border-left: none;
-  }
-  
-  /* Group column colors for better organization */
-  table.dataTable thead th.group-basic {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-l) 100%);
-  }
-  
-  table.dataTable thead th.group-dates {
-    background: linear-gradient(135deg, var(--blue) 0%, #1d4ed8 100%);
-  }
-  
-  table.dataTable thead th.group-hours {
-    background: linear-gradient(135deg, var(--gold) 0%, #d4a800 100%);
-  }
-  
-  table.dataTable thead th.group-parties {
-    background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
-  }
-  
-  table.dataTable thead th.group-services {
-    background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
-  }
-  
-  table.dataTable thead th.group-operations {
-    background: linear-gradient(135deg, var(--orange) 0%, #c95e00 100%);
-  }
-  
-  table.dataTable thead th.group-status {
-    background: linear-gradient(135deg, var(--red) 0%, #b91c1c 100%);
-  }
-  
-  table.dataTable tbody tr {
-    transition: all 0.3s ease;
-  }
-  
-  table.dataTable tbody tr:hover {
-    background: var(--gold-soft);
-    transform: scale(1.002);
-    box-shadow: var(--shadow-sm);
-  }
-  
-  table.dataTable tbody td {
-    padding: 1rem;
-    text-align: center;
-    font-weight: 500;
-  }
-  
-  /* Action Buttons in Table */
-  .btn-action {
-    padding: 0.4rem 0.8rem;
-    border-radius: 8px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin: 0 0.2rem;
-    transition: all 0.3s ease;
-    border: none;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-  
-  .btn-action i {
-    margin: 0;
-  }
-  
-  .btn-action-edit {
-    background: var(--blue-soft);
-    color: var(--blue);
-  }
-  
-  .btn-action-edit:hover {
-    background: var(--blue);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(37,99,235,.3);
-  }
-  
-  .btn-action-delete {
-    background: var(--red-soft);
-    color: var(--red);
-  }
-  
-  .btn-action-delete:hover {
-    background: var(--red);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(220,38,38,.3);
-  }
-  
-  .btn-action-view {
-    background: var(--green-soft);
-    color: var(--green);
-  }
-  
-  .btn-action-view:hover {
-    background: var(--green);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(22,163,74,.3);
-  }
-  
-  /* Group Toggle Buttons */
-  .btn-group-toggle {
-    padding: 0.5rem 1rem;
-    border: 1.5px solid var(--border);
-    background: var(--surface);
-    color: var(--sub);
-    border-radius: 50px;
-    cursor: pointer;
-    font-size: 0.82rem;
-    font-weight: 700;
-    transition: all var(--ease);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  
-  .btn-group-toggle:hover {
-    border-color: var(--gold);
-    color: var(--navy);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(232,184,0,.2);
-  }
-  
-  .btn-group-toggle.active {
-    background: var(--gold-soft);
-    color: var(--navy);
-    border-color: rgba(232,184,0,.28);
-    box-shadow: var(--shadow-sm);
-  }
-  
-  .btn-group-toggle.active:hover {
-    background: var(--gold);
-  }
-  
-  .btn-group-toggle-all {
-    padding: 0.5rem 1.2rem;
-    border: 1.5px solid rgba(22,163,74,.18);
-    background: var(--green-soft);
-    color: var(--green);
-    border-radius: 50px;
-    cursor: pointer;
-    font-size: 0.82rem;
-    font-weight: 700;
-    transition: all var(--ease);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  
-  .btn-group-toggle-all:hover {
-    background: var(--green);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 16px rgba(22,163,74,.35);
-  }
-  
-  /* Hidden columns */
-  .group-hidden {
-    display: none !important;
-  }
-  
-  /* Responsive table */
-  @media (max-width: 1400px) {
-    table.dataTable {
-      font-size: 0.85rem;
-    }
-    
-    table.dataTable thead th,
-    table.dataTable tbody td {
-      padding: 0.7rem 0.5rem;
-    }
-  }
-  
-  /* Animation */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .aligin {
-      justify-content: center;
-    }
-    
-    .aligin .add {
-      flex: 1 1 45%;
-    }
-    
-    .form-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .totals {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-</style>
 
-<body>
+<body class="ems-site">
 
   <?php include('../insidebar.php'); ?>
 
-  <div class="main">
+  <div class="main driver-contracts-main ems-unified-page-shell">
 
-    <div class="header">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div class="title-icon"><i class="fas fa-file-contract"></i></div>
-        <h1 class="page-title">إدارة عقود السائق</h1>
-      </div>
-      <div class="header -actions">
-        <a href="drivers.php" class="back-btn">
-          <i class="fas fa-arrow-right"></i> رجوع للسائقين
-        </a>
-        <a href="javascript:void(0)" id="toggleForm" class="add-btn">
+    <div class="main_head">
+      <div class="head_actions">
+         <a href="javascript:void(0)" id="toggleForm" class="add-btn">
           <i class="fas fa-plus-circle"></i> عقد جديد
+        </a>
+      </div>
+      <h1 class="head-title">
+        <div class="title-icon"><i class="fas fa-file-contract"></i></div>
+        إدارة عقود السائق
+      </h1>
+      <div class="head_back">
+        <a href="drivers.php" class="">
+          <i class="fas fa-arrow-right"></i> رجوع
         </a>
       </div>
     </div>
@@ -583,7 +132,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
           <!-- القسم 1: اختيار المشروع والمنجم والعقد -->
           <div class="section-title"><span class="chip">1</span> اختيار المشروع والمنجم والعقد</div>
           <br>
-          
+
           <div class="form-grid">
             <div class="field md-4">
               <label>اسم المشروع <font color="red">*</font></label>
@@ -600,7 +149,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                 </select>
               </div>
             </div>
-            
+
             <div class="field md-4">
               <label>المنجم <font color="red">*</font></label>
               <div class="control">
@@ -609,7 +158,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                 </select>
               </div>
             </div>
-            
+
             <div class="field md-4">
               <label>عقد المنجم <font color="red">*</font></label>
               <div class="control">
@@ -619,30 +168,30 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               </div>
             </div>
           </div>
-          
+
           <!-- عرض معلومات ساعات العقد -->
-          <div id="projectHoursInfo" style="display:none; margin: 1rem 0; padding: 1.5rem; background: var(--blue-soft); border-radius: var(--radius-lg); border-right: 4px solid var(--blue); box-shadow: var(--shadow-md);">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-              <div style="background: var(--surface); padding: 1.2rem; border-radius: var(--radius); box-shadow: var(--shadow-sm);">
-                <strong style="color: var(--blue); font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+          <div id="projectHoursInfo" class="project-hours-info drivercontracts-hidden">
+            <div class="project-hours-grid">
+              <div class="project-hours-card">
+                <strong class="project-hours-title project-hours-title-blue">
                   <i class="fas fa-clock"></i> إجمالي ساعات العقد
                 </strong>
-                <div style="font-size: 2rem; color: var(--navy); font-weight: 700;" id="contractTotalHours">0</div>
-                <div id="equipmentBreakdown" style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 2px dashed var(--border); font-size: 0.85rem;">
+                <div class="project-hours-value" id="contractTotalHours">0</div>
+                <div id="equipmentBreakdown" class="equipment-breakdown">
                   <!-- سيتم ملء التفصيل هنا -->
                 </div>
               </div>
-              <div style="background: var(--surface); padding: 1.2rem; border-radius: var(--radius); box-shadow: var(--shadow-sm);">
-                <strong style="color: var(--red); font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+              <div class="project-hours-card">
+                <strong class="project-hours-title project-hours-title-red">
                   <i class="fas fa-handshake"></i> المتعاقد عليه مع سائقين
                 </strong>
-                <div style="font-size: 2rem; color: var(--red); font-weight: 700;" id="driversContractedHours">0</div>
+                <div class="project-hours-value project-hours-value-red" id="driversContractedHours">0</div>
               </div>
-              <div style="background: var(--surface); padding: 1.2rem; border-radius: var(--radius); box-shadow: var(--shadow-sm);">
-                <strong style="color: var(--green); font-size: 0.9rem; display: block; margin-bottom: 0.5rem;">
+              <div class="project-hours-card">
+                <strong class="project-hours-title project-hours-title-green">
                   <i class="fas fa-chart-line"></i> الساعات المتبقية
                 </strong>
-                <div style="font-size: 2rem; color: var(--green); font-weight: 700;" id="remainingHours">0</div>
+                <div class="project-hours-value project-hours-value-green" id="remainingHours">0</div>
               </div>
             </div>
           </div>
@@ -670,9 +219,8 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
             </div>
           </div>
 
-          <div
-            style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px; border-right: 4px solid #667eea;">
-            <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+          <div class="contract-hours-note">
+            <p>
               <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
               البيانات المدخلة في الأقسام التالية
             </p>
@@ -691,30 +239,30 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
             </div>
 
-                <div class="field md-3 sm-6">
+            <div class="field md-3 sm-6">
               <label>فترة السماح بين التوقيع والتنفيذ </label>
               <div class="control"><input name="grace_period_days" id="grace_period_days" type="number" min="0"
                   placeholder="عدد الأيام"></div>
             </div>
 
-             <div class="field md-3 sm-6">
+            <div class="field md-3 sm-6">
               <label>بداية التنفيذ الفعلي المتفق عليه</label>
               <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
             </div>
 
 
-               <div class="field md-3 sm-6">
+            <div class="field md-3 sm-6">
               <label>نهاية التنفيذ الفعلي المتفق عليه</label>
               <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
             </div>
 
-        
-           
+
+
             <!-- خانتان فارغتان -->
-           
+
 
             <!-- صف 2: 3 خانات -->
-         
+
             <div class="field md-3 sm-6">
               <label>مدة العقد بالأيام </label>
               <div class="control"><input name="contract_duration_days" id="contract_duration_days" type="number"
@@ -724,41 +272,41 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
 
 
-        
-               <div class="field md-3 sm-6">
-                    <label>العملة</label>
-                    <div class="control">
-                      <select name="price_currency_contract" id="price_currency_contract">
-                        <option value="">— اختر —</option>
-                        <option value="دولار">دولار</option>
-                        <option value="جنيه">جنيه</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="field md-3 sm-6">
-                    <label>المبلغ المدفوع</label>
-                    <div class="control"><input name="paid_contract" type="text" ></div>
-                  </div>
 
-                    <div class="field md-3 sm-6">
-                    <label>وقت الدفع</label>
-                    <div class="control">
-                      <select name="payment_time" id="payment_time">
-                        <option value="">— اختر —</option>
-                        <option value="مقدم">مقدم</option>
-                        <option value=" مؤخر">مؤخر </option>
-  
-                      </select>
-                    </div>
-                  </div>
-           
-                     <div class="field md-3 sm-6">
-                    <label>  الضمانات</label>
-                    <div class="control"><input name="guarantees" type="text"></div>
-                  </div>
-                
-                      <div class="field md-3 sm-6">
-              <label>    تاريخ الدفع</label>
+            <div class="field md-3 sm-6">
+              <label>العملة</label>
+              <div class="control">
+                <select name="price_currency_contract" id="price_currency_contract">
+                  <option value="">— اختر —</option>
+                  <option value="دولار">دولار</option>
+                  <option value="جنيه">جنيه</option>
+                </select>
+              </div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>المبلغ المدفوع</label>
+              <div class="control"><input name="paid_contract" type="text"></div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label>وقت الدفع</label>
+              <div class="control">
+                <select name="payment_time" id="payment_time">
+                  <option value="">— اختر —</option>
+                  <option value="مقدم">مقدم</option>
+                  <option value=" مؤخر">مؤخر </option>
+
+                </select>
+              </div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label> الضمانات</label>
+              <div class="control"><input name="guarantees" type="text"></div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label> تاريخ الدفع</label>
               <div class="control"><input name="payment_date" id="payment_date" type="date"></div>
             </div>
 
@@ -770,36 +318,35 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
 
 
-           
-        
-               <div class="field md-3 sm-6">
-                    <label>عدد الورديات للعقد </label>
-                    <div class="control"><input name="equip_shifts_contract" type="number" min="0" placeholder="مثال: 2"></div>
-                  </div>
 
-    <div class="field md-3 sm-6">
-                    <label> ساعات الوردية للعقد</label>
-                    <div class="control"><input name="shift_contract" type="number" min="0"></div>
-                  </div>
+
             <div class="field md-3 sm-6">
-                    <label>إجمالي الوحدات يومياً للعقد </label>
-                    <div class="control"><input name="equip_total_contract" type="number" 
-                        placeholder=" "></div>
-                  </div>
-                     <div class="field md-3 sm-6">
-                    <label>وحدات العمل  في الشهر للعقد</label>
-                    <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
-                  </div>
-                
-               
-                  <div class="field md-3 sm-6">
-                    <label>إجمالي وحدات العقد  </label>
-                    <div class="control"><input name="total_contract" type="number" 
-                        placeholder=" "></div>
-                  </div>
+              <label>عدد الورديات للعقد </label>
+              <div class="control"><input name="equip_shifts_contract" type="number" min="0" placeholder="مثال: 2">
+              </div>
+            </div>
 
-                      <div class="field md-3 sm-6">
-              <label>مدراء الموقع   </label>
+            <div class="field md-3 sm-6">
+              <label> ساعات الوردية للعقد</label>
+              <div class="control"><input name="shift_contract" type="number" min="0"></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>إجمالي الوحدات يومياً للعقد </label>
+              <div class="control"><input name="equip_total_contract" type="number" placeholder=" "></div>
+            </div>
+            <div class="field md-3 sm-6">
+              <label>وحدات العمل في الشهر للعقد</label>
+              <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
+            </div>
+
+
+            <div class="field md-3 sm-6">
+              <label>إجمالي وحدات العقد </label>
+              <div class="control"><input name="total_contract" type="number" placeholder=" "></div>
+            </div>
+
+            <div class="field md-3 sm-6">
+              <label>مدراء الموقع </label>
               <div class="control"><input type="number" name="daily_operators" id="daily_operators" min="0"
                   placeholder="مثال: 3"></div>
             </div>
@@ -817,8 +364,8 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                 </select>
               </div>
             </div>
-          
-    <div class="field md-3 sm-6">
+
+            <div class="field md-3 sm-6">
               <label>السكن (Place for Living)</label>
               <div class="control">
                 <select name="place_for_living" id="place_for_living">
@@ -841,7 +388,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                 </select>
               </div>
             </div>
-        
+
             <div class="field md-3 sm-6">
               <label>الورشة (Workshop)</label>
               <div class="control">
@@ -866,9 +413,8 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
             </div>
             <br>
             <div class="equipment-section" data-index="1">
-              <div
-                style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-                <h6 style="margin: 0 0 15px 0;">المعدات رقم 1</h6>
+              <div class="equipment-box">
+                <h6 class="equipment-box-title">المعدات رقم 1</h6>
                 <div class="form-grid">
                   <div class="field md-3 sm-6">
                     <label>نوع المعدة</label>
@@ -891,27 +437,29 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                   </div>
 
                   <div class="field md-3 sm-6">
-                    <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
-                    <div class="control"><input name="equip_count_basic_1" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+                    <label><span class="label-dot basic">■</span> المعدات الأساسية</label>
+                    <div class="control"><input name="equip_count_basic_1" type="number" min="0" class="basic-input">
+                    </div>
                   </div>
 
                   <div class="field md-3 sm-6">
-                    <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
-                    <div class="control"><input name="equip_count_backup_1" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+                    <label><span class="label-dot backup">■</span> المعدات الاحتياطية</label>
+                    <div class="control"><input name="equip_count_backup_1" type="number" min="0" class="backup-input">
+                    </div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>عدد المشغلين</label>
                     <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
                   </div>
 
-                  
+
                   <div class="field md-3 sm-6">
                     <label>عدد المساعدين</label>
                     <div class="control"><input name="equip_assistants_1" type="number" min="0"></div>
                   </div>
-              
-             
-                    <div class="field md-3 sm-6">
+
+
+                  <div class="field md-3 sm-6">
                     <label>عدد الورديات</label>
                     <div class="control"><input name="equip_shifts_1" type="number" min="0" placeholder="مثال: 2"></div>
                   </div>
@@ -932,7 +480,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                     <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
                     <div class="control"><input name="shift2_end_1" type="time" placeholder="مثال: 00:00"></div>
                   </div>
-           <div class="field md-3 sm-6">
+                  <div class="field md-3 sm-6">
                     <label>وحدة القياس</label>
                     <div class="control">
                       <select name="equip_unit_1" class="equip-unit">
@@ -949,25 +497,25 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                     <label>ساعات الوردية</label>
                     <div class="control"><input name="shift_hours_1" type="number" min="0"></div>
                   </div>
-            <div class="field md-3 sm-6">
+                  <div class="field md-3 sm-6">
                     <label>إجمالي الوحدات يومياً</label>
                     <div class="control"><input name="equip_total_month_1" type="number" readonly
                         placeholder="يُحتسب تلقائياً"></div>
                   </div>
-                     <div class="field md-3 sm-6">
-                    <label>وحدات العمل  في الشهر</label>
+                  <div class="field md-3 sm-6">
+                    <label>وحدات العمل في الشهر</label>
                     <div class="control"><input name="equip_target_per_month_1" type="number" min="0"></div>
                   </div>
-                
-               
+
+
                   <div class="field md-3 sm-6">
                     <label>إجمالي وحدات العقد</label>
                     <div class="control"><input name="equip_total_contract_1" type="number" readonly
                         placeholder="يُحتسب تلقائياً"></div>
                   </div>
 
-                  
-                     <div class="field md-3 sm-6">
+
+                  <div class="field md-3 sm-6">
                     <label>العملة</label>
                     <div class="control">
                       <select name="equip_price_currency_1">
@@ -982,23 +530,23 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                     <div class="control"><input name="equip_price_1" type="number" min="0" step="0.01"
                         placeholder="0.00"></div>
                   </div>
-               
-                   <div class="field md-3 sm-6">
-                 
-                  </div>
-                
-                  
 
-              
-              
+                  <div class="field md-3 sm-6">
+
+                  </div>
+
+
+
+
+
                   <!-- خانتان فارغتان للحفاظ على 3 خانات لكل صف -->
-                
-                   <div class="field md-3 sm-6">
+
+                  <div class="field md-3 sm-6">
                     <label>عدد المشرفين</label>
                     <div class="control"><input name="equip_supervisors_1" type="number" min="0"></div>
                   </div>
 
-                      <div class="field md-3 sm-6">
+                  <div class="field md-3 sm-6">
                     <label>عدد الفنيين</label>
                     <div class="control"><input name="equip_technicians_1" type="number" min="0"></div>
                   </div>
@@ -1010,8 +558,8 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
             </div>
           </div>
 
-          <div style="margin: 15px 0; display: flex; gap: 10px;">
-            <button type="button" class="primary" id="addEquipmentBtn" style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
+          <div class="equipment-actions-row">
+            <button type="button" class="primary add-equipment-btn" id="addEquipmentBtn">
               <i class="fas fa-plus-circle"></i> إضافة مزيد من المعدات
             </button>
           </div>
@@ -1022,15 +570,15 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
           <div class="form-grid">
 
-             <div class="field md-3 sm-6" style="display: none;">
+            <div class="field md-3 sm-6 drivercontracts-hidden">
               <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
               <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
                   placeholder="مثال: 8" value="20"></div>
             </div>
-             <!-- Orgnization Break  -->
-            
+            <!-- Orgnization Break  -->
 
-            
+
+
             <div class="field md-3 sm-6">
               <label>الطرف الأول </label>
               <div class="control"><input type="text" name="first_party" id="first_party"
@@ -1038,7 +586,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               </div>
             </div>
 
-           
+
 
             <div class="field md-3 sm-6">
               <label>الطرف الثاني </label>
@@ -1047,7 +595,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               </div>
             </div>
 
-                                    <div class="field md-3 sm-6"> </div>
+            <div class="field md-3 sm-6"> </div>
 
             <div class="field md-3 sm-6">
               <label>الشاهد الأول</label>
@@ -1064,12 +612,11 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
           </div>
 
 
-          <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
-            <button type="reset"
-              style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+          <div class="form-actions-row">
+            <button type="reset" class="btn-reset-contract">
               <i class="fas fa-eraser"></i> تفريغ الحقول
             </button>
-            <button type="submit" class="primary" style="padding: 0.75rem 3rem;">
+            <button type="submit" class="primary btn-submit-contract">
               <i class="fas fa-save"></i> حفظ البيانات
             </button>
           </div>
@@ -1082,11 +629,11 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
           <i class="fas fa-list-alt"></i> قائمة العقود
         </h5>
       </div>
-      
+
       <!-- أزرار التحكم في المجموعات -->
-      <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0;">
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-          <span style="font-weight: 700; color: #667eea; margin-left: 10px;">
+      <div class="card-body group-tools-body">
+        <div class="group-tools-wrap">
+          <span class="group-tools-title">
             <i class="fas fa-filter"></i> عرض المجموعات:
           </span>
           <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
@@ -1115,9 +662,9 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
           </button>
         </div>
       </div>
-      
-      <div class="card-body" style="padding: 2rem; overflow-x: auto;">
-        <table id="projectsTable" class="display nowrap" style="width:100%; margin-top: 20px;">
+
+      <div class="card-body contracts-table-body">
+        <table id="projectsTable" class="display nowrap contracts-table">
           <thead>
             <tr>
               <!-- المعلومات الأساسية -->
@@ -1125,41 +672,41 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               <th class="group-basic"><i class="fas fa-project-diagram"></i> المشروع</th>
               <th class="group-basic"><i class="fas fa-mountain"></i> المنجم</th>
               <th class="group-basic"><i class="fas fa-file-contract"></i> رقم عقد المنجم</th>
-              
+
               <!-- التواريخ والمدد -->
               <th class="group-dates"><i class="far fa-calendar"></i> تاريخ التوقيع</th>
               <th class="group-dates"><i class="fas fa-hourglass-half"></i> مدة السماح (أيام)</th>
               <th class="group-dates"><i class="fas fa-calendar-days"></i> مدة العقد (أيام)</th>
               <th class="group-dates"><i class="fas fa-play-circle"></i> بداية التنفيذ</th>
               <th class="group-dates"><i class="fas fa-stop-circle"></i> نهاية التنفيذ</th>
-              
+
               <!-- الساعات والأهداف -->
               <th class="group-hours"><i class="far fa-clock"></i> هدف ساعات شهري</th>
               <th class="group-hours"><i class="fas fa-clock"></i> إجمالي ساعات متوقعة</th>
-              
+
               <!-- أطراف العقد -->
               <th class="group-parties"><i class="fas fa-user-tie"></i> الطرف الأول</th>
               <th class="group-parties"><i class="fas fa-user-check"></i> الطرف الثاني</th>
               <th class="group-parties"><i class="fas fa-eye"></i> شاهد أول</th>
               <th class="group-parties"><i class="fas fa-eye"></i> شاهد ثاني</th>
-              
+
               <!-- الخدمات المقدمة -->
               <th class="group-services"><i class="fas fa-truck"></i> النقل</th>
               <th class="group-services"><i class="fas fa-bed"></i> السكن</th>
               <th class="group-services"><i class="fas fa-home"></i> مكان المعيشة</th>
               <th class="group-services"><i class="fas fa-wrench"></i> الورشة</th>
-              
+
               <!-- التشغيل اليومي -->
               <th class="group-operations"><i class="fas fa-business-time"></i> ساعات العمل يومياً</th>
               <th class="group-operations"><i class="fas fa-users-cog"></i> عدد المشغلين يومياً</th>
-              
+
               <!-- البيانات المالية -->
               <th class="group-basic"><i class="fas fa-money-bill-wave"></i> العملة</th>
               <th class="group-basic"><i class="fas fa-dollar-sign"></i> المبلغ المدفوع</th>
               <th class="group-basic"><i class="fas fa-clock"></i> وقت الدفع</th>
               <th class="group-basic"><i class="fas fa-shield-alt"></i> الضمانات</th>
               <th class="group-basic"><i class="fas fa-calendar-check"></i> تاريخ الدفع</th>
-              
+
               <!-- الحالة والإجراءات -->
               <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
               <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
@@ -1175,7 +722,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               $project_id = intval($_POST['project_id']);
               $mine_id = isset($_POST['mine_id']) ? intval($_POST['mine_id']) : 0;
               $project_contract_id = intval($_POST['project_contract_id']);
-            
+
 
               $contract_signing_date = mysqli_real_escape_string($conn, $_POST['contract_signing_date']);
               $grace_period_days = intval($_POST['grace_period_days']);
@@ -1230,7 +777,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
               if ($id > 0) {
                 // تعديل
-                $sql = "UPDATE drivercontracts sc SET 
+                $sql = "UPDATE drivercontracts sc SET
             project_id='$project_id',
             mine_id='$mine_id',
             project_contract_id='$project_contract_id',
@@ -1264,26 +811,26 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
           WHERE sc.id=$id AND sc.driver_id=$driver_id AND $driver_contract_scope_sql";
               } else {
                 // إضافة
-              $insert_columns = "driver_id, project_id, mine_id, project_contract_id, contract_signing_date, grace_period_days, contract_duration_days,
+                $insert_columns = "driver_id, project_id, mine_id, project_contract_id, contract_signing_date, grace_period_days, contract_duration_days,
             equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
             actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
             hours_monthly_target, forecasted_contracted_hours,
             daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two,
             price_currency_contract, paid_contract, payment_time, guarantees, payment_date";
 
-              $insert_values = "'$driver_id_post', '$project_id', '$mine_id', '$project_contract_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days',
+                $insert_values = "'$driver_id_post', '$project_id', '$mine_id', '$project_contract_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days',
             '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
             '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
             '$hours_monthly_target','$forecasted_contracted_hours',
             '$daily_work_hours','$daily_operators','$first_party','$second_party','$witness_one','$witness_two',
             '$price_currency_contract','$paid_contract','$payment_time','$guarantees','$payment_date'";
 
-              if (!$is_super_admin && db_table_has_column($conn, 'drivercontracts', 'company_id')) {
-                $insert_columns .= ', company_id';
-                $insert_values .= ', ' . $company_id;
-              }
+                if (!$is_super_admin && db_table_has_column($conn, 'drivercontracts', 'company_id')) {
+                  $insert_columns .= ', company_id';
+                  $insert_values .= ', ' . $company_id;
+                }
 
-              $sql = "INSERT INTO drivercontracts (
+                $sql = "INSERT INTO drivercontracts (
             $insert_columns
           ) VALUES (
             $insert_values
@@ -1378,12 +925,12 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
             }
 
             // جلب العقود للمورد مع بيانات المنجم
-            $query = "SELECT sc.*, 
+            $query = "SELECT sc.*,
                       op.name AS project_name,
                       c.mine_id,
                       m.mine_name,
                       m.mine_code
-                      FROM drivercontracts sc 
+                      FROM drivercontracts sc
                       LEFT JOIN project op ON sc.project_id = op.id
                       LEFT JOIN contracts c ON sc.project_contract_id = c.id
                       LEFT JOIN mines m ON c.mine_id = m.id
@@ -1409,52 +956,52 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
 
               echo "<tr>";
-              
+
               // المعلومات الأساسية
               echo "<td class='group-basic'>" . $row['id'] . "</td>";
               echo "<td class='group-basic'>" . (isset($row['project_name']) ? $row['project_name'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['mine_name']) ? $row['mine_name'] . ' (' . $row['mine_code'] . ')' : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['project_contract_id']) ? 'عقد #' . $row['project_contract_id'] : '-') . "</td>";
-              
+
               // التواريخ والمدد
               echo "<td class='group-dates'>" . $row['contract_signing_date'] . "</td>";
               echo "<td class='group-dates'>" . (isset($row['grace_period_days']) ? $row['grace_period_days'] : 0) . "</td>";
               echo "<td class='group-dates'>" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "</td>";
               echo "<td class='group-dates'>" . $row['actual_start'] . "</td>";
               echo "<td class='group-dates'>" . $row['actual_end'] . "</td>";
-              
+
               // الساعات والأهداف
               echo "<td class='group-hours'>" . $row['hours_monthly_target'] . "</td>";
               echo "<td class='group-hours'>" . $row['forecasted_contracted_hours'] . "</td>";
-              
+
               // أطراف العقد
               echo "<td class='group-parties'>" . (isset($row['first_party']) ? $row['first_party'] : '-') . "</td>";
               echo "<td class='group-parties'>" . (isset($row['second_party']) ? $row['second_party'] : '-') . "</td>";
               echo "<td class='group-parties'>" . (isset($row['witness_one']) ? $row['witness_one'] : '-') . "</td>";
               echo "<td class='group-parties'>" . (isset($row['witness_two']) ? $row['witness_two'] : '-') . "</td>";
-              
+
               // الخدمات المقدمة
               $transportationText = isset($row['transportation']) && $row['transportation'] ? $row['transportation'] : '-';
               $accommodationText = isset($row['accommodation']) && $row['accommodation'] ? $row['accommodation'] : '-';
               $place_for_livingText = isset($row['place_for_living']) && $row['place_for_living'] ? $row['place_for_living'] : '-';
               $workshopText = isset($row['workshop']) && $row['workshop'] ? $row['workshop'] : '-';
-              
+
               echo "<td class='group-services'>" . $transportationText . "</td>";
               echo "<td class='group-services'>" . $accommodationText . "</td>";
               echo "<td class='group-services'>" . $place_for_livingText . "</td>";
               echo "<td class='group-services'>" . $workshopText . "</td>";
-              
+
               // التشغيل اليومي
               echo "<td class='group-operations'>" . (isset($row['daily_work_hours']) ? $row['daily_work_hours'] : '-') . "</td>";
               echo "<td class='group-operations'>" . (isset($row['daily_operators']) ? $row['daily_operators'] : '-') . "</td>";
-              
+
               // البيانات المالية
               echo "<td class='group-basic'>" . (isset($row['price_currency_contract']) && $row['price_currency_contract'] ? $row['price_currency_contract'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['paid_contract']) && $row['paid_contract'] ? $row['paid_contract'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['payment_time']) && $row['payment_time'] ? $row['payment_time'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['guarantees']) && $row['guarantees'] ? $row['guarantees'] : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['payment_date']) && $row['payment_date'] ? $row['payment_date'] : '-') . "</td>";
-              
+
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";
 
@@ -1490,7 +1037,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                   payment_time ='" . (isset($row['payment_time']) ? $row['payment_time'] : '') . "'
                   guarantees ='" . (isset($row['guarantees']) ? $row['guarantees'] : '') . "'
                   payment_date ='" . (isset($row['payment_date']) ? $row['payment_date'] : '') . "'
-                  
+
              data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
              class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>
                         <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>
@@ -1608,11 +1155,10 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
       newSection.className = 'equipment-section';
       newSection.setAttribute('data-index', equipmentIndex);
       newSection.innerHTML = `
-        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
-            <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}" 
-              style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+        <div class="equipment-box">
+          <div class="equipment-box-head">
+            <h6 class="equipment-box-title">المعدات رقم ${equipmentIndex}</h6>
+            <button type="button" class="removeEquipmentBtn equipment-remove-btn" data-index="${equipmentIndex}">
               <i class="fa fa-trash"></i> حذف
             </button>
           </div>
@@ -1637,12 +1183,12 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
-              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+              <label><span class="label-dot basic">■</span> المعدات الأساسية</label>
+              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="basic-input"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
-              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+              <label><span class="label-dot backup">■</span> المعدات الاحتياطية</label>
+              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="backup-input"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -1811,22 +1357,22 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
     recalc();
 
     // جلب مناجم المشروع عند تغيير المشروع
-    $('#project_id').on('change', function() {
+    $('#project_id').on('change', function () {
       const projectId = $(this).val();
       $('#mine_id').prop('disabled', true).html('<option value="">— جاري التحميل... —</option>');
       $('#project_contract_id').prop('disabled', true).html('<option value="">— اختر المنجم أولاً —</option>');
       $('#projectHoursInfo').fadeOut();
-      
+
       if (projectId) {
         $.ajax({
           url: 'get_project_mines.php',
           type: 'POST',
           data: { project_id: projectId },
           dataType: 'json',
-          success: function(response) {
+          success: function (response) {
             if (response.success && response.mines.length > 0) {
               let options = '<option value="">— اختر المنجم —</option>';
-              response.mines.forEach(function(mine) {
+              response.mines.forEach(function (mine) {
                 options += `<option value="${mine.id}">${mine.display_name}</option>`;
               });
               $('#mine_id').html(options).prop('disabled', false);
@@ -1834,7 +1380,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               $('#mine_id').html('<option value="">— لا توجد مناجم لهذا المشروع —</option>').prop('disabled', true);
             }
           },
-          error: function() {
+          error: function () {
             $('#mine_id').html('<option value="">— خطأ في التحميل —</option>').prop('disabled', true);
           }
         });
@@ -1845,21 +1391,21 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
     });
 
     // جلب عقود المنجم عند تغيير المنجم
-    $('#mine_id').on('change', function() {
+    $('#mine_id').on('change', function () {
       const mineId = $(this).val();
       $('#project_contract_id').prop('disabled', true).html('<option value="">— جاري التحميل... —</option>');
       $('#projectHoursInfo').fadeOut();
-      
+
       if (mineId) {
         $.ajax({
           url: 'get_mine_contracts.php',
           type: 'POST',
           data: { mine_id: mineId },
           dataType: 'json',
-          success: function(response) {
+          success: function (response) {
             if (response.success && response.contracts.length > 0) {
               let options = '<option value="">— اختر العقد —</option>';
-              response.contracts.forEach(function(contract) {
+              response.contracts.forEach(function (contract) {
                 options += `<option value="${contract.id}">${contract.display_name}</option>`;
               });
               $('#project_contract_id').html(options).prop('disabled', false);
@@ -1867,7 +1413,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               $('#project_contract_id').html('<option value="">— لا توجد عقود لهذا المنجم —</option>').prop('disabled', true);
             }
           },
-          error: function() {
+          error: function () {
             $('#project_contract_id').html('<option value="">— خطأ في التحميل —</option>').prop('disabled', true);
           }
         });
@@ -1877,51 +1423,51 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
     });
 
     // جلب بيانات ساعات العقد عند تغيير العقد
-    $('#project_contract_id').on('change', function() {
+    $('#project_contract_id').on('change', function () {
       const contractId = $(this).val();
       const driverContractId = $('#contract_id').val();
       if (contractId) {
         $.ajax({
           url: 'get_project_hours.php',
           type: 'POST',
-          data: { 
+          data: {
             project_contract_id: contractId,
             driver_contract_id: driverContractId || 0
           },
           dataType: 'json',
-          success: function(response) {
+          success: function (response) {
             if (response.success) {
               $('#contractTotalHours').text(new Intl.NumberFormat('ar-EG').format(response.contract_total_hours));
               $('#driversContractedHours').text(new Intl.NumberFormat('ar-EG').format(response.drivers_contracted_hours));
               $('#remainingHours').text(new Intl.NumberFormat('ar-EG').format(response.remaining_hours));
-              
+
               // عرض تفصيل المعدات
               var breakdownDiv = $('#equipmentBreakdown');
               breakdownDiv.empty();
-              
+
               if (response.equipment_breakdown && response.equipment_breakdown.length > 0) {
-                var breakdownHtml = '<div style="color: #555;"><strong style="color: #1976d2; display: block; margin-bottom: 0.5rem;">تفصيل الساعات:</strong>';
-                
-                response.equipment_breakdown.forEach(function(item) {
+                var breakdownHtml = '<div class="breakdown-wrap"><strong class="breakdown-title">تفصيل الساعات:</strong>';
+
+                response.equipment_breakdown.forEach(function (item) {
                   var percentage = ((item.hours / response.contract_total_hours) * 100).toFixed(1);
-                  breakdownHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; padding: 0.3rem 0;">';
-                  breakdownHtml += '<span><i class="fas fa-tools" style="color: #1976d2; margin-left: 0.3rem;"></i>' + item.type + '</span>';
-                  breakdownHtml += '<span style="font-weight: 600; color: #0d47a1;">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
+                  breakdownHtml += '<div class="breakdown-row">';
+                  breakdownHtml += '<span><i class="fas fa-tools breakdown-icon"></i>' + item.type + '</span>';
+                  breakdownHtml += '<span class="breakdown-hours">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
                   breakdownHtml += '</div>';
                 });
-                
+
                 breakdownHtml += '</div>';
                 breakdownDiv.html(breakdownHtml);
               } else {
-                breakdownDiv.html('<span style="color: #999; font-style: italic;">لا توجد معدات مسجلة لهذا العقد</span>');
+                breakdownDiv.html('<span class="breakdown-empty">لا توجد معدات مسجلة لهذا العقد</span>');
               }
-              
+
               $('#projectHoursInfo').fadeIn();
             } else {
               $('#projectHoursInfo').fadeOut();
             }
           },
-          error: function() {
+          error: function () {
             $('#projectHoursInfo').fadeOut();
           }
         });
@@ -1934,14 +1480,14 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
     $(document).on("click", ".editBtn", function () {
       $("#projectForm").addClass('allforms-visible');
       $("#contract_id").val($(this).data("id"));
-      
+
       // تحميل المشروع والمنجم والعقد
       const projectId = $(this).data("project_id");
       const mineId = $(this).data("mine_id");
       const projectContractId = $(this).data("project_contract_id");
-      
+
       $("#project_id").val(projectId);
-      
+
       // تحميل مناجم المشروع أولاً
       if (projectId) {
         $.ajax({
@@ -1949,15 +1495,15 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
           type: 'POST',
           data: { project_id: projectId },
           dataType: 'json',
-          success: function(response) {
+          success: function (response) {
             if (response.success && response.mines.length > 0) {
               let mineOptions = '<option value="">— اختر المنجم —</option>';
-              response.mines.forEach(function(mine) {
+              response.mines.forEach(function (mine) {
                 const selected = mine.id == mineId ? 'selected' : '';
                 mineOptions += `<option value="${mine.id}" ${selected}>${mine.display_name}</option>`;
               });
               $('#mine_id').html(mineOptions).prop('disabled', false);
-              
+
               // تحميل عقود المنجم
               if (mineId) {
                 $.ajax({
@@ -1965,15 +1511,15 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                   type: 'POST',
                   data: { mine_id: mineId },
                   dataType: 'json',
-                  success: function(contractResponse) {
+                  success: function (contractResponse) {
                     if (contractResponse.success && contractResponse.contracts.length > 0) {
                       let options = '<option value="">— اختر العقد —</option>';
-                      contractResponse.contracts.forEach(function(contract) {
+                      contractResponse.contracts.forEach(function (contract) {
                         const selected = contract.id == projectContractId ? 'selected' : '';
                         options += `<option value="${contract.id}" ${selected}>${contract.display_name}</option>`;
                       });
                       $('#project_contract_id').html(options).prop('disabled', false);
-                      
+
                       // تفعيل تحميل بيانات الساعات
                       if (projectContractId) {
                         $('#project_contract_id').trigger('change');
@@ -1986,7 +1532,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
           }
         });
       }
-      
+
       $("#projectForm [name='contract_signing_date']").val($(this).data("contract_signing_date"));
       $("#projectForm [name='grace_period_days']").val($(this).data("grace_period_days"));
       $("#projectForm [name='contract_duration_days']").val($(this).data("contract_duration_days"));
@@ -2071,11 +1617,10 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                 newSection.className = 'equipment-section';
                 newSection.setAttribute('data-index', equipmentIndex);
                 newSection.innerHTML = `
-                  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                      <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
-                      <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}" 
-                        style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                  <div class="equipment-box">
+                    <div class="equipment-box-head">
+                      <h6 class="equipment-box-title">المعدات رقم ${equipmentIndex}</h6>
+                      <button type="button" class="removeEquipmentBtn equipment-remove-btn" data-index="${equipmentIndex}">
                         <i class="fa fa-trash"></i> حذف
                       </button>
                     </div>
@@ -2100,12 +1645,12 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                         <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
                       </div>
                       <div class="field md-3 sm-6">
-                        <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
-                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" value="${equip.equip_count_basic || 0}" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+                        <label><span class="label-dot basic">■</span> المعدات الأساسية</label>
+                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" value="${equip.equip_count_basic || 0}" class="basic-input"></div>
                       </div>
                       <div class="field md-3 sm-6">
-                        <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
-                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" value="${equip.equip_count_backup || 0}" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+                        <label><span class="label-dot backup">■</span> المعدات الاحتياطية</label>
+                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" value="${equip.equip_count_backup || 0}" class="backup-input"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المساعدين</label>
@@ -2115,7 +1660,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                         <label>عدد الورديات</label>
                         <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}"></div>
                       </div>
-                      
+
                       <!-- أوقات الورديات -->
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
@@ -2208,7 +1753,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
     });
-    
+
     // ==================== Group Toggle Functionality ====================
     // حفظ حالة المجموعات في localStorage
     const groupStates = JSON.parse(localStorage.getItem('supplierContractGroupStates')) || {
@@ -2220,14 +1765,14 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
       operations: false,
       status: true
     };
-    
+
     // تطبيق الحالة المحفوظة عند تحميل الصفحة
     function applyGroupStates() {
       Object.keys(groupStates).forEach(group => {
         const isActive = groupStates[group];
         const btn = $(`.btn-group-toggle[data-group="${group}"]`);
         const columns = $(`.group-${group}`);
-        
+
         if (isActive) {
           btn.addClass('active');
           columns.removeClass('group-hidden');
@@ -2237,15 +1782,15 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
         }
       });
     }
-    
+
     // تطبيق الحالة عند تحميل الصفحة
     applyGroupStates();
-    
+
     // التحكم في إظهار/إخفاء المجموعات
-    $('.btn-group-toggle').on('click', function() {
+    $('.btn-group-toggle').on('click', function () {
       const group = $(this).data('group');
       const isActive = $(this).hasClass('active');
-      
+
       if (isActive) {
         // إخفاء المجموعة
         $(this).removeClass('active');
@@ -2257,15 +1802,15 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
         $(`.group-${group}`).removeClass('group-hidden');
         groupStates[group] = true;
       }
-      
+
       // حفظ الحالة
       localStorage.setItem('supplierContractGroupStates', JSON.stringify(groupStates));
     });
-    
+
     // زر إظهار/إخفاء الكل
-    $('.btn-group-toggle-all').on('click', function() {
+    $('.btn-group-toggle-all').on('click', function () {
       const allActive = Object.values(groupStates).every(state => state);
-      
+
       if (allActive) {
         // إخفاء الكل
         $('.btn-group-toggle').removeClass('active');
@@ -2279,13 +1824,13 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
         Object.keys(groupStates).forEach(key => groupStates[key] = true);
         $(this).html('<i class="fas fa-eye"></i> الكل');
       }
-      
+
       // حفظ الحالة
       localStorage.setItem('supplierContractGroupStates', JSON.stringify(groupStates));
     });
-    
+
     // تحديث نص زر "الكل" عند التحميل
-    $(document).ready(function() {
+    $(document).ready(function () {
       const allActive = Object.values(groupStates).every(state => state);
       if (allActive) {
         $('.btn-group-toggle-all').html('<i class="fas fa-eye"></i> الكل');
@@ -2299,5 +1844,3 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 </body>
 
 </html>
-
-

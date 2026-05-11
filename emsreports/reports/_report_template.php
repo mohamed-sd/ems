@@ -1111,6 +1111,7 @@ $exportQs = http_build_query(array_filter($_GET, function($v){ return $v !== '';
 <link rel="stylesheet" href="/ems/assets/css/bootstrap.rtl.min.css">
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+<link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.bootstrap5.min.css">
 <script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
@@ -1119,14 +1120,14 @@ $exportQs = http_build_query(array_filter($_GET, function($v){ return $v !== '';
    DESIGN TOKENS — matching system identity
 ════════════════════════════════════════ */
 :root {
-    --navy:   #0c1c3e; --navy-l: #1b2f6e;
-    --gold:   #e8b800; --gold-l: #ffd740;
-    --blue:   #2563eb; --blue-l: #3b82f6;
-    --teal:   #0d9488; --green:  #16a34a;
-    --red:    #dc2626; --purple: #7c3aed; --orange: #ea6f00;
-    --bg:     #f0f2f8; --surface:#ffffff;
-    --line:   rgba(12,28,62,.08);
-    --txt:    #0c1c3e; --ink:    #1e293b; --muted:  #64748b;
+    --navy:   #1a1208; --navy-l: #2d200a;
+    --gold:   #f7931a; --gold-l: #ffb347;
+    --blue:   #f7931a; --blue-l: #e67e00;
+    --teal:   #6b4e2a; --green:  #16a34a;
+    --red:    #dc2626; --purple: #7c3aed; --orange: #c96a00;
+    --bg:     #f5f0e8; --surface:#ffffff;
+    --line:   rgba(26,18,8,.10);
+    --txt:    #1a1208; --ink:    #2d200a; --muted:  #6b4e2a;
     --r:      12px;    --rl:     18px;
     --s1: 0 2px 8px rgba(12,28,62,.07);
     --s2: 0 8px 24px rgba(12,28,62,.11);
@@ -1136,8 +1137,8 @@ $exportQs = http_build_query(array_filter($_GET, function($v){ return $v !== '';
 body {
     margin: 0; font-family: 'Cairo', sans-serif;
     background:
-        radial-gradient(circle at 88% 5%,  rgba(232,184,0,.13),  transparent 26%),
-        radial-gradient(circle at 5%  92%,  rgba(37,99,235,.08),  transparent 28%),
+        radial-gradient(circle at 88% 5%,  rgba(247,147,26,.16),  transparent 26%),
+        radial-gradient(circle at 5%  92%,  rgba(26,18,8,.08),  transparent 28%),
         var(--bg);
     min-height: 100vh;
 }
@@ -1222,14 +1223,7 @@ body {
     font-size: .82rem; font-weight: 800; color: var(--muted);
     margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
 }
-.rpt-filter .form-control, .rpt-filter .form-select {
-    border-radius: 9px; border-color: rgba(12,28,62,.14);
-    font-size: .83rem; min-height: 38px;
-}
-.rpt-filter .form-control:focus, .rpt-filter .form-select:focus {
-    border-color: var(--blue); box-shadow: 0 0 0 .15rem rgba(37,99,235,.15);
-}
-.rpt-filter label { font-size: .76rem; font-weight: 700; color: var(--muted); margin-bottom: 4px; display: block; }
+.rpt-filter .fc-filter-label { min-width: 100%; }
 .btn-filter {
     background: linear-gradient(120deg, var(--blue), var(--blue-l));
     border: none; color: #fff; border-radius: 10px; font-weight: 700;
@@ -1339,8 +1333,8 @@ body {
 /* ── Table ──────────────────────────────── */
 #rTable { margin-bottom: 0 !important; width: 100% !important; }
 #rTable thead th {
-    background: linear-gradient(120deg, var(--navy), var(--navy-l));
-    color: #fff; font-size: .8rem; font-weight: 800;
+    background: linear-gradient(120deg, #120d07, #24180d);
+    color: #f7931a; font-size: .82rem; font-weight: 900;
     border: none; white-space: nowrap; padding: 11px 14px;
     text-align: center !important;
 }
@@ -1357,7 +1351,7 @@ body {
     text-align: center !important;
 }
 #rTable tbody tr:nth-child(even) { background: #f8fafd; }
-#rTable tbody tr:hover { background: #edf3ff; }
+#rTable tbody tr:hover { background: #fff4e6; }
 .dataTables_wrapper .dataTables_filter input,
 .dataTables_wrapper .dataTables_length select {
     border: 1px solid rgba(12,28,62,.14); border-radius: 8px;
@@ -1413,18 +1407,19 @@ body {
 <body>
 
 <!-- ═══ TOPBAR ═══════════════════════════════════════════════════════════ -->
-<div class="rpt-topbar">
-    <div class="rpt-brand">
-        <div class="rpt-brand-icon"><i class="fas fa-chart-pie"></i></div>
-        <div class="rpt-brand-text">
-            <div class="sys">إيكوبيشن EPS</div>
-            <div class="pg">مركز التقارير</div>
-        </div>
-    </div>
-    <div class="rpt-topbar-btns">
+<div class="rpt-topbar main_head">
+    <div class="head_actions rpt-topbar-btns">
         <a href="../index.php" class="btn btn-sm btn-outline-light">
             <i class="fas fa-th-large me-1"></i> قائمة التقارير
         </a>
+    </div>
+
+    <h1 class="head-title">
+        <div class="title-icon"><i class="fas fa-chart-pie"></i></div>
+        مركز التقارير
+    </h1>
+
+    <div class="head_back">
         <a href="/ems/main/dashboard.php" class="btn btn-sm btn-outline-light">
             <i class="fas fa-home me-1"></i> لوحة التحكم
         </a>
@@ -1501,24 +1496,24 @@ body {
         if ($feR) while ($fer = mysqli_fetch_assoc($feR)) $fleetEquipsList[] = $fer;
     }
     ?>
-    <div class="rpt-filter">
+    <div class="rpt-filter fc-filter-body">
         <div class="rpt-filter-hd"><i class="fas fa-sliders-h"></i> فلاتر التقرير</div>
-        <form method="GET" class="row g-2 align-items-end">
+        <form method="GET" class="fc-filter-bar row g-2 align-items-end form-grid allforms allforms-visible" style="display: flex;">
 
             <?php if ($showDates): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label><i class="fas fa-calendar-alt me-1" style="color:var(--blue)"></i>من تاريخ</label>
+                <label class="fc-filter-label"><i class="fas fa-calendar-alt me-1" style="color:var(--blue)"></i>من تاريخ</label>
                 <input type="date" name="date_from" class="form-control" value="<?php echo rr($fDateFrom); ?>">
             </div>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label><i class="fas fa-calendar-check me-1" style="color:var(--teal)"></i>إلى تاريخ</label>
+                <label class="fc-filter-label"><i class="fas fa-calendar-check me-1" style="color:var(--teal)"></i>إلى تاريخ</label>
                 <input type="date" name="date_to" class="form-control" value="<?php echo rr($fDateTo); ?>">
             </div>
             <?php endif; ?>
 
             <?php if ($showProject): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label><i class="fas fa-project-diagram me-1" style="color:var(--blue)"></i>المشروع</label>
+                <label class="fc-filter-label"><i class="fas fa-project-diagram me-1" style="color:var(--blue)"></i>المشروع</label>
                 <select name="project_id" class="form-select">
                     <?php echo rptSelectOptions($projectsList, 'id', 'name', $fProjectId, 'project_code'); ?>
                 </select>
@@ -1527,7 +1522,7 @@ body {
 
             <?php if ($showMine && !empty($minesList)): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label><i class="fas fa-mountain me-1" style="color:var(--teal)"></i>المنجم</label>
+                <label class="fc-filter-label"><i class="fas fa-mountain me-1" style="color:var(--teal)"></i>المنجم</label>
                 <select name="mine_id" class="form-select">
                     <option value="0">— كل المناجم —</option>
                     <?php foreach ($minesList as $mn): ?>
@@ -1541,7 +1536,7 @@ body {
 
             <?php if ($showSupplier): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label><i class="fas fa-truck me-1" style="color:var(--teal)"></i>المورد</label>
+                <label class="fc-filter-label"><i class="fas fa-truck me-1" style="color:var(--teal)"></i>المورد</label>
                 <select name="supplier_id" class="form-select">
                     <?php echo rptSelectOptions($suppliersList, 'id', 'name', $fSupplierId); ?>
                 </select>
@@ -1550,7 +1545,7 @@ body {
 
             <?php if ($showEquip && !empty($equipsList)): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label><i class="fas fa-tractor me-1" style="color:var(--gold)"></i>المعدة</label>
+                <label class="fc-filter-label"><i class="fas fa-tractor me-1" style="color:var(--gold)"></i>المعدة</label>
                 <select name="equip_id" class="form-select">
                     <option value="0">— كل المعدات —</option>
                     <?php foreach ($equipsList as $eq): ?>
@@ -1564,7 +1559,7 @@ body {
 
             <?php if ($showDriver): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label><i class="fas fa-id-badge me-1" style="color:var(--purple)"></i>المشغل</label>
+                <label class="fc-filter-label"><i class="fas fa-id-badge me-1" style="color:var(--purple)"></i>المشغل</label>
                 <select name="driver_id" class="form-select">
                     <?php echo rptSelectOptions($driversList, 'id', 'name', $fDriverId, 'driver_code'); ?>
                 </select>
@@ -1573,7 +1568,7 @@ body {
 
             <?php if ($showShift): ?>
             <div class="col-xl-1 col-md-3 col-sm-6">
-                <label><i class="fas fa-sun me-1" style="color:var(--gold)"></i>الوردية</label>
+                <label class="fc-filter-label"><i class="fas fa-sun me-1" style="color:var(--gold)"></i>الوردية</label>
                 <select name="shift" class="form-select">
                     <option value="" <?php echo $fShift === '' ? 'selected' : ''; ?>>الكل</option>
                     <option value="D" <?php echo $fShift === 'D' ? 'selected' : ''; ?>>نهاري</option>
@@ -1584,7 +1579,7 @@ body {
 
             <?php if ($showContractStatus): ?>
             <div class="col-xl-2 col-md-3 col-sm-6">
-                <label><i class="fas fa-info-circle me-1" style="color:var(--blue)"></i>حالة العقد</label>
+                <label class="fc-filter-label"><i class="fas fa-info-circle me-1" style="color:var(--blue)"></i>حالة العقد</label>
                 <select name="contract_status" class="form-select">
                     <option value="" <?php echo $fContractStatus === '' ? 'selected' : ''; ?>>— الكل —</option>
                     <option value="active"     <?php echo $fContractStatus === 'active'     ? 'selected' : ''; ?>>نشط</option>
@@ -1596,7 +1591,7 @@ body {
 
             <?php if ($showEquipType): ?>
             <div class="col-xl-2 col-md-3 col-sm-6">
-                <label><i class="fas fa-tag me-1" style="color:var(--teal)"></i>نوع المعدة</label>
+                <label class="fc-filter-label"><i class="fas fa-tag me-1" style="color:var(--teal)"></i>نوع المعدة</label>
                 <select name="category" id="equip_type_filter" class="form-select">
                     <option value="" <?php echo $fCategory === '' ? 'selected' : ''; ?>>— الكل —</option>
                     <?php
@@ -1617,7 +1612,7 @@ body {
 
             <?php if ($showEquipName): ?>
             <div class="col-xl-2 col-md-3 col-sm-6">
-                <label><i class="fas fa-tractor me-1" style="color:var(--gold)"></i>المعدة</label>
+                <label class="fc-filter-label"><i class="fas fa-tractor me-1" style="color:var(--gold)"></i>المعدة</label>
                 <select name="equip_id" id="equip_name_filter" class="form-select">
                     <option value="0">— كل المعدات —</option>
                     <?php foreach ($fleetEquipsList as $feq): ?>
@@ -1631,7 +1626,7 @@ body {
 
             <?php if ($REPORT_CODE === 'project_detailed'): ?>
             <div class="col-xl-2 col-md-3 col-sm-6">
-                <label><i class="fas fa-layer-group me-1" style="color:var(--blue)"></i>الفئة</label>
+                <label class="fc-filter-label"><i class="fas fa-layer-group me-1" style="color:var(--blue)"></i>الفئة</label>
                 <select name="category" class="form-select">
                     <option value="" <?php echo $fCategory === '' ? 'selected' : ''; ?>>— الكل —</option>
                     <?php
@@ -1649,7 +1644,7 @@ body {
 
             <?php if ($showSearch): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
-                <label><i class="fas fa-search me-1"></i>بحث</label>
+                <label class="fc-filter-label"><i class="fas fa-search me-1"></i>بحث</label>
                 <input type="text" name="search" class="form-control"
                        placeholder="اسم أو كود..." value="<?php echo rr($fSearch); ?>">
             </div>
@@ -1657,7 +1652,7 @@ body {
 
             <?php if ($showStatus): ?>
             <div class="col-xl-1 col-md-3 col-sm-6">
-                <label><i class="fas fa-toggle-on me-1"></i>الحالة</label>
+                <label class="fc-filter-label"><i class="fas fa-toggle-on me-1"></i>الحالة</label>
                 <select name="status" class="form-select">
                     <option value="" <?php echo $fStatus < 0 ? 'selected' : ''; ?>>الكل</option>
                     <option value="1" <?php echo $fStatus === 1 ? 'selected' : ''; ?>>نشط</option>
@@ -1666,7 +1661,7 @@ body {
             </div>
             <?php endif; ?>
 
-            <div class="col-auto d-flex gap-2 align-items-end">
+            <div class="col-auto d-flex gap-2 align-items-end fc-filter-actions">
                 <button type="submit" class="btn-filter btn">
                     <i class="fas fa-search"></i> تطبيق
                 </button>
@@ -1740,8 +1735,8 @@ body {
             <?php endif; ?>
         </div>
         <div class="rpt-data-body">
-            <div class="rpt-table-wrap">
-                <table class="table table-hover nowrap" id="rTable" style="width:100%">
+            <div class="rpt-table-wrap table-container">
+                <table class="table table-hover nowrap display" id="rTable" style="width:100%">
                     <thead>
                         <tr>
                             <?php foreach ($headers as $h): ?>
