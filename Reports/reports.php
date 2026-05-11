@@ -20,7 +20,7 @@ $mine_filter = isset($_GET['mine']) ? $_GET['mine'] : '';
 $contract_filter = isset($_GET['contract']) ? $_GET['contract'] : '';
 
 $sql = "
-SELECT 
+SELECT
     s.name AS supplier_name,
     p.name AS project_name,
     IFNULL(m.mine_name, '') AS mine_name,
@@ -30,7 +30,7 @@ SELECT
     SUM(t.executed_hours) AS total_hours
 FROM timesheet t
 JOIN operations o ON t.operator = o.id
-JOIN equipments e ON o.equipment = e.id   
+JOIN equipments e ON o.equipment = e.id
 JOIN suppliers s ON e.suppliers = s.id
 JOIN project p ON o.project_id = p.id
 LEFT JOIN mines m ON o.mine_id = m.id
@@ -50,43 +50,17 @@ if (!empty($mine_filter)) {
 if (!empty($contract_filter)) {
     $sql .= " AND c.id = '" . mysqli_real_escape_string($conn, $contract_filter) . "' ";
 }
-$sql .= " GROUP BY s.id, s.name, p.id, p.name, m.id, m.mine_name, m.mine_code, c.id, c.contract_signing_date 
+$sql .= " GROUP BY s.id, s.name, p.id, p.name, m.id, m.mine_name, m.mine_code, c.id, c.contract_signing_date
           ORDER BY p.name, m.mine_name, s.name ";
 $result = mysqli_query($conn, $sql);
+
+$page_title = "إيكوبيشن | التقارير";
+include("../inheader.php");
+include('../insidebar.php');
 ?>
-
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | التقارير</title>
-
-    <!-- Bootstrap 5 -->
-    <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
-    <link rel="stylesheet" href="../assets/css/main_admin_style.css">
-</head>
-
-
-<body>
-
-    <?php
-    include('../insidebar.php');
-    ?>
-
-    <div class="main">
-        <div class="header">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
-                <h1 class="page-title">التقارير</h1>
-            </div>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                 <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
+    <div class="main ems-unified-page-shell reports-main">
+        <div class="main_head">
+            <div class="head_actions">
                 <?php // صلاحيات مدير الموقع === 5
                 if ($_SESSION['user']['role'] == "5") { ?>
                     <a href="deliy.php" class="add-btn"><i class="fa fa-clock"></i> ساعات اليوم</a>
@@ -112,16 +86,27 @@ $result = mysqli_query($conn, $sql);
                     <a href="driverAndsupplerscontract.php" class="add-btn"><i class="fa fa-users"></i> إحصائيات العقود</a>
                 <?php } ?>
             </div>
+
+            <h1 class="head-title">
+                <div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
+                التقارير
+            </h1>
+
+            <div class="head_back">
+                <a href="../main/dashboard.php" class="back-btn">
+                    <i class="fas fa-arrow-right"></i> رجوع
+                </a>
+            </div>
         </div>
 
         <div class="card">
             <div class="card-header">
                 <h5><i class="fas fa-filter"></i> فلاتر التقارير</h5>
             </div>
-            <div class="card-body">
-                <form method="GET" class="form-grid" style="margin-bottom: 18px;">
+            <div class="card-body fc-filter-body">
+                <form method="GET" class="fc-filter-bar" style="margin-bottom: 0;">
                     <div>
-                        <label><i class="fas fa-truck-loading"></i> المورد</label>
+                        <label class="fc-filter-label"><i class="fas fa-truck-loading"></i> المورد</label>
                         <select name="supplier">
                             <option value="">-- الكل --</option>
                             <?php
@@ -134,7 +119,7 @@ $result = mysqli_query($conn, $sql);
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-project-diagram"></i> المشروع</label>
+                        <label class="fc-filter-label"><i class="fas fa-project-diagram"></i> المشروع</label>
                         <select name="project" id="projectSelect">
                             <option value="">-- الكل --</option>
                             <?php
@@ -147,7 +132,7 @@ $result = mysqli_query($conn, $sql);
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-mountain"></i> المنجم</label>
+                        <label class="fc-filter-label"><i class="fas fa-mountain"></i> المنجم</label>
                         <select name="mine" id="mineSelect">
                             <option value="">-- الكل --</option>
                             <?php
@@ -162,7 +147,7 @@ $result = mysqli_query($conn, $sql);
                         </select>
                     </div>
                     <div>
-                        <label><i class="fas fa-file-contract"></i> العقد</label>
+                        <label class="fc-filter-label"><i class="fas fa-file-contract"></i> العقد</label>
                         <select name="contract" id="contractSelect">
                             <option value="">-- الكل --</option>
                             <?php
@@ -176,7 +161,7 @@ $result = mysqli_query($conn, $sql);
                             ?>
                         </select>
                     </div>
-                    <div style="grid-column: 1 / -1; display: flex; justify-content: center; gap: 10px;">
+                    <div class="fc-filter-actions" style="gap: 10px;">
                         <button type="submit" class="btn btn-success">
                             <i class="fa fa-filter"></i> تطبيق الفلتر
                         </button>
@@ -265,13 +250,13 @@ $result = mysqli_query($conn, $sql);
                     const projectId = $(this).val();
                     const mineSelect = $('#mineSelect');
                     const contractSelect = $('#contractSelect');
-                    
+
                     console.log('تم اختيار المشروع:', projectId);
-                    
+
                     // إعادة تعيين قائمة المناجم والعقود
                     mineSelect.html('<option value="">-- الكل --</option>');
                     contractSelect.html('<option value="">-- الكل --</option>');
-                    
+
                     if (projectId) {
                         console.log('جاري تحميل المناجم...');
                         $.ajax({
@@ -303,11 +288,11 @@ $result = mysqli_query($conn, $sql);
                 $('#mineSelect').on('change', function() {
                     const mineId = $(this).val();
                     const contractSelect = $('#contractSelect');
-                    
+
                     console.log('تم اختيار المنجم:', mineId);
-                    
+
                     contractSelect.html('<option value="">-- الكل --</option>');
-                    
+
                     if (mineId) {
                         console.log('جاري تحميل العقود...');
                         $.ajax({
@@ -340,5 +325,3 @@ $result = mysqli_query($conn, $sql);
 </body>
 
 </html>
-
-

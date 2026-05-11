@@ -62,61 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<link rel="stylesheet" href="/ems/assets/css/all.min.css">
-
-<style>
-    .delete-disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    .delete-disabled:hover {
-        opacity: 0.6;
-    }
-
-    .badge-heavy {
-        background-color: #1a6fbb;
-        color: #fff;
-        padding: 4px 14px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-block;
-    }
-
-    .badge-truck {
-        background-color: #e07b00;
-        color: #fff;
-        padding: 4px 14px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-block;
-    }
-
-    .badge-drill {
-        background-color: #9333ea;
-        color: #fff;
-        padding: 4px 14px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-block;
-    }
-
-    .badge-default {
-        background-color: #6b7280;
-        color: #fff;
-        padding: 4px 14px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-block;
-    }
-</style>
-
-<div class="main">
+<div class="main equipments-types-main">
 
     <div class="main_head">
         <div class="head_actions">
@@ -137,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
     <!-- تنبيه الحذف (معطل) -->
-    <div id="deleteAlert" class="alert alert-warning text-center" style="display:none;">
+    <div id="deleteAlert" class="alert alert-warning text-center equipments-types-alert-hidden">
         <i class="fa-solid fa-circle-info"></i>
         لا يمكن حذف نوع المعدات حاليًا، فقط يمكن تعطيله
     </div>
@@ -209,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="card-body">
             <div class="table-container">
-                <table id="projectsTable" class="display" style="width:100%">
+                <table id="projectsTable" class="display equipments-types-table">
                     <thead>
                         <tr>
                             <th>#</th>

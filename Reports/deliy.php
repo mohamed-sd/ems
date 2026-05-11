@@ -12,7 +12,7 @@ $equipment_filter = isset($_GET['equipment']) ? $_GET['equipment'] : '';
 $project_filter   = isset($_GET['project']) ? $_GET['project'] : '';
 
 $sql = "
-  SELECT 
+  SELECT
       p.name AS project_name,
       e.name AS equipment_name,
       d.name AS driver_name,
@@ -23,7 +23,7 @@ $sql = "
       t.standby_hours
   FROM timesheet t
 JOIN operations o ON t.operator = o.id
-JOIN equipments e ON o.equipment = e.id 
+JOIN equipments e ON o.equipment = e.id
   JOIN drivers d ON t.driver = d.id
   JOIN project p ON o.project_id = p.id
   WHERE 1=1
@@ -45,7 +45,7 @@ $result = mysqli_query($conn, $sql) or die("خطأ في الاستعلام: " . 
 $total_sql = "SELECT SUM(t.executed_hours) AS executed_hours
 FROM timesheet t
 JOIN operations o ON t.operator = o.id
-JOIN equipments e ON o.equipment = e.id 
+JOIN equipments e ON o.equipment = e.id
 JOIN operations p ON o.project_id = p.id
 WHERE 1=1";
 
@@ -69,74 +69,46 @@ $executed_hours  = $total_row['executed_hours'];
 	<meta charset="UTF-8">
   	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>إيكوبيشن | التقارير</title>
-	
+
 	<!-- Bootstrap 5 -->
 	<link href="/ems/assets/css/bootstrap.rtl.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="/ems/assets/css/all.min.css">
-	<link rel="stylesheet" href="../assets/css/admin-style.css">
-	<link rel="stylesheet" href="../assets/css/main_admin_style.css">
-	<link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-	<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-
-	<style>
-		.main { font-family: 'Cairo', sans-serif; }
-
-		.report-table thead th {
-			background: #f8fafc;
-			color: #0c1c3e;
-			font-weight: 800;
-			border-color: rgba(12, 28, 62, 0.1);
-		}
-
-		.report-table td {
-			border-color: rgba(12, 28, 62, 0.08);
-			color: #0c1c3e;
-		}
-
-		.stats-box {
-			background: linear-gradient(135deg, rgba(13, 148, 136, 0.12), rgba(13, 148, 136, 0.06));
-			border: 1px solid rgba(13, 148, 136, 0.25);
-			border-radius: 14px;
-			padding: 16px 18px;
-			color: #0f766e;
-			font-weight: 800;
-			box-shadow: 0 4px 14px rgba(15, 118, 110, 0.12);
-		}
-
-		.form-grid { align-items: end; }
-	</style>
+	<link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
+	<link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
+	<link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
 </head>
-<body class="bg-light">
+<body class="ems-site">
 
 <?php include('../insidebar.php'); ?>
 
-<div class="main">
+<div class="main reports-daily-main ems-unified-page-shell">
 
-	<div class="header">
-		<h1 class="page-title">
+	<div class="main_head">
+		<div class="head_actions"></div>
+		<h1 class="head-title">
 			<div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
 			تقرير ساعات العمل اليومية
 		</h1>
-		<div style="display: flex; gap: 10px; flex-wrap: wrap;">
+		<div class="head_back">
 			<a href="reports.php" class="back-btn">
 				<i class="fas fa-arrow-right"></i> رجوع
 			</a>
 		</div>
 	</div>
 
-	<div class="card mb-4">
-		<div class="card-header">
+	<div class="card mb-4 fc-filter-body">
+		<div class="card-header fc-filter-bar">
 			<h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
 		</div>
 		<div class="card-body">
-			<form method="GET" class="form-grid">
+			<form method="GET" class="form-grid fc-filter-grid">
 				<div>
-					<label><i class="fas fa-calendar-day"></i> التاريخ</label>
+					<label class="fc-filter-label"><i class="fas fa-calendar-day"></i> التاريخ</label>
 					<input type="date" name="date" value="<?php echo $date_filter; ?>">
 				</div>
 
 				<div>
-					<label><i class="fas fa-cogs"></i> الآلية</label>
+					<label class="fc-filter-label"><i class="fas fa-cogs"></i> الآلية</label>
 					<select name="equipment">
 						<option value="">-- الكل --</option>
 						<?php
@@ -150,7 +122,7 @@ $executed_hours  = $total_row['executed_hours'];
 				</div>
 
 				<div>
-					<label><i class="fas fa-diagram-project"></i> المشروع</label>
+					<label class="fc-filter-label"><i class="fas fa-diagram-project"></i> المشروع</label>
 					<select name="project">
 						<option value="">-- الكل --</option>
 						<?php
@@ -163,7 +135,7 @@ $executed_hours  = $total_row['executed_hours'];
 					</select>
 				</div>
 
-				<button type="submit"><i class="fa fa-search"></i> بحث</button>
+				<button type="submit" class="add-btn"><i class="fa fa-search"></i> بحث</button>
 			</form>
 		</div>
 	</div>
@@ -195,9 +167,9 @@ $executed_hours  = $total_row['executed_hours'];
 							<td><?php echo $row['driver_name']; ?></td>
 							<td><?php echo $row['date']; ?></td>
 							<td><?php echo $row['shift']; ?></td>
-						<td style="color:#0d9488; font-weight:700;"><?php echo $row['executed_hours']; ?></td>
-						<td style="color:#dc2626; font-weight:700;"><?php echo $row['total_fault_hours']; ?></td>
-						<td style="color:#e8b800; font-weight:700;"><?php echo $row['standby_hours']; ?></td>
+						<td class="daily-hours-executed"><?php echo $row['executed_hours']; ?></td>
+						<td class="daily-hours-fault"><?php echo $row['total_fault_hours']; ?></td>
+						<td class="daily-hours-standby"><?php echo $row['standby_hours']; ?></td>
 						</tr>
 					<?php } ?>
 					</tbody>
@@ -216,6 +188,3 @@ $executed_hours  = $total_row['executed_hours'];
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-

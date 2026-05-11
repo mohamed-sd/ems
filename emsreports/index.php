@@ -28,22 +28,23 @@ $page_title = 'التقارير';
 <link rel="stylesheet" href="../assets/css/bootstrap.rtl.min.css">
 <link rel="stylesheet" href="../assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+<link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
 <style>
 :root {
-    --navy: #0c1c3e;
-    --navy-m: #132050;
-    --navy-l: #1b2f6e;
-    --gold: #e8b800;
-    --gold-l: #ffd740;
+    --navy: #1a1208;
+    --navy-m: #2d200a;
+    --navy-l: #3a2a12;
+    --gold: #f7931a;
+    --gold-l: #ffb347;
     --gold-d: rgba(232, 184, 0, .12);
-    --blue: #2563eb;
-    --blue-l: #3b82f6;
-    --teal: #0d9488;
-    --bg: #f0f2f8;
+    --blue: #f7931a;
+    --blue-l: #e67e00;
+    --teal: #6b4e2a;
+    --bg: #f5f0e8;
     --card: #ffffff;
-    --line: rgba(12, 28, 62, .09);
-    --txt: #0c1c3e;
-    --muted: #64748b;
+    --line: rgba(26, 18, 8, .12);
+    --txt: #1a1208;
+    --muted: #6b4e2a;
     --r: 14px;
     --rl: 20px;
     --s1: 0 2px 8px rgba(12, 28, 62, .08);
@@ -274,7 +275,7 @@ body {
 }
 
 .report-card a.btn:hover {
-    background: linear-gradient(120deg, var(--blue), var(--blue-l));
+    background: linear-gradient(120deg, var(--navy), var(--navy-l));
     border-color: transparent;
     color: #fff;
 }
@@ -304,24 +305,32 @@ body {
     .brand-info .sys { display: none; }
 }
 </style>
-<link rel="stylesheet" href="/ems/assets/css/site-identity.css">
 </head>
-<body class="standalone-brand">
+<?php
+include '../insidebar.php';
+?>
+<body class="ems-site">
 
-<div class="topbar-lite d-flex align-items-center justify-content-between">
-    <div class="brand">
-        <div class="brand-icon"><i class="fas fa-chart-pie"></i></div>
-        <div class="brand-info">
-            <div class="sys">إيكوبيشن EPS</div>
-            <div class="greet">مركز التقارير</div>
+<div class="main ems-unified-page-shell reports-shell">
+
+    <div class="main_head emsreports-head">
+        <div class="head_actions">
+            <a href="../main/dashboard.php" class="add-btn">
+                <i class="fas fa-home"></i> لوحة التحكم
+            </a>
+        </div>
+
+        <h1 class="head-title">
+            <div class="title-icon"><i class="fas fa-chart-pie"></i></div>
+            مركز التقارير
+        </h1>
+
+        <div class="head_back">
+            <a href="../main/dashboard.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
         </div>
     </div>
-    <a href="../main/dashboard.php" class="btn btn-sm btn-outline-light">
-        <i class="fas fa-home"></i> لوحة التحكم
-    </a>
-</div>
-
-<main class="reports-shell">
 
     <div class="hero">
         <h1><i class="fas fa-chart-pie"></i> التقارير</h1>
@@ -367,7 +376,7 @@ body {
         <?php endforeach; ?>
 
     <?php endif; ?>
-</main>
+</div>
 
 </body>
 </html>

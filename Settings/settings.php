@@ -36,11 +36,12 @@ include('../insidebar.php');
     /* ── بطاقة الترحيب العلوية ── */
     .settings-hero {
         position: relative;
-        background: linear-gradient(130deg, var(--navy) 0%, var(--navy-m) 55%, var(--navy-l) 100%);
-        border-radius: var(--radius-xl);
+        background: linear-gradient(135deg, var(--s0), #2d200a);
+        border: 1px solid rgba(247, 147, 26, 0.35);
+        border-radius: var(--rl);
         padding: 22px;
         color: #fff;
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--sh2);
         overflow: hidden;
     }
 
@@ -83,7 +84,7 @@ include('../insidebar.php');
         border-radius: 999px;
         background: rgba(232, 184, 0, 0.16);
         border: 1px solid rgba(232, 184, 0, 0.36);
-        color: var(--gold-l);
+        color: #ffe7b5;
         font-size: 0.72rem;
         font-weight: 700;
     }
@@ -97,17 +98,17 @@ include('../insidebar.php');
     .settings-hero p {
         margin: 0;
         font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.84);
+        color: rgba(255, 247, 230, 0.9);
         max-width: 760px;
     }
 
     /* ── قسم الإعدادات ── */
     .settings-section {
-        background: var(--surface);
-        border: 1.5px solid var(--border);
-        border-radius: var(--radius-lg);
+        background: var(--s1);
+        border: 1.5px solid var(--bdr);
+        border-radius: var(--rl);
         padding: 18px;
-        box-shadow: var(--shadow-sm);
+        box-shadow: var(--sh);
         display: grid;
         gap: 14px;
     }
@@ -117,13 +118,13 @@ include('../insidebar.php');
         align-items: center;
         gap: 8px;
         margin: 0;
-        color: var(--txt);
+        color: var(--t1);
         font-size: 1rem;
         font-weight: 800;
     }
 
     .settings-section-title i {
-        color: var(--gold);
+        color: var(--or);
     }
 
     /* ── شبكة البطاقات ── */
@@ -139,11 +140,11 @@ include('../insidebar.php');
         align-items: flex-start;
         gap: 12px;
         padding: 16px;
-        background: #fff;
-        border: 1.5px solid var(--border);
+        background: linear-gradient(180deg, var(--s1) 0%, #fffbf5 100%);
+        border: 1.5px solid var(--bdr);
         border-radius: 14px;
         text-decoration: none;
-        transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
         position: relative;
         overflow: hidden;
     }
@@ -156,15 +157,15 @@ include('../insidebar.php');
         top: 0;
         bottom: 0;
         width: 4px;
-        background: linear-gradient(180deg, var(--gold), var(--orange));
+        background: linear-gradient(180deg, var(--or), var(--or2));
         opacity: 0;
-        transition: opacity var(--ease);
+        transition: opacity .2s ease;
     }
 
     .settings-card:hover {
         transform: translateY(-3px);
-        box-shadow: var(--shadow-md);
-        border-color: rgba(232, 184, 0, 0.35);
+        box-shadow: var(--sh2);
+        border-color: rgba(247, 147, 26, 0.45);
     }
 
     .settings-card:hover::before {
@@ -184,13 +185,13 @@ include('../insidebar.php');
     }
 
     .settings-icon.account {
-        background: var(--gold-soft);
-        color: var(--gold);
+        background: rgba(247, 147, 26, 0.16);
+        color: var(--or2);
     }
 
     .settings-icon.admin {
-        background: var(--blue-soft);
-        color: var(--blue);
+        background: rgba(26, 18, 8, 0.09);
+        color: var(--s0);
     }
 
     /* نص البطاقة */
@@ -198,29 +199,29 @@ include('../insidebar.php');
         margin: 0 0 4px;
         font-size: 0.95rem;
         font-weight: 800;
-        color: var(--txt);
+        color: var(--t1);
     }
 
     .settings-meta p {
         margin: 0;
         font-size: 0.8rem;
         font-weight: 700;
-        color: var(--sub);
+        color: var(--t2);
         line-height: 1.7;
     }
 
     /* سهم التنقل */
     .settings-card-arrow {
         margin-right: auto;
-        color: var(--sub);
+        color: var(--t3);
         font-size: 0.9rem;
         align-self: center;
-        transition: transform var(--ease), color var(--ease);
+        transition: transform .2s ease, color .2s ease;
     }
 
     .settings-card:hover .settings-card-arrow {
         transform: translateX(-4px);
-        color: var(--txt);
+        color: var(--t1);
     }
 
     /* ── استجابة الشاشات الصغيرة ── */
@@ -239,7 +240,7 @@ include('../insidebar.php');
     }
 </style>
 
-<div class="main">
+<div class="main ems-unified-page-shell settings-main">
 
 
     <div class="main_head">
@@ -264,7 +265,7 @@ include('../insidebar.php');
                 <span class="settings-kicker">
                     <i class="fas fa-shield-halved"></i> مركز التحكم
                 </span>
-                <h2>إدارة إعدادات الحساب والنظام</h2>
+                <h2 style="color: #fff;">إدارة إعدادات الحساب والنظام</h2>
                 <p>اختر القسم المطلوب لإدارة كلمة المرور أو إعدادات الصلاحيات والموديولات بنفس تصميم صفحات الإدارة داخل
                     النظام.</p>
             </div>

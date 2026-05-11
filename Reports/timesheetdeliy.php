@@ -22,72 +22,8 @@ $_ts_supplier_company_where = (!$_ts_is_super_admin && $_ts_suppliers_has_compan
     <title> إيكوبيشن | التقارير </title>
     <link rel="stylesheet" href="/ems/assets/css/all.min.css">
     <link href="/ems/assets/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/admin-style.css">
-    <link rel="stylesheet" href="../assets/css/main_admin_style.css">
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css" />
     <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-
-    <style>
-        .main { font-family: 'Cairo', sans-serif; }
-
-        .report-table thead th {
-            background: #f8fafc;
-            color: #0c1c3e;
-            font-weight: 800;
-            border-color: rgba(12, 28, 62, 0.1);
-        }
-
-        .report-table td {
-            border-color: rgba(12, 28, 62, 0.08);
-            color: #0c1c3e;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 14px;
-            margin-bottom: 22px;
-        }
-
-        .stat-card {
-            border-radius: 14px;
-            border: 1px solid rgba(12, 28, 62, 0.08);
-            background: #fff;
-            padding: 16px 18px;
-            text-align: center;
-            box-shadow: 0 4px 14px rgba(12, 28, 62, 0.08);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 22px rgba(12, 28, 62, 0.14);
-        }
-
-        .stat-card .stat-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        .stat-card .stat-label {
-            font-size: 13px;
-            font-weight: 700;
-            color: #64748b;
-            margin-bottom: 6px;
-        }
-
-        .stat-card .stat-value {
-            font-size: 22px;
-            font-weight: 900;
-            color: #0c1c3e;
-        }
-
-        .stat-card.executed { border-top: 3px solid #0d9488; }
-        .stat-card.fault { border-top: 3px solid #dc2626; }
-        .stat-card.standby { border-top: 3px solid #e8b800; }
-
-        .form-grid { align-items: end; }
-    </style>
+    <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
 </head>
 
 <body>
@@ -107,7 +43,7 @@ $_ts_supplier_company_where = (!$_ts_is_super_admin && $_ts_suppliers_has_compan
 
 
     $sql = "
-SELECT 
+SELECT
     t.id,
     t.date,
     t.shift,
@@ -124,7 +60,7 @@ SELECT
 FROM timesheet t
 JOIN drivers d ON t.driver = d.id
 JOIN operations o ON t.operator = o.id
-JOIN equipments e ON o.equipment = e.id 
+JOIN equipments e ON o.equipment = e.id
 JOIN suppliers s ON e.suppliers = s.id
 JOIN project p ON o." . $operations_project_column . " = p.id
 WHERE 1=1
@@ -156,13 +92,13 @@ WHERE 1=1
 
     // إجمالي الإحصائيات
     $total_sql = "
-SELECT 
+SELECT
     SUM(t.executed_hours) AS executed_hours,
     SUM(t.total_fault_hours) AS total_fault,
     SUM(t.standby_hours) AS total_standby
 FROM timesheet t
 JOIN operations o ON t.operator = o.id
-JOIN equipments e ON o.equipment = e.id 
+JOIN equipments e ON o.equipment = e.id
 JOIN suppliers s ON e.suppliers = s.id
 JOIN project p ON o." . $operations_project_column . " = p.id
 WHERE 1=1
@@ -190,14 +126,17 @@ WHERE 1=1
     }
     ?>
 
-    <div class="main">
+    <div class="main reports-main timesheet-daily-main">
 
-        <div class="header">
-            <h1 class="page-title">
+        <div class="main_head">
+            <div class="head_actions"></div>
+
+            <h1 class="head-title">
                 <div class="title-icon"><i class="fa-solid fa-chart-column"></i></div>
                 تقرير التايم شيت اليومي
             </h1>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+
+            <div class="head_back">
                 <a href="reports.php" class="back-btn">
                     <i class="fas fa-arrow-right"></i> رجوع
                 </a>
@@ -208,15 +147,15 @@ WHERE 1=1
             <div class="card-header">
                 <h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
             </div>
-            <div class="card-body">
-                <form method="GET" class="form-grid">
+            <div class="card-body fc-filter-body">
+                <form method="GET" class="fc-filter-bar form-grid">
                     <div class="">
-                        <label class="form-label">ðŸ“… التاريخ:</label>
+                        <label class="fc-filter-label form-label">ðŸ“… التاريخ:</label>
                         <input type="date" class="form-control" name="date" value="<?php echo $date_filter; ?>">
                     </div>
 
                     <div>
-                        <label><i class="fas fa-diagram-project"></i> المشروع</label>
+                        <label class="fc-filter-label"><i class="fas fa-diagram-project"></i> المشروع</label>
                         <select name="project">
                             <option value="">-- الكل --</option>
                             <?php
@@ -230,7 +169,7 @@ WHERE 1=1
                     </div>
 
                     <div>
-                        <label><i class="fas fa-truck"></i> المورد</label>
+                        <label class="fc-filter-label"><i class="fas fa-truck"></i> المورد</label>
                         <select name="supplier">
                             <option value="">-- الكل --</option>
                             <?php
@@ -244,7 +183,7 @@ WHERE 1=1
                     </div>
 
                     <div>
-                        <label><i class="fas fa-clock"></i> الوردية</label>
+                        <label class="fc-filter-label"><i class="fas fa-clock"></i> الوردية</label>
                         <select name="shift">
                             <option value="">-- الكل --</option>
                             <option value="D" <?php if ($shift_filter == "D") echo "selected"; ?>>صباحية</option>
@@ -253,7 +192,7 @@ WHERE 1=1
                     </div>
 
                     <div>
-                        <label><i class="fas fa-cogs"></i> نوع الآلية</label>
+                        <label class="fc-filter-label"><i class="fas fa-cogs"></i> نوع الآلية</label>
                         <select name="type">
                             <option value="">-- الكل --</option>
                             <option value="1" <?php if ($type_filter == "1") echo "selected"; ?>>حفار</option>
@@ -261,7 +200,9 @@ WHERE 1=1
                         </select>
                     </div>
 
-                    <button type="submit"><i class="fa fa-search"></i> بحث</button>
+                    <div class="fc-filter-actions">
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> بحث</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -338,5 +279,3 @@ WHERE 1=1
 </body>
 
 </html>
-
-
