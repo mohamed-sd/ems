@@ -10,6 +10,11 @@ include '../includes/permissions_helper.php';
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string) $_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+
+// فلترة المنجم لمدير الموقع (Site Manager - Role 5)
+$user_mine_id = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0;
+$is_site_manager = ($current_role === '5');
 
 if (!$is_super_admin && $company_id <= 0) {
     header("Location: ../login.php?msg=Unauthorized+company+context");
@@ -84,6 +89,11 @@ if (!$is_super_admin) {
 
 if ((string) $_SESSION['user']['role'] === '6') {
     $where_parts[] = "t.user_id = " . intval($_SESSION['user']['id']);
+}
+
+// فلترة المنجم لمدير الموقع (Site Manager - Role 5)
+if ($is_site_manager && $user_mine_id > 0) {
+    $where_parts[] = "CAST(o.mine_id AS UNSIGNED) = $user_mine_id";
 }
 
 if ($month_filter !== '') {
@@ -186,6 +196,11 @@ if (!$is_super_admin) {
         WHERE p.id = o.$operations_project_column
           AND (su.company_id = $company_id OR scu.company_id = $company_id)
     )";
+}
+
+// إضافة فلتر المنجم لمدير الموقع في استعلام العمليات
+if ($is_site_manager && $user_mine_id > 0) {
+    $scope_where_operations .= " AND CAST(o.mine_id AS UNSIGNED) = $user_mine_id";
 }
 
 $operations = [];
