@@ -1234,7 +1234,7 @@ include('../insidebar.php');
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<!-- <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script> -->
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>

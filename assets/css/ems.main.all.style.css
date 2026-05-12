@@ -86,7 +86,7 @@
 }
 
 .allforms .card .card-header {
-  background: linear-gradient(135deg, var(--s2), var(--s3));
+  background: var(--card-bg, #f8f9fa);
   border-bottom: 1px solid var(--bdr);
   padding: 14px 16px;
   display: flex;
@@ -751,7 +751,7 @@ table.dataTable tbody tr:last-child td {
 
 .contracts-main .allforms .card .card-header,
 .supplier-contracts-main .allforms .card .card-header {
-  background: linear-gradient(135deg, var(--s2), var(--s3));
+  background: var(--card-bg, #f8f9fa);
   border-bottom: 1px solid var(--bdr);
 }
 
@@ -2779,7 +2779,7 @@ table.d-bd {
 
 .movement-page .ems-hero-actions .back-btn,
 .movement-map-page .map-header-actions .back-btn {
-  background: linear-gradient(135deg, #334155, #1f2937) !important;
+  background: linear-gradient(135deg, #334155, #372d1f) !important;
   color: #fff !important;
   border: 1px solid rgba(148,163,184,.45) !important;
   border-radius: 10px !important;
@@ -3092,7 +3092,7 @@ table.d-bd {
 }
 
 .movement-map-page .mine-hdr.mine-accent-0 {
-  background: linear-gradient(135deg, #07081e, #1a1660);
+  background: linear-gradient(135deg, #2b1506, #2a1601);
 }
 
 .movement-map-page .mine-hdr.mine-accent-1 {
@@ -4846,7 +4846,7 @@ table.d-bd {
 }
 
 .equipments-fleet-main .card-header {
-  background: linear-gradient(135deg, var(--s2), var(--s3));
+  background: var(--card-bg, #f8f9fa);
   border-bottom: 1px solid var(--bdr);
   padding: 12px 14px;
 }
@@ -5163,7 +5163,7 @@ table.d-bd {
 }
 
 .fc-page .card .card-header {
-  background: linear-gradient(135deg, var(--s2), var(--s3));
+  background: var(--card-bg, #f8f9fa);
   border-bottom: 1px solid var(--bdr);
   padding: 12px 14px;
 }
@@ -5410,7 +5410,7 @@ table.d-bd {
 }
 
 .project-users-main .card .card-header {
-  background: linear-gradient(135deg, var(--s2), var(--s3));
+  background: var(--card-bg, #f8f9fa);
   border-bottom: 1px solid var(--bdr);
 }
 
@@ -6161,7 +6161,7 @@ table.d-bd {
 }
 
 .suppliers-main .card-header {
-  background: linear-gradient(135deg, var(--s2), var(--s3));
+ background: var(--card-bg, #f8f9fa);
   border-bottom: 1px solid var(--bdr);
   padding: 12px 14px;
 }
@@ -6857,7 +6857,7 @@ table.d-bd {
 }
 
 .clients-main .allforms .card .card-header {
-  background: linear-gradient(135deg, var(--s2), var(--s3));
+  background: var(--card-bg, #f8f9fa);
   border-bottom: 1px solid var(--bdr);
 }
 
@@ -7498,7 +7498,7 @@ table.d-bd {
 }
 
 .projects-main .allforms .card .card-header {
-  background: linear-gradient(135deg, var(--s2), var(--s3));
+ background: var(--card-bg, #f8f9fa);
   border-bottom: 1px solid var(--bdr);
 }
 

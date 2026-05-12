@@ -778,38 +778,6 @@ include('../insidebar.php');
       </div>
 
       <!-- أزرار التحكم في المجموعات -->
-      <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0;">
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-          <span style="font-weight: 700; color: var(--navy); margin-left: 10px;">
-            <i class="fas fa-filter"></i> عرض المجموعات:
-          </span>
-          <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
-            <i class="fas fa-info-circle"></i> أساسية
-          </button>
-          <button class="btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
-            <i class="far fa-calendar"></i> تواريخ
-          </button>
-          <button class="btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
-            <i class="fas fa-clock"></i> ساعات
-          </button>
-          <button class="btn-group-toggle" data-group="parties" title="أطراف العقد">
-            <i class="fas fa-users"></i> أطراف
-          </button>
-          <button class="btn-group-toggle" data-group="services" title="الخدمات المقدمة">
-            <i class="fas fa-hands-helping"></i> خدمات
-          </button>
-          <button class="btn-group-toggle" data-group="operations" title="التشغيل اليومي">
-            <i class="fas fa-cogs"></i> تشغيل
-          </button>
-          <button class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
-            <i class="fas fa-check-circle"></i> حالة
-          </button>
-          <button class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
-            <i class="fas fa-eye"></i> الكل
-          </button>
-        </div>
-      </div>
-
       <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0; background: #f8f9fa;">
         <form method="get" action="supplierscontracts.php" style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
           <?php if ($has_supplier_filter): ?>
@@ -858,6 +826,39 @@ include('../insidebar.php');
           <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> تطبيق</button>
           <a href="supplierscontracts.php<?php echo $has_supplier_filter ? '?id=' . intval($supplier_id) : ''; ?>" class="btn btn-secondary"><i class="fas fa-undo"></i> مسح</a>
         </form>
+      </div>
+
+      <!-- أزرار التحكم في المجموعات -->
+      <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0;">
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+          <span style="font-weight: 700; color: var(--navy); margin-left: 10px;">
+            <i class="fas fa-layer-group"></i> عرض المجموعات:
+          </span>
+          <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
+            <i class="fas fa-info-circle"></i> أساسية
+          </button>
+          <button class="btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
+            <i class="far fa-calendar"></i> تواريخ
+          </button>
+          <button class="btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
+            <i class="fas fa-clock"></i> ساعات
+          </button>
+          <button class="btn-group-toggle" data-group="parties" title="أطراف العقد">
+            <i class="fas fa-users"></i> أطراف
+          </button>
+          <button class="btn-group-toggle" data-group="services" title="الخدمات المقدمة">
+            <i class="fas fa-hands-helping"></i> خدمات
+          </button>
+          <button class="btn-group-toggle" data-group="operations" title="التشغيل اليومي">
+            <i class="fas fa-cogs"></i> تشغيل
+          </button>
+          <button class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
+            <i class="fas fa-check-circle"></i> حالة
+          </button>
+          <button class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
+            <i class="fas fa-eye"></i> الكل
+          </button>
+        </div>
       </div>
 
       <div class="card-body" style="padding: 2rem; overflow-x: auto;">
@@ -1295,7 +1296,7 @@ include('../insidebar.php');
   <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
   <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
   <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-  <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+  <!-- <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script> -->
   <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
   <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
   <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>

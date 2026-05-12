@@ -1645,7 +1645,7 @@ if (!$is_super_admin) {
     <?php } ?>
   </form>
   <div class="card">
-    <div class="card-header">
+    <div style="padding: 5px;background: var(--card-bg, #f8f9fa); border-bottom: 1px solid var(--border, #dee2e6);">
       <h5><i class="fas fa-list-alt"></i> قائمة ساعات العمل</h5>
     </div>
     <div class="card-body table-container">

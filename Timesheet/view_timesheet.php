@@ -470,46 +470,349 @@ include('../insidebar.php');
 
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/main_admin_style.css">
+<link rel="stylesheet" href="../assets/css/ems.main.all.style.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 
 <style>
+/* ═══════════════════════════════════════════════════════════════
+   Unified Form & Cards Styling — Timesheet View
+   (Matching Clients Page Design)
+═══════════════════════════════════════════════════════════════ */
+
+/* Shadow classes */
+.shadow-sm {
+  box-shadow: 0 1px 3px rgba(26, 18, 8, 0.08), 0 4px 12px rgba(26, 18, 8, 0.06);
+}
+
+/* Card styling */
+.card {
+  background: #fff;
+  border: 1px solid #e8dcc8;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e8dcc8;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.card-header h5 {
+  margin: 0;
+  color: #1a1208;
+  font-weight: 800;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.card-header h5 i {
+  color: #f7931a;
+  font-size: 1.15rem;
+}
+
+.card-body {
+  background: linear-gradient(180deg, #fff 0%, #fffbf5 100%);
+  padding: 18px;
+}
+
+/* Form card styling */
+.pu-form-card {
+  background: #fff;
+  border: 1px solid #e8dcc8;
+  border-radius: 12px;
+}
+
+/* Form actions container */
+.pu-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+/* Button styling */
+.btn-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1a1208, #2d200a);
+  color: #fff;
+  border-left: 3px solid #f7931a;
+  font-weight: 800;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.25);
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(247, 147, 26, 0.35);
+}
+
+.btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  padding: 12px 20px;
+  border: 1.5px solid #e8dcc8;
+  border-radius: 10px;
+  background: #fff;
+  color: #6b4e2a;
+  font-weight: 800;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-cancel:hover {
+  border-color: #a07848;
+  background: #fdf8f0;
+  color: #1a1208;
+}
+
+/* Form grid styling */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  row-gap: 14px;
+  column-gap: 12px;
+}
+
+@media (min-width: 992px) and (max-width: 1366px) {
+  .form-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991px) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Form group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: #6b4e2a;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.form-group label i {
+  color: #f7931a;
+  font-size: 0.8rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  border: 1.4px solid #dacdb8;
+  border-radius: 10px;
+  background: #fffdfa;
+  color: #1a1208;
+  padding: 10px 14px;
+  min-height: 42px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: 'Tajawal', 'Cairo', sans-serif;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.form-group input:hover,
+.form-group select:hover {
+  border-color: rgba(247, 147, 26, 0.5);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #f7931a;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(247, 147, 26, 0.14), 0 3px 10px rgba(26, 18, 8, 0.07);
+}
+
+/* Group panel */
 .group-panel {
-    border: 1px solid rgba(12, 28, 62, 0.1);
-    border-radius: 12px;
-    padding: 12px;
-    background: #f8fafc;
+  border: 1px solid rgba(12, 28, 62, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+  background: #f8fafc;
 }
+
 .group-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
 }
+
 .group-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: var(--txt);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #6b4e2a;
 }
+
 .group-item input {
-    width: 16px;
-    height: 16px;
+  width: 16px;
+  height: 16px;
+  accent-color: #f7931a;
+  cursor: pointer;
 }
+
 .col-group-hidden {
-    display: none !important;
+  display: none !important;
 }
+
 .notice-box {
-    margin-bottom: 16px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(232, 184, 0, 0.3);
-    background: rgba(232, 184, 0, 0.1);
-    color: #7a5a00;
-    font-size: 14px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(232, 184, 0, 0.3);
+  background: rgba(232, 184, 0, 0.1);
+  color: #7a5a00;
+  font-size: 14px;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Stats Cards Styling (Timesheet)
+   مثل صفحة العملاء
+═══════════════════════════════════════════════════════════════ */
+
+.stats-grid.ts-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.stats-card {
+  background: #fff;
+  border: 1px solid #e8dcc8;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(26, 18, 8, 0.07);
+  position: relative;
+  overflow: hidden;
+}
+
+.stats-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  opacity: 0.9;
+}
+
+.stats-card .stats-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.stats-card .stats-title {
+  color: #6b4e2a;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 7px;
+  line-height: 1.3;
+}
+
+.stats-card .stats-value {
+  color: #1a1208;
+  font-size: 1.8rem;
+  line-height: 1;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Color variants */
+.ts-stats-executed::before {
+  background: linear-gradient(90deg, #1d4ed8, #2563eb);
+}
+
+.ts-stats-executed .stats-icon {
+  background: rgba(37, 99, 235, 0.14);
+  color: #1d4ed8;
+}
+
+.ts-stats-standby::before {
+  background: linear-gradient(90deg, #15803d, #16a34a);
+}
+
+.ts-stats-standby .stats-icon {
+  background: rgba(22, 163, 74, 0.14);
+  color: #15803d;
+}
+
+.ts-stats-fault::before {
+  background: linear-gradient(90deg, #b91c1c, #dc2626);
+}
+
+.ts-stats-fault .stats-icon {
+  background: rgba(220, 38, 38, 0.14);
+  color: #b91c1c;
+}
+
+.ts-stats-total::before {
+  background: linear-gradient(90deg, #b45309, #d97706);
+}
+
+.ts-stats-total .stats-icon {
+  background: rgba(217, 119, 6, 0.14);
+  color: #b45309;
+}
+
+/* Hover effect */
+.stats-card {
+  transition: all 0.25s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(26, 18, 8, 0.12);
+}
+
 </style>
 
 <div class="main timesheet-view-page ems-unified-page-shell">
@@ -542,47 +845,46 @@ include('../insidebar.php');
     <?php } ?>
 
     <div class="stats-grid ts-stats-grid">
-        <div class="stat-card">
-            <div class="stat-card-icon"><i class="fas fa-check-circle"></i></div>
-            <div class="stat-card-value"><?= number_format((float) $stats['executed_sum'], 2) ?></div>
-            <div class="stat-card-label">إجمالي الساعات المنفذة</div>
+        <div class="stats-card ts-stats-executed">
+            <div class="stats-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stats-title">إجمالي الساعات المنفذة</div>
+            <div class="stats-value"><?= number_format((float) $stats['executed_sum'], 2) ?></div>
         </div>
-        <div class="stat-card">
-            <div class="stat-card-icon"><i class="fas fa-pause-circle"></i></div>
-            <div class="stat-card-value"><?= number_format((float) $stats['standby_sum'], 2) ?></div>
-            <div class="stat-card-label">إجمالي ساعات الاستعداد</div>
+        <div class="stats-card ts-stats-standby">
+            <div class="stats-icon"><i class="fas fa-pause-circle"></i></div>
+            <div class="stats-title">إجمالي ساعات الاستعداد</div>
+            <div class="stats-value"><?= number_format((float) $stats['standby_sum'], 2) ?></div>
         </div>
-        <div class="stat-card">
-            <div class="stat-card-icon"><i class="fas fa-exclamation-triangle"></i></div>
-            <div class="stat-card-value"><?= number_format((float) $stats['fault_sum'], 2) ?></div>
-            <div class="stat-card-label">إجمالي ساعات الأعطال</div>
+        <div class="stats-card ts-stats-fault">
+            <div class="stats-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="stats-title">إجمالي ساعات الأعطال</div>
+            <div class="stats-value"><?= number_format((float) $stats['fault_sum'], 2) ?></div>
         </div>
-        <div class="stat-card">
-            <div class="stat-card-icon"><i class="fas fa-sigma"></i></div>
-            <div class="stat-card-value"><?= number_format((float) $stats['work_sum'], 2) ?></div>
-            <div class="stat-card-label">إجمالي ساعات العمل (منفذ + استعداد)</div>
+        <div class="stats-card ts-stats-total">
+            <div class="stats-icon"><i class="fas fa-chart-pie"></i></div>
+            <div class="stats-title">إجمالي ساعات العمل</div>
+            <div class="stats-value"><?= number_format((float) $stats['work_sum'], 2) ?></div>
         </div>
     </div>
 
-    <div class="card">
+    <div class="card shadow-sm pu-form-card">
         <div class="card-header">
             <h5><i class="fas fa-filter"></i> فلترة النتائج</h5>
         </div>
         <div class="card-body">
-            <form method="GET" class="form-grid">
-                <div>
+            <form method="GET" class="form-grid" id="timesheetFilterForm">
+                <div class="form-group">
                     <label><i class="fas fa-cogs"></i> نوع الآلية</label>
-                    <select name="equipment_type" id="equipment_type_filter" class="form-control">
+                    <select name="equipment_type" id="equipment_type_filter">
                         <option value="">-- اختر نوع الآلية --</option>
                         <option value="1" <?= $equipment_type === '1' ? 'selected' : '' ?>>معدات ثقيلة</option>
                         <option value="2" <?= $equipment_type === '2' ? 'selected' : '' ?>>شاحنات</option>
-                      <option value="3" <?= $equipment_type === '3' ? 'selected' : '' ?>>خرمات</option>
-
+                        <option value="3" <?= $equipment_type === '3' ? 'selected' : '' ?>>خرمات</option>
                     </select>
                 </div>
-                <div>
+                <div class="form-group">
                     <label><i class="fas fa-truck-moving"></i> الآلية</label>
-                    <select name="operation_id" id="operation_filter" class="form-control">
+                    <select name="operation_id" id="operation_filter">
                         <option value=""><?= ($equipment_type === '1' || $equipment_type === '2') ? '-- اختر الآلية --' : '-- اختر نوع الآلية أولاً --' ?></option>
                         <?php foreach ($operations as $op) { ?>
                             <option value="<?= intval($op['id']) ?>" <?= $operation_id === intval($op['id']) ? 'selected' : '' ?>>
@@ -591,17 +893,17 @@ include('../insidebar.php');
                         <?php } ?>
                     </select>
                 </div>
-                <div>
+                <div class="form-group">
                     <label><i class="fas fa-sun"></i> الوردية</label>
-                    <select name="shift" class="form-control">
+                    <select name="shift">
                         <option value="">-- الكل --</option>
                         <option value="D" <?= $shift_filter === 'D' ? 'selected' : '' ?>>☀️ صباحية</option>
                         <option value="N" <?= $shift_filter === 'N' ? 'selected' : '' ?>>🌙 مسائية</option>
                     </select>
                 </div>
-                <div>
+                <div class="form-group">
                     <label><i class="fas fa-user"></i> المشغل (السائق)</label>
-                    <select name="driver_id" id="driver_filter" class="form-control">
+                    <select name="driver_id" id="driver_filter">
                         <option value=""><?= $operation_id > 0 ? '-- اختر السائق --' : '-- اختر الآلية أولاً --' ?></option>
                         <?php foreach ($drivers as $driver) { ?>
                             <option value="<?= intval($driver['id']) ?>" <?= $driver_id === intval($driver['id']) ? 'selected' : '' ?>>
@@ -610,44 +912,44 @@ include('../insidebar.php');
                         <?php } ?>
                     </select>
                 </div>
-                <div>
+                <div class="form-group">
                     <label><i class="fas fa-calendar-day"></i> تاريخ محدد</label>
-                    <input type="date" name="filter_date" class="form-control" value="<?= htmlspecialchars($filter_date) ?>" />
+                    <input type="date" name="filter_date" value="<?= htmlspecialchars($filter_date) ?>" />
                 </div>
-                <div>
+                <div class="form-group">
                     <label><i class="fas fa-calendar"></i> من تاريخ</label>
-                    <input type="date" name="start_date" class="form-control" value="<?= htmlspecialchars($start_date) ?>" />
+                    <input type="date" name="start_date" value="<?= htmlspecialchars($start_date) ?>" />
                 </div>
-                <div>
+                <div class="form-group">
                     <label><i class="fas fa-calendar"></i> إلى تاريخ</label>
-                    <input type="date" name="end_date" class="form-control" value="<?= htmlspecialchars($end_date) ?>" />
+                    <input type="date" name="end_date" value="<?= htmlspecialchars($end_date) ?>" />
                 </div>
-                <div>
+                <div class="form-group">
                     <label><i class="fas fa-calendar-alt"></i> الشهر</label>
-                    <input type="month" name="month" class="form-control" value="<?= htmlspecialchars($month_filter) ?>" />
+                    <input type="month" name="month" value="<?= htmlspecialchars($month_filter) ?>" />
                 </div>
-                <div>
+                <div class="form-group">
                     <label><i class="fas fa-toggle-on"></i> حالة السجل</label>
-                    <select name="status" class="form-control">
+                    <select name="status">
                         <option value="">-- الكل --</option>
                         <option value="1" <?= $status_filter === '1' ? 'selected' : '' ?>>قيد المراجعة</option>
                         <option value="2" <?= $status_filter === '2' ? 'selected' : '' ?>>معتمد</option>
                         <option value="3" <?= $status_filter === '3' ? 'selected' : '' ?>>مرفوض</option>
                     </select>
                 </div>
-                <div style="display: flex; gap: 10px; align-items: flex-end;">
-                    <button type="submit" class="btn-submit">
-                        <i class="fas fa-search"></i> تطبيق
-                    </button>
-                    <a href="view_timesheet.php" class="btn-cancel" style="text-decoration: none; padding: 11px 26px;">
-                        <i class="fas fa-redo"></i> مسح الفلاتر
-                    </a>
-                </div>
             </form>
+            <div class="pu-form-actions">
+                <button type="submit" form="timesheetFilterForm" class="btn-submit">
+                    <i class="fas fa-search"></i> تطبيق
+                </button>
+                <a href="view_timesheet.php" class="btn-cancel">
+                    <i class="fas fa-redo"></i> مسح الفلاتر
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="card ts-mt-card">
+    <div class="card shadow-sm pu-form-card">
         <div class="card-header">
             <h5><i class="fas fa-layer-group"></i> إظهار وإخفاء مجموعات الحقول</h5>
         </div>
@@ -666,7 +968,7 @@ include('../insidebar.php');
         </div>
     </div>
 
-    <div class="card ts-mt-card">
+    <div class="card shadow-sm pu-form-card">
         <div class="card-header">
             <h5><i class="fas fa-columns"></i> اختيار الحقول المعروضة</h5>
         </div>
@@ -681,7 +983,7 @@ include('../insidebar.php');
         </div>
     </div>
 
-    <div class="card">
+    <div class="card shadow-sm">
         <div class="card-header">
             <h5><i class="fas fa-list-alt"></i> قائمة ساعات العمل</h5>
         </div>

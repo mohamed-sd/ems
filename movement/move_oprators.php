@@ -338,6 +338,265 @@ include('../insidebar.php');
 
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/ems.main.all.style.css">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   Unified Modal Design — Movement Operations View Modal
+   تصميم موحد للمديول - مثل صفحة العملاء
+═══════════════════════════════════════════════════════════════ */
+
+/* Modal overlay */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.35);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal content */
+.modal-content.movement-view-modal-content {
+  width: min(900px, 95vw);
+  max-height: 85vh;
+  border: 1px solid #e8dcc8;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff 0%, #fdf8f0 100%);
+  box-shadow: 0 22px 42px rgba(26, 18, 8, 0.25);
+  overflow: hidden;
+  animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Modal header */
+.modal-header.movement-view-modal-header {
+  background: linear-gradient(135deg, #1a1208, #2a1b0c);
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 207, 144, 0.22);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.modal-header.movement-view-modal-header h5 {
+  margin: 0;
+  font-weight: 900;
+  font-size: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+}
+
+.modal-header.movement-view-modal-header i {
+  color: #f7931a;
+  font-size: 1.1rem;
+}
+
+/* Close button */
+.movement-view-modal-close {
+  border: 0;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.movement-view-modal-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(90deg);
+}
+
+/* Modal body */
+.modal-body.movement-view-modal-body {
+  overflow-y: auto;
+  padding: 16px;
+  flex: 1;
+  background: linear-gradient(180deg, #fff 0%, #fffbf5 100%);
+}
+
+/* Grid layout */
+.movement-view-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+/* Item card */
+.movement-view-modal-item {
+  border: 1px solid #e8dcc8;
+  border-radius: 11px;
+  padding: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(26, 18, 8, 0.05);
+  transition: all 0.2s ease;
+}
+
+.movement-view-modal-item:hover {
+  border-color: #f7931a;
+  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.12);
+}
+
+/* Wide items (full width) */
+.movement-view-modal-item-wide {
+  grid-column: 1 / -1;
+}
+
+/* Label */
+.movement-view-modal-label {
+  color: #6b4e2a;
+  font-size: 0.81rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.movement-view-modal-label i {
+  color: #f7931a;
+  font-size: 0.9rem;
+}
+
+/* Value */
+.movement-view-modal-value {
+  color: #1a1208;
+  font-weight: 800;
+  font-size: 0.92rem;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+/* Reason section */
+.movement-view-modal-reason {
+  background: linear-gradient(135deg, rgba(247, 147, 26, 0.08), rgba(247, 147, 26, 0.03));
+  border: 1.5px solid rgba(247, 147, 26, 0.2);
+}
+
+.movement-view-modal-reason-label {
+  color: #b45309;
+  font-size: 0.81rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.movement-view-modal-reason-label i {
+  color: #b45309;
+  font-size: 0.9rem;
+}
+
+.movement-view-modal-reason-value {
+  color: #6b4e2a;
+  font-weight: 700;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* Modal footer */
+.modal-footer.movement-view-modal-footer {
+  border-top: 1px solid #e8dcc8;
+  background: #fff;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  flex-shrink: 0;
+}
+
+/* Footer buttons */
+.movement-view-modal-btn {
+  border: none;
+  border-radius: 9px;
+  padding: 10px 16px;
+  font-weight: 800;
+  font-size: 0.92rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.movement-view-modal-btn-primary {
+  background: linear-gradient(135deg, #1a1208, #2d200a);
+  color: #fff;
+  border-left: 3px solid #f7931a;
+  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.25);
+}
+
+.movement-view-modal-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(247, 147, 26, 0.35);
+}
+
+.movement-view-modal-btn-secondary {
+  background: #fff;
+  color: #6b4e2a;
+  border: 1.5px solid #e8dcc8;
+}
+
+.movement-view-modal-btn-secondary:hover {
+  border-color: #a07848;
+  background: #fdf8f0;
+  color: #1a1208;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .movement-view-modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-content.movement-view-modal-content {
+    width: 98vw;
+    max-height: 90vh;
+  }
+}
+</style>
 
 <div class="main movement-page movement-ops-page">
 
@@ -748,8 +1007,7 @@ include('../insidebar.php');
         <div id="viewOperationModal" class="modal movement-view-modal">
             <div class="modal-content movement-view-modal-content">
                 <div class="modal-header movement-view-modal-header">
-                    <h5 class="movement-view-modal-title"><i class="fas fa-eye movement-view-modal-title-icon"></i>
-                        تفاصيل سجل التشغيل</h5>
+                    <h5><i class="fas fa-eye"></i> تفاصيل سجل التشغيل</h5>
                     <button onclick="closeViewOperationModal()" class="movement-view-modal-close">&times;</button>
                 </div>
                 <div class="modal-body movement-view-modal-body">
@@ -767,8 +1025,7 @@ include('../insidebar.php');
                             <div class="movement-view-modal-value" id="view_op_mine">-</div>
                         </div>
                         <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-file-contract"></i> تاريخ توقيع
-                                العقد</div>
+                            <div class="movement-view-modal-label"><i class="fas fa-file-contract"></i> تاريخ توقيع العقد</div>
                             <div class="movement-view-modal-value" id="view_op_contract">-</div>
                         </div>
                         <div class="movement-view-modal-item">
@@ -780,13 +1037,11 @@ include('../insidebar.php');
                             <div class="movement-view-modal-value" id="view_op_category">-</div>
                         </div>
                         <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-calendar-alt"></i> تاريخ البداية
-                            </div>
+                            <div class="movement-view-modal-label"><i class="fas fa-calendar-alt"></i> تاريخ البداية</div>
                             <div class="movement-view-modal-value" id="view_op_start">-</div>
                         </div>
                         <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-calendar-check"></i> تاريخ النهاية
-                            </div>
+                            <div class="movement-view-modal-label"><i class="fas fa-calendar-check"></i> تاريخ النهاية</div>
                             <div class="movement-view-modal-value" id="view_op_end">-</div>
                         </div>
                         <div class="movement-view-modal-item">
@@ -794,8 +1049,7 @@ include('../insidebar.php');
                             <div class="movement-view-modal-value" id="view_op_total_hours">-</div>
                         </div>
                         <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-hourglass-half"></i> ساعات الوردية
-                            </div>
+                            <div class="movement-view-modal-label"><i class="fas fa-hourglass-half"></i> ساعات الوردية</div>
                             <div class="movement-view-modal-value" id="view_op_shift_hours">-</div>
                         </div>
                         <div class="movement-view-modal-item movement-view-modal-item-wide">
@@ -803,21 +1057,18 @@ include('../insidebar.php');
                             <div id="view_op_status">-</div>
                         </div>
                         <div id="view_op_reason_block" class="movement-view-modal-reason movement-view-modal-item-wide">
-                            <div class="movement-view-modal-reason-label"><i class="fas fa-info-circle"></i> سبب الإنهاء
-                            </div>
+                            <div class="movement-view-modal-reason-label"><i class="fas fa-info-circle"></i> سبب الإنهاء</div>
                             <div class="movement-view-modal-reason-value" id="view_op_reason">-</div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer movement-view-modal-footer">
                     <?php if ($can_edit): ?>
-                        <button type="button" id="viewOpEditBtn" onclick="triggerEditFromView()"
-                            class="movement-view-modal-btn movement-view-modal-btn-primary">
+                        <button type="button" id="viewOpEditBtn" onclick="triggerEditFromView()" class="movement-view-modal-btn movement-view-modal-btn-primary">
                             <i class="fas fa-edit"></i> تعديل
                         </button>
                     <?php endif; ?>
-                    <button type="button" onclick="closeViewOperationModal()"
-                        class="movement-view-modal-btn movement-view-modal-btn-secondary">
+                    <button type="button" onclick="closeViewOperationModal()" class="movement-view-modal-btn movement-view-modal-btn-secondary">
                         <i class="fas fa-times"></i> إغلاق
                     </button>
                 </div>
@@ -1332,12 +1583,12 @@ include('../insidebar.php');
                     // حفظ data-id للتعديل
                     _viewOpEditData = { id: btn.data('id') };
 
-                    $('#viewOperationModal').css('display', 'flex').hide().fadeIn(300);
+                    $('#viewOperationModal').addClass('show');
                 });
             });
 
             function closeViewOperationModal() {
-                $('#viewOperationModal').fadeOut(300);
+                $('#viewOperationModal').removeClass('show');
             }
 
             function triggerEditFromView() {
