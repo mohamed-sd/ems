@@ -1,12 +1,14 @@
 <?php
 session_start();
 
-while (ob_get_level()) ob_end_clean();
-
-header('Content-Type: application/json; charset=utf-8');
-
 // تضمين ملف الاتصال بقاعدة البيانات
 require_once '../config.php';
+
+// تأكد أن الاستجابة JSON خالصة بدون أي مخرجات إضافية من الـ bootstrap
+while (ob_get_level()) {
+    ob_end_clean();
+}
+header('Content-Type: application/json; charset=utf-8');
 
 // التحقق من أن الطلب هو POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
