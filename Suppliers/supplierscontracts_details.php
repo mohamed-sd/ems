@@ -40,7 +40,7 @@ if (!$is_super_admin) {
         )";
     }
 }
- 
+
 $page_title = 'الإيكوبيشن | تفاصيل عقد المورد';
 include '../inheader.php';
 include '../insidebar.php';
@@ -107,11 +107,11 @@ include '../insidebar.php';
 
 $contract_id = intval($_GET['id']);
 
-$sql = "SELECT 
+$sql = "SELECT
             sc.id, sc.supplier_id, sc.project_id, sc.mine_id, sc.project_contract_id, sc.contract_signing_date, sc.grace_period_days, sc.contract_duration_months, sc.contract_duration_days,
-            sc.actual_start, sc.actual_end, sc.transportation, sc.accommodation, sc.place_for_living, 
+            sc.actual_start, sc.actual_end, sc.transportation, sc.accommodation, sc.place_for_living,
             sc.workshop, sc.hours_monthly_target, sc.forecasted_contracted_hours, sc.created_at, sc.updated_at,
-            sc.daily_work_hours, sc.daily_operators, sc.first_party, sc.second_party, 
+            sc.daily_work_hours, sc.daily_operators, sc.first_party, sc.second_party,
             sc.witness_one, sc.witness_two, sc.status, sc.pause_reason, sc.pause_date, sc.resume_date, sc.termination_type, sc.termination_reason, sc.merged_with,
             sc.equip_shifts_contract, sc.shift_contract, sc.equip_total_contract_daily, sc.total_contract_permonth, sc.total_contract_units,
             sc.price_currency_contract, sc.paid_contract, sc.payment_time, sc.guarantees, sc.payment_date,
@@ -143,7 +143,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     $today = new DateTime();
     $actual_end_date = new DateTime($row['actual_end']);
     $interval = $today->diff($actual_end_date);
-    $remaining_days = (int)$interval->format('%r%a');  
+    $remaining_days = (int)$interval->format('%r%a');
 
 
 
@@ -446,7 +446,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         <?php endif; ?>
 
     </div>
-<?php 
+<?php
 $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
 $supplier_id = $row['supplier_id'];
 $project_id = $row['project_id'];
@@ -472,7 +472,7 @@ $paid_contract = isset($row['paid_contract']) ? $row['paid_contract'] : '';
 $payment_time = isset($row['payment_time']) ? $row['payment_time'] : '';
 $guarantees = isset($row['guarantees']) ? $row['guarantees'] : '';
 $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
-} 
+}
 ?>
 
 <!-- جدول معدات العقد (بما فيها معدات العقد المدموج) -->
@@ -483,7 +483,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
         </div>
         <h4>
             معدات العقد
-            <?php 
+            <?php
             if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
                 echo "<span class='badge-pill'>(العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")</span>";
             }
@@ -491,7 +491,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
         </h4>
     </div>
     <div class="table-responsive-wrapper">
-        <table class="modern-table">
+        <table class="modern-table" data-no-dt="1">
             <thead>
                 <tr>
                     <th>#</th>
@@ -511,7 +511,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     <th>المشرفين</th>
                     <th>الفنيين</th>
                     <th>المساعدين</th>
-                    <?php 
+                    <?php
                     if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
                         echo "<th>المصدر</th>";
                     }
@@ -538,9 +538,9 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         return $equipments;
                     }
                 }
-                
+
                 $equipments = getSupplierContractEquipments($contract_id, $conn);
-                
+
                 if (!empty($equipments)) {
                     $i = 1;
                     foreach ($equipments as $equip) {
@@ -567,15 +567,15 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             $merged_equipments = getSupplierContractEquipments(intval($row['merged_with']), $conn);
                             $is_from_merged = false;
                             foreach ($merged_equipments as $m_equip) {
-                                if ($m_equip['equip_type'] == $equip['equip_type'] && 
+                                if ($m_equip['equip_type'] == $equip['equip_type'] &&
                                     $m_equip['equip_size'] == $equip['equip_size'] &&
                                     $m_equip['equip_count'] == $equip['equip_count']) {
                                     $is_from_merged = true;
                                     break;
                                 }
                             }
-                            echo "<td><span class='badge " . ($is_from_merged ? "bg-success" : "bg-primary") . "'>" . 
-                                 ($is_from_merged ? "العقد #" . $row['merged_with'] : "العقد #" . $contract_id) . 
+                            echo "<td><span class='badge " . ($is_from_merged ? "bg-success" : "bg-primary") . "'>" .
+                                 ($is_from_merged ? "العقد #" . $row['merged_with'] : "العقد #" . $contract_id) .
                                  "</span></td>";
                         }
                         echo "</tr>";
@@ -593,7 +593,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
     </div>
 </div>
 
-<?php 
+<?php
 // إزالة الجدول المنفصل للعقد المدموج (تم دمج معداته في الجدول الرئيسي)
 ?>
 
@@ -608,7 +608,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <h4>سجل الملاحظات والتغييرات</h4>
         </div>
         <div class="table-responsive-wrapper">
-            <table class="modern-table">
+            <table class="modern-table" data-no-dt="1">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -620,13 +620,13 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </thead>
                 <tbody>
                     <?php
-                    $notes_query = "SELECT n.* 
+                    $notes_query = "SELECT n.*
                                     FROM supplier_contract_notes n
                                     JOIN supplierscontracts sc ON sc.id = n.contract_id
                                     WHERE n.contract_id = $contract_id AND $supplier_contract_scope_sql
                                     ORDER BY created_at DESC";
                     $notes_result = mysqli_query($conn, $notes_query);
-                    
+
                     if ($notes_result && mysqli_num_rows($notes_result) > 0) {
                         $j = 1;
                         while ($note = mysqli_fetch_assoc($notes_result)) {
@@ -634,7 +634,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             $note_text = htmlspecialchars($note['note']);
                             $action_icon = '<i class="fas fa-sticky-note"></i>';
                             $action_badge = 'info';
-                            
+
                             if (strpos($note_text, 'تجديد') !== false) {
                                 $action_icon = '<i class="fas fa-sync-alt"></i>';
                                 $action_badge = 'primary';
@@ -662,7 +662,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             } else {
                                 $action_type = 'ملاحظة عامة';
                             }
-                            
+
                             $badge_colors = [
                                 'primary' => 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);',
                                 'secondary' => 'background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);',
@@ -672,7 +672,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                                 'purple' => 'background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);',
                                 'info' => 'background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);'
                             ];
-                            
+
                             echo "<tr>";
                             echo "<td>" . $j . "</td>";
                             echo "<td><span style='" . $badge_colors[$action_badge] . " color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;'>" . $action_icon . " " . $action_type . "</span></td>";
@@ -865,7 +865,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     <i class="fas fa-check-circle"></i>
                     <strong>تأكيد:</strong> سيتم استئناف العقد وإعادة تفعيله.
                 </div>
-                
+
                 <!-- عرض تاريخ الإيقاف تلقائياً -->
                 <div class="mb-4" style="padding: 1.25rem; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 12px; border-right: 5px solid #ffc107; box-shadow: 0 2px 10px rgba(255, 193, 7, 0.2);">
                     <div style="display: flex; align-items: center; gap: 0.75rem; color: #856404; font-weight: 700; margin-bottom: 0.75rem; font-size: 1.05rem;">
@@ -874,7 +874,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     </div>
                     <div style="color: #856404; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
                         <i class="far fa-calendar-times"></i>
-                        <strong>تاريخ إيقاف العقد:</strong> 
+                        <strong>تاريخ إيقاف العقد:</strong>
                         <span style="background: white; padding: 0.4rem 1rem; border-radius: 6px; font-weight: 700; color: #d39e00;">
                             <?php echo !empty($pause_date) ? date('Y-m-d', strtotime($pause_date)) : 'غير محدد'; ?>
                         </span>
@@ -886,7 +886,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     </div>
                     <?php endif; ?>
                 </div>
-                
+
                 <!-- إدخال تاريخ الاستئناف -->
                 <div class="mb-4">
                     <label for="resumeDate" class="form-label" style="font-weight: 700; font-size: 1.05rem;">
@@ -898,13 +898,13 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         <i class="fas fa-info-circle"></i> التاريخ الافتراضي هو اليوم، يمكنك تعديله حسب الحاجة
                     </small>
                 </div>
-                
+
                 <div id="pauseDurationDisplay" style="display: none; padding: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; margin-bottom: 1rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600; margin-bottom: 1rem;">
                         <i class="fas fa-clock"></i>
                         <span>مدة الإيقاف: <strong id="calculatedPauseDays">0</strong> يوم</span>
                     </div>
-                    
+
                     <!-- خيارات معالجة أيام الإيقاف -->
                     <div style="background: white; padding: 1rem; border-radius: 8px; border: 2px solid #1976d2;">
                         <div style="font-weight: 700; color: #1976d2; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
@@ -933,7 +933,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="resumeReason" class="form-label">
                         <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
@@ -1033,18 +1033,18 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         ?>
                     </select>
                 </div>
-                
+
                 <!-- عرض المعدات الحالية والمعدات الخاصة بالعقد المختار -->
                 <div id="mergeEquipmentsContainer" style="margin-top: 20px;">
                     <h6 class="mb-3">معدات العقود:</h6>
-                    
+
                     <!-- معدات العقد الحالي -->
                     <div class="mb-4">
                         <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #0066cc;">
                             <i class="fa fa-cube"></i> معدات العقد الحالي (#<?php echo $contract_id; ?>)
                         </h6>
                         <div id="currentContractEquipments">
-                            <table class="table table-sm table-bordered">
+                            <table class="table table-sm table-bordered" data-no-dt="1">
                                 <thead class="table-light">
                                     <tr>
                                         <th>نوع المعدة</th>
@@ -1075,7 +1075,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             </table>
                         </div>
                     </div>
-                    
+
                     <!-- معدات العقد المختار -->
                     <div class="mb-4">
                         <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #28a745;">
@@ -1412,9 +1412,9 @@ function canPerformAction(action) {
         'terminate': [1, 0],
         'merge': [1]
     };
-    
+
     if (!activeStatuses[action]) return true;
-    
+
     if (!activeStatuses[action].includes(contractStatus)) {
         const statusMsg = {
             'renewal': 'العقد يجب أن يكون ساري لتجديده',
@@ -1451,15 +1451,15 @@ document.getElementById('renewalModal').addEventListener('hidden.bs.modal', func
 function calculateRenewalDuration() {
     const startDate = $('#renewalStartDate').val();
     const endDate = $('#renewalEndDate').val();
-    
+
     if (startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
-        
+
         if (start < end) {
             const timeDiff = end.getTime() - start.getTime();
             const durationDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-            
+
             $('#calculatedDays').text(durationDays);
             $('#renewalDurationDisplay').slideDown(300);
         } else {
@@ -1483,13 +1483,13 @@ $('#confirmRenewal').click(function() {
         alert('تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء');
         return;
     }
-    
+
     // حساب عدد الأيام بين التاريخين
     const start = new Date(startDate);
     const end = new Date(endDate);
     const timeDiff = end.getTime() - start.getTime();
     const durationDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    
+
     performAction('renewal', {
         new_start_date: startDate,
         new_end_date: endDate,
@@ -1563,7 +1563,7 @@ $('#resumeBtn').click(function() {
     if (!canPerformAction('resume')) return;
     const modal = new bootstrap.Modal(document.getElementById('resumeModal'));
     modal.show();
-    
+
     // حساب عدد أيام الإيقاف عند فتح الـ modal
     calculatePauseDuration();
 });
@@ -1572,15 +1572,15 @@ $('#resumeBtn').click(function() {
 function calculatePauseDuration() {
     const resumeDate = $('#resumeDate').val();
     const pauseDate = '<?php echo !empty($pause_date) ? $pause_date : ''; ?>';
-    
+
     if (pauseDate && resumeDate) {
         const pause = new Date(pauseDate);
         const resume = new Date(resumeDate);
-        
+
         if (resume >= pause) {
             const timeDiff = resume.getTime() - pause.getTime();
             const durationDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-            
+
             $('#calculatedPauseDays').text(durationDays);
             $('#pauseDurationDisplay').slideDown(300);
         } else {
@@ -1599,20 +1599,20 @@ $('#confirmResume').click(function() {
         alert('الرجاء تحديد تاريخ الاستئناف');
         return;
     }
-    
+
     const pauseDate = '<?php echo !empty($pause_date) ? $pause_date : ''; ?>';
     let pauseDays = 0;
-    
+
     if (pauseDate && resumeDate) {
         const pause = new Date(pauseDate);
         const resume = new Date(resumeDate);
         const timeDiff = resume.getTime() - pause.getTime();
         pauseDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
     }
-    
+
     // الحصول على خيار معالجة أيام الإيقاف
     const pauseHandling = $('input[name="pauseHandling"]:checked').val();
-    
+
     performAction('resume', {
         resume_reason: $('#resumeReason').val(),
         resume_date: resumeDate,
@@ -1695,7 +1695,7 @@ $('#editPartiesBtn').click(function() {
 $('#saveProjectInfo').click(function() {
     const gracePeriod = $('#editGracePeriod').val();
     const dailyOperators = $('#editDailyOperators').val();
-    
+
     $.ajax({
         url: '../Contracts/update_contract_details.php',
         type: 'POST',
@@ -1729,7 +1729,7 @@ $('#saveServices').click(function() {
     const accommodation = $('#editAccommodation').val();
     const placeLiving = $('#editPlaceLiving').val();
     const workshop = $('#editWorkshop').val();
-    
+
     $.ajax({
         url: '../Contracts/update_contract_details.php',
         type: 'POST',
@@ -1767,7 +1767,7 @@ $('#saveParties').click(function() {
     const secondParty = $('#editSecondParty').val();
     const witnessOne = $('#editWitnessOne').val();
     const witnessTwo = $('#editWitnessTwo').val();
-    
+
     $.ajax({
         url: '../Contracts/update_contract_details.php',
         type: 'POST',
@@ -1812,7 +1812,7 @@ $('#savePayment').click(function() {
     const paymentTime = $('#editPaymentTime').val();
     const guarantees = $('#editGuarantees').val();
     const paymentDate = $('#editPaymentDate').val();
-    
+
     $.ajax({
         url: '../Contracts/update_contract_details.php',
         type: 'POST',
@@ -1849,12 +1849,12 @@ $('#savePayment').click(function() {
 // تحميل معدات العقد المختار عند التغيير
 $('#mergeWithId').on('change', function() {
     const selectedContractId = $(this).val();
-    
+
     if (!selectedContractId) {
         $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>');
         return;
     }
-    
+
     // تحميل المعدات عبر AJAX
     $.ajax({
         url: 'get_supplier_contract_equipments.php',
@@ -1874,7 +1874,7 @@ $('#mergeWithId').on('change', function() {
                     html += '<th>وحدات/الشهر</th>';
                     html += '</tr></thead>';
                     html += '<tbody>';
-                    
+
                     response.equipments.forEach(function(equip) {
                         html += '<tr>';
                         html += '<td>' + equip.equip_type + '</td>';
@@ -1884,7 +1884,7 @@ $('#mergeWithId').on('change', function() {
                         html += '<td>' + (equip.equip_monthly_target || 0) + '</td>';
                         html += '</tr>';
                     });
-                    
+
                     html += '</tbody></table>';
                 } else {
                     html = '<p style="text-align: center; color: #999;">لا توجد معدات لهذا العقد</p>';
@@ -1923,6 +1923,3 @@ $('#confirmMerge').click(function() {
 
     </div><!-- /.page-wrapper -->
 </div><!-- /.main -->
-
-
-

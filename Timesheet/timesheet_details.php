@@ -4,35 +4,23 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
     exit();
 }
+require_once '../config.php';
+$page_title = 'تفاصيل ساعات العمل';
+include '../inheader.php';
+include '../insidebar.php';
 ?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيكوبيشن | تفاصيل ساعات العمل</title>
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-    <!-- Bootstrap 5 -->
-    <link href="/ems/assets/css/bootstrap.min.css" rel="stylesheet">
-    <!-- CSS الموقع -->
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
-    <!-- Google Fonts -->
-    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-    <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
-
-    <style>
+<style>
         :root {
-            --primary: #0f2444;
-            --primary-light: #1a3a6e;
-            --accent: #e8b84b;
-            --surface: #f0f4fa;
+            --primary: #161008;
+            --primary-light: #2a1b0c;
+            --accent: #f7931a;
+            --surface: #fffaf2;
             --surface-2: #ffffff;
-            --text-primary: #0f1a2e;
-            --text-secondary: #5a6a82;
-            --text-muted: #9aa5b4;
-            --border: #e2e8f4;
+            --text-primary: #1f1509;
+            --text-secondary: #7a4a12;
+            --text-muted: #c4a57b;
+            --border: #ede5d8;
             --success: #059669;
             --success-bg: #ecfdf5;
             --success-border: #a7f3d0;
@@ -45,9 +33,9 @@ if (!isset($_SESSION['user'])) {
             --info: #0369a1;
             --info-bg: #eff6ff;
             --info-border: #bae6fd;
-            --shadow-sm: 0 1px 3px rgba(15,36,68,0.07), 0 1px 2px rgba(15,36,68,0.04);
-            --shadow-md: 0 4px 16px rgba(15,36,68,0.09), 0 2px 6px rgba(15,36,68,0.05);
-            --shadow-lg: 0 10px 40px rgba(15,36,68,0.13), 0 4px 12px rgba(15,36,68,0.07);
+            --shadow-sm: 0 1px 3px rgba(22,16,8,0.07), 0 1px 2px rgba(22,16,8,0.04);
+            --shadow-md: 0 4px 16px rgba(22,16,8,0.09), 0 2px 6px rgba(22,16,8,0.05);
+            --shadow-lg: 0 10px 40px rgba(22,16,8,0.13), 0 4px 12px rgba(22,16,8,0.07);
             --radius-sm: 10px;
             --radius-md: 16px;
             --radius-lg: 24px;
@@ -74,7 +62,7 @@ if (!isset($_SESSION['user'])) {
 
         /* ========== PAGE HERO ========== */
         .page-hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, #2a5298 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, #3d2817 100%);
             border-radius: var(--radius-lg);
             padding: 32px 40px;
             margin-bottom: 28px;
@@ -455,10 +443,9 @@ if (!isset($_SESSION['user'])) {
         ::-webkit-scrollbar-thumb { background: #c1cfe0; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
-</head>
-<body class="standalone-brand">
 
-<div class="main">
+<div class="main timesheet-main timesheet-details-page ems-unified-page-shell">
+<div class="page-wrapper">
 
     <!-- ===== PAGE HERO ===== -->
     <div class="page-hero">
@@ -468,7 +455,7 @@ if (!isset($_SESSION['user'])) {
                     <i class="fas fa-clock"></i>
                 </div>
                 <div>
-                    <h1 class="hero-title">تفاصيل ساعات العمل</h1>
+                    <h1 class="hero-title" style="color: #fff;">تفاصيل ساعات العمل</h1>
                     <p class="hero-subtitle">عرض تقرير مفصّل لجميع ساعات التشغيل والأعطال والمشغل</p>
                 </div>
             </div>
@@ -479,7 +466,6 @@ if (!isset($_SESSION['user'])) {
     </div>
 
 <?php
-include '../config.php';
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
@@ -865,7 +851,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         <div style="padding: 20px 24px;">
             <?php if (!empty($ts_fault_records)): ?>
                 <div style="overflow-x:auto;">
-                    <table class="table table-sm table-hover table-bordered" style="font-size:13.5px;">
+                    <table class="table table-sm table-hover table-bordered" data-no-dt="1" style="font-size:13.5px;">
                         <thead>
                             <tr style="background:var(--primary);color:#fff;">
                                 <th style="padding:8px 12px;">#</th>
@@ -1083,7 +1069,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
         <div style="padding: 20px 24px;">
             <div style="overflow-x:auto;">
-                <table class="table table-sm table-hover table-bordered" style="font-size:13.5px;margin-bottom:0;">
+                <table class="table table-sm table-hover table-bordered" data-no-dt="1" style="font-size:13.5px;margin-bottom:0;">
                     <thead>
                         <tr style="background:var(--primary);color:#fff;">
                             <th style="padding:8px 12px;width:15%;">#</th>
@@ -1137,7 +1123,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     <div class="detail-row">
                         <span class="detail-label"><i class="fas fa-tag"></i> النوع</span>
                         <span class="detail-value">
-                            <?php 
+                            <?php
                             $transport_type = isset($row['transport_type']) && !empty($row['transport_type']) ? $row['transport_type'] : 'غير محدد';
                             $transport_class = '';
                             $transport_icon = '';
@@ -1276,14 +1262,11 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 <?php } ?>
 
+</div><!-- end .page-wrapper -->
 </div><!-- end .main -->
 
-<!-- jQuery -->
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
-<!-- Bootstrap JS -->
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
-
-

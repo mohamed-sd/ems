@@ -585,11 +585,11 @@ include '../insidebar.php';
 
                             // أزرار الإجراءات
                             $action_btns = "<td><div class='action-btns'>";
+                            $action_btns .= "<a href='supplierscontracts.php?id=" . $row['id'] . "' class='action-btn contracts' title='العقود'><i class='fas fa-file-contract'></i></a> | ";
                             $action_btns .= "<a href='javascript:void(0)' class='viewBtn action-btn view' $data_attrs title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
                             if ($can_edit) {
                                 $action_btns .= "<a href='javascript:void(0)' class='editBtn action-btn edit' $data_attrs title='تعديل'><i class='fas fa-edit'></i></a>";
                             }
-                            $action_btns .= "<a href='supplierscontracts.php?id=" . $row['id'] . "' class='action-btn contracts' title='العقود'><i class='fas fa-file-contract'></i></a>";
                             if ($can_delete) {
                                 $action_btns .= "<a href='?delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف هذا المورد؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
                             }

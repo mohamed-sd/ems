@@ -790,8 +790,8 @@ include '../inheader.php';
         </div>
     </form>
     <?php endif; ?>
-    <div class="card shadow-sm">
-            <div class="card-header">
+    <div  class="card shadow-sm">
+            <div style="background-color: var(--surface); padding: 12px 20px; border-radius: var(--radius) var(--radius) 0 0; border-bottom: 1px solid rgba(247, 147, 26, 0.28);">
                 <h5><i class="fas fa-list-alt"></i> قائمة المناجم</h5>
             </div>
             <div class="card-body" style="overflow-x: auto;">
