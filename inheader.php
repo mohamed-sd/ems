@@ -21,6 +21,8 @@ $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '..
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
+    <!-- Unified Table Styles -->
+    <link rel="stylesheet" href="/ems/assets/css/alltables.css">
     <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
     <link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
     <!-- <link rel="stylesheet" href="/ems/assets/css/brand-identity.css"> -->
@@ -34,4 +36,3 @@ $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '..
 
 </head>
 <body class="ems-site">
-

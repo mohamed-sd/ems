@@ -699,39 +699,6 @@ include('../insidebar.php');
       </h5>
     </div>
 
-    <!-- أزرار التحكم في المجموعات -->
-    <div class="card-body contracts-group-toolbar-wrap">
-      <div class="contracts-group-toolbar">
-        <span class="contracts-group-toolbar-label">
-          <i class="fas fa-filter"></i> عرض المجموعات:
-        </span>
-        <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
-          <i class="fas fa-info-circle"></i> أساسية
-        </button>
-        <button class="btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
-          <i class="far fa-calendar"></i> تواريخ
-        </button>
-        <button class="btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
-          <i class="fas fa-clock"></i> ساعات
-        </button>
-        <button class="btn-group-toggle" data-group="parties" title="أطراف العقد">
-          <i class="fas fa-users"></i> أطراف
-        </button>
-        <button class="btn-group-toggle" data-group="services" title="الخدمات المقدمة">
-          <i class="fas fa-hands-helping"></i> خدمات
-        </button>
-        <button class="btn-group-toggle" data-group="operations" title="التشغيل اليومي">
-          <i class="fas fa-cogs"></i> تشغيل
-        </button>
-        <button class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
-          <i class="fas fa-check-circle"></i> حالة
-        </button>
-        <button class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
-          <i class="fas fa-eye"></i> الكل
-        </button>
-      </div>
-    </div>
-
     <div class="card-body contracts-table-filter-wrap">
       <form method="get" action="contracts.php" class="contracts-table-filter-form">
         <?php if ($mine_id > 0): ?>
@@ -773,6 +740,39 @@ include('../insidebar.php');
         <a href="contracts.php<?php echo $mine_id > 0 ? '?id=' . intval($mine_id) : ''; ?>" class="btn btn-secondary"><i
             class="fas fa-undo"></i> مسح</a>
       </form>
+    </div>
+
+    <!-- أزرار التحكم في المجموعات -->
+    <div class="card-body contracts-group-toolbar-wrap">
+      <div class="contracts-group-toolbar">
+        <span class="contracts-group-toolbar-label">
+          <i class="fas fa-filter"></i> عرض المجموعات:
+        </span>
+        <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
+          <i class="fas fa-info-circle"></i> أساسية
+        </button>
+        <button class="btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
+          <i class="far fa-calendar"></i> تواريخ
+        </button>
+        <button class="btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
+          <i class="fas fa-clock"></i> ساعات
+        </button>
+        <button class="btn-group-toggle" data-group="parties" title="أطراف العقد">
+          <i class="fas fa-users"></i> أطراف
+        </button>
+        <button class="btn-group-toggle" data-group="services" title="الخدمات المقدمة">
+          <i class="fas fa-hands-helping"></i> خدمات
+        </button>
+        <button class="btn-group-toggle" data-group="operations" title="التشغيل اليومي">
+          <i class="fas fa-cogs"></i> تشغيل
+        </button>
+        <button class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
+          <i class="fas fa-check-circle"></i> حالة
+        </button>
+        <button class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
+          <i class="fas fa-eye"></i> الكل
+        </button>
+      </div>
     </div>
 
     <div class="card-body contracts-table-wrap">

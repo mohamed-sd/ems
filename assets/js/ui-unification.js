@@ -256,9 +256,12 @@
             var $table = $(table);
             ensureUnifiedTableClass(table);
             if (table.classList.contains('dtr-details')) return;
+            if (table.classList.contains('no-datatable')) return;
+            if (table.dataset.noDt) return;
             if (!table.tHead || !table.tBodies || !table.tBodies.length) return;
             if ($.fn.dataTable.isDataTable(table)) return;
             if ($table.closest('.dataTables_wrapper').length) return;
+            if ($table.closest('.modal').length) return;
             $table.addClass('display');
             try {
                 $table.DataTable({

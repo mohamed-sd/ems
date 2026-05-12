@@ -350,7 +350,7 @@ include '../inheader.php';
     }
 
     .modal-header {
-        background: linear-gradient(135deg, var(--navy), var(--navy-l));
+        background: linear-gradient(140deg, #2a1b0c 0%, #1f1509 55%, #161008 100%);
         color: #fff;
         padding: 16px 20px;
         border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -467,16 +467,17 @@ include '../inheader.php';
 
     .view-item {
         padding: 12px 14px;
-        background: var(--bg);
+        background: linear-gradient(135deg, #fffaf2 0%, #fff4e4 100%);
         border-radius: var(--radius);
-        border-right: 3px solid var(--gold);
+        border: 1px solid rgba(247, 147, 26, 0.22);
+        border-right: 3px solid #f7931a;
         box-shadow: var(--shadow-sm);
     }
 
     .view-item-label {
         font-size: 11px;
         font-weight: 700;
-        color: var(--sub);
+        color: #7a4a12;
         margin-bottom: 4px;
         display: flex;
         align-items: center;
@@ -487,8 +488,17 @@ include '../inheader.php';
     .view-item-value {
         font-size: .95rem;
         font-weight: 800;
-        color: var(--navy);
+        color: #1f1509;
         word-break: break-word;
+    }
+
+    #viewMineModal .modal-content {
+        border: 1px solid rgba(247, 147, 26, 0.28);
+        box-shadow: 0 16px 38px rgba(18, 13, 7, 0.28);
+    }
+
+    #viewMineModal .modal-header {
+        border-bottom: 1px solid rgba(247, 147, 26, 0.28);
     }
 
     .conditional-field { display: none; }
@@ -522,6 +532,97 @@ include '../inheader.php';
         padding: 8px 14px;
         border-radius: 10px;
         gap: 6px;
+    }
+
+    .main .card-header h5 i,
+    .main .head-title i,
+    .main .head_back a i {
+        color: #f7931a;
+    }
+
+    #minesTable tbody td > a:not(.action-btn) {
+        color: #7a4a12 !important;
+        background: linear-gradient(135deg, #fff8ec 0%, #fff1de 100%);
+        border: 1px solid rgba(247, 147, 26, 0.28);
+        border-radius: 999px;
+        padding: 4px 10px;
+        text-decoration: none;
+        font-weight: 800;
+        transition: all .18s ease;
+    }
+
+    #minesTable tbody td > a:not(.action-btn):hover {
+        color: #fff !important;
+        background: linear-gradient(135deg, #f7931a 0%, #d97706 100%);
+        border-color: rgba(247, 147, 26, 0.7);
+    }
+
+    #minesTable .action-btn {
+        border-radius: 10px;
+        border: 1px solid rgba(247, 147, 26, 0.28);
+        background: linear-gradient(135deg, #fff8ec 0%, #fff1de 100%);
+        color: #8a4f10;
+        box-shadow: 0 4px 10px rgba(26, 18, 8, 0.09);
+    }
+
+    #minesTable .action-btn i { color: inherit; }
+
+    #minesTable .action-btn:hover {
+        transform: translateY(-2px);
+        color: #fff;
+        border-color: rgba(247, 147, 26, 0.75);
+        background: linear-gradient(135deg, #f7931a 0%, #d97706 100%);
+        box-shadow: 0 8px 16px rgba(217, 119, 6, 0.25);
+    }
+
+    #minesTable .action-btn.delete {
+        color: #b42318;
+        border-color: rgba(220, 38, 38, 0.22);
+        background: linear-gradient(135deg, #fff3f4 0%, #ffe7ea 100%);
+    }
+
+    #minesTable .action-btn.delete:hover {
+        color: #fff;
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        border-color: rgba(185, 28, 28, 0.78);
+    }
+
+    #viewMineModal .modal-header {
+        background: linear-gradient(140deg, #2a1b0c 0%, #1f1509 55%, #161008 100%);
+        border-bottom: 1px solid rgba(247, 147, 26, 0.26);
+    }
+
+    #viewMineModal .modal-footer {
+        border-top: 1px solid rgba(247, 147, 26, 0.2);
+        background: linear-gradient(180deg, #fffdfa 0%, #fff7ec 100%);
+    }
+
+    #viewMineModal .modal-footer .action-btn.contracts,
+    #viewMineModal .modal-footer .action-btn.edit,
+    #viewMineModal .modal-footer .action-btn.delete {
+        border: 1px solid rgba(247, 147, 26, 0.28);
+        background: linear-gradient(135deg, #fff8ec 0%, #fff0d8 100%);
+        color: #8a4f10;
+        text-decoration: none;
+    }
+
+    #viewMineModal .modal-footer .action-btn.contracts:hover,
+    #viewMineModal .modal-footer .action-btn.edit:hover {
+        background: linear-gradient(135deg, #f7931a 0%, #d97706 100%);
+        border-color: rgba(247, 147, 26, 0.75);
+        color: #fff;
+    }
+
+    #viewMineModal .modal-footer .action-btn.delete {
+        border-color: rgba(220, 38, 38, 0.24);
+        color: #b42318;
+        background: linear-gradient(135deg, #fff2f3 0%, #ffe7ea 100%);
+    }
+
+    #viewMineModal .modal-footer .action-btn.delete:hover {
+        color: #fff;
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        border-color: rgba(185, 28, 28, 0.75);
     }
 
     .link-alert-chip {
@@ -689,6 +790,7 @@ include '../inheader.php';
         </div>
     </form>
     <?php endif; ?>
+    <div class="card shadow-sm">
             <div class="card-header">
                 <h5><i class="fas fa-list-alt"></i> قائمة المناجم</h5>
             </div>

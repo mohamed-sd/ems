@@ -481,7 +481,7 @@ include '../insidebar.php';
                 </h4>
             </div>
             <div class="table-responsive-wrapper">
-                <table class="modern-table">
+                <table class="modern-table" data-no-dt="1">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -558,7 +558,8 @@ include '../insidebar.php';
                                 $i++;
                             }
                         } else {
-                            echo "<tr><td colspan='17'><div class='empty-state'><i class='fas fa-inbox'></i><p>لا توجد معدات لهذا العقد</p></div></td></tr>";
+                            $equipments_colspan = (!empty($row['merged_with']) && $row['merged_with'] != '0') ? 18 : 17;
+                            echo "<tr><td colspan='" . $equipments_colspan . "'><div class='empty-state'><i class='fas fa-inbox'></i><p>لا توجد معدات لهذا العقد</p></div></td></tr>";
                         }
                         ?>
                     </tbody>
@@ -575,7 +576,7 @@ include '../insidebar.php';
                 <h4>سجل الملاحظات والتغييرات</h4>
             </div>
             <div class="table-responsive-wrapper">
-                <table class="modern-table">
+                <table class="modern-table" data-no-dt="1">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -980,7 +981,7 @@ include '../insidebar.php';
                                 <i class="fa fa-cube"></i> معدات العقد الحالي (#<?php echo $contract_id; ?>)
                             </div>
                             <div id="currentContractEquipments">
-                                <table class="table table-sm table-bordered cd-table-compact">
+                                <table class="table table-sm table-bordered cd-table-compact" data-no-dt="1">
                                     <thead class="table-light">
                                         <tr>
                                             <th>نوع المعدة</th><th>الحجم</th><th>العدد</th><th>الساعات/الشهر</th><th>وحدات/الشهر</th>

@@ -419,6 +419,211 @@ table.dataTable tfoot td {
   text-align: center !important;
 }
 
+.alltables tbody td > a:not(.action-btn),
+.alltable tbody td > a:not(.action-btn),
+table.alltables tbody td > a:not(.action-btn),
+table.alltable tbody td > a:not(.action-btn),
+table.display tbody td > a:not(.action-btn),
+table.dataTable tbody td > a:not(.action-btn) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(247,147,26,.28);
+  background: linear-gradient(135deg, #fff7ea 0%, #fff2db 100%);
+  color: #7a4a12 !important;
+  font-weight: 800;
+  font-size: .79rem;
+  text-decoration: none;
+  transition: all .2s ease;
+}
+
+.alltables tbody td > a:not(.action-btn):hover,
+.alltable tbody td > a:not(.action-btn):hover,
+table.alltables tbody td > a:not(.action-btn):hover,
+table.alltable tbody td > a:not(.action-btn):hover,
+table.display tbody td > a:not(.action-btn):hover,
+table.dataTable tbody td > a:not(.action-btn):hover {
+  background: linear-gradient(135deg, #f7931a 0%, #dd7b08 100%);
+  color: #fff !important;
+  border-color: rgba(247,147,26,.65);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(247,147,26,.24);
+}
+
+.alltables tbody td .action-btn,
+.alltable tbody td .action-btn,
+table.alltables tbody td .action-btn,
+table.alltable tbody td .action-btn,
+table.display tbody td .action-btn,
+table.dataTable tbody td .action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--bdr);
+  background: #fff;
+  color: var(--t2);
+  text-decoration: none;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease, background .2s ease;
+}
+
+.alltables tbody td .action-btn i,
+.alltable tbody td .action-btn i,
+table.alltables tbody td .action-btn i,
+table.alltable tbody td .action-btn i,
+table.display tbody td .action-btn i,
+table.dataTable tbody td .action-btn i {
+  font-size: 14px;
+  transition: transform .18s ease, filter .18s ease;
+}
+
+.alltables tbody td .action-btn:hover,
+.alltable tbody td .action-btn:hover,
+table.alltables tbody td .action-btn:hover,
+table.alltable tbody td .action-btn:hover,
+table.display tbody td .action-btn:hover,
+table.dataTable tbody td .action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(26,18,8,.14);
+}
+
+.alltables tbody td .action-btn:hover i,
+.alltable tbody td .action-btn:hover i,
+table.alltables tbody td .action-btn:hover i,
+table.alltable tbody td .action-btn:hover i,
+table.display tbody td .action-btn:hover i,
+table.dataTable tbody td .action-btn:hover i {
+  transform: scale(1.08);
+}
+
+.alltables tbody td .action-btn.view,
+.alltable tbody td .action-btn.view,
+table.alltables tbody td .action-btn.view,
+table.alltable tbody td .action-btn.view,
+table.display tbody td .action-btn.view,
+table.dataTable tbody td .action-btn.view,
+.alltables tbody td .action-btn.mines,
+.alltable tbody td .action-btn.mines,
+table.alltables tbody td .action-btn.mines,
+table.alltable tbody td .action-btn.mines,
+table.display tbody td .action-btn.mines,
+table.dataTable tbody td .action-btn.mines {
+  color: #975300;
+  border-color: rgba(247,147,26,.35);
+  background: linear-gradient(135deg, #fff7ea 0%, #ffeed5 100%);
+}
+
+.alltables tbody td .action-btn.contracts,
+.alltable tbody td .action-btn.contracts,
+table.alltables tbody td .action-btn.contracts,
+table.alltable tbody td .action-btn.contracts,
+table.display tbody td .action-btn.contracts,
+table.dataTable tbody td .action-btn.contracts {
+  color: #7c4a0d;
+  border-color: rgba(168,117,54,.3);
+  background: linear-gradient(135deg, #f8efe2 0%, #f2e2cf 100%);
+}
+
+.alltables tbody td .action-btn.delete,
+.alltable tbody td .action-btn.delete,
+table.alltables tbody td .action-btn.delete,
+table.alltable tbody td .action-btn.delete,
+table.display tbody td .action-btn.delete,
+table.dataTable tbody td .action-btn.delete {
+  color: #b42318;
+  border-color: rgba(220,38,38,.25);
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe5e8 100%);
+}
+
+.alltables tbody td .action-btn.view:hover,
+.alltable tbody td .action-btn.view:hover,
+table.alltables tbody td .action-btn.view:hover,
+table.alltable tbody td .action-btn.view:hover,
+table.display tbody td .action-btn.view:hover,
+table.dataTable tbody td .action-btn.view:hover,
+.alltables tbody td .action-btn.mines:hover,
+.alltable tbody td .action-btn.mines:hover,
+table.alltables tbody td .action-btn.mines:hover,
+table.alltable tbody td .action-btn.mines:hover,
+table.display tbody td .action-btn.mines:hover,
+table.dataTable tbody td .action-btn.mines:hover {
+  background: linear-gradient(135deg, #f7931a 0%, #d97706 100%);
+  color: #fff;
+  border-color: rgba(247,147,26,.75);
+}
+
+.alltables tbody td .action-btn.contracts:hover,
+.alltable tbody td .action-btn.contracts:hover,
+table.alltables tbody td .action-btn.contracts:hover,
+table.alltable tbody td .action-btn.contracts:hover,
+table.display tbody td .action-btn.contracts:hover,
+table.dataTable tbody td .action-btn.contracts:hover {
+  background: linear-gradient(135deg, #a0662c 0%, #7a4a12 100%);
+  color: #fff;
+  border-color: rgba(122,74,18,.75);
+}
+
+.alltables tbody td .action-btn.delete:hover,
+.alltable tbody td .action-btn.delete:hover,
+table.alltables tbody td .action-btn.delete:hover,
+table.alltable tbody td .action-btn.delete:hover,
+table.display tbody td .action-btn.delete:hover,
+table.dataTable tbody td .action-btn.delete:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: #fff;
+  border-color: rgba(185,28,28,.75);
+}
+
+.alltables tbody td .action-btn.view i,
+.alltable tbody td .action-btn.view i,
+table.alltables tbody td .action-btn.view i,
+table.alltable tbody td .action-btn.view i,
+table.display tbody td .action-btn.view i,
+table.dataTable tbody td .action-btn.view i {
+  color: #a16207;
+}
+
+.alltables tbody td .action-btn.mines i,
+.alltable tbody td .action-btn.mines i,
+table.alltables tbody td .action-btn.mines i,
+table.alltable tbody td .action-btn.mines i,
+table.display tbody td .action-btn.mines i,
+table.dataTable tbody td .action-btn.mines i,
+.alltables tbody td .action-btn i.fa-mountain,
+.alltable tbody td .action-btn i.fa-mountain,
+table.alltables tbody td .action-btn i.fa-mountain,
+table.alltable tbody td .action-btn i.fa-mountain,
+table.display tbody td .action-btn i.fa-mountain,
+table.dataTable tbody td .action-btn i.fa-mountain {
+  color: #9a600d;
+}
+
+.alltables tbody td .action-btn.delete i,
+.alltable tbody td .action-btn.delete i,
+table.alltables tbody td .action-btn.delete i,
+table.alltable tbody td .action-btn.delete i,
+table.display tbody td .action-btn.delete i,
+table.dataTable tbody td .action-btn.delete i,
+.alltables tbody td .action-btn i.fa-trash,
+.alltables tbody td .action-btn i.fa-trash-alt,
+table.dataTable tbody td .action-btn i.fa-trash,
+table.dataTable tbody td .action-btn i.fa-trash-alt {
+  color: #b42318;
+}
+
+.alltables tbody td .action-btn:hover i,
+.alltable tbody td .action-btn:hover i,
+table.alltables tbody td .action-btn:hover i,
+table.alltable tbody td .action-btn:hover i,
+table.display tbody td .action-btn:hover i,
+table.dataTable tbody td .action-btn:hover i {
+  color: #fff !important;
+}
+
 .alltables tbody tr:hover td,
 .alltable tbody tr:hover td,
 table.alltables tbody tr:hover td,
@@ -665,6 +870,9 @@ table.dataTable tbody tr:last-child td {
 
 .contracts-group-toolbar-wrap {
   padding: 1rem 2rem;
+  margin-top: .35rem;
+  background: linear-gradient(180deg, #fffdfa 0%, #fff9ef 100%);
+  border-top: 1px dashed rgba(247,147,26,.35);
   border-bottom: 1px solid #e0e0e0;
 }
 
@@ -7754,9 +7962,10 @@ table.d-bd {
 }
 
 .contracts-details-page .page-wrapper {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 24px 20px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 20px 14px;
 }
 
 .contracts-details-page .page-hero {
