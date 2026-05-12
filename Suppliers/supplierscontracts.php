@@ -329,12 +329,18 @@ include('../insidebar.php');
                   <i class="fas fa-handshake"></i> المتعاقد عليه مع موردين
                 </strong>
                 <div class="project-hours-value project-hours-value-red" id="suppliersContractedHours">0</div>
+                <div id="suppliersBreakdown" class="project-hours-breakdown">
+                  <!-- سيتم ملء تفصيل الموردين هنا -->
+                </div>
               </div>
               <div class="project-hours-card">
                 <strong class="project-hours-label project-hours-label-green">
                   <i class="fas fa-chart-line"></i> الساعات المتبقية
                 </strong>
                 <div class="project-hours-value project-hours-value-green" id="remainingHours">0</div>
+                <div id="remainingBreakdown" class="project-hours-breakdown">
+                  <!-- سيتم ملء تفصيل الساعات المتبقية هنا -->
+                </div>
               </div>
             </div>
           </div>
@@ -1850,6 +1856,98 @@ include('../insidebar.php');
                 breakdownDiv.html(breakdownHtml);
               } else {
                 breakdownDiv.html('<span style="color: #999; font-style: italic;">لا توجد معدات مسجلة لهذا العقد</span>');
+              }
+
+              // عرض تفصيل الموردين وساعاتهم التعاقدية
+              var suppliersDiv = $('#suppliersBreakdown');
+              suppliersDiv.empty();
+
+              if (response.suppliers_list && response.suppliers_list.length > 0) {
+                var suppliersHtml = '<div style="color: #555;"><strong style="color: #d32f2f; display: block; margin-bottom: 0.5rem; margin-top: 0.8rem;">تفصيل الموردين:</strong>';
+
+                response.suppliers_list.forEach(function (supplier) {
+                  var percentage = response.suppliers_contracted_hours > 0 ? ((supplier.hours / response.suppliers_contracted_hours) * 100).toFixed(1) : 0;
+
+                  suppliersHtml += '<div style="display: flex; flex-direction: column; margin-bottom: 0.6rem; padding: 0.5rem; background: #ffebee; border-radius: 6px; border-left: 4px solid #d32f2f;">';
+                  suppliersHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">';
+                  suppliersHtml += '<span><i class="fas fa-building" style="color: #d32f2f; margin-left: 0.3rem;"></i>' + supplier.name + '</span>';
+                  suppliersHtml += '<span style="font-weight: 600; color: #c62828;">' + new Intl.NumberFormat('ar-EG').format(supplier.hours) + ' ساعة (' + percentage + '%)</span>';
+                  suppliersHtml += '</div>';
+
+                  // معلومات العقد
+                  if (supplier.contract_date || supplier.start_date || supplier.end_date) {
+                    suppliersHtml += '<div style="display: flex; gap: 1rem; font-size: 0.85rem; padding-top: 0.3rem; border-top: 1px dashed #ffcdd2;">';
+                    if (supplier.contract_date) {
+                      suppliersHtml += '<span style="color: #666;"><i class="fas fa-calendar-check" style="color: #d32f2f;"></i> توقيع: ' + supplier.contract_date + '</span>';
+                    }
+                    if (supplier.start_date) {
+                      suppliersHtml += '<span style="color: #666;"><i class="fas fa-play-circle" style="color: #2e7d32;"></i> بداية: ' + supplier.start_date + '</span>';
+                    }
+                    if (supplier.end_date) {
+                      suppliersHtml += '<span style="color: #666;"><i class="fas fa-stop-circle" style="color: #c62828;"></i> نهاية: ' + supplier.end_date + '</span>';
+                    }
+                    suppliersHtml += '</div>';
+                  }
+
+                  // شريط نسبة المساهمة
+                  suppliersHtml += '<div style="margin-top: 0.4rem;">';
+                  suppliersHtml += '<div style="background: #e0e0e0; height: 6px; border-radius: 3px; overflow: hidden;">';
+                  suppliersHtml += '<div style="background: #d32f2f; height: 100%; width: ' + percentage + '%; transition: width 0.3s;"></div>';
+                  suppliersHtml += '</div>';
+                  suppliersHtml += '<span style="font-size: 0.75rem; color: #666; display: block; margin-top: 0.2rem;">نسبة المساهمة: ' + percentage + '%</span>';
+                  suppliersHtml += '</div>';
+
+                  suppliersHtml += '</div>';
+                });
+
+                suppliersHtml += '</div>';
+                suppliersDiv.html(suppliersHtml);
+              } else {
+                suppliersDiv.html('<span style="color: #999; font-style: italic; margin-top: 0.5rem; display: block;">لا توجد عقود موردين لهذا المشروع</span>');
+              }
+
+              // عرض تفصيل الساعات المتبقية حسب نوع الآلية
+              var remainingDiv = $('#remainingBreakdown');
+              remainingDiv.empty();
+
+              if (response.remaining_breakdown && response.remaining_breakdown.length > 0) {
+                var remainingHtml = '<div style="color: #555;"><strong style="color: #43a047; display: block; margin-bottom: 0.5rem; margin-top: 0.8rem;">تفصيل الساعات المتبقية:</strong>';
+
+                response.remaining_breakdown.forEach(function (item) {
+                  var percentage = response.remaining_hours > 0 ? ((item.remaining_hours / response.remaining_hours) * 100).toFixed(1) : 0;
+                  var statusColor = item.remaining_hours > 0 ? '#43a047' : (item.remaining_hours < 0 ? '#d32f2f' : '#999');
+                  var statusIcon = item.remaining_hours > 0 ? 'fa-check-circle' : (item.remaining_hours < 0 ? 'fa-exclamation-triangle' : 'fa-minus-circle');
+
+                  remainingHtml += '<div style="display: flex; flex-direction: column; margin-bottom: 0.6rem; padding: 0.5rem; background: #e8f5e9; border-radius: 6px; border-left: 4px solid ' + statusColor + ';">';
+                  remainingHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">';
+                  remainingHtml += '<span><i class="fas ' + statusIcon + '" style="color: ' + statusColor + '; margin-left: 0.3rem;"></i>' + item.type + '</span>';
+                  remainingHtml += '<span style="font-weight: 600; color: ' + statusColor + ';">' + new Intl.NumberFormat('ar-EG').format(item.remaining_hours) + ' ساعة</span>';
+                  remainingHtml += '</div>';
+                  remainingHtml += '<div style="display: flex; gap: 1rem; font-size: 0.85rem; padding-top: 0.3rem; border-top: 1px dashed #c8e6c9;">';
+                  remainingHtml += '<span style="color: #1976d2;"><i class="fas fa-calculator"></i> إجمالي: ' + new Intl.NumberFormat('ar-EG').format(item.total_hours) + '</span>';
+                  remainingHtml += '<span style="color: #d32f2f;"><i class="fas fa-handshake"></i> متعاقد: ' + new Intl.NumberFormat('ar-EG').format(item.suppliers_hours) + '</span>';
+                  remainingHtml += '<span style="color: ' + statusColor + ';"><i class="fas fa-balance-scale"></i> متبقي: ' + new Intl.NumberFormat('ar-EG').format(item.remaining_hours) + '</span>';
+                  remainingHtml += '</div>';
+
+                  // إضافة شريط تقدم
+                  if (item.total_hours > 0) {
+                    var progressPercentage = Math.min(100, (item.suppliers_hours / item.total_hours) * 100);
+                    var progressColor = progressPercentage >= 90 ? '#d32f2f' : (progressPercentage >= 70 ? '#ffa000' : '#43a047');
+                    remainingHtml += '<div style="margin-top: 0.4rem;">';
+                    remainingHtml += '<div style="background: #e0e0e0; height: 6px; border-radius: 3px; overflow: hidden;">';
+                    remainingHtml += '<div style="background: ' + progressColor + '; height: 100%; width: ' + progressPercentage.toFixed(1) + '%; transition: width 0.3s;"></div>';
+                    remainingHtml += '</div>';
+                    remainingHtml += '<span style="font-size: 0.75rem; color: #666; display: block; margin-top: 0.2rem;">نسبة التعاقد: ' + progressPercentage.toFixed(1) + '%</span>';
+                    remainingHtml += '</div>';
+                  }
+
+                  remainingHtml += '</div>';
+                });
+
+                remainingHtml += '</div>';
+                remainingDiv.html(remainingHtml);
+              } else {
+                remainingDiv.html('<span style="color: #999; font-style: italic; margin-top: 0.5rem; display: block;">لا توجد تفاصيل</span>');
               }
 
               $('#projectHoursInfo').fadeIn();
