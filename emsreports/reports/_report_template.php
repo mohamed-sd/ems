@@ -1187,9 +1187,9 @@ body {
 /* ── Hero ───────────────────────────────── */
 .rpt-hero {
     position: relative; overflow: hidden; border-radius: var(--rl);
-    background: linear-gradient(140deg, #000a2e 0%, #0d1a5c 55%, #1a0a3e 100%);
+    background: linear-gradient(140deg, #2e1401 0%, #2d1605 55%, #210801 100%);
     color: #fff; padding: 22px 26px; margin-bottom: 16px;
-    box-shadow: var(--s3); border: 1px solid rgba(255,255,255,.07);
+    box-shadow: var(--s3); border: 1px solid rgba(57, 33, 18, 0.07);
     display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
 }
 .rpt-hero::before {
@@ -1204,7 +1204,14 @@ body {
     font-size: 1.45rem; color: #ffcc00; position: relative; z-index: 1;
 }
 .rpt-hero-body { flex: 1; min-width: 0; position: relative; z-index: 1; }
-.rpt-hero-body h1 { margin: 0; font-size: 1.3rem; font-weight: 900; color: #fff; }
+.rpt-hero-body h1 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,.32);
+    letter-spacing: .2px;
+}
 .rpt-hero-body p  { margin: 5px 0 0; font-size: .84rem; color: rgba(255,255,210,.72); }
 .rpt-hero-badge {
     flex-shrink: 0; position: relative; z-index: 1;
@@ -1220,8 +1227,17 @@ body {
     box-shadow: var(--s1);
 }
 .rpt-filter-hd {
-    font-size: .82rem; font-weight: 800; color: var(--muted);
-    margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+    font-size: .88rem;
+    font-weight: 900;
+    color: #2d200a;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: linear-gradient(120deg, rgba(247,147,26,.12), rgba(201,106,0,.08));
+    border: 1px solid rgba(247,147,26,.24);
 }
 .rpt-filter .fc-filter-label { min-width: 100%; }
 .btn-filter {
@@ -1244,7 +1260,8 @@ body {
     gap: 10px; margin-bottom: 14px;
 }
 .rpt-kpi {
-    background: var(--surface); border: 1px solid var(--line);
+    background: linear-gradient(145deg, #fffdf9, #f8efe0);
+    border: 1px solid rgba(247,147,26,.18);
     border-radius: var(--r); position: relative; overflow: hidden;
     padding: 14px; box-shadow: var(--s1);
     transition: transform .2s, box-shadow .2s;
@@ -1287,7 +1304,9 @@ body {
     border-radius: var(--r); padding: 16px; box-shadow: var(--s1);
 }
 .rpt-chart-title {
-    font-size: .85rem; font-weight: 800; color: var(--txt);
+    font-size: .9rem;
+    font-weight: 900;
+    color: #2d200a;
     margin-bottom: 14px; display: flex; align-items: center; gap: 7px;
 }
 .rpt-chart-title::before {
@@ -1301,18 +1320,21 @@ body {
 
 /* ── Data Card ──────────────────────────── */
 .rpt-data-card {
-    background: var(--surface); border: 1px solid var(--line);
+    background: linear-gradient(180deg, #fffefc 0%, #f7efe1 100%);
+    border: 1px solid rgba(247,147,26,.2);
     border-radius: var(--r); box-shadow: var(--s1);
     overflow: hidden; margin-bottom: 20px;
 }
 .rpt-data-head {
     padding: 12px 16px; border-bottom: 1px solid var(--line);
-    background: linear-gradient(180deg, #fdfefe, #f6f9ff);
+    background: linear-gradient(120deg, rgba(247,147,26,.15), rgba(255,179,71,.16));
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 10px;
 }
 .rpt-table-meta {
-    font-size: .83rem; font-weight: 800; color: var(--txt);
+    font-size: .9rem;
+    font-weight: 900;
+    color: #2d200a;
     display: flex; align-items: center; gap: 8px;
 }
 .rpt-table-meta i { color: var(--blue); }
@@ -1747,9 +1769,10 @@ body {
                     <tbody>
                     <?php foreach ($rows as $row): ?>
                         <tr>
+                            <?php $rowVals = array_values($row); ?>
                             <?php for ($i = 0; $i < count($headers); $i++): ?>
                             <?php
-                            $cell = isset($row[$i]) ? $row[$i] : '—';
+                            $cell = isset($rowVals[$i]) ? $rowVals[$i] : '—';
                             $cv = ($cell === null || $cell === '') ? '—' : (string)$cell;
                             if ($cv === 'نشط') {
                                 echo '<td><span class="badge rounded-pill" style="background:rgba(22,163,74,.1);color:#15803d;border:1px solid rgba(22,163,74,.25);font-size:.78rem;font-weight:800;padding:4px 10px;">نشط</span></td>';
@@ -1785,96 +1808,6 @@ body {
 <script>
 $(function(){
     var tbl = $('#rTable');
-    var isTimesheetReport = <?php echo (strpos($REPORT_CODE, 'timesheet') !== false) ? 'true' : 'false'; ?>;
-
-    function normText(value) {
-        return String(value || '').replace(/\s+/g, '').replace(/\./g, '').toLowerCase();
-    }
-
-    function htmlToText(value) {
-        return $('<div>').html(value || '').text().trim();
-    }
-
-    function parseNum(value) {
-        var cleaned = String(value || '').replace(/,/g, '').replace(/[^0-9.\-]/g, '');
-        var parsed = parseFloat(cleaned);
-        return isNaN(parsed) ? 0 : parsed;
-    }
-
-    function formatNumber(value, decimals) {
-        return Number(value || 0).toLocaleString('en-US', {
-            minimumFractionDigits: decimals,
-            maximumFractionDigits: decimals
-        });
-    }
-
-    function setKpiByLabel(label, renderedValue) {
-        $('.rpt-kpi').each(function(){
-            var $card = $(this);
-            var lbl = $card.find('.rpt-kpi-lbl').text().trim();
-            if (lbl === label) {
-                $card.find('.rpt-kpi-val').text(renderedValue);
-            }
-        });
-    }
-
-    function findIndex(headersNorm, candidates) {
-        for (var i = 0; i < candidates.length; i++) {
-            var idx = headersNorm.indexOf(normText(candidates[i]));
-            if (idx !== -1) return idx;
-        }
-        return -1;
-    }
-
-    function refreshTimesheetKpis(dt) {
-        if (!isTimesheetReport || !$('.rpt-kpi-grid').length) return;
-
-        var headersNorm = [];
-        $('#rTable thead th').each(function(){
-            headersNorm.push(normText($(this).text()));
-        });
-
-        var idxExecuted = findIndex(headersNorm, ['executed_hours', 'الساعاتالمنفذة', 'عتنفيذ']);
-        var idxStandby  = findIndex(headersNorm, ['standby_hours', 'ساعاتاستعدادالعميل', 'عاستعداد']);
-        var idxWork     = findIndex(headersNorm, ['عالعمل', 'ساعاتالعمل']);
-        var idxFault    = findIndex(headersNorm, ['ساعاتالأعطال', 'عأعطال']);
-        var idxProject  = findIndex(headersNorm, ['المشروع']);
-
-        var data = dt.rows({ search: 'applied' }).data().toArray();
-        var rowsCount = data.length;
-        var sumExecuted = 0;
-        var sumStandby = 0;
-        var sumWork = 0;
-        var sumFault = 0;
-        var projects = {};
-
-        for (var r = 0; r < data.length; r++) {
-            var row = data[r] || [];
-            if (idxExecuted >= 0 && row[idxExecuted] !== undefined) sumExecuted += parseNum(htmlToText(row[idxExecuted]));
-            if (idxStandby >= 0 && row[idxStandby] !== undefined) sumStandby += parseNum(htmlToText(row[idxStandby]));
-            if (idxWork >= 0 && row[idxWork] !== undefined) sumWork += parseNum(htmlToText(row[idxWork]));
-            if (idxFault >= 0 && row[idxFault] !== undefined) sumFault += parseNum(htmlToText(row[idxFault]));
-            if (idxProject >= 0 && row[idxProject] !== undefined) {
-                var pName = htmlToText(row[idxProject]);
-                if (pName !== '' && pName !== '—' && pName !== '-') projects[pName] = true;
-            }
-        }
-
-        if (idxWork === -1) sumWork = sumExecuted + sumStandby;
-
-        var eff = (sumWork + sumFault) > 0 ? ((sumWork / (sumWork + sumFault)) * 100) : 0;
-
-        setKpiByLabel('إجمالي السجلات', formatNumber(rowsCount, 0));
-        setKpiByLabel('الساعات المنفذة', formatNumber(sumExecuted, 1) + ' س');
-        setKpiByLabel('ساعات استعداد العميل', formatNumber(sumStandby, 1) + ' س');
-        setKpiByLabel('ع.العمل', formatNumber(sumWork, 1) + ' س');
-        setKpiByLabel('ساعات الأعطال', formatNumber(sumFault, 1) + ' س');
-        setKpiByLabel('كفاءة التشغيل', formatNumber(eff, 1) + '%');
-
-        if ($('.rpt-kpi-lbl:contains("المشاريع")').length && idxProject >= 0) {
-            setKpiByLabel('المشاريع', formatNumber(Object.keys(projects).length, 0));
-        }
-    }
 
     if (tbl.length) {
         var dt = tbl.DataTable({
@@ -1917,11 +1850,6 @@ $(function(){
                     exportOptions: { columns: ':visible' }
                 }
             ]
-        });
-
-        refreshTimesheetKpis(dt);
-        dt.on('draw.dt', function() {
-            refreshTimesheetKpis(dt);
         });
 
         setTimeout(function(){ dt.columns.adjust().draw(false); }, 120);

@@ -332,7 +332,7 @@ include '../insidebar.php';
         </div>
     </div>
 
-    <div class="hero">
+    <div>
         <h1><i class="fas fa-chart-pie"></i> التقارير</h1>
         <p>مرحباً <?php echo $userName; ?> — إليك التقارير المتاحة لك</p>
     </div>

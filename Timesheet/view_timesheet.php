@@ -472,7 +472,7 @@ include('../insidebar.php');
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/ems.main.all.style.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
+<!-- <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css"> -->
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
 
 <style>
@@ -813,6 +813,22 @@ include('../insidebar.php');
   box-shadow: 0 6px 16px rgba(26, 18, 8, 0.12);
 }
 
+/* Horizontal scroll support for wide timesheet table */
+.timesheet-view-page .table-scroll-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.timesheet-view-page .table-scroll-wrap .dataTables_wrapper,
+.timesheet-view-page .table-scroll-wrap .dataTables_scroll,
+.timesheet-view-page .table-scroll-wrap .dataTables_scrollHead,
+.timesheet-view-page .table-scroll-wrap .dataTables_scrollBody,
+.timesheet-view-page .table-scroll-wrap table {
+    width: 100% !important;
+    min-width: 1500px;
+}
+
 </style>
 
 <div class="main timesheet-view-page ems-unified-page-shell">
@@ -988,6 +1004,7 @@ include('../insidebar.php');
             <h5><i class="fas fa-list-alt"></i> قائمة ساعات العمل</h5>
         </div>
         <div class="card-body">
+            <div class="table-scroll-wrap">
             <table id="timesheetTable" class="display nowrap" style="width:100%">
                 <thead>
                     <tr>
@@ -1133,6 +1150,7 @@ include('../insidebar.php');
                     ?>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>
@@ -1140,7 +1158,7 @@ include('../insidebar.php');
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<!-- <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script> -->
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -1199,8 +1217,10 @@ $(document).ready(function () {
     });
 
     var table = $('#timesheetTable').DataTable({
-        responsive: false,
+        // responsive: false,
         scrollX: true,
+        scrollCollapse: true,
+        autoWidth: false,
         deferRender: true,
         pageLength: 25,
         lengthMenu: [[25, 50, 100], [25, 50, 100]],

@@ -305,92 +305,94 @@ include("../inheader.php");
 
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/main_admin_style.css">
+<link rel="stylesheet" href="../assets/css/ems.main.all.style.css">
 
 <style>
-    .form-section {
-        background: var(--bg);
-        padding: 1rem;
-        border-radius: var(--radius);
-        margin-bottom: 1rem;
-        border: 2px solid var(--border);
+    .equipments-fleet-main .form-section {
+        margin-bottom: 14px;
+        border: 1px solid var(--bdr);
+        border-radius: var(--rl);
+        background: linear-gradient(180deg, var(--s1) 0%, #fffbf5 100%);
+        box-shadow: var(--sh);
+        overflow: hidden;
     }
 
-    .form-section-header {
-        background: linear-gradient(135deg, var(--navy), var(--navy-l));
+    .equipments-fleet-main .form-section-header {
+        background: linear-gradient(135deg, var(--s0), #2a1b0c);
         color: #fff;
-        padding: 12px 15px;
-        border-radius: var(--radius);
-        margin-bottom: 15px;
-        font-weight: 700;
-        font-size: 1rem;
+        padding: 12px 14px;
+        font-weight: 800;
+        font-size: .95rem;
         display: flex;
         align-items: center;
         gap: 10px;
         cursor: pointer;
         user-select: none;
-        transition: all var(--ease);
+        transition: all .2s ease;
+        border-bottom: 1px solid rgba(255, 207, 144, .18);
     }
 
-    .form-section-header:hover {
-        transform: translateX(-3px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    .equipments-fleet-main .form-section-header:hover {
+        filter: brightness(1.04);
     }
 
-    .form-section-header i {
-        font-size: 1.2rem;
+    .equipments-fleet-main .form-section-header i {
+        color: var(--or);
     }
 
-    .form-section-header .toggle-icon {
+    .equipments-fleet-main .form-section-header .toggle-icon {
         margin-right: auto;
-        transition: transform 0.3s ease;
+        transition: transform .25s ease;
     }
 
-    .form-section-header.collapsed .toggle-icon {
+    .equipments-fleet-main .form-section-header.collapsed .toggle-icon {
         transform: rotate(-90deg);
     }
 
-    .form-section-body {
-        padding: 5px;
+    .equipments-fleet-main .form-section-body {
+        padding: 14px;
         max-height: 1000px;
         overflow: hidden;
-        transition: max-height 0.3s ease;
+        transition: max-height .25s ease;
     }
 
-    .form-section-body.collapsed {
+    .equipments-fleet-main .form-section-body.collapsed {
         max-height: 0;
-        padding: 0;
+        padding-top: 0;
+        padding-bottom: 0;
     }
 
-    .checkbox-group {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: var(--radius);
-        border: 1px solid var(--border);
+    .equipments-fleet-main .checkbox-group {
+        background: var(--s2);
+        padding: 14px;
+        border-radius: var(--r);
+        border: 1px solid var(--bdr);
     }
 
-    .checkbox-group label {
+    .equipments-fleet-main .checkbox-group label {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 8px;
-        margin-bottom: 5px;
+        padding: 8px 10px;
+        margin-bottom: 6px;
         background: #fff;
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all .2s ease;
+        border: 1px solid transparent;
     }
 
-    .checkbox-group label:hover {
-        background: var(--gold-light);
-        transform: translateX(-3px);
+    .equipments-fleet-main .checkbox-group label:hover {
+        background: var(--s3);
+        border-color: rgba(247, 147, 26, .2);
+        transform: translateX(-2px);
     }
 
-    .checkbox-group input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
+    .equipments-fleet-main .checkbox-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
         cursor: pointer;
-        accent-color: var(--gold);
+        accent-color: var(--or);
     }
 
     .link-alert-chip {
@@ -416,7 +418,6 @@ include("../inheader.php");
     }
 
     @keyframes linkAlertPulse {
-
         0%,
         100% {
             transform: translateY(0);
@@ -434,7 +435,7 @@ include("../inheader.php");
 include('../insidebar.php');
 ?>
 
-<div class="main">
+<div class="main equipments-fleet-main drivers-main">
 
     <div class="main_head">
         <div class="head_actions">
@@ -443,16 +444,16 @@ include('../insidebar.php');
                     <i class="fas fa-plus-circle"></i> إضافة مشغل جديد
                 </a>
             <?php endif; ?>
-            <a href="download_drivers_template.php" class="btn btn-success"
-                style="display: flex; align-items: center; gap: 8px; padding: 10px 20px;">
+            <a href="download_drivers_template.php" class="btn"
+                style="background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;">
                 <i class="fas fa-file-excel"></i> تحميل نموذج Excel
             </a>
-            <a href="download_drivers_template_csv.php" class="btn btn-info"
-                style="display: flex; align-items: center; gap: 8px; padding: 10px 20px;">
+            <a href="download_drivers_template_csv.php" class="btn"
+                style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;">
                 <i class="fas fa-file-csv"></i> تحميل نموذج CSV
             </a>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal"
-                style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#importModal"
+                style="background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease; border: none;">
                 <i class="fas fa-file-upload"></i> استيراد من Excel/CSV
             </button>
         </div>
@@ -536,7 +537,7 @@ include('../insidebar.php');
     <!-- فورم إضافة / تعديل مشغل -->
     <form id="projectForm" action="" method="post" class="allforms">
         <div class="card shadow-sm">
-            <div class="card-header" style="background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff;">
+            <div class="card-header">
                 <h5><i class="fas fa-edit"></i> إضافة / تعديل مشغل - نموذج شامل</h5>
             </div>
             <div class="card-body">
@@ -1004,6 +1005,7 @@ include('../insidebar.php');
             <h5><i class="fas fa-list-alt"></i> قائمة المشغلين</h5>
         </div>
         <div class="card-body">
+            <div class="table-scroll-wrap">
             <table id="driversTable" class="display nowrap">
                 <thead>
                     <tr>
@@ -1105,6 +1107,7 @@ include('../insidebar.php');
                     ?>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 
@@ -1116,7 +1119,7 @@ include('../insidebar.php');
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables JS -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+<!-- <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script> -->
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -1153,6 +1156,8 @@ include('../insidebar.php');
         $(document).ready(function () {
             $('#driversTable').DataTable({
                 dom: 'Bfrtip',
+                scrollX: true,
+                scrollCollapse: true,
                 buttons: [
                     { extend: 'copy', text: 'نسخ' },
                     { extend: 'excel', text: 'تصدير Excel' },
@@ -1161,7 +1166,7 @@ include('../insidebar.php');
                     { extend: 'print', text: 'طباعة' }
                 ],
                 "language": {
-                    "url": "https:/ems/assets/i18n/datatables/ar.json"
+                    "url": "/ems/assets/i18n/datatables/ar.json"
                 }
             });
         });
