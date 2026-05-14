@@ -551,8 +551,7 @@ include('../insidebar.php');
                             <th><i class="fas fa-project-diagram"></i> المشروع</th>
                             <th><i class="fas fa-truck"></i> عدد الموردين</th>
                             <th><i class="fas fa-toggle-on"></i> الحالة</th>
-                            <!-- <th><i class="fas fa-file-contract"></i> عقود المشروع</th> -->
-                            <th> المناجم</th>
+                            <th><i class="fas fa-file-contract"></i> عقود المشروع</th>
                             <th><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
@@ -576,13 +575,11 @@ include('../insidebar.php');
                       cc.`client_name`,
                       (SELECT COUNT(*)
                        FROM contracts c
-                       INNER JOIN mines m ON c.mine_id = m.id
-                       WHERE m.project_id = op.id AND $mines_not_deleted_sql) as 'contracts',
+                       WHERE c.project_id = op.id AND c.status = 1) as 'contracts',
                       (SELECT COUNT(DISTINCT pm.suppliers)
                           FROM equipments pm
                           JOIN operations m ON pm.id = m.equipment
-                          WHERE m.project_id = op.id) as 'total_suppliers',
-                          (SELECT COUNT(*) FROM mines m WHERE m.project_id = op.id AND $mines_not_deleted_sql) as mines_count
+                          WHERE m.project_id = op.id) as 'total_suppliers'
                       FROM project op
                           LEFT JOIN clients cc ON op.$project_client_column = cc.id
                       $client_filter
@@ -591,9 +588,6 @@ include('../insidebar.php');
                         $result = mysqli_query($conn, $query);
                         while ($row = mysqli_fetch_assoc($result)) {
                             $project_name_cell = "<strong>" . e($row['name']) . "</strong>";
-                            if (intval($row['mines_count']) === 0) {
-                                $project_name_cell .= " <span class='link-alert-chip' title='المشروع ليس بداخله منجم'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
-                            }
 
                             echo "<tr>";
                             echo "<td>" . e($row['create_at']) . "</td>";
@@ -608,15 +602,12 @@ include('../insidebar.php');
                             }
 
                             echo "<td>
-
-
-                             <a href='project_mines.php?project_id=" . intval($row['id']) . "'
+                             <a href='../Contracts/contracts.php?filter_project_id=" . intval($row['id']) . "'
                                        class='mines-count-link'
-                                       title='عرض المناجم'>
-                                        <i class='fas fa-mountain'></i>
-                                        <span class='mines-count-badge'>" . intval($row['mines_count']) . "</span>
+                                       title='عرض عقود المشروع'>
+                                        <i class='fas fa-file-contract'></i>
+                                        <span class='mines-count-badge'>" . intval($row['contracts']) . "</span>
                              </a>
-
                         </td>";
 
                             echo "<td>
@@ -759,8 +750,8 @@ include('../insidebar.php');
             </div>
         </div>
         <div class="modal-footer projects-view-modal-footer">
-            <a id="viewMinesBtn" class="btn-modal btn-modal-save">
-                <i class="fas fa-mountain"></i> مناجم المشروع
+            <a id="viewContractsBtn" class="btn-modal btn-modal-save">
+                <i class="fas fa-file-contract"></i> عقود المشروع
             </a>
             <?php if ($can_edit): ?>
                 <button type="button" class="btn-modal btn-modal-save editBtn" id="viewEditBtn">
@@ -954,8 +945,8 @@ include('../insidebar.php');
             editBtn.data('location', projectData.location);
             editBtn.data('status', projectData.status);
 
-            // تحضير زر مناجم المشروع
-            $('#viewMinesBtn').attr('href', 'project_mines.php?project_id=' + projectData.id);
+            // تحضير زر عقود المشروع
+            $('#viewContractsBtn').attr('href', '../Contracts/contracts.php?filter_project_id=' + projectData.id);
 
             $('#viewProjectModal').fadeIn(300);
         });

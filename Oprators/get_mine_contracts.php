@@ -12,14 +12,18 @@ include '../config.php';
 header('Content-Type: application/json; charset=utf-8');
 
 $is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
-$user_mine_id = $is_role10 ? intval($_SESSION['user']['mine_id']) : 0;
 $user_contract_id = $is_role10 ? intval($_SESSION['user']['contract_id']) : 0;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mine_id'])) {
-    $mine_id = intval($_POST['mine_id']);
-
-    if ($is_role10 && $user_mine_id > 0 && $mine_id !== $user_mine_id) {
-        die(json_encode(['success' => false, 'message' => 'لا توجد صلاحية لهذا المنجم']));
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['project_id']) || isset($_POST['mine_id']))) {
+    // support both project_id (new) and mine_id (legacy)
+    $project_id = isset($_POST['project_id']) ? intval($_POST['project_id']) : 0;
+    if ($project_id <= 0 && isset($_POST['mine_id'])) {
+        // legacy: look up project_id from mine
+        $mine_legacy = intval($_POST['mine_id']);
+        $m_q = mysqli_query($conn, "SELECT project_id FROM mines WHERE id = $mine_legacy LIMIT 1");
+        if ($m_q && mysqli_num_rows($m_q) > 0) {
+            $project_id = intval(mysqli_fetch_assoc($m_q)['project_id']);
+        }
     }
 
     $contract_filter = '';
@@ -27,13 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mine_id'])) {
         $contract_filter = " AND c.id = $user_contract_id";
     }
 
-    $contracts_query = "SELECT
+        $contracts_query = "SELECT
             c.id,
             DATE_FORMAT(c.actual_start, '%Y/%m/%d') AS start_display,
             DATE_FORMAT(c.actual_end, '%Y-%m-%d') AS end_date,
             c.forecasted_contracted_hours
         FROM contracts c
-        WHERE c.mine_id = $mine_id AND c.status = 1$contract_filter
+        WHERE c.project_id = $project_id AND c.status = 1$contract_filter
         ORDER BY c.actual_start DESC";
 
     $result = mysqli_query($conn, $contracts_query);

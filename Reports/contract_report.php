@@ -63,17 +63,16 @@ if (!isset($_SESSION['user'])) {
 </head>
 <body>
 
-<?php 
-include('../insidebar.php'); 
+<?php
+include('../insidebar.php');
 
 $operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
 
 $contract_filter = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 
-$sql_contracts = "SELECT c.id, p.name AS project_name 
-                  FROM contracts c 
-                  LEFT JOIN mines m ON c.mine_id = m.id
-                  LEFT JOIN project p ON m.project_id = p.id";
+$sql_contracts = "SELECT c.id, p.name AS project_name
+                  FROM contracts c
+                  LEFT JOIN project p ON c.project_id = p.id";
 $contracts = mysqli_query($conn, $sql_contracts);
 
 $contract_data = null;
@@ -82,11 +81,9 @@ $monthly_stats = null;
 if ($contract_filter > 0) {
     // بيانات العقد الأساسية
     $sql_info = "
-    SELECT 
+    SELECT
         c.id AS contract_id,
         c.id AS contract_id,
-        m.mine_name,
-        m.mine_code,
         p.name AS project_name,
         c.contract_signing_date,
         c.contract_duration_months,
@@ -95,13 +92,12 @@ if ($contract_filter > 0) {
         IFNULL(SUM(t.total_work_hours),0) AS actual_hours,
         (c.forecasted_contracted_hours - IFNULL(SUM(t.executed_hours),0)) AS remaining_hours
     FROM contracts c
-    LEFT JOIN mines m ON c.mine_id = m.id
-    LEFT JOIN project p ON m.project_id = p.id
+    LEFT JOIN project p ON c.project_id = p.id
     LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN timesheet t ON t.operator = o.id
     WHERE c.id = $contract_filter
-    GROUP BY c.id, m.mine_name, p.name, c.contract_signing_date, c.contract_duration_months";
+    GROUP BY c.id, p.name, c.contract_signing_date, c.contract_duration_months";
     $contract_data_res = mysqli_query($conn, $sql_info);
     if ($contract_data_res) {
         $contract_data = mysqli_fetch_assoc($contract_data_res);
@@ -111,7 +107,7 @@ if ($contract_filter > 0) {
 
     // إحصائية شهرية
     $sql_monthly = "
-    SELECT 
+    SELECT
         YEAR(t.date) AS year,
         MONTH(t.date) AS month,
         IFNULL(SUM(t.executed_hours),0) AS executed_hours,
@@ -119,8 +115,7 @@ if ($contract_filter > 0) {
         IFNULL(SUM(t.executed_hours),0) + IFNULL(SUM(t.standby_hours),0) AS total_hours,
         c.hours_monthly_target
     FROM contracts c
-    LEFT JOIN mines m ON c.mine_id = m.id
-    LEFT JOIN project p ON m.project_id = p.id
+    LEFT JOIN project p ON c.project_id = p.id
     LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN timesheet t ON t.operator = o.id
@@ -187,9 +182,9 @@ if ($contract_filter > 0) {
                 </div>
                 <div class="report-progress">
                     <div style="font-weight:700; margin-bottom:8px; color:#0c1c3e;">نسبة الإنجاز الكلية</div>
-                        <?php 
-                        $overall_percent = ($contract_data['forecasted_contracted_hours'] > 0) 
-                            ? round(($contract_data['actual_hours'] / $contract_data['forecasted_contracted_hours']) * 100, 2) 
+                        <?php
+                        $overall_percent = ($contract_data['forecasted_contracted_hours'] > 0)
+                            ? round(($contract_data['actual_hours'] / $contract_data['forecasted_contracted_hours']) * 100, 2)
                             : 0;
 
                         $color = "bg-danger";
@@ -200,7 +195,7 @@ if ($contract_filter > 0) {
                         }
                         ?>
                         <div class="progress" style="max-width:480px;">
-                            <div class="progress-bar <?php echo $color; ?>" 
+                            <div class="progress-bar <?php echo $color; ?>"
                                  role="progressbar" style="width: <?php echo $overall_percent; ?>%;">
                                 <?php echo $overall_percent; ?> %
                             </div>
@@ -228,7 +223,7 @@ if ($contract_filter > 0) {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php 
+                        <?php
                         $labels = array();
                         $actual = array();
                         $target = array();
@@ -236,12 +231,12 @@ if ($contract_filter > 0) {
 
                         if ($monthly_stats) {
                         mysqli_data_seek($monthly_stats, 0);
-                        while($row = mysqli_fetch_assoc($monthly_stats)) { 
+                        while($row = mysqli_fetch_assoc($monthly_stats)) {
                             $labels[] = $row['year']."-".$row['month'];
                             $actual[] = isset($row['total_hours']) ? $row['total_hours'] : 0;
                             $target[] = isset($row['hours_monthly_target']) ? $row['hours_monthly_target'] : 0;
 
-                            $percent = ($row['hours_monthly_target'] > 0) 
+                            $percent = ($row['hours_monthly_target'] > 0)
                                        ? round(($row['total_hours'] / $row['hours_monthly_target']) * 100, 2)
                                        : 0;
                             $percentages[] = $percent;
@@ -262,7 +257,7 @@ if ($contract_filter > 0) {
                             <td><?php echo $row['hours_monthly_target']; ?></td>
                             <td>
                                 <div class="progress report-progress">
-                                    <div class="progress-bar <?php echo $color; ?>" role="progressbar" 
+                                    <div class="progress-bar <?php echo $color; ?>" role="progressbar"
                                          style="width: <?php echo $percent; ?>%;">
                                         <?php echo $percent; ?> %
                                     </div>
@@ -336,6 +331,3 @@ if ($contract_filter > 0) {
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-

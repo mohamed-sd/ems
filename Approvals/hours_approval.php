@@ -22,7 +22,6 @@ $role           = strval($_SESSION['user']['role']);
 $user_id        = intval($_SESSION['user']['id']);
 $company_id     = intval($_SESSION['user']['company_id'] ?? 0);
 $session_proj   = intval($_SESSION['user']['project_id'] ?? 0);
-$session_mine   = intval($_SESSION['user']['mine_id']    ?? 0);
 
 $equip_type_filter = intval($_GET['equip_type'] ?? 0);
 if (!in_array($equip_type_filter, [0, 1, 2, 3], true)) {
@@ -98,9 +97,6 @@ $site_scope_ts = '';
 if ($is_site_manager) {
     if ($session_proj > 0) {
         $site_scope_ts .= " AND o.{$ops_project_col} = $session_proj";
-    }
-    if ($session_mine > 0 && db_table_has_column($conn, 'operations', 'mine_id')) {
-        $site_scope_ts .= " AND o.mine_id = $session_mine";
     }
 }
 

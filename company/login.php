@@ -51,9 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (company_users_has_column('project_id')) {
                     $fields .= ', u.project_id';
                 }
-                if (company_users_has_column('mine_id')) {
-                    $fields .= ', u.mine_id';
-                }
                 if (company_users_has_column('contract_id')) {
                     $fields .= ', u.contract_id';
                 }
@@ -407,5 +404,3 @@ $csrf = generate_csrf_token();
     </div>
 </body>
 </html>
-
-

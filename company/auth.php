@@ -255,7 +255,6 @@ function company_login_success(array $userRow, array $companyRow) {
 
     $scope = array(
         'project_id' => isset($userRow['project_id']) ? intval($userRow['project_id']) : 0,
-        'mine_id' => isset($userRow['mine_id']) ? intval($userRow['mine_id']) : 0,
         'contract_id' => isset($userRow['contract_id']) ? intval($userRow['contract_id']) : 0,
         'company_id' => isset($companyRow['id']) ? intval($companyRow['id']) : 0
     );
@@ -284,7 +283,6 @@ function company_login_success(array $userRow, array $companyRow) {
         'phone' => isset($userRow['phone']) ? $userRow['phone'] : '',
         'role' => $userRole,
         'project_id' => $scope['project_id'],
-        'mine_id' => $scope['mine_id'],
         'contract_id' => $scope['contract_id'],
         'company_id' => $scope['company_id'],
         'last_login' => date('Y-m-d H:i:s')

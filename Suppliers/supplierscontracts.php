@@ -101,7 +101,6 @@ $supplier_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $has_supplier_filter = ($supplier_id > 0);
 $filter_supplier_id = isset($_GET['filter_supplier_id']) ? intval($_GET['filter_supplier_id']) : 0;
 $filter_project_id = isset($_GET['filter_project_id']) ? intval($_GET['filter_project_id']) : 0;
-$filter_mine_id = isset($_GET['filter_mine_id']) ? intval($_GET['filter_mine_id']) : 0;
 if ($has_supplier_filter) {
   $filter_supplier_id = $supplier_id;
 }
@@ -134,20 +133,7 @@ if ($projects_filter_result) {
   }
 }
 
-// جلب مناجم الفلتر بناءً على المشروع المختار (server-side للتحميل الأولي)
-$mines_filter_options = array();
-if ($filter_project_id > 0) {
-  $mines_filter_query = "SELECT m.id, m.mine_name, m.mine_code FROM mines m
-                         WHERE m.project_id = $filter_project_id AND m.status = 1
-                         ORDER BY m.mine_name ASC";
-  $mines_filter_result = mysqli_query($conn, $mines_filter_query);
-  if ($mines_filter_result) {
-    while ($mine_filter_row = mysqli_fetch_assoc($mines_filter_result)) {
-      $mine_code_suffix = isset($mine_filter_row['mine_code']) && $mine_filter_row['mine_code'] !== '' ? ' (' . $mine_filter_row['mine_code'] . ')' : '';
-      $mines_filter_options[intval($mine_filter_row['id'])] = $mine_filter_row['mine_name'] . $mine_code_suffix;
-    }
-  }
-}
+// (mine filter removed - contracts link directly to project)
 
 if (isset($_GET['delete_id'])) {
   if (!$can_delete) {
@@ -257,8 +243,8 @@ include('../insidebar.php');
           <input type="hidden" name="supplier_id" value="<?php echo $supplier_id; ?>" required />
           <?php endif; ?>
 
-          <!-- القسم 1: اختيار المشروع والمنجم والعقد -->
-          <div class="section-title"><span class="chip">1</span> اختيار المشروع والمنجم والعقد</div>
+          <!-- القسم 1: اختيار المشروع والعقد -->
+          <div class="section-title"><span class="chip">1</span> اختيار المشروع والعقد</div>
           <br>
 
           <div class="form-grid">
@@ -294,19 +280,10 @@ include('../insidebar.php');
             </div>
 
             <div class="field md-4">
-              <label>المنجم <font color="red">*</font></label>
-              <div class="control">
-                <select name="mine_id" id="mine_id" required disabled>
-                  <option value="">— اختر المشروع أولاً —</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field md-4">
-              <label>عقد المنجم <font color="red">*</font></label>
+              <label>عقد المشروع <font color="red">*</font></label>
               <div class="control">
                 <select name="project_contract_id" id="project_contract_id" required disabled>
-                  <option value="">— اختر المنجم أولاً —</option>
+                  <option value="">— اختر المشروع أولاً —</option>
                 </select>
               </div>
             </div>
@@ -811,18 +788,6 @@ include('../insidebar.php');
             </select>
           </div>
 
-          <div style="min-width:220px;">
-            <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المنجم</label>
-            <select name="filter_mine_id" id="sc_filter_mine_select" class="form-control" <?php echo $filter_project_id <= 0 ? 'disabled' : ''; ?>>
-              <option value="0">كل المناجم</option>
-              <?php foreach ($mines_filter_options as $mine_option_id => $mine_option_name): ?>
-              <option value="<?php echo intval($mine_option_id); ?>" <?php echo ($filter_mine_id === intval($mine_option_id)) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($mine_option_name, ENT_QUOTES, 'UTF-8'); ?>
-              </option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-
           <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> تطبيق</button>
           <a href="supplierscontracts.php<?php echo $has_supplier_filter ? '?id=' . intval($supplier_id) : ''; ?>" class="btn btn-secondary"><i class="fas fa-undo"></i> مسح</a>
         </form>
@@ -870,8 +835,7 @@ include('../insidebar.php');
               <th class="group-basic"><i class="fas fa-hashtag"></i> رقم العقد</th>
               <th class="group-basic"><i class="fas fa-project-diagram"></i> المشروع</th>
               <th class="group-basic"><i class="fas fa-truck-loading"></i> المورد</th>
-              <th class="group-basic"><i class="fas fa-mountain"></i> المنجم</th>
-              <th class="group-basic"><i class="fas fa-file-contract"></i> رقم عقد المنجم</th>
+              <th class="group-basic"><i class="fas fa-file-contract"></i> عقد المشروع المرتبط</th>
 
               <!-- التواريخ والمدد -->
               <th class="group-dates"><i class="far fa-calendar"></i> تاريخ التوقيع</th>
@@ -932,7 +896,6 @@ include('../insidebar.php');
               }
 
               $project_id = intval($_POST['project_id']);
-              $mine_id = isset($_POST['mine_id']) ? intval($_POST['mine_id']) : 0;
               $project_contract_id = intval($_POST['project_contract_id']);
 
 
@@ -991,7 +954,6 @@ include('../insidebar.php');
                 // تعديل
                 $sql = "UPDATE supplierscontracts sc SET
             project_id='$project_id',
-            mine_id='$mine_id',
             project_contract_id='$project_contract_id',
             contract_signing_date='$contract_signing_date',
             grace_period_days='$grace_period_days',
@@ -1023,14 +985,14 @@ include('../insidebar.php');
           WHERE sc.id=$id AND sc.supplier_id=$supplier_id AND $supplier_contract_scope_sql";
               } else {
                 // إضافة
-              $insert_columns = "supplier_id, project_id, mine_id, project_contract_id, contract_signing_date, grace_period_days, contract_duration_days,
+              $insert_columns = "supplier_id, project_id, project_contract_id, contract_signing_date, grace_period_days, contract_duration_days,
             equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
             actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
             hours_monthly_target, forecasted_contracted_hours,
             daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two,
             price_currency_contract, paid_contract, payment_time, guarantees, payment_date";
 
-              $insert_values = "'$supplier_id_post', '$project_id', '$mine_id', '$project_contract_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days',
+              $insert_values = "'$supplier_id_post', '$project_id', '$project_contract_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days',
             '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
             '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
             '$hours_monthly_target','$forecasted_contracted_hours',
@@ -1135,7 +1097,7 @@ include('../insidebar.php');
               exit;
             }
 
-            // جلب عقود الموردين مع فلترة المورد/المشروع/المنجم
+            // جلب عقود الموردين مع فلترة المورد/المشروع
             $supplier_contract_filter_parts = array($supplier_contract_scope_sql);
             if ($has_supplier_filter) {
               $supplier_contract_filter_parts[] = "sc.supplier_id = $supplier_id";
@@ -1143,25 +1105,16 @@ include('../insidebar.php');
               $supplier_contract_filter_parts[] = "sc.supplier_id = $filter_supplier_id";
             }
             if ($filter_project_id > 0) {
-              $supplier_contract_filter_parts[] = "m.project_id = $filter_project_id";
-            }
-            if ($filter_mine_id > 0) {
-              $supplier_contract_filter_parts[] = "sc.mine_id = $filter_mine_id";
+              $supplier_contract_filter_parts[] = "sc.project_id = $filter_project_id";
             }
             $supplier_contract_filter_sql = implode(' AND ', $supplier_contract_filter_parts);
 
             $query = "SELECT sc.*,
                       s.name AS supplier_name,
-                      op.name AS project_name,
-                      m.project_id AS mine_project_id,
-                      mp.name AS mine_project_name,
-                      m.mine_name,
-                      m.mine_code
+                      op.name AS project_name
                       FROM supplierscontracts sc
                       LEFT JOIN suppliers s ON sc.supplier_id = s.id
                       LEFT JOIN project op ON sc.project_id = op.id
-                      LEFT JOIN mines m ON sc.mine_id = m.id
-                      LEFT JOIN project mp ON m.project_id = mp.id
                       WHERE $supplier_contract_filter_sql
                       ORDER BY sc.id DESC";
             $result = mysqli_query($conn, $query);
@@ -1189,7 +1142,6 @@ include('../insidebar.php');
              data-id='" . $row['id'] . "'
              data-supplier_id='" . (isset($row['supplier_id']) ? intval($row['supplier_id']) : 0) . "'
              data-project_id='" . $row['project_id'] . "'
-             data-mine_id='" . (isset($row['mine_id']) ? $row['mine_id'] : '') . "'
              data-project_contract_id='" . (isset($row['project_contract_id']) ? $row['project_contract_id'] : '') . "'
              data-contract_signing_date='" . $row['contract_signing_date'] . "'
              data-grace_period_days='" . $row['grace_period_days'] . "'
@@ -1231,10 +1183,9 @@ include('../insidebar.php');
 
               // المعلومات الأساسية
               echo "<td class='group-basic'>" . $row['id'] . "</td>";
-              $mineProjectName = (isset($row['mine_project_name']) && $row['mine_project_name'] !== '') ? $row['mine_project_name'] : (isset($row['project_name']) ? $row['project_name'] : '-');
+              $mineProjectName = isset($row['project_name']) ? $row['project_name'] : '-';
               echo "<td class='group-basic'>" . $mineProjectName . "</td>";
               echo "<td class='group-basic'>" . (isset($row['supplier_name']) && $row['supplier_name'] !== '' ? $row['supplier_name'] : '-') . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['mine_name']) ? $row['mine_name'] . ' (' . $row['mine_code'] . ')' : '-') . "</td>";
               echo "<td class='group-basic'>" . (isset($row['project_contract_id']) ? 'عقد #' . $row['project_contract_id'] : '-') . "</td>";
 
               // التواريخ والمدد
@@ -1746,51 +1697,17 @@ include('../insidebar.php');
       if (equipTypeSelect) equipTypeSelect.addEventListener('change', updateEquipmentTypeOptions);
     });
 
-    // جلب مناجم المشروع عند تغيير المشروع
+    // جلب عقود المشروع عند تغيير المشروع
     $('#project_id').on('change', function () {
       const projectId = $(this).val();
-      $('#mine_id').prop('disabled', true).html('<option value="">— جاري التحميل... —</option>');
-      $('#project_contract_id').prop('disabled', true).html('<option value="">— اختر المنجم أولاً —</option>');
+      $('#project_contract_id').prop('disabled', true).html('<option value="">— جاري التحميل... —</option>');
       $('#projectHoursInfo').fadeOut();
 
       if (projectId) {
         $.ajax({
-          url: 'get_project_mines.php',
-          type: 'POST',
-          data: { project_id: projectId },
-          dataType: 'json',
-          success: function (response) {
-            if (response.success && response.mines.length > 0) {
-              let options = '<option value="">— اختر المنجم —</option>';
-              response.mines.forEach(function (mine) {
-                options += `<option value="${mine.id}">${mine.display_name}</option>`;
-              });
-              $('#mine_id').html(options).prop('disabled', false);
-            } else {
-              $('#mine_id').html('<option value="">— لا توجد مناجم لهذا المشروع —</option>').prop('disabled', true);
-            }
-          },
-          error: function () {
-            $('#mine_id').html('<option value="">— خطأ في التحميل —</option>').prop('disabled', true);
-          }
-        });
-      } else {
-        $('#mine_id').html('<option value="">— اختر المشروع أولاً —</option>').prop('disabled', true);
-        $('#project_contract_id').html('<option value="">— اختر المنجم أولاً —</option>').prop('disabled', true);
-      }
-    });
-
-    // جلب عقود المنجم عند تغيير المنجم
-    $('#mine_id').on('change', function () {
-      const mineId = $(this).val();
-      $('#project_contract_id').prop('disabled', true).html('<option value="">— جاري التحميل... —</option>');
-      $('#projectHoursInfo').fadeOut();
-
-      if (mineId) {
-        $.ajax({
           url: 'get_mine_contracts.php',
           type: 'POST',
-          data: { mine_id: mineId },
+          data: { project_id: projectId },
           dataType: 'json',
           success: function (response) {
             if (response.success && response.contracts.length > 0) {
@@ -1800,7 +1717,7 @@ include('../insidebar.php');
               });
               $('#project_contract_id').html(options).prop('disabled', false);
             } else {
-              $('#project_contract_id').html('<option value="">— لا توجد عقود لهذا المنجم —</option>').prop('disabled', true);
+              $('#project_contract_id').html('<option value="">— لا توجد عقود لهذا المشروع —</option>').prop('disabled', true);
             }
           },
           error: function () {
@@ -1808,7 +1725,7 @@ include('../insidebar.php');
           }
         });
       } else {
-        $('#project_contract_id').html('<option value="">— اختر المنجم أولاً —</option>').prop('disabled', true);
+        $('#project_contract_id').html('<option value="">— اختر المشروع أولاً —</option>').prop('disabled', true);
       }
     });
 
@@ -1970,10 +1887,9 @@ include('../insidebar.php');
       $("#projectForm").show();
       $("#contract_id").val($(this).data("id"));
 
-      // تحميل المشروع والمنجم والعقد
+      // تحميل المشروع والعقد
       const supplierId = $(this).data("supplier_id");
       const projectId = $(this).data("project_id");
-      const mineId = $(this).data("mine_id");
       const projectContractId = $(this).data("project_contract_id");
 
       if ($('#supplier_id_select').length) {
@@ -1982,45 +1898,24 @@ include('../insidebar.php');
 
       $("#project_id").val(projectId);
 
-      // تحميل مناجم المشروع أولاً
+      // تحميل عقود المشروع
       if (projectId) {
         $.ajax({
-          url: 'get_project_mines.php',
+          url: 'get_mine_contracts.php',
           type: 'POST',
           data: { project_id: projectId },
           dataType: 'json',
           success: function (response) {
-            if (response.success && response.mines.length > 0) {
-              let mineOptions = '<option value="">— اختر المنجم —</option>';
-              response.mines.forEach(function (mine) {
-                const selected = mine.id == mineId ? 'selected' : '';
-                mineOptions += `<option value="${mine.id}" ${selected}>${mine.display_name}</option>`;
+            if (response.success && response.contracts.length > 0) {
+              let options = '<option value="">— اختر العقد —</option>';
+              response.contracts.forEach(function (contract) {
+                const selected = contract.id == projectContractId ? 'selected' : '';
+                options += `<option value="${contract.id}" ${selected}>${contract.display_name}</option>`;
               });
-              $('#mine_id').html(mineOptions).prop('disabled', false);
+              $('#project_contract_id').html(options).prop('disabled', false);
 
-              // تحميل عقود المنجم
-              if (mineId) {
-                $.ajax({
-                  url: 'get_mine_contracts.php',
-                  type: 'POST',
-                  data: { mine_id: mineId },
-                  dataType: 'json',
-                  success: function (contractResponse) {
-                    if (contractResponse.success && contractResponse.contracts.length > 0) {
-                      let options = '<option value="">— اختر العقد —</option>';
-                      contractResponse.contracts.forEach(function (contract) {
-                        const selected = contract.id == projectContractId ? 'selected' : '';
-                        options += `<option value="${contract.id}" ${selected}>${contract.display_name}</option>`;
-                      });
-                      $('#project_contract_id').html(options).prop('disabled', false);
-
-                      // تفعيل تحميل بيانات الساعات
-                      if (projectContractId) {
-                        $('#project_contract_id').trigger('change');
-                      }
-                    }
-                  }
-                });
+              if (projectContractId) {
+                $('#project_contract_id').trigger('change');
               }
             }
           }
@@ -2257,41 +2152,6 @@ include('../insidebar.php');
     });
   </script>
 
-  <script>
-    // --- فلتر المناجم يعتمد على فلتر المشروع (عقود الموردين) ---
-    $(function () {
-      $('#sc_filter_project_select').on('change', function () {
-        var projectId = $(this).val();
-        var mineSelect = $('#sc_filter_mine_select');
-        if (!mineSelect.length) return;
-
-        if (!projectId || projectId === '0') {
-          mineSelect.html('<option value="0">كل المناجم</option>').prop('disabled', true);
-          return;
-        }
-
-        mineSelect.prop('disabled', true).html('<option value="0">جاري التحميل...</option>');
-        $.ajax({
-          url: 'get_project_mines.php',
-          type: 'POST',
-          data: { project_id: projectId },
-          dataType: 'json',
-          success: function (response) {
-            var options = '<option value="0">كل المناجم</option>';
-            if (response.success && response.mines && response.mines.length > 0) {
-              response.mines.forEach(function (mine) {
-                options += '<option value="' + mine.id + '">' + mine.display_name + '</option>';
-              });
-            }
-            mineSelect.html(options).prop('disabled', false);
-          },
-          error: function () {
-            mineSelect.html('<option value="0">كل المناجم</option>').prop('disabled', false);
-          }
-        });
-      });
-    });
-  </script>
 
 
 </body>

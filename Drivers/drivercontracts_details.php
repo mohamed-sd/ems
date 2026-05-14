@@ -43,23 +43,23 @@ if (!$is_super_admin) {
     <!-- CSS الموقع -->
     <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
     <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
-    
+
     <style>
         @import url('/ems/assets/css/local-fonts.css');
-        
+
         * {
             font-family: 'Cairo', sans-serif;
         }
-        
+
         body {
             background: #f5f7fa;
         }
-        
+
         .main {
             padding: 2rem;
             background: #f5f7fa;
         }
-        
+
         /* Page Title */
         .main h3 {
             font-size: 2rem;
@@ -70,7 +70,7 @@ if (!$is_super_admin) {
             margin-bottom: 2rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
-        
+
         /* Action Buttons Container */
         .aligin {
             display: flex;
@@ -82,7 +82,7 @@ if (!$is_super_admin) {
             border-radius: 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
-        
+
         /* Modern Action Buttons */
         .aligin .add {
             padding: 0.75rem 1.5rem;
@@ -97,7 +97,7 @@ if (!$is_super_admin) {
             position: relative;
             overflow: hidden;
         }
-        
+
         .aligin .add::before {
             content: '';
             position: absolute;
@@ -110,49 +110,49 @@ if (!$is_super_admin) {
             transform: translate(-50%, -50%);
             transition: width 0.6s, height 0.6s;
         }
-        
+
         .aligin .add:hover::before {
             width: 300px;
             height: 300px;
         }
-        
+
         .aligin .add:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 25px rgba(0,0,0,0.25);
         }
-        
+
         .aligin .add:active {
             transform: translateY(-1px);
         }
-        
+
         #renewalBtn {
             background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
         }
-        
+
         #settlementBtn {
             background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
         }
-        
+
         #pauseBtn {
             background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
         }
-        
+
         #resumeBtn {
             background: linear-gradient(135deg, #28a745 0%, #218838 100%);
         }
-        
+
         #terminateBtn {
             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
         }
-        
+
         #mergeBtn {
             background: linear-gradient(135deg, #e83e8c 0%, #d63384 100%);
         }
-        
+
         #completeBtn {
             background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
         }
-        
+
         /* Report Container */
         .report {
             background: white;
@@ -161,7 +161,7 @@ if (!$is_super_admin) {
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
             margin-bottom: 2rem;
         }
-        
+
         /* Info Cards Grid */
         .info-cards-grid {
             display: grid;
@@ -169,7 +169,7 @@ if (!$is_super_admin) {
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
-        
+
         .info-card {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             border-radius: 15px;
@@ -178,18 +178,18 @@ if (!$is_super_admin) {
             box-shadow: 0 3px 15px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
         }
-        
+
         .info-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
-        
+
         .info-card.primary { border-right-color: #667eea; }
         .info-card.success { border-right-color: #28a745; }
         .info-card.warning { border-right-color: #ffc107; }
         .info-card.danger { border-right-color: #dc3545; }
         .info-card.info { border-right-color: #17a2b8; }
-        
+
         .info-card h5 {
             font-size: 1.1rem;
             font-weight: 700;
@@ -198,22 +198,22 @@ if (!$is_super_admin) {
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .info-card h5 i {
             font-size: 1.3rem;
         }
-        
+
         .info-item {
             display: flex;
             justify-content: space-between;
             padding: 0.75rem 0;
             border-bottom: 1px solid #e9ecef;
         }
-        
+
         .info-item:last-child {
             border-bottom: none;
         }
-        
+
         .info-label {
             font-weight: 600;
             color: #495057;
@@ -221,12 +221,12 @@ if (!$is_super_admin) {
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .info-value {
             font-weight: 500;
             color: #212529;
         }
-        
+
         /* Status Badge */
         .status-badge {
             display: inline-block;
@@ -238,17 +238,17 @@ if (!$is_super_admin) {
             letter-spacing: 0.5px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
         }
-        
+
         .status-badge.active {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
         }
-        
+
         .status-badge.inactive {
             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: white;
         }
-        
+
         /* Tables */
         .modern-table {
             width: 100%;
@@ -259,37 +259,37 @@ if (!$is_super_admin) {
             box-shadow: 0 3px 15px rgba(0,0,0,0.08);
             margin-bottom: 2rem;
         }
-        
+
         .modern-table thead {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-        
+
         .modern-table thead th {
             padding: 1rem;
             font-weight: 700;
             text-align: center;
             font-size: 1rem;
         }
-        
+
         .modern-table tbody tr {
             transition: all 0.3s ease;
             background: white;
         }
-        
+
         .modern-table tbody tr:hover {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             transform: scale(1.01);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
+
         .modern-table tbody td {
             padding: 1rem;
             text-align: center;
             border-bottom: 1px solid #e9ecef;
             font-weight: 500;
         }
-        
+
         /* Modals Enhancement */
         .modal-content {
             border: none;
@@ -297,39 +297,39 @@ if (!$is_super_admin) {
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             overflow: hidden;
         }
-        
+
         .modal-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             padding: 1.5rem;
         }
-        
+
         .modal-header .modal-title {
             font-weight: 700;
             font-size: 1.3rem;
         }
-        
+
         .modal-header .btn-close {
             filter: brightness(0) invert(1);
         }
-        
+
         .modal-body {
             padding: 2rem;
         }
-        
+
         .modal-footer {
             border: none;
             padding: 1.5rem;
             background: #f8f9fa;
         }
-        
+
         .form-label {
             font-weight: 600;
             color: #495057;
             margin-bottom: 0.5rem;
         }
-        
+
         .form-control, .form-select {
             border: 2px solid #e9ecef;
             border-radius: 10px;
@@ -337,31 +337,31 @@ if (!$is_super_admin) {
             transition: all 0.3s ease;
             font-weight: 500;
         }
-        
+
         .form-control:focus, .form-select:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
-        
+
         .btn {
             border-radius: 10px;
             padding: 0.75rem 1.5rem;
             font-weight: 600;
             transition: all 0.3s ease;
         }
-        
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        
+
         .alert {
             border: none;
             border-radius: 10px;
             padding: 1rem;
             font-weight: 500;
         }
-        
+
         /* Animation */
         @keyframes fadeInUp {
             from {
@@ -373,21 +373,21 @@ if (!$is_super_admin) {
                 transform: translateY(0);
             }
         }
-        
+
         .info-card, .modern-table {
             animation: fadeInUp 0.6s ease;
         }
-        
+
         /* Responsive */
         @media (max-width: 768px) {
             .aligin {
                 justify-content: center;
             }
-            
+
             .aligin .add {
                 flex: 1 1 45%;
             }
-            
+
             .info-cards-grid {
                 grid-template-columns: 1fr;
             }
@@ -431,23 +431,20 @@ if (!$is_super_admin) {
 
 $contract_id = intval($_GET['id']);
 
-$sql = "SELECT 
-            sc.id, sc.driver_id, sc.project_id, sc.mine_id, sc.project_contract_id, sc.contract_signing_date, sc.grace_period_days, sc.contract_duration_months, sc.contract_duration_days,
-            sc.actual_start, sc.actual_end, sc.transportation, sc.accommodation, sc.place_for_living, 
+$sql = "SELECT
+            sc.id, sc.driver_id, sc.project_id, sc.project_contract_id, sc.contract_signing_date, sc.grace_period_days, sc.contract_duration_months, sc.contract_duration_days,
+            sc.actual_start, sc.actual_end, sc.transportation, sc.accommodation, sc.place_for_living,
             sc.workshop, sc.hours_monthly_target, sc.forecasted_contracted_hours, sc.created_at, sc.updated_at,
-            sc.daily_work_hours, sc.daily_operators, sc.first_party, sc.second_party, 
+            sc.daily_work_hours, sc.daily_operators, sc.first_party, sc.second_party,
             sc.witness_one, sc.witness_two, sc.status, sc.pause_reason, sc.pause_date, sc.resume_date, sc.termination_type, sc.termination_reason, sc.merged_with,
             sc.equip_shifts_contract, sc.shift_contract, sc.equip_total_contract_daily, sc.total_contract_permonth, sc.total_contract_units,
             sc.price_currency_contract, sc.paid_contract, sc.payment_time, sc.guarantees, sc.payment_date,
             s.name AS driver_name,
-            op.name AS project_name,
-            m.mine_name,
-            m.mine_code
+            op.name AS project_name
         FROM drivercontracts sc
         LEFT JOIN drivers s ON sc.driver_id = s.id
         LEFT JOIN project op ON sc.project_id = op.id
         LEFT JOIN contracts c ON sc.project_contract_id = c.id
-        LEFT JOIN mines m ON c.mine_id = m.id
         WHERE sc.id = $contract_id AND $driver_contract_scope_sql
         LIMIT 1";
 
@@ -467,7 +464,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     $today = new DateTime();
     $actual_end_date = new DateTime($row['actual_end']);
     $interval = $today->diff($actual_end_date);
-    $remaining_days = (int)$interval->format('%r%a');  
+    $remaining_days = (int)$interval->format('%r%a');
 
 
 
@@ -498,14 +495,8 @@ while ($row = mysqli_fetch_assoc($result)) {
             </div>
             <div class="info-item">
                 <span class="info-value">
-                    <?php 
+                    <?php
                     echo htmlspecialchars($row['project_name']);
-                    if (!empty($row['mine_name'])) {
-                        echo ' - ' . htmlspecialchars($row['mine_name']);
-                        if (!empty($row['mine_code'])) {
-                            echo ' (' . htmlspecialchars($row['mine_code']) . ')';
-                        }
-                    }
                     if (!empty($row['project_contract_id'])) {
                         echo ' - عقد #' . htmlspecialchars($row['project_contract_id']);
                     }
@@ -738,7 +729,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         <?php endif; ?>
     </div>
     <?php endif; ?>
-<?php 
+<?php
 $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
 $driver_id = $row['driver_id'];
 $project_id = $row['project_id'];
@@ -764,7 +755,7 @@ $paid_contract = isset($row['paid_contract']) ? $row['paid_contract'] : '';
 $payment_time = isset($row['payment_time']) ? $row['payment_time'] : '';
 $guarantees = isset($row['guarantees']) ? $row['guarantees'] : '';
 $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
-} 
+}
 ?>
 
 <!-- جدول معدات العقد (بما فيها معدات العقد المدموج) -->
@@ -772,7 +763,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
     <h4 style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: #667eea; font-weight: 700;">
         <i class="fas fa-boxes"></i>
         معدات العقد
-        <?php 
+        <?php
         if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
             echo "<span style='font-size: 0.9rem; color: #6c757d;'>(العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")</span>";
         }
@@ -799,7 +790,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     <th>المشرفين</th>
                     <th>الفنيين</th>
                     <th>المساعدين</th>
-                    <?php 
+                    <?php
                     if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
                         echo "<th>المصدر</th>";
                     }
@@ -826,9 +817,9 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         return $equipments;
                     }
                 }
-                
+
                 $equipments = getdriverContractEquipments($contract_id, $conn);
-                
+
                 if (!empty($equipments)) {
                     $i = 1;
                     foreach ($equipments as $equip) {
@@ -855,15 +846,15 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             $merged_equipments = getdriverContractEquipments(intval($row['merged_with']), $conn);
                             $is_from_merged = false;
                             foreach ($merged_equipments as $m_equip) {
-                                if ($m_equip['equip_type'] == $equip['equip_type'] && 
+                                if ($m_equip['equip_type'] == $equip['equip_type'] &&
                                     $m_equip['equip_size'] == $equip['equip_size'] &&
                                     $m_equip['equip_count'] == $equip['equip_count']) {
                                     $is_from_merged = true;
                                     break;
                                 }
                             }
-                            echo "<td><span class='badge " . ($is_from_merged ? "bg-success" : "bg-primary") . "'>" . 
-                                 ($is_from_merged ? "العقد #" . $row['merged_with'] : "العقد #" . $contract_id) . 
+                            echo "<td><span class='badge " . ($is_from_merged ? "bg-success" : "bg-primary") . "'>" .
+                                 ($is_from_merged ? "العقد #" . $row['merged_with'] : "العقد #" . $contract_id) .
                                  "</span></td>";
                         }
                         echo "</tr>";
@@ -881,7 +872,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
     </div>
 </div>
 
-<?php 
+<?php
 // إزالة الجدول المنفصل للعقد المدموج (تم دمج معداته في الجدول الرئيسي)
 ?>
 
@@ -906,13 +897,13 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </thead>
                 <tbody>
                     <?php
-                    $notes_query = "SELECT n.* 
+                    $notes_query = "SELECT n.*
                                     FROM driver_contract_notes n
                                     JOIN drivercontracts sc ON sc.id = n.contract_id
                                     WHERE n.contract_id = $contract_id AND $driver_contract_scope_sql
                                     ORDER BY created_at DESC";
                     $notes_result = mysqli_query($conn, $notes_query);
-                    
+
                     if ($notes_result && mysqli_num_rows($notes_result) > 0) {
                         $j = 1;
                         while ($note = mysqli_fetch_assoc($notes_result)) {
@@ -920,7 +911,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             $note_text = htmlspecialchars($note['note']);
                             $action_icon = '<i class="fas fa-sticky-note"></i>';
                             $action_badge = 'info';
-                            
+
                             if (strpos($note_text, 'تجديد') !== false) {
                                 $action_icon = '<i class="fas fa-sync-alt"></i>';
                                 $action_badge = 'primary';
@@ -948,7 +939,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             } else {
                                 $action_type = 'ملاحظة عامة';
                             }
-                            
+
                             $badge_colors = [
                                 'primary' => 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);',
                                 'secondary' => 'background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);',
@@ -958,7 +949,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                                 'purple' => 'background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);',
                                 'info' => 'background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);'
                             ];
-                            
+
                             echo "<tr>";
                             echo "<td>" . $j . "</td>";
                             echo "<td><span style='" . $badge_colors[$action_badge] . " color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;'>" . $action_icon . " " . $action_type . "</span></td>";
@@ -1151,7 +1142,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     <i class="fas fa-check-circle"></i>
                     <strong>تأكيد:</strong> سيتم استئناف العقد وإعادة تفعيله.
                 </div>
-                
+
                 <!-- عرض تاريخ الإيقاف تلقائياً -->
                 <div class="mb-4" style="padding: 1.25rem; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 12px; border-right: 5px solid #ffc107; box-shadow: 0 2px 10px rgba(255, 193, 7, 0.2);">
                     <div style="display: flex; align-items: center; gap: 0.75rem; color: #856404; font-weight: 700; margin-bottom: 0.75rem; font-size: 1.05rem;">
@@ -1160,7 +1151,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     </div>
                     <div style="color: #856404; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
                         <i class="far fa-calendar-times"></i>
-                        <strong>تاريخ إيقاف العقد:</strong> 
+                        <strong>تاريخ إيقاف العقد:</strong>
                         <span style="background: white; padding: 0.4rem 1rem; border-radius: 6px; font-weight: 700; color: #d39e00;">
                             <?php echo !empty($pause_date) ? date('Y-m-d', strtotime($pause_date)) : 'غير محدد'; ?>
                         </span>
@@ -1172,7 +1163,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     </div>
                     <?php endif; ?>
                 </div>
-                
+
                 <!-- إدخال تاريخ الاستئناف -->
                 <div class="mb-4">
                     <label for="resumeDate" class="form-label" style="font-weight: 700; font-size: 1.05rem;">
@@ -1184,13 +1175,13 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         <i class="fas fa-info-circle"></i> التاريخ الافتراضي هو اليوم، يمكنك تعديله حسب الحاجة
                     </small>
                 </div>
-                
+
                 <div id="pauseDurationDisplay" style="display: none; padding: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; margin-bottom: 1rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600; margin-bottom: 1rem;">
                         <i class="fas fa-clock"></i>
                         <span>مدة الإيقاف: <strong id="calculatedPauseDays">0</strong> يوم</span>
                     </div>
-                    
+
                     <!-- خيارات معالجة أيام الإيقاف -->
                     <div style="background: white; padding: 1rem; border-radius: 8px; border: 2px solid #1976d2;">
                         <div style="font-weight: 700; color: #1976d2; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
@@ -1219,7 +1210,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="mb-3">
                     <label for="resumeReason" class="form-label">
                         <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
@@ -1319,11 +1310,11 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         ?>
                     </select>
                 </div>
-                
+
                 <!-- عرض المعدات الحالية والمعدات الخاصة بالعقد المختار -->
                 <div id="mergeEquipmentsContainer" style="margin-top: 20px;">
                     <h6 class="mb-3">معدات العقود:</h6>
-                    
+
                     <!-- معدات العقد الحالي -->
                     <div class="mb-4">
                         <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #0066cc;">
@@ -1361,7 +1352,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             </table>
                         </div>
                     </div>
-                    
+
                     <!-- معدات العقد المختار -->
                     <div class="mb-4">
                         <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #28a745;">
@@ -1692,9 +1683,9 @@ function canPerformAction(action) {
         'terminate': [1, 0],
         'merge': [1]
     };
-    
+
     if (!activeStatuses[action]) return true;
-    
+
     if (!activeStatuses[action].includes(contractStatus)) {
         const statusMsg = {
             'renewal': 'العقد يجب أن يكون ساري لتجديده',
@@ -1731,15 +1722,15 @@ document.getElementById('renewalModal').addEventListener('hidden.bs.modal', func
 function calculateRenewalDuration() {
     const startDate = $('#renewalStartDate').val();
     const endDate = $('#renewalEndDate').val();
-    
+
     if (startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
-        
+
         if (start < end) {
             const timeDiff = end.getTime() - start.getTime();
             const durationDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-            
+
             $('#calculatedDays').text(durationDays);
             $('#renewalDurationDisplay').slideDown(300);
         } else {
@@ -1763,13 +1754,13 @@ $('#confirmRenewal').click(function() {
         alert('تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء');
         return;
     }
-    
+
     // حساب عدد الأيام بين التاريخين
     const start = new Date(startDate);
     const end = new Date(endDate);
     const timeDiff = end.getTime() - start.getTime();
     const durationDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    
+
     performAction('renewal', {
         new_start_date: startDate,
         new_end_date: endDate,
@@ -1843,7 +1834,7 @@ $('#resumeBtn').click(function() {
     if (!canPerformAction('resume')) return;
     const modal = new bootstrap.Modal(document.getElementById('resumeModal'));
     modal.show();
-    
+
     // حساب عدد أيام الإيقاف عند فتح الـ modal
     calculatePauseDuration();
 });
@@ -1852,15 +1843,15 @@ $('#resumeBtn').click(function() {
 function calculatePauseDuration() {
     const resumeDate = $('#resumeDate').val();
     const pauseDate = '<?php echo !empty($pause_date) ? $pause_date : ''; ?>';
-    
+
     if (pauseDate && resumeDate) {
         const pause = new Date(pauseDate);
         const resume = new Date(resumeDate);
-        
+
         if (resume >= pause) {
             const timeDiff = resume.getTime() - pause.getTime();
             const durationDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-            
+
             $('#calculatedPauseDays').text(durationDays);
             $('#pauseDurationDisplay').slideDown(300);
         } else {
@@ -1879,20 +1870,20 @@ $('#confirmResume').click(function() {
         alert('الرجاء تحديد تاريخ الاستئناف');
         return;
     }
-    
+
     const pauseDate = '<?php echo !empty($pause_date) ? $pause_date : ''; ?>';
     let pauseDays = 0;
-    
+
     if (pauseDate && resumeDate) {
         const pause = new Date(pauseDate);
         const resume = new Date(resumeDate);
         const timeDiff = resume.getTime() - pause.getTime();
         pauseDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
     }
-    
+
     // الحصول على خيار معالجة أيام الإيقاف
     const pauseHandling = $('input[name="pauseHandling"]:checked').val();
-    
+
     performAction('resume', {
         resume_reason: $('#resumeReason').val(),
         resume_date: resumeDate,
@@ -1975,7 +1966,7 @@ $('#editPartiesBtn').click(function() {
 $('#saveProjectInfo').click(function() {
     const gracePeriod = $('#editGracePeriod').val();
     const dailyOperators = $('#editDailyOperators').val();
-    
+
     $.ajax({
         url: '../Contracts/update_contract_details.php',
         type: 'POST',
@@ -2009,7 +2000,7 @@ $('#saveServices').click(function() {
     const accommodation = $('#editAccommodation').val();
     const placeLiving = $('#editPlaceLiving').val();
     const workshop = $('#editWorkshop').val();
-    
+
     $.ajax({
         url: '../Contracts/update_contract_details.php',
         type: 'POST',
@@ -2047,7 +2038,7 @@ $('#saveParties').click(function() {
     const secondParty = $('#editSecondParty').val();
     const witnessOne = $('#editWitnessOne').val();
     const witnessTwo = $('#editWitnessTwo').val();
-    
+
     $.ajax({
         url: '../Contracts/update_contract_details.php',
         type: 'POST',
@@ -2092,7 +2083,7 @@ $('#savePayment').click(function() {
     const paymentTime = $('#editPaymentTime').val();
     const guarantees = $('#editGuarantees').val();
     const paymentDate = $('#editPaymentDate').val();
-    
+
     $.ajax({
         url: '../Contracts/update_contract_details.php',
         type: 'POST',
@@ -2129,12 +2120,12 @@ $('#savePayment').click(function() {
 // تحميل معدات العقد المختار عند التغيير
 $('#mergeWithId').on('change', function() {
     const selectedContractId = $(this).val();
-    
+
     if (!selectedContractId) {
         $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>');
         return;
     }
-    
+
     // تحميل المعدات عبر AJAX
     $.ajax({
         url: 'get_driver_contract_equipments.php',
@@ -2154,7 +2145,7 @@ $('#mergeWithId').on('change', function() {
                     html += '<th>وحدات/الشهر</th>';
                     html += '</tr></thead>';
                     html += '<tbody>';
-                    
+
                     response.equipments.forEach(function(equip) {
                         html += '<tr>';
                         html += '<td>' + equip.equip_type + '</td>';
@@ -2164,7 +2155,7 @@ $('#mergeWithId').on('change', function() {
                         html += '<td>' + (equip.equip_monthly_target || 0) + '</td>';
                         html += '</tr>';
                     });
-                    
+
                     html += '</tbody></table>';
                 } else {
                     html = '<p style="text-align: center; color: #999;">لا توجد معدات لهذا العقد</p>';
@@ -2203,5 +2194,3 @@ $('#confirmMerge').click(function() {
 
 </body>
 </html>
-
-

@@ -102,19 +102,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $role_lookup_result = mysqli_query($conn, $role_lookup_sql);
     if ($role_lookup_result && mysqli_num_rows($role_lookup_result) > 0) {
         $role_lookup_row = mysqli_fetch_assoc($role_lookup_result);
-        if (isset($role_lookup_row['role_scope']) && $role_lookup_row['role_scope'] === 'mine') {
-            $selected_role_scope = 'mine';
+        if (isset($role_lookup_row['role_scope']) && ($role_lookup_row['role_scope'] === 'mine' || $role_lookup_row['role_scope'] === 'project')) {
+            $selected_role_scope = 'project';
         }
     }
 
-    $requires_project_context = ($selected_role_scope === 'mine');
+    $requires_project_context = ($selected_role_scope === 'project');
     $project = ($requires_project_context && !empty($_POST['project_id'])) ? intval($_POST['project_id']) : 0;
-    $mine = ($requires_project_context && !empty($_POST['mine_id'])) ? intval($_POST['mine_id']) : 0;
     $contract = ($requires_project_context && !empty($_POST['contract_id'])) ? intval($_POST['contract_id']) : 0;
     $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
 
-    if ($requires_project_context && ($project <= 0 || $mine <= 0 || $contract <= 0)) {
-        echo "<script>alert('⚠️ هذا الدور مرتبط بمنجم محدد، يرجى اختيار المشروع والمنجم والعقد');</script>";
+    if ($requires_project_context && ($project <= 0 || $contract <= 0)) {
+        echo "<script>alert('⚠️ هذا الدور مرتبط بمشروع محدد، يرجى اختيار المشروع والعقد');</script>";
     } elseif ($uid > 0) {
 
         // تحقق من التكرار عند التعديل (يتجاهل السجل الحالي) - التحقق عالمي عبر جميع الشركات
@@ -135,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             $update_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
 
             $sql = "UPDATE users
-                    SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', mine_id='$mine', contract_id='$contract', updated_at=NOW() $sql_pass
+                    SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', contract_id='$contract', updated_at=NOW() $sql_pass
                     $company_update
                     WHERE id='$uid' AND $users_not_deleted_sql $update_scope";
             if (mysqli_query($conn, $sql)) {
@@ -157,8 +156,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             } else {
                 $hashedPass = mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_BCRYPT));
 
-                $insert_columns = "name, username, password, phone, role, project_id, mine_id, contract_id, parent_id, created_at, updated_at";
-                $insert_values = "'$name', '$username', '$hashedPass', '$phone', '$role', '$project', '$mine', '$contract', '0', NOW(), NOW()";
+                $insert_columns = "name, username, password, phone, role, project_id, contract_id, parent_id, created_at, updated_at";
+                $insert_values = "'$name', '$username', '$hashedPass', '$phone', '$role', '$project', '$contract', '0', NOW(), NOW()";
 
                 if ($users_has_company_id && $current_company_id > 0) {
                     $insert_columns .= ", company_id";
@@ -265,13 +264,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         </select>
                     </div>
 
-                    <div id="mineDiv" class="pu-hidden">
-                        <label><i class="fas fa-mountain"></i> المنجم <span class="pu-required-star">*</span></label>
-                        <select id="mine_id" name="mine_id" class="form-control">
-                            <option value="">-- اختر المنجم --</option>
-                        </select>
-                    </div>
-
                     <div id="contractDiv" class="pu-hidden">
                         <label><i class="fas fa-file-contract"></i> العقد <span
                                 class="pu-required-star">*</span></label>
@@ -316,13 +308,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     <tbody>
                         <?php
                         $list_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
-                        $query = "SELECT id, name, username, password, phone, role, project_id, mine_id, contract_id FROM users WHERE parent_id='0' AND role!='-1' AND $users_not_deleted_sql $list_scope ORDER BY id DESC";
+                        $query = "SELECT id, name, username, password, phone, role, project_id, contract_id FROM users WHERE parent_id='0' AND role!='-1' AND $users_not_deleted_sql $list_scope ORDER BY id DESC";
                         $result = mysqli_query($conn, $query);
 
                         $i = 1;
                         while ($row = mysqli_fetch_assoc($result)) {
                             $project_id = $row['project_id'];
-                            $mine_id = $row['mine_id'];
                             $contract_id = $row['contract_id'];
 
                             $project_info = "";
@@ -330,20 +321,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             $row_role_key = isset($row['role']) ? (string) $row['role'] : '';
                             $row_role_scope = isset($roles_scope[$row_role_key]) ? $roles_scope[$row_role_key] : 'gloable';
 
-                            if ($row_role_scope === 'mine') {
+                            if ($row_role_scope === 'mine' || $row_role_scope === 'project') {
                                 // جلب اسم المشروع
                                 if ($project_id > 0) {
                                     $select_project = mysqli_query($conn, "SELECT name, project_code FROM `project` WHERE `id` = $project_id");
                                     if ($project_row = mysqli_fetch_array($select_project)) {
                                         $project_info = "<div class='pu-project-meta'><div class='pu-project-meta-item'><i class='fas fa-project-diagram pu-meta-icon'></i> " . htmlspecialchars($project_row['name'], ENT_QUOTES, 'UTF-8') . " (" . $project_row['project_code'] . ")";
-                                    }
-                                }
-
-                                // جلب اسم المنجم
-                                if ($mine_id > 0) {
-                                    $select_mine = mysqli_query($conn, "SELECT mine_name, mine_code FROM `mines` WHERE `id` = $mine_id");
-                                    if ($mine_row = mysqli_fetch_array($select_mine)) {
-                                        $project_info .= "</div><div class='pu-project-meta-item'><i class='fas fa-mountain pu-meta-icon'></i> " . htmlspecialchars($mine_row['mine_name'], ENT_QUOTES, 'UTF-8') . " (" . $mine_row['mine_code'] . ")";
                                     }
                                 }
 
@@ -356,7 +339,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                 }
 
                                 if (!empty($project_info)) {
-                                    $project_info = $project_info . "</div>";
+                                    $project_info = $project_info . "</div></div>";
                                 }
                             }
 
@@ -376,7 +359,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                    data-phone='" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "'
                                    data-role='{$row['role']}'
                                    data-project='{$row['project_id']}'
-                                   data-mine='{$row['mine_id']}'
                                    data-contract='{$row['contract_id']}'
                                    title='تعديل'><i class='fas fa-edit'></i></a>
                                 <a href='?delete={$row['id']}' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>
@@ -411,11 +393,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
         const roleSelect = document.getElementById("role");
         const projectDiv = document.getElementById("projectDiv");
-        const mineDiv = document.getElementById("mineDiv");
         const contractDiv = document.getElementById("contractDiv");
 
         const projectSelect = document.getElementById("project_id");
-        const mineSelect = document.getElementById("mine_id");
         const contractSelect = document.getElementById("contract_id");
 
         const form = document.getElementById('projectForm');
@@ -428,7 +408,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             if (!roleId) {
                 return false;
             }
-            return roleScopes[String(roleId)] === "mine";
+            return roleScopes[String(roleId)] === 'mine' || roleScopes[String(roleId)] === 'project';
         }
 
         /* =============================
@@ -439,89 +419,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             if (roleNeedsMineScope(this.value)) {
 
                 projectDiv.classList.remove("pu-hidden");
-                mineDiv.classList.remove("pu-hidden");
                 contractDiv.classList.remove("pu-hidden");
 
                 projectSelect.required = true;
-                mineSelect.required = true;
                 contractSelect.required = true;
 
             } else {
 
                 projectDiv.classList.add("pu-hidden");
-                mineDiv.classList.add("pu-hidden");
                 contractDiv.classList.add("pu-hidden");
 
                 projectSelect.required = false;
-                mineSelect.required = false;
                 contractSelect.required = false;
 
                 projectSelect.value = "";
-                mineSelect.innerHTML = '<option value="">-- اختر المنجم --</option>';
                 contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
             }
         });
 
         /* =============================
-           تحميل المناجم
-        ============================== */
-        async function loadMines(projectId, selectedMine = null) {
-
-            mineSelect.innerHTML = '<option value="">-- اختر المنجم --</option>';
-            contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
-
-            if (!projectId) return;
-
-            try {
-                const response = await fetch(`../Projects/get_project_mines_ajax.php?project_id=${projectId}`);
-                const data = await response.json();
-
-                if (data.success && data.mines.length > 0) {
-                    data.mines.forEach(mine => {
-                        const option = document.createElement('option');
-                        option.value = mine.id;
-                        option.textContent = `${mine.mine_name} (${mine.mine_code})`;
-                        mineSelect.appendChild(option);
-                    });
-
-                    if (selectedMine) {
-                        mineSelect.value = selectedMine;
-                    }
-                }
-
-            } catch (error) {
-                console.error("خطأ في تحميل المناجم:", error);
-            }
-        }
-
-        /* =============================
            تحميل العقود
         ============================== */
-        async function loadContracts(mineId, selectedContract = null) {
+        async function loadContracts(projectId, selectedContract = null) {
 
-            contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+            contractSelect.innerHTML = '<option value="">-- جاري التحميل... --</option>';
 
-            if (!mineId) return;
+            if (!projectId) {
+                contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
+                return;
+            }
 
             try {
-                const response = await fetch(`../Contracts/get_mine_contracts_ajax.php?mine_id=${mineId}`);
+                const response = await fetch('../Suppliers/get_mine_contracts.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `project_id=${projectId}`
+                });
                 const data = await response.json();
 
                 if (data.success && data.contracts.length > 0) {
+                    contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
                     data.contracts.forEach(contract => {
                         const option = document.createElement('option');
                         option.value = contract.id;
-                        option.textContent = `عقد #${contract.id} - ${contract.contract_signing_date}`;
+                        option.textContent = contract.display_name;
                         contractSelect.appendChild(option);
                     });
 
                     if (selectedContract) {
                         contractSelect.value = selectedContract;
                     }
+                } else {
+                    contractSelect.innerHTML = '<option value="">-- لا توجد عقود لهذا المشروع --</option>';
                 }
 
             } catch (error) {
                 console.error("خطأ في تحميل العقود:", error);
+                contractSelect.innerHTML = '<option value="">-- خطأ في التحميل --</option>';
             }
         }
 
@@ -529,13 +483,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
            عند تغيير المشروع
         ============================== */
         projectSelect.addEventListener("change", async function () {
-            await loadMines(this.value);
-        });
-
-        /* =============================
-           عند تغيير المنجم
-        ============================== */
-        mineSelect.addEventListener("change", async function () {
             await loadContracts(this.value);
         });
 
@@ -583,7 +530,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             const role = $(this).data('role');
 
             const projectId = $(this).data('project');
-            const mineId = $(this).data('mine');
             const contractId = $(this).data('contract');
 
             $('#uid').val(id);
@@ -601,11 +547,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
                 if (projectId) {
                     $('#project_id').val(projectId);
-                    await loadMines(projectId, mineId);
-
-                    if (mineId) {
-                        await loadContracts(mineId, contractId);
-                    }
+                    await loadContracts(projectId, contractId);
                 }
             }
 

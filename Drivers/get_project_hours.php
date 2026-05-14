@@ -18,9 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
     // جلب إجمالي ساعات العقد المحدد من جدول contracts
     $contract_query = "SELECT
         c.forecasted_contracted_hours as contract_total_hours,
-        m.project_id
+        c.project_id
         FROM contracts c
-        LEFT JOIN mines m ON c.mine_id = m.id
         WHERE c.id = $project_contract_id
         LIMIT 1";
     $contract_result = mysqli_query($conn, $contract_query);

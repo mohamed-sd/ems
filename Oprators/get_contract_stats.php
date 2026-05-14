@@ -8,7 +8,6 @@ include '../config.php';
 header('Content-Type: application/json; charset=utf-8');
 
 $is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
-$user_mine_id = $is_role10 ? intval($_SESSION['user']['mine_id']) : 0;
 $user_contract_id = $is_role10 ? intval($_SESSION['user']['contract_id']) : 0;
 
 $contract_id = isset($_GET['contract_id']) ? intval($_GET['contract_id']) : 0;
@@ -23,11 +22,10 @@ if ($contract_id <= 0) {
     exit;
 }
 
-$contract_query = "SELECT c.*, m.mine_name, m.project_id, p.name as project_name,
+$contract_query = "SELECT c.*, p.name as project_name,
                    (SELECT COALESCE(SUM(ce.equip_count), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count
                    FROM contracts c
-                   LEFT JOIN mines m ON c.mine_id = m.id
-                   LEFT JOIN project p ON m.project_id = p.id
+                   LEFT JOIN project p ON c.project_id = p.id
                    WHERE c.id = $contract_id";
 $contract_result = mysqli_query($conn, $contract_query);
 
@@ -42,13 +40,15 @@ if (mysqli_num_rows($contract_result) == 0) {
 }
 
 $contract = mysqli_fetch_assoc($contract_result);
-$contract_mine_id = intval($contract['mine_id']);
-
-if ($is_role10 && $user_mine_id > 0 && $contract_mine_id !== $user_mine_id) {
-    echo json_encode(['success' => false, 'message' => 'لا توجد صلاحية لهذا المنجم']);
-    exit;
-}
 $project_id = intval($contract['project_id']);
+
+if ($is_role10) {
+    $user_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
+    if ($user_project_id > 0 && $project_id !== $user_project_id) {
+        echo json_encode(['success' => false, 'message' => 'لا توجد صلاحية لهذا المشروع']);
+        exit;
+    }
+}
 
 $active_equipment_query = "SELECT COUNT(*) as active_count
                           FROM operations o
@@ -71,7 +71,7 @@ $suppliers_query = "SELECT
     (SELECT COALESCE(SUM(sce.equip_count_backup), 0) FROM suppliercontractequipments sce WHERE sce.contract_id = sc.id) as equipment_count_backup
 FROM supplierscontracts sc
 LEFT JOIN suppliers s ON sc.supplier_id = s.id
-WHERE sc.mine_id = $contract_mine_id AND sc.status = 1
+WHERE sc.project_id = $project_id AND sc.status = 1
 ORDER BY s.name";
 
 $suppliers_result = mysqli_query($conn, $suppliers_query);
@@ -103,7 +103,7 @@ if ($suppliers_result) {
                            FROM operations o
                            LEFT JOIN equipments e ON o.equipment = e.id
                            WHERE o.status = 1
-                           AND o.mine_id = $contract_mine_id
+                           AND o.project_id = $project_id
                            AND o.supplier_id = " . intval($row['supplier_id']) . "
                            AND (o.equipment_type = $equip_type_id OR e.type = $equip_type_id)";
             $added_result = mysqli_query($conn, $added_query);
@@ -156,8 +156,7 @@ $response = [
         'duration' => $contract['contract_duration_months'] . ' شهر',
         'total_hours' => floatval($contract['forecasted_contracted_hours']),
         'equipment_count' => $active_equipment_count,
-        'project_name' => $contract['project_name'],
-        'mine_name' => $contract['mine_name']
+        'project_name' => $contract['project_name']
     ],
     'suppliers' => $suppliers,
     'summary' => [

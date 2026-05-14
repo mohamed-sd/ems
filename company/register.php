@@ -571,7 +571,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 'phone' => $managerPhone,
                                 'role' => '1',
                                 'project_id' => 0,
-                                'mine_id' => 0,
                                 'contract_id' => 0
                             );
                             $newCompany = array(
@@ -1469,5 +1468,3 @@ if (selectedCard) {
 </script>
 </body>
 </html>
-
-

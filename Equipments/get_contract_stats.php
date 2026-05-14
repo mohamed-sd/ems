@@ -84,13 +84,12 @@ if ($contract_id <= 0) {
 }
 
 // جلب بيانات العقد مع عدد المعدات من contractequipments
-$contract_query = "SELECT c.*, m.mine_name, m.project_id, p.name as project_name,
+$contract_query = "SELECT c.*, p.name as project_name,
                    (SELECT COALESCE(SUM(ce.equip_count), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count,
                    (SELECT COALESCE(SUM(ce.equip_count_basic), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count_basic,
                    (SELECT COALESCE(SUM(ce.equip_count_backup), 0) FROM contractequipments ce WHERE ce.contract_id = c.id) as equipment_count_backup
                    FROM contracts c
-                   LEFT JOIN mines m ON c.mine_id = m.id
-                   LEFT JOIN project p ON m.project_id = p.id
+                   LEFT JOIN project p ON c.project_id = p.id
                                      WHERE c.id = $contract_id
                                          AND $contract_scope_sql";
 $contract_result = mysqli_query($conn, $contract_query);
@@ -106,11 +105,9 @@ if (mysqli_num_rows($contract_result) == 0) {
 }
 
 $contract = mysqli_fetch_assoc($contract_result);
-$mine_id = $contract['mine_id'];
-$project_id = $contract['project_id'];
+$project_id = intval($contract['project_id']);
 
 // جلب عقود الموردين المرتبطة بنفس المشروع مع عدد المعدات
-$project_id = $contract['project_id'];
 $suppliers_query = "SELECT
     sc.id,
     sc.supplier_id,
@@ -200,8 +197,7 @@ $response = [
         'equipment_count' => intval($contract['equipment_count']),
         'equipment_count_basic' => intval($contract['equipment_count_basic']) ?: 0,
         'equipment_count_backup' => intval($contract['equipment_count_backup']) ?: 0,
-        'project_name' => $contract['project_name'],
-        'mine_name' => $contract['mine_name']
+        'project_name' => $contract['project_name']
     ],
     'suppliers' => $suppliers,
     'summary' => [

@@ -34,10 +34,9 @@ if (!$is_super_admin) {
     } else {
         $contracts_scope_sql = "EXISTS (
             SELECT 1
-            FROM mines sm
-            JOIN project sp ON sp.id = sm.project_id
+            FROM project sp
             JOIN users su ON su.project_id = sp.id
-            WHERE sm.id = c.mine_id
+            WHERE sp.id = c.project_id
               AND su.company_id = " . $company_id . "
         )";
     }
@@ -117,17 +116,16 @@ include '../insidebar.php';
         $contract_id = intval($_GET['id']);
 
         $sql = "SELECT
-            c.id, c.mine_id, c.contract_signing_date, c.grace_period_days, c.contract_duration_months, c.contract_duration_days,
+            c.id, c.project_id, c.contract_signing_date, c.grace_period_days, c.contract_duration_months, c.contract_duration_days,
             c.actual_start, c.actual_end, c.transportation, c.accommodation, c.place_for_living,
             c.workshop, c.hours_monthly_target, c.forecasted_contracted_hours, c.created_at, c.updated_at,
             c.daily_work_hours, c.daily_operators, c.first_party, c.second_party,
             c.witness_one, c.witness_two, c.status, c.pause_reason, c.pause_date, c.resume_date, c.termination_type, c.termination_reason, c.merged_with,
             c.equip_shifts_contract, c.shift_contract, c.equip_total_contract_daily, c.total_contract_permonth, c.total_contract_units,
             c.price_currency_contract, c.paid_contract, c.payment_time, c.guarantees, c.payment_date,
-            m.mine_name, m.mine_code, p.name AS project_name
+            p.name AS project_name
         FROM contracts c
-        LEFT JOIN mines m ON c.mine_id = m.id
-        LEFT JOIN project p ON m.project_id = p.id
+        LEFT JOIN project p ON c.project_id = p.id
         WHERE c.id = $contract_id AND $contracts_scope_sql
         LIMIT 1";
 
@@ -272,10 +270,6 @@ include '../insidebar.php';
                             <?php endif; ?>
                         </div>
                         <div class="detail-card-body">
-                            <div class="detail-row">
-                                <span class="detail-label"><i class="fas fa-mountain"></i> المنجم</span>
-                                <span class="detail-value" id="mineDisplay"><?php echo $row['mine_name'] . ' (' . $row['mine_code'] . ')'; ?></span>
-                            </div>
                             <div class="detail-row">
                                 <span class="detail-label"><i class="fas fa-project-diagram"></i> المشروع</span>
                                 <span class="detail-value"><?php echo $row['project_name']; ?></span>
@@ -441,7 +435,7 @@ include '../insidebar.php';
 
             <?php
             $contractStatusValue = isset($row['status']) ? $row['status'] : 1;
-            $mine_id = $row['mine_id'];
+            $contract_project_id = isset($row['project_id']) ? intval($row['project_id']) : 0;
             $actual_end_date = $row['actual_end'];
             $pause_date = isset($row['pause_date']) ? $row['pause_date'] : '';
             $pause_reason = isset($row['pause_reason']) ? $row['pause_reason'] : '';
@@ -960,10 +954,10 @@ include '../insidebar.php';
                         <select id="mergeWithId" class="form-select">
                             <option value="">-- اختر عقد --</option>
                             <?php
-                            $merge_query = "SELECT c.id, c.contract_signing_date, m.mine_name
+                            $merge_query = "SELECT c.id, c.contract_signing_date, p.name AS project_name
                                             FROM contracts c
-                                            LEFT JOIN mines m ON c.mine_id = m.id
-                                            WHERE c.mine_id = $mine_id AND c.id != $contract_id AND $contracts_scope_sql
+                                            LEFT JOIN project p ON c.project_id = p.id
+                                            WHERE c.project_id = $contract_project_id AND c.id != $contract_id AND $contracts_scope_sql
                                             ORDER BY c.id DESC";
                             $merge_result = mysqli_query($conn, $merge_query);
                             while ($m_row = mysqli_fetch_assoc($merge_result)) {

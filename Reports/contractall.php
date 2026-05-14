@@ -97,10 +97,9 @@ if (!isset($_SESSION['user'])) {
 
     $contract_filter = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 
-    $sql_contracts = "SELECT c.id, m.mine_name, p.name AS project_name 
-                      FROM contracts c 
-                      LEFT JOIN mines m ON c.mine_id = m.id
-                      LEFT JOIN project p ON m.project_id = p.id";
+    $sql_contracts = "SELECT c.id, p.name AS project_name
+                      FROM contracts c
+                      LEFT JOIN project p ON c.project_id = p.id";
     $contracts = mysqli_query($conn, $sql_contracts);
 
     $contract_data = $time_vs_progress = $faults = $suppliers = $equipments = $drivers = $variance = null;
@@ -108,9 +107,8 @@ if (!isset($_SESSION['user'])) {
     if ($contract_filter > 0) {
         // تفاصيل العقد
         $sql_info = "
-        SELECT 
+        SELECT
             c.id AS contract_id,
-            m.mine_name,
             p.name AS project_name,
             c.contract_signing_date,
             c.contract_duration_months,
@@ -118,13 +116,12 @@ if (!isset($_SESSION['user'])) {
             c.forecasted_contracted_hours,
             IFNULL(SUM(t.executed_hours),0) AS actual_hours
         FROM contracts c
-        LEFT JOIN mines m ON c.mine_id = m.id
-        LEFT JOIN project p ON m.project_id = p.id
+        LEFT JOIN project p ON c.project_id = p.id
         LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
         WHERE c.id = $contract_filter
-        GROUP BY c.id, m.mine_name, p.name";
+        GROUP BY c.id, p.name";
         $contract_data_res = mysqli_query($conn, $sql_info);
         if ($contract_data_res) {
             $contract_data = mysqli_fetch_assoc($contract_data_res);
@@ -134,12 +131,11 @@ if (!isset($_SESSION['user'])) {
 
         // الزمن مقابل الإنجاز
         $sql_time = "
-        SELECT 
+        SELECT
             (TIMESTAMPDIFF(MONTH, c.contract_signing_date, CURDATE()) / c.contract_duration_months) * 100 AS time_progress,
             (IFNULL(SUM(t.executed_hours),0) / c.forecasted_contracted_hours) * 100 AS work_progress
         FROM contracts c
-        LEFT JOIN mines m ON c.mine_id = m.id
-        LEFT JOIN project p ON m.project_id = p.id
+        LEFT JOIN project p ON c.project_id = p.id
         LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
@@ -155,8 +151,7 @@ if (!isset($_SESSION['user'])) {
         $sql_faults = "
         SELECT SUM(t.total_fault_hours) AS total_fault_hours
         FROM contracts c
-        LEFT JOIN mines m ON c.mine_id = m.id
-        LEFT JOIN project p ON m.project_id = p.id
+        LEFT JOIN project p ON c.project_id = p.id
         LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
@@ -172,8 +167,7 @@ if (!isset($_SESSION['user'])) {
         $sql_suppliers = "
         SELECT s.name AS supplier_name, SUM(t.executed_hours) AS total_work_hours
         FROM contracts c
-        LEFT JOIN mines m ON c.mine_id = m.id
-        LEFT JOIN project p ON m.project_id = p.id
+        LEFT JOIN project p ON c.project_id = p.id
         JOIN operations o ON o." . $operations_project_column . " = p.id
         JOIN equipments e ON e.id = o.equipment
         JOIN suppliers s ON e.suppliers = s.id
@@ -191,8 +185,7 @@ if (!isset($_SESSION['user'])) {
                SUM(t.executed_hours) AS work_hours,
                SUM(t.total_fault_hours) AS fault_hours
         FROM contracts c
-        LEFT JOIN mines m ON c.mine_id = m.id
-        LEFT JOIN project p ON m.project_id = p.id
+        LEFT JOIN project p ON c.project_id = p.id
         JOIN operations o ON o." . $operations_project_column . " = p.id
         JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
@@ -207,8 +200,7 @@ if (!isset($_SESSION['user'])) {
         $sql_drivers = "
         SELECT d.name AS driver_name, SUM(t.executed_hours) AS driver_hours
         FROM contracts c
-        LEFT JOIN mines m ON c.mine_id = m.id
-        LEFT JOIN project p ON m.project_id = p.id
+        LEFT JOIN project p ON c.project_id = p.id
         JOIN operations o ON o." . $operations_project_column . " = p.id
         JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
@@ -226,8 +218,7 @@ if (!isset($_SESSION['user'])) {
                IFNULL(SUM(t.executed_hours),0) AS actual_hours,
                (IFNULL(SUM(t.executed_hours),0) - c.forecasted_contracted_hours) AS variance
         FROM contracts c
-        LEFT JOIN mines m ON c.mine_id = m.id
-        LEFT JOIN project p ON m.project_id = p.id
+        LEFT JOIN project p ON c.project_id = p.id
         LEFT JOIN operations o ON o." . $operations_project_column . " = p.id
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
@@ -267,7 +258,7 @@ if (!isset($_SESSION['user'])) {
                             <option value="">-- اختر --</option>
                             <?php while($row = mysqli_fetch_assoc($contracts)) {
                                 $selected = ($contract_filter == $row['id']) ? "selected" : "";
-                                echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['mine_name']} ({$row['project_name']})</option>";
+                                echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['project_name']}</option>";
                             } ?>
                         </select>
                     </div>
@@ -390,6 +381,3 @@ if (!isset($_SESSION['user'])) {
     <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-

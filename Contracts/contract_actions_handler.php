@@ -33,10 +33,9 @@ function contractTenantScopeSql($conn, $is_super_admin, $company_id, $alias)
 
     return "EXISTS (
         SELECT 1
-        FROM mines m
-        JOIN project p ON p.id = m.project_id
+        FROM project p
         JOIN users u ON u.project_id = p.id
-        WHERE m.id = " . $a . "mine_id
+        WHERE p.id = " . $a . "project_id
           AND u.company_id = " . $safe_company_id . "
     )";
 }
@@ -427,8 +426,8 @@ else if ($action === 'merge') {
         die(json_encode(['success' => false, 'message' => 'أحد العقود غير موجود']));
     }
 
-    if ($contract_to_merge['mine_id'] != $current_contract['mine_id']) {
-        die(json_encode(['success' => false, 'message' => 'لا يمكن دمج عقود من مناجم مختلفة']));
+    if ($contract_to_merge['project_id'] != $current_contract['project_id']) {
+        die(json_encode(['success' => false, 'message' => 'لا يمكن دمج عقود من مشاريع مختلفة']));
     }
 
     $current_hours = intval($current_contract['forecasted_contracted_hours']);

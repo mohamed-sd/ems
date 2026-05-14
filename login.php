@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (mb_strlen($u) > 50 || mb_strlen($p) > 128) {
       $error = "بيانات الاعتماد أطول من المسموح.";
     } else {
-      $stmt = mysqli_prepare($conn, "SELECT id,name,username,password,phone,role,project_id,mine_id,contract_id,company_id,parent_id,created_at,updated_at FROM users WHERE username=? LIMIT 1");
+      $stmt = mysqli_prepare($conn, "SELECT id,name,username,password,phone,role,project_id,contract_id,company_id,parent_id,created_at,updated_at FROM users WHERE username=? LIMIT 1");
       if ($stmt) {
         mysqli_stmt_bind_param($stmt, "s", $u);
         mysqli_stmt_execute($stmt);
@@ -96,7 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               'phone' => $user['phone'],
               'role' => $user['role'],
               'project_id' => $user['project_id'],
-              'mine_id' => $user['mine_id'] ?? null,
               'contract_id' => $user['contract_id'] ?? null,
               'company_id' => $cid > 0 ? $cid : null,
               'parent' => $user['parent_id'],

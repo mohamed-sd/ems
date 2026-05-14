@@ -12,8 +12,7 @@ $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['rol
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
-// فلترة المعدات حسب المنجم لمدير الحركة والتشغيل (Role 6)
-$user_mine_id = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0;
+// (mine filtering removed - operations filter by project_id directly)
 $is_movement_manager = ($current_role === '6');
 $project_client_column = db_table_has_column($conn, 'project', 'client_id') ? 'client_id' : 'company_client_id';
 $project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
@@ -86,11 +85,8 @@ $ed_company_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND
 $driver_company_scope = (!$is_super_admin && $drivers_has_company) ? " AND d.company_id = $company_id" : "";
 $driver_status_scope = $drivers_has_status ? " AND d.status = 1" : "";
 
-// فلتر المنجم لمدير الحركة والتشغيل (Role 6)
+// (mine filter removed - operations filtered by project_id only)
 $ops_mine_filter = "";
-if ($is_movement_manager && $user_mine_id > 0) {
-    $ops_mine_filter = " AND CAST(o.mine_id AS UNSIGNED) = $user_mine_id";
-}
 
 $msg = '';
 $is_success = true;

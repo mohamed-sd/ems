@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -64,7 +64,6 @@ if (!$can_view) {
 
 $is_role10 = isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10";
 $user_project_id = $is_role10 ? intval($_SESSION['user']['project_id']) : 0;
-$user_mine_id = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0; // يُستخدم لجميع الأدوار
 $user_contract_id = $is_role10 ? intval($_SESSION['user']['contract_id']) : 0;
 
 $session_user_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
@@ -112,14 +111,8 @@ if (mysqli_num_rows($project_result) > 0) {
     exit();
 }
 
-// جلب بيانات المنجم المحدد في الجلسة (يعمل لجميع الأدوار)
+// (mine filtering removed - operations filter by project_id directly)
 $selected_mine = null;
-if ($user_mine_id > 0) {
-    $mine_q = mysqli_query($conn, "SELECT id, mine_name, mine_code FROM mines WHERE id = $user_mine_id AND project_id = $selected_project_id AND status = '1' LIMIT 1");
-    if ($mine_q && mysqli_num_rows($mine_q) > 0) {
-        $selected_mine = mysqli_fetch_assoc($mine_q);
-    }
-}
 
 // تغيير حالة التشغيل (إيقاف/تعطل/استئناف)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_status') {
@@ -651,9 +644,6 @@ include('../insidebar.php');
                             <input type="hidden" name="project_id" id="project_id"
                                 value="<?php echo $selected_project_id; ?>">
 
-                            <!-- المنجم مخفي - محدد من الجلسة تلقائياً -->
-                            <input type="hidden" name="mine_id" id="mine_id" value="<?php echo $user_mine_id; ?>">
-
                             <!-- العقود -->
                             <select name="contract_id" id="contract_id" required>
                                 <option value="">-- اختر العقد --</option>
@@ -826,7 +816,6 @@ include('../insidebar.php');
 
                                 $equipment = intval($_POST['equipment']);
                                 $project_id = intval($_POST['project_id']);
-                                $mine_id = intval($_POST['mine_id']);
                                 $contract_id = intval($_POST['contract_id']);
                                 $supplier_id = intval($_POST['supplier_id']);
                                 $equipment_type = intval($_POST['type']);
@@ -857,7 +846,6 @@ include('../insidebar.php');
                                     equipment = '$equipment',
                                     equipment_type = '$equipment_type',
                                     equipment_category = '$equipment_category',
-                                    mine_id = '$mine_id',
                                     contract_id = '$contract_id',
                                     supplier_id = '$supplier_id',
                                     start = '$start',
@@ -873,18 +861,16 @@ include('../insidebar.php');
                                     // إضافة سجل جديد
                                     $insert_company_col = (!$is_super_admin && $operations_has_company) ? ", company_id" : "";
                                     $insert_company_val = (!$is_super_admin && $operations_has_company) ? ", '$company_id'" : "";
-                                    mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, mine_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, status$insert_company_col)
-                                         VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$mine_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$status_escaped'$insert_company_val)");
+                                    mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, status$insert_company_col)
+                                         VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$status_escaped'$insert_company_val)");
                                     echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
                                 }
                             }
 
-                            // جلب بيانات التشغيل - فلتر المنجم من الجلسة
-                            $mine_primary_filter = ($user_mine_id > 0) ? "o.mine_id = $user_mine_id" : "o.project_id = $selected_project_id";
-
+                            // جلب بيانات التشغيل - فلتر بالمشروع
                             $operations_scope_sql = (!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "";
 
-                            $query = "SELECT o.id, o.equipment, o.equipment_type, o.equipment_category, o.mine_id, o.contract_id, o.supplier_id,
+                            $query = "SELECT o.id, o.equipment, o.equipment_type, o.equipment_category, o.contract_id, o.supplier_id,
                              o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.status, o.reason,
                              e.code AS equipment_code, e.name AS equipment_name, e.type AS equipment_type_id,
                              et.type AS equipment_type_name,
@@ -897,7 +883,7 @@ include('../insidebar.php');
                       LEFT JOIN suppliers s ON e.suppliers = s.id
                       LEFT JOIN equipment_drivers ed ON o.equipment = ed.equipment_id
                       LEFT JOIN drivers d ON ed.driver_id = d.id
-                      WHERE $mine_primary_filter$operations_scope_sql
+                      WHERE o.project_id = $selected_project_id$operations_scope_sql
                       GROUP BY o.id
                       ORDER BY o.id DESC";
                             $result = mysqli_query($conn, $query);
@@ -944,9 +930,6 @@ include('../insidebar.php');
                                 </form> ";
                                 }
 
-                                // جلب اسم المنجم
-                                $mine_name_res = mysqli_query($conn, "SELECT mine_name FROM mines WHERE id = " . intval($row['mine_id']) . " LIMIT 1");
-                                $mine_name_val = ($mine_name_res && mysqli_num_rows($mine_name_res) > 0) ? mysqli_fetch_assoc($mine_name_res)['mine_name'] : '-';
                                 // جلب رقم العقد
                                 $contract_code_res = mysqli_query($conn, "SELECT contract_signing_date FROM contracts WHERE id = " . intval($row['contract_id']) . " LIMIT 1");
                                 $contract_code_val = ($contract_code_res && mysqli_num_rows($contract_code_res) > 0) ? mysqli_fetch_assoc($contract_code_res)['contract_signing_date'] : '-';
@@ -959,7 +942,6 @@ include('../insidebar.php');
                                                                  data-equipment='" . htmlspecialchars($row['equipment_code'] . ' - ' . $row['equipment_name'], ENT_QUOTES) . "'
                                                                  data-equipment-type='" . htmlspecialchars($row['equipment_type_name'] ?? '-', ENT_QUOTES) . "'
                                                                  data-supplier='" . htmlspecialchars($row['suppliers_name'] ?? '-', ENT_QUOTES) . "'
-                                                                 data-mine='" . htmlspecialchars($mine_name_val, ENT_QUOTES) . "'
                                                                  data-contract='" . htmlspecialchars($contract_code_val, ENT_QUOTES) . "'
                                                                  data-drivers='" . htmlspecialchars(!empty($row['driver_names']) ? $row['driver_names'] : '-', ENT_QUOTES) . "'
                                                                  data-start='" . $row['start'] . "'
@@ -976,7 +958,6 @@ include('../insidebar.php');
                                                                  data-equipment='" . $row['equipment'] . "'
                                                                  data-equipment-type='" . $row['equipment_type'] . "'
                                                                  data-equipment-category='" . $row['equipment_category'] . "'
-                                                                 data-mine='" . $row['mine_id'] . "'
                                                                  data-contract='" . $row['contract_id'] . "'
                                                                  data-supplier='" . $row['supplier_id'] . "'
                                                                  data-start='" . $row['start'] . "'
@@ -1166,14 +1147,14 @@ include('../insidebar.php');
 
                     form.classList.add('allforms-visible');
 
-                    // تحميل عقود المنجم تلقائياً من الجلسة
-                    var sessionMineId = <?php echo $user_mine_id; ?>;
-                    if (sessionMineId > 0) {
+                    // تحميل عقود المشروع تلقائياً
+                    var sessionProjectId = <?php echo $selected_project_id; ?>;
+                    if (sessionProjectId > 0) {
                         $.ajax({
                             url: "../Oprators/get_mine_contracts.php",
                             type: "POST",
                             dataType: "json",
-                            data: { mine_id: sessionMineId },
+                            data: { project_id: sessionProjectId },
                             success: function (response) {
                                 if (response.success) {
                                     var opts = "<option value=''>-- اختر العقد --</option>";
@@ -1454,18 +1435,16 @@ include('../insidebar.php');
 
                     console.log('✅ تم ملء البيانات الأساسية');
 
-                    // mine_id محدد من الجلسة تلقائياً
-                    var mineId = <?php echo $user_mine_id; ?>;
+                    // تحميل عقود المشروع المحدد
+                    var editProjectId = <?php echo $selected_project_id; ?>;
 
-                    console.log('ðŸ“ تحميل العقود للمنجم:', mineId);
-
-                    // تحميل العقود للمنجم المحدد
+                    // تحميل العقود للمشروع المحدد
                     setTimeout(function () {
                         $.ajax({
                             url: "../Oprators/get_mine_contracts.php",
                             type: "POST",
                             dataType: "json",
-                            data: { mine_id: mineId },
+                            data: { project_id: editProjectId },
                             success: function (response) {
                                 console.log('ðŸ“‹ استجابة العقود:', response);
                                 if (response.success) {

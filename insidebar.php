@@ -28,11 +28,10 @@ if (isset($_SESSION['user']) && isset($conn)) {
       $sb_role         = strval($_SESSION['user']['role']);
       $sb_company_id   = intval($_SESSION['user']['company_id'] ?? 0);
       $sb_session_proj = intval($_SESSION['user']['project_id'] ?? 0);
-      $sb_session_mine = intval($_SESSION['user']['mine_id'] ?? 0);
 
       $sb_allowed_roles = ['-1', '1', '2', '3', '4', '5'];
       if (in_array($sb_role, $sb_allowed_roles)) {
-        $sb_cache_key = implode('|', [$sb_role, $sb_company_id, $sb_session_proj, $sb_session_mine]);
+        $sb_cache_key = implode('|', [$sb_role, $sb_company_id, $sb_session_proj]);
         $sb_cache_ttl = 60;
         $sb_cache_ok  = false;
         if (isset($_SESSION['hours_approval_pending_cache']) && is_array($_SESSION['hours_approval_pending_cache'])) {
@@ -66,9 +65,6 @@ if (isset($_SESSION['user']) && isset($conn)) {
         if ($sb_is_site_manager) {
           if ($sb_session_proj > 0) {
             $sb_site_scope .= " AND o.$sb_ops_project_col = $sb_session_proj";
-          }
-          if ($sb_session_mine > 0 && function_exists('db_table_has_column') && db_table_has_column($conn, 'operations', 'mine_id')) {
-            $sb_site_scope .= " AND o.mine_id = $sb_session_mine";
           }
         }
 
@@ -158,7 +154,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
         <li><a href="../main/users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
         <li><a href="../Reports/new_reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
         <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>تقارير العقود</span></a></li>
-        <?php 
+        <?php
       }
       ?>
 
@@ -223,7 +219,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
         <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
       <?php } ?>
 
-      <?php // صلاحيات  مدخل الساعات === 6 
+      <?php // صلاحيات  مدخل الساعات === 6
       if ($_SESSION['user']['role'] == "6") { ?>
         <!-- <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a>
         </li>
@@ -231,13 +227,13 @@ if (isset($_SESSION['user']) && isset($conn)) {
         </li> -->
       <?php } ?>
 
-      <?php // صلاحيات مراجع ساعات المورد والمشغل === 7 8 
+      <?php // صلاحيات مراجع ساعات المورد والمشغل === 7 8
       if ($_SESSION['user']['role'] == "7" || $_SESSION['user']['role'] == "8") { ?>
         <!-- <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
         <!-- <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a> -->
         <?php } ?>
 
-        <?php // صلاحيات مراجع الاعطال === 9 
+        <?php // صلاحيات مراجع الاعطال === 9
         if ($_SESSION['user']['role'] == "9") { ?>
         <!-- <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a> -->
         <?php } ?>
@@ -247,7 +243,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
       <li><a href="../Settings/settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
 
 
-      <!-- 
+      <!--
       <?php if ($_SESSION['user']['role'] == "1") {
         // المدير
         ?>

@@ -73,7 +73,6 @@ $fSearch         = isset($_GET['search'])          ? trim($_GET['search'])      
 // فلاتر إضافية للتقارير التفصيلية
 $fShift          = isset($_GET['shift'])           ? trim($_GET['shift'])           : '';
 $fEquipId        = isset($_GET['equip_id'])        ? intval($_GET['equip_id'])      : 0;
-$fMineId         = isset($_GET['mine_id'])         ? intval($_GET['mine_id'])       : 0;
 $fContractStatus = isset($_GET['contract_status']) ? trim($_GET['contract_status']) : '';
 $fCategory       = isset($_GET['category'])        ? trim($_GET['category'])        : '';
 
@@ -89,7 +88,6 @@ $hasAnyFilter = (
     $fSearch !== '' ||
     $fShift !== '' ||
     $fEquipId > 0 ||
-    $fMineId > 0 ||
     $fContractStatus !== '' ||
     $fCategory !== ''
 );
@@ -268,10 +266,9 @@ case 'drivers_timesheet': {
             // ── تقرير التفاصيل الكامل مع كل الحقول ──
             if ($fShift !== '')  $where[] = "t.shift = '" . mysqli_real_escape_string($conn, $fShift) . "'";
             if ($fEquipId > 0)   $where[] = "o.equipment = $fEquipId";
-            if ($fMineId  > 0)   $where[] = "o.mine_id = $fMineId";
             $ws = implode(' AND ', $where);
 
-              $headers = ['#','التاريخ','الوردية','البداية','النهاية','ع.المنفذة','ع.الاستعداد','ع.العمل','ع.أعطال','ع.تنفيذ مشغل','ع.استعداد مشغل','ع.وردية','كفاءة%','المشروع','المنجم','المعدة','كود المعدة','المورد','المشغل','نوع الخلل','ملاحظات'];
+              $headers = ['#','التاريخ','الوردية','البداية','النهاية','ع.المنفذة','ع.الاستعداد','ع.العمل','ع.أعطال','ع.تنفيذ مشغل','ع.استعداد مشغل','ع.وردية','كفاءة%','المشروع','المعدة','كود المعدة','المورد','المشغل','نوع الخلل','ملاحظات'];
             $sql = "SELECT t.id,
                            t.date,
                            CASE WHEN t.shift='D' THEN 'D' WHEN t.shift='N' THEN 'N' ELSE IFNULL(t.shift,'-') END AS shift_txt,
@@ -288,7 +285,6 @@ case 'drivers_timesheet': {
                               THEN ROUND(IFNULL(t.executed_hours + t.standby_hours,0)/(IFNULL(t.executed_hours + t.standby_hours,0)+IFNULL(t.total_fault_hours,0))*100,1)
                                 ELSE 0 END AS eff_pct,
                            IFNULL(p.name,'—')  AS project_name,
-                           IFNULL(mn.mine_name,'—') AS mine_name,
                            IFNULL(e.name,'—')  AS equipment_name,
                            IFNULL(e.code,'-')  AS equipment_code,
                            IFNULL(s.name,'—')  AS supplier_name,
@@ -298,7 +294,6 @@ case 'drivers_timesheet': {
                     FROM timesheet t
                     LEFT JOIN operations o ON o.id=t.operator
                     LEFT JOIN project    p ON p.id=o.project_id
-                    LEFT JOIN mines      mn ON mn.id=o.mine_id
                     LEFT JOIN equipments e ON e.id=o.equipment
                     LEFT JOIN suppliers  s ON s.id=o.supplier_id
                     LEFT JOIN drivers    d ON d.id=t.driver
@@ -415,24 +410,19 @@ case 'project_detailed': {
     $kpiRes = mysqli_query($conn, $kpiSql);
     $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
 
-    $totalMines = 0;
-    $minesSql = mysqli_query($conn, "SELECT COUNT(*) AS c FROM mines m WHERE m.status=1 AND ({$sc['m']}) AND m.project_id IN (SELECT id FROM project p WHERE $ws)");
-    if ($minesSql) { $mr = mysqli_fetch_assoc($minesSql); $totalMines = $mr['c'] ?? 0; }
-
     $totalContracts = 0;
-    $contractsSql = mysqli_query($conn, "SELECT COUNT(*) AS c FROM contracts c JOIN mines mi ON mi.id=c.mine_id WHERE c.status=1 AND mi.project_id IN (SELECT id FROM project p WHERE $ws)");
+    $contractsSql = mysqli_query($conn, "SELECT COUNT(*) AS c FROM contracts c WHERE c.status=1 AND c.project_id IN (SELECT id FROM project p WHERE $ws)");
     if ($contractsSql) { $cr2 = mysqli_fetch_assoc($contractsSql); $totalContracts = $cr2['c'] ?? 0; }
 
     $kpi = [
         ['icon'=>'fa-project-diagram','value'=> number_format($kpiRow['total_p']    ?? 0),'label'=>'إجمالي المشاريع','color'=>'blue'],
         ['icon'=>'fa-check-circle',   'value'=> number_format($kpiRow['active_p']   ?? 0),'label'=>'مشاريع نشطة',   'color'=>'green'],
-        ['icon'=>'fa-mountain',       'value'=> number_format($totalMines),               'label'=>'المناجم',        'color'=>'teal'],
         ['icon'=>'fa-file-contract',  'value'=> number_format($totalContracts),           'label'=>'العقود النشطة',  'color'=>'gold'],
         ['icon'=>'fa-map-marker-alt', 'value'=> number_format($kpiRow['states_cnt'] ?? 0),'label'=>'الولايات',       'color'=>'purple'],
     ];
 
     if ($REPORT_CODE === 'project_detailed') {
-        $headers = ['الكود','المشروع','العميل','الولاية','المنطقة','الموقع','الفئة','القطاع الفرعي','أقرب سوق','الإحداثيات','المناجم','العقود النشطة','ساعات العمل','الوردية المنفذة','الحالة','تاريخ الإنشاء'];
+        $headers = ['الكود','المشروع','العميل','الولاية','المنطقة','الموقع','الفئة','القطاع الفرعي','أقرب سوق','الإحداثيات','العقود النشطة','ساعات العمل','الوردية المنفذة','الحالة','تاريخ الإنشاء'];
         $sql = "SELECT p.project_code,
                        p.name,
                        IFNULL(p.client,'—') AS client,
@@ -444,19 +434,17 @@ case 'project_detailed': {
                        IFNULL(p.nearest_market,'—') AS nearest_market,
                        CASE WHEN p.latitude IS NOT NULL AND p.longitude IS NOT NULL
                             THEN CONCAT(p.latitude,' / ',p.longitude) ELSE '—' END AS coords,
-                       (SELECT COUNT(*) FROM mines m2 WHERE m2.project_id=p.id AND m2.status=1) AS mines_cnt,
-                       (SELECT COUNT(*) FROM contracts ct JOIN mines mi ON mi.id=ct.mine_id WHERE mi.project_id=p.id AND ct.status=1 AND ct.is_deleted=0) AS contracts_cnt,
+                       (SELECT COUNT(*) FROM contracts ct WHERE ct.project_id=p.id AND ct.status=1 AND ct.is_deleted=0) AS contracts_cnt,
                        IFNULL((SELECT ROUND(SUM(t2.total_work_hours),1) FROM timesheet t2 JOIN operations o2 ON o2.id=t2.operator WHERE o2.project_id=p.id),0) AS total_wh,
                        IFNULL((SELECT COUNT(*) FROM timesheet t3 JOIN operations o3 ON o3.id=t3.operator WHERE o3.project_id=p.id),0) AS shifts_cnt,
                        CASE WHEN p.status=1 THEN 'نشط' ELSE 'غير نشط' END AS status_txt,
                        DATE_FORMAT(p.create_at,'%Y-%m-%d') AS created_date
                 FROM project p WHERE $ws ORDER BY p.status DESC, p.name ASC";
     } else {
-        $headers = ['الكود','المشروع','العميل','الموقع','المناجم','ساعات العمل','الحالة'];
+        $headers = ['الكود','المشروع','العميل','الموقع','ساعات العمل','الحالة'];
         $sql = "SELECT p.project_code, p.name,
                        IFNULL(p.client,'—') AS client,
                        IFNULL(p.location,'—') AS location,
-                       (SELECT COUNT(*) FROM mines m2 WHERE m2.project_id=p.id AND m2.status=1) AS mines_cnt,
                        IFNULL((SELECT ROUND(SUM(t2.total_work_hours),1) FROM timesheet t2 JOIN operations o2 ON o2.id=t2.operator WHERE o2.project_id=p.id),0) AS total_wh,
                        CASE WHEN p.status=1 THEN 'نشط' ELSE 'غير نشط' END AS status_txt
                 FROM project p WHERE $ws ORDER BY p.status DESC, p.name ASC";
@@ -492,8 +480,7 @@ case 'contracts_summary':
 case 'contracts_detailed': {
     $where = ["({$sc['c']})", "c.is_deleted = 0"];
     if ($fStatus >= 0)       $where[] = "c.status = $fStatus";
-    if ($fProjectId > 0)     $where[] = "m.project_id = $fProjectId";
-    if ($fMineId > 0)        $where[] = "c.mine_id = $fMineId";
+    if ($fProjectId > 0)     $where[] = "c.project_id = $fProjectId";
     if ($fContractStatus !== '') {
         $safeCst = mysqli_real_escape_string($conn, $fContractStatus);
         $where[] = "c.contract_status = '$safeCst'";
@@ -506,7 +493,7 @@ case 'contracts_detailed': {
                       SUM(CASE WHEN c.contract_status='terminated' THEN 1 ELSE 0 END) AS term_c,
                       ROUND(IFNULL(SUM(c.forecasted_contracted_hours),0),0) AS total_hrs,
                       ROUND(AVG(c.contract_duration_months),1) AS avg_dur
-               FROM contracts c LEFT JOIN mines m ON m.id=c.mine_id WHERE $ws";
+               FROM contracts c LEFT JOIN project p ON p.id=c.project_id WHERE $ws";
     $kpiRes = mysqli_query($conn, $kpiSql);
     $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
 
@@ -520,10 +507,9 @@ case 'contracts_detailed': {
     ];
 
     if ($REPORT_CODE === 'contracts_detailed') {
-        $headers = ['رقم العقد','المشروع','المنجم','تاريخ التوقيع','تاريخ البدء الفعلي','تاريخ الانتهاء','المدة','ايام الفترة','ساعات/يوم','الورديات/معدة','مشغلين/يوم','الساعات الشهرية','الإجمالي المستهدف','الطرف الأول','الطرف الثاني','العملة','المبلغ المدفوع','وقت الدفع','الضمانات','حالة العقد','ملاحظة التوقف'];
+        $headers = ['رقم العقد','المشروع','تاريخ التوقيع','تاريخ البدء الفعلي','تاريخ الانتهاء','المدة','ايام الفترة','ساعات/يوم','الورديات/معدة','مشغلين/يوم','الساعات الشهرية','الإجمالي المستهدف','الطرف الأول','الطرف الثاني','العملة','المبلغ المدفوع','وقت الدفع','الضمانات','حالة العقد','ملاحظة التوقف'];
         $sql = "SELECT c.id,
                        IFNULL(p.name,'—') AS project_name,
-                       IFNULL(m.mine_name,'—') AS mine_name,
                        IFNULL(c.contract_signing_date,'—') AS signing_date,
                        IFNULL(c.actual_start,'—') AS actual_start,
                        IFNULL(c.actual_end,'—') AS actual_end,
@@ -547,22 +533,19 @@ case 'contracts_detailed': {
                             ELSE c.contract_status END AS status_txt,
                        IFNULL(c.pause_reason,'—') AS pause_reason
                 FROM contracts c
-                LEFT JOIN mines   m ON m.id=c.mine_id
-                LEFT JOIN project p ON p.id=m.project_id
+                LEFT JOIN project p ON p.id=c.project_id
                 WHERE $ws ORDER BY c.contract_signing_date DESC";
     } else {
-        $headers = ['رقم العقد','المشروع','المنجم','تاريخ التوقيع','المدة (شهر)','الساعات الشهرية','الإجمالي المستهدف','الحالة'];
+        $headers = ['رقم العقد','المشروع','تاريخ التوقيع','المدة (شهر)','الساعات الشهرية','الإجمالي المستهدف','الحالة'];
         $sql = "SELECT c.id,
                        IFNULL(p.name,'—') AS project_name,
-                       IFNULL(m.mine_name,'—') AS mine_name,
                        IFNULL(c.contract_signing_date,'—') AS signing_date,
                        IFNULL(c.contract_duration_months,0) AS duration_months,
                        IFNULL(c.hours_monthly_target,0) AS monthly_target,
                        IFNULL(c.forecasted_contracted_hours,0) AS total_target,
                        CASE WHEN c.status=1 THEN 'نشط' ELSE 'غير ساري' END AS status_txt
                 FROM contracts c
-                LEFT JOIN mines   m ON m.id=c.mine_id
-                LEFT JOIN project p ON p.id=m.project_id
+                LEFT JOIN project p ON p.id=c.project_id
                 WHERE $ws ORDER BY c.contract_signing_date DESC";
     }
     $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
@@ -600,7 +583,6 @@ case 'supplier_equipment_performance': {
     if ($fStatus >= 0)    $where[] = "sc.status = $fStatus";
     if ($fSupplierId > 0) $where[] = "sc.supplier_id = $fSupplierId";
     if ($fProjectId  > 0) $where[] = "sc.project_id = $fProjectId";
-    if ($fMineId > 0)     $where[] = "sc.mine_id = $fMineId";
     if ($fContractStatus !== '') {
         $safeCst = mysqli_real_escape_string($conn, $fContractStatus);
         $where[] = "sc.termination_type IS " . ($safeCst === 'terminated' ? "NOT NULL" : "NULL");
@@ -626,11 +608,10 @@ case 'supplier_equipment_performance': {
     ];
 
     if ($REPORT_CODE === 'supplier_contracts_detailed') {
-        $headers = ['المورد','الكود','المشروع','المنجم','تاريخ التوقيع','تاريخ البدء','تاريخ الانتهاء','المدة','فترة السماح','نوع المعدة','عدد المعدات','نوع الآلة','عدد الآلات','ساعات/يوم','مشغلين/يوم','الساعات الشهرية','الإجمالي','الطرف الأول','الطرف الثاني','العملة','المبلغ المدفوع','وقت الدفع','الضمانات','الحالة'];
+        $headers = ['المورد','الكود','المشروع','تاريخ التوقيع','تاريخ البدء','تاريخ الانتهاء','المدة','فترة السماح','نوع المعدة','عدد المعدات','نوع الآلة','عدد الآلات','ساعات/يوم','مشغلين/يوم','الساعات الشهرية','الإجمالي','الطرف الأول','الطرف الثاني','العملة','المبلغ المدفوع','وقت الدفع','الضمانات','الحالة'];
         $sql = "SELECT IFNULL(s.name,'—') AS supplier_name,
                        IFNULL(s.supplier_code,'-') AS supplier_code,
                        IFNULL(p.name,'—') AS project_name,
-                       IFNULL(mn.mine_name,'—') AS mine_name,
                        IFNULL(sc.contract_signing_date,'—') AS signing_date,
                        IFNULL(sc.actual_start,'—') AS actual_start,
                        IFNULL(sc.actual_end,'—') AS actual_end,
@@ -656,7 +637,6 @@ case 'supplier_equipment_performance': {
                 FROM supplierscontracts sc
                 LEFT JOIN suppliers s  ON s.id=sc.supplier_id
                 LEFT JOIN project   p  ON p.id=sc.project_id
-                LEFT JOIN mines     mn ON mn.id=sc.mine_id
                 WHERE $ws ORDER BY sc.contract_signing_date DESC";
     } else {
         $headers = ['المورد','المشروع','تاريخ التوقيع','المدة (شهر)','المستهدف الشهري','الإجمالي المستهدف','عدد المعدات','الحالة'];
@@ -791,7 +771,6 @@ case 'fleet_operations': {
     if ($fProjectId  > 0) $where[] = "o.project_id = $fProjectId";
     if ($fSupplierId > 0) $where[] = "o.supplier_id = $fSupplierId";
     if ($fEquipId    > 0) $where[] = "o.equipment = $fEquipId";
-    if ($fMineId     > 0) $where[] = "o.mine_id = $fMineId";
     if ($fCategory  !== '') $where[] = "e.type = " . intval($fCategory);
     $ws = implode(' AND ', $where);
 
@@ -817,10 +796,9 @@ case 'fleet_operations': {
     ];
 
     if ($REPORT_CODE === 'operations_detailed') {
-        $headers = ['رقم العملية','المشروع','المنجم','المورد','المعدة','كود المعدة','نوع المعدة','تاريخ البداية','تاريخ النهاية','الأيام','ساعات الوردية','إجمالي ساعات المعدة','إجمالي ساعات المشغل','إجمالي ورديات','سبب الانتهاء','الحالة'];
+        $headers = ['رقم العملية','المشروع','المورد','المعدة','كود المعدة','نوع المعدة','تاريخ البداية','تاريخ النهاية','الأيام','ساعات الوردية','إجمالي ساعات المعدة','إجمالي ساعات المشغل','إجمالي ورديات','سبب الانتهاء','الحالة'];
         $sql = "SELECT o.id,
                        IFNULL(p.name,'—') AS project_name,
-                       IFNULL(mn.mine_name,'—') AS mine_name,
                        IFNULL(s.name,'—') AS supplier_name,
                        IFNULL(e.name,'—') AS equipment_name,
                        IFNULL(e.code,'-') AS equipment_code,
@@ -836,7 +814,6 @@ case 'fleet_operations': {
                        CASE WHEN o.status=1 THEN 'نشط' ELSE 'منتهي' END AS status_txt
                 FROM operations o
                 LEFT JOIN project    p  ON p.id=o.project_id
-                LEFT JOIN mines      mn ON mn.id=o.mine_id
                 LEFT JOIN suppliers  s  ON s.id=o.supplier_id
                 LEFT JOIN equipments e  ON e.id=o.equipment
                 WHERE $ws ORDER BY o.id DESC";
@@ -981,7 +958,6 @@ case 'drivers_contracts': {
     if ($fStatus >= 0)    $where[] = "dc.status = $fStatus";
     if ($fDriverId  > 0)  $where[] = "dc.driver_id = $fDriverId";
     if ($fProjectId > 0)  $where[] = "dc.project_id = $fProjectId";
-    if ($fMineId    > 0)  $where[] = "dc.mine_id = $fMineId";
     if ($fContractStatus !== '') {
         $safeCst = mysqli_real_escape_string($conn, $fContractStatus);
         if ($safeCst === 'terminated')   $where[] = "dc.termination_type IS NOT NULL";
@@ -1008,11 +984,10 @@ case 'drivers_contracts': {
     ];
 
     // عرض تفصيلي كامل لهذا القسم دائمًا
-    $headers = ['المشغل','الكود','المشروع','المنجم','تاريخ التوقيع','تاريخ البدء','تاريخ الانتهاء','المدة','فترة السماح','نوع المعدة','عدد المعدات','نوع الآلة','عدد الآلات','الساعات الشهرية','الإجمالي المتوقع','الطرف الأول','الطرف الثاني','العملة','المبلغ المدفوع','وقت الدفع','الضمانات','الحالة'];
+    $headers = ['المشغل','الكود','المشروع','تاريخ التوقيع','تاريخ البدء','تاريخ الانتهاء','المدة','فترة السماح','نوع المعدة','عدد المعدات','نوع الآلة','عدد الآلات','الساعات الشهرية','الإجمالي المتوقع','الطرف الأول','الطرف الثاني','العملة','المبلغ المدفوع','وقت الدفع','الضمانات','الحالة'];
     $sql = "SELECT IFNULL(d.name,'—') AS driver_name,
                    IFNULL(d.driver_code,'-') AS driver_code,
                    IFNULL(p.name,'—') AS project_name,
-                   IFNULL(mn.mine_name,'—') AS mine_name,
                    IFNULL(dc.contract_signing_date,'—') AS signing_date,
                    IFNULL(dc.actual_start,'—') AS actual_start,
                    IFNULL(dc.actual_end,'—') AS actual_end,
@@ -1036,7 +1011,6 @@ case 'drivers_contracts': {
             FROM drivercontracts dc
             LEFT JOIN drivers d  ON d.id=dc.driver_id
             LEFT JOIN project p  ON p.id=dc.project_id
-            LEFT JOIN mines  mn  ON mn.id=dc.mine_id
             WHERE $ws ORDER BY dc.contract_signing_date DESC";
             $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
     $result = mysqli_query($conn, $sql);
@@ -1486,19 +1460,11 @@ body {
                       );
     // فلاتر إضافية للتقارير التفصيلية
     $showShift          = in_array($REPORT_CODE, ['timesheet_detailed','timesheet_by_driver','drivers_timesheet']);
-    $showMine           = in_array($REPORT_CODE, ['contracts_detailed','supplier_contracts_detailed','drivers_contracts','operations_detailed']);
     $showContractStatus = in_array($REPORT_CODE, ['contracts_detailed','supplier_contracts_detailed','drivers_contracts']);
     $showEquipType      = in_array($REPORT_CODE, ['fleet_equipment_detailed','fleet_equipment_summary','fleet_operations']);
     $showEquip          = in_array($REPORT_CODE, ['operations_detailed','fleet_operations','timesheet_detailed']);
     $showEquipName      = in_array($REPORT_CODE, ['fleet_equipment_detailed','fleet_equipment_summary']);
 
-    // جلب المناجم للقائمة المنسدلة
-    $minesList = [];
-    if ($showMine) {
-        $minesQ = "SELECT id, mine_name, mine_code FROM mines WHERE ({$sc['m']}) ORDER BY mine_name ASC";
-        $minesR = mysqli_query($conn, $minesQ);
-        if ($minesR) while ($mr = mysqli_fetch_assoc($minesR)) $minesList[] = $mr;
-    }
     // جلب المعدات للقائمة المنسدلة (عمليات/تايمشيت)
     $equipsList = [];
     if ($showEquip) {
@@ -1538,20 +1504,6 @@ body {
                 <label class="fc-filter-label"><i class="fas fa-project-diagram me-1" style="color:var(--blue)"></i>المشروع</label>
                 <select name="project_id" class="form-select">
                     <?php echo rptSelectOptions($projectsList, 'id', 'name', $fProjectId, 'project_code'); ?>
-                </select>
-            </div>
-            <?php endif; ?>
-
-            <?php if ($showMine && !empty($minesList)): ?>
-            <div class="col-xl-2 col-md-4 col-sm-6">
-                <label class="fc-filter-label"><i class="fas fa-mountain me-1" style="color:var(--teal)"></i>المنجم</label>
-                <select name="mine_id" class="form-select">
-                    <option value="0">— كل المناجم —</option>
-                    <?php foreach ($minesList as $mn): ?>
-                    <option value="<?php echo intval($mn['id']); ?>" <?php echo $fMineId === intval($mn['id']) ? 'selected' : ''; ?>>
-                        <?php if (!empty($mn['mine_code'])) echo rr($mn['mine_code']) . ' - '; echo rr($mn['mine_name']); ?>
-                    </option>
-                    <?php endforeach; ?>
                 </select>
             </div>
             <?php endif; ?>

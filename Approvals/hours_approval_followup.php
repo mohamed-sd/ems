@@ -27,7 +27,6 @@ $role         = strval($_SESSION['user']['role']);
 $user_id      = intval($_SESSION['user']['id']);
 $company_id   = intval($_SESSION['user']['company_id'] ?? 0);
 $session_proj = intval($_SESSION['user']['project_id'] ?? 0);
-$session_mine = intval($_SESSION['user']['mine_id'] ?? 0);
 
 $allowed_roles = array('-1', '1', '2', '3', '4', '5');
 if (!in_array($role, $allowed_roles, true)) {
@@ -77,7 +76,6 @@ $level_role_name = array(
 );
 
 $ops_project_col = ha_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
-$has_ops_mine = ha_table_has_column($conn, 'operations', 'mine_id');
 
 $company_scope_ts = '';
 if (!$is_admin && $company_id > 0) {
@@ -88,9 +86,6 @@ $site_scope_ts = '';
 if ($is_site_manager) {
     if ($session_proj > 0) {
         $site_scope_ts .= " AND o.{$ops_project_col} = $session_proj";
-    }
-    if ($session_mine > 0 && $has_ops_mine) {
-        $site_scope_ts .= " AND o.mine_id = $session_mine";
     }
 }
 

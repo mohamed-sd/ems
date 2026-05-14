@@ -158,9 +158,6 @@ $project_has_deleted_at = clients_table_has_column($conn, 'project', 'deleted_at
 
 $operations_has_company_id = clients_table_has_column($conn, 'operations', 'company_id');
 $equipment_drivers_has_company_id = clients_table_has_column($conn, 'equipment_drivers', 'company_id');
-$mines_has_company_id = clients_table_has_column($conn, 'mines', 'company_id');
-$mines_has_is_deleted = clients_table_has_column($conn, 'mines', 'is_deleted');
-$mines_has_deleted_at = clients_table_has_column($conn, 'mines', 'deleted_at');
 
 $project_client_link_column = '';
 if ($project_has_company_client_id) {
@@ -484,8 +481,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
 
     $operations_company_filter = $operations_has_company_id ? " AND o.company_id = $company_id" : '';
     $equipment_drivers_company_filter = $equipment_drivers_has_company_id ? " AND ed.company_id = $company_id" : '';
-    $mines_company_filter = $mines_has_company_id ? " AND m.company_id = $company_id" : '';
-    $mines_not_deleted_sql = clients_not_deleted_sql('m', $mines_has_is_deleted, $mines_has_deleted_at);
 
     $projects_query = "
         SELECT
@@ -493,14 +488,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
             p.name,
             p.project_code,
             p.status,
-            (
-                SELECT COUNT(*)
-                FROM mines m
-                WHERE m.project_id = p.id
-                  AND m.status = 1
-                  AND $mines_not_deleted_sql
-                  $mines_company_filter
-            ) AS mines_count,
             (
                 SELECT COUNT(DISTINCT CASE
                     WHEN o.supplier_id IS NOT NULL AND o.supplier_id <> '' AND o.supplier_id <> '0' THEN o.supplier_id
@@ -574,7 +561,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
         $project_row['operators_total'] = $operators_total;
         $project_row['operators_working'] = $operators_working;
         $project_row['operators_stopped'] = max(0, $operators_total - $operators_working);
-        $project_row['mines_count'] = intval($project_row['mines_count']);
         $project_row['suppliers_count'] = intval($project_row['suppliers_count']);
 
         $projects[] = $project_row;
@@ -1118,8 +1104,6 @@ include('../insidebar.php');
             <div id="clientProjectsSummary" class="clients-projects-summary">
                 <span class="status-active clients-summary-pill">المشاريع: <strong
                         id="summary_projects_count">0</strong></span>
-                <span class="status-active clients-summary-pill">المناجم: <strong
-                        id="summary_mines_count">0</strong></span>
                 <span class="status-active clients-summary-pill">الموردون: <strong
                         id="summary_suppliers_count">0</strong></span>
                 <span class="status-active clients-summary-pill">الآليات: <strong
@@ -1137,7 +1121,6 @@ include('../insidebar.php');
                     <thead>
                         <tr>
                             <th>المشروع</th>
-                            <th>المناجم</th>
                             <th>الموردون</th>
                             <th>الآليات</th>
                             <th>الآليات العاملة</th>
@@ -1149,7 +1132,7 @@ include('../insidebar.php');
                     </thead>
                     <tbody id="clientProjectsTableBody">
                         <tr>
-                            <td colspan="9" class="clients-table-empty">لا توجد بيانات بعد</td>
+                            <td colspan="8" class="clients-table-empty">لا توجد بيانات بعد</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1439,20 +1422,17 @@ include('../insidebar.php');
     });
 
     function setProjectsSummary(projects) {
-        let mines = 0;
         let suppliers = 0;
         let equipments = 0;
         let operators = 0;
 
         projects.forEach(function (project) {
-            mines += parseInt(project.mines_count || 0, 10);
             suppliers += parseInt(project.suppliers_count || 0, 10);
             equipments += parseInt(project.equipments_total || 0, 10);
             operators += parseInt(project.operators_total || 0, 10);
         });
 
         $('#summary_projects_count').text(projects.length);
-        $('#summary_mines_count').text(mines);
         $('#summary_suppliers_count').text(suppliers);
         $('#summary_equipments_count').text(equipments);
         $('#summary_operators_count').text(operators);
@@ -1463,7 +1443,7 @@ include('../insidebar.php');
         tbody.empty();
 
         if (!projects.length) {
-            tbody.append('<tr><td colspan="9" class="clients-table-empty clients-table-empty-muted">لا توجد مشاريع مرتبطة بهذا العميل</td></tr>');
+            tbody.append('<tr><td colspan="8" class="clients-table-empty clients-table-empty-muted">لا توجد مشاريع مرتبطة بهذا العميل</td></tr>');
             setProjectsSummary([]);
             return;
         }
@@ -1472,7 +1452,6 @@ include('../insidebar.php');
             const projectLabel = (project.name || '-') + (project.project_code ? ' (' + project.project_code + ')' : '');
             const rowHtml = '<tr>' +
                 '<td>' + projectLabel + '</td>' +
-                '<td>' + (project.mines_count || 0) + '</td>' +
                 '<td>' + (project.suppliers_count || 0) + '</td>' +
                 '<td>' + (project.equipments_total || 0) + '</td>' +
                 '<td class="clients-num-positive">' + (project.equipments_working || 0) + '</td>' +
@@ -1490,7 +1469,7 @@ include('../insidebar.php');
 
     function loadClientProjectsStats(clientId) {
         $('#clientProjectsLoading').show();
-        $('#clientProjectsTableBody').html('<tr><td colspan="9" class="clients-table-empty clients-table-empty-muted">جاري التحميل...</td></tr>');
+        $('#clientProjectsTableBody').html('<tr><td colspan="8" class="clients-table-empty clients-table-empty-muted">جاري التحميل...</td></tr>');
 
         $.ajax({
             url: 'clients.php',
@@ -1503,7 +1482,7 @@ include('../insidebar.php');
             success: function (response) {
                 $('#clientProjectsLoading').hide();
                 if (!response || !response.success) {
-                    $('#clientProjectsTableBody').html('<tr><td colspan="9" class="clients-table-empty clients-table-empty-error">تعذر تحميل بيانات المشاريع</td></tr>');
+                    $('#clientProjectsTableBody').html('<tr><td colspan="8" class="clients-table-empty clients-table-empty-error">تعذر تحميل بيانات المشاريع</td></tr>');
                     setProjectsSummary([]);
                     return;
                 }
@@ -1512,7 +1491,7 @@ include('../insidebar.php');
             },
             error: function () {
                 $('#clientProjectsLoading').hide();
-                $('#clientProjectsTableBody').html('<tr><td colspan="9" class="clients-table-empty clients-table-empty-error">حدث خطأ أثناء تحميل بيانات المشاريع</td></tr>');
+                $('#clientProjectsTableBody').html('<tr><td colspan="8" class="clients-table-empty clients-table-empty-error">حدث خطأ أثناء تحميل بيانات المشاريع</td></tr>');
                 setProjectsSummary([]);
             }
         });
