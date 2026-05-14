@@ -525,9 +525,10 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     function getSupplierContractEquipments($contract_id, $conn) {
                         global $supplier_contract_scope_sql;
                         $equipments = [];
-                        $query = "SELECT sce.*
+                        $query = "SELECT sce.*, et.type AS equipment_type_name
                                   FROM suppliercontractequipments sce
                                   JOIN supplierscontracts sc ON sc.id = sce.contract_id
+                                  LEFT JOIN equipments_types et ON sce.equip_type = et.id
                                   WHERE sce.contract_id = " . intval($contract_id) . " AND $supplier_contract_scope_sql";
                         $result = mysqli_query($conn, $query);
                         if ($result) {
@@ -546,7 +547,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     foreach ($equipments as $equip) {
                         echo "<tr>";
                         echo "<td>" . $i . "</td>";
-                        echo "<td><strong>" . htmlspecialchars($equip['equip_type']) . "</strong></td>";
+                        echo "<td><strong>" . htmlspecialchars(!empty($equip['equipment_type_name']) ? $equip['equipment_type_name'] : $equip['equip_type']) . "</strong></td>";
                         echo "<td>" . $equip['equip_size'] . "</td>";
                         echo "<td><span style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . $equip['equip_count'] . "</span></td>";
                         echo "<td><span style='background: #007bff; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . (isset($equip['equip_count_basic']) ? $equip['equip_count_basic'] : 0) . "</span></td>";
@@ -1060,7 +1061,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                                     if (!empty($current_equipments)) {
                                         foreach ($current_equipments as $equip) {
                                             echo "<tr>";
-                                            echo "<td>" . $equip['equip_type'] . "</td>";
+                                            echo "<td>" . (!empty($equip['equipment_type_name']) ? $equip['equipment_type_name'] : $equip['equip_type']) . "</td>";
                                             echo "<td>" . $equip['equip_size'] . "</td>";
                                             echo "<td>" . $equip['equip_count'] . "</td>";
                                             echo "<td>" . $equip['shift_hours'] . "</td>";
@@ -1877,7 +1878,7 @@ $('#mergeWithId').on('change', function() {
 
                     response.equipments.forEach(function(equip) {
                         html += '<tr>';
-                        html += '<td>' + equip.equip_type + '</td>';
+                        html += '<td>' + (equip.equipment_type_name || equip.equip_type) + '</td>';
                         html += '<td>' + equip.equip_size + '</td>';
                         html += '<td>' + equip.equip_count + '</td>';
                         html += '<td>' + equip.shift_hours + '</td>';

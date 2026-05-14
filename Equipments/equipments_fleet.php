@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -494,6 +494,251 @@ if (!empty($editData)) {
     );
 }
 ?>
+
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   Unified Modal Design — Equipment Fleet View Modal
+   تصميم موحد للمديول - عرض بيانات المعدات
+═══════════════════════════════════════════════════════════════ */
+
+/* Modal overlay */
+.modal.equipment-view-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.35);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal.equipment-view-modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal content */
+.modal-content.equipment-view-modal-content {
+  width: min(900px, 95vw);
+  max-height: 85vh;
+  border: 1px solid #e8dcc8;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff 0%, #fdf8f0 100%);
+  box-shadow: 0 22px 42px rgba(26, 18, 8, 0.25);
+  overflow: hidden;
+  animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Modal header */
+.modal-header.equipment-view-modal-header {
+  background: linear-gradient(135deg, #1a1208, #2a1b0c);
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 207, 144, 0.22);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.modal-header.equipment-view-modal-header h5 {
+  margin: 0;
+  font-weight: 900;
+  font-size: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+}
+
+.modal-header.equipment-view-modal-header i {
+  color: #f7931a;
+  font-size: 1.1rem;
+}
+
+/* Close button */
+.equipment-view-modal-close {
+  border: 0;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.equipment-view-modal-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(90deg);
+}
+
+/* Modal body */
+.modal-body.equipment-view-modal-body {
+  overflow-y: auto;
+  padding: 16px;
+  flex: 1;
+  background: linear-gradient(180deg, #fff 0%, #fffbf5 100%);
+}
+
+/* Grid layout */
+.equipment-view-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+/* Item card */
+.equipment-view-modal-item {
+  border: 1px solid #e8dcc8;
+  border-radius: 11px;
+  padding: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(26, 18, 8, 0.05);
+  transition: all 0.2s ease;
+}
+
+.equipment-view-modal-item:hover {
+  border-color: #f7931a;
+  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.12);
+}
+
+/* Wide items (full width) */
+.equipment-view-modal-item-wide {
+  grid-column: 1 / -1;
+}
+
+/* Label */
+.equipment-view-modal-label {
+  color: #6b4e2a;
+  font-size: 0.81rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.equipment-view-modal-label i {
+  color: #f7931a;
+  font-size: 0.9rem;
+}
+
+/* Value */
+.equipment-view-modal-value {
+  color: #1a1208;
+  font-weight: 800;
+  font-size: 0.92rem;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+/* Modal footer */
+.modal-footer.equipment-view-modal-footer {
+  border-top: 1px solid #e8dcc8;
+  background: #fff;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  flex-shrink: 0;
+}
+
+/* Footer buttons */
+.equipment-view-modal-btn {
+  border: none;
+  border-radius: 9px;
+  padding: 10px 16px;
+  font-weight: 800;
+  font-size: 0.92rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.equipment-view-modal-btn-primary {
+  background: linear-gradient(135deg, #1a1208, #2d200a);
+  color: #fff;
+  border-left: 3px solid #f7931a;
+  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.25);
+}
+
+.equipment-view-modal-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(247, 147, 26, 0.35);
+  color: #fff;
+}
+
+.equipment-view-modal-btn-danger {
+  background: linear-gradient(135deg, #991b1b, #b91c1c);
+  color: #fff;
+  border-left: 3px solid #dc2626;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+
+.equipment-view-modal-btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35);
+  color: #fff;
+}
+
+.equipment-view-modal-btn-secondary {
+  background: #fff;
+  color: #6b4e2a;
+  border: 1.5px solid #e8dcc8;
+}
+
+.equipment-view-modal-btn-secondary:hover {
+  border-color: #a07848;
+  background: #fdf8f0;
+  color: #1a1208;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .equipment-view-modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-content.equipment-view-modal-content {
+    width: 98vw;
+    max-height: 90vh;
+  }
+}
+</style>
 
 <div class="main equipments-fleet-main ems-unified-page-shell">
 
@@ -1178,19 +1423,20 @@ if (!empty($editData)) {
                 <table id="projectsTable" class="display nowrap">
                     <thead>
                         <tr>
+                          <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
+
                             <th data-group="basic"><i class="fas fa-hashtag"></i> #</th>
                             <th data-group="basic"><i class="fas fa-truck-loading"></i> المورد</th>
-                            <th data-group="basic"><i class="fas fa-barcode"></i> كود المعدة</th>
-                            <th data-group="identification"><i class="fas fa-hashtag"></i> رقم تسلسلي</th>
+                            <!-- <th data-group="basic"><i class="fas fa-barcode"></i> كود المعدة</th> -->
+                            <!-- <th data-group="identification"><i class="fas fa-hashtag"></i> رقم تسلسلي</th> -->
                             <th data-group="basic"><i class="fas fa-list-alt"></i> النوع</th>
-                            <th data-group="basic"><i class="fas fa-tag"></i> الاسم</th>
+                            <th data-group="basic"><i class="fas fa-tag"></i> الكود</th>
                             <th data-group="manufacturing"><i class="fas fa-car"></i> الموديل</th>
                             <th data-group="manufacturing"><i class="fas fa-calendar"></i> سنة الصنع</th>
                             <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
                             <th data-group="ownership"><i class="fas fa-user"></i> المالك</th>
                             <th data-group="status"><i class="fas fa-traffic-light"></i> التوفر</th>
                             <th data-group="status"><i class="fas fa-toggle-on"></i> حالة المعدة</th>
-                            <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1235,16 +1481,30 @@ if (!empty($editData)) {
                         $result = mysqli_query($conn, $query2);
                         $i = 1;
                         while ($row = mysqli_fetch_assoc($result)) {
+
+
                             echo "<tr>";
+                                    // الإجراءات
+                            echo "<td>";
+                            echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
+                                                        <i class='fas fa-eye'></i>
+                                                    </a>";
+                            if ($can_edit) {
+                                echo "<a href='equipments_fleet.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
+                                                                        <i class='fas fa-edit'></i>
+                                                                    </a>";
+                            }
+                            echo "</td>";
+
                             echo "<td><strong>" . $i++ . "</strong></td>";
                             echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
-                            echo "<td><span class='mono code-badge'>" . htmlspecialchars($row['code']) . "</span></td>";
+                            // echo "<td><span class='mono code-badge'>" . htmlspecialchars($row['code']) . "</span></td>";
 
-                            // رقم تسلسلي
-                            $serial = !empty($row['serial_number'])
-                                ? "<span class='mono'>" . htmlspecialchars($row['serial_number']) . "</span>"
-                                : "<span class='text-muted'>غير محدد</span>";
-                            echo "<td>" . $serial . "</td>";
+                            // // رقم تسلسلي
+                            // $serial = !empty($row['serial_number'])
+                            //     ? "<span class='mono'>" . htmlspecialchars($row['serial_number']) . "</span>"
+                            //     : "<span class='text-muted'>غير محدد</span>";
+                            // echo "<td>" . $serial . "</td>";
 
                             // نوع المعدة - من جدول equipments_types
                             $type_text = !empty($row['equipment_type_name']) ? htmlspecialchars($row['equipment_type_name']) : 'غير محدد';
@@ -1266,7 +1526,7 @@ if (!empty($editData)) {
                             echo "<td><span class='badge-type'><i class='fas $type_icon'></i> $type_text</span></td>";
 
                             // اسم المعدة (تهيئة المتغير)
-                            $name_display = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
+                            $name_display = "<strong>" . htmlspecialchars($row['code']) . "</strong>";
 
                             // المشروع النشط
                             if (!empty($row['project_id'])) {
@@ -1328,17 +1588,7 @@ if (!empty($editData)) {
                             $s = isset($status_map[$eq_status]) ? $status_map[$eq_status] : ["badge-type", "fa-question-circle", "غير محدد"];
                             echo "<td><span class='{$s[0]}'><i class='fas {$s[1]}'></i> {$s[2]}</span></td>";
 
-                            // الإجراءات
-                            echo "<td>";
-                            echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
-                                                        <i class='fas fa-eye'></i>
-                                                    </a>";
-                            if ($can_edit) {
-                                echo "<a href='equipments_fleet.php?edit=" . $row['id'] . "' class='action-btn btn-edit' title='تعديل'>
-                                                                        <i class='fas fa-edit'></i>
-                                                                    </a>";
-                            }
-                            echo "</td>";
+
 
                             echo "</tr>";
                         }
@@ -1350,180 +1600,180 @@ if (!empty($editData)) {
     </div>
 
     <!-- Modal عرض تفاصيل المعدة -->
-    <div id="viewEquipmentModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
+    <div id="viewEquipmentModal" class="modal equipment-view-modal">
+        <div class="modal-content equipment-view-modal-content">
+            <div class="modal-header equipment-view-modal-header">
                 <h5><i class="fas fa-eye"></i> عرض بيانات المعدة</h5>
-                <button class="close-modal" id="closeEquipmentModal">&times;</button>
+                <button class="equipment-view-modal-close" id="closeEquipmentModal">&times;</button>
             </div>
-            <div class="modal-body">
-                <div class="view-modal-body">
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-barcode"></i> كود المعدة</div>
-                        <div class="view-item-value" id="view_eq_code">-</div>
+            <div class="modal-body equipment-view-modal-body">
+                <div class="equipment-view-modal-grid">
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-barcode"></i> كود المعدة</div>
+                        <div class="equipment-view-modal-value" id="view_eq_code">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-tag"></i> اسم المعدة</div>
-                        <div class="view-item-value" id="view_eq_name">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-tag"></i> اسم المعدة</div>
+                        <div class="equipment-view-modal-value" id="view_eq_name">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-tools"></i> نوع المعدة</div>
-                        <div class="view-item-value" id="view_eq_type">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-tools"></i> نوع المعدة</div>
+                        <div class="equipment-view-modal-value" id="view_eq_type">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-truck-loading"></i> المورد</div>
-                        <div class="view-item-value" id="view_eq_supplier">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-truck-loading"></i> المورد</div>
+                        <div class="equipment-view-modal-value" id="view_eq_supplier">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-project-diagram"></i> المشروع</div>
-                        <div class="view-item-value" id="view_eq_project">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-project-diagram"></i> المشروع</div>
+                        <div class="equipment-view-modal-value" id="view_eq_project">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-mountain"></i> المنجم</div>
-                        <div class="view-item-value" id="view_eq_mine">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-mountain"></i> المنجم</div>
+                        <div class="equipment-view-modal-value" id="view_eq_mine">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-hashtag"></i> الرقم التسلسلي</div>
-                        <div class="view-item-value" id="view_eq_serial">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-hashtag"></i> الرقم التسلسلي</div>
+                        <div class="equipment-view-modal-value" id="view_eq_serial">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-car"></i> رقم الهيكل</div>
-                        <div class="view-item-value" id="view_eq_chassis">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-car"></i> رقم الهيكل</div>
+                        <div class="equipment-view-modal-value" id="view_eq_chassis">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-microchip"></i> رقم الماكينة</div>
-                        <div class="view-item-value" id="view_eq_machine_number">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-microchip"></i> رقم الماكينة</div>
+                        <div class="equipment-view-modal-value" id="view_eq_machine_number">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-industry"></i> الشركة المصنعة</div>
-                        <div class="view-item-value" id="view_eq_manufacturer">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-industry"></i> الشركة المصنعة</div>
+                        <div class="equipment-view-modal-value" id="view_eq_manufacturer">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-car-side"></i> الموديل</div>
-                        <div class="view-item-value" id="view_eq_model">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-car-side"></i> الموديل</div>
+                        <div class="equipment-view-modal-value" id="view_eq_model">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-calendar"></i> سنة الصنع</div>
-                        <div class="view-item-value" id="view_eq_year">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-calendar"></i> سنة الصنع</div>
+                        <div class="equipment-view-modal-value" id="view_eq_year">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-calendar-plus"></i> سنة الاستيراد</div>
-                        <div class="view-item-value" id="view_eq_import_year">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-calendar-plus"></i> سنة الاستيراد</div>
+                        <div class="equipment-view-modal-value" id="view_eq_import_year">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-cogs"></i> حالة المعدة</div>
-                        <div class="view-item-value" id="view_eq_condition">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-cogs"></i> حالة المعدة</div>
+                        <div class="equipment-view-modal-value" id="view_eq_condition">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-clock"></i> ساعات التشغيل</div>
-                        <div class="view-item-value" id="view_eq_hours">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-clock"></i> ساعات التشغيل</div>
+                        <div class="equipment-view-modal-value" id="view_eq_hours">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-car-crash"></i> حالة المحرك</div>
-                        <div class="view-item-value" id="view_eq_engine">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-car-crash"></i> حالة المحرك</div>
+                        <div class="equipment-view-modal-value" id="view_eq_engine">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-circle-notch"></i> حالة الإطارات</div>
-                        <div class="view-item-value" id="view_eq_tires">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-circle-notch"></i> حالة الإطارات</div>
+                        <div class="equipment-view-modal-value" id="view_eq_tires">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-user"></i> اسم المالك</div>
-                        <div class="view-item-value" id="view_eq_owner">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-user"></i> اسم المالك</div>
+                        <div class="equipment-view-modal-value" id="view_eq_owner">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-briefcase"></i> نوع المالك</div>
-                        <div class="view-item-value" id="view_eq_owner_type">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-briefcase"></i> نوع المالك</div>
+                        <div class="equipment-view-modal-value" id="view_eq_owner_type">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-phone"></i> هاتف المالك</div>
-                        <div class="view-item-value" id="view_eq_owner_phone">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-phone"></i> هاتف المالك</div>
+                        <div class="equipment-view-modal-value" id="view_eq_owner_phone">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-handshake"></i> علاقة المالك بالمورد</div>
-                        <div class="view-item-value" id="view_eq_owner_relation">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-handshake"></i> علاقة المالك بالمورد</div>
+                        <div class="equipment-view-modal-value" id="view_eq_owner_relation">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-address-card"></i> رقم الترخيص</div>
-                        <div class="view-item-value" id="view_eq_license">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-address-card"></i> رقم الترخيص</div>
+                        <div class="equipment-view-modal-value" id="view_eq_license">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-landmark"></i> جهة الترخيص</div>
-                        <div class="view-item-value" id="view_eq_license_authority">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-landmark"></i> جهة الترخيص</div>
+                        <div class="equipment-view-modal-value" id="view_eq_license_authority">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-file-alt"></i> نوع الوثيقة</div>
-                        <div class="view-item-value" id="view_eq_document_type">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-file-alt"></i> نوع الوثيقة</div>
+                        <div class="equipment-view-modal-value" id="view_eq_document_type">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-calendar-times"></i> انتهاء الترخيص</div>
-                        <div class="view-item-value" id="view_eq_license_expiry">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-calendar-times"></i> انتهاء الترخيص</div>
+                        <div class="equipment-view-modal-value" id="view_eq_license_expiry">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-certificate"></i> رقم شهادة الفحص</div>
-                        <div class="view-item-value" id="view_eq_inspection">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-certificate"></i> رقم شهادة الفحص</div>
+                        <div class="equipment-view-modal-value" id="view_eq_inspection">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-calendar-check"></i> آخر فحص</div>
-                        <div class="view-item-value" id="view_eq_last_inspection">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-calendar-check"></i> آخر فحص</div>
+                        <div class="equipment-view-modal-value" id="view_eq_last_inspection">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-map-marker-alt"></i> الموقع الحالي</div>
-                        <div class="view-item-value" id="view_eq_location">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-map-marker-alt"></i> الموقع الحالي</div>
+                        <div class="equipment-view-modal-value" id="view_eq_location">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-user-hard-hat"></i> مهندس/مشرف الموقع</div>
-                        <div class="view-item-value" id="view_eq_supervisor_name">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-user-hard-hat"></i> مهندس/مشرف الموقع</div>
+                        <div class="equipment-view-modal-value" id="view_eq_supervisor_name">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-address-book"></i> اتصال المشرف</div>
-                        <div class="view-item-value" id="view_eq_supervisor_contact">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-address-book"></i> اتصال المشرف</div>
+                        <div class="equipment-view-modal-value" id="view_eq_supervisor_contact">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-traffic-light"></i> التوفر</div>
-                        <div class="view-item-value" id="view_eq_availability">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-traffic-light"></i> التوفر</div>
+                        <div class="equipment-view-modal-value" id="view_eq_availability">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-money-bill-wave"></i> القيمة المقدرة</div>
-                        <div class="view-item-value" id="view_eq_value">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-money-bill-wave"></i> القيمة المقدرة</div>
+                        <div class="equipment-view-modal-value" id="view_eq_value">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-calendar-day"></i> سعر التأجير اليومي</div>
-                        <div class="view-item-value" id="view_eq_daily">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-calendar-day"></i> سعر التأجير اليومي</div>
+                        <div class="equipment-view-modal-value" id="view_eq_daily">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-calendar-alt"></i> سعر التأجير الشهري</div>
-                        <div class="view-item-value" id="view_eq_monthly">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-calendar-alt"></i> سعر التأجير الشهري</div>
+                        <div class="equipment-view-modal-value" id="view_eq_monthly">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-shield-alt"></i> التأمين/الضمان</div>
-                        <div class="view-item-value" id="view_eq_insurance">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-shield-alt"></i> التأمين/الضمان</div>
+                        <div class="equipment-view-modal-value" id="view_eq_insurance">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-comment-alt"></i> ملاحظات عامة</div>
-                        <div class="view-item-value" id="view_eq_notes">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-comment-alt"></i> ملاحظات عامة</div>
+                        <div class="equipment-view-modal-value" id="view_eq_notes">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-wrench"></i> آخر صيانة</div>
-                        <div class="view-item-value" id="view_eq_last_maintenance">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-wrench"></i> آخر صيانة</div>
+                        <div class="equipment-view-modal-value" id="view_eq_last_maintenance">-</div>
                     </div>
-                    <div class="view-item">
-                        <div class="view-item-label"><i class="fas fa-toggle-on"></i> الحالة الحالية</div>
-                        <div class="view-item-value" id="view_eq_status">-</div>
+                    <div class="equipment-view-modal-item">
+                        <div class="equipment-view-modal-label"><i class="fas fa-toggle-on"></i> الحالة الحالية</div>
+                        <div class="equipment-view-modal-value" id="view_eq_status">-</div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer equipment-view-modal-footer">
 
-                <a id="viewEquipmentEditBtn" class="btn-modal btn-modal-save fleet-btn-link">
+                <a id="viewEquipmentEditBtn" class="equipment-view-modal-btn equipment-view-modal-btn-primary fleet-btn-link">
                     <i class="fas fa-edit"></i> تعديل المعدة
                 </a>
 
-                <a id="viewEquipmentDeleteBtn" class="btn-modal btn-modal-danger fleet-btn-link fleet-hidden"
+                <a id="viewEquipmentDeleteBtn" class="equipment-view-modal-btn equipment-view-modal-btn-danger fleet-btn-link fleet-hidden"
                     onclick="return confirm('هل أنت متأكد من حذف هذه المعدة؟');">
                     <i class="fas fa-trash"></i> حذف المعدة
                 </a>
 
-                <button type="button" class="btn-modal btn-modal-cancel" id="closeEquipmentModalFooter">
+                <button type="button" class="equipment-view-modal-btn equipment-view-modal-btn-secondary" id="closeEquipmentModalFooter">
                     <i class="fas fa-times"></i> إغلاق
                 </button>
             </div>
@@ -1907,7 +2157,7 @@ if (!empty($editData)) {
                 const equipmentId = $(this).data('id');
                 if (!equipmentId || !viewEquipmentModal) return;
 
-                viewEquipmentModal.classList.add('is-open');
+                viewEquipmentModal.classList.add('show');
 
                 const loadingText = 'جار التحميل...';
                 [
@@ -2002,7 +2252,7 @@ if (!empty($editData)) {
 
             function closeEquipmentModal() {
                 if (viewEquipmentModal) {
-                    viewEquipmentModal.classList.remove('is-open');
+                    viewEquipmentModal.classList.remove('show');
                 }
             }
 

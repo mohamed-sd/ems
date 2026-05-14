@@ -793,15 +793,15 @@ include('../insidebar.php');
                             <tr>
                                 <th>#</th>
                                 <th>المعدة</th>
-
+                                <th>نوع المعدة</th>
                                 <th>السائقين</th>
 
                                 <th>المورد</th>
-                                <th>ساعات العمل الكلية</th>
+                                <!-- <th>ساعات العمل الكلية</th> -->
                                 <th>ساعات الوردية</th>
 
                                 <th>تاريخ البداية</th>
-                                <th>تاريخ النهاية</th>
+                                <!-- <th>تاريخ النهاية</th> -->
                                 <th>النوع</th>
                                 <!-- <th>عدد الساعات</th> -->
                                 <th>الحالة</th>
@@ -886,11 +886,13 @@ include('../insidebar.php');
 
                             $query = "SELECT o.id, o.equipment, o.equipment_type, o.equipment_category, o.mine_id, o.contract_id, o.supplier_id,
                              o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.status, o.reason,
-                             e.code AS equipment_code, e.name AS equipment_name,
+                             e.code AS equipment_code, e.name AS equipment_name, e.type AS equipment_type_id,
+                             et.type AS equipment_type_name,
                              p.name AS project_name, s.name AS suppliers_name,
                              IFNULL(GROUP_CONCAT(DISTINCT d.name SEPARATOR ', '), '') AS driver_names
                       FROM operations o
                       LEFT JOIN equipments e ON o.equipment = e.id
+                      LEFT JOIN equipments_types et ON e.type = et.id
                       LEFT JOIN project p ON o.project_id = p.id
                       LEFT JOIN suppliers s ON e.suppliers = s.id
                       LEFT JOIN equipment_drivers ed ON o.equipment = ed.equipment_id
@@ -904,14 +906,15 @@ include('../insidebar.php');
                                 echo "<tr>";
                                 echo "<td>" . $i++ . "</td>";
                                 echo "<td>" . $row['equipment_code'] . " - " . $row['equipment_name'] . "</td>";
+                                echo "<td>" . (!empty($row['equipment_type_name']) ? htmlspecialchars($row['equipment_type_name']) : "-") . "</td>";
                                 echo "<td>" . (!empty($row['driver_names']) ? $row['driver_names'] : "-") . "</td>";
 
                                 echo "<td>" . $row['suppliers_name'] . "</td>";
 
-                                echo "<td>" . (!empty($row['total_equipment_hours']) ? $row['total_equipment_hours'] : '0') . "</td>";
+                                // echo "<td>" . (!empty($row['total_equipment_hours']) ? $row['total_equipment_hours'] : '0') . "</td>";
                                 echo "<td>" . (!empty($row['shift_hours']) ? $row['shift_hours'] : '0') . "</td>";
                                 echo "<td>" . $row['start'] . "</td>";
-                                echo "<td>" . $row['end'] . "</td>";
+                                // echo "<td>" . $row['end'] . "</td>";
 
                                 // عرض نوع المعدة (أساسي/احتياطي)
                                 $categoryText = ($row['equipment_category'] === 'أساسي') ? 'أساسي' : 'احتياطي';
@@ -954,6 +957,7 @@ include('../insidebar.php');
                                                             " . ($can_view ? "<a href='javascript:void(0)' class='action-btn view viewOperationBtn'
                                                                  data-id='" . $row['id'] . "'
                                                                  data-equipment='" . htmlspecialchars($row['equipment_code'] . ' - ' . $row['equipment_name'], ENT_QUOTES) . "'
+                                                                 data-equipment-type='" . htmlspecialchars($row['equipment_type_name'] ?? '-', ENT_QUOTES) . "'
                                                                  data-supplier='" . htmlspecialchars($row['suppliers_name'] ?? '-', ENT_QUOTES) . "'
                                                                  data-mine='" . htmlspecialchars($mine_name_val, ENT_QUOTES) . "'
                                                                  data-contract='" . htmlspecialchars($contract_code_val, ENT_QUOTES) . "'
@@ -1017,6 +1021,10 @@ include('../insidebar.php');
                             <div class="movement-view-modal-value" id="view_op_equipment">-</div>
                         </div>
                         <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-tools"></i> تصنيف المعدة</div>
+                            <div class="movement-view-modal-value" id="view_op_equipment_type">-</div>
+                        </div>
+                        <div class="movement-view-modal-item">
                             <div class="movement-view-modal-label"><i class="fas fa-truck"></i> المورد</div>
                             <div class="movement-view-modal-value" id="view_op_supplier">-</div>
                         </div>
@@ -1033,7 +1041,7 @@ include('../insidebar.php');
                             <div class="movement-view-modal-value" id="view_op_drivers">-</div>
                         </div>
                         <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-check-circle"></i> نوع المعدة</div>
+                            <div class="movement-view-modal-label"><i class="fas fa-check-circle"></i> فئة المعدة</div>
                             <div class="movement-view-modal-value" id="view_op_category">-</div>
                         </div>
                         <div class="movement-view-modal-item">
@@ -1556,6 +1564,7 @@ include('../insidebar.php');
                 $(document).on('click', '.viewOperationBtn', function () {
                     var btn = $(this);
                     $('#view_op_equipment').text(btn.data('equipment') || '-');
+                    $('#view_op_equipment_type').text(btn.data('equipment-type') || '-');
                     $('#view_op_supplier').text(btn.data('supplier') || '-');
                     $('#view_op_mine').text(btn.data('mine') || '-');
                     $('#view_op_contract').text(btn.data('contract') || '-');

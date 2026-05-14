@@ -9,10 +9,14 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 
-if (isset($_POST['contract_id'])) {
-  $contract_id = intval($_POST['contract_id']);
+if (isset($_POST['contract_id']) || isset($_GET['contract_id'])) {
+  $contract_id = intval(isset($_POST['contract_id']) ? $_POST['contract_id'] : $_GET['contract_id']);
 
-  $query = "SELECT * FROM suppliercontractequipments WHERE contract_id = $contract_id ORDER BY id ASC";
+  $query = "SELECT sce.*, et.type AS equipment_type_name
+            FROM suppliercontractequipments sce
+            LEFT JOIN equipments_types et ON sce.equip_type = et.id
+            WHERE sce.contract_id = $contract_id
+            ORDER BY sce.id ASC";
   $result = mysqli_query($conn, $query);
 
   $equipments = [];
