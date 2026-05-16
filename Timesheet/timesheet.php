@@ -578,7 +578,7 @@ if (!$is_super_admin) {
             </div>
             <div>
               <label for="date"> التاريخ </label>
-              <input type="date" name="date" id="date" required />
+              <input type="date" name="date" id="date" value="<?php echo date('Y-m-d'); ?>" required />
             </div>
 
             <!-- ********************************************************** -->
@@ -955,7 +955,7 @@ if (!$is_super_admin) {
             </div>
             <div>
               <label> التاريخ </label>
-              <input type="date" name="date" id="date" required />
+              <input type="date" name="date" id="date" value="<?php echo date('Y-m-d'); ?>" required />
             </div>
 
 
@@ -1314,7 +1314,7 @@ if (!$is_super_admin) {
             </div>
             <div>
               <label for="date"> التاريخ </label>
-              <input type="date" name="date" id="date" required />
+              <input type="date" name="date" id="date" value="<?php echo date('Y-m-d'); ?>" required />
             </div>
 
             <!-- ********************************************************** -->

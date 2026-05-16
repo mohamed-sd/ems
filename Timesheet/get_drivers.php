@@ -41,11 +41,12 @@ if (isset($_GET['operation_id'])) {
     }
     $equipment_id = $op['equipment'];
 
-    // جلب السائقين المرتبطين بهذه الآلية
+    // جلب السائقين المرتبطين بهذه الآلية (النشطين فقط)
     $sql = "SELECT d.id, d.name
             FROM equipment_drivers ed
             JOIN drivers d ON ed.driver_id = d.id
-            WHERE ed.equipment_id = $equipment_id";
+            WHERE ed.equipment_id = $equipment_id
+              AND ed.status = 1";
 
     if (!$is_super_admin) {
         if (db_table_has_column($conn, 'drivers', 'company_id')) {
@@ -63,6 +64,11 @@ if (isset($_GET['operation_id'])) {
                   AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
             )";
         }
+    }
+
+    // فلترة السائقين النشطين فقط (إن وُجد عمود status)
+    if (db_table_has_column($conn, 'drivers', 'status')) {
+        $sql .= " AND d.status = 1";
     }
 
     $result = mysqli_query($conn, $sql);

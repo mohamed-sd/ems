@@ -12,26 +12,8 @@ $_ts_suppliers_has_company_id = db_table_has_column($conn, 'suppliers', 'company
 $_ts_supplier_company_where = (!$_ts_is_super_admin && $_ts_suppliers_has_company_id && $_ts_company_id > 0)
     ? " AND company_id = '$_ts_company_id'"
     : "";
-?>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> إيكوبيشن | التقارير </title>
-    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
-    <link href="/ems/assets/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-    <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
-</head>
-
-<body>
-
-    <?php
-    include('../insidebar.php');
-
-    $operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
+$operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
 
     // استقبال الفلاتر
     $date_filter = isset($_GET['date']) ? mysqli_real_escape_string($conn, $_GET['date']) : '';
@@ -119,163 +101,195 @@ WHERE 1=1
     }
 
 
-    $total_res = mysqli_query($conn, $total_sql);
-    $totals = $total_res ? mysqli_fetch_assoc($total_res) : ['executed_hours' => 0, 'total_fault' => 0, 'total_standby' => 0];
-    if (!$total_res) {
-        error_log('timesheetdeliy.php totals query failed: ' . mysqli_error($conn));
-    }
-    ?>
+$total_res = mysqli_query($conn, $total_sql);
+$totals = $total_res ? mysqli_fetch_assoc($total_res) : ['executed_hours' => 0, 'total_fault' => 0, 'total_standby' => 0];
+if (!$total_res) {
+    error_log('timesheetdeliy.php totals query failed: ' . mysqli_error($conn));
+}
 
-    <div class="main reports-main timesheet-daily-main">
+$page_title = "إيكوبيشن | تقرير التايم شيت اليومي";
+include("../inheader.php");
+include('../insidebar.php');
+?>
 
-        <div class="main_head">
-            <div class="head_actions"></div>
+<div class="main ems-unified-page-shell reports-main timesheet-daily-main">
 
-            <h1 class="head-title">
-                <div class="title-icon"><i class="fa-solid fa-chart-column"></i></div>
-                تقرير التايم شيت اليومي
-            </h1>
+    <div class="main_head">
+        <div class="head_actions"></div>
 
-            <div class="head_back">
-                <a href="reports.php" class="back-btn">
-                    <i class="fas fa-arrow-right"></i> رجوع
-                </a>
-            </div>
+        <h1 class="head-title">
+            <div class="title-icon"><i class="fa-solid fa-chart-column"></i></div>
+            تقرير التايم شيت اليومي
+        </h1>
+
+        <div class="head_back">
+            <a href="reports.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
         </div>
+    </div>
 
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
-            </div>
-            <div class="card-body fc-filter-body">
-                <form method="GET" class="fc-filter-bar form-grid">
-                    <div class="">
-                        <label class="fc-filter-label form-label">ðŸ“… التاريخ:</label>
-                        <input type="date" class="form-control" name="date" value="<?php echo $date_filter; ?>">
-                    </div>
-
-                    <div>
-                        <label class="fc-filter-label"><i class="fas fa-diagram-project"></i> المشروع</label>
-                        <select name="project">
-                            <option value="">-- الكل --</option>
-                            <?php
-                            $prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
-                            while ($row = mysqli_fetch_assoc($prj)) {
-                                $selected = ($project_filter == $row['id']) ? "selected" : "";
-                                echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="fc-filter-label"><i class="fas fa-truck"></i> المورد</label>
-                        <select name="supplier">
-                            <option value="">-- الكل --</option>
-                            <?php
-                            $sup = mysqli_query($conn, "SELECT id, name FROM suppliers where status = '1'$_ts_supplier_company_where ");
-                            while ($row = mysqli_fetch_assoc($sup)) {
-                                $selected = ($supplier_filter == $row['id']) ? "selected" : "";
-                                echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="fc-filter-label"><i class="fas fa-clock"></i> الوردية</label>
-                        <select name="shift">
-                            <option value="">-- الكل --</option>
-                            <option value="D" <?php if ($shift_filter == "D") echo "selected"; ?>>صباحية</option>
-                            <option value="N" <?php if ($shift_filter == "N") echo "selected"; ?>>مسائية</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="fc-filter-label"><i class="fas fa-cogs"></i> نوع الآلية</label>
-                        <select name="type">
-                            <option value="">-- الكل --</option>
-                            <option value="1" <?php if ($type_filter == "1") echo "selected"; ?>>حفار</option>
-                            <option value="2" <?php if ($type_filter == "2") echo "selected"; ?>>قلاب</option>
-                        </select>
-                    </div>
-
-                    <div class="fc-filter-actions">
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> بحث</button>
-                    </div>
-                </form>
-            </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
         </div>
-
-
-        <!-- بطاقات الإحصائيات -->
-        <div class="stats-grid">
-            <div class="stat-card executed">
-                <div class="stat-icon">⏱️</div>
-                <div class="stat-label">إجمالي ساعات العمل</div>
-                <div class="stat-value"><?php echo !empty($totals['executed_hours']) ? $totals['executed_hours'] : 0; ?></div>
-            </div>
-            <div class="stat-card fault">
-                <div class="stat-icon">⚠️</div>
-                <div class="stat-label">إجمالي ساعات الأعطال</div>
-                <div class="stat-value"><?php echo !empty($totals['total_fault']) ? $totals['total_fault'] : 0; ?></div>
-            </div>
-            <div class="stat-card standby">
-                <div class="stat-icon">⏸️</div>
-                <div class="stat-label">إجمالي ساعات الاستعداد</div>
-                <div class="stat-value"><?php echo !empty($totals['total_standby']) ? $totals['total_standby'] : 0; ?></div>
-            </div>
-        </div>
-
-        <div class="card shadow-sm">
-            <div class="card-header">
-                <h5><i class="fas fa-table"></i> تفاصيل التايم شيت</h5>
-            </div>
-            <div class="card-body table-container">
-                <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle report-table" id="projectsTable">
-                    <thead>
-                        <tr>
-                            <th>التاريخ</th>
-                            <th>المشروع</th>
-                            <th>المورد</th>
-                            <th>الآلية</th>
-                            <th>كود الآلية</th>
-                            <th>السائق</th>
-                            <th>الشفت</th>
-                            <th>⏱️ ساعات العمل</th>
-                            <th>⚠️ ساعات الأعطال</th>
-                            <th>⏸️ ساعات الاستعداد</th>
-                            <th>ðŸ“’ ملاحظات العمل</th>
-                            <th>ðŸ“’ ملاحظات الأعطال</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($result)) { ?>
-                            <tr>
-                                <td><?php echo $row['date']; ?></td>
-                                <td><?php echo $row['project_name']; ?></td>
-                                <td><?php echo $row['supplier_name']; ?></td>
-                                <td><?php echo $row['equipment_name']; ?></td>
-                                <td><?php echo $row['equipment_code']; ?></td>
-                                <td><?php echo $row['driver_name']; ?></td>
-                                <td><?php echo $row['shift']; ?></td>
-                                <td style="color:#0d9488; font-weight:700;"><?php echo $row['executed_hours']; ?></td>
-                                <td style="color:#dc2626; font-weight:700;"><?php echo $row['total_fault_hours']; ?></td>
-                                <td style="color:#e8b800; font-weight:700;"><?php echo $row['standby_hours']; ?></td>
-                                <td><?php echo $row['work_notes']; ?></td>
-                                <td><?php echo $row['fault_notes']; ?></td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
+        <div class="card-body fc-filter-body">
+            <form method="GET" class="fc-filter-bar">
+                <div>
+                    <label class="fc-filter-label"><i class="fas fa-calendar-day"></i> التاريخ:</label>
+                    <input type="date" class="form-control" name="date" value="<?php echo $date_filter; ?>">
                 </div>
+
+                <div>
+                    <label class="fc-filter-label"><i class="fas fa-diagram-project"></i> المشروع</label>
+                    <select name="project" class="form-select">
+                        <option value="">-- الكل --</option>
+                        <?php
+                        $prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
+                        while ($row = mysqli_fetch_assoc($prj)) {
+                            $selected = ($project_filter == $row['id']) ? "selected" : "";
+                            echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="fc-filter-label"><i class="fas fa-truck"></i> المورد</label>
+                    <select name="supplier" class="form-select">
+                        <option value="">-- الكل --</option>
+                        <?php
+                        $sup = mysqli_query($conn, "SELECT id, name FROM suppliers where status = '1'$_ts_supplier_company_where ");
+                        while ($row = mysqli_fetch_assoc($sup)) {
+                            $selected = ($supplier_filter == $row['id']) ? "selected" : "";
+                            echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="fc-filter-label"><i class="fas fa-clock"></i> الوردية</label>
+                    <select name="shift" class="form-select">
+                        <option value="">-- الكل --</option>
+                        <option value="D" <?php if ($shift_filter == "D") echo "selected"; ?>>صباحية</option>
+                        <option value="N" <?php if ($shift_filter == "N") echo "selected"; ?>>مسائية</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="fc-filter-label"><i class="fas fa-cogs"></i> نوع الآلية</label>
+                    <select name="type" class="form-select">
+                        <option value="">-- الكل --</option>
+                        <option value="1" <?php if ($type_filter == "1") echo "selected"; ?>>حفار</option>
+                        <option value="2" <?php if ($type_filter == "2") echo "selected"; ?>>قلاب</option>
+                    </select>
+                </div>
+
+                <div class="fc-filter-actions">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> بحث</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- بطاقات الإحصائيات -->
+    <div class="stats-grid">
+        <div class="stat-card executed">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-label">إجمالي ساعات العمل</div>
+            <div class="stat-value"><?php echo !empty($totals['executed_hours']) ? $totals['executed_hours'] : 0; ?></div>
+        </div>
+        <div class="stat-card fault">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-label">إجمالي ساعات الأعطال</div>
+            <div class="stat-value"><?php echo !empty($totals['total_fault']) ? $totals['total_fault'] : 0; ?></div>
+        </div>
+        <div class="stat-card standby">
+            <div class="stat-icon">⏸️</div>
+            <div class="stat-label">إجمالي ساعات الاستعداد</div>
+            <div class="stat-value"><?php echo !empty($totals['total_standby']) ? $totals['total_standby'] : 0; ?></div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5><i class="fas fa-table"></i> تفاصيل التايم شيت</h5>
+        </div>
+        <div class="card-body table-container">
+            <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle report-table alltable" id="projectsTable">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>المشروع</th>
+                        <th>المورد</th>
+                        <th>الآلية</th>
+                        <th>كود الآلية</th>
+                        <th>السائق</th>
+                        <th>الشفت</th>
+                        <th><i class="fas fa-clock"></i> ساعات العمل</th>
+                        <th><i class="fas fa-exclamation-triangle"></i> ساعات الأعطال</th>
+                        <th><i class="fas fa-pause-circle"></i> ساعات الاستعداد</th>
+                        <th><i class="fas fa-sticky-note"></i> ملاحظات العمل</th>
+                        <th><i class="fas fa-sticky-note"></i> ملاحظات الأعطال</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['date']); ?></td>
+                            <td><?php echo htmlspecialchars($row['project_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['supplier_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['equipment_name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['equipment_code']); ?></td>
+                            <td><?php echo htmlspecialchars($row['driver_name']); ?></td>
+                            <td><?php echo ($row['shift'] === 'D') ? 'صباحية' : (($row['shift'] === 'N') ? 'مسائية' : htmlspecialchars($row['shift'])); ?></td>
+                            <td style="color:#0d9488; font-weight:700;"><?php echo $row['executed_hours']; ?></td>
+                            <td style="color:#dc2626; font-weight:700;"><?php echo $row['total_fault_hours']; ?></td>
+                            <td style="color:#e8b800; font-weight:700;"><?php echo $row['standby_hours']; ?></td>
+                            <td><?php echo htmlspecialchars($row['work_notes']); ?></td>
+                            <td><?php echo htmlspecialchars($row['fault_notes']); ?></td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
             </div>
         </div>
+    </div>
 
     </div>
 
+    <!-- jQuery (يجب أن يكون أولاً) -->
+    <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+    <!-- Bootstrap JS -->
     <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-</body>
+    <!-- DataTables JS -->
+    <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+    <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+    <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+    <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
+    <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+    <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
 
+    <script>
+        $(document).ready(function () {
+            $('#projectsTable').DataTable({
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copy',  text: 'نسخ' },
+                    { extend: 'excel', text: 'تصدير Excel' },
+                    { extend: 'csv',   text: 'تصدير CSV' },
+                    { extend: 'pdf',   text: 'تصدير PDF' },
+                    { extend: 'print', text: 'طباعة' }
+                ],
+                language: {
+                    url: '/ems/assets/i18n/datatables/ar.json'
+                }
+            });
+        });
+    </script>
+</body>
 </html>

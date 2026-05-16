@@ -362,6 +362,16 @@ $available_drivers_sql = "SELECT d.id, d.name, d.phone
                           WHERE 1=1
                             $driver_company_scope
                             $driver_status_scope
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM equipment_drivers ed
+                                INNER JOIN operations o ON o.equipment = ed.equipment_id
+                                WHERE ed.driver_id = d.id
+                                  AND ed.status = 1
+                                  AND o.project_id = $selected_project_id
+                                  $operations_company_scope
+                                  $ed_company_scope
+                            )
                           ORDER BY d.name ASC";
 $available_drivers_result = mysqli_query($conn, $available_drivers_sql);
 $available_drivers = [];

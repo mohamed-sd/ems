@@ -226,6 +226,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
     // جلب البيانات المدخولة بشكل آمن
     $name = sanitize_input($_POST['project_name']);
     $project_code = sanitize_input(isset($_POST['project_code']) ? $_POST['project_code'] : '');
+    $mine_code = sanitize_input(isset($_POST['mine_code']) ? $_POST['mine_code'] : '');
     $category = sanitize_input(isset($_POST['category']) ? $_POST['category'] : '');
     $sub_sector = sanitize_input(isset($_POST['sub_sector']) ? $_POST['sub_sector'] : '');
     $state = sanitize_input(isset($_POST['state']) ? $_POST['state'] : '');
@@ -281,6 +282,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
             client = ?,
             location = ?,
             project_code = ?,
+            mine_code = ?,
             category = ?,
             sub_sector = ?,
             state = ?,
@@ -298,6 +300,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
             $client,
             $location,
             $project_code,
+            $mine_code,
             $category,
             $sub_sector,
             $state,
@@ -308,7 +311,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
             $total,
             $status
         );
-        $update_types = 'isssssssssssds';
+        $update_types = 'issssssssssssds';
 
         if ($project_has_company_id) {
             $update_sql .= ", company_id = ?";
@@ -337,8 +340,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
         projects_redirect_with_msg('حدث خطأ أثناء تعديل المشروع ❌' . (!empty($error_message) ? ' - ' . $error_message : ''));
     } else {
         // إضافة مع Prepared Statement
-        $insert_columns = "$project_client_column, name, client, location, project_code, category, sub_sector, state, region, nearest_market, latitude, longitude, total, status, created_by";
-        $insert_values = array($client_id, $name, $client, $location, $project_code, $category, $sub_sector, $state, $region, $nearest_market, $latitude, $longitude, $total, $status, $created_by);
+        $insert_columns = "$project_client_column, name, client, location, project_code, mine_code, category, sub_sector, state, region, nearest_market, latitude, longitude, total, status, created_by";
+        $insert_values = array($client_id, $name, $client, $location, $project_code, $mine_code, $category, $sub_sector, $state, $region, $nearest_market, $latitude, $longitude, $total, $status, $created_by);
 
         if ($project_has_company_id) {
             $insert_columns .= ", company_id";
@@ -454,6 +457,10 @@ include('../insidebar.php');
                         <input type="text" name="project_code" placeholder="كود المشروع" id="project_code" />
                     </div>
                     <div>
+                        <label><i class="fas fa-mountain"></i> كود المنجم</label>
+                        <input type="text" name="mine_code" placeholder="كود المنجم" id="mine_code" />
+                    </div>
+                    <div>
                         <label><i class="fas fa-file-signature"></i> اسم المشروع</label>
                         <input type="text" name="project_name" id="project_name" placeholder="أدخل اسم المشروع"
                             required />
@@ -548,6 +555,7 @@ include('../insidebar.php');
                             <th><i class="fas fa-calendar"></i> تاريخ الإضافة</th>
                             <th><i class="fas fa-user-tie"></i> العميل</th>
                             <th><i class="fas fa-file-contract"></i> كود المشروع</th>
+                            <th><i class="fas fa-mountain"></i> كود المنجم</th>
                             <th><i class="fas fa-project-diagram"></i> المشروع</th>
                             <th><i class="fas fa-truck"></i> عدد الموردين</th>
                             <th><i class="fas fa-toggle-on"></i> الحالة</th>
@@ -570,7 +578,7 @@ include('../insidebar.php');
 
                         // جلب جميع المشاريع من جدول project مع البيانات المدخولة يدويًا
                         $query = "SELECT op.`id`, op.`name`, op.`client`, op.`location`, op.`total`, op.`status`, op.`create_at`,
-                      op.`project_code`, op.`category`, op.`sub_sector`, op.`state`, op.`region`,
+                      op.`project_code`, op.`mine_code`, op.`category`, op.`sub_sector`, op.`state`, op.`region`,
                                             op.`nearest_market`, op.`latitude`, op.`longitude`, op.`$project_client_column` AS `client_id`,
                       cc.`client_name`,
                       (SELECT COUNT(*)
@@ -593,6 +601,7 @@ include('../insidebar.php');
                             echo "<td>" . e($row['create_at']) . "</td>";
                             echo "<td>" . e(isset($row['client_name']) && $row['client_name'] !== '' ? $row['client_name'] : $row['client']) . "</td>";
                             echo "<td>" . e(isset($row['project_code']) && $row['project_code'] !== '' ? $row['project_code'] : '-') . "</td>";
+                            echo "<td>" . e(isset($row['mine_code']) && $row['mine_code'] !== '' ? $row['mine_code'] : '-') . "</td>";
                             echo "<td>" . $project_name_cell . "</td>";
                             echo "<td><span class='count-badge'>" . intval($row['total_suppliers']) . "</span></td>";
                             if ($row['status'] == "1") {
@@ -620,6 +629,7 @@ include('../insidebar.php');
                                    data-client-name='" . htmlspecialchars(isset($row['client_name']) && $row['client_name'] !== '' ? $row['client_name'] : $row['client']) . "'
                                    data-location='" . htmlspecialchars($row['location']) . "'
                                    data-project-code='" . htmlspecialchars(isset($row['project_code']) ? $row['project_code'] : '') . "'
+                                   data-mine-code='" . htmlspecialchars(isset($row['mine_code']) ? $row['mine_code'] : '') . "'
                                    data-category='" . htmlspecialchars(isset($row['category']) ? $row['category'] : '') . "'
                                    data-sub-sector='" . htmlspecialchars(isset($row['sub_sector']) ? $row['sub_sector'] : '') . "'
                                    data-state='" . htmlspecialchars(isset($row['state']) ? $row['state'] : '') . "'
@@ -642,6 +652,7 @@ include('../insidebar.php');
                                                     data-project-name='" . htmlspecialchars($row['name']) . "'
                                                     data-location='" . htmlspecialchars($row['location']) . "'
                                                     data-project-code='" . htmlspecialchars(isset($row['project_code']) ? $row['project_code'] : '') . "'
+                                                    data-mine-code='" . htmlspecialchars(isset($row['mine_code']) ? $row['mine_code'] : '') . "'
                                                     data-category='" . htmlspecialchars(isset($row['category']) ? $row['category'] : '') . "'
                                                     data-sub-sector='" . htmlspecialchars(isset($row['sub_sector']) ? $row['sub_sector'] : '') . "'
                                                     data-state='" . htmlspecialchars(isset($row['state']) ? $row['state'] : '') . "'
@@ -692,6 +703,10 @@ include('../insidebar.php');
                 <div class="view-item">
                     <div class="view-item-label"><i class="fas fa-barcode"></i> كود المشروع</div>
                     <div class="view-item-value" id="view_project_code">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-item-label"><i class="fas fa-mountain"></i> كود المنجم</div>
+                    <div class="view-item-value" id="view_mine_code">-</div>
                 </div>
                 <div class="view-item">
                     <div class="view-item-label"><i class="fas fa-project-diagram"></i> اسم المشروع</div>
@@ -834,6 +849,7 @@ include('../insidebar.php');
             $("#client_id").val("");
             $("#project_location").val("");
             $("#project_code").val("");
+            $("#mine_code").val("");
             $("#project_category").val("");
             $("#project_sub_sector").val("");
             $("#project_state").val("");
@@ -900,6 +916,7 @@ include('../insidebar.php');
             $('#view_project_name').text(projectData.projectName || '-');
             $('#view_client_name').text(projectData.clientName || '-');
             $('#view_project_code').text(projectData.projectCode || '-');
+            $('#view_mine_code').text(projectData.mineCode || '-');
             $('#view_category').text(projectData.category || '-');
             $('#view_sub_sector').text(projectData.subSector || '-');
             $('#view_state').text(projectData.state || '-');
@@ -935,6 +952,7 @@ include('../insidebar.php');
             editBtn.data('client-id', $(this).data('client-id'));
             editBtn.data('project-name', projectData.projectName);
             editBtn.data('project-code', projectData.projectCode);
+            editBtn.data('mine-code', projectData.mineCode);
             editBtn.data('category', projectData.category);
             editBtn.data('sub-sector', projectData.subSector);
             editBtn.data('state', projectData.state);
@@ -973,6 +991,7 @@ include('../insidebar.php');
             $("#project_name").val($(this).data('project-name'));
             $("#project_location").val($(this).data('location'));
             $("#project_code").val($(this).data('project-code'));
+            $("#mine_code").val($(this).data('mine-code'));
             $("#project_category").val($(this).data('category'));
             $("#project_sub_sector").val($(this).data('sub-sector'));
             $("#project_state").val($(this).data('state'));
@@ -996,6 +1015,7 @@ include('../insidebar.php');
             $("#client_id").val($(this).data("client-id"));
             $("#project_location").val($(this).data("location"));
             $("#project_code").val($(this).data("project-code"));
+            $("#mine_code").val($(this).data("mine-code"));
             $("#project_category").val($(this).data("category"));
             $("#project_sub_sector").val($(this).data("sub-sector"));
             $("#project_state").val($(this).data("state"));

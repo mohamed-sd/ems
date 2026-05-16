@@ -2,12 +2,7 @@
 /**
  * خريطة الموقع - Map Page
  *
- * عرض خريطة تفاعلية للمناجم والمعدات والمشغلين
- *
- * آلية الفلترة حسب الأدوار:
- * - Admin (Role -1): يعرض جميع المناجم
- * - Movement & Operations Manager (Role 6): يعرض المنجم المخصص له فقط (حسب mine_id في جدول users)
- * - باقي الأدوار: تعرض جميع المناجم في المشروع (حسب صلاحيات الشركة)
+ * عرض خريطة تفاعلية للمعدات والمشغلين مجمّعة حسب المورد
  */
 session_start();
 if (!isset($_SESSION['user'])) {
@@ -67,54 +62,13 @@ if (!$selected_project) {
 }
 
 // ============================================================
-// جلب المناجم الخاصة بالمشروع
-// ============================================================
-$mines_data = [];
-$mines_has_company = db_table_has_column($conn, 'mines', 'company_id');
-$company_mine_clause = ($mines_has_company && !$is_super_admin) ? " AND m.company_id = $company_id" : "";
-
-// فلترة المناجم حسب صلاحية مدير الحركة والتشغيل (Role 6)
-$user_mine_id = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0;
-$is_movement_manager = ($current_role === '6');
-$mine_filter_clause = "";
-
-// إذا كان مدير حركة وتشغيل وله منجم محدد، يعرض منجمه فقط
-if ($is_movement_manager && $user_mine_id > 0) {
-    $mine_filter_clause = " AND m.id = $user_mine_id";
-}
-
-$mines_q = mysqli_query($conn, "
-    SELECT m.id, m.mine_name, m.mine_code, m.manager_name, m.mineral_type,
-           m.mine_type, m.ownership_type, m.mine_area, m.mine_area_unit,
-           m.mining_depth, m.contract_nature, m.status, m.notes
-    FROM mines m
-    WHERE m.project_id = $selected_project_id AND m.status = 1 AND m.is_deleted = 0
-    $company_mine_clause
-    $mine_filter_clause
-    ORDER BY m.id ASC
-");
-
-if ($mines_q) {
-    while ($mine = mysqli_fetch_assoc($mines_q)) {
-        $mines_data[$mine['id']] = $mine;
-        $mines_data[$mine['id']]['equipments'] = [];
-    }
-}
-
-// ============================================================
-// جلب المعدات (الشاحنات) لكل منجم في المشروع
+// جلب المعدات (الشاحنات) للمشروع — مجمّعة حسب المورد
 // ============================================================
 $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
 $ops_company_clause = ($operations_has_company && !$is_super_admin) ? " AND o.company_id = $company_id" : "";
 
-// إضافة فلتر المنجم للمعدات (لمدير الحركة Role 6 فقط)
-$ops_mine_filter = "";
-if ($is_movement_manager && $user_mine_id > 0) {
-    $ops_mine_filter = " AND CAST(o.mine_id AS UNSIGNED) = $user_mine_id";
-}
-
 $ops_q = mysqli_query($conn, "
-    SELECT o.id AS op_id, o.mine_id, o.status AS op_status,
+    SELECT o.id AS op_id, o.status AS op_status,
            o.start, o.end, o.equipment_category,
            e.id AS eq_id, e.code AS eq_code, e.name AS eq_name,
            e.type AS eq_type_id, e.serial_number, e.chassis_number,
@@ -122,7 +76,8 @@ $ops_q = mysqli_query($conn, "
            e.equipment_condition, e.availability_status,
            e.engine_condition, e.operating_hours, e.general_notes AS eq_notes,
            COALESCE(et.type, '') AS type_name,
-           s.name AS supplier_name
+           COALESCE(s.id, 0) AS supplier_id,
+           COALESCE(s.name, 'بدون مورد') AS supplier_name
     FROM operations o
     JOIN equipments e ON o.equipment = e.id
     LEFT JOIN equipments_types et ON CAST(e.type AS UNSIGNED) = et.id
@@ -130,28 +85,29 @@ $ops_q = mysqli_query($conn, "
     WHERE CAST(o.project_id AS UNSIGNED) = $selected_project_id
       AND o.status = 1
       $ops_company_clause
-      $ops_mine_filter
-    ORDER BY o.mine_id ASC, e.code ASC
+    ORDER BY supplier_name ASC, e.code ASC
 ");
 
-// معدات بدون منجم محدد
-$no_mine_equipments = [];
+// تجميع المعدات حسب المورد
+$suppliers_data = [];
 
 if ($ops_q) {
     while ($op = mysqli_fetch_assoc($ops_q)) {
-        $mine_id = intval($op['mine_id']);
-        // تحديد حالة الشاحنة: عاملة / متوقفة
-        $avail = $op['availability_status'] ?? '';
+        $sup_id   = intval($op['supplier_id']);
+        $sup_name = $op['supplier_name'];
+        $avail    = $op['availability_status'] ?? '';
         $is_working = !in_array($avail, ['معطلة', 'مبيعة/مسحوبة', 'خارج الخدمة', 'تحت الصيانة', 'موقوفة']);
-
         $op['is_working'] = $is_working;
-        $op['drivers'] = [];
+        $op['drivers']    = [];
 
-        if ($mine_id > 0 && isset($mines_data[$mine_id])) {
-            $mines_data[$mine_id]['equipments'][$op['op_id']] = $op;
-        } else {
-            $no_mine_equipments[$op['op_id']] = $op;
+        if (!isset($suppliers_data[$sup_id])) {
+            $suppliers_data[$sup_id] = [
+                'supplier_id'   => $sup_id,
+                'supplier_name' => $sup_name,
+                'equipments'    => [],
+            ];
         }
+        $suppliers_data[$sup_id]['equipments'][$op['op_id']] = $op;
     }
 }
 
@@ -163,13 +119,10 @@ $drivers_company_clause = ($eq_drivers_has_company && !$is_super_admin) ? " AND 
 
 // جمع كل معرفات المعدات
 $all_eq_ids = [];
-foreach ($mines_data as $mine) {
-    foreach ($mine['equipments'] as $op) {
+foreach ($suppliers_data as $sup) {
+    foreach ($sup['equipments'] as $op) {
         $all_eq_ids[] = intval($op['eq_id']);
     }
-}
-foreach ($no_mine_equipments as $op) {
-    $all_eq_ids[] = intval($op['eq_id']);
 }
 
 if (!empty($all_eq_ids)) {
@@ -199,21 +152,15 @@ if (!empty($all_eq_ids)) {
         }
     }
 
-    // إسناد المشغلين للمعدات في المناجم
-    foreach ($mines_data as $mine_id => &$mine) {
-        foreach ($mine['equipments'] as $op_id => &$op) {
+    // إسناد المشغلين للمعدات في الموردين
+    foreach ($suppliers_data as $sup_id => &$sup) {
+        foreach ($sup['equipments'] as $op_id => &$op) {
             $eq_id = intval($op['eq_id']);
             $op['drivers'] = $eq_drivers_map[$eq_id] ?? [];
         }
         unset($op);
     }
-    unset($mine);
-
-    foreach ($no_mine_equipments as $op_id => &$op) {
-        $eq_id = intval($op['eq_id']);
-        $op['drivers'] = $eq_drivers_map[$eq_id] ?? [];
-    }
-    unset($op);
+    unset($sup);
 }
 
 // ============================================================
@@ -224,21 +171,15 @@ $ts_company_clause = ($ts_has_company && !$is_super_admin) ? " AND t.company_id 
 
 // تهيئة الساعات بالصفر وتجميع معرّفات التشغيل
 $all_op_ids_ts = [];
-foreach ($mines_data as $mine_id => &$mine) {
-    foreach ($mine['equipments'] as $op_id => &$op) {
+foreach ($suppliers_data as $sup_id => &$sup) {
+    foreach ($sup['equipments'] as $op_id => &$op) {
         $op['ts_total'] = 0.0;
         $op['ts_today'] = 0.0;
         $all_op_ids_ts[] = intval($op_id);
     }
     unset($op);
 }
-unset($mine);
-foreach ($no_mine_equipments as $op_id => &$op) {
-    $op['ts_total'] = 0.0;
-    $op['ts_today'] = 0.0;
-    $all_op_ids_ts[] = intval($op_id);
-}
-unset($op);
+unset($sup);
 
 if (!empty($all_op_ids_ts)) {
     $op_ids_ts_str = implode(',', array_unique($all_op_ids_ts));
@@ -260,8 +201,8 @@ if (!empty($all_op_ids_ts)) {
                 'today' => floatval($ts_row['today_hours']),
             ];
         }
-        foreach ($mines_data as $mine_id => &$mine) {
-            foreach ($mine['equipments'] as $op_id => &$op) {
+        foreach ($suppliers_data as $sup_id => &$sup) {
+            foreach ($sup['equipments'] as $op_id => &$op) {
                 if (isset($ts_map[$op_id])) {
                     $op['ts_total'] = $ts_map[$op_id]['total'];
                     $op['ts_today'] = $ts_map[$op_id]['today'];
@@ -269,28 +210,21 @@ if (!empty($all_op_ids_ts)) {
             }
             unset($op);
         }
-        unset($mine);
-        foreach ($no_mine_equipments as $op_id => &$op) {
-            if (isset($ts_map[$op_id])) {
-                $op['ts_total'] = $ts_map[$op_id]['total'];
-                $op['ts_today'] = $ts_map[$op_id]['today'];
-            }
-        }
-        unset($op);
+        unset($sup);
     }
 }
 
 // ============================================================
 // إحصائيات إجمالية
 // ============================================================
-$total_mines = count($mines_data);
+$total_suppliers = count($suppliers_data);
 $total_equip = 0;
 $total_working = 0;
 $total_stopped = 0;
 $total_operators = 0;
 
-foreach ($mines_data as $mine) {
-    foreach ($mine['equipments'] as $op) {
+foreach ($suppliers_data as $sup) {
+    foreach ($sup['equipments'] as $op) {
         $total_equip++;
         if ($op['is_working']) $total_working++; else $total_stopped++;
         $total_operators += count($op['drivers']);
@@ -342,8 +276,8 @@ include('../insidebar.php');
 <!-- ═══ الإحصائيات ═══ -->
 <div class="stats-row">
     <div class="stat-tile">
-        <div class="stat-tile-icon c-gold"><i class="fas fa-mountain"></i></div>
-        <div><div class="stat-tile-val"><?php echo $total_mines; ?></div><div class="stat-tile-lbl">إجمالي المناجم</div></div>
+        <div class="stat-tile-icon c-gold"><i class="fas fa-truck-loading"></i></div>
+        <div><div class="stat-tile-val"><?php echo $total_suppliers; ?></div><div class="stat-tile-lbl">إجمالي الموردين</div></div>
     </div>
     <div class="stat-tile">
         <div class="stat-tile-icon c-blue"><i class="fas fa-truck-monster"></i></div>
@@ -381,94 +315,71 @@ include('../insidebar.php');
     </div>
 </div>
 
-<?php if (empty($mines_data)): ?>
-<!-- حالة لا مناجم -->
+<?php if (empty($suppliers_data)): ?>
+<!-- حالة لا معدات -->
 <div class="zero-state">
-    <i class="fas fa-mountain"></i>
-    <h3>لا توجد مناجم مسجّلة في هذا المشروع</h3>
-    <p>يمكنك إضافة المناجم من صفحة إدارة المشاريع</p>
+    <i class="fas fa-truck-monster"></i>
+    <h3>لا توجد آليات مسجّلة في هذا المشروع</h3>
+    <p>يمكنك إضافة عمليات التشغيل من صفحة إدارة التشغيل</p>
 </div>
 <?php else: ?>
 
-<!-- ═══ شبكة المناجم ═══ -->
+<!-- ═══ شبكة الموردين ═══ -->
 <div class="mines-grid">
 
 <?php
 $mine_colors = ['mine-accent-0','mine-accent-1','mine-accent-2','mine-accent-3','mine-accent-4'];
 $mi = 0;
-foreach ($mines_data as $mine_id => $mine):
-    $mine_equips  = $mine['equipments'];
-    $mine_total   = count($mine_equips);
-    $mine_working = 0; $mine_stopped = 0; $mine_ops = 0;
-    foreach ($mine_equips as $op) {
-        if ($op['is_working']) $mine_working++; else $mine_stopped++;
-        $mine_ops += count($op['drivers']);
+foreach ($suppliers_data as $sup_id => $sup):
+    $sup_equips  = $sup['equipments'];
+    $sup_total   = count($sup_equips);
+    $sup_working = 0; $sup_stopped = 0; $sup_ops = 0;
+    foreach ($sup_equips as $op) {
+        if ($op['is_working']) $sup_working++; else $sup_stopped++;
+        $sup_ops += count($op['drivers']);
     }
     $hdr_accent = $mine_colors[$mi % count($mine_colors)];
     $mi++;
-
-    // tooltip المنجم
-    $tt_mine_data = [
-        'الكود'       => $mine['mine_code'] ?? '-',
-        'المدير'      => $mine['manager_name'] ?? '-',
-        'النوع'       => $mine['mine_type'] ?? '-',
-        'المعدن'      => $mine['mineral_type'] ?? '-',
-        'المساحة'     => $mine['mine_area'] ? ($mine['mine_area'] . ' ' . ($mine['mine_area_unit'] ?? '')) : '-',
-    ];
 ?>
 
 <div class="mine-card">
-    <!-- رأس المنجم -->
+    <!-- رأس المورد -->
     <div class="mine-hdr <?php echo htmlspecialchars($hdr_accent); ?>">
-        <div class="mine-hdr-icon"><i class="fas fa-mountain"></i></div>
+        <div class="mine-hdr-icon"><i class="fas fa-truck-loading"></i></div>
         <div>
-            <!-- الاسم قابل للـ tooltip -->
-            <div class="mine-hdr-name tt-trigger mine-hdr-name-static">
-                <?php echo htmlspecialchars($mine['mine_name']); ?>
-                <div class="tt-box">
-                    <div class="tt-title"><i class="fas fa-mountain"></i> <?php echo htmlspecialchars($mine['mine_name']); ?></div>
-                    <?php foreach ($tt_mine_data as $k => $v): ?>
-                    <div class="tt-row">
-                        <span class="tt-k"><?php echo $k; ?></span>
-                        <span class="tt-v"><?php echo htmlspecialchars($v); ?></span>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
+            <div class="mine-hdr-name mine-hdr-name-static">
+                <?php echo htmlspecialchars($sup['supplier_name']); ?>
             </div>
-            <div class="mine-hdr-code"><?php echo htmlspecialchars($mine['mine_code'] ?? ''); ?></div>
         </div>
         <div class="mine-hdr-badges">
-            <span class="m-badge gold"><i class="fas fa-truck-monster fa-xs"></i> <?php echo $mine_total; ?></span>
-            <?php if ($mine_working > 0): ?>
-            <span class="m-badge green"><i class="fas fa-check fa-xs"></i> <?php echo $mine_working; ?></span>
+            <span class="m-badge gold"><i class="fas fa-truck-monster fa-xs"></i> <?php echo $sup_total; ?></span>
+            <?php if ($sup_working > 0): ?>
+            <span class="m-badge green"><i class="fas fa-check fa-xs"></i> <?php echo $sup_working; ?></span>
             <?php endif; ?>
-            <?php if ($mine_stopped > 0): ?>
-            <span class="m-badge red"><i class="fas fa-times fa-xs"></i> <?php echo $mine_stopped; ?></span>
+            <?php if ($sup_stopped > 0): ?>
+            <span class="m-badge red"><i class="fas fa-times fa-xs"></i> <?php echo $sup_stopped; ?></span>
             <?php endif; ?>
         </div>
     </div>
 
-    <!-- شريط إحصائيات المنجم -->
+    <!-- شريط إحصائيات المورد -->
     <div class="mine-stats-strip">
-        <div class="mss-item"><span class="mss-n"><?php echo $mine_total; ?></span>إجمالي</div>
-        <div class="mss-item"><span class="mss-n green"><?php echo $mine_working; ?></span>عاملة</div>
-        <div class="mss-item"><span class="mss-n red"><?php echo $mine_stopped; ?></span>متوقفة</div>
-        <div class="mss-item"><span class="mss-n blue"><?php echo $mine_ops; ?></span>مشغّلون</div>
-        <?php if (!empty($mine['mineral_type'])): ?>
-        <div class="mss-item"><span class="mss-n gold mss-mineral-icon">⛏</span><?php echo htmlspecialchars($mine['mineral_type']); ?></div>
-        <?php endif; ?>
+        <div class="mss-item"><span class="mss-n"><?php echo $sup_total; ?></span>إجمالي</div>
+        <div class="mss-item"><span class="mss-n green"><?php echo $sup_working; ?></span>عاملة</div>
+        <div class="mss-item"><span class="mss-n red"><?php echo $sup_stopped; ?></span>متوقفة</div>
+        <div class="mss-item"><span class="mss-n blue"><?php echo $sup_ops; ?></span>مشغّلون</div>
     </div>
 
-    <!-- جسم المنجم -->
+    <!-- جسم المورد -->
     <div class="mine-body">
-        <?php if (empty($mine_equips)): ?>
+        <?php if (empty($sup_equips)): ?>
         <div class="empty-mine-body">
             <i class="fas fa-truck-monster"></i>
-            <p>لا توجد آليات مسندة لهذا المنجم</p>
+            <p>لا توجد آليات لهذا المورد</p>
         </div>
         <?php else:
-            $working_list = array_filter($mine_equips, fn($o) => $o['is_working']);
-            $stopped_list = array_filter($mine_equips, fn($o) => !$o['is_working']);
+            $working_list = array_filter($sup_equips, fn($o) => $o['is_working']);
+            $stopped_list = array_filter($sup_equips, fn($o) => !$o['is_working']);
         ?>
 
         <?php if (!empty($working_list)): ?>
@@ -626,80 +537,9 @@ foreach ($mines_data as $mine_id => $mine):
 <?php endforeach; ?>
 </div><!-- .mines-grid -->
 
-<?php endif; /* end empty($mines_data) */ ?>
+<?php endif; /* end empty($suppliers_data) */ ?>
 
 <!-- ═══ معدات بلا منجم ═══ -->
-<?php if (!empty($no_mine_equipments)): ?>
-<div class="orphan-section">
-    <div class="orphan-title">
-        <i class="fas fa-exclamation-triangle orphan-title-icon"></i>
-        آليات غير مرتبطة بمنجم محدد (<?php echo count($no_mine_equipments); ?>)
-    </div>
-    <div class="eq-grid">
-        <?php foreach ($no_mine_equipments as $op):
-            $css_cls   = $op['is_working'] ? 'working' : 'stopped';
-            $drv_count = count($op['drivers']);
-            $tt_eq_data = [
-                'الكود'   => $op['eq_code'] ?? '-',
-                'النوع'   => $op['type_name'] ?: '-',
-                'الحالة'  => $op['availability_status'] ?? '-',
-                'المورد'  => $op['supplier_name'] ?? '-',
-            ];
-        ?>
-        <div class="eq-card <?php echo $css_cls; ?> tt-trigger">
-            <div class="eq-status-dot"></div>
-            <div class="eq-inner">
-                <div class="eq-top-bar"></div>
-                <div class="eq-content">
-                    <div class="eq-machine-icon"><i class="fas fa-truck-monster"></i></div>
-                    <div class="eq-code"><?php echo htmlspecialchars($op['eq_code']); ?></div>
-                    <div class="eq-type-lbl"><?php echo htmlspecialchars($op['type_name'] ?: ($op['eq_name'] ?? '')); ?></div>
-                </div>
-                <div class="op-row">
-                    <?php if ($drv_count === 0): ?>
-                    <span class="no-op-label"><i class="fas fa-user-slash no-op-icon"></i> لا مشغّل</span>
-                    <?php else:
-                        foreach ($op['drivers'] as $drv):
-                            $dn = htmlspecialchars($drv['driver_name']);
-                    ?>
-                    <div class="op-av active tt-trigger" title="<?php echo $dn; ?>">
-                        <i class="fas fa-user op-avatar-icon"></i>
-                        <div class="tt-box tt-box-sm">
-                            <div class="tt-title"><i class="fas fa-dharmachakra"></i> <?php echo $dn; ?></div>
-                            <div class="tt-row"><span class="tt-k">الكود</span><span class="tt-v"><?php echo htmlspecialchars($drv['driver_code'] ?? '-'); ?></span></div>
-                            <div class="tt-row"><span class="tt-k">الهاتف</span><span class="tt-v"><?php echo htmlspecialchars($drv['phone'] ?? '-'); ?></span></div>
-                            <div class="tt-row"><span class="tt-k">الكفاءة</span><span class="tt-v"><?php echo htmlspecialchars($drv['skill_level'] ?? '-'); ?></span></div>
-                            <div class="tt-row"><span class="tt-k">الخبرة</span><span class="tt-v"><?php echo htmlspecialchars($drv['years_in_field'] ?? '0'); ?> سنة</span></div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-                <!-- ساعات التشغيل -->
-                <div class="eq-hours-row">
-                    <div class="eq-hours-item">
-                        <span class="eq-hours-val"><?php echo number_format($op['ts_total'], 1); ?></span>
-                        <span class="eq-hours-lbl">إجمالي ساعات</span>
-                    </div>
-                    <div class="eq-hours-sep"></div>
-                    <div class="eq-hours-item">
-                        <span class="eq-hours-val today-val"><?php echo number_format($op['ts_today'], 1); ?></span>
-                        <span class="eq-hours-lbl">ساعات اليوم</span>
-                    </div>
-                </div>
-            </div>
-            <div class="tt-box">
-                <div class="tt-title"><i class="fas fa-truck-monster"></i> <?php echo htmlspecialchars($op['eq_name']); ?></div>
-                <?php foreach ($tt_eq_data as $k => $v): ?>
-                <div class="tt-row"><span class="tt-k"><?php echo $k; ?></span><span class="tt-v"><?php echo htmlspecialchars($v); ?></span></div>
-                <?php endforeach; ?>
-                <div class="tt-row"><span class="tt-k">المشغلون</span><span class="tt-v"><?php echo $drv_count; ?> أساسي · 0 احتياطي</span></div>
-            </div>
-        </div>
-        <?php endforeach; ?>
-    </div>
-</div>
-<?php endif; ?>
 
   </div><!-- .movement-content-wrapper -->
 </div><!-- .main -->
@@ -707,7 +547,7 @@ foreach ($mines_data as $mine_id => $mine):
 <script>
 /**
  * نظام Tooltip الذكي — يعرض tooltip للعنصر الأعمق فقط
- * الأولوية: مشغّل > آلية > منجم
+ * الأولوية: مشغّل > آلية > مورد
  */
 (function () {
     'use strict';
