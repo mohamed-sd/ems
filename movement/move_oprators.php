@@ -802,7 +802,6 @@ include('../insidebar.php');
                                 <th>نوع المعدة</th>
                                 <th>السائقين</th>
 
-                                <th>المورد</th>
                                 <!-- <th>ساعات العمل الكلية</th> -->
                                 <th>ساعات الوردية</th>
                                 <th>نظام الوردية</th>
@@ -917,7 +916,6 @@ include('../insidebar.php');
                                 echo "<td>" . (!empty($row['equipment_type_name']) ? htmlspecialchars($row['equipment_type_name']) : "-") . "</td>";
                                 echo "<td>" . (!empty($row['driver_names']) ? $row['driver_names'] : "-") . "</td>";
 
-                                echo "<td>" . $row['suppliers_name'] . "</td>";
 
                                 // echo "<td>" . (!empty($row['total_equipment_hours']) ? $row['total_equipment_hours'] : '0') . "</td>";
                                 echo "<td>" . (!empty($row['shift_hours']) ? $row['shift_hours'] : '0') . "</td>";

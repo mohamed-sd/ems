@@ -819,6 +819,28 @@ include '../insidebar.php';
         gap: 8px;
         align-items: center;
     }
+
+    /* نمط الرابط لاسم المعدة */
+    .equipment-name-link {
+        color: #0c1c3e;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+
+    .equipment-name-link:hover {
+        color: #e8b800;
+        text-decoration: underline;
+        background: rgba(232, 184, 0, 0.1);
+    }
+
+    .equipment-name-link:hover::before {
+        content: "🔗 ";
+    }
 </style>
 
 <div class="main movement-page movement-drivers-page">
@@ -971,7 +993,7 @@ include '../insidebar.php';
 
                                 echo '<tr>';
                                 echo '<td>' . $idx++ . '</td>';
-                                echo '<td><strong>' . htmlspecialchars($eq_label, ENT_QUOTES, 'UTF-8') . '</strong></td>';
+                                echo '<td><strong><a href="add_drivers.php?equipment_id=' . $eq_id . '" class="equipment-name-link" title="انقر لإدارة السائقين">' . htmlspecialchars($eq_label, ENT_QUOTES, 'UTF-8') . '</a></strong></td>';
                                 echo '<td><span class="drivers-count-badge"><i class="fas fa-user"></i>' . $driver_count . '</span></td>';
                                 echo '<td><div class="drivers-icons-wrap">' . $drivers_tooltip_html . '</div></td>';
 

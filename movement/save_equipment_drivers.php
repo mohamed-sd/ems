@@ -66,7 +66,7 @@ if (isset($_POST['equipment_id'])) {
     $equipment_id = intval($_POST['equipment_id']);
     $user_role = isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : '';
     $is_role10 = ($user_role == "10");
-    
+
     // دعم كلاً من النظام الجديد والقديم
     $drivers = [];
     if (isset($_POST['drivers']) && is_array($_POST['drivers'])) {
@@ -76,7 +76,7 @@ if (isset($_POST['equipment_id'])) {
         // النظام الجديد (cards with checkboxes)
         $drivers = explode(',', $_POST['drivers_selected']);
     }
-    
+
     if (empty($drivers)) {
         echo "❌ يجب اختيار مشغل واحد على الأقل.";
         exit;
@@ -140,7 +140,7 @@ if (isset($_POST['equipment_id'])) {
 
         foreach ($drivers as $driver_id) {
             $driver_id = intval($driver_id);
-            
+
             // التحقق من عدم وجود ربط نشط بالفعل
             $check_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";
             $check = mysqli_query($conn, "SELECT id FROM equipment_drivers WHERE equipment_id=$equipment_id AND driver_id=$driver_id AND status=1$check_scope");
@@ -216,11 +216,11 @@ if (isset($_POST['equipment_id'])) {
         }
         exit;
     }
-    
+
     // المستخدمون الآخرون: إضافة مباشرة
     foreach ($drivers as $driver_id) {
         $driver_id = intval($driver_id);
-        
+
         // التحقق من عدم وجود ربط نشط بالفعل
         $check_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";
         $check = mysqli_query($conn, "SELECT id FROM equipment_drivers WHERE equipment_id=$equipment_id AND driver_id=$driver_id AND status=1$check_scope");
@@ -235,16 +235,15 @@ if (isset($_POST['equipment_id'])) {
 
         $insert_company_col = ($is_super_admin || !$equipment_drivers_has_company) ? "" : ", company_id";
         $insert_company_val = ($is_super_admin || !$equipment_drivers_has_company) ? "" : ", $company_id";
-        
+
         mysqli_query(
             $conn,
-            "INSERT INTO equipment_drivers (equipment_id, driver_id, start_date, end_date, status$insert_company_col) 
+            "INSERT INTO equipment_drivers (equipment_id, driver_id, start_date, end_date, status$insert_company_col)
              VALUES ($equipment_id, $driver_id, $start_sql, $end_sql, 1$insert_company_val)"
         );
     }
 
     echo "✅ تم تحديث السائقين للآلية.";
-    echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='equipments.php';</script>";
+    echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='project_drivers.php';</script>";
 }
 ?>
-
