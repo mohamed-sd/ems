@@ -1055,7 +1055,7 @@ include('../insidebar.php');
 
                     while ($row = mysqli_fetch_assoc($result)) {
                         $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">✅ مفعّل</span>' : '<span class="status-pill status-inactive">❌ موقف</span>';
-                        $driver_name_cell = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
+                        $driver_name_cell = "<a class='client-name-link' href='driver_profile.php?id=" . intval($row['id']) . "'><strong>" . htmlspecialchars($row['name']) . "</strong></a>";
                         if (intval($row['numcontracts']) === 0) {
                             $driver_name_cell .= " <span class='link-alert-chip' title='المشغل ليس لديه عقد'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
                         }

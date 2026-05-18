@@ -9,6 +9,7 @@ include '../config.php';
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$operations_project_column = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
 
 if (!$is_super_admin && $company_id <= 0) {
     while (ob_get_level()) ob_end_clean();
@@ -26,7 +27,7 @@ if (!$is_super_admin) {
             LEFT JOIN users su2 ON su2.id = p2.created_by
             LEFT JOIN clients sc2 ON sc2.id = p2.company_client_id
             LEFT JOIN users scu2 ON scu2.id = sc2.created_by
-            WHERE p2.id = o.project_id
+            WHERE p2.id = o.$operations_project_column
               AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
         )";
     }
@@ -41,8 +42,11 @@ $type = isset($_GET['type']) ? mysqli_real_escape_string($conn, $_GET['type']) :
 $today_only = isset($_GET['today_only']) ? $_GET['today_only'] : '0';
 $today_filter = '';
 if ($today_only === '1') {
-    $today = date('Y-m-d');
-    $today_filter = " AND t.date = '$today'";
+    // Match calendar day even if t.date is DATE, DATETIME, or legacy text formats.
+    $today_filter = " AND (DATE(t.date) = CURDATE()"
+                  . " OR STR_TO_DATE(t.date, '%Y-%m-%d') = CURDATE()"
+                  . " OR STR_TO_DATE(t.date, '%d-%m-%Y') = CURDATE()"
+                  . " OR STR_TO_DATE(t.date, '%d/%m/%Y') = CURDATE())";
 }
 
 // Column mapping for ordering
@@ -54,8 +58,13 @@ $orderColumnIndex = isset($_GET['order'][0]['column']) ? intval($_GET['order'][0
 $orderDir = isset($_GET['order'][0]['dir']) && $_GET['order'][0]['dir'] === 'asc' ? 'ASC' : 'DESC';
 $orderColumn = isset($columns[$orderColumnIndex]) ? $columns[$orderColumnIndex] : 't.id';
 
+$type_filter = '';
+if ($type !== '') {
+    $type_filter = " AND t.type = '$type'";
+}
+
 // Build WHERE clause
-$where = "WHERE t.type LIKE '$type'" . $tenant_scope . $today_filter;
+$where = "WHERE 1=1" . $type_filter . $tenant_scope . $today_filter;
 
 if ($_SESSION['user']['role'] == "6") {
     $user_filter = $_SESSION['user']['id'];
@@ -76,9 +85,9 @@ $totalQuery = "SELECT COUNT(*) as total
                FROM timesheet t
                JOIN operations o ON t.operator = o.id
                JOIN equipments e ON o.equipment = e.id
-               JOIN project p ON o.project_id = p.id
+               JOIN project p ON o.$operations_project_column = p.id
                JOIN drivers d ON t.driver = d.id
-               WHERE t.type LIKE '$type'" . $tenant_scope . $today_filter;
+               WHERE 1=1" . $type_filter . $tenant_scope . $today_filter;
 
 if ($_SESSION['user']['role'] == "6") {
     $totalQuery .= " AND t.user_id = '$user_filter'";
@@ -92,7 +101,7 @@ $filteredQuery = "SELECT COUNT(*) as total
                   FROM timesheet t
                   JOIN operations o ON t.operator = o.id
                   JOIN equipments e ON o.equipment = e.id
-                  JOIN project p ON o.project_id = p.id
+                  JOIN project p ON o.$operations_project_column = p.id
                   JOIN drivers d ON t.driver = d.id
                   $where";
 
@@ -111,7 +120,7 @@ $query = "SELECT t.id, t.shift, t.date, t.executed_hours,
           FROM timesheet t
           JOIN operations o ON t.operator = o.id
           JOIN equipments e ON o.equipment = e.id
-          JOIN project p ON o.project_id = p.id
+          JOIN project p ON o.$operations_project_column = p.id
           JOIN drivers d ON t.driver = d.id
           $where
           ORDER BY $orderColumn $orderDir

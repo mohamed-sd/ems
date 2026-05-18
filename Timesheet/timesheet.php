@@ -422,6 +422,60 @@ if (!$is_super_admin) {
       AND (su.company_id = $company_id OR scu.company_id = $company_id)
   )";
 }
+
+$today_rows = [];
+$today_filter_sql = "(DATE(t.date) = CURDATE()"
+  . " OR STR_TO_DATE(t.date, '%Y-%m-%d') = CURDATE()"
+  . " OR STR_TO_DATE(t.date, '%d-%m-%Y') = CURDATE()"
+  . " OR STR_TO_DATE(t.date, '%d/%m/%Y') = CURDATE())";
+
+$tenant_timesheet_filter_sql = "";
+if (!$is_super_admin) {
+  if ($timesheet_has_company) {
+    $tenant_timesheet_filter_sql = " AND t.company_id = $company_id";
+  } else {
+    $tenant_timesheet_filter_sql = " AND EXISTS (
+      SELECT 1
+      FROM project p2
+      LEFT JOIN users su2 ON su2.id = p2.created_by
+      LEFT JOIN clients sc2 ON sc2.id = p2.company_client_id
+      LEFT JOIN users scu2 ON scu2.id = sc2.created_by
+      WHERE p2.id = o." . $operations_project_column . "
+        AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
+    )";
+  }
+}
+
+$type_sql = "";
+if ($type !== "") {
+  $type_esc = mysqli_real_escape_string($conn, $type);
+  $type_sql = " AND t.type = '$type_esc'";
+}
+
+$role6_sql = "";
+if (isset($_SESSION['user']['role']) && strval($_SESSION['user']['role']) === "6") {
+  $user_filter = intval($_SESSION['user']['id']);
+  $role6_sql = " AND t.user_id = $user_filter";
+}
+
+$today_rows_query = "SELECT t.id, t.shift, t.date, t.executed_hours,
+                      t.standby_hours, t.total_fault_hours, t.bucket_hours, t.jackhammer_hours,
+                      t.extra_hours, t.dependence_hours, t.total_work_hours, t.status,
+                      e.code AS eq_code, e.name AS eq_name
+                      FROM timesheet t
+                      JOIN operations o ON t.operator = o.id
+                      JOIN equipments e ON o.equipment = e.id
+                      JOIN project p ON o." . $operations_project_column . " = p.id
+                      JOIN drivers d ON t.driver = d.id
+                      WHERE " . $today_filter_sql . $type_sql . $tenant_timesheet_filter_sql . $role6_sql . "
+                      ORDER BY t.date DESC, t.id DESC";
+
+$today_rows_result = mysqli_query($conn, $today_rows_query);
+if ($today_rows_result) {
+  while ($today_row = mysqli_fetch_assoc($today_rows_result)) {
+    $today_rows[] = $today_row;
+  }
+}
 ?>
 
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
@@ -570,10 +624,8 @@ if (!$is_super_admin) {
             </div>
             <div>
               <label>الوردية</label>
-              <select name="shift" id="shift">
-                <option value=""> -- اختار الوردية -- </option>
-                <option value="D"> صباحية </option>
-                <option value="N"> مسائية </option>
+              <select name="shift" id="shift" required>
+                <option value="">-- اختر الآلية أولاً --</option>
               </select>
             </div>
             <div>
@@ -947,10 +999,8 @@ if (!$is_super_admin) {
             </div>
             <div>
               <label>الوردية</label>
-              <select name="shift" id="shift">
-                <option value=""> -- اختار الوردية -- </option>
-                <option value="D"> صباحية </option>
-                <option value="N"> مسائية </option>
+              <select name="shift" id="shift" required>
+                <option value="">-- اختر الآلية أولاً --</option>
               </select>
             </div>
             <div>
@@ -1306,10 +1356,8 @@ if (!$is_super_admin) {
             </div>
             <div>
               <label>الوردية</label>
-              <select name="shift" id="shift">
-                <option value=""> -- اختار الوردية -- </option>
-                <option value="D"> صباحية </option>
-                <option value="N"> مسائية </option>
+              <select name="shift" id="shift" required>
+                <option value="">-- اختر الآلية أولاً --</option>
               </select>
             </div>
             <div>
@@ -1651,12 +1699,56 @@ if (!$is_super_admin) {
             <th><i class="fas fa-wrench"></i> الأعطال</th>
             <th><i class="fas fa-briefcase"></i> ساعات العمل</th>
             <th><i class="fas fa-chart-bar"></i> الإجمالي</th>
-            <!-- <th><i class="fas fa-toggle-on"></i> الحالة</th> -->
+            <th><i class="fas fa-toggle-on"></i> الحالة</th>
             <th><i class="fas fa-cogs"></i> إجراءات</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Data will be loaded via AJAX -->
+          <?php $row_index = 1;
+          foreach ($today_rows as $row) {
+            $totalwork = floatval($row['standby_hours']) + floatval($row['bucket_hours']) + floatval($row['jackhammer_hours']) + floatval($row['extra_hours']) + floatval($row['dependence_hours']);
+            $totalall = floatval($row['total_work_hours']) + floatval($row['total_fault_hours']);
+
+            if ($row['status'] == "1") {
+              $status = "<font color='grey'>تحت المراجعة</font>";
+            } elseif ($row['status'] == "2") {
+              $status = "<font color='green'>تم الاعتماد</font>";
+            } elseif ($row['status'] == "3") {
+              $status = "<font color='red'>تم الرفض</font>";
+            } else {
+              $status = "غير معروف";
+            }
+
+            $shiftBadge = $row['shift'] == "D"
+              ? "<span style='background: #ffeaa7; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #2d3436;'><i class='fas fa-sun'></i> صباحية</span>"
+              : "<span style='background: #2d3436; padding: 4px 12px; border-radius: 15px; font-weight: 600; color: #fff;'><i class='fas fa-moon'></i> مسائية</span>";
+
+            $id = intval($row['id']);
+            echo "<tr>";
+            echo "<td><span style='font-weight: 600;'>" . $row_index . "</span></td>";
+            echo "<td><span style='font-weight: 700; color: #1f2937;'>" . $id . "</span></td>";
+            echo "<td><span style='font-weight: 600; color: #2980b9;'>" . htmlspecialchars($row['eq_code'], ENT_QUOTES, 'UTF-8') . " - " . htmlspecialchars($row['eq_name'], ENT_QUOTES, 'UTF-8') . "</span></td>";
+            echo "<td>" . htmlspecialchars($row['date'], ENT_QUOTES, 'UTF-8') . "</td>";
+            echo "<td>" . $shiftBadge . "</td>";
+            echo "<td><span style='background: #e8f5e9; font-weight: 600; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['executed_hours']) . "</span></td>";
+            echo "<td><span style='background: #e8f5e9; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['bucket_hours']) . "</span></td>";
+            echo "<td><span style='background: #e8f5e9; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['jackhammer_hours']) . "</span></td>";
+            echo "<td><span style='background: #e8f5e9; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['extra_hours']) . "</span></td>";
+            echo "<td><span style='background: #fff3e0; font-weight: 600; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['standby_hours']) . "</span></td>";
+            echo "<td><span style='background: #fff3e0; font-weight: 600; color: #d63031; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . floatval($row['total_fault_hours']) . "</span></td>";
+            echo "<td><span style='background: #e3f2fd; font-weight: 700; color: #2980b9; font-size: 1.05rem; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . $totalwork . "</span></td>";
+            echo "<td><span style='background: #ffebee; font-weight: 700; color: #c0392b; font-size: 1.05rem; padding: 4px 8px; display: inline-block; border-radius: 4px;'>" . $totalall . "</span></td>";
+            echo "<td><div style='text-align: center;'>" . $status . "</div></td>";
+            echo "<td><div style='white-space: nowrap; text-align: center;'>"
+              . "<a href='javascript:void(0)' class='editBtn' data-id='" . $id . "' title='تعديل' style='color:#3498db; font-size: 1.1rem; margin: 0 3px;'><i class='fas fa-edit'></i></a>"
+              . "<a href='delete_timesheet.php?id=" . $id . "' onclick='return confirm(\"هل أنت متأكد؟\")' title='حذف' style='color: #e74c3c; font-size: 1.1rem; margin: 0 3px;'><i class='fas fa-trash'></i></a>"
+              . "<a href='timesheet_details.php?id=" . $id . "' title='عرض التفاصيل' style='color: #8e44ad; font-size: 1.1rem; margin: 0 3px;'><i class='fas fa-eye'></i></a>"
+              . "</div></td>";
+            echo "</tr>";
+
+            $row_index++;
+          }
+          ?>
         </tbody>
       </table>
 
@@ -1680,35 +1772,6 @@ if (!$is_super_admin) {
   $(document).ready(function () {
     var table = $('#projectsTable').DataTable({
       processing: true,
-      serverSide: true,
-      ajax: {
-        url: 'get_timesheet_data.php',
-        type: 'GET',
-        data: {
-          type: '<?php echo $type; ?>',
-          today_only: '1'
-        },
-        error: function (xhr, error, thrown) {
-          console.error('DataTables AJAX Error:', error, thrown);
-        }
-      },
-      columns: [
-        { data: 0, orderable: false }, // #
-        { data: 1 }, // ID
-        { data: 2 }, // المعدة
-        { data: 3 }, // التاريخ
-        { data: 4, orderable: false }, // الوردية
-        { data: 5 }, // الساعات المنفذة
-        { data: 6 }, // الجردل
-        { data: 7 }, // الجاكهمر
-        { data: 8 }, // الإضافية
-        { data: 9 }, // الاستعداد
-        { data: 10 }, // الأعطال
-        { data: 11 }, // ساعات العمل
-        { data: 12, orderable: false }, // الإجمالي
-        // { data: 13 }, // الحالة
-        { data: 14, orderable: false } // إجراءات
-      ],
       order: [[3, 'desc']], // Sort by date descending by default
       pageLength: 10,
       lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "الكل"]],
@@ -1723,7 +1786,7 @@ if (!$is_super_admin) {
         { extend: 'print', text: 'طباعة' }
       ],
       language: {
-        url: "https:/ems/assets/i18n/datatables/ar.json",
+        url: "/ems/assets/i18n/datatables/ar.json",
         processing: '<i class="fas fa-spinner fa-spin fa-3x"></i><br>جاري التحميل...'
       }
     });
@@ -1962,53 +2025,85 @@ if (!$is_super_admin) {
 
 
 
-  $(document).ready(function () {
-    $("#operator").change(function () {
-      var equipId = $(this).val();
-      if (equipId !== "") {
-        $.ajax({
-          url: "get_drivers.php",
-          type: "GET",
-          data: { operation_id: equipId },
-          success: function (response) {
-            console.log("ðŸ“Œ Response:", response); // Debug
-            $("#driver").html(response);
-          },
-          error: function (xhr, status, error) {
-            console.error("❌ AJAX Error:", error);
-          }
-        });
-      } else {
-        $("#driver").html("<option value=''>-- اختر السائق --</option>");
-      }
-    });
-  });
+  function buildShiftOptionsHtml(allowedShifts) {
+    var options = "<option value=''>-- اختر الوردية --</option>";
+    var hasDay = allowedShifts.indexOf('D') !== -1;
+    var hasNight = allowedShifts.indexOf('N') !== -1;
 
+    if (hasDay) {
+      options += "<option value='D'>صباحية</option>";
+    }
+    if (hasNight) {
+      options += "<option value='N'>مسائية</option>";
+    }
 
+    return options;
+  }
 
+  function applyOperationShiftData(response, preselectedShift) {
+    var allowed = [];
+    if (response && response.allowed_shifts && Array.isArray(response.allowed_shifts)) {
+      allowed = response.allowed_shifts;
+    }
+
+    if (allowed.length === 0) {
+      allowed = ['D', 'N'];
+    }
+
+    $("#shift").html(buildShiftOptionsHtml(allowed));
+
+    var targetShift = preselectedShift || '';
+    if (targetShift !== '' && allowed.indexOf(targetShift) !== -1) {
+      $("#shift").val(targetShift);
+    } else if (allowed.length === 1) {
+      $("#shift").val(allowed[0]);
+    }
+
+    if (response && typeof response.shift_hours !== 'undefined') {
+      $("#shift_hours").val(response.shift_hours);
+    } else {
+      $("#shift_hours").val("0");
+    }
+
+    calculateCustomHours();
+  }
 
   $(document).ready(function () {
     $("#operator").change(function () {
       var opId = $(this).val();
       if (opId !== "") {
         $.ajax({
-          url: "get_contract_hours.php",
+          url: "get_drivers.php",
           type: "GET",
           data: { operation_id: opId },
           success: function (response) {
-            console.log("✅ تم جلب ساعات الوردية:", response);
-            $("#shift_hours").val(response); // عرض القيمة داخل input
-
-            // إعادة حساب الحقول الأخرى تلقائياً بعد تحميل ساعات الوردية
-            calculateCustomHours();
+            console.log("تم تحميل السائقين");
+            $("#driver").html(response);
           },
           error: function (xhr, status, error) {
-            console.error("❌ خطأ في جلب ساعات الوردية:", error);
-            $("#shift_hours").val("8"); // قيمة افتراضية في حالة الخطأ
+            console.error("خطأ في جلب السائقين:", error);
+            $("#driver").html("<option value=''>-- اختر السائق --</option>");
+          }
+        });
+
+        $.ajax({
+          url: "get_contract_hours.php",
+          type: "GET",
+          dataType: "json",
+          data: { operation_id: opId },
+          success: function (response) {
+            console.log("تم تحميل بيانات الوردية من التشغيل:", response);
+            applyOperationShiftData(response, '');
+          },
+          error: function (xhr, status, error) {
+            console.error("خطأ في جلب بيانات الوردية:", error);
+            applyOperationShiftData({ shift_hours: 0, allowed_shifts: ['D', 'N'] }, '');
           }
         });
       } else {
-        $("#shift_hours").val("8");
+        $("#driver").html("<option value=''>-- اختر السائق --</option>");
+        $("#shift").html("<option value=''>-- اختر الآلية أولاً --</option>");
+        $("#shift_hours").val("0");
       }
     });
   });
@@ -2026,12 +2121,14 @@ if (!$is_super_admin) {
       $("#timesheet_id").val(data.id);
       $("#operator").val(data.operator).trigger('change');
 
-      // بعد تحميل السائقين من AJAX نضبط السائق المحدد (ننتظر قليلاً)
+      // بعد تحميل بيانات العملية عبر AJAX نضبط السائق والوردية
       setTimeout(function () {
         $("#driver").val(data.driver);
-      }, 300);
+        if (data.shift) {
+          $("#shift").val(data.shift);
+        }
+      }, 400);
 
-      $("#shift").val(data.shift);
       $("#date").val(data.date);
       $("#shift_hours").val(data.shift_hours);
       $("#executed_hours").val(data.executed_hours);

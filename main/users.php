@@ -345,7 +345,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
                             echo "<tr>";
                             echo "<td><strong>" . $i++ . "</strong></td>";
-                            echo "<td>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . $project_info . "</td>";
+                            echo "<td><a class='client-name-link' href='user_profile.php?id=" . intval($row['id']) . "'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</a>" . $project_info . "</td>";
                             echo "<td><strong>" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "</strong></td>";
                             echo "<td><span class='password-cell pu-password-cell'>••••••••</span></td>";
                             echo "<td><span class='role-badge role-" . $row['role'] . "'>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</span></td>";

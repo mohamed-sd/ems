@@ -901,7 +901,7 @@ include('../insidebar.php');
                     <tbody>
                         <?php
                         foreach ($clients_rows as $row) {
-                            $client_name_cell = "<a class='client-name-link' href='../Projects/projects.php?client_id=" . urlencode($row['id']) . "'>" . clients_e($row['client_name']) . "</a>";
+                            $client_name_cell = "<a class='client-name-link' href='client_profile.php?id=" . urlencode($row['id']) . "'>" . clients_e($row['client_name']) . "</a>";
                             if (intval($row['projects_count']) === 0) {
                                 $client_name_cell .= " <span class='link-alert-chip' title='العميل ليس مشترك في مشروع'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
                             }

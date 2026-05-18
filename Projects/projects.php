@@ -595,7 +595,7 @@ include('../insidebar.php');
 
                         $result = mysqli_query($conn, $query);
                         while ($row = mysqli_fetch_assoc($result)) {
-                            $project_name_cell = "<strong>" . e($row['name']) . "</strong>";
+                            $project_name_cell = "<a class='client-name-link' href='project_profile.php?id=" . intval($row['id']) . "'><strong>" . e($row['name']) . "</strong></a>";
 
                             echo "<tr>";
                             echo "<td>" . e($row['create_at']) . "</td>";

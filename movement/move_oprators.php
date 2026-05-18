@@ -27,6 +27,12 @@ if (!$operations_has_company) {
     $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
 }
 
+$operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
+if (!$operations_has_shift_type) {
+    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER shift_hours");
+    $operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
+}
+
 if (!$is_super_admin && !$operations_has_company) {
     die('لا يمكن تطبيق عزل الشركات في شاشة التشغيل لأن عمود company_id غير متاح في جدول operations.');
 }
@@ -699,6 +705,15 @@ include('../insidebar.php');
                                     placeholder="ساعات الوردية" value="0" required />
                             </div>
 
+                            <div>
+                                <label><i class="fa fa-sync-alt"></i> نظام الوردية</label>
+                                <select name="shift_type" id="shift_type" required>
+                                    <option value="D">نهاري فقط</option>
+                                    <option value="N">ليلي فقط</option>
+                                    <option value="B" selected>نهاري + ليلي</option>
+                                </select>
+                            </div>
+
                             <select name="status" id="status" required>
                                 <option value="1">ساري</option>
                                 <option value="0">منتهي</option>
@@ -789,6 +804,7 @@ include('../insidebar.php');
                                 <th>المورد</th>
                                 <!-- <th>ساعات العمل الكلية</th> -->
                                 <th>ساعات الوردية</th>
+                                <th>نظام الوردية</th>
 
                                 <th>تاريخ البداية</th>
                                 <!-- <th>تاريخ النهاية</th> -->
@@ -826,6 +842,10 @@ include('../insidebar.php');
                                 $hours = floatval($_POST['hours']);
                                 $total_equipment_hours = floatval($_POST['total_equipment_hours']);
                                 $shift_hours = floatval($_POST['shift_hours']);
+                                $shift_type_raw = isset($_POST['shift_type']) ? strval($_POST['shift_type']) : 'B';
+                                $allowed_shift_types = array('D', 'N', 'B');
+                                $shift_type = in_array($shift_type_raw, $allowed_shift_types, true) ? $shift_type_raw : 'B';
+                                $shift_type_escaped = mysqli_real_escape_string($conn, $shift_type);
                                 $status = intval($_POST['status']);
 
                                 // التحقق من عدم وجود سجل ساري آخر لنفس المعدة
@@ -853,6 +873,7 @@ include('../insidebar.php');
                                     days = '$hours',
                                     total_equipment_hours = '$total_equipment_hours',
                                     shift_hours = '$shift_hours',
+                                    shift_type = '$shift_type_escaped',
                                     status = '$status_escaped'
                                         WHERE id = $operation_id AND project_id = '$project_id'$operations_company_scope";
                                     mysqli_query($conn, $sql);
@@ -861,8 +882,8 @@ include('../insidebar.php');
                                     // إضافة سجل جديد
                                     $insert_company_col = (!$is_super_admin && $operations_has_company) ? ", company_id" : "";
                                     $insert_company_val = (!$is_super_admin && $operations_has_company) ? ", '$company_id'" : "";
-                                    mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, status$insert_company_col)
-                                         VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$status_escaped'$insert_company_val)");
+                                     mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, shift_type, status$insert_company_col)
+                                         VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$shift_type_escaped', '$status_escaped'$insert_company_val)");
                                     echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
                                 }
                             }
@@ -871,7 +892,7 @@ include('../insidebar.php');
                             $operations_scope_sql = (!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "";
 
                             $query = "SELECT o.id, o.equipment, o.equipment_type, o.equipment_category, o.contract_id, o.supplier_id,
-                             o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.status, o.reason,
+                             o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.shift_type, o.status, o.reason,
                              e.code AS equipment_code, e.name AS equipment_name, e.type AS equipment_type_id,
                              et.type AS equipment_type_name,
                              p.name AS project_name, s.name AS suppliers_name,
@@ -899,6 +920,15 @@ include('../insidebar.php');
 
                                 // echo "<td>" . (!empty($row['total_equipment_hours']) ? $row['total_equipment_hours'] : '0') . "</td>";
                                 echo "<td>" . (!empty($row['shift_hours']) ? $row['shift_hours'] : '0') . "</td>";
+
+                                $shift_type_label = 'نهاري + ليلي';
+                                if (isset($row['shift_type']) && $row['shift_type'] === 'D') {
+                                    $shift_type_label = 'نهاري فقط';
+                                } elseif (isset($row['shift_type']) && $row['shift_type'] === 'N') {
+                                    $shift_type_label = 'ليلي فقط';
+                                }
+                                echo "<td>" . $shift_type_label . "</td>";
+
                                 echo "<td>" . $row['start'] . "</td>";
                                 // echo "<td>" . $row['end'] . "</td>";
 
@@ -948,6 +978,8 @@ include('../insidebar.php');
                                                                  data-end='" . $row['end'] . "'
                                                                  data-total-hours='" . $row['total_equipment_hours'] . "'
                                                                  data-shift-hours='" . $row['shift_hours'] . "'
+                                                                 data-shift-type='" . htmlspecialchars($row['shift_type'] ?? 'B', ENT_QUOTES) . "'
+                                                                 data-shift-type-label='" . htmlspecialchars($shift_type_label, ENT_QUOTES) . "'
                                                                  data-category='" . htmlspecialchars($row['equipment_category'], ENT_QUOTES) . "'
                                                                  data-status='" . $status_label . "'
                                                                  data-status-class='" . $status_class . "'
@@ -964,6 +996,7 @@ include('../insidebar.php');
                                                                  data-end='" . $row['end'] . "'
                                                                  data-total-hours='" . $row['total_equipment_hours'] . "'
                                                                  data-shift-hours='" . $row['shift_hours'] . "'
+                                                                data-shift-type='" . htmlspecialchars($row['shift_type'] ?? 'B', ENT_QUOTES) . "'
                                                                  data-status='" . $row['status'] . "'
                                                                  title='تعديل'><i class='fa fa-edit'></i></a>" : "") . "
                                                             " . ($can_delete ? "<a href='move_oprators.php?project_id=" . $selected_project_id . "&delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف التشغيل؟\")' title='حذف'>
@@ -1040,6 +1073,10 @@ include('../insidebar.php');
                         <div class="movement-view-modal-item">
                             <div class="movement-view-modal-label"><i class="fas fa-hourglass-half"></i> ساعات الوردية</div>
                             <div class="movement-view-modal-value" id="view_op_shift_hours">-</div>
+                        </div>
+                        <div class="movement-view-modal-item">
+                            <div class="movement-view-modal-label"><i class="fas fa-sync-alt"></i> نظام الوردية</div>
+                            <div class="movement-view-modal-value" id="view_op_shift_type">-</div>
                         </div>
                         <div class="movement-view-modal-item movement-view-modal-item-wide">
                             <div class="movement-view-modal-label"><i class="fas fa-toggle-on"></i> الحالة</div>
@@ -1132,6 +1169,7 @@ include('../insidebar.php');
                     const endDate = document.getElementById('end_date');
                     const totalEquipmentHours = document.getElementById('total_equipment_hours');
                     const shiftHours = document.getElementById('shift_hours');
+                    const shiftType = document.getElementById('shift_type');
                     const status = document.getElementById('status');
 
                     if (operationId) operationId.value = '';
@@ -1143,6 +1181,7 @@ include('../insidebar.php');
                     if (endDate) endDate.value = '';
                     if (totalEquipmentHours) totalEquipmentHours.value = '0';
                     if (shiftHours) shiftHours.value = '0';
+                    if (shiftType) shiftType.value = 'B';
                     if (status) status.value = '1';
 
                     form.classList.add('allforms-visible');
@@ -1430,6 +1469,7 @@ include('../insidebar.php');
                     $('#end_date').val(btn.data('end'));
                     $('#total_equipment_hours').val(btn.data('total-hours'));
                     $('#shift_hours').val(btn.data('shift-hours'));
+                    $('#shift_type').val(btn.data('shift-type') || 'B');
                     $('#status').val(btn.data('status'));
                     $('#equipment_category').val(btn.data('equipment-category'));
 
@@ -1552,6 +1592,7 @@ include('../insidebar.php');
                     $('#view_op_end').text(btn.data('end') || '-');
                     $('#view_op_total_hours').text(btn.data('total-hours') || '0');
                     $('#view_op_shift_hours').text(btn.data('shift-hours') || '0');
+                    $('#view_op_shift_type').text(btn.data('shift-type-label') || '-');
                     $('#view_op_category').text(btn.data('category') || '-');
 
                     var statusLabel = btn.data('status') || '-';

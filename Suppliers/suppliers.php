@@ -542,7 +542,7 @@ include '../insidebar.php';
                         $i = 1;
 
                         while ($row = mysqli_fetch_assoc($result)) {
-                            $supplier_name_cell = "<span class='client-name-link'>" . htmlspecialchars($row['name']) . "</span>";
+                            $supplier_name_cell = "<a class='client-name-link' href='supplier_profile.php?id=" . intval($row['id']) . "'>" . htmlspecialchars($row['name']) . "</a>";
                             if (intval($row['num_contracts']) === 0) {
                                 $supplier_name_cell .= " <span class='link-alert-chip' title='المورد ليس لديه عقد'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
                             }

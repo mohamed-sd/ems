@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         $success_msg = "❌ ليس لديك صلاحية لتعديل أو إضافة المعدات";
         goto skip_save;
     }
-    
+
     // الحقول الأساسية
     $suppliers = mysqli_real_escape_string($conn, $_POST['suppliers']);
     $code      = mysqli_real_escape_string($conn, trim($_POST['code']));
@@ -167,46 +167,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     $name      = mysqli_real_escape_string($conn, trim($_POST['name']));
     $status    = mysqli_real_escape_string($conn, $_POST['status']);
     $edit_id   = isset($_POST['edit_id']) ? intval($_POST['edit_id']) : 0;
-    
+
     // المعلومات الأساسية والتعريفية
     $serial_number = mysqli_real_escape_string($conn, trim($_POST['serial_number'] ?? ''));
     $chassis_number = mysqli_real_escape_string($conn, trim($_POST['chassis_number'] ?? ''));
-    
+
     // بيانات الصنع والموديل
     $manufacturer = mysqli_real_escape_string($conn, trim($_POST['manufacturer'] ?? ''));
     $model = mysqli_real_escape_string($conn, trim($_POST['model'] ?? ''));
     $manufacturing_year = !empty($_POST['manufacturing_year']) ? intval($_POST['manufacturing_year']) : 'NULL';
     $import_year = !empty($_POST['import_year']) ? intval($_POST['import_year']) : 'NULL';
-    
+
     // الحالة الفنية والمواصفات
     $equipment_condition = mysqli_real_escape_string($conn, $_POST['equipment_condition'] ?? 'في حالة جيدة');
     $operating_hours = !empty($_POST['operating_hours']) ? intval($_POST['operating_hours']) : 'NULL';
     $engine_condition = mysqli_real_escape_string($conn, $_POST['engine_condition'] ?? 'جيدة');
     $tires_condition = mysqli_real_escape_string($conn, $_POST['tires_condition'] ?? 'N/A');
-    
+
     // بيانات الملكية
     $actual_owner_name = mysqli_real_escape_string($conn, trim($_POST['actual_owner_name'] ?? ''));
     $owner_type = mysqli_real_escape_string($conn, $_POST['owner_type'] ?? '');
     $owner_phone = mysqli_real_escape_string($conn, trim($_POST['owner_phone'] ?? ''));
     $owner_supplier_relation = mysqli_real_escape_string($conn, $_POST['owner_supplier_relation'] ?? '');
-    
+
     // الوثائق والتسجيلات
     $license_number = mysqli_real_escape_string($conn, trim($_POST['license_number'] ?? ''));
     $license_authority = mysqli_real_escape_string($conn, trim($_POST['license_authority'] ?? ''));
     $license_expiry_date = !empty($_POST['license_expiry_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['license_expiry_date']) . "'" : 'NULL';
     $inspection_certificate_number = mysqli_real_escape_string($conn, trim($_POST['inspection_certificate_number'] ?? ''));
     $last_inspection_date = !empty($_POST['last_inspection_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['last_inspection_date']) . "'" : 'NULL';
-    
+
     // الموقع والتوفر
     $current_location = mysqli_real_escape_string($conn, trim($_POST['current_location'] ?? ''));
     $availability_status = mysqli_real_escape_string($conn, $_POST['availability_status'] ?? 'متاحة للعمل');
-    
+
     // البيانات المالية والقيمة
     $estimated_value = !empty($_POST['estimated_value']) ? floatval($_POST['estimated_value']) : 'NULL';
     $daily_rental_price = !empty($_POST['daily_rental_price']) ? floatval($_POST['daily_rental_price']) : 'NULL';
     $monthly_rental_price = !empty($_POST['monthly_rental_price']) ? floatval($_POST['monthly_rental_price']) : 'NULL';
     $insurance_status = mysqli_real_escape_string($conn, $_POST['insurance_status'] ?? '');
-    
+
     // ملاحظات وسجل الصيانة
     $general_notes = mysqli_real_escape_string($conn, trim($_POST['general_notes'] ?? ''));
     $last_maintenance_date = !empty($_POST['last_maintenance_date']) ? "'" . mysqli_real_escape_string($conn, $_POST['last_maintenance_date']) . "'" : 'NULL';
@@ -219,26 +219,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         $supplier_contract_query = "SELECT sc.id, sce.equip_count
                                    FROM supplierscontracts sc
                                    JOIN suppliercontractequipments sce ON sc.id = sce.contract_id
-                                   WHERE sc.supplier_id = $suppliers 
+                                   WHERE sc.supplier_id = $suppliers
                                    AND sce.equip_type = '$type'
                                    AND sc.status = 1
                                    LIMIT 1";
         $supplier_contract_result = mysqli_query($conn, $supplier_contract_query);
-        
+
         if ($supplier_contract_result && mysqli_num_rows($supplier_contract_result) > 0) {
             $supplier_contract = mysqli_fetch_assoc($supplier_contract_result);
             $contracted_count = intval($supplier_contract['equip_count']);
-            
+
             // حساب عدد المعدات المضافة حالياً
-            $added_count_query = "SELECT COUNT(*) as added_count 
-                                 FROM equipments 
-                                 WHERE suppliers = $suppliers 
+            $added_count_query = "SELECT COUNT(*) as added_count
+                                 FROM equipments
+                                 WHERE suppliers = $suppliers
                                  AND type = '$type'
                                  AND status = 1";
             $added_count_result = mysqli_query($conn, $added_count_query);
             $added_count_row = mysqli_fetch_assoc($added_count_result);
             $current_added = intval($added_count_row['added_count']);
-            
+
             // التحقق من عدم تجاوز العدد المتعاقد عليه
             if ($current_added >= $contracted_count) {
                 $success_msg = "⚠️ تحذير: تم الوصول للحد الأقصى! العدد المتعاقد عليه: $contracted_count | المضاف حالياً: $current_added. لا يمكن إضافة المزيد من المعدات.";
@@ -250,12 +250,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     if ($edit_id > 0) {
         // تعديل
         $scope_update = ($is_super_admin || !$equipments_has_company) ? "" : " AND company_id = $company_id";
-        $sql = "UPDATE equipments 
-                SET  
-                    suppliers='$suppliers', 
-                    code='$code', 
-                    type='$type', 
-                    name='$name', 
+        $sql = "UPDATE equipments
+                SET
+                    suppliers='$suppliers',
+                    code='$code',
+                    type='$type',
+                    name='$name',
                     status='$status',
                     serial_number='$serial_number',
                     chassis_number='$chassis_number',
@@ -290,17 +290,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         // إضافة
         $insert_company_col = (!$is_super_admin && $equipments_has_company) ? ", company_id" : "";
         $insert_company_val = (!$is_super_admin && $equipments_has_company) ? ", '$company_id'" : "";
-        $sql = "INSERT INTO equipments 
-                (suppliers, code, type, name, status, serial_number, chassis_number, 
-                 manufacturer, model, manufacturing_year, import_year, 
+        $sql = "INSERT INTO equipments
+                (suppliers, code, type, name, status, serial_number, chassis_number,
+                 manufacturer, model, manufacturing_year, import_year,
                  equipment_condition, operating_hours, engine_condition, tires_condition,
                  actual_owner_name, owner_type, owner_phone, owner_supplier_relation,
-                 license_number, license_authority, license_expiry_date, 
+                 license_number, license_authority, license_expiry_date,
                  inspection_certificate_number, last_inspection_date,
                  current_location, availability_status,
                  estimated_value, daily_rental_price, monthly_rental_price, insurance_status,
-             general_notes, last_maintenance_date$insert_company_col) 
-                VALUES 
+             general_notes, last_maintenance_date$insert_company_col)
+                VALUES
                 ('$suppliers', '$code', '$type', '$name', '$status', '$serial_number', '$chassis_number',
                  '$manufacturer', '$model', $manufacturing_year, $import_year,
                  '$equipment_condition', $operating_hours, '$engine_condition', '$tires_condition',
@@ -319,7 +319,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     } else {
         $success_msg = "خطأ في الحفظ: " . mysqli_error($conn);
     }
-    
+
     skip_save:
 }
 
@@ -366,7 +366,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
         </div>
     </div>
 
-    <?php if (!empty($success_msg)): 
+    <?php if (!empty($success_msg)):
         $isSuccess = strpos($success_msg, '✅') !== false;
     ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
@@ -390,7 +390,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <?php if (!empty($editData)) { ?>
                         <input type="hidden" name="edit_id" value="<?php echo isset($editData['id']) ? $editData['id'] : ''; ?>">
                     <?php } ?>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-truck-loading"></i>
@@ -412,16 +412,16 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             ?>
                         </select>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-barcode"></i>
                             كود المعدة <span class="required-indicator">*</span>
                         </label>
-                        <input type="text" name="code" id="code" placeholder="أدخل كود المعدة" 
+                        <input type="text" name="code" id="code" placeholder="أدخل كود المعدة"
                                value="<?php echo isset($editData['code']) ? htmlspecialchars($editData['code']) : ''; ?>" required />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-list-alt"></i>
@@ -441,91 +441,91 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             ?>
                         </select>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-tag"></i>
                             اسم المعدة <span class="required-indicator">*</span>
                         </label>
-                        <input type="text" name="name" id="name" placeholder="أدخل اسم المعدة" 
+                        <input type="text" name="name" id="name" placeholder="أدخل اسم المعدة"
                                value="<?php echo isset($editData['name']) ? htmlspecialchars($editData['name']) : ''; ?>" required />
                     </div>
-                    
+
                     <!-- ================================= -->
                     <!-- قسم: المعلومات الأساسية والتعريفية -->
                     <!-- ================================= -->
                     <div class="form-section-header">
                         <h6><i class="fas fa-id-card"></i> المعلومات الأساسية والتعريفية</h6>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-hashtag"></i>
                             رقم المعدة/الرقم التسلسلي
                         </label>
-                        <input type="text" name="serial_number" id="serial_number" placeholder="مثال: EXC-2024-001" 
+                        <input type="text" name="serial_number" id="serial_number" placeholder="مثال: EXC-2024-001"
                                value="<?php echo isset($editData['serial_number']) ? htmlspecialchars($editData['serial_number']) : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-barcode"></i>
                             رقم الهيكل/الهيكل الأساسي (VIN/Chassis)
                         </label>
-                        <input type="text" name="chassis_number" id="chassis_number" placeholder="مثال: CAT320-ABC123456" 
+                        <input type="text" name="chassis_number" id="chassis_number" placeholder="مثال: CAT320-ABC123456"
                                value="<?php echo isset($editData['chassis_number']) ? htmlspecialchars($editData['chassis_number']) : ''; ?>" />
                     </div>
-                    
+
                     <!-- ================================= -->
                     <!-- قسم: بيانات الصنع والموديل -->
                     <!-- ================================= -->
                     <div class="form-section-header">
                         <h6><i class="fas fa-industry"></i> بيانات الصنع والموديل</h6>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-building"></i>
                             الماركة/الشركة المصنعة
                         </label>
-                        <input type="text" name="manufacturer" id="manufacturer" placeholder="مثال: كاتربيلر، كوماتسو، هيونداي" 
+                        <input type="text" name="manufacturer" id="manufacturer" placeholder="مثال: كاتربيلر، كوماتسو، هيونداي"
                                value="<?php echo isset($editData['manufacturer']) ? htmlspecialchars($editData['manufacturer']) : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-car"></i>
                             الموديل/الطراز
                         </label>
-                        <input type="text" name="model" id="model" placeholder="مثال: 320D, PC200, HD1024" 
+                        <input type="text" name="model" id="model" placeholder="مثال: 320D, PC200, HD1024"
                                value="<?php echo isset($editData['model']) ? htmlspecialchars($editData['model']) : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-calendar"></i>
                             سنة الصنع
                         </label>
-                        <input type="number" name="manufacturing_year" id="manufacturing_year" placeholder="مثال: 2018" min="1950" max="2099" 
+                        <input type="number" name="manufacturing_year" id="manufacturing_year" placeholder="مثال: 2018" min="1950" max="2099"
                                value="<?php echo isset($editData['manufacturing_year']) ? $editData['manufacturing_year'] : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-calendar-plus"></i>
                             سنة الاستيراد/البدء
                         </label>
-                        <input type="number" name="import_year" id="import_year" placeholder="مثال: 2020" min="1950" max="2099" 
+                        <input type="number" name="import_year" id="import_year" placeholder="مثال: 2020" min="1950" max="2099"
                                value="<?php echo isset($editData['import_year']) ? $editData['import_year'] : ''; ?>" />
                     </div>
-                    
+
                     <!-- ================================= -->
                     <!-- قسم: الحالة الفنية والمواصفات -->
                     <!-- ================================= -->
                     <div class="form-section-header">
                         <h6><i class="fas fa-wrench"></i> الحالة الفنية والمواصفات</h6>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-cogs"></i>
@@ -542,16 +542,16 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <option value="مستعملة بكثافة" <?php echo (!empty($editData) && $editData['equipment_condition']=="مستعملة بكثافة") ? "selected" : ""; ?>>مستعملة بكثافة</option>
                         </select>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-clock"></i>
                             ساعات التشغيل (للمعدات الثقيلة)
                         </label>
-                        <input type="number" name="operating_hours" id="operating_hours" placeholder="مثال: 5400 ساعة" min="0" 
+                        <input type="number" name="operating_hours" id="operating_hours" placeholder="مثال: 5400 ساعة" min="0"
                                value="<?php echo isset($editData['operating_hours']) ? $editData['operating_hours'] : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-car-crash"></i>
@@ -565,7 +565,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <option value="محتاجة إصلاح" <?php echo (!empty($editData) && $editData['engine_condition']=="محتاجة إصلاح") ? "selected" : ""; ?>>محتاجة إصلاح</option>
                         </select>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-circle-notch"></i>
@@ -579,23 +579,23 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <option value="محتاجة تبديل" <?php echo (!empty($editData) && $editData['tires_condition']=="محتاجة تبديل") ? "selected" : ""; ?>>محتاجة تبديل</option>
                         </select>
                     </div>
-                    
+
                     <!-- ================================= -->
                     <!-- قسم: بيانات الملكية -->
                     <!-- ================================= -->
                     <div class="form-section-header">
                         <h6><i class="fas fa-user-tie"></i> بيانات الملكية</h6>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-user"></i>
                             اسم المالك الفعلي
                         </label>
-                        <input type="text" name="actual_owner_name" id="actual_owner_name" placeholder="مثال: محمد علي أحمد" 
+                        <input type="text" name="actual_owner_name" id="actual_owner_name" placeholder="مثال: محمد علي أحمد"
                                value="<?php echo isset($editData['actual_owner_name']) ? htmlspecialchars($editData['actual_owner_name']) : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-briefcase"></i>
@@ -609,16 +609,16 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <option value="أخرى" <?php echo (!empty($editData) && $editData['owner_type']=="أخرى") ? "selected" : ""; ?>>أخرى</option>
                         </select>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-phone"></i>
                             رقم هاتف المالك
                         </label>
-                        <input type="text" name="owner_phone" id="owner_phone" placeholder="مثال: +249-9-123-4567" 
+                        <input type="text" name="owner_phone" id="owner_phone" placeholder="مثال: +249-9-123-4567"
                                value="<?php echo isset($editData['owner_phone']) ? htmlspecialchars($editData['owner_phone']) : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-handshake"></i>
@@ -632,75 +632,75 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <option value="غير محدد" <?php echo (!empty($editData) && $editData['owner_supplier_relation']=="غير محدد") ? "selected" : ""; ?>>غير محدد</option>
                         </select>
                     </div>
-                    
+
                     <!-- ================================= -->
                     <!-- قسم: الوثائق والتسجيلات -->
                     <!-- ================================= -->
                     <div class="form-section-header">
                         <h6><i class="fas fa-file-contract"></i> الوثائق والتسجيلات</h6>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-address-card"></i>
                             رقم الترخيص/التسجيل
                         </label>
-                        <input type="text" name="license_number" id="license_number" placeholder="مثال: VEH-2024-12345" 
+                        <input type="text" name="license_number" id="license_number" placeholder="مثال: VEH-2024-12345"
                                value="<?php echo isset($editData['license_number']) ? htmlspecialchars($editData['license_number']) : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-landmark"></i>
                             جهة الترخيص
                         </label>
-                        <input type="text" name="license_authority" id="license_authority" placeholder="مثال: المرور، وزارة النقل" 
+                        <input type="text" name="license_authority" id="license_authority" placeholder="مثال: المرور، وزارة النقل"
                                value="<?php echo isset($editData['license_authority']) ? htmlspecialchars($editData['license_authority']) : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-calendar-times"></i>
                             تاريخ انتهاء الترخيص
                         </label>
-                        <input type="date" name="license_expiry_date" id="license_expiry_date" 
+                        <input type="date" name="license_expiry_date" id="license_expiry_date"
                                value="<?php echo isset($editData['license_expiry_date']) ? $editData['license_expiry_date'] : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-certificate"></i>
                             رقم شهادة الفحص
                         </label>
-                        <input type="text" name="inspection_certificate_number" id="inspection_certificate_number" placeholder="رقم شهادة الفحص الفنية" 
+                        <input type="text" name="inspection_certificate_number" id="inspection_certificate_number" placeholder="رقم شهادة الفحص الفنية"
                                value="<?php echo isset($editData['inspection_certificate_number']) ? htmlspecialchars($editData['inspection_certificate_number']) : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-calendar-check"></i>
                             تاريخ آخر فحص
                         </label>
-                        <input type="date" name="last_inspection_date" id="last_inspection_date" 
+                        <input type="date" name="last_inspection_date" id="last_inspection_date"
                                value="<?php echo isset($editData['last_inspection_date']) ? $editData['last_inspection_date'] : ''; ?>" />
                     </div>
-                    
+
                     <!-- ================================= -->
                     <!-- قسم: الموقع والتوفر -->
                     <!-- ================================= -->
                     <div class="form-section-header">
                         <h6><i class="fas fa-map-marker-alt"></i> الموقع والتوفر</h6>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-location-arrow"></i>
                             الموقع الحالي
                         </label>
-                        <input type="text" name="current_location" id="current_location" placeholder="مثال: منجم الذهب الشرقي، مستودع الخرطوم" 
+                        <input type="text" name="current_location" id="current_location" placeholder="مثال: منجم الذهب الشرقي، مستودع الخرطوم"
                                value="<?php echo isset($editData['current_location']) ? htmlspecialchars($editData['current_location']) : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-traffic-light"></i>
@@ -716,41 +716,41 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <option value="مبيعة/مسحوبة" <?php echo (!empty($editData) && $editData['availability_status']=="مبيعة/مسحوبة") ? "selected" : ""; ?>>مبيعة/مسحوبة</option>
                         </select>
                     </div>
-                    
+
                     <!-- ================================= -->
                     <!-- قسم: البيانات المالية والقيمة -->
                     <!-- ================================= -->
                     <div class="form-section-header">
                         <h6><i class="fas fa-dollar-sign"></i> البيانات المالية والقيمة</h6>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-money-bill-wave"></i>
                             القيمة المقدرة للمعدة (بالدولار)
                         </label>
-                        <input type="number" name="estimated_value" id="estimated_value" placeholder="مثال: 150000" min="0" step="0.01" 
+                        <input type="number" name="estimated_value" id="estimated_value" placeholder="مثال: 150000" min="0" step="0.01"
                                value="<?php echo isset($editData['estimated_value']) ? $editData['estimated_value'] : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-calendar-day"></i>
                             سعر التأجير اليومي (بالدولار)
                         </label>
-                        <input type="number" name="daily_rental_price" id="daily_rental_price" placeholder="مثال: 500" min="0" step="0.01" 
+                        <input type="number" name="daily_rental_price" id="daily_rental_price" placeholder="مثال: 500" min="0" step="0.01"
                                value="<?php echo isset($editData['daily_rental_price']) ? $editData['daily_rental_price'] : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-calendar-alt"></i>
                             سعر التأجير الشهري (بالدولار)
                         </label>
-                        <input type="number" name="monthly_rental_price" id="monthly_rental_price" placeholder="مثال: 10000" min="0" step="0.01" 
+                        <input type="number" name="monthly_rental_price" id="monthly_rental_price" placeholder="مثال: 10000" min="0" step="0.01"
                                value="<?php echo isset($editData['monthly_rental_price']) ? $editData['monthly_rental_price'] : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-shield-alt"></i>
@@ -764,14 +764,14 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <option value="جاري التأمين" <?php echo (!empty($editData) && $editData['insurance_status']=="جاري التأمين") ? "selected" : ""; ?>>جاري التأمين</option>
                         </select>
                     </div>
-                    
+
                     <!-- ================================= -->
                     <!-- قسم: ملاحظات وسجل الصيانة -->
                     <!-- ================================= -->
                     <div class="form-section-header">
                         <h6><i class="fas fa-tools"></i> ملاحظات وسجل الصيانة</h6>
                     </div>
-                    
+
                     <div class="form-grid-full">
                         <label>
                             <i class="fas fa-comment-alt"></i>
@@ -779,16 +779,16 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         </label>
                         <textarea name="general_notes" id="general_notes" rows="3" placeholder="مثال: معدة موثوقة، تحتاج إلى صيانة دورية كل 3 أشهر"><?php echo isset($editData['general_notes']) ? htmlspecialchars($editData['general_notes']) : ''; ?></textarea>
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-wrench"></i>
                             تاريخ آخر صيانة
                         </label>
-                        <input type="date" name="last_maintenance_date" id="last_maintenance_date" 
+                        <input type="date" name="last_maintenance_date" id="last_maintenance_date"
                                value="<?php echo isset($editData['last_maintenance_date']) ? $editData['last_maintenance_date'] : ''; ?>" />
                     </div>
-                    
+
                     <div>
                         <label>
                             <i class="fas fa-toggle-on"></i>
@@ -800,7 +800,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <option value="0" <?php echo (!empty($editData) && $editData['status']=="0") ? "selected" : ""; ?>>مشغولة</option>
                         </select>
                     </div>
-                    
+
                     <div class="form-actions">
                         <button type="submit">
                             <i class="fas fa-save"></i>
@@ -834,7 +834,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         <i class="fas fa-times-circle"></i> إلغاء الفلاتر
                     </button>
                 </div>
-                
+
                 <div class="filters-grid">
                     <div class="filter-item">
                         <label><i class="fas fa-truck-loading"></i> فلترة بالمورد</label>
@@ -853,7 +853,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             ?>
                         </select>
                     </div>
-                    
+
                     <div class="filter-item">
                         <label><i class="fas fa-list-alt"></i> فلترة بالنوع</label>
                         <select id="filterType" class="filter-select">
@@ -867,7 +867,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             ?>
                         </select>
                     </div>
-                    
+
                     <div class="filter-item">
                         <label><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
                         <select id="filterStatus" class="filter-select">
@@ -876,7 +876,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <option value="غير نشط">غير نشط</option>
                         </select>
                     </div>
-                    
+
                     <div class="filter-item">
                         <label><i class="fas fa-traffic-light"></i> فلترة بالتوفر</label>
                         <select id="filterAvailability" class="filter-select">
@@ -888,13 +888,13 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="filters-summary" id="filtersSummary" style="display: none;">
                     <span class="summary-icon"><i class="fas fa-check-circle"></i></span>
                     <span class="summary-text"></span>
                 </div>
             </div>
-            
+
             <!-- أزرار إظهار/إخفاء المجموعات -->
             <div class="column-groups-toggle">
                 <button type="button" class="toggle-group-btn active" data-group="basic" title="المعلومات الأساسية">
@@ -919,7 +919,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     <i class="fas fa-eye"></i> الكل
                 </button>
             </div>
-            
+
             <table id="projectsTable" class="display nowrap">
                 <thead>
                     <tr>
@@ -951,12 +951,12 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     }
 
                     $query2 = "
-                        SELECT 
-                            m.id, 
-                            s.name AS supplier_name, 
-                            m.type, 
-                            m.code, 
-                            m.name, 
+                        SELECT
+                            m.id,
+                            s.name AS supplier_name,
+                            m.type,
+                            m.code,
+                            m.name,
                             m.status,
                             m.serial_number,
                             m.model,
@@ -964,18 +964,18 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             m.equipment_condition,
                             m.actual_owner_name,
                             m.availability_status,
-                            o.project_id, 
+                            o.project_id,
                             o.status AS operation_status,
                             COUNT(DISTINCT d.id) AS drivers_count
                         FROM equipments m
                         JOIN suppliers s ON m.suppliers = s.id
-                        LEFT JOIN operations o 
-                            ON o.equipment = m.id 
+                        LEFT JOIN operations o
+                            ON o.equipment = m.id
                             AND o.status = '1'
-                        LEFT JOIN equipment_drivers ed 
+                        LEFT JOIN equipment_drivers ed
                             ON ed.equipment_id = m.id
-                        LEFT JOIN drivers d 
-                            ON d.id = ed.driver_id 
+                        LEFT JOIN drivers d
+                            ON d.id = ed.driver_id
                             AND ed.status = '1'
                         WHERE $equipment_scope_where
                         GROUP BY m.id
@@ -988,7 +988,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         echo "<td><strong>" . $i++ . "</strong></td>";
                         echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
                         echo "<td><span class='mono code-badge'>" . htmlspecialchars($row['code']) . "</span></td>";
-                        
+
                         // رقم تسلسلي
                         $serial = !empty($row['serial_number'])
                             ? "<span class='mono'>" . htmlspecialchars($row['serial_number']) . "</span>"
@@ -1001,8 +1001,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         echo "<td><span class='badge-type'><i class='fas $type_icon'></i> $type_text</span></td>";
 
                         // اسم المعدة (تهيئة المتغير)
-                        $name_display = "<strong>" . htmlspecialchars($row['name']) . "</strong>";
-                        
+                        $name_display = "<a class='client-name-link' href='equipment_profile.php?id=" . intval($row['id']) . "'><strong>" . htmlspecialchars($row['name']) . "</strong></a>";
+
                         // المشروع النشط
                         if (!empty($row['project'])) {
                             $p_res = mysqli_query($conn, "SELECT name FROM project WHERE id='" . $row['project'] . "'");
@@ -1022,19 +1022,19 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         // الموديل
                         $model = !empty($row['model']) ? htmlspecialchars($row['model']) : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $model . "</td>";
-                        
+
                         // سنة الصنع
                         $manufacturing_year = !empty($row['manufacturing_year']) ? $row['manufacturing_year'] : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $manufacturing_year . "</td>";
-                        
+
                         // حالة المعدة
                         $equipment_condition = !empty($row['equipment_condition']) ? htmlspecialchars($row['equipment_condition']) : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $equipment_condition . "</td>";
-                        
+
                         // المالك
                         $owner = !empty($row['actual_owner_name']) ? htmlspecialchars($row['actual_owner_name']) : "<span class='text-muted'>غير محدد</span>";
                         echo "<td>" . $owner . "</td>";
-                        
+
                         // التوفر
                         $availability = !empty($row['availability_status']) ? htmlspecialchars($row['availability_status']) : "متاحة للعمل";
                         echo "<td>" . $availability . "</td>";
@@ -1264,7 +1264,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     "url": "https:/ems/assets/i18n/datatables/ar.json"
                 }
             });
-            
+
             // نظام إظهار/إخفاء المجموعات
             var columnGroups = {
                 'basic': [0, 1, 2, 4, 5],        // #، المورد، كود المعدة، النوع، الاسم
@@ -1274,7 +1274,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 'ownership': [9],                 // المالك
                 'status': [11, 12]                // الحالة، الإجراءات
             };
-            
+
             // حفظ حالة المجموعات (الصنع والفنية مخفيتين بشكل افتراضي)
             var groupsState = {
                 'basic': true,
@@ -1284,7 +1284,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 'ownership': true,
                 'status': true
             };
-            
+
             // إخفاء الأعمدة المخفية بشكل افتراضي عند التحميل
             columnGroups['manufacturing'].forEach(function(colIndex) {
                 table.column(colIndex).visible(false);
@@ -1292,7 +1292,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
             columnGroups['technical'].forEach(function(colIndex) {
                 table.column(colIndex).visible(false);
             });
-            
+
             // نظام الفلترة الاحترافي
             var activeFilters = {
                 supplier: '',
@@ -1300,7 +1300,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 status: '',
                 availability: ''
             };
-            
+
             // تهيئة الفلاتر
             $('#filterSupplier, #filterType, #filterStatus, #filterAvailability').on('change', function() {
                 var filterType = $(this).attr('id').replace('filter', '').toLowerCase();
@@ -1308,7 +1308,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 applyFilters();
                 updateFiltersSummary();
             });
-            
+
             // تطبيق الفلاتر
             function applyFilters() {
                 $.fn.dataTable.ext.search.push(
@@ -1317,47 +1317,47 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         // data[4] = النوع (يحتوي على نص مثل "حفار" أو "قلاب")
                         // data[11] = الحالة (يحتوي على "نشط" أو "غير نشط")
                         // data[10] = التوفر
-                        
+
                         var supplierMatch = true;
                         var typeMatch = true;
                         var statusMatch = true;
                         var availabilityMatch = true;
-                        
+
                         // فلترة المورد
                         if (activeFilters.supplier !== '') {
                             supplierMatch = data[1].indexOf(activeFilters.supplier) !== -1;
                         }
-                        
+
                         // فلترة النوع
                         if (activeFilters.type !== '') {
                             typeMatch = data[4].indexOf(activeFilters.type) !== -1;
                         }
-                        
+
                         // فلترة الحالة
                         if (activeFilters.status !== '') {
                             statusMatch = data[11].indexOf(activeFilters.status) !== -1;
                         }
-                        
+
                         // فلترة التوفر
                         if (activeFilters.availability !== '') {
                             availabilityMatch = data[10].indexOf(activeFilters.availability) !== -1;
                         }
-                        
+
                         return supplierMatch && typeMatch && statusMatch && availabilityMatch;
                     }
                 );
-                
+
                 table.draw();
-                
+
                 // إزالة دالة البحث بعد التطبيق لتجنب التكرار
                 $.fn.dataTable.ext.search.pop();
             }
-            
+
             // تحديث ملخص الفلاتر
             function updateFiltersSummary() {
                 var activeCount = 0;
                 var summaryParts = [];
-                
+
                 if (activeFilters.supplier) {
                     activeCount++;
                     summaryParts.push('المورد: ' + activeFilters.supplier);
@@ -1374,7 +1374,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     activeCount++;
                     summaryParts.push('التوفر: ' + activeFilters.availability);
                 }
-                
+
                 var $summary = $('#filtersSummary');
                 if (activeCount > 0) {
                     $summary.find('.summary-text').text(
@@ -1385,7 +1385,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     $summary.slideUp(300);
                 }
             }
-            
+
             // إلغاء جميع الفلاتر
             $('#clearFiltersBtn').on('click', function() {
                 activeFilters = {
@@ -1394,42 +1394,42 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     status: '',
                     availability: ''
                 };
-                
+
                 $('#filterSupplier, #filterType, #filterStatus, #filterAvailability').val('');
                 applyFilters();
                 updateFiltersSummary();
-                
+
                 // تأثير بصري
                 $(this).addClass('btn-clear-active');
                 setTimeout(function() {
                     $('#clearFiltersBtn').removeClass('btn-clear-active');
                 }, 300);
             });
-            
+
             // وظيفة إظهار/إخفاء مجموعة
             function toggleGroup(groupName) {
                 var columns = columnGroups[groupName];
                 var isVisible = groupsState[groupName];
-                
+
                 columns.forEach(function(colIndex) {
                     table.column(colIndex).visible(!isVisible);
                 });
-                
+
                 groupsState[groupName] = !isVisible;
             }
-            
+
             // معالج النقر على أزرار المجموعات
             $('.toggle-group-btn').on('click', function() {
                 var groupName = $(this).data('group');
                 toggleGroup(groupName);
                 $(this).toggleClass('active');
             });
-            
+
             // زر إظهار/إخفاء الكل
             var allVisible = true;
             $('.toggle-all-btn').on('click', function() {
                 allVisible = !allVisible;
-                
+
                 Object.keys(columnGroups).forEach(function(groupName) {
                     var columns = columnGroups[groupName];
                     columns.forEach(function(colIndex) {
@@ -1437,7 +1437,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     });
                     groupsState[groupName] = allVisible;
                 });
-                
+
                 if (allVisible) {
                     $('.toggle-group-btn').addClass('active');
                     $(this).html('<i class="fas fa-eye"></i> الكل');
@@ -1465,13 +1465,13 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 }
             });
         }
-        
+
         // تحميل بيانات التعديل عند تحميل الصفحة
         <?php if (!empty($editData)) { ?>
         $(document).ready(function() {
             // عرض الفورم
             $('#projectForm').addClass('allforms-visible');
-            
+
             // التمرير للفورم
             $('html, body').animate({
                 scrollTop: $('#projectForm').offset().top - 100
@@ -1605,7 +1605,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 }
             });
         }
-        
+
         // Toggle Form Functionality
     })();
 </script>
@@ -1635,11 +1635,11 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         <i class="fas fa-upload" style="color:#e8b800; margin-left:6px;"></i>
                         اختر ملف Excel أو CSV
                     </label>
-                    <input type="file" 
-                           id="excel_file" 
-                           name="excel_file" 
-                           accept=".xlsx,.xls,.csv" 
-                           required 
+                    <input type="file"
+                           id="excel_file"
+                           name="excel_file"
+                           accept=".xlsx,.xls,.csv"
+                           required
                            style="width:100%; padding:14px; border:2px dashed #cbd5e1; border-radius:10px; font-size:0.95rem; cursor:pointer; transition:all 0.3s; background:#f8fafc;">
                 </div>
 
@@ -1669,12 +1669,12 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 
                 <!-- أزرار التحكم -->
                 <div style="display:flex; gap:12px; justify-content:flex-end;">
-                    <button type="button" 
-                            onclick="closeImportModal()" 
+                    <button type="button"
+                            onclick="closeImportModal()"
                             style="padding:12px 28px; border:2px solid #e2e8f0; background:white; color:#64748b; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.3s; font-size:0.95rem;">
                         <i class="fas fa-times"></i> إلغاء
                     </button>
-                    <button type="submit" 
+                    <button type="submit"
                             style="padding:12px 28px; background:linear-gradient(135deg, #16a34a 0%, #059669 100%); color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.3s; box-shadow:0 2px 8px rgba(22,163,74,0.25); font-size:0.95rem;">
                         <i class="fas fa-file-import"></i> رفع واستيراد
                     </button>
@@ -1824,13 +1824,13 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 }
 
 @keyframes slideDown {
-    from { 
-        opacity: 0; 
-        transform: translateY(-10px); 
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
     }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -1839,13 +1839,13 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
     .filters-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .filters-header {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
     }
-    
+
     .btn-clear-filters {
         width: 100%;
         justify-content: center;
@@ -1997,6 +1997,3 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 </div> <!-- closing main div -->
 </body>
 </html>
-
-
-

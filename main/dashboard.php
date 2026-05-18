@@ -103,8 +103,22 @@ if ($dashboardRole=="0"||$dashboardRole=="1") {
 } elseif ($dashboardRole=="3") {
   $s=dashboard_scalar($conn,"SELECT COUNT(DISTINCT s.id) AS t FROM suppliers s WHERE company_id=$companyId",'t');
   $eq=dashboard_scalar($conn,"SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE company_id=$companyId",'t');
-  $ao=dashboard_scalar($conn,"SELECT COUNT(*) AS t FROM operations WHERE status='1' AND company_id=$companyId AND $so",'t');
-  $bo=dashboard_scalar($conn,"SELECT COUNT(*) AS t FROM equipments WHERE status='3' AND company_id=$companyId",'t');
+  $stopListRole3="'معطلة','معطلة مؤقتاً','تحت الصيانة','في الصيانة','موقوفة للصيانة','متوقفة','موقوفة','مبيعة/مسحوبة'";
+
+  // تعمل الآن = معدات ليست في حالات التعطل/الصيانة (مع دعم البيانات القديمة)
+  $ao=dashboard_scalar(
+    $conn,
+    "SELECT COUNT(DISTINCT e.id) AS t
+     FROM equipments e
+     WHERE e.company_id=$companyId" .
+     ($hasAvail
+        ? " AND (e.availability_status IS NULL OR e.availability_status='' OR e.availability_status NOT IN($stopListRole3))"
+        : " AND (e.status='1' OR e.status=1)"),
+    't'
+  );
+
+  // نجعل المعادلة متسقة دائمًا: المعطلة = إجمالي المعدات - التي تعمل الآن
+  $bo=max(0, intval($eq) - intval($ao));
   $stats=[['fa-tools',$eq,'إجمالي المعدات','or'],['fa-play-circle',$ao,'تعمل الآن','ok'],['fa-exclamation-triangle',$bo,'معطلة','err'],['fa-truck',$s,'الموردون','or']];
 } elseif ($dashboardRole=="4") {
   $dr=dashboard_scalar($conn,"SELECT COUNT(DISTINCT d.id) AS t FROM drivers d WHERE company_id=$companyId",'t');
