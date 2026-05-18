@@ -144,14 +144,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
             if ($eq_id <= 0) {
                 $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-                echo "<script>alert('❌ لا يمكن تحديد الآلية المرتبطة بهذا السجل'); window.location.href='move_oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+                echo "<script>alert('❌ لا يمكن تحديد الآلية المرتبطة بهذا السجل'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
                 exit();
             }
             // التحقق من عدم وجود سجل ساري آخر لنفس المعدة
             $conflict_res = mysqli_query($conn, "SELECT id FROM operations WHERE equipment = $eq_id AND status = 1 AND id != $operation_id LIMIT 1");
             if ($conflict_res && mysqli_num_rows($conflict_res) > 0) {
                 $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-                echo "<script>alert('❌ لا يمكن إعادة تشغيل المعدة وهي تعمل بالفعل في سجل آخر'); window.location.href='move_oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+                echo "<script>alert('❌ لا يمكن إعادة تشغيل المعدة وهي تعمل بالفعل في سجل آخر'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
                 exit();
             }
         }
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         if ($update_result) {
             $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-            echo "<script>alert('✅ تم تحديث الحالة بنجاح'); window.location.href='move_oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+            echo "<script>alert('✅ تم تحديث الحالة بنجاح'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
             exit();
         }
 
@@ -247,7 +247,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                     $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
                     if (!empty($approval_result['success'])) {
-                        echo "<script>alert('✅ " . addslashes($approval_result['message']) . "'); window.location.href='move_oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+                        echo "<script>alert('✅ " . addslashes($approval_result['message']) . "'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
                         exit();
                     }
 
@@ -262,13 +262,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'end_service') {
     if (!$can_edit) {
         $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-        echo "<script>alert('❌ ليس لديك صلاحية إنهاء الخدمة'); window.location.href='move_oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+        echo "<script>alert('❌ ليس لديك صلاحية إنهاء الخدمة'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
         exit();
     }
 
     if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10") {
         $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-        echo "<script>alert('❌ ليس لديك صلاحية لإنهاء الخدمة'); window.location.href='move_oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+        echo "<script>alert('❌ ليس لديك صلاحية لإنهاء الخدمة'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
         exit();
     }
 
@@ -298,7 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         if ($update_result) {
             // الحفاظ على المشروع المحدد بعد إنهاء الخدمة
             $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-            echo "<script>alert('✅ تم إنهاء الخدمة بنجاح'); window.location.href='move_oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
+            echo "<script>alert('✅ تم إنهاء الخدمة بنجاح'); window.location.href='oprators.php" . ($redirect_project ? "?project_id=$redirect_project" : "") . "';</script>";
             exit();
         } else {
             echo "<script>alert('❌ خطأ في إنهاء الخدمة: " . mysqli_error($conn) . "');</script>";
@@ -312,7 +312,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) {
         $redirect_project = isset($_SESSION['operations_project_id']) ? $_SESSION['operations_project_id'] : '';
-        header("Location: move_oprators.php" . ($redirect_project ? "?project_id=$redirect_project&msg=" : "?msg=") . "لا+توجد+صلاحية+حذف+التشغيل+❌");
+        header("Location: oprators.php" . ($redirect_project ? "?project_id=$redirect_project&msg=" : "?msg=") . "لا+توجد+صلاحية+حذف+التشغيل+❌");
         exit();
     }
 
@@ -320,10 +320,10 @@ if (isset($_GET['delete_id'])) {
     if ($delete_id > 0) {
         $delete_sql = "DELETE FROM operations WHERE id = $delete_id AND project_id = $selected_project_id$operations_company_scope";
         if (mysqli_query($conn, $delete_sql)) {
-            header("Location: move_oprators.php?project_id=$selected_project_id&msg=تم+حذف+التشغيل+بنجاح+✅");
+            header("Location: oprators.php?project_id=$selected_project_id&msg=تم+حذف+التشغيل+بنجاح+✅");
             exit();
         }
-        header("Location: move_oprators.php?project_id=$selected_project_id&msg=حدث+خطأ+أثناء+الحذف+❌");
+        header("Location: oprators.php?project_id=$selected_project_id&msg=حدث+خطأ+أثناء+الحذف+❌");
         exit();
     }
 }
@@ -822,11 +822,11 @@ include('../insidebar.php');
                                 $operation_id = isset($_POST['operation_id']) ? intval($_POST['operation_id']) : 0;
 
                                 if ($operation_id > 0 && !$can_edit) {
-                                    echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
+                                    echo "<script>alert('❌ ليس لديك صلاحية تعديل التشغيل'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                                     exit();
                                 }
                                 if ($operation_id === 0 && !$can_add) {
-                                    echo "<script>alert('❌ ليس لديك صلاحية إضافة تشغيل جديد'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
+                                    echo "<script>alert('❌ ليس لديك صلاحية إضافة تشغيل جديد'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                                     exit();
                                 }
 
@@ -853,7 +853,7 @@ include('../insidebar.php');
                                     $exclude_id = $operation_id > 0 ? " AND id != $operation_id" : "";
                                     $conflict_check = mysqli_query($conn, "SELECT id FROM operations WHERE equipment = $equipment AND status = 1$exclude_id LIMIT 1");
                                     if ($conflict_check && mysqli_num_rows($conflict_check) > 0) {
-                                        echo "<script>alert('❌ لا يمكن تشغيل المعدة وهي تعمل بالفعل في تشغيل آخر'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
+                                        echo "<script>alert('❌ لا يمكن تشغيل المعدة وهي تعمل بالفعل في تشغيل آخر'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                                         exit();
                                     }
                                 }
@@ -877,14 +877,14 @@ include('../insidebar.php');
                                     status = '$status_escaped'
                                         WHERE id = $operation_id AND project_id = '$project_id'$operations_company_scope";
                                     mysqli_query($conn, $sql);
-                                    echo "<script>alert('✅ تم التحديث بنجاح'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
+                                    echo "<script>alert('✅ تم التحديث بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                                 } else {
                                     // إضافة سجل جديد
                                     $insert_company_col = (!$is_super_admin && $operations_has_company) ? ", company_id" : "";
                                     $insert_company_val = (!$is_super_admin && $operations_has_company) ? ", '$company_id'" : "";
                                      mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, shift_type, status$insert_company_col)
                                          VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$shift_type_escaped', '$status_escaped'$insert_company_val)");
-                                    echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='move_oprators.php?project_id=$selected_project_id';</script>";
+                                    echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                                 }
                             }
 
@@ -999,7 +999,7 @@ include('../insidebar.php');
                                                                 data-shift-type='" . htmlspecialchars($row['shift_type'] ?? 'B', ENT_QUOTES) . "'
                                                                  data-status='" . $row['status'] . "'
                                                                  title='تعديل'><i class='fa fa-edit'></i></a>" : "") . "
-                                                            " . ($can_delete ? "<a href='move_oprators.php?project_id=" . $selected_project_id . "&delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف التشغيل؟\")' title='حذف'>
+                                                            " . ($can_delete ? "<a href='oprators.php?project_id=" . $selected_project_id . "&delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف التشغيل؟\")' title='حذف'>
                                                                 <i class='fa fa-trash'></i>
                                                             </a>" : "") . "
                                                                 </div>

@@ -2,7 +2,7 @@
 /**
  * ملف الأمان المركزي - EMS Security Core
  * يحتوي على جميع الوظائف الأمنية للنظام
- * 
+ *
  * @version 2.0
  * @date 2026-03-01
  */
@@ -90,11 +90,11 @@ function secure_session_start() {
     if (session_status() === PHP_SESSION_ACTIVE) {
         return true;
     }
-    
+
     // إعدادات أمان الجلسة
-    $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || 
+    $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
               (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
-    
+
     // تكوين cookie الجلسة
     $cookieParams = [
         'lifetime' => 0,              // تنتهي عند إغلاق المتصفح
@@ -104,9 +104,9 @@ function secure_session_start() {
         'httponly' => true,           // لا يمكن الوصول عبر JavaScript
         'samesite' => 'Strict'        // حماية من CSRF
     ];
-    
+
     session_set_cookie_params($cookieParams);
-    
+
     // إعدادات أمان إضافية
     ini_set('session.use_strict_mode', 1);           // رفض session IDs غير معروفة
     ini_set('session.use_only_cookies', 1);          // استخدام cookies فقط
@@ -116,10 +116,10 @@ function secure_session_start() {
     ini_set('session.cookie_samesite', 'Strict');
     ini_set('session.sid_length', 48);               // طول أكبر لـ session ID
     ini_set('session.sid_bits_per_character', 6);
-    
+
     // بدء الجلسة
     session_start();
-    
+
     // تجديد session ID بشكل دوري للحماية من Session Fixation
     if (!isset($_SESSION['created_at'])) {
         session_regenerate_id(true);
@@ -128,13 +128,13 @@ function secure_session_start() {
         session_regenerate_id(true);
         $_SESSION['created_at'] = time();
     }
-    
+
     // تحقق من انتهاء الجلسة (Session Timeout)
     check_session_timeout();
-    
+
     // التحقق من IP و User Agent للحماية من Session Hijacking
     validate_session_fingerprint();
-    
+
     return true;
 }
 
@@ -143,20 +143,20 @@ function secure_session_start() {
  */
 function check_session_timeout() {
     $timeout = 3600; // 60 دقيقة بدون نشاط
-    
+
     if (isset($_SESSION['last_activity'])) {
         $elapsed = time() - $_SESSION['last_activity'];
-        
+
         if ($elapsed > $timeout) {
             session_unset();
             session_destroy();
-            
+
             // إعادة توجيه لصفحة تسجيل الدخول
             header("Location: " . get_auth_login_path() . "?timeout=1");
             exit();
         }
     }
-    
+
     $_SESSION['last_activity'] = time();
 }
 
@@ -184,11 +184,11 @@ function validate_session_fingerprint() {
     $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
     $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
 
-    $fingerprint = hash('sha256', 
-        $userAgent . 
+    $fingerprint = hash('sha256',
+        $userAgent .
         $remoteAddr
     );
-    
+
     if (isset($_SESSION['fingerprint'])) {
         if ($_SESSION['fingerprint'] !== $fingerprint) {
             // محاولة اختراق - تدمير الجلسة
@@ -213,17 +213,17 @@ function generate_csrf_token() {
     if (!isset($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
-    
+
     if (!isset($_SESSION['csrf_token_time'])) {
         $_SESSION['csrf_token_time'] = time();
     }
-    
+
     // تجديد التوكن كل ساعة
     if (time() - $_SESSION['csrf_token_time'] > 3600) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         $_SESSION['csrf_token_time'] = time();
     }
-    
+
     return $_SESSION['csrf_token'];
 }
 
@@ -234,7 +234,7 @@ function verify_csrf_token($token) {
     if (!isset($_SESSION['csrf_token']) || empty($token)) {
         return false;
     }
-    
+
     return hash_equals($_SESSION['csrf_token'], $token);
 }
 
@@ -329,17 +329,17 @@ function validate_integer($value, $min = null, $max = null) {
     if (!is_numeric($value) || intval($value) != $value) {
         return false;
     }
-    
+
     $value = intval($value);
-    
+
     if ($min !== null && $value < $min) {
         return false;
     }
-    
+
     if ($max !== null && $value > $max) {
         return false;
     }
-    
+
     return true;
 }
 
@@ -356,7 +356,7 @@ function validate_length($text, $min = 0, $max = PHP_INT_MAX) {
  */
 function sanitize_input($data, $type = 'string') {
     $data = trim($data);
-    
+
     switch ($type) {
         case 'int':
             return intval($data);
@@ -385,7 +385,7 @@ function db_escape($conn, $data) {
             return db_escape($conn, $item);
         }, $data);
     }
-    
+
     return mysqli_real_escape_string($conn, $data);
 }
 
@@ -394,12 +394,12 @@ function db_escape($conn, $data) {
  */
 function db_query($conn, $query, $params = [], $types = '') {
     $stmt = mysqli_prepare($conn, $query);
-    
+
     if (!$stmt) {
         error_log("Database prepare error: " . mysqli_error($conn));
         return false;
     }
-    
+
     if (!empty($params)) {
         // تخمين أنواع البيانات تلقائياً إذا لم تُحدد
         if (empty($types)) {
@@ -412,12 +412,12 @@ function db_query($conn, $query, $params = [], $types = '') {
                 }
             }
         }
-        
+
         mysqli_stmt_bind_param($stmt, $types, ...$params);
     }
-    
+
     mysqli_stmt_execute($stmt);
-    
+
     return $stmt;
 }
 
@@ -433,24 +433,24 @@ function set_security_headers() {
         return;
     }
 
-    // منع الصفحة من العرض في iframe (Clickjacking Protection)
-    header("X-Frame-Options: DENY");
-    
+    // السماح فقط بعرض الصفحات داخل نفس الأصل حتى تعمل الصفحة الموحدة
+    header("X-Frame-Options: SAMEORIGIN");
+
     // منع المتصفح من تخمين نوع الملف (MIME-type sniffing)
     header("X-Content-Type-Options: nosniff");
-    
+
     // تفعيل XSS Filter في المتصفح
     header("X-XSS-Protection: 1; mode=block");
-    
+
     // Content Security Policy - حماية شاملة من XSS
-    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self';");
-    
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'self';");
+
     // Referrer Policy - التحكم في معلومات الإحالة
     header("Referrer-Policy: strict-origin-when-cross-origin");
-    
+
     // Permissions Policy - تقييد الميزات الخطرة
     header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
-    
+
     // Strict Transport Security (HSTS) - إجبار HTTPS
     if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) {
         header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
@@ -476,13 +476,13 @@ function require_login() {
  */
 function require_role($allowed_roles) {
     require_login();
-    
+
     if (!is_array($allowed_roles)) {
         $allowed_roles = [$allowed_roles];
     }
-    
+
     $user_role = $_SESSION['user']['role'] ?? null;
-    
+
     if (!in_array($user_role, $allowed_roles) && $user_role != '-1') { // -1 = مدير النظام
         $dashboardUrl = ems_url('main/dashboard.php');
         die('
@@ -515,15 +515,15 @@ function require_role($allowed_roles) {
  */
 function check_ownership($resource_id, $user_field = 'project_id') {
     require_login();
-    
+
     $user_value = $_SESSION['user'][$user_field] ?? null;
     $user_role = $_SESSION['user']['role'] ?? null;
-    
+
     // المدير يمكنه الوصول لكل شيء
     if ($user_role == '-1') {
         return true;
     }
-    
+
     if ($user_value != $resource_id) {
         $dashboardUrl = ems_url('main/dashboard.php');
         die('
@@ -549,7 +549,7 @@ function check_ownership($resource_id, $user_field = 'project_id') {
             </html>
         ');
     }
-    
+
     return true;
 }
 
@@ -562,14 +562,14 @@ function check_ownership($resource_id, $user_field = 'project_id') {
  */
 function check_rate_limit($action, $max_attempts = 10, $time_window = 60) {
     $key = 'rate_limit_' . $action . '_' . $_SERVER['REMOTE_ADDR'];
-    
+
     if (!isset($_SESSION[$key])) {
         $_SESSION[$key] = [
             'count' => 0,
             'start_time' => time()
         ];
     }
-    
+
     // إعادة تعيين العداد إذا انتهى الوقت
     if (time() - $_SESSION[$key]['start_time'] > $time_window) {
         $_SESSION[$key] = [
@@ -577,9 +577,9 @@ function check_rate_limit($action, $max_attempts = 10, $time_window = 60) {
             'start_time' => time()
         ];
     }
-    
+
     $_SESSION[$key]['count']++;
-    
+
     if ($_SESSION[$key]['count'] > $max_attempts) {
         header('HTTP/1.1 429 Too Many Requests');
         die('
@@ -615,18 +615,18 @@ function check_rate_limit($action, $max_attempts = 10, $time_window = 60) {
 function log_security_event($event_type, $details = '') {
     $log_file = __DIR__ . '/../logs/security.log';
     $log_dir = dirname($log_file);
-    
+
     // إنشاء مجلد logs إذا لم يكن موجوداً
     if (!is_dir($log_dir)) {
         mkdir($log_dir, 0755, true);
     }
-    
+
     $timestamp = date('Y-m-d H:i:s');
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
     $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'UNKNOWN';
     $user_id = $_SESSION['user']['id'] ?? 'GUEST';
     $username = $_SESSION['user']['username'] ?? 'GUEST';
-    
+
     $log_entry = sprintf(
         "[%s] [%s] IP: %s | User: %s (%s) | Event: %s | Details: %s | UA: %s\n",
         $timestamp,
@@ -638,7 +638,7 @@ function log_security_event($event_type, $details = '') {
         $details,
         $user_agent
     );
-    
+
     error_log($log_entry, 3, $log_file);
 }
 
@@ -651,26 +651,26 @@ function log_security_event($event_type, $details = '') {
  */
 function validate_file_upload($file, $allowed_types = [], $max_size = 2097152) { // 2MB default
     $errors = [];
-    
+
     // التحقق من وجود أخطاء في الرفع
     if ($file['error'] !== UPLOAD_ERR_OK) {
         $errors[] = 'حدث خطأ أثناء رفع الملف';
         return ['valid' => false, 'errors' => $errors];
     }
-    
+
     // التحقق من الحجم
     if ($file['size'] > $max_size) {
         $errors[] = 'حجم الملف كبير جداً. الحد الأقصى: ' . ($max_size / 1024 / 1024) . 'MB';
     }
-    
+
     // التحقق من نوع الملف
     $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     $file_mime = mime_content_type($file['tmp_name']);
-    
+
     if (!empty($allowed_types) && !in_array($file_ext, $allowed_types)) {
         $errors[] = 'نوع الملف غير مسموح. الأنواع المسموحة: ' . implode(', ', $allowed_types);
     }
-    
+
     // التحقق من المحتوى الفعلي للملف (ليس فقط الامتداد)
     $allowed_mimes = [
         'jpg' => 'image/jpeg',
@@ -683,15 +683,15 @@ function validate_file_upload($file, $allowed_types = [], $max_size = 2097152) {
         'xls' => 'application/vnd.ms-excel',
         'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ];
-    
+
     if (isset($allowed_mimes[$file_ext]) && $file_mime !== $allowed_mimes[$file_ext]) {
         $errors[] = 'محتوى الملف لا يطابق امتداده';
     }
-    
+
     if (!empty($errors)) {
         return ['valid' => false, 'errors' => $errors];
     }
-    
+
     return ['valid' => true, 'ext' => $file_ext, 'mime' => $file_mime];
 }
 
@@ -722,6 +722,3 @@ generate_csrf_token();
 // ═══════════════════════════════════════════════════════════════════════════
 // END OF SECURITY FILE
 // ═══════════════════════════════════════════════════════════════════════════
-
-
-

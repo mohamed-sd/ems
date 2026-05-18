@@ -604,6 +604,7 @@ include('../insidebar.php');
            <?php if ($can_add): ?>
             <a href="javascript:void(0)" id="toggleForm" class="movement-topbar-btn movement-topbar-btn-primary add-btn"><i class="fa fa-plus-circle"></i> إضافة تشغيل جديد</a>
             <?php endif; ?>
+            <a href="movement_operations.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn"><i class="fas fa-route"></i> الحركة والتشغيل</a>
             <a href="project_drivers.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn"><i class="fas fa-id-badge"></i> سائقي المشروع</a>
             <?php if($_SESSION['user']['role'] != "10"): ?>
             <!-- <a href="select_project.php" class="movement-topbar-btn"><i class="fas fa-exchange-alt"></i> تغيير المشروع</a> -->
@@ -985,7 +986,7 @@ include('../insidebar.php');
                                                                  data-status-class='" . $status_class . "'
                                                                  data-reason='" . htmlspecialchars($row['reason'] ?? '', ENT_QUOTES) . "'
                                                                  title='عرض التفاصيل'><i class='fa fa-eye'></i></a>" : "") . "
-                                                            " . ($can_edit ? "<a href='javascript:void(0)' class='action-btn edit editOperationBtn'
+                                                            " . ($can_edit && $status_value === 1 ? "<a href='javascript:void(0)' class='action-btn edit editOperationBtn'
                                                                  data-id='" . $row['id'] . "'
                                                                  data-equipment='" . $row['equipment'] . "'
                                                                  data-equipment-type='" . $row['equipment_type'] . "'
@@ -1611,6 +1612,12 @@ include('../insidebar.php');
 
                     // حفظ data-id للتعديل
                     _viewOpEditData = { id: btn.data('id') };
+
+                    if (statusClass === 'status-idle') {
+                        $('#viewOpEditBtn').hide();
+                    } else {
+                        $('#viewOpEditBtn').show();
+                    }
 
                     $('#viewOperationModal').addClass('show');
                 });

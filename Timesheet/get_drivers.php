@@ -18,6 +18,7 @@ if (!$is_super_admin && $company_id <= 0) {
 
 if (isset($_GET['operation_id'])) {
     $operation_id = intval($_GET['operation_id']);
+    $shift_type = isset($_GET['shift']) ? trim($_GET['shift']) : '';
 
     $operation_scope = "";
     if (!$is_super_admin) {
@@ -41,12 +42,17 @@ if (isset($_GET['operation_id'])) {
     }
     $equipment_id = $op['equipment'];
 
+    $shift_filter_sql = "";
+    if ($shift_type === 'D' || $shift_type === 'N') {
+        $shift_filter_sql = " AND (ed.shift_type = 'B' OR ed.shift_type = '" . mysqli_real_escape_string($conn, $shift_type) . "')";
+    }
+
     // جلب السائقين المرتبطين بهذه الآلية (النشطين فقط)
     $sql = "SELECT d.id, d.name
             FROM equipment_drivers ed
             JOIN drivers d ON ed.driver_id = d.id
             WHERE ed.equipment_id = $equipment_id
-              AND ed.status = 1";
+              AND ed.status = 1" . $shift_filter_sql;
 
     if (!$is_super_admin) {
         if (db_table_has_column($conn, 'drivers', 'company_id')) {

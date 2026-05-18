@@ -587,6 +587,14 @@ if ($today_rows_result) {
         <div class="card-body">
           <div class="form-grid">
             <div>
+              <label>الوردية</label>
+              <select name="shift" id="shift" required>
+                <option value="">-- اختر الوردية --</option>
+                <option value="D">☀️ صباحية</option>
+                <option value="N">🌙 مسائية</option>
+              </select>
+            </div>
+            <div>
               <label>الالية</label>
               <select name="operator" id="operator" required>
                 <option value="">-- اختر الالية --</option>
@@ -620,12 +628,6 @@ if ($today_rows_result) {
               <label>السائق</label>
               <select id="driver" name="driver">
                 <option value="">-- اختر السائق --</option>
-              </select>
-            </div>
-            <div>
-              <label>الوردية</label>
-              <select name="shift" id="shift" required>
-                <option value="">-- اختر الآلية أولاً --</option>
               </select>
             </div>
             <div>
@@ -930,6 +932,14 @@ if ($today_rows_result) {
         <div class="card-body">
           <div class="form-grid">
             <div>
+              <label>الوردية</label>
+              <select name="shift" id="shift" required>
+                <option value="">-- اختر الوردية --</option>
+                <option value="D">☀️ صباحية</option>
+                <option value="N">🌙 مسائية</option>
+              </select>
+            </div>
+            <div>
               <label>الالية</label>
               <select name="operator" id="operator" required>
                 <option value="">-- اختر الالية --</option>
@@ -996,12 +1006,6 @@ if ($today_rows_result) {
               </select>
 
 
-            </div>
-            <div>
-              <label>الوردية</label>
-              <select name="shift" id="shift" required>
-                <option value="">-- اختر الآلية أولاً --</option>
-              </select>
             </div>
             <div>
               <label> التاريخ </label>
@@ -1319,6 +1323,14 @@ if ($today_rows_result) {
         <div class="card-body">
           <div class="form-grid">
             <div>
+              <label>الوردية</label>
+              <select name="shift" id="shift" required>
+                <option value="">-- اختر الوردية --</option>
+                <option value="D">☀️ صباحية</option>
+                <option value="N">🌙 مسائية</option>
+              </select>
+            </div>
+            <div>
               <label>الالية</label>
               <select name="operator" id="operator" required>
                 <option value="">-- اختر الالية --</option>
@@ -1352,12 +1364,6 @@ if ($today_rows_result) {
               <label>السائق</label>
               <select id="driver" name="driver">
                 <option value="">-- اختر السائق --</option>
-              </select>
-            </div>
-            <div>
-              <label>الوردية</label>
-              <select name="shift" id="shift" required>
-                <option value="">-- اختر الآلية أولاً --</option>
               </select>
             </div>
             <div>
@@ -2025,40 +2031,7 @@ if ($today_rows_result) {
 
 
 
-  function buildShiftOptionsHtml(allowedShifts) {
-    var options = "<option value=''>-- اختر الوردية --</option>";
-    var hasDay = allowedShifts.indexOf('D') !== -1;
-    var hasNight = allowedShifts.indexOf('N') !== -1;
-
-    if (hasDay) {
-      options += "<option value='D'>صباحية</option>";
-    }
-    if (hasNight) {
-      options += "<option value='N'>مسائية</option>";
-    }
-
-    return options;
-  }
-
-  function applyOperationShiftData(response, preselectedShift) {
-    var allowed = [];
-    if (response && response.allowed_shifts && Array.isArray(response.allowed_shifts)) {
-      allowed = response.allowed_shifts;
-    }
-
-    if (allowed.length === 0) {
-      allowed = ['D', 'N'];
-    }
-
-    $("#shift").html(buildShiftOptionsHtml(allowed));
-
-    var targetShift = preselectedShift || '';
-    if (targetShift !== '' && allowed.indexOf(targetShift) !== -1) {
-      $("#shift").val(targetShift);
-    } else if (allowed.length === 1) {
-      $("#shift").val(allowed[0]);
-    }
-
+  function applyOperationShiftData(response) {
     if (response && typeof response.shift_hours !== 'undefined') {
       $("#shift_hours").val(response.shift_hours);
     } else {
@@ -2069,13 +2042,73 @@ if ($today_rows_result) {
   }
 
   $(document).ready(function () {
+    function refreshOperationAndDriverLists() {
+      var opId = $("#operator").val();
+      var shiftVal = $("#shift").val();
+
+      if (!shiftVal) {
+        $("#operator").html("<option value=''>-- اختر الوردية أولاً --</option>");
+        $("#driver").html("<option value=''>-- اختر الوردية أولاً --</option>");
+        $("#shift_hours").val("0");
+        return;
+      }
+
+      $.ajax({
+        url: "get_operations.php",
+        type: "GET",
+        data: { type: <?php echo json_encode($type); ?>, shift: shiftVal },
+        success: function (response) {
+          var currentOperation = opId;
+          $("#operator").html(response);
+          if (currentOperation) {
+            $("#operator").val(currentOperation);
+          }
+        },
+        error: function () {
+          $("#operator").html("<option value=''>-- تعذر تحميل الآليات --</option>");
+        }
+      });
+
+      if (opId) {
+        $.ajax({
+          url: "get_drivers.php",
+          type: "GET",
+          data: { operation_id: opId, shift: shiftVal },
+          success: function (response) {
+            $("#driver").html(response);
+          },
+          error: function () {
+            $("#driver").html("<option value=''>-- تعذر تحميل السائقين --</option>");
+          }
+        });
+
+        $.ajax({
+          url: "get_contract_hours.php",
+          type: "GET",
+          dataType: "json",
+          data: { operation_id: opId },
+          success: function (response) {
+            applyOperationShiftData(response);
+          },
+          error: function () {
+            applyOperationShiftData({ shift_hours: 0 });
+          }
+        });
+      }
+    }
+
+    $("#shift").on("change", function () {
+      refreshOperationAndDriverLists();
+    });
+
     $("#operator").change(function () {
       var opId = $(this).val();
+      var shiftVal = $("#shift").val();
       if (opId !== "") {
         $.ajax({
           url: "get_drivers.php",
           type: "GET",
-          data: { operation_id: opId },
+          data: { operation_id: opId, shift: shiftVal },
           success: function (response) {
             console.log("تم تحميل السائقين");
             $("#driver").html(response);
@@ -2093,16 +2126,15 @@ if ($today_rows_result) {
           data: { operation_id: opId },
           success: function (response) {
             console.log("تم تحميل بيانات الوردية من التشغيل:", response);
-            applyOperationShiftData(response, '');
+            applyOperationShiftData(response);
           },
           error: function (xhr, status, error) {
             console.error("خطأ في جلب بيانات الوردية:", error);
-            applyOperationShiftData({ shift_hours: 0, allowed_shifts: ['D', 'N'] }, '');
+            applyOperationShiftData({ shift_hours: 0 });
           }
         });
       } else {
         $("#driver").html("<option value=''>-- اختر السائق --</option>");
-        $("#shift").html("<option value=''>-- اختر الآلية أولاً --</option>");
         $("#shift_hours").val("0");
       }
     });

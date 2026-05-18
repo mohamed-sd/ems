@@ -19,6 +19,7 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 $type = isset($_GET['type']) ? trim($_GET['type']) : '';
+$shift_type = isset($_GET['shift']) ? trim($_GET['shift']) : '';
 if ($type !== '1' && $type !== '2' && $type !== '3') {
     while (ob_get_level()) ob_end_clean();
     echo "<option value=''>-- اختر نوع الآلية أولاً --</option>";
@@ -51,11 +52,15 @@ if (!$is_super_admin) {
 }
 
 $type_filter_sql = " AND e.type IN (SELECT id FROM equipments_types WHERE form LIKE '$type' AND status = 'active')";
+$shift_filter_sql = "";
+if ($shift_type === 'D' || $shift_type === 'N') {
+    $shift_filter_sql = " AND (o.shift_type = 'B' OR o.shift_type = '" . mysqli_real_escape_string($conn, $shift_type) . "')";
+}
 
 $query = "SELECT o.id, e.code, e.name
           FROM operations o
           JOIN equipments e ON o.equipment = e.id
-          WHERE o.status = '1' $scope_sql $type_filter_sql
+          WHERE o.status = '1' $scope_sql $type_filter_sql $shift_filter_sql
           ORDER BY e.code ASC, e.name ASC";
 
 $result = mysqli_query($conn, $query);
