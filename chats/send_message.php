@@ -63,6 +63,17 @@ if (!$result) {
 
 $new_id = mysqli_insert_id($conn);
 
+// سجل إرسال واحد فقط باسم "إرسال".
+\App\Services\ActivityLogService::logAction('send', 'chats', 'send_message', [
+    'button_name'     => 'إرسال',
+    'record_id'       => $new_id,
+    'response_status' => 200,
+    'new_value'       => [
+        'receiver_id' => $safe_receiver,
+        'message_id'  => $new_id,
+    ],
+]);
+
 // إيقاف جميع output buffers قبل إرجاع JSON
 while (ob_get_level()) {
     ob_end_clean();

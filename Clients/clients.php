@@ -364,6 +364,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
         }
 
         if (mysqli_query($conn, $update_query)) {
+            \App\Services\ActivityLogService::logUpdate(
+                'clients', 'clients',
+                $client_id,
+                null,
+                ['client_code' => $client_code_raw, 'client_name' => trim($_POST['client_name'])]
+            );
             clients_redirect_with_msg('تم تعديل العميل بنجاح ✅');
         } else {
             error_log('clients.php update failed: ' . mysqli_error($conn));
@@ -395,6 +401,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
         }
 
         if (mysqli_query($conn, $insert_query)) {
+            $new_client_id = (int) mysqli_insert_id($conn);
+            \App\Services\ActivityLogService::logCreate(
+                'clients', 'clients',
+                $new_client_id,
+                ['client_code' => $client_code_raw, 'client_name' => trim($_POST['client_name'])]
+            );
             clients_redirect_with_msg('تم إضافة العميل بنجاح ✅');
         } else {
             error_log('clients.php insert failed: ' . mysqli_error($conn));
@@ -451,6 +463,10 @@ if (isset($_GET['delete_id'])) {
     }
 
     if (mysqli_query($conn, $soft_delete_query)) {
+        \App\Services\ActivityLogService::logDelete(
+            'clients', 'clients',
+            $delete_id
+        );
         clients_redirect_with_msg('تم حذف العميل بنجاح ✅');
     }
 

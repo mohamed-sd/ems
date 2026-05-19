@@ -1,0 +1,2 @@
+# Deny directory listing only — PHP files are served normally
+Options -Indexes

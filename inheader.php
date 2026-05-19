@@ -33,6 +33,8 @@ $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '..
     <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
     <script src="../assets/js/performance-boost.js" defer></script>
     <script src="/ems/assets/js/ui-unification.js" defer></script>
+    <!-- Bootstrap Bundle JS (for modal and other components) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </head>
 <body class="ems-site">

@@ -104,6 +104,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               'last_login' => date('Y-m-d H:i:s')
             ];
 
+            // Record login event.
+            if (class_exists('App\Services\ActivityLogService')) {
+                \App\Services\ActivityLogService::logLogin();
+            }
+
             header("Location: main/dashboard.php");
             exit();
           }

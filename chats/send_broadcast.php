@@ -49,54 +49,54 @@ if (!empty($recipients_json)) {
             }
         }
     }
-    
+
     if (empty($recipient_ids)) {
         while (ob_get_level()) ob_end_clean();
         die(json_encode(['success' => false, 'message' => 'لم يتم تحديد مستلمين صالحين'], JSON_UNESCAPED_UNICODE));
     }
-    
+
     // التحقق من أن جميع المستلمين في نفس الشركة
     $ids_list = implode(',', $recipient_ids);
-    $verify_query = "SELECT id FROM users 
-                     WHERE id IN ($ids_list) 
-                     AND company_id = $safe_company 
-                     AND is_deleted = 0 
+    $verify_query = "SELECT id FROM users
+                     WHERE id IN ($ids_list)
+                     AND company_id = $safe_company
+                     AND is_deleted = 0
                      AND status = 'active'";
     $verify_result = mysqli_query($conn, $verify_query);
-    
+
     if (!$verify_result) {
         while (ob_get_level()) ob_end_clean();
         die(json_encode(['success' => false, 'message' => 'خطأ في التحقق من المستلمين'], JSON_UNESCAPED_UNICODE));
     }
-    
+
     // إعادة بناء القائمة من النتائج الصحيحة فقط
     $recipient_ids = [];
     while ($row = mysqli_fetch_assoc($verify_result)) {
         $recipient_ids[] = intval($row['id']);
     }
-    
+
     if (empty($recipient_ids)) {
         while (ob_get_level()) ob_end_clean();
         die(json_encode(['success' => false, 'message' => 'لا يوجد مستلمون صالحون'], JSON_UNESCAPED_UNICODE));
     }
 } else {
     // إرسال للجميع
-    $users_query = "SELECT id FROM users 
-                    WHERE company_id = $safe_company 
-                    AND id != $sender_id 
-                    AND is_deleted = 0 
+    $users_query = "SELECT id FROM users
+                    WHERE company_id = $safe_company
+                    AND id != $sender_id
+                    AND is_deleted = 0
                     AND status = 'active'";
     $users_result = mysqli_query($conn, $users_query);
-    
+
     if (!$users_result) {
         while (ob_get_level()) ob_end_clean();
         die(json_encode(['success' => false, 'message' => 'خطأ في جلب المستخدمين: ' . mysqli_error($conn)], JSON_UNESCAPED_UNICODE));
     }
-    
+
     while ($user = mysqli_fetch_assoc($users_result)) {
         $recipient_ids[] = intval($user['id']);
     }
-    
+
     if (empty($recipient_ids)) {
         while (ob_get_level()) ob_end_clean();
         die(json_encode(['success' => false, 'message' => 'لا يوجد مستخدمون آخرون في شركتك'], JSON_UNESCAPED_UNICODE));
@@ -109,10 +109,10 @@ $failed_count = 0;
 
 foreach ($recipient_ids as $receiver_id) {
     $safe_receiver = intval($receiver_id);
-    
+
     $sql = "INSERT INTO messages (company_id, sender_id, receiver_id, message, created_at)
             VALUES ($safe_company, $sender_id, $safe_receiver, '$safe_message', NOW())";
-    
+
     if (mysqli_query($conn, $sql)) {
         $inserted_count++;
     } else {
@@ -122,16 +122,26 @@ foreach ($recipient_ids as $receiver_id) {
 
 // النتيجة
 if ($inserted_count > 0) {
-    $message_text = $inserted_count === 1 
-        ? "تم إرسال الرسالة بنجاح لمستخدم واحد" 
+    $message_text = $inserted_count === 1
+        ? "تم إرسال الرسالة بنجاح لمستخدم واحد"
         : "تم إرسال الرسالة بنجاح لـ {$inserted_count} مستخدم";
-    
+
+    // سجل إرسال واحد فقط باسم "إرسال" للبث الجماعي.
+    \App\Services\ActivityLogService::logAction('send', 'chats', 'send_broadcast', [
+        'button_name'     => 'إرسال',
+        'response_status' => 200,
+        'new_value'       => [
+            'recipients_count' => $inserted_count,
+            'failed_count'     => $failed_count,
+        ],
+    ]);
+
     // إيقاف جميع output buffers قبل إرجاع JSON
     while (ob_get_level()) {
         ob_end_clean();
     }
     header('Content-Type: application/json; charset=utf-8');
-    
+
     echo json_encode([
         'success'          => true,
         'message'          => $message_text,
@@ -144,7 +154,7 @@ if ($inserted_count > 0) {
         ob_end_clean();
     }
     header('Content-Type: application/json; charset=utf-8');
-    
+
     die(json_encode(['success' => false, 'message' => 'فشل في إرسال الرسائل'], JSON_UNESCAPED_UNICODE));
 }
 

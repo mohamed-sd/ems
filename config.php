@@ -150,7 +150,7 @@ $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
     // تسجيل الخطأ
     error_log("Database Connection Failed: " . $conn->connect_error);
-    
+
     // عرض رسالة عامة للمستخدم (بدون كشف تفاصيل فنية)
     die('
         <!DOCTYPE html>
@@ -324,6 +324,15 @@ function db_table_has_column($conn, $tableName, $columnName) {
     $cache[$key] = $res && mysqli_num_rows($res) > 0;
 
     return $cache[$key];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 5. Activity Log System Bootstrap
+// ═══════════════════════════════════════════════════════════════════════════
+// Loads PSR-4 autoloader for App\\ namespace and boots ActivityLogMiddleware.
+// Must be loaded AFTER $conn is established and session is active.
+if (php_sapi_name() !== 'cli') {
+    require_once __DIR__ . '/app/bootstrap.php';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
