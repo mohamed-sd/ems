@@ -75,7 +75,7 @@ if (!$equipment) {
 // جلب المشغلين المرتبطين مسبقًا
 $current = [];
 $linked = [];
-$res = mysqli_query($conn, "SELECT ed.id, ed.start_date, ed.end_date, d.id AS driver_id, d.name, d.phone, ed.status
+$res = mysqli_query($conn, "SELECT ed.id, ed.start_date, ed.end_date, ed.shift_type, d.id AS driver_id, d.name, d.phone, ed.status
                              FROM equipment_drivers ed
                              JOIN drivers d ON ed.driver_id = d.id
                                                          WHERE ed.equipment_id = $equipment_id
@@ -709,6 +709,103 @@ include("../inheader.php");
         border: 1.5px solid rgba(220, 38, 38, .22);
     }
 
+    /* أنماط بطاقات الوردية */
+    .shift-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .shift-day {
+        background: linear-gradient(135deg, #fff7e6 0%, #ffe8b3 100%);
+        color: #d97706;
+        border: 1.5px solid rgba(217, 119, 6, .25);
+    }
+
+    .shift-night {
+        background: linear-gradient(135deg, #e8e9f3 0%, #c7cae0 100%);
+        color: #4338ca;
+        border: 1.5px solid rgba(67, 56, 202, .25);
+    }
+
+    .shift-both {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        color: #15803d;
+        border: 1.5px solid rgba(21, 128, 61, .25);
+    }
+
+    /* أنماط تعديل الوردية */
+    .shift-cell {
+        position: relative;
+        transition: all 0.2s ease;
+    }
+
+    .shift-cell:hover {
+        background: rgba(232, 184, 0, 0.1);
+    }
+
+    .shift-cell:hover .shift-badge::after {
+        content: " ✏️";
+        font-size: 0.7rem;
+        margin-left: 4px;
+    }
+
+    .shift-edit-select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 2px solid var(--gold);
+        border-radius: 8px;
+        font-family: 'Cairo', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 600;
+        background: white;
+        color: var(--txt);
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(232, 184, 0, 0.2);
+    }
+
+    .shift-edit-select:focus {
+        outline: none;
+        box-shadow: 0 4px 12px rgba(232, 184, 0, 0.3);
+    }
+
+    /* رسالة النجاح المؤقتة */
+    .shift-success-msg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        z-index: 1000;
+        animation: popIn 0.3s ease;
+        white-space: nowrap;
+    }
+
+    @keyframes popIn {
+        0% {
+            transform: translate(-50%, -50%) scale(0.5);
+            opacity: 0;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+    }
+
     .action-btns {
         display: flex;
         gap: 7px;
@@ -1042,6 +1139,7 @@ include("../inheader.php");
                                 <th>رقم الهاتف</th>
                                 <th>تاريخ البداية</th>
                                 <th>تاريخ النهاية</th>
+                                <th>نظام الوردية</th>
                                 <th>الحالة</th>
                                 <th>الإجراءات</th>
                             </tr>
@@ -1056,6 +1154,26 @@ include("../inheader.php");
                                 $actionIcon = $row['status'] ? 'ban' : 'check';
                                 $actionText = $row['status'] ? 'تعطيل' : 'تفعيل';
                                 $actionClass = $row['status'] ? 'delete' : 'activate';
+
+                                // تحويل نظام الوردية إلى نص عربي
+                                $shift_type = isset($row['shift_type']) ? $row['shift_type'] : 'B';
+                                $shift_label = '';
+                                $shift_class = '';
+                                switch ($shift_type) {
+                                    case 'D':
+                                        $shift_label = '☀️ نهاري فقط';
+                                        $shift_class = 'shift-day';
+                                        break;
+                                    case 'N':
+                                        $shift_label = '🌙 ليلي فقط';
+                                        $shift_class = 'shift-night';
+                                        break;
+                                    case 'B':
+                                    default:
+                                        $shift_label = '🔄 نهاري + ليلي';
+                                        $shift_class = 'shift-both';
+                                        break;
+                                }
                                 ?>
                                 <tr>
                                     <td><strong><?php echo $i++; ?></strong></td>
@@ -1064,6 +1182,16 @@ include("../inheader.php");
                                     <td><?php echo $row['start_date'] ? date('Y-m-d', strtotime($row['start_date'])) : '-'; ?>
                                     </td>
                                     <td><?php echo $row['end_date'] ? date('Y-m-d', strtotime($row['end_date'])) : '-'; ?></td>
+                                    <td class="shift-cell" data-relation-id="<?php echo $row['id']; ?>" data-current-shift="<?php echo $shift_type; ?>" style="cursor: pointer;" title="انقر للتعديل">
+                                        <span class="shift-badge <?php echo $shift_class; ?>">
+                                            <?php echo $shift_label; ?>
+                                        </span>
+                                        <select class="shift-edit-select" style="display:none;" data-relation-id="<?php echo $row['id']; ?>">
+                                            <option value="D" <?php echo $shift_type === 'D' ? 'selected' : ''; ?>>☀️ نهاري فقط</option>
+                                            <option value="N" <?php echo $shift_type === 'N' ? 'selected' : ''; ?>>🌙 ليلي فقط</option>
+                                            <option value="B" <?php echo $shift_type === 'B' ? 'selected' : ''; ?>>🔄 نهاري + ليلي</option>
+                                        </select>
+                                    </td>
                                     <td>
                                         <span class="status-badge <?php echo $statusClass; ?>">
                                             <i class="fas fa-<?php echo $statusIcon; ?>"></i>
@@ -1286,6 +1414,124 @@ include("../inheader.php");
             if (!confirm(`هل أنت متأكد من ${actionType} المشغل: ${driverName}؟`)) {
                 e.preventDefault();
                 return false;
+            }
+        });
+
+        // ===== نظام تعديل الوردية السريع =====
+        // عند النقر على خلية الوردية، يظهر dropdown
+        $('.shift-cell').on('click', function() {
+            const $cell = $(this);
+            const $badge = $cell.find('.shift-badge');
+            const $select = $cell.find('.shift-edit-select');
+
+            // إخفاء جميع الـ selects الأخرى وإظهار الـ badges
+            $('.shift-edit-select').hide();
+            $('.shift-badge').show();
+
+            // إظهار select وإخفاء badge
+            $badge.hide();
+            $select.show().focus();
+        });
+
+        // عند تغيير قيمة الـ select
+        $('.shift-edit-select').on('change', function() {
+            const $select = $(this);
+            const relationId = $select.data('relation-id');
+            const newShiftType = $select.val();
+            const $cell = $select.closest('.shift-cell');
+            const $badge = $cell.find('.shift-badge');
+
+            // إظهار مؤشر التحميل
+            $select.prop('disabled', true);
+            $cell.css('opacity', '0.6');
+
+            // إرسال طلب AJAX
+            $.ajax({
+                url: 'update_shift_type.php',
+                method: 'POST',
+                data: {
+                    relation_id: relationId,
+                    shift_type: newShiftType
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        // تحديث البطاقة
+                        let newLabel = '';
+                        let newClass = '';
+
+                        switch (newShiftType) {
+                            case 'D':
+                                newLabel = '☀️ نهاري فقط';
+                                newClass = 'shift-day';
+                                break;
+                            case 'N':
+                                newLabel = '🌙 ليلي فقط';
+                                newClass = 'shift-night';
+                                break;
+                            case 'B':
+                                newLabel = '🔄 نهاري + ليلي';
+                                newClass = 'shift-both';
+                                break;
+                        }
+
+                        // تحديث البطاقة بالقيم الجديدة
+                        $badge.removeClass('shift-day shift-night shift-both')
+                              .addClass(newClass)
+                              .text(newLabel);
+
+                        // إخفاء select وإظهار badge
+                        $select.hide();
+                        $badge.show();
+                        $cell.css('opacity', '1');
+                        $select.prop('disabled', false);
+
+                        // رسالة نجاح مؤقتة
+                        const $successMsg = $('<div class="shift-success-msg">✅ تم التحديث</div>');
+                        $cell.append($successMsg);
+                        setTimeout(() => $successMsg.fadeOut(300, () => $successMsg.remove()), 2000);
+
+                    } else {
+                        alert('❌ فشل التحديث: ' + (response.message || 'خطأ غير معروف'));
+                        $select.prop('disabled', false);
+                        $cell.css('opacity', '1');
+                        // إرجاع القيمة القديمة
+                        $select.val($cell.data('current-shift'));
+                        $select.hide();
+                        $badge.show();
+                    }
+                },
+                error: function() {
+                    alert('❌ حدث خطأ في الاتصال بالخادم');
+                    $select.prop('disabled', false);
+                    $cell.css('opacity', '1');
+                    // إرجاع القيمة القديمة
+                    $select.val($cell.data('current-shift'));
+                    $select.hide();
+                    $badge.show();
+                }
+            });
+        });
+
+        // عند الضغط على Escape، إلغاء التعديل
+        $('.shift-edit-select').on('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const $select = $(this);
+                const $cell = $select.closest('.shift-cell');
+                const $badge = $cell.find('.shift-badge');
+
+                // إرجاع القيمة القديمة
+                $select.val($cell.data('current-shift'));
+                $select.hide();
+                $badge.show();
+            }
+        });
+
+        // إخفاء select عند النقر خارجه
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.shift-cell').length) {
+                $('.shift-edit-select').hide();
+                $('.shift-badge').show();
             }
         });
     });

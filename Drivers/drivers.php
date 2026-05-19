@@ -22,6 +22,7 @@ $suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
 $drivercontracts_has_company = db_table_has_column($conn, 'drivercontracts', 'company_id');
 $drivers_has_driver_photo = db_table_has_column($conn, 'drivers', 'driver_photo');
 $drivers_has_identity_photo = db_table_has_column($conn, 'drivers', 'identity_photo');
+$drivers_has_project_id = db_table_has_column($conn, 'drivers', 'project_id');
 
 if (!$drivers_has_company) {
     @mysqli_query($conn, "ALTER TABLE drivers ADD COLUMN company_id INT NULL AFTER id");
@@ -37,6 +38,12 @@ if (!$drivers_has_driver_photo) {
 if (!$drivers_has_identity_photo) {
     @mysqli_query($conn, "ALTER TABLE drivers ADD COLUMN identity_photo VARCHAR(255) NULL AFTER driver_photo");
     $drivers_has_identity_photo = db_table_has_column($conn, 'drivers', 'identity_photo');
+}
+
+if (!$drivers_has_project_id) {
+    @mysqli_query($conn, "ALTER TABLE drivers ADD COLUMN project_id INT NULL AFTER company_id");
+    @mysqli_query($conn, "ALTER TABLE drivers ADD INDEX idx_drivers_project_id (project_id)");
+    $drivers_has_project_id = db_table_has_column($conn, 'drivers', 'project_id');
 }
 
 if (!$is_super_admin && !$drivers_has_company) {
@@ -125,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     // 6. علاقة العمل والتبعية
     $owner_supervisor = mysqli_real_escape_string($conn, trim($_POST['owner_supervisor']));
     $supplier_id = !empty($_POST['supplier_id']) ? intval($_POST['supplier_id']) : NULL;
+    $project_id = !empty($_POST['project_id']) ? intval($_POST['project_id']) : NULL;
     $employment_affiliation = mysqli_real_escape_string($conn, $_POST['employment_affiliation']);
     $salary_type = mysqli_real_escape_string($conn, $_POST['salary_type']);
     $monthly_salary = !empty($_POST['monthly_salary']) ? floatval($_POST['monthly_salary']) : NULL;
@@ -173,6 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $years_in_field_sql = $years_in_field !== NULL ? $years_in_field : "NULL";
         $years_on_equipment_sql = $years_on_equipment !== NULL ? $years_on_equipment : "NULL";
         $supplier_id_sql = $supplier_id !== NULL ? $supplier_id : "NULL";
+        $project_id_sql = $project_id !== NULL ? $project_id : "NULL";
         $monthly_salary_sql = $monthly_salary !== NULL ? $monthly_salary : "NULL";
 
         $scope_where = sprintf($driver_scope_where, $id);
@@ -183,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             license_number='$license_number', license_type='$license_type', license_expiry_date=$license_expiry_sql, license_issuer='$license_issuer',
             specialized_equipment='$specialized_equipment',
             years_in_field=$years_in_field_sql, years_on_equipment=$years_on_equipment_sql, skill_level='$skill_level', certificates='$certificates',
-            owner_supervisor='$owner_supervisor', supplier_id=$supplier_id_sql, employment_affiliation='$employment_affiliation',
+            owner_supervisor='$owner_supervisor', supplier_id=$supplier_id_sql, project_id=$project_id_sql, employment_affiliation='$employment_affiliation',
             salary_type='$salary_type', monthly_salary=$monthly_salary_sql,
             email='$email', phone='$phone', phone_alternative='$phone_alternative', address='$address',
             performance_rating='$performance_rating', behavior_record='$behavior_record', accident_record='$accident_record',
@@ -207,6 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $years_in_field_sql = $years_in_field !== NULL ? $years_in_field : "NULL";
         $years_on_equipment_sql = $years_on_equipment !== NULL ? $years_on_equipment : "NULL";
         $supplier_id_sql = $supplier_id !== NULL ? $supplier_id : "NULL";
+        $project_id_sql = $project_id !== NULL ? $project_id : "NULL";
         $monthly_salary_sql = $monthly_salary !== NULL ? $monthly_salary : "NULL";
 
         // التحقق من فرادة كود المشغل على مستوى الشركة (عند الإضافة)
@@ -225,7 +235,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             license_number, license_type, license_expiry_date, license_issuer,
             specialized_equipment,
             years_in_field, years_on_equipment, skill_level, certificates,
-            owner_supervisor, supplier_id, employment_affiliation, salary_type, monthly_salary,
+            owner_supervisor, supplier_id, project_id, employment_affiliation, salary_type, monthly_salary,
             email, phone, phone_alternative, address,
             performance_rating, behavior_record, accident_record,
             health_status, health_issues, vaccinations_status,
@@ -237,7 +247,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             '$license_number', '$license_type', $license_expiry_sql, '$license_issuer',
             '$specialized_equipment',
             $years_in_field_sql, $years_on_equipment_sql, '$skill_level', '$certificates',
-            '$owner_supervisor', $supplier_id_sql, '$employment_affiliation', '$salary_type', $monthly_salary_sql,
+            '$owner_supervisor', $supplier_id_sql, $project_id_sql, '$employment_affiliation', '$salary_type', $monthly_salary_sql,
             '$email', '$phone', '$phone_alternative', '$address',
             '$performance_rating', '$behavior_record', '$accident_record',
             '$health_status', '$health_issues', '$vaccinations_status',
@@ -760,6 +770,27 @@ include('../insidebar.php');
                                 </select>
                             </div>
                             <div>
+                                <label><i class="fas fa-project-diagram"></i> المشروع المرتبط</label>
+                                <select name="project_id" id="project_id">
+                                    <option value="">-- اختر المشروع --</option>
+                                    <?php
+                                    $project_scope_sql = "1=1";
+                                    if (!$is_super_admin) {
+                                        $project_scope_sql = "company_id = $company_id";
+                                    }
+                                    $projects_query = "SELECT id, name, project_code FROM project WHERE $project_scope_sql AND status = 1 ORDER BY name";
+                                    $projects_result = mysqli_query($conn, $projects_query);
+                                    while ($project = mysqli_fetch_assoc($projects_result)) {
+                                        $project_display = htmlspecialchars($project['name']);
+                                        if (!empty($project['project_code'])) {
+                                            $project_display .= " (" . htmlspecialchars($project['project_code']) . ")";
+                                        }
+                                        echo "<option value='" . $project['id'] . "'>" . $project_display . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div>
                                 <label><i class="fas fa-sitemap"></i> تبعية المشغل</label>
                                 <select name="employment_affiliation" id="employment_affiliation">
                                     <option value="">-- اختر التبعية --</option>
@@ -1012,10 +1043,8 @@ include('../insidebar.php');
                         <th>#</th>
                         <th>الكود</th>
                         <th>اسم المشغل</th>
-                        <th>رقم الهاتف</th>
                         <th>المورد</th>
-                        <th>الصور</th>
-                        <th>مستوى الكفاءة</th>
+                        <th>المشروع</th>
                         <th>عدد العقود</th>
                         <th>الحالة</th>
                         <th>الإجراءات</th>
@@ -1044,10 +1073,11 @@ include('../insidebar.php');
                         ? " AND drivercontracts.company_id = $company_id"
                         : "";
 
-                    $query = "SELECT d.*, s.name as supplier_name,
+                    $query = "SELECT d.*, s.name as supplier_name, p.name as project_name, p.project_code,
                              (SELECT COUNT(*) FROM drivercontracts WHERE driver_id = d.id$drivercontracts_scope_sql) as numcontracts
                              FROM drivers d
                              LEFT JOIN suppliers s ON d.supplier_id = s.id
+                             LEFT JOIN project p ON d.project_id = p.id
                              WHERE $drivers_scope_sql
                              ORDER BY d.id DESC";
                     $result = mysqli_query($conn, $query);
@@ -1064,12 +1094,16 @@ include('../insidebar.php');
                         echo "<td>" . $i++ . "</td>";
                         echo "<td><code>" . htmlspecialchars($row['driver_code'] ?: 'N/A') . "</code></td>";
                         echo "<td>" . $driver_name_cell . "</td>";
-                        echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['supplier_name'] ?: '-') . "</td>";
-                        $driver_photo_status = !empty($row['driver_photo']) ? '✅ صورة السائق' : '⏳ صورة السائق';
-                        $identity_photo_status = !empty($row['identity_photo']) ? '✅ صورة الهوية' : '⏳ صورة الهوية';
-                        echo "<td><small>" . $driver_photo_status . "<br>" . $identity_photo_status . "</small></td>";
-                        echo "<td>" . htmlspecialchars($row['skill_level'] ?: 'غير محدد') . "</td>";
+                        $project_display = '-';
+                        if (!empty($row['project_name'])) {
+                            $project_display = htmlspecialchars($row['project_name']);
+                            if (!empty($row['project_code'])) {
+                                $project_display .= " <code style='font-size:0.7rem;'>" . htmlspecialchars($row['project_code']) . "</code>";
+                            }
+                        }
+                        echo "<td>" . $project_display . "</td>";
+
                         echo "<td><span class='badge badge-info'>" . $row['numcontracts'] . " عقد</span></td>";
                         echo "<td>" . $statusBadge . "</td>";
                         echo "<td><div class='action-btns'>";
@@ -1237,6 +1271,7 @@ include('../insidebar.php');
                         $("#certificates").val(driver.certificates);
                         $("#owner_supervisor").val(driver.owner_supervisor);
                         $("#supplier_id").val(driver.supplier_id);
+                        $("#project_id").val(driver.project_id);
                         $("#employment_affiliation").val(driver.employment_affiliation);
                         $("#salary_type").val(driver.salary_type);
                         $("#monthly_salary").val(driver.monthly_salary);
@@ -1263,11 +1298,22 @@ include('../insidebar.php');
                         expandAllSections();
                         $("html, body").animate({ scrollTop: $("#projectForm").offset().top - 100 }, 500);
                     } else {
-                        alert('خطأ في تحميل البيانات');
+                        alert('❌ خطأ في تحميل البيانات: ' + (data.message || 'سبب غير معروف'));
                     }
                 },
-                error: function () {
-                    alert('حدث خطأ في الاتصال بالخادم');
+                error: function (xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                    console.error('Response:', xhr.responseText);
+                    let errorMsg = 'حدث خطأ في الاتصال بالخادم';
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMsg = response.message;
+                        }
+                    } catch (e) {
+                        errorMsg += ' (Status: ' + status + ')';
+                    }
+                    alert('❌ ' + errorMsg);
                 }
             });
         });

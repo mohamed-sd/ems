@@ -595,6 +595,108 @@ include('../insidebar.php');
     max-height: 90vh;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Shift Type Quick Edit System - نظام تعديل الوردية السريع
+═══════════════════════════════════════════════════════════════ */
+
+/* أنماط بطاقات الوردية */
+.shift-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.shift-day {
+    background: linear-gradient(135deg, #fff7e6 0%, #ffe8b3 100%);
+    color: #d97706;
+    border: 1.5px solid rgba(217, 119, 6, .25);
+}
+
+.shift-night {
+    background: linear-gradient(135deg, #e8e9f3 0%, #c7cae0 100%);
+    color: #4338ca;
+    border: 1.5px solid rgba(67, 56, 202, .25);
+}
+
+.shift-both {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    color: #15803d;
+    border: 1.5px solid rgba(21, 128, 61, .25);
+}
+
+/* أنماط تعديل الوردية */
+.shift-cell {
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.shift-cell:hover {
+    background: rgba(232, 184, 0, 0.1);
+}
+
+.shift-cell:hover .shift-badge::after {
+    content: " ✏️";
+    font-size: 0.7rem;
+    margin-left: 4px;
+}
+
+.shift-edit-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #f7931a;
+    border-radius: 8px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    background: white;
+    color: #1a1208;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(247, 147, 26, 0.2);
+}
+
+.shift-edit-select:focus {
+    outline: none;
+    box-shadow: 0 4px 12px rgba(247, 147, 26, 0.3);
+}
+
+/* رسالة النجاح المؤقتة */
+.shift-success-msg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    z-index: 1000;
+    animation: popIn 0.3s ease;
+    white-space: nowrap;
+}
+
+@keyframes popIn {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
 </style>
 
 <div class="main movement-page movement-ops-page">
@@ -920,13 +1022,34 @@ include('../insidebar.php');
                                 // echo "<td>" . (!empty($row['total_equipment_hours']) ? $row['total_equipment_hours'] : '0') . "</td>";
                                 echo "<td>" . (!empty($row['shift_hours']) ? $row['shift_hours'] : '0') . "</td>";
 
-                                $shift_type_label = 'نهاري + ليلي';
-                                if (isset($row['shift_type']) && $row['shift_type'] === 'D') {
-                                    $shift_type_label = 'نهاري فقط';
-                                } elseif (isset($row['shift_type']) && $row['shift_type'] === 'N') {
-                                    $shift_type_label = 'ليلي فقط';
+                                $shift_type_value = isset($row['shift_type']) ? $row['shift_type'] : 'B';
+                                $shift_type_label = '';
+                                $shift_class = '';
+
+                                switch ($shift_type_value) {
+                                    case 'D':
+                                        $shift_type_label = '☀️ نهاري فقط';
+                                        $shift_class = 'shift-day';
+                                        break;
+                                    case 'N':
+                                        $shift_type_label = '🌙 ليلي فقط';
+                                        $shift_class = 'shift-night';
+                                        break;
+                                    case 'B':
+                                    default:
+                                        $shift_type_label = '🔄 نهاري + ليلي';
+                                        $shift_class = 'shift-both';
+                                        break;
                                 }
-                                echo "<td>" . $shift_type_label . "</td>";
+
+                                echo "<td class='shift-cell' data-operation-id='" . $row['id'] . "' data-current-shift='" . $shift_type_value . "' style='cursor: pointer;' title='انقر للتعديل'>";
+                                echo "<span class='shift-badge " . $shift_class . "'>" . $shift_type_label . "</span>";
+                                echo "<select class='shift-edit-select' style='display:none;' data-operation-id='" . $row['id'] . "'>";
+                                echo "<option value='D' " . ($shift_type_value === 'D' ? 'selected' : '') . ">☀️ نهاري فقط</option>";
+                                echo "<option value='N' " . ($shift_type_value === 'N' ? 'selected' : '') . ">🌙 ليلي فقط</option>";
+                                echo "<option value='B' " . ($shift_type_value === 'B' ? 'selected' : '') . ">🔄 نهاري + ليلي</option>";
+                                echo "</select>";
+                                echo "</td>";
 
                                 echo "<td>" . $row['start'] . "</td>";
                                 // echo "<td>" . $row['end'] . "</td>";
@@ -1646,6 +1769,130 @@ include('../insidebar.php');
             $(document).on('keydown', function (e) {
                 if (e.key === 'Escape' && $('#viewOperationModal').is(':visible')) {
                     closeViewOperationModal();
+                }
+            });
+
+            // ═══════════════════════════════════════════════════════════════
+            // نظام تعديل الوردية السريع - Quick Shift Type Edit System
+            // ═══════════════════════════════════════════════════════════════
+
+            // عند النقر على خلية الوردية، يظهر dropdown
+            $(document).on('click', '.shift-cell', function() {
+                const $cell = $(this);
+                const $badge = $cell.find('.shift-badge');
+                const $select = $cell.find('.shift-edit-select');
+
+                // إخفاء جميع الـ selects الأخرى وإظهار الـ badges
+                $('.shift-edit-select').hide();
+                $('.shift-badge').show();
+
+                // إظهار select وإخفاء badge
+                $badge.hide();
+                $select.show().focus();
+            });
+
+            // عند تغيير قيمة الـ select
+            $(document).on('change', '.shift-edit-select', function() {
+                const $select = $(this);
+                const operationId = $select.data('operation-id');
+                const newShiftType = $select.val();
+                const $cell = $select.closest('.shift-cell');
+                const $badge = $cell.find('.shift-badge');
+
+                // إظهار مؤشر التحميل
+                $select.prop('disabled', true);
+                $cell.css('opacity', '0.6');
+
+                // إرسال طلب AJAX
+                $.ajax({
+                    url: 'update_operation_shift_type.php',
+                    method: 'POST',
+                    data: {
+                        operation_id: operationId,
+                        shift_type: newShiftType
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            // تحديث البطاقة
+                            let newLabel = '';
+                            let newClass = '';
+
+                            switch (newShiftType) {
+                                case 'D':
+                                    newLabel = '☀️ نهاري فقط';
+                                    newClass = 'shift-day';
+                                    break;
+                                case 'N':
+                                    newLabel = '🌙 ليلي فقط';
+                                    newClass = 'shift-night';
+                                    break;
+                                case 'B':
+                                    newLabel = '🔄 نهاري + ليلي';
+                                    newClass = 'shift-both';
+                                    break;
+                            }
+
+                            // تحديث البطاقة بالقيم الجديدة
+                            $badge.removeClass('shift-day shift-night shift-both')
+                                  .addClass(newClass)
+                                  .text(newLabel);
+
+                            // تحديث data-current-shift
+                            $cell.data('current-shift', newShiftType);
+
+                            // إخفاء select وإظهار badge
+                            $select.hide();
+                            $badge.show();
+                            $cell.css('opacity', '1');
+                            $select.prop('disabled', false);
+
+                            // رسالة نجاح مؤقتة
+                            const $successMsg = $('<div class="shift-success-msg">✅ تم التحديث</div>');
+                            $cell.append($successMsg);
+                            setTimeout(() => $successMsg.fadeOut(300, () => $successMsg.remove()), 2000);
+
+                        } else {
+                            alert('❌ فشل التحديث: ' + (response.message || 'خطأ غير معروف'));
+                            $select.prop('disabled', false);
+                            $cell.css('opacity', '1');
+                            // إرجاع القيمة القديمة
+                            $select.val($cell.data('current-shift'));
+                            $select.hide();
+                            $badge.show();
+                        }
+                    },
+                    error: function() {
+                        alert('❌ حدث خطأ في الاتصال بالخادم');
+                        $select.prop('disabled', false);
+                        $cell.css('opacity', '1');
+                        // إرجاع القيمة القديمة
+                        $select.val($cell.data('current-shift'));
+                        $select.hide();
+                        $badge.show();
+                    }
+                });
+            });
+
+            // عند الضغط على Escape، إلغاء التعديل
+            $(document).on('keydown', '.shift-edit-select', function(e) {
+                if (e.key === 'Escape') {
+                    const $select = $(this);
+                    const $cell = $select.closest('.shift-cell');
+                    const $badge = $cell.find('.shift-badge');
+
+                    // إرجاع القيمة القديمة
+                    $select.val($cell.data('current-shift'));
+                    $select.hide();
+                    $badge.show();
+                }
+            });
+
+            // إخفاء select عند النقر خارجه
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.shift-cell').length) {
+                    $('.shift-edit-select').hide();
+                    $('.shift-badge').show();
                 }
             });
 

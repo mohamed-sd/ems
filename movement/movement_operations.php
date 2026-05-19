@@ -26,6 +26,7 @@ $equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers',
 $equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
 $drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
 $drivers_has_status = db_table_has_column($conn, 'drivers', 'status');
+$drivers_has_project_id = db_table_has_column($conn, 'drivers', 'project_id');
 $equipments_has_lat = db_table_has_column($conn, 'equipments', 'latitude');
 $equipments_has_lng = db_table_has_column($conn, 'equipments', 'longitude');
 $project_has_lat = db_table_has_column($conn, 'project', 'latitude');
@@ -466,12 +467,18 @@ if ($drivers_res) {
     }
 }
 
-// جلب جميع السائقين والمعدات
+// جلب جميع السائقين والمعدات (فقط المرتبطين بالمشروع المحدد)
+$driver_project_scope = "";
+if ($drivers_has_project_id) {
+    $driver_project_scope = " AND (d.project_id = $selected_project_id OR d.project_id IS NULL)";
+}
+
 $all_drivers_sql = "SELECT DISTINCT d.id, d.name, d.phone
                     FROM drivers d
                     WHERE 1=1
                       $driver_company_scope
                       $driver_status_scope
+                      $driver_project_scope
                     ORDER BY d.name ASC";
 $all_drivers_res = mysqli_query($conn, $all_drivers_sql);
 $all_drivers = [];
