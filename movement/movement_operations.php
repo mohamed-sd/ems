@@ -162,16 +162,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $category_sql = mysqli_real_escape_string($conn, $equipment_category);
                 $shift_sql = mysqli_real_escape_string($conn, $shift_type);
 
-                $start_sql = $start !== '' ? (" start = '" . mysqli_real_escape_string($conn, $start) . "',") : '';
-                $end_sql = $end !== '' ? (" end = '" . mysqli_real_escape_string($conn, $end) . "',") : '';
+                $set_parts = [
+                    "equipment_category = '$category_sql'",
+                    "shift_type = '$shift_sql'",
+                    "status = $status",
+                ];
+                if ($start !== '') {
+                    $set_parts[] = "start = '" . mysqli_real_escape_string($conn, $start) . "'";
+                }
+                if ($end !== '') {
+                    $set_parts[] = "end = '" . mysqli_real_escape_string($conn, $end) . "'";
+                }
+                $set_clause = implode(', ', $set_parts);
 
                 $update_sql = "UPDATE operations
-                               SET equipment_category = '$category_sql',
-                                   shift_type = '$shift_sql',
-                                   status = $status
-                                   $start_sql
-                                   $end_sql
-                                   id = id
+                               SET $set_clause
                                WHERE id = $op_id AND project_id = $selected_project_id$operations_company_scope_inline";
                 if (!mysqli_query($conn, $update_sql)) {
                     throw new Exception('خطأ في تحديث التشغيل');
@@ -482,8 +487,8 @@ $all_equipment_sql = "SELECT DISTINCT e.id, e.code, e.name
                         SELECT 1 FROM operations o
                         WHERE o.equipment = e.id
                           AND o.project_id = $selected_project_id
+                          $operations_company_scope_inline
                       )
-                      $operations_company_scope
                       ORDER BY e.code ASC";
 $all_equipment_res = mysqli_query($conn, $all_equipment_sql);
 $all_equipment = [];
@@ -677,6 +682,22 @@ include '../insidebar.php';
         background: #083a63;
     }
 
+    .movement-unified-page .btn-end-row {
+        background: #dc2626;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        margin-right: 4px;
+    }
+
+    .movement-unified-page .btn-end-row:hover {
+        background: #b91c1c;
+    }
+
     .movement-unified-page #monitoringMap {
         height: 400px;
         border: 1px solid #d5e2ef;
@@ -798,113 +819,6 @@ include '../insidebar.php';
             <div class="success-message <?php echo $is_success ? 'is-success' : 'is-error'; ?>">
                 <i class="fas <?php echo $is_success ? 'fa-check-circle' : 'fa-exclamation-circle'; ?>"></i>
                 <?php echo htmlspecialchars($msg, ENT_QUOTES, 'UTF-8'); ?>
-            </div>
-        <?php endif; ?>
-
-        <!-- إضافة تشغيل جديد -->
-        <?php if ($can_add): ?>
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-plus-circle"></i> إضافة تشغيل جديد</h5>
-                </div>
-                <div class="card-body">
-                    <form id="addOperationForm" method="post">
-                        <input type="hidden" name="action" value="add_new_operation">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>العقد *</label>
-                                <select name="contract_id" id="add_contract_id" required>
-                                    <option value="">-- اختر العقد --</option>
-                                    <?php foreach ($all_contracts as $ct): ?>
-                                        <option value="<?php echo intval($ct['contract_id']); ?>"><?php echo htmlspecialchars($ct['contract_signing_date']); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>المورد *</label>
-                                <select name="supplier_id" id="add_supplier_id" required>
-                                    <option value="">-- اختر المورد --</option>
-                                    <?php foreach ($all_suppliers as $sup): ?>
-                                        <option value="<?php echo intval($sup['id']); ?>"><?php echo htmlspecialchars($sup['name']); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>نوع المعدة *</label>
-                                <select name="equipment_type" id="add_equipment_type" required>
-                                    <option value="">-- اختر النوع --</option>
-                                    <?php
-                                    $type_query = "SELECT DISTINCT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
-                                    $type_result = mysqli_query($conn, $type_query);
-                                    if ($type_result) {
-                                        while ($type_row = mysqli_fetch_assoc($type_result)) {
-                                            echo "<option value='" . intval($type_row['id']) . "'>" . htmlspecialchars($type_row['type']) . "</option>";
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>المعدة *</label>
-                                <select name="equipment" id="add_equipment" required>
-                                    <option value="">-- اختر المعدة --</option>
-                                    <?php foreach ($all_equipment as $eq): ?>
-                                        <option value="<?php echo intval($eq['id']); ?>"><?php echo htmlspecialchars($eq['code'] . ' - ' . $eq['name']); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>الفئة</label>
-                                <select name="equipment_category">
-                                    <option value="أساسي">أساسي</option>
-                                    <option value="احتياطي">احتياطي</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>الوردية</label>
-                                <select name="shift_type">
-                                    <option value="D">نهاري</option>
-                                    <option value="N">ليلي</option>
-                                    <option value="B" selected>نهاري + ليلي</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>بداية التشغيل *</label>
-                                <input type="date" name="start" value="<?php echo date('Y-m-d'); ?>" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>نهاية التشغيل</label>
-                                <input type="date" name="end">
-                            </div>
-
-                            <div class="form-group">
-                                <label>إجمالي ساعات العمل</label>
-                                <input type="number" name="total_equipment_hours" step="0.01" value="0">
-                            </div>
-
-                            <div class="form-group">
-                                <label>ساعات الوردية</label>
-                                <input type="number" name="shift_hours" step="0.01" value="0">
-                            </div>
-
-                            <div class="form-group">
-                                <label>الحالة</label>
-                                <select name="status">
-                                    <option value="1" selected>ساري</option>
-                                    <option value="0">منتهي</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-bulk-save"><i class="fas fa-plus"></i> إضافة التشغيل</button>
-                    </form>
-                </div>
             </div>
         <?php endif; ?>
 
@@ -1036,15 +950,20 @@ include '../insidebar.php';
                                     </td>
                                     <td><?php echo intval($op['active_drivers_count']); ?></td>
                                     <td>
-                                        <span class="status-<?php echo $is_running ? 'running' : 'idle'; ?>">
-                                            <?php echo $is_running ? 'ساري' : 'منتهي'; ?>
-                                        </span>
+                                        <?php if ($is_running): ?>
+                                            <span class="status-running">ساري</span>
+                                            <?php if ($can_edit): ?>
+                                                <button type="button" class="btn-end-row" onclick="endOperation(<?php echo $op_id; ?>)"><i class="fas fa-stop-circle"></i> إنهاء</button>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <span class="status-idle">منتهي</span>
+                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php if ($is_running && $can_edit): ?>
                                             <button type="button" class="btn-save-row" onclick="saveOperation(<?php echo $op_id; ?>)"><i class="fas fa-save"></i> حفظ</button>
                                         <?php else: ?>
-                                            <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>" class="btn-save-row" style="text-decoration:none; display:inline-block;"><i class="fas fa-eye"></i> عرض</a>
+                                            <span>-</span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -1115,15 +1034,20 @@ include '../insidebar.php';
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <span class="status-<?php echo $is_active ? 'running' : 'idle'; ?>">
-                                            <?php echo $is_active ? 'ساري' : 'منتهي'; ?>
-                                        </span>
+                                        <?php if ($is_active): ?>
+                                            <span class="status-running">ساري</span>
+                                            <?php if ($can_edit): ?>
+                                                <button type="button" class="btn-end-row" onclick="endDriver(<?php echo $rel_id; ?>)"><i class="fas fa-stop-circle"></i> إنهاء</button>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <span class="status-idle">منتهي</span>
+                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php if ($is_active && $can_edit): ?>
                                             <button type="button" class="btn-save-row" onclick="saveDriver(<?php echo $rel_id; ?>)"><i class="fas fa-save"></i> حفظ</button>
                                         <?php else: ?>
-                                            <a href="project_drivers.php?project_id=<?php echo intval($selected_project_id); ?>" class="btn-save-row" style="text-decoration:none; display:inline-block;"><i class="fas fa-eye"></i> عرض</a>
+                                            <span>-</span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -1172,6 +1096,42 @@ include '../insidebar.php';
         .catch(error => {
             alert('❌ خطأ في الحفظ: ' + error);
         });
+    }
+
+    function endOperation(opId) {
+        if (!confirm('هل تريد إنهاء هذا التشغيل؟')) return;
+        const formData = new FormData();
+        formData.append('action', 'save_single_operation');
+        formData.append('op_id', opId);
+        formData.append('equipment_category', document.querySelector('.op_category[data-op="' + opId + '"]')?.value || 'أساسي');
+        formData.append('shift_type', document.querySelector('.op_shift[data-op="' + opId + '"]')?.value || 'B');
+        formData.append('status', 0);
+        formData.append('json', '1');
+        fetch(window.location.href, { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) { alert('✅ تم إنهاء التشغيل'); location.reload(); }
+                else { alert('❌ ' + data.message); }
+            })
+            .catch(() => alert('❌ خطأ في الاتصال'));
+    }
+
+    function endDriver(relId) {
+        if (!confirm('هل تريد إنهاء تشغيل هذا السائق؟')) return;
+        const formData = new FormData();
+        formData.append('action', 'save_single_driver');
+        formData.append('rel_id', relId);
+        formData.append('shift_type', document.querySelector('.drv_shift[data-rel="' + relId + '"]')?.value || 'B');
+        formData.append('status', 0);
+        formData.append('end_date', new Date().toISOString().split('T')[0]);
+        formData.append('json', '1');
+        fetch(window.location.href, { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) { alert('✅ تم إنهاء تشغيل السائق'); location.reload(); }
+                else { alert('❌ ' + data.message); }
+            })
+            .catch(() => alert('❌ خطأ في الاتصال'));
     }
 
     function saveDriver(relId) {

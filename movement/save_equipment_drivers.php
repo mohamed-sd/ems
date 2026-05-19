@@ -22,6 +22,7 @@ $drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
 $drivers_has_supplier = db_table_has_column($conn, 'drivers', 'supplier_id');
 $suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
 $equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
+$equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
 
 $equipment_scope_sql = '1=1';
 if (!$is_super_admin) {
@@ -84,6 +85,11 @@ if (isset($_POST['equipment_id'])) {
 
     $start_date = isset($_POST['start_date']) ? trim($_POST['start_date']) : '';
     $end_date = isset($_POST['end_date']) ? trim($_POST['end_date']) : '';
+    $shift_type_raw = isset($_POST['shift_type']) ? strval($_POST['shift_type']) : 'B';
+    $auto_replace = isset($_POST['auto_replace']) ? intval($_POST['auto_replace']) : 0;
+
+    $allowed_shift_types = array('D', 'N', 'B');
+    $shift_type = in_array($shift_type_raw, $allowed_shift_types, true) ? $shift_type_raw : 'B';
 
     $start_valid = false;
     if ($start_date !== '') {
@@ -166,6 +172,7 @@ if (isset($_POST['equipment_id'])) {
                     'equipment_name' => $equipment_name,
                     'start_date' => $start_date,
                     'end_date' => $end_date !== '' ? $end_date : '2099-12-31',
+                    'shift_type' => $shift_type,
                     'action' => 'تشغيل مشغل جديد',
                     'requested_by_role' => '10',
                     'reason' => "طلب تشغيل مشغل جديد على آلية من شاشة إدارة المشغلين"
@@ -179,11 +186,16 @@ if (isset($_POST['equipment_id'])) {
                             'driver_id' => $driver_id,
                             'start_date' => $start_date,
                             'end_date' => $end_date !== '' ? $end_date : '2099-12-31',
-                            'status' => 1
+                            'status' => 1,
+                            'shift_type' => $shift_type
                         ]
                     ]
                 ]
             ];
+
+            if (!$equipment_drivers_has_shift_type) {
+                unset($payload['operations'][0]['data']['shift_type']);
+            }
 
             $approval_result = approval_create_request(
                 'driver',
@@ -228,6 +240,25 @@ if (isset($_POST['equipment_id'])) {
             continue;
         }
 
+        $active_any = mysqli_query($conn, "SELECT id, equipment_id FROM equipment_drivers WHERE driver_id=$driver_id AND status=1$check_scope LIMIT 1");
+        if ($active_any && mysqli_num_rows($active_any) > 0) {
+            $active_row = mysqli_fetch_assoc($active_any);
+            $active_equipment_id = isset($active_row['equipment_id']) ? intval($active_row['equipment_id']) : 0;
+
+            if ($active_equipment_id === $equipment_id) {
+                continue;
+            }
+
+            if ($auto_replace === 1) {
+                mysqli_query(
+                    $conn,
+                    "UPDATE equipment_drivers SET status=0, end_date=$start_sql WHERE driver_id=$driver_id AND status=1$check_scope"
+                );
+            } else {
+                continue;
+            }
+        }
+
         $driver_res = mysqli_query($conn, "SELECT d.id FROM drivers d WHERE d.id = $driver_id AND $driver_scope_sql LIMIT 1");
         if (!$driver_res || mysqli_num_rows($driver_res) === 0) {
             continue;
@@ -235,11 +266,13 @@ if (isset($_POST['equipment_id'])) {
 
         $insert_company_col = ($is_super_admin || !$equipment_drivers_has_company) ? "" : ", company_id";
         $insert_company_val = ($is_super_admin || !$equipment_drivers_has_company) ? "" : ", $company_id";
+        $insert_shift_col = $equipment_drivers_has_shift_type ? ", shift_type" : "";
+        $insert_shift_val = $equipment_drivers_has_shift_type ? ", '" . mysqli_real_escape_string($conn, $shift_type) . "'" : "";
 
         mysqli_query(
             $conn,
-            "INSERT INTO equipment_drivers (equipment_id, driver_id, start_date, end_date, status$insert_company_col)
-             VALUES ($equipment_id, $driver_id, $start_sql, $end_sql, 1$insert_company_val)"
+            "INSERT INTO equipment_drivers (equipment_id, driver_id, start_date, end_date, status$insert_shift_col$insert_company_col)
+             VALUES ($equipment_id, $driver_id, $start_sql, $end_sql, 1$insert_shift_val$insert_company_val)"
         );
     }
 

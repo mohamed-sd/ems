@@ -1098,7 +1098,7 @@ include '../insidebar.php';
     <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
     <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-    <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
+    <!-- <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script> -->
     <script>
         $(document).ready(function () {
             var projectDriversTable = $('#projectDriversTable').DataTable({
