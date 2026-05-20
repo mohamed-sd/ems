@@ -160,10 +160,43 @@ if ($dashboardRole=="0"||$dashboardRole=="1") {
     ['fa-truck',intval($supCnt),'موردو العقد','or'],
   ];
 } elseif ($dashboardRole=="10") {
-  $eq=dashboard_scalar($conn,"SELECT COUNT(DISTINCT e.id) AS t FROM equipments e JOIN operations o ON o.equipment=e.id WHERE e.status='1' AND $so",'t');
-  $dr=dashboard_scalar($conn,"SELECT COUNT(DISTINCT d.id) AS t FROM drivers d JOIN equipment_drivers ed ON ed.driver_id=d.id JOIN operations o ON o.equipment=ed.equipment_id WHERE d.status='1' AND $so",'t');
-  $h=dashboard_scalar($conn,"SELECT SUM(t.total_work_hours) AS t FROM timesheet t JOIN operations o ON t.operator=o.id WHERE $so",'t');
-  $stats=[['fa-tools',$eq,'الآليات','or'],['fa-id-badge',$dr,'المشغلون','or'],['fa-clock',(int)$h,'الساعات','or']];
+  $projectEqScope = $projectId > 0 ? "o.project_id = $projectId" : "1=0";
+  $stopListRole10 = "'معطلة','معطلة مؤقتاً','تحت الصيانة','في الصيانة','موقوفة للصيانة','متوقفة','موقوفة','مبيعة/مسحوبة'";
+
+  // نفس منطق مدير الأسطول لكن على آليات المشروع المحدد فقط
+  $eq=dashboard_scalar(
+    $conn,
+    "SELECT COUNT(DISTINCT e.id) AS t
+     FROM operations o
+     JOIN equipments e ON e.id = o.equipment
+     WHERE $projectEqScope
+       AND o.equipment IS NOT NULL
+       AND o.equipment<>''
+       AND o.equipment<>'0'",
+    't'
+  );
+
+  $ao=dashboard_scalar(
+    $conn,
+    "SELECT COUNT(DISTINCT e.id) AS t
+     FROM operations o
+     JOIN equipments e ON e.id = o.equipment
+     WHERE $projectEqScope
+       AND o.equipment IS NOT NULL
+       AND o.equipment<>''
+       AND o.equipment<>'0'" .
+     ($hasAvail
+       ? " AND (e.availability_status IS NULL OR e.availability_status='' OR e.availability_status NOT IN($stopListRole10))"
+       : " AND (e.status='1' OR e.status=1)"),
+    't'
+  );
+
+  $bo=max(0, intval($eq) - intval($ao));
+  $stats=[
+    ['fa-tools',$eq,'إجمالي المعدات','or'],
+    ['fa-play-circle',$ao,'تعمل الآن','ok'],
+    ['fa-exclamation-triangle',$bo,'معطلة','err']
+  ];
 }
 
 $AC = [

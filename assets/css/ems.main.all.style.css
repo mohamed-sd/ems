@@ -9464,6 +9464,260 @@ table.d-bd {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   ACTIVITY LOGS PAGE (ActivityLogs/activity_logs.php)
+   Unified cards/table/filter form with system identity
+══════════════════════════════════════════════════════════════ */
+
+.activity-logs-main {
+  font-family: 'Tajawal', 'Cairo', sans-serif;
+}
+
+.activity-logs-main .activity-page-hero {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(247, 147, 26, .3);
+  background: linear-gradient(140deg, #fffdf9 0%, #fff7eb 100%);
+  box-shadow: var(--sh);
+}
+
+.activity-logs-main .activity-page-hero-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(247, 147, 26, .14);
+  color: var(--or2);
+  font-size: 1.18rem;
+}
+
+.activity-logs-main .activity-page-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.activity-logs-main .activity-page-hero-label {
+  color: var(--t3);
+  font-weight: 700;
+  font-size: .8rem;
+}
+
+.activity-logs-main .activity-page-hero-title {
+  margin: 0;
+  color: var(--t1);
+  font-weight: 900;
+  font-size: 1.07rem;
+}
+
+.activity-logs-main .activity-page-hero-count {
+  margin-inline-start: auto;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--or), var(--or2));
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 800;
+}
+
+.activity-logs-main .role-cards-flex {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 14px;
+}
+
+.activity-logs-main .role-card-wrap {
+  flex: 1 1 calc(25% - 14px);
+  max-width: calc(25% - 11px);
+  min-width: 240px;
+}
+
+.activity-logs-main .role-card-wrap > a {
+  display: block;
+  height: 100%;
+}
+
+.activity-logs-main .role-card {
+  border: 1.5px solid var(--bdr);
+  border-right: 4px solid var(--role-color, var(--or));
+  border-radius: var(--rl);
+  background: var(--role-bg, #fff);
+  box-shadow: var(--sh);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.activity-logs-main .role-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sh2);
+}
+
+.activity-logs-main .activity-role-icon {
+  width: 52px;
+  height: 52px;
+  background: var(--role-tint, rgba(247, 147, 26, .14));
+}
+
+.activity-logs-main .activity-role-icon i,
+.activity-logs-main .role-card .fa-list-ul {
+  color: var(--role-color, var(--or));
+}
+
+.activity-logs-main .activity-role-last {
+  font-size: .72rem;
+  margin-top: 3px;
+}
+
+.activity-logs-main .activity-role-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--rl);
+  border: 1.5px solid var(--role-tint, rgba(247, 147, 26, .2));
+  background: linear-gradient(135deg, var(--role-bg, #fff), #fff);
+  box-shadow: var(--sh);
+}
+
+.activity-logs-main .activity-role-banner-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--role-tint, rgba(247, 147, 26, .12));
+  color: var(--role-color, var(--or));
+  font-size: 1.1rem;
+}
+
+.activity-logs-main .activity-role-banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.activity-logs-main .activity-role-banner-label {
+  color: var(--t3);
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+.activity-logs-main .activity-role-banner-title {
+  margin: 0;
+  color: var(--t1);
+  font-size: 1.03rem;
+  font-weight: 900;
+}
+
+.activity-logs-main .activity-role-banner-count {
+  margin-inline-start: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--role-color, var(--or));
+  color: #fff;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: .85rem;
+  font-weight: 800;
+}
+
+.activity-logs-main .activity-filters-form {
+  display: block;
+}
+
+.activity-logs-main .activity-filter-actions {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.activity-logs-main .activity-clear-btn {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #fff;
+}
+
+.activity-logs-main .activity-clear-btn:hover {
+  background: linear-gradient(135deg, #b91c1c, #991b1b);
+}
+
+.activity-logs-main #logsTable th {
+  white-space: nowrap;
+}
+
+.activity-logs-main #logsTable .detail-btn {
+  min-width: 34px;
+  min-height: 30px;
+  padding: 4px 8px;
+}
+
+.activity-logs-main pre {
+  font-family: 'Courier New', monospace;
+  font-size: .78rem;
+}
+
+@keyframes slideInToast {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 1199px) {
+  .activity-logs-main .role-card-wrap {
+    flex-basis: calc(50% - 10px);
+    max-width: calc(50% - 7px);
+  }
+}
+
+@media (max-width: 575px) {
+  .activity-logs-main .activity-role-banner {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .activity-logs-main .activity-page-hero {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .activity-logs-main .activity-page-hero-count {
+    margin-inline-start: 0;
+  }
+
+  .activity-logs-main .role-card-wrap {
+    flex-basis: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .activity-logs-main .activity-role-banner-count {
+    margin-inline-start: 0;
+  }
+
+  .activity-logs-main .activity-filter-actions {
+    justify-content: stretch;
+    flex-direction: column;
+  }
+
+  .activity-logs-main .activity-filter-actions .btn-cancel,
+  .activity-logs-main .activity-filter-actions .activity-clear-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
    GROUP TOGGLE BUTTONS (Contracts Tables)
    أزرار التحكم في مجموعات أعمدة الجداول
 ══════════════════════════════════════════════════════════════ */

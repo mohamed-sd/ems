@@ -4,7 +4,7 @@
  * /ActivityLogs/activity_logs.php
  *
  * Phase 1: Role Cards overview.
- * Phase 2: Filtered log table (cursor-paginated) per role.
+ * Phase 2: Log table via DataTables + AJAX endpoint for clear-logs action.
  */
 session_start();
 if (!isset($_SESSION['user'])) {
@@ -27,7 +27,6 @@ $current_role = strval($_SESSION['user']['role'] ?? '');
 $is_super_admin = ($current_role === '-1');
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 
-// Only admins and company admins can view logs.
 if (!$is_super_admin && $company_id <= 0) {
     header("Location: ../login.php?msg=غير+مصرح");
     exit();
@@ -52,14 +51,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'logs') {
             $filters[$k] = trim($_GET[$k]);
     }
 
-    // Enforce company scope for non-super-admin.
     if (!$is_super_admin && $company_id > 0) {
         $filters['company_id'] = $company_id;
     }
 
     $afterCreatedAt = trim((string) ($_GET['after_created_at'] ?? ''));
     $afterId = intval($_GET['after_id'] ?? 0);
-    $limit = min(intval($_GET['limit'] ?? 50), 200);
+    $limit = min(intval($_GET['limit'] ?? 2000), 5000);
 
     $rows = $repo->getPage($filters, $afterCreatedAt, $afterId, $limit);
     echo json_encode(
@@ -69,7 +67,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'logs') {
     exit();
 }
 
-// ── AJAX: single log detail for modal ────────────────────────────────────
+// ── AJAX: single log detail ───────────────────────────────────────────────
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'detail') {
     header('Content-Type: application/json; charset=utf-8');
     $id = intval($_GET['id'] ?? 0);
@@ -78,7 +76,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'detail') {
         echo json_encode(['success' => false, 'message' => 'السجل غير موجود']);
         exit();
     }
-    // Enforce scope.
     if (!$is_super_admin && $company_id > 0 && intval($row['company_id'] ?? 0) !== $company_id) {
         echo json_encode(['success' => false, 'message' => 'غير مصرح']);
         exit();
@@ -87,30 +84,74 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'detail') {
     exit();
 }
 
-// ── Phase 1: role cards data ──────────────────────────────────────────────
+// ── AJAX: clear logs for a specific role ─────────────────────────────────
+if (isset($_POST['ajax']) && $_POST['ajax'] === 'clear_logs') {
+    header('Content-Type: application/json; charset=utf-8');
+
+    // Only super-admin or company admin allowed.
+    if (!$is_super_admin && $company_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'غير مصرح']);
+        exit();
+    }
+
+    $roleId = intval($_POST['role_id'] ?? 0);
+    if ($roleId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'معرّف الدور غير صالح']);
+        exit();
+    }
+
+    try {
+        // Build DELETE query scoped by role (and company for non-super-admin).
+        if ($is_super_admin) {
+            $stmt = $conn->prepare("DELETE FROM activity_logs WHERE role_id = ?");
+            $stmt->bind_param('i', $roleId);
+        } else {
+            $stmt = $conn->prepare("DELETE FROM activity_logs WHERE role_id = ? AND company_id = ?");
+            $stmt->bind_param('ii', $roleId, $company_id);
+        }
+        $stmt->execute();
+        $deleted = $stmt->affected_rows;
+        $stmt->close();
+
+        echo json_encode([
+            'success' => true,
+            'deleted' => $deleted,
+            'message' => 'تم تفريغ ' . $deleted . ' سجل بنجاح'
+        ], JSON_UNESCAPED_UNICODE);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'خطأ في قاعدة البيانات: ' . $e->getMessage()]);
+    }
+    exit();
+}
+
+// ── Phase 1: role cards ───────────────────────────────────────────────────
 $roleSummary = $repo->getRoleSummary($is_super_admin ? 0 : $company_id);
 
-// ── Phase 2: initial log table (when role_id is in GET) ──────────────────
+// ── Phase 2: initial rows (SSR for DataTables) ────────────────────────────
 $selectedRoleId = isset($_GET['role_id']) ? intval($_GET['role_id']) : 0;
 $initialRows = [];
 if ($selectedRoleId > 0) {
+    // Load up to 5000 rows; DataTables handles client-side paging/search from here.
     $initialRows = $repo->getInitialPage(
         $is_super_admin ? 0 : $company_id,
         $selectedRoleId,
-        1000
+        5000
     );
 }
 
-$initialCursorId = 0;
-$initialCursorCreatedAt = '';
-if (!empty($initialRows)) {
-    $lastInitialRow = end($initialRows);
-    $initialCursorId = intval($lastInitialRow['id'] ?? 0);
-    $initialCursorCreatedAt = strval($lastInitialRow['created_at'] ?? '');
-    reset($initialRows);
+$currentRoleCard = null;
+if ($selectedRoleId > 0) {
+    foreach ($roleSummary as $c) {
+        if (intval($c['role_id']) === $selectedRoleId) {
+            $currentRoleCard = $c;
+            break;
+        }
+    }
 }
 
-// Role icon / colour palette.
+$selectedRoleName = htmlspecialchars($currentRoleCard['role_name'] ?? 'جميع الإدارات', ENT_QUOTES, 'UTF-8');
+$selectedRoleCount = number_format(intval($currentRoleCard['total_logs'] ?? 0));
+
 $roleIconMap = [
     '-1' => ['icon' => 'fa-user-shield', 'color' => '#c84a0c', 'bg' => '#fff3ee'],
     '1' => ['icon' => 'fa-briefcase', 'color' => '#1255a8', 'bg' => '#eef4ff'],
@@ -138,48 +179,93 @@ $actionLabels = [
     'click' => ['label' => 'نقرة', 'badge' => 'bg-secondary'],
 ];
 
-function actionBadge(string $type, array $labels): string
+function renderLogRow(array $row, array $actionLabels): string
 {
-    $info = $labels[$type] ?? ['label' => $type, 'badge' => 'bg-secondary'];
-    return '<span class="badge ' . $info['badge'] . '">' . htmlspecialchars($info['label'], ENT_QUOTES) . '</span>';
+    $e = fn($s) => htmlspecialchars((string) ($s ?? ''), ENT_QUOTES, 'UTF-8');
+    $t = $row['created_at'] ? date('Y-m-d H:i:s', strtotime($row['created_at'])) : '—';
+
+    $actionType = $row['action_type'] ?? '';
+    $info = $actionLabels[$actionType] ?? ['label' => $actionType ?: '—', 'badge' => 'bg-secondary'];
+    $badge = '<span class="badge ' . $info['badge'] . '">' . $e($info['label']) . '</span>';
+
+    $status = intval($row['response_status'] ?? 0);
+    $statusClass = $status >= 500 ? 'text-danger fw-bold'
+        : ($status >= 400 ? 'text-warning fw-bold'
+            : ($status >= 200 ? 'text-success' : 'text-muted'));
+
+    $statusDisplay = ($status !== 0) ? strval($status) : '—';
+    $recordDisplay = ($row['record_id'] !== null && $row['record_id'] !== '') ? $e($row['record_id']) : '—';
+    $buttonDisplay = ($row['button_name'] !== null && $row['button_name'] !== '') ? $e($row['button_name']) : '—';
+
+    return '<tr data-id="' . intval($row['id']) . '">
+        <td class="px-3 text-nowrap small" data-date="' . substr($e($t), 0, 10) . '">' . $e($t) . '</td>
+        <td class="small">' . $e($row['user_name'] ?? ($row['user_id'] ?? '—')) . '</td>
+        <td class="small">' . $e($row['role_name'] ?? '—') . '</td>
+        <td class="small">' . $e($row['module_name'] ?? '—') . '</td>
+        <td class="small">' . $e($row['screen_name'] ?? '—') . '</td>
+        <td data-action="' . $e($actionType) . '">' . $badge . '</td>
+        <td class="small text-truncate" style="max-width:100px" title="' . $e($row['button_name'] ?? '') . '">' . $buttonDisplay . '</td>
+        <td class="small">' . $recordDisplay . '</td>
+        <td class="small ' . $statusClass . '">' . $statusDisplay . '</td>
+        <td class="text-center">
+            <button class="action-btn view detail-btn"
+                    data-id="' . intval($row['id']) . '" title="تفاصيل">
+                <i class="fa fa-eye"></i>
+            </button>
+        </td>
+        <td class="d-none">' . $e($row['http_method'] ?? '') . '</td>
+    </tr>';
 }
 
 $page_title = 'سجل النشاطات';
 ?>
-<?php require_once '../insidebar.php'; ?>
 <?php require_once '../inheader.php'; ?>
+<?php require_once '../insidebar.php'; ?>
 
-<main class="main-content">
-    <div class="container-fluid py-4 px-3 px-md-4">
+<div class="main activity-logs-main ems-unified-page-shell">
 
-        <!-- Page Header -->
-        <div class="d-flex align-items-center justify-content-between mb-4 gap-2 flex-wrap">
-            <div>
-                <h4 class="mb-1 fw-bold" style="color:var(--ni5,#1255a8)">
-                    <i class="fa fa-history me-2"></i>سجل النشاطات
-                </h4>
-                <p class="text-muted small mb-0">تتبع جميع عمليات المستخدمين في النظام</p>
+
+        <div class="main_head">
+
+            <div class="head_actions"></div>
+
+            <h1 class="head-title">
+                <div class="title-icon"><i class="fa fa-history"></i></div>
+                سجل النشاطات
+                <p class="small mb-0" style="color: #fff;">تتبع جميع عمليات المستخدمين في النظام</p>
+            </h1>
+
+            <?php if ($selectedRoleId > 0): ?>
+            <div class="head_back">
+                <a href="activity_logs.php" class="">
+                    <i class="fas fa-arrow-right"></i> رجوع
+                </a>
+            </div>
+             <?php endif; ?>
+        </div>
+
+        <div class="activity-page-hero">
+            <div class="activity-page-hero-icon"><i class="fa fa-layer-group"></i></div>
+            <div class="activity-page-hero-content">
+                <span class="activity-page-hero-label">عنوان الصفحة</span>
+                <h2 class="activity-page-hero-title"><?= $selectedRoleName ?></h2>
             </div>
             <?php if ($selectedRoleId > 0): ?>
-                <a href="activity_logs.php" class="btn btn-outline-secondary btn-sm">
-                    <i class="fa fa-arrow-right me-1"></i>العودة للأدوار
-                </a>
+                <span class="activity-page-hero-count" id="heroLogCount"><?= $selectedRoleCount ?> سجل</span>
             <?php endif; ?>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════
-       PHASE 1 — Role Cards
-  ════════════════════════════════════════════════════ -->
+        <!-- ══════════════════════════════════════════
+             PHASE 1 — Role Cards
+        ═══════════════════════════════════════════ -->
         <?php if ($selectedRoleId === 0): ?>
-            <div class="row g-3 mb-2" id="roleCardsGrid">
-                <?php if (empty($roleSummary)): ?>
-                    <div class="col-12">
-                        <div class="alert alert-info text-center">
-                            <i class="fa fa-info-circle me-2"></i>
-                            لا توجد سجلات نشاط حتى الآن. السجلات ستظهر هنا بعد أول دخول للمستخدمين.
-                        </div>
-                    </div>
-                <?php else: ?>
+            <?php if (empty($roleSummary)): ?>
+                <div class="alert alert-info text-center mb-2">
+                    <i class="fa fa-info-circle me-2"></i>
+                    لا توجد سجلات نشاط حتى الآن.
+                </div>
+            <?php else: ?>
+                <div id="roleCardsGrid" class="mb-4 role-cards-flex">
                     <?php foreach ($roleSummary as $card):
                         $rid = strval($card['role_id'] ?? '');
                         $ico = $roleIconMap[$rid] ?? ['icon' => 'fa-user', 'color' => '#6b7280', 'bg' => '#f9fafb'];
@@ -187,24 +273,22 @@ $page_title = 'سجل النشاطات';
                         $total = number_format(intval($card['total_logs']));
                         $lastAt = $card['last_activity'] ? date('Y-m-d H:i', strtotime($card['last_activity'])) : '—';
                         ?>
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                        <div class="role-card-wrap">
                             <a href="activity_logs.php?role_id=<?= intval($card['role_id']) ?>" class="text-decoration-none">
-                                <div class="card h-100 border-0 shadow-sm role-card"
-                                    style="border-right:4px solid <?= $ico['color'] ?> !important;background:<?= $ico['bg'] ?>;transition:transform .15s,box-shadow .15s">
+                                <div class="card h-100 role-card">
                                     <div class="card-body d-flex align-items-center gap-3">
-                                        <div class="role-icon-wrap rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                                            style="width:52px;height:52px;background:<?= $ico['color'] ?>22">
-                                            <i class="fa <?= $ico['icon'] ?> fa-lg" style="color:<?= $ico['color'] ?>"></i>
+                                        <div class="activity-role-icon rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+                                            <i class="fa <?= $ico['icon'] ?> fa-lg"></i>
                                         </div>
                                         <div class="flex-grow-1 min-w-0">
                                             <div class="fw-semibold text-dark text-truncate" style="font-size:.95rem"><?= $name ?>
                                             </div>
                                             <div class="text-muted small mt-1">
-                                                <i class="fa fa-list-ul me-1" style="color:<?= $ico['color'] ?>"></i>
-                                                <?= $total ?> سجل
+                                                <i class="fa fa-list-ul me-1"></i><?= $total ?>
+                                                سجل
                                             </div>
-                                            <div class="text-muted" style="font-size:.72rem;margin-top:3px">
-                                                <i class="fa fa-clock me-1"></i> آخر نشاط: <?= $lastAt ?>
+                                            <div class="text-muted activity-role-last">
+                                                <i class="fa fa-clock me-1"></i>آخر نشاط: <?= $lastAt ?>
                                             </div>
                                         </div>
                                         <i class="fa fa-chevron-left text-muted" style="font-size:.8rem"></i>
@@ -213,150 +297,226 @@ $page_title = 'سجل النشاطات';
                             </a>
                         </div>
                     <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
 
-        <!-- ═══════════════════════════════════════════════════
-       PHASE 2 — Log Table
-  ════════════════════════════════════════════════════ -->
+        <!-- ══════════════════════════════════════════
+             PHASE 2 — Log Table
+        ═══════════════════════════════════════════ -->
         <?php if ($selectedRoleId > 0):
-            $currentRoleCard = null;
-            foreach ($roleSummary as $c) {
-                if (intval($c['role_id']) === $selectedRoleId) {
-                    $currentRoleCard = $c;
-                    break;
-                }
-            }
             $rid = strval($selectedRoleId);
             $ico = $roleIconMap[$rid] ?? ['icon' => 'fa-user', 'color' => '#6b7280', 'bg' => '#f9fafb'];
             ?>
 
-            <!-- Selected role badge -->
-            <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
-                <div class="role-badge-lg d-flex align-items-center gap-2 px-3 py-2 rounded-3"
-                    style="background:<?= $ico['bg'] ?>;border:1px solid <?= $ico['color'] ?>33">
-                    <i class="fa <?= $ico['icon'] ?>" style="color:<?= $ico['color'] ?>"></i>
-                    <span class="fw-semibold" style="color:<?= $ico['color'] ?>">
-                        <?= htmlspecialchars($currentRoleCard['role_name'] ?? 'الدور #' . $selectedRoleId, ENT_QUOTES) ?>
-                    </span>
-                    <span class="badge rounded-pill text-white ms-1" style="background:<?= $ico['color'] ?>">
-                        <?= number_format(intval($currentRoleCard['total_logs'] ?? 0)) ?> سجل
-                    </span>
-                </div>
-            </div>
+
 
             <!-- Filters Bar -->
-            <div class="card border-0 shadow-sm mb-3">
-                <div class="card-body py-3">
-                    <div class="row g-2 align-items-end" id="filterForm">
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-                            <label class="form-label form-label-sm">نوع الإجراء</label>
-                            <select id="f_action_type" class="form-select form-select-sm">
+            <form class="allforms allforms-visible activity-filters-form" onsubmit="return false;">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fa fa-filter"></i> فلترة سجلات النشاط</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid">
+
+                        <!-- نوع الإجراء — يبحث على data-action في الـ <td> -->
+                        <div class="form-group">
+                            <label>نوع الإجراء</label>
+                            <select id="f_action_type">
                                 <option value="">الكل</option>
                                 <?php foreach ($actionLabels as $k => $v): ?>
                                     <option value="<?= $k ?>"><?= $v['label'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-                            <label class="form-label form-label-sm">الوحدة</label>
-                            <input type="text" id="f_module_name" class="form-control form-control-sm"
-                                placeholder="مثال: contracts">
+
+                        <!-- من تاريخ -->
+                        <div class="form-group">
+                            <label>من تاريخ</label>
+                            <input type="date" id="f_date_from">
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-                            <label class="form-label form-label-sm">الشاشة</label>
-                            <input type="text" id="f_screen_name" class="form-control form-control-sm"
-                                placeholder="مثال: contracts_list">
+
+                        <!-- إلى تاريخ -->
+                        <div class="form-group">
+                            <label>إلى تاريخ</label>
+                            <input type="date" id="f_date_to">
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-                            <label class="form-label form-label-sm">رقم السجل</label>
-                            <input type="number" id="f_record_id" class="form-control form-control-sm" placeholder="ID">
-                        </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-                            <label class="form-label form-label-sm">من تاريخ</label>
-                            <input type="date" id="f_date_from" class="form-control form-control-sm">
-                        </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-                            <label class="form-label form-label-sm">إلى تاريخ</label>
-                            <input type="date" id="f_date_to" class="form-control form-control-sm">
-                        </div>
-                        <div class="col-12 col-sm-6 col-md-3 col-lg-2">
-                            <label class="form-label form-label-sm">حالة الاستجابة</label>
-                            <input type="number" id="f_response_status" class="form-control form-control-sm"
-                                placeholder="200">
-                        </div>
-                        <div class="col-12 col-sm-6 col-md-3 col-lg-2">
-                            <label class="form-label form-label-sm">طريقة HTTP</label>
-                            <select id="f_http_method" class="form-select form-select-sm">
+
+                        <!-- نوع الميثود — column(9 hidden) -->
+                        <div class="form-group">
+                            <label>طريقة HTTP</label>
+                            <select id="f_http_method">
                                 <option value="">الكل</option>
                                 <option value="GET">GET</option>
                                 <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
                             </select>
                         </div>
-                        <div class="col-12 col-auto d-flex gap-2 align-items-end">
-                            <button class="btn btn-primary btn-sm px-3" id="applyFiltersBtn">
-                                <i class="fa fa-filter me-1"></i>تطبيق
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm" id="resetFiltersBtn">
+
+                        <!-- أزرار -->
+                        <div class="form-group allforms-span-full activity-filter-actions">
+                            <button type="button" class="btn-cancel" id="resetFiltersBtn">
                                 <i class="fa fa-times me-1"></i>إعادة
                             </button>
+                            <button type="button" class="btn-save activity-clear-btn" id="clearLogsBtn"
+                                data-role-id="<?= intval($selectedRoleId) ?>"
+                                data-role-name="<?= htmlspecialchars($currentRoleCard['role_name'] ?? 'الدور #' . $selectedRoleId, ENT_QUOTES) ?>">
+                                <i class="fa fa-trash me-1"></i>تفريغ السجلات
+                            </button>
                         </div>
+
                     </div>
                 </div>
-            </div>
+            </form>
 
             <!-- Table -->
-            <div class="card border-0 shadow-sm">
+            <div class="card">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-sm mb-0 no-datatable" id="logsTable" data-no-dt="1">
-                            <thead class="table-light sticky-top">
+                        <table class="alltables display nowrap" id="logsTable">
+                            <thead>
                                 <tr>
-                                    <th class="px-3" style="min-width:140px">التاريخ والوقت</th>
-                                    <th>المستخدم</th>
-                                    <th>الدور</th>
-                                    <th>الوحدة</th>
-                                    <th>الشاشة</th>
-                                    <th>الإجراء</th>
-                                    <th>الزر</th>
-                                    <th>رقم السجل</th>
-                                    <th>الاستجابة</th>
-                                    <th class="text-center">تفاصيل</th>
+                                    <th class="px-3" style="min-width:140px">التاريخ والوقت</th><!-- col 0 -->
+                                    <th>المستخدم</th><!-- col 1 -->
+                                    <th>الدور</th><!-- col 2 -->
+                                    <th>الوحدة</th><!-- col 3 -->
+                                    <th>الشاشة</th><!-- col 4 -->
+                                    <th>الإجراء</th><!-- col 5 -->
+                                    <th>الزر</th><!-- col 6 -->
+                                    <th>رقم السجل</th><!-- col 7 -->
+                                    <th>الاستجابة</th><!-- col 8 -->
+                                    <th class="text-center" data-orderable="false">تفاصيل</th><!-- col 9 -->
+                                    <th class="d-none">http_method</th><!-- col 10 hidden -->
                                 </tr>
                             </thead>
                             <tbody id="logsTableBody">
                                 <?php foreach ($initialRows as $row): ?>
                                     <?php echo renderLogRow($row, $actionLabels); ?>
                                 <?php endforeach; ?>
-                                <?php if (empty($initialRows)): ?>
-                                    <tr id="emptyRow">
-                                        <td colspan="10" class="text-center py-5 text-muted">
-                                            <i class="fa fa-inbox fa-2x mb-2 d-block"></i>لا توجد سجلات
-                                        </td>
-                                    </tr>
-                                <?php endif; ?>
                             </tbody>
                         </table>
-                    </div>
-
-                    <!-- Load more -->
-                    <div class="d-flex justify-content-center py-3" id="loadMoreWrap" <?= empty($initialRows) || count($initialRows) < 1000 ? 'style="display:none!important"' : '' ?>>
-                        <button class="btn btn-outline-primary btn-sm px-4" id="loadMoreBtn">
-                            <i class="fa fa-chevron-down me-1"></i>تحميل المزيد
-                        </button>
                     </div>
                 </div>
             </div>
 
         <?php endif; ?>
+</div>
 
-    </div><!-- /container -->
-</main>
+<style>
+    /* Force visible layout/design for activity logs page (high-priority local overrides) */
+    .activity-logs-main .activity-page-hero {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        padding: 12px 14px !important;
+        border-radius: 14px !important;
+        border: 1px solid rgba(247, 147, 26, .32) !important;
+        background: linear-gradient(140deg, #fffdf8 0%, #fff5e6 100%) !important;
+        box-shadow: 0 2px 10px rgba(26, 18, 8, .08) !important;
+        margin-bottom: 10px !important;
+    }
 
-<!-- ═══════════════════════════════════════════════════
+    .activity-logs-main .activity-page-hero-icon {
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: rgba(247, 147, 26, .14) !important;
+        color: #e67e00 !important;
+        font-size: 1.15rem !important;
+    }
+
+    .activity-logs-main .activity-page-hero-title {
+        margin: 0 !important;
+        font-size: 1.08rem !important;
+        font-weight: 900 !important;
+        color: #1a1208 !important;
+    }
+
+    .activity-logs-main .activity-page-hero-label {
+        color: #a07848 !important;
+        font-size: .8rem !important;
+        font-weight: 700 !important;
+    }
+
+    .activity-logs-main .activity-page-hero-count {
+        margin-inline-start: auto !important;
+        padding: 6px 12px !important;
+        border-radius: 999px !important;
+        background: linear-gradient(135deg, #f7931a, #e67e00) !important;
+        color: #fff !important;
+        font-weight: 800 !important;
+        font-size: .85rem !important;
+    }
+
+    .activity-logs-main .role-cards-flex {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: stretch !important;
+        gap: 14px !important;
+    }
+
+    .activity-logs-main .role-card-wrap {
+        flex: 1 1 calc(25% - 14px) !important;
+        max-width: calc(25% - 11px) !important;
+        min-width: 240px !important;
+    }
+
+    .activity-logs-main .role-card-wrap>a {
+        display: block !important;
+        height: 100% !important;
+    }
+
+    .activity-logs-main .role-card {
+        height: 100% !important;
+        border: 1.5px solid #e8dcc8 !important;
+        border-right: 4px solid #f7931a !important;
+        border-radius: 12px !important;
+        box-shadow: 0 1px 3px rgba(26, 18, 8, .08), 0 4px 12px rgba(26, 18, 8, .06) !important;
+        background: #fdf8f0 !important;
+    }
+
+    .activity-logs-main .activity-role-icon {
+        background: rgba(247, 147, 26, .14) !important;
+    }
+
+    .activity-logs-main .activity-role-icon i,
+    .activity-logs-main .role-card .fa-list-ul {
+        color: #f7931a !important;
+    }
+
+    @media (max-width:1199px) {
+        .activity-logs-main .role-card-wrap {
+            flex-basis: calc(50% - 10px) !important;
+            max-width: calc(50% - 7px) !important;
+        }
+    }
+
+    @media (max-width:575px) {
+        .activity-logs-main .role-card-wrap {
+            flex-basis: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+        }
+
+        .activity-logs-main .activity-page-hero {
+            flex-wrap: wrap !important;
+            align-items: flex-start !important;
+        }
+
+        .activity-logs-main .activity-page-hero-count {
+            margin-inline-start: 0 !important;
+        }
+    }
+</style>
+
+<!-- ══════════════════════════════════════════
      Detail Modal
-════════════════════════════════════════════════════ -->
+═══════════════════════════════════════════ -->
 <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
@@ -366,7 +526,7 @@ $page_title = 'سجل النشاطات';
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="detailModalBody">
+            <div class="modal-body">
                 <div class="text-center py-4 text-muted" id="detailLoading">
                     <i class="fa fa-spinner fa-spin fa-2x"></i>
                 </div>
@@ -414,381 +574,394 @@ $page_title = 'سجل النشاطات';
     </div>
 </div>
 
-<?php
-// ── Inline helper to render one <tr> ─────────────────────────────────────
-function renderLogRow(array $row, array $actionLabels): string
-{
-    $e = fn($s) => htmlspecialchars((string) ($s ?? ''), ENT_QUOTES, 'UTF-8');
-    $t = $row['created_at'] ? date('Y-m-d H:i:s', strtotime($row['created_at'])) : '—';
-
-    $actionType = $row['action_type'] ?? '';
-    $info = $actionLabels[$actionType] ?? ['label' => $e($actionType), 'badge' => 'bg-secondary'];
-    $badge = '<span class="badge ' . $info['badge'] . '">' . $e($info['label']) . '</span>';
-
-    $status = intval($row['response_status'] ?? 0);
-    $statusClass = $status >= 500 ? 'text-danger fw-bold'
-        : ($status >= 400 ? 'text-warning fw-bold'
-            : ($status >= 200 ? 'text-success' : 'text-muted'));
-
-    return '<tr data-id="' . intval($row['id']) . '">
-        <td class="px-3 text-nowrap small">' . $e($t) . '</td>
-      <td class="small">' . $e($row['user_name'] ?? ($row['user_id'] ?? '—')) . '</td>
-        <td class="small">' . $e($row['role_name'] ?? '—') . '</td>
-        <td class="small">' . $e($row['module_name'] ?? '—') . '</td>
-        <td class="small">' . $e($row['screen_name'] ?? '—') . '</td>
-        <td>' . $badge . '</td>
-        <td class="small text-truncate" style="max-width:100px" title="' . $e($row['button_name'] ?? '') . '">' . $e($row['button_name'] ?? '—') . '</td>
-        <td class="small">' . ($row['record_id'] ? $e($row['record_id']) : '—') . '</td>
-        <td class="small ' . $statusClass . '">' . ($status ?: '—') . '</td>
-        <td class="text-center">
-          <button class="btn btn-outline-primary btn-xs py-0 px-2 detail-btn" data-id="' . intval($row['id']) . '" title="تفاصيل">
-            <i class="fa fa-eye"></i>
-          </button>
-        </td>
-      </tr>';
-}
-?>
+<!-- ══════════════════════════════════════════
+     Confirm Clear Modal
+═══════════════════════════════════════════ -->
+<div class="modal fade" id="clearConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fa fa-exclamation-triangle me-2"></i>تأكيد تفريغ السجلات</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1">سيتم حذف جميع سجلات نشاط الدور:</p>
+                <p class="fw-bold fs-6" id="clearConfirmRoleName"></p>
+                <div class="alert alert-warning mb-0 py-2 small">
+                    <i class="fa fa-warning me-1"></i>هذا الإجراء لا يمكن التراجع عنه.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-danger btn-sm" id="clearConfirmBtn">
+                    <i class="fa fa-trash me-1"></i>نعم، تفريغ السجلات
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+    // ──────────────────────────────────────────────────────────────────────────
+    // Loader: ينتظر jQuery ثم DataTables ثم يشغّل الكود مرة واحدة فقط.
+    // Guard يمنع التهيئة المزدوجة حتى لو استُدعيت الدالة مرتين.
+    // ──────────────────────────────────────────────────────────────────────────
     (function () {
-        'use strict';
+        var DT_BASE = '/ems/assets/vendor/datatables/js/';
+        var DT_SCRIPTS = [
+            DT_BASE + 'jquery.dataTables.min.js',
+            DT_BASE + 'dataTables.responsive.min.js',
+            DT_BASE + 'dataTables.buttons.min.js',
+            DT_BASE + 'buttons.html5.min.js',
+            DT_BASE + 'buttons.print.min.js'
+        ];
 
-        const ROLE_ID = <?= intval($selectedRoleId) ?>;
-        const IS_PHASE2 = ROLE_ID > 0;
-        let cursorAfterId = <?= intval($initialCursorId) ?>;
-        let cursorAfterCreatedAt = <?= json_encode($initialCursorCreatedAt, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 
-        function initLogsDataTable() {
-            if (!window.jQuery || !window.jQuery.fn || !window.jQuery.fn.dataTable) return false;
-            var $ = window.jQuery;
-            var tableEl = document.getElementById('logsTable');
-            if (!tableEl) return false;
-
-            if ($.fn.dataTable.isDataTable(tableEl)) {
-                $(tableEl).DataTable().order([7, 'desc']).draw(false);
-                return true;
-            }
-
-            $(tableEl).DataTable({
-                responsive: true,
-                autoWidth: false,
-                order: [[7, 'desc']],
-                language: { url: '/ems/assets/i18n/datatables/ar.json' }
-            });
-            return true;
+        function loadScript(src, cb) {
+            // إذا كان محملاً بالفعل استدع cb مباشرة بدون إنشاء tag جديد
+            if (document.querySelector('script[src="' + src + '"]')) { return cb(); }
+            var s = document.createElement('script');
+            s.src = src;
+            s.onload = cb;
+            s.onerror = function () { console.error('Failed: ' + src); cb(); };
+            document.head.appendChild(s);
         }
 
-        // ── Role card hover effect ──────────────────────────────────────────────
-        document.querySelectorAll('.role-card').forEach(function (card) {
-            card.addEventListener('mouseenter', function () {
-                this.style.transform = 'translateY(-3px)';
-                this.style.boxShadow = '0 8px 24px rgba(0,0,0,.12)';
-            });
-            card.addEventListener('mouseleave', function () {
-                this.style.transform = '';
-                this.style.boxShadow = '';
+        function loadSequential(list, done) {
+            if (!list.length) return done();
+            loadScript(list[0], function () { loadSequential(list.slice(1), done); });
+        }
+
+        function waitForJQuery(cb) {
+            if (typeof window.jQuery !== 'undefined') return cb(window.jQuery);
+            setTimeout(function () { waitForJQuery(cb); }, 30);
+        }
+
+        // ── الدخول الوحيد لتشغيل الكود ──────────────────────────────────────
+        waitForJQuery(function ($) {
+            // انتظر DataTables — سواء محملة مسبقاً أو ستُحمَّل الآن
+            function waitForDT(cb) {
+                if ($.fn && $.fn.dataTable) return cb();
+                loadSequential(DT_SCRIPTS, cb);
+            }
+
+            waitForDT(function () {
+                $(function () { initActivityLogs($); });
             });
         });
+    })();
 
-        // Local init only; retries briefly until DataTables library is ready.
-        (function bootLogsTable() {
-            var tries = 0;
-            var timer = setInterval(function () {
-                tries++;
-                if (initLogsDataTable() || tries >= 20) {
-                    clearInterval(timer);
-                }
-            }, 250);
-            initLogsDataTable();
-        })();
+    function initActivityLogs($) {
+        'use strict';
+
+        // ── Guard: يمنع التهيئة المزدوجة لـ DataTables ──────────────────────
+        if (window._logsTableInitialized) return;
+        window._logsTableInitialized = true;
+
+        var ROLE_ID = <?= intval($selectedRoleId) ?>;
+        var IS_PHASE2 = ROLE_ID > 0;
 
         if (!IS_PHASE2) return;
 
-        // ── Cursor state ───────────────────────────────────────────────────────
-        let activeFilters = { role_id: ROLE_ID };
-        let isLoading = false;
-
-        const tbody = document.getElementById('logsTableBody');
-        const loadMoreWrap = document.getElementById('loadMoreWrap');
-        const loadMoreBtn = document.getElementById('loadMoreBtn');
-        const emptyRow = document.getElementById('emptyRow');
-
-        // ── Build URL for AJAX ─────────────────────────────────────────────────
-        function buildUrl(filters, afterId, afterCreatedAt, limit) {
-            var params = new URLSearchParams(filters);
-            params.set('ajax', 'logs');
-            if (afterId > 0) params.set('after_id', afterId);
-            if (afterCreatedAt) params.set('after_created_at', afterCreatedAt);
-            params.set('limit', limit || 50);
-            return 'activity_logs.php?' + params.toString();
+        // ══════════════════════════════════════════════════════════════════════
+        // DataTables init
+        // ══════════════════════════════════════════════════════════════════════
+        // إذا كان الجدول مهيَّأً مسبقاً بـ DataTables (حالة نادرة) أزله أولاً
+        if ($.fn.dataTable.isDataTable('#logsTable')) {
+            $('#logsTable').DataTable().destroy();
         }
 
-        // ── Render rows from API response ──────────────────────────────────────
-        var actionLabels = <?= json_encode($actionLabels, JSON_UNESCAPED_UNICODE) ?>;
-        var badgeMap = {
-            'view': ['عرض', 'bg-secondary'],
-            'create': ['إنشاء', 'bg-success'],
-            'update': ['تعديل', 'bg-warning'],
-            'delete': ['حذف', 'bg-danger'],
-            'send': ['إرسال', 'bg-primary'],
-            'login': ['دخول', 'bg-primary'],
-            'logout': ['خروج', 'bg-dark'],
-            'export': ['تصدير', 'bg-info text-dark'],
-            'print': ['طباعة', 'bg-info text-dark'],
-            'search': ['بحث', 'bg-light text-dark border'],
-            'click': ['نقرة', 'bg-secondary'],
-        };
-
-        function escHtml(s) {
-            if (!s && s !== 0) return '—';
-            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        }
-
-        function renderRow(r) {
-            var t = r.created_at ? r.created_at.substring(0, 19) : '—';
-            var bm = badgeMap[r.action_type] || [escHtml(r.action_type), 'bg-secondary'];
-            var badge = '<span class="badge ' + bm[1] + '">' + bm[0] + '</span>';
-
-            var status = parseInt(r.response_status || 0);
-            var sc = status >= 500 ? 'text-danger fw-bold'
-                : status >= 400 ? 'text-warning fw-bold'
-                    : status >= 200 ? 'text-success' : 'text-muted';
-
-            return '<tr data-id="' + parseInt(r.id) + '">' +
-                '<td class="px-3 text-nowrap small">' + escHtml(t) + '</td>' +
-                '<td class="small">' + escHtml(r.user_name || r.user_id) + '</td>' +
-                '<td class="small">' + escHtml(r.role_name) + '</td>' +
-                '<td class="small">' + escHtml(r.module_name) + '</td>' +
-                '<td class="small">' + escHtml(r.screen_name) + '</td>' +
-                '<td>' + badge + '</td>' +
-                '<td class="small text-truncate" style="max-width:100px" title="' + escHtml(r.button_name) + '">' + escHtml(r.button_name) + '</td>' +
-                '<td class="small">' + escHtml(r.record_id) + '</td>' +
-                '<td class="small ' + sc + '">' + (status || '—') + '</td>' +
-                '<td class="text-center"><button class="btn btn-outline-primary btn-xs py-0 px-2 detail-btn" data-id="' + parseInt(r.id) + '"><i class="fa fa-eye"></i></button></td>' +
-                '</tr>';
-        }
-
-        // ── Load more ──────────────────────────────────────────────────────────
-        function fetchMore(replace) {
-            if (isLoading) return;
-            isLoading = true;
-            loadMoreBtn && (loadMoreBtn.disabled = true);
-
-            var url = buildUrl(activeFilters, replace ? 0 : cursorAfterId, replace ? '' : cursorAfterCreatedAt, 50);
-
-            fetch(url)
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
-                    if (!data.success) { isLoading = false; return; }
-
-                    if (replace) {
-                        tbody.innerHTML = '';
+        var logsTable = $('#logsTable').DataTable({
+            language: { url: '/ems/assets/i18n/datatables/ar.json' },
+            responsive: true,
+            autoWidth: false,
+            pageLength: 25,
+            lengthMenu: [10, 25, 50, 100, 250],
+            order: [[0, 'desc']], // newest first
+            // Column 9 (details button) is not sortable
+            columnDefs: [
+                { targets: 9, orderable: false, searchable: false },
+                { targets: 10, visible: false, searchable: true }   // http_method hidden col
+            ],
+            dom: '<"row align-items-center mb-2"<"col-sm-4"l><"col-sm-4 text-center" B><"col-sm-4"f>>rtip',
+            buttons: {
+                dom: {
+                    button: { tag: 'button', className: 'btn btn-sm' }
+                },
+                buttons: [
+                    {
+                        // CSV يعمل بدون JSZip ويُفتح مباشرة في Excel
+                        extend: 'csvHtml5',
+                        text: '<i class="fa fa-file-excel-o me-1"></i> تصدير CSV',
+                        className: 'btn-outline-success',
+                        title: 'سجل_النشاطات',
+                        fieldSeparator: ',',
+                        charset: 'utf-8',
+                        bom: true,          // BOM يجعل Excel يقرأ العربية صح
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8] }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa fa-print me-1"></i> طباعة',
+                        className: 'btn-outline-secondary',
+                        title: 'سجل النشاطات',
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8] }
                     }
-                    if (emptyRow) emptyRow.remove();
+                ]
+            },
+            // Rebind detail buttons after every draw (paging, search, sort)
+            drawCallback: function () {
+                bindDetailBtns();
+            }
+        });
 
-                    if (!data.rows || data.rows.length === 0) {
-                        if (replace || tbody.innerHTML.trim() === '') {
-                            tbody.innerHTML = '<tr><td colspan="10" class="text-center py-5 text-muted"><i class="fa fa-inbox fa-2x mb-2 d-block"></i>لا توجد سجلات</td></tr>';
-                        }
-                        loadMoreWrap && (loadMoreWrap.style.display = 'none');
+        // ══════════════════════════════════════════════════════════════════════
+        // Custom search functions
+        // ══════════════════════════════════════════════════════════════════════
+
+        // نوع الإجراء — يقرأ data-action من الخلية مباشرة (يتجاوز HTML للـ badge)
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex, rowData, counter) {
+            if (settings.nTable.id !== 'logsTable') return true;
+
+            var actionFilter = $('#f_action_type').val();
+            var dateFrom = $('#f_date_from').val();
+            var dateTo = $('#f_date_to').val();
+            var methodFilter = $('#f_http_method').val();
+
+            // فلتر نوع الإجراء — يقرأ data-action من خلية العمود 5
+            // نستخدم الـ row node مباشرة لتجنب مشاكل responsive مع cell().node()
+            if (actionFilter) {
+                var rowNode = logsTable.row(dataIndex).node();
+                var actionCell = rowNode ? $(rowNode).find('td').eq(5).attr('data-action') : '';
+                if ((actionCell || '') !== actionFilter) return false;
+            }
+
+            // فلتر التاريخ — يقرأ data-date من أول خلية في الصف
+            // data[0] قد يحتوي على whitespace أو HTML لذا نقرأ من الـ attribute مباشرة
+            if (dateFrom || dateTo) {
+                var rowNode = logsTable.row(dataIndex).node();
+                var rowDate = rowNode ? ($(rowNode).find('td').eq(0).attr('data-date') || '').trim() : '';
+                if (!rowDate) {
+                    // fallback: trim data[0] وخذ أول 10 أحرف
+                    rowDate = (data[0] || '').replace(/<[^>]+>/g, '').trim().substring(0, 10);
+                }
+                if (dateFrom && rowDate < dateFrom) return false;
+                if (dateTo && rowDate > dateTo) return false;
+            }
+
+            // فلتر HTTP method — column 10 (hidden)
+            if (methodFilter) {
+                var rowMethod = (data[10] || '').trim().toUpperCase();
+                if (rowMethod !== methodFilter.toUpperCase()) return false;
+            }
+
+            return true;
+        });
+
+        // ربط الفلاتر بالأحداث
+        $('#f_action_type, #f_http_method').on('change', function () {
+            logsTable.draw();
+        });
+        $('#f_date_from, #f_date_to').on('change', function () {
+            logsTable.draw();
+        });
+
+        // زر إعادة الفلاتر
+        $('#resetFiltersBtn').on('click', function () {
+            $('#f_action_type, #f_http_method').val('');
+            $('#f_date_from, #f_date_to').val('');
+            logsTable.draw();
+        });
+
+        // ══════════════════════════════════════════════════════════════════════
+        // Clear logs — زر تفريغ السجلات
+        // ══════════════════════════════════════════════════════════════════════
+        var clearRoleId = 0;
+        var clearRoleName = '';
+
+        // فتح مودال التأكيد
+        $('#clearLogsBtn').on('click', function () {
+            clearRoleId = parseInt($(this).data('role-id'));
+            clearRoleName = $(this).data('role-name');
+            $('#clearConfirmRoleName').text(clearRoleName);
+            getModal('clearConfirmModal').show();
+        });
+
+        // تنفيذ الحذف
+        $('#clearConfirmBtn').on('click', function () {
+            var $btn = $(this);
+            $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i>جاري التفريغ...');
+
+            $.ajax({
+                url: 'activity_logs.php',
+                method: 'POST',
+                data: { ajax: 'clear_logs', role_id: clearRoleId },
+                dataType: 'json'
+            })
+                .done(function (data) {
+                    getModal('clearConfirmModal').hide();
+                    if (data.success) {
+                        // امسح جميع صفوف الجدول في DataTables
+                        logsTable.clear().draw();
+                        // حدّث عداد البادج
+                        $('#roleLogCount').text('0 سجل');
+                        $('#heroLogCount').text('0 سجل');
+                        showToast('success', data.message || 'تم تفريغ السجلات بنجاح');
                     } else {
-                        var html = data.rows.map(renderRow).join('');
-                        tbody.insertAdjacentHTML('beforeend', html);
-                        cursorAfterId = parseInt(data.rows[data.rows.length - 1].id);
-                        cursorAfterCreatedAt = data.rows[data.rows.length - 1].created_at || '';
-                        loadMoreWrap && (loadMoreWrap.style.display = data.rows.length < 50 ? 'none' : '');
+                        showToast('danger', data.message || 'حدث خطأ أثناء التفريغ');
                     }
+                })
+                .fail(function () {
+                    getModal('clearConfirmModal').hide();
+                    showToast('danger', 'تعذّر الاتصال بالخادم');
+                })
+                .always(function () {
+                    $btn.prop('disabled', false).html('<i class="fa fa-trash me-1"></i>نعم، تفريغ السجلات');
+                });
+        });
 
-                    // Re-bind detail buttons
-                    bindDetailBtns();
-                    isLoading = false;
-                    loadMoreBtn && (loadMoreBtn.disabled = false);
+        // ══════════════════════════════════════════════════════════════════════
+        // Detail Modal
+        // ══════════════════════════════════════════════════════════════════════
+        function escHtml(s) {
+            if (s === null || s === undefined || s === '') return '—';
+            return String(s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function prettyJson(v) {
+            if (v === null || v === undefined || v === '') return '—';
+            try { return JSON.stringify(JSON.parse(v), null, 2); } catch (e) { return String(v); }
+        }
+
+        function openDetailModal(id) {
+            var modal = getModal('detailModal');
+            var loading = document.getElementById('detailLoading');
+            var content = document.getElementById('detailContent');
+
+            loading.style.display = '';
+            content.style.display = 'none';
+            modal.show();
+
+            fetch('activity_logs.php?ajax=detail&id=' + parseInt(id))
+                .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                .then(function (data) {
+                    loading.style.display = 'none';
+                    if (!data.success) {
+                        content.innerHTML = '<p class="text-danger">' + escHtml(data.message || 'خطأ') + '</p>';
+                        content.style.display = '';
+                        return;
+                    }
+                    var r = data.row;
+
+                    var metaFields = [
+                        ['ID', r.id], ['التاريخ', r.created_at], ['IP', r.ip_address],
+                        ['المستخدم', r.user_name || r.user_id], ['الدور', r.role_name],
+                        ['الوحدة', r.module_name], ['الشاشة', r.screen_name],
+                        ['الإجراء', r.action_type], ['الزر', r.button_name],
+                        ['رقم السجل', r.record_id], ['URL', r.url],
+                        ['طريقة', r.http_method], ['الاستجابة', r.response_status], ['جلسة', r.session_id]
+                    ];
+                    document.getElementById('detailMeta').innerHTML = metaFields.map(function (f) {
+                        if (f[1] === null || f[1] === undefined || f[1] === '') return '';
+                        return '<div class="col-12 col-sm-6 col-md-4 col-lg-3">' +
+                            '<small class="text-muted d-block">' + f[0] + '</small>' +
+                            '<span class="small fw-medium">' + escHtml(f[1]) + '</span></div>';
+                    }).join('');
+
+                    var jsonFields = ['old_value', 'new_value', 'request_payload'];
+                    document.getElementById('detailAllFields').innerHTML = Object.keys(r).map(function (k) {
+                        var raw = r[k];
+                        var val = jsonFields.indexOf(k) !== -1 ? prettyJson(raw)
+                            : (raw === null || raw === undefined || raw === '' ? '—' : String(raw));
+                        var cell = val.indexOf('\n') !== -1
+                            ? '<pre class="mb-0 small" style="white-space:pre-wrap;max-height:220px;overflow:auto">' + escHtml(val) + '</pre>'
+                            : '<span class="small">' + escHtml(val) + '</span>';
+                        return '<tr><td class="small fw-semibold text-muted">' + escHtml(k) + '</td><td>' + cell + '</td></tr>';
+                    }).join('');
+
+                    document.getElementById('detailOldValue').textContent = prettyJson(r.old_value);
+                    document.getElementById('detailNewValue').textContent = prettyJson(r.new_value);
+                    document.getElementById('detailPayload').textContent = prettyJson(r.request_payload);
+                    content.style.display = '';
                 })
                 .catch(function (err) {
-                    console.error('fetchMore error', err);
-                    isLoading = false;
-                    loadMoreBtn && (loadMoreBtn.disabled = false);
+                    console.error('Detail fetch error', err);
+                    loading.style.display = 'none';
+                    document.getElementById('detailContent').innerHTML =
+                        '<p class="text-danger"><i class="fa fa-exclamation-triangle me-1"></i>حدث خطأ أثناء التحميل</p>';
+                    document.getElementById('detailContent').style.display = '';
                 });
         }
 
-        // ── Filters ────────────────────────────────────────────────────────────
-        document.getElementById('applyFiltersBtn') && document.getElementById('applyFiltersBtn').addEventListener('click', function () {
-            var filters = { role_id: ROLE_ID };
-            ['action_type', 'module_name', 'screen_name', 'record_id', 'date_from', 'date_to', 'response_status', 'http_method']
-                .forEach(function (k) {
-                    var el = document.getElementById('f_' + k);
-                    if (el && el.value.trim()) filters[k] = el.value.trim();
-                });
-            activeFilters = filters;
-            cursorAfterId = 0;
-            fetchMore(true);
-        });
-
-        document.getElementById('resetFiltersBtn') && document.getElementById('resetFiltersBtn').addEventListener('click', function () {
-            ['action_type', 'module_name', 'screen_name', 'record_id', 'date_from', 'date_to', 'response_status', 'http_method']
-                .forEach(function (k) {
-                    var el = document.getElementById('f_' + k);
-                    if (el) el.value = '';
-                });
-            activeFilters = { role_id: ROLE_ID };
-            cursorAfterId = 0;
-            fetchMore(true);
-        });
-
-        loadMoreBtn && loadMoreBtn.addEventListener('click', function () {
-            fetchMore(false);
-        });
-
-        // ── Detail Modal ───────────────────────────────────────────────────────
         function bindDetailBtns() {
             document.querySelectorAll('.detail-btn').forEach(function (btn) {
                 btn.removeEventListener('click', handleDetailClick);
                 btn.addEventListener('click', handleDetailClick);
             });
         }
+        function handleDetailClick() { openDetailModal(this.dataset.id); }
 
-        function handleDetailClick() {
-            var id = this.dataset.id;
-            openDetailModal(id);
-        }
+        // ══════════════════════════════════════════════════════════════════════
+        // Helpers
+        // ══════════════════════════════════════════════════════════════════════
 
-        var detailModalEl = document.getElementById('detailModal');
-        var detailModal = detailModalEl ? new bootstrap.Modal(detailModalEl) : null;
-
-        function openDetailModal(id) {
-            if (!detailModal) {
-                console.error('Modal element not found');
-                return;
-            }
-
-            var body = document.getElementById('detailModalBody');
-            var loading = document.getElementById('detailLoading');
-            var content = document.getElementById('detailContent');
-
-            if (!loading || !content) {
-                console.error('Modal elements not found');
-                return;
-            }
-
-            loading.style.display = '';
-            content.style.display = 'none';
-            detailModal.show();
-
-            var url = 'activity_logs.php?ajax=detail&id=' + parseInt(id);
-            console.log('Fetching detail from:', url);
-
-            fetch(url)
-                .then(function (r) {
-                    console.log('Response status:', r.status);
-                    if (!r.ok) throw new Error('HTTP ' + r.status);
-                    return r.json();
-                })
-                .then(function (data) {
-                    console.log('Response data:', data);
-                    loading.style.display = 'none';
-                    if (!data.success) {
-                        console.error('API error:', data.message);
-                        content.innerHTML = '<p class="text-danger">' + (data.message || 'خطأ في تحميل البيانات') + '</p>';
-                        content.style.display = '';
-                        return;
+        // Lazy Bootstrap modal resolver (BS5 → BS4/jQuery → manual fallback)
+        var _modals = {};
+        function getModal(id) {
+            if (_modals[id]) return _modals[id];
+            var el = document.getElementById(id);
+            if (!el) return null;
+            if (window.bootstrap && window.bootstrap.Modal) {
+                _modals[id] = new window.bootstrap.Modal(el);
+            } else if (window.jQuery && $.fn.modal) {
+                _modals[id] = {
+                    show: function () { $(el).modal('show'); },
+                    hide: function () { $(el).modal('hide'); }
+                };
+            } else {
+                _modals[id] = {
+                    show: function () {
+                        el.style.display = 'block'; el.classList.add('show');
+                        document.body.classList.add('modal-open');
+                        var bd = document.createElement('div');
+                        bd.id = '_bd_' + id; bd.className = 'modal-backdrop fade show';
+                        document.body.appendChild(bd);
+                    },
+                    hide: function () {
+                        el.style.display = 'none'; el.classList.remove('show');
+                        document.body.classList.remove('modal-open');
+                        var bd = document.getElementById('_bd_' + id);
+                        if (bd) bd.remove();
                     }
-
-                    var r = data.row;
-                    console.log('Rendering detail for row:', r);
-
-                    var metaFields = [
-                        ['ID', r.id], ['التاريخ', r.created_at], ['IP', r.ip_address],
-                        ['المستخدم', (r.user_name || r.user_id)], ['الدور', r.role_name], ['الوحدة', r.module_name],
-                        ['الشاشة', r.screen_name], ['الإجراء', r.action_type], ['الزر', r.button_name],
-                        ['رقم السجل', r.record_id], ['URL', r.url], ['طريقة', r.http_method],
-                        ['الاستجابة', r.response_status], ['جلسة', r.session_id]
-                    ];
-
-                    var metaHtml = metaFields.map(function (f) {
-                        if (!f[1] && f[1] !== 0) return '';
-                        return '<div class="col-12 col-sm-6 col-md-4 col-lg-3">' +
-                            '<small class="text-muted d-block">' + f[0] + '</small>' +
-                            '<span class="small fw-medium">' + escHtml(f[1]) + '</span></div>';
-                    }).join('');
-
-                    document.getElementById('detailMeta').innerHTML = metaHtml;
-
-                    function prettyJson(v) {
-                        if (!v) return '—';
-                        try { return JSON.stringify(JSON.parse(v), null, 2); }
-                        catch (e) { return String(v); }
-                    }
-
-                    var jsonFields = ['old_value', 'new_value', 'request_payload'];
-                    var allRowsHtml = Object.keys(r).map(function (k) {
-                        var raw = r[k];
-                        var val = jsonFields.indexOf(k) !== -1 ? prettyJson(raw) : (raw === null || raw === '' ? '—' : String(raw));
-                        var renderedVal = val.indexOf('\n') !== -1
-                            ? ('<pre class="mb-0 small" style="white-space:pre-wrap;max-height:220px;overflow:auto">' + escHtml(val) + '</pre>')
-                            : ('<span class="small">' + escHtml(val) + '</span>');
-                        return '<tr><td class="small fw-semibold text-muted">' + escHtml(k) + '</td><td>' + renderedVal + '</td></tr>';
-                    }).join('');
-
-                    console.log('All rows HTML length:', allRowsHtml.length);
-
-                    var allFieldsTable = document.getElementById('detailAllFields');
-                    if (allFieldsTable) {
-                        console.log('Updating detailAllFields');
-                        allFieldsTable.innerHTML = allRowsHtml;
-                    } else {
-                        console.warn('detailAllFields element not found');
-                    }
-
-                    var oldValEl = document.getElementById('detailOldValue');
-                    var newValEl = document.getElementById('detailNewValue');
-                    var payloadEl = document.getElementById('detailPayload');
-
-                    if (oldValEl) oldValEl.textContent = prettyJson(r.old_value);
-                    if (newValEl) newValEl.textContent = prettyJson(r.new_value);
-                    if (payloadEl) payloadEl.textContent = prettyJson(r.request_payload);
-
-                    content.style.display = '';
-                })
-                .catch(function (err) {
-                    console.error('Detail fetch error', err);
-                    loading.style.display = 'none';
-                    var errMsg = document.getElementById('detailContent');
-                    if (errMsg) {
-                        errMsg.innerHTML = '<p class="text-danger"><i class="fa fa-exclamation-triangle"></i> حدث خطأ أثناء التحميل</p>';
-                        errMsg.style.display = '';
-                    }
+                };
+                el.querySelectorAll('[data-bs-dismiss="modal"],[data-dismiss="modal"]').forEach(function (b) {
+                    b.addEventListener('click', function () { _modals[id].hide(); });
                 });
+            }
+            return _modals[id];
         }
 
+        // Simple toast notification
+        function showToast(type, msg) {
+            var colors = { success: '#16a34a', danger: '#dc2626', warning: '#ca8a04' };
+            var color = colors[type] || '#1255a8';
+            var toast = document.createElement('div');
+            toast.style.cssText =
+                'position:fixed;bottom:24px;left:24px;z-index:9999;padding:12px 20px;border-radius:8px;' +
+                'background:' + color + ';color:#fff;font-size:.9rem;box-shadow:0 4px 16px rgba(0,0,0,.2);' +
+                'display:flex;align-items:center;gap:8px;max-width:360px;animation:slideInToast .25s ease';
+            toast.innerHTML = '<i class="fa fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i>' + escHtml(msg);
+            document.body.appendChild(toast);
+            setTimeout(function () {
+                toast.style.opacity = '0'; toast.style.transition = 'opacity .3s';
+                setTimeout(function () { toast.remove(); }, 350);
+            }, 3500);
+        }
+
+        // Initial bind for SSR rows
         bindDetailBtns();
 
-    }());
+    }
 </script>
-
-<style>
-    .btn-xs {
-        font-size: .72rem;
-        line-height: 1.4;
-    }
-
-    .sticky-top {
-        top: 0;
-        z-index: 1;
-    }
-
-    pre {
-        font-family: 'Courier New', monospace;
-        font-size: .78rem;
-    }
-
-    #logsTable th {
-        font-size: .78rem;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    #logsTable td {
-        font-size: .82rem;
-        vertical-align: middle;
-    }
-</style>
