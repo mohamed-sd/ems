@@ -1,7 +1,6 @@
 <?php
 /**
  * خريطة الموقع - Map Page
- *
  * عرض خريطة تفاعلية للمعدات والمشغلين مجمّعة حسب المورد
  */
 session_start();
@@ -117,7 +116,6 @@ if ($ops_q) {
 $eq_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
 $drivers_company_clause = ($eq_drivers_has_company && !$is_super_admin) ? " AND ed.company_id = $company_id" : "";
 
-// جمع كل معرفات المعدات
 $all_eq_ids = [];
 foreach ($suppliers_data as $sup) {
     foreach ($sup['equipments'] as $op) {
@@ -142,7 +140,6 @@ if (!empty($all_eq_ids)) {
         ORDER BY ed.equipment_id ASC, d.name ASC
     ");
 
-    // بناء خريطة المعدة -> قائمة المشغلين
     $eq_drivers_map = [];
     if ($drv_q) {
         while ($dr = mysqli_fetch_assoc($drv_q)) {
@@ -152,7 +149,6 @@ if (!empty($all_eq_ids)) {
         }
     }
 
-    // إسناد المشغلين للمعدات في الموردين
     foreach ($suppliers_data as $sup_id => &$sup) {
         foreach ($sup['equipments'] as $op_id => &$op) {
             $eq_id = intval($op['eq_id']);
@@ -169,7 +165,6 @@ if (!empty($all_eq_ids)) {
 $ts_has_company = db_table_has_column($conn, 'timesheet', 'company_id');
 $ts_company_clause = ($ts_has_company && !$is_super_admin) ? " AND t.company_id = $company_id" : "";
 
-// تهيئة الساعات بالصفر وتجميع معرّفات التشغيل
 $all_op_ids_ts = [];
 foreach ($suppliers_data as $sup_id => &$sup) {
     foreach ($sup['equipments'] as $op_id => &$op) {
@@ -217,16 +212,25 @@ if (!empty($all_op_ids_ts)) {
 // ============================================================
 // إحصائيات إجمالية
 // ============================================================
-$total_suppliers = count($suppliers_data);
-$total_equip = 0;
-$total_working = 0;
-$total_stopped = 0;
-$total_operators = 0;
+$projectId = intval($selected_project_id);
+if (!function_exists('dashboard_scalar')) {
+    function dashboard_scalar($conn, $sql, $col = 't') {
+        $q = mysqli_query($conn, $sql);
+        if ($q && $row = mysqli_fetch_assoc($q)) {
+            return isset($row[$col]) ? intval($row[$col]) : 0;
+        }
+        return 0;
+    }
+}
 
+$total_suppliers = count($suppliers_data);
+$totEq = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM `equipments` WHERE id IN (SELECT operations.equipment FROM operations WHERE operations.project_id = '$projectId');", 't');
+$wrkEq = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM `equipments` WHERE id IN (SELECT operations.equipment FROM operations WHERE operations.project_id = '$projectId' AND operations.status='1');", 't');
+$stoppedEq = $totEq - $wrkEq;
+
+$total_operators = 0;
 foreach ($suppliers_data as $sup) {
     foreach ($sup['equipments'] as $op) {
-        $total_equip++;
-        if ($op['is_working']) $total_working++; else $total_stopped++;
         $total_operators += count($op['drivers']);
     }
 }
@@ -239,7 +243,6 @@ include('../insidebar.php');
 <div class="main map-page-main movement-map-page ems-unified-page-shell">
 
   <div class="main_head">
-
     <div class="head_actions">
       <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>" class="add-btn">
         <i class="fas fa-cogs"></i> إدارة التشغيل
@@ -281,15 +284,15 @@ include('../insidebar.php');
     </div>
     <div class="stat-tile">
         <div class="stat-tile-icon c-blue"><i class="fas fa-truck-monster"></i></div>
-        <div><div class="stat-tile-val"><?php echo $total_equip; ?></div><div class="stat-tile-lbl">إجمالي الآليات</div></div>
+        <div><div class="stat-tile-val"><?php echo $totEq; ?></div><div class="stat-tile-lbl">إجمالي الآليات</div></div>
     </div>
     <div class="stat-tile">
         <div class="stat-tile-icon c-green"><i class="fas fa-cog fa-spin slow-spin"></i></div>
-        <div><div class="stat-tile-val"><?php echo $total_working; ?></div><div class="stat-tile-lbl">آليات عاملة</div></div>
+        <div><div class="stat-tile-val"><?php echo $wrkEq; ?></div><div class="stat-tile-lbl">آليات عاملة</div></div>
     </div>
     <div class="stat-tile">
         <div class="stat-tile-icon c-red"><i class="fas fa-tools"></i></div>
-        <div><div class="stat-tile-val"><?php echo $total_stopped; ?></div><div class="stat-tile-lbl">آليات متوقفة</div></div>
+        <div><div class="stat-tile-val"><?php echo $stoppedEq; ?></div><div class="stat-tile-lbl">آليات متوقفة</div></div>
     </div>
     <div class="stat-tile">
         <div class="stat-tile-icon c-purple"><i class="fas fa-hard-hat"></i></div>
@@ -309,9 +312,6 @@ include('../insidebar.php');
     <div class="legend-item">
         <div class="op-av reserve legend-op-avatar"><i class="fas fa-user legend-op-avatar-icon"></i></div>
         احتياطي (قريباً)
-    </div>
-    <div class="legend-item legend-hint">
-        <i class="fas fa-hand-pointer fa-xs"></i> مرّر على أي عنصر لعرض تفاصيله
     </div>
 </div>
 
@@ -382,6 +382,7 @@ foreach ($suppliers_data as $sup_id => $sup):
             $stopped_list = array_filter($sup_equips, fn($o) => !$o['is_working']);
         ?>
 
+        <!-- ══ آليات عاملة ══ -->
         <?php if (!empty($working_list)): ?>
         <div class="section-sep working-sep">
             <i class="fas fa-play-circle"></i> آليات عاملة (<?php echo count($working_list); ?>)
@@ -457,6 +458,7 @@ foreach ($suppliers_data as $sup_id => $sup):
         </div>
         <?php endif; ?>
 
+        <!-- ══ آليات متوقفة — نفس البنية تماماً مع class="stopped" ══ -->
         <?php if (!empty($stopped_list)): ?>
         <div class="section-sep stopped-sep">
             <i class="fas fa-pause-circle"></i> آليات متوقفة (<?php echo count($stopped_list); ?>)
@@ -464,12 +466,16 @@ foreach ($suppliers_data as $sup_id => $sup):
         <div class="eq-grid">
             <?php foreach ($stopped_list as $op):
                 $drv_count = count($op['drivers']);
+                // نفس بيانات tooltip الآلية العاملة + حالة الإتاحة
                 $tt_eq_data = [
-                    'الكود'   => $op['eq_code'] ?? '-',
-                    'الاسم'   => $op['eq_name'] ?? '-',
-                    'النوع'   => $op['type_name'] ?: '-',
-                    'الحالة'  => $op['availability_status'] ?? '-',
-                    'المورد'  => $op['supplier_name'] ?? '-',
+                    'الكود'    => $op['eq_code'] ?? '-',
+                    'الاسم'    => $op['eq_name'] ?? '-',
+                    'النوع'    => $op['type_name'] ?: '-',
+                    'الماركة'  => trim(($op['manufacturer'] ?? '') . ' ' . ($op['model'] ?? '')) ?: '-',
+                    'الحالة'   => $op['availability_status'] ?? '-',
+                    'رقم الهيكل' => $op['chassis_number'] ?? '-',
+                    'رقم السيريال' => $op['serial_number'] ?? '-',
+                    'المورد'   => $op['supplier_name'] ?? '-',
                 ];
             ?>
             <div class="eq-card stopped tt-trigger">
@@ -481,6 +487,7 @@ foreach ($suppliers_data as $sup_id => $sup):
                         <div class="eq-code"><?php echo htmlspecialchars($op['eq_code']); ?></div>
                         <div class="eq-type-lbl"><?php echo htmlspecialchars($op['type_name'] ?: ($op['eq_name'] ?? '')); ?></div>
                     </div>
+                    <!-- صف المشغلين — نفس هيكل العاملة تماماً -->
                     <div class="op-row">
                         <?php if ($drv_count === 0): ?>
                         <span class="no-op-label"><i class="fas fa-user-slash no-op-icon"></i> لا مشغّل</span>
@@ -491,6 +498,8 @@ foreach ($suppliers_data as $sup_id => $sup):
                                 $dp = htmlspecialchars($drv['phone'] ?? '-');
                                 $ds = htmlspecialchars($drv['skill_level'] ?? '-');
                                 $dy = htmlspecialchars($drv['years_in_field'] ?? '0');
+                                $dl = htmlspecialchars($drv['license_type'] ?? '-');
+                                $dye = htmlspecialchars($drv['years_on_equipment'] ?? '0');
                         ?>
                         <div class="op-av active tt-trigger" title="<?php echo $dn; ?>">
                             <i class="fas fa-user op-avatar-icon"></i>
@@ -499,7 +508,9 @@ foreach ($suppliers_data as $sup_id => $sup):
                                 <div class="tt-row"><span class="tt-k">الكود</span><span class="tt-v"><?php echo $dc; ?></span></div>
                                 <div class="tt-row"><span class="tt-k">الهاتف</span><span class="tt-v"><?php echo $dp; ?></span></div>
                                 <div class="tt-row"><span class="tt-k">الكفاءة</span><span class="tt-v"><?php echo $ds; ?></span></div>
-                                <div class="tt-row"><span class="tt-k">الخبرة</span><span class="tt-v"><?php echo $dy; ?> سنة</span></div>
+                                <div class="tt-row"><span class="tt-k">الرخصة</span><span class="tt-v"><?php echo $dl; ?></span></div>
+                                <div class="tt-row"><span class="tt-k">خبرة المجال</span><span class="tt-v"><?php echo $dy; ?> سنة</span></div>
+                                <div class="tt-row"><span class="tt-k">خبرة الآلية</span><span class="tt-v"><?php echo $dye; ?> سنة</span></div>
                             </div>
                         </div>
                         <?php endforeach; ?>
@@ -518,6 +529,7 @@ foreach ($suppliers_data as $sup_id => $sup):
                         </div>
                     </div>
                 </div>
+                <!-- tooltip بطاقة المعدة المتوقفة -->
                 <div class="tt-box">
                     <div class="tt-title"><i class="fas fa-truck-monster"></i> <?php echo htmlspecialchars($op['eq_name']); ?></div>
                     <?php foreach ($tt_eq_data as $k => $v): ?>
@@ -539,8 +551,6 @@ foreach ($suppliers_data as $sup_id => $sup):
 
 <?php endif; /* end empty($suppliers_data) */ ?>
 
-<!-- ═══ معدات بلا منجم ═══ -->
-
   </div><!-- .movement-content-wrapper -->
 </div><!-- .main -->
 
@@ -554,7 +564,6 @@ foreach ($suppliers_data as $sup_id => $sup):
 
     var activeBox = null;
 
-    /* إخفاء الـ tooltip الحالي */
     function closeActive() {
         if (activeBox) {
             activeBox.classList.remove('tt-show');
@@ -563,9 +572,7 @@ foreach ($suppliers_data as $sup_id => $sup):
         }
     }
 
-    /* ضبط موضع الـ tooltip حتى لا يخرج عن الشاشة */
     function positionBox(trigger, box) {
-        /* reset */
         box.style.right     = '';
         box.style.left      = '';
         box.style.transform = '';
@@ -575,17 +582,14 @@ foreach ($suppliers_data as $sup_id => $sup):
         var vw = window.innerWidth;
         var vh = window.innerHeight;
 
-        /* هل يوجد مساحة فوق؟ */
-        var boxH = 170; /* تقدير */
+        var boxH = 170;
         if (trigRect.top < boxH + 18) {
             box.classList.add('tt-below');
         }
 
-        /* ضبط أفقي: ابدأ بالتمركز */
         box.style.right     = '50%';
         box.style.transform = 'translateX(50%)';
 
-        /* بعد render نتحقق من الحدود الفعلية */
         requestAnimationFrame(function () {
             var bRect = box.getBoundingClientRect();
             if (bRect.right > vw - 12) {
@@ -600,9 +604,7 @@ foreach ($suppliers_data as $sup_id => $sup):
         });
     }
 
-    /* معالج mouseover الرئيسي — يُعالج على مستوى document */
     document.addEventListener('mouseover', function (e) {
-        /* ابحث عن أعمق .tt-trigger يحتوي العنصر المحوّم */
         var target = e.target;
         var deepest = null;
         var el = target;
@@ -610,7 +612,7 @@ foreach ($suppliers_data as $sup_id => $sup):
         while (el && el !== document.body) {
             if (el.classList && el.classList.contains('tt-trigger')) {
                 deepest = el;
-                break;   /* أعمق عنصر هو الأول في الصعود */
+                break;
             }
             el = el.parentElement;
         }
@@ -620,7 +622,6 @@ foreach ($suppliers_data as $sup_id => $sup):
             return;
         }
 
-        /* الـ tt-box المباشر للعنصر الأعمق فقط */
         var box = null;
         var children = deepest.childNodes;
         for (var i = 0; i < children.length; i++) {
@@ -632,24 +633,16 @@ foreach ($suppliers_data as $sup_id => $sup):
         }
 
         if (!box) { closeActive(); return; }
-
-        /* إن كان نفس الـ tooltip المفتوح بالفعل، لا حاجة لتغيير */
         if (box === activeBox) return;
 
-        /* إخفاء القديم وعرض الجديد */
         closeActive();
         positionBox(deepest, box);
         box.classList.add('tt-show');
         activeBox = box;
     });
 
-    /* إخفاء عند مغادرة الصفحة */
     document.addEventListener('mouseleave', closeActive);
-
-    /* إخفاء عند النقر */
     document.addEventListener('click', closeActive);
-
-    /* إخفاء عند التمرير (scroll) لتجنب tooltip عالق */
     document.addEventListener('scroll', closeActive, true);
 
 }());
