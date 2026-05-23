@@ -20,6 +20,13 @@ DirectoryIndex index.php index.html
     </IfModule>
 </FilesMatch>
 
+# منع الوصول المباشر إلى ملفات الإعدادات الحساسة
+<FilesMatch "^config.*\.php$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
+
 # منع الوصول لملفات النسخ الاحتياطي وقواعد البيانات
 <FilesMatch "\.(bak|backup|old|orig|save|swp|tmp|sql|log)$">
     <IfModule mod_authz_core.c>
@@ -74,4 +81,3 @@ DirectoryIndex index.php index.html
 # ═══════════════════════════════════════════════════════════════════════════
 # END OF .htaccess - نسخة مبسطة وآمنة
 # ═══════════════════════════════════════════════════════════════════════════
-

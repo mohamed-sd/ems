@@ -385,6 +385,7 @@ if (isset($_SESSION['user']) && isset($conn)) {
     navBadgeReqInFlight = true;
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/ems/chats/get_unread_count.php', true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     xhr.onload = function() {
       try {
         var data = JSON.parse(xhr.responseText);

@@ -5,6 +5,16 @@
  * @date 2026-03-01
  */
 
+// منع الوصول المباشر لملفات الإعدادات من المتصفح.
+if (PHP_SAPI !== 'cli') {
+    $scriptFilename = isset($_SERVER['SCRIPT_FILENAME']) ? realpath($_SERVER['SCRIPT_FILENAME']) : '';
+    if ($scriptFilename !== '' && $scriptFilename === __FILE__) {
+        http_response_code(403);
+        header('Content-Type: text/plain; charset=UTF-8');
+        exit('403 Forbidden');
+    }
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // 1. تحميل نظام الأمان المركزي
 // ═══════════════════════════════════════════════════════════════════════════
@@ -279,6 +289,83 @@ function ems_force_logout_if_company_suspended($conn) {
 }
 
 ems_force_logout_if_company_suspended($conn);
+
+function ems_is_ajax_endpoint_request()
+{
+    if (PHP_SAPI === 'cli') {
+        return false;
+    }
+
+    $scriptName = isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME']) : '';
+    if ($scriptName === '') {
+        return false;
+    }
+
+    return preg_match('/^(get_.*\.php|.*_handler\.php)$/i', $scriptName) === 1;
+}
+
+function ems_ajax_guard_response($statusCode, $message)
+{
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+
+    http_response_code($statusCode);
+    header('Content-Type: application/json; charset=UTF-8');
+    echo json_encode(array('success' => false, 'message' => $message), JSON_UNESCAPED_UNICODE);
+    exit();
+}
+
+function ems_ajax_rate_limit_check($key, $maxAttempts, $windowSeconds)
+{
+    $bucketKey = 'ems_ajax_rl_' . md5($key . '|' . (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0'));
+    $now = time();
+
+    if (!isset($_SESSION[$bucketKey]) || !is_array($_SESSION[$bucketKey])) {
+        $_SESSION[$bucketKey] = array('count' => 0, 'start' => $now);
+    }
+
+    $start = isset($_SESSION[$bucketKey]['start']) ? intval($_SESSION[$bucketKey]['start']) : $now;
+    if (($now - $start) >= $windowSeconds) {
+        $_SESSION[$bucketKey] = array('count' => 0, 'start' => $now);
+    }
+
+    $_SESSION[$bucketKey]['count'] = intval($_SESSION[$bucketKey]['count']) + 1;
+    return intval($_SESSION[$bucketKey]['count']) <= $maxAttempts;
+}
+
+function ems_enforce_ajax_endpoint_security()
+{
+    if (!ems_is_ajax_endpoint_request()) {
+        return;
+    }
+
+    $requestedWith = isset($_SERVER['HTTP_X_REQUESTED_WITH']) ? strtolower(trim($_SERVER['HTTP_X_REQUESTED_WITH'])) : '';
+    if ($requestedWith !== 'xmlhttprequest') {
+        ems_ajax_guard_response(403, 'Direct endpoint access is blocked');
+    }
+
+    $hasSession = isset($_SESSION['user']) || isset($_SESSION['company_user']) || isset($_SESSION['super_admin']);
+    if (!$hasSession) {
+        ems_ajax_guard_response(401, 'غير مصرح');
+    }
+
+    $script = isset($_SERVER['SCRIPT_NAME']) ? strtolower(str_replace('\\', '/', $_SERVER['SCRIPT_NAME'])) : '';
+    $isSensitive = (strpos($script, '_handler.php') !== false)
+        || (strpos($script, '/chats/get_messages.php') !== false)
+        || (strpos($script, '/chats/get_unread_count.php') !== false)
+        || (strpos($script, '/timesheet/get_timesheet_data.php') !== false)
+        || (strpos($script, '/timesheet/get_timesheet.php') !== false);
+
+    $maxAttempts = $isSensitive ? 45 : 180;
+    $windowSeconds = 60;
+    $rateKey = $script !== '' ? $script : (isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : 'ajax');
+    if (!ems_ajax_rate_limit_check($rateKey, $maxAttempts, $windowSeconds)) {
+        ems_ajax_guard_response(429, 'تم تجاوز الحد المسموح للطلبات. حاول لاحقاً.');
+    }
+}
+
+ems_enforce_ajax_endpoint_security();
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 4. Global Security Functions Shortcuts

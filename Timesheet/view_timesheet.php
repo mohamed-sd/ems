@@ -61,6 +61,7 @@ $has_filters = (
     $start_date !== '' ||
     $end_date !== '' ||
     $month_filter !== '' ||
+    $project_id > 0 ||
     $equipment_type !== '' ||
     $operation_id > 0 ||
     $driver_id > 0 ||
@@ -68,13 +69,14 @@ $has_filters = (
     $status_filter !== ''
 );
 
-$where_parts = ["1=1"];
+$scope_where_parts = ["1=1"];
+$filter_where_parts = [];
 
 if (!$is_super_admin) {
     if ($timesheet_has_company) {
-        $where_parts[] = "t.company_id = $company_id";
+        $scope_where_parts[] = "t.company_id = $company_id";
     } else {
-        $where_parts[] = "EXISTS (
+        $scope_where_parts[] = "EXISTS (
             SELECT 1
             FROM project p2
             LEFT JOIN users su2 ON su2.id = p2.created_by
@@ -87,50 +89,57 @@ if (!$is_super_admin) {
 }
 
 if ((string) $_SESSION['user']['role'] === '6') {
-    $where_parts[] = "t.user_id = " . intval($_SESSION['user']['id']);
+    $scope_where_parts[] = "t.user_id = " . intval($_SESSION['user']['id']);
+}
+
+// تقييد مدير الموقع على مشروع الجلسة فقط (لباقي الأدوار نعرض على مستوى الشركة)
+if (!$is_super_admin && $is_site_manager && $session_project_id > 0) {
+    $scope_where_parts[] = "p.id = $session_project_id";
 }
 
 if ($month_filter !== '') {
     $month_start = $month_filter . '-01';
     $month_end = date('Y-m-t', strtotime($month_start));
-    $where_parts[] = "t.date >= '$month_start'";
-    $where_parts[] = "t.date <= '$month_end'";
+    $filter_where_parts[] = "t.date >= '$month_start'";
+    $filter_where_parts[] = "t.date <= '$month_end'";
 } elseif ($filter_date !== '') {
-    $where_parts[] = "t.date = '$filter_date'";
+    $filter_where_parts[] = "t.date = '$filter_date'";
 } else {
     if ($start_date !== '') {
-        $where_parts[] = "t.date >= '$start_date'";
+        $filter_where_parts[] = "t.date >= '$start_date'";
     }
     if ($end_date !== '') {
-        $where_parts[] = "t.date <= '$end_date'";
+        $filter_where_parts[] = "t.date <= '$end_date'";
     }
 }
 
-if (!$is_super_admin && $session_project_id > 0) {
-    $where_parts[] = "p.id = $session_project_id";
+if ($project_id > 0) {
+    $filter_where_parts[] = "p.id = $project_id";
 }
 
 if ($operation_id > 0) {
-    $where_parts[] = "o.id = $operation_id";
+    $filter_where_parts[] = "o.id = $operation_id";
 }
 
 if ($driver_id > 0) {
-    $where_parts[] = "d.id = $driver_id";
+    $filter_where_parts[] = "d.id = $driver_id";
 }
 
 if ($equipment_type === '1' || $equipment_type === '2' || $equipment_type === '3') {
-    $where_parts[] = "t.type = '$equipment_type'";
+    $filter_where_parts[] = "t.type = '$equipment_type'";
 }
 
 if ($shift_filter === 'D' || $shift_filter === 'N') {
-    $where_parts[] = "t.shift = '$shift_filter'";
+    $filter_where_parts[] = "t.shift = '$shift_filter'";
 }
 
 if ($status_filter === '1' || $status_filter === '2' || $status_filter === '3') {
-    $where_parts[] = "t.status = '$status_filter'";
+    $filter_where_parts[] = "t.status = '$status_filter'";
 }
 
+$where_parts = array_merge($scope_where_parts, $filter_where_parts);
 $where_sql = 'WHERE ' . implode(' AND ', $where_parts);
+$scope_where_sql = 'WHERE ' . implode(' AND ', $scope_where_parts);
 
 $base_from_sql = "
     FROM timesheet t
@@ -141,7 +150,23 @@ $base_from_sql = "
 ";
 
 $order_sql = " ORDER BY t.date DESC, t.id DESC ";
-$display_limit_sql = (!$has_filters && !$export_all) ? " LIMIT 100 " : "";
+$display_limit_sql = "";
+
+// المطلوب: تحميل آخر 1000 سجل أولاً ضمن نطاق الصلاحية ثم تطبيق الفلاتر.
+$recent_1000_clause = "";
+if (!$export_all) {
+        $recent_1000_clause = "
+            AND t.id IN (
+                SELECT recent_ids.id
+                FROM (
+                    SELECT t.id
+                    $base_from_sql
+                    $scope_where_sql
+                    $order_sql
+                    LIMIT 1000
+                ) recent_ids
+            )";
+}
 
 $stats = [
     'executed_sum' => 0,
@@ -150,30 +175,15 @@ $stats = [
     'work_sum' => 0
 ];
 
-if (!$has_filters) {
-    $stats_query = mysqli_query($conn, "SELECT
-        IFNULL(SUM(x.executed_hours), 0) AS executed_sum,
-        IFNULL(SUM(x.standby_hours), 0) AS standby_sum,
-        IFNULL(SUM(x.total_fault_hours), 0) AS fault_sum,
-        IFNULL(SUM(x.executed_hours + x.standby_hours), 0) AS work_sum
-        FROM (
-            SELECT t.executed_hours, t.standby_hours, t.total_fault_hours
-            $base_from_sql
-            $where_sql
-            $order_sql
-            LIMIT 100
-        ) x
-    ");
-} else {
-    $stats_query = mysqli_query($conn, "SELECT
-        IFNULL(SUM(t.executed_hours), 0) AS executed_sum,
-        IFNULL(SUM(t.standby_hours), 0) AS standby_sum,
-        IFNULL(SUM(t.total_fault_hours), 0) AS fault_sum,
-        IFNULL(SUM(t.executed_hours + t.standby_hours), 0) AS work_sum
-        $base_from_sql
-        $where_sql
-    ");
-}
+$stats_query = mysqli_query($conn, "SELECT
+    IFNULL(SUM(t.executed_hours), 0) AS executed_sum,
+    IFNULL(SUM(t.standby_hours), 0) AS standby_sum,
+    IFNULL(SUM(t.total_fault_hours), 0) AS fault_sum,
+    IFNULL(SUM(t.executed_hours + t.standby_hours), 0) AS work_sum
+    $base_from_sql
+    $where_sql
+    $recent_1000_clause
+");
 
 if ($stats_query && mysqli_num_rows($stats_query) > 0) {
     $stats = mysqli_fetch_assoc($stats_query);
@@ -196,7 +206,7 @@ if (!$is_super_admin) {
 
 $operations = [];
 $operation_project_filter = "";
-if (!$is_super_admin && $session_project_id > 0) {
+if (!$is_super_admin && $is_site_manager && $session_project_id > 0) {
     $operation_project_filter = " AND o.$operations_project_column = $session_project_id";
 }
 
@@ -326,6 +336,7 @@ $select_sql = "SELECT
     COALESCE(d.name, 'غير محدد') AS driver_name
     $base_from_sql
     $where_sql
+    $recent_1000_clause
     $order_sql
 ";
 

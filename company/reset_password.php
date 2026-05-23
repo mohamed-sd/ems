@@ -7,95 +7,7 @@ if (company_is_logged_in()) {
     exit();
 }
 
-$token = trim(isset($_REQUEST['token']) ? $_REQUEST['token'] : '');
-$error = '';
-$resetRow = null;
-
-if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
-    $error = 'رابط إعادة التعيين غير صالح.';
-} elseif (!company_table_exists('company_user_password_resets')) {
-    $error = 'جدول reset غير موجود. نفّذ database/company_portal_auth.sql.';
-} else {
-    $tokenHash = hash('sha256', $token);
-    $stmt = mysqli_prepare(
-        $conn,
-        'SELECT pr.id, pr.user_id, u.name, u.email
-         FROM company_user_password_resets pr
-         INNER JOIN users u ON u.id = pr.user_id
-         WHERE pr.token_hash = ? AND pr.used_at IS NULL AND pr.expires_at > NOW()
-         LIMIT 1'
-    );
-
-    if ($stmt) {
-        mysqli_stmt_bind_param($stmt, 's', $tokenHash);
-        mysqli_stmt_execute($stmt);
-        $res = mysqli_stmt_get_result($stmt);
-        $resetRow = $res ? mysqli_fetch_assoc($res) : null;
-        mysqli_stmt_close($stmt);
-    }
-
-    if (!$resetRow) {
-        $error = 'الرابط منتهي أو تم استخدامه مسبقاً.';
-    }
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $error === '' && $resetRow) {
-    if (!verify_csrf_token(isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '')) {
-        $error = 'رمز الحماية غير صالح.';
-    } else {
-        $password = trim(isset($_POST['password']) ? $_POST['password'] : '');
-        $confirm = trim(isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '');
-
-        if (!validate_length($password, 8, 255)) {
-            $error = 'كلمة المرور يجب أن تكون 8 أحرف على الأقل.';
-        } elseif ($password !== $confirm) {
-            $error = 'تأكيد كلمة المرور غير مطابق.';
-        } else {
-            $hash = password_hash($password, PASSWORD_BCRYPT);
-            $uid = intval($resetRow['user_id']);
-            $rid = intval($resetRow['id']);
-
-            $u1 = mysqli_prepare($conn, 'UPDATE users SET password = ? WHERE id = ?');
-            $u2 = mysqli_prepare($conn, 'UPDATE company_user_password_resets SET used_at = NOW() WHERE id = ?');
-            $u3 = mysqli_prepare($conn, 'UPDATE company_user_password_resets SET used_at = NOW() WHERE user_id = ? AND used_at IS NULL');
-
-            if ($u1 && $u2 && $u3) {
-                mysqli_begin_transaction($conn);
-                $ok = true;
-
-                mysqli_stmt_bind_param($u1, 'si', $hash, $uid);
-                $ok = $ok && mysqli_stmt_execute($u1);
-
-                mysqli_stmt_bind_param($u2, 'i', $rid);
-                $ok = $ok && mysqli_stmt_execute($u2);
-
-                mysqli_stmt_bind_param($u3, 'i', $uid);
-                $ok = $ok && mysqli_stmt_execute($u3);
-
-                if ($ok) {
-                    mysqli_commit($conn);
-                    company_write_audit($uid, 0, 'password_reset_completed', 'بوابة الشركة', 'تم تعيين كلمة مرور جديدة');
-
-                    mysqli_stmt_close($u1);
-                    mysqli_stmt_close($u2);
-                    mysqli_stmt_close($u3);
-
-                    company_redirect('login.php', array('reset' => 'success'));
-                } else {
-                    mysqli_rollback($conn);
-                }
-            }
-
-            if ($u1) mysqli_stmt_close($u1);
-            if ($u2) mysqli_stmt_close($u2);
-            if ($u3) mysqli_stmt_close($u3);
-
-            $error = 'تعذر تحديث كلمة المرور حالياً.';
-        }
-    }
-}
-
-$csrf = generate_csrf_token();
+$error = 'تم إلغاء إعادة تعيين كلمة المرور عبر الروابط. لاستعادة الوصول، يرجى التواصل مباشرة مع إدارة الشركة عبر البريد الإلكتروني أو رقم الهاتف المعتمد.';
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -120,29 +32,12 @@ $csrf = generate_csrf_token();
 </head>
 <body class="standalone-brand">
     <div class="card">
-        <h1>تعيين كلمة مرور جديدة</h1>
-        <p>رابط إعادة التعيين صالح لمدة 60 دقيقة فقط.</p>
+        <h1>إعادة التعيين عبر الإدارة</h1>
+        <p>تحديث كلمة المرور ذاتيًا عبر رابط لم يعد متاحًا في بوابة الشركة.</p>
 
         <?php if ($error !== ''): ?><div class="alert"><?php echo e($error); ?></div><?php endif; ?>
-
-        <?php if ($error === '' && $resetRow): ?>
-        <form method="post" action="">
-            <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
-            <input type="hidden" name="token" value="<?php echo e($token); ?>">
-
-            <label for="password">كلمة المرور الجديدة</label>
-            <input type="password" id="password" name="password" maxlength="255" required>
-
-            <label for="confirm_password">تأكيد كلمة المرور</label>
-            <input type="password" id="confirm_password" name="confirm_password" maxlength="255" required>
-
-            <button type="submit">تحديث كلمة المرور</button>
-        </form>
-        <?php endif; ?>
 
         <a href="<?php echo e(company_url('login.php')); ?>">العودة لتسجيل الدخول</a>
     </div>
 </body>
 </html>
-
-

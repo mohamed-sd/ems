@@ -387,6 +387,7 @@ include '../insidebar.php';
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', 'get_messages.php?' + params, true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.onload = function() {
             if (xhr.status !== 200) {
                 showErrorInChat('فشل تحميل الرسائل - كود الخطأ: ' + xhr.status);
@@ -512,6 +513,7 @@ include '../insidebar.php';
     function markRead(senderId) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', 'mark_read.php', true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.send('sender_id=' + senderId);
         // تحديث شارة nav
@@ -532,6 +534,7 @@ include '../insidebar.php';
 
         var xhr = new XMLHttpRequest();
         xhr.open('POST', 'send_message.php', true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.onload = function() {
             btn.disabled = false;
@@ -618,6 +621,7 @@ include '../insidebar.php';
     function updateNavBadge() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', 'get_unread_count.php', true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.onload = function() {
             try {
                 var data = JSON.parse(xhr.responseText);
@@ -767,7 +771,7 @@ include '../insidebar.php';
             el.classList.remove('active');
         });
         document.querySelector('.type-option[data-type="' + type + '"]').classList.add('active');
-        
+
         if (type === 'specific') {
             document.getElementById('recipientsList').classList.add('show');
         } else {
@@ -839,12 +843,12 @@ include '../insidebar.php';
         // جمع المستلمين
         var recipientType = document.querySelector('.type-option.active').getAttribute('data-type');
         var recipients = [];
-        
+
         if (recipientType === 'specific') {
             document.querySelectorAll('.recipient-checkbox:checked').forEach(function(cb) {
                 recipients.push(cb.value);
             });
-            
+
             if (recipients.length === 0) {
                 simpleToast('الرجاء تحديد مستلم واحد على الأقل', 'fas fa-exclamation-circle');
                 return;
@@ -857,6 +861,7 @@ include '../insidebar.php';
 
         var xhr = new XMLHttpRequest();
         xhr.open('POST', 'send_broadcast.php', true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.onload = function() {
             btn.disabled = false;
@@ -880,7 +885,7 @@ include '../insidebar.php';
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال';
             simpleToast('فشل الاتصال بالخادم', 'fas fa-exclamation-triangle');
         };
-        
+
         var params = 'message=' + encodeURIComponent(msg);
         if (recipientType === 'specific') {
             params += '&recipients=' + encodeURIComponent(JSON.stringify(recipients));

@@ -59,65 +59,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               $_SESSION['login_attempts']++;
               $_SESSION['last_attempt_time'] = time();
               $error = "المستخدم غير مرتبط بشركة.";
-              mysqli_stmt_close($stmt);
-              goto login_end;
-            }
+            } else {
+              if (!$sup && $cid > 0 && db_table_has_column($conn, 'admin_companies', 'status')) {
+                $company_status = 'active';
+                $ss = @mysqli_prepare($conn, 'SELECT status FROM admin_companies WHERE id=? LIMIT 1');
+                if ($ss) {
+                  mysqli_stmt_bind_param($ss, 'i', $cid);
+                  mysqli_stmt_execute($ss);
+                  $sr = mysqli_stmt_get_result($ss);
+                  $sw = $sr ? mysqli_fetch_assoc($sr) : null;
+                  mysqli_stmt_close($ss);
+                  if ($sw && isset($sw['status']) && trim($sw['status']) !== '') {
+                    $company_status = strtolower(trim($sw['status']));
+                  }
+                }
 
-            if (!$sup && $cid > 0 && db_table_has_column($conn, 'admin_companies', 'status')) {
-              $company_status = 'active';
-              $ss = @mysqli_prepare($conn, 'SELECT status FROM admin_companies WHERE id=? LIMIT 1');
-              if ($ss) {
-                mysqli_stmt_bind_param($ss, 'i', $cid);
-                mysqli_stmt_execute($ss);
-                $sr = mysqli_stmt_get_result($ss);
-                $sw = $sr ? mysqli_fetch_assoc($sr) : null;
-                mysqli_stmt_close($ss);
-                if ($sw && isset($sw['status']) && trim($sw['status']) !== '') {
-                  $company_status = strtolower(trim($sw['status']));
+                if ($company_status !== 'active') {
+                  $_SESSION['login_attempts']++;
+                  $_SESSION['last_attempt_time'] = time();
+                  $error = "حالة الشركة غير نشطة.";
                 }
               }
 
-              if ($company_status !== 'active') {
-                $_SESSION['login_attempts']++;
-                $_SESSION['last_attempt_time'] = time();
-                $error = "حالة الشركة غير نشطة.";
-                mysqli_stmt_close($stmt);
-                goto login_end;
+              if ($error === '') {
+                $_SESSION['login_attempts'] = 0;
+                $_SESSION['last_attempt_time'] = null;
+                session_regenerate_id(true);
+                $_SESSION['user'] = [
+                  'id' => $user['id'],
+                  'name' => $user['name'],
+                  'username' => $user['username'],
+                  'phone' => $user['phone'],
+                  'role' => $user['role'],
+                  'project_id' => $user['project_id'],
+                  'contract_id' => $user['contract_id'] ?? null,
+                  'company_id' => $cid > 0 ? $cid : null,
+                  'parent' => $user['parent_id'],
+                  'created_at' => $user['created_at'],
+                  'updated_at' => $user['updated_at'],
+                  'last_login' => date('Y-m-d H:i:s')
+                ];
+
+                // Record login event.
+                if (class_exists('App\Services\ActivityLogService')) {
+                    \App\Services\ActivityLogService::logLogin();
+                }
+
+                header("Location: main/dashboard.php");
+                exit();
               }
             }
-
-            $_SESSION['login_attempts'] = 0;
-            $_SESSION['last_attempt_time'] = null;
-            session_regenerate_id(true);
-            $_SESSION['user'] = [
-              'id' => $user['id'],
-              'name' => $user['name'],
-              'username' => $user['username'],
-              'phone' => $user['phone'],
-              'role' => $user['role'],
-              'project_id' => $user['project_id'],
-              'contract_id' => $user['contract_id'] ?? null,
-              'company_id' => $cid > 0 ? $cid : null,
-              'parent' => $user['parent_id'],
-              'created_at' => $user['created_at'],
-              'updated_at' => $user['updated_at'],
-              'last_login' => date('Y-m-d H:i:s')
-            ];
-
-            // Record login event.
-            if (class_exists('App\Services\ActivityLogService')) {
-                \App\Services\ActivityLogService::logLogin();
-            }
-
-            header("Location: main/dashboard.php");
-            exit();
           }
         }
-
-        $_SESSION['login_attempts']++;
-        $_SESSION['last_attempt_time'] = time();
-        $error = "اسم المستخدم أو كلمة المرور غير صحيحة. المحاولات المتبقية: " . max(0, $max_attempts - $_SESSION['login_attempts']);
         mysqli_stmt_close($stmt);
+
+        if ($error === '') {
+          $_SESSION['login_attempts']++;
+          $_SESSION['last_attempt_time'] = time();
+          $error = "اسم المستخدم أو كلمة المرور غير صحيحة. المحاولات المتبقية: " . max(0, $max_attempts - $_SESSION['login_attempts']);
+        }
       } else {
         $error = "حدث خطأ أثناء التحقق.";
       }
@@ -125,7 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 
-login_end:
 $csrf = generate_csrf_token();
 $errH = !empty($error) ? htmlspecialchars($error, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : '';
 $postU = isset($_POST['username']) ? htmlspecialchars($_POST['username'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : '';

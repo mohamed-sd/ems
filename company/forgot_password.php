@@ -13,54 +13,12 @@ $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf_token(isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '')) {
         $error = 'رمز الحماية غير صالح.';
-    } elseif (!company_users_has_column('email')) {
-        $error = 'هذه الميزة تتطلب عمود email في users. نفّذ database/company_portal_auth.sql.';
-    } elseif (!company_table_exists('company_user_password_resets')) {
-        $error = 'جدول reset غير موجود. نفّذ database/company_portal_auth.sql.';
     } else {
         $email = trim(isset($_POST['email']) ? $_POST['email'] : '');
         if (!validate_email($email) || !validate_length($email, 5, 150)) {
             $error = 'أدخل بريداً إلكترونياً صحيحاً.';
         } else {
-            $fields = 'id, name, email, password';
-            if (company_users_has_column('status')) {
-                $fields .= ', status';
-            }
-            $stmt = mysqli_prepare($conn, 'SELECT ' . $fields . ' FROM users WHERE email = ? LIMIT 1');
-            if ($stmt) {
-                mysqli_stmt_bind_param($stmt, 's', $email);
-                mysqli_stmt_execute($stmt);
-                $res = mysqli_stmt_get_result($stmt);
-                $user = $res ? mysqli_fetch_assoc($res) : null;
-                mysqli_stmt_close($stmt);
-
-                if ($user) {
-                    if (!company_users_has_column('status') || strtolower((string)$user['status']) === 'active') {
-                        $token = bin2hex(random_bytes(32));
-                        $tokenHash = hash('sha256', $token);
-                        $uid = intval($user['id']);
-
-                        $cleanup = mysqli_prepare($conn, 'DELETE FROM company_user_password_resets WHERE user_id = ? OR expires_at < NOW()');
-                        if ($cleanup) {
-                            mysqli_stmt_bind_param($cleanup, 'i', $uid);
-                            mysqli_stmt_execute($cleanup);
-                            mysqli_stmt_close($cleanup);
-                        }
-
-                        $ins = mysqli_prepare($conn, 'INSERT INTO company_user_password_resets (user_id, token_hash, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 60 MINUTE))');
-                        if ($ins) {
-                            mysqli_stmt_bind_param($ins, 'is', $uid, $tokenHash);
-                            mysqli_stmt_execute($ins);
-                            mysqli_stmt_close($ins);
-
-                            company_send_reset_email($user['email'], $user['name'], $token);
-                            company_write_audit($uid, 0, 'password_reset_requested', 'بوابة الشركة', 'طلب إعادة تعيين كلمة المرور');
-                        }
-                    }
-                }
-            }
-
-            $message = 'إذا كان البريد موجوداً وفعالاً، سيتم إرسال رابط إعادة التعيين (صالح لمدة 60 دقيقة).';
+            $message = 'تم إيقاف إعادة التعيين التلقائي. يرجى التواصل مباشرة مع إدارة الشركة عبر البريد الإلكتروني أو رقم الهاتف المعتمد لاستعادة كلمة المرور.';
         }
     }
 }
@@ -94,7 +52,7 @@ $csrf = generate_csrf_token();
 <body class="standalone-brand">
     <div class="card">
         <h1>نسيت كلمة المرور</h1>
-        <p>أدخل بريدك الرسمي لاستلام رابط إعادة التعيين الصالح لمدة 60 دقيقة.</p>
+        <p>تم إلغاء الروابط الآلية لإعادة التعيين. استعادة كلمة المرور تتم فقط عبر التواصل المباشر مع إدارة الشركة.</p>
 
         <?php if ($message !== ''): ?><div class="alert ok"><?php echo e($message); ?></div><?php endif; ?>
         <?php if ($error !== ''): ?><div class="alert err"><?php echo e($error); ?></div><?php endif; ?>
@@ -105,11 +63,9 @@ $csrf = generate_csrf_token();
             <input type="email" id="email" name="email" maxlength="150" required value="<?php echo isset($_POST['email']) ? e($_POST['email']) : ''; ?>">
             <div class="actions">
                 <a href="<?php echo e(company_url('login.php')); ?>">العودة لتسجيل الدخول</a>
-                <button type="submit">إرسال الرابط</button>
+                <button type="submit">عرض تعليمات التواصل</button>
             </div>
         </form>
     </div>
 </body>
 </html>
-
-
