@@ -254,6 +254,51 @@ if (isset($_GET['delete_id'])) {
         exit();
     }
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// إحصائيات الموردين
+// ══════════════════════════════════════════════════════════════════════════════
+$suppliers_total_count = 0;
+$suppliers_active_count = 0;
+$suppliers_inactive_count = 0;
+$suppliers_with_contracts_count = 0;
+$suppliers_contracts_total = 0;
+$suppliers_hours_total = 0;
+
+$supplier_scope_stats_sql = $supplier_scope_list_sql;
+$supplier_status_active_sql = "(s.status = 1 OR s.status = '1' OR TRIM(s.status) = 'نشط' OR TRIM(LOWER(s.status)) = 'active' OR TRIM(LOWER(s.status)) = 'true')";
+
+$suppliers_stats_query = "SELECT
+    COUNT(*) AS total_suppliers,
+    SUM(CASE WHEN $supplier_status_active_sql THEN 1 ELSE 0 END) AS active_suppliers
+  FROM suppliers s
+  WHERE $supplier_scope_stats_sql AND ($suppliers_not_deleted_s_sql)";
+$suppliers_stats_result = mysqli_query($conn, $suppliers_stats_query);
+if ($suppliers_stats_result && ($suppliers_stats_row = mysqli_fetch_assoc($suppliers_stats_result))) {
+    $suppliers_total_count = intval($suppliers_stats_row['total_suppliers']);
+    $suppliers_active_count = intval($suppliers_stats_row['active_suppliers']);
+}
+$suppliers_inactive_count = max(0, $suppliers_total_count - $suppliers_active_count);
+
+$suppliers_contracts_scope = (!$is_super_admin && $supplierscontracts_has_company)
+    ? "ssc.company_id = $company_id"
+    : "1=1";
+
+$suppliers_contracts_stats_query = "SELECT
+    COUNT(*) AS total_contracts,
+    COUNT(DISTINCT ssc.supplier_id) AS suppliers_with_contracts,
+    COALESCE(SUM(ssc.forecasted_contracted_hours), 0) AS total_contracted_hours
+  FROM supplierscontracts ssc
+  INNER JOIN suppliers s ON s.id = ssc.supplier_id
+  WHERE $suppliers_contracts_scope
+    AND $supplier_scope_stats_sql
+    AND ($suppliers_not_deleted_s_sql)";
+$suppliers_contracts_stats_result = mysqli_query($conn, $suppliers_contracts_stats_query);
+if ($suppliers_contracts_stats_result && ($suppliers_contracts_stats_row = mysqli_fetch_assoc($suppliers_contracts_stats_result))) {
+    $suppliers_contracts_total = intval($suppliers_contracts_stats_row['total_contracts']);
+    $suppliers_with_contracts_count = intval($suppliers_contracts_stats_row['suppliers_with_contracts']);
+    $suppliers_hours_total = floatval($suppliers_contracts_stats_row['total_contracted_hours']);
+}
 ?>
 <?php
 $page_title = 'إيكوبيشن | الموردون';
@@ -270,6 +315,11 @@ include '../insidebar.php';
                     <i class="fas fa-plus-circle"></i> إضافة مورد جديد
                 </a>
             <?php endif; ?>
+
+            <a href="javascript:void(0)" id="toggleStats" class="suppliers-header-link" title="إظهار أو إخفاء الإحصائيات">
+                <i class="fas fa-eye"></i>
+                <span class="suppliers-toggle-stats-text">إظهار الإحصائيات</span>
+            </a>
 
             <a href="download_suppliers_template_csv.php" class="suppliers-header-link suppliers-header-link-csv">
                 <i class="fas fa-file-csv"></i> تحميل نموذج CSV
@@ -303,6 +353,41 @@ include '../insidebar.php';
             <?php echo htmlspecialchars($_GET['msg']); ?>
         </div>
     <?php endif; ?>
+
+    <div class="stats-section suppliers-hidden" id="suppliersStatsSection">
+        <div class="stats-grid">
+            <div class="stats-card stats-primary">
+                <div class="stats-icon"><i class="fas fa-truck-loading"></i></div>
+                <div class="stats-title">إجمالي الموردين</div>
+                <div class="stats-value"><?php echo $suppliers_total_count; ?></div>
+            </div>
+            <div class="stats-card stats-success">
+                <div class="stats-icon"><i class="fas fa-user-check"></i></div>
+                <div class="stats-title">الموردون النشطون</div>
+                <div class="stats-value"><?php echo $suppliers_active_count; ?></div>
+            </div>
+            <div class="stats-card stats-danger">
+                <div class="stats-icon"><i class="fas fa-user-slash"></i></div>
+                <div class="stats-title">الموردون المعلقون</div>
+                <div class="stats-value"><?php echo $suppliers_inactive_count; ?></div>
+            </div>
+            <div class="stats-card stats-cyan">
+                <div class="stats-icon"><i class="fas fa-file-contract"></i></div>
+                <div class="stats-title">إجمالي العقود</div>
+                <div class="stats-value"><?php echo $suppliers_contracts_total; ?></div>
+            </div>
+            <div class="stats-card stats-purple">
+                <div class="stats-icon"><i class="fas fa-link"></i></div>
+                <div class="stats-title">موردون لديهم عقود</div>
+                <div class="stats-value"><?php echo $suppliers_with_contracts_count; ?></div>
+            </div>
+            <div class="stats-card stats-orange">
+                <div class="stats-icon"><i class="fas fa-clock"></i></div>
+                <div class="stats-title">إجمالي الساعات المتعاقد عليها</div>
+                <div class="stats-value"><?php echo number_format($suppliers_hours_total); ?></div>
+            </div>
+        </div>
+    </div>
 
     <!-- ══ فورم إضافة / تعديل مورد ══════════════════════════════════════════ -->
     <form id="projectForm" action="" method="post" class="allforms">
@@ -494,17 +579,17 @@ include '../insidebar.php';
         </div>
         <div class="card-body">
             <div class="table-container">
-                <table id="projectsTable" class="display alltables">
+                <table id="projectsTable" class="display nowrap alltables suppliers-table-nowrap" style="width:100%;">
                     <thead>
                         <tr>
-                            <th><i class="fas fa-hashtag"></i> #</th>
+                            <th><i class="fas fa-sliders-h"></i> الإجراءات</th>
+                            <th><i class="fas fa-barcode"></i> كود المورد</th>
                             <th><i class="fas fa-truck-loading"></i> اسم المورد</th>
                             <th><i class="fas fa-cogs"></i> عدد الآليات</th>
-                            <th><i class="fas fa-file-contract"></i> عدد العقود</th>
                             <th><i class="fas fa-clock"></i> الساعات المتعاقد عليها</th>
                             <th><i class="fas fa-phone"></i> رقم الهاتف</th>
                             <th><i class="fas fa-info-circle"></i> الحالة</th>
-                            <th><i class="fas fa-sliders-h"></i> الإجراءات</th>
+                            <th><i class="fas fa-file-contract"></i> عقود المورد</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -539,8 +624,6 @@ include '../insidebar.php';
                                                     WHERE $supplier_scope_sql AND ($suppliers_not_deleted_s_sql)
                           ORDER BY s.id DESC";
                         $result = mysqli_query($conn, $query);
-                        $i = 1;
-
                         while ($row = mysqli_fetch_assoc($result)) {
                             $supplier_name_cell = "<a class='client-name-link' href='supplier_profile.php?id=" . intval($row['id']) . "'>" . htmlspecialchars($row['name']) . "</a>";
                             if (intval($row['num_contracts']) === 0) {
@@ -569,10 +652,21 @@ include '../insidebar.php';
                                 "data-status='" . $row['status'] . "'";
 
                             echo "<tr>";
-                            echo "<td><strong>" . $i++ . "</strong></td>";
+
+                            $action_btns = "<td><div class='action-btns'>";
+                            $action_btns .= "<a href='javascript:void(0)' class='viewBtn action-btn view' $data_attrs title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
+                            if ($can_edit) {
+                                $action_btns .= "<a href='javascript:void(0)' class='editBtn action-btn edit' $data_attrs title='تعديل'><i class='fas fa-edit'></i></a>";
+                            }
+                            if ($can_delete) {
+                                $action_btns .= "<a href='?delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف هذا المورد؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
+                            }
+                            $action_btns .= "</div></td>";
+
+                            echo $action_btns;
+                            echo "<td><strong>" . htmlspecialchars((string) ($row['supplier_code'] ?? '-')) . "</strong></td>";
                             echo "<td>" . $supplier_name_cell . "</td>";
                             echo "<td><span class='stat-cell'>" . $row['equipments'] . "</span></td>";
-                            echo "<td><span class='stat-cell'>" . $row['num_contracts'] . "</span></td>";
                             echo "<td><span class='status-active'>" . number_format($row['total_hours']) . " ساعة</span></td>";
                             echo "<td><i class='fas fa-phone phone-icon'></i>" . htmlspecialchars($row['phone']) . "</td>";
 
@@ -583,18 +677,15 @@ include '../insidebar.php';
                                 echo "<td><span class='status-inactive'><i class='fas fa-times-circle suppliers-status-icon'></i>معلق</span></td>";
                             }
 
-                            // أزرار الإجراءات
-                            $action_btns = "<td><div class='action-btns'>";
-                            $action_btns .= "<a href='supplierscontracts.php?id=" . $row['id'] . "' class='action-btn contracts' title='العقود'><i class='fas fa-file-contract'></i></a> | ";
-                            $action_btns .= "<a href='javascript:void(0)' class='viewBtn action-btn view' $data_attrs title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
-                            if ($can_edit) {
-                                $action_btns .= "<a href='javascript:void(0)' class='editBtn action-btn edit' $data_attrs title='تعديل'><i class='fas fa-edit'></i></a>";
-                            }
-                            if ($can_delete) {
-                                $action_btns .= "<a href='?delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف هذا المورد؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
-                            }
-                            $action_btns .= "</div></td>";
-                            echo $action_btns;
+                            echo "<td>
+                             <a href='supplierscontracts.php?id=" . intval($row['id']) . "'
+                                       class='suppliers-contracts-link'
+                                       title='عرض عقود المورد'>
+                                        <i class='fas fa-file-contract'></i>
+                                        <span class='suppliers-contracts-badge'>" . intval($row['num_contracts']) . "</span>
+                             </a>
+                        </td>";
+
                             echo "</tr>";
                         }
                         ?>
@@ -781,7 +872,8 @@ include '../insidebar.php';
         // ════════════════════════════════════════════════
         $(document).ready(function () {
             $('#projectsTable').DataTable({
-                responsive: true,
+                scrollX: true,
+                autoWidth: false,
                 dom: 'Bfrtip',
                 buttons: [
                     { extend: 'copy', text: '📋 نسخ' },
@@ -801,6 +893,42 @@ include '../insidebar.php';
         // ════════════════════════════════════════════════
         const toggleSupplierFormBtn = document.getElementById('toggleForm');
         const supplierForm = document.getElementById('projectForm');
+        const statsToggleBtn = $('#toggleStats');
+        const statsSection = $('#suppliersStatsSection');
+
+        function updateStatsToggleState(isVisible) {
+            if (!statsToggleBtn.length) {
+                return;
+            }
+
+            const icon = statsToggleBtn.find('i').first();
+            const text = statsToggleBtn.find('.suppliers-toggle-stats-text');
+
+            if (isVisible) {
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                text.text('إخفاء الإحصائيات');
+            } else {
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                text.text('إظهار الإحصائيات');
+            }
+        }
+
+        updateStatsToggleState(statsSection.is(':visible'));
+
+        statsToggleBtn.on('click', function () {
+            if (statsSection.is(':visible')) {
+                statsSection.stop(true, true).slideUp(250, function () {
+                    statsSection.addClass('suppliers-hidden');
+                    updateStatsToggleState(false);
+                });
+            } else {
+                statsSection.removeClass('suppliers-hidden').hide();
+                statsSection.stop(true, true).slideDown(250, function () {
+                    updateStatsToggleState(true);
+                });
+            }
+        });
+
         if (toggleSupplierFormBtn && supplierForm) {
             toggleSupplierFormBtn.addEventListener('click', function () {
                 supplierForm.classList.toggle('allforms-visible');
@@ -1043,6 +1171,115 @@ include '../insidebar.php';
 
     })();
 </script>
+
+<style>
+    .suppliers-main .stats-section {
+        border: 1px solid var(--bdr);
+        border-radius: var(--rl);
+        background: linear-gradient(180deg, rgba(255, 255, 255, .95) 0%, var(--s2) 100%);
+        box-shadow: var(--sh);
+        padding: 14px;
+        margin-bottom: 14px;
+    }
+
+    .suppliers-main .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(170px, 1fr));
+        gap: 12px;
+    }
+
+    .suppliers-main .stats-card {
+        background: var(--s1);
+        border: 1px solid var(--bdr);
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 2px 8px rgba(26, 18, 8, .07);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .suppliers-main .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--or), var(--or2));
+        opacity: .9;
+    }
+
+    .suppliers-main .stats-card .stats-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .suppliers-main .stats-card .stats-title {
+        margin-top: 10px;
+        color: var(--t2);
+        font-size: .82rem;
+        font-weight: 700;
+    }
+
+    .suppliers-main .stats-card .stats-value {
+        margin-top: 7px;
+        color: var(--t1);
+        font-size: 1.62rem;
+        line-height: 1;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .suppliers-main .stats-primary .stats-icon { background: rgba(37, 99, 235, .14); color: #1d4ed8; }
+    .suppliers-main .stats-success .stats-icon { background: rgba(22, 163, 74, .14); color: #15803d; }
+    .suppliers-main .stats-danger .stats-icon { background: rgba(220, 38, 38, .14); color: #b91c1c; }
+    .suppliers-main .stats-purple .stats-icon { background: rgba(124, 58, 237, .14); color: #6d28d9; }
+    .suppliers-main .stats-cyan .stats-icon { background: rgba(8, 145, 178, .14); color: #0e7490; }
+    .suppliers-main .stats-orange .stats-icon { background: rgba(217, 119, 6, .14); color: #b45309; }
+
+    #projectsTable.suppliers-table-nowrap,
+    #projectsTable.suppliers-table-nowrap th,
+    #projectsTable.suppliers-table-nowrap td {
+        white-space: nowrap;
+    }
+
+    .suppliers-main .suppliers-contracts-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        text-decoration: none;
+    }
+
+    .suppliers-main .suppliers-contracts-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        font-size: .8rem;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, #1f4f7a, #2f6fa5);
+    }
+
+    @media (max-width: 900px) {
+        .suppliers-main .stats-grid {
+            grid-template-columns: repeat(2, minmax(150px, 1fr));
+        }
+    }
+
+    @media (max-width: 560px) {
+        .suppliers-main .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 
 </body>
 

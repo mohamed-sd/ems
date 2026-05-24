@@ -130,6 +130,9 @@ $hasAvail = dashboard_has_column($conn, 'equipments', 'availability_status');
 $hasDrvSt = dashboard_has_column($conn, 'drivers', 'driver_status');
 $hasSCMine = dashboard_has_column($conn, 'supplierscontracts', 'mine_id');
 $hasSCPCId = dashboard_has_column($conn, 'supplierscontracts', 'project_contract_id');
+$contractsProjectCol = dashboard_has_column($conn, 'contracts', 'project_id') ? 'project_id' : (dashboard_has_column($conn, 'contracts', 'project') ? 'project' : 'project_id');
+$contractsHasIsDeleted = dashboard_has_column($conn, 'contracts', 'is_deleted');
+$contractsHasDeletedAt = dashboard_has_column($conn, 'contracts', 'deleted_at');
 
 $sessionMineId = isset($_SESSION['user']['mine_id']) ? intval($_SESSION['user']['mine_id']) : 0;
 $sessionContractId = isset($_SESSION['user']['contract_id']) ? intval($_SESSION['user']['contract_id']) : 0;
@@ -139,12 +142,28 @@ $role6SupplierBreakdown = [];
 $role6ContextText = '';
 $opsProjectCol = dashboard_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
 
-if ($dashboardRole == "0" || $dashboardRole == "1") {
+if ($dashboardRole == "0" || $dashboardRole == "1" || $dashboardRole == "12") {
   $c = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM clients WHERE status='نشط' AND $sc", 't');
   $p = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM project WHERE status='1' AND $sp", 't');
-  $m = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM mines WHERE status='1' AND project_id IN(SELECT id FROM project WHERE $sp)", 't');
+  $contractsNotDeletedSql = "1=1";
+  if ($contractsHasIsDeleted) {
+    $contractsNotDeletedSql = "c.is_deleted = 0";
+  } elseif ($contractsHasDeletedAt) {
+    $contractsNotDeletedSql = "c.deleted_at IS NULL";
+  }
+  $activeContracts = dashboard_table_exists($conn, 'contracts')
+    ? dashboard_scalar(
+      $conn,
+      "SELECT COUNT(*) AS t
+       FROM contracts c
+       WHERE (c.status='1' OR c.status=1)
+         AND $contractsNotDeletedSql
+         AND c.$contractsProjectCol IN(SELECT id FROM project WHERE $sp)",
+      't'
+    )
+    : 0;
   $u = $companyId > 0 ? dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE company_id=$companyId AND role!='-1'", 't') : dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE parent_id='0' AND role!='-1'", 't');
-  $stats = [['fa-users', $c, 'العملاء', 'or'], ['fa-project-diagram', $p, 'المشاريع', 'or'], ['fa-mountain', $m, 'المناجم', 'or'], ['fa-user-shield', $u, 'المستخدمون', 'or']];
+  $stats = [['fa-users', $c, 'العملاء', 'or'], ['fa-project-diagram', $p, 'المشاريع', 'or'], ['fa-file-contract', $activeContracts, 'العقود النشطة', 'ok'], ['fa-user-shield', $u, 'المستخدمون', 'or']];
 } elseif ($dashboardRole == "2") {
   $s = dashboard_scalar($conn, "SELECT COUNT(DISTINCT s.id) AS t FROM suppliers s WHERE company_id=$companyId", 't');
   $e = dashboard_scalar($conn, "SELECT COUNT(DISTINCT e.id) AS t FROM equipments e WHERE company_id=$companyId", 't');
@@ -435,7 +454,39 @@ include '../insidebar.php';
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  overflow-y: visible !important;
   font-family: 'Tajawal','Cairo',sans-serif;
+}
+
+/* Keep one vertical scrollbar on dashboard (page scrollbar) */
+html,
+body.ems-site {
+  overflow-y: auto !important;
+}
+
+.ems-site .main {
+  overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.ems-site .sidebar {
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+}
+
+.ems-site .sidebar ul {
+  overflow-y: hidden !important;
+  max-height: none !important;
+}
+
+.ems-site .sidebar ul::-webkit-scrollbar,
+.ems-site .main::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
 }
 /* atmospheric grid */
 .ems-dash::before {

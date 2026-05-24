@@ -14,6 +14,7 @@ $equipment_has_site_supervisor_name = db_table_has_column($conn, 'equipments', '
 $equipment_has_site_supervisor_contact = db_table_has_column($conn, 'equipments', 'site_supervisor_contact');
 $equipment_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
 $equipment_has_company_id = db_table_has_column($conn, 'equipments', 'company_id');
+$operations_project_col = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
 
 // company isolation (SaaS)
 $current_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
@@ -493,6 +494,38 @@ if (!empty($editData)) {
         isset($editData['availability_status']) ? $editData['availability_status'] : ''
     );
 }
+
+// إحصائيات المعدات
+$fleet_total_count = 0;
+$fleet_available_count = 0;
+$fleet_unavailable_count = 0;
+$fleet_maintenance_count = 0;
+$fleet_reserved_count = 0;
+$fleet_active_ops_count = 0;
+
+$fleet_company_where_plain = ($equipment_has_company_id && $current_company_id > 0)
+    ? " WHERE company_id = $current_company_id"
+    : "";
+
+$fleet_total_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments$fleet_company_where_plain"))['t'] ?? 0);
+
+if ($equipment_has_availability_state) {
+    $fleet_available_sql = "SELECT COUNT(*) AS t FROM equipments
+        WHERE (
+            availability_state = 'متوفرة'
+            OR ((availability_state IS NULL OR availability_state = '')
+                AND (availability_status IS NULL OR availability_status = '' OR availability_status IN ('متاحة للعمل','قيد الاستخدام')))
+        )" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : '');
+} else {
+    $fleet_available_sql = "SELECT COUNT(*) AS t FROM equipments
+        WHERE (availability_status IS NULL OR availability_status = '' OR availability_status IN ('متاحة للعمل','قيد الاستخدام'))" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : '');
+}
+
+$fleet_available_count = intval(mysqli_fetch_assoc(mysqli_query($conn, $fleet_available_sql))['t'] ?? 0);
+$fleet_unavailable_count = max(0, $fleet_total_count - $fleet_available_count);
+$fleet_maintenance_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments WHERE status = 1" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : '')))['t'] ?? 0);
+$fleet_reserved_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments WHERE status = 2" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : '')))['t'] ?? 0);
+$fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(DISTINCT o.equipment) AS t FROM operations o JOIN equipments m ON m.id = o.equipment WHERE o.status = '1'$equipment_company_filter"))['t'] ?? 0);
 ?>
 
 <style>
@@ -738,6 +771,57 @@ if (!empty($editData)) {
     max-height: 90vh;
   }
 }
+
+.equipments-fleet-main .stats-section {
+    margin: 12px 0 16px;
+    border: 1px solid #eadfce;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #fff 0%, #fffbf5 100%);
+    padding: 12px;
+}
+
+.equipments-fleet-main .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.equipments-fleet-main .stats-card {
+    border: 1px solid #e8dcc8;
+    border-radius: 12px;
+    background: #fff;
+    padding: 12px;
+}
+
+.equipments-fleet-main .stats-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.equipments-fleet-main .stats-title {
+    font-size: .84rem;
+    color: #6b4e2a;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.equipments-fleet-main .stats-value {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #1a1208;
+}
+
+.equipments-fleet-main .stats-primary .stats-icon { background: rgba(37,99,235,.14); color: #1d4ed8; }
+.equipments-fleet-main .stats-success .stats-icon { background: rgba(22,163,74,.14); color: #15803d; }
+.equipments-fleet-main .stats-danger .stats-icon { background: rgba(220,38,38,.14); color: #b91c1c; }
+.equipments-fleet-main .stats-purple .stats-icon { background: rgba(124,58,237,.14); color: #6d28d9; }
+.equipments-fleet-main .stats-cyan .stats-icon { background: rgba(8,145,178,.14); color: #0e7490; }
+.equipments-fleet-main .stats-orange .stats-icon { background: rgba(217,119,6,.14); color: #b45309; }
 </style>
 
 <div class="main equipments-fleet-main ems-unified-page-shell">
@@ -766,6 +850,10 @@ if (!empty($editData)) {
             إدارة المعدات
         </h1>
         <div class="head_back">
+            <a href="javascript:void(0)" id="toggleStats" class="btn" title="إظهار أو إخفاء الإحصائيات">
+                <i class="fas fa-eye"></i>
+                <span class="fleet-toggle-stats-text">إظهار الإحصائيات</span>
+            </a>
             <a href="../main/dashboard.php" class="">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
@@ -782,6 +870,41 @@ if (!empty($editData)) {
             <?php echo $success_msg; ?>
         </div>
     <?php endif; ?>
+
+    <div class="stats-section fleet-hidden" id="fleetStatsSection">
+        <div class="stats-grid">
+            <div class="stats-card stats-primary">
+                <div class="stats-icon"><i class="fas fa-truck-monster"></i></div>
+                <div class="stats-title">إجمالي المعدات</div>
+                <div class="stats-value"><?php echo $fleet_total_count; ?></div>
+            </div>
+            <div class="stats-card stats-success">
+                <div class="stats-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stats-title">المعدات المتوفرة</div>
+                <div class="stats-value"><?php echo $fleet_available_count; ?></div>
+            </div>
+            <div class="stats-card stats-danger">
+                <div class="stats-icon"><i class="fas fa-ban"></i></div>
+                <div class="stats-title">المعدات غير المتوفرة</div>
+                <div class="stats-value"><?php echo $fleet_unavailable_count; ?></div>
+            </div>
+            <div class="stats-card stats-cyan">
+                <div class="stats-icon"><i class="fas fa-play-circle"></i></div>
+                <div class="stats-title">معدات في تشغيل نشط</div>
+                <div class="stats-value"><?php echo $fleet_active_ops_count; ?></div>
+            </div>
+            <div class="stats-card stats-purple">
+                <div class="stats-icon"><i class="fas fa-tools"></i></div>
+                <div class="stats-title">تحت الصيانة</div>
+                <div class="stats-value"><?php echo $fleet_maintenance_count; ?></div>
+            </div>
+            <div class="stats-card stats-orange">
+                <div class="stats-icon"><i class="fas fa-bookmark"></i></div>
+                <div class="stats-title">محجوزة</div>
+                <div class="stats-value"><?php echo $fleet_reserved_count; ?></div>
+            </div>
+        </div>
+    </div>
 
     <?php if ($can_add || $can_edit) { ?>
         <!-- فورم إضافة / تعديل معدة -->
@@ -1394,29 +1517,30 @@ if (!empty($editData)) {
             </div>
 
             <!-- أزرار إظهار/إخفاء المجموعات -->
-            <div class="column-groups-toggle">
-                <button type="button" class="toggle-group-btn active" data-group="basic" title="المعلومات الأساسية">
+            <div class="contracts-group-toolbar-wrap">
+              <div class="contracts-group-toolbar">
+                <span class="contracts-group-toolbar-label">
+                    <i class="fas fa-filter"></i> عرض المجموعات:
+                </span>
+                <button type="button" class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
                     <i class="fas fa-info-circle"></i> أساسية
                 </button>
-                <button type="button" class="toggle-group-btn active" data-group="identification"
-                    title="بيانات التعريف">
-                    <i class="fas fa-id-card"></i> التعريف
-                </button>
-                <button type="button" class="toggle-group-btn" data-group="manufacturing" title="بيانات الصنع">
+                <button type="button" class="btn-group-toggle" data-group="manufacturing" title="بيانات الصنع">
                     <i class="fas fa-industry"></i> الصنع
                 </button>
-                <button type="button" class="toggle-group-btn" data-group="technical" title="الحالة الفنية">
+                <button type="button" class="btn-group-toggle" data-group="technical" title="الحالة الفنية">
                     <i class="fas fa-wrench"></i> فنية
                 </button>
-                <button type="button" class="toggle-group-btn active" data-group="ownership" title="بيانات الملكية">
+                <button type="button" class="btn-group-toggle active" data-group="ownership" title="بيانات الملكية">
                     <i class="fas fa-user-tie"></i> الملكية
                 </button>
-                <button type="button" class="toggle-group-btn active" data-group="status" title="الحالة والإجراءات">
+                <button type="button" class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
                     <i class="fas fa-toggle-on"></i> الحالة
                 </button>
-                <button type="button" class="toggle-all-btn" title="إظهار/إخفاء الكل">
+                <button type="button" class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
                     <i class="fas fa-eye"></i> الكل
                 </button>
+              </div>
             </div>
 
             <div class="table-scroll-wrap">
@@ -1424,13 +1548,9 @@ if (!empty($editData)) {
                     <thead>
                         <tr>
                           <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
-
-                            <th data-group="basic"><i class="fas fa-hashtag"></i> #</th>
+                                                        <th data-group="basic"><i class="fas fa-tag"></i> كود المعدة</th>
                             <th data-group="basic"><i class="fas fa-truck-loading"></i> المورد</th>
-                            <!-- <th data-group="basic"><i class="fas fa-barcode"></i> كود المعدة</th> -->
-                            <!-- <th data-group="identification"><i class="fas fa-hashtag"></i> رقم تسلسلي</th> -->
                             <th data-group="basic"><i class="fas fa-list-alt"></i> النوع</th>
-                            <th data-group="basic"><i class="fas fa-tag"></i> الكود</th>
                             <th data-group="manufacturing"><i class="fas fa-car"></i> الموديل</th>
                             <th data-group="manufacturing"><i class="fas fa-calendar"></i> سنة الصنع</th>
                             <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
@@ -1460,7 +1580,7 @@ if (!empty($editData)) {
                             m.actual_owner_name,
                             m.availability_status,
                             $availability_state_select
-                            o.project_id,
+                            o.$operations_project_col AS project_id,
                             o.status AS operation_status,
                             COUNT(DISTINCT d.id) AS drivers_count
                         FROM equipments m
@@ -1479,7 +1599,6 @@ if (!empty($editData)) {
                         ORDER BY m.id DESC
                     ";
                         $result = mysqli_query($conn, $query2);
-                        $i = 1;
                         while ($row = mysqli_fetch_assoc($result)) {
 
 
@@ -1496,7 +1615,8 @@ if (!empty($editData)) {
                             }
                             echo "</td>";
 
-                            echo "<td><strong>" . $i++ . "</strong></td>";
+                            $equipment_profile_url = "equipment_profile.php?id=" . intval($row['id']);
+                            echo "<td><a class='client-name-link' href='" . $equipment_profile_url . "'><strong>" . htmlspecialchars($row['code']) . "</strong></a></td>";
                             echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
                             // echo "<td><span class='mono code-badge'>" . htmlspecialchars($row['code']) . "</span></td>";
 
@@ -1523,10 +1643,8 @@ if (!empty($editData)) {
                                 $type_icon = "fa-truck";
                             }
 
-                            echo "<td><span class='badge-type'><i class='fas $type_icon'></i> $type_text</span></td>";
-
-                            // اسم المعدة (تهيئة المتغير)
-                            $name_display = "<strong>" . htmlspecialchars($row['code']) . "</strong>";
+                            // تفاصيل إضافية بجانب الكود
+                            $name_display = "";
 
                             // المشروع النشط
                             if (!empty($row['project_id'])) {
@@ -1542,7 +1660,7 @@ if (!empty($editData)) {
                                 $name_display .= "<br><span class='extra-info'><i class='fas fa-users'></i> " . $row['drivers_count'] . " سائق</span>";
                             }
 
-                            echo "<td>" . $name_display . "</td>";
+                            echo "<td><span class='badge-type'><i class='fas $type_icon'></i> $type_text</span>" . $name_display . "</td>";
 
                             // الموديل
                             $model = !empty($row['model']) ? htmlspecialchars($row['model']) : "<span class='text-muted'>غير محدد</span>";
@@ -1812,18 +1930,16 @@ if (!empty($editData)) {
 
                 // نظام إظهار/إخفاء المجموعات
                 var columnGroups = {
-                    'basic': [0, 1, 2, 4, 5],        // #، المورد، كود المعدة، النوع، الاسم
-                    'identification': [3],            // رقم تسلسلي
-                    'manufacturing': [6, 7],          // الموديل، سنة الصنع
-                    'technical': [8],                 // حالة المعدة
-                    'ownership': [9],                 // المالك
-                    'status': [10, 11, 12]             // التوفر، الحالة، الإجراءات
+                    'basic': [0, 1, 2, 3],          // إجراءات، الكود، المورد، النوع
+                    'manufacturing': [4, 5],        // الموديل، سنة الصنع
+                    'technical': [6],               // حالة المعدة
+                    'ownership': [7],               // المالك
+                    'status': [8, 9]                // التوفر، الحالة
                 };
 
                 // حفظ حالة المجموعات (الصنع والفنية مخفيتين بشكل افتراضي)
                 var groupsState = {
                     'basic': true,
-                    'identification': true,
                     'manufacturing': false,
                     'technical': false,
                     'ownership': true,
@@ -1858,10 +1974,10 @@ if (!empty($editData)) {
                 function applyFilters() {
                     $.fn.dataTable.ext.search.push(
                         function (settings, data, dataIndex) {
-                            // data[1] = المورد
-                            // data[4] = النوع (يحتوي على نص مثل "حفار" أو "قلاب")
-                            // data[11] = الحالة (يحتوي على "نشط" أو "غير نشط")
-                            // data[10] = التوفر
+                            // data[2] = المورد
+                            // data[3] = النوع
+                            // data[9] = الحالة
+                            // data[8] = التوفر
 
                             var supplierMatch = true;
                             var typeMatch = true;
@@ -1870,25 +1986,25 @@ if (!empty($editData)) {
 
                             // فلترة المورد
                             if (activeFilters.supplier !== '') {
-                                supplierMatch = data[1].indexOf(activeFilters.supplier) !== -1;
+                                supplierMatch = data[2].indexOf(activeFilters.supplier) !== -1;
                             }
 
                             // فلترة النوع
                             if (activeFilters.type !== '') {
-                                typeMatch = data[4].indexOf(activeFilters.type) !== -1;
+                                typeMatch = data[3].indexOf(activeFilters.type) !== -1;
                             }
 
                             // فلترة الحالة
                             if (activeFilters.status !== '') {
-                                statusMatch = data[11].indexOf(activeFilters.status) !== -1;
+                                statusMatch = data[9].indexOf(activeFilters.status) !== -1;
                             }
 
                             // فلترة التوفر (مطابقة دقيقة لتجنب تشابه "متوفرة" مع "غير متوفرة")
                             if (activeFilters.availability !== '') {
                                 if (activeFilters.availability === 'متوفرة') {
-                                    availabilityMatch = data[10].indexOf('غير متوفرة') === -1 && data[10].indexOf('متوفرة') !== -1;
+                                    availabilityMatch = data[8].indexOf('غير متوفرة') === -1 && data[8].indexOf('متوفرة') !== -1;
                                 } else {
-                                    availabilityMatch = data[10].indexOf(activeFilters.availability) !== -1;
+                                    availabilityMatch = data[8].indexOf(activeFilters.availability) !== -1;
                                 }
                             }
 
@@ -1968,7 +2084,7 @@ if (!empty($editData)) {
                 }
 
                 // معالج النقر على أزرار المجموعات
-                $('.toggle-group-btn').on('click', function () {
+                $('.btn-group-toggle').on('click', function () {
                     var groupName = $(this).data('group');
                     toggleGroup(groupName);
                     $(this).toggleClass('active');
@@ -1976,7 +2092,7 @@ if (!empty($editData)) {
 
                 // زر إظهار/إخفاء الكل
                 var allVisible = true;
-                $('.toggle-all-btn').on('click', function () {
+                $('.btn-group-toggle-all').on('click', function () {
                     allVisible = !allVisible;
 
                     Object.keys(columnGroups).forEach(function (groupName) {
@@ -1988,11 +2104,40 @@ if (!empty($editData)) {
                     });
 
                     if (allVisible) {
-                        $('.toggle-group-btn').addClass('active');
+                        $('.btn-group-toggle').addClass('active');
                         $(this).html('<i class="fas fa-eye"></i> الكل');
                     } else {
-                        $('.toggle-group-btn').removeClass('active');
+                        $('.btn-group-toggle').removeClass('active');
                         $(this).html('<i class="fas fa-eye-slash"></i> إخفاء الكل');
+                    }
+                });
+
+                const statsToggleBtn = $('#toggleStats');
+                const statsSection = $('#fleetStatsSection');
+
+                function updateStatsToggleState(isVisible) {
+                    if (!statsToggleBtn.length) return;
+                    statsToggleBtn.toggleClass('is-active', isVisible);
+                    statsToggleBtn.attr('aria-expanded', isVisible ? 'true' : 'false');
+                    statsToggleBtn.find('.fleet-toggle-stats-text').text(isVisible ? 'إخفاء الإحصائيات' : 'إظهار الإحصائيات');
+                    const icon = statsToggleBtn.find('i').first();
+                    icon.toggleClass('fa-chart-pie', isVisible);
+                    icon.toggleClass('fa-eye', !isVisible);
+                }
+
+                updateStatsToggleState(statsSection.is(':visible'));
+                statsToggleBtn.on('click', function (e) {
+                    e.preventDefault();
+                    if (statsSection.is(':visible')) {
+                        statsSection.stop(true, true).slideUp(250, function () {
+                            statsSection.addClass('fleet-hidden');
+                            updateStatsToggleState(false);
+                        });
+                    } else {
+                        statsSection.removeClass('fleet-hidden').hide();
+                        statsSection.stop(true, true).slideDown(250, function () {
+                            updateStatsToggleState(true);
+                        });
                     }
                 });
             });
@@ -2140,9 +2285,22 @@ if (!empty($editData)) {
                 return '$' + num.toLocaleString();
             }
 
-            function formatType(value) {
+            function formatType(value, typeName) {
+                if (typeName) return typeName;
                 if (!value) return 'غير محدد';
-                return String(value) === '1' ? 'حفار' : 'قلاب';
+                return String(value);
+            }
+
+            function formatEquipmentStatus(statusValue) {
+                const map = {
+                    '0': 'متاحة',
+                    '1': 'تحت الصيانة',
+                    '2': 'محجوزة',
+                    '3': 'معطلة',
+                    '5': 'مسحوبة'
+                };
+                const key = String(statusValue ?? '');
+                return map[key] || 'غير محدد';
             }
 
             function formatAvailabilityState(value, fallbackStatus) {
@@ -2200,14 +2358,22 @@ if (!empty($editData)) {
                     dataType: 'json',
                     success: function (response) {
                         if (!response.success || !response.data) {
-                            setViewValue('view_eq_name', 'تعذر تحميل البيانات');
+                            const failMessage = (response && response.message) ? response.message : 'تعذر تحميل البيانات';
+                            ['view_eq_code', 'view_eq_name', 'view_eq_type', 'view_eq_supplier', 'view_eq_project', 'view_eq_mine',
+                             'view_eq_serial', 'view_eq_chassis', 'view_eq_machine_number', 'view_eq_manufacturer', 'view_eq_model', 'view_eq_year',
+                             'view_eq_import_year', 'view_eq_condition', 'view_eq_hours', 'view_eq_engine', 'view_eq_tires',
+                             'view_eq_owner', 'view_eq_owner_type', 'view_eq_owner_phone', 'view_eq_owner_relation',
+                             'view_eq_license', 'view_eq_license_authority', 'view_eq_document_type', 'view_eq_license_expiry', 'view_eq_inspection',
+                             'view_eq_last_inspection', 'view_eq_location', 'view_eq_supervisor_name', 'view_eq_supervisor_contact', 'view_eq_availability', 'view_eq_value',
+                             'view_eq_daily', 'view_eq_monthly', 'view_eq_insurance', 'view_eq_notes', 'view_eq_last_maintenance', 'view_eq_status']
+                             .forEach(id => setViewValue(id, failMessage));
                             return;
                         }
 
                         const data = response.data;
                         setViewValue('view_eq_code', data.code);
                         setViewValue('view_eq_name', data.name);
-                        setViewValue('view_eq_type', formatType(data.type));
+                        setViewValue('view_eq_type', formatType(data.type, data.equipment_type_name));
                         setViewValue('view_eq_supplier', data.supplier_name);
                         setViewValue('view_eq_project', data.project_name);
                         setViewValue('view_eq_mine', data.mine_name);
@@ -2242,10 +2408,17 @@ if (!empty($editData)) {
                         setViewValue('view_eq_insurance', data.insurance_status);
                         setViewValue('view_eq_notes', data.general_notes);
                         setViewValue('view_eq_last_maintenance', data.last_maintenance_date);
-                        setViewValue('view_eq_status', formatAvailabilityStatus(data.availability_state, data.availability_status));
+                        setViewValue('view_eq_status', formatEquipmentStatus(data.status));
                     },
                     error: function () {
-                        setViewValue('view_eq_name', 'تعذر الاتصال بالخادم');
+                        ['view_eq_code', 'view_eq_name', 'view_eq_type', 'view_eq_supplier', 'view_eq_project', 'view_eq_mine',
+                         'view_eq_serial', 'view_eq_chassis', 'view_eq_machine_number', 'view_eq_manufacturer', 'view_eq_model', 'view_eq_year',
+                         'view_eq_import_year', 'view_eq_condition', 'view_eq_hours', 'view_eq_engine', 'view_eq_tires',
+                         'view_eq_owner', 'view_eq_owner_type', 'view_eq_owner_phone', 'view_eq_owner_relation',
+                         'view_eq_license', 'view_eq_license_authority', 'view_eq_document_type', 'view_eq_license_expiry', 'view_eq_inspection',
+                         'view_eq_last_inspection', 'view_eq_location', 'view_eq_supervisor_name', 'view_eq_supervisor_contact', 'view_eq_availability', 'view_eq_value',
+                         'view_eq_daily', 'view_eq_monthly', 'view_eq_insurance', 'view_eq_notes', 'view_eq_last_maintenance', 'view_eq_status']
+                         .forEach(id => setViewValue(id, 'تعذر الاتصال بالخادم'));
                     }
                 });
             });

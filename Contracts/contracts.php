@@ -626,7 +626,7 @@ include('../insidebar.php');
             </div>
           </div>
 
-          <div class="field md-3 sm-6"> </div>
+          <!-- <div class="field md-3 sm-6"> </div> -->
 
           <div class="field md-3 sm-6">
             <label>الشاهد الأول</label>
@@ -711,8 +711,8 @@ include('../insidebar.php');
       </div>
     </div>
 
-    <div class="card-body contracts-table-wrap">
-      <table id="projectsTable" class="display nowrap contracts-table">
+    <div class="card-body contracts-table-wrap table-container">
+      <table id="projectsTable" class="display nowrap contracts-table contracts-table-nowrap">
         <thead>
           <tr>
             <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
@@ -858,7 +858,8 @@ include('../insidebar.php');
               $start_date = new DateTime($actual_start);
               $end_date = new DateTime($actual_end);
               $interval = $start_date->diff($end_date);
-              $contract_duration_days = $interval->days + 1; // +1 لحساب يوم البداية ويوم النهاية معاً
+              // توحيد المنطق مع الواجهة: الفرق الفعلي بين التاريخين بدون إضافة يوم إضافي
+              $contract_duration_days = $interval->days;
             } else {
               $contract_duration_days = 0;
             }
@@ -1039,10 +1040,10 @@ include('../insidebar.php');
               $statusText = 'غير ساري';
             }
             $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
-
-            $actions_html = '';
+            $actions_html = "<div class='action-btns'>";
+            $actions_html .= "<a href='contracts_details.php?id=" . $row['id'] . "' class='action-btn view' title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
             if ($can_edit) {
-              $actions_html .= "<a href='javascript:void(0)' class='editBtn'
+              $actions_html .= "<a href='javascript:void(0)' class='editBtn action-btn edit'
              data-id='" . $row['id'] . "'
                data-project_id='" . (isset($row['project_id']) ? intval($row['project_id']) : 0) . "'
              data-contract_signing_date='" . $row['contract_signing_date'] . "'
@@ -1073,21 +1074,22 @@ include('../insidebar.php');
                   payment_date ='" . (isset($row['payment_date']) ? $row['payment_date'] : '') . "'
 
              data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
-             class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>";
+             title='تعديل'><i class='fas fa-edit'></i></a>";
             }
 
             if ($can_delete) {
               $delete_project_id = $project_id > 0 ? $project_id : intval(isset($row['project_id']) ? $row['project_id'] : 0);
-              $actions_html .= "<a href='contracts.php?id=" . $delete_project_id . "&delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode($contracts_csrf_token) . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>";
+              $actions_html .= "<a href='contracts.php?id=" . $delete_project_id . "&delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode($contracts_csrf_token) . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></a>";
             }
+            $actions_html .= "</div>";
 
-            $actions_html .= "<a href='contracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>";
+
 
             echo "<tr>";
             echo "<td class='group-status'>" . $actions_html . "</td>";
 
             // المعلومات الأساسية
-            echo "<td class='group-basic'>" . $row['id'] . "</td>";
+            echo "<td class='group-basic'> " . $row['id'] . "#</td>";
             echo "<td class='group-basic'>" . (isset($row['project_name']) && $row['project_name'] !== '' ? $row['project_name'] : '-') . "</td>";
 
             // التواريخ والمدد
@@ -1166,6 +1168,8 @@ include('../insidebar.php');
     $(document).ready(function () {
       $('#projectsTable').DataTable({
         dom: 'Bfrtip', // Buttons + Search + Pagination
+        scrollX: true,
+        autoWidth: false,
         buttons: [
           { extend: 'copy', text: 'نسخ' },
           { extend: 'excel', text: 'تصدير Excel' },
@@ -1199,6 +1203,49 @@ include('../insidebar.php');
   })();
 
 </script>
+
+<style>
+  .contracts-main .table-container,
+  .contracts-main .contracts-table-wrap {
+    overflow-x: auto;
+  }
+
+  #projectsTable.contracts-table-nowrap,
+  #projectsTable.contracts-table-nowrap th,
+  #projectsTable.contracts-table-nowrap td {
+    white-space: nowrap;
+  }
+
+  #projectsTable .action-btns {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  #projectsTable .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-size: .85rem;
+    transition: all .2s ease;
+  }
+
+  #projectsTable .action-btn.view { background: rgba(232, 184, 0, .18); color: #9a7b00; }
+  #projectsTable .action-btn.edit { background: rgba(12, 28, 62, .08); color: #0c1c3e; }
+  #projectsTable .action-btn.delete { background: rgba(220, 38, 38, .12); color: #b91c1c; }
+
+  #projectsTable .action-btn.view:hover { background: #e8b800; color: #0c1c3e; transform: translateY(-2px); }
+  #projectsTable .action-btn.edit:hover { background: #0c1c3e; color: #fff; transform: translateY(-2px); }
+  #projectsTable .action-btn.delete:hover { background: #dc2626; color: #fff; transform: translateY(-2px); }
+</style>
 
 <script>
   const $el = (sel) => document.querySelector(sel);
@@ -1272,6 +1319,9 @@ include('../insidebar.php');
     } else {
       fields.contractDays.value = '';
     }
+
+    // تحديث جميع الإجماليات مباشرة عند تغيير التواريخ
+    recalc();
   }
 
   // تحديث حساب الأيام عند تغيير التواريخ
@@ -1528,6 +1578,9 @@ include('../insidebar.php');
     $("#projectForm [name='contract_duration_days']").val($(this).data("contract_duration_days"));
     $("#projectForm [name='actual_start']").val($(this).data("actual_start"));
     $("#projectForm [name='actual_end']").val($(this).data("actual_end"));
+
+    // استخدم التاريخين كمصدر الحقيقة قبل أي إعادة حساب للإجماليات
+    calculateDaysFromDates();
 
 
     $("#projectForm [name='hours_monthly_target']").val($(this).data("hours_monthly_target"));

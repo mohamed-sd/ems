@@ -909,7 +909,7 @@ include '../insidebar.php';
                         </label>
                         <select id="terminationType" class="form-select">
                             <option value="">-- اختر النوع --</option>
-                            <option value="amicable">ðŸ¤ رضائي</option>
+                            <option value="amicable"> رضائي</option>
                             <option value="hardship">⚠️ بسبب التعسر</option>
                         </select>
                     </div>

@@ -655,9 +655,10 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
       </div>
 
       <div class="card-body contracts-table-body">
-        <table id="projectsTable" class="display nowrap contracts-table">
+        <table id="projectsTable" class="display nowrap contracts-table contracts-table-nowrap">
           <thead>
             <tr>
+              <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
               <!-- المعلومات الأساسية -->
               <th class="group-basic"><i class="fas fa-hashtag"></i> رقم العقد</th>
               <th class="group-basic"><i class="fas fa-project-diagram"></i> المشروع</th>
@@ -699,7 +700,6 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
               <!-- الحالة والإجراءات -->
               <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
-              <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
             </tr>
           </thead>
           <tbody>
@@ -725,7 +725,8 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
                 $start_date = new DateTime($actual_start);
                 $end_date = new DateTime($actual_end);
                 $interval = $start_date->diff($end_date);
-                $contract_duration_days = $interval->days + 1; // +1 لحساب يوم البداية ويوم النهاية معاً
+                // توحيد المنطق مع الواجهة: الفرق الفعلي بدون إضافة يوم إضافي
+                $contract_duration_days = $interval->days;
               } else {
                 $contract_duration_days = 0;
               }
@@ -940,6 +941,44 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
               echo "<tr>";
 
+              $actions_html = "<div class='action-btns'>
+                        <a href='javascript:void(0)' class='editBtn action-btn edit' title='تعديل'
+             data-id='" . $row['id'] . "'
+             data-project_id='" . $row['project_id'] . "'
+             data-project_contract_id='" . (isset($row['project_contract_id']) ? $row['project_contract_id'] : '') . "'
+             data-contract_signing_date='" . $row['contract_signing_date'] . "'
+             data-grace_period_days='" . $row['grace_period_days'] . "'
+             data-contract_duration_days='" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "'
+             data-actual_start='" . $row['actual_start'] . "'
+             data-actual_end='" . $row['actual_end'] . "'
+             data-hours_monthly_target='" . $row['hours_monthly_target'] . "'
+             daily_work_hours ='" . $row['daily_work_hours'] . "'
+              daily_operators ='" . $row['daily_operators'] . "'
+               first_party ='" . $row['first_party'] . "'
+                second_party ='" . $row['second_party'] . "'
+                 witness_one ='" . $row['witness_one'] . "'
+                  witness_two ='" . $row['witness_two'] . "'
+                  transportation ='" . $row['transportation'] . "'
+                  accommodation ='" . $row['accommodation'] . "'
+                  place_for_living ='" . $row['place_for_living'] . "'
+                  workshop ='" . $row['workshop'] . "'
+                  equip_shifts_contract ='" . (isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0) . "'
+                  shift_contract ='" . (isset($row['shift_contract']) ? $row['shift_contract'] : 0) . "'
+                  equip_total_contract_daily ='" . (isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0) . "'
+                  total_contract_permonth ='" . (isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0) . "'
+                  total_contract_units ='" . (isset($row['total_contract_units']) ? $row['total_contract_units'] : 0) . "'
+                  price_currency_contract ='" . (isset($row['price_currency_contract']) ? $row['price_currency_contract'] : '') . "'
+                  paid_contract ='" . (isset($row['paid_contract']) ? $row['paid_contract'] : '') . "'
+                  payment_time ='" . (isset($row['payment_time']) ? $row['payment_time'] : '') . "'
+                  guarantees ='" . (isset($row['guarantees']) ? $row['guarantees'] : '') . "'
+                  payment_date ='" . (isset($row['payment_date']) ? $row['payment_date'] : '') . "'
+             data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'><i class='fas fa-edit'></i></a>
+                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></a>
+                        <a href='drivercontracts_details.php?id=" . $row['id'] . "' class='action-btn view' title='عرض التفاصيل'><i class='fas fa-eye'></i></a>
+                      </div>";
+
+              echo "<td class='group-status'>" . $actions_html . "</td>";
+
               // المعلومات الأساسية
               echo "<td class='group-basic'>" . $row['id'] . "</td>";
               echo "<td class='group-basic'>" . (isset($row['project_name']) ? $row['project_name'] : '-') . "</td>";
@@ -986,44 +1025,6 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";
-
-              echo "<td class='group-status'>
-                        <a href='javascript:void(0)' class='editBtn'
-             data-id='" . $row['id'] . "'
-             data-project_id='" . $row['project_id'] . "'
-             data-project_contract_id='" . (isset($row['project_contract_id']) ? $row['project_contract_id'] : '') . "'
-             data-contract_signing_date='" . $row['contract_signing_date'] . "'
-             data-grace_period_days='" . $row['grace_period_days'] . "'
-             data-contract_duration_days='" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "'
-             data-actual_start='" . $row['actual_start'] . "'
-             data-actual_end='" . $row['actual_end'] . "'
-             data-hours_monthly_target='" . $row['hours_monthly_target'] . "'
-             daily_work_hours ='" . $row['daily_work_hours'] . "'
-              daily_operators ='" . $row['daily_operators'] . "'
-               first_party ='" . $row['first_party'] . "'
-                second_party ='" . $row['second_party'] . "'
-                 witness_one ='" . $row['witness_one'] . "'
-                  witness_two ='" . $row['witness_two'] . "'
-                  transportation ='" . $row['transportation'] . "'
-                  accommodation ='" . $row['accommodation'] . "'
-                  place_for_living ='" . $row['place_for_living'] . "'
-                  workshop ='" . $row['workshop'] . "'
-                  equip_shifts_contract ='" . (isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0) . "'
-                  shift_contract ='" . (isset($row['shift_contract']) ? $row['shift_contract'] : 0) . "'
-                  equip_total_contract_daily ='" . (isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0) . "'
-                  total_contract_permonth ='" . (isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0) . "'
-                  total_contract_units ='" . (isset($row['total_contract_units']) ? $row['total_contract_units'] : 0) . "'
-                  price_currency_contract ='" . (isset($row['price_currency_contract']) ? $row['price_currency_contract'] : '') . "'
-                  paid_contract ='" . (isset($row['paid_contract']) ? $row['paid_contract'] : '') . "'
-                  payment_time ='" . (isset($row['payment_time']) ? $row['payment_time'] : '') . "'
-                  guarantees ='" . (isset($row['guarantees']) ? $row['guarantees'] : '') . "'
-                  payment_date ='" . (isset($row['payment_date']) ? $row['payment_date'] : '') . "'
-
-             data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
-             class='btn btn-action btn-action-edit'><i class='fas fa-edit'></i></a>
-                        <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='btn btn-action btn-action-delete'><i class='fas fa-trash-alt'></i></a>
-                        <a href='drivercontracts_details.php?id=" . $row['id'] . "' class='btn btn-action btn-action-view'><i class='fas fa-eye'></i></a>
-                      </td>";
               echo "</tr>";
             }
             ?>
@@ -1050,6 +1051,48 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
   <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
   <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
+  <style>
+    .driver-contracts-main .contracts-table-body {
+      overflow-x: auto;
+    }
+
+    #projectsTable.contracts-table-nowrap,
+    #projectsTable.contracts-table-nowrap th,
+    #projectsTable.contracts-table-nowrap td {
+      white-space: nowrap;
+    }
+
+    #projectsTable .action-btns {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    #projectsTable .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-size: .85rem;
+      transition: all .2s ease;
+    }
+
+    #projectsTable .action-btn.view { background: rgba(232, 184, 0, .18); color: #9a7b00; }
+    #projectsTable .action-btn.edit { background: rgba(12, 28, 62, .08); color: #0c1c3e; }
+    #projectsTable .action-btn.delete { background: rgba(220, 38, 38, .12); color: #b91c1c; }
+
+    #projectsTable .action-btn.view:hover { background: #e8b800; color: #0c1c3e; transform: translateY(-2px); }
+    #projectsTable .action-btn.edit:hover { background: #0c1c3e; color: #fff; transform: translateY(-2px); }
+    #projectsTable .action-btn.delete:hover { background: #dc2626; color: #fff; transform: translateY(-2px); }
+  </style>
+
 
   <script>
     (function () {
@@ -1058,8 +1101,9 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
       $(document).ready(function () {
         $('#projectsTable').DataTable({
-          responsive: true,
           dom: 'Bfrtip', // Buttons + Search + Pagination
+          scrollX: true,
+          autoWidth: false,
           buttons: [
             { extend: 'copy', text: 'نسخ' },
             { extend: 'excel', text: 'تصدير Excel' },
@@ -1123,6 +1167,9 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
       } else {
         fields.contractDays.value = '';
       }
+
+      // تحديث الإجماليات مباشرة عند تغيير التواريخ
+      recalc();
     }
 
     // تحديث حساب الأيام عند تغيير التواريخ
@@ -1464,6 +1511,9 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
       $("#projectForm [name='contract_duration_days']").val($(this).data("contract_duration_days"));
       $("#projectForm [name='actual_start']").val($(this).data("actual_start"));
       $("#projectForm [name='actual_end']").val($(this).data("actual_end"));
+
+      // اعتمد التاريخين كمصدر الحقيقة قبل أي إعادة حساب
+      calculateDaysFromDates();
 
 
       $("#projectForm [name='hours_monthly_target']").val($(this).data("hours_monthly_target"));

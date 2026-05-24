@@ -43,7 +43,7 @@ if (!headers_sent()) {
 
 if (!defined('EMS_DIGIT_SYSTEM')) {
     // Allowed values: arabic-indic | latin
-    define('EMS_DIGIT_SYSTEM', 'arabic-indic');
+    define('EMS_DIGIT_SYSTEM', 'latin');
 }
 
 if (!function_exists('ems_fix_mojibake_output')) {
@@ -85,7 +85,7 @@ if (!function_exists('ems_fix_mojibake_output')) {
         $fixed = is_string($fixed) ? $fixed : $buffer;
 
         if (stripos($fixed, 'number-format-unifier.js') === false) {
-            $digitSystem = defined('EMS_DIGIT_SYSTEM') ? EMS_DIGIT_SYSTEM : 'arabic-indic';
+            $digitSystem = defined('EMS_DIGIT_SYSTEM') ? EMS_DIGIT_SYSTEM : 'latin';
             $scriptPath = function_exists('ems_url')
                 ? ems_url('assets/js/number-format-unifier.js')
                 : '/ems/assets/js/number-format-unifier.js';

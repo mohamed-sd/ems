@@ -198,8 +198,17 @@ $not_deleted_plain_sql = clients_not_deleted_sql('', $clients_has_is_deleted, $c
 
 $scope_project_sql = clients_build_scope_sql($company_id, $project_has_company_id, 'p');
 $not_deleted_project_sql = clients_not_deleted_sql('p', $project_has_is_deleted, $project_has_deleted_at);
+$project_active_status_sql = "(
+    p.status = 1
+    OR p.status = '1'
+    OR TRIM(p.status) = 'نشط'
+    OR TRIM(LOWER(p.status)) = 'active'
+    OR TRIM(LOWER(p.status)) = 'true'
+)";
 
 $projects_count_select_sql = '0';
+$projects_active_count_select_sql = '0';
+$projects_inactive_count_select_sql = '0';
 if ($project_client_link_column !== '') {
     $projects_count_select_sql = "(
         SELECT COUNT(*)
@@ -207,6 +216,34 @@ if ($project_client_link_column !== '') {
         WHERE p.$project_client_link_column = cc.id
           AND $scope_project_sql
           AND $not_deleted_project_sql
+    )";
+
+    $projects_active_count_select_sql = "(
+        SELECT COUNT(*)
+        FROM project p
+        WHERE p.$project_client_link_column = cc.id
+          AND $scope_project_sql
+          AND $not_deleted_project_sql
+          AND $project_active_status_sql
+    )";
+
+    $projects_inactive_count_select_sql = "(
+        (
+            SELECT COUNT(*)
+            FROM project p
+            WHERE p.$project_client_link_column = cc.id
+              AND $scope_project_sql
+              AND $not_deleted_project_sql
+        )
+        -
+        (
+            SELECT COUNT(*)
+            FROM project p
+            WHERE p.$project_client_link_column = cc.id
+              AND $scope_project_sql
+              AND $not_deleted_project_sql
+              AND $project_active_status_sql
+        )
     )";
 }
 
@@ -598,11 +635,16 @@ $clients_companies_count = 0;
 $clients_individuals_count = 0;
 $clients_unknown_entity_count = 0;
 $clients_projects_total = 0;
+$clients_projects_active_total = 0;
+$clients_projects_inactive_total = 0;
 $clients_without_projects = 0;
 
 $sector_counts = array();
 
-$clients_query = "SELECT cc.*, u.name as creator_name, $projects_count_select_sql AS projects_count
+$clients_query = "SELECT cc.*, u.name as creator_name,
+                         $projects_count_select_sql AS projects_count,
+                         $projects_active_count_select_sql AS projects_active_count,
+                         $projects_inactive_count_select_sql AS projects_inactive_count
                   FROM clients cc
                   LEFT JOIN users u ON cc.created_by = u.id
                   WHERE $scope_clients_sql AND $not_deleted_cc_sql
@@ -619,7 +661,16 @@ if ($clients_result) {
         }
 
         $projects_count_value = intval($row['projects_count']);
+        $projects_active_count_value = intval($row['projects_active_count']);
+        $projects_inactive_count_value = intval($row['projects_inactive_count']);
+
+        if ($projects_active_count_value + $projects_inactive_count_value !== $projects_count_value) {
+            $projects_inactive_count_value = max(0, $projects_count_value - $projects_active_count_value);
+        }
+
         $clients_projects_total += $projects_count_value;
+        $clients_projects_active_total += $projects_active_count_value;
+        $clients_projects_inactive_total += $projects_inactive_count_value;
         if ($projects_count_value === 0) {
             $clients_without_projects++;
         }
@@ -677,8 +728,8 @@ include('../insidebar.php');
             <?php endif; ?>
 
             <a href="javascript:void(0)" id="toggleStats" class="btn" title="إظهار أو إخفاء الإحصائيات">
-                <i class="fas fa-chart-pie"></i>
-                <span class="clients-toggle-stats-text">إخفاء الإحصائيات</span>
+                <i class="fas fa-eye"></i>
+                <span class="clients-toggle-stats-text">إظهار الإحصائيات</span>
             </a>
 
             <a href="download_clients_template_csv.php" class="btn" title="تحميل نموذج CSV فارغ للاستيراد">
@@ -719,7 +770,7 @@ include('../insidebar.php');
         </div>
     <?php endif; ?>
 
-    <div class="stats-section" id="clientsStatsSection">
+    <div class="stats-section clients-hidden" id="clientsStatsSection">
         <div class="stats-grid">
             <div class="stats-card stats-primary">
                 <div class="stats-icon"><i class="fas fa-users"></i></div>
@@ -740,6 +791,16 @@ include('../insidebar.php');
                 <div class="stats-icon"><i class="fas fa-diagram-project"></i></div>
                 <div class="stats-title">إجمالي المشاريع المرتبطة</div>
                 <div class="stats-value"><?php echo $clients_projects_total; ?></div>
+            </div>
+            <div class="stats-card stats-success">
+                <div class="stats-icon"><i class="fas fa-folder-open"></i></div>
+                <div class="stats-title">المشاريع النشطة</div>
+                <div class="stats-value"><?php echo $clients_projects_active_total; ?></div>
+            </div>
+            <div class="stats-card stats-danger">
+                <div class="stats-icon"><i class="fas fa-folder"></i></div>
+                <div class="stats-title clients-danger-text">المشاريع غير النشطة</div>
+                <div class="stats-value"><?php echo $clients_projects_inactive_total; ?></div>
             </div>
             <div class="stats-card stats-orange">
                 <div class="stats-icon"><i class="fas fa-building"></i></div>
@@ -901,9 +962,10 @@ include('../insidebar.php');
                 </div>
             </div>
             <div class="table-container">
-                <table id="clientsTable" class="display">
+                <table id="clientsTable" class="display clients-table-nowrap">
                     <thead>
                         <tr>
+                            <th><i class="fas fa-cogs"></i> إجراءات</th>
                             <th width="100"><i class="fas fa-barcode"></i> كود العميل</th>
                             <th><i class="fas fa-user"></i> اسم العميل</th>
                             <th><i class="fas fa-building"></i> نوع الكيان</th>
@@ -911,7 +973,6 @@ include('../insidebar.php');
                             <th><i class="fas fa-project-diagram"></i> عدد المشاريع</th>
                             <th><i class="fas fa-phone"></i> الهاتف</th>
                             <th><i class="fas fa-toggle-on"></i> الحالة</th>
-                            <th><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -923,21 +984,7 @@ include('../insidebar.php');
                             }
 
                             echo "<tr>";
-                            echo "<td><strong class='clients-code-cell'>" . clients_e($row['client_code']) . "</strong></td>";
-                            echo "<td>" . $client_name_cell . "</td>";
-                            echo "<td>" . clients_e($row['entity_type']) . "</td>";
-                            echo "<td>" . clients_e($row['sector_category']) . "</td>";
-                            echo "<td><span class='status-active clients-inline-pill'><i class='fas fa-briefcase'></i> " . intval($row['projects_count']) . "</span></td>";
-                            echo "<td>" . clients_e($row['phone']) . "</td>";
-
-                            // عرض الحالة بألوان
-                            if ($row['status'] == 'نشط') {
-                                echo "<td><span class='status-active'><i class='fas fa-check-circle'></i> نشط</span></td>";
-                            } else {
-                                echo "<td><span class='status-inactive'><i class='fas fa-times-circle'></i> متوقف</span></td>";
-                            }
-
-                            // أزرار الإجراءات
+                            // أزرار الإجراءات في أول عمود
                             echo "<td>
                                 <div class='action-btns'>
                                     <a href='javascript:void(0)'
@@ -985,6 +1032,31 @@ include('../insidebar.php');
 
                             echo "</div>
                             </td>";
+                            echo "<td><strong class='clients-code-cell'>" . clients_e($row['client_code']) . "</strong></td>";
+                            echo "<td>" . $client_name_cell . "</td>";
+                            echo "<td>" . clients_e($row['entity_type']) . "</td>";
+                            echo "<td>" . clients_e($row['sector_category']) . "</td>";
+                            $row_projects_total = intval($row['projects_count']);
+                            $row_projects_active = intval(isset($row['projects_active_count']) ? $row['projects_active_count'] : 0);
+                            $row_projects_inactive = intval(isset($row['projects_inactive_count']) ? $row['projects_inactive_count'] : 0);
+                            if ($row_projects_active + $row_projects_inactive !== $row_projects_total) {
+                                $row_projects_inactive = max(0, $row_projects_total - $row_projects_active);
+                            }
+
+                            echo "<td>";
+                            echo "<span class='status-active clients-inline-pill' title='إجمالي المشاريع'><i class='fas fa-briefcase'></i> " . $row_projects_total . "</span> ";
+                            echo "<span class='status-active clients-inline-pill' title='المشاريع النشطة'><i class='fas fa-folder-open'></i> " . $row_projects_active . "</span> ";
+                            echo "<span class='status-inactive clients-inline-pill clients-inline-pill-danger' title='المشاريع غير النشطة'><i class='fas fa-folder'></i> " . $row_projects_inactive . "</span>";
+                            echo "</td>";
+                            echo "<td>" . clients_e($row['phone']) . "</td>";
+
+                            // عرض الحالة بألوان
+                            if ($row['status'] == 'نشط') {
+                                echo "<td><span class='status-active'><i class='fas fa-check-circle'></i> نشط</span></td>";
+                            } else {
+                                echo "<td><span class='status-inactive'><i class='fas fa-times-circle'></i> متوقف</span></td>";
+                            }
+
                             echo "</tr>";
                         }
                         ?>
@@ -1120,6 +1192,10 @@ include('../insidebar.php');
             <div id="clientProjectsSummary" class="clients-projects-summary">
                 <span class="status-active clients-summary-pill">المشاريع: <strong
                         id="summary_projects_count">0</strong></span>
+                <span class="status-active clients-summary-pill">المشاريع النشطة: <strong
+                    id="summary_projects_active_count">0</strong></span>
+                <span class="status-inactive clients-summary-pill clients-summary-pill-danger"><span class="clients-danger-text">المشاريع غير النشطة:</span> <strong
+                    id="summary_projects_inactive_count">0</strong></span>
                 <span class="status-active clients-summary-pill">الموردون: <strong
                         id="summary_suppliers_count">0</strong></span>
                 <span class="status-active clients-summary-pill">الآليات: <strong
@@ -1171,7 +1247,6 @@ include('../insidebar.php');
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -1183,6 +1258,8 @@ include('../insidebar.php');
     $(document).ready(function () {
         // تهيئة جدول العملاء بالعربية
         const clientsTable = $('#clientsTable').DataTable({
+            scrollX: true,
+            autoWidth: false,
             language: {
                 url: '/ems/assets/i18n/datatables/ar.json'
             }
@@ -1210,17 +1287,17 @@ include('../insidebar.php');
             }
         }
 
-        fillFilterOptions(2, '#filterEntityType');
-        fillFilterOptions(3, '#filterSectorCategory');
+        fillFilterOptions(3, '#filterEntityType');
+        fillFilterOptions(4, '#filterSectorCategory');
 
         $('#filterEntityType').on('change', function () {
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
-            clientsTable.column(2).search(value ? '^' + value + '$' : '', true, false).draw();
+            clientsTable.column(3).search(value ? '^' + value + '$' : '', true, false).draw();
         });
 
         $('#filterSectorCategory').on('change', function () {
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
-            clientsTable.column(3).search(value ? '^' + value + '$' : '', true, false).draw();
+            clientsTable.column(4).search(value ? '^' + value + '$' : '', true, false).draw();
         });
     });
 
@@ -1331,9 +1408,11 @@ include('../insidebar.php');
 
         if (statsSection.is(':visible')) {
             statsSection.stop(true, true).slideUp(250, function () {
+                statsSection.addClass('clients-hidden');
                 updateStatsToggleState(false);
             });
         } else {
+            statsSection.removeClass('clients-hidden').hide();
             statsSection.stop(true, true).slideDown(250, function () {
                 updateStatsToggleState(true);
             });
@@ -1441,14 +1520,30 @@ include('../insidebar.php');
         let suppliers = 0;
         let equipments = 0;
         let operators = 0;
+        let activeProjects = 0;
+
+        function isProjectActiveStatus(statusValue) {
+            const normalized = String(statusValue === null || typeof statusValue === 'undefined' ? '' : statusValue)
+                .trim()
+                .toLowerCase()
+                .replace(/✅|✔/g, '')
+                .trim();
+
+            return normalized === '1' || normalized === 'active' || normalized === 'نشط' || normalized === 'true';
+        }
 
         projects.forEach(function (project) {
             suppliers += parseInt(project.suppliers_count || 0, 10);
             equipments += parseInt(project.equipments_total || 0, 10);
             operators += parseInt(project.operators_total || 0, 10);
+            if (isProjectActiveStatus(project.status)) {
+                activeProjects += 1;
+            }
         });
 
         $('#summary_projects_count').text(projects.length);
+        $('#summary_projects_active_count').text(activeProjects);
+        $('#summary_projects_inactive_count').text(Math.max(0, projects.length - activeProjects));
         $('#summary_suppliers_count').text(suppliers);
         $('#summary_equipments_count').text(equipments);
         $('#summary_operators_count').text(operators);
@@ -1458,6 +1553,16 @@ include('../insidebar.php');
         const tbody = $('#clientProjectsTableBody');
         tbody.empty();
 
+        function isProjectActiveStatus(statusValue) {
+            const normalized = String(statusValue === null || typeof statusValue === 'undefined' ? '' : statusValue)
+                .trim()
+                .toLowerCase()
+                .replace(/✅|✔/g, '')
+                .trim();
+
+            return normalized === '1' || normalized === 'active' || normalized === 'نشط' || normalized === 'true';
+        }
+
         if (!projects.length) {
             tbody.append('<tr><td colspan="8" class="clients-table-empty clients-table-empty-muted">لا توجد مشاريع مرتبطة بهذا العميل</td></tr>');
             setProjectsSummary([]);
@@ -1466,8 +1571,12 @@ include('../insidebar.php');
 
         projects.forEach(function (project) {
             const projectLabel = (project.name || '-') + (project.project_code ? ' (' + project.project_code + ')' : '');
+            const projectLabelClass = isProjectActiveStatus(project.status)
+                ? 'clients-project-label-active'
+                : 'clients-project-label-inactive';
+
             const rowHtml = '<tr>' +
-                '<td>' + projectLabel + '</td>' +
+                '<td><span class="' + projectLabelClass + '">' + projectLabel + '</span></td>' +
                 '<td>' + (project.suppliers_count || 0) + '</td>' +
                 '<td>' + (project.equipments_total || 0) + '</td>' +
                 '<td class="clients-num-positive">' + (project.equipments_working || 0) + '</td>' +
@@ -1575,6 +1684,45 @@ include('../insidebar.php');
         }, 500);
     });
 </script>
+
+<style>
+    .clients-main .clients-summary-pill-danger,
+    .clients-main .clients-inline-pill-danger {
+        background: rgba(220, 38, 38, 0.12) !important;
+        color: #b91c1c !important;
+        border: 1px solid rgba(220, 38, 38, 0.28) !important;
+    }
+
+    .clients-main .clients-danger-text {
+        color: #b91c1c !important;
+        font-weight: 800;
+    }
+
+    .clients-main .clients-project-label-active {
+        color: #15803d;
+        font-weight: 700;
+    }
+
+    .clients-main .clients-project-label-inactive {
+        color: #b91c1c;
+        font-weight: 700;
+    }
+
+    .clients-main .table-container {
+        overflow-x: auto;
+    }
+
+    #clientsTable.clients-table-nowrap,
+    #clientsTable.clients-table-nowrap th,
+    #clientsTable.clients-table-nowrap td {
+        white-space: nowrap;
+    }
+
+    #clientsTable .action-btns {
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
+</style>
 
 <script>
     // ════════════════════════════════════════════════

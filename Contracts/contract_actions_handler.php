@@ -506,11 +506,24 @@ else if ($action === 'complete') {
         die(json_encode(['success' => false, 'message' => 'الرجاء إدخال ملاحظات الانتهاء']));
     }
 
-    $note_text = 'انتهاء العقد: ' . $complete_note;
+    $operations = [
+        [
+            'db_action' => 'update',
+            'table' => 'contracts',
+            'where' => ['id' => $contract_id],
+            'data' => [
+                'status' => 0,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]
+        ]
+    ];
 
-    addContractNote($contract_id, $note_text, $user_id, $conn);
-
-    $result = ['success' => true, 'message' => 'تم تسجيل انتهاء العقد بنجاح'];
+    $result = executeOperations($operations, $conn);
+    if ($result['success']) {
+        $note_text = 'انتهاء العقد وتحويل حالته إلى غير ساري: ' . $complete_note;
+        addContractNote($contract_id, $note_text, $user_id, $conn);
+        $result = ['success' => true, 'message' => 'تم تسجيل انتهاء العقد وتحويل الحالة إلى غير ساري بنجاح'];
+    }
 
     echo json_encode($result);
 }

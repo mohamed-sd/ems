@@ -365,6 +365,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
 
 
 <?php
+$projects_total_count = 0;
+$projects_active_count = 0;
+$projects_inactive_count = 0;
+$projects_with_contracts_count = 0;
+$projects_active_contracts_count = 0;
+
+$project_active_status_case_sql = "(status = 1 OR status = '1' OR TRIM(status) = 'نشط' OR TRIM(LOWER(status)) = 'active' OR TRIM(LOWER(status)) = 'true')";
+$project_scope_stats_sql = str_replace('op.', 'p.', $project_scope_sql);
+$project_not_deleted_stats_sql = str_replace('op.', 'p.', $project_not_deleted_sql);
+
+$projects_stats_query = "SELECT
+        COUNT(*) AS total_projects,
+        SUM(CASE WHEN $project_active_status_case_sql THEN 1 ELSE 0 END) AS active_projects
+    FROM project p
+    WHERE $project_scope_stats_sql AND $project_not_deleted_stats_sql";
+$projects_stats_result = mysqli_query($conn, $projects_stats_query);
+if ($projects_stats_result && ($projects_stats_row = mysqli_fetch_assoc($projects_stats_result))) {
+        $projects_total_count = intval($projects_stats_row['total_projects']);
+        $projects_active_count = intval($projects_stats_row['active_projects']);
+}
+$projects_inactive_count = max(0, $projects_total_count - $projects_active_count);
+
+$projects_with_contracts_query = "SELECT COUNT(DISTINCT c.project_id) AS projects_with_contracts
+    FROM contracts c
+    INNER JOIN project p ON p.id = c.project_id
+    WHERE $project_scope_stats_sql AND $project_not_deleted_stats_sql AND c.status = 1";
+$projects_with_contracts_result = mysqli_query($conn, $projects_with_contracts_query);
+if ($projects_with_contracts_result && ($projects_with_contracts_row = mysqli_fetch_assoc($projects_with_contracts_result))) {
+        $projects_with_contracts_count = intval($projects_with_contracts_row['projects_with_contracts']);
+}
+
+$projects_active_contracts_query = "SELECT COUNT(*) AS total_active_contracts
+    FROM contracts c
+    INNER JOIN project p ON p.id = c.project_id
+    WHERE $project_scope_stats_sql AND $project_not_deleted_stats_sql AND c.status = 1";
+$projects_active_contracts_result = mysqli_query($conn, $projects_active_contracts_query);
+if ($projects_active_contracts_result && ($projects_active_contracts_row = mysqli_fetch_assoc($projects_active_contracts_result))) {
+        $projects_active_contracts_count = intval($projects_active_contracts_row['total_active_contracts']);
+}
+?>
+
+
+<?php
 $page_title = "إيكوبيشن | المشاريع";
 include("../inheader.php");
 include('../insidebar.php');
@@ -374,10 +417,10 @@ include('../insidebar.php');
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <div class="main projects-main ems-unified-page-shell">
 
- <div class="main_head">
+    <div class="main_head">
 
-            <div class="head_actions">
-               <?php if ($can_add): ?>
+        <div class="head_actions">
+            <?php if ($can_add): ?>
                 <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                     <i class="fas fa-plus-circle"></i> إضافة مشروع
                 </a>
@@ -386,17 +429,31 @@ include('../insidebar.php');
                     <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحية)
                 </button>
             <?php endif; ?>
+
+            <a href="javascript:void(0)" id="toggleStats" class="btn" title="إظهار أو إخفاء الإحصائيات">
+                <i class="fas fa-eye"></i>
+                <span class="projects-toggle-stats-text">إظهار الإحصائيات</span>
+            </a>
+
+            <a href="javascript:void(0)" class="btn projects-btn projects-btn-export" id="exportBtn" title="تحميل النموذج">
+                <i class="fas fa-download"></i> تحميل النموذج
+            </a>
+            <?php if ($can_add): ?>
+                <a href="javascript:void(0)" class="btn projects-btn projects-btn-import" id="importBtn" title="استيراد ملف">
+                    <i class="fas fa-upload"></i> استيراد من Excel
+                </a>
+            <?php endif; ?>
         </div>
 
-         <h1 class="head-title">
-             <div class="title-icon"><i class="fas fa-project-diagram"></i></div>
+        <h1 class="head-title">
+            <div class="title-icon"><i class="fas fa-project-diagram"></i></div>
             إدارة المشاريع
         </h1>
 
         <div class="head_back">
-           <a href="../main/dashboard.php" class="back-btn">
-            <i class="fas fa-arrow-right"></i> رجوع
-        </a>
+            <a href="../main/dashboard.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
         </div>
     </div>
 
@@ -424,9 +481,40 @@ include('../insidebar.php');
     <?php if (!empty($_GET['msg'])): ?>
         <?php $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
-            <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i> <?php echo htmlspecialchars($_GET['msg']); ?>
+            <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
+            <?php echo htmlspecialchars($_GET['msg']); ?>
         </div>
     <?php endif; ?>
+
+    <div class="stats-section projects-hidden" id="projectsStatsSection">
+        <div class="stats-grid">
+            <div class="stats-card stats-primary">
+                <div class="stats-icon"><i class="fas fa-project-diagram"></i></div>
+                <div class="stats-title">إجمالي المشاريع</div>
+                <div class="stats-value"><?php echo $projects_total_count; ?></div>
+            </div>
+            <div class="stats-card stats-success">
+                <div class="stats-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stats-title">المشاريع النشطة</div>
+                <div class="stats-value"><?php echo $projects_active_count; ?></div>
+            </div>
+            <div class="stats-card stats-danger">
+                <div class="stats-icon"><i class="fas fa-times-circle"></i></div>
+                <div class="stats-title">المشاريع غير النشطة</div>
+                <div class="stats-value"><?php echo $projects_inactive_count; ?></div>
+            </div>
+            <div class="stats-card stats-cyan">
+                <div class="stats-icon"><i class="fas fa-file-contract"></i></div>
+                <div class="stats-title">المشاريع التي لها عقود</div>
+                <div class="stats-value"><?php echo $projects_with_contracts_count; ?></div>
+            </div>
+            <div class="stats-card stats-purple">
+                <div class="stats-icon"><i class="fas fa-clipboard-list"></i></div>
+                <div class="stats-title">إجمالي العقود النشطة</div>
+                <div class="stats-value"><?php echo $projects_active_contracts_count; ?></div>
+            </div>
+        </div>
+    </div>
 
 
 
@@ -443,7 +531,7 @@ include('../insidebar.php');
                     <div>
                         <label><i class="fas fa-user-tie"></i> اسم العميل (اختياري)</label>
                         <select name="client_id" id="client_id" required>
-                            <option value="">-- اختر العميل  --</option>
+                            <option value="">-- اختر العميل --</option>
                             <?php
                             $clients_query = mysqli_query($conn, "SELECT c.id, c.client_code, c.client_name FROM clients c WHERE c.status = 'نشط' AND $client_scope_sql ORDER BY c.client_name ASC");
                             while ($cli = mysqli_fetch_assoc($clients_query)) {
@@ -524,43 +612,32 @@ include('../insidebar.php');
         <div class="card-header projects-table-header">
             <h5><i class="fas fa-list"></i> قائمة المشاريع</h5>
 
-                <?php
+            <?php
 
-                if (isset($_GET['client_id']) && is_numeric($_GET['client_id'])) {
-                    $client_id = intval($_GET['client_id']);
-                    $client_result = mysqli_query($conn, "SELECT c.client_name FROM clients c WHERE c.id = $client_id AND $client_scope_sql");
-                    if ($client_row = mysqli_fetch_assoc($client_result)) {
-                        echo "للعميل: <strong>" . htmlspecialchars($client_row['client_name']) . "</strong>";
-                    }
+            if (isset($_GET['client_id']) && is_numeric($_GET['client_id'])) {
+                $client_id = intval($_GET['client_id']);
+                $client_result = mysqli_query($conn, "SELECT c.client_name FROM clients c WHERE c.id = $client_id AND $client_scope_sql");
+                if ($client_row = mysqli_fetch_assoc($client_result)) {
+                    echo "للعميل: <strong>" . htmlspecialchars($client_row['client_name']) . "</strong>";
                 }
+            }
 
-                ?>
-
-            <div class="projects-table-actions">
-                <button class="btn btn-sm btn-success projects-btn projects-btn-export" id="exportBtn" title="تحميل النموذج">
-                    <i class="fas fa-download"></i> تحميل النموذج
-                </button>
-                <?php if ($can_add): ?>
-                    <button class="btn btn-sm btn-info projects-btn projects-btn-import" id="importBtn" title="استيراد ملف">
-                        <i class="fas fa-upload"></i> استيراد من Excel
-                    </button>
-                <?php endif; ?>
-            </div>
+            ?>
         </div>
         <div class="card-body">
             <div class="table-container">
-                <table id="projectsTable" class="display" style="width:100%;">
+                <table id="projectsTable" class="display projects-table-nowrap" style="width:100%;">
                     <thead>
                         <tr>
+                            <th><i class="fas fa-cogs"></i> إجراءات</th>
+                            <th><i class="fas fa-project-diagram"></i> المشروع</th>
                             <th><i class="fas fa-calendar"></i> تاريخ الإضافة</th>
                             <th><i class="fas fa-user-tie"></i> العميل</th>
                             <th><i class="fas fa-file-contract"></i> كود المشروع</th>
                             <th><i class="fas fa-mountain"></i> كود المنجم</th>
-                            <th><i class="fas fa-project-diagram"></i> المشروع</th>
                             <th><i class="fas fa-truck"></i> عدد الموردين</th>
                             <th><i class="fas fa-toggle-on"></i> الحالة</th>
                             <th><i class="fas fa-file-contract"></i> عقود المشروع</th>
-                            <th><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -598,27 +675,6 @@ include('../insidebar.php');
                             $project_name_cell = "<a class='client-name-link' href='project_profile.php?id=" . intval($row['id']) . "'><strong>" . e($row['name']) . "</strong></a>";
 
                             echo "<tr>";
-                            echo "<td>" . e($row['create_at']) . "</td>";
-                            echo "<td>" . e(isset($row['client_name']) && $row['client_name'] !== '' ? $row['client_name'] : $row['client']) . "</td>";
-                            echo "<td>" . e(isset($row['project_code']) && $row['project_code'] !== '' ? $row['project_code'] : '-') . "</td>";
-                            echo "<td>" . e(isset($row['mine_code']) && $row['mine_code'] !== '' ? $row['mine_code'] : '-') . "</td>";
-                            echo "<td>" . $project_name_cell . "</td>";
-                            echo "<td><span class='count-badge'>" . intval($row['total_suppliers']) . "</span></td>";
-                            if ($row['status'] == "1") {
-                                echo "<td><span class='status-active'><i class='fas fa-check-circle'></i> نشط</span></td>";
-                            } else {
-                                echo "<td><span class='status-inactive'><i class='fas fa-times-circle'></i> غير نشط</span></td>";
-                            }
-
-                            echo "<td>
-                             <a href='../Contracts/contracts.php?filter_project_id=" . intval($row['id']) . "'
-                                       class='mines-count-link'
-                                       title='عرض عقود المشروع'>
-                                        <i class='fas fa-file-contract'></i>
-                                        <span class='mines-count-badge'>" . intval($row['contracts']) . "</span>
-                             </a>
-                        </td>";
-
                             echo "<td>
                             <div class='action-btns'>
                                 <a href='javascript:void(0)'
@@ -644,8 +700,8 @@ include('../insidebar.php');
                                    <i class='fas fa-eye'></i>
                                           </a>";
 
-                                          if ($can_edit) {
-                                                echo "<a href='javascript:void(0)'
+                            if ($can_edit) {
+                                echo "<a href='javascript:void(0)'
                                                     class='action-btn edit editBtn'
                                                     data-id='" . intval($row['id']) . "'
                                                     data-client-id='" . intval(isset($row['client_id']) ? $row['client_id'] : 0) . "'
@@ -664,19 +720,40 @@ include('../insidebar.php');
                                                     title='تعديل'>
                                                     <i class='fas fa-edit'></i>
                                                 </a>";
-                                          }
+                            }
 
-                                          if ($can_delete) {
-                                                echo "<a href='projects.php?delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode(generate_csrf_token()) . "'
+                            if ($can_delete) {
+                                echo "<a href='projects.php?delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode(generate_csrf_token()) . "'
                                                     class='action-btn delete'
                                                     onclick='return confirm(\"هل أنت متأكد من حذف هذا المشروع؟\")'
                                                     title='حذف'>
                                                     <i class='fas fa-trash-alt'></i>
                                                 </a>";
-                                          }
+                            }
 
-                                     echo "</div>
+                            echo "</div>
                       </td>";
+                            echo "<td>" . $project_name_cell . "</td>";
+                            echo "<td>" . e($row['create_at']) . "</td>";
+                            echo "<td>" . e(isset($row['client_name']) && $row['client_name'] !== '' ? $row['client_name'] : $row['client']) . "</td>";
+                            echo "<td>" . e(isset($row['project_code']) && $row['project_code'] !== '' ? $row['project_code'] : '-') . "</td>";
+                            echo "<td>" . e(isset($row['mine_code']) && $row['mine_code'] !== '' ? $row['mine_code'] : '-') . "</td>";
+                            echo "<td><span class='count-badge'>" . intval($row['total_suppliers']) . "</span></td>";
+                            if ($row['status'] == "1") {
+                                echo "<td><span class='status-active'><i class='fas fa-check-circle'></i> نشط</span></td>";
+                            } else {
+                                echo "<td><span class='status-inactive'><i class='fas fa-times-circle'></i> غير نشط</span></td>";
+                            }
+
+                            echo "<td>
+                             <a href='../Contracts/contracts.php?filter_project_id=" . intval($row['id']) . "'
+                                       class='mines-count-link'
+                                       title='عرض عقود المشروع'>
+                                        <i class='fas fa-file-contract'></i>
+                                        <span class='mines-count-badge'>" . intval($row['contracts']) . "</span>
+                             </a>
+                        </td>";
+
                             echo "</tr>";
                         }
                         ?>
@@ -697,7 +774,7 @@ include('../insidebar.php');
         <div class="modal-body projects-view-modal-body">
             <div class="view-modal-body projects-view-grid">
                 <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-user-tie"></i>  العميل</div>
+                    <div class="view-item-label"><i class="fas fa-user-tie"></i> العميل</div>
                     <div class="view-item-value" id="view_client_name">-</div>
                 </div>
                 <div class="view-item">
@@ -786,7 +863,6 @@ include('../insidebar.php');
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- DataTables JS -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -805,6 +881,8 @@ include('../insidebar.php');
         $(document).ready(function () {
             $('#projectsTable').DataTable({
                 dom: 'Bfrtip',
+                scrollX: true,
+                autoWidth: false,
                 buttons: [
                     { extend: 'copy', text: 'نسخ (Copy)' },
                     { extend: 'excel', text: 'تصدير Excel' },
@@ -824,6 +902,8 @@ include('../insidebar.php');
         const projectFormCancelBtn = document.getElementById('projectFormCancelBtn');
         const projectFormTitle = document.getElementById('formTitle');
         const projectSubmitBtnText = document.getElementById('submitBtnText');
+        const statsToggleBtn = $('#toggleStats');
+        const statsSection = $('#projectsStatsSection');
 
         function setProjectFormAddMode() {
             if (projectFormTitle) {
@@ -890,6 +970,39 @@ include('../insidebar.php');
             });
         }
 
+        function updateStatsToggleState(isVisible) {
+            if (!statsToggleBtn.length) {
+                return;
+            }
+
+            const icon = statsToggleBtn.find('i').first();
+            const text = statsToggleBtn.find('.projects-toggle-stats-text');
+
+            if (isVisible) {
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                text.text('إخفاء الإحصائيات');
+            } else {
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                text.text('إظهار الإحصائيات');
+            }
+        }
+
+        updateStatsToggleState(statsSection.is(':visible'));
+
+        statsToggleBtn.on('click', function () {
+            if (statsSection.is(':visible')) {
+                statsSection.stop(true, true).slideUp(250, function () {
+                    statsSection.addClass('projects-hidden');
+                    updateStatsToggleState(false);
+                });
+            } else {
+                statsSection.removeClass('projects-hidden').hide();
+                statsSection.stop(true, true).slideDown(250, function () {
+                    updateStatsToggleState(true);
+                });
+            }
+        });
+
         setProjectFormAddMode();
 
         // عرض Modal عند الضغط على زر العرض
@@ -900,6 +1013,7 @@ include('../insidebar.php');
                 clientName: $(this).data('client-name'),
                 location: $(this).data('location'),
                 projectCode: $(this).data('project-code'),
+                mineCode: $(this).data('mine-code'),
                 category: $(this).data('category'),
                 subSector: $(this).data('sub-sector'),
                 state: $(this).data('state'),
@@ -1047,17 +1161,17 @@ include('../insidebar.php');
         // ===== معالجات الاستيراد والتصدير =====
 
         // زر تحميل النموذج
-        $('#exportBtn').on('click', function() {
+        $('#exportBtn').on('click', function () {
             window.location.href = 'download_projects_template.php';
         });
 
         // زر الاستيراد من Excel
-        $('#importBtn').on('click', function() {
+        $('#importBtn').on('click', function () {
             $('#importModal').modal('show');
         });
 
         // معالج رفع الملف
-        $('#importFileForm').on('submit', function(e) {
+        $('#importFileForm').on('submit', function (e) {
             e.preventDefault();
 
             const fileInput = $('#projectFile')[0];
@@ -1076,7 +1190,7 @@ include('../insidebar.php');
                 contentType: false,
                 processData: false,
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         alert('تم استيراد ' + response.imported_count + ' مشروع بنجاح!');
                         $('#importModal').modal('hide');
@@ -1085,14 +1199,14 @@ include('../insidebar.php');
                     } else {
                         let errorMsg = 'حدث خطأ أثناء الاستيراد:\n\n';
                         if (response.errors && response.errors.length > 0) {
-                            response.errors.forEach(function(error) {
+                            response.errors.forEach(function (error) {
                                 errorMsg += error + '\n';
                             });
                         }
                         alert(errorMsg);
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert('حدث خطأ في الاتصال: ' + error);
                 }
             });
@@ -1101,19 +1215,119 @@ include('../insidebar.php');
     })();
 </script>
 
+<style>
+    .projects-main .stats-section {
+        border: 1px solid var(--bdr);
+        border-radius: var(--rl);
+        background: linear-gradient(180deg, rgba(255, 255, 255, .95) 0%, var(--s2) 100%);
+        box-shadow: var(--sh);
+        padding: 14px;
+        margin-bottom: 14px;
+    }
+
+    .projects-main .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(170px, 1fr));
+        gap: 12px;
+    }
+
+    .projects-main .stats-card {
+        background: var(--s1);
+        border: 1px solid var(--bdr);
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 2px 8px rgba(26, 18, 8, .07);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .projects-main .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--or), var(--or2));
+        opacity: .9;
+    }
+
+    .projects-main .stats-card .stats-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .projects-main .stats-card .stats-title {
+        margin-top: 10px;
+        color: var(--t2);
+        font-size: .82rem;
+        font-weight: 700;
+    }
+
+    .projects-main .stats-card .stats-value {
+        margin-top: 7px;
+        color: var(--t1);
+        font-size: 1.62rem;
+        line-height: 1;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .projects-main .stats-primary .stats-icon { background: rgba(37, 99, 235, .14); color: #1d4ed8; }
+    .projects-main .stats-success .stats-icon { background: rgba(22, 163, 74, .14); color: #15803d; }
+    .projects-main .stats-danger .stats-icon { background: rgba(220, 38, 38, .14); color: #b91c1c; }
+    .projects-main .stats-purple .stats-icon { background: rgba(124, 58, 237, .14); color: #6d28d9; }
+    .projects-main .stats-cyan .stats-icon { background: rgba(8, 145, 178, .14); color: #0e7490; }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    #projectsTable.projects-table-nowrap,
+    #projectsTable.projects-table-nowrap th,
+    #projectsTable.projects-table-nowrap td {
+        white-space: nowrap;
+    }
+
+    #projectsTable .action-btns {
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 900px) {
+        .projects-main .stats-grid {
+            grid-template-columns: repeat(2, minmax(150px, 1fr));
+        }
+    }
+
+    @media (max-width: 560px) {
+        .projects-main .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
 <!-- Modal لاستيراد الملفات -->
-<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="importModalLabel"><i class="fas fa-upload"></i> استيراد المشاريع من ملف Excel</h5>
+                <h5 class="modal-title" id="importModalLabel"><i class="fas fa-upload"></i> استيراد المشاريع من ملف
+                    Excel</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
             </div>
             <div class="modal-body">
                 <form id="importFileForm">
                     <div class="form-group">
                         <label for="projectFile">اختر ملف Excel:</label>
-                        <input type="file" class="form-control" id="projectFile" name="file" accept=".xlsx,.xls" required>
+                        <input type="file" class="form-control" id="projectFile" name="file" accept=".xlsx,.xls"
+                            required>
                         <small class="form-text text-muted">الملفات المقبولة: Excel (.xlsx, .xls)</small>
                     </div>
                 </form>

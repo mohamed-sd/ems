@@ -1,5 +1,5 @@
 (function () {
-  var targetSystem = String(window.EMS_DIGIT_SYSTEM || 'arabic-indic').toLowerCase();
+  var targetSystem = String(window.EMS_DIGIT_SYSTEM || 'latin').toLowerCase();
   var hasArabicDigits = /[٠-٩]/;
   var hasLatinDigits = /[0-9]/;
   var arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];

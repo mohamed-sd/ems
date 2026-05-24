@@ -121,10 +121,8 @@ if (isset($_SESSION['user']) && isset($conn)) {
       <li>
         <a href="../chats/index.php" id="sidebarChatLink">
           <i class="fa fa-comments"></i>
-          <span>المراسلات
-            <span id="nav-unread-badge"
-              class="nav-count-badge" style="display:none;"></span>
-          </span>
+          <span class="sidebar-link-text">المراسلات</span>
+          <span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>
         </a>
       </li>
 
@@ -160,10 +158,11 @@ if (isset($_SESSION['user']) && isset($conn)) {
 
       <?php if (in_array($_SESSION['user']['role'], ["-1", "1", "2", "3", "4", "5"])) { ?>
       <li><a href="../Approvals/hours_approval.php"><i class="fa fa-check-double"></i> <span>اعتماد الساعات
+        </span>
         <?php if ($hoursApprovalPendingCount > 0): ?>
         <span class="nav-count-badge"><?php echo ($hoursApprovalPendingCount > 99 ? '99+' : $hoursApprovalPendingCount); ?></span>
         <?php endif; ?>
-      </span></a></li>
+      </a></li>
       <?php } ?>
 
       <?php // صلاحيات مدير المشاريع === 1
@@ -392,10 +391,12 @@ if (isset($_SESSION['user']) && isset($conn)) {
         var badge = document.getElementById('nav-unread-badge');
         if (badge) {
           if (data.count > 0) {
-            badge.textContent = data.count > 99 ? '99+' : data.count;
-            badge.style.display = 'inline';
+            badge.textContent = data.count > 99 ? '99+' : String(data.count);
+            badge.style.display = 'inline-flex';
+            badge.setAttribute('aria-label', data.count > 99 ? 'أكثر من 99 رسالة غير مقروءة' : (String(data.count) + ' رسائل غير مقروءة'));
           } else {
             badge.style.display = 'none';
+            badge.removeAttribute('aria-label');
           }
         }
       } catch(e) {}

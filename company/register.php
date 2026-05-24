@@ -1113,9 +1113,9 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
                             <div class="fw">
                                 <select id="sector" name="sector" required>
                                     <option value="">— اختر القطاع —</option>
-                                    <option value="تعدين" <?php echo (isset($_POST['sector']) && $_POST['sector'] === 'تعدين') ? 'selected' : ''; ?>>⛏️ تعدين</option>
-                                    <option value="مقاولات" <?php echo (isset($_POST['sector']) && $_POST['sector'] === 'مقاولات') ? 'selected' : ''; ?>>ðŸ—️ مقاولات</option>
-                                    <option value="إنشاء" <?php echo (isset($_POST['sector']) && $_POST['sector'] === 'إنشاء') ? 'selected' : ''; ?>>ðŸ¢ إنشاء</option>
+                                    <option value="تعدين" <?php echo (isset($_POST['sector']) && $_POST['sector'] === 'تعدين') ? 'selected' : ''; ?>>تعدين</option>
+                                    <option value="مقاولات" <?php echo (isset($_POST['sector']) && $_POST['sector'] === 'مقاولات') ? 'selected' : ''; ?>>مقاولات</option>
+                                    <option value="إنشاء" <?php echo (isset($_POST['sector']) && $_POST['sector'] === 'إنشاء') ? 'selected' : ''; ?>> إنشاء</option>
                                 </select>
                                 <i class="fas fa-industry ico"></i>
                             </div>

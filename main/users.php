@@ -12,6 +12,7 @@ $users_has_company_id = db_table_has_column($conn, 'users', 'company_id');
 $users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');
 $users_has_deleted_at = db_table_has_column($conn, 'users', 'deleted_at');
 $users_has_deleted_by = db_table_has_column($conn, 'users', 'deleted_by');
+$users_has_status = db_table_has_column($conn, 'users', 'status');
 
 if (!$users_has_is_deleted) {
     @mysqli_query($conn, "ALTER TABLE users ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0");
@@ -22,13 +23,87 @@ if (!$users_has_deleted_at) {
 if (!$users_has_deleted_by) {
     @mysqli_query($conn, "ALTER TABLE users ADD COLUMN deleted_by INT NULL");
 }
+if (!$users_has_status) {
+    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'active'");
+}
 
 $users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');
 $users_has_deleted_at = db_table_has_column($conn, 'users', 'deleted_at');
+$users_has_status = db_table_has_column($conn, 'users', 'status');
 $users_not_deleted_sql = $users_has_is_deleted ? "(COALESCE(is_deleted,0)=0)" : "1=1";
 
 if ($users_has_company_id && $current_company_id <= 0) {
     echo "<script>alert('❌ الحساب غير مرتبط بشركة'); window.location.href='../login.php';</script>";
+    exit;
+}
+
+// Endpoint محلي لجلب عقود المشروع (يُستخدم عبر Ajax من نفس الصفحة)
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'contracts') {
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    header('Content-Type: application/json; charset=utf-8');
+
+    if (!isset($_SESSION['user'])) {
+        echo json_encode(['success' => false, 'message' => 'غير مصرح']);
+        exit;
+    }
+
+    $project_id = isset($_GET['project_id']) ? intval($_GET['project_id']) : 0;
+    if ($project_id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'معرف مشروع غير صالح']);
+        exit;
+    }
+
+    $project_scope = $users_has_company_id ? " AND p.company_id = $current_company_id" : "";
+    $project_not_deleted = db_table_has_column($conn, 'project', 'is_deleted') ? " AND COALESCE(p.is_deleted,0)=0" : "";
+
+    $project_check_sql = "SELECT p.id FROM project p WHERE p.id = $project_id AND p.status = '1' $project_not_deleted $project_scope LIMIT 1";
+    $project_check_res = mysqli_query($conn, $project_check_sql);
+    if (!$project_check_res || mysqli_num_rows($project_check_res) === 0) {
+        echo json_encode(['success' => true, 'contracts' => []], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $contract_active_sql = "(
+        c.status = 1
+        OR c.status = '1'
+        OR TRIM(c.status) = 'نشط'
+        OR TRIM(LOWER(c.status)) = 'active'
+        OR TRIM(LOWER(c.status)) = 'true'
+    )";
+
+    $contracts_sql = "SELECT
+            c.id,
+            c.contract_signing_date,
+            c.actual_start,
+            c.forecasted_contracted_hours
+        FROM contracts c
+        WHERE c.project_id = $project_id
+          AND $contract_active_sql
+        ORDER BY c.actual_start DESC, c.id DESC";
+
+    $contracts_result = mysqli_query($conn, $contracts_sql);
+    if (!$contracts_result) {
+        echo json_encode(['success' => false, 'message' => 'خطأ في جلب العقود'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $contracts = [];
+    while ($row = mysqli_fetch_assoc($contracts_result)) {
+        $contracts[] = [
+            'id' => intval($row['id']),
+            'display_name' => 'عقد رقم ' . intval($row['id']) . ' - ' . (isset($row['actual_start']) ? $row['actual_start'] : '-') . ' - ' . floatval(isset($row['forecasted_contracted_hours']) ? $row['forecasted_contracted_hours'] : 0) . ' ساعة',
+            'contract_signing_date' => isset($row['contract_signing_date']) ? $row['contract_signing_date'] : null,
+            'actual_start' => isset($row['actual_start']) ? $row['actual_start'] : null,
+            'hours' => floatval(isset($row['forecasted_contracted_hours']) ? $row['forecasted_contracted_hours'] : 0)
+        ];
+    }
+
+    echo json_encode([
+        'success' => true,
+        'contracts' => $contracts
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -97,6 +172,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $passwordRaw = isset($_POST['password']) ? trim($_POST['password']) : '';
     $phone = mysqli_real_escape_string($conn, $_POST['phone']);
     $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $status_input = isset($_POST['status']) ? trim($_POST['status']) : 'active';
+    $status = (in_array($status_input, array('active', '1', 1, 'نشط', 'true'), true)) ? 'active' : 'inactive';
     $selected_role_scope = 'gloable';
     $role_lookup_sql = "SELECT role_scope FROM roles WHERE id='" . mysqli_real_escape_string($conn, $role) . "' LIMIT 1";
     $role_lookup_result = mysqli_query($conn, $role_lookup_sql);
@@ -133,8 +210,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             $company_update = ($users_has_company_id && $current_company_id > 0) ? ", company_id='$current_company_id'" : "";
             $update_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
 
-            $sql = "UPDATE users
-                    SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', contract_id='$contract', updated_at=NOW() $sql_pass
+                $sql_status = $users_has_status ? ", status='$status'" : "";
+
+                $sql = "UPDATE users
+                    SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', contract_id='$contract', updated_at=NOW() $sql_status $sql_pass
                     $company_update
                     WHERE id='$uid' AND $users_not_deleted_sql $update_scope";
             if (mysqli_query($conn, $sql)) {
@@ -158,6 +237,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
                 $insert_columns = "name, username, password, phone, role, project_id, contract_id, parent_id, created_at, updated_at";
                 $insert_values = "'$name', '$username', '$hashedPass', '$phone', '$role', '$project', '$contract', '0', NOW(), NOW()";
+
+                if ($users_has_status) {
+                    $insert_columns .= ", status";
+                    $insert_values .= ", '$status'";
+                }
 
                 if ($users_has_company_id && $current_company_id > 0) {
                     $insert_columns .= ", company_id";
@@ -247,6 +331,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             value="09209303903" />
                     </div>
 
+                    <div>
+                        <label><i class="fas fa-toggle-on"></i> حالة المستخدم</label>
+                        <select name="status" id="status" class="form-control" required>
+                            <option value="active" selected>✅ نشط</option>
+                            <option value="inactive">❌ غير نشط</option>
+                        </select>
+                    </div>
+
                     <div id="projectDiv" class="pu-hidden">
                         <label><i class="fas fa-project-diagram"></i> المشروع <span
                                 class="pu-required-star">*</span></label>
@@ -293,22 +385,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 <div class="users-table-note">عرض وإدارة المستخدمين مع التصدير السريع من الشريط العلوي</div>
             </div>
             <div class="table-container">
-                <table id="projectsTable" class="display pu-table">
+                <table id="projectsTable" class="display nowrap pu-table users-table-nowrap" style="width:100%;">
                     <thead>
                         <tr>
+                            <th>إجراءات</th>
                             <th>#</th>
                             <th>الاسم </th>
                             <th>اسم المستخدم </th>
                             <th>كلمه المرور </th>
                             <th>الدور </th>
                             <th>رقم الهاتف</th>
-                            <th>إجراءات</th>
+                            <th>الحالة</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
                         $list_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
-                        $query = "SELECT id, name, username, password, phone, role, project_id, contract_id FROM users WHERE parent_id='0' AND role!='-1' AND $users_not_deleted_sql $list_scope ORDER BY id DESC";
+                        $select_status_column = $users_has_status ? "status" : "'active' AS status";
+                        $query = "SELECT id, name, username, password, phone, role, project_id, contract_id, $select_status_column FROM users WHERE parent_id='0' AND role!='-1' AND $users_not_deleted_sql $list_scope ORDER BY id DESC";
                         $result = mysqli_query($conn, $query);
 
                         $i = 1;
@@ -344,26 +438,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             }
 
                             echo "<tr>";
+                                                        $raw_status = isset($row['status']) ? trim((string) $row['status']) : 'active';
+                                                        $status_is_active = in_array(strtolower($raw_status), array('1', 'active', 'true', 'نشط'), true);
+                                                        $status_badge = $status_is_active
+                                                                ? "<span class='status-active'><i class='fas fa-check-circle'></i> نشط</span>"
+                                                                : "<span class='status-inactive'><i class='fas fa-times-circle'></i> غير نشط</span>";
+
+                                                        echo "<td>
+                                                                <div class='action-btns'>
+                                                                <a href='javascript:void(0)' class='editBtn action-btn edit'
+                                                                     data-id='{$row['id']}'
+                                                                     data-name='" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "'
+                                                                     data-username='" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "'
+                                                                     data-phone='" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "'
+                                                                     data-role='{$row['role']}'
+                                                                     data-status='" . ($status_is_active ? 'active' : 'inactive') . "'
+                                                                     data-project='{$row['project_id']}'
+                                                                     data-contract='{$row['contract_id']}'
+                                                                     title='تعديل'><i class='fas fa-edit'></i></a>
+                                                                <a href='?delete={$row['id']}' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>
+                                                                </div>
+                                                            </td>";
                             echo "<td><strong>" . $i++ . "</strong></td>";
                             echo "<td><a class='client-name-link' href='user_profile.php?id=" . intval($row['id']) . "'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</a>" . $project_info . "</td>";
                             echo "<td><strong>" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "</strong></td>";
                             echo "<td><span class='password-cell pu-password-cell'>••••••••</span></td>";
                             echo "<td><span class='role-badge role-" . $row['role'] . "'>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</span></td>";
                             echo "<td><i class='fas fa-phone'></i>" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
-                            echo "<td>
-                                <div class='action-btns'>
-                                <a href='javascript:void(0)' class='editBtn action-btn edit'
-                                   data-id='{$row['id']}'
-                                   data-name='" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "'
-                                   data-username='" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "'
-                                   data-phone='" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "'
-                                   data-role='{$row['role']}'
-                                   data-project='{$row['project_id']}'
-                                   data-contract='{$row['contract_id']}'
-                                   title='تعديل'><i class='fas fa-edit'></i></a>
-                                <a href='?delete={$row['id']}' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>
-                                </div>
-                              </td>";
+                                                        echo "<td>" . $status_badge . "</td>";
                             echo "</tr>";
                         }
                         ?>
@@ -374,6 +476,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     </div>
 
 </div>
+
+<style>
+    .project-users-main .table-container {
+        overflow-x: auto;
+    }
+
+    #projectsTable.users-table-nowrap,
+    #projectsTable.users-table-nowrap th,
+    #projectsTable.users-table-nowrap td {
+        white-space: nowrap;
+    }
+
+    #projectsTable .action-btns {
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
+</style>
 
 <!-- jQuery + DataTables -->
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
@@ -450,19 +569,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             }
 
             try {
-                const response = await fetch('../Suppliers/get_mine_contracts.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `project_id=${projectId}`
+                const response = await fetch(`users.php?ajax=contracts&project_id=${encodeURIComponent(projectId)}`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
                 });
-                const data = await response.json();
+
+                const responseText = await response.text();
+                let data = null;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (jsonError) {
+                    throw new Error('استجابة غير صالحة من الخادم');
+                }
 
                 if (data.success && data.contracts.length > 0) {
                     contractSelect.innerHTML = '<option value="">-- اختر العقد --</option>';
                     data.contracts.forEach(contract => {
                         const option = document.createElement('option');
                         option.value = contract.id;
-                        option.textContent = contract.display_name;
+                        if (contract.display_name) {
+                            option.textContent = contract.display_name;
+                        } else {
+                            const start = contract.actual_start ? String(contract.actual_start) : '-';
+                            option.textContent = `عقد رقم ${contract.id} - ${start}`;
+                        }
                         contractSelect.appendChild(option);
                     });
 
@@ -490,8 +620,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
            DataTable
         ============================== */
         const usersTable = $('#projectsTable').DataTable({
-            responsive: true,
             dom: 'Bfrtip',
+            scrollX: true,
+            autoWidth: false,
             buttons: [
                 { extend: 'copy', text: '<i class="fas fa-copy"></i> نسخ', className: 'users-table-action' },
                 { extend: 'excel', text: '<i class="fas fa-file-excel"></i> Excel', className: 'users-table-action' },
@@ -528,6 +659,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             const username = $(this).data('username');
             const phone = $(this).data('phone');
             const role = $(this).data('role');
+            const status = $(this).data('status');
 
             const projectId = $(this).data('project');
             const contractId = $(this).data('contract');
@@ -537,6 +669,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             $('#username').val(username);
             $('#phone').val(phone);
             $('#role').val(role).trigger('change');
+            $('#status').val(status || 'active');
 
             // إعادة تعيين حالة التحقق من اسم المستخدم
             usernameFeedback.innerHTML = '<span class="pu-feedback-ok"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';
