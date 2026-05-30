@@ -444,6 +444,18 @@ if ($operations_res) {
     }
 }
 
+$operations_rows_day = [];
+$operations_rows_night = [];
+foreach ($operations_rows as $op_row) {
+    $shift_code = isset($op_row['shift_type']) ? strtoupper((string)$op_row['shift_type']) : 'B';
+    if ($shift_code === 'D' || $shift_code === 'B') {
+        $operations_rows_day[] = $op_row;
+    }
+    if ($shift_code === 'N' || $shift_code === 'B') {
+        $operations_rows_night[] = $op_row;
+    }
+}
+
 $drivers_sql = "SELECT ed.id, ed.equipment_id, ed.driver_id, ed.start_date, ed.end_date, ed.status,
                        " . ($equipment_drivers_has_shift_type ? "ed.shift_type" : "'B' AS shift_type") . ",
                        d.name AS driver_name, d.phone AS driver_phone,
@@ -884,10 +896,17 @@ include '../insidebar.php';
             </div>
         <?php endif; ?>
 
-        <!-- جدول التشغيلات -->
+        <!-- جداول التشغيلات (نهار / ليل) -->
+        <?php
+            $operations_tables = [
+                ['title' => 'إدارة تشغيلات النهار', 'rows' => $operations_rows_day, 'table_key' => 'day'],
+                ['title' => 'إدارة تشغيلات الليل', 'rows' => $operations_rows_night, 'table_key' => 'night'],
+            ];
+        ?>
+        <?php foreach ($operations_tables as $operations_table): ?>
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-cogs"></i> إدارة التشغيلات</h5>
+                <h5><i class="fas fa-cogs"></i> <?php echo htmlspecialchars($operations_table['title'], ENT_QUOTES, 'UTF-8'); ?></h5>
             </div>
             <div class="card-body">
                 <div class="table-scroll">
@@ -907,79 +926,86 @@ include '../insidebar.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $idx = 1; foreach ($operations_rows as $op): ?>
-                                <?php
-                                    $op_id = intval($op['id']);
-                                    $status = intval($op['status']);
-                                    $category = isset($op['equipment_category']) ? $op['equipment_category'] : 'أساسي';
-                                    $shift = isset($op['shift_type']) ? $op['shift_type'] : 'B';
-                                    $is_running = ($status === 1);
-                                    $shift_label = ($shift === 'D') ? 'نهاري' : (($shift === 'N') ? 'ليلي' : 'نهاري + ليلي');
-                                ?>
-                                <tr id="op_row_<?php echo $op_id; ?>">
-                                    <td><?php echo $idx++; ?></td>
-                                    <td><?php echo htmlspecialchars(($op['equipment_code'] ?? '-') . ' - ' . ($op['equipment_name'] ?? '-')); ?></td>
-                                    <td><?php echo htmlspecialchars($op['equipment_type_name'] ?? '-'); ?></td>
-                                    <td>
-                                        <?php if ($is_running && $can_edit): ?>
-                                            <select class="op_category" data-op="<?php echo $op_id; ?>">
-                                                <option value="أساسي" <?php echo $category === 'أساسي' ? 'selected' : ''; ?>>أساسي</option>
-                                                <option value="احتياطي" <?php echo $category === 'احتياطي' ? 'selected' : ''; ?>>احتياطي</option>
-                                            </select>
-                                        <?php else: ?>
-                                            <span><?php echo htmlspecialchars($category); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($is_running && $can_edit): ?>
-                                            <select class="op_shift" data-op="<?php echo $op_id; ?>">
-                                                <option value="D" <?php echo $shift === 'D' ? 'selected' : ''; ?>>نهاري</option>
-                                                <option value="N" <?php echo $shift === 'N' ? 'selected' : ''; ?>>ليلي</option>
-                                                <option value="B" <?php echo $shift === 'B' ? 'selected' : ''; ?>>نهاري + ليلي</option>
-                                            </select>
-                                        <?php else: ?>
-                                            <span><?php echo htmlspecialchars($shift_label); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($is_running && $can_edit): ?>
-                                            <input type="date" class="op_start" data-op="<?php echo $op_id; ?>" value="<?php echo htmlspecialchars($op['start'] ?? ''); ?>">
-                                        <?php else: ?>
-                                            <span><?php echo htmlspecialchars($op['start'] ?? '-'); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($is_running && $can_edit): ?>
-                                            <input type="date" class="op_end" data-op="<?php echo $op_id; ?>" value="<?php echo htmlspecialchars($op['end'] ?? ''); ?>">
-                                        <?php else: ?>
-                                            <span><?php echo htmlspecialchars($op['end'] ?? '-'); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?php echo intval($op['active_drivers_count']); ?></td>
-                                    <td>
-                                        <?php if ($is_running): ?>
-                                            <span class="status-running">ساري</span>
-                                            <?php if ($can_edit): ?>
-                                                <button type="button" class="btn-end-row" onclick="endOperation(<?php echo $op_id; ?>)"><i class="fas fa-stop-circle"></i> إنهاء</button>
-                                            <?php endif; ?>
-                                        <?php else: ?>
-                                            <span class="status-idle">منتهي</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($is_running && $can_edit): ?>
-                                            <button type="button" class="btn-save-row" onclick="saveOperation(<?php echo $op_id; ?>)"><i class="fas fa-save"></i> حفظ</button>
-                                        <?php else: ?>
-                                            <span>-</span>
-                                        <?php endif; ?>
-                                    </td>
+                            <?php if (empty($operations_table['rows'])): ?>
+                                <tr>
+                                    <td colspan="10">لا توجد آليات في هذا الجدول</td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php else: ?>
+                                <?php $idx = 1; foreach ($operations_table['rows'] as $op): ?>
+                                    <?php
+                                        $op_id = intval($op['id']);
+                                        $status = intval($op['status']);
+                                        $category = isset($op['equipment_category']) ? $op['equipment_category'] : 'أساسي';
+                                        $shift = isset($op['shift_type']) ? $op['shift_type'] : 'B';
+                                        $is_running = ($status === 1);
+                                        $shift_label = ($shift === 'D') ? 'نهاري' : (($shift === 'N') ? 'ليلي' : 'نهاري + ليلي');
+                                    ?>
+                                    <tr id="op_row_<?php echo $operations_table['table_key']; ?>_<?php echo $op_id; ?>">
+                                        <td><?php echo $idx++; ?></td>
+                                        <td><?php echo htmlspecialchars(($op['equipment_code'] ?? '-') . ' - ' . ($op['equipment_name'] ?? '-')); ?></td>
+                                        <td><?php echo htmlspecialchars($op['equipment_type_name'] ?? '-'); ?></td>
+                                        <td>
+                                            <?php if ($is_running && $can_edit): ?>
+                                                <select class="op_category" data-op="<?php echo $op_id; ?>">
+                                                    <option value="أساسي" <?php echo $category === 'أساسي' ? 'selected' : ''; ?>>أساسي</option>
+                                                    <option value="احتياطي" <?php echo $category === 'احتياطي' ? 'selected' : ''; ?>>احتياطي</option>
+                                                </select>
+                                            <?php else: ?>
+                                                <span><?php echo htmlspecialchars($category); ?></span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($is_running && $can_edit): ?>
+                                                <select class="op_shift" data-op="<?php echo $op_id; ?>">
+                                                    <option value="D" <?php echo $shift === 'D' ? 'selected' : ''; ?>>نهاري</option>
+                                                    <option value="N" <?php echo $shift === 'N' ? 'selected' : ''; ?>>ليلي</option>
+                                                    <option value="B" <?php echo $shift === 'B' ? 'selected' : ''; ?>>نهاري + ليلي</option>
+                                                </select>
+                                            <?php else: ?>
+                                                <span><?php echo htmlspecialchars($shift_label); ?></span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($is_running && $can_edit): ?>
+                                                <input type="date" class="op_start" data-op="<?php echo $op_id; ?>" value="<?php echo htmlspecialchars($op['start'] ?? ''); ?>">
+                                            <?php else: ?>
+                                                <span><?php echo htmlspecialchars($op['start'] ?? '-'); ?></span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($is_running && $can_edit): ?>
+                                                <input type="date" class="op_end" data-op="<?php echo $op_id; ?>" value="<?php echo htmlspecialchars($op['end'] ?? ''); ?>">
+                                            <?php else: ?>
+                                                <span><?php echo htmlspecialchars($op['end'] ?? '-'); ?></span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?php echo intval($op['active_drivers_count']); ?></td>
+                                        <td>
+                                            <?php if ($is_running): ?>
+                                                <span class="status-running">ساري</span>
+                                                <?php if ($can_edit): ?>
+                                                    <button type="button" class="btn-end-row" onclick="endOperation(<?php echo $op_id; ?>, this)"><i class="fas fa-stop-circle"></i> إنهاء</button>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <span class="status-idle">منتهي</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($is_running && $can_edit): ?>
+                                                <button type="button" class="btn-save-row" onclick="saveOperation(<?php echo $op_id; ?>, this)"><i class="fas fa-save"></i> حفظ</button>
+                                            <?php else: ?>
+                                                <span>-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+        <?php endforeach; ?>
 
         <!-- جدول السائقين -->
         <div class="card">
@@ -1071,11 +1097,12 @@ include '../insidebar.php';
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    function saveOperation(opId) {
-        const category = document.querySelector('.op_category[data-op="' + opId + '"]')?.value || 'أساسي';
-        const shift = document.querySelector('.op_shift[data-op="' + opId + '"]')?.value || 'B';
-        const start = document.querySelector('.op_start[data-op="' + opId + '"]')?.value || '';
-        const end = document.querySelector('.op_end[data-op="' + opId + '"]')?.value || '';
+    function saveOperation(opId, triggerBtn) {
+        const row = triggerBtn ? triggerBtn.closest('tr') : null;
+        const category = row?.querySelector('.op_category[data-op="' + opId + '"]')?.value || document.querySelector('.op_category[data-op="' + opId + '"]')?.value || 'أساسي';
+        const shift = row?.querySelector('.op_shift[data-op="' + opId + '"]')?.value || document.querySelector('.op_shift[data-op="' + opId + '"]')?.value || 'B';
+        const start = row?.querySelector('.op_start[data-op="' + opId + '"]')?.value || document.querySelector('.op_start[data-op="' + opId + '"]')?.value || '';
+        const end = row?.querySelector('.op_end[data-op="' + opId + '"]')?.value || document.querySelector('.op_end[data-op="' + opId + '"]')?.value || '';
 
         const formData = new FormData();
         formData.append('action', 'save_single_operation');
@@ -1105,13 +1132,14 @@ include '../insidebar.php';
         });
     }
 
-    function endOperation(opId) {
+    function endOperation(opId, triggerBtn) {
         if (!confirm('هل تريد إنهاء هذا التشغيل؟')) return;
+        const row = triggerBtn ? triggerBtn.closest('tr') : null;
         const formData = new FormData();
         formData.append('action', 'save_single_operation');
         formData.append('op_id', opId);
-        formData.append('equipment_category', document.querySelector('.op_category[data-op="' + opId + '"]')?.value || 'أساسي');
-        formData.append('shift_type', document.querySelector('.op_shift[data-op="' + opId + '"]')?.value || 'B');
+        formData.append('equipment_category', row?.querySelector('.op_category[data-op="' + opId + '"]')?.value || document.querySelector('.op_category[data-op="' + opId + '"]')?.value || 'أساسي');
+        formData.append('shift_type', row?.querySelector('.op_shift[data-op="' + opId + '"]')?.value || document.querySelector('.op_shift[data-op="' + opId + '"]')?.value || 'B');
         formData.append('status', 0);
         formData.append('json', '1');
         fetch(window.location.href, { method: 'POST', body: formData })

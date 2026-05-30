@@ -674,6 +674,23 @@ $ops_stmt->execute();
 $operations_result = $ops_stmt->get_result();
 $ops_stmt->close();
 
+$operations_rows = [];
+while ($op_row = $operations_result->fetch_assoc()) {
+    $operations_rows[] = $op_row;
+}
+
+$operations_rows_day = [];
+$operations_rows_night = [];
+foreach ($operations_rows as $op_row) {
+    $shift_code = strtoupper((string)($op_row['shift_type'] ?? 'B'));
+    if ($shift_code === 'D' || $shift_code === 'B') {
+        $operations_rows_day[] = $op_row;
+    }
+    if ($shift_code === 'N' || $shift_code === 'B') {
+        $operations_rows_night[] = $op_row;
+    }
+}
+
 // جلب أنواع المعدات للقائمة المنسدلة
 $type_result = mysqli_query(
     $conn,
@@ -1066,14 +1083,21 @@ function get_shift_info(string $code): array
             </div>
         </div>
 
-        <!-- ── جدول التشغيل ──────────────────────────────── -->
+        <!-- ── جدول التشغيل (نهار / ليل) ─────────────────── -->
+        <?php
+        $operations_tables = [
+            ['id' => 'projectsTableDay', 'title' => 'قائمة تشغيل النهار', 'rows' => $operations_rows_day],
+            ['id' => 'projectsTableNight', 'title' => 'قائمة تشغيل الليل', 'rows' => $operations_rows_night],
+        ];
+        ?>
+        <?php foreach ($operations_tables as $table): ?>
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-cogs"></i> قائمة التشغيل</h5>
+                <h5 style="color: #333;"><i class="fas fa-cogs"></i> <?= htmlspecialchars($table['title'], ENT_QUOTES, 'UTF-8') ?></h5>
             </div>
             <div class="card-body card-body-zero">
                 <div class="tbl-scroll-wrap tbl-scroll-zero">
-                    <table id="projectsTable" class="display nowrap table-full-width">
+                    <table id="<?= htmlspecialchars($table['id'], ENT_QUOTES, 'UTF-8') ?>" class="display nowrap table-full-width">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -1089,9 +1113,14 @@ function get_shift_info(string $code): array
                             </tr>
                         </thead>
                         <tbody>
+                        <?php if (empty($table['rows'])): ?>
+                        <tr>
+                            <td colspan="10">لا توجد آليات في هذا الجدول</td>
+                        </tr>
+                        <?php else: ?>
                         <?php
                         $i = 1;
-                        while ($row = $operations_result->fetch_assoc()):
+                        foreach ($table['rows'] as $row):
                             $status_value    = intval($row['status']);
                             $shift_code      = $row['shift_type'] ?? 'B';
                             $shift_info      = get_shift_info($shift_code);
@@ -1120,7 +1149,6 @@ function get_shift_info(string $code): array
                             <td><?= $driver_display ?></td>
                             <td><?= htmlspecialchars((string)($row['shift_hours'] ?? '0'), ENT_QUOTES, 'UTF-8') ?></td>
 
-                            <!-- خلية الوردية القابلة للتعديل السريع -->
                             <td class="shift-cell"
                                 data-operation-id="<?= intval($row['id']) ?>"
                                 data-current-shift="<?= htmlspecialchars($shift_code, ENT_QUOTES, 'UTF-8') ?>"
@@ -1205,7 +1233,6 @@ function get_shift_info(string $code): array
 
                                 </div>
 
-                                <!-- إنهاء خدمة (للأدوار غير role10) -->
                                 <?php if ($status_value === 1 && !$is_role10 && $can_edit): ?>
                                 <a href="#" class="end-service-btn btn btn-sm btn-outline-secondary"
                                    data-bs-toggle="modal" data-bs-target="#endServiceModal"
@@ -1216,12 +1243,14 @@ function get_shift_info(string $code): array
 
                             </td>
                         </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+        <?php endforeach; ?>
 
         <!-- ── مودال عرض التفاصيل ──────────────────────── -->
         <div id="viewOperationModal" class="modal movement-view-modal" role="dialog"
@@ -1409,7 +1438,7 @@ async function ajaxPost(url, data) {
    DataTable
 ════════════════════════════════════════════════════════════ */
 $(document).ready(function () {
-    $('#projectsTable').DataTable({
+    const dtOptions = {
         dom: 'Bfrtip',
         buttons: [
             { extend: 'copy',  text: 'نسخ'          },
@@ -1419,7 +1448,10 @@ $(document).ready(function () {
             { extend: 'print', text: 'طباعة'        }
         ],
         language: { url: '/ems/assets/i18n/datatables/ar.json' }
-    });
+    };
+
+    $('#projectsTableDay').DataTable(dtOptions);
+    $('#projectsTableNight').DataTable(dtOptions);
 });
 
 /* ════════════════════════════════════════════════════════════
@@ -1844,9 +1876,17 @@ $(document).on('change', '.shift-edit-select', async function () {
             };
             const info = shiftMap[newShiftType] || shiftMap.B;
 
-            $badge.removeClass('shift-day shift-night shift-both')
-                  .addClass(info.cls).text(info.label);
-            $cell.data('current-shift', newShiftType);
+            const $sameOperationCells = $('.shift-cell[data-operation-id="' + operationId + '"]');
+            $sameOperationCells.each(function () {
+                const $currentCell = $(this);
+                const $currentBadge = $currentCell.find('.shift-badge');
+                const $currentSelect = $currentCell.find('.shift-edit-select');
+
+                $currentBadge.removeClass('shift-day shift-night shift-both')
+                             .addClass(info.cls).text(info.label);
+                $currentCell.data('current-shift', newShiftType);
+                $currentSelect.val(newShiftType);
+            });
 
             const $msg = $('<div class="shift-success-msg">✅ تم التحديث</div>');
             $cell.append($msg);
