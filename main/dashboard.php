@@ -736,8 +736,8 @@ body.ems-site .sidebar.closed .logout span {
 }
 
 .shot-body {
-  padding: 88px 18px 14px;
-  background: #ffffff;
+  padding: 50px 18px 14px;
+  background: #e2e2e2;
   margin-right: 68px;
 }
 
@@ -773,14 +773,21 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   text-align: right;
 }
 
+.shot-quick-zone {
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+  border-radius: 12px;
+  padding: 10px 12px 12px;
+}
+
 .shot-hex-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px 16px;
+  gap: 0px 0px;
 }
 
 .shot-hex-link {
-  min-height: 110px;
+  min-height: 130px;
   border: none;
   color: #111;
   text-decoration: none;
@@ -789,9 +796,9 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: 12px;
-  padding: 14px 44px;
-  font-size: 1.55rem;
-  font-weight: 700;
+  padding: 30px 44px;
+  font-size: 1.3rem;
+  font-weight: 600;
   transition: transform .2s ease, filter .2s ease;
   direction: rtl;
   position: relative;
@@ -807,8 +814,8 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 }
 
 .shot-hex-bg path {
-  fill: #fff;
-  stroke: #666666;
+  fill: #efefef;
+  stroke: #4f4f4f;
   stroke-width: 1.6;
   vector-effect: non-scaling-stroke;
   transition: fill .2s ease, stroke .2s ease;
@@ -866,10 +873,18 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 }
 
 .shot-session {
-  margin-top: 12px;
-  border-top: 1px solid #b9b9b9;
-  border-bottom: 1px solid #b9b9b9;
+  margin-top: 0;
+  border-top: none;
+  border-bottom: none;
   padding: 10px 0;
+}
+
+.shot-lower-zone {
+  margin-top: 12px;
+  background: #e2e2e2;
+  border: 1px solid #c8c8c8;
+  border-radius: 12px;
+  padding: 10px 10px 14px;
 }
 
 .shot-session-title {
@@ -949,11 +964,28 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
 .shot-stat-panel {
   margin-top: 14px;
-   background: var(--dash-yellow);
-  border-color: #9d7e00;
-  border-radius: 20px 20px 0 0;
-  padding: 24px 24px 18px;
+  position: relative;
+  padding: 30px 190px 50px;
+  isolation: isolate;
   transition: background .2s ease, border-color .2s ease;
+}
+
+.shot-stat-panel:not(.shot-stat-panel-secondary)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--dash-yellow);
+  border: 1px solid #9d7e00;
+  border-radius: 32px 32px 0 0;
+  -webkit-clip-path: polygon(34px 0, calc(100% - 34px) 0, calc(100% - 16px) 12px, calc(100% - 6px) 28px, 100% 50px, 100% 100%, 0 100%, 0 50px, 6px 28px, 16px 12px);
+  clip-path: polygon(50% 0%, 90% 0, 100% 40%, 100% 100%, 0 100%, 0 40%, 10% 0);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.shot-stat-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .shot-stat-panel-secondary {
@@ -1049,7 +1081,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: 12px;
   background: #cf2626;
   color: #fff;
   border: 1px solid #a91f1f;
@@ -1062,6 +1094,8 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   clear: both;
   margin-right: 0;
   margin-left: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .shot-logout i {
@@ -1139,7 +1173,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   }
 
   .shot-body {
-    padding-top: 82px;
+    padding-top: 10px;
     margin-right: 0;
   }
 
@@ -1187,6 +1221,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   <div class="shot-body">
     <div class="shot-breadcrumb" id="emsClock"><?= date('Y F d, l') ?></div>
 
+    <div class="shot-quick-zone">
     <h2 class="shot-section-title">الوصول السريع</h2>
 
     <?php
@@ -1207,7 +1242,9 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
       </a>
       <?php endforeach; ?>
     </div>
+    </div>
 
+    <div class="shot-lower-zone">
     <div class="shot-session">
       <div class="shot-session-title">بيانات الجلسة</div>
       <div class="shot-session-row">
@@ -1297,6 +1334,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
           <canvas id="chartTrend"></canvas>
         </div>
       </div>
+    </div>
     </div>
   </div>
 
