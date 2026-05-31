@@ -441,738 +441,857 @@ include '../inheader.php';
 include '../insidebar.php';
 ?>
 <style>
-/* ═══════════════════════════════════════
-   EMS Dashboard v2 — Inline Critical CSS
-═══════════════════════════════════════ */
+/* Dashboard redesign to match the provided yellow/gray visual identity */
 .ems-dash.main {
-  background: #0b0f16 !important;
-  color: #f0ece4 !important;
+  --dash-yellow: #f3be00;
+  --dash-gray: #e2e2e2;
+  --dash-line: #bdbdbd;
+  --dash-ink: #121212;
+  --hex-regular: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
+  --hex-wide: polygon(6% 0, 94% 0, 100% 50%, 94% 100%, 6% 100%, 0 50%);
+  background: #ffffff;
+  color: var(--dash-ink);
   flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
   min-height: 100vh;
-  position: relative;
+  margin-right: 0;
+  font-family: 'Tajawal', 'Cairo', sans-serif;
   overflow-x: hidden;
-  overflow-y: visible !important;
-  font-family: 'Tajawal','Cairo',sans-serif;
 }
 
-/* Keep one vertical scrollbar on dashboard (page scrollbar) */
-html,
-body.ems-site {
+.ems-dash * {
+  box-sizing: border-box;
+}
+
+/* Right vertical icon sidebar (desktop) */
+body.ems-site .mobile-menu-btn,
+body.ems-site .sidebar-overlay {
+  display: none;
+}
+
+body.ems-site .sidebar {
+  position: fixed;
+  top: 50px;
+  right: 0;
+  left: auto;
+  width: 286px;
+  height: calc(100vh - 50px);
+  background: #efefef;
+  border-right: 1px solid #c8c8c8;
+  border-left: 1px solid #c8c8c8;
+  box-shadow: none;
+  z-index: 50;
+  transition: width .3s ease;
   overflow-y: auto !important;
-}
-
-.ems-site .main {
-  overflow: hidden !important;
   overflow-x: hidden !important;
-  overflow-y: hidden !important;
-  height: auto !important;
+}
+
+body.ems-site .sidebar.closed {
+  width: 68px;
+}
+
+body.ems-site .sidebar .toggle-btn {
+  display: flex;
+  width: 100%;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  border-bottom: 1px solid #d0d0d0;
+  background: #e5e5e5;
+}
+
+body.ems-site .sidebar .logo {
+  display: block;
+  padding: 10px 12px;
+  color: #151515;
+  font-size: 1.2rem;
+  border-bottom: 1px solid #d0d0d0;
+  background: #ececec;
+}
+
+body.ems-site .sidebar.closed .logo {
+  display: none;
+}
+
+body.ems-site .sidebar ul {
+  padding: 8px 0 12px;
+  overflow-y: visible !important;
   max-height: none !important;
 }
 
-.ems-site .sidebar {
-  overflow: hidden !important;
-  overflow-y: hidden !important;
+body.ems-site .sidebar ul li {
+  margin: 6px 8px;
+  width: auto;
+  min-height: 42px;
+  padding: 0 8px;
+  border-radius: 10px;
+  background: transparent;
+  display: flex;
+  justify-content: flex-start;
 }
 
-.ems-site .sidebar ul {
-  overflow-y: hidden !important;
-  max-height: none !important;
+body.ems-site .sidebar ul li::before {
+  display: none;
 }
 
-.ems-site .sidebar ul::-webkit-scrollbar,
-.ems-site .main::-webkit-scrollbar {
-  width: 0 !important;
-  height: 0 !important;
-  display: none !important;
+body.ems-site .sidebar ul li a {
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0;
 }
-/* atmospheric grid */
-.ems-dash::before {
-  content: '';
+
+body.ems-site .sidebar ul li i {
+  margin: 0;
+  color: #6e6e6e;
+  font-size: 1.05rem;
+}
+
+body.ems-site .sidebar ul li span {
+  display: inline;
+  color: #222;
+  margin-right: 10px;
+  font-size: .95rem;
+  font-weight: 700;
+}
+
+body.ems-site .sidebar.closed ul li {
+  margin: 6px auto;
+  width: 48px;
+  justify-content: center;
+  padding: 0;
+}
+
+body.ems-site .sidebar.closed ul li a {
+  justify-content: center;
+}
+
+body.ems-site .sidebar.closed ul li span {
+  display: none;
+}
+
+body.ems-site .sidebar ul li.active,
+body.ems-site .sidebar ul li:hover {
+  background: #efefef;
+  border: 1px solid #d4d4d4;
+}
+
+body.ems-site .sidebar ul li.active i,
+body.ems-site .sidebar ul li:hover i {
+  color: #111;
+}
+
+body.ems-site .sidebar .logout {
+  margin: 8px 8px 12px;
+  width: auto;
+  min-height: 42px;
+  padding: 0 10px;
+  justify-content: flex-start;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid #cfcfcf;
+  color: #a12727;
+}
+
+body.ems-site .sidebar .logout i {
+  margin: 0;
+}
+
+body.ems-site .sidebar.closed .logout {
+  width: 48px;
+  margin: 8px auto 12px;
+  justify-content: center;
+  padding: 0;
+}
+
+body.ems-site .sidebar.closed .logout span {
+  display: none;
+}
+
+.shot-topbar {
+  height: 50px;
+  background: var(--dash-yellow);
+  border-bottom: 1px solid #d8a400;
   position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(247,147,26,.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(247,147,26,.025) 1px, transparent 1px);
-  background-size: 60px 60px;
-  pointer-events: none;
-  z-index: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 120;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 18px;
+  direction: ltr;
 }
-/* ambient gold orb */
-.ems-dash::after {
-  content: '';
-  position: fixed;
-  top: -20vh; right: -10vw;
-  width: 60vw; height: 60vw;
-  background: radial-gradient(ellipse at center, rgba(247,147,26,.07) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-  animation: emsOrbFloat 12s ease-in-out infinite;
-}
-@keyframes emsOrbFloat {
-  0%,100% { transform: translate(0,0) scale(1); }
-  33%      { transform: translate(-3vw,4vh) scale(1.05); }
-  66%      { transform: translate(2vw,-3vh) scale(.97); }
-}
-.ems-dash > * { position: relative; z-index: 1; }
 
-/* ── Topbar ── */
-.ems-nav {
+.shot-logo {
   display: flex;
   align-items: center;
-  gap: .9rem;
-  padding: 0 1.5rem;
-  height: 60px;
-  background: rgba(6,9,16,.94);
-  border-bottom: 1px solid rgba(247,147,26,.15);
-  backdrop-filter: blur(12px);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  flex-shrink: 0;
-}
-.ems-nav-logo { display:flex; align-items:center; gap:.7rem; text-decoration:none; color:#f0ece4; }
-.ems-nav-hex {
-  width:38px; height:38px;
-  background: linear-gradient(135deg,#f7931a,#ffb84d);
-  clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
-  display:flex; align-items:center; justify-content:center;
-  color:#fff; font-size:.9rem;
-}
-.ems-nav-brand { font-size:1.1rem; font-weight:700; letter-spacing:.04em; color:#f0ece4; }
-.ems-nav-brand span { color:#f7931a; }
-.ems-nav-spacer { flex:1; }
-.ems-nav-clock { font-size:.8rem; color:rgba(240,236,228,.40); font-variant-numeric:tabular-nums; }
-.ems-nav-badge {
-  display:inline-flex; align-items:center; gap:.35rem;
-  padding:.25rem .65rem;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:20px;
-  font-size:.75rem;
-  color:rgba(240,236,228,.65);
-}
-.ems-nav-avatar {
-  width:34px; height:34px;
-  background:linear-gradient(135deg,rgba(247,147,26,.3),rgba(247,147,26,.1));
-  border:1px solid rgba(247,147,26,.15);
-  border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-size:.85rem; color:#f7931a; flex-shrink:0;
-}
-.ems-nav-logout {
-  display:inline-flex; align-items:center; gap:.4rem;
-  padding:.3rem .75rem;
-  background:rgba(239,68,68,.1);
-  border:1px solid rgba(239,68,68,.3);
-  border-radius:6px;
-  color:#fca5a5; font-size:.78rem; text-decoration:none;
-  transition:background .2s;
-  white-space:nowrap;
-}
-.ems-nav-logout:hover { background:rgba(239,68,68,.2); color:#fca5a5; }
-
-/* ── Hero ── */
-.ems-hero {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:2rem;
-  padding:2rem 2rem 1.5rem;
-  background:linear-gradient(135deg,rgba(247,147,26,.05) 0%,transparent 60%);
-  border-bottom:1px solid rgba(255,255,255,.08);
-  flex-shrink:0;
-}
-.ems-hero-left { display:flex; flex-direction:column; justify-content:center; gap:.75rem; }
-.ems-hero-tag {
-  display:inline-flex; align-items:center; gap:.5rem;
-  padding:.3rem .8rem;
-  background:rgba(247,147,26,.1);
-  border:1px solid rgba(247,147,26,.25);
-  border-radius:20px; font-size:.75rem; color:#f7931a; width:fit-content;
-}
-.ems-hero-welcome { font-size:1.85rem; font-weight:800; line-height:1.25; color:#f0ece4; margin:0; }
-.ems-hero-welcome em { color:#f7931a; font-style:normal; }
-.ems-hero-sub { font-size:.88rem; color:rgba(240,236,228,.65); }
-.ems-hero-meta { display:flex; flex-wrap:wrap; gap:.55rem; margin-top:.4rem; }
-.ems-hero-chip {
-  display:inline-flex; align-items:center; gap:.4rem;
-  padding:.25rem .7rem;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:20px; font-size:.77rem; color:rgba(240,236,228,.35);
-}
-.ems-hero-chip i { color:#f7931a; font-size:.7rem; }
-
-/* ── KPI Grid ── */
-.ems-kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:.85rem; }
-.ems-kpi-card {
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:12px; padding:1rem 1.1rem;
-  display:flex; flex-direction:column; gap:.5rem;
-  transition:all .25s; position:relative; overflow:hidden;
-  cursor:default;
-}
-.ems-kpi-card::before {
-  content:''; position:absolute; top:0; left:0; right:0; height:2px;
-  background:var(--kpiAccent,#f7931a); opacity:.7;
-}
-.ems-kpi-card:hover { background:rgba(255,255,255,.07); transform:translateY(-2px); box-shadow:0 4px 24px rgba(0,0,0,.5); }
-.ems-kpi-head { display:flex; align-items:center; justify-content:space-between; }
-.ems-kpi-label { font-size:.75rem; color:rgba(240,236,228,.35); font-weight:500; }
-.ems-kpi-ico {
-  width:28px; height:28px;
-  background:rgba(var(--kpiRgb,247,147,26),.12);
-  border-radius:7px; display:flex; align-items:center; justify-content:center;
-  font-size:.75rem; color:var(--kpiAccent,#f7931a);
-}
-.ems-kpi-val { font-size:1.65rem; font-weight:800; color:#f0ece4; line-height:1; }
-
-/* ── Body ── */
-.ems-body { padding:1.5rem 2rem 3rem; display:flex; flex-direction:column; gap:2rem; flex:1; }
-.ems-section-head { display:flex; align-items:center; gap:.75rem; margin-bottom:1.1rem; }
-.ems-section-line { width:3px; height:18px; background:#f7931a; border-radius:2px; flex-shrink:0; }
-.ems-section-title { font-size:1rem; font-weight:700; color:#f0ece4; }
-.ems-section-count {
-  margin-right:auto; font-size:.74rem; color:rgba(240,236,228,.35);
-  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
-  border-radius:12px; padding:.15rem .55rem;
+  gap: 9px;
+  font-weight: 800;
+  font-size: .9rem;
+  letter-spacing: .4px;
+  color: #111;
+  grid-column: 1;
+  justify-self: start;
+  direction: ltr;
 }
 
-/* ── Stats ── */
-.ems-stats { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:.9rem; }
-.ems-stat {
-  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
-  border-radius:12px; padding:1.1rem 1.1rem .9rem;
-  display:flex; flex-direction:column; gap:.55rem;
-  transition:all .25s; position:relative; overflow:hidden;
-}
-.ems-stat::before {
-  content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
-  background:linear-gradient(90deg,transparent,var(--sAccent,#f7931a),transparent); opacity:.45;
-}
-.ems-stat:hover { background:rgba(255,255,255,.07); transform:translateY(-3px); box-shadow:0 4px 24px rgba(0,0,0,.5); }
-.ems-stat-top { display:flex; align-items:center; justify-content:space-between; }
-.ems-stat-ico {
-  width:36px; height:36px;
-  background:rgba(var(--sRgb,247,147,26),.12);
-  border-radius:10px; display:flex; align-items:center; justify-content:center;
-  font-size:.9rem; color:var(--sAccent,#f7931a);
-}
-.ems-stat-label { font-size:.74rem; color:rgba(240,236,228,.35); }
-.ems-stat-val { font-size:1.8rem; font-weight:800; color:#f0ece4; line-height:1; }
-
-/* ── Quick Links ── */
-.ems-links { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:.75rem; }
-.ems-link-card {
-  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
-  border-radius:12px; padding:.85rem 1rem;
-  display:flex; align-items:center; gap:.7rem;
-  text-decoration:none; color:#f0ece4; transition:all .25s;
-}
-.ems-link-card:hover {
-  background:rgba(255,255,255,.07); border-color:rgba(247,147,26,.2);
-  transform:translateY(-2px); box-shadow:0 4px 24px rgba(0,0,0,.5); color:#f0ece4;
-}
-.ems-link-ico {
-  width:38px; height:38px; flex-shrink:0;
-  background:rgba(247,147,26,.1); border:1px solid rgba(247,147,26,.2);
-  border-radius:10px; display:flex; align-items:center; justify-content:center;
-  font-size:.9rem; color:#f7931a; transition:all .25s;
-}
-.ems-link-card:hover .ems-link-ico { background:rgba(247,147,26,.18); transform:scale(1.08); }
-.ems-link-text { flex:1; font-size:.82rem; font-weight:600; line-height:1.3; }
-.ems-link-arrow { font-size:.7rem; color:rgba(240,236,228,.35); transition:all .25s; }
-.ems-link-card:hover .ems-link-arrow { color:#f7931a; transform:translateX(-3px); }
-
-/* ── Charts ── */
-.ems-charts { display:grid; grid-template-columns:1fr 1fr; gap:1.1rem; }
-.ems-chart-card {
-  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
-  border-radius:14px; padding:1.3rem 1.4rem;
-  display:flex; flex-direction:column; gap:1rem;
-}
-.ems-chart-card.wide { grid-column:span 2; }
-.ems-chart-head { display:flex; align-items:center; gap:.6rem; }
-.ems-chart-dot { width:8px; height:8px; border-radius:50%; background:#f7931a; flex-shrink:0; }
-.ems-chart-title { font-size:.88rem; font-weight:700; color:#f0ece4; }
-.ems-chart-sub { font-size:.74rem; color:rgba(240,236,228,.35); margin-right:auto; }
-.ems-chart-wrap { position:relative; height:200px; }
-.ems-chart-wrap.tall { height:260px; }
-.ems-chart-donut-wrap { display:flex; align-items:center; gap:1.5rem; }
-.ems-donut-canvas { width:130px !important; height:130px !important; flex-shrink:0; }
-.ems-donut-legend { display:flex; flex-direction:column; gap:.6rem; flex:1; }
-.ems-legend-row { display:flex; align-items:center; gap:.5rem; }
-.ems-legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-.ems-legend-label { font-size:.78rem; color:rgba(240,236,228,.65); flex:1; }
-.ems-legend-val { font-size:.88rem; font-weight:700; color:#f0ece4; }
-
-/* ── Supplier Table ── */
-.ems-table-wrap { overflow-x:auto; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
-.ems-table { width:100%; border-collapse:collapse; font-size:.82rem; }
-.ems-table th {
-  background:rgba(247,147,26,.07); color:#f7931a; font-weight:700;
-  padding:.65rem 1rem; text-align:right; border-bottom:1px solid rgba(247,147,26,.15); white-space:nowrap;
-}
-.ems-table td { padding:.6rem 1rem; border-bottom:1px solid rgba(255,255,255,.05); color:rgba(240,236,228,.65); }
-.ems-table tr:last-child td { border-bottom:none; }
-.ems-table tbody tr:hover td { background:rgba(255,255,255,.07); }
-.ems-eq-bar { display:flex; align-items:center; gap:.6rem; }
-.ems-eq-track { flex:1; height:5px; background:rgba(255,255,255,.06); border-radius:3px; overflow:hidden; }
-.ems-eq-fill { height:100%; background:linear-gradient(90deg,#f7931a,#ffb84d); border-radius:3px; }
-
-/* ── Session Strip ── */
-.ems-session { display:flex; flex-wrap:wrap; gap:.55rem; padding-top:.75rem; border-top:1px solid rgba(255,255,255,.08); }
-.ems-chip2 {
-  display:inline-flex; align-items:center; gap:.4rem;
-  padding:.28rem .7rem;
-  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
-  border-radius:20px; font-size:.74rem; color:rgba(240,236,228,.35);
-}
-.ems-chip2 strong { color:rgba(240,236,228,.65); }
-.ems-chip2 i { color:#f7931a; font-size:.68rem; }
-
-/* ── Responsive ── */
-@media (max-width:1024px) {
-  .ems-hero { grid-template-columns:1fr; gap:1.25rem; }
-  .ems-charts { grid-template-columns:1fr; }
-  .ems-chart-card.wide { grid-column:span 1; }
-}
-@media (max-width:768px) {
-  .ems-hero { padding:1.25rem; }
-  .ems-body { padding:1rem 1.25rem 2rem; }
-  .ems-nav { padding:0 1rem; height:54px; }
-  .ems-nav-badge { display:none; }
-  .ems-hero-welcome { font-size:1.4rem; }
-}
-@media (max-width:480px) {
-  .ems-nav-clock { display:none; }
-  .ems-kpi-grid { grid-template-columns:1fr 1fr; }
-  .ems-stats { grid-template-columns:1fr 1fr; }
+.shot-logo-mark {
+  width: 28px;
+  height: 22px;
+  clip-path: polygon(18% 4%, 82% 4%, 100% 50%, 82% 96%, 18% 96%, 0 50%);
+  background: #111;
+  position: relative;
 }
 
-/* ══════════════════════════════════════
-   LIGHT MODE OVERRIDES
-══════════════════════════════════════ */
-.ems-dash.main.ems-light {
-  background: #f4efe6 !important;
-  color: #1a1208 !important;
+.shot-logo-mark::before,
+.shot-logo-mark::after {
+  content: '';
+  position: absolute;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 8px solid var(--dash-yellow);
+  top: 5px;
+  width: 0;
+  height: 0;
 }
-.ems-dash.ems-light::before {
-  background-image:
-    linear-gradient(rgba(247,147,26,.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(247,147,26,.06) 1px, transparent 1px);
+
+.shot-logo-mark::before {
+  left: 7px;
 }
-.ems-dash.ems-light::after {
-  background: radial-gradient(ellipse at center, rgba(247,147,26,.09) 0%, transparent 70%);
+
+.shot-logo-mark::after {
+  left: 14px;
 }
-/* nav */
-.ems-dash.ems-light .ems-nav {
-  background: rgba(255,250,242,.97);
-  border-bottom-color: rgba(247,147,26,.25);
+
+.shot-top-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  grid-column: 2;
+  justify-self: center;
+  direction: rtl;
 }
-.ems-dash.ems-light .ems-nav-brand { color: #1a1208; }
-.ems-dash.ems-light .ems-nav-clock { color: rgba(26,18,8,.45); }
-.ems-dash.ems-light .ems-nav-badge {
-  background: rgba(247,147,26,.08);
-  border-color: rgba(247,147,26,.2);
-  color: #5a3a0a;
-}
-.ems-dash.ems-light .ems-nav-avatar {
-  background: linear-gradient(135deg,rgba(247,147,26,.25),rgba(247,147,26,.1));
-  border-color: rgba(247,147,26,.3);
-}
-/* hero */
-.ems-dash.ems-light .ems-hero {
-  background: linear-gradient(135deg,rgba(247,147,26,.08) 0%,rgba(255,250,242,.5) 60%);
-  border-bottom-color: rgba(247,147,26,.18);
-}
-.ems-dash.ems-light .ems-hero-welcome { color: #1a1208; }
-.ems-dash.ems-light .ems-hero-sub { color: rgba(26,18,8,.65); }
-.ems-dash.ems-light .ems-hero-chip {
-  background: rgba(255,255,255,.75);
-  border-color: rgba(247,147,26,.2);
-  color: rgba(26,18,8,.55);
-}
-/* kpi cards */
-.ems-dash.ems-light .ems-kpi-card {
-  background: rgba(255,255,255,.85);
-  border-color: rgba(247,147,26,.18);
-  box-shadow: 0 2px 12px rgba(0,0,0,.07);
-}
-.ems-dash.ems-light .ems-kpi-card:hover {
+
+.shot-nav-pill {
+  height: 30px;
+  min-width: 108px;
+  padding: 0 16px;
+  border: 1px solid #cfcfcf;
   background: #ffffff;
-  box-shadow: 0 6px 24px rgba(0,0,0,.12);
+  color: #121212;
+  clip-path: polygon(8% 0, 92% 0, 100% 50%, 92% 100%, 8% 100%, 0 50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
-.ems-dash.ems-light .ems-kpi-label { color: rgba(26,18,8,.45); }
-.ems-dash.ems-light .ems-kpi-val { color: #1a1208; }
-/* section */
-.ems-dash.ems-light .ems-section-title { color: #1a1208; }
-.ems-dash.ems-light .ems-section-count {
-  background: rgba(255,255,255,.75);
-  border-color: rgba(247,147,26,.18);
-  color: rgba(26,18,8,.45);
-}
-/* stat cards */
-.ems-dash.ems-light .ems-stat {
-  background: rgba(255,255,255,.85);
-  border-color: rgba(247,147,26,.15);
-  box-shadow: 0 2px 10px rgba(0,0,0,.06);
-}
-.ems-dash.ems-light .ems-stat:hover {
-  background: #ffffff;
-  box-shadow: 0 6px 20px rgba(0,0,0,.1);
-}
-.ems-dash.ems-light .ems-stat-label { color: rgba(26,18,8,.45); }
-.ems-dash.ems-light .ems-stat-val { color: #1a1208; }
-/* links */
-.ems-dash.ems-light .ems-link-card {
-  background: rgba(255,255,255,.85);
-  border-color: rgba(247,147,26,.15);
-  color: #1a1208;
-  box-shadow: 0 2px 8px rgba(0,0,0,.05);
-}
-.ems-dash.ems-light .ems-link-card:hover {
-  background: #ffffff;
-  border-color: rgba(247,147,26,.35);
-  color: #1a1208;
-  box-shadow: 0 6px 20px rgba(0,0,0,.1);
-}
-.ems-dash.ems-light .ems-link-text { color: #2d1f0a; }
-.ems-dash.ems-light .ems-link-arrow { color: rgba(26,18,8,.3); }
-.ems-dash.ems-light .ems-link-card:hover .ems-link-arrow { color: #f7931a; }
-/* charts */
-.ems-dash.ems-light .ems-chart-card {
-  background: rgba(255,255,255,.9);
-  border-color: rgba(247,147,26,.15);
-  box-shadow: 0 2px 12px rgba(0,0,0,.06);
-}
-.ems-dash.ems-light .ems-chart-title { color: #1a1208; }
-.ems-dash.ems-light .ems-chart-sub { color: rgba(26,18,8,.4); }
-.ems-dash.ems-light .ems-legend-label { color: rgba(26,18,8,.65); }
-.ems-dash.ems-light .ems-legend-val { color: #1a1208; }
-/* table */
-.ems-dash.ems-light .ems-table-wrap { border-color: rgba(247,147,26,.18); }
-.ems-dash.ems-light .ems-table th {
-  background: rgba(247,147,26,.1);
-  border-bottom-color: rgba(247,147,26,.25);
-}
-.ems-dash.ems-light .ems-table td {
-  color: rgba(26,18,8,.7);
-  border-bottom-color: rgba(247,147,26,.1);
-}
-.ems-dash.ems-light .ems-table tbody tr:hover td { background: rgba(247,147,26,.04); }
-/* session */
-.ems-dash.ems-light .ems-session { border-top-color: rgba(247,147,26,.2); }
-.ems-dash.ems-light .ems-chip2 {
-  background: rgba(255,255,255,.75);
-  border-color: rgba(247,147,26,.18);
-  color: rgba(26,18,8,.5);
-}
-.ems-dash.ems-light .ems-chip2 strong { color: rgba(26,18,8,.75); }
 
-/* ── Toggle Button ── */
-.ems-theme-toggle {
-  width: 38px;
-  height: 38px;
+.shot-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  grid-column: 3;
+  justify-self: end;
+  direction: rtl;
+}
+
+.shot-user-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.shot-icon-pill {
+  width: 40px;
+  aspect-ratio: 1.1547 / 1;
+  clip-path: var(--hex-regular);
   border: none;
-  border-radius: 10px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
-  color: rgba(240,236,228,.7);
-  font-size: .95rem;
-  cursor: pointer;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all .2s;
+  font-size: .99rem;
+  color: #2b2b2b;
   flex-shrink: 0;
   position: relative;
-  overflow: hidden;
 }
-.ems-theme-toggle:hover {
-  background: rgba(247,147,26,.15);
-  border-color: rgba(247,147,26,.35);
-  color: #f7931a;
-  transform: scale(1.08);
-}
-.ems-theme-toggle .ico-dark,
-.ems-theme-toggle .ico-light { transition: all .25s; }
-.ems-theme-toggle .ico-light { display: none; }
 
-/* light mode button adjustments */
-.ems-dash.ems-light .ems-theme-toggle {
-  background: rgba(247,147,26,.1);
-  border-color: rgba(247,147,26,.25);
-  color: #b45309;
+.shot-icon-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: var(--hex-regular);
+  border: 1.4px solid #2f2f2f;
+  pointer-events: none;
 }
-.ems-dash.ems-light .ems-theme-toggle:hover {
-  background: rgba(247,147,26,.2);
-  color: #f7931a;
+
+.shot-icon-pill i {
+  line-height: 1;
+  position: relative;
+  z-index: 1;
 }
-.ems-dash.ems-light .ems-theme-toggle .ico-dark { display: none; }
-.ems-dash.ems-light .ems-theme-toggle .ico-light { display: inline; }
+
+.shot-body {
+  padding: 88px 18px 14px;
+  background: #ffffff;
+  margin-right: 68px;
+}
+
+body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
+  margin-right: 286px;
+}
+
+.shot-breadcrumb {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  min-width: 205px;
+  width: max-content;
+  text-align: center;
+  background: #d7d7d7;
+  border: 1px solid #bdbdbd;
+  border-top: none;
+  clip-path: polygon(0 0, 100% 0, 100% 44%, 95% 100%, 5% 100%, 0 44%);
+  padding: 5px 34px;
+  font-weight: 700;
+  font-size: .78rem;
+  line-height: 1;
+  z-index: 115;
+  pointer-events: none;
+}
+
+.shot-section-title {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.shot-hex-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.shot-hex-link {
+  min-height: 110px;
+  border: none;
+  color: #111;
+  text-decoration: none;
+  background: #e3e3e3;
+  clip-path: var(--hex-wide);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  font-size: 1.55rem;
+  font-weight: 700;
+  transition: transform .2s ease, box-shadow .2s ease;
+  direction: rtl;
+  position: relative;
+}
+
+.shot-hex-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: var(--hex-wide);
+  border: 1.6px solid #666666;
+  pointer-events: none;
+}
+
+.shot-hex-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, .1);
+  background: var(--dash-yellow);
+  color: #111;
+}
+
+.shot-hex-link:hover::before {
+  border-color: #5f5f5f;
+}
+
+.shot-hex-link > span {
+  position: relative;
+  z-index: 1;
+}
+
+.shot-hex-title {
+  display: inline-block;
+}
+
+.shot-hex-icon {
+  width: 64px;
+  aspect-ratio: 1.1547 / 1;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.45rem;
+  position: relative;
+}
+
+.shot-hex-icon svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.shot-hex-icon polygon {
+  fill: #ffffff;
+  stroke: #6b6b6b;
+  stroke-width: 1.8;
+}
+
+.shot-hex-icon i {
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.shot-session {
+  margin-top: 12px;
+  border-top: 1px solid #b9b9b9;
+  border-bottom: 1px solid #b9b9b9;
+  padding: 10px 0;
+}
+
+.shot-session-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.shot-session-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.shot-session-chip {
+  background: #ededed;
+  border: 1px solid #c7c7c7;
+  border-radius: 10px;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  direction: rtl;
+  gap: 10px;
+  padding: 0 10px;
+  font-size: 1.35rem;
+  color: #1c1c1c;
+  transition: background .2s ease, border-color .2s ease;
+}
+
+.shot-session-chip:hover {
+  background: var(--dash-yellow);
+  border-color: #9d7e00;
+}
+
+.shot-session-chip strong {
+  font-weight: 700;
+  flex: 1;
+  text-align: center;
+}
+
+.shot-session-chip .chip-icon {
+  width: 52px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.shot-session-chip .chip-icon svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.shot-session-chip .chip-icon polygon {
+  fill: #ffffff;
+  stroke: #6f6f6f;
+  stroke-width: 1.4;
+}
+
+.shot-session-chip .chip-icon i {
+  font-size: .85rem;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.shot-session-chip:hover .chip-icon {
+  border-color: #333;
+}
+
+.shot-stat-panel {
+  margin-top: 14px;
+   background: var(--dash-yellow);
+  border-color: #9d7e00;
+  border-radius: 20px 20px 0 0;
+  padding: 24px 24px 18px;
+  transition: background .2s ease, border-color .2s ease;
+}
+
+.shot-stat-panel-secondary {
+  margin-top: 12px;
+  background: #f3f3f3;
+  border: 1px solid #d7d7d7;
+  border-radius: 14px;
+  padding: 16px 18px 14px;
+}
+
+.shot-stat-panel-secondary .shot-stat-grid {
+  gap: 12px;
+}
+
+.shot-stat-panel-secondary .shot-stat-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.shot-stat-panel-secondary .shot-stat-value {
+  font-size: 3.1rem;
+}
+
+.shot-charts {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.shot-chart-card {
+  background: #f8f8f8;
+  border: 1px solid #d8d8d8;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.shot-chart-card.wide {
+  grid-column: 1 / -1;
+}
+
+.shot-chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.shot-chart-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f1f1f;
+}
+
+.shot-chart-note {
+  font-size: .78rem;
+  color: #666;
+}
+
+.shot-chart-wrap {
+  position: relative;
+  height: 220px;
+}
+
+.shot-chart-wrap.tall {
+  height: 265px;
+}
+
+
+.shot-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.shot-stat-card {
+  text-align: center;
+}
+
+.shot-stat-label {
+  font-size: 2.1rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.shot-stat-value {
+  font-size: 5.7rem;
+  line-height: 1;
+  font-weight: 100;
+}
+
+.shot-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  background: #cf2626;
+  color: #fff;
+  border: 1px solid #a91f1f;
+  clip-path: var(--hex-wide);
+  padding: 6px 18px 6px 22px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  float: left;
+  clear: both;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.shot-logout i {
+  font-size: .95rem;
+}
+
+.shot-logout:hover {
+  color: #fff;
+}
+
+@media (max-width: 1280px) {
+  .shot-hex-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shot-session-row,
+  .shot-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .ems-dash.main {
+    margin-right: 0;
+  }
+
+  body.ems-site .mobile-menu-btn {
+    display: inline-flex;
+  }
+
+  body.ems-site .sidebar {
+    top: 50px;
+    width: 280px;
+    height: calc(100vh - 50px);
+    right: auto;
+    left: 0;
+    background: #fff;
+    transform: translateX(-110%);
+    transition: transform .3s ease;
+  }
+
+  body.ems-site .sidebar.active {
+    transform: translateX(0);
+  }
+
+  body.ems-site .sidebar ul li span,
+  body.ems-site .sidebar .logout span,
+  body.ems-site .sidebar .logo {
+    display: initial;
+  }
+
+  body.ems-site .sidebar .toggle-btn,
+  body.ems-site .sidebar .logo,
+  body.ems-site .sidebar .logout span,
+  body.ems-site .sidebar ul li span {
+    display: initial;
+  }
+
+  .shot-topbar {
+    grid-template-columns: auto 1fr auto;
+    padding: 0 10px;
+    gap: 8px;
+  }
+
+  .shot-top-center {
+    justify-self: center;
+    gap: 6px;
+  }
+
+  .shot-nav-pill {
+    min-width: 86px;
+    font-size: .85rem;
+    height: 27px;
+    padding: 0 12px;
+  }
+
+  .shot-body {
+    padding-top: 82px;
+    margin-right: 0;
+  }
+
+  .shot-breadcrumb {
+    min-width: 168px;
+    padding: 4px 24px;
+    font-size: .72rem;
+  }
+
+  .shot-hex-grid,
+  .shot-session-row,
+  .shot-stat-grid,
+  .shot-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .shot-stat-value {
+    font-size: 4.2rem;
+  }
+}
 </style>
 
 <div class="ems-dash main">
 
-  <!-- ══════════════ TOPBAR ══════════════ -->
-  <nav class="ems-nav">
-    <a href="#" class="ems-nav-logo">
-      <div class="ems-nav-hex"><i class="fas fa-layer-group"></i></div>
-      <div class="ems-nav-brand">EQUIP<span>ATION</span></div>
-    </a>
+  <nav class="shot-topbar">
+    <div class="shot-logo">
+      <span class="shot-logo-mark"></span>
+      <span>EQUIPATION</span>
+    </div>
 
-    <div class="ems-nav-spacer"></div>
+    <div class="shot-top-center">
+      <span class="shot-nav-pill"><?= htmlspecialchars($roleText) ?></span>
+      <span class="shot-nav-pill"><?= htmlspecialchars($userName) ?></span>
+    </div>
 
-    <span class="ems-nav-badge"><i class="fas fa-id-badge"></i> <?= htmlspecialchars($roleText) ?></span>
-    <?php if ($companyName): ?>
-      <span class="ems-nav-badge"><i class="fas fa-building"></i> <?= htmlspecialchars($companyName) ?></span>
-    <?php endif; ?>
-    <?php if ($projectName): ?>
-      <span class="ems-nav-badge"><i class="fas fa-project-diagram"></i> <?= htmlspecialchars($projectName) ?></span>
-    <?php endif; ?>
-
-    <span class="ems-nav-clock" id="emsClock">--:--:--</span>
-
-    <button class="ems-theme-toggle" id="emsThemeToggle" title="تبديل بين الوضع الفاتح والداكن">
-      <i class="fas fa-moon ico-dark"></i>
-      <i class="fas fa-sun ico-light"></i>
-    </button>
-
-    <div class="ems-nav-avatar"><i class="fas fa-user"></i></div>
-
-    <a href="../logout.php" class="ems-nav-logout">
-      <i class="fas fa-power-off"></i> خروج
-    </a>
+    <div class="shot-user">
+      <div class="shot-user-icons">
+        <span class="shot-icon-pill"><i class="far fa-user"></i></span>
+        <span class="shot-icon-pill"><i class="fas fa-gear"></i></span>
+      </div>
+      <span></span>
+    </div>
   </nav>
 
-  <!-- ══════════════ HERO ══════════════ -->
-  <section class="ems-hero">
+  <div class="shot-body">
+    <div class="shot-breadcrumb" id="emsClock"><?= date('Y F d, l') ?></div>
 
-    <!-- Left: Welcome -->
-    <div class="ems-hero-left">
-      <div class="ems-hero-tag">
-        <i class="fas fa-home"></i> لوحة التحكم
-      </div>
-      <h1 class="ems-hero-welcome">
-        مرحباً، <em><?= htmlspecialchars($userName) ?></em>
-      </h1>
-      <div class="ems-hero-sub">
-        <?= htmlspecialchars($roleText) ?> &mdash; <?= date('l، j F Y') ?>
-      </div>
-      <div class="ems-hero-meta">
-        <?php if ($companyName): ?>
-          <span class="ems-hero-chip"><i class="fas fa-building"></i> <?= htmlspecialchars($companyName) ?></span>
-        <?php endif; ?>
-        <?php if ($projectName): ?>
-          <span class="ems-hero-chip"><i class="fas fa-project-diagram"></i> <?= htmlspecialchars($projectName) ?></span>
-        <?php endif; ?>
-        <span class="ems-hero-chip"><i class="fas fa-calendar-alt"></i> <?= date('m/Y') ?></span>
-        <span class="ems-hero-chip"><i class="fas fa-circle" style="color:#22c55e;font-size:.5em"></i> متصل</span>
+    <h2 class="shot-section-title">الوصول السريع</h2>
+
+    <?php
+    $quickTiles = array_slice($links, 0, 8);
+    if (empty($quickTiles)) {
+      $quickTiles = [
+        ['../main/dashboard.php', 'لوحة التحكم', 'fa-solid fa-house'],
+      ];
+    }
+    ?>
+
+    <div class="shot-hex-grid">
+      <?php foreach ($quickTiles as $i => $lk): ?>
+      <a href="<?= htmlspecialchars($lk[0]) ?>" class="shot-hex-link">
+        <span class="shot-hex-icon"><svg viewBox="0 0 100 86" aria-hidden="true" focusable="false"><polygon points="25,1 75,1 99,43 75,85 25,85 1,43"></polygon></svg><i class="<?= htmlspecialchars($lk[2]) ?>"></i></span>
+        <span class="shot-hex-title"><?= htmlspecialchars($lk[1]) ?></span>
+      </a>
+      <?php endforeach; ?>
+    </div>
+
+    <div class="shot-session">
+      <div class="shot-session-title">بيانات الجلسة</div>
+      <div class="shot-session-row">
+        <div class="shot-session-chip">
+          <span class="chip-icon"><svg viewBox="0 0 100 58" aria-hidden="true" focusable="false"><polygon points="14,1 86,1 99,29 86,57 14,57 1,29"></polygon></svg><i class="far fa-calendar"></i></span>
+          <strong><?= date('Y M d') ?></strong>
+        </div>
+        <div class="shot-session-chip">
+          <span class="chip-icon"><svg viewBox="0 0 100 58" aria-hidden="true" focusable="false"><polygon points="14,1 86,1 99,29 86,57 14,57 1,29"></polygon></svg><i class="fas fa-building"></i></span>
+          <strong><?= $companyName ? htmlspecialchars($companyName) : 'اكويشن' ?></strong>
+        </div>
+        <div class="shot-session-chip">
+          <span class="chip-icon"><svg viewBox="0 0 100 58" aria-hidden="true" focusable="false"><polygon points="14,1 86,1 99,29 86,57 14,57 1,29"></polygon></svg><i class="fas fa-gear"></i></span>
+          <strong><?= $projectName ? htmlspecialchars($projectName) : 'ادارة التشغيل' ?></strong>
+        </div>
+        <div class="shot-session-chip">
+          <span class="chip-icon"><svg viewBox="0 0 100 58" aria-hidden="true" focusable="false"><polygon points="14,1 86,1 99,29 86,57 14,57 1,29"></polygon></svg><i class="far fa-user"></i></span>
+          <strong><?= htmlspecialchars($userName) ?></strong>
+        </div>
       </div>
     </div>
 
-    <!-- Right: KPI Cards -->
-    <div>
-      <div class="ems-kpi-grid">
-        <?php
-        $kpiColors = [
-          'ok'   => ['#22c55e', '34,197,94'],
-          'or'   => ['#f7931a', '247,147,26'],
-          'warn' => ['#f59e0b', '245,158,11'],
-          'err'  => ['#ef4444', '239,68,68'],
-        ];
-        foreach ($analyticsSummaryCards as $kpi):
-          $acc = $kpiColors[$kpi['accent']] ?? $kpiColors['or'];
-        ?>
-        <div class="ems-kpi-card" id="<?= $kpi['id'] ?>"
-             style="--kpiAccent:<?= $acc[0] ?>;--kpiRgb:<?= $acc[1] ?>">
-          <div class="ems-kpi-head">
-            <span class="ems-kpi-label"><?= $kpi['label'] ?></span>
-            <span class="ems-kpi-ico"><i class="fas <?= $kpi['icon'] ?>"></i></span>
-          </div>
-          <div class="ems-kpi-val" data-count="<?= $kpi['value'] ?>">0</div>
+    <?php
+    $displayStats = !empty($stats) ? $stats : [
+      ['fa-users', 0, 'العمـــــلاء', 'or'],
+      ['fa-project-diagram', 0, 'المشــــاريع', 'or'],
+      ['fa-file-contract', 0, 'العقود', 'or'],
+      ['fa-user-shield', 0, 'المستخدمون', 'or'],
+    ];
+    ?>
+    <div class="shot-stat-panel">
+      <div class="shot-stat-grid">
+        <?php foreach ($displayStats as $st): ?>
+        <div class="shot-stat-card">
+          <div class="shot-stat-label"><?= htmlspecialchars($st[2]) ?></div>
+          <div class="shot-stat-value" data-count="<?= intval($st[1]) ?>">0</div>
         </div>
         <?php endforeach; ?>
       </div>
+
+      <a href="../logout.php" class="shot-logout">
+        خروج <i class="fas fa-power-off"></i>
+      </a>
     </div>
 
-  </section>
-
-  <!-- ══════════════ BODY ══════════════ -->
-  <div class="ems-body">
-
-    <!-- ── Stats Section ── -->
-    <?php if (!empty($stats)): ?>
-    <div>
-      <div class="ems-section-head">
-        <div class="ems-section-line"></div>
-        <span class="ems-section-title">نظرة عامة</span>
-        <span class="ems-section-count"><?= count($stats) ?> مؤشر</span>
-      </div>
-      <div class="ems-stats">
-        <?php
-        $accColors = [
-          'or'   => ['#f7931a', '247,147,26'],
-          'ok'   => ['#22c55e', '34,197,94'],
-          'warn' => ['#f59e0b', '245,158,11'],
-          'err'  => ['#ef4444', '239,68,68'],
-        ];
-        foreach ($stats as $st):
-          $ac = $accColors[$st[3]] ?? $accColors['or'];
-        ?>
-        <div class="ems-stat" style="--sAccent:<?= $ac[0] ?>;--sRgb:<?= $ac[1] ?>">
-          <div class="ems-stat-top">
-            <span class="ems-stat-ico"><i class="fas <?= $st[0] ?>"></i></span>
-            <span class="ems-stat-label"><?= $st[2] ?></span>
-          </div>
-          <div class="ems-stat-val" data-count="<?= intval($st[1]) ?>">0</div>
+    <?php if (!empty($analyticsSummaryCards)): ?>
+    <div class="shot-stat-panel shot-stat-panel-secondary">
+      <div class="shot-session-title">إحصائيات الأداء</div>
+      <div class="shot-stat-grid">
+        <?php foreach ($analyticsSummaryCards as $kpi): ?>
+        <div class="shot-stat-card">
+          <div class="shot-stat-label"><?= htmlspecialchars($kpi['label']) ?></div>
+          <div class="shot-stat-value" data-count="<?= floatval($kpi['value']) ?>">0</div>
         </div>
         <?php endforeach; ?>
       </div>
     </div>
     <?php endif; ?>
 
-    <!-- ── Quick Links ── -->
-    <?php if (!empty($links)): ?>
-    <div>
-      <div class="ems-section-head">
-        <div class="ems-section-line"></div>
-        <span class="ems-section-title">الوصول السريع</span>
-        <span class="ems-section-count"><?= count($links) ?> رابط</span>
-      </div>
-      <div class="ems-links">
-        <?php foreach ($links as $lk): ?>
-        <a href="<?= htmlspecialchars($lk[0]) ?>" class="ems-link-card">
-          <span class="ems-link-ico"><i class="<?= htmlspecialchars($lk[2]) ?>"></i></span>
-          <span class="ems-link-text"><?= htmlspecialchars($lk[1]) ?></span>
-          <i class="fas fa-chevron-left ems-link-arrow"></i>
-        </a>
-        <?php endforeach; ?>
-      </div>
-    </div>
-    <?php endif; ?>
-
-    <!-- ── Analytics Charts ── -->
-    <div>
-      <div class="ems-section-head">
-        <div class="ems-section-line"></div>
-        <span class="ems-section-title">التحليلات والأداء</span>
-        <span class="ems-section-count"><?= $analyticsPayload['monthName'] ?></span>
-      </div>
-      <div class="ems-charts">
-
-        <!-- Equipment Status Donut -->
-        <div class="ems-chart-card">
-          <div class="ems-chart-head">
-            <div class="ems-chart-dot"></div>
-            <span class="ems-chart-title">حالة المعدات</span>
-            <span class="ems-chart-sub">إجمالي <?= $analyticsTotalEquip ?></span>
-          </div>
-          <div class="ems-chart-donut-wrap">
-            <canvas class="ems-donut-canvas" id="chartEquipStatus"></canvas>
-            <div class="ems-donut-legend">
-              <div class="ems-legend-row">
-                <div class="ems-legend-dot" style="background:#22c55e"></div>
-                <span class="ems-legend-label">نشطة</span>
-                <span class="ems-legend-val"><?= $analyticsActiveEquip ?></span>
-              </div>
-              <div class="ems-legend-row">
-                <div class="ems-legend-dot" style="background:#ef4444"></div>
-                <span class="ems-legend-label">متوقفة</span>
-                <span class="ems-legend-val"><?= $analyticsInactiveEquip ?></span>
-              </div>
-            </div>
-          </div>
+    <div class="shot-charts">
+      <div class="shot-chart-card">
+        <div class="shot-chart-head">
+          <span class="shot-chart-title">حالة المعدات</span>
+          <span class="shot-chart-note">إجمالي <?= intval($analyticsTotalEquip) ?></span>
         </div>
-
-        <!-- Hours Bar Chart -->
-        <div class="ems-chart-card">
-          <div class="ems-chart-head">
-            <div class="ems-chart-dot" style="background:#3b82f6"></div>
-            <span class="ems-chart-title">ساعات الشهر الحالي</span>
-            <span class="ems-chart-sub"><?= $analyticsPayload['monthName'] ?></span>
-          </div>
-          <div class="ems-chart-wrap">
-            <canvas id="chartHoursBar"></canvas>
-          </div>
+        <div class="shot-chart-wrap">
+          <canvas id="chartEquipStatus"></canvas>
         </div>
+      </div>
 
-        <!-- Daily Trend — full width -->
-        <div class="ems-chart-card wide">
-          <div class="ems-chart-head">
-            <div class="ems-chart-dot" style="background:#f7931a"></div>
-            <span class="ems-chart-title">مسار الأداء اليومي — <?= $analyticsPayload['monthName'] ?></span>
-          </div>
-          <div class="ems-chart-wrap tall">
-            <canvas id="chartTrend"></canvas>
-          </div>
+      <div class="shot-chart-card">
+        <div class="shot-chart-head">
+          <span class="shot-chart-title">ساعات الشهر الحالي</span>
+          <span class="shot-chart-note"><?= htmlspecialchars($analyticsPayload['monthName']) ?></span>
         </div>
+        <div class="shot-chart-wrap">
+          <canvas id="chartHoursBar"></canvas>
+        </div>
+      </div>
 
+      <div class="shot-chart-card wide">
+        <div class="shot-chart-head">
+          <span class="shot-chart-title">مسار الأداء اليومي</span>
+          <span class="shot-chart-note"><?= htmlspecialchars($analyticsPayload['monthName']) ?></span>
+        </div>
+        <div class="shot-chart-wrap tall">
+          <canvas id="chartTrend"></canvas>
+        </div>
       </div>
     </div>
-
-    <!-- ── Supplier Breakdown (role 6) ── -->
-    <?php if (!empty($role6SupplierBreakdown)): ?>
-    <div>
-      <div class="ems-section-head">
-        <div class="ems-section-line"></div>
-        <span class="ems-section-title">توزيع الموردين</span>
-        <span class="ems-section-count"><?= count($role6SupplierBreakdown) ?> مورد</span>
-      </div>
-      <div class="ems-table-wrap">
-        <table class="ems-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>المورد</th>
-              <th>عدد الآليات</th>
-              <th>الحصة</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            $maxEq = max(array_column($role6SupplierBreakdown, 'equipments_count'));
-            foreach ($role6SupplierBreakdown as $i => $sup):
-              $pct = $maxEq > 0 ? round($sup['equipments_count'] / $maxEq * 100) : 0;
-            ?>
-            <tr>
-              <td><?= $i + 1 ?></td>
-              <td><?= htmlspecialchars($sup['supplier_name']) ?></td>
-              <td><strong style="color:var(--gold)"><?= $sup['equipments_count'] ?></strong></td>
-              <td>
-                <div class="ems-eq-bar">
-                  <div class="ems-eq-track">
-                    <div class="ems-eq-fill" style="width:<?= $pct ?>%"></div>
-                  </div>
-                  <span style="font-size:.74rem;color:var(--t3);min-width:32px"><?= $pct ?>%</span>
-                </div>
-              </td>
-            </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <?php endif; ?>
-
-    <!-- ── Session Strip ── -->
-    <div class="ems-session">
-      <span class="ems-chip2"><i class="fas fa-user-circle"></i> <strong><?= htmlspecialchars($userName) ?></strong></span>
-      <span class="ems-chip2"><i class="fas fa-shield-alt"></i> <?= htmlspecialchars($roleText) ?></span>
-      <?php if ($companyName): ?>
-        <span class="ems-chip2"><i class="fas fa-building"></i> <?= htmlspecialchars($companyName) ?></span>
-      <?php endif; ?>
-      <?php if ($projectName): ?>
-        <span class="ems-chip2"><i class="fas fa-project-diagram"></i> <?= htmlspecialchars($projectName) ?></span>
-      <?php endif; ?>
-      <span class="ems-chip2"><i class="fas fa-calendar"></i> <?= date('Y/m/d') ?></span>
-    </div>
-
-  </div><!-- /.ems-body -->
+  </div>
 
 </div><!-- /.ems-dash -->
 
@@ -1202,12 +1321,12 @@ body.ems-site {
   document.querySelectorAll('[data-count]').forEach(countUp);
 
   /* ── Chart defaults ── */
-  Chart.defaults.color = 'rgba(240,236,228,.55)';
+  Chart.defaults.color = 'rgba(25,25,25,.75)';
   Chart.defaults.font.family = "'Tajawal','Cairo',sans-serif";
   Chart.defaults.plugins.legend.display = false;
 
-  const gridColor = 'rgba(255,255,255,.05)';
-  const tickColor = 'rgba(240,236,228,.40)';
+  const gridColor = 'rgba(0,0,0,.08)';
+  const tickColor = 'rgba(25,25,25,.70)';
 
   /* ── Equipment Donut ── */
   const eqCtx = document.getElementById('chartEquipStatus');
@@ -1315,38 +1434,12 @@ body.ems-site {
     var el = document.getElementById('emsClock');
     if (!el) return;
     var now = new Date();
-    el.textContent = now.toLocaleTimeString('ar-SA', {
-      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    el.textContent = now.toLocaleDateString('en-GB', {
+      year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
     });
   }
   updateClock();
-  setInterval(updateClock, 1000);
-
-  /* ── Theme Toggle ── */
-  var THEME_KEY = 'ems_dash_theme';
-  var dash = document.querySelector('.ems-dash');
-  var toggleBtn = document.getElementById('emsThemeToggle');
-
-  function applyTheme(theme) {
-    if (theme === 'light') {
-      dash.classList.add('ems-light');
-    } else {
-      dash.classList.remove('ems-light');
-    }
-  }
-
-  /* restore saved preference */
-  var savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
-  applyTheme(savedTheme);
-
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', function () {
-      var isLight = dash.classList.contains('ems-light');
-      var newTheme = isLight ? 'dark' : 'light';
-      applyTheme(newTheme);
-      localStorage.setItem(THEME_KEY, newTheme);
-    });
-  }
+  setInterval(updateClock, 60000);
 
 })();
 </script>
