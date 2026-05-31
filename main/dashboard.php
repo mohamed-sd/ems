@@ -975,10 +975,8 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   position: absolute;
   inset: 0;
   background: var(--dash-yellow);
-  border: 1px solid #9d7e00;
-  border-radius: 32px 32px 0 0;
-  -webkit-clip-path: polygon(34px 0, calc(100% - 34px) 0, calc(100% - 16px) 12px, calc(100% - 6px) 28px, 100% 50px, 100% 100%, 0 100%, 0 50px, 6px 28px, 16px 12px);
-  clip-path: polygon(50% 0%, 90% 0, 100% 40%, 100% 100%, 0 100%, 0 40%, 10% 0);
+  -webkit-clip-path: polygon(3.5% 0, 96.5% 0, 100% 24%, 100% 100%, 0 100%, 0 24%);
+  clip-path: polygon(3.5% 0, 96.5% 0, 100% 24%, 100% 100%, 0 100%, 0 24%);
   z-index: 0;
   pointer-events: none;
 }
@@ -1389,6 +1387,8 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
         }]
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
         cutout: '72%',
         plugins: {
           tooltip: {
@@ -1415,6 +1415,8 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
         }]
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
         indexAxis: 'y',
         plugins: {
           tooltip: { callbacks: { label: function(c) { return ' ' + c.raw + ' ساعة'; } } }
@@ -1460,6 +1462,8 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
         ]
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: {
             display: true,

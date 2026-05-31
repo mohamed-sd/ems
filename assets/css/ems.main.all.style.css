@@ -1345,16 +1345,16 @@ table.dataTable tbody tr:last-child td {
 .ems-site .sidebar {
   width: var(--sidebar-width-expanded);
   flex: 0 0 var(--sidebar-width-expanded);
-  background: linear-gradient(180deg, #120d07 0%, #1a1208 45%, #24180d 100%);
-  color: #f8f5ef;
+  background: #ffffff;
+  color: #1f1f1f;
   transition: width 0.35s ease, flex-basis 0.35s ease;
   overflow: clip;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border-left: 1px solid rgba(247, 147, 26, 0.14);
-  box-shadow: 0 12px 28px rgba(9, 6, 2, 0.32);
+  border-left: 1px solid #e2e2e2;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.05);
   isolation: isolate;
 }
 
@@ -1362,9 +1362,9 @@ table.dataTable tbody tr:last-child td {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(247, 147, 26, 0.08) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px);
   background-size: 20px 20px;
-  opacity: 0.45;
+  opacity: 0.5;
   pointer-events: none;
   z-index: 0;
 }
@@ -1372,15 +1372,14 @@ table.dataTable tbody tr:last-child td {
 .ems-site .sidebar .logo {
   position: relative;
   z-index: 1;
-  color: var(--or);
+  color: #1f1f1f;
   font-size: 1.2rem;
   font-weight: 800;
   text-align: center;
   padding: 16px 14px;
-  border-bottom: 1px solid rgba(247, 147, 26, 0.18);
-  background: linear-gradient(135deg, rgba(247, 147, 26, 0.15), rgba(247, 147, 26, 0.05));
+  border-bottom: 1px solid #ececec;
+  background: linear-gradient(135deg, rgba(246, 186, 2, 0.18), rgba(246, 186, 2, 0.04));
   letter-spacing: 0.3px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
 }
 
 .ems-site .sidebar.closed {
@@ -1398,15 +1397,15 @@ table.dataTable tbody tr:last-child td {
   padding: 11px 0;
   cursor: pointer;
   font-size: 1rem;
-  background: rgba(255, 255, 255, 0.04);
+  background: #f7f7f7;
   transition: background-color 0.2s ease, color 0.2s ease;
-  border-bottom: 1px solid rgba(247, 147, 26, 0.14);
-  color: var(--or);
+  border-bottom: 1px solid #ececec;
+  color: #555;
 }
 
 .ems-site .sidebar .toggle-btn:hover {
-  background: rgba(247, 147, 26, 0.14);
-  color: var(--or);
+  background: rgba(246, 186, 2, 0.16);
+  color: #1f1f1f;
 }
 
 .ems-site .sidebar h2 {
@@ -1416,7 +1415,7 @@ table.dataTable tbody tr:last-child td {
   padding: 11px 12px;
   font-size: 0.95rem;
   transition: opacity 0.2s ease, visibility 0.2s ease;
-  color: rgba(255, 242, 222, 0.95);
+  color: #1f1f1f;
   font-weight: 800;
   letter-spacing: 0.2px;
 }
@@ -1435,7 +1434,7 @@ table.dataTable tbody tr:last-child td {
   flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(247, 147, 26, 0.45) transparent;
+  scrollbar-color: rgba(246, 186, 2, 0.55) transparent;
 }
 
 .ems-site .sidebar ul::-webkit-scrollbar {
@@ -1447,12 +1446,12 @@ table.dataTable tbody tr:last-child td {
 }
 
 .ems-site .sidebar ul::-webkit-scrollbar-thumb {
-  background: rgba(247, 147, 26, 0.45);
+  background: rgba(246, 186, 2, 0.55);
   border-radius: 999px;
 }
 
 .ems-site .sidebar ul::-webkit-scrollbar-thumb:hover {
-  background: rgba(247, 147, 26, 0.7);
+  background: rgba(246, 186, 2, 0.8);
 }
 
 .ems-site .sidebar ul li,
@@ -1474,7 +1473,7 @@ table.dataTable tbody tr:last-child td {
   padding: 11px 12px;
   cursor: pointer;
   text-decoration: none;
-  color: rgba(255, 247, 236, 0.88);
+  color: #555;
   transition: background-color 0.2s ease, color 0.2s ease;
   font-weight: 700;
 }
@@ -1487,7 +1486,7 @@ table.dataTable tbody tr:last-child td {
   bottom: 8px;
   width: 3px;
   border-radius: 999px;
-  background: linear-gradient(180deg, var(--or), var(--or));
+  background: linear-gradient(180deg, #f6ba02, #f6ba02);
   opacity: 0;
   transform: scaleY(0.25);
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -1500,14 +1499,14 @@ table.dataTable tbody tr:last-child td {
 }
 
 .ems-site .sidebar ul li:hover a {
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
+  background: rgba(246, 186, 2, 0.12);
+  color: #1f1f1f;
 }
 
 .ems-site .sidebar ul li.active a,
 .ems-site .sidebar ul li.active:hover a {
-  background: linear-gradient(90deg, rgba(247, 147, 26, 0.24), rgba(255, 255, 255, 0.1));
-  color: #ffffff;
+  background: rgba(246, 186, 2, 0.22);
+  color: #1f1f1f;
 }
 
 .ems-site .sidebar ul li:active a {
@@ -1518,7 +1517,7 @@ table.dataTable tbody tr:last-child td {
   font-size: 1rem;
   width: 24px;
   text-align: center;
-  color: var(--or);
+  color: #6b7280;
   transition: color 0.2s ease, transform 0.2s ease;
   margin-left: 10px;
   flex-shrink: 0;
@@ -1526,7 +1525,7 @@ table.dataTable tbody tr:last-child td {
 
 .ems-site .sidebar ul li:hover i,
 .ems-site .sidebar ul li.active i {
-  color: var(--or);
+  color: #f6ba02;
   transform: translateY(-1px);
 }
 
@@ -1651,18 +1650,19 @@ table.dataTable tbody tr:last-child td {
   align-items: center;
   padding: 11px 12px;
   cursor: pointer;
-  background: rgba(220, 38, 38, 0.14);
+  background: #e53935;
   text-decoration: none;
-  color: #ffe1e1;
+  color: #ffffff;
   transition: background-color 0.2s ease, color 0.2s ease;
-  border-top: 1px solid rgba(247, 147, 26, 0.14);
+  border-top: none;
   margin: 8px 10px 12px;
   border-radius: 12px;
   font-weight: 700;
+  box-shadow: 0 4px 12px rgba(229, 57, 53, 0.28);
 }
 
 .ems-site .logout:hover {
-  background: rgba(220, 38, 38, 0.24);
+  background: #c62828;
   color: #ffffff;
 }
 
@@ -1838,7 +1838,7 @@ table.dataTable tbody tr:last-child td {
 .ems-site .sidebar a:focus-visible,
 .ems-site .sidebar .toggle-btn:focus-visible,
 .ems-site .mobile-menu-btn:focus-visible {
-  outline: 2px solid rgba(247, 147, 26, 0.7);
+  outline: 2px solid rgba(246, 186, 2, 0.8);
   outline-offset: 2px;
 }
 
