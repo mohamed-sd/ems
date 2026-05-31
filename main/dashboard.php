@@ -784,38 +784,44 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   border: none;
   color: #111;
   text-decoration: none;
-  background: #e3e3e3;
-  clip-path: var(--hex-wide);
+  background: transparent;
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: 12px;
-  padding: 14px 18px;
+  padding: 14px 44px;
   font-size: 1.55rem;
   font-weight: 700;
-  transition: transform .2s ease, box-shadow .2s ease;
+  transition: transform .2s ease, filter .2s ease;
   direction: rtl;
   position: relative;
 }
 
-.shot-hex-link::before {
-  content: '';
+.shot-hex-bg {
   position: absolute;
   inset: 0;
-  clip-path: var(--hex-wide);
-  border: 1.6px solid #666666;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
+  z-index: 0;
+}
+
+.shot-hex-bg path {
+  fill: #fff;
+  stroke: #666666;
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+  transition: fill .2s ease, stroke .2s ease;
 }
 
 .shot-hex-link:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, .1);
-  background: var(--dash-yellow);
-  color: #111;
 }
 
-.shot-hex-link:hover::before {
-  border-color: #5f5f5f;
+.shot-hex-link:hover .shot-hex-bg path,
+.shot-hex-link.active .shot-hex-bg path {
+  fill: var(--dash-yellow);
+  stroke: var(--dash-yellow-d, #dca400);
 }
 
 .shot-hex-link > span {
@@ -1195,6 +1201,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
     <div class="shot-hex-grid">
       <?php foreach ($quickTiles as $i => $lk): ?>
       <a href="<?= htmlspecialchars($lk[0]) ?>" class="shot-hex-link">
+        <svg class="shot-hex-bg" viewBox="0 0 461 236.09" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M377.75,30.27H82.25c-6.43,0-12.37,3.43-15.58,9L26.98,108c-3.21,5.57-3.21,12.43,0,17.99l39.68,68.74c3.21,5.57,9.15,9,15.58,9h295.5c6.43,0,12.37-3.43,15.58-9l39.68-68.74c3.21-5.57,3.21-12.43,0-17.99l-39.68-68.74c-3.21-5.57-9.15-9-15.58-9Z"></path></svg>
         <span class="shot-hex-icon"><svg viewBox="0 0 100 86" aria-hidden="true" focusable="false"><polygon points="25,1 75,1 99,43 75,85 25,85 1,43"></polygon></svg><i class="<?= htmlspecialchars($lk[2]) ?>"></i></span>
         <span class="shot-hex-title"><?= htmlspecialchars($lk[1]) ?></span>
       </a>
