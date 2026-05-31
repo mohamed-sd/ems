@@ -479,6 +479,16 @@ if ($drivers_res) {
     }
 }
 
+// تجميع السائقين حسب equipment_id للعرض المدمج داخل جداول التشغيل
+$drivers_by_equipment = [];
+foreach ($drivers_rows as $drv_item) {
+    $eid = intval($drv_item['equipment_id']);
+    if (!isset($drivers_by_equipment[$eid])) {
+        $drivers_by_equipment[$eid] = [];
+    }
+    $drivers_by_equipment[$eid][] = $drv_item;
+}
+
 // جلب جميع السائقين والمعدات (فقط المرتبطين بالمشروع المحدد)
 $driver_project_scope = "";
 if ($drivers_has_project_id) {
@@ -497,6 +507,15 @@ $all_drivers = [];
 if ($all_drivers_res) {
     while ($drv = mysqli_fetch_assoc($all_drivers_res)) {
         $all_drivers[] = $drv;
+    }
+}
+
+// السائقون الذين لديهم تعيين ساري حالياً — يُستثنون من قوائم الإضافة
+$active_driver_ids = [];
+$active_drv_res = mysqli_query($conn, "SELECT DISTINCT driver_id FROM equipment_drivers WHERE status = 1$ed_company_scope_inline");
+if ($active_drv_res) {
+    while ($adr = mysqli_fetch_assoc($active_drv_res)) {
+        $active_driver_ids[] = intval($adr['driver_id']);
     }
 }
 
@@ -815,13 +834,104 @@ include '../insidebar.php';
     .movement-unified-page .collapse-btn:hover {
         background: #083a63;
     }
+
+    /* صفوف السائقين المدمجة */
+    .movement-unified-page .drivers-sub-row > td {
+        background: #f4f8fd;
+        padding: 0;
+        border-bottom: 2px solid #c0d4ea;
+    }
+
+    .movement-unified-page .sub-drivers-wrap {
+        padding: 14px 18px;
+    }
+
+    .movement-unified-page .sub-drivers-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 14px;
+        font-size: 13px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .movement-unified-page .sub-drivers-table th {
+        background: #dce9f6;
+        color: #0b4c8c;
+        font-weight: 700;
+        padding: 8px 10px;
+        text-align: right;
+        border-bottom: 1px solid #b8ceea;
+        font-size: 12px;
+    }
+
+    .movement-unified-page .sub-drivers-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #e6edf5;
+        background: #fff;
+    }
+
+    .movement-unified-page .btn-drivers-toggle {
+        background: #0b4c8c;
+        color: #fff;
+        border: none;
+        padding: 5px 11px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: background 0.2s;
+        white-space: nowrap;
+    }
+
+    .movement-unified-page .btn-drivers-toggle:hover {
+        background: #083a63;
+    }
+
+    .movement-unified-page .btn-drivers-toggle .toggle-icon {
+        transition: transform 0.25s;
+        font-size: 10px;
+    }
+
+    .movement-unified-page .btn-drivers-toggle.open .toggle-icon {
+        transform: rotate(180deg);
+    }
+
+    .movement-unified-page .add-driver-inline {
+        background: #eef6ff;
+        border: 1px dashed #7aadd4;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-top: 6px;
+    }
+
+    .movement-unified-page .add-driver-inline > strong {
+        display: block;
+        color: #0b4c8c;
+        margin-bottom: 10px;
+        font-size: 13px;
+    }
+
+    .movement-unified-page .inline-form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: flex-end;
+    }
+
+    .movement-unified-page .inline-form-row .form-group {
+        flex: 1;
+        min-width: 140px;
+    }
 </style>
 
 <div class="main movement-page movement-unified-page">
     <div class="main_head">
         <div class="head_actions">
             <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn" title="الصفحة القديمة"><i class="fas fa-cogs"></i> الصفحة القديمة</a>
-            <a href="project_drivers.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn" title="السائقين القديمة"><i class="fas fa-id-badge"></i> السائقين</a>
             <a href="../main/dashboard.php" class="movement-topbar-btn"><i class="fas fa-home"></i> لوحة التحكم</a>
         </div>
         <h1 class="head-title">
@@ -841,76 +951,20 @@ include '../insidebar.php';
             </div>
         <?php endif; ?>
 
-        <!-- إضافة سائق جديد -->
-        <?php if ($can_add): ?>
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-plus-circle"></i> إضافة سائق جديد</h5>
-                </div>
-                <div class="card-body">
-                    <form id="addDriverForm" method="post">
-                        <input type="hidden" name="action" value="add_new_driver">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>السائق *</label>
-                                <select name="driver_id" id="add_driver_id" required>
-                                    <option value="">-- اختر السائق --</option>
-                                    <?php foreach ($all_drivers as $d): ?>
-                                        <option value="<?php echo intval($d['id']); ?>"><?php echo htmlspecialchars($d['name'] . ' - ' . $d['phone']); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>الآلية *</label>
-                                <select name="equipment_id" id="add_driver_equipment" required>
-                                    <option value="">-- اختر الآلية --</option>
-                                    <?php foreach ($all_equipment as $eq): ?>
-                                        <option value="<?php echo intval($eq['id']); ?>"><?php echo htmlspecialchars($eq['code'] . ' - ' . $eq['name']); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>الوردية</label>
-                                <select name="shift_type">
-                                    <option value="D">نهاري</option>
-                                    <option value="N">ليلي</option>
-                                    <option value="B" selected>نهاري + ليلي</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>بداية التعيين *</label>
-                                <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>نهاية التعيين</label>
-                                <input type="date" name="end_date">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-bulk-save"><i class="fas fa-plus"></i> إضافة السائق</button>
-                    </form>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <!-- جداول التشغيلات (نهار / ليل) -->
         <?php
-            $operations_tables = [
-                ['title' => 'إدارة تشغيلات النهار', 'rows' => $operations_rows_day, 'table_key' => 'day'],
-                ['title' => 'إدارة تشغيلات الليل', 'rows' => $operations_rows_night, 'table_key' => 'night'],
-            ];
+        $operations_tables = [
+            ['title' => 'إدارة تشغيلات النهار', 'rows' => $operations_rows_day,   'table_key' => 'day'],
+            ['title' => 'إدارة تشغيلات الليل',  'rows' => $operations_rows_night, 'table_key' => 'night'],
+        ];
+        foreach ($operations_tables as $operations_table):
         ?>
-        <?php foreach ($operations_tables as $operations_table): ?>
         <div class="card">
             <div class="card-header">
                 <h5><i class="fas fa-cogs"></i> <?php echo htmlspecialchars($operations_table['title'], ENT_QUOTES, 'UTF-8'); ?></h5>
             </div>
             <div class="card-body">
                 <div class="table-scroll">
-                    <table>
+                    <table class="no-datatable">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -920,84 +974,215 @@ include '../insidebar.php';
                                 <th>الوردية</th>
                                 <th>بداية</th>
                                 <th>نهاية</th>
-                                <th>سائقون</th>
+                                <th>السائقون</th>
                                 <th>الحالة</th>
                                 <th>إجراء</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($operations_table['rows'])): ?>
-                                <tr>
-                                    <td colspan="10">لا توجد آليات في هذا الجدول</td>
-                                </tr>
+                                <tr><td colspan="10" style="text-align:center;color:#888;padding:14px;">لا توجد آليات في هذا الجدول</td></tr>
                             <?php else: ?>
-                                <?php $idx = 1; foreach ($operations_table['rows'] as $op): ?>
-                                    <?php
-                                        $op_id = intval($op['id']);
-                                        $status = intval($op['status']);
-                                        $category = isset($op['equipment_category']) ? $op['equipment_category'] : 'أساسي';
-                                        $shift = isset($op['shift_type']) ? $op['shift_type'] : 'B';
-                                        $is_running = ($status === 1);
-                                        $shift_label = ($shift === 'D') ? 'نهاري' : (($shift === 'N') ? 'ليلي' : 'نهاري + ليلي');
-                                    ?>
-                                    <tr id="op_row_<?php echo $operations_table['table_key']; ?>_<?php echo $op_id; ?>">
-                                        <td><?php echo $idx++; ?></td>
-                                        <td><?php echo htmlspecialchars(($op['equipment_code'] ?? '-') . ' - ' . ($op['equipment_name'] ?? '-')); ?></td>
-                                        <td><?php echo htmlspecialchars($op['equipment_type_name'] ?? '-'); ?></td>
-                                        <td>
-                                            <?php if ($is_running && $can_edit): ?>
-                                                <select class="op_category" data-op="<?php echo $op_id; ?>">
-                                                    <option value="أساسي" <?php echo $category === 'أساسي' ? 'selected' : ''; ?>>أساسي</option>
-                                                    <option value="احتياطي" <?php echo $category === 'احتياطي' ? 'selected' : ''; ?>>احتياطي</option>
-                                                </select>
-                                            <?php else: ?>
-                                                <span><?php echo htmlspecialchars($category); ?></span>
+                                <?php $idx = 1; foreach ($operations_table['rows'] as $op):
+                                    $op_id      = intval($op['id']);
+                                    $eq_id      = intval($op['equipment']);
+                                    $status     = intval($op['status']);
+                                    $category   = isset($op['equipment_category']) ? $op['equipment_category'] : 'أساسي';
+                                    $shift      = isset($op['shift_type']) ? $op['shift_type'] : 'B';
+                                    $is_running = ($status === 1);
+                                    $shift_label = ($shift === 'D') ? 'نهاري' : (($shift === 'N') ? 'ليلي' : 'نهاري + ليلي');
+                                    $eq_drivers  = isset($drivers_by_equipment[$eq_id]) ? $drivers_by_equipment[$eq_id] : [];
+                                    $tkey        = $operations_table['table_key'];
+                                ?>
+                                <!-- صف الآلية الرئيسي -->
+                                <tr id="op_row_<?php echo $tkey; ?>_<?php echo $op_id; ?>">
+                                    <td><?php echo $idx++; ?></td>
+                                    <td><?php echo htmlspecialchars(($op['equipment_code'] ?? '-') . ' - ' . ($op['equipment_name'] ?? '-')); ?></td>
+                                    <td><?php echo htmlspecialchars($op['equipment_type_name'] ?? '-'); ?></td>
+                                    <td>
+                                        <?php if ($is_running && $can_edit): ?>
+                                            <select class="op_category" data-op="<?php echo $op_id; ?>">
+                                                <option value="أساسي" <?php echo $category === 'أساسي' ? 'selected' : ''; ?>>أساسي</option>
+                                                <option value="احتياطي" <?php echo $category === 'احتياطي' ? 'selected' : ''; ?>>احتياطي</option>
+                                            </select>
+                                        <?php else: ?>
+                                            <span><?php echo htmlspecialchars($category); ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($is_running && $can_edit): ?>
+                                            <select class="op_shift" data-op="<?php echo $op_id; ?>">
+                                                <option value="D" <?php echo $shift === 'D' ? 'selected' : ''; ?>>نهاري</option>
+                                                <option value="N" <?php echo $shift === 'N' ? 'selected' : ''; ?>>ليلي</option>
+                                                <option value="B" <?php echo $shift === 'B' ? 'selected' : ''; ?>>نهاري + ليلي</option>
+                                            </select>
+                                        <?php else: ?>
+                                            <span><?php echo htmlspecialchars($shift_label); ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($is_running && $can_edit): ?>
+                                            <input type="date" class="op_start" data-op="<?php echo $op_id; ?>" value="<?php echo htmlspecialchars($op['start'] ?? ''); ?>">
+                                        <?php else: ?>
+                                            <span><?php echo htmlspecialchars($op['start'] ?? '-'); ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($is_running && $can_edit): ?>
+                                            <input type="date" class="op_end" data-op="<?php echo $op_id; ?>" value="<?php echo htmlspecialchars($op['end'] ?? ''); ?>">
+                                        <?php else: ?>
+                                            <span><?php echo htmlspecialchars($op['end'] ?? '-'); ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <button type="button"
+                                                class="btn-drivers-toggle"
+                                                id="toggle_btn_<?php echo $tkey; ?>_<?php echo $op_id; ?>"
+                                                onclick="toggleDrivers('<?php echo $tkey; ?>', <?php echo $op_id; ?>)">
+                                            <i class="fas fa-users"></i>
+                                            <?php echo intval($op['active_drivers_count']); ?>
+                                            <i class="fas fa-chevron-down toggle-icon"></i>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <?php if ($is_running): ?>
+                                            <span class="status-running">ساري</span>
+                                            <?php if ($can_edit): ?>
+                                                <button type="button" class="btn-end-row" onclick="endOperation(<?php echo $op_id; ?>, this)"><i class="fas fa-stop-circle"></i> إنهاء</button>
                                             <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <?php if ($is_running && $can_edit): ?>
-                                                <select class="op_shift" data-op="<?php echo $op_id; ?>">
-                                                    <option value="D" <?php echo $shift === 'D' ? 'selected' : ''; ?>>نهاري</option>
-                                                    <option value="N" <?php echo $shift === 'N' ? 'selected' : ''; ?>>ليلي</option>
-                                                    <option value="B" <?php echo $shift === 'B' ? 'selected' : ''; ?>>نهاري + ليلي</option>
-                                                </select>
-                                            <?php else: ?>
-                                                <span><?php echo htmlspecialchars($shift_label); ?></span>
+                                        <?php else: ?>
+                                            <span class="status-idle">منتهي</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($is_running && $can_edit): ?>
+                                            <button type="button" class="btn-save-row" onclick="saveOperation(<?php echo $op_id; ?>, this)"><i class="fas fa-save"></i> حفظ</button>
+                                        <?php else: ?>
+                                            <span>-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                                <!-- صف السائقين القابل للتوسيع -->
+                                <tr id="op_drivers_<?php echo $tkey; ?>_<?php echo $op_id; ?>" class="drivers-sub-row" style="display:none;">
+                                    <td colspan="10">
+                                        <div class="sub-drivers-wrap">
+                                            <table class="sub-drivers-table no-datatable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>السائق</th>
+                                                        <th>الهاتف</th>
+                                                        <th>الوردية</th>
+                                                        <th>بداية التعيين</th>
+                                                        <th>نهاية التعيين</th>
+                                                        <th>الحالة</th>
+                                                        <th>إجراء</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php if (empty($eq_drivers)): ?>
+                                                        <tr><td colspan="8" style="text-align:center;color:#888;padding:10px;">لا يوجد سائقون مرتبطون بهذه الآلية</td></tr>
+                                                    <?php else: ?>
+                                                        <?php $didx = 1; foreach ($eq_drivers as $drv):
+                                                            $rel_id     = intval($drv['id']);
+                                                            $drv_shift  = isset($drv['shift_type']) ? $drv['shift_type'] : 'B';
+                                                            $drv_status = intval($drv['status']);
+                                                            $is_active  = ($drv_status === 1);
+                                                            $drv_shift_label = ($drv_shift === 'D') ? 'نهاري' : (($drv_shift === 'N') ? 'ليلي' : 'نهاري + ليلي');
+                                                            $end_display = ((string)$drv['end_date'] === '2099-12-31') ? '' : (string)$drv['end_date'];
+                                                        ?>
+                                                        <tr id="drv_row_<?php echo $rel_id; ?>">
+                                                            <td><?php echo $didx++; ?></td>
+                                                            <td><?php echo htmlspecialchars($drv['driver_name'] ?? '-'); ?></td>
+                                                            <td><?php echo htmlspecialchars($drv['driver_phone'] ?? '-'); ?></td>
+                                                            <td>
+                                                                <?php if ($is_active && $can_edit): ?>
+                                                                    <select class="drv_shift" data-rel="<?php echo $rel_id; ?>">
+                                                                        <option value="D" <?php echo $drv_shift === 'D' ? 'selected' : ''; ?>>نهاري</option>
+                                                                        <option value="N" <?php echo $drv_shift === 'N' ? 'selected' : ''; ?>>ليلي</option>
+                                                                        <option value="B" <?php echo $drv_shift === 'B' ? 'selected' : ''; ?>>نهاري + ليلي</option>
+                                                                    </select>
+                                                                <?php else: ?>
+                                                                    <span><?php echo htmlspecialchars($drv_shift_label); ?></span>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                            <td>
+                                                                <?php if ($is_active && $can_edit): ?>
+                                                                    <input type="date" class="drv_start" data-rel="<?php echo $rel_id; ?>" value="<?php echo htmlspecialchars($drv['start_date'] ?? ''); ?>">
+                                                                <?php else: ?>
+                                                                    <span><?php echo htmlspecialchars($drv['start_date'] ?? '-'); ?></span>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                            <td>
+                                                                <?php if ($is_active && $can_edit): ?>
+                                                                    <input type="date" class="drv_end" data-rel="<?php echo $rel_id; ?>" value="<?php echo htmlspecialchars($end_display); ?>">
+                                                                <?php else: ?>
+                                                                    <span><?php echo htmlspecialchars($end_display ?: '-'); ?></span>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                            <td>
+                                                                <?php if ($is_active): ?>
+                                                                    <span class="status-running">ساري</span>
+                                                                <?php else: ?>
+                                                                    <span class="status-idle">منتهي</span>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                            <td>
+                                                                <?php if ($is_active && $can_edit): ?>
+                                                                    <button type="button" class="btn-save-row" onclick="saveDriver(<?php echo $rel_id; ?>)"><i class="fas fa-save"></i> حفظ</button>
+                                                                    <button type="button" class="btn-end-row"  onclick="endDriver(<?php echo $rel_id; ?>)"><i class="fas fa-stop-circle"></i> إنهاء</button>
+                                                                <?php else: ?>
+                                                                    <span>-</span>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                        </tr>
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                </tbody>
+                                            </table>
+
+                                            <?php if ($can_add && $is_running): ?>
+                                            <div class="add-driver-inline">
+                                                <strong><i class="fas fa-plus-circle"></i> إضافة سائق لهذه الآلية</strong>
+                                                <form class="add-driver-form" onsubmit="submitAddDriver(event, this, <?php echo $eq_id; ?>)">
+                                                    <div class="inline-form-row">
+                                                        <div class="form-group">
+                                                            <label>السائق *</label>
+                                                            <select name="driver_id" required>
+                                                                <option value="">-- اختر السائق --</option>
+                                                                <?php foreach ($all_drivers as $d): ?>
+                                                                    <?php if (in_array(intval($d['id']), $active_driver_ids)) continue; ?>
+                                                                    <option value="<?php echo intval($d['id']); ?>"><?php echo htmlspecialchars($d['name'] . ' - ' . $d['phone']); ?></option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>الوردية</label>
+                                                            <select name="shift_type">
+                                                                <option value="D">نهاري</option>
+                                                                <option value="N">ليلي</option>
+                                                                <option value="B" selected>نهاري + ليلي</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>بداية التعيين</label>
+                                                            <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>نهاية التعيين</label>
+                                                            <input type="date" name="end_date">
+                                                        </div>
+                                                        <div class="form-group" style="justify-content:flex-end;">
+                                                            <label>&nbsp;</label>
+                                                            <button type="submit" class="btn-bulk-save" style="padding:8px 16px;font-size:13px;margin-top:0;"><i class="fas fa-plus"></i> إضافة</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
                                             <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <?php if ($is_running && $can_edit): ?>
-                                                <input type="date" class="op_start" data-op="<?php echo $op_id; ?>" value="<?php echo htmlspecialchars($op['start'] ?? ''); ?>">
-                                            <?php else: ?>
-                                                <span><?php echo htmlspecialchars($op['start'] ?? '-'); ?></span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <?php if ($is_running && $can_edit): ?>
-                                                <input type="date" class="op_end" data-op="<?php echo $op_id; ?>" value="<?php echo htmlspecialchars($op['end'] ?? ''); ?>">
-                                            <?php else: ?>
-                                                <span><?php echo htmlspecialchars($op['end'] ?? '-'); ?></span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?php echo intval($op['active_drivers_count']); ?></td>
-                                        <td>
-                                            <?php if ($is_running): ?>
-                                                <span class="status-running">ساري</span>
-                                                <?php if ($can_edit): ?>
-                                                    <button type="button" class="btn-end-row" onclick="endOperation(<?php echo $op_id; ?>, this)"><i class="fas fa-stop-circle"></i> إنهاء</button>
-                                                <?php endif; ?>
-                                            <?php else: ?>
-                                                <span class="status-idle">منتهي</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <?php if ($is_running && $can_edit): ?>
-                                                <button type="button" class="btn-save-row" onclick="saveOperation(<?php echo $op_id; ?>, this)"><i class="fas fa-save"></i> حفظ</button>
-                                            <?php else: ?>
-                                                <span>-</span>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    </td>
+                                </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </tbody>
@@ -1007,87 +1192,13 @@ include '../insidebar.php';
         </div>
         <?php endforeach; ?>
 
-        <!-- جدول السائقين -->
+        <!-- خريطة المراقبة -->
         <div class="card">
             <div class="card-header">
-                <h5><i class="fas fa-id-badge"></i> إدارة السائقين</h5>
+                <h5><i class="fas fa-map-marked-alt"></i> خريطة المراقبة</h5>
             </div>
-            <div class="card-body">
-                <div class="table-scroll">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>السائق</th>
-                                <th>الآلية</th>
-                                <th>الوردية</th>
-                                <th>بداية</th>
-                                <th>نهاية</th>
-                                <th>الحالة</th>
-                                <th>إجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $idx = 1; foreach ($drivers_rows as $drv): ?>
-                                <?php
-                                    $rel_id = intval($drv['id']);
-                                    $drv_shift = isset($drv['shift_type']) ? $drv['shift_type'] : 'B';
-                                    $drv_status = intval($drv['status']);
-                                    $is_active = ($drv_status === 1);
-                                    $shift_label = ($drv_shift === 'D') ? 'نهاري' : (($drv_shift === 'N') ? 'ليلي' : 'نهاري + ليلي');
-                                    $end_display = ((string)$drv['end_date'] === '2099-12-31') ? '' : (string)$drv['end_date'];
-                                ?>
-                                <tr id="drv_row_<?php echo $rel_id; ?>">
-                                    <td><?php echo $idx++; ?></td>
-                                    <td><?php echo htmlspecialchars($drv['driver_name'] ?? '-'); ?></td>
-                                    <td><?php echo htmlspecialchars(($drv['equipment_code'] ?? '-') . ' - ' . ($drv['equipment_name'] ?? '-')); ?></td>
-                                    <td>
-                                        <?php if ($is_active && $can_edit): ?>
-                                            <select class="drv_shift" data-rel="<?php echo $rel_id; ?>">
-                                                <option value="D" <?php echo $drv_shift === 'D' ? 'selected' : ''; ?>>نهاري</option>
-                                                <option value="N" <?php echo $drv_shift === 'N' ? 'selected' : ''; ?>>ليلي</option>
-                                                <option value="B" <?php echo $drv_shift === 'B' ? 'selected' : ''; ?>>نهاري + ليلي</option>
-                                            </select>
-                                        <?php else: ?>
-                                            <span><?php echo htmlspecialchars($shift_label); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($is_active && $can_edit): ?>
-                                            <input type="date" class="drv_start" data-rel="<?php echo $rel_id; ?>" value="<?php echo htmlspecialchars($drv['start_date'] ?? ''); ?>">
-                                        <?php else: ?>
-                                            <span><?php echo htmlspecialchars($drv['start_date'] ?? '-'); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($is_active && $can_edit): ?>
-                                            <input type="date" class="drv_end" data-rel="<?php echo $rel_id; ?>" value="<?php echo htmlspecialchars($end_display); ?>">
-                                        <?php else: ?>
-                                            <span><?php echo htmlspecialchars($end_display ?: '-'); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($is_active): ?>
-                                            <span class="status-running">ساري</span>
-                                            <?php if ($can_edit): ?>
-                                                <button type="button" class="btn-end-row" onclick="endDriver(<?php echo $rel_id; ?>)"><i class="fas fa-stop-circle"></i> إنهاء</button>
-                                            <?php endif; ?>
-                                        <?php else: ?>
-                                            <span class="status-idle">منتهي</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php if ($is_active && $can_edit): ?>
-                                            <button type="button" class="btn-save-row" onclick="saveDriver(<?php echo $rel_id; ?>)"><i class="fas fa-save"></i> حفظ</button>
-                                        <?php else: ?>
-                                            <span>-</span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="card-body" style="padding:0;">
+                <div id="monitoringMap"></div>
             </div>
         </div>
     </div>
@@ -1097,124 +1208,123 @@ include '../insidebar.php';
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    function saveOperation(opId, triggerBtn) {
-        const row = triggerBtn ? triggerBtn.closest('tr') : null;
-        const category = row?.querySelector('.op_category[data-op="' + opId + '"]')?.value || document.querySelector('.op_category[data-op="' + opId + '"]')?.value || 'أساسي';
-        const shift = row?.querySelector('.op_shift[data-op="' + opId + '"]')?.value || document.querySelector('.op_shift[data-op="' + opId + '"]')?.value || 'B';
-        const start = row?.querySelector('.op_start[data-op="' + opId + '"]')?.value || document.querySelector('.op_start[data-op="' + opId + '"]')?.value || '';
-        const end = row?.querySelector('.op_end[data-op="' + opId + '"]')?.value || document.querySelector('.op_end[data-op="' + opId + '"]')?.value || '';
+    function toggleDrivers(tableKey, opId) {
+        var subRow = document.getElementById('op_drivers_' + tableKey + '_' + opId);
+        var btn    = document.getElementById('toggle_btn_' + tableKey + '_' + opId);
+        if (!subRow) return;
+        var isOpen = subRow.style.display !== 'none';
+        subRow.style.display = isOpen ? 'none' : 'table-row';
+        if (btn) btn.classList.toggle('open', !isOpen);
+    }
 
-        const formData = new FormData();
+    function saveOperation(opId, triggerBtn) {
+        var row = triggerBtn ? triggerBtn.closest('tr') : null;
+        var get = function(sel) {
+            var el = (row && row.querySelector(sel)) || document.querySelector(sel);
+            return el ? el.value : '';
+        };
+        var formData = new FormData();
         formData.append('action', 'save_single_operation');
         formData.append('op_id', opId);
-        formData.append('equipment_category', category);
-        formData.append('shift_type', shift);
+        formData.append('equipment_category', get('.op_category[data-op="' + opId + '"]') || 'أساسي');
+        formData.append('shift_type', get('.op_shift[data-op="' + opId + '"]') || 'B');
         formData.append('status', 1);
-        formData.append('start', start);
-        formData.append('end', end);
+        formData.append('start', get('.op_start[data-op="' + opId + '"]'));
+        formData.append('end',   get('.op_end[data-op="'   + opId + '"]'));
         formData.append('json', '1');
-
-        fetch(window.location.href, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('✅ تم الحفظ');
-                location.reload();
-            } else {
-                alert('❌ ' + data.message);
-            }
-        })
-        .catch(error => {
-            alert('❌ خطأ في الحفظ: ' + error);
-        });
+        fetch(window.location.href, { method: 'POST', body: formData })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { d.success ? (alert('✅ تم الحفظ'), location.reload()) : alert('❌ ' + d.message); })
+            .catch(function()  { alert('❌ خطأ في الاتصال'); });
     }
 
     function endOperation(opId, triggerBtn) {
         if (!confirm('هل تريد إنهاء هذا التشغيل؟')) return;
-        const row = triggerBtn ? triggerBtn.closest('tr') : null;
-        const formData = new FormData();
+        var row = triggerBtn ? triggerBtn.closest('tr') : null;
+        var get = function(sel) {
+            var el = (row && row.querySelector(sel)) || document.querySelector(sel);
+            return el ? el.value : '';
+        };
+        var formData = new FormData();
         formData.append('action', 'save_single_operation');
         formData.append('op_id', opId);
-        formData.append('equipment_category', row?.querySelector('.op_category[data-op="' + opId + '"]')?.value || document.querySelector('.op_category[data-op="' + opId + '"]')?.value || 'أساسي');
-        formData.append('shift_type', row?.querySelector('.op_shift[data-op="' + opId + '"]')?.value || document.querySelector('.op_shift[data-op="' + opId + '"]')?.value || 'B');
+        formData.append('equipment_category', get('.op_category[data-op="' + opId + '"]') || 'أساسي');
+        formData.append('shift_type', get('.op_shift[data-op="' + opId + '"]') || 'B');
         formData.append('status', 0);
         formData.append('json', '1');
         fetch(window.location.href, { method: 'POST', body: formData })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) { alert('✅ تم إنهاء التشغيل'); location.reload(); }
-                else { alert('❌ ' + data.message); }
-            })
-            .catch(() => alert('❌ خطأ في الاتصال'));
+            .then(function(r) { return r.json(); })
+            .then(function(d) { d.success ? (alert('✅ تم إنهاء التشغيل'), location.reload()) : alert('❌ ' + d.message); })
+            .catch(function()  { alert('❌ خطأ في الاتصال'); });
+    }
+
+    function saveDriver(relId) {
+        var get = function(sel) { var el = document.querySelector(sel); return el ? el.value : ''; };
+        var formData = new FormData();
+        formData.append('action', 'save_single_driver');
+        formData.append('rel_id', relId);
+        formData.append('shift_type', get('.drv_shift[data-rel="' + relId + '"]') || 'B');
+        formData.append('status', 1);
+        formData.append('start_date', get('.drv_start[data-rel="' + relId + '"]'));
+        formData.append('end_date',   get('.drv_end[data-rel="'   + relId + '"]'));
+        formData.append('json', '1');
+        fetch(window.location.href, { method: 'POST', body: formData })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { d.success ? (alert('✅ تم الحفظ'), location.reload()) : alert('❌ ' + d.message); })
+            .catch(function()  { alert('❌ خطأ في الاتصال'); });
     }
 
     function endDriver(relId) {
         if (!confirm('هل تريد إنهاء تشغيل هذا السائق؟')) return;
-        const formData = new FormData();
+        var shiftEl = document.querySelector('.drv_shift[data-rel="' + relId + '"]');
+        var formData = new FormData();
         formData.append('action', 'save_single_driver');
         formData.append('rel_id', relId);
-        formData.append('shift_type', document.querySelector('.drv_shift[data-rel="' + relId + '"]')?.value || 'B');
+        formData.append('shift_type', shiftEl ? shiftEl.value : 'B');
         formData.append('status', 0);
         formData.append('end_date', new Date().toISOString().split('T')[0]);
         formData.append('json', '1');
         fetch(window.location.href, { method: 'POST', body: formData })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) { alert('✅ تم إنهاء تشغيل السائق'); location.reload(); }
-                else { alert('❌ ' + data.message); }
-            })
-            .catch(() => alert('❌ خطأ في الاتصال'));
+            .then(function(r) { return r.json(); })
+            .then(function(d) { d.success ? (alert('✅ تم إنهاء تشغيل السائق'), location.reload()) : alert('❌ ' + d.message); })
+            .catch(function()  { alert('❌ خطأ في الاتصال'); });
     }
 
-    function saveDriver(relId) {
-        const shift = document.querySelector('.drv_shift[data-rel="' + relId + '"]')?.value || 'B';
-        const start = document.querySelector('.drv_start[data-rel="' + relId + '"]')?.value || '';
-        const end = document.querySelector('.drv_end[data-rel="' + relId + '"]')?.value || '';
-
-        const formData = new FormData();
-        formData.append('action', 'save_single_driver');
-        formData.append('rel_id', relId);
-        formData.append('shift_type', shift);
-        formData.append('status', 1);
-        formData.append('start_date', start);
-        formData.append('end_date', end);
+    function submitAddDriver(event, form, equipmentId) {
+        event.preventDefault();
+        var driverSel  = form.querySelector('[name="driver_id"]');
+        var shiftSel   = form.querySelector('[name="shift_type"]');
+        var startInput = form.querySelector('[name="start_date"]');
+        var endInput   = form.querySelector('[name="end_date"]');
+        if (!driverSel || !driverSel.value) { alert('يرجى اختيار السائق'); return; }
+        var formData = new FormData();
+        formData.append('action', 'add_new_driver');
+        formData.append('driver_id',   driverSel.value);
+        formData.append('equipment_id', equipmentId);
+        formData.append('shift_type',  shiftSel   ? shiftSel.value   : 'B');
+        formData.append('start_date',  startInput ? startInput.value : '');
+        formData.append('end_date',    endInput   ? endInput.value   : '');
         formData.append('json', '1');
-
-        fetch(window.location.href, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('✅ تم الحفظ');
-                location.reload();
-            } else {
-                alert('❌ ' + data.message);
-            }
-        })
-        .catch(error => {
-            alert('❌ خطأ في الحفظ: ' + error);
-        });
+        fetch(window.location.href, { method: 'POST', body: formData })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { d.success ? (alert('✅ ' + d.message), location.reload()) : alert('❌ ' + d.message); })
+            .catch(function()  { alert('❌ خطأ في الاتصال'); });
     }
 
     // خريطة Leaflet
     (function () {
-        var mapRows = <?php echo json_encode($map_rows, JSON_UNESCAPED_UNICODE); ?>;
+        var mapRows    = <?php echo json_encode($map_rows, JSON_UNESCAPED_UNICODE); ?>;
         var projectLat = <?php echo isset($selected_project['latitude']) ? floatval($selected_project['latitude']) : 0; ?>;
         var projectLng = <?php echo isset($selected_project['longitude']) ? floatval($selected_project['longitude']) : 0; ?>;
 
-        var mapCenterLat = 24.7136;
-        var mapCenterLng = 46.6753;
+        var mapCenterLat = 15.5007;
+        var mapCenterLng = 32.5599;
         if (projectLat !== 0 && projectLng !== 0) {
             mapCenterLat = projectLat;
             mapCenterLng = projectLng;
         } else if (mapRows.length > 0) {
-            mapCenterLat = parseFloat(mapRows[0].lat || 24.7136);
-            mapCenterLng = parseFloat(mapRows[0].lng || 46.6753);
+            mapCenterLat = parseFloat(mapRows[0].lat || mapCenterLat);
+            mapCenterLng = parseFloat(mapRows[0].lng || mapCenterLng);
         }
 
         var map = L.map('monitoringMap').setView([mapCenterLat, mapCenterLng], 9);
@@ -1225,13 +1335,8 @@ include '../insidebar.php';
 
         mapRows.forEach(function (row) {
             var shiftLabel = row.shift === 'D' ? 'نهاري' : (row.shift === 'N' ? 'ليلي' : 'نهاري + ليلي');
-            var marker = L.marker([parseFloat(row.lat), parseFloat(row.lng)]).addTo(map);
-            marker.bindPopup(
-                '<b>' + row.equipment + '</b><br>' +
-                'النوع: ' + (row.type || '-') + '<br>' +
-                'السائقون: ' + row.drivers + '<br>' +
-                'الوردية: ' + shiftLabel
-            );
+            L.marker([parseFloat(row.lat), parseFloat(row.lng)]).addTo(map)
+                .bindPopup('<b>' + row.equipment + '</b><br>النوع: ' + (row.type || '-') + '<br>السائقون: ' + row.drivers + '<br>الوردية: ' + shiftLabel);
         });
     })();
 </script>
