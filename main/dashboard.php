@@ -42,6 +42,16 @@ if (!function_exists('dashboard_scalar')) {
     return ($row && isset($row[$key])) ? $row[$key] : 0;
   }
 }
+if (!function_exists('dashboard_two_digits')) {
+  function dashboard_two_digits($value)
+  {
+    $num = intval(round($value));
+    if ($num < 0) {
+      return '00';
+    }
+    return str_pad((string) $num, 2, '0', STR_PAD_LEFT);
+  }
+}
 if (!function_exists('dashboard_table_exists')) {
   function dashboard_table_exists($conn, $t)
   {
@@ -447,8 +457,6 @@ include '../insidebar.php';
   --dash-gray: #e2e2e2;
   --dash-line: #bdbdbd;
   --dash-ink: #121212;
-  --hex-regular: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
-  --hex-wide: polygon(6% 0, 94% 0, 100% 50%, 94% 100%, 6% 100%, 0 50%);
   background: #ffffff;
   color: var(--dash-ink);
   flex: 1 1 auto;
@@ -626,7 +634,7 @@ body.ems-site .sidebar.closed .logout span {
 .shot-logo {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 3px;
   font-weight: 800;
   font-size: .9rem;
   letter-spacing: .4px;
@@ -634,6 +642,16 @@ body.ems-site .sidebar.closed .logout span {
   grid-column: 1;
   justify-self: start;
   direction: ltr;
+  w
+}
+
+.shot-logo image {
+  width: 28px;
+  height: 30px;
+}
+
+.shot-logo span{
+  font-size: 1.1rem;
 }
 
 .shot-logo-mark {
@@ -674,13 +692,13 @@ body.ems-site .sidebar.closed .logout span {
 }
 
 .shot-nav-pill {
-  height: 30px;
-  min-width: 108px;
-  padding: 0 16px;
+  height: 32px;
+  min-width: 120px;
+  padding: 0 18px;
   border: 1px solid #cfcfcf;
   background: #ffffff;
   color: #121212;
-  clip-path: polygon(8% 0, 92% 0, 100% 50%, 92% 100%, 8% 100%, 0 50%);
+  border-radius: 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -705,38 +723,36 @@ body.ems-site .sidebar.closed .logout span {
   gap: 8px;
 }
 
+.shot-user-icons a.shot-icon-pill {
+  text-decoration: none;
+}
+
 .shot-icon-pill {
-  width: 40px;
-  aspect-ratio: 1.1547 / 1;
-  clip-path: var(--hex-regular);
-  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #666;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: .99rem;
+  font-size: .82rem;
   color: #2b2b2b;
   flex-shrink: 0;
-  position: relative;
 }
 
-.shot-icon-pill::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  clip-path: var(--hex-regular);
-  border: 1.4px solid #2f2f2f;
-  pointer-events: none;
+.shot-icon-pill.shot-power {
+  background: #d42f2f;
+  border-color: #b31f1f;
+  color: #fff;
 }
 
 .shot-icon-pill i {
   line-height: 1;
-  position: relative;
-  z-index: 1;
 }
 
 .shot-body {
-  padding: 50px 18px 14px;
+  padding: 50px 0px 14px;
   background: #e2e2e2;
   margin-right: 68px;
 }
@@ -757,78 +773,70 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   background: #d7d7d7;
   border: 1px solid #bdbdbd;
   border-top: none;
-  clip-path: polygon(0 0, 100% 0, 100% 44%, 95% 100%, 5% 100%, 0 44%);
   padding: 5px 34px;
   font-weight: 700;
   font-size: .78rem;
   line-height: 1;
   z-index: 115;
   pointer-events: none;
+  border-radius: 0 0 35px 35px;
 }
 
 .shot-section-title {
-  margin: 0 0 8px;
-  font-size: 1.1rem;
+  margin: 0 0 12px;
+  font-size: 1.08rem;
   font-weight: 700;
   text-align: right;
 }
 
 .shot-quick-zone {
-  background: #ffffff;
-  border: 1px solid #cfcfcf;
-  border-radius: 12px;
-  padding: 10px 12px 12px;
+  width: 100%;
+  background: #fff;
+  border: none;
+  border-radius: 0;
+  padding: 25px 50px 50px;
 }
 
 .shot-hex-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0px 0px;
+  gap: 10px 10px;
 }
 
 .shot-hex-link {
-  min-height: 130px;
-  border: none;
+  min-height: 88px;
+  border: 1px solid #b7b7b7;
+  border-radius: 30px;
   color: #111;
   text-decoration: none;
-  background: transparent;
+  background: #ececec;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 72px 1fr;
   align-items: center;
   gap: 12px;
-  padding: 30px 44px;
-  font-size: 1.3rem;
-  font-weight: 600;
-  transition: transform .2s ease, filter .2s ease;
+  padding: 8px 14px;
+  font-size: 2rem;
+  font-weight: 700;
+  transition: transform .2s ease, background .2s ease, border-color .2s ease;
   direction: rtl;
   position: relative;
 }
 
 .shot-hex-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 .shot-hex-bg path {
-  fill: #efefef;
-  stroke: #4f4f4f;
-  stroke-width: 1.6;
-  vector-effect: non-scaling-stroke;
-  transition: fill .2s ease, stroke .2s ease;
+  display: none;
 }
 
 .shot-hex-link:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
-.shot-hex-link:hover .shot-hex-bg path,
-.shot-hex-link.active .shot-hex-bg path {
-  fill: var(--dash-yellow);
-  stroke: var(--dash-yellow-d, #dca400);
+.shot-hex-link:hover {
+  background: var(--dash-yellow);
+  border-color: #9f8500;
 }
 
 .shot-hex-link > span {
@@ -838,59 +846,58 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
 .shot-hex-title {
   display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1.3rem;
 }
 
 .shot-hex-icon {
-  width: 64px;
-  aspect-ratio: 1.1547 / 1;
-  background: transparent;
+  width: 66px;
+  height: 66px;
+  border-radius: 18px;
+  border: 1px solid #a9a9a9;
+  background: #f7f7f7;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 1.45rem;
-  position: relative;
+  font-size: 1.5rem;
+  color: #252525;
 }
 
 .shot-hex-icon svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
+  display: none;
 }
 
 .shot-hex-icon polygon {
-  fill: #ffffff;
-  stroke: #6b6b6b;
-  stroke-width: 1.8;
+  display: none;
 }
 
 .shot-hex-icon i {
   line-height: 1;
-  position: relative;
-  z-index: 1;
 }
 
 .shot-session {
   margin-top: 0;
   border-top: none;
   border-bottom: none;
-  padding: 10px 0;
+  padding: 10px 40px;
 }
 
 .shot-lower-zone {
   margin-top: 12px;
-  background: #e2e2e2;
-  border: 1px solid #c8c8c8;
+  background: #e4e4e4;
+  border: 1px solid #cfcfcf;
   border-radius: 12px;
   padding: 10px 10px 14px;
 }
 
 .shot-session-title {
-  font-size: 1.2rem;
+  font-size: .92rem;
   font-weight: 700;
   margin-bottom: 8px;
+  text-align: right;
 }
 
 .shot-session-row {
@@ -900,18 +907,18 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 }
 
 .shot-session-chip {
-  background: #ededed;
-  border: 1px solid #c7c7c7;
-  border-radius: 10px;
-  min-height: 42px;
+  background: #f5f3f3;
+  border: 1px solid rgb(191, 191, 191);
+  border-radius: 22px;
+  min-height: 55px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   direction: rtl;
   gap: 10px;
-  padding: 0 10px;
-  font-size: 1.35rem;
-  color: #1c1c1c;
+  padding: 0 8px;
+  font-size: 1.1rem;
+  color: rgb(33, 33, 33);
   transition: background .2s ease, border-color .2s ease;
 }
 
@@ -927,32 +934,28 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 }
 
 .shot-session-chip .chip-icon {
-  width: 52px;
-  height: 30px;
+  width: 60px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #555;
+  color: #4c4c4c;
   flex-shrink: 0;
-  position: relative;
+  border: 1px solid #b2b2b2;
+  border-radius: 18px;
+  background: #f7f7f7;
 }
 
 .shot-session-chip .chip-icon svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
+  display: none;
 }
 
 .shot-session-chip .chip-icon polygon {
-  fill: #ffffff;
-  stroke: #6f6f6f;
-  stroke-width: 1.4;
+  display: none;
 }
 
 .shot-session-chip .chip-icon i {
-  font-size: .85rem;
+  font-size: 1.3rem;
   line-height: 1;
   position: relative;
   z-index: 1;
@@ -965,9 +968,18 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 .shot-stat-panel {
   margin-top: 14px;
   position: relative;
-  padding: 30px 190px 50px;
+  padding: 58px 150px 44px;
   isolation: isolate;
-  transition: background .2s ease, border-color .2s ease;
+}
+
+.shot-stat-panel .shot-stat-label {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.shot-stat-panel .shot-stat-value {
+  font-size: 6.5rem;
+  font-weight: 50;
 }
 
 .shot-stat-panel:not(.shot-stat-panel-secondary)::before {
@@ -975,8 +987,8 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   position: absolute;
   inset: 0;
   background: var(--dash-yellow);
-  -webkit-clip-path: polygon(3.5% 0, 96.5% 0, 100% 24%, 100% 100%, 0 100%, 0 24%);
-  clip-path: polygon(3.5% 0, 96.5% 0, 100% 24%, 100% 100%, 0 100%, 0 24%);
+  border: 1px solid #d4a500;
+  border-radius: 68px 68px 0 0;
   z-index: 0;
   pointer-events: none;
 }
@@ -988,9 +1000,9 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
 .shot-stat-panel-secondary {
   margin-top: 12px;
-  background: #f3f3f3;
-  border: 1px solid #d7d7d7;
-  border-radius: 14px;
+    background: #ffffff;
+  border: 1px solid #cfcfcf;
+  border-radius: 20px;
   padding: 16px 18px 14px;
 }
 
@@ -999,12 +1011,13 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 }
 
 .shot-stat-panel-secondary .shot-stat-label {
-  font-size: 1.1rem;
+  font-size: 1.0rem;
   font-weight: 700;
 }
 
 .shot-stat-panel-secondary .shot-stat-value {
   font-size: 3.1rem;
+  font-weight: lighter;
 }
 
 .shot-charts {
@@ -1015,9 +1028,9 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 }
 
 .shot-chart-card {
-  background: #f8f8f8;
-  border: 1px solid #d8d8d8;
-  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+  border-radius: 20px;
   padding: 12px;
 }
 
@@ -1056,7 +1069,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 .shot-stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  gap: 12px;
 }
 
 .shot-stat-card {
@@ -1064,26 +1077,26 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 }
 
 .shot-stat-label {
-  font-size: 2.1rem;
-  font-weight: 800;
+  font-size: 2rem;
+  font-weight: 700;
   margin-bottom: 6px;
 }
 
 .shot-stat-value {
-  font-size: 5.7rem;
+  font-size: 5.1rem;
   line-height: 1;
   font-weight: 100;
 }
 
 .shot-logout {
-  display: inline-flex;
+  display: none;
   align-items: center;
   gap: 6px;
   margin-top: 12px;
   background: #cf2626;
   color: #fff;
   border: 1px solid #a91f1f;
-  clip-path: var(--hex-wide);
+  border-radius: 18px;
   padding: 6px 18px 6px 22px;
   font-size: 1rem;
   font-weight: 700;
@@ -1198,7 +1211,8 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
   <nav class="shot-topbar">
     <div class="shot-logo">
-      <span class="shot-logo-mark"></span>
+      <img src="../assets/images/icon.png" alt="Equipation Logo" width="28" height="22">
+      <!-- <span class="shot-logo-mark"></span> -->
       <span>EQUIPATION</span>
     </div>
 
@@ -1209,6 +1223,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
     <div class="shot-user">
       <div class="shot-user-icons">
+        <a href="../logout.php" class="shot-icon-pill shot-power" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i class="fas fa-power-off"></i></a>
         <span class="shot-icon-pill"><i class="far fa-user"></i></span>
         <span class="shot-icon-pill"><i class="fas fa-gear"></i></span>
       </div>
@@ -1234,8 +1249,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
     <div class="shot-hex-grid">
       <?php foreach ($quickTiles as $i => $lk): ?>
       <a href="<?= htmlspecialchars($lk[0]) ?>" class="shot-hex-link">
-        <svg class="shot-hex-bg" viewBox="0 0 461 236.09" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M377.75,30.27H82.25c-6.43,0-12.37,3.43-15.58,9L26.98,108c-3.21,5.57-3.21,12.43,0,17.99l39.68,68.74c3.21,5.57,9.15,9,15.58,9h295.5c6.43,0,12.37-3.43,15.58-9l39.68-68.74c3.21-5.57,3.21-12.43,0-17.99l-39.68-68.74c-3.21-5.57-9.15-9-15.58-9Z"></path></svg>
-        <span class="shot-hex-icon"><svg viewBox="0 0 100 86" aria-hidden="true" focusable="false"><polygon points="25,1 75,1 99,43 75,85 25,85 1,43"></polygon></svg><i class="<?= htmlspecialchars($lk[2]) ?>"></i></span>
+        <span class="shot-hex-icon"><i class="<?= htmlspecialchars($lk[2]) ?>"></i></span>
         <span class="shot-hex-title"><?= htmlspecialchars($lk[1]) ?></span>
       </a>
       <?php endforeach; ?>
@@ -1247,19 +1261,19 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
       <div class="shot-session-title">بيانات الجلسة</div>
       <div class="shot-session-row">
         <div class="shot-session-chip">
-          <span class="chip-icon"><svg viewBox="0 0 100 58" aria-hidden="true" focusable="false"><polygon points="14,1 86,1 99,29 86,57 14,57 1,29"></polygon></svg><i class="far fa-calendar"></i></span>
+          <span class="chip-icon"><i class="far fa-calendar"></i></span>
           <strong><?= date('Y M d') ?></strong>
         </div>
         <div class="shot-session-chip">
-          <span class="chip-icon"><svg viewBox="0 0 100 58" aria-hidden="true" focusable="false"><polygon points="14,1 86,1 99,29 86,57 14,57 1,29"></polygon></svg><i class="fas fa-building"></i></span>
+          <span class="chip-icon"><i class="fas fa-building"></i></span>
           <strong><?= $companyName ? htmlspecialchars($companyName) : 'اكويشن' ?></strong>
         </div>
         <div class="shot-session-chip">
-          <span class="chip-icon"><svg viewBox="0 0 100 58" aria-hidden="true" focusable="false"><polygon points="14,1 86,1 99,29 86,57 14,57 1,29"></polygon></svg><i class="fas fa-gear"></i></span>
+          <span class="chip-icon"><i class="fas fa-gear"></i></span>
           <strong><?= $projectName ? htmlspecialchars($projectName) : 'ادارة التشغيل' ?></strong>
         </div>
         <div class="shot-session-chip">
-          <span class="chip-icon"><svg viewBox="0 0 100 58" aria-hidden="true" focusable="false"><polygon points="14,1 86,1 99,29 86,57 14,57 1,29"></polygon></svg><i class="far fa-user"></i></span>
+          <span class="chip-icon"><i class="far fa-user"></i></span>
           <strong><?= htmlspecialchars($userName) ?></strong>
         </div>
       </div>
@@ -1278,7 +1292,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
         <?php foreach ($displayStats as $st): ?>
         <div class="shot-stat-card">
           <div class="shot-stat-label"><?= htmlspecialchars($st[2]) ?></div>
-          <div class="shot-stat-value" data-count="<?= intval($st[1]) ?>">0</div>
+          <div class="shot-stat-value" data-count="<?= intval($st[1]) ?>">00</div>
         </div>
         <?php endforeach; ?>
       </div>
@@ -1295,7 +1309,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
         <?php foreach ($analyticsSummaryCards as $kpi): ?>
         <div class="shot-stat-card">
           <div class="shot-stat-label"><?= htmlspecialchars($kpi['label']) ?></div>
-          <div class="shot-stat-value" data-count="<?= floatval($kpi['value']) ?>">0</div>
+          <div class="shot-stat-value" data-count="<?= floatval($kpi['value']) ?>">00</div>
         </div>
         <?php endforeach; ?>
       </div>
@@ -1306,7 +1320,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
       <div class="shot-chart-card">
         <div class="shot-chart-head">
           <span class="shot-chart-title">حالة المعدات</span>
-          <span class="shot-chart-note">إجمالي <?= intval($analyticsTotalEquip) ?></span>
+          <span class="shot-chart-note">إجمالي <?= dashboard_two_digits($analyticsTotalEquip) ?></span>
         </div>
         <div class="shot-chart-wrap">
           <canvas id="chartEquipStatus"></canvas>
@@ -1344,6 +1358,18 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 (function () {
   const AP = <?= json_encode($analyticsPayload) ?>;
 
+  function formatTwoDigits(value, isFloat) {
+    if (isFloat) {
+      const safeValue = isFinite(value) ? value : 0;
+      const fixed = safeValue.toFixed(1);
+      const parts = fixed.split('.');
+      const intPart = String(Math.max(0, parseInt(parts[0], 10) || 0)).padStart(2, '0');
+      return intPart + '.' + parts[1];
+    }
+    const n = Math.max(0, Math.round(isFinite(value) ? value : 0));
+    return String(n).padStart(2, '0');
+  }
+
   /* ── Count-up animation ── */
   function countUp(el) {
     const target = parseFloat(el.dataset.count) || 0;
@@ -1354,10 +1380,10 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
       step++;
       const cur = target * (step / steps);
       if (step >= steps) {
-        el.textContent = isFloat ? target.toFixed(1) : Math.round(target).toLocaleString('ar-EG');
+        el.textContent = formatTwoDigits(target, isFloat);
         clearInterval(t);
       } else {
-        el.textContent = isFloat ? cur.toFixed(1) : Math.round(cur).toLocaleString('ar-EG');
+        el.textContent = formatTwoDigits(cur, isFloat);
       }
     }, 1000 / fps);
   }
