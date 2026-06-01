@@ -451,6 +451,16 @@ include '../inheader.php';
 include '../insidebar.php';
 ?>
 <style>
+/* ─── Dashboard font: IBM Plex Sans Arabic ────────────────────
+   --dash-font must live on :root so body.ems-site (an ancestor
+   of .ems-dash.main) can resolve var(--dash-font).
+   CSS custom properties only inherit DOWN the DOM tree.
+   Using a literal font-family avoids any CSS variable failures.
+   ──────────────────────────────────────────────────────────── */
+:root {
+  --dash-font: "IBM Plex Sans Arabic", "Tajawal", "Cairo", "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
 /* Dashboard redesign to match the provided yellow/gray visual identity */
 .ems-dash.main {
   --dash-yellow: #f3be00;
@@ -462,8 +472,38 @@ include '../insidebar.php';
   flex: 1 1 auto;
   min-height: 100vh;
   margin-right: 0;
-  font-family: 'Tajawal', 'Cairo', sans-serif;
+  font-family: var(--dash-font);
   overflow-x: hidden;
+}
+
+body.ems-site,
+body.ems-site .sidebar,
+body.ems-site .sidebar a,
+body.ems-site .sidebar span,
+body.ems-site .sidebar li,
+body.ems-site .sidebar .logo,
+body.ems-site .sidebar .toggle-btn,
+body.ems-site .sidebar .logout,
+.ems-dash.main,
+.ems-dash.main h1,
+.ems-dash.main h2,
+.ems-dash.main h3,
+.ems-dash.main h4,
+.ems-dash.main h5,
+.ems-dash.main h6,
+.ems-dash.main p,
+.ems-dash.main span,
+.ems-dash.main a,
+.ems-dash.main button,
+.ems-dash.main input,
+.ems-dash.main select,
+.ems-dash.main textarea,
+.ems-dash.main th,
+.ems-dash.main td,
+.ems-dash.main label,
+.ems-dash.main li,
+.ems-dash.main div {
+  font-family: var(--dash-font) !important;
 }
 
 .ems-dash * {
@@ -787,6 +827,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   font-size: 1.08rem;
   font-weight: 700;
   text-align: right;
+  font-family: "IBM Plex Sans Arabic", "Tajawal", "Cairo", "Segoe UI", Tahoma, Arial, sans-serif !important;
 }
 
 .shot-quick-zone {
@@ -795,6 +836,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   border: none;
   border-radius: 0;
   padding: 25px 50px 50px;
+  font-family: "IBM Plex Sans Arabic", "Tajawal", "Cairo", "Segoe UI", Tahoma, Arial, sans-serif !important;
 }
 
 .shot-hex-grid {
@@ -820,6 +862,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   transition: transform .2s ease, background .2s ease, border-color .2s ease;
   direction: rtl;
   position: relative;
+  font-family: "IBM Plex Sans Arabic", "Tajawal", "Cairo", "Segoe UI", Tahoma, Arial, sans-serif !important;
 }
 
 .shot-hex-bg {
@@ -850,6 +893,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 1.3rem;
+  font-family: "IBM Plex Sans Arabic", "Tajawal", "Cairo", "Segoe UI", Tahoma, Arial, sans-serif !important;
 }
 
 .shot-hex-icon {
@@ -876,6 +920,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
 .shot-hex-icon i {
   line-height: 1;
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free", "Font Awesome 5 Brands", FontAwesome !important;
 }
 
 .shot-session {
@@ -963,6 +1008,28 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
 .shot-session-chip:hover .chip-icon {
   border-color: #333;
+}
+
+.shot-quick-zone,
+.shot-session,
+.shot-session-title,
+.shot-session-row,
+.shot-session-chip,
+.shot-session-chip strong,
+.shot-stat-panel,
+.shot-stat-grid,
+.shot-stat-card,
+.shot-stat-label,
+.shot-stat-value,
+.shot-chart-card,
+.shot-chart-head,
+.shot-chart-title,
+.shot-chart-note,
+.shot-hex-link,
+.shot-hex-title,
+.shot-section-title,
+.shot-breadcrumb {
+  font-family: var(--dash-font) !important;
 }
 
 .shot-stat-panel {
@@ -1391,7 +1458,9 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
   /* ── Chart defaults ── */
   Chart.defaults.color = 'rgba(25,25,25,.75)';
-  Chart.defaults.font.family = "'Tajawal','Cairo',sans-serif";
+  Chart.defaults.font.family = getComputedStyle(document.documentElement)
+    .getPropertyValue('--font-ar')
+    .trim() || "'IBM Plex Sans Arabic','Tajawal','Cairo',sans-serif";
   Chart.defaults.plugins.legend.display = false;
 
   const gridColor = 'rgba(0,0,0,.08)';

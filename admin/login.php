@@ -79,6 +79,7 @@ $csrf = generate_csrf_token();
     <link rel="stylesheet" href="/ems/assets/css/all.min.css">
     <style>
         :root {
+            --font-ui: var(--font-ar, 'IBM Plex Sans Arabic', 'Tajawal', 'Cairo', sans-serif);
             --ink: #102443;
             --ink-soft: #27456f;
             --gold: #d6a700;
@@ -93,7 +94,7 @@ $csrf = generate_csrf_token();
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: 'Cairo', sans-serif;
+            font-family: var(--font-ui);
             background: radial-gradient(circle at top right, rgba(214, 167, 0, 0.18), transparent 28%), linear-gradient(135deg, #eef2f7, #f8fafc 60%, #eef1f5);
             color: var(--ink);
             display: flex;
@@ -328,4 +329,3 @@ $csrf = generate_csrf_token();
     </div>
 </body>
 </html>
-

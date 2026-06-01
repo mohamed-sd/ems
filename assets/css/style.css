@@ -27,7 +27,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: var(--font-ar, "Tajawal", "Cairo", sans-serif);
+  font-family: var(--font-ar, "IBM Plex Sans Arabic", "Tajawal", "Cairo", sans-serif);
 }
 
 body {
@@ -507,7 +507,7 @@ table {
 }
 
 .table thead tr th {
-  font-family: var(--font-ar, 'Tajawal', 'Cairo', 'Arial', sans-serif);
+  font-family: var(--font-ar, 'IBM Plex Sans Arabic', 'Tajawal', 'Cairo', 'Arial', sans-serif);
   padding: 12px 10px;
   font-weight: 600;
   font-size: 14px;

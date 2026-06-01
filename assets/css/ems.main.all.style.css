@@ -14,6 +14,8 @@
    (names are unique to avoid conflicts with style.css)
 ══════════════════════════════════════════════════════════════ */
 :root {
+  --font-ui: var(--font-ar, "IBM Plex Sans Arabic", "Tajawal", "Cairo", "Segoe UI", Arial, sans-serif);
+
   /* Warm cream surfaces */
   --bg:   #F5F0E8;
   --s0:   #1A1208;
@@ -53,6 +55,25 @@
   --brand-black: #0f1115;
   --brand-black-soft: #1a1f28;
   --equipation-gold: #f7931a;
+}
+
+html,
+body {
+  font-family: var(--font-ui);
+}
+
+/* Compound :not() selector — no spaces between :not() = no accidental descendant combinator */
+body *:not(.fa):not(.fas):not(.far):not(.fab):not(.fa-solid):not(.fa-regular):not(.fa-brands):not([class^="fa-"]):not([class*=" fa-"]) {
+  font-family: var(--font-ui);
+}
+
+code,
+pre,
+kbd,
+samp,
+.mono,
+.equipments-fleet-main .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
 }
 
 /* ══════════════════════════════════════════════════════════════

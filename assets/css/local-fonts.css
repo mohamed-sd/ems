@@ -1,8 +1,81 @@
 @import url('/ems/assets/css/brand-identity.css');
 
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  src: url('/ems/assets/fonts/IBMPLEXSANSARABIC/IBMPLEXSANSARABIC-THIN.TTF') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  src: url('/ems/assets/fonts/IBMPLEXSANSARABIC/IBMPLEXSANSARABIC-EXTRALIGHT.TTF') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  src: url('/ems/assets/fonts/IBMPLEXSANSARABIC/IBMPLEXSANSARABIC-LIGHT.TTF') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  src: url('/ems/assets/fonts/IBMPLEXSANSARABIC/IBMPLEXSANSARABIC-REGULAR.TTF') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  src: url('/ems/assets/fonts/IBMPLEXSANSARABIC/IBMPLEXSANSARABIC-MEDIUM.TTF') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  src: url('/ems/assets/fonts/IBMPLEXSANSARABIC/IBMPLEXSANSARABIC-SEMIBOLD.TTF') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  src: url('/ems/assets/fonts/IBMPLEXSANSARABIC/IBMPLEXSANSARABIC-BOLD.TTF') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  src: url('/ems/assets/fonts/IBMPLEXSANSARABIC/IBMPLEXSANSARABIC-BOLD.TTF') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Arabic";
+  src: url('/ems/assets/fonts/IBMPLEXSANSARABIC/IBMPLEXSANSARABIC-BOLD.TTF') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Offline-safe font stack fallback used instead of Google Fonts */
 :root {
-  --app-font-family: "Tajawal", "Cairo", "Barlow Condensed", "Segoe UI", Tahoma, Arial, sans-serif;
+  --app-font-family: "IBM Plex Sans Arabic", "Tajawal", "Cairo", "Barlow Condensed", "Segoe UI", Tahoma, Arial, sans-serif;
+  --font-ar: var(--app-font-family);
 }
 
 body,
@@ -10,5 +83,71 @@ input,
 select,
 textarea,
 button {
-  font-family: var(--app-font-family);
+  font-family: var(--app-font-family) !important;
+}
+
+/* ============================================================
+   GLOBAL FONT OVERRIDE — IBM Plex Sans Arabic
+   ============================================================
+   Uses a COMPOUND :not() selector (no spaces = no descendant
+   combinator mistake) to override every element except
+   Font Awesome icons, without breaking icon rendering.
+   Using a literal font-family value (not a CSS variable)
+   so this rule works even before variables are resolved.
+   ============================================================ */
+html,
+body {
+  font-family: "IBM Plex Sans Arabic", "Tajawal", "Cairo", "Segoe UI", Tahoma, Arial, sans-serif !important;
+}
+
+body *:not(.fa):not(.fas):not(.far):not(.fab):not(.fa-solid):not(.fa-regular):not(.fa-brands):not([class^="fa-"]):not([class*=" fa-"]) {
+  font-family: "IBM Plex Sans Arabic", "Tajawal", "Cairo", "Segoe UI", Tahoma, Arial, sans-serif !important;
+}
+
+/* Restore Font Awesome icon fonts explicitly */
+.fa, .fas, .far, .fab, .fa-solid, .fa-regular, .fa-brands,
+[class^="fa-"], [class*=" fa-"] {
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free", "Font Awesome 5 Brands", FontAwesome !important;
+}
+
+/* Monospace elements stay as-is */
+code, pre, kbd, samp, .mono {
+  font-family: "Consolas", "Monaco", "Courier New", monospace !important;
+}
+
+h1,
+h2,
+h3,
+strong,
+b,
+th,
+.fw-bold,
+.font-weight-bold {
+  font-weight: 700;
+}
+
+h4,
+h5,
+h6,
+label,
+.fw-semibold,
+.font-weight-semibold {
+  font-weight: 600;
+}
+
+button,
+.btn,
+.badge,
+.nav-link,
+.dropdown-item {
+  font-weight: 500;
+}
+
+body,
+p,
+span,
+li,
+td,
+a {
+  font-weight: 400;
 }

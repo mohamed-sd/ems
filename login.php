@@ -143,20 +143,21 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --gold: #f7931a;
-      --gold-dark: #da7c05;
-      --line: #ededed;
-      --txt-1: #1f1f1f;
-      --txt-2: #9ba1a8;
-      --input-bg: #eef3fb;
+      --font-ui: var(--font-ar, 'IBM Plex Sans Arabic', 'Tajawal', 'Cairo', sans-serif);
+      --gold: #f3be00;
+      --gold-dark: #9f8500;
+      --line: #c8c8c8;
+      --txt-1: #121212;
+      --txt-2: #4d4d4d;
+      --input-bg: #ececec;
       --error: #c81f24;
     }
 
     html, body {
       height: 100%;
-      font-family: 'Tajawal', sans-serif;
+      font-family: var(--font-ui);
       overflow: hidden;
-      background: #0f1114;
+      background: #e2e2e2;
     }
 
     .stage {
@@ -176,7 +177,7 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       position: absolute;
       inset: 0;
       z-index: -1;
-      background: linear-gradient(90deg, rgba(8, 10, 14, 0.28) 0%, rgba(8, 10, 14, 0.11) 42%, rgba(8, 10, 14, 0.06) 100%);
+      background: linear-gradient(90deg, rgba(18, 18, 18, 0.26) 0%, rgba(18, 18, 18, 0.13) 45%, rgba(18, 18, 18, 0.08) 100%);
     }
 
     .login-card {
@@ -184,9 +185,9 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       max-width: 380px;
       direction: rtl;
       border-radius: 14px;
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.85);
-      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.34);
+      background: rgba(239, 239, 239, 0.96);
+      border: 1px solid rgba(200, 200, 200, 0.96);
+      box-shadow: 0 16px 42px rgba(18, 18, 18, 0.24);
       padding: 16px 10px 10px;
       animation: cardIn .45s ease-out;
     }
@@ -198,7 +199,7 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     .logo-wrap img {
-      width: 128px;
+      width: 180px;
       max-width: 78%;
       height: auto;
       display: inline-block;
@@ -207,7 +208,7 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     .title {
       margin-top: 6px;
       text-align: center;
-      color: #262626;
+      color: #121212;
       font-size: 25px;
       font-weight: 800;
       line-height: 1.1;
@@ -251,7 +252,7 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     .field label {
       display: block;
       text-align: right;
-      color: #777;
+      color: #333;
       font-size: 10px;
       font-weight: 700;
       margin-bottom: 5px;
@@ -263,13 +264,14 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     .input-wrap input {
+      background: var(--input-bg);
       width: 100%;
       height: 42px;
       border-radius: 9px;
-      border: 2px solid #f2b46c;
+      border: 2px solid #bdbdbd;
       background: var(--input-bg);
-      color: #222;
-      font-family: 'Tajawal', sans-serif;
+      color: #121212;
+      font-family: var(--font-ui);
       font-size: 17px;
       font-weight: 600;
       padding: 0 44px 0 44px;
@@ -278,13 +280,11 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     .input-wrap input:focus {
-      border-color: #f2bd80;
-      box-shadow: 0 0 0 3px rgba(247, 147, 26, 0.12);
+
       background: #fff;
     }
 
     .input-wrap input::placeholder {
-      color: #c7c7c7;
       font-size: 19px;
       font-weight: 500;
     }
@@ -306,22 +306,23 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
     .icon-r {
       right: 6px;
-      background: var(--gold);
-      color: #fff;
+      background: #f7f7f7;
+      border: 1px solid #a9a9a9;
+      color: #252525;
     }
 
     .icon-l {
       left: 6px;
-      background: #eef2f7;
-      border: 1px solid #e5eaf1;
-      color: #a5adb9;
+      background: #f7f7f7;
+      border: 1px solid #a9a9a9;
+      color: #252525;
     }
 
     .eye-btn {
       left: 6px;
-      border: 1px solid #e5eaf1;
-      background: #eef2f7;
-      color: #a5adb9;
+      border: 1px solid #a9a9a9;
+      background: #f7f7f7;
+      color: #252525;
       cursor: pointer;
     }
 
@@ -337,9 +338,9 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       height: 43px;
       border: 0;
       border-radius: 10px;
-      background: linear-gradient(180deg, #f89c1c 0%, #f48900 100%);
-      color: #fff;
-      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(180deg, #f3be00 0%, #d6a700 100%);
+      color: #121212;
+      font-family: var(--font-ui);
       font-size: 17px;
       font-weight: 800;
       display: flex;
@@ -347,13 +348,13 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       justify-content: center;
       gap: 8px;
       cursor: pointer;
-      box-shadow: 0 6px 15px rgba(244, 137, 0, 0.35);
+      box-shadow: 0 6px 15px rgba(159, 133, 0, 0.35);
       transition: transform .16s ease, box-shadow .16s ease;
     }
 
     .btn-submit:hover {
       transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(244, 137, 0, 0.4);
+      box-shadow: 0 8px 18px rgba(159, 133, 0, 0.42);
     }
 
     .btn-submit:disabled {
@@ -366,9 +367,9 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       margin-top: 10px;
       height: 28px;
       border-radius: 9px;
-      border: 1px solid #f0dcc0;
-      background: #fff8ee;
-      color: #bb8a47;
+      border: 1px solid #c8c8c8;
+      background: #efefef;
+      color: #333;
       font-size: 11px;
       font-weight: 700;
       display: flex;
@@ -392,9 +393,9 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     .p-link {
       height: 33px;
       border-radius: 8px;
-      border: 1px solid #e6e6e6;
-      background: #f7f7f7;
-      color: #707070;
+      border: 1px solid #c8c8c8;
+      background: #ececec;
+      color: #222;
       font-size: 16px;
       font-weight: 700;
       text-decoration: none;
@@ -406,14 +407,18 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     .p-link i {
-      color: var(--gold);
+      color: #6e6e6e;
       font-size: 10px;
     }
 
+    .p-link:hover i {
+      color: #111;
+    }
+
     .p-link:hover {
-      border-color: #f2bf81;
-      background: #fff;
-      color: #4d4d4d;
+      border-color: #9f8500;
+      background: #f3be00;
+      color: #121212;
     }
 
     @keyframes cardIn {
@@ -450,7 +455,7 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 <div class="stage">
   <div class="login-card">
     <div class="logo-wrap">
-      <img src="/ems/assets/images/logo.png" alt="Equipation logo">
+      <img src="/ems/assets/images/logo 2.svg" alt="Equipation logo">
       <div class="title">مرحبا بعودتك</div>
       <div class="subtitle">ادخل بياناتك للوصول الي لوحة التحكم</div>
     </div>

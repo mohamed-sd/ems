@@ -34,7 +34,7 @@
 	--s2:0 5px 20px rgba(12,28,62,.09);
 	--s3:0 14px 44px rgba(12,28,62,.13);
 	--ease:.22s cubic-bezier(.4,0,.2,1);
-	--font:'Cairo',sans-serif;
+	--font:var(--font-ar,"IBM Plex Sans Arabic","Tajawal","Cairo",sans-serif);
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
