@@ -164,24 +164,16 @@ $event_types_result = mysqli_query($conn, $event_types_query);
 ?>
 
 <div class="main failures-page fleet-failures-main">
-    <div class="main_head">
-        <div class="head_actions">
-            <button type="button" class="add-btn btn" onclick="exportToExcel()">
-                <i class="fas fa-file-excel"></i> تصدير Excel
-            </button>
-        </div>
-
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-tools"></i></div>
-            تقرير الأعطال - إدارة الأسطول
-        </h1>
-
-        <div class="head_back">
-            <a href="manage_failure_codes.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'تقرير الأعطال - إدارة الأسطول';
+    $header_icon    = 'fas fa-tools';
+    $header_actions = array(
+        array('tag' => 'button', 'class' => 'add-btn btn', 'attrs' => 'type="button" onclick="exportToExcel()"', 'icon' => 'fas fa-file-excel', 'label' => 'تصدير Excel'),
+    );
+    $header_back = array('href' => 'manage_failure_codes.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <div class="hero-note">
         <i class="fas fa-chart-line"></i>

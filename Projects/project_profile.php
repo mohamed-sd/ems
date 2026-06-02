@@ -124,18 +124,17 @@ include '../insidebar.php';
 </style>
 
 <div class="main project-profile-page ems-unified-page-shell">
-    <div class="main_head">
-        <div class="head_actions">
-            <a href="../Contracts/contracts.php?filter_project_id=<?php echo intval($project_id); ?>" class="add-btn">
-                <i class="fas fa-file-contract"></i> عقود المشروع
-            </a>
-            <a href="project_mines.php?project_id=<?php echo intval($project_id); ?>" class="add-btn">
-                <i class="fas fa-mountain"></i> مناجم المشروع
-            </a>
-        </div>
-        <h1 class="head-title"><div class="title-icon"><i class="fas fa-id-card"></i></div>بطاقة المشروع</h1>
-        <div class="head_back"><a href="projects.php"><i class="fas fa-arrow-right"></i> رجوع</a></div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'بطاقة المشروع';
+    $header_icon    = 'fas fa-id-card';
+    $header_actions = array(
+        array('href' => '../Contracts/contracts.php?filter_project_id=' . intval($project_id), 'class' => 'add-btn', 'icon' => 'fas fa-file-contract', 'label' => 'عقود المشروع'),
+        array('href' => 'project_mines.php?project_id=' . intval($project_id), 'class' => 'add-btn', 'icon' => 'fas fa-mountain', 'label' => 'مناجم المشروع'),
+    );
+    $header_back = array('href' => 'projects.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <div class="profile-card" style="margin-bottom:12px;">
         <h2 style="margin:0 0 8px 0;"><?php echo htmlspecialchars($project['name']); ?></h2>

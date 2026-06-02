@@ -243,19 +243,14 @@ include('../insidebar.php');
 <div class="main ems-unified-page-shell settings-main">
 
 
-    <div class="main_head">
-        <div class="head_actions">
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-gear"></i></div>
-            الإعدادات
-        </h1>
-        <div class="head_back">
-            <a href="../main/dashboard.php" class="">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'الإعدادات';
+    $header_icon    = 'fas fa-gear';
+    $header_actions = array();
+    $header_back    = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <div class="settings-shell">
 

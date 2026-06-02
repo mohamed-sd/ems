@@ -125,18 +125,16 @@ include '../insidebar.php';
 </style>
 
 <div class="main supplier-profile-page ems-unified-page-shell">
-    <div class="main_head">
-        <div class="head_actions">
-            <a href="supplierscontracts.php?id=<?php echo intval($supplier_id); ?>" class="add-btn">
-                <i class="fas fa-file-contract"></i> عقود المورد
-            </a>
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-id-card-alt"></i></div>
-            بطاقة المورد
-        </h1>
-        <div class="head_back"><a href="suppliers.php"><i class="fas fa-arrow-right"></i> رجوع</a></div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'بطاقة المورد';
+    $header_icon    = 'fas fa-id-card-alt';
+    $header_actions = array(
+        array('href' => 'supplierscontracts.php?id=' . intval($supplier_id), 'class' => 'add-btn', 'icon' => 'fas fa-file-contract', 'label' => 'عقود المورد'),
+    );
+    $header_back = array('href' => 'suppliers.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <div class="profile-card" style="margin-bottom:12px;">
         <h2 style="margin:0 0 8px 0;"><?php echo htmlspecialchars($supplier['name']); ?></h2>

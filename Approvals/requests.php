@@ -65,12 +65,18 @@ $result = mysqli_query($conn, $sql);
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 
 <div class="main">
-    <div class="header">
-        <div style="display:flex;align-items:center;gap:12px;">
-            <div class="title-icon"><i class="fas fa-check-double"></i></div>
-            <h1 class="page-title">طلبات الموافقات</h1>
+    <!-- Unified header: pre-built final structure (data-ems-unified-header skips the JS rebuild). Styling: ems.main.all.style.css (.header) -->
+    <div class="header" data-ems-unified-header="1">
+        <div class="actions" style="display:none;"></div>
+        <div class="title">
+            <div class="title-content" style="display:flex;align-items:center;gap:12px;">
+                <div class="title-icon"><i class="fas fa-check-double"></i></div>
+                <h1>طلبات الموافقات</h1>
+            </div>
         </div>
-        <a href="../main/dashboard.php" class="back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
+        <div class="back">
+            <a href="../main/dashboard.php" class="back-btn"><i class="fas fa-arrow-right"></i> رجوع</a>
+        </div>
     </div>
 
     <?php

@@ -827,38 +827,23 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
 <div class="main equipments-fleet-main ems-unified-page-shell">
 
    <!-- عنوان الصفحة -->
-    <div class="main_head">
-        <div class="head_actions">
-             <?php if ($can_add) { ?>
-                <a href="javascript:void(0)" id="toggleForm" class="add-btn" onclick="toggleFleetForm(event)">
-                    <i class="fas fa-plus-circle"></i> إضافة معدة جديدة
-                </a>
-                <!-- أزرار الاستيراد من Excel -->
-                <a href="download_equipments_template.php" class="btn fleet-action-btn fleet-action-btn-excel">
-                    <i class="fas fa-file-excel"></i> تحميل نموذج Excel
-                </a>
-                <a href="download_equipments_template_csv.php" class="btn fleet-action-btn fleet-action-btn-csv">
-                    <i class="fas fa-file-csv"></i> تحميل نموذج CSV
-                </a>
-                <a href="javascript:void(0)" id="openImportModal" class="btn fleet-action-btn fleet-action-btn-import">
-                    <i class="fas fa-file-import"></i> استيراد من Excel
-                </a>
-            <?php } ?>
-        </div>
-        <h1 class="head-title">
-             <div class="title-icon"><i class="fas fa-cogs"></i></div>
-            إدارة المعدات
-        </h1>
-        <div class="head_back">
-            <a href="javascript:void(0)" id="toggleStats" class="btn" title="إظهار أو إخفاء الإحصائيات">
-                <i class="fas fa-eye"></i>
-                <span class="fleet-toggle-stats-text">إظهار الإحصائيات</span>
-            </a>
-            <a href="../main/dashboard.php" class="">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title = 'إدارة المعدات';
+    $header_icon  = 'fas fa-cogs';
+    $header_actions = array();
+    if ($can_add) {
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'attrs' => 'onclick="toggleFleetForm(event)"', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة معدة جديدة');
+        $header_actions[] =  array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'fleet-toggle-stats-text');
+        $header_actions[] = array('href' => 'download_equipments_template.php', 'class' => 'btn fleet-action-btn fleet-action-btn-excel', 'icon' => 'fas fa-file-excel', 'label' => 'تحميل نموذج Excel');
+        $header_actions[] = array('href' => 'download_equipments_template_csv.php', 'class' => 'btn fleet-action-btn fleet-action-btn-csv', 'icon' => 'fas fa-file-csv', 'label' => 'تحميل نموذج CSV');
+        $header_actions[] = array('id' => 'openImportModal', 'class' => 'btn fleet-action-btn fleet-action-btn-import', 'icon' => 'fas fa-file-import', 'label' => 'استيراد من Excel');
+    }
+    $header_back = array(
+        array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع'),
+    );
+    include('../includes/page_header.php');
+    ?>
 
 
 

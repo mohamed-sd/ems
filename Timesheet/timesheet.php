@@ -556,25 +556,17 @@ if ($today_rows_result) {
 
 <div class="main timesheet-entry-page ems-unified-page-shell">
 
-  <div class="main_head">
-    <div class="head_actions">
-      <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-        <i class="fas fa-plus-circle"></i> إضافة ساعات عمل جديدة
-      </a>
-      <a href="view_timesheet.php?type=<?= urlencode($type) ?>" class="back-btn ts-view-link">
-        <i class="fas fa-table"></i> شاشة العرض الكاملة
-      </a>
-    </div>
-    <h1 class="head-title">
-      <div class="title-icon"><i class="fas fa-clock"></i></div>
-      إدارة ساعات العمل
-    </h1>
-    <div class="head_back">
-      <a href="timesheet_type.php" class="">
-        <i class="fas fa-arrow-right"></i> رجوع
-      </a>
-    </div>
-  </div>
+  <?php
+  // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+  $header_title   = 'إدارة ساعات العمل';
+  $header_icon    = 'fas fa-clock';
+  $header_actions = array(
+      array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة ساعات عمل جديدة'),
+      array('href' => 'view_timesheet.php?type=' . urlencode($type), 'class' => 'back-btn ts-view-link', 'icon' => 'fas fa-table', 'label' => 'شاشة العرض الكاملة'),
+  );
+  $header_back = array('href' => 'timesheet_type.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+  include('../includes/page_header.php');
+  ?>
 
   <form id="projectForm" action="" method="post" class="allforms">
     <?php if ($_GET['type'] == "1") {

@@ -242,37 +242,27 @@ include('../insidebar.php');
 
 <div class="main map-page-main movement-map-page ems-unified-page-shell">
 
-  <div class="main_head">
-    <div class="head_actions">
-      <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>" class="add-btn">
-        <i class="fas fa-cogs"></i> إدارة التشغيل
-      </a>
-      <a href="project_drivers.php?project_id=<?php echo intval($selected_project_id); ?>" class="add-btn map-project-drivers-btn">
-        <i class="fas fa-id-badge"></i> سائقي المشروع
-      </a>
-      <span class="movement-topbar-live map-live-badge">
-        <span class="live-dot map-live-dot"></span>
-        عرض مباشر
-      </span>
-    </div>
-
-    <h1 class="head-title">
-      <div class="title-icon"><i class="fas fa-map-marked-alt"></i></div>
-      خريطة الموقع
+  <?php
+  // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+  $header_icon       = 'fas fa-map-marked-alt';
+  $header_title_html = 'خريطة الموقع
       <small class="map-project-meta">
         <i class="fas fa-project-diagram"></i>
-        <?php echo htmlspecialchars($selected_project['name']); ?>
-        <?php if (!empty($selected_project['project_code'])): ?> · <?php echo htmlspecialchars($selected_project['project_code']); ?><?php endif; ?>
-        <?php if (!empty($selected_project['location'])): ?> · <?php echo htmlspecialchars($selected_project['location']); ?><?php endif; ?>
-      </small>
-    </h1>
-
-    <div class="head_back">
-      <a href="../main/dashboard.php" class="back-btn">
-        <i class="fa-solid fa-house"></i> الرئيسية
-      </a>
-    </div>
-  </div>
+        ' . htmlspecialchars($selected_project['name'])
+        . (!empty($selected_project['project_code']) ? ' · ' . htmlspecialchars($selected_project['project_code']) : '')
+        . (!empty($selected_project['location']) ? ' · ' . htmlspecialchars($selected_project['location']) : '') . '
+      </small>';
+  $header_actions = array(
+      array('href' => 'move_oprators.php?project_id=' . intval($selected_project_id), 'class' => 'add-btn', 'icon' => 'fas fa-cogs', 'label' => 'إدارة التشغيل'),
+      array('href' => 'project_drivers.php?project_id=' . intval($selected_project_id), 'class' => 'add-btn map-project-drivers-btn', 'icon' => 'fas fa-id-badge', 'label' => 'سائقي المشروع'),
+      array('raw' => '<span class="movement-topbar-live map-live-badge">
+        <span class="live-dot map-live-dot"></span>
+        عرض مباشر
+      </span>'),
+  );
+  $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fa-solid fa-house', 'label' => 'الرئيسية');
+  include(__DIR__ . '/../includes/page_header.php');
+  ?>
 
   <div class="movement-content-wrapper">
 

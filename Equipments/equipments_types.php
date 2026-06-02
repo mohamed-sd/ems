@@ -64,24 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="main equipments-types-main">
 
-    <div class="main_head">
-        <div class="head_actions">
-            <?php if ($perms['can_add']): ?>
-                <button id="toggleForm" class="add">
-                    <i class="fa-solid fa-plus-circle"></i> إضافة نوع جديد
-                </button>
-            <?php endif; ?>
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-cubes"></i></div>
-            إدارة أنواع المعدات
-        </h1>
-        <div class="head_back">
-            <a href="../main/dashboard.php" class="">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'إدارة أنواع المعدات';
+    $header_icon    = 'fas fa-cubes';
+    $header_actions = array();
+    if ($perms['can_add']) {
+        $header_actions[] = array('tag' => 'button', 'id' => 'toggleForm', 'class' => 'add', 'icon' => 'fa-solid fa-plus-circle', 'label' => 'إضافة نوع جديد');
+    }
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
     <!-- تنبيه الحذف (معطل) -->
     <div id="deleteAlert" class="alert alert-warning text-center equipments-types-alert-hidden">
         <i class="fa-solid fa-circle-info"></i>

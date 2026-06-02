@@ -890,34 +890,20 @@ function get_shift_info(string $code): array
 
 <div class="main movement-page movement-ops-page">
 
-    <div class="main_head">
-        <div class="head_actions">
-            <?php if ($can_add): ?>
-            <a href="javascript:void(0)" id="toggleForm"
-               class="movement-topbar-btn movement-topbar-btn-primary add-btn">
-                <i class="fa fa-plus-circle"></i> إضافة تشغيل جديد
-            </a>
-            <?php endif; ?>
-            <a href="movement_operations.php?project_id=<?= intval($selected_project_id) ?>"
-               class="movement-topbar-btn">
-                <i class="fas fa-route"></i> الحركة والتشغيل
-            </a>
-            <a href="project_drivers.php?project_id=<?= intval($selected_project_id) ?>"
-               class="movement-topbar-btn">
-                <i class="fas fa-id-badge"></i> سائقي المشروع
-            </a>
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-cogs"></i></div>
-            إدارة التشغيل <i class="fas fa-project-diagram"></i>
-            <?= htmlspecialchars($selected_project['name'], ENT_QUOTES, 'UTF-8') ?>
-        </h1>
-        <div class="head_back">
-            <a href="../main/dashboard.php">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_icon       = 'fas fa-cogs';
+    $header_title_html = 'إدارة التشغيل <i class="fas fa-project-diagram"></i>
+            ' . htmlspecialchars($selected_project['name'], ENT_QUOTES, 'UTF-8');
+    $header_actions = array();
+    if ($can_add) {
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'movement-topbar-btn movement-topbar-btn-primary add-btn', 'icon' => 'fa fa-plus-circle', 'label' => 'إضافة تشغيل جديد');
+    }
+    $header_actions[] = array('href' => 'movement_operations.php?project_id=' . intval($selected_project_id), 'class' => 'movement-topbar-btn', 'icon' => 'fas fa-route', 'label' => 'الحركة والتشغيل');
+    $header_actions[] = array('href' => 'project_drivers.php?project_id=' . intval($selected_project_id), 'class' => 'movement-topbar-btn', 'icon' => 'fas fa-id-badge', 'label' => 'سائقي المشروع');
+    $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include(__DIR__ . '/../includes/page_header.php');
+    ?>
 
     <div class="ems-content">
 

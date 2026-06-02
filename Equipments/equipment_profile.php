@@ -128,14 +128,17 @@ include '../insidebar.php';
 </style>
 
 <div class="main equipment-profile-page ems-unified-page-shell">
-    <div class="main_head">
-        <div class="head_actions">
-            <a href="add_drivers.php?equipment_id=<?php echo intval($equipment_id); ?>" class="add-btn"><i class="fas fa-user-cog"></i> إدارة المشغلين</a>
-            <a href="equipments.php?edit=<?php echo intval($equipment_id); ?>" class="add-btn"><i class="fas fa-edit"></i> تعديل المعدة</a>
-        </div>
-        <h1 class="head-title"><div class="title-icon"><i class="fas fa-id-card"></i></div>بطاقة المعدة / الشاحنة</h1>
-        <div class="head_back"><a href="equipments.php"><i class="fas fa-arrow-right"></i> رجوع</a></div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'بطاقة المعدة / الشاحنة';
+    $header_icon    = 'fas fa-id-card';
+    $header_actions = array(
+        array('href' => 'add_drivers.php?equipment_id=' . intval($equipment_id), 'class' => 'add-btn', 'icon' => 'fas fa-user-cog', 'label' => 'إدارة المشغلين'),
+        array('href' => 'equipments.php?edit=' . intval($equipment_id), 'class' => 'add-btn', 'icon' => 'fas fa-edit', 'label' => 'تعديل المعدة'),
+    );
+    $header_back = array('href' => 'equipments.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <div class="profile-card" style="margin-bottom:12px;">
         <h2 style="margin:0 0 8px 0;"><?php echo htmlspecialchars($equipment['name']); ?></h2>

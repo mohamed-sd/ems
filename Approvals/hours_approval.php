@@ -306,24 +306,18 @@ include '../insidebar.php';
 <div class="main hours-approval-main">
 <div class="page-wrapper">
 
-  <div class="main_head">
-    <div class="head_actions">
-      <a href="<?= $is_admin ? '../admin/dashboard.php' : '../main/dashboard.php' ?>" class="btn btn-outline-secondary btn-sm fw-semibold">
-        <i class="fa fa-home me-1"></i> لوحة التحكم
-      </a>
-      <a href="hours_approval_followup.php" class="btn btn-primary btn-sm fw-semibold">
-        <i class="fa fa-route me-1"></i> متابعة الاعتمادات المنقولة
-      </a>
-      <span class="badge bg-light text-dark border">فلتر نوع المعدة: <?= htmlspecialchars($equip_type_label) ?></span>
-    </div>
-
-    <h1 class="head-title">
-      <div class="title-icon"><i class="fa fa-check-double"></i></div>
-      اعتماد ساعات العمل
-    </h1>
-
-    <div class="head_back"></div>
-  </div>
+  <?php
+  // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+  $header_title   = 'اعتماد ساعات العمل';
+  $header_icon    = 'fa fa-check-double';
+  $header_actions = array(
+      array('href' => ($is_admin ? '../admin/dashboard.php' : '../main/dashboard.php'), 'class' => 'btn btn-outline-secondary btn-sm fw-semibold', 'icon' => 'fa fa-home me-1', 'label' => 'لوحة التحكم'),
+      array('href' => 'hours_approval_followup.php', 'class' => 'btn btn-primary btn-sm fw-semibold', 'icon' => 'fa fa-route me-1', 'label' => 'متابعة الاعتمادات المنقولة'),
+      array('raw' => '<span class="badge bg-light text-dark border">فلتر نوع المعدة: ' . htmlspecialchars($equip_type_label) . '</span>'),
+  );
+  $header_back = array();
+  include('../includes/page_header.php');
+  ?>
 
   <div class="mb-4">
     <small class="text-muted">

@@ -13198,3 +13198,70 @@ body.ems-site .main .card .card-header {
 body.ems-site {
   font-family: var(--font-ui);
 }
+
+/* Final unified header styling override */
+body.ems-site .main .main_head .head-title .title-icon,
+body.ems-site .main .allheaders .title-icon,
+body.ems-site .main .allheaders .allheaders-title i:first-child,
+body.ems-site .main .page-header.allheaders .title-icon,
+body.ems-site .main .page-header.allheaders .allheaders-title i:first-child {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.ems-site .main .main_head .head-title .title-icon i,
+body.ems-site .main .allheaders .title-icon i,
+body.ems-site .main .allheaders .allheaders-title i:first-child,
+body.ems-site .main .page-header.allheaders .title-icon i,
+body.ems-site .main .page-header.allheaders .allheaders-title i:first-child {
+  color: #ffffff !important;
+  size: .1rem !important;
+}
+
+body.ems-site .main .main_head .add-btn,
+body.ems-site .main .allheaders .allheaders-add,
+body.ems-site .main .page-header.allheaders .allheaders-add {
+  background: #111111 !important;
+  border-color: #111111 !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.24) !important;
+}
+
+body.ems-site .main .main_head .add-btn:hover,
+body.ems-site .main .allheaders .allheaders-add:hover,
+body.ems-site .main .page-header.allheaders .allheaders-add:hover {
+  background: #1f2937 !important;
+  border-color: #1f2937 !important;
+  color: #ffffff !important;
+}
+
+/* Absolute override for header add button (button + inner icon/text) */
+body.ems-site .main .main_head .head_actions > a.add-btn,
+body.ems-site .main .main_head .head_actions > button.add-btn,
+body.ems-site .main .main_head .head_actions > #toggleForm,
+body.ems-site .main .allheaders .allheaders-add,
+body.ems-site .main .page-header.allheaders .allheaders-add {
+  background: #111111 !important;
+  border-color: #111111 !important;
+  color: #ffffff !important;
+}
+
+body.ems-site .main .main_head .head_actions > a.add-btn *,
+body.ems-site .main .main_head .head_actions > button.add-btn *,
+body.ems-site .main .main_head .head_actions > #toggleForm *,
+body.ems-site .main .allheaders .allheaders-add *,
+body.ems-site .main .page-header.allheaders .allheaders-add * {
+  color: #ffffff !important;
+}
+
+body.ems-site .main .main_head .head_actions > a.add-btn:hover,
+body.ems-site .main .main_head .head_actions > button.add-btn:hover,
+body.ems-site .main .main_head .head_actions > #toggleForm:hover,
+body.ems-site .main .allheaders .allheaders-add:hover,
+body.ems-site .main .page-header.allheaders .allheaders-add:hover {
+  background: #1f2937 !important;
+  border-color: #1f2937 !important;
+  color: #ffffff !important;
+}

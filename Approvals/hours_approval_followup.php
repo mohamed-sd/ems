@@ -320,19 +320,17 @@ include('../inheader.php');
 
 <div class="main hours-approval-followup-main">
 <div class="page-wrapper">
-  <div class="main_head">
-    <div class="head_actions">
-      <a href="hours_approval.php" class="add-btn btn btn-light btn-sm fw-bold"><i class="fa fa-arrow-right"></i> شاشة الاعتماد</a>
-      <a href="<?= $is_admin ? '../admin/dashboard.php' : '../main/dashboard.php' ?>" class="btn btn-outline-light btn-sm fw-bold"><i class="fa fa-home"></i> لوحة التحكم</a>
-    </div>
-
-    <h1 class="head-title">
-      <div class="title-icon"><i class="fa fa-route"></i></div>
-      متابعة الاعتمادات المنقولة
-    </h1>
-
-    <div class="head_back"></div>
-  </div>
+  <?php
+  // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+  $header_title   = 'متابعة الاعتمادات المنقولة';
+  $header_icon    = 'fa fa-route';
+  $header_actions = array(
+      array('href' => 'hours_approval.php', 'class' => 'add-btn btn btn-light btn-sm fw-bold', 'icon' => 'fa fa-arrow-right', 'label' => 'شاشة الاعتماد'),
+      array('href' => ($is_admin ? '../admin/dashboard.php' : '../main/dashboard.php'), 'class' => 'btn btn-outline-light btn-sm fw-bold', 'icon' => 'fa fa-home', 'label' => 'لوحة التحكم'),
+  );
+  $header_back = array();
+  include('../includes/page_header.php');
+  ?>
 
   <div class="mb-3 text-muted" style="font-size:.85rem;">
     <?php if ($is_admin): ?>

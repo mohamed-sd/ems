@@ -301,17 +301,22 @@ include('../insidebar.php');
 </style>
 
 <div class="main">
-    <div class="header">
-        <h1 class="page-title">
-            <div class="title-icon"><i class="fas fa-layer-group"></i></div>
-            إدارة الصفحات والموديولات
-        </h1>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="settings.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
+    <!-- Unified header: pre-built final structure (data-ems-unified-header skips the JS rebuild). Styling: ems.main.all.style.css (.header) -->
+    <div class="header" data-ems-unified-header="1">
+        <div class="actions">
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة صفحة جديدة
+            </a>
+        </div>
+        <div class="title">
+            <h1 class="title-content">
+                <div class="title-icon"><i class="fas fa-layer-group"></i></div>
+                إدارة الصفحات والموديولات
+            </h1>
+        </div>
+        <div class="back">
+            <a href="settings.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
             </a>
         </div>
     </div>

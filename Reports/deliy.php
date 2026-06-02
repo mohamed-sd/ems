@@ -83,18 +83,14 @@ $executed_hours  = $total_row['executed_hours'];
 
 <div class="main reports-daily-main ems-unified-page-shell">
 
-	<div class="main_head">
-		<div class="head_actions"></div>
-		<h1 class="head-title">
-			<div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
-			تقرير ساعات العمل اليومية
-		</h1>
-		<div class="head_back">
-			<a href="reports.php" class="back-btn">
-				<i class="fas fa-arrow-right"></i> رجوع
-			</a>
-		</div>
-	</div>
+		<?php
+		// Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+		$header_title   = 'تقرير ساعات العمل اليومية';
+		$header_icon    = 'fa-solid fa-chart-line';
+		$header_actions = array();
+		$header_back    = array('href' => 'reports.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+		include('../includes/page_header.php');
+		?>
 
 	<div class="card mb-4 fc-filter-body">
 		<div class="card-header fc-filter-bar">

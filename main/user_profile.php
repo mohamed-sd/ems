@@ -106,11 +106,14 @@ include '../insidebar.php';
 </style>
 
 <div class="main user-profile-page ems-unified-page-shell">
-    <div class="main_head">
-        <div class="head_actions"></div>
-        <h1 class="head-title"><div class="title-icon"><i class="fas fa-id-card"></i></div>بطاقة المستخدم</h1>
-        <div class="head_back"><a href="users.php"><i class="fas fa-arrow-right"></i> رجوع</a></div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'بطاقة المستخدم';
+    $header_icon    = 'fas fa-id-card';
+    $header_actions = array();
+    $header_back    = array('href' => 'users.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <div class="profile-card" style="margin-bottom:12px;">
         <h2 style="margin:0 0 8px 0;"><?php echo htmlspecialchars($user_data['name']); ?></h2>

@@ -835,25 +835,17 @@ include('../insidebar.php');
 
 <div class="main timesheet-view-page ems-unified-page-shell">
 
-<div class="main_head">
-    <div class="head_actions">
-            <a href="view_timesheet.php" class="back-btn ts-reset-link">
-                <i class="fas fa-redo"></i> إعادة تعيين
-            </a>
-            <a href="<?= htmlspecialchars($export_all_url) ?>" class="back-btn ts-export-link">
-                <i class="fas fa-file-export"></i> تصدير كل البيانات حسب الفلترة
-            </a>
-    </div>
-    <h1 class="head-title">
-        <div class="title-icon"><i class="fas fa-table"></i></div>
-            شاشة عرض ساعات العمل
-    </h1>
-    <div class="head_back">
-      <a href="timesheet_type.php" class="">
-        <i class="fas fa-arrow-right"></i> رجوع
-      </a>
-    </div>
-  </div>
+<?php
+// Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+$header_title   = 'شاشة عرض ساعات العمل';
+$header_icon    = 'fas fa-table';
+$header_actions = array(
+    array('href' => 'view_timesheet.php', 'class' => 'back-btn ts-reset-link', 'icon' => 'fas fa-redo', 'label' => 'إعادة تعيين'),
+    array('href' => $export_all_url, 'class' => 'back-btn ts-export-link', 'icon' => 'fas fa-file-export', 'label' => 'تصدير كل البيانات حسب الفلترة'),
+);
+$header_back = array('href' => 'timesheet_type.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+include('../includes/page_header.php');
+?>
 
 
     <?php if (!$has_filters) { ?>

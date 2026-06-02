@@ -68,20 +68,14 @@ $result = mysqli_query($conn, $sql);
 
 <div class="main reports-main driver-report-main">
 
-        <div class="main_head">
-            <div class="head_actions"></div>
-
-            <h1 class="head-title">
-                <div class="title-icon"><i class="fas fa-user-clock"></i></div>
-                تقرير ساعات عمل السائقين
-            </h1>
-
-            <div class="head_back">
-        <a href="reports.php" class="back-btn">
-          <i class="fas fa-arrow-right"></i> رجوع
-        </a>
-      </div>
-    </div>
+        <?php
+        // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+        $header_title   = 'تقرير ساعات عمل السائقين';
+        $header_icon    = 'fas fa-user-clock';
+        $header_actions = array();
+        $header_back    = array('href' => 'reports.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+        include('../includes/page_header.php');
+        ?>
 
     <div class="card">
         <div class="card-header">

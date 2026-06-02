@@ -947,28 +947,24 @@ include("../inheader.php");
 
 <div class="main movement-page movement-drivers-page">
 
-    <div class="main_head">
-        <div class="head_actions">
-            <a href="javascript:void(0)" id="toggleForm" class="btn btn-success">
-                <i class="fas fa-user-plus"></i> إسناد مشغل جديد
-            </a>
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-users-cog"></i></div>
-            إدارة مشغلي المعدة
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_icon       = 'fas fa-users-cog';
+    $header_title_html = 'إدارة مشغلي المعدة
             <span style="font-size: 15px;">
-                <i class="fas fa-cogs"></i> <?php echo htmlspecialchars($equipment['name']); ?>
+                <i class="fas fa-cogs"></i> ' . htmlspecialchars($equipment['name']) . '
                 <p><i class="fas fa-barcode"></i> الكود:
-                    <strong><?php echo htmlspecialchars($equipment['code']); ?></strong> |
+                    <strong>' . htmlspecialchars($equipment['code']) . '</strong> |
                     <i class="fas fa-building"></i> المورد:
-                    <strong><?php echo htmlspecialchars($equipment['supplier_name'] ?: 'غير محدد'); ?></strong>
+                    <strong>' . htmlspecialchars($equipment['supplier_name'] ?: 'غير محدد') . '</strong>
                 </p>
-            </span>
-        </h1>
-        <div class="head_back">
-            <a href="../main/dashboard.php"><i class="fas fa-arrow-right"></i> رجوع</a>
-        </div>
-    </div>
+            </span>';
+    $header_actions = array(
+        array('id' => 'toggleForm', 'class' => 'btn btn-success', 'icon' => 'fas fa-user-plus', 'label' => 'إسناد مشغل جديد'),
+    );
+    $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include(__DIR__ . '/../includes/page_header.php');
+    ?>
 
     <?php if (isset($_GET['msg'])): ?>
         <div class="alert alert-success">

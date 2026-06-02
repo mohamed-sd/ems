@@ -114,20 +114,14 @@ include('../insidebar.php');
 
 <div class="main ems-unified-page-shell reports-main timesheet-daily-main">
 
-    <div class="main_head">
-        <div class="head_actions"></div>
-
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fa-solid fa-chart-column"></i></div>
-            تقرير التايم شيت اليومي
-        </h1>
-
-        <div class="head_back">
-            <a href="reports.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'تقرير التايم شيت اليومي';
+    $header_icon    = 'fa-solid fa-chart-column';
+    $header_actions = array();
+    $header_back    = array('href' => 'reports.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <div class="card mb-4">
         <div class="card-header">

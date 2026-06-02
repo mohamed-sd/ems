@@ -417,45 +417,24 @@ include('../insidebar.php');
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 <div class="main projects-main ems-unified-page-shell">
 
-    <div class="main_head">
-
-        <div class="head_actions">
-            <?php if ($can_add): ?>
-                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                    <i class="fas fa-plus-circle"></i> إضافة مشروع
-                </a>
-            <?php else: ?>
-                <button class="add-btn" disabled>
-                    <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحية)
-                </button>
-            <?php endif; ?>
-
-            <a href="javascript:void(0)" id="toggleStats" class="btn" title="إظهار أو إخفاء الإحصائيات">
-                <i class="fas fa-eye"></i>
-                <span class="projects-toggle-stats-text">إظهار الإحصائيات</span>
-            </a>
-
-            <a href="javascript:void(0)" class="btn projects-btn projects-btn-export" id="exportBtn" title="تحميل النموذج">
-                <i class="fas fa-download"></i> تحميل النموذج
-            </a>
-            <?php if ($can_add): ?>
-                <a href="javascript:void(0)" class="btn projects-btn projects-btn-import" id="importBtn" title="استيراد ملف">
-                    <i class="fas fa-upload"></i> استيراد من Excel
-                </a>
-            <?php endif; ?>
-        </div>
-
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-project-diagram"></i></div>
-            إدارة المشاريع
-        </h1>
-
-        <div class="head_back">
-            <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title = 'إدارة المشاريع';
+    $header_icon  = 'fas fa-project-diagram';
+    $header_actions = array();
+    if ($can_add) {
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مشروع');
+    } else {
+        $header_actions[] = array('tag' => 'button', 'class' => 'add-btn', 'disabled' => true, 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة (بدون صلاحية)');
+    }
+    $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'projects-toggle-stats-text');
+    $header_actions[] = array('id' => 'exportBtn', 'class' => 'btn projects-btn projects-btn-export', 'title' => 'تحميل النموذج', 'icon' => 'fas fa-download', 'label' => 'تحميل النموذج');
+    if ($can_add) {
+        $header_actions[] = array('id' => 'importBtn', 'class' => 'btn projects-btn projects-btn-import', 'title' => 'استيراد ملف', 'icon' => 'fas fa-upload', 'label' => 'استيراد من Excel');
+    }
+    $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <!-- <div class="header projects-header-shell">
         <a href="../main/dashboard.php" class="back-btn">

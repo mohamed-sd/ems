@@ -98,22 +98,16 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
   <div class="main driver-contracts-main ems-unified-page-shell">
 
-    <div class="main_head">
-      <div class="head_actions">
-         <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-          <i class="fas fa-plus-circle"></i> عقد جديد
-        </a>
-      </div>
-      <h1 class="head-title">
-        <div class="title-icon"><i class="fas fa-file-contract"></i></div>
-        إدارة عقود السائق
-      </h1>
-      <div class="head_back">
-        <a href="drivers.php" class="">
-          <i class="fas fa-arrow-right"></i> رجوع
-        </a>
-      </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title = 'إدارة عقود السائق';
+    $header_icon  = 'fas fa-file-contract';
+    $header_actions = array(
+        array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'عقد جديد'),
+    );
+    $header_back = array('href' => 'drivers.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <!-- فورم إضافة عقد -->
     <form id="projectForm" action="" method="post" class="allforms">

@@ -265,22 +265,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
 <div class="main project-users-main ems-unified-page-shell">
 
-    <div class="main_head">
-        <div class="head_actions">
-            <button id="toggleForm" class="add users-add-btn" type="button">
-                <i class="fas fa-plus-circle"></i> إضافة مستخدم جديد
-            </button>
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-cogs"></i></div>
-            إدارة المستخدمين
-        </h1>
-        <div class="head_back">
-            <a href="../main/dashboard.php" class="">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'إدارة المستخدمين';
+    $header_icon    = 'fas fa-cogs';
+    $header_actions = array(
+        array('tag' => 'button', 'id' => 'toggleForm', 'class' => 'btn btn-primary', 'attrs' => 'type="button"', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مستخدم جديد'),
+    );
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <?php
 

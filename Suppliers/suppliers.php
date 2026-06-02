@@ -308,42 +308,23 @@ include '../insidebar.php';
 
 <div class="main suppliers-main ems-unified-page-shell">
 
-    <div class="main_head">
-        <div class="head_actions">
-            <?php if ($can_add): ?>
-                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                    <i class="fas fa-plus-circle"></i> إضافة مورد جديد
-                </a>
-            <?php endif; ?>
-
-            <a href="javascript:void(0)" id="toggleStats" class="suppliers-header-link" title="إظهار أو إخفاء الإحصائيات">
-                <i class="fas fa-eye"></i>
-                <span class="suppliers-toggle-stats-text">إظهار الإحصائيات</span>
-            </a>
-
-            <a href="download_suppliers_template_csv.php" class="suppliers-header-link suppliers-header-link-csv">
-                <i class="fas fa-file-csv"></i> تحميل نموذج CSV
-            </a>
-            <a href="download_suppliers_template.php" class="suppliers-header-link suppliers-header-link-excel">
-                <i class="fas fa-file-excel"></i> تحميل نموذج Excel
-            </a>
-            <?php if ($can_add): ?>
-                <a href="javascript:void(0)" id="openImportModal"
-                    class="suppliers-header-link suppliers-header-link-import">
-                    <i class="fas fa-file-import"></i> استيراد من Excel
-                </a>
-            <?php endif; ?>
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-truck-loading"></i></div>
-            إدارة الموردين
-        </h1>
-        <div class="head_back">
-            <a href="../main/dashboard.php" class="">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'إدارة الموردين';
+    $header_icon    = 'fas fa-truck-loading';
+    $header_actions = array();
+    if ($can_add) {
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مورد جديد');
+    }
+    $header_actions[] = array('id' => 'toggleStats', 'class' => 'suppliers-header-link', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'suppliers-toggle-stats-text');
+    $header_actions[] = array('href' => 'download_suppliers_template_csv.php', 'class' => 'suppliers-header-link suppliers-header-link-csv', 'icon' => 'fas fa-file-csv', 'label' => 'تحميل نموذج CSV');
+    $header_actions[] = array('href' => 'download_suppliers_template.php', 'class' => 'suppliers-header-link suppliers-header-link-excel', 'icon' => 'fas fa-file-excel', 'label' => 'تحميل نموذج Excel');
+    if ($can_add) {
+        $header_actions[] = array('id' => 'openImportModal', 'class' => 'suppliers-header-link suppliers-header-link-import', 'icon' => 'fas fa-file-import', 'label' => 'استيراد من Excel');
+    }
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;

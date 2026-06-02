@@ -713,53 +713,26 @@ include('../insidebar.php');
 
 <div class="main clients-main ems-unified-page-shell">
 
-    <div class="main_head">
-
-        <div class="head_actions">
-            <?php if ($can_add): ?>
-                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                    <i class="fas fa-plus-circle"></i>
-                    <span class="clients-toggle-form-text">إضافة عميل جديد</span>
-                </a>
-            <?php else: ?>
-                <button class="" disabled>
-                    <i class="fas fa-plus-circle"></i> إضافة (بدون صلاحيات)
-                </button>
-            <?php endif; ?>
-
-            <a href="javascript:void(0)" id="toggleStats" class="btn" title="إظهار أو إخفاء الإحصائيات">
-                <i class="fas fa-eye"></i>
-                <span class="clients-toggle-stats-text">إظهار الإحصائيات</span>
-            </a>
-
-            <a href="download_clients_template_csv.php" class="btn" title="تحميل نموذج CSV فارغ للاستيراد">
-                <i class="fas fa-file-csv"></i> تحميل نموذج CSV
-            </a>
-            <a href="download_clients_template.php" class="btn" title="تحميل نموذج Excel فارغ للاستيراد">
-                <i class="fas fa-file-excel"></i> تحميل نموذج Excel
-            </a>
-            <?php if ($can_add): ?>
-                <a href="javascript:void(0)" id="openImportModal" class="">
-                    <i class="fas fa-file-upload"></i> استيراد من Excel
-                </a>
-            <?php endif; ?>
-            <a href="export_clients_excel.php" class="btn" title="تصدير جميع العملاء إلى ملف Excel">
-                <i class="fas fa-download"></i> تصدير Excel
-            </a>
-
-        </div>
-
-          <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-users"></i></div>
-            إدارة العملاء
-        </h1>
-
-        <div class="head_back">
-            <a href="../main/dashboard.php" class="">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title = 'إدارة العملاء';
+    $header_icon  = 'fas fa-users';
+    $header_actions = array();
+    if ($can_add) {
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة عميل جديد', 'label_class' => 'clients-toggle-form-text');
+    } else {
+        $header_actions[] = array('tag' => 'button', 'class' => '', 'disabled' => true, 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة (بدون صلاحيات)');
+    }
+    $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'clients-toggle-stats-text');
+    $header_actions[] = array('href' => 'download_clients_template_csv.php', 'class' => 'btn', 'title' => 'تحميل نموذج CSV فارغ للاستيراد', 'icon' => 'fas fa-file-csv', 'label' => 'تحميل نموذج CSV');
+    $header_actions[] = array('href' => 'download_clients_template.php', 'class' => 'btn', 'title' => 'تحميل نموذج Excel فارغ للاستيراد', 'icon' => 'fas fa-file-excel', 'label' => 'تحميل نموذج Excel');
+    if ($can_add) {
+        $header_actions[] = array('id' => 'openImportModal', 'class' => '', 'icon' => 'fas fa-file-upload', 'label' => 'استيراد من Excel');
+    }
+    $header_actions[] = array('href' => 'export_clients_excel.php', 'class' => 'btn', 'title' => 'تصدير جميع العملاء إلى ملف Excel', 'icon' => 'fas fa-download', 'label' => 'تصدير Excel');
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;

@@ -221,23 +221,17 @@ include("../insidebar.php");
 
 <div class="main driver-profile-page ems-unified-page-shell">
 
-    <div class="main_head">
-        <div class="head_actions">
-            <a href="drivercontracts.php?id=<?php echo intval($driver_id); ?>"
-                class="add-btn driver-profile-link-btn"><i class="fas fa-file-contract"></i> عقود السائق</a>
-            <a href="driver_truck_history.php?id=<?php echo intval($driver_id); ?>"
-                class="add-btn driver-profile-link-btn"><i class="fas fa-history"></i> سجل حركة الآليات</a>
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-id-card-alt"></i></div>
-            بطاقة وبيانات السائق التفصيلية
-        </h1>
-        <div class="head_back">
-            <a href="drivers.php" class="">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'بطاقة وبيانات السائق التفصيلية';
+    $header_icon    = 'fas fa-id-card-alt';
+    $header_actions = array(
+        array('href' => 'drivercontracts.php?id=' . intval($driver_id), 'class' => 'add-btn driver-profile-link-btn', 'icon' => 'fas fa-file-contract', 'label' => 'عقود السائق'),
+        array('href' => 'driver_truck_history.php?id=' . intval($driver_id), 'class' => 'add-btn driver-profile-link-btn', 'icon' => 'fas fa-history', 'label' => 'سجل حركة الآليات'),
+    );
+    $header_back = array('href' => 'drivers.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <div class="identity-card">
         <div class="id-grid">

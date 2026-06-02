@@ -244,24 +244,17 @@ include('../insidebar.php');
 
 <div class="main project-users-main ems-unified-page-shell">
 
-    <div class="main_head">
-        <div class="head_actions">
-            <?php if ($can_add): ?>
-                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                    <i class="fas fa-plus-circle"></i> إضافة مشرف جديد
-                </a>
-            <?php endif; ?>
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-users-cog"></i></div>
-            إدارة مشرفين <?php echo !empty($roleName) ? '- ' . $roleName : ''; ?>
-        </h1>
-        <div class="head_back">
-            <a href="../main/dashboard.php" class="">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_icon       = 'fas fa-users-cog';
+    $header_title_html = 'إدارة مشرفين ' . (!empty($roleName) ? '- ' . $roleName : '');
+    $header_actions = array();
+    if ($can_add) {
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مشرف جديد');
+    }
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;

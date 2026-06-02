@@ -929,19 +929,17 @@ include '../insidebar.php';
 </style>
 
 <div class="main movement-page movement-unified-page">
-    <div class="main_head">
-        <div class="head_actions">
-            <a href="move_oprators.php?project_id=<?php echo intval($selected_project_id); ?>" class="movement-topbar-btn" title="الصفحة القديمة"><i class="fas fa-cogs"></i> الصفحة القديمة</a>
-            <a href="../main/dashboard.php" class="movement-topbar-btn"><i class="fas fa-home"></i> لوحة التحكم</a>
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-route"></i></div>
-            الحركة والتشغيل الموحدة <i class="fas fa-project-diagram"></i> <?php echo htmlspecialchars($selected_project['name']); ?>
-        </h1>
-        <div class="head_back">
-            <a href="../main/dashboard.php"><i class="fas fa-arrow-right"></i> رجوع</a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_icon       = 'fas fa-route';
+    $header_title_html = 'الحركة والتشغيل الموحدة <i class="fas fa-project-diagram"></i> ' . htmlspecialchars($selected_project['name']);
+    $header_actions = array(
+        array('href' => 'move_oprators.php?project_id=' . intval($selected_project_id), 'class' => 'movement-topbar-btn', 'title' => 'الصفحة القديمة', 'icon' => 'fas fa-cogs', 'label' => 'الصفحة القديمة'),
+        array('href' => '../main/dashboard.php', 'class' => 'movement-topbar-btn', 'icon' => 'fas fa-home', 'label' => 'لوحة التحكم'),
+    );
+    $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include(__DIR__ . '/../includes/page_header.php');
+    ?>
 
     <div class="ems-content">
         <?php if ($msg !== ''): ?>

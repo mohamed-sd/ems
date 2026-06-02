@@ -225,24 +225,17 @@ $page_title = 'سجل النشاطات';
 <div class="main activity-logs-main ems-unified-page-shell">
 
 
-        <div class="main_head">
-
-            <div class="head_actions"></div>
-
-            <h1 class="head-title">
-                <div class="title-icon"><i class="fa fa-history"></i></div>
-                سجل النشاطات
-                <p class="small mb-0" style="color: #fff;">تتبع جميع عمليات المستخدمين في النظام</p>
-            </h1>
-
-            <?php if ($selectedRoleId > 0): ?>
-            <div class="head_back">
-                <a href="activity_logs.php" class="">
-                    <i class="fas fa-arrow-right"></i> رجوع
-                </a>
-            </div>
-             <?php endif; ?>
-        </div>
+        <?php
+        // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+        $header_icon       = 'fa fa-history';
+        $header_title_html = 'سجل النشاطات
+                <p class="small mb-0" style="color: #fff;">تتبع جميع عمليات المستخدمين في النظام</p>';
+        $header_actions = array();
+        $header_back    = ($selectedRoleId > 0)
+            ? array('href' => 'activity_logs.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع')
+            : false;
+        include(__DIR__ . '/../includes/page_header.php');
+        ?>
 
         <div class="activity-page-hero">
             <div class="activity-page-hero-icon"><i class="fa fa-layer-group"></i></div>

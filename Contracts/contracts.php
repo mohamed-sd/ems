@@ -175,27 +175,17 @@ include('../insidebar.php');
 
 <div class="main contracts-main ems-unified-page-shell">
 
-  <div class="main_head">
-
-    <div class="head_actions">
-      <?php if ($can_add): ?>
-        <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-          <i class="fas fa-plus-circle"></i> عقد جديد
-        </a>
-      <?php endif; ?>
-    </div>
-
-    <h1 class="head-title">
-      <div class="title-icon"><i class="fas fa-file-contract"></i></div>
-      إدارة العقود
-    </h1>
-
-    <div class="head_back">
-      <a href="../main/dashboard.php" class="back-btn">
-        <i class="fas fa-arrow-right"></i> رجوع
-      </a>
-    </div>
-  </div>
+  <?php
+  // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+  $header_title = 'إدارة العقود';
+  $header_icon  = 'fas fa-file-contract';
+  $header_actions = array();
+  if ($can_add) {
+      $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'عقد جديد');
+  }
+  $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+  include('../includes/page_header.php');
+  ?>
 
   <!-- فورم إضافة عقد -->
   <form id="projectForm" action="" method="post" class="allforms">

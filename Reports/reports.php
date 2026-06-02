@@ -52,45 +52,34 @@ include("../inheader.php");
 include('../insidebar.php');
 ?>
     <div class="main ems-unified-page-shell reports-main">
-        <div class="main_head">
-            <div class="head_actions">
-                <?php // صلاحيات مدير الموقع === 5
-                if ($_SESSION['user']['role'] == "5") { ?>
-                    <a href="deliy.php" class="add-btn"><i class="fa fa-clock"></i> ساعات اليوم</a>
-                    <a href="deriver.php" class="add-btn"><i class="fa fa-clock"></i> ساعات السائق</a>
-                    <a href="timesheetdeliy.php" class="add-btn"><i class="fa fa-clock"></i> ساعات العمل اليومية</a>
-                <?php } ?>
-                <?php // صلاحيات مدير المشغلين === 3
-                if ($_SESSION['user']['role'] == "3") { ?>
-                    <a href="deriver.php" class="add-btn"><i class="fa fa-clock"></i> ساعات السائق</a>
-                <?php } ?>
-                <?php // صلاحيات مدير الموردين === 2
-                if ($_SESSION['user']['role'] == "2") { ?>
-                    <a href="timesheetdeliy.php" class="add-btn"><i class="fa fa-clock"></i> ساعات العمل اليومية</a>
-                <?php } ?>
-                <?php // صلاحيات مدير الاسطول === 4
-                if ($_SESSION['user']['role'] == "4") { ?>
-                    <a href="deliy.php" class="add-btn"><i class="fa fa-clock"></i> ساعات اليوم</a>
-                <?php } ?>
-                <?php // صلاحيات مدير المشاريع === 1
-                if ($_SESSION['user']['role'] == "1") { ?>
-                    <a href="contract_report.php" class="add-btn"><i class="fa fa-file-contract"></i> العقد</a>
-                    <a href="contractall.php" class="add-btn"><i class="fa fa-chart-pie"></i> إحصائيات العقد</a>
-                    <a href="driverAndsupplerscontract.php" class="add-btn"><i class="fa fa-users"></i> إحصائيات العقود</a>
-                <?php } ?>
-            </div>
-
-            <h1 class="head-title">
-                <div class="title-icon"><i class="fa-solid fa-chart-line"></i></div>
-                التقارير
-            </h1>
-
-            <div class="head_back">
-                <a href="../main/dashboard.php" class="back-btn">
-                    <i class="fas fa-arrow-right"></i> رجوع
-                </a>
-            </div>
-        </div>
+        <?php
+        // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+        $header_title   = 'التقارير';
+        $header_icon    = 'fa-solid fa-chart-line';
+        $header_actions = array();
+        $__role = $_SESSION['user']['role'];
+        if ($__role == "5") { // مدير الموقع
+            $header_actions[] = array('href' => 'deliy.php', 'class' => 'add-btn', 'icon' => 'fa fa-clock', 'label' => 'ساعات اليوم');
+            $header_actions[] = array('href' => 'deriver.php', 'class' => 'add-btn', 'icon' => 'fa fa-clock', 'label' => 'ساعات السائق');
+            $header_actions[] = array('href' => 'timesheetdeliy.php', 'class' => 'add-btn', 'icon' => 'fa fa-clock', 'label' => 'ساعات العمل اليومية');
+        }
+        if ($__role == "3") { // مدير المشغلين
+            $header_actions[] = array('href' => 'deriver.php', 'class' => 'add-btn', 'icon' => 'fa fa-clock', 'label' => 'ساعات السائق');
+        }
+        if ($__role == "2") { // مدير الموردين
+            $header_actions[] = array('href' => 'timesheetdeliy.php', 'class' => 'add-btn', 'icon' => 'fa fa-clock', 'label' => 'ساعات العمل اليومية');
+        }
+        if ($__role == "4") { // مدير الاسطول
+            $header_actions[] = array('href' => 'deliy.php', 'class' => 'add-btn', 'icon' => 'fa fa-clock', 'label' => 'ساعات اليوم');
+        }
+        if ($__role == "1") { // مدير المشاريع
+            $header_actions[] = array('href' => 'contract_report.php', 'class' => 'add-btn', 'icon' => 'fa fa-file-contract', 'label' => 'العقد');
+            $header_actions[] = array('href' => 'contractall.php', 'class' => 'add-btn', 'icon' => 'fa fa-chart-pie', 'label' => 'إحصائيات العقد');
+            $header_actions[] = array('href' => 'driverAndsupplerscontract.php', 'class' => 'add-btn', 'icon' => 'fa fa-users', 'label' => 'إحصائيات العقود');
+        }
+        $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+        include('../includes/page_header.php');
+        ?>
 
         <div class="card">
             <div class="card-header">

@@ -188,20 +188,16 @@ include '../insidebar.php';
 </style>
 
 <div class="main client-profile-page ems-unified-page-shell">
-    <div class="main_head">
-        <div class="head_actions">
-            <a href="../Projects/projects.php?client_id=<?php echo intval($client_id); ?>" class="add-btn">
-                <i class="fas fa-diagram-project"></i> مشاريع العميل
-            </a>
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-id-card"></i></div>
-            بطاقة العميل
-        </h1>
-        <div class="head_back">
-            <a href="clients.php"><i class="fas fa-arrow-right"></i> رجوع</a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    $header_title   = 'بطاقة العميل';
+    $header_icon    = 'fas fa-id-card';
+    $header_actions = array(
+        array('href' => '../Projects/projects.php?client_id=' . intval($client_id), 'class' => 'add-btn', 'icon' => 'fas fa-diagram-project', 'label' => 'مشاريع العميل'),
+    );
+    $header_back = array('href' => 'clients.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <div class="profile-card" style="margin-bottom:12px;">
         <div class="identity-head">

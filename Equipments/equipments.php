@@ -339,15 +339,9 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 
 <div class="main">
     <!-- عنوان الصفحة -->
-    <div class="header">
-        <h1 class="page-title">
-            <div class="title-icon"><i class="fas fa-cogs"></i></div>
-            إدارة المعدات
-        </h1>
-        <div class="header -actions">
-            <a href="../main/dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
+    <!-- Unified header: pre-built final structure (data-ems-unified-header skips the JS rebuild). Styling: ems.main.all.style.css (.header) -->
+    <div class="header" data-ems-unified-header="1">
+        <div class="actions"<?php if ($_SESSION['user']['role'] == "10") echo ' style="display:none;"'; ?>>
             <?php if ($_SESSION['user']['role'] != "10") { ?>
             <!-- أزرار الاستيراد من Excel -->
             <a href="download_equipments_template.php" class="btn" style="background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;">
@@ -363,6 +357,17 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 <i class="fas fa-plus-circle"></i> إضافة معدة جديدة
             </a>
             <?php } ?>
+        </div>
+        <div class="title">
+            <h1 class="title-content">
+                <div class="title-icon"><i class="fas fa-cogs"></i></div>
+                إدارة المعدات
+            </h1>
+        </div>
+        <div class="back">
+            <a href="../main/dashboard.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
         </div>
     </div>
 

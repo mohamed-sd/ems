@@ -11,33 +11,17 @@ include('../insidebar.php');
 
 <div class="main timesheet-type-page ems-unified-page-shell">
 
-  <div class="main_head">
-
-    <div class="head_actions">
-      <!-- <a href="timesheet.php?type=1" class="add-btn ts-header-action ts-action-heavy">
-        <i class="fas fa-tractor"></i> معدات ثقيلة
-      </a>
-      <a href="timesheet.php?type=2" class="add-btn ts-header-action ts-action-truck">
-        <i class="fas fa-truck"></i> الشاحنات
-      </a>
-      <a href="timesheet.php?type=3" class="add-btn ts-header-action ts-action-drill">
-        <i class="fas fa-hammer"></i> الخرامات
-      </a> -->
-    </div>
-
-    <h1 class="head-title">
-      <span class="title-icon"><i class="fas fa-clock"></i></span>
-      اختيار نوع الآلية
+  <?php
+  // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+  $header_icon      = 'fas fa-clock';
+  $header_icon_tag  = 'span';
+  $header_title_html = 'اختيار نوع الآلية
     <i class="fas fa-layer-group"></i>
-    اختر التصنيف المناسب للبدء في إدخال ساعات العمل
-    </h1>
-
-    <div class="head_back">
-      <a href="../main/dashboard.php" class="">
-        <i class="fas fa-arrow-right"></i> رجوع
-      </a>
-    </div>
-  </div>
+    اختر التصنيف المناسب للبدء في إدخال ساعات العمل';
+  $header_actions = array();
+  $header_back    = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+  include('../includes/page_header.php');
+  ?>
 
   <div class="ts-type-cards">
     <a href="timesheet.php?type=1" class="ts-type-card ts-type-heavy">

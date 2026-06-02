@@ -201,30 +201,20 @@ include('../insidebar.php');
 
 <div class="main contracts-main supplier-contracts-page ems-unified-page-shell">
 
-  <div class="main_head">
-
-    <div class="head_actions">
-      <?php if ($can_add): ?>
-        <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-          <i class="fas fa-plus-circle"></i> عقد جديد
-        </a>
-      <?php endif; ?>
-    </div>
-
-    <h1 class="head-title">
-      <div class="title-icon"><i class="fas fa-file-contract"></i></div>
-      عقود المورد
-    </h1>
-
-    <div class="head_back">
-      <a href="suppliers.php" class="back-btn">
-        <i class="fas fa-arrow-right"></i> العودة للموردين
-      </a>
-      <a href="../main/dashboard.php" class="back-btn">
-        <i class="fa-solid fa-house"></i> الرئيسية
-      </a>
-    </div>
-  </div>
+  <?php
+  // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+  $header_title   = 'عقود المورد';
+  $header_icon    = 'fas fa-file-contract';
+  $header_actions = array();
+  if ($can_add) {
+      $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'عقد جديد');
+  }
+  $header_back = array(
+      array('href' => 'suppliers.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'العودة للموردين'),
+      array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fa-solid fa-house', 'label' => 'الرئيسية'),
+  );
+  include('../includes/page_header.php');
+  ?>
 
   <!-- فورم إضافة عقد -->
   <?php if ($can_add || $can_edit): ?>

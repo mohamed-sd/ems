@@ -447,36 +447,21 @@ include('../insidebar.php');
 
 <div class="main equipments-fleet-main drivers-main">
 
-    <div class="main_head">
-        <div class="head_actions">
-            <?php if ($can_add): ?>
-                <a href="javascript:void(0)" id="toggleForm" class="add-btn">
-                    <i class="fas fa-plus-circle"></i> إضافة مشغل جديد
-                </a>
-            <?php endif; ?>
-            <a href="download_drivers_template.php" class="btn"
-                style="background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;">
-                <i class="fas fa-file-excel"></i> تحميل نموذج Excel
-            </a>
-            <a href="download_drivers_template_csv.php" class="btn"
-                style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;">
-                <i class="fas fa-file-csv"></i> تحميل نموذج CSV
-            </a>
-            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#importModal"
-                style="background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease; border: none;">
-                <i class="fas fa-file-upload"></i> استيراد من Excel/CSV
-            </button>
-        </div>
-        <h1 class="head-title">
-            <div class="title-icon"><i class="fas fa-id-card"></i></div>
-            إدارة المشغلين
-        </h1>
-        <div class="head_back">
-            <a href="../main/dashboard.php" class="">
-                <i class="fas fa-arrow-right"></i> رجوع
-            </a>
-        </div>
-    </div>
+    <?php
+    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
+    // NOTE: the gradient button inline styles are preserved as-is for now (separate CSS-consolidation task).
+    $header_title = 'إدارة المشغلين';
+    $header_icon  = 'fas fa-id-card';
+    $header_actions = array();
+    if ($can_add) {
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مشغل جديد');
+    }
+    $header_actions[] = array('href' => 'download_drivers_template.php', 'class' => 'btn', 'icon' => 'fas fa-file-excel', 'label' => 'تحميل نموذج Excel', 'style' => 'background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;');
+    $header_actions[] = array('href' => 'download_drivers_template_csv.php', 'class' => 'btn', 'icon' => 'fas fa-file-csv', 'label' => 'تحميل نموذج CSV', 'style' => 'background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;');
+    $header_actions[] = array('tag' => 'button', 'class' => 'btn', 'attrs' => 'type="button" data-bs-toggle="modal" data-bs-target="#importModal"', 'icon' => 'fas fa-file-upload', 'label' => 'استيراد من Excel/CSV', 'style' => 'background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease; border: none;');
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;

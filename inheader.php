@@ -25,10 +25,6 @@ $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '..
     <link rel="stylesheet" href="/ems/assets/css/alltables.css">
     <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
     <link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
-    <!-- <link rel="stylesheet" href="/ems/assets/css/brand-identity.css"> -->
-    <!-- CSS الموقع -->
-    <!-- <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/> -->
-    <!-- <link rel="stylesheet" href="/ems/assets/css/site-identity.css"> -->
     <!-- Unified page styles: Dashboard + Chat -->
     <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
     <script src="../assets/js/performance-boost.js" defer></script>

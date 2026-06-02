@@ -1278,9 +1278,9 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
   <nav class="shot-topbar">
     <div class="shot-logo">
-      <img src="../assets/images/icon.png" alt="Equipation Logo" width="28" height="22">
+      <img src="../assets/images/logo 2.svg" alt="Equipation Logo" width="150" height="35">
       <!-- <span class="shot-logo-mark"></span> -->
-      <span>EQUIPATION</span>
+      <!-- <span>EQUIPATION</span> -->
     </div>
 
     <div class="shot-top-center">
