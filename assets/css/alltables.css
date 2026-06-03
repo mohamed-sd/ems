@@ -323,6 +323,42 @@ span[class*="badge-"] {
     color: #be185d;
 }
 
+/* Global hard override for table headers across the whole system */
+table thead,
+.table thead,
+table.dataTable thead,
+.dataTables_scrollHead table thead {
+    background: #eeeeee !important;
+    color: #000000 !important;
+    background-image: none !important;
+}
+
+table thead th,
+table thead td,
+.table thead th,
+.table thead td,
+table.dataTable thead th,
+table.dataTable thead td,
+.dataTables_scrollHead table thead th,
+.dataTables_scrollHead table thead td {
+    background: #eeeeee !important;
+    color: #000000 !important;
+    background-image: none !important;
+}
+
+table thead th i,
+.table thead th i,
+table.dataTable thead th i,
+.dataTables_scrollHead table thead th i,
+table.dataTable thead .sorting::before,
+table.dataTable thead .sorting::after,
+table.dataTable thead .sorting_asc::before,
+table.dataTable thead .sorting_asc::after,
+table.dataTable thead .sorting_desc::before,
+table.dataTable thead .sorting_desc::after {
+    color: #000000 !important;
+}
+
 /* ========== PRICE CHIPS ========== */
 .price-chip {
     display: inline-flex;

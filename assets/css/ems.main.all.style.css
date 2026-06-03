@@ -406,8 +406,7 @@ table.alltables thead th,
 table.alltable thead th,
 table.display thead th,
 table.dataTable thead th {
-
-  background: linear-gradient(180deg, #2C2C2C 0%, #3D3D3D 45%, #24180d 100%) !important;
+  background: #666 ;
   color: #F4C542 !important;
   padding: 12px 10px;
   text-align: center;
@@ -13264,4 +13263,70 @@ body.ems-site .main .page-header.allheaders .allheaders-add:hover {
   background: #1f2937 !important;
   border-color: #1f2937 !important;
   color: #ffffff !important;
+}
+
+/* Global tables header color override (system-wide) */
+body.ems-site .main table thead,
+body.ems-site .main .table thead,
+body.ems-site .main table.dataTable thead,
+body.ems-site .main .dataTables_scrollHead table thead {
+  background: #eeeeee !important;
+  color: #000000 !important;
+}
+
+body.ems-site .main table thead th,
+body.ems-site .main table thead td,
+body.ems-site .main .table thead th,
+body.ems-site .main .table thead td,
+body.ems-site .main table.dataTable thead th,
+body.ems-site .main table.dataTable thead td,
+body.ems-site .main .dataTables_scrollHead table thead th,
+body.ems-site .main .dataTables_scrollHead table thead td {
+  background: #eeeeee !important;
+  color: #000000 !important;
+}
+
+body.ems-site .main table thead th i,
+body.ems-site .main .table thead th i,
+body.ems-site .main table.dataTable thead th i,
+body.ems-site .main .dataTables_scrollHead table thead th i,
+body.ems-site .main table.dataTable thead .sorting::before,
+body.ems-site .main table.dataTable thead .sorting::after,
+body.ems-site .main table.dataTable thead .sorting_asc::before,
+body.ems-site .main table.dataTable thead .sorting_asc::after,
+body.ems-site .main table.dataTable thead .sorting_desc::before,
+body.ems-site .main table.dataTable thead .sorting_desc::after {
+  color: #000000 !important;
+}
+
+/* Absolute global fallback (no layout scope) */
+table thead,
+.table thead,
+table.dataTable thead,
+.dataTables_scrollHead table thead {
+  background: #eeeeee !important;
+  color: #000000 !important;
+  background-image: none !important;
+}
+
+table thead th,
+table thead td,
+.table thead th,
+.table thead td,
+table.dataTable thead th,
+table.dataTable thead td,
+.dataTables_scrollHead table thead th,
+.dataTables_scrollHead table thead td {
+  background: #eeeeee !important;
+  color: #000000 !important;
+  background-image: none !important;
+}
+
+table.dataTable thead .sorting::before,
+table.dataTable thead .sorting::after,
+table.dataTable thead .sorting_asc::before,
+table.dataTable thead .sorting_asc::after,
+table.dataTable thead .sorting_desc::before,
+table.dataTable thead .sorting_desc::after {
+  color: #000000 !important;
 }

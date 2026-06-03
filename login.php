@@ -180,12 +180,23 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       background: linear-gradient(90deg, rgba(18, 18, 18, 0.26) 0%, rgba(18, 18, 18, 0.13) 45%, rgba(18, 18, 18, 0.08) 100%);
     }
 
+    .logo{
+      width: 160px;
+      max-width: 350px;
+      direction: rtl;
+      padding: 16px 10px 10px;
+      animation: cardIn .45s ease-out;
+      position: fixed;
+      top: 10px;
+      left : 10px;
+    }
+
     .login-card {
       width: 100%;
       max-width: 380px;
       direction: rtl;
       border-radius: 14px;
-      background: rgba(239, 239, 239, 0.96);
+      background: #fff;
       border: 1px solid rgba(200, 200, 200, 0.96);
       box-shadow: 0 16px 42px rgba(18, 18, 18, 0.24);
       padding: 16px 10px 10px;
@@ -267,8 +278,8 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       background: var(--input-bg);
       width: 100%;
       height: 42px;
-      border-radius: 9px;
-      border: 2px solid #bdbdbd;
+      border-radius: 10px;
+      border: 1px solid #bdbdbd;
       background: var(--input-bg);
       color: #121212;
       font-family: var(--font-ui);
@@ -277,11 +288,6 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       padding: 0 44px 0 44px;
       outline: none;
       transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
-    }
-
-    .input-wrap input:focus {
-
-      background: #fff;
     }
 
     .input-wrap input::placeholder {
@@ -326,19 +332,12 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
       cursor: pointer;
     }
 
-    .password-line {
-      height: 3px;
-      border-radius: 8px;
-      margin: 1px 0 8px;
-      background: linear-gradient(90deg, transparent 0%, var(--gold) 58%, var(--gold) 100%);
-    }
-
     .btn-submit {
       width: 100%;
       height: 43px;
       border: 0;
       border-radius: 10px;
-      background: linear-gradient(180deg, #f3be00 0%, #d6a700 100%);
+      background:  #f3be00;
       color: #121212;
       font-family: var(--font-ui);
       font-size: 17px;
@@ -453,9 +452,11 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 </head>
 <body>
 <div class="stage">
+
+ <img class="logo" src="/ems/assets/images/logo 3.png" alt="Equipation logo">
+
   <div class="login-card">
     <div class="logo-wrap">
-      <img src="/ems/assets/images/logo 2.svg" alt="Equipation logo">
       <div class="title">مرحبا بعودتك</div>
       <div class="subtitle">ادخل بياناتك للوصول الي لوحة التحكم</div>
     </div>
@@ -488,8 +489,6 @@ $csrfH = htmlspecialchars($csrf, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
           <span class="icon-r"><i class="fas fa-lock"></i></span>
         </div>
       </div>
-
-      <div class="password-line"></div>
 
       <input type="hidden" name="csrf_token" value="<?php echo $csrfH; ?>">
 

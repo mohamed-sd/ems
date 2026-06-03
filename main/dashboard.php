@@ -657,8 +657,6 @@ body.ems-site .sidebar.closed .logout span {
 
 .shot-topbar {
   height: 50px;
-  background: var(--dash-yellow);
-  border-bottom: 1px solid #d8a400;
   position: fixed;
   top: 0;
   left: 0;
@@ -669,6 +667,47 @@ body.ems-site .sidebar.closed .logout span {
   align-items: center;
   padding: 0 18px;
   direction: ltr;
+  background: var(--dash-yellow);
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background-image: none !important;
+}
+
+body.ems-site .ems-site .main .shot-topbar,
+body.ems-site .main .shot-topbar,
+body.ems-site .ems-dash.main .shot-topbar,
+body.ems-site .ems-dash.main [class*="topbar"],
+body.ems-site .ems-dash.main .shot-topbar[class*="topbar"] {
+  border: none !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background-image: none !important;
+}
+
+.shot-topbar::before,
+.shot-topbar::after {
+  content: none !important;
+  display: none !important;
+}
+
+body.ems-site .ems-dash.main .shot-topbar::before,
+body.ems-site .ems-dash.main .shot-topbar::after,
+body.ems-site .ems-dash.main [class*="topbar"]::before,
+body.ems-site .ems-dash.main [class*="topbar"]::after {
+  content: none !important;
+  display: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+.ems-dash.main::before,
+.ems-dash.main::after {
+  content: none !important;
+  display: none !important;
 }
 
 .shot-logo {
@@ -792,9 +831,10 @@ body.ems-site .sidebar.closed .logout span {
 }
 
 .shot-body {
-  padding: 50px 0px 14px;
+  padding: 51px 0px 14px;
   background: #e2e2e2;
   margin-right: 68px;
+  margin-top: -1px;
 }
 
 body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
@@ -803,7 +843,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
 .shot-breadcrumb {
   position: fixed;
-  top: 50px;
+  top: 51px;
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
@@ -843,6 +883,10 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px 10px;
+}
+
+.shot-hex-grid.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .shot-hex-link {
@@ -1252,6 +1296,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
   .shot-body {
     padding-top: 10px;
+    margin-top: 0;
     margin-right: 0;
   }
 
@@ -1276,7 +1321,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
 <div class="ems-dash main">
 
-  <nav class="shot-topbar">
+  <div class="shot-topbar">
     <div class="shot-logo">
       <img src="../assets/images/logo 2.svg" alt="Equipation Logo" width="150" height="35">
       <!-- <span class="shot-logo-mark"></span> -->
@@ -1296,7 +1341,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
       </div>
       <span></span>
     </div>
-  </nav>
+</div>
 
   <div class="shot-body">
     <div class="shot-breadcrumb" id="emsClock"><?= date('Y F d, l') ?></div>
@@ -1311,9 +1356,11 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
         ['../main/dashboard.php', 'لوحة التحكم', 'fa-solid fa-house'],
       ];
     }
+    $quickTilesCount = count($quickTiles);
+    $quickGridClass = ($quickTilesCount > 2 && ($quickTilesCount % 2 === 1)) ? 'cols-3' : 'cols-4';
     ?>
 
-    <div class="shot-hex-grid">
+    <div class="shot-hex-grid <?= $quickGridClass ?>">
       <?php foreach ($quickTiles as $i => $lk): ?>
       <a href="<?= htmlspecialchars($lk[0]) ?>" class="shot-hex-link">
         <span class="shot-hex-icon"><i class="<?= htmlspecialchars($lk[2]) ?>"></i></span>
