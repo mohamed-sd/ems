@@ -1,0 +1,161 @@
+/* ════════════════════════════════════════════════════════════════════════
+   ems-excel.css — تنسيق مكوّن Excel الموحّد (معالج الاستيراد + شريط التقدّم)
+   متوافق مع الهوية البصرية: ذهبي/كهرماني على أسود فحمي (design-tokens.css).
+   كل القيم تستند إلى متغيّرات الهوية مع قيم احتياطية.
+════════════════════════════════════════════════════════════════════════ */
+
+.ems-xl-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 2000);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  background: rgba(15, 17, 21, 0.55);
+  overflow-y: auto;
+}
+.ems-xl-overlay.is-open { display: flex; }
+
+.ems-xl-modal {
+  width: 100%;
+  max-width: 860px;
+  background: var(--white, #fff);
+  border-radius: var(--radius-xl, 16px);
+  box-shadow: var(--shadow-xl, 0 24px 48px rgba(0, 0, 0, 0.18));
+  direction: rtl;
+  overflow: hidden;
+  animation: emsXlIn 0.25s ease-out;
+}
+@keyframes emsXlIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.ems-xl-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--brand-black, #0f1115);
+  color: var(--brand-amber, #f2aa2a);
+}
+.ems-xl-head h5 { margin: 0; font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 9px; }
+.ems-xl-close {
+  border: 0; background: transparent; color: #fff; font-size: 26px; line-height: 1;
+  cursor: pointer; opacity: 0.8; transition: opacity 0.15s;
+}
+.ems-xl-close:hover { opacity: 1; }
+
+/* خطوات المعالج */
+.ems-xl-steps {
+  display: flex; gap: 0; padding: 14px 20px 0; list-style: none; margin: 0;
+}
+.ems-xl-steps li {
+  flex: 1; text-align: center; font-size: 13px; font-weight: 600; color: var(--gray-500, #78716c);
+  position: relative; padding-bottom: 12px;
+}
+.ems-xl-steps li::after {
+  content: ""; position: absolute; bottom: 0; right: 0; left: 0; height: 3px; background: var(--gray-200, #e7e5e4);
+}
+.ems-xl-steps li.active { color: var(--brand-orange-bright, #e67e00); }
+.ems-xl-steps li.active::after { background: var(--brand-amber, #f2aa2a); }
+.ems-xl-steps li.done { color: var(--success-600, #5b7f1e); }
+.ems-xl-steps li.done::after { background: var(--success-600, #5b7f1e); }
+.ems-xl-steps .num {
+  display: inline-flex; width: 22px; height: 22px; border-radius: 50%; background: var(--gray-200, #e7e5e4);
+  color: var(--gray-700, #44403c); align-items: center; justify-content: center; margin-left: 6px; font-size: 12px;
+}
+.ems-xl-steps li.active .num { background: var(--brand-amber, #f2aa2a); color: #0f1115; }
+.ems-xl-steps li.done .num { background: var(--success-600, #5b7f1e); color: #fff; }
+
+.ems-xl-body { padding: 20px; max-height: 62vh; overflow-y: auto; }
+.ems-xl-pane { display: none; }
+.ems-xl-pane.is-active { display: block; }
+
+/* منطقة الرفع */
+.ems-xl-drop {
+  border: 2px dashed var(--brand-amber, #f2aa2a);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--brand-cream-light, #fff5e8);
+  padding: 30px 20px; text-align: center; cursor: pointer; transition: background 0.15s, border-color 0.15s;
+}
+.ems-xl-drop:hover, .ems-xl-drop.dragover { background: #fff0db; border-color: var(--brand-orange-bright, #e67e00); }
+.ems-xl-drop i { font-size: 40px; color: var(--brand-orange-bright, #e67e00); }
+.ems-xl-drop p { margin: 10px 0 4px; font-weight: 700; color: var(--gray-900, #1c1917); }
+.ems-xl-drop small { color: var(--gray-500, #78716c); }
+.ems-xl-drop input[type=file] { display: none; }
+.ems-xl-filename {
+  margin-top: 12px; padding: 8px 12px; border-radius: var(--radius-md, 8px); background: var(--gray-100, #f5f5f4);
+  font-weight: 600; color: var(--gray-700, #44403c); display: none;
+}
+.ems-xl-filename.show { display: block; }
+
+.ems-xl-tip {
+  margin-top: 14px; font-size: 13px; color: var(--gray-700, #44403c);
+  background: var(--gray-50, #fafaf9); border: 1px solid var(--gray-200, #e7e5e4);
+  border-radius: var(--radius-md, 8px); padding: 10px 12px;
+}
+.ems-xl-tip a { color: var(--brand-orange-bright, #e67e00); font-weight: 700; text-decoration: none; }
+.ems-xl-tip a:hover { text-decoration: underline; }
+
+/* بطاقات الملخّص */
+.ems-xl-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.ems-xl-card {
+  border-radius: var(--radius-lg, 12px); padding: 14px; text-align: center; border: 1px solid var(--gray-200, #e7e5e4);
+}
+.ems-xl-card .n { font-size: 26px; font-weight: 800; line-height: 1; }
+.ems-xl-card .l { font-size: 12px; margin-top: 6px; font-weight: 600; }
+.ems-xl-card.total { background: var(--gray-50, #fafaf9); }
+.ems-xl-card.valid { background: var(--success-100, #ecf1de); } .ems-xl-card.valid .n { color: var(--success-deep, #365314); }
+.ems-xl-card.invalid { background: var(--danger-100, #f5dcdc); } .ems-xl-card.invalid .n { color: var(--danger-deep, #7f1d1d); }
+.ems-xl-card.warn { background: var(--warning-100, #f4e5d3); } .ems-xl-card.warn .n { color: var(--warning-deep, #7c2d12); }
+
+/* جداول المعاينة + الأخطاء */
+.ems-xl-table-wrap { overflow-x: auto; border: 1px solid var(--gray-200, #e7e5e4); border-radius: var(--radius-md, 8px); margin-bottom: 14px; }
+.ems-xl-table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+.ems-xl-table th { background: var(--brand-black, #0f1115); color: #fff; padding: 8px 10px; font-weight: 600; position: sticky; top: 0; }
+.ems-xl-table td { padding: 7px 10px; border-top: 1px solid var(--gray-200, #e7e5e4); }
+.ems-xl-table tr.bad { background: var(--danger-100, #f5dcdc); }
+.ems-xl-table tr.bad td:first-child { color: var(--danger-deep, #7f1d1d); font-weight: 700; }
+.ems-xl-rowflag { font-size: 11px; padding: 2px 7px; border-radius: 999px; font-weight: 700; }
+.ems-xl-rowflag.ok { background: var(--success-100, #ecf1de); color: var(--success-deep, #365314); }
+.ems-xl-rowflag.no { background: var(--danger-100, #f5dcdc); color: var(--danger-deep, #7f1d1d); }
+
+.ems-xl-errors h6 { margin: 4px 0 8px; font-weight: 700; color: var(--danger-deep, #7f1d1d); }
+.ems-xl-errors table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ems-xl-errors th, .ems-xl-errors td { padding: 6px 9px; border: 1px solid var(--gray-200, #e7e5e4); text-align: right; }
+.ems-xl-errors th { background: var(--gray-100, #f5f5f4); }
+
+/* شريط التقدّم */
+.ems-xl-progress { text-align: center; padding: 30px 10px; }
+.ems-xl-progress i { font-size: 38px; color: var(--brand-orange-bright, #e67e00); }
+.ems-xl-progress p { margin: 12px 0; font-weight: 600; }
+.ems-xl-bar { height: 10px; border-radius: 999px; background: var(--gray-200, #e7e5e4); overflow: hidden; }
+.ems-xl-bar > span { display: block; height: 100%; width: 0; background: var(--brand-amber, #f2aa2a); transition: width 0.3s ease; }
+
+/* رسائل */
+.ems-xl-msg { padding: 12px 14px; border-radius: var(--radius-md, 8px); font-weight: 600; margin-bottom: 12px; display: none; }
+.ems-xl-msg.show { display: block; }
+.ems-xl-msg.ok { background: var(--success-100, #ecf1de); color: var(--success-deep, #365314); }
+.ems-xl-msg.err { background: var(--danger-100, #f5dcdc); color: var(--danger-deep, #7f1d1d); }
+
+.ems-xl-result { text-align: center; padding: 20px; }
+.ems-xl-result i { font-size: 52px; color: var(--success-600, #5b7f1e); }
+.ems-xl-result.has-fail i { color: var(--warning-600, #a8541c); }
+.ems-xl-result h4 { margin: 12px 0 6px; }
+
+/* تذييل/أزرار */
+.ems-xl-foot { display: flex; justify-content: flex-start; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--gray-200, #e7e5e4); background: var(--gray-50, #fafaf9); }
+.ems-xl-btn {
+  border: 0; border-radius: var(--radius-md, 8px); padding: 10px 20px; font-weight: 700; font-size: 14px;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-ar, inherit);
+}
+.ems-xl-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.ems-xl-btn.primary { background: var(--brand-amber, #f2aa2a); color: #0f1115; }
+.ems-xl-btn.primary:hover:not(:disabled) { background: var(--brand-orange-bright, #e67e00); }
+.ems-xl-btn.ghost { background: var(--gray-200, #e7e5e4); color: var(--gray-700, #44403c); }
+.ems-xl-btn.ghost:hover { background: var(--gray-300, #d6d3d1); }
+
+@media (max-width: 640px) {
+  .ems-xl-cards { grid-template-columns: repeat(2, 1fr); }
+  .ems-xl-steps li { font-size: 11px; }
+}

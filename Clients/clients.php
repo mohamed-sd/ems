@@ -719,17 +719,18 @@ include('../insidebar.php');
     $header_icon  = 'fas fa-users';
     $header_actions = array();
     if ($can_add) {
-        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة عميل جديد', 'label_class' => 'clients-toggle-form-text');
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fa fa-solid fa-plus', 'label' => '', 'label_class' => 'clients-toggle-form-text');
     } else {
         $header_actions[] = array('tag' => 'button', 'class' => '', 'disabled' => true, 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة (بدون صلاحيات)');
     }
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'clients-toggle-stats-text');
-    $header_actions[] = array('href' => 'download_clients_template_csv.php', 'class' => 'btn', 'title' => 'تحميل نموذج CSV فارغ للاستيراد', 'icon' => 'fas fa-file-csv', 'label' => 'تحميل نموذج CSV');
-    $header_actions[] = array('href' => 'download_clients_template.php', 'class' => 'btn', 'title' => 'تحميل نموذج Excel فارغ للاستيراد', 'icon' => 'fas fa-file-excel', 'label' => 'تحميل نموذج Excel');
-    if ($can_add) {
-        $header_actions[] = array('id' => 'openImportModal', 'class' => '', 'icon' => 'fas fa-file-upload', 'label' => 'استيراد من Excel');
+    // ── نظام Excel الموحّد (Unified Excel Framework) ──
+    // يستبدل أزرار النموذج/التصدير/الاستيراد القديمة بالطبقة الموحّدة.
+    // الملفات القديمة (download_*/import_*/export_*) تبقى كما هي دون كسر.
+    require_once __DIR__ . '/../includes/excel_ui.php';
+    foreach (ems_excel_header_actions('clients', 'العملاء', $can_add) as $__xlAction) {
+        $header_actions[] = $__xlAction;
     }
-    $header_actions[] = array('href' => 'export_clients_excel.php', 'class' => 'btn', 'title' => 'تصدير جميع العملاء إلى ملف Excel', 'icon' => 'fas fa-download', 'label' => 'تصدير Excel');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
@@ -938,14 +939,14 @@ include('../insidebar.php');
                 <table id="clientsTable" class="display clients-table-nowrap">
                     <thead>
                         <tr>
-                            <th><i class="fas fa-cogs"></i> إجراءات</th>
-                            <th width="100"><i class="fas fa-barcode"></i> كود العميل</th>
-                            <th><i class="fas fa-user"></i> اسم العميل</th>
-                            <th><i class="fas fa-building"></i> نوع الكيان</th>
-                            <th><i class="fas fa-industry"></i> تصنيف القطاع</th>
-                            <th><i class="fas fa-project-diagram"></i> عدد المشاريع</th>
-                            <th><i class="fas fa-phone"></i> الهاتف</th>
-                            <th><i class="fas fa-toggle-on"></i> الحالة</th>
+                            <th> إجراءات</th>
+                            <th width="100"> كود العميل</th>
+                            <th> اسم العميل</th>
+                            <th> نوع الكيان</th>
+                            <th> تصنيف القطاع</th>
+                            <th> عدد المشاريع</th>
+                            <th> الهاتف</th>
+                            <th> الحالة</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1025,7 +1026,7 @@ include('../insidebar.php');
 
                             // عرض الحالة بألوان
                             if ($row['status'] == 'نشط') {
-                                echo "<td><span class='status-active'><i class='fas fa-check-circle'></i> نشط</span></td>";
+                                echo "<td><span class='status-active'><i class='fa-regular fa-circle-check'></i> نشط</span></td>";
                             } else {
                                 echo "<td><span class='status-inactive'><i class='fas fa-times-circle'></i> متوقف</span></td>";
                             }
@@ -1811,6 +1812,13 @@ include('../insidebar.php');
         });
     });
 </script>
+
+<?php
+// ── نافذة معالج الاستيراد الموحّد + أصول Excel (تُطبع مرّة واحدة) ──
+if (function_exists('ems_excel_render')) {
+    ems_excel_render();
+}
+?>
 
 </body>
 

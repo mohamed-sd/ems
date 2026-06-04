@@ -9,6 +9,42 @@ if (isset($_SESSION['user']) && isset($conn)) {
   enforce_current_page_view_permission($conn, '../main/dashboard.php');
 }
 ?>
+<script>
+  (function () {
+    var head = document.head || document.getElementsByTagName('head')[0];
+    if (!head) return;
+
+    var cssFiles = [
+      '/ems/assets/css/local-fonts.css',
+      '/ems/assets/css/design-tokens.css',
+      '/ems/assets/css/alltables.css',
+      '/ems/assets/css/ems.main.all.style.css'
+    ];
+
+    cssFiles.forEach(function (href) {
+      if (document.querySelector('link[rel="stylesheet"][href="' + href + '"]')) return;
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      head.appendChild(link);
+    });
+
+    if (!document.querySelector('script[src="/ems/assets/js/ui-unification.js"]')) {
+      var script = document.createElement('script');
+      script.src = '/ems/assets/js/ui-unification.js';
+      script.defer = true;
+      head.appendChild(script);
+    }
+
+    if (document.body) {
+      document.body.classList.add('ems-site');
+    } else {
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.classList.add('ems-site');
+      }, { once: true });
+    }
+  })();
+</script>
 <!-- زر القائمة في الموبايل -->
 <button class="mobile-menu-btn" id="mobileMenuBtn">
   <i class="fa fa-bars"></i>

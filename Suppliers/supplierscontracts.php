@@ -209,6 +209,9 @@ include('../insidebar.php');
   if ($can_add) {
       $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'عقد جديد');
   }
+  // ── نظام Excel الموحّد (Unified Excel Framework) ──
+  require_once __DIR__ . '/../includes/excel_ui.php';
+  foreach (ems_excel_header_actions('supplier_contracts', 'عقود الموردين', $can_add) as $__xlAction) { $header_actions[] = $__xlAction; }
   $header_back = array(
       array('href' => 'suppliers.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'العودة للموردين'),
       array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fa-solid fa-house', 'label' => 'الرئيسية'),
@@ -2211,7 +2214,7 @@ include('../insidebar.php');
   </script>
 
 
-
+<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>
 
 </html>

@@ -1532,16 +1532,16 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
                 <table id="projectsTable" class="display nowrap">
                     <thead>
                         <tr>
-                          <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
-                                                        <th data-group="basic"><i class="fas fa-tag"></i> كود المعدة</th>
-                            <th data-group="basic"><i class="fas fa-truck-loading"></i> المورد</th>
-                            <th data-group="basic"><i class="fas fa-list-alt"></i> النوع</th>
-                            <th data-group="manufacturing"><i class="fas fa-car"></i> الموديل</th>
-                            <th data-group="manufacturing"><i class="fas fa-calendar"></i> سنة الصنع</th>
-                            <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
-                            <th data-group="ownership"><i class="fas fa-user"></i> المالك</th>
-                            <th data-group="status"><i class="fas fa-traffic-light"></i> التوفر</th>
-                            <th data-group="status"><i class="fas fa-toggle-on"></i> حالة المعدة</th>
+                            <th data-group="status">> إجراءات</th>
+                            <th data-group="basic"> كود المعدة</th>
+                            <th data-group="basic"> المورد</th>
+                            <th data-group="basic"> النوع</th>
+                            <th data-group="manufacturing"> الموديل</th>
+                            <th data-group="manufacturing"> سنة الصنع</th>
+                            <th data-group="technical"> حالة المعدة</th>
+                            <th data-group="ownership"> المالك</th>
+                            <th data-group="status"> التوفر</th>
+                            <th data-group="status"> الحالة </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1674,9 +1674,9 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
 
                             // التوفر
                             if ($row_availability_state === 'متوفرة') {
-                                echo "<td><span class='badge-available'><i class='fas fa-check-circle'></i> متوفرة</span></td>";
+                                echo "<td><span class='badge-available'><i class='fa-regular fa-circle-check'></i> متوفرة</span></td>";
                             } else {
-                                echo "<td><span class='badge-busy'><i class='fas fa-ban'></i> غير متوفرة</span></td>";
+                                echo "<td><span class='badge-busy'><i class='fa-regular fa-circle-xmark'></i> غير متوفرة</span></td>";
                             }
 
                             // حالة المعدة (من حقل status الرقمي)

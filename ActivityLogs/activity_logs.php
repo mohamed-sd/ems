@@ -231,6 +231,9 @@ $page_title = 'سجل النشاطات';
         $header_title_html = 'سجل النشاطات
                 <p class="small mb-0" style="color: #fff;">تتبع جميع عمليات المستخدمين في النظام</p>';
         $header_actions = array();
+        // ── نظام Excel الموحّد (تصدير فقط — سجل تدقيق) ──
+        require_once __DIR__ . '/../includes/excel_ui.php';
+        foreach (ems_excel_header_actions('activity_logs', 'سجل النشاطات', false, ['exportOnly' => true]) as $__xlAction) { $header_actions[] = $__xlAction; }
         $header_back    = ($selectedRoleId > 0)
             ? array('href' => 'activity_logs.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع')
             : false;

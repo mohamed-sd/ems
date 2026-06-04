@@ -435,8 +435,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                                         $raw_status = isset($row['status']) ? trim((string) $row['status']) : 'active';
                                                         $status_is_active = in_array(strtolower($raw_status), array('1', 'active', 'true', 'نشط'), true);
                                                         $status_badge = $status_is_active
-                                                                ? "<span class='status-active'><i class='fas fa-check-circle'></i> نشط</span>"
-                                                                : "<span class='status-inactive'><i class='fas fa-times-circle'></i> غير نشط</span>";
+                                                                ? "<span class='status-active'><i class='fa-regular fa-circle-check'></i> نشط</span>"
+                                                                : "<span class='status-inactive'><i class='fa-regular fa-circle-xmark'></i> غير نشط</span>";
 
                                                         echo "<td>
                                                                 <div class='action-btns'>
@@ -491,7 +491,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 <!-- jQuery + DataTables -->
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>

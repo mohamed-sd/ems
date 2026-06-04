@@ -343,16 +343,20 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
     <div class="header" data-ems-unified-header="1">
         <div class="actions"<?php if ($_SESSION['user']['role'] == "10") echo ' style="display:none;"'; ?>>
             <?php if ($_SESSION['user']['role'] != "10") { ?>
-            <!-- أزرار الاستيراد من Excel -->
-            <a href="download_equipments_template.php" class="btn" style="background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;">
-                <i class="fas fa-file-excel"></i> تحميل نموذج Excel
+            <!-- ── نظام Excel الموحّد (Unified Excel Framework) ── -->
+            <?php
+            require_once __DIR__ . '/../includes/excel_ui.php';
+            $__xlBase = ems_excel_endpoint_url();
+            ?>
+            <a href="<?php echo htmlspecialchars($__xlBase . '?entity=equipments&action=template', ENT_QUOTES, 'UTF-8'); ?>" class="btn" style="background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;">
+                <i class="fas fa-file-excel"></i> تحميل النموذج
             </a>
-            <a href="download_equipments_template_csv.php" class="btn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;">
-                <i class="fas fa-file-csv"></i> تحميل نموذج CSV
+            <a href="<?php echo htmlspecialchars($__xlBase . '?entity=equipments&action=export', ENT_QUOTES, 'UTF-8'); ?>" class="btn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;">
+                <i class="fas fa-file-export"></i> تصدير Excel
             </a>
-            <a href="javascript:void(0)" id="openImportModal" class="btn" style="background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease;">
-                <i class="fas fa-file-import"></i> استيراد من Excel
-            </a>
+            <button type="button" class="btn" data-ems-excel-import="equipments" data-ems-excel-title="المعدات" style="background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease;">
+                <i class="fas fa-file-import"></i> استيراد Excel
+            </button>
             <a href="javascript:void(0)" id="toggleForm" class="add-btn">
                 <i class="fas fa-plus-circle"></i> إضافة معدة جديدة
             </a>
@@ -2000,5 +2004,6 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
 </script>
 
 </div> <!-- closing main div -->
+<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>
 </html>

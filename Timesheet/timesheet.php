@@ -564,6 +564,9 @@ if ($today_rows_result) {
       array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة ساعات عمل جديدة'),
       array('href' => 'view_timesheet.php?type=' . urlencode($type), 'class' => 'back-btn ts-view-link', 'icon' => 'fas fa-table', 'label' => 'شاشة العرض الكاملة'),
   );
+  // ── نظام Excel الموحّد (Unified Excel Framework) ──
+  require_once __DIR__ . '/../includes/excel_ui.php';
+  foreach (ems_excel_header_actions('timesheet', 'ساعات العمل', true) as $__xlAction) { $header_actions[] = $__xlAction; }
   $header_back = array('href' => 'timesheet_type.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
   include('../includes/page_header.php');
   ?>
@@ -2606,7 +2609,7 @@ if ($today_rows_result) {
 
   })();
 </script>
-
+<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>
 
 </html>

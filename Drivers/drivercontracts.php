@@ -105,6 +105,9 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
     $header_actions = array(
         array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'عقد جديد'),
     );
+    // ── نظام Excel الموحّد (Unified Excel Framework) ──
+    require_once __DIR__ . '/../includes/excel_ui.php';
+    foreach (ems_excel_header_actions('driver_contracts', 'عقود السائقين', true) as $__xlAction) { $header_actions[] = $__xlAction; }
     $header_back = array('href' => 'drivers.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
@@ -1810,7 +1813,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
     });
   </script>
 
-
+<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>
 
 </html>

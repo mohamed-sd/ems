@@ -317,10 +317,10 @@ include '../insidebar.php';
         $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مورد جديد');
     }
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'suppliers-header-link', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'suppliers-toggle-stats-text');
-    $header_actions[] = array('href' => 'download_suppliers_template_csv.php', 'class' => 'suppliers-header-link suppliers-header-link-csv', 'icon' => 'fas fa-file-csv', 'label' => 'تحميل نموذج CSV');
-    $header_actions[] = array('href' => 'download_suppliers_template.php', 'class' => 'suppliers-header-link suppliers-header-link-excel', 'icon' => 'fas fa-file-excel', 'label' => 'تحميل نموذج Excel');
-    if ($can_add) {
-        $header_actions[] = array('id' => 'openImportModal', 'class' => 'suppliers-header-link suppliers-header-link-import', 'icon' => 'fas fa-file-import', 'label' => 'استيراد من Excel');
+    // ── نظام Excel الموحّد (Unified Excel Framework) ──
+    require_once __DIR__ . '/../includes/excel_ui.php';
+    foreach (ems_excel_header_actions('suppliers', 'الموردين', $can_add) as $__xlAction) {
+        $header_actions[] = $__xlAction;
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
@@ -1261,7 +1261,7 @@ include '../insidebar.php';
         }
     }
 </style>
-
+<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>
 
 </html>

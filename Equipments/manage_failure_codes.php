@@ -178,6 +178,9 @@ $stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM fa
         $header_actions[] = array('tag' => 'button', 'id' => 'toggleFormBtn', 'class' => 'add-btn', 'attrs' => 'onclick="toggleForm()"', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة كود جديد', 'label_class' => '');
     }
     $header_actions[] = array('href' => 'fleet_failures.php', 'class' => 'btn-gold', 'icon' => 'fas fa-chart-line', 'label' => 'تقرير الاخطاء');
+    // ── نظام Excel الموحّد (Unified Excel Framework) ──
+    require_once __DIR__ . '/../includes/excel_ui.php';
+    foreach (ems_excel_header_actions('failure_codes', 'أكواد الأعطال', $can_add) as $__xlAction) { $header_actions[] = $__xlAction; }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
@@ -585,5 +588,5 @@ function editRow(data) {
     form.status.value           = data.status;
 }
 </script>
-
+<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 <?php mysqli_close($conn); ?>

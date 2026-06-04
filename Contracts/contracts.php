@@ -183,6 +183,9 @@ include('../insidebar.php');
   if ($can_add) {
       $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'عقد جديد');
   }
+  // ── نظام Excel الموحّد (Unified Excel Framework) ──
+  require_once __DIR__ . '/../includes/excel_ui.php';
+  foreach (ems_excel_header_actions('contracts', 'عقود المشاريع', $can_add) as $__xlAction) { $header_actions[] = $__xlAction; }
   $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
   include('../includes/page_header.php');
   ?>
@@ -705,47 +708,47 @@ include('../insidebar.php');
       <table id="projectsTable" class="display nowrap contracts-table contracts-table-nowrap">
         <thead>
           <tr>
-            <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
+            <th class="group-status"> الإجراءات</th>
             <!-- المعلومات الأساسية -->
-            <th class="group-basic"><i class="fas fa-hashtag"></i> رقم العقد</th>
-            <th class="group-basic"><i class="fas fa-project-diagram"></i> المشروع</th>
+            <th class="group-basic"> رقم العقد</th>
+            <th class="group-basic"> المشروع</th>
 
             <!-- التواريخ والمدد -->
-            <th class="group-dates"><i class="far fa-calendar"></i> تاريخ التوقيع</th>
-            <th class="group-dates"><i class="fas fa-hourglass-half"></i> مدة السماح (أيام)</th>
-            <th class="group-dates"><i class="fas fa-calendar-days"></i> مدة العقد (أيام)</th>
-            <th class="group-dates"><i class="fas fa-play-circle"></i> بداية التنفيذ</th>
-            <th class="group-dates"><i class="fas fa-stop-circle"></i> نهاية التنفيذ</th>
+            <th class="group-dates"> تاريخ التوقيع</th>
+            <th class="group-dates"> مدة السماح (أيام)</th>
+            <th class="group-dates"> مدة العقد (أيام)</th>
+            <th class="group-dates"> بداية التنفيذ</th>
+            <th class="group-dates"> نهاية التنفيذ</th>
 
             <!-- الساعات والأهداف -->
-            <th class="group-hours"><i class="far fa-clock"></i> هدف ساعات شهري</th>
-            <th class="group-hours"><i class="fas fa-clock"></i> إجمالي ساعات متوقعة</th>
+            <th class="group-hours"> هدف ساعات شهري</th>
+            <th class="group-hours"> إجمالي ساعات متوقعة</th>
 
             <!-- أطراف العقد -->
-            <th class="group-parties"><i class="fas fa-user-tie"></i> الطرف الأول</th>
-            <th class="group-parties"><i class="fas fa-user-check"></i> الطرف الثاني</th>
-            <th class="group-parties"><i class="fas fa-eye"></i> شاهد أول</th>
-            <th class="group-parties"><i class="fas fa-eye"></i> شاهد ثاني</th>
+            <th class="group-parties"> الطرف الأول</th>
+            <th class="group-parties"> الطرف الثاني</th>
+            <th class="group-parties"> شاهد أول</th>
+            <th class="group-parties"> شاهد ثاني</th>
 
             <!-- الخدمات المقدمة -->
-            <th class="group-services"><i class="fas fa-truck"></i> النقل</th>
-            <th class="group-services"><i class="fas fa-bed"></i> السكن</th>
-            <th class="group-services"><i class="fas fa-home"></i> مكان المعيشة</th>
-            <th class="group-services"><i class="fas fa-wrench"></i> الورشة</th>
+            <th class="group-services"> النقل</th>
+            <th class="group-services"> السكن</th>
+            <th class="group-services"> مكان المعيشة</th>
+            <th class="group-services"> الورشة</th>
 
             <!-- التشغيل اليومي -->
-            <th class="group-operations"><i class="fas fa-business-time"></i> ساعات العمل يومياً</th>
-            <th class="group-operations"><i class="fas fa-users-cog"></i> عدد المشغلين يومياً</th>
+            <th class="group-operations"> ساعات العمل يومياً</th>
+            <th class="group-operations"> عدد المشغلين يومياً</th>
 
             <!-- البيانات المالية -->
-            <th class="group-basic"><i class="fas fa-money-bill-wave"></i> العملة</th>
-            <th class="group-basic"><i class="fas fa-dollar-sign"></i> المبلغ المدفوع</th>
-            <th class="group-basic"><i class="fas fa-clock"></i> وقت الدفع</th>
-            <th class="group-basic"><i class="fas fa-shield-alt"></i> الضمانات</th>
-            <th class="group-basic"><i class="fas fa-calendar-check"></i> تاريخ الدفع</th>
+            <th class="group-basic"> العملة</th>
+            <th class="group-basic"> المبلغ المدفوع</th>
+            <th class="group-basic"> وقت الدفع</th>
+            <th class="group-basic"> الضمانات</th>
+            <th class="group-basic"> تاريخ الدفع</th>
 
             <!-- الحالة والإجراءات -->
-            <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
+            <th class="group-status"> الحالة</th>
           </tr>
         </thead>
         <tbody>
@@ -1885,7 +1888,7 @@ include('../insidebar.php');
   });
 </script>
 
-
+<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>
 
 </html>

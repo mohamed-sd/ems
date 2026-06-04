@@ -24,6 +24,15 @@ define('EMS_STORAGE_DIR',   EMS_ROOT_DIR . '/storage');
 define('EMS_QUEUE_SPOOL_DIR', EMS_STORAGE_DIR . '/queue');
 define('EMS_LOGS_DIR',      EMS_STORAGE_DIR . '/logs');
 
+// ── Composer autoloader (PhpSpreadsheet & other vendor libs) ──────────────
+// Loaded centrally so the whole App\ layer (e.g. the Unified Excel Framework)
+// has vendor classes available without per-file `require vendor/autoload`.
+$emsVendorAutoload = EMS_ROOT_DIR . '/vendor/autoload.php';
+if (is_file($emsVendorAutoload)) {
+    require_once $emsVendorAutoload;
+}
+unset($emsVendorAutoload);
+
 // ── Create necessary directories (once, with .htaccess protection) ────────
 foreach ([EMS_STORAGE_DIR, EMS_QUEUE_SPOOL_DIR, EMS_LOGS_DIR] as $dir) {
     if (!is_dir($dir)) {

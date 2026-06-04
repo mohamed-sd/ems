@@ -456,9 +456,11 @@ include('../insidebar.php');
     if ($can_add) {
         $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مشغل جديد');
     }
-    $header_actions[] = array('href' => 'download_drivers_template.php', 'class' => 'btn', 'icon' => 'fas fa-file-excel', 'label' => 'تحميل نموذج Excel', 'style' => 'background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;');
-    $header_actions[] = array('href' => 'download_drivers_template_csv.php', 'class' => 'btn', 'icon' => 'fas fa-file-csv', 'label' => 'تحميل نموذج CSV', 'style' => 'background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;');
-    $header_actions[] = array('tag' => 'button', 'class' => 'btn', 'attrs' => 'type="button" data-bs-toggle="modal" data-bs-target="#importModal"', 'icon' => 'fas fa-file-upload', 'label' => 'استيراد من Excel/CSV', 'style' => 'background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease; border: none;');
+    // ── نظام Excel الموحّد (Unified Excel Framework) ──
+    require_once __DIR__ . '/../includes/excel_ui.php';
+    foreach (ems_excel_header_actions('drivers', 'المشغلين', $can_add) as $__xlAction) {
+        $header_actions[] = $__xlAction;
+    }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
@@ -1408,7 +1410,7 @@ include('../insidebar.php');
         });
     });
 </script>
-
+<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>
 
 </html>

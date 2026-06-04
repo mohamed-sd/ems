@@ -611,6 +611,9 @@ include('../insidebar.php');
     if ($_SESSION['user']['role'] != "10") {
         $header_actions[] = array('href' => 'select_project.php', 'class' => 'movement-topbar-btn', 'icon' => 'fas fa-exchange-alt', 'label' => 'تغيير المشروع');
     }
+    // ── نظام Excel الموحّد (Unified Excel Framework) ──
+    require_once __DIR__ . '/../includes/excel_ui.php';
+    foreach (ems_excel_header_actions('operations', 'حركات التشغيل', $can_add) as $__xlAction) { $header_actions[] = $__xlAction; }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
@@ -1642,7 +1645,7 @@ include('../insidebar.php');
         </script>
 
     </div><!-- /.main -->
-
+<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
     </body>
 
     </html>

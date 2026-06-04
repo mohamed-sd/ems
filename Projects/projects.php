@@ -423,14 +423,15 @@ include('../insidebar.php');
     $header_icon  = 'fas fa-project-diagram';
     $header_actions = array();
     if ($can_add) {
-        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مشروع');
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fa fa-solid fa-plus', 'label' => '');
     } else {
         $header_actions[] = array('tag' => 'button', 'class' => 'add-btn', 'disabled' => true, 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة (بدون صلاحية)');
     }
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'projects-toggle-stats-text');
-    $header_actions[] = array('id' => 'exportBtn', 'class' => 'btn projects-btn projects-btn-export', 'title' => 'تحميل النموذج', 'icon' => 'fas fa-download', 'label' => 'تحميل النموذج');
-    if ($can_add) {
-        $header_actions[] = array('id' => 'importBtn', 'class' => 'btn projects-btn projects-btn-import', 'title' => 'استيراد ملف', 'icon' => 'fas fa-upload', 'label' => 'استيراد من Excel');
+    // ── نظام Excel الموحّد (Unified Excel Framework) ──
+    require_once __DIR__ . '/../includes/excel_ui.php';
+    foreach (ems_excel_header_actions('projects', 'المشاريع', $can_add) as $__xlAction) {
+        $header_actions[] = $__xlAction;
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
@@ -608,15 +609,15 @@ include('../insidebar.php');
                 <table id="projectsTable" class="display projects-table-nowrap" style="width:100%;">
                     <thead>
                         <tr>
-                            <th><i class="fas fa-cogs"></i> إجراءات</th>
-                            <th><i class="fas fa-project-diagram"></i> المشروع</th>
-                            <th><i class="fas fa-calendar"></i> تاريخ الإضافة</th>
-                            <th><i class="fas fa-user-tie"></i> العميل</th>
-                            <th><i class="fas fa-file-contract"></i> كود المشروع</th>
-                            <th><i class="fas fa-mountain"></i> كود المنجم</th>
-                            <th><i class="fas fa-truck"></i> عدد الموردين</th>
-                            <th><i class="fas fa-toggle-on"></i> الحالة</th>
-                            <th><i class="fas fa-file-contract"></i> عقود المشروع</th>
+                            <th> إجراءات</th>
+                            <th> المشروع</th>
+                            <th> تاريخ الإضافة</th>
+                            <th> العميل</th>
+                            <th> كود المشروع</th>
+                            <th> كود المنجم</th>
+                            <th> عدد الموردين</th>
+                            <th> الحالة</th>
+                            <th> عقود المشروع</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -717,9 +718,9 @@ include('../insidebar.php');
                             echo "<td>" . e(isset($row['client_name']) && $row['client_name'] !== '' ? $row['client_name'] : $row['client']) . "</td>";
                             echo "<td>" . e(isset($row['project_code']) && $row['project_code'] !== '' ? $row['project_code'] : '-') . "</td>";
                             echo "<td>" . e(isset($row['mine_code']) && $row['mine_code'] !== '' ? $row['mine_code'] : '-') . "</td>";
-                            echo "<td><span class='count-badge'>" . intval($row['total_suppliers']) . "</span></td>";
+                            echo "<td><span class='action-btn'>" . intval($row['total_suppliers']) . "</span></td>";
                             if ($row['status'] == "1") {
-                                echo "<td><span class='status-active'><i class='fas fa-check-circle'></i> نشط</span></td>";
+                                echo "<td><span class='status-active'><i class='fa-regular fa-circle-check'></i> نشط</span></td>";
                             } else {
                                 echo "<td><span class='status-inactive'><i class='fas fa-times-circle'></i> غير نشط</span></td>";
                             }
@@ -729,7 +730,7 @@ include('../insidebar.php');
                                        class='mines-count-link'
                                        title='عرض عقود المشروع'>
                                         <i class='fas fa-file-contract'></i>
-                                        <span class='mines-count-badge'>" . intval($row['contracts']) . "</span>
+                                        <span class='action-btn'>" . intval($row['contracts']) . "</span>
                              </a>
                         </td>";
 
@@ -1322,7 +1323,7 @@ include('../insidebar.php');
         </div>
     </div>
 </div>
-
+<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>
 
 </html>

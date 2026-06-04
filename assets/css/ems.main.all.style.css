@@ -13265,6 +13265,192 @@ body.ems-site .main .page-header.allheaders .allheaders-add:hover {
   color: #ffffff !important;
 }
 
+/* Final system header shell: one layout and one identity for all page headers */
+body.ems-site {
+  --ems-header-bg: linear-gradient(180deg, #f3c300 0%, #eab800 100%);
+  --ems-header-text: #111111;
+  --ems-header-border: rgba(17, 17, 17, 0.2);
+  --ems-header-chip: #f7f7f7;
+  --ems-header-chip-hover: #ebebeb;
+  --ems-header-primary: #f7f7f7;
+  --ems-header-primary-hover: #ebebeb;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) {
+  direction: ltr !important;
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 8px 12px !important;
+  min-height: 50px !important;
+  margin-bottom: 16px !important;
+  background: var(--ems-header-bg) !important;
+  border: 1px solid var(--ems-header-border) !important;
+  border-bottom: 2px solid #b68f00 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 10px rgba(15, 17, 21, 0.16) !important;
+  color: var(--ems-header-text) !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header)::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 35%) !important;
+  pointer-events: none !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_actions, .actions, .head_back, .back) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_actions, .actions) {
+  justify-self: start !important;
+  justify-content: flex-start !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_back, .back) {
+  justify-self: end !important;
+  justify-content: flex-end !important;
+  background: transparent !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head-title, .title, .title-content, .page-title, h1, h2, h3) {
+  direction: rtl !important;
+  justify-self: end !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  color: var(--ems-header-text) !important;
+  font-size: clamp(1.02rem, 0.94rem + 0.34vw, 1.26rem) !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head-title, .title, .title-content, .page-title, h1, h2, h3) .title-icon,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head-title, .title, .title-content, .page-title, h1, h2, h3) > i:first-child {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #f7f7f7 !important;
+  color: #202020 !important;
+  border: 1px solid #8d8d !important;
+  box-shadow: none !important;
+  flex-shrink: 1 !important;
+  padding: 10px;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head-title, .title, .title-content, .page-title, h1, h2, h3) .title-icon i,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head-title, .title, .title-content, .page-title, h1, h2, h3) > i:first-child {
+  color: #202020 !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions, .head_back, .back) > :is(a, button, input[type="button"], input[type="submit"]),
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions) .dt-buttons > :is(a, button, .dt-button) {
+  direction: rtl !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 40px !important;
+  padding: 8px 14px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(17, 17, 17, 0.2) !important;
+  background: var(--ems-header-chip) !important;
+  color: var(--ems-header-text) !important;
+  text-decoration: none !important;
+  font-size: 0.84rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions, .head_back, .back) > :is(a, button, input[type="button"], input[type="submit"]):hover,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions) .dt-buttons > :is(a, button, .dt-button):hover {
+  transform: translateY(-1px) !important;
+  background: var(--ems-header-chip-hover) !important;
+  border-color: rgba(17, 17, 17, 0.2) !important;
+  box-shadow: 0 6px 16px rgba(17, 17, 17, 0.12) !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions) > :is(.add-btn, #toggleForm),
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) .allheaders-add {
+  background: var(--ems-header-primary) !important;
+  border-color: var(--ems-header-primary) !important;
+  color: var(--ems-header-text) !important;
+  box-shadow: none !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions) > :is(.add-btn, #toggleForm) *,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) .allheaders-add * {
+  color: var(--ems-header-text) !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions) > :is(.add-btn, #toggleForm):hover,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) .allheaders-add:hover {
+  background: var(--ems-header-primary-hover) !important;
+  border-color: var(--ems-header-primary-hover) !important;
+  color: var(--ems-header-text) !important;
+  box-shadow: 0 6px 16px rgba(17, 17, 17, 0.12) !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions) .dt-buttons {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+@media (max-width: 991px) {
+  body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) {
+    grid-template-columns: 1fr !important;
+    gap: 9px !important;
+  }
+
+  body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_actions, .actions, .head-title, .title, .page-title, .head_back, .back, h1, h2, h3) {
+    justify-self: stretch !important;
+  }
+
+  body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head-title, .title, .page-title, h1, h2, h3) {
+    justify-content: center !important;
+    white-space: normal !important;
+  }
+
+  body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_actions, .actions) {
+    justify-content: flex-start !important;
+  }
+
+  body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_back, .back) {
+    justify-content: flex-end !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_actions, .actions) {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    padding-bottom: 4px !important;
+  }
+}
+
 /* Global tables header color override (system-wide) */
 body.ems-site .main table thead,
 body.ems-site .main .table thead,
@@ -13329,4 +13515,852 @@ table.dataTable thead .sorting_asc::after,
 table.dataTable thead .sorting_desc::before,
 table.dataTable thead .sorting_desc::after {
   color: #000000 !important;
+}
+
+/* ============================================================
+   FINAL UNIFIED THEME (Reference Header + DataTables)
+   Applied centrally to all sidebar pages and all DataTables.
+============================================================ */
+body.ems-site {
+  --ref-yellow-1: #f0bc00;
+  --ref-yellow-2: #dfab00;
+  --ref-yellow-border: #b98a00;
+  --ref-ink: #161616;
+  --ref-chip: #f2f2f2;
+  --ref-chip-border: #c9c9c9;
+  --ref-chip-hover: #e6e6e6;
+  --ref-head-bg: #5d5d5d;
+  --ref-row-a: #ececec;
+  --ref-row-b: #e2e2e2;
+  --ref-row-hover: #d8d8d8;
+  --ref-cell-border: #cfcfcf;
+}
+
+/* Header shell */
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) {
+  direction: ltr !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 48px !important;
+  padding: 8px 12px !important;
+  margin-bottom: 14px !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--ref-yellow-border) !important;
+  border-bottom-width: 2px !important;
+  background: linear-gradient(180deg, var(--ref-yellow-1) 0%, var(--ref-yellow-2) 100%) !important;
+  color: var(--ref-ink) !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header)::before,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header)::after {
+  display: none !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_actions, .actions),
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_back, .back) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_actions, .actions) {
+  justify-self: start !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_back, .back) {
+  justify-self: end !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head-title, .title, .title-content, .page-title, h1, h2, h3) {
+  direction: rtl !important;
+  justify-self: end !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  color: var(--ref-ink) !important;
+  font-size: clamp(1rem, 0.92rem + 0.34vw, 1.22rem) !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head-title, .title, .title-content, .page-title, h1, h2, h3) .title-icon,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head-title, .title, .title-content, .page-title, h1, h2, h3) > i:first-child {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #f7f7f7 !important;
+  border: 1px solid #8d8d8d !important;
+  color: #202020 !important;
+  box-shadow: none !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions, .head_back, .back) > :is(a, button, input[type="button"], input[type="submit"]),
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions) .dt-buttons > :is(a, button, .dt-button) {
+  direction: rtl !important;
+  min-height: 32px !important;
+  padding: 6px 11px !important;
+  border-radius: 999px !important;
+  border: 1px solid #8f8f8f !important;
+  background: #f5f5f5 !important;
+  color: #1f1f1f !important;
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions, .head_back, .back) > :is(a, button, input[type="button"], input[type="submit"]):hover,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions) .dt-buttons > :is(a, button, .dt-button):hover {
+  background: #ebebeb !important;
+  border-color: #7e7e7e !important;
+  transform: none !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head_actions, .actions) > :is(.add-btn, #toggleForm),
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) .allheaders-add {
+  background: #f6f6f6 !important;
+  border: 1px solid #7f7f7f !important;
+  color: #191919 !important;
+}
+
+/* DataTables and unified tables */
+body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border: 1px solid var(--ref-cell-border) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background: #e9e9e9 !important;
+  box-shadow: none !important;
+}
+
+body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead,
+body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead tr,
+body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead th {
+  background: var(--ref-head-bg) !important;
+  color: #ffffff !important;
+  background-image: none !important;
+  border-color: #707070 !important;
+}
+
+body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead th {
+  padding: 9px 10px !important;
+  font-size: 0.93rem !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+body.ems-site .main table.dataTable thead .sorting::before,
+body.ems-site .main table.dataTable thead .sorting::after,
+body.ems-site .main table.dataTable thead .sorting_asc::before,
+body.ems-site .main table.dataTable thead .sorting_asc::after,
+body.ems-site .main table.dataTable thead .sorting_desc::before,
+body.ems-site .main table.dataTable thead .sorting_desc::after {
+  color: #ffffff !important;
+  opacity: 0.9 !important;
+}
+
+body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:nth-child(odd) {
+  background: var(--ref-row-a) !important;
+}
+
+body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:nth-child(even) {
+  background: var(--ref-row-b) !important;
+}
+
+body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:hover,
+body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:hover td {
+  background: var(--ref-row-hover) !important;
+}
+
+body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody td {
+  color: #161616 !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  padding: 6px 10px !important;
+  border-bottom: 1px solid var(--ref-cell-border) !important;
+  border-left: 1px solid var(--ref-cell-border) !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody td:last-child {
+  border-left: 0 !important;
+}
+
+body.ems-site .main .dataTables_wrapper {
+  margin-top: 6px !important;
+}
+
+body.ems-site .main .dataTables_wrapper :is(.dataTables_filter, .dataTables_length, .dataTables_info, .dataTables_paginate) {
+  color: #242424 !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+}
+
+body.ems-site .main .dataTables_wrapper .dataTables_filter input,
+body.ems-site .main .dataTables_wrapper .dataTables_length select {
+  background: #f3f3f3 !important;
+  border: 1px solid #c5c5c5 !important;
+  border-radius: 999px !important;
+  min-height: 34px !important;
+  padding: 6px 12px !important;
+  color: #181818 !important;
+}
+
+body.ems-site .main .dataTables_wrapper .dataTables_filter input:focus,
+body.ems-site .main .dataTables_wrapper .dataTables_length select:focus {
+  border-color: #9b9b9b !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
+}
+
+body.ems-site .main .dataTables_wrapper .dt-buttons .dt-button {
+  border: 1px solid #8f8f8f !important;
+  border-radius: 999px !important;
+  background: #f5f5f5 !important;
+  color: #202020 !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+}
+
+body.ems-site .main .dataTables_wrapper .dt-buttons .dt-button:hover {
+  background: #ebebeb !important;
+  border-color: #7e7e7e !important;
+}
+
+body.ems-site .main .dataTables_wrapper .dataTables_paginate .paginate_button {
+  border: 1px solid #c3c3c3 !important;
+  border-radius: 999px !important;
+  background: #f3f3f3 !important;
+  color: #222 !important;
+  margin: 0 2px !important;
+  min-width: 32px !important;
+}
+
+body.ems-site .main .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+body.ems-site .main .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: linear-gradient(180deg, var(--ref-yellow-1) 0%, var(--ref-yellow-2) 100%) !important;
+  border-color: var(--ref-yellow-border) !important;
+  color: #161616 !important;
+  font-weight: 900 !important;
+}
+
+body.ems-site .main .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #e9e9e9 !important;
+  border-color: #b4b4b4 !important;
+  color: #111 !important;
+}
+
+@media (max-width: 991px) {
+  body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) {
+    grid-template-columns: 1fr !important;
+  }
+
+  body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head_actions, .actions, .head-title, .title, .page-title, .head_back, .back, h1, h2, h3) {
+    justify-self: stretch !important;
+  }
+
+  body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) > :is(.head-title, .title, .page-title, h1, h2, h3) {
+    justify-content: center !important;
+    white-space: normal !important;
+  }
+
+  body.ems-site .main .dataTables_wrapper :is(.dataTables_filter, .dataTables_length) {
+    width: 100% !important;
+    margin-bottom: 6px !important;
+  }
+}
+
+/* ============================================================
+   ACTION ICONS UNIFICATION (All Tables / All Modules)
+   Reference style: compact circular icon actions + neutral gray shell.
+============================================================ */
+body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
+  .action-btn,
+  .eye-btn,
+  .edit-btn,
+  .delete-btn,
+  .edit-icon,
+  .delete-icon,
+  .view-icon,
+  .btn-edit,
+  .btn-delete,
+  .btn-view,
+  [title*="عرض"],
+  [title*="مشاهدة"],
+  [title*="تعديل"],
+  [title*="حذف"],
+  [title*="طباعة"],
+  [title*="تحميل"],
+  [title*="اعتماد"],
+  [title*="إلغاء"],
+  [title*="view"],
+  [title*="edit"],
+  [title*="delete"],
+  [title*="print"],
+  [title*="download"],
+  [title*="approve"],
+  [title*="cancel"]
+) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  min-height: 30px !important;
+  min-width: 30px !important;
+  padding: 5px 8px !important;
+  border-radius: 999px !important;
+  border: 1px solid #8d8d8d !important;
+  background: linear-gradient(180deg, #f8f8f8 0%, #ececec 100%) !important;
+  color: #1a1a1a !important;
+  text-decoration: none !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.11) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease !important;
+}
+
+body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
+  .action-btn,
+  .eye-btn,
+  .edit-btn,
+  .delete-btn,
+  .edit-icon,
+  .delete-icon,
+  .view-icon,
+  .btn-edit,
+  .btn-delete,
+  .btn-view,
+  [title*="عرض"],
+  [title*="مشاهدة"],
+  [title*="تعديل"],
+  [title*="حذف"],
+  [title*="طباعة"],
+  [title*="تحميل"],
+  [title*="اعتماد"],
+  [title*="إلغاء"],
+  [title*="view"],
+  [title*="edit"],
+  [title*="delete"],
+  [title*="print"],
+  [title*="download"],
+  [title*="approve"],
+  [title*="cancel"]
+):hover {
+  background: #e5e5e5 !important;
+  border-color: #707070 !important;
+  color: #111 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
+  .action-btn,
+  .eye-btn,
+  .edit-btn,
+  .delete-btn,
+  .edit-icon,
+  .delete-icon,
+  .view-icon,
+  .btn-edit,
+  .btn-delete,
+  .btn-view,
+  [title*="عرض"],
+  [title*="مشاهدة"],
+  [title*="تعديل"],
+  [title*="حذف"],
+  [title*="طباعة"],
+  [title*="تحميل"],
+  [title*="اعتماد"],
+  [title*="إلغاء"],
+  [title*="view"],
+  [title*="edit"],
+  [title*="delete"],
+  [title*="print"],
+  [title*="download"],
+  [title*="approve"],
+  [title*="cancel"]
+):active {
+  transform: translateY(0) !important;
+  background: #dbdbdb !important;
+}
+
+body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
+  .action-btn,
+  .eye-btn,
+  .edit-btn,
+  .delete-btn,
+  .edit-icon,
+  .delete-icon,
+  .view-icon,
+  .btn-edit,
+  .btn-delete,
+  .btn-view,
+  [title*="عرض"],
+  [title*="مشاهدة"],
+  [title*="تعديل"],
+  [title*="حذف"],
+  [title*="طباعة"],
+  [title*="تحميل"],
+  [title*="اعتماد"],
+  [title*="إلغاء"],
+  [title*="view"],
+  [title*="edit"],
+  [title*="delete"],
+  [title*="print"],
+  [title*="download"],
+  [title*="approve"],
+  [title*="cancel"]
+):focus-visible {
+  outline: 2px solid rgba(0, 0, 0, 0.4) !important;
+  outline-offset: 1px !important;
+}
+
+body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
+  .action-btn,
+  .eye-btn,
+  .edit-btn,
+  .delete-btn,
+  .edit-icon,
+  .delete-icon,
+  .view-icon,
+  .btn-edit,
+  .btn-delete,
+  .btn-view,
+  [title*="عرض"],
+  [title*="مشاهدة"],
+  [title*="تعديل"],
+  [title*="حذف"],
+  [title*="طباعة"],
+  [title*="تحميل"],
+  [title*="اعتماد"],
+  [title*="إلغاء"],
+  [title*="view"],
+  [title*="edit"],
+  [title*="delete"],
+  [title*="print"],
+  [title*="download"],
+  [title*="approve"],
+  [title*="cancel"]
+) i {
+  color: inherit !important;
+  font-size: 0.9rem !important;
+}
+
+/* Make semantic variants subtle while keeping one visual system */
+body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(.delete-btn, .delete-icon, .action-btn.delete, [title*="حذف"], [title*="delete"]) {
+  border-color: #a15b5b !important;
+  color: #6d1d1d !important;
+}
+
+body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(.delete-btn, .delete-icon, .action-btn.delete, [title*="حذف"], [title*="delete"]):hover {
+  background: #f0dfdf !important;
+  border-color: #8b4444 !important;
+}
+
+/* ============================================================
+   HEADER ADD BUTTON UNIFICATION
+   Add button now follows same visual language as all header controls.
+============================================================ */
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header)
+  :is(.head_actions, .actions) > :is(.add-btn, #toggleForm),
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header)
+  :is(.head_actions, .actions, .head_back, .back) > :is(a, button, input[type="button"], input[type="submit"]).add-btn,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) .allheaders-add {
+  min-height: 32px !important;
+  padding: 6px 11px !important;
+  border-radius: 999px !important;
+  border: 1px solid #8f8f8f !important;
+  background: #f5f5f5 !important;
+  color: #1f1f1f !important;
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.11) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header)
+  :is(.head_actions, .actions) > :is(.add-btn, #toggleForm):hover,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) .allheaders-add:hover {
+  background: #ebebeb !important;
+  border-color: #7e7e7e !important;
+  color: #111 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header)
+  :is(.head_actions, .actions) > :is(.add-btn, #toggleForm):active,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) .allheaders-add:active {
+  transform: translateY(0) !important;
+  background: #dbdbdb !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header)
+  :is(.head_actions, .actions) > :is(.add-btn, #toggleForm):focus-visible,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) .allheaders-add:focus-visible {
+  outline: 2px solid rgba(0, 0, 0, 0.4) !important;
+  outline-offset: 1px !important;
+}
+
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header)
+  :is(.head_actions, .actions) > :is(.add-btn, #toggleForm) *,
+body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) .allheaders-add * {
+  color: inherit !important;
+}
+
+/* ============================================================
+   EMS CENTRAL DESIGN SYSTEM - FINAL LAYER
+   Reference identity: warm gold + neutral grays + rounded controls.
+============================================================ */
+body.ems-site {
+  --ems-ui-gold-1: #f0bc00;
+  --ems-ui-gold-2: #dca900;
+  --ems-ui-gold-border: #b48600;
+  --ems-ui-neutral-0: #ffffff;
+  --ems-ui-neutral-1: #f8f8f8;
+  --ems-ui-neutral-2: #ececec;
+  --ems-ui-neutral-3: #d9d9d9;
+  --ems-ui-neutral-4: #8e8e8e;
+  --ems-ui-ink: #1f1f1f;
+  --ems-ui-focus: rgba(240, 188, 0, 0.38);
+  --ems-ui-success-bg: #e8f5ec;
+  --ems-ui-success-border: #8fb59a;
+  --ems-ui-success-text: #1f5f35;
+  --ems-ui-warning-bg: #fff7df;
+  --ems-ui-warning-border: #c4aa63;
+  --ems-ui-warning-text: #6a5317;
+  --ems-ui-danger-bg: #fbe9e9;
+  --ems-ui-danger-border: #c68c8c;
+  --ems-ui-danger-text: #7b1f1f;
+  --ems-ui-info-bg: #e9f1fb;
+  --ems-ui-info-border: #8ea7c7;
+  --ems-ui-info-text: #22476f;
+  --ems-sort-neutral: #b7bec7;
+  --ems-sort-hover: #d8dde4;
+  --ems-sort-active: #f0bc00;
+}
+
+/* ── DataTables Header Sorting: fixed icon zone + no overlap ── */
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_asc,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc,
+body.ems-site .main table.dataTable thead > tr > th.sorting,
+body.ems-site .main table.dataTable thead > tr > th.sorting_asc,
+body.ems-site .main table.dataTable thead > tr > th.sorting_desc {
+  position: relative !important;
+  vertical-align: middle !important;
+  min-height: 44px !important;
+  min-width: 88px !important;
+  padding-block: 8px !important;
+  padding-inline-start: 10px !important;
+  padding-inline-end: 42px !important;
+  line-height: 1.22 !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting::before,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting::after,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_asc::before,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_asc::after,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc::before,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc::after,
+body.ems-site .main table.dataTable thead > tr > th.sorting::before,
+body.ems-site .main table.dataTable thead > tr > th.sorting::after,
+body.ems-site .main table.dataTable thead > tr > th.sorting_asc::before,
+body.ems-site .main table.dataTable thead > tr > th.sorting_asc::after,
+body.ems-site .main table.dataTable thead > tr > th.sorting_desc::before,
+body.ems-site .main table.dataTable thead > tr > th.sorting_desc::after {
+  right: auto !important;
+  left: auto !important;
+  inset-inline-end: 14px !important;
+  width: 12px !important;
+  text-align: center !important;
+  color: var(--ems-sort-neutral) !important;
+  font-size: 11px !important;
+  opacity: 0.62 !important;
+  pointer-events: none !important;
+}
+
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting::before,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_asc::before,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc::before,
+body.ems-site .main table.dataTable thead > tr > th.sorting::before,
+body.ems-site .main table.dataTable thead > tr > th.sorting_asc::before,
+body.ems-site .main table.dataTable thead > tr > th.sorting_desc::before {
+  top: 43% !important;
+  transform: translateY(-9px) !important;
+}
+
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting::after,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_asc::after,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc::after,
+body.ems-site .main table.dataTable thead > tr > th.sorting::after,
+body.ems-site .main table.dataTable thead > tr > th.sorting_asc::after,
+body.ems-site .main table.dataTable thead > tr > th.sorting_desc::after {
+  top: 57% !important;
+  transform: translateY(-1px) !important;
+}
+
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting:hover::before,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting:hover::after,
+body.ems-site .main table.dataTable thead > tr > th.sorting:hover::before,
+body.ems-site .main table.dataTable thead > tr > th.sorting:hover::after {
+  color: var(--ems-sort-hover) !important;
+  opacity: 0.9 !important;
+}
+
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_asc::before,
+body.ems-site .main table.dataTable thead > tr > th.sorting_asc::before,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc::after,
+body.ems-site .main table.dataTable thead > tr > th.sorting_desc::after {
+  color: var(--ems-sort-active) !important;
+  opacity: 1 !important;
+  text-shadow: 0 0 0 transparent !important;
+}
+
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_asc::after,
+body.ems-site .main table.dataTable thead > tr > th.sorting_asc::after,
+body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc::before,
+body.ems-site .main table.dataTable thead > tr > th.sorting_desc::before {
+  color: var(--ems-sort-neutral) !important;
+  opacity: 0.32 !important;
+}
+
+/* ── Unified buttons ── */
+body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close) {
+  min-height: 36px !important;
+  padding: 7px 14px !important;
+  border-radius: 12px !important;
+  border: 1px solid #8d8d8d !important;
+  background: linear-gradient(180deg, var(--ems-ui-neutral-1) 0%, var(--ems-ui-neutral-2) 100%) !important;
+  color: var(--ems-ui-ink) !important;
+  font-size: 0.88rem !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.11) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease !important;
+}
+
+body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):hover {
+  background: #e8e8e8 !important;
+  border-color: #717171 !important;
+  color: #111111 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):active {
+  transform: translateY(0) !important;
+  background: #dcdcdc !important;
+}
+
+body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):focus-visible {
+  outline: 0 !important;
+  box-shadow: 0 0 0 3px var(--ems-ui-focus), 0 1px 2px rgba(0, 0, 0, 0.11) !important;
+}
+
+body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):disabled,
+body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button).disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.2) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+body.ems-site .main :is(.btn-primary, .save-btn, .submit-btn, .search-btn, .filter-btn, .add-btn, #toggleForm) {
+  background: linear-gradient(180deg, var(--ems-ui-gold-1) 0%, var(--ems-ui-gold-2) 100%) !important;
+  border-color: var(--ems-ui-gold-border) !important;
+  color: #181818 !important;
+}
+
+body.ems-site .main :is(.btn-danger, .delete-btn, .btn-delete, .action-btn.delete) {
+  background: var(--ems-ui-danger-bg) !important;
+  border-color: var(--ems-ui-danger-border) !important;
+  color: var(--ems-ui-danger-text) !important;
+}
+
+/* ── Unified forms / controls ── */
+body.ems-site .main :is(.form-control, .form-select, input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="search"], input[type="date"], input[type="datetime-local"], input[type="month"], input[type="time"], textarea, select) {
+  min-height: 38px !important;
+  border-radius: 12px !important;
+  border: 1px solid #b7b7b7 !important;
+  background: #fbfbfb !important;
+  color: #171717 !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  padding: 7px 12px !important;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.03) !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+}
+
+body.ems-site .main textarea {
+  min-height: 96px !important;
+  resize: vertical !important;
+}
+
+body.ems-site .main :is(.form-control, .form-select, input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="search"], input[type="date"], input[type="datetime-local"], input[type="month"], input[type="time"], textarea, select):focus {
+  border-color: var(--ems-ui-gold-border) !important;
+  background: #fffef7 !important;
+  box-shadow: 0 0 0 3px var(--ems-ui-focus) !important;
+  outline: 0 !important;
+}
+
+body.ems-site .main :is(.form-control, .form-select, input, textarea, select).is-invalid,
+body.ems-site .main :is(.form-control, .form-select, input, textarea, select):invalid {
+  border-color: var(--ems-ui-danger-border) !important;
+  background: #fff8f8 !important;
+  box-shadow: 0 0 0 3px rgba(198, 140, 140, 0.22) !important;
+}
+
+body.ems-site .main :is(.form-control, .form-select, input, textarea, select).is-valid {
+  border-color: var(--ems-ui-success-border) !important;
+  background: #f7fff9 !important;
+  box-shadow: 0 0 0 3px rgba(143, 181, 154, 0.22) !important;
+}
+
+body.ems-site .main :is(.invalid-feedback, .text-danger) {
+  color: var(--ems-ui-danger-text) !important;
+  font-weight: 700 !important;
+}
+
+body.ems-site .main :is(.valid-feedback, .text-success) {
+  color: var(--ems-ui-success-text) !important;
+  font-weight: 700 !important;
+}
+
+body.ems-site .main :is(.form-check-input, input[type="checkbox"], input[type="radio"]) {
+  width: 1.05rem !important;
+  height: 1.05rem !important;
+  border: 1px solid #8f8f8f !important;
+  accent-color: var(--ems-ui-gold-2) !important;
+  box-shadow: none !important;
+}
+
+body.ems-site .main .form-switch .form-check-input {
+  width: 2.05rem !important;
+}
+
+body.ems-site .main :is(.form-check-input, input[type="checkbox"], input[type="radio"]):focus {
+  box-shadow: 0 0 0 3px var(--ems-ui-focus) !important;
+}
+
+/* ── Unified table links ── */
+body.ems-site .main :is(table, .table, .dataTable, .alltable, .alltables) tbody td a:not(.btn):not(.action-btn):not(.eye-btn):not(.edit-btn):not(.delete-btn):not(.btn-view):not(.btn-edit):not(.btn-delete):not(.ems-status-chip) {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  max-width: 100% !important;
+  padding: 4px 9px !important;
+  border-radius: 999px !important;
+  border: 1px solid #bcc5d2 !important;
+  background: #edf2f8 !important;
+  color: #26405f !important;
+  font-weight: 800 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+body.ems-site .main :is(table, .table, .dataTable, .alltable, .alltables) tbody td a:not(.btn):not(.action-btn):not(.eye-btn):not(.edit-btn):not(.delete-btn):not(.btn-view):not(.btn-edit):not(.btn-delete):not(.ems-status-chip):hover {
+  background: #dfe9f5 !important;
+  border-color: #9ba9be !important;
+  color: #1f3651 !important;
+}
+
+/* ── Unified badges/chips/status tokens ── */
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip, [class*=" badge"], [class^="badge"], [class*="status"], [class*="chip"], [class*="tag"]) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  min-height: 24px !important;
+  padding: 2px 9px !important;
+  border-radius: 999px !important;
+  border: 1px solid #bdbdbd !important;
+  background: #f3f3f3 !important;
+  color: #2a2a2a !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip)[data-status="active"],
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).active,
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).approved,
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).completed,
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).paid,
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).open {
+  background: var(--ems-ui-success-bg) !important;
+  border-color: var(--ems-ui-success-border) !important;
+  color: var(--ems-ui-success-text) !important;
+}
+
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip)[data-status="pending"],
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).pending,
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).processing,
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).in-progress {
+  background: var(--ems-ui-warning-bg) !important;
+  border-color: var(--ems-ui-warning-border) !important;
+  color: var(--ems-ui-warning-text) !important;
+}
+
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip)[data-status="inactive"],
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).inactive,
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).cancelled,
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).closed,
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).unpaid,
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip).rejected {
+  background: var(--ems-ui-danger-bg) !important;
+  border-color: var(--ems-ui-danger-border) !important;
+  color: var(--ems-ui-danger-text) !important;
+}
+
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip)[data-status="info"] {
+  background: var(--ems-ui-info-bg) !important;
+  border-color: var(--ems-ui-info-border) !important;
+  color: var(--ems-ui-info-text) !important;
+}
+
+@media (max-width: 768px) {
+  body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting,
+  body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_asc,
+  body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc,
+  body.ems-site .main table.dataTable thead > tr > th.sorting,
+  body.ems-site .main table.dataTable thead > tr > th.sorting_asc,
+  body.ems-site .main table.dataTable thead > tr > th.sorting_desc {
+    min-width: 74px !important;
+    padding-inline-end: 36px !important;
+    font-size: 0.84rem !important;
+  }
+
+  body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting::before,
+  body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting::after,
+  body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_asc::before,
+  body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_asc::after,
+  body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc::before,
+  body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc::after,
+  body.ems-site .main table.dataTable thead > tr > th.sorting::before,
+  body.ems-site .main table.dataTable thead > tr > th.sorting::after,
+  body.ems-site .main table.dataTable thead > tr > th.sorting_asc::before,
+  body.ems-site .main table.dataTable thead > tr > th.sorting_asc::after,
+  body.ems-site .main table.dataTable thead > tr > th.sorting_desc::before,
+  body.ems-site .main table.dataTable thead > tr > th.sorting_desc::after {
+    inset-inline-end: 10px !important;
+    font-size: 10px !important;
+  }
 }
