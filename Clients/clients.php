@@ -916,11 +916,8 @@ include('../insidebar.php');
         </div>
     </form>
 
-    <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-list"></i> جميع العملاء</h5>
-        </div>
-        <div class="card-body">
+    <div class="card" style="padding : 15px;">
+
             <div class="row clients-filter-row">
                 <div class="col-md-4 col-sm-6 clients-filter-col">
                     <label for="filterEntityType" class="clients-filter-label">فلتر نوع الكيان</label>
@@ -1037,7 +1034,6 @@ include('../insidebar.php');
                     </tbody>
                 </table>
             </div>
-        </div>
     </div>
 </div>
 

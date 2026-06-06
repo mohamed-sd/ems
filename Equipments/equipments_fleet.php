@@ -530,248 +530,8 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
 ?>
 
 <style>
-/* ═══════════════════════════════════════════════════════════════
-   Unified Modal Design — Equipment Fleet View Modal
-   تصميم موحد للمديول - عرض بيانات المعدات
-═══════════════════════════════════════════════════════════════ */
+/* نافذة عرض المعدة موحّدة عبر EmsDetailsModal — الأنماط في assets/css/ems.main.all.style.css */
 
-/* Modal overlay */
-.modal.equipment-view-modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.35);
-  animation: fadeIn 0.3s ease;
-}
-
-.modal.equipment-view-modal.show {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Modal content */
-.modal-content.equipment-view-modal-content {
-  width: min(900px, 95vw);
-  max-height: 85vh;
-  border: 1px solid #e8dcc8;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #fff 0%, #fdf8f0 100%);
-  box-shadow: 0 22px 42px rgba(26, 18, 8, 0.25);
-  overflow: hidden;
-  animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Modal header */
-.modal-header.equipment-view-modal-header {
-  background: linear-gradient(135deg, #1a1208, #2a1b0c);
-  color: #fff;
-  border-bottom: 1px solid rgba(255, 207, 144, 0.22);
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.modal-header.equipment-view-modal-header h5 {
-  margin: 0;
-  font-weight: 900;
-  font-size: 1.15rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #fff;
-}
-
-.modal-header.equipment-view-modal-header i {
-  color: #f7931a;
-  font-size: 1.1rem;
-}
-
-/* Close button */
-.equipment-view-modal-close {
-  border: 0;
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  font-size: 1.3rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.equipment-view-modal-close:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: rotate(90deg);
-}
-
-/* Modal body */
-.modal-body.equipment-view-modal-body {
-  overflow-y: auto;
-  padding: 16px;
-  flex: 1;
-  background: linear-gradient(180deg, #fff 0%, #fffbf5 100%);
-}
-
-/* Grid layout */
-.equipment-view-modal-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 12px;
-}
-
-/* Item card */
-.equipment-view-modal-item {
-  border: 1px solid #e8dcc8;
-  border-radius: 11px;
-  padding: 12px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(26, 18, 8, 0.05);
-  transition: all 0.2s ease;
-}
-
-.equipment-view-modal-item:hover {
-  border-color: #f7931a;
-  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.12);
-}
-
-/* Wide items (full width) */
-.equipment-view-modal-item-wide {
-  grid-column: 1 / -1;
-}
-
-/* Label */
-.equipment-view-modal-label {
-  color: #6b4e2a;
-  font-size: 0.81rem;
-  font-weight: 800;
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.equipment-view-modal-label i {
-  color: #f7931a;
-  font-size: 0.9rem;
-}
-
-/* Value */
-.equipment-view-modal-value {
-  color: #1a1208;
-  font-weight: 800;
-  font-size: 0.92rem;
-  word-break: break-word;
-  line-height: 1.4;
-}
-
-/* Modal footer */
-.modal-footer.equipment-view-modal-footer {
-  border-top: 1px solid #e8dcc8;
-  background: #fff;
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  padding: 12px 16px;
-  flex-shrink: 0;
-}
-
-/* Footer buttons */
-.equipment-view-modal-btn {
-  border: none;
-  border-radius: 9px;
-  padding: 10px 16px;
-  font-weight: 800;
-  font-size: 0.92rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-}
-
-.equipment-view-modal-btn-primary {
-  background: linear-gradient(135deg, #1a1208, #2d200a);
-  color: #fff;
-  border-left: 3px solid #f7931a;
-  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.25);
-}
-
-.equipment-view-modal-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(247, 147, 26, 0.35);
-  color: #fff;
-}
-
-.equipment-view-modal-btn-danger {
-  background: linear-gradient(135deg, #991b1b, #b91c1c);
-  color: #fff;
-  border-left: 3px solid #dc2626;
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
-}
-
-.equipment-view-modal-btn-danger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.35);
-  color: #fff;
-}
-
-.equipment-view-modal-btn-secondary {
-  background: #fff;
-  color: #6b4e2a;
-  border: 1.5px solid #e8dcc8;
-}
-
-.equipment-view-modal-btn-secondary:hover {
-  border-color: #a07848;
-  background: #fdf8f0;
-  color: #1a1208;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .equipment-view-modal-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-content.equipment-view-modal-content {
-    width: 98vw;
-    max-height: 90vh;
-  }
-}
 
 .equipments-fleet-main .stats-section {
     margin: 12px 0 16px;
@@ -1705,185 +1465,7 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
     </div>
 
     <!-- Modal عرض تفاصيل المعدة -->
-    <div id="viewEquipmentModal" class="modal equipment-view-modal">
-        <div class="modal-content equipment-view-modal-content">
-            <div class="modal-header equipment-view-modal-header">
-                <h5><i class="fas fa-eye"></i> عرض بيانات المعدة</h5>
-                <button class="equipment-view-modal-close" id="closeEquipmentModal">&times;</button>
-            </div>
-            <div class="modal-body equipment-view-modal-body">
-                <div class="equipment-view-modal-grid">
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-barcode"></i> كود المعدة</div>
-                        <div class="equipment-view-modal-value" id="view_eq_code">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-tag"></i> اسم المعدة</div>
-                        <div class="equipment-view-modal-value" id="view_eq_name">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-tools"></i> نوع المعدة</div>
-                        <div class="equipment-view-modal-value" id="view_eq_type">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-truck-loading"></i> المورد</div>
-                        <div class="equipment-view-modal-value" id="view_eq_supplier">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-project-diagram"></i> المشروع</div>
-                        <div class="equipment-view-modal-value" id="view_eq_project">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-mountain"></i> المنجم</div>
-                        <div class="equipment-view-modal-value" id="view_eq_mine">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-hashtag"></i> الرقم التسلسلي</div>
-                        <div class="equipment-view-modal-value" id="view_eq_serial">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-car"></i> رقم الهيكل</div>
-                        <div class="equipment-view-modal-value" id="view_eq_chassis">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-microchip"></i> رقم الماكينة</div>
-                        <div class="equipment-view-modal-value" id="view_eq_machine_number">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-industry"></i> الشركة المصنعة</div>
-                        <div class="equipment-view-modal-value" id="view_eq_manufacturer">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-car-side"></i> الموديل</div>
-                        <div class="equipment-view-modal-value" id="view_eq_model">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-calendar"></i> سنة الصنع</div>
-                        <div class="equipment-view-modal-value" id="view_eq_year">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-calendar-plus"></i> سنة الاستيراد</div>
-                        <div class="equipment-view-modal-value" id="view_eq_import_year">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-cogs"></i> حالة المعدة</div>
-                        <div class="equipment-view-modal-value" id="view_eq_condition">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-clock"></i> ساعات التشغيل</div>
-                        <div class="equipment-view-modal-value" id="view_eq_hours">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-car-crash"></i> حالة المحرك</div>
-                        <div class="equipment-view-modal-value" id="view_eq_engine">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-circle-notch"></i> حالة الإطارات</div>
-                        <div class="equipment-view-modal-value" id="view_eq_tires">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-user"></i> اسم المالك</div>
-                        <div class="equipment-view-modal-value" id="view_eq_owner">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-briefcase"></i> نوع المالك</div>
-                        <div class="equipment-view-modal-value" id="view_eq_owner_type">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-phone"></i> هاتف المالك</div>
-                        <div class="equipment-view-modal-value" id="view_eq_owner_phone">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-handshake"></i> علاقة المالك بالمورد</div>
-                        <div class="equipment-view-modal-value" id="view_eq_owner_relation">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-address-card"></i> رقم الترخيص</div>
-                        <div class="equipment-view-modal-value" id="view_eq_license">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-landmark"></i> جهة الترخيص</div>
-                        <div class="equipment-view-modal-value" id="view_eq_license_authority">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-file-alt"></i> نوع الوثيقة</div>
-                        <div class="equipment-view-modal-value" id="view_eq_document_type">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-calendar-times"></i> انتهاء الترخيص</div>
-                        <div class="equipment-view-modal-value" id="view_eq_license_expiry">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-certificate"></i> رقم شهادة الفحص</div>
-                        <div class="equipment-view-modal-value" id="view_eq_inspection">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-calendar-check"></i> آخر فحص</div>
-                        <div class="equipment-view-modal-value" id="view_eq_last_inspection">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-map-marker-alt"></i> الموقع الحالي</div>
-                        <div class="equipment-view-modal-value" id="view_eq_location">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-user-hard-hat"></i> مهندس/مشرف الموقع</div>
-                        <div class="equipment-view-modal-value" id="view_eq_supervisor_name">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-address-book"></i> اتصال المشرف</div>
-                        <div class="equipment-view-modal-value" id="view_eq_supervisor_contact">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-traffic-light"></i> التوفر</div>
-                        <div class="equipment-view-modal-value" id="view_eq_availability">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-money-bill-wave"></i> القيمة المقدرة</div>
-                        <div class="equipment-view-modal-value" id="view_eq_value">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-calendar-day"></i> سعر التأجير اليومي</div>
-                        <div class="equipment-view-modal-value" id="view_eq_daily">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-calendar-alt"></i> سعر التأجير الشهري</div>
-                        <div class="equipment-view-modal-value" id="view_eq_monthly">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-shield-alt"></i> التأمين/الضمان</div>
-                        <div class="equipment-view-modal-value" id="view_eq_insurance">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-comment-alt"></i> ملاحظات عامة</div>
-                        <div class="equipment-view-modal-value" id="view_eq_notes">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-wrench"></i> آخر صيانة</div>
-                        <div class="equipment-view-modal-value" id="view_eq_last_maintenance">-</div>
-                    </div>
-                    <div class="equipment-view-modal-item">
-                        <div class="equipment-view-modal-label"><i class="fas fa-toggle-on"></i> الحالة الحالية</div>
-                        <div class="equipment-view-modal-value" id="view_eq_status">-</div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer equipment-view-modal-footer">
-
-                <a id="viewEquipmentEditBtn" class="equipment-view-modal-btn equipment-view-modal-btn-primary fleet-btn-link">
-                    <i class="fas fa-edit"></i> تعديل المعدة
-                </a>
-
-                <a id="viewEquipmentDeleteBtn" class="equipment-view-modal-btn equipment-view-modal-btn-danger fleet-btn-link fleet-hidden"
-                    onclick="return confirm('هل أنت متأكد من حذف هذه المعدة؟');">
-                    <i class="fas fa-trash"></i> حذف المعدة
-                </a>
-
-                <button type="button" class="equipment-view-modal-btn equipment-view-modal-btn-secondary" id="closeEquipmentModalFooter">
-                    <i class="fas fa-times"></i> إغلاق
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- نافذة تفاصيل المعدة تُولَّد عبر النظام الموحّد EmsDetailsModal -->
 
     <!-- jQuery -->
     <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
@@ -2254,89 +1836,102 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
             const canDelete = <?php echo json_encode($can_delete); ?>;
 
             // Equipment view modal
-            const viewEquipmentModal = document.getElementById('viewEquipmentModal');
-            const closeEquipmentModalBtn = document.getElementById('closeEquipmentModal');
-            const closeEquipmentModalFooter = document.getElementById('closeEquipmentModalFooter');
-
-            function setViewValue(elementId, value) {
-                const el = document.getElementById(elementId);
-                if (!el) return;
-                const safeValue = (value !== null && value !== undefined && value !== '') ? value : 'غير محدد';
-                el.textContent = safeValue;
+            // Equipment view modal — عبر النظام الموحّد EmsDetailsModal
+            function eqVal(value) {
+                return (value !== null && value !== undefined && value !== '') ? value : 'غير محدد';
             }
-
             function formatCurrency(value) {
                 if (value === null || value === undefined || value === '') return 'غير محدد';
                 const num = parseFloat(value);
                 if (Number.isNaN(num)) return value;
                 return '$' + num.toLocaleString();
             }
-
             function formatType(value, typeName) {
                 if (typeName) return typeName;
                 if (!value) return 'غير محدد';
                 return String(value);
             }
-
             function formatEquipmentStatus(statusValue) {
-                const map = {
-                    '0': 'متاحة',
-                    '1': 'تحت الصيانة',
-                    '2': 'محجوزة',
-                    '3': 'معطلة',
-                    '5': 'مسحوبة'
-                };
+                const map = { '0': 'متاحة', '1': 'تحت الصيانة', '2': 'محجوزة', '3': 'معطلة', '5': 'مسحوبة' };
                 const key = String(statusValue ?? '');
                 return map[key] || 'غير محدد';
             }
-
             function formatAvailabilityState(value, fallbackStatus) {
                 return normalizeAvailabilityState(value, fallbackStatus);
             }
 
-            function formatAvailabilityStatus(stateValue, statusValue) {
-                return normalizeAvailabilityStatus(stateValue, statusValue);
+            function buildFleetFields(data) {
+                return [
+                    { label: 'كود المعدة', value: eqVal(data.code), icon: 'fas fa-barcode' },
+                    { label: 'اسم المعدة', value: eqVal(data.name), icon: 'fas fa-tag', size: 'lg' },
+                    { label: 'نوع المعدة', value: formatType(data.type, data.equipment_type_name), icon: 'fas fa-tools' },
+                    { label: 'المورد', value: eqVal(data.supplier_name), icon: 'fas fa-truck-loading', size: 'lg' },
+                    { label: 'المشروع', value: eqVal(data.project_name), icon: 'fas fa-project-diagram', size: 'lg' },
+                    { label: 'المنجم', value: eqVal(data.mine_name), icon: 'fas fa-mountain' },
+                    { label: 'الرقم التسلسلي', value: eqVal(data.serial_number), icon: 'fas fa-hashtag' },
+                    { label: 'رقم الهيكل', value: eqVal(data.chassis_number), icon: 'fas fa-car' },
+                    { label: 'رقم الماكينة', value: eqVal(data.machine_number), icon: 'fas fa-microchip' },
+                    { label: 'الشركة المصنعة', value: eqVal(data.manufacturer), icon: 'fas fa-industry' },
+                    { label: 'الموديل', value: eqVal(data.model), icon: 'fas fa-car-side' },
+                    { label: 'سنة الصنع', value: eqVal(data.manufacturing_year), icon: 'fas fa-calendar' },
+                    { label: 'سنة الاستيراد', value: eqVal(data.import_year), icon: 'fas fa-calendar-plus' },
+                    { label: 'حالة المعدة', value: eqVal(data.equipment_condition), icon: 'fas fa-cogs' },
+                    { label: 'ساعات التشغيل', value: data.operating_hours ? (data.operating_hours + ' ساعة') : 'غير محدد', icon: 'fas fa-clock' },
+                    { label: 'حالة المحرك', value: eqVal(data.engine_condition), icon: 'fas fa-car-crash' },
+                    { label: 'حالة الإطارات', value: eqVal(data.tires_condition), icon: 'fas fa-circle-notch' },
+                    { label: 'اسم المالك', value: eqVal(data.actual_owner_name), icon: 'fas fa-user' },
+                    { label: 'نوع المالك', value: eqVal(data.owner_type), icon: 'fas fa-briefcase' },
+                    { label: 'هاتف المالك', value: eqVal(data.owner_phone), icon: 'fas fa-phone' },
+                    { label: 'علاقة المالك بالمورد', value: eqVal(data.owner_supplier_relation), icon: 'fas fa-handshake' },
+                    { label: 'رقم الترخيص', value: eqVal(data.license_number), icon: 'fas fa-address-card' },
+                    { label: 'جهة الترخيص', value: eqVal(data.license_authority), icon: 'fas fa-landmark' },
+                    { label: 'نوع الوثيقة', value: eqVal(data.document_type), icon: 'fas fa-file-alt' },
+                    { label: 'انتهاء الترخيص', value: eqVal(data.license_expiry_date), icon: 'fas fa-calendar-times' },
+                    { label: 'رقم شهادة الفحص', value: eqVal(data.inspection_certificate_number), icon: 'fas fa-certificate' },
+                    { label: 'آخر فحص', value: eqVal(data.last_inspection_date), icon: 'fas fa-calendar-check' },
+                    { label: 'الموقع الحالي', value: eqVal(data.current_location), icon: 'fas fa-map-marker-alt', size: 'lg' },
+                    { label: 'مهندس/مشرف الموقع', value: eqVal(data.site_supervisor_name), icon: 'fas fa-user-hard-hat' },
+                    { label: 'اتصال المشرف', value: eqVal(data.site_supervisor_contact), icon: 'fas fa-address-book' },
+                    { label: 'التوفر', value: formatAvailabilityState(data.availability_state, data.availability_status), icon: 'fas fa-traffic-light' },
+                    { label: 'القيمة المقدرة', value: formatCurrency(data.estimated_value), icon: 'fas fa-money-bill-wave' },
+                    { label: 'سعر التأجير اليومي', value: formatCurrency(data.daily_rental_price), icon: 'fas fa-calendar-day' },
+                    { label: 'سعر التأجير الشهري', value: formatCurrency(data.monthly_rental_price), icon: 'fas fa-calendar-alt' },
+                    { label: 'التأمين/الضمان', value: eqVal(data.insurance_status), icon: 'fas fa-shield-alt' },
+                    { label: 'ملاحظات عامة', value: eqVal(data.general_notes), icon: 'fas fa-comment-alt', size: 'full' },
+                    { label: 'آخر صيانة', value: eqVal(data.last_maintenance_date), icon: 'fas fa-wrench' },
+                    { label: 'الحالة الحالية', value: formatEquipmentStatus(data.status), icon: 'fas fa-toggle-on', type: 'status', tone: String(data.status) === '0' ? 'active' : 'inactive' }
+                ];
+            }
+
+            function fleetActions(equipmentId) {
+                const actions = [];
+                if (canEdit) {
+                    actions.push({ label: 'تعديل المعدة', icon: 'fas fa-edit', variant: 'primary',
+                        onClick: function () { window.location.href = 'equipments_fleet.php?edit=' + equipmentId; } });
+                }
+                if (canDelete) {
+                    actions.push({ label: 'حذف المعدة', icon: 'fas fa-trash', variant: 'danger',
+                        onClick: function () {
+                            if (confirm('هل أنت متأكد من حذف هذه المعدة؟')) {
+                                window.location.href = 'equipments_fleet.php?delete_id=' + equipmentId;
+                            }
+                        } });
+                }
+                actions.push({ label: 'إغلاق', icon: 'fas fa-times', variant: 'secondary', close: true });
+                return actions;
             }
 
             $(document).on('click', '.viewEquipmentBtn', function () {
                 const equipmentId = $(this).data('id');
-                if (!equipmentId || !viewEquipmentModal) return;
+                if (!equipmentId) return;
 
-                viewEquipmentModal.classList.add('show');
-
-                const loadingText = 'جار التحميل...';
-                [
-                    'view_eq_code', 'view_eq_name', 'view_eq_type', 'view_eq_supplier', 'view_eq_project', 'view_eq_mine',
-                    'view_eq_serial', 'view_eq_chassis', 'view_eq_machine_number', 'view_eq_manufacturer', 'view_eq_model', 'view_eq_year',
-                    'view_eq_import_year', 'view_eq_condition', 'view_eq_hours', 'view_eq_engine', 'view_eq_tires',
-                    'view_eq_owner', 'view_eq_owner_type', 'view_eq_owner_phone', 'view_eq_owner_relation',
-                    'view_eq_license', 'view_eq_license_authority', 'view_eq_document_type', 'view_eq_license_expiry', 'view_eq_inspection',
-                    'view_eq_last_inspection', 'view_eq_location', 'view_eq_supervisor_name', 'view_eq_supervisor_contact', 'view_eq_availability', 'view_eq_value',
-                    'view_eq_daily', 'view_eq_monthly', 'view_eq_insurance', 'view_eq_notes', 'view_eq_last_maintenance',
-                    'view_eq_status'
-                ].forEach(id => setViewValue(id, loadingText));
-
-                const editBtn = document.getElementById('viewEquipmentEditBtn');
-                if (editBtn) {
-                    editBtn.setAttribute('href', 'equipments_fleet.php?edit=' + equipmentId);
-                    // التحكم في ظهور الزر بناءً على الصلاحيات
-                    if (canEdit) {
-                        editBtn.classList.remove('fleet-hidden');
-                    } else {
-                        editBtn.classList.add('fleet-hidden');
-                    }
-                }
-
-                const deleteBtn = document.getElementById('viewEquipmentDeleteBtn');
-                if (deleteBtn) {
-                    deleteBtn.setAttribute('href', 'equipments_fleet.php?delete_id=' + equipmentId);
-                    // التحكم في ظهور الزر بناءً على الصلاحيات
-                    if (canDelete) {
-                        deleteBtn.classList.remove('fleet-hidden');
-                    } else {
-                        deleteBtn.classList.add('fleet-hidden');
-                    }
-                }
+                EmsDetailsModal.open({
+                    title: 'بيانات المعدة',
+                    icon: 'fas fa-truck-monster',
+                    sections: [{ title: 'تحميل البيانات', icon: 'fas fa-spinner',
+                        html: '<div style="padding:20px;text-align:center;color:var(--t2)"><i class="fas fa-spinner fa-spin"></i> جار التحميل...</div>' }],
+                    actions: fleetActions(equipmentId)
+                });
 
                 $.ajax({
                     url: 'get_equipment_details.php',
@@ -2346,91 +1941,25 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
                     success: function (response) {
                         if (!response.success || !response.data) {
                             const failMessage = (response && response.message) ? response.message : 'تعذر تحميل البيانات';
-                            ['view_eq_code', 'view_eq_name', 'view_eq_type', 'view_eq_supplier', 'view_eq_project', 'view_eq_mine',
-                             'view_eq_serial', 'view_eq_chassis', 'view_eq_machine_number', 'view_eq_manufacturer', 'view_eq_model', 'view_eq_year',
-                             'view_eq_import_year', 'view_eq_condition', 'view_eq_hours', 'view_eq_engine', 'view_eq_tires',
-                             'view_eq_owner', 'view_eq_owner_type', 'view_eq_owner_phone', 'view_eq_owner_relation',
-                             'view_eq_license', 'view_eq_license_authority', 'view_eq_document_type', 'view_eq_license_expiry', 'view_eq_inspection',
-                             'view_eq_last_inspection', 'view_eq_location', 'view_eq_supervisor_name', 'view_eq_supervisor_contact', 'view_eq_availability', 'view_eq_value',
-                             'view_eq_daily', 'view_eq_monthly', 'view_eq_insurance', 'view_eq_notes', 'view_eq_last_maintenance', 'view_eq_status']
-                             .forEach(id => setViewValue(id, failMessage));
+                            EmsDetailsModal.setSection(0, { title: 'خطأ', icon: 'fas fa-exclamation-triangle',
+                                html: '<div style="padding:16px;text-align:center;color:#c0392b">' + failMessage + '</div>' });
                             return;
                         }
-
-                        const data = response.data;
-                        setViewValue('view_eq_code', data.code);
-                        setViewValue('view_eq_name', data.name);
-                        setViewValue('view_eq_type', formatType(data.type, data.equipment_type_name));
-                        setViewValue('view_eq_supplier', data.supplier_name);
-                        setViewValue('view_eq_project', data.project_name);
-                        setViewValue('view_eq_mine', data.mine_name);
-                        setViewValue('view_eq_serial', data.serial_number);
-                        setViewValue('view_eq_chassis', data.chassis_number);
-                        setViewValue('view_eq_machine_number', data.machine_number);
-                        setViewValue('view_eq_manufacturer', data.manufacturer);
-                        setViewValue('view_eq_model', data.model);
-                        setViewValue('view_eq_year', data.manufacturing_year);
-                        setViewValue('view_eq_import_year', data.import_year);
-                        setViewValue('view_eq_condition', data.equipment_condition);
-                        setViewValue('view_eq_hours', data.operating_hours ? data.operating_hours + ' ساعة' : 'غير محدد');
-                        setViewValue('view_eq_engine', data.engine_condition);
-                        setViewValue('view_eq_tires', data.tires_condition);
-                        setViewValue('view_eq_owner', data.actual_owner_name);
-                        setViewValue('view_eq_owner_type', data.owner_type);
-                        setViewValue('view_eq_owner_phone', data.owner_phone);
-                        setViewValue('view_eq_owner_relation', data.owner_supplier_relation);
-                        setViewValue('view_eq_license', data.license_number);
-                        setViewValue('view_eq_license_authority', data.license_authority);
-                        setViewValue('view_eq_document_type', data.document_type);
-                        setViewValue('view_eq_license_expiry', data.license_expiry_date);
-                        setViewValue('view_eq_inspection', data.inspection_certificate_number);
-                        setViewValue('view_eq_last_inspection', data.last_inspection_date);
-                        setViewValue('view_eq_location', data.current_location);
-                        setViewValue('view_eq_supervisor_name', data.site_supervisor_name);
-                        setViewValue('view_eq_supervisor_contact', data.site_supervisor_contact);
-                        setViewValue('view_eq_availability', formatAvailabilityState(data.availability_state, data.availability_status));
-                        setViewValue('view_eq_value', formatCurrency(data.estimated_value));
-                        setViewValue('view_eq_daily', formatCurrency(data.daily_rental_price));
-                        setViewValue('view_eq_monthly', formatCurrency(data.monthly_rental_price));
-                        setViewValue('view_eq_insurance', data.insurance_status);
-                        setViewValue('view_eq_notes', data.general_notes);
-                        setViewValue('view_eq_last_maintenance', data.last_maintenance_date);
-                        setViewValue('view_eq_status', formatEquipmentStatus(data.status));
+                        EmsDetailsModal.open({
+                            title: 'بيانات المعدة',
+                            icon: 'fas fa-truck-monster',
+                            fields: buildFleetFields(response.data),
+                            actions: fleetActions(equipmentId)
+                        });
                     },
                     error: function () {
-                        ['view_eq_code', 'view_eq_name', 'view_eq_type', 'view_eq_supplier', 'view_eq_project', 'view_eq_mine',
-                         'view_eq_serial', 'view_eq_chassis', 'view_eq_machine_number', 'view_eq_manufacturer', 'view_eq_model', 'view_eq_year',
-                         'view_eq_import_year', 'view_eq_condition', 'view_eq_hours', 'view_eq_engine', 'view_eq_tires',
-                         'view_eq_owner', 'view_eq_owner_type', 'view_eq_owner_phone', 'view_eq_owner_relation',
-                         'view_eq_license', 'view_eq_license_authority', 'view_eq_document_type', 'view_eq_license_expiry', 'view_eq_inspection',
-                         'view_eq_last_inspection', 'view_eq_location', 'view_eq_supervisor_name', 'view_eq_supervisor_contact', 'view_eq_availability', 'view_eq_value',
-                         'view_eq_daily', 'view_eq_monthly', 'view_eq_insurance', 'view_eq_notes', 'view_eq_last_maintenance', 'view_eq_status']
-                         .forEach(id => setViewValue(id, 'تعذر الاتصال بالخادم'));
+                        EmsDetailsModal.setSection(0, { title: 'خطأ', icon: 'fas fa-exclamation-triangle',
+                            html: '<div style="padding:16px;text-align:center;color:#c0392b">تعذر الاتصال بالخادم</div>' });
                     }
                 });
             });
 
-            function closeEquipmentModal() {
-                if (viewEquipmentModal) {
-                    viewEquipmentModal.classList.remove('show');
-                }
-            }
-
-            if (closeEquipmentModalBtn) {
-                closeEquipmentModalBtn.addEventListener('click', closeEquipmentModal);
-            }
-
-            if (closeEquipmentModalFooter) {
-                closeEquipmentModalFooter.addEventListener('click', closeEquipmentModal);
-            }
-
-            if (viewEquipmentModal) {
-                viewEquipmentModal.addEventListener('click', function (event) {
-                    if (event.target === viewEquipmentModal) {
-                        closeEquipmentModal();
-                    }
-                });
-            }
+            function closeEquipmentModal() { if (window.EmsDetailsModal) EmsDetailsModal.close(); }
 
             // Toggle Form Functionality
         })();

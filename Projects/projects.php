@@ -589,22 +589,7 @@ include('../insidebar.php');
 
     <!-- جدول المشاريع -->
     <div class="card">
-        <div class="card-header projects-table-header">
-            <h5><i class="fas fa-list"></i> قائمة المشاريع</h5>
-
-            <?php
-
-            if (isset($_GET['client_id']) && is_numeric($_GET['client_id'])) {
-                $client_id = intval($_GET['client_id']);
-                $client_result = mysqli_query($conn, "SELECT c.client_name FROM clients c WHERE c.id = $client_id AND $client_scope_sql");
-                if ($client_row = mysqli_fetch_assoc($client_result)) {
-                    echo "للعميل: <strong>" . htmlspecialchars($client_row['client_name']) . "</strong>";
-                }
-            }
-
-            ?>
-        </div>
-        <div class="card-body">
+             <div class="card-body">
             <div class="table-container">
                 <table id="projectsTable" class="display projects-table-nowrap" style="width:100%;">
                     <thead>
