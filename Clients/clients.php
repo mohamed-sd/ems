@@ -1041,183 +1041,7 @@ include('../insidebar.php');
     </div>
 </div>
 
-<!-- ══ Modal استيراد من Excel ════════════════════════════════════════════════ -->
-<div id="importExcelModal" class="modal">
-    <div class="modal-content clients-import-modal-content">
-        <div class="modal-header">
-            <h5><i class="fas fa-file-upload"></i> استيراد عملاء من Excel / CSV</h5>
-            <button class="close-modal" onclick="closeImportModal()">&times;</button>
-        </div>
-        <form id="importExcelForm" enctype="multipart/form-data">
-            <div class="modal-body">
-                <!-- معلومات الحقول -->
-                <div class="clients-import-notice">
-                    <div class="clients-import-notice-head">
-                        <i class="fas fa-table"></i> &nbsp;ترتيب الأعمدة في الملف:
-                    </div>
-                    <div class="clients-import-cols-grid">
-                        <div><span class="clients-col-required">A</span> — كود العميل <span
-                                class="clients-col-required-text">(مطلوب)</span></div>
-                        <div><span class="clients-col-required">B</span> — اسم العميل <span
-                                class="clients-col-required-text">(مطلوب)</span></div>
-                        <div><span class="clients-col-optional">C</span> — نوع الكيان</div>
-                        <div><span class="clients-col-optional">D</span> — تصنيف القطاع</div>
-                        <div><span class="clients-col-optional">E</span> — رقم الهاتف</div>
-                        <div><span class="clients-col-optional">F</span> — البريد الإلكتروني</div>
-                        <div><span class="clients-col-optional">G</span> — واتساب</div>
-                        <div><span class="clients-col-optional">H</span> — الحالة (نشط / متوقف)</div>
-                    </div>
-                    <div class="clients-import-tip">
-                        <i class="fas fa-lightbulb clients-import-tip-icon"></i>
-                        حمّل <a href="download_clients_template.php" class="clients-import-link" target="_blank">نموذج
-                            Excel</a>
-                        أو <a href="download_clients_template_csv.php" class="clients-import-link" target="_blank">نموذج
-                            CSV</a>
-                        لمعرفة الترتيب الصحيح.
-                    </div>
-                </div>
-
-                <div class="form-group-modal">
-                    <label class="clients-import-upload-label">
-                        <i class="fas fa-file-excel clients-import-upload-label-icon"></i> اختر ملف Excel أو CSV
-                    </label>
-                    <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" required
-                        class="clients-import-file-input">
-                    <small class="clients-import-help-text">
-                        الصيغ المدعومة: .xlsx, .xls, .csv &nbsp;|&nbsp; الحد الأقصى: 1000 عميل / 5 ميجابايت
-                    </small>
-                </div>
-
-                <div id="importProgress" class="clients-hidden clients-import-progress">
-                    <i class="fas fa-spinner fa-spin clients-import-progress-icon"></i>
-                    <p class="clients-import-progress-text">جاري معالجة الملف والاستيراد...</p>
-                </div>
-
-                <div id="importResult" class="clients-hidden clients-import-result"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn-modal btn-modal-save clients-import-submit-btn">
-                    <i class="fas fa-upload"></i> رفع واستيراد
-                </button>
-                <button type="button" class="btn-modal btn-modal-cancel" onclick="closeImportModal()">
-                    <i class="fas fa-times"></i> إلغاء
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- ══ Modal عرض العميل ═══════════════════════════════════════════════════════ -->
-<div id="viewClientModal" class="modal ems-view-modal clients-view-modal">
-    <div class="modal-content ems-view-modal__content clients-view-modal-content">
-        <div class="modal-header ems-view-modal__header clients-view-modal-header">
-            <h5><i class="fas fa-eye"></i> عرض بيانات العميل</h5>
-            <button class="close-modal ems-view-modal__close" onclick="closeViewModal()">&times;</button>
-        </div>
-        <div class="modal-body ems-view-modal__body clients-view-modal-body">
-            <div class="view-modal-body ems-view-grid clients-view-grid">
-                <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fas fa-barcode"></i> كود العميل</div>
-                    <div class="view-item-value ems-view-item-value" id="view_client_code">-</div>
-                </div>
-                <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fas fa-user"></i> اسم العميل</div>
-                    <div class="view-item-value ems-view-item-value" id="view_client_name">-</div>
-                </div>
-                <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fas fa-building"></i> نوع الكيان</div>
-                    <div class="view-item-value ems-view-item-value" id="view_entity_type">-</div>
-                </div>
-                <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fas fa-industry"></i> تصنيف القطاع</div>
-                    <div class="view-item-value ems-view-item-value" id="view_sector_category">-</div>
-                </div>
-                <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fas fa-project-diagram"></i> عدد المشاريع
-                        المرتبطة</div>
-                    <div class="view-item-value ems-view-item-value" id="view_projects_count">0</div>
-                </div>
-                <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fas fa-phone"></i> الهاتف</div>
-                    <div class="view-item-value ems-view-item-value" id="view_phone">-</div>
-                </div>
-                <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fas fa-envelope"></i> البريد الإلكتروني
-                    </div>
-                    <div class="view-item-value ems-view-item-value" id="view_email">-</div>
-                </div>
-                <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fab fa-whatsapp"></i> واتساب</div>
-                    <div class="view-item-value ems-view-item-value" id="view_whatsapp">-</div>
-                </div>
-                <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fas fa-toggle-on"></i> الحالة</div>
-                    <div class="view-item-value ems-view-item-value" id="view_status">-</div>
-                </div>
-                <div class="view-item ems-view-item">
-                    <div class="view-item-label ems-view-item-label"><i class="fas fa-user-plus"></i> أضيف بواسطة</div>
-                    <div class="view-item-value ems-view-item-value" id="view_created_by">-</div>
-                </div>
-            </div>
-
-            <hr class="clients-modal-separator" />
-            <h6 class="clients-related-projects-title"><i class="fas fa-folder-open"></i> المشاريع المرتبطة بالعميل</h6>
-
-            <div id="clientProjectsSummary" class="clients-projects-summary">
-                <span class="status-active clients-summary-pill">المشاريع: <strong
-                        id="summary_projects_count">0</strong></span>
-                <span class="status-active clients-summary-pill">المشاريع النشطة: <strong
-                    id="summary_projects_active_count">0</strong></span>
-                <span class="status-inactive clients-summary-pill clients-summary-pill-danger"><span class="clients-danger-text">المشاريع غير النشطة:</span> <strong
-                    id="summary_projects_inactive_count">0</strong></span>
-                <span class="status-active clients-summary-pill">الموردون: <strong
-                        id="summary_suppliers_count">0</strong></span>
-                <span class="status-active clients-summary-pill">الآليات: <strong
-                        id="summary_equipments_count">0</strong></span>
-                <span class="status-active clients-summary-pill">المشغلون: <strong
-                        id="summary_operators_count">0</strong></span>
-            </div>
-
-            <div id="clientProjectsLoading" class="clients-hidden clients-projects-loading">
-                <i class="fas fa-spinner fa-spin"></i> جاري تحميل بيانات المشاريع...
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-bordered table-sm clients-projects-table">
-                    <thead>
-                        <tr>
-                            <th>المشروع</th>
-                            <th>الموردون</th>
-                            <th>الآليات</th>
-                            <th>الآليات العاملة</th>
-                            <th>الآليات المتوقفة</th>
-                            <th>المشغلون</th>
-                            <th>المشغلون النشطون</th>
-                            <th>المشغلون المتوقفون</th>
-                        </tr>
-                    </thead>
-                    <tbody id="clientProjectsTableBody">
-                        <tr>
-                            <td colspan="8" class="clients-table-empty">لا توجد بيانات بعد</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="modal-footer ems-view-modal__footer clients-view-modal-footer">
-            <?php if ($can_edit): ?>
-                <button type="button" class="btn-modal ems-view-btn ems-view-btn--primary btn-modal-save editClientBtn"
-                    id="viewEditBtn">
-                    <i class="fas fa-edit"></i> تعديل البيانات
-                </button>
-            <?php endif; ?>
-            <button type="button" class="btn-modal ems-view-btn ems-view-btn--secondary btn-modal-cancel"
-                onclick="closeViewModal()">
-                <i class="fas fa-times"></i> إغلاق
-            </button>
-        </div>
-    </div>
-</div>
+<!-- نافذة عرض العميل تُولَّد ديناميكياً عبر النظام الموحّد EmsDetailsModal (assets/js/ems-details-modal.js) -->
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
@@ -1436,10 +1260,113 @@ include('../insidebar.php');
     });
 
     // ════════════════════════════════════════════════
-    // Modal عرض تفاصيل العميل
+    // عرض تفاصيل العميل — عبر النظام الموحّد EmsDetailsModal
     // ════════════════════════════════════════════════
+    function clientIsActiveStatus(statusValue) {
+        const normalized = String(statusValue === null || typeof statusValue === 'undefined' ? '' : statusValue)
+            .trim()
+            .toLowerCase()
+            .replace(/✅|✔/g, '')
+            .trim();
+        return normalized === '1' || normalized === 'active' || normalized === 'نشط' || normalized === 'true';
+    }
+
+    function clientEscapeHtml(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // يبني قسم "المشاريع المرتبطة" (حالة تحميل / فارغ / بيانات)
+    function buildClientProjectsSection(projects, loading) {
+        const base = { title: 'المشاريع المرتبطة بالعميل', icon: 'fas fa-folder-open' };
+
+        if (loading) {
+            base.html = '<div class="clients-projects-loading"><i class="fas fa-spinner fa-spin"></i> جاري تحميل بيانات المشاريع...</div>';
+            return base;
+        }
+
+        projects = projects || [];
+        let suppliers = 0, equipments = 0, operators = 0, activeProjects = 0;
+        projects.forEach(function (p) {
+            suppliers += parseInt(p.suppliers_count || 0, 10);
+            equipments += parseInt(p.equipments_total || 0, 10);
+            operators += parseInt(p.operators_total || 0, 10);
+            if (clientIsActiveStatus(p.status)) activeProjects += 1;
+        });
+
+        base.pills = [
+            { label: 'المشاريع', value: projects.length },
+            { label: 'المشاريع النشطة', value: activeProjects },
+            { label: 'المشاريع غير النشطة', value: Math.max(0, projects.length - activeProjects) },
+            { label: 'الموردون', value: suppliers },
+            { label: 'الآليات', value: equipments },
+            { label: 'المشغلون', value: operators }
+        ];
+
+        base.table = {
+            columns: ['المشروع', 'الموردون', 'الآليات', 'الآليات العاملة', 'الآليات المتوقفة', 'المشغلون', 'المشغلون النشطون', 'المشغلون المتوقفون'],
+            rows: projects.map(function (p) {
+                const label = (p.name || '-') + (p.project_code ? ' (' + p.project_code + ')' : '');
+                const cls = clientIsActiveStatus(p.status) ? 'clients-project-label-active' : 'clients-project-label-inactive';
+                return [
+                    { html: '<span class="' + cls + '">' + clientEscapeHtml(label) + '</span>' },
+                    p.suppliers_count || 0,
+                    p.equipments_total || 0,
+                    { html: '<span class="clients-num-positive">' + (p.equipments_working || 0) + '</span>' },
+                    { html: '<span class="clients-num-negative">' + (p.equipments_stopped || 0) + '</span>' },
+                    p.operators_total || 0,
+                    { html: '<span class="clients-num-positive">' + (p.operators_working || 0) + '</span>' },
+                    { html: '<span class="clients-num-negative">' + (p.operators_stopped || 0) + '</span>' }
+                ];
+            })
+        };
+        base.empty = 'لا توجد مشاريع مرتبطة بهذا العميل';
+        return base;
+    }
+
+    function loadClientProjectsStats(clientId) {
+        $.ajax({
+            url: 'clients.php',
+            type: 'GET',
+            dataType: 'json',
+            data: { ajax: 'client_projects', client_id: clientId },
+            success: function (response) {
+                if (!response || !response.success) {
+                    EmsDetailsModal.setSection(0, { title: 'المشاريع المرتبطة بالعميل', icon: 'fas fa-folder-open', html: '<div class="clients-table-empty-error">تعذر تحميل بيانات المشاريع</div>' });
+                    return;
+                }
+                EmsDetailsModal.setSection(0, buildClientProjectsSection(response.projects || [], false));
+            },
+            error: function () {
+                EmsDetailsModal.setSection(0, { title: 'المشاريع المرتبطة بالعميل', icon: 'fas fa-folder-open', html: '<div class="clients-table-empty-error">حدث خطأ أثناء تحميل بيانات المشاريع</div>' });
+            }
+        });
+    }
+
+    // تعبئة الفورم بالبيانات (تُستدعى من زر التعديل داخل نافذة العرض)
+    function fillClientForm(c) {
+        $('#client_id').val(c.id);
+        $('#client_code').val(c.code);
+        $('#client_name').val(c.name);
+        $('#entity_type').val(c.entity);
+        $('#sector_category').val(c.sector);
+        $('#phone').val(c.phone);
+        $('#email').val(c.email);
+        $('#whatsapp').val(c.whatsapp);
+        $('#status').val(c.status);
+
+        if (!clientForm.is(':visible')) {
+            clientForm.addClass('allforms-visible').hide();
+            clientForm.stop(true, true).slideDown(250, function () { updateFormToggleState(true); });
+        } else {
+            updateFormToggleState(true);
+        }
+        $('html, body').animate({ scrollTop: $('#clientForm').offset().top - 100 }, 500);
+    }
+
     $(document).on('click', '.viewClientBtn', function () {
-        const clientData = {
+        const c = {
             id: $(this).data('id'),
             code: $(this).data('code'),
             name: $(this).data('name'),
@@ -1453,209 +1380,37 @@ include('../insidebar.php');
             created: $(this).data('created')
         };
 
-        // ملء بيانات العرض
-        $('#view_client_code').text(clientData.code || '-');
-        $('#view_client_name').text(clientData.name || '-');
-        $('#view_entity_type').text(clientData.entity || '-');
-        $('#view_sector_category').text(clientData.sector || '-');
-        $('#view_phone').text(clientData.phone || '-');
-        $('#view_email').text(clientData.email || '-');
-        $('#view_whatsapp').text(clientData.whatsapp || '-');
-        $('#view_projects_count').text(clientData.projectsCount || 0);
+        const statusTone = (c.status === 'نشط') ? 'active' : 'inactive';
 
-        // عرض الحالة بألوان
-        let statusHtml = '';
-        if (clientData.status === 'نشط') {
-            statusHtml = '<span class="status-active"><i class="fas fa-check-circle"></i> نشط</span>';
-        } else {
-            statusHtml = '<span class="status-inactive"><i class="fas fa-times-circle"></i> متوقف</span>';
-        }
-        $('#view_status').html(statusHtml);
-        $('#view_created_by').text(clientData.created || '-');
+        const actions = [];
+        <?php if ($can_edit): ?>
+        actions.push({
+            label: 'تعديل البيانات', icon: 'fas fa-edit', variant: 'primary',
+            onClick: function () { EmsDetailsModal.close(); fillClientForm(c); }
+        });
+        <?php endif; ?>
+        actions.push({ label: 'إغلاق', icon: 'fas fa-times', variant: 'secondary', close: true });
 
-        // تحضير زر التعديل داخل المودال
-        const editBtn = $('#viewEditBtn');
-        editBtn.data('id', clientData.id);
-        editBtn.data('code', clientData.code);
-        editBtn.data('name', clientData.name);
-        editBtn.data('entity', clientData.entity);
-        editBtn.data('sector', clientData.sector);
-        editBtn.data('phone', clientData.phone);
-        editBtn.data('email', clientData.email);
-        editBtn.data('whatsapp', clientData.whatsapp);
-        editBtn.data('status', clientData.status);
-
-        loadClientProjectsStats(clientData.id);
-
-        $('#viewClientModal').fadeIn(300);
-    });
-
-    function setProjectsSummary(projects) {
-        let suppliers = 0;
-        let equipments = 0;
-        let operators = 0;
-        let activeProjects = 0;
-
-        function isProjectActiveStatus(statusValue) {
-            const normalized = String(statusValue === null || typeof statusValue === 'undefined' ? '' : statusValue)
-                .trim()
-                .toLowerCase()
-                .replace(/✅|✔/g, '')
-                .trim();
-
-            return normalized === '1' || normalized === 'active' || normalized === 'نشط' || normalized === 'true';
-        }
-
-        projects.forEach(function (project) {
-            suppliers += parseInt(project.suppliers_count || 0, 10);
-            equipments += parseInt(project.equipments_total || 0, 10);
-            operators += parseInt(project.operators_total || 0, 10);
-            if (isProjectActiveStatus(project.status)) {
-                activeProjects += 1;
-            }
+        EmsDetailsModal.open({
+            title: 'تفاصيل العميل',
+            icon: 'fas fa-user-tie',
+            fields: [
+                { label: 'كود العميل', value: c.code, icon: 'fas fa-barcode' },
+                { label: 'اسم العميل', value: c.name, icon: 'fas fa-user', size: 'lg' },
+                { label: 'نوع الكيان', value: c.entity, icon: 'fas fa-building' },
+                { label: 'تصنيف القطاع', value: c.sector, icon: 'fas fa-industry', size: 'lg' },
+                { label: 'عدد المشاريع المرتبطة', value: c.projectsCount || 0, icon: 'fas fa-project-diagram' },
+                { label: 'الهاتف', value: c.phone, icon: 'fas fa-phone' },
+                { label: 'البريد الإلكتروني', value: c.email, icon: 'fas fa-envelope', size: 'lg' },
+                { label: 'واتساب', value: c.whatsapp, icon: 'fab fa-whatsapp' },
+                { label: 'الحالة', value: c.status, icon: 'fas fa-toggle-on', type: 'status', tone: statusTone },
+                { label: 'أضيف بواسطة', value: c.created, icon: 'fas fa-user-plus' }
+            ],
+            sections: [ buildClientProjectsSection([], true) ],
+            actions: actions
         });
 
-        $('#summary_projects_count').text(projects.length);
-        $('#summary_projects_active_count').text(activeProjects);
-        $('#summary_projects_inactive_count').text(Math.max(0, projects.length - activeProjects));
-        $('#summary_suppliers_count').text(suppliers);
-        $('#summary_equipments_count').text(equipments);
-        $('#summary_operators_count').text(operators);
-    }
-
-    function renderClientProjects(projects) {
-        const tbody = $('#clientProjectsTableBody');
-        tbody.empty();
-
-        function isProjectActiveStatus(statusValue) {
-            const normalized = String(statusValue === null || typeof statusValue === 'undefined' ? '' : statusValue)
-                .trim()
-                .toLowerCase()
-                .replace(/✅|✔/g, '')
-                .trim();
-
-            return normalized === '1' || normalized === 'active' || normalized === 'نشط' || normalized === 'true';
-        }
-
-        if (!projects.length) {
-            tbody.append('<tr><td colspan="8" class="clients-table-empty clients-table-empty-muted">لا توجد مشاريع مرتبطة بهذا العميل</td></tr>');
-            setProjectsSummary([]);
-            return;
-        }
-
-        projects.forEach(function (project) {
-            const projectLabel = (project.name || '-') + (project.project_code ? ' (' + project.project_code + ')' : '');
-            const projectLabelClass = isProjectActiveStatus(project.status)
-                ? 'clients-project-label-active'
-                : 'clients-project-label-inactive';
-
-            const rowHtml = '<tr>' +
-                '<td><span class="' + projectLabelClass + '">' + projectLabel + '</span></td>' +
-                '<td>' + (project.suppliers_count || 0) + '</td>' +
-                '<td>' + (project.equipments_total || 0) + '</td>' +
-                '<td class="clients-num-positive">' + (project.equipments_working || 0) + '</td>' +
-                '<td class="clients-num-negative">' + (project.equipments_stopped || 0) + '</td>' +
-                '<td>' + (project.operators_total || 0) + '</td>' +
-                '<td class="clients-num-positive">' + (project.operators_working || 0) + '</td>' +
-                '<td class="clients-num-negative">' + (project.operators_stopped || 0) + '</td>' +
-                '</tr>';
-
-            tbody.append(rowHtml);
-        });
-
-        setProjectsSummary(projects);
-    }
-
-    function loadClientProjectsStats(clientId) {
-        $('#clientProjectsLoading').show();
-        $('#clientProjectsTableBody').html('<tr><td colspan="8" class="clients-table-empty clients-table-empty-muted">جاري التحميل...</td></tr>');
-
-        $.ajax({
-            url: 'clients.php',
-            type: 'GET',
-            dataType: 'json',
-            data: {
-                ajax: 'client_projects',
-                client_id: clientId
-            },
-            success: function (response) {
-                $('#clientProjectsLoading').hide();
-                if (!response || !response.success) {
-                    $('#clientProjectsTableBody').html('<tr><td colspan="8" class="clients-table-empty clients-table-empty-error">تعذر تحميل بيانات المشاريع</td></tr>');
-                    setProjectsSummary([]);
-                    return;
-                }
-
-                renderClientProjects(response.projects || []);
-            },
-            error: function () {
-                $('#clientProjectsLoading').hide();
-                $('#clientProjectsTableBody').html('<tr><td colspan="8" class="clients-table-empty clients-table-empty-error">حدث خطأ أثناء تحميل بيانات المشاريع</td></tr>');
-                setProjectsSummary([]);
-            }
-        });
-    }
-
-    // إغلاق مودال العرض
-    function closeViewModal() {
-        $('#viewClientModal').fadeOut(300);
-    }
-
-    // إغلاق المودالات عند الضغط خارجها
-    $(window).on('click', function (e) {
-        if (e.target.id === 'viewClientModal') {
-            closeViewModal();
-        }
-    });
-
-    // إغلاق المودال عند ضغط ESC
-    $(document).on('keydown', function (e) {
-        if (e.key === 'Escape' && $('#viewClientModal').is(':visible')) {
-            closeViewModal();
-        }
-    });
-
-    // تعديل من مودال العرض — تحميل البيانات في الفورم
-    $('#viewEditBtn').on('click', function () {
-        const clientData = {
-            id: $(this).data('id'),
-            code: $(this).data('code'),
-            name: $(this).data('name'),
-            entity: $(this).data('entity'),
-            sector: $(this).data('sector'),
-            phone: $(this).data('phone'),
-            email: $(this).data('email'),
-            whatsapp: $(this).data('whatsapp'),
-            status: $(this).data('status')
-        };
-
-        closeViewModal();
-
-        // ملء الفورم بالبيانات
-        $('#client_id').val(clientData.id);
-        $('#client_code').val(clientData.code);
-        $('#client_name').val(clientData.name);
-        $('#entity_type').val(clientData.entity);
-        $('#sector_category').val(clientData.sector);
-        $('#phone').val(clientData.phone);
-        $('#email').val(clientData.email);
-        $('#whatsapp').val(clientData.whatsapp);
-        $('#status').val(clientData.status);
-
-        // عرض الفورم إذا كان مخفياً
-        if (!clientForm.is(':visible')) {
-            clientForm.addClass('allforms-visible').hide();
-            clientForm.stop(true, true).slideDown(250, function () {
-                updateFormToggleState(true);
-            });
-        } else {
-            updateFormToggleState(true);
-        }
-
-        // التمرير إلى الفورم
-        $('html, body').animate({
-            scrollTop: $('#clientForm').offset().top - 100
-        }, 500);
+        loadClientProjectsStats(c.id);
     });
 </script>
 
@@ -1698,120 +1453,6 @@ include('../insidebar.php');
     }
 </style>
 
-<script>
-    // ════════════════════════════════════════════════
-    // Modal استيراد من Excel
-    // ════════════════════════════════════════════════
-
-    // فتح مودال الاستيراد
-    $('#openImportModal').on('click', function () {
-        $('#importExcelModal').fadeIn(300);
-    });
-
-    // إغلاق مودال الاستيراد
-    function closeImportModal() {
-        $('#importExcelModal').fadeOut(300);
-        $('#importExcelForm')[0].reset();
-        $('#importProgress').hide();
-        $('#importResult').hide();
-    }
-
-    // إغلاق عند الضغط خارج المودال
-    $(window).on('click', function (e) {
-        if (e.target.id === 'importExcelModal') {
-            closeImportModal();
-        }
-    });
-
-    // معالجة رفع ملف Excel
-    $('#importExcelForm').on('submit', function (e) {
-        e.preventDefault();
-
-        const fileInput = $('#excel_file')[0];
-        if (!fileInput.files.length) {
-            alert('الرجاء اختيار ملف Excel');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('excel_file', fileInput.files[0]);
-
-        $('#importProgress').show();
-        $('#importResult').hide();
-        $(this).find('[type="submit"]').prop('disabled', true);
-
-        $.ajax({
-            url: 'import_clients_excel.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function (response) {
-                $('#importProgress').hide();
-                $('#importExcelForm [type="submit"]').prop('disabled', false);
-
-                let resultHtml = '';
-
-                if (response.success) {
-                    resultHtml = '<div class="clients-import-result-card clients-import-result-success">';
-                    resultHtml += '<h6 class="clients-import-result-title">'
-                        + '<i class="fas fa-check-circle clients-import-result-icon-success"></i> &nbsp;تم الاستيراد بنجاح</h6>';
-                    resultHtml += '<p class="clients-import-result-line">✅ العملاء المضافون: <strong>' + response.added + '</strong></p>';
-
-                    if (response.skipped > 0) {
-                        resultHtml += '<p class="clients-import-result-line clients-import-result-line-warn">⚠️ تم تخطي: <strong>' + response.skipped + '</strong> (مكرر أو بيانات ناقصة)</p>';
-                    }
-
-                    if (response.errors && response.errors.length > 0) {
-                        resultHtml += '<details class="clients-import-result-details">';
-                        resultHtml += '<summary class="clients-import-result-summary">تفاصيل الأخطاء (' + response.errors.length + ')</summary>';
-                        resultHtml += '<ul class="clients-import-result-errors">';
-                        response.errors.forEach(function (err) {
-                            resultHtml += '<li class="clients-import-result-error-item">' + $('<span>').text(err).html() + '</li>';
-                        });
-                        resultHtml += '</ul></details>';
-                    }
-
-                    if (response.added > 0) {
-                        resultHtml += '<p class="clients-import-result-hint">سيتم تحديث الصفحة خلال 3 ثوان...</p>';
-                        setTimeout(function () { location.reload(); }, 3000);
-                    }
-
-                    resultHtml += '</div>';
-                } else {
-                    resultHtml = '<div class="clients-import-result-card clients-import-result-error">';
-                    resultHtml += '<h6 class="clients-import-result-title"><i class="fas fa-times-circle"></i> &nbsp;فشل الاستيراد</h6>';
-                    resultHtml += '<p class="clients-import-result-line clients-import-result-line-no-margin">' + $('<span>').text(response.message).html() + '</p>';
-                    resultHtml += '</div>';
-                }
-
-                $('#importResult').html(resultHtml).fadeIn(300);
-            },
-            error: function (xhr) {
-                $('#importProgress').hide();
-                $('#importExcelForm [type="submit"]').prop('disabled', false);
-
-                let errorMsg = 'حدث خطأ أثناء رفع الملف. الرجاء المحاولة مرة أخرى.';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                } else if (xhr.responseText && xhr.responseText.trim() !== '') {
-                    // عرض أول جزء من استجابة الخادم غير-JSON للمساعدة في التشخيص
-                    errorMsg = xhr.responseText.trim().substring(0, 300);
-                }
-
-                const errorHtml = '<div class="clients-import-result-card clients-import-result-error">'
-                    + '<h6 class="clients-import-result-title"><i class="fas fa-times-circle"></i> &nbsp;خطأ في الرفع</h6>'
-                    + '<p class="clients-import-result-line">' + $('<span>').text(errorMsg).html() + '</p>'
-                    + '<small class="clients-import-result-small">تأكد من: صيغة الملف (xlsx/csv) · الحجم (أقل من 5MB) · البيانات الصحيحة</small>'
-                    + '</div>';
-
-
-                $('#importResult').html(errorHtml).fadeIn(300);
-            }
-        });
-    });
-</script>
 
 <?php
 // ── نافذة معالج الاستيراد الموحّد + أصول Excel (تُطبع مرّة واحدة) ──

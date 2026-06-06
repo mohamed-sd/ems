@@ -744,98 +744,7 @@ include('../insidebar.php');
     </div>
 </div>
 
-<!-- Modal عرض تفاصيل المشروع -->
-<div id="viewProjectModal" class="modal projects-view-modal">
-    <div class="modal-content projects-view-modal-content">
-        <div class="modal-header projects-view-modal-header">
-            <h5><i class="fas fa-eye"></i> عرض تفاصيل المشروع</h5>
-            <button class="close-modal" onclick="closeViewModal()">&times;</button>
-        </div>
-        <div class="modal-body projects-view-modal-body">
-            <div class="view-modal-body projects-view-grid">
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-user-tie"></i> العميل</div>
-                    <div class="view-item-value" id="view_client_name">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-barcode"></i> كود المشروع</div>
-                    <div class="view-item-value" id="view_project_code">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-mountain"></i> كود المنجم</div>
-                    <div class="view-item-value" id="view_mine_code">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-project-diagram"></i> اسم المشروع</div>
-                    <div class="view-item-value" id="view_project_name">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-layer-group"></i> الفئة</div>
-                    <div class="view-item-value" id="view_category">-</div>
-                </div>
-
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-industry"></i> القطاع الفرعي</div>
-                    <div class="view-item-value" id="view_sub_sector">-</div>
-                </div>
-
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-map-marked-alt"></i> الولاية</div>
-                    <div class="view-item-value" id="view_state">-</div>
-                </div>
-
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-map-pin"></i> المنطقة</div>
-                    <div class="view-item-value" id="view_region">-</div>
-                </div>
-
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-map-marker-alt"></i> موقع المشروع</div>
-                    <div class="view-item-value" id="view_location">-</div>
-                </div>
-
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-store"></i> أقرب سوق</div>
-                    <div class="view-item-value" id="view_nearest_market">-</div>
-                </div>
-
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-map-marker"></i> الإحداثيات (خط العرض / خط الطول)
-                    </div>
-                    <div class="view-item-value" id="view_coordinates">-</div>
-                </div>
-
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-file-contract"></i> عدد العقود</div>
-                    <div class="view-item-value" id="view_contracts">-</div>
-                </div>
-
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-truck"></i> عدد الموردين</div>
-                    <div class="view-item-value" id="view_suppliers">-</div>
-                </div>
-
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> حالة المشروع</div>
-                    <div class="view-item-value" id="view_status">-</div>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer projects-view-modal-footer">
-            <a id="viewContractsBtn" class="btn-modal btn-modal-save">
-                <i class="fas fa-file-contract"></i> عقود المشروع
-            </a>
-            <?php if ($can_edit): ?>
-                <button type="button" class="btn-modal btn-modal-save editBtn" id="viewEditBtn">
-                    <i class="fas fa-edit"></i> تعديل المشروع
-                </button>
-            <?php endif; ?>
-            <button type="button" class="btn-modal btn-modal-cancel" onclick="closeViewModal()">
-                <i class="fas fa-times"></i> إغلاق
-            </button>
-        </div>
-    </div>
-</div>
+<!-- نافذة عرض تفاصيل المشروع تُولَّد ديناميكياً عبر النظام الموحّد EmsDetailsModal (assets/js/ems-details-modal.js) -->
 
 <!-- jQuery -->
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
@@ -851,9 +760,9 @@ include('../insidebar.php');
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
 <script>
-    // إغلاق Modal عرض المشروع - تعريف عام
+    // إغلاق نافذة العرض الموحّدة (متوافق مع الاستدعاءات القديمة)
     function closeViewModal() {
-        $('#viewProjectModal').fadeOut(300);
+        if (window.EmsDetailsModal) EmsDetailsModal.close();
     }
 
     (function () {
@@ -985,10 +894,35 @@ include('../insidebar.php');
 
         setProjectFormAddMode();
 
-        // عرض Modal عند الضغط على زر العرض
+        // تعبئة فورم تعديل المشروع من بيانات العرض
+        function fillProjectEditForm(d) {
+            $("#project_id").val(d.id);
+            $("#company_project_id").val(d.companyProjectId);
+            $("#client_id").val(d.clientId);
+            $("#project_name").val(d.projectName);
+            $("#project_location").val(d.location);
+            $("#project_code").val(d.projectCode);
+            $("#mine_code").val(d.mineCode);
+            $("#project_category").val(d.category);
+            $("#project_sub_sector").val(d.subSector);
+            $("#project_state").val(d.state);
+            $("#project_region").val(d.region);
+            $("#project_nearest_market").val(d.nearestMarket);
+            $("#project_latitude").val(d.latitude);
+            $("#project_longitude").val(d.longitude);
+            $("#project_status").val(d.status);
+
+            setProjectFormEditMode();
+            $("#projectForm").addClass('allforms-visible');
+            $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
+        }
+
+        // عرض تفاصيل المشروع عبر النظام الموحّد
         $(document).on("click", ".viewBtn", function () {
-            const projectData = {
+            const d = {
                 id: $(this).data('id'),
+                companyProjectId: $(this).data('company-project-id'),
+                clientId: $(this).data('client-id'),
                 projectName: $(this).data('project-name'),
                 clientName: $(this).data('client-name'),
                 location: $(this).data('location'),
@@ -1006,100 +940,43 @@ include('../insidebar.php');
                 suppliers: $(this).data('suppliers')
             };
 
-            // ملء بيانات العرض
-            $('#view_project_name').text(projectData.projectName || '-');
-            $('#view_client_name').text(projectData.clientName || '-');
-            $('#view_project_code').text(projectData.projectCode || '-');
-            $('#view_mine_code').text(projectData.mineCode || '-');
-            $('#view_category').text(projectData.category || '-');
-            $('#view_sub_sector').text(projectData.subSector || '-');
-            $('#view_state').text(projectData.state || '-');
-            $('#view_region').text(projectData.region || '-');
-            $('#view_location').text(projectData.location || '-');
-            $('#view_nearest_market').text(projectData.nearestMarket || '-');
+            const isActive = (d.status === '1' || d.status === 1);
+            let coordsText = (d.latitude && d.longitude) ? (d.latitude + ' / ' + d.longitude) : '-';
 
-            // عرض الإحداثيات
-            let coordsText = '-';
-            if (projectData.latitude && projectData.longitude) {
-                coordsText = projectData.latitude + ' / ' + projectData.longitude;
-            }
-            $('#view_coordinates').text(coordsText);
+            const actions = [];
+            actions.push({
+                label: 'عقود المشروع', icon: 'fas fa-file-contract', variant: 'primary',
+                onClick: function () { window.location.href = '../Contracts/contracts.php?filter_project_id=' + d.id; }
+            });
+            <?php if ($can_edit): ?>
+            actions.push({
+                label: 'تعديل المشروع', icon: 'fas fa-edit', variant: 'primary',
+                onClick: function () { EmsDetailsModal.close(); fillProjectEditForm(d); }
+            });
+            <?php endif; ?>
+            actions.push({ label: 'إغلاق', icon: 'fas fa-times', variant: 'secondary', close: true });
 
-            $('#view_contracts').text(projectData.contracts || '0');
-            $('#view_suppliers').text(projectData.suppliers || '0');
-
-            // عرض الحالة بألوان
-            let statusHtml = '<span style="padding: 4px 12px; border-radius: 20px; color: white;';
-            if (projectData.status === '1' || projectData.status === 1) {
-                statusHtml += ' background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);';
-            } else {
-                statusHtml += ' background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);';
-            }
-            statusHtml += ' display: inline-block;">';
-            statusHtml += '<i class="fas fa-circle" style="margin-left: 6px; font-size: 8px;"></i> ' + (projectData.status === '1' || projectData.status === 1 ? 'نشط' : 'غير نشط') + '</span>';
-            $('#view_status').html(statusHtml);
-
-            // تحضير زر التعديل
-            const editBtn = $('#viewEditBtn');
-            editBtn.data('id', projectData.id);
-            editBtn.data('company-project-id', $(this).data('company-project-id'));
-            editBtn.data('client-id', $(this).data('client-id'));
-            editBtn.data('project-name', projectData.projectName);
-            editBtn.data('project-code', projectData.projectCode);
-            editBtn.data('mine-code', projectData.mineCode);
-            editBtn.data('category', projectData.category);
-            editBtn.data('sub-sector', projectData.subSector);
-            editBtn.data('state', projectData.state);
-            editBtn.data('region', projectData.region);
-            editBtn.data('nearest-market', projectData.nearestMarket);
-            editBtn.data('latitude', projectData.latitude);
-            editBtn.data('longitude', projectData.longitude);
-            editBtn.data('location', projectData.location);
-            editBtn.data('status', projectData.status);
-
-            // تحضير زر عقود المشروع
-            $('#viewContractsBtn').attr('href', '../Contracts/contracts.php?filter_project_id=' + projectData.id);
-
-            $('#viewProjectModal').fadeIn(300);
-        });
-
-        // إغلاق عند الضغط خارج Modal
-        $(window).on('click', function (e) {
-            if (e.target.id === 'viewProjectModal') {
-                closeViewModal();
-            }
-        });
-
-        // إغلاق عند الضغط على ESC
-        $(document).on('keydown', function (e) {
-            if (e.key === 'Escape' && $('#viewProjectModal').is(':visible')) {
-                closeViewModal();
-            }
-        });
-
-        // التعامل مع زر التعديل من Modal العرض
-        $('#viewEditBtn').on('click', function () {
-            $("#project_id").val($(this).data('id'));
-            $("#company_project_id").val($(this).data('company-project-id'));
-            $("#client_id").val($(this).data('client-id'));
-            $("#project_name").val($(this).data('project-name'));
-            $("#project_location").val($(this).data('location'));
-            $("#project_code").val($(this).data('project-code'));
-            $("#mine_code").val($(this).data('mine-code'));
-            $("#project_category").val($(this).data('category'));
-            $("#project_sub_sector").val($(this).data('sub-sector'));
-            $("#project_state").val($(this).data('state'));
-            $("#project_region").val($(this).data('region'));
-            $("#project_nearest_market").val($(this).data('nearest-market'));
-            $("#project_latitude").val($(this).data('latitude'));
-            $("#project_longitude").val($(this).data('longitude'));
-            $("#project_status").val($(this).data('status'));
-
-            setProjectFormEditMode();
-
-            closeViewModal();
-            $("#projectForm").addClass('allforms-visible');
-            $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
+            EmsDetailsModal.open({
+                title: 'تفاصيل المشروع',
+                icon: 'fas fa-project-diagram',
+                fields: [
+                    { label: 'العميل', value: d.clientName, icon: 'fas fa-user-tie', size: 'lg' },
+                    { label: 'كود المشروع', value: d.projectCode, icon: 'fas fa-barcode' },
+                    { label: 'كود المنجم', value: d.mineCode, icon: 'fas fa-mountain' },
+                    { label: 'اسم المشروع', value: d.projectName, icon: 'fas fa-project-diagram', size: 'lg' },
+                    { label: 'الفئة', value: d.category, icon: 'fas fa-layer-group' },
+                    { label: 'القطاع الفرعي', value: d.subSector, icon: 'fas fa-industry' },
+                    { label: 'الولاية', value: d.state, icon: 'fas fa-map-marked-alt' },
+                    { label: 'المنطقة', value: d.region, icon: 'fas fa-map-pin' },
+                    { label: 'موقع المشروع', value: d.location, icon: 'fas fa-map-marker-alt', size: 'lg' },
+                    { label: 'أقرب سوق', value: d.nearestMarket, icon: 'fas fa-store' },
+                    { label: 'الإحداثيات (خط العرض / خط الطول)', value: coordsText, icon: 'fas fa-map-marker', size: 'lg' },
+                    { label: 'عدد العقود', value: d.contracts || '0', icon: 'fas fa-file-contract' },
+                    { label: 'عدد الموردين', value: d.suppliers || '0', icon: 'fas fa-truck' },
+                    { label: 'حالة المشروع', value: isActive ? 'نشط' : 'غير نشط', icon: 'fas fa-toggle-on', type: 'status', tone: isActive ? 'active' : 'inactive' }
+                ],
+                actions: actions
+            });
         });
 
         // عند الضغط على زر تعديل من الجدول
@@ -1136,60 +1013,6 @@ include('../insidebar.php');
                 $('#projectForm').addClass('allforms-visible');
                 $('#client_id').val(clientId);
             }
-        });
-
-        // ===== معالجات الاستيراد والتصدير =====
-
-        // زر تحميل النموذج
-        $('#exportBtn').on('click', function () {
-            window.location.href = 'download_projects_template.php';
-        });
-
-        // زر الاستيراد من Excel
-        $('#importBtn').on('click', function () {
-            $('#importModal').modal('show');
-        });
-
-        // معالج رفع الملف
-        $('#importFileForm').on('submit', function (e) {
-            e.preventDefault();
-
-            const fileInput = $('#projectFile')[0];
-            if (!fileInput.files.length) {
-                alert('يرجى اختيار ملف');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-
-            $.ajax({
-                url: 'import_projects_excel.php',
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                dataType: 'json',
-                success: function (response) {
-                    if (response.success) {
-                        alert('تم استيراد ' + response.imported_count + ' مشروع بنجاح!');
-                        $('#importModal').modal('hide');
-                        $('#projectsTable').DataTable().ajax.reload();
-                        location.reload(); // إعادة تحميل الصفحة لتحديث الجدول
-                    } else {
-                        let errorMsg = 'حدث خطأ أثناء الاستيراد:\n\n';
-                        if (response.errors && response.errors.length > 0) {
-                            response.errors.forEach(function (error) {
-                                errorMsg += error + '\n';
-                            });
-                        }
-                        alert(errorMsg);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    alert('حدث خطأ في الاتصال: ' + error);
-                }
-            });
         });
 
     })();
@@ -1292,37 +1115,6 @@ include('../insidebar.php');
     }
 </style>
 
-<!-- Modal لاستيراد الملفات -->
-<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="importModalLabel"><i class="fas fa-upload"></i> استيراد المشاريع من ملف
-                    Excel</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
-            </div>
-            <div class="modal-body">
-                <form id="importFileForm">
-                    <div class="form-group">
-                        <label for="projectFile">اختر ملف Excel:</label>
-                        <input type="file" class="form-control" id="projectFile" name="file" accept=".xlsx,.xls"
-                            required>
-                        <small class="form-text text-muted">الملفات المقبولة: Excel (.xlsx, .xls)</small>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-                <?php if ($can_add): ?>
-                    <button type="submit" form="importFileForm" class="btn btn-primary">
-                        <i class="fas fa-upload"></i> استيراد
-                    </button>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</div>
 <?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>
 

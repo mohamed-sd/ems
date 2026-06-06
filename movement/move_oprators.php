@@ -1239,93 +1239,7 @@ function get_shift_info(string $code): array
         <?php endforeach; ?>
 
         <!-- ── مودال عرض التفاصيل ──────────────────────── -->
-        <div id="viewOperationModal" class="modal movement-view-modal" role="dialog"
-             aria-modal="true" aria-labelledby="viewOpModalTitle">
-            <div class="modal-content movement-view-modal-content">
-                <div class="modal-header movement-view-modal-header">
-                    <h5 id="viewOpModalTitle">
-                        <i class="fas fa-eye"></i> تفاصيل سجل التشغيل
-                    </h5>
-                    <button onclick="closeViewOperationModal()"
-                            class="movement-view-modal-close" aria-label="إغلاق">&times;</button>
-                </div>
-                <div class="modal-body movement-view-modal-body">
-                    <div class="movement-view-modal-grid">
-
-                        <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-cogs"></i> المعدة</div>
-                            <div class="movement-view-modal-value" id="view_op_equipment">-</div>
-                        </div>
-                        <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-tools"></i> تصنيف المعدة</div>
-                            <div class="movement-view-modal-value" id="view_op_equipment_type">-</div>
-                        </div>
-                        <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-truck"></i> المورد</div>
-                            <div class="movement-view-modal-value" id="view_op_supplier">-</div>
-                        </div>
-                        <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-file-contract"></i> تاريخ توقيع العقد</div>
-                            <div class="movement-view-modal-value" id="view_op_contract">-</div>
-                        </div>
-                        <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-id-badge"></i> السائقون</div>
-                            <div class="movement-view-modal-value" id="view_op_drivers">-</div>
-                        </div>
-                        <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-check-circle"></i> فئة المعدة</div>
-                            <div class="movement-view-modal-value" id="view_op_category">-</div>
-                        </div>
-                        <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-calendar-alt"></i> تاريخ البداية</div>
-                            <div class="movement-view-modal-value" id="view_op_start">-</div>
-                        </div>
-                        <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-calendar-check"></i> تاريخ النهاية</div>
-                            <div class="movement-view-modal-value" id="view_op_end">-</div>
-                        </div>
-                        <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-clock"></i> ساعات العمل الكلية</div>
-                            <div class="movement-view-modal-value" id="view_op_total_hours">-</div>
-                        </div>
-                        <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-hourglass-half"></i> ساعات الوردية</div>
-                            <div class="movement-view-modal-value" id="view_op_shift_hours">-</div>
-                        </div>
-                        <div class="movement-view-modal-item">
-                            <div class="movement-view-modal-label"><i class="fas fa-sync-alt"></i> نظام الوردية</div>
-                            <div class="movement-view-modal-value" id="view_op_shift_type">-</div>
-                        </div>
-                        <div class="movement-view-modal-item movement-view-modal-item-wide">
-                            <div class="movement-view-modal-label"><i class="fas fa-toggle-on"></i> الحالة</div>
-                            <div id="view_op_status">-</div>
-                        </div>
-                        <div id="view_op_reason_block"
-                             class="movement-view-modal-reason movement-view-modal-item-wide"
-                             style="display:none;">
-                            <div class="movement-view-modal-reason-label">
-                                <i class="fas fa-info-circle"></i> سبب الإنهاء
-                            </div>
-                            <div class="movement-view-modal-reason-value" id="view_op_reason">-</div>
-                        </div>
-
-                    </div>
-                </div>
-                <div class="modal-footer movement-view-modal-footer">
-                    <?php if ($can_edit): ?>
-                    <button type="button" id="viewOpEditBtn"
-                            onclick="triggerEditFromView()"
-                            class="movement-view-modal-btn movement-view-modal-btn-primary">
-                        <i class="fas fa-edit"></i> تعديل
-                    </button>
-                    <?php endif; ?>
-                    <button type="button" onclick="closeViewOperationModal()"
-                            class="movement-view-modal-btn movement-view-modal-btn-secondary">
-                        <i class="fas fa-times"></i> إغلاق
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- نافذة تفاصيل سجل التشغيل تُولَّد عبر EmsDetailsModal -->
 
         <!-- ── مودال إنهاء الخدمة ─────────────────────── -->
         <div class="modal fade" id="endServiceModal" tabindex="-1"
@@ -1669,66 +1583,57 @@ $(document).ready(function () {
 
     $(document).on('click', '.viewOperationBtn', function () {
         const btn = $(this);
-
-        // تعبئة بيانات المودال
-        $('#view_op_equipment').text(btn.data('equipment')      || '-');
-        $('#view_op_equipment_type').text(btn.data('equipment-type') || '-');
-        $('#view_op_supplier').text(btn.data('supplier')        || '-');
-        $('#view_op_contract').text(btn.data('contract')        || '-');
-        $('#view_op_drivers').text(btn.data('drivers')          || '-');
-        $('#view_op_start').text(btn.data('start')              || '-');
-        $('#view_op_end').text(btn.data('end')                  || '-');
-        $('#view_op_total_hours').text(btn.data('total-hours')  || '0');
-        $('#view_op_shift_hours').text(btn.data('shift-hours')  || '0');
-        $('#view_op_shift_type').text(btn.data('shift-type-label') || '-');
-        $('#view_op_category').text(btn.data('category')        || '-');
-
         const statusLabel = btn.data('status')       || '-';
         const statusClass = btn.data('status-class') || '';
-        $('#view_op_status').html(
-            `<span class="status-pill ${statusClass}">${statusLabel}</span>`
-        );
-
-        // سبب الإنهاء
         const reason = btn.data('reason') || '';
+        const opId = btn.data('id');
+
+        const fields = [
+            { label: 'المعدة', value: btn.data('equipment'), icon: 'fas fa-cogs', size: 'lg' },
+            { label: 'تصنيف المعدة', value: btn.data('equipment-type'), icon: 'fas fa-tools' },
+            { label: 'المورد', value: btn.data('supplier'), icon: 'fas fa-truck', size: 'lg' },
+            { label: 'تاريخ توقيع العقد', value: btn.data('contract'), icon: 'fas fa-file-contract' },
+            { label: 'السائقون', value: btn.data('drivers'), icon: 'fas fa-id-badge', size: 'lg' },
+            { label: 'فئة المعدة', value: btn.data('category'), icon: 'fas fa-check-circle' },
+            { label: 'تاريخ البداية', value: btn.data('start'), icon: 'fas fa-calendar-alt' },
+            { label: 'تاريخ النهاية', value: btn.data('end'), icon: 'fas fa-calendar-check' },
+            { label: 'ساعات العمل الكلية', value: btn.data('total-hours') || '0', icon: 'fas fa-clock' },
+            { label: 'ساعات الوردية', value: btn.data('shift-hours') || '0', icon: 'fas fa-hourglass-half' },
+            { label: 'نظام الوردية', value: btn.data('shift-type-label'), icon: 'fas fa-sync-alt' },
+            { label: 'الحالة', icon: 'fas fa-toggle-on', type: 'html',
+              value: `<span class="status-pill ${statusClass}">${statusLabel}</span>` }
+        ];
         if (statusClass === 'status-idle' && reason) {
-            $('#view_op_reason').text(reason);
-            $('#view_op_reason_block').show();
-        } else {
-            $('#view_op_reason').text('-');
-            $('#view_op_reason_block').hide();
+            fields.push({ label: 'سبب الإنهاء', value: reason, icon: 'fas fa-info-circle', size: 'full' });
         }
 
-        _viewOpEditData = { id: btn.data('id') };
-        $('#viewOpEditBtn').toggle(statusClass !== 'status-idle');
-        $('#viewOperationModal').addClass('show');
+        const actions = [];
+        <?php if ($can_edit): ?>
+        if (statusClass !== 'status-idle') {
+            actions.push({ label: 'تعديل', icon: 'fas fa-edit', variant: 'primary', onClick: function () {
+                EmsDetailsModal.close();
+                setTimeout(() => {
+                    const editBtn = $(`.editOperationBtn[data-id="${opId}"]`);
+                    if (editBtn.length) editBtn.trigger('click');
+                }, 200);
+            } });
+        }
+        <?php endif; ?>
+        actions.push({ label: 'إغلاق', icon: 'fas fa-times', variant: 'secondary', close: true });
+
+        EmsDetailsModal.open({
+            title: 'تفاصيل سجل التشغيل',
+            icon: 'fas fa-clipboard-list',
+            fields: fields,
+            actions: actions
+        });
     });
 
 }); // end document.ready
 
 function closeViewOperationModal() {
-    document.getElementById('viewOperationModal').classList.remove('show');
+    if (window.EmsDetailsModal) EmsDetailsModal.close();
 }
-
-function triggerEditFromView() {
-    closeViewOperationModal();
-    setTimeout(() => {
-        const editBtn = $(`.editOperationBtn[data-id="${_viewOpEditData.id}"]`);
-        if (editBtn.length) editBtn.trigger('click');
-    }, 350);
-}
-
-// إغلاق عند النقر خارج المودال
-$(document).on('click', '#viewOperationModal', function (e) {
-    if ($(e.target).is('#viewOperationModal')) closeViewOperationModal();
-});
-
-// إغلاق بـ ESC
-$(document).on('keydown', function (e) {
-    if (e.key === 'Escape' && $('#viewOperationModal').hasClass('show')) {
-        closeViewOperationModal();
-    }
-});
 
 /* ════════════════════════════════════════════════════════════
    إحصائيات العقد

@@ -1084,165 +1084,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
         </div>
     </div>
 
-<!-- Modal عرض تفاصيل المعدة -->
-<div id="viewEquipmentModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5><i class="fas fa-eye"></i> عرض بيانات المعدة</h5>
-            <button class="close-modal" id="closeEquipmentModal">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="view-modal-body">
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-barcode"></i> كود المعدة</div>
-                    <div class="view-item-value" id="view_eq_code">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-tag"></i> اسم المعدة</div>
-                    <div class="view-item-value" id="view_eq_name">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-tools"></i> نوع المعدة</div>
-                    <div class="view-item-value" id="view_eq_type">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-truck-loading"></i> المورد</div>
-                    <div class="view-item-value" id="view_eq_supplier">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-project-diagram"></i> المشروع</div>
-                    <div class="view-item-value" id="view_eq_project">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-mountain"></i> المنجم</div>
-                    <div class="view-item-value" id="view_eq_mine">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-hashtag"></i> الرقم التسلسلي</div>
-                    <div class="view-item-value" id="view_eq_serial">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-car"></i> رقم الهيكل</div>
-                    <div class="view-item-value" id="view_eq_chassis">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-industry"></i> الشركة المصنعة</div>
-                    <div class="view-item-value" id="view_eq_manufacturer">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-car-side"></i> الموديل</div>
-                    <div class="view-item-value" id="view_eq_model">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar"></i> سنة الصنع</div>
-                    <div class="view-item-value" id="view_eq_year">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar-plus"></i> سنة الاستيراد</div>
-                    <div class="view-item-value" id="view_eq_import_year">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-cogs"></i> حالة المعدة</div>
-                    <div class="view-item-value" id="view_eq_condition">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-clock"></i> ساعات التشغيل</div>
-                    <div class="view-item-value" id="view_eq_hours">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-car-crash"></i> حالة المحرك</div>
-                    <div class="view-item-value" id="view_eq_engine">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-circle-notch"></i> حالة الإطارات</div>
-                    <div class="view-item-value" id="view_eq_tires">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-user"></i> اسم المالك</div>
-                    <div class="view-item-value" id="view_eq_owner">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-briefcase"></i> نوع المالك</div>
-                    <div class="view-item-value" id="view_eq_owner_type">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-phone"></i> هاتف المالك</div>
-                    <div class="view-item-value" id="view_eq_owner_phone">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-handshake"></i> علاقة المالك بالمورد</div>
-                    <div class="view-item-value" id="view_eq_owner_relation">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-address-card"></i> رقم الترخيص</div>
-                    <div class="view-item-value" id="view_eq_license">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-landmark"></i> جهة الترخيص</div>
-                    <div class="view-item-value" id="view_eq_license_authority">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar-times"></i> انتهاء الترخيص</div>
-                    <div class="view-item-value" id="view_eq_license_expiry">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-certificate"></i> رقم شهادة الفحص</div>
-                    <div class="view-item-value" id="view_eq_inspection">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar-check"></i> آخر فحص</div>
-                    <div class="view-item-value" id="view_eq_last_inspection">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-map-marker-alt"></i> الموقع الحالي</div>
-                    <div class="view-item-value" id="view_eq_location">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-traffic-light"></i> حالة التوفر</div>
-                    <div class="view-item-value" id="view_eq_availability">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-money-bill-wave"></i> القيمة المقدرة</div>
-                    <div class="view-item-value" id="view_eq_value">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar-day"></i> سعر التأجير اليومي</div>
-                    <div class="view-item-value" id="view_eq_daily">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-calendar-alt"></i> سعر التأجير الشهري</div>
-                    <div class="view-item-value" id="view_eq_monthly">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-shield-alt"></i> التأمين/الضمان</div>
-                    <div class="view-item-value" id="view_eq_insurance">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-comment-alt"></i> ملاحظات عامة</div>
-                    <div class="view-item-value" id="view_eq_notes">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-wrench"></i> آخر صيانة</div>
-                    <div class="view-item-value" id="view_eq_last_maintenance">-</div>
-                </div>
-                <div class="view-item">
-                    <div class="view-item-label"><i class="fas fa-toggle-on"></i> الحالة</div>
-                    <div class="view-item-value" id="view_eq_status">-</div>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <?php if ($_SESSION['user']['role'] != "3" && $_SESSION['user']['role'] != "10") { ?>
-            <a id="viewEquipmentEditBtn" class="btn-modal btn-modal-save" style="text-decoration: none;">
-                <i class="fas fa-edit"></i> تعديل المعدة
-            </a>
-            <?php } ?>
-            <button type="button" class="btn-modal btn-modal-cancel" id="closeEquipmentModalFooter">
-                <i class="fas fa-times"></i> إغلاق
-            </button>
-        </div>
-    </div>
-</div>
+<!-- نافذة تفاصيل المعدة تُولَّد ديناميكياً عبر النظام الموحّد EmsDetailsModal (assets/js/ems-details-modal.js) -->
 
 <!-- jQuery -->
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
@@ -1488,57 +1330,88 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
         });
         <?php } ?>
 
-        // Equipment view modal
-        const viewEquipmentModal = document.getElementById('viewEquipmentModal');
-        const closeEquipmentModalBtn = document.getElementById('closeEquipmentModal');
-        const closeEquipmentModalFooter = document.getElementById('closeEquipmentModalFooter');
+        // Equipment view modal — عبر النظام الموحّد EmsDetailsModal
+        const eqCanEdit = <?php echo ($_SESSION['user']['role'] != "3" && $_SESSION['user']['role'] != "10") ? 'true' : 'false'; ?>;
 
-        function setViewValue(elementId, value) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            const safeValue = (value !== null && value !== undefined && value !== '') ? value : 'غير محدد';
-            el.textContent = safeValue;
+        function eqVal(value) {
+            return (value !== null && value !== undefined && value !== '') ? value : 'غير محدد';
         }
-
         function formatCurrency(value) {
             if (value === null || value === undefined || value === '') return 'غير محدد';
             const num = parseFloat(value);
             if (Number.isNaN(num)) return value;
             return '$' + num.toLocaleString();
         }
-
         function formatType(value) {
             if (!value) return 'غير محدد';
             return String(value) === '1' ? 'حفار' : 'قلاب';
         }
-
         function formatStatus(value) {
             if (value === null || value === undefined || value === '') return 'غير محدد';
             return String(value) === '1' ? 'متاحة' : 'مشغولة';
         }
 
+        function buildEquipmentFields(data) {
+            return [
+                { label: 'كود المعدة', value: eqVal(data.code), icon: 'fas fa-barcode' },
+                { label: 'اسم المعدة', value: eqVal(data.name), icon: 'fas fa-tag', size: 'lg' },
+                { label: 'نوع المعدة', value: formatType(data.type), icon: 'fas fa-tools' },
+                { label: 'المورد', value: eqVal(data.supplier_name), icon: 'fas fa-truck-loading', size: 'lg' },
+                { label: 'المشروع', value: eqVal(data.project_name), icon: 'fas fa-project-diagram', size: 'lg' },
+                { label: 'المنجم', value: eqVal(data.mine_name), icon: 'fas fa-mountain' },
+                { label: 'الرقم التسلسلي', value: eqVal(data.serial_number), icon: 'fas fa-hashtag' },
+                { label: 'رقم الهيكل', value: eqVal(data.chassis_number), icon: 'fas fa-car' },
+                { label: 'الشركة المصنعة', value: eqVal(data.manufacturer), icon: 'fas fa-industry' },
+                { label: 'الموديل', value: eqVal(data.model), icon: 'fas fa-car-side' },
+                { label: 'سنة الصنع', value: eqVal(data.manufacturing_year), icon: 'fas fa-calendar' },
+                { label: 'سنة الاستيراد', value: eqVal(data.import_year), icon: 'fas fa-calendar-plus' },
+                { label: 'حالة المعدة', value: eqVal(data.equipment_condition), icon: 'fas fa-cogs' },
+                { label: 'ساعات التشغيل', value: data.operating_hours ? (data.operating_hours + ' ساعة') : 'غير محدد', icon: 'fas fa-clock' },
+                { label: 'حالة المحرك', value: eqVal(data.engine_condition), icon: 'fas fa-car-crash' },
+                { label: 'حالة الإطارات', value: eqVal(data.tires_condition), icon: 'fas fa-circle-notch' },
+                { label: 'اسم المالك', value: eqVal(data.actual_owner_name), icon: 'fas fa-user' },
+                { label: 'نوع المالك', value: eqVal(data.owner_type), icon: 'fas fa-briefcase' },
+                { label: 'هاتف المالك', value: eqVal(data.owner_phone), icon: 'fas fa-phone' },
+                { label: 'علاقة المالك بالمورد', value: eqVal(data.owner_supplier_relation), icon: 'fas fa-handshake' },
+                { label: 'رقم الترخيص', value: eqVal(data.license_number), icon: 'fas fa-address-card' },
+                { label: 'جهة الترخيص', value: eqVal(data.license_authority), icon: 'fas fa-landmark' },
+                { label: 'انتهاء الترخيص', value: eqVal(data.license_expiry_date), icon: 'fas fa-calendar-times' },
+                { label: 'رقم شهادة الفحص', value: eqVal(data.inspection_certificate_number), icon: 'fas fa-certificate' },
+                { label: 'آخر فحص', value: eqVal(data.last_inspection_date), icon: 'fas fa-calendar-check' },
+                { label: 'الموقع الحالي', value: eqVal(data.current_location), icon: 'fas fa-map-marker-alt', size: 'lg' },
+                { label: 'حالة التوفر', value: eqVal(data.availability_status), icon: 'fas fa-traffic-light' },
+                { label: 'القيمة المقدرة', value: formatCurrency(data.estimated_value), icon: 'fas fa-money-bill-wave' },
+                { label: 'سعر التأجير اليومي', value: formatCurrency(data.daily_rental_price), icon: 'fas fa-calendar-day' },
+                { label: 'سعر التأجير الشهري', value: formatCurrency(data.monthly_rental_price), icon: 'fas fa-calendar-alt' },
+                { label: 'التأمين/الضمان', value: eqVal(data.insurance_status), icon: 'fas fa-shield-alt' },
+                { label: 'ملاحظات عامة', value: eqVal(data.general_notes), icon: 'fas fa-comment-alt', size: 'full' },
+                { label: 'آخر صيانة', value: eqVal(data.last_maintenance_date), icon: 'fas fa-wrench' },
+                { label: 'الحالة', value: formatStatus(data.status), icon: 'fas fa-toggle-on', type: 'status', tone: String(data.status) === '1' ? 'active' : 'inactive' }
+            ];
+        }
+
+        function equipmentActions(equipmentId) {
+            const actions = [];
+            if (eqCanEdit) {
+                actions.push({ label: 'تعديل المعدة', icon: 'fas fa-edit', variant: 'primary',
+                    onClick: function () { window.location.href = 'equipments.php?edit=' + equipmentId; } });
+            }
+            actions.push({ label: 'إغلاق', icon: 'fas fa-times', variant: 'secondary', close: true });
+            return actions;
+        }
+
         $(document).on('click', '.viewEquipmentBtn', function() {
             const equipmentId = $(this).data('id');
-            if (!equipmentId || !viewEquipmentModal) return;
+            if (!equipmentId) return;
 
-            viewEquipmentModal.style.display = 'flex';
-
-            const loadingText = 'جار التحميل...';
-            [
-                'view_eq_code','view_eq_name','view_eq_type','view_eq_supplier','view_eq_project','view_eq_mine',
-                'view_eq_serial','view_eq_chassis','view_eq_manufacturer','view_eq_model','view_eq_year',
-                'view_eq_import_year','view_eq_condition','view_eq_hours','view_eq_engine','view_eq_tires',
-                'view_eq_owner','view_eq_owner_type','view_eq_owner_phone','view_eq_owner_relation',
-                'view_eq_license','view_eq_license_authority','view_eq_license_expiry','view_eq_inspection',
-                'view_eq_last_inspection','view_eq_location','view_eq_availability','view_eq_value',
-                'view_eq_daily','view_eq_monthly','view_eq_insurance','view_eq_notes','view_eq_last_maintenance',
-                'view_eq_status'
-            ].forEach(id => setViewValue(id, loadingText));
-
-            const editBtn = document.getElementById('viewEquipmentEditBtn');
-            if (editBtn) {
-                editBtn.setAttribute('href', 'equipments.php?edit=' + equipmentId);
-            }
+            // فتح فوري بحالة تحميل
+            EmsDetailsModal.open({
+                title: 'بيانات المعدة',
+                icon: 'fas fa-truck-monster',
+                sections: [{ title: 'تحميل البيانات', icon: 'fas fa-spinner',
+                    html: '<div style="padding:20px;text-align:center;color:var(--t2)"><i class="fas fa-spinner fa-spin"></i> جار التحميل...</div>' }],
+                actions: equipmentActions(equipmentId)
+            });
 
             $.ajax({
                 url: 'get_equipment_details.php',
@@ -1547,151 +1420,30 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 dataType: 'json',
                 success: function(response) {
                     if (!response.success || !response.data) {
-                        setViewValue('view_eq_name', 'تعذر تحميل البيانات');
+                        EmsDetailsModal.setSection(0, { title: 'خطأ', icon: 'fas fa-exclamation-triangle',
+                            html: '<div style="padding:16px;text-align:center;color:#c0392b">تعذر تحميل البيانات</div>' });
                         return;
                     }
-
-                    const data = response.data;
-                    setViewValue('view_eq_code', data.code);
-                    setViewValue('view_eq_name', data.name);
-                    setViewValue('view_eq_type', formatType(data.type));
-                    setViewValue('view_eq_supplier', data.supplier_name);
-                    setViewValue('view_eq_project', data.project_name);
-                    setViewValue('view_eq_mine', data.mine_name);
-                    setViewValue('view_eq_serial', data.serial_number);
-                    setViewValue('view_eq_chassis', data.chassis_number);
-                    setViewValue('view_eq_manufacturer', data.manufacturer);
-                    setViewValue('view_eq_model', data.model);
-                    setViewValue('view_eq_year', data.manufacturing_year);
-                    setViewValue('view_eq_import_year', data.import_year);
-                    setViewValue('view_eq_condition', data.equipment_condition);
-                    setViewValue('view_eq_hours', data.operating_hours ? data.operating_hours + ' ساعة' : 'غير محدد');
-                    setViewValue('view_eq_engine', data.engine_condition);
-                    setViewValue('view_eq_tires', data.tires_condition);
-                    setViewValue('view_eq_owner', data.actual_owner_name);
-                    setViewValue('view_eq_owner_type', data.owner_type);
-                    setViewValue('view_eq_owner_phone', data.owner_phone);
-                    setViewValue('view_eq_owner_relation', data.owner_supplier_relation);
-                    setViewValue('view_eq_license', data.license_number);
-                    setViewValue('view_eq_license_authority', data.license_authority);
-                    setViewValue('view_eq_license_expiry', data.license_expiry_date);
-                    setViewValue('view_eq_inspection', data.inspection_certificate_number);
-                    setViewValue('view_eq_last_inspection', data.last_inspection_date);
-                    setViewValue('view_eq_location', data.current_location);
-                    setViewValue('view_eq_availability', data.availability_status);
-                    setViewValue('view_eq_value', formatCurrency(data.estimated_value));
-                    setViewValue('view_eq_daily', formatCurrency(data.daily_rental_price));
-                    setViewValue('view_eq_monthly', formatCurrency(data.monthly_rental_price));
-                    setViewValue('view_eq_insurance', data.insurance_status);
-                    setViewValue('view_eq_notes', data.general_notes);
-                    setViewValue('view_eq_last_maintenance', data.last_maintenance_date);
-                    setViewValue('view_eq_status', formatStatus(data.status));
+                    EmsDetailsModal.open({
+                        title: 'بيانات المعدة',
+                        icon: 'fas fa-truck-monster',
+                        fields: buildEquipmentFields(response.data),
+                        actions: equipmentActions(equipmentId)
+                    });
                 },
                 error: function() {
-                    setViewValue('view_eq_name', 'تعذر الاتصال بالخادم');
+                    EmsDetailsModal.setSection(0, { title: 'خطأ', icon: 'fas fa-exclamation-triangle',
+                        html: '<div style="padding:16px;text-align:center;color:#c0392b">تعذر الاتصال بالخادم</div>' });
                 }
             });
         });
 
-        function closeEquipmentModal() {
-            if (viewEquipmentModal) {
-                viewEquipmentModal.style.display = 'none';
-            }
-        }
-
-        if (closeEquipmentModalBtn) {
-            closeEquipmentModalBtn.addEventListener('click', closeEquipmentModal);
-        }
-
-        if (closeEquipmentModalFooter) {
-            closeEquipmentModalFooter.addEventListener('click', closeEquipmentModal);
-        }
-
-        if (viewEquipmentModal) {
-            viewEquipmentModal.addEventListener('click', function(event) {
-                if (event.target === viewEquipmentModal) {
-                    closeEquipmentModal();
-                }
-            });
-        }
+        // إغلاق متوافق مع الاستدعاءات القديمة
+        function closeEquipmentModal() { if (window.EmsDetailsModal) EmsDetailsModal.close(); }
 
         // Toggle Form Functionality
     })();
 </script>
-
-<!-- ========================================== -->
-<!-- Modal استيراد من Excel/CSV -->
-<!-- ========================================== -->
-<div id="importExcelModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:white; border-radius:16px; width:90%; max-width:650px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; animation:modalSlideIn 0.3s ease;">
-        <!-- رأس Modal -->
-        <div style="background:linear-gradient(135deg, #0c1c3e 0%, #1e3a5f 100%); color:white; padding:24px 32px; display:flex; justify-content:space-between; align-items:center;">
-            <h5 style="margin:0; font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:12px;">
-                <i class="fas fa-file-import" style="color:#e8b800;"></i>
-                استيراد المعدات من Excel/CSV
-            </h5>
-            <button onclick="closeImportModal()" style="background:rgba(255,255,255,0.1); border:none; color:white; font-size:1.5rem; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <!-- جسم Modal -->
-        <div style="padding:32px;">
-            <form id="importExcelForm" enctype="multipart/form-data">
-                <!-- منطقة رفع الملف -->
-                <div style="margin-bottom:24px;">
-                    <label style="display:block; font-weight:600; margin-bottom:12px; color:#0c1c3e; font-size:1rem;">
-                        <i class="fas fa-upload" style="color:#e8b800; margin-left:6px;"></i>
-                        اختر ملف Excel أو CSV
-                    </label>
-                    <input type="file"
-                           id="excel_file"
-                           name="excel_file"
-                           accept=".xlsx,.xls,.csv"
-                           required
-                           style="width:100%; padding:14px; border:2px dashed #cbd5e1; border-radius:10px; font-size:0.95rem; cursor:pointer; transition:all 0.3s; background:#f8fafc;">
-                </div>
-
-                <!-- مؤشر التحميل -->
-                <div id="importProgress" style="display:none; padding:16px; background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:10px; margin-bottom:20px; text-align:center; color:#1e40af;">
-                    <i class="fas fa-spinner fa-spin" style="font-size:1.5rem; margin-bottom:8px;"></i>
-                    <p style="margin:0; font-weight:600;">جاري معالجة الملف... يرجى الانتظار</p>
-                </div>
-
-                <!-- نتيجة الاستيراد -->
-                <div id="importResult" style="display:none; margin-bottom:20px;"></div>
-
-                <!-- التعليمات -->
-                <div style="background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:10px; padding:18px; margin-bottom:24px;">
-                    <h6 style="margin:0 0 12px 0; color:#1e40af; font-weight:700; font-size:0.95rem;">
-                        <i class="fas fa-info-circle"></i> تعليمات الاستيراد:
-                    </h6>
-                    <ul style="margin:0; padding-right:20px; color:#475569; font-size:0.9rem; line-height:1.8;">
-                        <li>قم بتحميل نموذج Excel أو CSV أولاً</li>
-                        <li>املأ البيانات في النموذج (الحقول المطلوبة: كود المعدة، اسم المورد، نوع المعدة، اسم المعدة)</li>
-                        <li>تأكد من أن اسم المورد ونوع المعدة موجودان في النظام</li>
-                        <li>احذف الأمثلة قبل رفع الملف</li>
-                        <li>الحد الأقصى لحجم الملف: 5 ميجا بايت</li>
-                        <li>الصيغ المدعومة: .xlsx, .xls, .csv</li>
-                    </ul>
-                </div>
-
-                <!-- أزرار التحكم -->
-                <div style="display:flex; gap:12px; justify-content:flex-end;">
-                    <button type="button"
-                            onclick="closeImportModal()"
-                            style="padding:12px 28px; border:2px solid #e2e8f0; background:white; color:#64748b; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.3s; font-size:0.95rem;">
-                        <i class="fas fa-times"></i> إلغاء
-                    </button>
-                    <button type="submit"
-                            style="padding:12px 28px; background:linear-gradient(135deg, #16a34a 0%, #059669 100%); color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.3s; box-shadow:0 2px 8px rgba(22,163,74,0.25); font-size:0.95rem;">
-                        <i class="fas fa-file-import"></i> رفع واستيراد
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <style>
 /* نظام الفلترة الاحترافي */
@@ -1887,121 +1639,6 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
     border-color: #cbd5e1;
 }
 </style>
-
-<script>
-    // فتح Modal الاستيراد
-    $('#openImportModal').on('click', function () {
-        $('#importExcelModal').css('display', 'flex').hide().fadeIn(300);
-    });
-
-    // إغلاق Modal الاستيراد
-    function closeImportModal() {
-        $('#importExcelModal').fadeOut(300);
-        $('#importExcelForm')[0].reset();
-        $('#importProgress').hide();
-        $('#importResult').hide();
-    }
-
-    // إغلاق عند الضغط خارج Modal
-    $(window).on('click', function (e) {
-        if (e.target.id === 'importExcelModal') {
-            closeImportModal();
-        }
-    });
-
-    // معالجة رفع ملف Excel
-    $('#importExcelForm').on('submit', function (e) {
-        e.preventDefault();
-
-        const fileInput = $('#excel_file')[0];
-        if (!fileInput.files.length) {
-            alert('الرجاء اختيار ملف Excel أو CSV');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('excel_file', fileInput.files[0]);
-        formData.append('action', 'import_excel');
-
-        $('#importProgress').show();
-        $('#importResult').hide();
-
-        $.ajax({
-            url: 'import_equipments_excel.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function (response) {
-                $('#importProgress').hide();
-
-                let resultHtml = '<div style="padding:16px;border-radius:10px;border:1.5px solid;';
-
-                if (response.success) {
-                    resultHtml += 'background:#dcfce7;border-color:rgba(22,163,74,.22);color:#15803d">';
-                    resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-check-circle"></i> تم الاستيراد بنجاح!</h6>';
-                    resultHtml += '<p style="margin:4px 0;">✅ تم إضافة: <strong>' + response.added + '</strong> معدة</p>';
-                    if (response.skipped > 0) {
-                        resultHtml += '<p style="margin:4px 0;color:#854d0e;">⚠️ تم تخطي: <strong>' + response.skipped + '</strong> معدة</p>';
-                    }
-                    if (response.errors.length > 0) {
-                        resultHtml += '<p style="margin:8px 0 4px;"><strong>الأخطاء:</strong></p><ul style="margin:0;padding-right:20px;max-height:200px;overflow-y:auto;">';
-                        response.errors.forEach(function (error) {
-                            resultHtml += '<li style="margin:4px 0;">' + error + '</li>';
-                        });
-                        resultHtml += '</ul>';
-                    }
-                    resultHtml += '</div>';
-                    setTimeout(function () { location.reload(); }, 3000);
-                } else {
-                    resultHtml += 'background:#fee2e2;border-color:rgba(220,38,38,.22);color:#991b1b">';
-                    resultHtml += '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> فشل الاستيراد</h6>';
-                    resultHtml += '<p style="margin:0;">' + response.message + '</p>';
-                    if (response.errors && response.errors.length > 0) {
-                        resultHtml += '<ul style="margin:8px 0 0;padding-right:20px;max-height:200px;overflow-y:auto;">';
-                        response.errors.forEach(function (error) {
-                            resultHtml += '<li style="margin:4px 0;">' + error + '</li>';
-                        });
-                        resultHtml += '</ul>';
-                    }
-                    resultHtml += '</div>';
-                }
-
-                $('#importResult').html(resultHtml).fadeIn(300);
-            },
-            error: function (xhr, status, error) {
-                $('#importProgress').hide();
-
-                let errorMsg = 'حدث خطأ أثناء رفع الملف. الرجاء المحاولة مرة أخرى.';
-
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                } else if (xhr.responseText) {
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response.message) { errorMsg = response.message; }
-                    } catch (e) {
-                        errorMsg += '<br><small>تفاصيل الخطأ: ' + status + '</small>';
-                    }
-                }
-
-                const errorHtml = '<div style="padding:16px;border-radius:10px;background:#fee2e2;color:#991b1b;border:1.5px solid rgba(220,38,38,.22);">' +
-                    '<h6 style="font-weight:700;margin-bottom:8px;"><i class="fas fa-times-circle"></i> حدث خطأ</h6>' +
-                    '<p style="margin:0;">' + errorMsg + '</p>' +
-                    '<p style="margin:10px 0 4px;"><strong>نصائح:</strong></p>' +
-                    '<ul style="font-size:.85rem;margin:0;padding-right:20px;">' +
-                    '<li>تأكد من أن الملف بصيغة .xlsx, .xls أو .csv</li>' +
-                    '<li>تأكد من أن حجم الملف أقل من 5 ميجا</li>' +
-                    '<li>تأكد من أن الملف يحتوي على بيانات صحيحة</li>' +
-                    '<li>تأكد من أن أسماء الموردين وأنواع المعدات موجودة في النظام</li>' +
-                    '<li>إذا كنت تستخدم Excel، جرب حفظ الملف كـ CSV</li>' +
-                    '</ul></div>';
-                $('#importResult').html(errorHtml).fadeIn(300);
-            }
-        });
-    });
-</script>
 
 </div> <!-- closing main div -->
 <?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>

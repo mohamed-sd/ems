@@ -29,6 +29,8 @@ $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '..
     <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
     <script src="../assets/js/performance-boost.js" defer></script>
     <script src="/ems/assets/js/ui-unification.js" defer></script>
+    <!-- Unified Details/View Modal System (نظام نافذة العرض الموحّد) -->
+    <script src="/ems/assets/js/ems-details-modal.js" defer></script>
     <!-- Bootstrap Bundle JS (local, CSP-safe) -->
     <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 

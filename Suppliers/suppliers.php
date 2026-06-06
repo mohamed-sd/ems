@@ -563,14 +563,14 @@ include '../insidebar.php';
                 <table id="projectsTable" class="display nowrap alltables suppliers-table-nowrap" style="width:100%;">
                     <thead>
                         <tr>
-                            <th><i class="fas fa-sliders-h"></i> الإجراءات</th>
-                            <th><i class="fas fa-barcode"></i> كود المورد</th>
-                            <th><i class="fas fa-truck-loading"></i> اسم المورد</th>
-                            <th><i class="fas fa-cogs"></i> عدد الآليات</th>
-                            <th><i class="fas fa-clock"></i> الساعات المتعاقد عليها</th>
-                            <th><i class="fas fa-phone"></i> رقم الهاتف</th>
-                            <th><i class="fas fa-info-circle"></i> الحالة</th>
-                            <th><i class="fas fa-file-contract"></i> عقود المورد</th>
+                            <th> الإجراءات</th>
+                            <th> كود المورد</th>
+                            <th> اسم المورد</th>
+                            <th> عدد الآليات</th>
+                            <th> الساعات المتعاقد عليها</th>
+                            <th> رقم الهاتف</th>
+                            <th> الحالة</th>
+                            <th> عقود المورد</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -647,7 +647,7 @@ include '../insidebar.php';
                             echo $action_btns;
                             echo "<td><strong>" . htmlspecialchars((string) ($row['supplier_code'] ?? '-')) . "</strong></td>";
                             echo "<td>" . $supplier_name_cell . "</td>";
-                            echo "<td><span class='stat-cell'>" . $row['equipments'] . "</span></td>";
+                            echo "<td><span class='action-btn'>" . $row['equipments'] . "</span></td>";
                             echo "<td><span class='status-active'>" . number_format($row['total_hours']) . " ساعة</span></td>";
                             echo "<td><i class='fas fa-phone phone-icon'></i>" . htmlspecialchars($row['phone']) . "</td>";
 
@@ -663,7 +663,7 @@ include '../insidebar.php';
                                        class='suppliers-contracts-link'
                                        title='عرض عقود المورد'>
                                         <i class='fas fa-file-contract'></i>
-                                        <span class='suppliers-contracts-badge'>" . intval($row['num_contracts']) . "</span>
+                                        <span class='action-btn'>" . intval($row['num_contracts']) . "</span>
                              </a>
                         </td>";
 
@@ -675,169 +675,12 @@ include '../insidebar.php';
             </div>
         </div>
     </div>
-
-    <!-- ══ Modal عرض تفاصيل المورد ═══════════════════════════════════════════ -->
-    <div id="viewSupplierModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5><i class="fas fa-truck-loading"></i> تفاصيل المورد</h5>
-                <button class="close-modal" onclick="closeViewModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-
-                <!-- المعلومات الأساسية -->
-                <div class="info-section">
-                    <h5 class="section-title"><i class="fas fa-info-circle"></i> المعلومات الأساسية</h5>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">اسم المورد:</span>
-                            <span class="info-value" id="view_name">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">الرمز/الكود:</span>
-                            <span class="info-value" id="view_supplier_code">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">نوع المورد:</span>
-                            <span class="info-value" id="view_supplier_type">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">طبيعة التعامل:</span>
-                            <span class="info-value" id="view_dealing_nature">-</span>
-                        </div>
-                        <div class="info-item suppliers-span-full">
-                            <span class="info-label">المعدات:</span>
-                            <span class="info-value" id="view_equipment_types">-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- البيانات القانونية -->
-                <div class="info-section">
-                    <h5 class="section-title"><i class="fas fa-file-contract"></i> البيانات القانونية</h5>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">رقم التسجيل التجاري:</span>
-                            <span class="info-value" id="view_commercial_registration">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">نوع الهوية:</span>
-                            <span class="info-value" id="view_identity_type">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">رقم الهوية:</span>
-                            <span class="info-value" id="view_identity_number">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">تاريخ انتهاء الهوية:</span>
-                            <span class="info-value" id="view_identity_expiry_date">-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- البيانات التواصلية -->
-                <div class="info-section">
-                    <h5 class="section-title"><i class="fas fa-address-book"></i> البيانات التواصلية</h5>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">البريد الإلكتروني:</span>
-                            <span class="info-value" id="view_email">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">رقم الهاتف الأساسي:</span>
-                            <span class="info-value" id="view_phone">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">رقم هاتف بديل:</span>
-                            <span class="info-value" id="view_phone_alternative">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">جهة الاتصال:</span>
-                            <span class="info-value" id="view_contact_person_name">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">هاتف جهة الاتصال:</span>
-                            <span class="info-value" id="view_contact_person_phone">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">حالة التسجيل المالي:</span>
-                            <span class="info-value" id="view_financial_registration_status">-</span>
-                        </div>
-                        <div class="info-item suppliers-span-full">
-                            <span class="info-label">العنوان الكامل:</span>
-                            <span class="info-value" id="view_full_address">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">الحالة:</span>
-                            <span class="info-value" id="view_status">-</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer suppliers-modal-footer">
-                <button onclick="closeViewModal()" class="btn-cancel">
-                    <i class="fas fa-times"></i> إغلاق
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ══ Modal استيراد من Excel ════════════════════════════════════════════ -->
-    <div id="importExcelModal" class="modal">
-        <div class="modal-content suppliers-import-modal-content">
-            <div class="modal-header">
-                <h5><i class="fas fa-file-excel"></i> استيراد موردين من Excel</h5>
-                <button class="close-modal" onclick="closeImportModal()">&times;</button>
-            </div>
-            <form id="importExcelForm" enctype="multipart/form-data">
-                <div class="modal-body">
-                    <div class="suppliers-import-notice">
-                        <div class="suppliers-import-notice-head">
-                            <i class="fas fa-info-circle"></i>
-                            <strong>تعليمات الاستيراد:</strong>
-                        </div>
-                        <ul class="suppliers-import-list">
-                            <li>قم بتحميل نموذج Excel أو CSV أولاً</li>
-                            <li>املأ البيانات في النموذج (كود المورد، الاسم، رقم الهاتف مطلوبة)</li>
-                            <li>احفظ الملف ثم قم برفعه هنا</li>
-                            <li>الصيغ المدعومة: .xlsx, .xls, .csv</li>
-                            <li>الحد الأقصى: 1000 صف، 5 ميجا</li>
-                        </ul>
-                    </div>
-
-                    <div class="suppliers-import-upload-wrap">
-                        <label class="suppliers-import-upload-label">
-                            <i class="fas fa-file-upload"></i> اختر ملف Excel أو CSV
-                        </label>
-                        <input type="file" name="excel_file" id="excelFileInput" accept=".xlsx,.xls,.csv"
-                            class="suppliers-import-file-input" required>
-                    </div>
-
-                    <div id="importProgress" class="suppliers-hidden suppliers-import-progress">
-                        <div class="suppliers-import-progress-bar"></div>
-                        <p>جاري الاستيراد...</p>
-                    </div>
-
-                    <div id="importResult" class="suppliers-hidden suppliers-import-result"></div>
-                </div>
-                <div class="modal-footer suppliers-modal-footer">
-                    <button type="submit" class="btn-save suppliers-import-submit-btn">
-                        <i class="fas fa-upload"></i> رفع واستيراد
-                    </button>
-                    <button type="button" class="btn-cancel" onclick="closeImportModal()">
-                        <i class="fas fa-times"></i> إلغاء
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 </div>
 
 <!-- jQuery -->
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- DataTables JS -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -969,47 +812,37 @@ include '../insidebar.php';
         // ════════════════════════════════════════════════
         $(document).on("click", ".viewBtn", function () {
             const $this = $(this);
+            const isActive = String($this.data("status")) === "1";
 
-            // ملء البيانات الأساسية
-            $("#view_name").text($this.data("name") || "-");
-            $("#view_supplier_code").text($this.data("supplier_code") || "-");
-            $("#view_supplier_type").text($this.data("supplier_type") || "-");
-            $("#view_dealing_nature").text($this.data("dealing_nature") || "-");
-            $("#view_equipment_types").text($this.data("equipment_types") || "-");
-
-            // البيانات القانونية
-            $("#view_commercial_registration").text($this.data("commercial_registration") || "-");
-            $("#view_identity_type").text($this.data("identity_type") || "-");
-            $("#view_identity_number").text($this.data("identity_number") || "-");
-            $("#view_identity_expiry_date").text($this.data("identity_expiry_date") || "-");
-
-            // البيانات التواصلية
-            $("#view_email").text($this.data("email") || "-");
-            $("#view_phone").text($this.data("phone") || "-");
-            $("#view_phone_alternative").text($this.data("phone_alternative") || "-");
-            $("#view_full_address").text($this.data("full_address") || "-");
-            $("#view_contact_person_name").text($this.data("contact_person_name") || "-");
-            $("#view_contact_person_phone").text($this.data("contact_person_phone") || "-");
-            $("#view_financial_registration_status").text($this.data("financial_registration_status") || "-");
-
-            // عرض الحالة بناء على القيمة المخزنة فعلياً (قد تأتي رقمًا أو نصًا)
-            const rawStatus = $this.data("status");
-            const isActive = String(rawStatus) === "1";
-            const status = isActive ? "نشط ✅" : "معلق ⏸️";
-            $("#view_status").text(status);
-
-            $("#viewSupplierModal").fadeIn(300);
+            EmsDetailsModal.open({
+                title: 'تفاصيل المورد',
+                icon: 'fas fa-truck-loading',
+                fields: [
+                    { label: 'اسم المورد', value: $this.data("name"), icon: 'fas fa-truck', size: 'lg' },
+                    { label: 'الرمز/الكود', value: $this.data("supplier_code"), icon: 'fas fa-barcode' },
+                    { label: 'نوع المورد', value: $this.data("supplier_type"), icon: 'fas fa-tags' },
+                    { label: 'طبيعة التعامل', value: $this.data("dealing_nature"), icon: 'fas fa-handshake' },
+                    { label: 'المعدات', value: $this.data("equipment_types"), icon: 'fas fa-truck-monster', size: 'full' },
+                    { label: 'رقم التسجيل التجاري', value: $this.data("commercial_registration"), icon: 'fas fa-file-contract' },
+                    { label: 'نوع الهوية', value: $this.data("identity_type"), icon: 'fas fa-id-card' },
+                    { label: 'رقم الهوية', value: $this.data("identity_number"), icon: 'fas fa-id-badge' },
+                    { label: 'تاريخ انتهاء الهوية', value: $this.data("identity_expiry_date"), icon: 'fas fa-calendar-times' },
+                    { label: 'البريد الإلكتروني', value: $this.data("email"), icon: 'fas fa-envelope', size: 'lg' },
+                    { label: 'رقم الهاتف الأساسي', value: $this.data("phone"), icon: 'fas fa-phone' },
+                    { label: 'رقم هاتف بديل', value: $this.data("phone_alternative"), icon: 'fas fa-phone-alt' },
+                    { label: 'جهة الاتصال', value: $this.data("contact_person_name"), icon: 'fas fa-user' },
+                    { label: 'هاتف جهة الاتصال', value: $this.data("contact_person_phone"), icon: 'fas fa-mobile-alt' },
+                    { label: 'حالة التسجيل المالي', value: $this.data("financial_registration_status"), icon: 'fas fa-money-check' },
+                    { label: 'العنوان الكامل', value: $this.data("full_address"), icon: 'fas fa-map-marker-alt', size: 'full' },
+                    { label: 'الحالة', value: isActive ? 'نشط' : 'معلق', icon: 'fas fa-toggle-on', type: 'status', tone: isActive ? 'active' : 'inactive' }
+                ]
+            });
         });
 
-        // إغلاق مودال العرض
+        // إغلاق مودال العرض (متوافق مع الاستدعاءات القديمة)
         window.closeViewModal = function () {
-            $("#viewSupplierModal").fadeOut(300);
+            if (window.EmsDetailsModal) EmsDetailsModal.close();
         };
-
-        // إغلاق المودال عند الضغط خارج المحتوى
-        $(document).on("click", "#viewSupplierModal", function (e) {
-            if (e.target.id === "viewSupplierModal") { closeViewModal(); }
-        });
 
         // ════════════════════════════════════════════════
         // دالة toggleForm — إظهار/إخفاء النموذج وتنظيفه
@@ -1044,111 +877,6 @@ include '../insidebar.php';
                 $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
             }
         };
-
-        // ════════════════════════════════════════════════
-        // Modal استيراد من Excel
-        // ════════════════════════════════════════════════
-
-        // فتح المودال
-        $('#openImportModal').on('click', function () {
-            $('#importExcelModal').fadeIn(300);
-            $('#importResult').addClass('suppliers-hidden').empty();
-            $('#excelFileInput').val('');
-        });
-
-        // إغلاق المودال
-        window.closeImportModal = function () {
-            $('#importExcelModal').fadeOut(300);
-            $('#importExcelForm')[0].reset();
-            $('#importProgress').addClass('suppliers-hidden');
-            $('#importResult').addClass('suppliers-hidden').empty();
-        };
-
-        // إغلاق عند الضغط خارج المحتوى
-        $(document).on('click', '#importExcelModal', function (e) {
-            if (e.target.id === 'importExcelModal') { closeImportModal(); }
-        });
-
-        // معالجة رفع واستيراد الملف
-        $('#importExcelForm').on('submit', function (e) {
-            e.preventDefault();
-
-            const fileInput = document.getElementById('excelFileInput');
-            if (!fileInput.files.length) {
-                alert('الرجاء اختيار ملف أولاً');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('excel_file', fileInput.files[0]);
-            formData.append('action', 'import_excel');
-
-            $('#importProgress').removeClass('suppliers-hidden');
-            $('#importResult').addClass('suppliers-hidden').empty();
-
-            $.ajax({
-                url: 'import_suppliers_excel.php',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                dataType: 'json',
-                success: function (response) {
-                    $('#importProgress').addClass('suppliers-hidden');
-
-                    let resultHtml = '<div class="suppliers-import-result-card';
-
-                    if (response.success) {
-                        resultHtml += ' suppliers-import-result-card-success">';
-                        resultHtml += '<div class="suppliers-import-result-head">';
-                        resultHtml += '<i class="fas fa-check-circle suppliers-import-result-icon"></i>';
-                        resultHtml += '<strong class="suppliers-import-result-title">' + response.message + '</strong>';
-                        resultHtml += '</div>';
-                        resultHtml += '<div class="suppliers-import-result-body">';
-                        resultHtml += '<p><strong>✅ تمت الإضافة:</strong> ' + response.added + ' مورد</p>';
-                        if (response.skipped > 0) {
-                            resultHtml += '<p><strong>⭕ تم التخطي:</strong> ' + response.skipped + ' مورد</p>';
-                        }
-                        if (response.errors && response.errors.length > 0) {
-                            resultHtml += '<details class="suppliers-import-result-details">';
-                            resultHtml += '<summary>عرض الأخطاء (' + response.errors.length + ')</summary>';
-                            resultHtml += '<ul>';
-                            response.errors.forEach(function (error) {
-                                resultHtml += '<li>' + error + '</li>';
-                            });
-                            resultHtml += '</ul></details>';
-                        }
-                        resultHtml += '</div>';
-                        resultHtml += '<button type="button" onclick="location.reload()" class="suppliers-import-refresh-btn">تحديث الصفحة</button>';
-                    } else {
-                        resultHtml += ' suppliers-import-result-card-error">';
-                        resultHtml += '<div class="suppliers-import-result-head">';
-                        resultHtml += '<i class="fas fa-exclamation-circle suppliers-import-result-icon"></i>';
-                        resultHtml += '<div><strong class="suppliers-import-result-title">فشل الاستيراد</strong>';
-                        resultHtml += '<p class="suppliers-import-result-error-text">' + response.message + '</p></div>';
-                        resultHtml += '</div>';
-                    }
-
-                    resultHtml += '</div>';
-                    $('#importResult').html(resultHtml).removeClass('suppliers-hidden').hide().fadeIn();
-                },
-                error: function (xhr) {
-                    $('#importProgress').addClass('suppliers-hidden');
-                    let errorMsg = 'حدث خطأ غير متوقع';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMsg = xhr.responseJSON.message;
-                    }
-                    $('#importResult').html(
-                        '<div class="suppliers-import-result-card suppliers-import-result-card-error">' +
-                        '<div class="suppliers-import-result-head">' +
-                        '<i class="fas fa-times-circle suppliers-import-result-icon"></i>' +
-                        '<div><strong class="suppliers-import-result-title">خطأ في الاتصال</strong>' +
-                        '<p class="suppliers-import-result-error-text">' + errorMsg + '</p></div>' +
-                        '</div></div>'
-                    ).removeClass('suppliers-hidden').hide().fadeIn();
-                }
-            });
-        });
 
     })();
 </script>
