@@ -86,6 +86,81 @@ foreach (ems_excel_header_actions('warehouses', 'المخازن', $can_add) as $
 | `foreignKey` | array | `['table'=>..,'column'=>..,'scoped'=>bool]` للتحقق من وجود القيمة |
 | `importable` / `exportable` | bool | إظهار العمود في الاستيراد/التصدير |
 | `exportExpr` | string | تعبير SQL للتصدير (مثل `DATE_FORMAT(...)`) |
+| `lookup` | array | بحث: يحوّل اسماً/كوداً مقروءاً إلى مفتاح أجنبي (انظر أدناه) |
+
+---
+
+## الربط بمفتاح أجنبي عبر الاسم/الكود (`lookup`)
+
+للشاشات المعتمدة على مفاتيح أجنبية (مثل المشاريع المرتبطة بالعملاء)، لا يكفي تخزين
+الاسم النصّي فقط — يجب ربط السجل بالمعرف الحقيقي (`client_id`). خاصية `lookup` تحلّ
+ذلك: يدخل المستخدم **اسم العميل أو كوده**، فيبحث عنه الإطار ويخزّن المعرف في العمود
+المخصّص ويعيد كتابة الاسم القانوني، **ويرفض الصف** إن لم يُعثر على القيمة.
+
+```php
+new Column('client', 'العميل (اسم أو كود)', [
+    'required'   => true,
+    'lookup'     => [
+        'table'      => 'clients',                       // الجدول المرجعي
+        'idColumn'   => 'id',                            // عمود المعرف فيه
+        'storeIdIn'  => 'client_id',                     // عمود قاعدة البيانات لتخزين المعرف
+        'matchBy'    => ['client_code', 'client_name'],  // المطابقة: الكود أولاً ثم الاسم
+        'nameColumn' => 'client_name',                   // الاسم القانوني المُعاد كتابته في client
+        'scoped'     => true,                            // تقييد البحث بنطاق الشركة
+        'softDelete' => 'is_deleted',                    // استبعاد المحذوف ناعماً (اختياري)
+    ],
+    // التصدير يعرض الاسم المرتبط فعلياً (عبر المعرف) مع رجوع للنص المخزّن:
+    'exportExpr' => "COALESCE((SELECT c.client_name FROM clients c WHERE c.id = project.client_id), project.client)",
+]),
+```
+
+كيف يعمل: عند المعاينة يبحث `Validator::resolveLookup()` بترتيب `matchBy`؛ إن وُجد
+يخزّن `storeIdIn` (المعرف) ويصحّح الاسم؛ وإن لم يوجد يُدرَج خطأ «القيمة غير موجودة في
+النظام» ويُستبعد الصف. عند التنفيذ يُدرج `Importer::commit()` عمود `storeIdIn` تلقائياً
+ضمن نفس عبارة الإدراج. الفرق عن `foreignKey`: الأخير يتحقق فقط من وجود قيمة رقمية كما
+هي، بينما `lookup` يقبل اسماً مقروءاً ويحوّله إلى معرف ويربطه.
+
+### حالتان لتركيب `lookup`
+
+1. **عمود نصّي منفصل + عمود معرّف** (مثل `project.client` + `project.client_id`):
+   اجعل `field` = العمود النصّي و`storeIdIn` = عمود المعرّف. يكتب الإطار الاسم القانوني
+   في `field` والمعرف في `storeIdIn`.
+
+2. **عمود المعرّف فقط** (مثل `contracts.project_id`, `operations.equipment` — لا يوجد
+   عمود اسم نصّي منفصل): اجعل `field` = عمود المعرّف نفسه و`storeIdIn` = نفس العمود.
+   في هذه الحالة لا يكتب الإطار الاسم فوق العمود (`field === storeIdIn`)، بل يخزّن المعرف
+   مباشرةً. **أضِف `exportExpr`** يعرض الاسم/الكود المقروء بدل الرقم لضمان دورة
+   تصدير↔استيراد سليمة، مثل:
+   `"(SELECT p.name FROM project p WHERE p.id = contracts.project_id)"`.
+   ولا تضع `'type' => Column::TYPE_INT` ولا `foreignKey` على عمود الحالة 2 — المدخل صار
+   نصاً مقروءاً، وفحص `foreignKey` يسبق `lookup` ويرفض النص.
+
+### الأعمدة المربوطة بـ `lookup` حالياً
+
+| الكيان | العمود (`field`) | الجدول المرجعي | `storeIdIn` | `matchBy` | الحالة |
+|--------|------------------|-----------------|-------------|-----------|--------|
+| `projects` | `client` | `clients` | `client_id` | `client_code`, `client_name` | 1 |
+| `equipments` | `suppliers` | `suppliers` | `suppliers` | `supplier_code`, `name` | 2 |
+| `equipments` | `type` | `equipments_types` | `type` | `type`, `form` | 2 |
+| `contracts` | `project_id` | `project` | `project_id` | `project_code`, `name` | 2 |
+| `supplier_contracts` | `supplier_id` | `suppliers` | `supplier_id` | `supplier_code`, `name` | 2 |
+| `supplier_contracts` | `project_id` | `project` | `project_id` | `project_code`, `name` | 2 |
+| `driver_contracts` | `driver_id` | `drivers` | `driver_id` | `driver_code`, `name` | 2 |
+| `driver_contracts` | `project_id` | `project` | `project_id` | `project_code`, `name` | 2 |
+| `operations` | `equipment` | `equipments` | `equipment` | `code`, `name` | 2 |
+| `operations` | `project_id` | `project` | `project_id` | `project_code`, `name` | 2 |
+| `operations` | `supplier_id` | `suppliers` | `supplier_id` | `supplier_code`, `name` | 2 |
+| `timesheet` | `driver` | `drivers` | `driver` | `driver_code`, `name` | 2 |
+
+> `softDelete => 'is_deleted'` مُفعّل على `project` و`suppliers` و`clients` (تملك العمود)؛
+> أما `drivers` فلا تملك `is_deleted` ولذلك لا يُضبط لها `softDelete`.
+> `scoped => true` لكل جدول يملك `company_id` (clients/suppliers/drivers/project/equipments)؛
+> أما `equipments_types` فلا تملك `company_id` (أنواع عامة) فيُضبط `scoped => false` لبحث النوع.
+
+**أعمدة لم تُربط (لا مفتاح مقروء):** `operations.contract_id` و`timesheet.operator`
+تشيران إلى `contracts.id`/`operations.id` وهما بلا عمود كود/اسم مقروء — تبقى أرقاماً خام.
+و`operations.equipment_category` نص حر (أساسي/احتياطي) و`operations.equipment_type`
+حقل مشتق للعرض — لا يُربطان.
 
 ---
 
@@ -101,7 +176,7 @@ foreach (ems_excel_header_actions('warehouses', 'المخازن', $can_add) as $
 
 **تصدير فقط (سجلّات/تقارير):** `activity_logs` (سجل النشاطات).
 
-كل الكيانات مُدمجة في شاشاتها. الاستيراد مرتبط بصلاحية الإضافة (`can_add`)؛ الكيانات ذات المفاتيح الأجنبية (العقود، الحركات) تتحقّق من وجود المرجع ضمن نطاق الشركة قبل القبول.
+كل الكيانات مُدمجة في شاشاتها. الاستيراد مرتبط بصلاحية الإضافة (`can_add`)؛ الكيانات ذات المفاتيح الأجنبية (العقود، الحركات، ساعات العمل) تقبل **اسماً/كوداً مقروءاً** عبر `lookup` وتحوّله إلى المعرف الصحيح ضمن نطاق الشركة، وترفض الصف إن لم يُعثر على المرجع (انظر جدول «الأعمدة المربوطة بـ `lookup`» أعلاه).
 
 ### وضع التصدير فقط (للتقارير والسجلات)
 
@@ -116,7 +191,7 @@ foreach (ems_excel_header_actions('activity_logs', 'سجل النشاطات', fa
 
 ## الترحيل من النظام القديم
 
-الملفات القديمة (`download_*_template*.php`, `import_*_excel.php`, `export_*_excel.php`) **تبقى كما هي ولا تُحذف** (غير كاسر). لتحويل شاشة، استبدل أزرار Excel القديمة باستدعاء `ems_excel_header_actions()` + `ems_excel_render()` كما في شاشة العملاء. بعد التأكد، يمكن أرشفة الملفات القديمة لاحقاً.
+اكتمل الترحيل: كل الشاشات (العملاء، الموردون، السائقون، المشاريع، المعدات بشاشتيها) تستخدم الآن الإطار الموحّد، وحُذفت كل ملفات النظام القديم (`download_*_template*.php`, `import_*_excel.php`, `export_*_excel.php`) بعد التأكد من عدم وجود أي مرجع لها. لتحويل أي شاشة جديدة، استبدل أزرار Excel باستدعاء `ems_excel_header_actions()` + `ems_excel_render()` (انظر أي شاشة حالية كمرجع) — لا تُنشئ ملفات استيراد/تصدير مستقلة.
 
 ## الأمان والأداء
 

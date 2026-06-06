@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once '../includes/excel_ui.php'; // إطار Excel الموحّد (أزرار + نافذة المعالج)
 
 $equipment_has_machine_number = db_table_has_column($conn, 'equipments', 'machine_number');
 $equipment_has_document_type = db_table_has_column($conn, 'equipments', 'document_type');
@@ -835,9 +836,10 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
     if ($can_add) {
         $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'attrs' => 'onclick="toggleFleetForm(event)"', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة معدة جديدة');
         $header_actions[] =  array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'fleet-toggle-stats-text');
-        $header_actions[] = array('href' => 'download_equipments_template.php', 'class' => 'btn fleet-action-btn fleet-action-btn-excel', 'icon' => 'fas fa-file-excel', 'label' => 'تحميل نموذج Excel');
-        $header_actions[] = array('href' => 'download_equipments_template_csv.php', 'class' => 'btn fleet-action-btn fleet-action-btn-csv', 'icon' => 'fas fa-file-csv', 'label' => 'تحميل نموذج CSV');
-        $header_actions[] = array('id' => 'openImportModal', 'class' => 'btn fleet-action-btn fleet-action-btn-import', 'icon' => 'fas fa-file-import', 'label' => 'استيراد من Excel');
+        // إطار Excel الموحّد: نموذج + تصدير + استيراد متعدد الخطوات (يستبدل الأزرار/النافذة القديمة).
+        foreach (ems_excel_header_actions('equipments', 'المعدات', $can_add) as $a) {
+            $header_actions[] = $a;
+        }
     }
     $header_back = array(
         array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع'),
@@ -2434,188 +2436,8 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
         })();
     </script>
 
-    <!-- ========================================== -->
-    <!-- Modal استيراد من Excel/CSV -->
-    <!-- ========================================== -->
-    <div id="importExcelModal" class="fleet-import-modal">
-        <div class="fleet-import-dialog">
-            <!-- رأس Modal -->
-            <div class="fleet-import-header">
-                <h5 class="fleet-import-title">
-                    <i class="fas fa-file-import fleet-import-title-icon"></i>
-                    استيراد المعدات من Excel/CSV
-                </h5>
-                <button onclick="closeImportModal()" class="fleet-import-close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <!-- جسم Modal -->
-            <div class="fleet-import-body">
-                <form id="importExcelForm" enctype="multipart/form-data">
-                    <!-- منطقة رفع الملف -->
-                    <div class="fleet-import-upload-wrap">
-                        <label class="fleet-import-upload-label">
-                            <i class="fas fa-upload fleet-import-upload-label-icon"></i>
-                            اختر ملف Excel أو CSV
-                        </label>
-                        <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls,.csv" required
-                            class="fleet-import-file-input">
-                    </div>
-
-                    <!-- مؤشر التحميل -->
-                    <div id="importProgress" class="fleet-import-progress fleet-hidden">
-                        <i class="fas fa-spinner fa-spin fleet-import-progress-icon"></i>
-                        <p class="fleet-import-progress-text">جاري معالجة الملف... يرجى الانتظار</p>
-                    </div>
-
-                    <!-- نتيجة الاستيراد -->
-                    <div id="importResult" class="fleet-import-result fleet-hidden"></div>
-
-                    <!-- التعليمات -->
-                    <div class="fleet-import-instructions">
-                        <h6 class="fleet-import-instructions-title">
-                            <i class="fas fa-info-circle"></i> تعليمات الاستيراد:
-                        </h6>
-                        <ul class="fleet-import-instructions-list">
-                            <li>قم بتحميل نموذج Excel أو CSV أولاً</li>
-                            <li>املأ البيانات في النموذج (الحقول المطلوبة: كود المعدة، اسم المورد، نوع المعدة، اسم
-                                المعدة)</li>
-                            <li>تأكد من أن اسم المورد ونوع المعدة موجودان في النظام</li>
-                            <li>احذف الأمثلة قبل رفع الملف</li>
-                            <li>الحد الأقصى لحجم الملف: 5 ميجا بايت</li>
-                            <li>الصيغ المدعومة: .xlsx, .xls, .csv</li>
-                        </ul>
-                    </div>
-
-                    <!-- أزرار التحكم -->
-                    <div class="fleet-import-actions">
-                        <button type="button" onclick="closeImportModal()" class="fleet-import-cancel-btn">
-                            <i class="fas fa-times"></i> إلغاء
-                        </button>
-                        <button type="submit" class="fleet-import-submit-btn">
-                            <i class="fas fa-file-import"></i> رفع واستيراد
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // فتح Modal الاستيراد
-        $('#openImportModal').on('click', function () {
-            $('#importExcelModal').addClass('is-open');
-        });
-
-        // إغلاق Modal الاستيراد
-        function closeImportModal() {
-            $('#importExcelModal').removeClass('is-open');
-            $('#importExcelForm')[0].reset();
-            $('#importProgress').hide();
-            $('#importResult').hide();
-        }
-
-        // إغلاق عند الضغط خارج Modal
-        $(window).on('click', function (e) {
-            if (e.target.id === 'importExcelModal') {
-                closeImportModal();
-            }
-        });
-
-        // معالجة رفع ملف Excel
-        $('#importExcelForm').on('submit', function (e) {
-            e.preventDefault();
-
-            const fileInput = $('#excel_file')[0];
-            if (!fileInput.files.length) {
-                alert('الرجاء اختيار ملف Excel أو CSV');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('excel_file', fileInput.files[0]);
-            formData.append('action', 'import_excel');
-
-            $('#importProgress').show();
-            $('#importResult').hide();
-
-            $.ajax({
-                url: 'import_equipments_excel.php',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                dataType: 'json',
-                success: function (response) {
-                    $('#importProgress').hide();
-
-                    let resultHtml = '<div class="fleet-import-result-card">';
-
-                    if (response.success) {
-                        resultHtml = '<div class="fleet-import-result-card fleet-import-result-success">';
-                        resultHtml += '<h6 class="fleet-import-result-title"><i class="fas fa-check-circle"></i> تم الاستيراد بنجاح!</h6>';
-                        resultHtml += '<p class="fleet-import-result-line">✅ تم إضافة: <strong>' + response.added + '</strong> معدة</p>';
-                        if (response.skipped > 0) {
-                            resultHtml += '<p class="fleet-import-result-line fleet-import-result-warn">⚠️ تم تخطي: <strong>' + response.skipped + '</strong> معدة</p>';
-                        }
-                        if (response.errors.length > 0) {
-                            resultHtml += '<p class="fleet-import-result-errors-label"><strong>الأخطاء:</strong></p><ul class="fleet-import-result-errors-list">';
-                            response.errors.forEach(function (error) {
-                                resultHtml += '<li class="fleet-import-result-error-item">' + error + '</li>';
-                            });
-                            resultHtml += '</ul>';
-                        }
-                        resultHtml += '</div>';
-                        setTimeout(function () { location.reload(); }, 3000);
-                    } else {
-                        resultHtml = '<div class="fleet-import-result-card fleet-import-result-error">';
-                        resultHtml += '<h6 class="fleet-import-result-title"><i class="fas fa-times-circle"></i> فشل الاستيراد</h6>';
-                        resultHtml += '<p class="fleet-import-result-line fleet-import-result-line-zero">' + response.message + '</p>';
-                        if (response.errors && response.errors.length > 0) {
-                            resultHtml += '<ul class="fleet-import-result-errors-list fleet-import-result-errors-list-spaced">';
-                            response.errors.forEach(function (error) {
-                                resultHtml += '<li class="fleet-import-result-error-item">' + error + '</li>';
-                            });
-                            resultHtml += '</ul>';
-                        }
-                        resultHtml += '</div>';
-                    }
-
-                    $('#importResult').html(resultHtml).fadeIn(300);
-                },
-                error: function (xhr, status, error) {
-                    $('#importProgress').hide();
-
-                    let errorMsg = 'حدث خطأ أثناء رفع الملف. الرجاء المحاولة مرة أخرى.';
-
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMsg = xhr.responseJSON.message;
-                    } else if (xhr.responseText) {
-                        try {
-                            const response = JSON.parse(xhr.responseText);
-                            if (response.message) { errorMsg = response.message; }
-                        } catch (e) {
-                            errorMsg += '<br><small>تفاصيل الخطأ: ' + status + '</small>';
-                        }
-                    }
-
-                    const errorHtml = '<div class="fleet-import-result-card fleet-import-result-error">' +
-                        '<h6 class="fleet-import-result-title"><i class="fas fa-times-circle"></i> حدث خطأ</h6>' +
-                        '<p class="fleet-import-result-line fleet-import-result-line-zero">' + errorMsg + '</p>' +
-                        '<p class="fleet-import-result-errors-label fleet-import-result-errors-label-space"><strong>نصائح:</strong></p>' +
-                        '<ul class="fleet-import-result-tips-list">' +
-                        '<li>تأكد من أن الملف بصيغة .xlsx, .xls أو .csv</li>' +
-                        '<li>تأكد من أن حجم الملف أقل من 5 ميجا</li>' +
-                        '<li>تأكد من أن الملف يحتوي على بيانات صحيحة</li>' +
-                        '<li>تأكد من أن أسماء الموردين وأنواع المعدات موجودة في النظام</li>' +
-                        '<li>إذا كنت تستخدم Excel، جرب حفظ الملف كـ CSV</li>' +
-                        '</ul></div>';
-                    $('#importResult').html(errorHtml).fadeIn(300);
-                }
-            });
-        });
-    </script>
+    <!-- استيراد المعدات: نافذة معالج إطار Excel الموحّد (متعددة الخطوات: رفع ← معاينة ← تنفيذ). -->
+    <?php ems_excel_render(); ?>
 
 </div> <!-- closing main div -->
 </body>

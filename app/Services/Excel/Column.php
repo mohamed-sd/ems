@@ -66,6 +66,20 @@ class Column
     public $hint = null;
 
     /**
+     * @var array|null إعداد «بحث/Lookup»: يحوّل قيمة مقروءة (اسم/كود) يدخلها
+     * المستخدم إلى مفتاح أجنبي يُخزَّن في عمود آخر، مع إعادة كتابة الاسم القانوني
+     * في حقل هذا العمود نفسه. مفاتيحه:
+     *   'table'      => اسم الجدول المرجعي (مثل 'clients').
+     *   'idColumn'   => عمود المعرف في الجدول المرجعي (افتراضي 'id').
+     *   'storeIdIn'  => عمود قاعدة البيانات الذي يُخزَّن فيه المعرف (مثل 'client_id').
+     *   'matchBy'    => أعمدة المطابقة بالترتيب (مثل ['client_code','client_name']).
+     *   'nameColumn' => عمود الاسم القانوني المُعاد (مثل 'client_name').
+     *   'scoped'     => bool هل يُقيَّد البحث بنطاق الشركة (company_id)؟
+     *   'softDelete' => string|null عمود الحذف الناعم للاستبعاد (مثل 'is_deleted').
+     */
+    public $lookup = null;
+
+    /**
      * @param string $field
      * @param string $label
      * @param array  $options مفاتيح اختيارية تطابق خصائص الصنف.

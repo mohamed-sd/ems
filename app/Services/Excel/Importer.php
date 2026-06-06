@@ -102,6 +102,13 @@ class Importer
             if (self::columnExists($conn, $def->table, $c->field)) {
                 $fields[] = $c->field;
             }
+            // عمود المفتاح الأجنبي المحلول عبر Lookup (مثل client_id) يُدرَج أيضاً.
+            if (!empty($c->lookup['storeIdIn'])) {
+                $idCol = $c->lookup['storeIdIn'];
+                if (!in_array($idCol, $fields, true) && self::columnExists($conn, $def->table, $idCol)) {
+                    $fields[] = $idCol;
+                }
+            }
         }
 
         $hasCompany = $def->companyScoped && self::columnExists($conn, $def->table, $def->companyColumn);

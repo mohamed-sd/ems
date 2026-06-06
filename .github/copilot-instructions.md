@@ -238,8 +238,6 @@ Pattern for endpoints that handle multiple related actions (see [contract_action
 | [Projects/view_projects.php](Projects/view_projects.php) | Company projects CRUD (JSON API pattern with `action` parameter) with mines count column |
 | [Projects/view_clients.php](Projects/view_clients.php) | Company clients CRUD (JSON API pattern with `action` parameter) |
 | [Projects/project_mines.php](Projects/project_mines.php) | Mines management CRUD - Modal-based forms with DataTables, accessed from projects table |
-| [Projects/import_clients_excel.php](Projects/import_clients_excel.php) | Excel/CSV import handler for bulk client import (requires PHPSpreadsheet via Composer) |
-| [Projects/download_clients_template.php](Projects/download_clients_template.php) | Excel template generator for client import |
 | [Equipments/equipments.php](Equipments/equipments.php) | Equipment-to-driver assignments |
 | [Timesheet/timesheet.php](Timesheet/timesheet.php) | Complex work-hour tracking (dependent dropdowns, AJAX patterns) |
 | [Timesheet/get_drivers.php](Timesheet/get_drivers.php) | AJAX helper for dependent dropdown (returns `<option>` HTML) |

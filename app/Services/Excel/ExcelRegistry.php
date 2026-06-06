@@ -98,34 +98,125 @@ class ExcelRegistry
             new Column('skill_level', 'مستوى المهارة', ['example' => 'خبير']),
             new Column('email', 'البريد الإلكتروني', ['type' => Column::TYPE_EMAIL]),
             new Column('address', 'العنوان', ['width' => 30]),
+            // المورد الذي يعمل معه المشغّل (اختياري) — يُحوّل الاسم/الكود إلى supplier_id.
+            new Column('supplier_id', 'المورد (اسم أو كود)', [
+                'width'      => 24,
+                'example'    => 'مؤسسة المعدات الحديثة',
+                'hint'       => 'اختياري: المورد الذي يعمل معه المشغّل — أدخل اسمه أو كوده (مثل SUP-0001).',
+                'lookup'     => [
+                    'table'      => 'suppliers',
+                    'idColumn'   => 'id',
+                    'storeIdIn'  => 'supplier_id',
+                    'matchBy'    => ['supplier_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'     => true,
+                    'softDelete' => 'is_deleted',
+                ],
+                'exportExpr' => "(SELECT s.name FROM suppliers s WHERE s.id = drivers.supplier_id)",
+            ]),
+            // المشروع المرتبط (اختياري) — يُحوّل الاسم/الكود إلى project_id.
+            new Column('project_id', 'المشروع المرتبط (اسم أو كود)', [
+                'width'      => 24,
+                'example'    => 'مشروع طريق الإنقاذ الغربي',
+                'hint'       => 'اختياري: المشروع المرتبط — أدخل اسمه أو كوده (مثل PRJ-0001).',
+                'lookup'     => [
+                    'table'      => 'project',
+                    'idColumn'   => 'id',
+                    'storeIdIn'  => 'project_id',
+                    'matchBy'    => ['project_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'     => true,
+                    'softDelete' => 'is_deleted',
+                ],
+                'exportExpr' => "(SELECT p.name FROM project p WHERE p.id = drivers.project_id)",
+            ]),
             new Column('driver_status', 'الحالة', ['type' => Column::TYPE_ENUM, 'enum' => ['نشط', 'متوقف'], 'default' => 'نشط', 'width' => 14]),
         ], [
             'moduleCode'      => 'drivers',
             'softDeleteColumn' => null,
             'createdByColumn'  => null,
-            'instructions'    => ['الحقول المطلوبة: اسم السائق + رقم الهاتف.'],
+            'instructions'    => [
+                'الحقول المطلوبة: اسم السائق + رقم الهاتف.',
+                'المورد والمشروع اختياريان — إن أدخلتهما (اسماً أو كوداً) يُربط المشغّل تلقائياً، وإن لم يوجد أيٌّ منهما يُرفض الصف.',
+            ],
         ]);
 
         // ─────────────────────────── المعدات (Equipments) ───────────────────────────
+        // ترتيب الأعمدة مطابق للنموذج القديم (A→AF) لضمان توافق الملفات القديمة موضعياً.
         $defs['equipments'] = new EntityDefinition('equipments', 'المعدات', 'equipments', [
-            new Column('code', 'كود المعدة', ['required' => true, 'unique' => true, 'width' => 18, 'example' => 'EQP-0001']),
-            new Column('name', 'اسم المعدة', ['required' => true, 'width' => 30, 'example' => 'حفار هيدروليكي']),
-            new Column('type', 'النوع', ['required' => true, 'example' => 'حفار']),
-            new Column('manufacturer', 'الصانع', ['example' => 'Caterpillar']),
-            new Column('model', 'الموديل', ['example' => '320D']),
-            new Column('manufacturing_year', 'سنة الصنع', ['type' => Column::TYPE_INT, 'example' => '2019']),
-            new Column('serial_number', 'الرقم التسلسلي', ['width' => 22]),
-            new Column('chassis_number', 'رقم الشاسيه', ['width' => 22]),
-            new Column('equipment_condition', 'الحالة الفنية', ['example' => 'في حالة جيدة']),
-            new Column('current_location', 'الموقع الحالي', ['width' => 25]),
-            new Column('daily_rental_price', 'سعر التأجير اليومي', ['type' => Column::TYPE_FLOAT, 'example' => '1500']),
+            new Column('code', 'كود المعدة', ['required' => true, 'unique' => true, 'width' => 15, 'example' => 'EQP-0001']),
+            new Column('suppliers', 'المورد (اسم أو كود)', [
+                'required'   => true,
+                'width'      => 22,
+                'example'    => 'مؤسسة المعدات الحديثة',
+                'hint'       => 'أدخل اسم المورد كما هو مسجّل أو كوده (مثل SUP-0001).',
+                // بحث/Lookup: يحوّل اسم/كود المورد إلى معرفه ويخزّنه في عمود suppliers.
+                'lookup'     => [
+                    'table'      => 'suppliers',
+                    'idColumn'   => 'id',
+                    'storeIdIn'  => 'suppliers',
+                    'matchBy'    => ['supplier_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'     => true,
+                    'softDelete' => 'is_deleted',
+                ],
+                'exportExpr' => "(SELECT s.name FROM suppliers s WHERE s.id = equipments.suppliers)",
+            ]),
+            new Column('type', 'نوع المعدة (اسم أو كود)', [
+                'required'   => true,
+                'width'      => 18,
+                'example'    => 'حفار',
+                'hint'       => 'أدخل اسم النوع كما هو مسجّل في أنواع المعدات (مثل: حفار) أو رمز الشكل.',
+                // بحث/Lookup: يحوّل اسم النوع إلى معرفه في equipments_types ويخزّنه في عمود type.
+                'lookup'     => [
+                    'table'      => 'equipments_types',
+                    'idColumn'   => 'id',
+                    'storeIdIn'  => 'type',
+                    'matchBy'    => ['type', 'form'],
+                    'nameColumn' => 'type',
+                    'scoped'     => false,
+                ],
+                'exportExpr' => "(SELECT et.type FROM equipments_types et WHERE et.id = equipments.type)",
+            ]),
+            new Column('name', 'اسم المعدة', ['required' => true, 'width' => 22, 'example' => 'حفار كاتربيلر 320']),
+            new Column('serial_number', 'رقم المعدة/التسلسلي', ['width' => 20, 'example' => 'EXC-2024-001']),
+            new Column('chassis_number', 'رقم الهيكل', ['width' => 20, 'example' => 'CAT320-ABC123456']),
+            new Column('manufacturer', 'الماركة/الشركة المصنعة', ['width' => 20, 'example' => 'كاتربيلر']),
+            new Column('model', 'الموديل/الطراز', ['width' => 15, 'example' => '320D']),
+            new Column('manufacturing_year', 'سنة الصنع', ['type' => Column::TYPE_INT, 'width' => 12, 'example' => '2018']),
+            new Column('import_year', 'سنة الاستيراد', ['type' => Column::TYPE_INT, 'width' => 12, 'example' => '2020']),
+            new Column('equipment_condition', 'حالة المعدة', ['width' => 20, 'default' => 'في حالة جيدة', 'example' => 'في حالة جيدة']),
+            new Column('operating_hours', 'ساعات التشغيل', ['type' => Column::TYPE_INT, 'width' => 15, 'example' => '5400']),
+            new Column('engine_condition', 'حالة المحرك', ['width' => 15, 'default' => 'جيدة', 'example' => 'جيدة']),
+            new Column('tires_condition', 'حالة الإطارات', ['width' => 15, 'default' => 'N/A', 'example' => 'N/A']),
+            new Column('actual_owner_name', 'اسم المالك الفعلي', ['width' => 20, 'example' => 'محمد علي أحمد']),
+            new Column('owner_type', 'نوع المالك', ['width' => 18, 'example' => 'مالك فردي']),
+            new Column('owner_phone', 'رقم هاتف المالك', ['width' => 18, 'example' => '+249912345678']),
+            new Column('owner_supplier_relation', 'علاقة المالك بالمورد', ['width' => 25, 'example' => 'تابع للمورد (مملوكة للمورد نفسه)']),
+            new Column('license_number', 'رقم الترخيص', ['width' => 18, 'example' => 'VEH-2024-12345']),
+            new Column('license_authority', 'جهة الترخيص', ['width' => 18, 'example' => 'المرور']),
+            new Column('license_expiry_date', 'تاريخ انتهاء الترخيص', ['type' => Column::TYPE_DATE, 'width' => 18, 'example' => '2025-12-31']),
+            new Column('inspection_certificate_number', 'رقم شهادة الفحص', ['width' => 18, 'example' => 'INS-2024-001']),
+            new Column('last_inspection_date', 'تاريخ آخر فحص', ['type' => Column::TYPE_DATE, 'width' => 15, 'example' => '2024-06-15']),
+            new Column('current_location', 'الموقع الحالي', ['width' => 20, 'example' => 'منجم الذهب الشرقي']),
+            new Column('availability_status', 'حالة التوفر', ['width' => 18, 'default' => 'متاحة للعمل', 'example' => 'متاحة للعمل']),
+            new Column('estimated_value', 'القيمة المقدرة (دولار)', ['type' => Column::TYPE_FLOAT, 'width' => 18, 'example' => '150000']),
+            new Column('daily_rental_price', 'سعر التأجير اليومي (دولار)', ['type' => Column::TYPE_FLOAT, 'width' => 20, 'example' => '500']),
+            new Column('monthly_rental_price', 'سعر التأجير الشهري (دولار)', ['type' => Column::TYPE_FLOAT, 'width' => 20, 'example' => '10000']),
+            new Column('insurance_status', 'التأمين/الضمان', ['width' => 18, 'example' => 'مؤمن بالكامل']),
+            new Column('last_maintenance_date', 'تاريخ آخر صيانة', ['type' => Column::TYPE_DATE, 'width' => 15, 'example' => '2024-05-10']),
+            new Column('general_notes', 'ملاحظات عامة', ['width' => 30, 'example' => 'معدة موثوقة، تحتاج صيانة دورية']),
+            new Column('status', 'الحالة', ['type' => Column::TYPE_INT, 'default' => 1, 'width' => 14, 'example' => '1', 'hint' => '1=نشط، 0=غير نشط']),
         ], [
             'moduleCode'       => 'equipments',
             'softDeleteColumn' => null,
             'createdByColumn'  => null,
             'instructions'     => [
-                'الحقول المطلوبة: كود المعدة + اسم المعدة + النوع.',
-                'ربط المعدة بالمورد يتم لاحقاً من شاشة المعدات.',
+                'الحقول المطلوبة: كود المعدة + المورد + نوع المعدة + اسم المعدة.',
+                'المورد: أدخل اسم المورد كما هو مسجّل أو كوده — سيُربط تلقائياً، وإن لم يوجد يُرفض الصف.',
+                'نوع المعدة: أدخل اسم النوع كما هو مسجّل في «أنواع المعدات» (مثل: حفار).',
+                'كود المعدة يجب أن يكون فريداً. الحالة: 1=نشط، 0=غير نشط.',
+                'احذف صفوف الأمثلة قبل رفع الملف.',
             ],
         ]);
 
@@ -133,7 +224,24 @@ class ExcelRegistry
         $defs['projects'] = new EntityDefinition('projects', 'المشاريع', 'project', [
             new Column('project_code', 'كود المشروع', ['unique' => true, 'width' => 18, 'example' => 'PRJ-0001']),
             new Column('name', 'اسم المشروع', ['required' => true, 'width' => 32, 'example' => 'مشروع طريق الإنقاذ الغربي']),
-            new Column('client', 'العميل', ['required' => true, 'width' => 28, 'example' => 'الهيئة العامة للطرق']),
+            new Column('client', 'العميل (اسم أو كود)', [
+                'required'   => true,
+                'width'      => 28,
+                'example'    => 'شركة بايناتس',
+                'hint'       => 'أدخل اسم العميل كما هو مسجّل أو كود العميل (مثل C001).',
+                // بحث/Lookup: يحوّل الاسم/الكود إلى client_id ويربط المشروع بالعميل.
+                'lookup'     => [
+                    'table'      => 'clients',
+                    'idColumn'   => 'id',
+                    'storeIdIn'  => 'client_id',
+                    'matchBy'    => ['client_code', 'client_name'],
+                    'nameColumn' => 'client_name',
+                    'scoped'     => true,
+                    'softDelete' => 'is_deleted',
+                ],
+                // التصدير يعرض الاسم المرتبط فعلياً (عبر client_id) مع رجوع للنص المخزّن.
+                'exportExpr' => "COALESCE((SELECT c.client_name FROM clients c WHERE c.id = project.client_id), project.client)",
+            ]),
             new Column('location', 'الموقع', ['required' => true, 'width' => 25, 'example' => 'ولاية الخرطوم']),
             new Column('category', 'التصنيف', ['example' => 'بنية تحتية']),
             new Column('state', 'الولاية', ['example' => 'الخرطوم']),
@@ -141,7 +249,11 @@ class ExcelRegistry
             new Column('total', 'القيمة الإجمالية', ['required' => true, 'example' => '1000000']),
         ], [
             'moduleCode'   => 'projects',
-            'instructions' => ['الحقول المطلوبة: اسم المشروع + العميل + الموقع + القيمة الإجمالية.'],
+            'instructions' => [
+                'الحقول المطلوبة: اسم المشروع + العميل + الموقع + القيمة الإجمالية.',
+                'العميل: أدخل اسم العميل كما هو مسجّل في النظام أو كوده (مثل C001). سيُربط المشروع تلقائياً بالعميل.',
+                'إن لم يكن العميل موجوداً مسبقاً في شاشة العملاء، سيُرفض الصف — أضِف العميل أولاً.',
+            ],
         ]);
 
         // ─────────────────────────── أنواع المعدات (Equipment Types) ───────────────────────────
@@ -179,12 +291,57 @@ class ExcelRegistry
 
         // ─────────────────────────── التشغيل/الحركات (Operations) ───────────────────────────
         $defs['operations'] = new EntityDefinition('operations', 'حركات التشغيل', 'operations', [
-            new Column('equipment', 'المعدة', ['required' => true, 'width' => 24, 'example' => 'EQP-0001']),
+            new Column('equipment', 'المعدة (كود أو اسم)', [
+                'required'   => true,
+                'width'      => 24,
+                'example'    => 'EQP-0001',
+                'hint'       => 'أدخل كود المعدة أو اسمها كما هو مسجّل في شاشة المعدات.',
+                // بحث/Lookup: يحوّل كود/اسم المعدة إلى معرفها ويخزّنه في نفس العمود (equipment يخزّن المعرف).
+                'lookup'     => [
+                    'table'     => 'equipments',
+                    'idColumn'  => 'id',
+                    'storeIdIn' => 'equipment',
+                    'matchBy'   => ['code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'    => true,
+                ],
+                'exportExpr' => "(SELECT e.code FROM equipments e WHERE e.id = operations.equipment)",
+            ]),
             new Column('equipment_type', 'نوع المعدة', ['width' => 18, 'example' => 'حفار']),
             new Column('equipment_category', 'فئة المعدة', ['required' => true, 'width' => 16, 'example' => 'أساسي']),
-            new Column('project_id', 'رقم المشروع', ['required' => true, 'width' => 14, 'example' => '12', 'foreignKey' => ['table' => 'project', 'column' => 'id', 'scoped' => true]]),
+            new Column('project_id', 'المشروع (اسم أو كود)', [
+                'required'   => true,
+                'width'      => 24,
+                'example'    => 'مشروع طريق الإنقاذ الغربي',
+                'hint'       => 'أدخل اسم المشروع كما هو مسجّل أو كوده (مثل PRJ-0001).',
+                'lookup'     => [
+                    'table'     => 'project',
+                    'idColumn'  => 'id',
+                    'storeIdIn' => 'project_id',
+                    'matchBy'   => ['project_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'    => true,
+                    'softDelete' => 'is_deleted',
+                ],
+                'exportExpr' => "(SELECT p.name FROM project p WHERE p.id = operations.project_id)",
+            ]),
             new Column('contract_id', 'رقم العقد', ['required' => true, 'width' => 14, 'example' => '5']),
-            new Column('supplier_id', 'رقم المورد', ['required' => true, 'width' => 14, 'example' => '3']),
+            new Column('supplier_id', 'المورد (اسم أو كود)', [
+                'required'   => true,
+                'width'      => 24,
+                'example'    => 'مؤسسة المعدات الحديثة',
+                'hint'       => 'أدخل اسم المورد كما هو مسجّل أو كوده (مثل SUP-0001).',
+                'lookup'     => [
+                    'table'     => 'suppliers',
+                    'idColumn'  => 'id',
+                    'storeIdIn' => 'supplier_id',
+                    'matchBy'   => ['supplier_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'    => true,
+                    'softDelete' => 'is_deleted',
+                ],
+                'exportExpr' => "(SELECT s.name FROM suppliers s WHERE s.id = operations.supplier_id)",
+            ]),
             new Column('start', 'بداية التشغيل', ['required' => true, 'width' => 18, 'example' => '2026-01-01']),
             new Column('end', 'نهاية التشغيل', ['required' => true, 'width' => 18, 'example' => '2026-01-31']),
             new Column('reason', 'البيان', ['required' => true, 'width' => 28, 'example' => 'تشغيل بالمشروع']),
@@ -196,13 +353,32 @@ class ExcelRegistry
             'moduleCode'       => 'Oprators/oprators.php',
             'softDeleteColumn' => null,
             'createdByColumn'  => null,
-            'instructions'     => ['الحقول المطلوبة: المعدة + فئة المعدة + رقم المشروع/العقد/المورد + بداية ونهاية التشغيل + البيان + الأيام.'],
+            'instructions'     => [
+                'المعدة/المشروع/المورد: أدخل الكود أو الاسم المقروء — سيُربط تلقائياً بالسجل الصحيح، وإن لم يوجد يُرفض الصف.',
+                'رقم العقد: أدخل رقم العقد كما يظهر في شاشة العقود (لا يوجد له كود/اسم مقروء بعد).',
+                'الحقول المطلوبة: المعدة + فئة المعدة + المشروع/العقد/المورد + بداية ونهاية التشغيل + البيان + الأيام.',
+            ],
         ]);
 
         // ─────────────────────────── ساعات العمل (Timesheet) ───────────────────────────
         $defs['timesheet'] = new EntityDefinition('timesheet', 'ساعات العمل', 'timesheet', [
             new Column('operator', 'المشغّل', ['required' => true, 'width' => 22, 'example' => 'محمد علي']),
-            new Column('driver', 'المعدة/السائق', ['required' => true, 'width' => 22, 'example' => 'EQP-0001']),
+            new Column('driver', 'السائق (اسم أو كود)', [
+                'required'   => true,
+                'width'      => 22,
+                'example'    => 'محمد أحمد علي',
+                'hint'       => 'أدخل اسم السائق كما هو مسجّل أو كوده (مثل DRV-0001).',
+                // بحث/Lookup: يحوّل اسم/كود السائق إلى معرفه ويخزّنه في نفس العمود (driver يخزّن معرف السائق).
+                'lookup'     => [
+                    'table'     => 'drivers',
+                    'idColumn'  => 'id',
+                    'storeIdIn' => 'driver',
+                    'matchBy'   => ['driver_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'    => true,
+                ],
+                'exportExpr' => "(SELECT d.name FROM drivers d WHERE d.id = timesheet.driver)",
+            ]),
             new Column('shift', 'الوردية', ['required' => true, 'width' => 12, 'example' => 'D']),
             new Column('date', 'التاريخ', ['required' => true, 'width' => 16, 'example' => '2026-01-15']),
             new Column('type', 'نوع الكشف (كود)', ['required' => true, 'width' => 16, 'example' => '1', 'hint' => '1=حفار، 2=قلاب، 3=خرامة']),
@@ -213,12 +389,32 @@ class ExcelRegistry
             'moduleCode'       => 'Timesheet/timesheet.php',
             'softDeleteColumn' => null,
             'createdByColumn'  => 'user_id',
-            'instructions'     => ['الحقول المطلوبة: المشغّل + المعدة + الوردية + التاريخ + نوع الكشف.', 'الورديات: D (نهار) / N (ليل).'],
+            'instructions'     => [
+                'السائق: أدخل اسم السائق كما هو مسجّل أو كوده — سيُربط تلقائياً بمعرف السائق، وإن لم يوجد يُرفض الصف.',
+                'المشغّل: أدخل رقم حركة التشغيل المرتبطة (لا يوجد له اسم/كود مقروء بعد).',
+                'الحقول المطلوبة: المشغّل + السائق + الوردية + التاريخ + نوع الكشف.',
+                'الورديات: D (نهار) / N (ليل).',
+            ],
         ]);
 
         // ─────────────────────────── عقود المشاريع (Contracts) ───────────────────────────
         $defs['contracts'] = new EntityDefinition('contracts', 'عقود المشاريع', 'contracts', [
-            new Column('project_id', 'رقم المشروع', ['type' => Column::TYPE_INT, 'required' => true, 'width' => 14, 'example' => '12', 'foreignKey' => ['table' => 'project', 'column' => 'id', 'scoped' => true]]),
+            new Column('project_id', 'المشروع (اسم أو كود)', [
+                'required'   => true,
+                'width'      => 24,
+                'example'    => 'مشروع طريق الإنقاذ الغربي',
+                'hint'       => 'أدخل اسم المشروع كما هو مسجّل أو كوده (مثل PRJ-0001).',
+                'lookup'     => [
+                    'table'     => 'project',
+                    'idColumn'  => 'id',
+                    'storeIdIn' => 'project_id',
+                    'matchBy'   => ['project_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'    => true,
+                    'softDelete' => 'is_deleted',
+                ],
+                'exportExpr' => "(SELECT p.name FROM project p WHERE p.id = contracts.project_id)",
+            ]),
             new Column('contract_signing_date', 'تاريخ توقيع العقد', ['type' => Column::TYPE_DATE, 'required' => true, 'width' => 18, 'example' => '2026-01-01']),
             new Column('contract_duration_months', 'مدة العقد (أشهر)', ['type' => Column::TYPE_INT, 'width' => 14, 'example' => '12']),
             new Column('contract_duration_days', 'مدة العقد (أيام)', ['type' => Column::TYPE_INT, 'width' => 14, 'example' => '365']),
@@ -229,13 +425,46 @@ class ExcelRegistry
             new Column('created_at', 'تاريخ الإنشاء', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
         ], [
             'moduleCode'   => 'Contracts/contracts.php',
-            'instructions' => ['الحقول المطلوبة: رقم المشروع + تاريخ توقيع العقد.', 'رقم المشروع يجب أن يكون موجوداً مسبقاً في النظام.'],
+            'instructions' => [
+                'الحقول المطلوبة: المشروع + تاريخ توقيع العقد.',
+                'المشروع: أدخل اسم المشروع كما هو مسجّل أو كوده — سيُربط العقد تلقائياً بالمشروع، وإن لم يوجد يُرفض الصف.',
+            ],
         ]);
 
         // ─────────────────────────── عقود الموردين (Supplier Contracts) ───────────────────────────
         $defs['supplier_contracts'] = new EntityDefinition('supplier_contracts', 'عقود الموردين', 'supplierscontracts', [
-            new Column('supplier_id', 'رقم المورد', ['type' => Column::TYPE_INT, 'required' => true, 'width' => 14, 'example' => '3', 'foreignKey' => ['table' => 'suppliers', 'column' => 'id', 'scoped' => true]]),
-            new Column('project_id', 'رقم المشروع', ['type' => Column::TYPE_INT, 'required' => true, 'width' => 14, 'example' => '12', 'foreignKey' => ['table' => 'project', 'column' => 'id', 'scoped' => true]]),
+            new Column('supplier_id', 'المورد (اسم أو كود)', [
+                'required'   => true,
+                'width'      => 24,
+                'example'    => 'مؤسسة المعدات الحديثة',
+                'hint'       => 'أدخل اسم المورد كما هو مسجّل أو كوده (مثل SUP-0001).',
+                'lookup'     => [
+                    'table'     => 'suppliers',
+                    'idColumn'  => 'id',
+                    'storeIdIn' => 'supplier_id',
+                    'matchBy'   => ['supplier_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'    => true,
+                    'softDelete' => 'is_deleted',
+                ],
+                'exportExpr' => "(SELECT s.name FROM suppliers s WHERE s.id = supplierscontracts.supplier_id)",
+            ]),
+            new Column('project_id', 'المشروع (اسم أو كود)', [
+                'required'   => true,
+                'width'      => 24,
+                'example'    => 'مشروع طريق الإنقاذ الغربي',
+                'hint'       => 'أدخل اسم المشروع كما هو مسجّل أو كوده (مثل PRJ-0001).',
+                'lookup'     => [
+                    'table'     => 'project',
+                    'idColumn'  => 'id',
+                    'storeIdIn' => 'project_id',
+                    'matchBy'   => ['project_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'    => true,
+                    'softDelete' => 'is_deleted',
+                ],
+                'exportExpr' => "(SELECT p.name FROM project p WHERE p.id = supplierscontracts.project_id)",
+            ]),
             new Column('contract_signing_date', 'تاريخ توقيع العقد', ['type' => Column::TYPE_DATE, 'required' => true, 'width' => 18, 'example' => '2026-01-01']),
             new Column('equip_type', 'نوع المعدة', ['width' => 18]),
             new Column('first_party', 'الطرف الأول', ['width' => 26]),
@@ -245,13 +474,45 @@ class ExcelRegistry
             'moduleCode'       => 'Suppliers/supplierscontracts.php',
             'softDeleteColumn' => null,
             'createdByColumn'  => null,
-            'instructions'     => ['الحقول المطلوبة: رقم المورد + رقم المشروع + تاريخ توقيع العقد.', 'رقم المورد ورقم المشروع يجب أن يكونا موجودين مسبقاً.'],
+            'instructions'     => [
+                'الحقول المطلوبة: المورد + المشروع + تاريخ توقيع العقد.',
+                'المورد والمشروع: أدخل الاسم أو الكود المقروء — سيُربط العقد تلقائياً، وإن لم يوجد أيٌّ منهما يُرفض الصف.',
+            ],
         ]);
 
         // ─────────────────────────── عقود السائقين (Driver Contracts) ───────────────────────────
         $defs['driver_contracts'] = new EntityDefinition('driver_contracts', 'عقود السائقين', 'drivercontracts', [
-            new Column('driver_id', 'رقم السائق', ['type' => Column::TYPE_INT, 'required' => true, 'width' => 14, 'example' => '7', 'foreignKey' => ['table' => 'drivers', 'column' => 'id', 'scoped' => true]]),
-            new Column('project_id', 'رقم المشروع', ['type' => Column::TYPE_INT, 'required' => true, 'width' => 14, 'example' => '12', 'foreignKey' => ['table' => 'project', 'column' => 'id', 'scoped' => true]]),
+            new Column('driver_id', 'السائق (اسم أو كود)', [
+                'required'   => true,
+                'width'      => 24,
+                'example'    => 'محمد أحمد علي',
+                'hint'       => 'أدخل اسم السائق كما هو مسجّل أو كوده (مثل DRV-0001).',
+                'lookup'     => [
+                    'table'     => 'drivers',
+                    'idColumn'  => 'id',
+                    'storeIdIn' => 'driver_id',
+                    'matchBy'   => ['driver_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'    => true,
+                ],
+                'exportExpr' => "(SELECT d.name FROM drivers d WHERE d.id = drivercontracts.driver_id)",
+            ]),
+            new Column('project_id', 'المشروع (اسم أو كود)', [
+                'required'   => true,
+                'width'      => 24,
+                'example'    => 'مشروع طريق الإنقاذ الغربي',
+                'hint'       => 'أدخل اسم المشروع كما هو مسجّل أو كوده (مثل PRJ-0001).',
+                'lookup'     => [
+                    'table'     => 'project',
+                    'idColumn'  => 'id',
+                    'storeIdIn' => 'project_id',
+                    'matchBy'   => ['project_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'    => true,
+                    'softDelete' => 'is_deleted',
+                ],
+                'exportExpr' => "(SELECT p.name FROM project p WHERE p.id = drivercontracts.project_id)",
+            ]),
             new Column('contract_signing_date', 'تاريخ توقيع العقد', ['type' => Column::TYPE_DATE, 'required' => true, 'width' => 18, 'example' => '2026-01-01']),
             new Column('first_party', 'الطرف الأول', ['width' => 26]),
             new Column('second_party', 'الطرف الثاني', ['width' => 26]),
@@ -260,7 +521,10 @@ class ExcelRegistry
             'moduleCode'       => 'Drivers/drivercontracts.php',
             'softDeleteColumn' => null,
             'createdByColumn'  => null,
-            'instructions'     => ['الحقول المطلوبة: رقم السائق + رقم المشروع + تاريخ توقيع العقد.'],
+            'instructions'     => [
+                'الحقول المطلوبة: السائق + المشروع + تاريخ توقيع العقد.',
+                'السائق والمشروع: أدخل الاسم أو الكود المقروء — سيُربط العقد تلقائياً، وإن لم يوجد أيٌّ منهما يُرفض الصف.',
+            ],
         ]);
 
         // ─────────────────────────── سجل النشاطات (Activity Logs — تصدير فقط) ───────────────────────────

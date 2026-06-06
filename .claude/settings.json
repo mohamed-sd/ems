@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/app/Services/Excel/ExcelRegistry.php\")",
+      "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/app/Services/Excel/Validator.php\")",
+      "Bash(\"/c/xampp/php/php.exe\" \"/c/xampp/htdocs/ems/_lookup_verify.php\")",
+      "Bash(\"/c/xampp/php/php.exe\" \"/c/xampp/htdocs/ems/_export_verify.php\")",
+      "Bash(cd \"/c/xampp/htdocs/ems\" && wc -l \"Equipments/equipments_fleet.php\")",
+      "Read(//c/c/xampp/htdocs/ems/Equipments/**)",
+      "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Equipments/equipments_fleet.php\")",
+      "Bash(\"/c/xampp/php/php.exe\" \"/c/xampp/htdocs/ems/_equip_verify.php\")",
+      "Bash(cd \"/c/xampp/htdocs/ems\" && wc -l \"Drivers/drivers.php\")",
+      "Read(//c/c/xampp/htdocs/ems/Drivers/**)",
+      "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Drivers/drivers.php\")",
+      "Bash(\"/c/xampp/php/php.exe\" \"/c/xampp/htdocs/ems/_drivers_verify.php\")",
+      "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Clients/clients.php\")",
+      "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Suppliers/suppliers.php\")",
+      "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Projects/projects.php\")",
+      "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Equipments/equipments.php\")"
+    ]
+  }
+}
