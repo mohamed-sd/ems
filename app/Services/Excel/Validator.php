@@ -108,6 +108,22 @@ class Validator
                     if ($c->foreignKey && !self::fkExists($conn, $c, (string) $data[$c->field], $companyId)) {
                         $errors[] = self::err($rowNum, $c->label, "القيمة «{$data[$c->field]}» غير موجودة في الجدول المرتبط", 'تأكد من إدخال قيمة موجودة مسبقاً');
                     }
+                    // بحث/Lookup: تحويل الاسم/الكود إلى مفتاح أجنبي.
+                    if ($c->lookup) {
+                        $resolved = self::resolveLookup($conn, $c->lookup, (string) $data[$c->field], $companyId);
+                        if ($resolved === null) {
+                            $errors[] = self::err($rowNum, $c->label, "القيمة «{$data[$c->field]}» غير موجودة في النظام", 'أدخل اسماً أو كوداً موجوداً مسبقاً، أو أضِف السجل أولاً');
+                        } else {
+                            $storeIdIn = $c->lookup['storeIdIn'];
+                            // الحالة 1 (عمود نصّي منفصل): أعِد كتابة الاسم القانوني في عمود العرض.
+                            // الحالة 2 (نفس العمود يحمل المعرف): لا تكتب الاسم فوقه — المعرف هو القيمة المخزّنة.
+                            if ($c->field !== $storeIdIn) {
+                                $data[$c->field] = $resolved['name'];
+                            }
+                            // تخزين المعرف في عموده (يفوز دائماً في الحالة 2).
+                            $data[$storeIdIn] = $resolved['id'];
+                        }
+                    }
                 }
             }
 
@@ -261,5 +277,74 @@ class Validator
         $exists = mysqli_stmt_num_rows($stmt) > 0;
         mysqli_stmt_close($stmt);
         return $exists;
+    }
+
+    /**
+     * يحلّ قيمة مقروءة (اسم/كود) إلى مفتاح أجنبي.
+     * يجرّب أعمدة المطابقة بالترتيب (الكود أولاً ثم الاسم عادةً) ويعيد أول تطابق.
+     *
+     * @return array{id:mixed,name:string}|null عند عدم العثور.
+     */
+    private static function resolveLookup(\mysqli $conn, array $lookup, string $value, int $companyId): ?array
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return null;
+        }
+
+        $table    = preg_replace('/[^a-zA-Z0-9_]/', '', (string) ($lookup['table'] ?? ''));
+        $idCol    = preg_replace('/[^a-zA-Z0-9_]/', '', (string) ($lookup['idColumn'] ?? 'id'));
+        $nameCol  = preg_replace('/[^a-zA-Z0-9_]/', '', (string) ($lookup['nameColumn'] ?? 'name'));
+        $matchBy  = $lookup['matchBy'] ?? [];
+        if ($table === '' || empty($matchBy)) {
+            return null;
+        }
+
+        $scoped     = !empty($lookup['scoped']);
+        $softDelete = isset($lookup['softDelete']) ? (string) $lookup['softDelete'] : null;
+
+        $useCompany = $scoped
+            && function_exists('db_table_has_column')
+            && db_table_has_column($conn, $table, 'company_id');
+        $useSoftDelete = $softDelete
+            && function_exists('db_table_has_column')
+            && db_table_has_column($conn, $table, $softDelete);
+        $softDeleteCol = $useSoftDelete ? preg_replace('/[^a-zA-Z0-9_]/', '', $softDelete) : null;
+
+        foreach ($matchBy as $rawCol) {
+            $matchCol = preg_replace('/[^a-zA-Z0-9_]/', '', (string) $rawCol);
+            if ($matchCol === '') {
+                continue;
+            }
+
+            $sql = "SELECT `{$idCol}` AS lk_id, `{$nameCol}` AS lk_name FROM `{$table}` WHERE `{$matchCol}` = ?";
+            $types = 's';
+            $params = [$value];
+            if ($useCompany) {
+                $sql .= ' AND `company_id` = ?';
+                $types .= 'i';
+                $params[] = $companyId;
+            }
+            if ($softDeleteCol) {
+                $sql .= " AND `{$softDeleteCol}` = 0";
+            }
+            $sql .= ' LIMIT 1';
+
+            $stmt = mysqli_prepare($conn, $sql);
+            if (!$stmt) {
+                continue;
+            }
+            mysqli_stmt_bind_param($stmt, $types, ...$params);
+            mysqli_stmt_execute($stmt);
+            $res = mysqli_stmt_get_result($stmt);
+            $row = $res ? mysqli_fetch_assoc($res) : null;
+            mysqli_stmt_close($stmt);
+
+            if ($row) {
+                return ['id' => $row['lk_id'], 'name' => (string) $row['lk_name']];
+            }
+        }
+
+        return null;
     }
 }

@@ -1,1 +1,0 @@
-ALTER TABLE timesheet ADD COLUMN transport_type VARCHAR(50) NULL AFTER trips_count;
