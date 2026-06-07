@@ -9,6 +9,15 @@ if (isset($_SESSION['user']) && isset($conn)) {
   enforce_current_page_view_permission($conn, '../main/dashboard.php');
 }
 ?>
+<?php
+// Match inheader.php cache-busting so the dedup check below recognises the
+// already-loaded versioned stylesheets (avoids appending a stale duplicate).
+$__sb_css_dir = __DIR__ . '/assets/css/';
+$__sb_ver = function ($f) use ($__sb_css_dir) {
+    $p = $__sb_css_dir . $f;
+    return is_file($p) ? ('?v=' . filemtime($p)) : '';
+};
+?>
 <script>
   (function () {
     var head = document.head || document.getElementsByTagName('head')[0];
@@ -17,8 +26,8 @@ if (isset($_SESSION['user']) && isset($conn)) {
     var cssFiles = [
       '/ems/assets/css/local-fonts.css',
       '/ems/assets/css/design-tokens.css',
-      '/ems/assets/css/alltables.css',
-      '/ems/assets/css/ems.main.all.style.css'
+      '/ems/assets/css/alltables.css<?php echo $__sb_ver('alltables.css'); ?>',
+      '/ems/assets/css/ems.main.all.style.css<?php echo $__sb_ver('ems.main.all.style.css'); ?>'
     ];
 
     cssFiles.forEach(function (href) {
@@ -45,6 +54,10 @@ if (isset($_SESSION['user']) && isset($conn)) {
     }
   })();
 </script>
+
+<!-- الهيدر/التوببار المشترك (مكوّن واحد لكل الصفحات التي بها Sidebar) -->
+<?php require_once __DIR__ . '/includes/topbar.php'; ?>
+
 <!-- زر القائمة في الموبايل -->
 <button class="mobile-menu-btn" id="mobileMenuBtn">
   <i class="fa fa-bars"></i>
@@ -311,10 +324,10 @@ if (isset($_SESSION['user']) && isset($conn)) {
   </div>
 
   <!-- زر تسجيل الخروج -->
-  <a href="../logout.php" class="logout">
+  <!-- <a href="../logout.php" class="logout">
     <i class="fa fa-sign-out-alt"></i>
     <span>تسجيل الخروج</span>
-  </a>
+  </a> -->
 </div>
 
 <script>

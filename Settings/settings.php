@@ -16,18 +16,16 @@ if (!$perms['can_view']) {
     exit();
 }
 
+$settings_role   = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+$settings_is_admin = ($settings_role === '-1');
+$settings_user_name = isset($_SESSION['user']['name']) ? $_SESSION['user']['name'] : '';
+
 $page_title = "الإعدادات";
 include("../inheader.php");
 include('../insidebar.php');
 ?>
 
-<link rel="stylesheet" href="../assets/css/admin-style.css">
-<link rel="stylesheet" href="../assets/css/main_admin_style.css">
-<link rel="stylesheet" href="/ems/assets/css/all.min.css">
-<link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-
 <style>
-    /* ── الهيكل العام ── */
     .settings-shell {
         display: grid;
         gap: 18px;
@@ -36,35 +34,34 @@ include('../insidebar.php');
     /* ── بطاقة الترحيب العلوية ── */
     .settings-hero {
         position: relative;
-        background: linear-gradient(135deg, var(--s0), #2d200a);
-        border: 1px solid rgba(247, 147, 26, 0.35);
-        border-radius: var(--rl);
-        padding: 22px;
+        background:  #ccc;
+        border: 1px solid rgba(244, 197, 66, 0.32);
+        border-radius: var(--rl, 14px);
+        padding: 26px;
         color: #fff;
         box-shadow: var(--sh2);
         overflow: hidden;
     }
 
-    /* نقاط الخلفية الزخرفية */
     .settings-hero::before {
         content: "";
         position: absolute;
         inset: 0;
-        background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+        background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
         background-size: 18px 18px;
         pointer-events: none;
     }
 
-    /* دائرة ذهبية زخرفية */
     .settings-hero::after {
         content: "";
         position: absolute;
-        left: -30px;
-        top: -40px;
-        width: 190px;
-        height: 190px;
+        left: -40px;
+        top: -50px;
+        width: 210px;
+        height: 210px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(232, 184, 0, 0.35) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(244, 197, 66, 0.35) 0%, transparent 70%);
+        pointer-events: none;
     }
 
     .settings-hero-content {
@@ -74,25 +71,25 @@ include('../insidebar.php');
         gap: 8px;
     }
 
-    /* شارة التصنيف */
     .settings-kicker {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         width: fit-content;
-        padding: 4px 12px;
+        padding: 5px 13px;
         border-radius: 999px;
-        background: rgba(232, 184, 0, 0.16);
-        border: 1px solid rgba(232, 184, 0, 0.36);
+        background: rgba(244, 197, 66, 0.18);
+        border: 1px solid rgba(244, 197, 66, 0.4);
         color: #ffe7b5;
-        font-size: 0.72rem;
-        font-weight: 700;
+        font-size: 0.74rem;
+        font-weight: 800;
     }
 
     .settings-hero h2 {
         margin: 0;
-        font-size: 1.45rem;
+        font-size: 1.5rem;
         font-weight: 900;
+        color: #fff;
     }
 
     .settings-hero p {
@@ -100,13 +97,14 @@ include('../insidebar.php');
         font-size: 0.9rem;
         color: rgba(255, 247, 230, 0.9);
         max-width: 760px;
+        line-height: 1.7;
     }
 
     /* ── قسم الإعدادات ── */
     .settings-section {
-        background: var(--s1);
-        border: 1.5px solid var(--bdr);
-        border-radius: var(--rl);
+        background: var(--s1, #fff);
+        border: 1.5px solid var(--bdr, #D7DBE0);
+        border-radius: var(--rl, 14px);
         padding: 18px;
         box-shadow: var(--sh);
         display: grid;
@@ -116,32 +114,39 @@ include('../insidebar.php');
     .settings-section-title {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 9px;
         margin: 0;
-        color: var(--t1);
-        font-size: 1rem;
+        color: var(--t1, #111);
+        font-size: 1.02rem;
         font-weight: 800;
     }
 
     .settings-section-title i {
-        color: var(--or);
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(244, 197, 66, 0.16);
+        color: #b8860b;
+        font-size: .92rem;
     }
 
     /* ── شبكة البطاقات ── */
     .settings-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
         gap: 14px;
     }
 
-    /* بطاقة إعداد واحدة */
     .settings-card {
         display: flex;
         align-items: flex-start;
         gap: 12px;
         padding: 16px;
-        background: linear-gradient(180deg, var(--s1) 0%, #fffbf5 100%);
-        border: 1.5px solid var(--bdr);
+        background: linear-gradient(180deg, var(--s1, #fff) 0%, #fffdf8 100%);
+        border: 1.5px solid var(--bdr, #D7DBE0);
         border-radius: 14px;
         text-decoration: none;
         transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
@@ -149,15 +154,14 @@ include('../insidebar.php');
         overflow: hidden;
     }
 
-    /* شريط ذهبي عند التحويم */
     .settings-card::before {
         content: "";
         position: absolute;
-        left: 0;
+        right: 0;
         top: 0;
         bottom: 0;
         width: 4px;
-        background: linear-gradient(180deg, var(--or), var(--or2));
+        background: linear-gradient(180deg, var(--primary-yellow, #F4C542), #D9AB32);
         opacity: 0;
         transition: opacity .2s ease;
     }
@@ -165,55 +169,52 @@ include('../insidebar.php');
     .settings-card:hover {
         transform: translateY(-3px);
         box-shadow: var(--sh2);
-        border-color: rgba(247, 147, 26, 0.45);
+        border-color: rgba(244, 197, 66, 0.5);
     }
 
     .settings-card:hover::before {
         opacity: 1;
     }
 
-    /* أيقونة البطاقة */
     .settings-icon {
-        width: 44px;
-        height: 44px;
+        width: 46px;
+        height: 46px;
         border-radius: 12px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 1rem;
+        font-size: 1.05rem;
         flex-shrink: 0;
     }
 
     .settings-icon.account {
-        background: rgba(247, 147, 26, 0.16);
-        color: var(--or2);
+        background: rgba(244, 197, 66, 0.18);
+        color: #b8860b;
     }
 
     .settings-icon.admin {
-        background: rgba(26, 18, 8, 0.09);
-        color: var(--s0);
+        background: rgba(30, 58, 95, 0.1);
+        color: #1E3A5F;
     }
 
-    /* نص البطاقة */
     .settings-meta h4 {
         margin: 0 0 4px;
-        font-size: 0.95rem;
+        font-size: 0.96rem;
         font-weight: 800;
-        color: var(--t1);
+        color: var(--t1, #111);
     }
 
     .settings-meta p {
         margin: 0;
         font-size: 0.8rem;
         font-weight: 700;
-        color: var(--t2);
+        color: var(--t3, #666E78);
         line-height: 1.7;
     }
 
-    /* سهم التنقل */
     .settings-card-arrow {
-        margin-right: auto;
-        color: var(--t3);
+        margin-left: auto;
+        color: var(--t3, #9aa0a8);
         font-size: 0.9rem;
         align-self: center;
         transition: transform .2s ease, color .2s ease;
@@ -221,13 +222,12 @@ include('../insidebar.php');
 
     .settings-card:hover .settings-card-arrow {
         transform: translateX(-4px);
-        color: var(--t1);
+        color: var(--t1, #111);
     }
 
-    /* ── استجابة الشاشات الصغيرة ── */
     @media (max-width: 768px) {
         .settings-hero {
-            padding: 18px;
+            padding: 20px;
         }
 
         .settings-hero h2 {
@@ -242,13 +242,11 @@ include('../insidebar.php');
 
 <div class="main ems-unified-page-shell settings-main">
 
-
     <?php
-    // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     $header_title   = 'الإعدادات';
     $header_icon    = 'fas fa-gear';
     $header_actions = array();
-    $header_back    = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
 
@@ -260,9 +258,8 @@ include('../insidebar.php');
                 <span class="settings-kicker">
                     <i class="fas fa-shield-halved"></i> مركز التحكم
                 </span>
-                <h2 style="color: #fff;">إدارة إعدادات الحساب والنظام</h2>
-                <p>اختر القسم المطلوب لإدارة كلمة المرور أو إعدادات الصلاحيات والموديولات بنفس تصميم صفحات الإدارة داخل
-                    النظام.</p>
+                <h2>إدارة إعدادات الحساب والنظام</h2>
+                <p>اختر القسم المطلوب لإدارة حسابك الشخصي أو إعدادات النظام والصلاحيات، بنفس هوية وتصميم بقية صفحات النظام.</p>
             </div>
         </div>
 
@@ -272,6 +269,14 @@ include('../insidebar.php');
                 <i class="fas fa-user-cog"></i> إعدادات الحساب
             </h3>
             <div class="settings-grid">
+                <a href="../main/profile.php" class="settings-card">
+                    <div class="settings-icon account"><i class="fas fa-id-badge"></i></div>
+                    <div class="settings-meta">
+                        <h4>الملف الشخصي</h4>
+                        <p>استعراض بياناتك الشخصية ومعلومات حسابك في النظام.</p>
+                    </div>
+                    <i class="fas fa-arrow-left settings-card-arrow"></i>
+                </a>
                 <a href="change_password.php" class="settings-card">
                     <div class="settings-icon account"><i class="fas fa-key"></i></div>
                     <div class="settings-meta">
@@ -283,5 +288,44 @@ include('../insidebar.php');
             </div>
         </div>
 
+        <?php if ($settings_is_admin): ?>
+        <!-- قسم إدارة النظام (للإدارة العليا) -->
+        <div class="settings-section">
+            <h3 class="settings-section-title">
+                <i class="fas fa-sliders"></i> إدارة النظام والصلاحيات
+            </h3>
+            <div class="settings-grid">
+                <a href="role_permissions.php" class="settings-card">
+                    <div class="settings-icon admin"><i class="fas fa-user-lock"></i></div>
+                    <div class="settings-meta">
+                        <h4>صلاحيات الأدوار</h4>
+                        <p>التحكم في صلاحيات العرض والإضافة والتعديل والحذف لكل دور.</p>
+                    </div>
+                    <i class="fas fa-arrow-left settings-card-arrow"></i>
+                </a>
+                <a href="roles.php" class="settings-card">
+                    <div class="settings-icon admin"><i class="fas fa-users-gear"></i></div>
+                    <div class="settings-meta">
+                        <h4>إدارة الأدوار</h4>
+                        <p>إنشاء وتعديل الأدوار الوظيفية ومستوياتها داخل النظام.</p>
+                    </div>
+                    <i class="fas fa-arrow-left settings-card-arrow"></i>
+                </a>
+                <a href="modules.php" class="settings-card">
+                    <div class="settings-icon admin"><i class="fas fa-table-cells-large"></i></div>
+                    <div class="settings-meta">
+                        <h4>الصفحات والموديولات</h4>
+                        <p>إدارة صفحات النظام والموديولات المتاحة وربطها بالقوائم.</p>
+                    </div>
+                    <i class="fas fa-arrow-left settings-card-arrow"></i>
+                </a>
+            </div>
+        </div>
+        <?php endif; ?>
+
     </div>
 </div>
+
+</body>
+
+</html>

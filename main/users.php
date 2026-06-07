@@ -371,9 +371,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     </form>
 
     <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-list"></i> قائمة المستخدمين</h5>
-        </div>
         <div class="card-body">
             <div class="users-table-actions-row">
                 <div class="users-table-note">عرض وإدارة المستخدمين مع التصدير السريع من الشريط العلوي</div>

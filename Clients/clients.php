@@ -402,7 +402,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
 
         if (mysqli_query($conn, $update_query)) {
             \App\Services\ActivityLogService::logUpdate(
-                'clients', 'clients',
+                'clients',
+                'clients',
                 $client_id,
                 null,
                 ['client_code' => $client_code_raw, 'client_name' => trim($_POST['client_name'])]
@@ -440,7 +441,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
         if (mysqli_query($conn, $insert_query)) {
             $new_client_id = (int) mysqli_insert_id($conn);
             \App\Services\ActivityLogService::logCreate(
-                'clients', 'clients',
+                'clients',
+                'clients',
                 $new_client_id,
                 ['client_code' => $client_code_raw, 'client_name' => trim($_POST['client_name'])]
             );
@@ -501,7 +503,8 @@ if (isset($_GET['delete_id'])) {
 
     if (mysqli_query($conn, $soft_delete_query)) {
         \App\Services\ActivityLogService::logDelete(
-            'clients', 'clients',
+            'clients',
+            'clients',
             $delete_id
         );
         clients_redirect_with_msg('تم حذف العميل بنجاح ✅');
@@ -716,7 +719,7 @@ include('../insidebar.php');
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     $header_title = 'إدارة العملاء';
-    $header_icon  = 'fas fa-users';
+    $header_icon = 'fas fa-users';
     $header_actions = array();
     if ($can_add) {
         $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fa fa-solid fa-plus', 'label' => '', 'label_class' => 'clients-toggle-form-text');
@@ -916,22 +919,25 @@ include('../insidebar.php');
         </div>
     </form>
 
-    <div class="card" style="padding : 15px;">
-
+    <div class="card">
+        <div class="card-body">
             <div class="row clients-filter-row">
-                <div class="col-md-4 col-sm-6 clients-filter-col">
-                    <label for="filterEntityType" class="clients-filter-label">فلتر نوع الكيان</label>
-                    <select id="filterEntityType" class="form-control">
-                        <option value="">الكل</option>
+                <div class="col-md-3 col-sm-6 clients-filter-col">
+                    <select id="filterEntityType" class="form-control" placeholder="">
+                        <option value="">-- حدد نوع الكيان --</option>
                     </select>
                 </div>
-                <div class="col-md-4 col-sm-6 clients-filter-col">
-                    <label for="filterSectorCategory" class="clients-filter-label">فلتر تصنيف القطاع</label>
+                <div class="col-md-3 col-sm-6 clients-filter-col">
                     <select id="filterSectorCategory" class="form-control">
-                        <option value="">الكل</option>
+                        <option value=""> -- حدد تصنيف القطاع -- </option>
                     </select>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
             <div class="table-container">
                 <table id="clientsTable" class="display clients-table-nowrap">
                     <thead>
@@ -1034,6 +1040,7 @@ include('../insidebar.php');
                     </tbody>
                 </table>
             </div>
+        </div>
     </div>
 </div>
 
@@ -1380,10 +1387,10 @@ include('../insidebar.php');
 
         const actions = [];
         <?php if ($can_edit): ?>
-        actions.push({
-            label: 'تعديل البيانات', icon: 'fas fa-edit', variant: 'primary',
-            onClick: function () { EmsDetailsModal.close(); fillClientForm(c); }
-        });
+            actions.push({
+                label: 'تعديل البيانات', icon: 'fas fa-edit', variant: 'primary',
+                onClick: function () { EmsDetailsModal.close(); fillClientForm(c); }
+            });
         <?php endif; ?>
         actions.push({ label: 'إغلاق', icon: 'fas fa-times', variant: 'secondary', close: true });
 
@@ -1402,7 +1409,7 @@ include('../insidebar.php');
                 { label: 'الحالة', value: c.status, icon: 'fas fa-toggle-on', type: 'status', tone: statusTone },
                 { label: 'أضيف بواسطة', value: c.created, icon: 'fas fa-user-plus' }
             ],
-            sections: [ buildClientProjectsSection([], true) ],
+            sections: [buildClientProjectsSection([], true)],
             actions: actions
         });
 

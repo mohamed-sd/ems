@@ -1516,9 +1516,9 @@ table.dataTable.no-footer { border: none !important; }
 }
 
 .btn-group-toggle.active {
-    background: linear-gradient(135deg, var(--navy), var(--navy-l));
-    color: #fff;
-    border-color: transparent;
+    background: linear-gradient(135deg, #D9AB32, #C2941C);
+    color: #2A2010;
+    border-color: #B0851A;
     box-shadow: var(--shadow-sm);
 }
 

@@ -646,12 +646,6 @@ include('../insidebar.php');
     </div>
   </form>
   <div class="card">
-    <div class="card-header">
-      <h5>
-        <i class="fas fa-list-alt"></i> قائمة العقود
-      </h5>
-    </div>
-
     <div class="card-body contracts-table-filter-wrap">
       <form method="get" action="contracts.php" class="contracts-table-filter-form">
         <div class="contracts-filter-field">
@@ -1855,6 +1849,9 @@ include('../insidebar.php');
     localStorage.setItem('contractGroupStates', JSON.stringify(groupStates));
   });
 
+  // محدد أعمدة المجموعات فقط (يستهدف خلايا الجدول دون أزرار التحكم)
+  const groupColumnsSelector = Object.keys(groupStates).map(g => '.group-' + g).join(',');
+
   // زر إظهار/إخفاء الكل
   $('.btn-group-toggle-all').on('click', function () {
     const allActive = Object.values(groupStates).every(state => state);
@@ -1862,13 +1859,13 @@ include('../insidebar.php');
     if (allActive) {
       // إخفاء الكل
       $('.btn-group-toggle').removeClass('active');
-      $('[class*="group-"]').addClass('group-hidden');
+      $(groupColumnsSelector).addClass('group-hidden');
       Object.keys(groupStates).forEach(key => groupStates[key] = false);
-      $(this).html('<i class="fas fa-eye-slash"></i> إخفاء الكل');
+      $(this).html('<i class="fas fa-eye-slash"></i> إظهار الكل');
     } else {
       // إظهار الكل
       $('.btn-group-toggle').addClass('active');
-      $('[class*="group-"]').removeClass('group-hidden');
+      $(groupColumnsSelector).removeClass('group-hidden');
       Object.keys(groupStates).forEach(key => groupStates[key] = true);
       $(this).html('<i class="fas fa-eye"></i> الكل');
     }
