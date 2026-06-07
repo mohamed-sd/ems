@@ -19,7 +19,35 @@
       "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Equipments/equipments.php\")",
       "Bash(cd \"/c/xampp/htdocs/ems\" && find mapnewdesgin -type f | head -50 && echo \"--- sizes ---\" && ls -la mapnewdesgin/)",
       "Read(//c/c/xampp/htdocs/ems/**)",
-      "Bash(\"/c/xampp/php/php.exe\" -l movement/map_page.php)"
+      "Bash(\"/c/xampp/php/php.exe\" -l movement/map_page.php)",
+      "Bash(c:/xampp/php/php.exe -v)",
+      "Bash(c:/xampp/mysql/bin/mysql.exe -u root equipation_manage)",
+      "Bash(c:/xampp/mysql/bin/mysql.exe -u root equipation_manage -e \"SHOW COLUMNS FROM api_tokens;\")",
+      "Bash(curl -s -m 10 -w \"\\\\nHTTP %{http_code}\\\\n\" http://localhost/ems/api/)",
+      "Bash(curl -s -m 10 -w \"\\\\nHTTP %{http_code}\\\\n\" http://localhost/ems/api/me)",
+      "Bash(curl -s -m 10 -w \"\\\\nHTTP %{http_code}\\\\n\" -X POST http://localhost/ems/api/login -H \"Content-Type: application/json\" -d '{\"username\":\"__nope__\",\"password\":\"x\"}')",
+      "Bash(c:/xampp/mysql/bin/mysql.exe -u root equipation_manage -e ' *)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -m 20 http://localhost/ems/api/board -H 'Authorization: Bearer __CMDSUB_OUTPUT__')",
+      "Bash(c:/xampp/php/php.exe -r '$d=json_decode\\(file_get_contents\\(\"php://stdin\"\\),true\\); echo \"success=\".var_export\\($d[\"success\"],true\\).\"\\\\n\"; echo \"perms=\".json_encode\\($d[\"data\"][\"permissions\"]\\).\"\\\\n\"; echo \"day=\".count\\($d[\"data\"][\"day\"]\\).\" night=\".count\\($d[\"data\"][\"night\"]\\).\" map=\".count\\($d[\"data\"][\"map\"]\\).\"\\\\n\"; if\\(!empty\\($d[\"data\"][\"day\"]\\)\\){echo \"first_day_op=\".json_encode\\($d[\"data\"][\"day\"][0],JSON_UNESCAPED_UNICODE\\).\"\\\\n\";}')",
+      "Bash(c:/xampp/php/php.exe -l c:/xampp/htdocs/ems/api/controllers/operations.php)",
+      "Bash(c:/xampp/php/php.exe -l c:/xampp/htdocs/ems/api/controllers/drivers.php)",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X PUT http://localhost/ems/api/operations/13 -H 'Authorization: Bearer __TRACKED_VAR__' -H 'Content-Type: application/json' -d '{\"equipment_category\":\"أساسي\",\"shift_type\":\"B\",\"status\":1,\"start\":\"2025-12-01\",\"end\":\"2026-11-01\"}')",
+      "Bash(curl -s -m 10 -o /dev/null -w \"HTTP %{http_code}  type=%{content_type}\\\\n\" http://localhost/ems/flutter_app/build/web/)",
+      "Bash(curl -s -m 10 http://localhost/ems/flutter_app/build/web/)",
+      "Bash(curl -s -m 10 -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost/ems/api/)",
+      "PowerShell(Start-Process \"http://localhost/ems/flutter_app/build/web/\")",
+      "PowerShell(\"Opened http://localhost/ems/flutter_app/build/web/\")",
+      "Bash(DIO=$\\(ls -d /c/Users/ahsam/AppData/Local/Pub/Cache/hosted/pub.dev/dio-*/lib/src 2>/dev/null | head -1\\) *)",
+      "Read(//c/Users/ahsam/AppData/Local/Pub/Cache/hosted/pub.dev/**)",
+      "Bash(curl -s -m 8 -o /dev/null -w \"POST /ems/apilogin  -> HTTP %{http_code}  type=%{content_type}\\\\n\" -X POST http://localhost/ems/apilogin -H \"Content-Type: application/json\" -d '{\"username\":\"x\",\"password\":\"y\"}')",
+      "Bash(curl -s -m 8 -w \"  body=\" -o /tmp/r.txt -X POST http://localhost/ems/api/login -H \"Content-Type: application/json\" -d '{\"username\":\"x\",\"password\":\"y\"}' -w \"POST /ems/api/login  -> HTTP %{http_code}  type=%{content_type}\\\\n\")",
+      "PowerShell(\"reopened\")",
+      "Bash(curl -s -m 8 -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost/ems/flutter_app/build/web/)",
+      "Bash(curl -s -m 10 -o /dev/null -w \"HTTP %{http_code}  size=%{size_download} bytes  type=%{content_type}\\\\n\" http://localhost/ems/equipation-movement.apk)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
     ]
   }
 }
