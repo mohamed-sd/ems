@@ -447,6 +447,8 @@ $AC = [
 ];
 
 $page_title = 'Equipation | الرئيسية';
+// Dashboard exception: deep-yellow top bar + the wide logo (see includes/topbar.php).
+$ems_topbar_variant = 'dashboard';
 include '../inheader.php';
 include '../insidebar.php';
 ?>
@@ -655,183 +657,20 @@ body.ems-site .sidebar.closed .logout span {
   display: none;
 }
 
-.shot-topbar {
-  height: 50px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 120;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  padding: 0 18px;
-  direction: ltr;
-  background: var(--dash-yellow);
-  border: none !important;
-  border-bottom: none !important;
-  box-shadow: none !important;
-  outline: none !important;
-  background-image: none !important;
-}
-
-body.ems-site .ems-site .main .shot-topbar,
-body.ems-site .main .shot-topbar,
-body.ems-site .ems-dash.main .shot-topbar,
-body.ems-site .ems-dash.main [class*="topbar"],
-body.ems-site .ems-dash.main .shot-topbar[class*="topbar"] {
-  border: none !important;
-  border-bottom: 0 !important;
-  box-shadow: none !important;
-  outline: none !important;
-  background-image: none !important;
-}
-
-.shot-topbar::before,
-.shot-topbar::after {
-  content: none !important;
-  display: none !important;
-}
-
-body.ems-site .ems-dash.main .shot-topbar::before,
-body.ems-site .ems-dash.main .shot-topbar::after,
-body.ems-site .ems-dash.main [class*="topbar"]::before,
-body.ems-site .ems-dash.main [class*="topbar"]::after {
-  content: none !important;
-  display: none !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  background: none !important;
-}
-
+/* ── Top bar ──────────────────────────────────────────────────
+   The bar itself now lives in the shared component
+   (includes/topbar.php · styling .ems-topbar* in ems.main.all.style.css).
+   Only the reset that keeps .ems-dash.main free of stray pseudo borders
+   is kept here. The shared `body.ems-site { padding-top }` reserves the
+   50px the fixed bar needs, so .shot-body no longer adds its own top gap. */
 .ems-dash.main::before,
 .ems-dash.main::after {
   content: none !important;
   display: none !important;
 }
 
-.shot-logo {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-weight: 800;
-  font-size: .9rem;
-  letter-spacing: .4px;
-  color: #111;
-  grid-column: 1;
-  justify-self: start;
-  direction: ltr;
-  w
-}
-
-.shot-logo image {
-  width: 28px;
-  height: 30px;
-}
-
-.shot-logo span{
-  font-size: 1.1rem;
-}
-
-.shot-logo-mark {
-  width: 28px;
-  height: 22px;
-  clip-path: polygon(18% 4%, 82% 4%, 100% 50%, 82% 96%, 18% 96%, 0 50%);
-  background: #111;
-  position: relative;
-}
-
-.shot-logo-mark::before,
-.shot-logo-mark::after {
-  content: '';
-  position: absolute;
-  border-top: 6px solid transparent;
-  border-bottom: 6px solid transparent;
-  border-left: 8px solid var(--dash-yellow);
-  top: 5px;
-  width: 0;
-  height: 0;
-}
-
-.shot-logo-mark::before {
-  left: 7px;
-}
-
-.shot-logo-mark::after {
-  left: 14px;
-}
-
-.shot-top-center {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  grid-column: 2;
-  justify-self: center;
-  direction: rtl;
-}
-
-.shot-nav-pill {
-  height: 32px;
-  min-width: 120px;
-  padding: 0 18px;
-  border: 1px solid #cfcfcf;
-  background: #ffffff;
-  color: #121212;
-  border-radius: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.shot-user {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  grid-column: 3;
-  justify-self: end;
-  direction: rtl;
-}
-
-.shot-user-icons {
-  display: flex;
-  gap: 8px;
-}
-
-.shot-user-icons a.shot-icon-pill {
-  text-decoration: none;
-}
-
-.shot-icon-pill {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1px solid #666;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: .82rem;
-  color: #2b2b2b;
-  flex-shrink: 0;
-}
-
-.shot-icon-pill.shot-power {
-  background: #d42f2f;
-  border-color: #b31f1f;
-  color: #fff;
-}
-
-.shot-icon-pill i {
-  line-height: 1;
-}
-
 .shot-body {
-  padding: 51px 0px 14px;
+  padding: 0 0px 14px;
   background: #e2e2e2;
   margin-right: 68px;
   margin-top: -1px;
@@ -1276,24 +1115,6 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
     display: initial;
   }
 
-  .shot-topbar {
-    grid-template-columns: auto 1fr auto;
-    padding: 0 10px;
-    gap: 8px;
-  }
-
-  .shot-top-center {
-    justify-self: center;
-    gap: 6px;
-  }
-
-  .shot-nav-pill {
-    min-width: 86px;
-    font-size: .85rem;
-    height: 27px;
-    padding: 0 12px;
-  }
-
   .shot-body {
     padding-top: 10px;
     margin-top: 0;
@@ -1321,27 +1142,7 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 
 <div class="ems-dash main">
 
-  <div class="shot-topbar">
-    <div class="shot-logo">
-      <img src="../assets/images/logo 2.svg" alt="Equipation Logo" width="150" height="35">
-      <!-- <span class="shot-logo-mark"></span> -->
-      <!-- <span>EQUIPATION</span> -->
-    </div>
-
-    <div class="shot-top-center">
-      <span class="shot-nav-pill"><?= htmlspecialchars($roleText) ?></span>
-      <span class="shot-nav-pill"><?= htmlspecialchars($userName) ?></span>
-    </div>
-
-    <div class="shot-user">
-      <div class="shot-user-icons">
-        <a href="../logout.php" class="shot-icon-pill shot-power" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i class="fas fa-power-off"></i></a>
-        <span class="shot-icon-pill"><i class="far fa-user"></i></span>
-        <span class="shot-icon-pill"><i class="fas fa-gear"></i></span>
-      </div>
-      <span></span>
-    </div>
-</div>
+  <!-- التوببار المشترك يُعرض الآن من insidebar.php (includes/topbar.php) -->
 
   <div class="shot-body">
     <div class="shot-breadcrumb" id="emsClock"><?= date('Y F d, l') ?></div>

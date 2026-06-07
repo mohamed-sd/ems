@@ -493,9 +493,9 @@ table.dataTable thead .sorting_desc::after {
     gap: 6px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1px solid var(--border-accent);
-    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-vlight) 100%);
-    color: var(--text-muted);
+    border: 1.5px solid #D7DBE0;
+    background: #fff;
+    color: #4d4d4d;
     font-weight: 700;
     font-size: 0.85rem;
     cursor: pointer;
@@ -504,15 +504,16 @@ table.dataTable thead .sorting_desc::after {
 }
 
 .btn-group-toggle:hover {
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-    color: #fff;
-    border-color: var(--gold-dark);
+    border-color: #D9AB32;
+    color: #2A2010;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-group-toggle.active {
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-    color: #fff;
-    border-color: var(--gold-dark);
+    background: linear-gradient(135deg, #D9AB32 0%, #C2941C 100%);
+    color: #2A2010;
+    border-color: #B0851A;
     box-shadow: var(--shadow-md);
 }
 

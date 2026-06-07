@@ -555,9 +555,6 @@ include '../insidebar.php';
 
     <!-- ══ جدول الموردين ══════════════════════════════════════════════════════ -->
     <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-list-alt"></i> قائمة الموردين</h5>
-        </div>
         <div class="card-body">
             <div class="table-container">
                 <table id="projectsTable" class="display nowrap alltables suppliers-table-nowrap" style="width:100%;">

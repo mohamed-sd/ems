@@ -335,9 +335,6 @@ include('../insidebar.php');
     </form>
 
     <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-list-alt"></i> قائمة المستخدمين</h5>
-        </div>
         <div class="card-body">
             <table id="usersTable" class="display nowrap">
                 <thead>

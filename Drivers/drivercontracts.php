@@ -1780,6 +1780,9 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
       localStorage.setItem('supplierContractGroupStates', JSON.stringify(groupStates));
     });
 
+    // محدد أعمدة المجموعات فقط (يستهدف خلايا الجدول دون أزرار التحكم)
+    const groupColumnsSelector = Object.keys(groupStates).map(g => '.group-' + g).join(',');
+
     // زر إظهار/إخفاء الكل
     $('.btn-group-toggle-all').on('click', function () {
       const allActive = Object.values(groupStates).every(state => state);
@@ -1787,13 +1790,13 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
       if (allActive) {
         // إخفاء الكل
         $('.btn-group-toggle').removeClass('active');
-        $('[class*="group-"]').addClass('group-hidden');
+        $(groupColumnsSelector).addClass('group-hidden');
         Object.keys(groupStates).forEach(key => groupStates[key] = false);
-        $(this).html('<i class="fas fa-eye-slash"></i> إخفاء الكل');
+        $(this).html('<i class="fas fa-eye-slash"></i> إظهار الكل');
       } else {
         // إظهار الكل
         $('.btn-group-toggle').addClass('active');
-        $('[class*="group-"]').removeClass('group-hidden');
+        $(groupColumnsSelector).removeClass('group-hidden');
         Object.keys(groupStates).forEach(key => groupStates[key] = true);
         $(this).html('<i class="fas fa-eye"></i> الكل');
       }

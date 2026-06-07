@@ -1400,7 +1400,7 @@ body {
 }
 </style>
 </head>
-<body>
+<body class="ems-site">
 
 <!-- ═══ TOPBAR ═══════════════════════════════════════════════════════════ -->
 <div class="rpt-topbar main_head">
