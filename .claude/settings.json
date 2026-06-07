@@ -16,7 +16,10 @@
       "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Clients/clients.php\")",
       "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Suppliers/suppliers.php\")",
       "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Projects/projects.php\")",
-      "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Equipments/equipments.php\")"
+      "Bash(\"/c/xampp/php/php.exe\" -l \"/c/xampp/htdocs/ems/Equipments/equipments.php\")",
+      "Bash(cd \"/c/xampp/htdocs/ems\" && find mapnewdesgin -type f | head -50 && echo \"--- sizes ---\" && ls -la mapnewdesgin/)",
+      "Read(//c/c/xampp/htdocs/ems/**)",
+      "Bash(\"/c/xampp/php/php.exe\" -l movement/map_page.php)"
     ]
   }
 }

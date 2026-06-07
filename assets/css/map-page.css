@@ -1,0 +1,384 @@
+/* ============================================================
+   EQUIPATION — «خريطة الموقع» — الطبقة البصرية المعزولة
+   مخصّص حصرياً لشاشة movement/map_page.php
+   - كل المحدّدات محصّنة تحت الجذر .movement-map-page
+   - المتغيّرات مُسبَّقة بـ --mp- لتفادي أي تصادم مع الملف العام
+   - يُحمَّل بعد ems.main.all.style.css فيتجاوز قواعد الخريطة القديمة
+   مبني على تصميم board.css (هوية: كريمي/ذهبي/أسود)
+   ============================================================ */
+
+/* رموز الهوية — مقصورة على حاوية الصفحة فقط */
+.movement-map-page {
+  --mp-ink:        #0F1115;
+  --mp-ink-2:      #1C2026;
+  --mp-gold:       #F2AA2A;
+  --mp-gold-deep:  #E0921A;
+  --mp-orange:     #F7931A;
+  --mp-cream:      #FFF5E8;
+  --mp-green:      #5B7F1E;
+  --mp-green-soft: #6E9A28;
+  --mp-red:        #991B1B;
+  --mp-red-soft:   #B23232;
+  --mp-info:       #475569;
+  --mp-plum:       #6B4E8F;
+
+  --mp-bg:         #F5F1E8;
+  --mp-bg-2:       #EFEADF;
+  --mp-surface:    #FFFFFF;
+  --mp-surface-2:  #FBF8F2;
+  --mp-line:       rgba(15,17,21,.08);
+  --mp-line-2:     rgba(15,17,21,.05);
+
+  --mp-t-1: #14171C;
+  --mp-t-2: #5A5750;
+  --mp-t-3: #8A867C;
+
+  --mp-green-tint: rgba(91,127,30,.10);
+  --mp-green-line: rgba(91,127,30,.28);
+  --mp-red-tint:   rgba(153,27,27,.07);
+  --mp-red-line:   rgba(153,27,27,.24);
+  --mp-gold-tint:  rgba(242,170,42,.12);
+  --mp-gold-line:  rgba(242,170,42,.40);
+
+  --mp-r-6: 6px; --mp-r-8: 8px; --mp-r-12: 12px; --mp-r-16: 16px; --mp-r-20: 20px;
+
+  --mp-sh-1: 0 1px 2px rgba(15,17,21,.04);
+  --mp-sh-2: 0 1px 2px rgba(15,17,21,.05), 0 10px 26px -16px rgba(15,17,21,.20);
+  --mp-sh-3: 0 2px 6px rgba(15,17,21,.06), 0 20px 48px -22px rgba(15,17,21,.30);
+  --mp-sh-tt: 0 10px 40px -8px rgba(15,17,21,.45), 0 2px 8px rgba(15,17,21,.30);
+
+  --mp-s-1:4px; --mp-s-2:8px; --mp-s-3:12px; --mp-s-4:16px; --mp-s-5:20px;
+  --mp-s-6:24px; --mp-s-8:32px; --mp-s-10:40px; --mp-s-12:48px; --mp-s-16:64px;
+
+  --mp-ease: cubic-bezier(.22,.61,.36,1);
+
+  /* خلفية الصفحة الدافئة (لا نلمس .main العام — نطبّقها على جذر الشاشة فقط) */
+  background:
+    radial-gradient(1200px 600px at 90% -10%, rgba(242,170,42,.07), transparent 60%),
+    var(--mp-bg);
+  /* هامش حول المحتوى الرئيسي (آمن: .main يستخدم flex لا margin للسايدبار) */
+  margin: 15px;
+}
+
+/* المحتوى متمركز بعرض مريح دون المساس بتخطيط .main/الشريط الجانبي */
+.movement-map-page .movement-content-wrapper {
+  max-width: none;        /* كامل عرض الشاشة */
+  margin-inline: 0;
+  margin-top: var(--mp-s-5);
+  display: block;
+  gap: 0;
+  padding: 0;
+}
+
+/* ============================================================
+   شريط الإحصائيات (5 بطاقات)
+   ============================================================ */
+.movement-map-page .stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--mp-s-4);
+  margin-top: var(--mp-s-6);
+}
+.movement-map-page .stat-tile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-line);
+  border-radius: var(--mp-r-16);
+  padding: 18px;
+  box-shadow: var(--mp-sh-2);
+  position: relative;
+  overflow: hidden;
+  transition: .2s var(--mp-ease);
+}
+.movement-map-page .stat-tile:hover { transform: translateY(-2px); box-shadow: var(--mp-sh-3); }
+.movement-map-page .stat-tile-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--mp-r-12);
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-size: 21px;
+  box-shadow: none;
+}
+.movement-map-page .stat-tile-icon.c-gold   { background: var(--mp-gold-tint);            color: var(--mp-gold-deep); }
+.movement-map-page .stat-tile-icon.c-blue   { background: rgba(71,85,105,.12);            color: var(--mp-info); }
+.movement-map-page .stat-tile-icon.c-green  { background: var(--mp-green-tint);           color: var(--mp-green); }
+.movement-map-page .stat-tile-icon.c-red    { background: var(--mp-red-tint);             color: var(--mp-red); }
+.movement-map-page .stat-tile-icon.c-purple { background: rgba(107,78,143,.12);           color: var(--mp-plum); }
+.movement-map-page .stat-tile-val { font-size: 30px; font-weight: 800; color: var(--mp-ink); line-height: 1; letter-spacing: -.5px; }
+.movement-map-page .stat-tile-lbl { font-size: 13px; font-weight: 600; color: var(--mp-t-2); margin-top: 5px; }
+.movement-map-page .slow-spin { animation: mpSpin 4.5s linear infinite; }
+@keyframes mpSpin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   مفتاح الألوان
+   ============================================================ */
+.movement-map-page .legend-row {
+  display: flex;
+  align-items: center;
+  gap: var(--mp-s-5);
+  flex-wrap: wrap;
+  margin-top: var(--mp-s-5);
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-line);
+  border-radius: var(--mp-r-12);
+  padding: 12px 18px;
+  box-shadow: var(--mp-sh-1);
+}
+.movement-map-page .legend-label { font-size: 13px; font-weight: 800; color: var(--mp-ink); }
+.movement-map-page .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--mp-t-2); }
+.movement-map-page .ldot { width: 11px; height: 11px; border-radius: 50%; box-shadow: none; }
+.movement-map-page .ldot.green { background: var(--mp-green); box-shadow: 0 0 0 3px var(--mp-green-tint); }
+.movement-map-page .ldot.red   { background: var(--mp-red);   box-shadow: 0 0 0 3px var(--mp-red-tint); }
+.movement-map-page .legend-op-avatar { width: 24px; height: 24px; }
+.movement-map-page .legend-op-avatar .legend-op-avatar-icon { font-size: 11px; }
+
+/* ============================================================
+   شبكة الموردين — صفوف عريضة بكامل العرض
+   ============================================================ */
+.movement-map-page .mines-grid { display: flex; flex-direction: column; gap: var(--mp-s-6); margin-top: var(--mp-s-6); }
+
+.movement-map-page .mine-card {
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-line);
+  border-radius: var(--mp-r-20);
+  box-shadow: var(--mp-sh-2);
+  position: relative;
+  --mp-accent: var(--mp-gold);
+  --mp-accent-deep: var(--mp-gold-deep);
+}
+.movement-map-page .mine-card.mine-accent-0 { --mp-accent:#F2AA2A; --mp-accent-deep:#E0921A; }
+.movement-map-page .mine-card.mine-accent-1 { --mp-accent:oklch(.60 .11 215); --mp-accent-deep:oklch(.52 .11 215); }
+.movement-map-page .mine-card.mine-accent-2 { --mp-accent:oklch(.55 .13 285); --mp-accent-deep:oklch(.48 .13 285); }
+.movement-map-page .mine-card.mine-accent-3 { --mp-accent:oklch(.58 .13 350); --mp-accent-deep:oklch(.50 .13 350); }
+.movement-map-page .mine-card.mine-accent-4 { --mp-accent:oklch(.60 .10 155); --mp-accent-deep:oklch(.52 .10 155); }
+
+/* رأس المورد — خلفية فاتحة بنص داكن + شريط لوني جانبي.
+   مرفوع التخصيص (.mine-card .mine-hdr) لتجاوز خلفية الأكسنت الداكنة القديمة. */
+.movement-map-page .mine-card .mine-hdr {
+  background: linear-gradient(100deg,
+     color-mix(in srgb, var(--mp-accent) 12%, var(--mp-surface)),
+     var(--mp-surface) 60%);
+  color: var(--mp-ink);
+  border-top: 0;
+}
+.movement-map-page .mine-hdr {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  position: relative;
+  border-bottom: 1px solid var(--mp-line);
+  overflow: hidden;
+}
+.movement-map-page .mine-hdr::before {
+  content: "";
+  position: absolute; inset-inline-start: 0; top: 0; bottom: 0; width: 5px;
+  background: linear-gradient(var(--mp-accent), var(--mp-accent-deep));
+}
+.movement-map-page .mine-hdr-icon {
+  width: 46px; height: 46px; border-radius: var(--mp-r-12); flex: none;
+  background: linear-gradient(150deg, var(--mp-accent), var(--mp-accent-deep));
+  color: #fff; display: grid; place-items: center; font-size: 19px;
+  box-shadow: 0 6px 14px -8px var(--mp-accent);
+}
+.movement-map-page .mine-card.mine-accent-0 .mine-hdr-icon { color: var(--mp-ink); }
+.movement-map-page .mine-hdr-name { font-size: 18px; font-weight: 800; color: var(--mp-ink); }
+.movement-map-page .mine-hdr-sub { font-size: 12.5px; font-weight: 600; color: var(--mp-t-2); margin-top: 3px; }
+.movement-map-page .mine-hdr-badges { margin-inline-start: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.movement-map-page .m-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-weight: 800;
+  border: 1px solid transparent;
+}
+.movement-map-page .m-badge.gold  { background: var(--mp-gold-tint);  color: var(--mp-gold-deep); border-color: var(--mp-gold-line); }
+.movement-map-page .m-badge.green { background: var(--mp-green-tint); color: var(--mp-green);     border-color: var(--mp-green-line); }
+.movement-map-page .m-badge.red   { background: var(--mp-red-tint);   color: var(--mp-red);       border-color: var(--mp-red-line); }
+
+/* شريط إحصائيات المورد */
+.movement-map-page .mine-stats-strip {
+  display: flex; gap: 0; padding: 0;
+  background: var(--mp-surface-2);
+  border-bottom: 1px solid var(--mp-line);
+}
+.movement-map-page .mss-item {
+  flex: 1; display: flex; flex-direction: column-reverse; align-items: center; gap: 4px;
+  padding: 14px 8px; font-size: 12.5px; font-weight: 600; color: var(--mp-t-2);
+  border-inline-start: 1px solid var(--mp-line-2);
+}
+.movement-map-page .mss-item:first-child { border-inline-start: none; }
+.movement-map-page .mss-n { font-size: 22px; font-weight: 800; color: var(--mp-ink); line-height: 1; }
+.movement-map-page .mss-n.green { color: var(--mp-green); }
+.movement-map-page .mss-n.red   { color: var(--mp-red); }
+.movement-map-page .mss-n.blue  { color: var(--mp-info); }
+
+/* جسم المورد */
+.movement-map-page .mine-body { padding: 20px 22px 24px; }
+
+.movement-map-page .section-sep {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13.5px; font-weight: 800; margin: 6px 0 16px;
+  border: 0; background: transparent; border-radius: 0; padding: 0;
+}
+.movement-map-page .section-sep::after { content: ""; flex: 1; height: 1px; background: var(--mp-line); }
+.movement-map-page .section-sep i { font-size: 15px; }
+.movement-map-page .section-sep.working-sep { color: var(--mp-green); }
+.movement-map-page .section-sep.stopped-sep { color: var(--mp-red); margin-top: 26px; }
+.movement-map-page .section-sep.working-sep i { color: var(--mp-green); }
+.movement-map-page .section-sep.stopped-sep i { color: var(--mp-red); }
+
+/* شبكة بطاقات الآليات */
+.movement-map-page .eq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
+  gap: var(--mp-s-4);
+}
+
+/* ============================================================
+   بطاقة الآلية
+   ============================================================ */
+.movement-map-page .eq-card {
+  position: relative;
+  background: var(--mp-surface);
+  border: 1px solid var(--mp-line);
+  border-radius: var(--mp-r-16);
+  box-shadow: var(--mp-sh-1);
+  cursor: default;
+  transition: .2s var(--mp-ease);
+}
+.movement-map-page .eq-card:hover { transform: translateY(-3px); box-shadow: var(--mp-sh-3); z-index: 5; }
+.movement-map-page .eq-card.working { --mp-st: var(--mp-green); --mp-st-tint: var(--mp-green-tint); --mp-st-line: var(--mp-green-line); }
+.movement-map-page .eq-card.stopped { --mp-st: var(--mp-red);   --mp-st-tint: var(--mp-red-tint);   --mp-st-line: var(--mp-red-line); }
+
+.movement-map-page .eq-status-dot {
+  position: absolute; top: 14px; inset-inline-end: 14px; z-index: 2;
+  width: 11px; height: 11px; border-radius: 50%; background: var(--mp-st);
+  box-shadow: 0 0 0 4px var(--mp-st-tint);
+}
+.movement-map-page .eq-card.working .eq-status-dot { animation: mpDotPulse 2.4s var(--mp-ease) infinite; }
+@keyframes mpDotPulse { 0%,100% { box-shadow: 0 0 0 4px var(--mp-st-tint); } 50% { box-shadow: 0 0 0 7px rgba(91,127,30,.05); } }
+
+.movement-map-page .eq-inner { padding: 0; }
+.movement-map-page .eq-card .eq-top-bar { height: 4px; border-radius: var(--mp-r-16) var(--mp-r-16) 0 0; background: var(--mp-st); opacity: .9; }
+.movement-map-page .eq-card.working .eq-top-bar { background: var(--mp-st); }
+.movement-map-page .eq-card.stopped .eq-top-bar { background: var(--mp-st); }
+.movement-map-page .eq-content { display: flex; flex-direction: column; align-items: center; padding: 18px 14px 8px; text-align: center; gap: 0; margin: 0; }
+.movement-map-page .eq-machine-icon {
+  width: 52px; height: 52px; border-radius: var(--mp-r-12); margin-bottom: 10px;
+  background: var(--mp-st-tint); color: var(--mp-st); display: grid; place-items: center; font-size: 24px;
+}
+.movement-map-page .eq-headings { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.movement-map-page .eq-code { font-size: 18px; font-weight: 800; color: var(--mp-ink); letter-spacing: .3px; white-space: nowrap; }
+.movement-map-page .eq-type-lbl { font-size: 12.5px; font-weight: 600; color: var(--mp-t-2); margin-top: 3px; margin-right: 0; }
+
+/* صف المشغّلين */
+.movement-map-page .op-row {
+  display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; min-height: 30px; margin: 0;
+}
+.movement-map-page .op-av {
+  position: relative; width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 14px; cursor: pointer;
+  border: 2px solid var(--mp-surface); transition: .16s var(--mp-ease);
+}
+.movement-map-page .op-av:hover { transform: translateY(-2px) scale(1.06); z-index: 6; }
+.movement-map-page .op-av.active { background: linear-gradient(150deg, var(--mp-ink-2), var(--mp-ink)); color: var(--mp-gold); border-color: var(--mp-surface); box-shadow: 0 4px 10px -4px rgba(15,17,21,.5); }
+.movement-map-page .op-av .op-avatar-icon { font-size: 14px; }
+.movement-map-page .op-av.reserve {
+  background: repeating-linear-gradient(45deg, var(--mp-bg-2), var(--mp-bg-2) 4px, var(--mp-surface) 4px, var(--mp-surface) 8px);
+  color: var(--mp-t-3); border: 2px dashed var(--mp-line); box-shadow: none;
+}
+.movement-map-page .op-av.reserve .reserve-soon {
+  position: absolute; bottom: -7px; inset-inline-end: -7px;
+  background: var(--mp-gold); color: var(--mp-ink); font-size: 8px; font-weight: 800;
+  padding: 1px 5px; border-radius: 999px; white-space: nowrap; border: 1.5px solid var(--mp-surface);
+}
+.movement-map-page .no-op-label {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; white-space: nowrap;
+  color: var(--mp-t-3); background: var(--mp-surface-2); border: 1px dashed var(--mp-line);
+  border-radius: 999px; padding: 5px 12px;
+}
+.movement-map-page .no-op-icon { font-size: 11px; }
+
+/* صف الساعات */
+.movement-map-page .eq-hours-row {
+  display: flex; align-items: stretch; margin: 6px 12px 14px;
+  background: var(--mp-surface-2); border: 1px solid var(--mp-line-2); border-radius: var(--mp-r-12);
+  overflow: hidden; padding-top: 0; border-top: 1px solid var(--mp-line-2);
+}
+.movement-map-page .eq-hours-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 6px; }
+.movement-map-page .eq-hours-val { font-size: 18px; font-weight: 800; color: var(--mp-ink); line-height: 1; }
+.movement-map-page .eq-hours-val.today-val { color: var(--mp-gold-deep); }
+.movement-map-page .eq-hours-lbl { font-size: 10.5px; font-weight: 600; color: var(--mp-t-3); white-space: nowrap; }
+.movement-map-page .eq-hours-sep { width: 1px; height: auto; background: var(--mp-line); }
+
+/* ============================================================
+   حالات فارغة
+   ============================================================ */
+.movement-map-page .zero-state,
+.movement-map-page .empty-mine-body {
+  text-align: center; padding: 64px 24px; color: var(--mp-t-3);
+  background: var(--mp-surface); border: 1px dashed var(--mp-line); border-radius: var(--mp-r-20);
+}
+.movement-map-page .zero-state i { font-size: 46px; color: var(--mp-gold); opacity: .7; margin-bottom: 0; display: block; }
+.movement-map-page .zero-state h3 { font-size: 19px; font-weight: 800; color: var(--mp-ink); margin: 16px 0 6px; }
+.movement-map-page .zero-state p { font-size: 14px; margin: 0; }
+.movement-map-page .empty-mine-body { padding: 36px 20px; }
+.movement-map-page .empty-mine-body i { font-size: 30px; opacity: .5; color: var(--mp-gold); display: block; }
+.movement-map-page .empty-mine-body p { margin: 10px 0 0; font-size: 13.5px; font-weight: 600; }
+
+/* ============================================================
+   نظام Tooltip — هوية ذهبي/أسود
+   ============================================================ */
+.movement-map-page .tt-trigger { position: relative; }
+.movement-map-page .tt-box {
+  position: absolute; bottom: calc(100% + 12px); inset-inline-end: 50%;
+  transform: translateX(50%) translateY(6px); width: 248px; max-width: 320px; min-width: 0; z-index: 99999;
+  background: linear-gradient(180deg, var(--mp-ink-2), var(--mp-ink));
+  border: 1px solid rgba(242,170,42,.22); border-radius: var(--mp-r-12);
+  box-shadow: var(--mp-sh-tt); padding: 13px 14px;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity .16s var(--mp-ease), transform .16s var(--mp-ease);
+}
+.movement-map-page .tt-box.tt-box-sm { width: 208px; }
+.movement-map-page .tt-box.tt-show { opacity: 1; visibility: visible; transform: translateX(50%) translateY(0); }
+.movement-map-page .tt-box::after {
+  content: ""; position: absolute; top: 100%; inset-inline-end: 50%; transform: translateX(50%);
+  border: 7px solid transparent; border-top-color: var(--mp-ink);
+}
+.movement-map-page .tt-box.tt-below { bottom: auto; top: calc(100% + 12px); }
+.movement-map-page .tt-box.tt-below::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--mp-ink-2); }
+.movement-map-page .tt-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 800; color: #E0921A;
+  padding-bottom: 9px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,.10);
+}
+.movement-map-page .tt-title i { font-size: 13px; }
+.movement-map-page .tt-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 3.5px 0; grid-template-columns: none; }
+.movement-map-page .tt-k { font-size: 12px; font-weight: 600; color: #ffffff !important; }
+.movement-map-page .tt-v { font-size: 12.5px; font-weight: 700; color: #ccc !important;  text-align: start; }
+
+/* ============================================================
+   استجابة
+   ============================================================ */
+@media (max-width: 1100px) {
+  .movement-map-page .stats-row { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 760px) {
+  .movement-map-page .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .movement-map-page .eq-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .movement-map-page .mss-item { font-size: 11px; }
+  .movement-map-page .mss-n { font-size: 18px; }
+}
+@media (max-width: 480px) {
+  .movement-map-page .stats-row { grid-template-columns: 1fr 1fr; }
+  .movement-map-page .tt-box { width: 200px; }
+}
+
+/* لمس: إظهار التول-تيب عند التركيز */
+@media (hover: none) {
+  .movement-map-page .tt-trigger:focus-within > .tt-box { opacity: 1; visibility: visible; transform: translateX(50%) translateY(0); }
+}

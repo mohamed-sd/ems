@@ -237,6 +237,8 @@ foreach ($suppliers_data as $sup) {
 
 $page_title = "خريطة الموقع | " . htmlspecialchars($selected_project['name']);
 include('../inheader.php');
+// تصميم شاشة الخريطة معزول في ملف خاص (يُحمّل بعد الأنماط العامة، محصّن تحت .movement-map-page)
+echo '<link rel="stylesheet" href="/ems/assets/css/map-page.css?v=2026060603">' . "\n";
 include('../insidebar.php');
 ?>
 
@@ -332,7 +334,7 @@ foreach ($suppliers_data as $sup_id => $sup):
     $mi++;
 ?>
 
-<div class="mine-card">
+<div class="mine-card <?php echo htmlspecialchars($hdr_accent); ?>">
     <!-- رأس المورد -->
     <div class="mine-hdr <?php echo htmlspecialchars($hdr_accent); ?>">
         <div class="mine-hdr-icon"><i class="fas fa-truck-loading"></i></div>
@@ -394,8 +396,10 @@ foreach ($suppliers_data as $sup_id => $sup):
                     <div class="eq-top-bar"></div>
                     <div class="eq-content">
                         <div class="eq-machine-icon"><i class="fas fa-truck-monster"></i></div>
-                        <div class="eq-code"><?php echo htmlspecialchars($op['eq_code']); ?></div>
-                        <div class="eq-type-lbl"><?php echo htmlspecialchars($op['type_name'] ?: ($op['eq_name'] ?? '')); ?></div>
+                        <div class="eq-headings">
+                            <div class="eq-code"><?php echo htmlspecialchars($op['eq_code']); ?></div>
+                            <div class="eq-type-lbl"><?php echo htmlspecialchars($op['type_name'] ?: ($op['eq_name'] ?? '')); ?></div>
+                        </div>
                     </div>
                     <!-- صف المشغلين -->
                     <div class="op-row">
@@ -474,8 +478,10 @@ foreach ($suppliers_data as $sup_id => $sup):
                     <div class="eq-top-bar"></div>
                     <div class="eq-content">
                         <div class="eq-machine-icon"><i class="fas fa-truck-monster"></i></div>
-                        <div class="eq-code"><?php echo htmlspecialchars($op['eq_code']); ?></div>
-                        <div class="eq-type-lbl"><?php echo htmlspecialchars($op['type_name'] ?: ($op['eq_name'] ?? '')); ?></div>
+                        <div class="eq-headings">
+                            <div class="eq-code"><?php echo htmlspecialchars($op['eq_code']); ?></div>
+                            <div class="eq-type-lbl"><?php echo htmlspecialchars($op['type_name'] ?: ($op['eq_name'] ?? '')); ?></div>
+                        </div>
                     </div>
                     <!-- صف المشغلين — نفس هيكل العاملة تماماً -->
                     <div class="op-row">
@@ -547,94 +553,101 @@ foreach ($suppliers_data as $sup_id => $sup):
 <script>
 /**
  * نظام Tooltip الذكي — يعرض tooltip للعنصر الأعمق فقط
- * الأولوية: مشغّل > آلية > مورد
+ * الأولوية: مشغّل > آلية > مورد · تموضع تلقائي داخل حدود الشاشة · يدعم اللمس · RTL
  */
 (function () {
     'use strict';
 
     var activeBox = null;
+    var activeTrigger = null;
 
     function closeActive() {
         if (activeBox) {
-            activeBox.classList.remove('tt-show');
-            activeBox.classList.remove('tt-below');
+            activeBox.classList.remove('tt-show', 'tt-below');
+            activeBox.style.right = '';
+            activeBox.style.left = '';
+            activeBox.style.transform = '';
             activeBox = null;
+            activeTrigger = null;
         }
     }
 
     function positionBox(trigger, box) {
-        box.style.right     = '';
-        box.style.left      = '';
-        box.style.transform = '';
         box.classList.remove('tt-below');
+        box.style.right = '50%';
+        box.style.left = 'auto';
+        box.style.transform = 'translateX(50%)';
 
         var trigRect = trigger.getBoundingClientRect();
         var vw = window.innerWidth;
-        var vh = window.innerHeight;
+        var boxH = box.offsetHeight || 170;
 
-        var boxH = 170;
-        if (trigRect.top < boxH + 18) {
+        if (trigRect.top < boxH + 20) {
             box.classList.add('tt-below');
         }
-
-        box.style.right     = '50%';
-        box.style.transform = 'translateX(50%)';
 
         requestAnimationFrame(function () {
             var bRect = box.getBoundingClientRect();
             if (bRect.right > vw - 12) {
-                box.style.right     = '0';
-                box.style.left      = 'auto';
+                box.style.right = '0';
+                box.style.left = 'auto';
                 box.style.transform = 'none';
             } else if (bRect.left < 12) {
-                box.style.right     = 'auto';
-                box.style.left      = '0';
+                box.style.right = 'auto';
+                box.style.left = '0';
                 box.style.transform = 'none';
             }
         });
     }
 
-    document.addEventListener('mouseover', function (e) {
-        var target = e.target;
-        var deepest = null;
-        var el = target;
-
+    function findDeepestTrigger(start) {
+        var el = start;
         while (el && el !== document.body) {
-            if (el.classList && el.classList.contains('tt-trigger')) {
-                deepest = el;
-                break;
-            }
+            if (el.classList && el.classList.contains('tt-trigger')) return el;
             el = el.parentElement;
         }
+        return null;
+    }
 
-        if (!deepest) {
-            closeActive();
-            return;
+    function directChildBox(trigger) {
+        var c = trigger.children;
+        for (var i = 0; i < c.length; i++) {
+            if (c[i].classList && c[i].classList.contains('tt-box')) return c[i];
         }
+        return null;
+    }
 
-        var box = null;
-        var children = deepest.childNodes;
-        for (var i = 0; i < children.length; i++) {
-            var c = children[i];
-            if (c.nodeType === 1 && c.classList.contains('tt-box')) {
-                box = c;
-                break;
-            }
-        }
-
+    function show(trigger) {
+        var box = directChildBox(trigger);
         if (!box) { closeActive(); return; }
         if (box === activeBox) return;
-
         closeActive();
-        positionBox(deepest, box);
+        positionBox(trigger, box);
         box.classList.add('tt-show');
         activeBox = box;
+        activeTrigger = trigger;
+    }
+
+    document.addEventListener('mouseover', function (e) {
+        var trigger = findDeepestTrigger(e.target);
+        if (!trigger) { closeActive(); return; }
+        show(trigger);
     });
 
     document.addEventListener('mouseleave', closeActive);
-    document.addEventListener('click', closeActive);
     document.addEventListener('scroll', closeActive, true);
+    window.addEventListener('resize', closeActive);
 
+    document.addEventListener('touchstart', function (e) {
+        var trigger = findDeepestTrigger(e.target);
+        if (!trigger) { closeActive(); return; }
+        if (trigger === activeTrigger) { closeActive(); return; }
+        show(trigger);
+    }, { passive: true });
+
+    document.addEventListener('click', function (e) {
+        if (!findDeepestTrigger(e.target)) closeActive();
+    });
 }());
 </script>
 
