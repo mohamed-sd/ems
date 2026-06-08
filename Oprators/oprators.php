@@ -799,17 +799,13 @@ include('../insidebar.php');
                                 <th>#</th>
                                 <th>المعدة</th>
                                 <th>نوع المعدة</th>
-                                <th>السائقين</th>
-
                                 <th>المورد</th>
                                 <!-- <th>ساعات العمل الكلية</th> -->
                                 <th>ساعات الوردية</th>
                                 <th>نظام الوردية</th>
 
                                 <th>تاريخ البداية</th>
-                                <!-- <th>تاريخ النهاية</th> -->
-                                <th>النوع</th>
-                                <!-- <th>عدد الساعات</th> -->
+                                <!-- <th>تاريخ النهاية</th> -->                                <!-- <th>عدد الساعات</th> -->
                                 <th>الحالة</th>
                                 <th>إجراءات</th>
 
@@ -926,7 +922,6 @@ include('../insidebar.php');
                                 echo "<td>" . $i . "</td>";
                                 echo "<td>" . $row['equipment_code'] . " - " . $row['equipment_name'] . "</td>";
                                 echo "<td>" . (!empty($row['equipment_type_name']) ? htmlspecialchars($row['equipment_type_name']) : "-") . "</td>";
-                                echo "<td>" . (!empty($row['driver_names']) ? $row['driver_names'] : "-") . "</td>";
 
                                 echo "<td>" . $row['suppliers_name'] . "</td>";
 
@@ -943,11 +938,6 @@ include('../insidebar.php');
 
                                 echo "<td>" . $row['start'] . "</td>";
                                 // echo "<td>" . $row['end'] . "</td>";
-
-                                // عرض نوع المعدة (أساسي/احتياطي)
-                                $categoryText = ($row['equipment_category'] === 'أساسي') ? 'أساسي' : 'احتياطي';
-                                $categoryClass = ($row['equipment_category'] === 'أساسي') ? 'basic' : 'backup';
-                                echo "<td><span class='category-badge $categoryClass'>$categoryText</span></td>";
 
                                 // echo "<td>" . $row['hours'] . "</td>";
                                 $status_value = intval($row['status']);
@@ -1021,7 +1011,7 @@ include('../insidebar.php');
                             };
                             // عرض صفوف الجدول الأول: المعدات الأساسية
                             if (empty($primary_rows)) {
-                                echo "<tr><td colspan='11' style='text-align:center;color:#999;padding:16px;'>لا توجد معدات أساسية</td></tr>";
+                                echo "<tr><td colspan='9' style='text-align:center;color:#999;padding:16px;'>لا توجد معدات أساسية</td></tr>";
                             } else {
                                 $i = 1;
                                 foreach ($primary_rows as $r) { $render_op_row($r, $i++); }
@@ -1039,14 +1029,10 @@ include('../insidebar.php');
                             <tr>
                                 <th>#</th>
                                 <th>المعدة</th>
-                                <th>نوع المعدة</th>
-                                <th>السائقين</th>
-                                <th>المورد</th>
+                                <th>نوع المعدة</th>                                <th>المورد</th>
                                 <th>ساعات الوردية</th>
                                 <th>نظام الوردية</th>
-                                <th>تاريخ البداية</th>
-                                <th>النوع</th>
-                                <th>الحالة</th>
+                                <th>تاريخ البداية</th>                                <th>الحالة</th>
                                 <th>إجراءات</th>
                             </tr>
                         </thead>
@@ -1054,7 +1040,7 @@ include('../insidebar.php');
                             <?php
                             // عرض صفوف الجدول الثاني: المعدات الاحتياطية
                             if (empty($reserve_rows)) {
-                                echo "<tr><td colspan='11' style='text-align:center;color:#999;padding:16px;'>لا توجد معدات احتياطية</td></tr>";
+                                echo "<tr><td colspan='9' style='text-align:center;color:#999;padding:16px;'>لا توجد معدات احتياطية</td></tr>";
                             } else {
                                 $i = 1;
                                 foreach ($reserve_rows as $r) { $render_op_row($r, $i++); }

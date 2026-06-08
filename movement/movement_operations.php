@@ -446,7 +446,14 @@ if ($operations_res) {
 
 $operations_rows_day = [];
 $operations_rows_night = [];
+$operations_rows_reserve = [];
 foreach ($operations_rows as $op_row) {
+    // المعدات الاحتياطية تظهر في جدولها الخاص فقط (لا ضمن جداول النهار/الليل)
+    $op_category = isset($op_row['equipment_category']) ? $op_row['equipment_category'] : 'أساسي';
+    if ($op_category === 'احتياطي') {
+        $operations_rows_reserve[] = $op_row;
+        continue;
+    }
     $shift_code = isset($op_row['shift_type']) ? strtoupper((string)$op_row['shift_type']) : 'B';
     if ($shift_code === 'D' || $shift_code === 'B') {
         $operations_rows_day[] = $op_row;
@@ -953,6 +960,7 @@ include '../insidebar.php';
         $operations_tables = [
             ['title' => 'إدارة تشغيلات النهار', 'rows' => $operations_rows_day,   'table_key' => 'day'],
             ['title' => 'إدارة تشغيلات الليل',  'rows' => $operations_rows_night, 'table_key' => 'night'],
+            ['title' => 'إدارة تشغيلات المعدات الاحتياطية', 'rows' => $operations_rows_reserve, 'table_key' => 'reserve'],
         ];
         foreach ($operations_tables as $operations_table):
         ?>
