@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
         WHERE c.id = $project_contract_id
         LIMIT 1";
     $contract_result = mysqli_query($conn, $contract_query);
-    $contract_data = mysqli_fetch_assoc($contract_result);
+    $contract_data = $contract_result ? mysqli_fetch_assoc($contract_result) : null;
 
     if (!$contract_data) {
         die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
@@ -40,13 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
         ORDER BY equip_type";
     $equipment_result = mysqli_query($conn, $equipment_details_query);
     $equipment_breakdown = [];
-    while ($row = mysqli_fetch_assoc($equipment_result)) {
+    if ($equipment_result) { while ($row = mysqli_fetch_assoc($equipment_result)) {
         $equipment_breakdown[] = [
             'type' => $row['equip_type'],
             'hours' => floatval($row['total_hours']),
             'count' => intval($row['equipment_count'])
         ];
-    }
+    } }
 
     // جلب مجموع ساعات عقود السائقين لهذا العقد المحدد (باستثناء العقد الحالي عند التعديل)
     $drivers_query = "SELECT
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
     }
 
     $drivers_result = mysqli_query($conn, $drivers_query);
-    $drivers_data = mysqli_fetch_assoc($drivers_result);
+    $drivers_data = $drivers_result ? mysqli_fetch_assoc($drivers_result) : null;
 
     $contract_hours = floatval($contract_data['contract_total_hours']);
     $drivers_hours = floatval($drivers_data['drivers_contracted_hours']);

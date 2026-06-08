@@ -960,9 +960,9 @@ include '../insidebar.php';
                                             WHERE c.project_id = $contract_project_id AND c.id != $contract_id AND $contracts_scope_sql
                                             ORDER BY c.id DESC";
                             $merge_result = mysqli_query($conn, $merge_query);
-                            while ($m_row = mysqli_fetch_assoc($merge_result)) {
+                            if ($merge_result) { while ($m_row = mysqli_fetch_assoc($merge_result)) {
                                 echo "<option value='" . $m_row['id'] . "'>العقد #" . $m_row['id'] . " - " . $m_row['contract_signing_date'] . "</option>";
-                            }
+                            } }
                             ?>
                         </select>
                     </div>

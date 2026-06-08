@@ -248,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['project_name'])) {
         );
         if ($stmt) {
             $stmt_result = mysqli_stmt_get_result($stmt);
-            if ($client_row = mysqli_fetch_assoc($stmt_result)) {
+            if ($stmt_result && ($client_row = mysqli_fetch_assoc($stmt_result))) {
                 $client = sanitize_input($client_row['client_name']);
             }
         }
@@ -514,9 +514,9 @@ include('../insidebar.php');
                             <option value="">-- اختر العميل --</option>
                             <?php
                             $clients_query = mysqli_query($conn, "SELECT c.id, c.client_code, c.client_name FROM clients c WHERE c.status = 'نشط' AND $client_scope_sql ORDER BY c.client_name ASC");
-                            while ($cli = mysqli_fetch_assoc($clients_query)) {
+                            if ($clients_query) { while ($cli = mysqli_fetch_assoc($clients_query)) {
                                 echo "<option value='" . intval($cli['id']) . "'>[" . e($cli['client_code']) . "] " . e($cli['client_name']) . "</option>";
-                            }
+                            } }
                             ?>
                         </select>
                     </div>
@@ -636,7 +636,7 @@ include('../insidebar.php');
                       ORDER BY op.id DESC";
 
                         $result = mysqli_query($conn, $query);
-                        while ($row = mysqli_fetch_assoc($result)) {
+                        if ($result) { while ($row = mysqli_fetch_assoc($result)) {
                             $project_name_cell = "<a class='client-name-link' href='project_profile.php?id=" . intval($row['id']) . "'><strong>" . e($row['name']) . "</strong></a>";
 
                             echo "<tr>";
@@ -720,7 +720,7 @@ include('../insidebar.php');
                         </td>";
 
                             echo "</tr>";
-                        }
+                        } }
                         ?>
                     </tbody>
                 </table>

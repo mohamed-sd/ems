@@ -186,6 +186,9 @@ if ($conn->connect_error) {
 
 // تعيين charset لمنع SQL Injection عبر encoding
 $conn->set_charset("utf8mb4");
+// مواءمة ترتيب الاتصال مع ترتيب الأعمدة الموحّد (utf8mb4_unicode_ci) — يمنع خطأ
+// «Illegal mix of collations» عند مقارنة عمود بنتيجة CAST/تعبير تأخذ ترتيب الاتصال.
+mysqli_query($conn, "SET collation_connection = 'utf8mb4_unicode_ci'");
 
 // تهيئة إعدادات أداء اتصال قاعدة البيانات
 ems_optimize_db_session($conn);

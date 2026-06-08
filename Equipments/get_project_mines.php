@@ -68,11 +68,13 @@ $query = "SELECT m.id, m.mine_name, m.mine_code
 $result = mysqli_query($conn, $query);
 
 $mines = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $mines[] = [
-        'id' => $row['id'],
-        'name' => $row['mine_name'] . ' (' . $row['mine_code'] . ')'
-    ];
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $mines[] = [
+            'id' => $row['id'],
+            'name' => $row['mine_name'] . ' (' . $row['mine_code'] . ')'
+        ];
+    }
 }
 
 echo json_encode(['success' => true, 'mines' => $mines]);

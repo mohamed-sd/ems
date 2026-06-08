@@ -189,6 +189,100 @@ curl http://localhost/ems/api/board -H "Authorization: Bearer <token>"
 
 ---
 
+# تطبيق مدير الموقع — التايم شيت + المزامنة (Offline-First)
+
+نقاط مخصّصة لدور **مدير الموقع (الدور 5)** لتوثيق ساعات عمل المعدات. **العزل بالمشروع
+مفروض على كل المسارات بما فيها تفاصيل السجل المفرد** (تصحيح لسلوك الشاشة الويب القديمة).
+
+## بيانات مرجعية (تُخزَّن محلياً للعمل offline)
+
+### `GET /api/timesheet/refdata`
+حزمة مرجعية كاملة لمشروع المستخدم تكفي للعمل دون اتصال. `data`:
+```json
+{
+  "server_time": "2026-06-07 18:00:00",
+  "project": { "id": 4, "name": "...", ... },
+  "operations": [ { "operation_id", "equipment_id", "code", "name", "equipment_type_id",
+                    "type_form": 1, "type_name": "...", "shift_type": "B",
+                    "shift_hours": 10.0, "allowed_shifts": ["D","N"] } ],
+  "equipment_drivers": [ { "equipment_id", "driver_id", "shift_type" } ],
+  "drivers": [ { "id", "name", "phone", "driver_code" } ],
+  "equipment_types": [ { "id", "form", "type" } ],
+  "contracts": [ { "id", "contract_signing_date" } ],
+  "failure_codes": [ { "id", "equipment_type", "event_type_code", "event_type_name",
+                       "main_category_code", "main_category_name", "sub_category",
+                       "failure_detail", "full_code" } ]   // الشجرة الرباعية كاملة
+}
+```
+> `type_form` (1/2/3) هو نوع الكشف (حفّار/قلّاب/خرّامة) المشتقّ من `equipments_types.form`.
+
+### `GET /api/operations/by-type?type=1|2|3&shift=D|N`
+`data.operations[]`: `{ operation_id, code, name }` (مكافئ get_operations.php).
+
+### `GET /api/operations/{operation_id}/drivers?shift=D|N`
+`data.drivers[]`: `{ driver_id, name, phone }` (مكافئ get_drivers.php).
+
+### `GET /api/operations/{operation_id}/contract-hours`
+`data`: `{ shift_hours, shift_type, allowed_shifts }`.
+
+### `GET /api/failure-codes[?equipment_type=1|2|3]`
+`data.failure_codes[]`: نفس بنية refdata. يبني التطبيق الشجرة الرباعية محلياً.
+
+## سجلات التايم شيت
+
+### `GET /api/timesheets?type=&operation_id=&driver_id=&shift=&date=&start_date=&end_date=&month=&status=`
+JSON خام لسجلات مشروع المستخدم (≤500) + إحصائيات. `data`:
+```json
+{
+  "stats": { "executed": 7.0, "standby": 1.0, "faults": 3.0, "total_work": 8.0 },
+  "count": 1,
+  "timesheets": [ { "id", "operation_id", "driver_id", "driver_name", "equipment_code",
+                    "equipment_name", "type", "type_name", "shift", "date", "status",
+                    "shift_hours", "executed_hours", "bucket_hours", "jackhammer_hours",
+                    "total_work_hours", "total_fault_hours", "meters_count", "counter_diff",
+                    "fault_count", "client_uuid", "updated_at", ... } ]
+}
+```
+
+### `GET /api/timesheets/{id}`
+سجل واحد ضمن المشروع (404 إن خارجه) + `failures[]` المصنّفة.
+
+### `POST /api/timesheets` · `PUT /api/timesheets/{id}` · `DELETE /api/timesheets/{id}`
+المدخلات (حسب النوع): `type` (1/2/3)، `operator` (operation_id)، `driver`، `shift` (D/N)، `date`،
+`bucket_hours`/`jackhammer_hours` (حفّار)، `executed_hours` (قلّاب/خرّامة)، `standby_hours`،
+`dependence_hours`، `extra_hours`، حقول العدّاد (start/end_hours/minutes/seconds)،
+`tons_count`/`trips_count`/`transport_type` (قلّاب)، `drilling_holes_count`/`drilling_depth`/`meters_type` (خرّامة)،
+توزيع الأعطال `hr_fault`/`maintenance_fault`/`marketing_fault`/`approval_fault`/`other_fault_hours`،
+الملاحظات، و`fault_items[]` (`[{failure_code_id}]`).
+
+**يُحسب خادمياً (لا يُوثق بالعميل):** `executed_hours` (حفّار)، `total_work_hours`، `total_fault_hours`،
+`operator_standby_hours`، `machine_standby_hours`، `meters_count` (خرّامة)، `counter_diff`، و`shift_hours` (من التشغيل).
+
+**القواعد:** المعدة/التشغيل ضمن مشروع المستخدم فقط؛ الوردية ضمن `allowed_shifts`؛
+**تحقّق الأعطال** — إن كان `total_fault_hours > 0` فمجموع الجهات الخمس = إجماليه بالضبط وإلا **422**؛
+الحالة تُنشأ «تحت المراجعة» (1)؛ الأعطال تُحفظ في `timesheet_failure_hours` داخل Transaction.
+
+## المزامنة (Sync)
+
+### `POST /api/sync/timesheets` — رفع دفعي (idempotent)
+المدخل:
+```json
+{ "items": [ { "op": "create|update|delete", "client_uuid": "<uuid محلي>",
+              "client_updated_at": "2026-06-07 10:00:00", "payload": { ...نفس حقول POST/PUT, مع id للتحديث/الحذف } } ] }
+```
+الردّ `data.results[]`: `{ client_uuid, status: "applied|conflict|error", server_id, message[, server_record] }`.
+- **idempotency:** `create` بنفس `client_uuid` لا يُكرّر الإدراج (يعيد server_id الموجود).
+- **سياسة التعارض:** «الأحدث يفوز» — إن كان `updated_at` على الخادم أحدث من `client_updated_at`
+  يُعاد `conflict` مع `server_record` دون كتابة؛ غير ذلك يُطبّق التعديل.
+- `update` بلا `server_id` (لم يُرفع بعد) يُنشأ عبر `client_uuid`. `delete` غير الموجود يُعدّ منفّذاً.
+
+### `GET /api/sync/pull?updated_since=YYYY-MM-DD HH:MM:SS`
+يعيد `data`: `{ server_time, count, timesheets[] }` لسجلات المشروع المتغيّرة منذ `updated_since`
+(فارغ = الكل). استخدم `server_time` المُعاد في الطلب التالي.
+> ملاحظة: الحذف على الخادم حذف فعلي (hard delete) فلا يُكتشف عبر pull — وثّق ذلك للعميل.
+
+---
+
 ## الملفات
 
 ```
@@ -198,14 +292,17 @@ api/
 ├── bootstrap.php             تحميل config + ردود JSON + مدخلات + مصادقة + عزل + أخطاء
 ├── controllers/
 │   ├── auth.php              login · logout · me
-│   ├── board.php             board
-│   ├── operations.php        operations (GET/POST/PUT)
+│   ├── board.php             board (تطبيق الحركة)
+│   ├── operations.php        operations (GET/POST/PUT) + by-type/drivers/contract-hours
 │   ├── drivers.php           equipment-drivers (POST/PUT) · drivers/available
-│   └── lists.php             contracts · suppliers · equipment-types · equipments
+│   ├── lists.php             contracts · suppliers · equipment-types · equipments
+│   ├── timesheet.php         refdata · failure-codes · timesheets (CRUD) · حسابات + تحقّق
+│   └── sync.php              sync/timesheets (push) · sync/pull
 └── README.md
 ```
 
-جدول التوكنات: `database/migrations/2026_06_06_create_api_tokens.sql`.
+ترحيلات: `database/migrations/2026_06_06_create_api_tokens.sql` ·
+`database/migrations/2026_06_07_timesheet_sync_columns.sql` (يضيف `client_uuid` و`updated_at` لجدول timesheet).
 
 ## الإعداد
 

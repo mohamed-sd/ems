@@ -42,8 +42,10 @@ switch ($action) {
              ORDER BY FIELD(event_type_code,'OPR','EQF','MNT','DEP','CST','MST','HRF','MKF')"
         );
         $data = [];
-        while ($row = mysqli_fetch_assoc($res)) {
-            $data[] = $row;
+        if ($res) {
+            while ($row = mysqli_fetch_assoc($res)) {
+                $data[] = $row;
+            }
         }
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         break;
@@ -60,8 +62,10 @@ switch ($action) {
              ORDER BY main_category_name"
         );
         $data = [];
-        while ($row = mysqli_fetch_assoc($res)) {
-            $data[] = $row;
+        if ($res) {
+            while ($row = mysqli_fetch_assoc($res)) {
+                $data[] = $row;
+            }
         }
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         break;
@@ -79,8 +83,10 @@ switch ($action) {
              ORDER BY sub_category"
         );
         $data = [];
-        while ($row = mysqli_fetch_assoc($res)) {
-            $data[] = $row['sub_category'];
+        if ($res) {
+            while ($row = mysqli_fetch_assoc($res)) {
+                $data[] = $row['sub_category'];
+            }
         }
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         break;
@@ -99,8 +105,10 @@ switch ($action) {
              ORDER BY failure_detail"
         );
         $data = [];
-        while ($row = mysqli_fetch_assoc($res)) {
-            $data[] = $row;
+        if ($res) {
+            while ($row = mysqli_fetch_assoc($res)) {
+                $data[] = $row;
+            }
         }
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         break;
@@ -111,7 +119,7 @@ switch ($action) {
         $res = mysqli_query($conn,
             "SELECT * FROM failure_codes WHERE full_code = '$full_code' AND status = 1 LIMIT 1"
         );
-        $row = mysqli_fetch_assoc($res);
+        $row = $res ? mysqli_fetch_assoc($res) : null;
         echo json_encode($row ?: null, JSON_UNESCAPED_UNICODE);
         break;
 

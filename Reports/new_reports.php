@@ -8,22 +8,28 @@ if (!isset($_SESSION['user'])) {
 include("../config.php"); // ملف الاتصال بقاعدة البيانات
 
 // المشاريع
-$projects_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(id) AS c FROM project"))['c'];
+$projects_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM project");
+$projects_count = $projects_res ? (mysqli_fetch_assoc($projects_res)['c'] ?? null) : null;
 
 // الموردين
-$suppliers_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(id) AS c FROM suppliers"))['c'];
+$suppliers_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM suppliers");
+$suppliers_count = $suppliers_res ? (mysqli_fetch_assoc($suppliers_res)['c'] ?? null) : null;
 
 // الآليات
-$equipments_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(id) AS c FROM equipments"))['c'];
+$equipments_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM equipments");
+$equipments_count = $equipments_res ? (mysqli_fetch_assoc($equipments_res)['c'] ?? null) : null;
 
 // المشغلين (drivers)
-$operators_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(id) AS c FROM drivers"))['c'];
+$operators_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM drivers");
+$operators_count = $operators_res ? (mysqli_fetch_assoc($operators_res)['c'] ?? null) : null;
 
 // المستخدمين
-$users_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(id) AS c FROM users"))['c'];
+$users_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM users");
+$users_count = $users_res ? (mysqli_fetch_assoc($users_res)['c'] ?? null) : null;
 
 // ساعات العمل (مجموع total_work_hours)
-$workhours_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT SUM(total_work_hours) AS total FROM timesheet"))['total'];
+$workhours_res = mysqli_query($conn, "SELECT SUM(total_work_hours) AS total FROM timesheet");
+$workhours_count = $workhours_res ? (mysqli_fetch_assoc($workhours_res)['total'] ?? null) : null;
 if(!$workhours_count) $workhours_count = 0;
 ?>
 <!DOCTYPE html>

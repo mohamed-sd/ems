@@ -1013,7 +1013,7 @@ include('../insidebar.php');
           $i = 1;
 
 
-          while ($row = mysqli_fetch_assoc($result)) {
+          if ($result) { while ($row = mysqli_fetch_assoc($result)) {
 
             // عرض حالة العقد من status
             $contractStatus = isset($row['status']) ? $row['status'] : 1;
@@ -1121,7 +1121,7 @@ include('../insidebar.php');
             // الحالة والإجراءات
             echo "<td class='group-status'>" . $status . "</td>";
             echo "</tr>";
-          }
+          } }
           ?>
         </tbody>
       </table>

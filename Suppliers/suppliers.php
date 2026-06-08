@@ -229,10 +229,10 @@ if (isset($_GET['delete_id'])) {
 
     // التحقق من وجود معدات أو عقود مرتبطة
     $check_equip = mysqli_query($conn, "SELECT COUNT(*) as count FROM equipments WHERE suppliers = $delete_id");
-    $equip_count = mysqli_fetch_assoc($check_equip)['count'];
+    $equip_count = $check_equip ? (mysqli_fetch_assoc($check_equip)['count'] ?? 0) : 0;
 
     $check_contracts = mysqli_query($conn, "SELECT COUNT(*) as count FROM supplierscontracts WHERE supplier_id = $delete_id");
-    $contracts_count = mysqli_fetch_assoc($check_contracts)['count'];
+    $contracts_count = $check_contracts ? (mysqli_fetch_assoc($check_contracts)['count'] ?? 0) : 0;
 
     if ($equip_count > 0 || $contracts_count > 0) {
         header("Location: suppliers.php?msg=لا+يمكن+حذف+المورد+لأنه+مرتبط+بمعدات+أو+عقود+موجودة+❌");
@@ -602,7 +602,7 @@ include '../insidebar.php';
                                                     WHERE $supplier_scope_sql AND ($suppliers_not_deleted_s_sql)
                           ORDER BY s.id DESC";
                         $result = mysqli_query($conn, $query);
-                        while ($row = mysqli_fetch_assoc($result)) {
+                        if ($result) { while ($row = mysqli_fetch_assoc($result)) {
                             $supplier_name_cell = "<a class='client-name-link' href='supplier_profile.php?id=" . intval($row['id']) . "'>" . htmlspecialchars($row['name']) . "</a>";
                             if (intval($row['num_contracts']) === 0) {
                                 $supplier_name_cell .= " <span class='link-alert-chip' title='المورد ليس لديه عقد'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
@@ -665,7 +665,7 @@ include '../insidebar.php';
                         </td>";
 
                             echo "</tr>";
-                        }
+                        } }
                         ?>
                     </tbody>
                 </table>

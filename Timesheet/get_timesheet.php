@@ -70,7 +70,7 @@ if (!$is_super_admin) {
 }
 
 $q = mysqli_query($conn, "SELECT * FROM timesheet WHERE id = $id" . $scope . " LIMIT 1");
-$row = mysqli_fetch_assoc($q);
+$row = $q ? mysqli_fetch_assoc($q) : null;
 if (!$row) {
     echo json_encode([], JSON_UNESCAPED_UNICODE);
     exit;

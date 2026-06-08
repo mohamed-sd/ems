@@ -94,7 +94,7 @@ if (isset($_GET['delete_id'])) {
 
     // التحقق من عدم استخدام المعدة في عمليات نشطة
     $check_ops = mysqli_query($conn, "SELECT COUNT(*) as count FROM operations WHERE equipment = $delete_id AND status = '1'");
-    $ops_count = mysqli_fetch_assoc($check_ops)['count'];
+    $ops_count = $check_ops ? (mysqli_fetch_assoc($check_ops)['count'] ?? 0) : 0;
 
     if ($ops_count > 0) {
         header("Location: equipments_fleet.php?msg=لا+يمكن+حذف+المعدة+لأنها+بصدد+التشغيل+حالياً+❌");
@@ -279,8 +279,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
                                  AND type = '$type'
                                  AND status = 1";
             $added_count_result = mysqli_query($conn, $added_count_query);
-            $added_count_row = mysqli_fetch_assoc($added_count_result);
-            $current_added = intval($added_count_row['added_count']);
+            $added_count_row = $added_count_result ? mysqli_fetch_assoc($added_count_result) : null;
+            $current_added = intval($added_count_row['added_count'] ?? 0);
 
             // التحقق من عدم تجاوز العدد المتعاقد عليه
             if ($current_added >= $contracted_count) {
@@ -508,7 +508,8 @@ $fleet_company_where_plain = ($equipment_has_company_id && $current_company_id >
     ? " WHERE company_id = $current_company_id"
     : "";
 
-$fleet_total_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments$fleet_company_where_plain"))['t'] ?? 0);
+$_ftc_res = mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments$fleet_company_where_plain");
+$fleet_total_count = intval($_ftc_res ? (mysqli_fetch_assoc($_ftc_res)['t'] ?? 0) : 0);
 
 if ($equipment_has_availability_state) {
     $fleet_available_sql = "SELECT COUNT(*) AS t FROM equipments
@@ -522,11 +523,15 @@ if ($equipment_has_availability_state) {
         WHERE (availability_status IS NULL OR availability_status = '' OR availability_status IN ('متاحة للعمل','قيد الاستخدام'))" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : '');
 }
 
-$fleet_available_count = intval(mysqli_fetch_assoc(mysqli_query($conn, $fleet_available_sql))['t'] ?? 0);
+$_fac_res = mysqli_query($conn, $fleet_available_sql);
+$fleet_available_count = intval($_fac_res ? (mysqli_fetch_assoc($_fac_res)['t'] ?? 0) : 0);
 $fleet_unavailable_count = max(0, $fleet_total_count - $fleet_available_count);
-$fleet_maintenance_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments WHERE status = 1" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : '')))['t'] ?? 0);
-$fleet_reserved_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments WHERE status = 2" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : '')))['t'] ?? 0);
-$fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(DISTINCT o.equipment) AS t FROM operations o JOIN equipments m ON m.id = o.equipment WHERE o.status = '1'$equipment_company_filter"))['t'] ?? 0);
+$_fmc_res = mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments WHERE status = 1" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : ''));
+$fleet_maintenance_count = intval($_fmc_res ? (mysqli_fetch_assoc($_fmc_res)['t'] ?? 0) : 0);
+$_frc_res = mysqli_query($conn, "SELECT COUNT(*) AS t FROM equipments WHERE status = 2" . (($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : ''));
+$fleet_reserved_count = intval($_frc_res ? (mysqli_fetch_assoc($_frc_res)['t'] ?? 0) : 0);
+$_faoc_res = mysqli_query($conn, "SELECT COUNT(DISTINCT o.equipment) AS t FROM operations o JOIN equipments m ON m.id = o.equipment WHERE o.status = '1'$equipment_company_filter");
+$fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t'] ?? 0) : 0);
 ?>
 
 <style>
@@ -682,7 +687,7 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
                                 $supplier_company_where = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
                                 $supplier_query = "SELECT id, name FROM suppliers WHERE status = 1$supplier_company_where ORDER BY name";
                                 $supplier_result = mysqli_query($conn, $supplier_query);
-                                while ($supplier = mysqli_fetch_assoc($supplier_result)) {
+                                if ($supplier_result) while ($supplier = mysqli_fetch_assoc($supplier_result)) {
                                     $selected = (!empty($editData) && $editData['suppliers'] == $supplier['id']) ? 'selected' : '';
                                     echo "<option value='{$supplier['id']}' $selected>{$supplier['name']}</option>";
                                 }
@@ -1214,7 +1219,7 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
                             $supplier_company_filter_where = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
                             $supplier_filter_query = "SELECT id, name FROM suppliers WHERE status = 1$supplier_company_filter_where ORDER BY name";
                             $supplier_filter_result = mysqli_query($conn, $supplier_filter_query);
-                            while ($supplier = mysqli_fetch_assoc($supplier_filter_result)) {
+                            if ($supplier_filter_result) while ($supplier = mysqli_fetch_assoc($supplier_filter_result)) {
                                 echo "<option value='" . htmlspecialchars($supplier['name']) . "'>" . htmlspecialchars($supplier['name']) . "</option>";
                             }
                             ?>
@@ -1228,7 +1233,7 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
                             <?php
                             $type_filter_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
                             $type_filter_result = mysqli_query($conn, $type_filter_query);
-                            while ($type_row = mysqli_fetch_assoc($type_filter_result)) {
+                            if ($type_filter_result) while ($type_row = mysqli_fetch_assoc($type_filter_result)) {
                                 echo "<option value='" . htmlspecialchars($type_row['type']) . "'>" . htmlspecialchars($type_row['type']) . "</option>";
                             }
                             ?>
@@ -1346,7 +1351,7 @@ $fleet_active_ops_count = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT 
                         ORDER BY m.id DESC
                     ";
                         $result = mysqli_query($conn, $query2);
-                        while ($row = mysqli_fetch_assoc($result)) {
+                        if ($result) while ($row = mysqli_fetch_assoc($result)) {
 
 
                             echo "<tr>";

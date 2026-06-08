@@ -94,7 +94,7 @@ if ($_SESSION['user']['role'] == "6") {
 }
 
 $totalResult = mysqli_query($conn, $totalQuery);
-$totalRecords = mysqli_fetch_assoc($totalResult)['total'];
+$totalRecords = $totalResult ? (mysqli_fetch_assoc($totalResult)['total'] ?? 0) : 0;
 
 // Count filtered records
 $filteredQuery = "SELECT COUNT(*) as total
@@ -106,7 +106,7 @@ $filteredQuery = "SELECT COUNT(*) as total
                   $where";
 
 $filteredResult = mysqli_query($conn, $filteredQuery);
-$filteredRecords = mysqli_fetch_assoc($filteredResult)['total'];
+$filteredRecords = $filteredResult ? (mysqli_fetch_assoc($filteredResult)['total'] ?? 0) : 0;
 
 // Fetch data
 $query = "SELECT t.id, t.shift, t.date, t.executed_hours,

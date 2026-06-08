@@ -16,9 +16,9 @@ if (isset($_POST['contract_id'])) {
   $result = mysqli_query($conn, $query);
 
   $equipments = [];
-  while ($row = mysqli_fetch_assoc($result)) {
+  if ($result) { while ($row = mysqli_fetch_assoc($result)) {
     $equipments[] = $row;
-  }
+  } }
 
   header('Content-Type: application/json');
   echo json_encode($equipments);

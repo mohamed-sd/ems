@@ -94,17 +94,22 @@ $sql_contacts = "
     ORDER BY last_message_time DESC, u.name ASC
 ";
 $contacts_result = mysqli_query($conn, $sql_contacts);
+if ($contacts_result === false) {
+    error_log('chats/index.php: فشل استعلام جهات الاتصال: ' . mysqli_error($conn));
+}
 $contacts    = [];
 $departments = []; // role_id => role_name (للأدوار الموجودة فعلاً في القائمة)
-while ($row = mysqli_fetch_assoc($contacts_result)) {
-    $info              = getRoleInfo($row['role'], $roles_map, $role_palette);
-    $row['role_name']  = $info['name'];
-    $row['role_color'] = $info['color'];
-    $row['avatar']     = mb_substr($row['name'], 0, 1);
-    $contacts[]        = $row;
-    $dept_key = $row['role'];
-    if (!isset($departments[$dept_key])) {
-        $departments[$dept_key] = $info['name'];
+if ($contacts_result) {
+    while ($row = mysqli_fetch_assoc($contacts_result)) {
+        $info              = getRoleInfo($row['role'], $roles_map, $role_palette);
+        $row['role_name']  = $info['name'];
+        $row['role_color'] = $info['color'];
+        $row['avatar']     = mb_substr($row['name'], 0, 1);
+        $contacts[]        = $row;
+        $dept_key = $row['role'];
+        if (!isset($departments[$dept_key])) {
+            $departments[$dept_key] = $info['name'];
+        }
     }
 }
 

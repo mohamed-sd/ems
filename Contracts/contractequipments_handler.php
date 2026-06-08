@@ -106,12 +106,12 @@ function saveContractEquipments($contract_id, $equipment_data, $conn) {
 function getContractEquipments($contract_id, $conn) {
     $sql = "SELECT * FROM contractequipments WHERE contract_id = " . intval($contract_id) . " ORDER BY id ASC";
     $result = mysqli_query($conn, $sql);
-    
+
     $equipments = [];
-    while ($row = mysqli_fetch_assoc($result)) {
+    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
         $equipments[] = $row;
-    }
-    
+    } }
+
     return $equipments;
 }
 

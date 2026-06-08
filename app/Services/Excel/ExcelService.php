@@ -160,8 +160,10 @@ class ExcelService
         mysqli_stmt_execute($stmt);
         $res = mysqli_stmt_get_result($stmt);
         $rows = [];
-        while ($row = mysqli_fetch_assoc($res)) {
-            $rows[] = $row;
+        if ($res) {
+            while ($row = mysqli_fetch_assoc($res)) {
+                $rows[] = $row;
+            }
         }
         mysqli_stmt_close($stmt);
         return $rows;

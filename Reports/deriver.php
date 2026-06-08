@@ -93,9 +93,11 @@ $result = mysqli_query($conn, $sql);
                         <option value="">-- الكل --</option>
                         <?php
                         $prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
+                        if ($prj) {
                         while ($prjRow = mysqli_fetch_assoc($prj)) {
                             $selected = ($project_filter == $prjRow['id']) ? "selected" : "";
                             echo "<option value='{$prjRow['id']}' $selected>{$prjRow['name']}</option>";
+                        }
                         }
                         ?>
                     </select></div>
@@ -107,9 +109,11 @@ $result = mysqli_query($conn, $sql);
                         <option value="">-- الكل --</option>
                         <?php
                         $drv = mysqli_query($conn, "SELECT id, name FROM drivers where status = '1' ");
+                        if ($drv) {
                         while ($drvRow = mysqli_fetch_assoc($drv)) {
                             $selected = ($driver_filter == $drvRow['id']) ? "selected" : "";
                             echo "<option value='{$drvRow['id']}' $selected>{$drvRow['name']}</option>";
+                        }
                         }
                         ?>
                     </select></div>
@@ -144,9 +148,11 @@ $result = mysqli_query($conn, $sql);
                             FROM operations o
                             JOIN equipments e ON o.equipment = e.id
                         ");
+                        if ($res) {
                         while ($equipRow = mysqli_fetch_assoc($res)) {
                             $sel = ($equipment_id == $equipRow['id']) ? "selected" : "";
                             echo "<option value='{$equipRow['id']}' $sel>{$equipRow['name']}</option>";
+                        }
                         }
                         ?>
                     </select></div>
@@ -184,6 +190,7 @@ $result = mysqli_query($conn, $sql);
                 <tbody>
                 <?php
                 $grand_total = 0;
+                if ($result) {
                 while ($row = mysqli_fetch_assoc($result)) {
                     $grand_total += $row['total_hours'];
                 ?>
@@ -194,7 +201,7 @@ $result = mysqli_query($conn, $sql);
                         <td><?php echo $row['equipment_name']; ?></td>
                         <td><span class="status-active"><?php echo $row['total_hours']; ?> ساعة</span></td>
                     </tr>
-                <?php } ?>
+                <?php } } ?>
                 </tbody>
             </table>
         </div>

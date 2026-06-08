@@ -790,8 +790,10 @@ include('../insidebar.php');
                 <h5><i class="fas fa-cogs"></i> قائمة التشغيل</h5>
             </div>
             <div class="card-body card-body-zero">
+                <!-- ===== جدول المعدات الأساسية ===== -->
+                <h6 style="margin:6px 14px 8px;font-size:15px;font-weight:800;color:#1a1208;display:flex;align-items:center;gap:8px;"><span class="legend-dot legend-basic">■</span> المعدات الأساسية</h6>
                 <div class="tbl-scroll-wrap tbl-scroll-zero">
-                    <table id="projectsTable" class="display nowrap table-full-width">
+                    <table id="primaryTable" class="display nowrap table-full-width">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -906,10 +908,22 @@ include('../insidebar.php');
                       GROUP BY o.id
                       ORDER BY o.id DESC";
                             $result = mysqli_query($conn, $query);
-                            $i = 1;
-                            while ($row = mysqli_fetch_assoc($result)) {
+                            // تقسيم التشغيلات إلى أساسية / احتياطية
+                            $primary_rows = [];
+                            $reserve_rows = [];
+                            if ($result) {
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    if (($row['equipment_category'] ?? '') === 'أساسي') {
+                                        $primary_rows[] = $row;
+                                    } else {
+                                        $reserve_rows[] = $row;
+                                    }
+                                }
+                            }
+                            // دالة رسم صف تشغيل واحد (تُستخدم للجدولين)
+                            $render_op_row = function ($row, $i) use ($conn, $can_view, $can_edit, $can_delete, $selected_project_id) {
                                 echo "<tr>";
-                                echo "<td>" . $i++ . "</td>";
+                                echo "<td>" . $i . "</td>";
                                 echo "<td>" . $row['equipment_code'] . " - " . $row['equipment_name'] . "</td>";
                                 echo "<td>" . (!empty($row['equipment_type_name']) ? htmlspecialchars($row['equipment_type_name']) : "-") . "</td>";
                                 echo "<td>" . (!empty($row['driver_names']) ? $row['driver_names'] : "-") . "</td>";
@@ -1004,6 +1018,46 @@ include('../insidebar.php');
                                                                 " . $action_buttons . "
                                                             </td>";
                                 echo "</tr>";
+                            };
+                            // عرض صفوف الجدول الأول: المعدات الأساسية
+                            if (empty($primary_rows)) {
+                                echo "<tr><td colspan='11' style='text-align:center;color:#999;padding:16px;'>لا توجد معدات أساسية</td></tr>";
+                            } else {
+                                $i = 1;
+                                foreach ($primary_rows as $r) { $render_op_row($r, $i++); }
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ===== جدول المعدات الاحتياطية ===== -->
+                <h6 style="margin:18px 14px 8px;font-size:15px;font-weight:800;color:#1a1208;display:flex;align-items:center;gap:8px;"><span class="legend-dot legend-backup">■</span> المعدات الاحتياطية</h6>
+                <div class="tbl-scroll-wrap tbl-scroll-zero">
+                    <table id="reserveTable" class="display nowrap table-full-width">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>المعدة</th>
+                                <th>نوع المعدة</th>
+                                <th>السائقين</th>
+                                <th>المورد</th>
+                                <th>ساعات الوردية</th>
+                                <th>نظام الوردية</th>
+                                <th>تاريخ البداية</th>
+                                <th>النوع</th>
+                                <th>الحالة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            // عرض صفوف الجدول الثاني: المعدات الاحتياطية
+                            if (empty($reserve_rows)) {
+                                echo "<tr><td colspan='11' style='text-align:center;color:#999;padding:16px;'>لا توجد معدات احتياطية</td></tr>";
+                            } else {
+                                $i = 1;
+                                foreach ($reserve_rows as $r) { $render_op_row($r, $i++); }
                             }
                             ?>
                         </tbody>
@@ -1142,19 +1196,23 @@ include('../insidebar.php');
                 // تشغيل DataTable بالعربية
                 // تشغيل DataTable بالعربية
                 $(document).ready(function () {
-                    $('#projectsTable').DataTable({
-                        dom: 'Bfrtip', // أزرار + بحث + ترقيم الصفحات
-                        buttons: [
-                            { extend: 'copy', text: 'نسخ' },
-                            { extend: 'excel', text: 'تصدير Excel' },
-                            { extend: 'csv', text: 'تصدير CSV' },
-                            { extend: 'pdf', text: 'تصدير PDF' },
-                            { extend: 'print', text: 'طباعة' }
-                        ],
-                        "language": {
-                            "url": "https:/ems/assets/i18n/datatables/ar.json"
-                        }
-                    });
+                    function opsTableConfig() {
+                        return {
+                            dom: 'Bfrtip', // أزرار + بحث + ترقيم الصفحات
+                            buttons: [
+                                { extend: 'copy', text: 'نسخ' },
+                                { extend: 'excel', text: 'تصدير Excel' },
+                                { extend: 'csv', text: 'تصدير CSV' },
+                                { extend: 'pdf', text: 'تصدير PDF' },
+                                { extend: 'print', text: 'طباعة' }
+                            ],
+                            "language": {
+                                "url": "https:/ems/assets/i18n/datatables/ar.json"
+                            }
+                        };
+                    }
+                    $('#primaryTable').DataTable(opsTableConfig());
+                    $('#reserveTable').DataTable(opsTableConfig());
                 });
 
             })();

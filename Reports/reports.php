@@ -93,9 +93,11 @@ include('../insidebar.php');
                             <option value="">-- الكل --</option>
                             <?php
                             $sup = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE status = '1'$_supplier_company_where ORDER BY name");
+                            if ($sup) {
                             while ($row = mysqli_fetch_assoc($sup)) {
                                 $selected = ($supplier_filter == $row['id']) ? "selected" : "";
                                 echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+                            }
                             }
                             ?>
                         </select>
@@ -106,9 +108,11 @@ include('../insidebar.php');
                             <option value="">-- الكل --</option>
                             <?php
                             $prj = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name");
+                            if ($prj) {
                             while ($row = mysqli_fetch_assoc($prj)) {
                                 $selected = ($project_filter == $row['id']) ? "selected" : "";
                                 echo "<option value='{$row['id']}' $selected>{$row['name']} ({$row['project_code']})</option>";
+                            }
                             }
                             ?>
                         </select>
@@ -120,9 +124,11 @@ include('../insidebar.php');
                             <?php
                             if (!empty($project_filter)) {
                                 $contracts = mysqli_query($conn, "SELECT id, contract_signing_date FROM contracts WHERE project_id = '$project_filter' AND status = 1 ORDER BY contract_signing_date DESC");
+                                if ($contracts) {
                                 while ($row = mysqli_fetch_assoc($contracts)) {
                                     $selected = ($contract_filter == $row['id']) ? "selected" : "";
                                     echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['contract_signing_date']}</option>";
+                                }
                                 }
                             }
                             ?>
@@ -159,6 +165,7 @@ include('../insidebar.php');
                         <tbody>
                             <?php
                             $i = 1;
+                            if ($result) {
                             while ($row = mysqli_fetch_assoc($result)) {
                                 $contract_display = !empty($row['contract_id']) ? 'عقد #' . $row['contract_id'] . ' - ' . $row['contract_signing_date'] : '<span class="text-muted">غير محدد</span>';
                             ?>
@@ -169,7 +176,7 @@ include('../insidebar.php');
                                     <td><?= htmlspecialchars($row['supplier_name']); ?></td>
                                     <td><span class="status-active"><?= number_format($row['total_hours'], 2); ?> ساعة</span></td>
                                 </tr>
-                            <?php } ?>
+                            <?php } } ?>
                         </tbody>
                     </table>
                 </div>

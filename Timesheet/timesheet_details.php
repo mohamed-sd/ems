@@ -528,7 +528,7 @@ if ($_an_tbl_check && $_an_tbl_check->num_rows > 0) {
     }
 }
 
-while ($row = mysqli_fetch_assoc($result)) {
+if ($result) while ($row = mysqli_fetch_assoc($result)) {
     $shift_display = $row['shift'] == "D" ? "صباح" : "مساء";
     $shift_class   = $row['shift'] == "D" ? "day" : "night";
     $shift_icon    = $row['shift'] == "D" ? "fas fa-sun" : "fas fa-moon";

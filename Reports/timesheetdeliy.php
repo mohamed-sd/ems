@@ -140,9 +140,11 @@ include('../insidebar.php');
                         <option value="">-- الكل --</option>
                         <?php
                         $prj = mysqli_query($conn, "SELECT id, name FROM project where status = '1' ");
+                        if ($prj) {
                         while ($row = mysqli_fetch_assoc($prj)) {
                             $selected = ($project_filter == $row['id']) ? "selected" : "";
                             echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+                        }
                         }
                         ?>
                     </select>
@@ -154,9 +156,11 @@ include('../insidebar.php');
                         <option value="">-- الكل --</option>
                         <?php
                         $sup = mysqli_query($conn, "SELECT id, name FROM suppliers where status = '1'$_ts_supplier_company_where ");
+                        if ($sup) {
                         while ($row = mysqli_fetch_assoc($sup)) {
                             $selected = ($supplier_filter == $row['id']) ? "selected" : "";
                             echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+                        }
                         }
                         ?>
                     </select>
@@ -230,7 +234,7 @@ include('../insidebar.php');
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                    <?php if ($result) { while ($row = mysqli_fetch_assoc($result)) { ?>
                         <tr>
                             <td><?php echo htmlspecialchars($row['date']); ?></td>
                             <td><?php echo htmlspecialchars($row['project_name']); ?></td>
@@ -245,7 +249,7 @@ include('../insidebar.php');
                             <td><?php echo htmlspecialchars($row['work_notes']); ?></td>
                             <td><?php echo htmlspecialchars($row['fault_notes']); ?></td>
                         </tr>
-                    <?php } ?>
+                    <?php } } ?>
                 </tbody>
             </table>
             </div>

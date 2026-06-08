@@ -145,7 +145,7 @@ if ($suppliers_result) {
 
         $equipment_breakdown = [];
 
-        while ($equip = mysqli_fetch_assoc($equip_details_result)) {
+        if ($equip_details_result) while ($equip = mysqli_fetch_assoc($equip_details_result)) {
             // حساب عدد الآليات المشغّلة فعليًا من جدول operations
                         $operating_count_query = "SELECT COUNT(DISTINCT o.equipment) as operating_count
                                       FROM operations o
@@ -155,8 +155,8 @@ if ($suppliers_result) {
                                         AND o.project_id = $project_id
                                                                                 AND o.status = 1" . ((!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "");
             $operating_result = mysqli_query($conn, $operating_count_query);
-            $operating_row = mysqli_fetch_assoc($operating_result);
-            $operating_count = intval($operating_row['operating_count']);
+            $operating_row = $operating_result ? mysqli_fetch_assoc($operating_result) : null;
+            $operating_count = intval($operating_row['operating_count'] ?? 0);
 
             $contracted_count = intval($equip['total_count']);
             $remaining_count = max(0, $contracted_count - $operating_count);

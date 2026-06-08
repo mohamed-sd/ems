@@ -5,11 +5,15 @@ include "../config.php";
 // جلب بيانات المستخدم
 $userName = isset($_SESSION['user']['name']) ? $_SESSION['user']['name'] : "مستخدم غير معروف";
 
-// الإحصائيات العامة 
-$totalExecuted = $conn->query("SELECT SUM(executed_hours) AS s FROM timesheet")->fetch_assoc()['s'];
-$totalFault = $conn->query("SELECT SUM(total_fault_hours) AS s FROM timesheet")->fetch_assoc()['s'];
-$totalOperator = $conn->query("SELECT SUM(operator_hours) AS s FROM timesheet")->fetch_assoc()['s'];
-$totalCounter = $conn->query("SELECT SUM(counter_diff) AS s FROM timesheet")->fetch_assoc()['s'];
+// الإحصائيات العامة
+$totalExecuted_res = $conn->query("SELECT SUM(executed_hours) AS s FROM timesheet");
+$totalExecuted = $totalExecuted_res ? ($totalExecuted_res->fetch_assoc()['s'] ?? null) : null;
+$totalFault_res = $conn->query("SELECT SUM(total_fault_hours) AS s FROM timesheet");
+$totalFault = $totalFault_res ? ($totalFault_res->fetch_assoc()['s'] ?? null) : null;
+$totalOperator_res = $conn->query("SELECT SUM(operator_hours) AS s FROM timesheet");
+$totalOperator = $totalOperator_res ? ($totalOperator_res->fetch_assoc()['s'] ?? null) : null;
+$totalCounter_res = $conn->query("SELECT SUM(counter_diff) AS s FROM timesheet");
+$totalCounter = $totalCounter_res ? ($totalCounter_res->fetch_assoc()['s'] ?? null) : null;
 
 // جلب أول 50 سجل
 // جلب أول 50 سجل مع اسم المعدة واسم السائق
@@ -175,7 +179,7 @@ $timesheets = $conn->query("
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($row = $timesheets->fetch_assoc()): ?>
+                    <?php if ($timesheets): while ($row = $timesheets->fetch_assoc()): ?>
                         <tr>
                             <td><?= $row['id'] ?></td>
                             <td><?= $row['date'] ?></td>
@@ -187,7 +191,7 @@ $timesheets = $conn->query("
                             <td><?= htmlspecialchars($row['counter_diff'], ENT_QUOTES, 'UTF-8') ?></td>
                             <td><?= htmlspecialchars($row['work_notes'], ENT_QUOTES, 'UTF-8') ?></td>
                         </tr>
-                    <?php endwhile; ?>
+                    <?php endwhile; endif; ?>
                 </tbody>
             </table>
 

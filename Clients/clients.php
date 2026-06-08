@@ -370,7 +370,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
         $check_query = "SELECT cc.id FROM clients cc WHERE cc.client_code = '$client_code' AND cc.id != $client_id AND $scope_clients_sql AND $not_deleted_cc_sql";
         $check_result = mysqli_query($conn, $check_query);
 
-        if (mysqli_num_rows($check_result) > 0) {
+        if ($check_result && mysqli_num_rows($check_result) > 0) {
             clients_redirect_with_msg('كود العميل موجود مسبقاً داخل شركتك ❌');
         }
 
@@ -421,7 +421,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
         $check_query = "SELECT cc.id FROM clients cc WHERE cc.client_code = '$client_code' AND $scope_clients_sql AND $not_deleted_cc_sql";
         $check_result = mysqli_query($conn, $check_query);
 
-        if (mysqli_num_rows($check_result) > 0) {
+        if ($check_result && mysqli_num_rows($check_result) > 0) {
             clients_redirect_with_msg('كود العميل موجود مسبقاً داخل شركتك ❌');
         }
 

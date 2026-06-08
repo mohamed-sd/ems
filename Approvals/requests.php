@@ -90,8 +90,10 @@ $result = mysqli_query($conn, $sql);
     
     $stats_result = mysqli_query($conn, $stats_sql);
     $stats = ['pending' => 0, 'approved' => 0, 'rejected' => 0];
-    while ($stat = mysqli_fetch_assoc($stats_result)) {
-        $stats[$stat['status']] = $stat['count'];
+    if ($stats_result) {
+        while ($stat = mysqli_fetch_assoc($stats_result)) {
+            $stats[$stat['status']] = $stat['count'];
+        }
     }
     $total = $stats['pending'] + $stats['approved'] + $stats['rejected'];
     ?>

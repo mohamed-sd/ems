@@ -123,7 +123,7 @@ if (isset($_POST['equipment_id'])) {
 
     // جلب معلومات الآلية
     $equipment_res = mysqli_query($conn, "SELECT e.code, e.name FROM equipments e WHERE e.id = $equipment_id AND $equipment_scope_sql LIMIT 1");
-    $equipment_info = mysqli_fetch_assoc($equipment_res);
+    $equipment_info = $equipment_res ? mysqli_fetch_assoc($equipment_res) : null;
     if (!$equipment_info) {
         echo "❌ الآلية غير موجودة أو خارج نطاق الشركة.";
         exit;
@@ -150,13 +150,13 @@ if (isset($_POST['equipment_id'])) {
             // التحقق من عدم وجود ربط نشط بالفعل
             $check_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";
             $check = mysqli_query($conn, "SELECT id FROM equipment_drivers WHERE equipment_id=$equipment_id AND driver_id=$driver_id AND status=1$check_scope");
-            if (mysqli_num_rows($check) > 0) {
+            if ($check && mysqli_num_rows($check) > 0) {
                 continue;
             }
 
             // جلب معلومات السائق
             $driver_res = mysqli_query($conn, "SELECT d.name, d.phone FROM drivers d WHERE d.id = $driver_id AND $driver_scope_sql LIMIT 1");
-            $driver_info = mysqli_fetch_assoc($driver_res);
+            $driver_info = $driver_res ? mysqli_fetch_assoc($driver_res) : null;
             if (!$driver_info) {
                 $error_messages[] = "السائق #$driver_id خارج النطاق";
                 continue;
@@ -236,7 +236,7 @@ if (isset($_POST['equipment_id'])) {
         // التحقق من عدم وجود ربط نشط بالفعل
         $check_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";
         $check = mysqli_query($conn, "SELECT id FROM equipment_drivers WHERE equipment_id=$equipment_id AND driver_id=$driver_id AND status=1$check_scope");
-        if (mysqli_num_rows($check) > 0) {
+        if ($check && mysqli_num_rows($check) > 0) {
             continue;
         }
 

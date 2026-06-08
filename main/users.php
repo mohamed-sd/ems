@@ -343,8 +343,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             $project_not_deleted = db_table_has_column($conn, 'project', 'is_deleted') ? " AND COALESCE(is_deleted,0)=0" : "";
                             $sql = "SELECT id, name, project_code FROM project WHERE status = '1' $project_not_deleted $project_scope ORDER BY name ASC";
                             $result = mysqli_query($conn, $sql);
+                            if ($result) {
                             while ($row = mysqli_fetch_assoc($result)) {
                                 echo "<option value='{$row['id']}'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . " ({$row['project_code']})</option>";
+                            }
                             }
                             ?>
                         </select>
@@ -397,6 +399,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         $result = mysqli_query($conn, $query);
 
                         $i = 1;
+                        if ($result) {
                         while ($row = mysqli_fetch_assoc($result)) {
                             $project_id = $row['project_id'];
                             $contract_id = $row['contract_id'];
@@ -410,7 +413,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                 // جلب اسم المشروع
                                 if ($project_id > 0) {
                                     $select_project = mysqli_query($conn, "SELECT name, project_code FROM `project` WHERE `id` = $project_id");
-                                    if ($project_row = mysqli_fetch_array($select_project)) {
+                                    if ($select_project && ($project_row = mysqli_fetch_array($select_project))) {
                                         $project_info = "<div class='pu-project-meta'><div class='pu-project-meta-item'><i class='fas fa-project-diagram pu-meta-icon'></i> " . htmlspecialchars($project_row['name'], ENT_QUOTES, 'UTF-8') . " (" . $project_row['project_code'] . ")";
                                     }
                                 }
@@ -418,7 +421,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                 // جلب تاريخ العقد
                                 if ($contract_id > 0) {
                                     $select_contract = mysqli_query($conn, "SELECT contract_signing_date FROM `contracts` WHERE `id` = $contract_id");
-                                    if ($contract_row = mysqli_fetch_array($select_contract)) {
+                                    if ($select_contract && ($contract_row = mysqli_fetch_array($select_contract))) {
                                         $project_info .= "</div><div class='pu-project-meta-item'><i class='fas fa-file-contract pu-meta-icon'></i> عقد #" . $contract_id . " - " . $contract_row['contract_signing_date'];
                                     }
                                 }
@@ -458,6 +461,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             echo "<td><i class='fas fa-phone'></i>" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
                                                         echo "<td>" . $status_badge . "</td>";
                             echo "</tr>";
+                        }
                         }
                         ?>
                     </tbody>

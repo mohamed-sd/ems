@@ -234,8 +234,8 @@ include '../config.php';
                   WHERE p.status = '1' 
                   ORDER BY p.name ASC";
         $result = mysqli_query($conn, $query);
-        
-        if (mysqli_num_rows($result) > 0) {
+
+        if ($result && mysqli_num_rows($result) > 0) {
             while ($project = mysqli_fetch_assoc($result)) {
                 ?>
                 <a href="equipments.php?project_id=<?php echo $project['id']; ?>" class="project-card">

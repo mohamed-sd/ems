@@ -57,7 +57,7 @@ $sql = "SELECT
 
 $result = mysqli_query($conn, $sql);
 
-while ($row = mysqli_fetch_assoc($result)) {
+if ($result) { while ($row = mysqli_fetch_assoc($result)) {
 ?>
     <div class="report">
         <div class="row">
@@ -158,7 +158,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class="col-lg-4 col-7"><?php echo $row['witness_two']; ?></div>
         </div>
     </div>
-<?php } ?>
+<?php } } ?>
 
 
     <br/><br/><br/>

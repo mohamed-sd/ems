@@ -236,8 +236,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
                                  AND type = '$type'
                                  AND status = 1";
             $added_count_result = mysqli_query($conn, $added_count_query);
-            $added_count_row = mysqli_fetch_assoc($added_count_result);
-            $current_added = intval($added_count_row['added_count']);
+            $added_count_row = $added_count_result ? mysqli_fetch_assoc($added_count_result) : null;
+            $current_added = intval($added_count_row['added_count'] ?? 0);
 
             // التحقق من عدم تجاوز العدد المتعاقد عليه
             if ($current_added >= $contracted_count) {
@@ -414,7 +414,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             }
                             $supplier_query = "SELECT id, name FROM suppliers WHERE $supplier_scope_sql ORDER BY name";
                             $supplier_result = mysqli_query($conn, $supplier_query);
-                            while($supplier = mysqli_fetch_assoc($supplier_result)) {
+                            if ($supplier_result) while($supplier = mysqli_fetch_assoc($supplier_result)) {
                                 $selected = (!empty($editData) && $editData['suppliers'] == $supplier['id']) ? 'selected' : '';
                                 echo "<option value='{$supplier['id']}' $selected>{$supplier['name']}</option>";
                             }
@@ -856,7 +856,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             }
                             $supplier_filter_query = "SELECT id, name FROM suppliers WHERE $supplier_filter_scope_sql ORDER BY name";
                             $supplier_filter_result = mysqli_query($conn, $supplier_filter_query);
-                            while($supplier = mysqli_fetch_assoc($supplier_filter_result)) {
+                            if ($supplier_filter_result) while($supplier = mysqli_fetch_assoc($supplier_filter_result)) {
                                 echo "<option value='" . htmlspecialchars($supplier['name']) . "'>" . htmlspecialchars($supplier['name']) . "</option>";
                             }
                             ?>
@@ -870,7 +870,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                             <?php
                             $type_filter_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
                             $type_filter_result = mysqli_query($conn, $type_filter_query);
-                            while($type_row = mysqli_fetch_assoc($type_filter_result)) {
+                            if ($type_filter_result) while($type_row = mysqli_fetch_assoc($type_filter_result)) {
                                 echo "<option value='" . htmlspecialchars($type_row['type']) . "'>" . htmlspecialchars($type_row['type']) . "</option>";
                             }
                             ?>
@@ -992,7 +992,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                     ";
                     $result = mysqli_query($conn, $query2);
                     $i = 1;
-                    while ($row = mysqli_fetch_assoc($result)) {
+                    if ($result) while ($row = mysqli_fetch_assoc($result)) {
                         echo "<tr>";
                         echo "<td><strong>" . $i++ . "</strong></td>";
                         echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";

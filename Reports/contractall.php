@@ -316,12 +316,12 @@ if (!isset($_SESSION['user'])) {
                         <tr><th>المورد</th><th>إجمالي الساعات</th></tr>
                     </thead>
                     <tbody>
-                    <?php while($row = mysqli_fetch_assoc($suppliers)) { ?>
+                    <?php if ($suppliers) { while($row = mysqli_fetch_assoc($suppliers)) { ?>
                         <tr>
                             <td><?= $row['supplier_name'] ?></td>
                             <td><?= $row['total_work_hours'] ?></td>
                         </tr>
-                    <?php } ?>
+                    <?php } } ?>
                     </tbody>
                 </table>
                 </div>
@@ -335,13 +335,13 @@ if (!isset($_SESSION['user'])) {
                         <tr><th>الآلية</th><th>ساعات العمل</th><th>ساعات الأعطال</th></tr>
                     </thead>
                     <tbody>
-                    <?php while($row = mysqli_fetch_assoc($equipments)) { ?>
+                    <?php if ($equipments) { while($row = mysqli_fetch_assoc($equipments)) { ?>
                         <tr>
                             <td><?= $row['equipment_name'] ?></td>
                             <td><?= $row['work_hours'] ?></td>
                             <td><?= $row['fault_hours'] ?></td>
                         </tr>
-                    <?php } ?>
+                    <?php } } ?>
                     </tbody>
                 </table>
                 </div>
@@ -355,12 +355,12 @@ if (!isset($_SESSION['user'])) {
                         <tr><th>السائق</th><th>إجمالي الساعات</th></tr>
                     </thead>
                     <tbody>
-                    <?php while($row = mysqli_fetch_assoc($drivers)) { ?>
+                    <?php if ($drivers) { while($row = mysqli_fetch_assoc($drivers)) { ?>
                         <tr>
                             <td><?= $row['driver_name'] ?></td>
                             <td><?= $row['driver_hours'] ?></td>
                         </tr>
-                    <?php } ?>
+                    <?php } } ?>
                     </tbody>
                 </table>
                 </div>

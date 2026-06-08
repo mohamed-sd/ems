@@ -134,9 +134,11 @@ if (!$result) {
                         <option value="">-- الكل --</option>
                         <?php
                         $prj = mysqli_query($conn, "SELECT id, name FROM project");
+                        if ($prj) {
                         while ($row = mysqli_fetch_assoc($prj)) {
                             $selected = ($project_filter == $row['id']) ? "selected" : "";
                             echo "<option value='" . $row['id'] . "' $selected>" . $row['name'] . "</option>";
+                        }
                         }
                         ?>
                     </select>
@@ -148,9 +150,11 @@ if (!$result) {
                         <option value="">-- الكل --</option>
                         <?php
                         $drv = mysqli_query($conn, "SELECT id, name FROM drivers");
+                        if ($drv) {
                         while ($row = mysqli_fetch_assoc($drv)) {
                             $selected = ($driver_filter == $row['id']) ? "selected" : "";
                             echo "<option value='" . $row['id'] . "' $selected>" . $row['name'] . "</option>";
+                        }
                         }
                         ?>
                     </select>
@@ -190,6 +194,7 @@ if (!$result) {
                     <tbody>
                     <?php
                     $grand_total = 0;
+                    if ($result) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         $grand_total += $row['total_hours'];
                         echo "<tr>";
@@ -199,6 +204,7 @@ if (!$result) {
                         echo "<td>" . $row['date'] . "</td>";
                         echo "<td>" . $row['total_hours'] . "</td>";
                         echo "</tr>";
+                    }
                     }
                     ?>
                     </tbody>

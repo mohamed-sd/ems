@@ -95,7 +95,7 @@ if ($suppliers_result) {
         $equipment_breakdown = [];
         $total_added_to_operations = 0;
 
-        while ($equip = mysqli_fetch_assoc($equip_details_result)) {
+        if ($equip_details_result) { while ($equip = mysqli_fetch_assoc($equip_details_result)) {
             $equip_type_id = intval($equip['equip_type']);
             $contracted_count = intval($equip['total_count']);
 
@@ -107,8 +107,8 @@ if ($suppliers_result) {
                            AND o.supplier_id = " . intval($row['supplier_id']) . "
                            AND (o.equipment_type = $equip_type_id OR e.type = $equip_type_id)";
             $added_result = mysqli_query($conn, $added_query);
-            $added_row = mysqli_fetch_assoc($added_result);
-            $added_count = intval($added_row['added_count']);
+            $added_row = $added_result ? mysqli_fetch_assoc($added_result) : null;
+            $added_count = intval($added_row['added_count'] ?? 0);
             $total_added_to_operations += $added_count;
 
             $remaining = $contracted_count - $added_count;
@@ -124,7 +124,7 @@ if ($suppliers_result) {
                 'added_count' => $added_count,
                 'remaining' => $remaining
             ];
-        }
+        } }
 
         $equipment_count = intval($row['equipment_count']);
         $remaining_to_add = $equipment_count - $total_added_to_operations;

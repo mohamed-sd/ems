@@ -49,14 +49,14 @@ if (!isset($_SESSION['user'])) {
         <?php
         include '../config.php';
 
-        $project = $_GET['id'];
+        $project = intval($_GET['id']);
 
-        $select = mysqli_query($conn, "SELECT * , 
+        $select = mysqli_query($conn, "SELECT * ,
                       (SELECT COUNT(*) FROM equipments WHERE equipments.suppliers = suppliers.id ) as 'equipments',
                       (SELECT COUNT(*) FROM supplierscontracts WHERE supplierscontracts.supplier_id = suppliers.id ) as 'num_contracts',
                       (SELECT COALESCE(SUM(forecasted_contracted_hours), 0) FROM supplierscontracts WHERE supplierscontracts.supplier_id = suppliers.id ) as 'total_hours'
                       FROM `suppliers` WHERE `id` = $project ORDER BY id DESC");
-        while ($row = mysqli_fetch_array($select)) {
+        if ($select) { while ($row = mysqli_fetch_array($select)) {
             ?>
             <div class="report">
                 <div class="row">
@@ -75,7 +75,7 @@ if (!isset($_SESSION['user'])) {
                 </div>
             </div>
             <?php
-        } // end while loop
+        } } // end while loop
         ?>
 
 
@@ -102,7 +102,7 @@ if (!isset($_SESSION['user'])) {
                 $query = "SELECT `id`, `code`, `type`, `name`, `status` FROM `equipments` where suppliers = $project ORDER BY id DESC";
                 $result = mysqli_query($conn, $query);
                 $i = 1;
-                while ($row = mysqli_fetch_assoc($result)) {
+                if ($result) { while ($row = mysqli_fetch_assoc($result)) {
                     echo "<tr>";
                     echo "<td>" . $i++ . "</td>";
                     echo "<td>" . $row['code'] . "</td>";
@@ -111,11 +111,11 @@ if (!isset($_SESSION['user'])) {
 
                     // echo "<td>".$row['status']."</td>";
                     // echo "<td>
-                    //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
+                    //         <a href='edit.php?id=".$row['id']."'>تعديل</a> |
                     //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
                     //       </td>";
                     echo "</tr>";
-                }
+                } }
                 ?>
             </tbody>
         </table>
@@ -148,7 +148,7 @@ if (!isset($_SESSION['user'])) {
                           ORDER BY sc.id DESC";
                 $result = mysqli_query($conn, $query);
                 $i = 1;
-                while ($row = mysqli_fetch_assoc($result)) {
+                if ($result) { while ($row = mysqli_fetch_assoc($result)) {
                      $status = $row['status']=="1" ? "<font color='green'>ساري</font>" : "
                     <font color='red'>منتهي</font>";
 
@@ -165,7 +165,7 @@ if (!isset($_SESSION['user'])) {
                     //       </td>";
                     echo "<td><a href='../Contracts/contracts_details.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a></td>";
                     echo "</tr>";
-                }
+                } }
                 ?>
             </tbody>
         </table>

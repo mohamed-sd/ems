@@ -23,11 +23,13 @@ require_once __DIR__ . '/controllers/board.php';
 require_once __DIR__ . '/controllers/operations.php';
 require_once __DIR__ . '/controllers/drivers.php';
 require_once __DIR__ . '/controllers/lists.php';
+require_once __DIR__ . '/controllers/timesheet.php';
+require_once __DIR__ . '/controllers/sync.php';
 
 // ── CORS (تطبيق جوّال/أدوات اختبار) — توكن لا كوكيز، فلا خطر على الجلسة ──────
 if (!headers_sent()) {
     header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Authorization, Content-Type');
     header('Access-Control-Max-Age: 86400');
 }
@@ -72,6 +74,7 @@ function api_route_segments(): array
 $seg = api_route_segments();
 $resource = $seg[0] ?? '';
 $id = isset($seg[1]) ? $seg[1] : null;
+$sub = isset($seg[2]) ? $seg[2] : null;
 
 /** ردّ 405 موحّد. */
 function api_method_not_allowed(): void
@@ -106,7 +109,7 @@ switch ($resource) {
         $method === 'GET' ? board_index() : api_method_not_allowed();
         break;
 
-    // ── التشغيلات ──────────────────────────────────────────────────────────
+    // ── التشغيلات (مشتركة بين تطبيق الحركة وتطبيق مدير الموقع) ───────────────
     case 'operations':
         if ($id === null) {
             if ($method === 'GET') {
@@ -116,8 +119,61 @@ switch ($resource) {
             } else {
                 api_method_not_allowed();
             }
+        } elseif ($id === 'by-type') {
+            $method === 'GET' ? timesheet_operations_by_type() : api_method_not_allowed();
+        } elseif ($sub === 'drivers') {
+            $method === 'GET' ? timesheet_operation_drivers((int) $id) : api_method_not_allowed();
+        } elseif ($sub === 'contract-hours') {
+            $method === 'GET' ? timesheet_operation_contract_hours((int) $id) : api_method_not_allowed();
         } else {
             $method === 'PUT' ? operations_update((int) $id) : api_method_not_allowed();
+        }
+        break;
+
+    // ── مدير الموقع: البيانات المرجعية ───────────────────────────────────
+    case 'timesheet':
+        if ($id === 'refdata' && $method === 'GET') {
+            timesheet_refdata();
+        } else {
+            api_fail('المسار غير موجود', 404);
+        }
+        break;
+
+    case 'failure-codes':
+        $method === 'GET' ? timesheet_failure_codes() : api_method_not_allowed();
+        break;
+
+    // ── مدير الموقع: سجلات التايم شيت ─────────────────────────────────────
+    case 'timesheets':
+        if ($id === null) {
+            if ($method === 'GET') {
+                timesheets_list();
+            } elseif ($method === 'POST') {
+                timesheets_create();
+            } else {
+                api_method_not_allowed();
+            }
+        } else {
+            if ($method === 'GET') {
+                timesheets_get((int) $id);
+            } elseif ($method === 'PUT') {
+                timesheets_update((int) $id);
+            } elseif ($method === 'DELETE') {
+                timesheets_delete((int) $id);
+            } else {
+                api_method_not_allowed();
+            }
+        }
+        break;
+
+    // ── مدير الموقع: المزامنة ─────────────────────────────────────────────
+    case 'sync':
+        if ($id === 'timesheets' && $method === 'POST') {
+            sync_push();
+        } elseif ($id === 'pull' && $method === 'GET') {
+            sync_pull();
+        } else {
+            api_fail('المسار غير موجود', 404);
         }
         break;
 

@@ -34,7 +34,8 @@ if (isset($_GET['edit_id'])) {
     $stmt = $conn->prepare("SELECT * FROM equipments_types WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
-    $editData = $stmt->get_result()->fetch_assoc();
+    $editData_res = $stmt->get_result();
+    $editData = $editData_res ? $editData_res->fetch_assoc() : null;
 }
 
 /* إضافة / تعديل */
@@ -166,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php
                         $result = $conn->query("SELECT * FROM equipments_types");
                         $i = 1;
-                        while ($row = $result->fetch_assoc()):
+                        if ($result) while ($row = $result->fetch_assoc()):
                             ?>
                             <tr>
                                 <td><?= $i++; ?></td>

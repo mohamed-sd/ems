@@ -29,8 +29,8 @@ if (isset($_GET['type'])) {
     );
 
     echo "<option value=''>-- اختر الالية --</option>";
-    while ($eq = mysqli_fetch_assoc($result)) {
+    if ($result) { while ($eq = mysqli_fetch_assoc($result)) {
         echo "<option value='" . $eq['id'] . "'>" . $eq['code'] . " - " . $eq['name'] . "</option>";
-    }
+    } }
 }
 ?>

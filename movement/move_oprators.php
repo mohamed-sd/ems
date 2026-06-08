@@ -206,7 +206,8 @@ function handle_change_status(): void
         $eq_stmt = $conn->prepare("SELECT equipment FROM operations WHERE id = ? LIMIT 1");
         $eq_stmt->bind_param('i', $operation_id);
         $eq_stmt->execute();
-        $eq_row = $eq_stmt->get_result()->fetch_assoc();
+        $eq_res = $eq_stmt->get_result();
+        $eq_row = $eq_res ? $eq_res->fetch_assoc() : null;
         $eq_stmt->close();
 
         if (!$eq_row || intval($eq_row['equipment']) <= 0) {
@@ -219,7 +220,8 @@ function handle_change_status(): void
         );
         $conflict_stmt->bind_param('ii', $eq_id, $operation_id);
         $conflict_stmt->execute();
-        $conflict_count = $conflict_stmt->get_result()->num_rows;
+        $conflict_res = $conflict_stmt->get_result();
+        $conflict_count = $conflict_res ? $conflict_res->num_rows : 0;
         $conflict_stmt->close();
 
         if ($conflict_count > 0) {
@@ -289,7 +291,8 @@ function handle_request_equipment_stop(): void
     }
 
     $op_stmt->execute();
-    $op_row = $op_stmt->get_result()->fetch_assoc();
+    $op_res = $op_stmt->get_result();
+    $op_row = $op_res ? $op_res->fetch_assoc() : null;
     $op_stmt->close();
 
     if (!$op_row) {
@@ -387,7 +390,8 @@ function handle_end_service(): void
         $start_stmt->bind_param('ii', $operation_id, $selected_project_id);
     }
     $start_stmt->execute();
-    $start_row = $start_stmt->get_result()->fetch_assoc();
+    $start_res = $start_stmt->get_result();
+    $start_row = $start_res ? $start_res->fetch_assoc() : null;
     $start_stmt->close();
 
     if ($start_row && !empty($start_row['start'])) {
@@ -482,7 +486,8 @@ function handle_save_operation(): void
         );
         $conflict_stmt->bind_param('i', $equipment);
         $conflict_stmt->execute();
-        $conflict_count = $conflict_stmt->get_result()->num_rows;
+        $conflict_res = $conflict_stmt->get_result();
+        $conflict_count = $conflict_res ? $conflict_res->num_rows : 0;
         $conflict_stmt->close();
 
         if ($conflict_count > 0) {
@@ -675,8 +680,10 @@ $operations_result = $ops_stmt->get_result();
 $ops_stmt->close();
 
 $operations_rows = [];
-while ($op_row = $operations_result->fetch_assoc()) {
-    $operations_rows[] = $op_row;
+if ($operations_result) {
+    while ($op_row = $operations_result->fetch_assoc()) {
+        $operations_rows[] = $op_row;
+    }
 }
 
 $operations_rows_day = [];

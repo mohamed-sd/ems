@@ -67,7 +67,7 @@ $equipment_query = "SELECT e.*, s.name as supplier_name
                     LEFT JOIN suppliers s ON e.suppliers = s.id
                     WHERE e.id = $equipment_id AND $equipment_scope_sql";
 $equipment_result = mysqli_query($conn, $equipment_query);
-$equipment = mysqli_fetch_assoc($equipment_result);
+$equipment = $equipment_result ? mysqli_fetch_assoc($equipment_result) : null;
 if (!$equipment) {
     die('المعدة غير موجودة أو خارج نطاق الشركة');
 }
@@ -80,9 +80,11 @@ $res = mysqli_query($conn, "SELECT ed.id, ed.start_date, ed.end_date, ed.shift_t
                              JOIN drivers d ON ed.driver_id = d.id
                                                          WHERE ed.equipment_id = $equipment_id
                                                              AND $driver_scope_sql" . (($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND ed.company_id = $company_id"));
-while ($r = mysqli_fetch_assoc($res)) {
-    $current[] = $r['driver_id'];
-    $linked[] = $r;
+if ($res) {
+    while ($r = mysqli_fetch_assoc($res)) {
+        $current[] = $r['driver_id'];
+        $linked[] = $r;
+    }
 }
 
 $page_title = "إيكوبيشن | إدارة مشغلي المعدة";
@@ -1063,7 +1065,7 @@ include("../inheader.php");
                                                             AND $driver_scope_sql
                                                             ORDER BY d.name");
 
-                            if (mysqli_num_rows($drivers) > 0) {
+                            if ($drivers && mysqli_num_rows($drivers) > 0) {
                                 while ($d = mysqli_fetch_assoc($drivers)) {
                                     $driverName = htmlspecialchars($d['name']);
                                     $driverPhone = htmlspecialchars($d['phone'] ?: 'لا يوجد');

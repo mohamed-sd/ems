@@ -158,11 +158,16 @@ include '../insidebar.php';
 
 <?php
 // ── حساب إحصائيات سريعة
-$stat_total  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes"))['c'];
-$stat_active = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE status=1"))['c'];
-$stat_eq1    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE equipment_type=1 AND status=1"))['c'];
-$stat_eq2    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE equipment_type=2 AND status=1"))['c'];
-$stat_eq3    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE equipment_type=3 AND status=1"))['c'];
+$_st_res = mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes");
+$stat_total  = $_st_res ? (mysqli_fetch_assoc($_st_res)['c'] ?? null) : null;
+$_sa_res = mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE status=1");
+$stat_active = $_sa_res ? (mysqli_fetch_assoc($_sa_res)['c'] ?? null) : null;
+$_se1_res = mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE equipment_type=1 AND status=1");
+$stat_eq1    = $_se1_res ? (mysqli_fetch_assoc($_se1_res)['c'] ?? null) : null;
+$_se2_res = mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE equipment_type=2 AND status=1");
+$stat_eq2    = $_se2_res ? (mysqli_fetch_assoc($_se2_res)['c'] ?? null) : null;
+$_se3_res = mysqli_query($conn, "SELECT COUNT(*) c FROM failure_codes WHERE equipment_type=3 AND status=1");
+$stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
 ?>
 
 <div class="main fc-page ems-unified-page-shell">

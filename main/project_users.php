@@ -105,7 +105,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 
     $verifyResult = mysqli_query($conn, $verifyQuery);
 
-    if (mysqli_num_rows($verifyResult) > 0) {
+    if ($verifyResult && mysqli_num_rows($verifyResult) > 0) {
         $deleteBy = intval($_SESSION['user']['id']);
         $delete_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
         $deleteSQL = "UPDATE users SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleteBy, updated_at = NOW() WHERE id = $deleteId AND COALESCE(is_deleted,0)=0 $delete_scope";
@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     $verifyResult = mysqli_query($conn, $verifyQuery);
 
-    if (mysqli_num_rows($verifyResult) === 0) {
+    if (!$verifyResult || mysqli_num_rows($verifyResult) === 0) {
         header("Location: project_users.php?msg=ليس+لديك+صلاحية+لتعديل+هذا+المستخدم+❌");
         exit;
     }
@@ -163,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
     $check_result = mysqli_query($conn, $check_query);
 
-    if (mysqli_num_rows($check_result) > 0) {
+    if ($check_result && mysqli_num_rows($check_result) > 0) {
         header("Location: project_users.php?msg=اسم+المستخدم+موجود+مسبقاً+❌");
         exit;
     }
@@ -214,7 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
     }
     $check_result = mysqli_query($conn, $check_query);
 
-    if (mysqli_num_rows($check_result) > 0) {
+    if ($check_result && mysqli_num_rows($check_result) > 0) {
         header("Location: project_users.php?msg=اسم+المستخدم+موجود+مسبقاً+❌");
         exit;
     }
@@ -371,6 +371,7 @@ include('../insidebar.php');
                     $result = mysqli_query($conn, $query);
                     $i = 1;
 
+                    if ($result) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         $roleText = !empty($row['role_name'])
                             ? htmlspecialchars($row['role_name'], ENT_QUOTES, 'UTF-8')
@@ -403,6 +404,7 @@ include('../insidebar.php');
                         $action_btns .= "</div></td>";
                         echo $action_btns;
                         echo "</tr>";
+                    }
                     }
                     ?>
                 </tbody>

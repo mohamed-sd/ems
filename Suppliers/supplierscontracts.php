@@ -264,9 +264,9 @@ include('../insidebar.php');
 
                   $projects_query = "SELECT p.id, p.name FROM project p WHERE p.status = 1 AND $project_scope_sql ORDER BY p.name ASC";
                   $projects_result = mysqli_query($conn, $projects_query);
-                  while ($project = mysqli_fetch_assoc($projects_result)) {
+                  if ($projects_result) { while ($project = mysqli_fetch_assoc($projects_result)) {
                     echo "<option value='" . $project['id'] . "'>" . $project['name'] . "</option>";
-                  }
+                  } }
                   ?>
                 </select>
               </div>
@@ -1109,7 +1109,7 @@ include('../insidebar.php');
             $i = 1;
 
 
-            while ($row = mysqli_fetch_assoc($result)) {
+            if ($result) { while ($row = mysqli_fetch_assoc($result)) {
 
               // عرض حالة العقد من status
               $contractStatus = isset($row['status']) ? $row['status'] : 1;
@@ -1219,7 +1219,7 @@ include('../insidebar.php');
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";
               echo "</tr>";
-            }
+            } }
             ?>
           </tbody>
         </table>

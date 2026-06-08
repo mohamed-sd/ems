@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
         WHERE c.id = $project_contract_id
         LIMIT 1";
     $contract_result = mysqli_query($conn, $contract_query);
-    $contract_data = mysqli_fetch_assoc($contract_result);
+    $contract_data = $contract_result ? mysqli_fetch_assoc($contract_result) : null;
 
     if (!$contract_data) {
         die(json_encode(['success' => false, 'message' => 'العقد غير موجود']));
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
         ORDER BY et.type";
     $equipment_result = mysqli_query($conn, $equipment_details_query);
     $equipment_breakdown = [];
-    while ($row = mysqli_fetch_assoc($equipment_result)) {
+    if ($equipment_result) { while ($row = mysqli_fetch_assoc($equipment_result)) {
         $equipment_breakdown[] = [
             'type_id' => $row['equip_type'],
             'type' => $row['equip_type_name'] ? $row['equip_type_name'] : $row['equip_type'],
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
             'count_basic' => intval($row['equipment_count_basic']) ?: 0,
             'count_backup' => intval($row['equipment_count_backup']) ?: 0
         ];
-    }
+    } }
 
     // جلب مجموع ساعات عقود الموردين لهذا العقد المحدد (باستثناء العقد الحالي عند التعديل)
     $suppliers_query = "SELECT
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
     }
 
     $suppliers_result = mysqli_query($conn, $suppliers_query);
-    $suppliers_data = mysqli_fetch_assoc($suppliers_result);
+    $suppliers_data = $suppliers_result ? mysqli_fetch_assoc($suppliers_result) : null;
 
     // جلب تفصيل ساعات الموردين حسب نوع المعدة
     $suppliers_breakdown_query = "SELECT
@@ -88,10 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
 
     $suppliers_breakdown_result = mysqli_query($conn, $suppliers_breakdown_query);
     $suppliers_by_type = [];
-    while ($row = mysqli_fetch_assoc($suppliers_breakdown_result)) {
+    if ($suppliers_breakdown_result) { while ($row = mysqli_fetch_assoc($suppliers_breakdown_result)) {
         $type_key = $row['equip_type'];
         $suppliers_by_type[$type_key] = floatval($row['suppliers_hours']);
-    }
+    } }
 
     // جلب تفصيل الموردين مع ساعاتهم التعاقدية
     $suppliers_list_query = "SELECT
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
 
     $suppliers_list_result = mysqli_query($conn, $suppliers_list_query);
     $suppliers_list = [];
-    while ($row = mysqli_fetch_assoc($suppliers_list_result)) {
+    if ($suppliers_list_result) { while ($row = mysqli_fetch_assoc($suppliers_list_result)) {
         $suppliers_list[] = [
             'id' => intval($row['id']),
             'name' => $row['supplier_name'],
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['project_contract_id']
             'start_date' => $row['actual_start'],
             'end_date' => $row['actual_end']
         ];
-    }
+    } }
 
     // حساب الساعات المتبقية لكل نوع معدة
     $remaining_breakdown = [];

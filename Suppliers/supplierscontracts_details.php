@@ -1010,9 +1010,9 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         <?php
                         $merge_query = "SELECT sc.id, sc.contract_signing_date FROM supplierscontracts sc WHERE sc.supplier_id = $supplier_id AND sc.project_id = $project_id AND sc.id != $contract_id AND $supplier_contract_scope_sql ORDER BY sc.id DESC";
                         $merge_result = mysqli_query($conn, $merge_query);
-                        while ($m_row = mysqli_fetch_assoc($merge_result)) {
+                        if ($merge_result) { while ($m_row = mysqli_fetch_assoc($merge_result)) {
                             echo "<option value='" . $m_row['id'] . "'>العقد #" . $m_row['id'] . " - " . $m_row['contract_signing_date'] . "</option>";
-                        }
+                        } }
                         ?>
                     </select>
                 </div>

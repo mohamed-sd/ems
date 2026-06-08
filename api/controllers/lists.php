@@ -36,13 +36,15 @@ function lists_contracts(): void
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
     $out = [];
-    while ($r = mysqli_fetch_assoc($res)) {
-        $date = (string)($r['contract_signing_date'] ?? '');
-        $out[] = [
-            'id'                    => intval($r['id']),
-            'contract_signing_date' => $date,
-            'label'                 => 'عقد ' . intval($r['id']) . ($date !== '' ? ' · ' . $date : ''),
-        ];
+    if ($res) {
+        while ($r = mysqli_fetch_assoc($res)) {
+            $date = (string)($r['contract_signing_date'] ?? '');
+            $out[] = [
+                'id'                    => intval($r['id']),
+                'contract_signing_date' => $date,
+                'label'                 => 'عقد ' . intval($r['id']) . ($date !== '' ? ' · ' . $date : ''),
+            ];
+        }
     }
     mysqli_stmt_close($stmt);
 

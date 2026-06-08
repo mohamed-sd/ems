@@ -56,7 +56,7 @@ $sql = "SELECT
 
 $result = mysqli_query($conn, $sql);
 
-while ($row = mysqli_fetch_assoc($result)) {
+if ($result) { while ($row = mysqli_fetch_assoc($result)) {
 ?>
     <div class="report">
 
@@ -130,7 +130,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
 
     </div>
-<?php } ?>
+<?php } } ?>
 
 
     <br/><br/><br/>

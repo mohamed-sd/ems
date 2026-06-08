@@ -6,10 +6,14 @@ include "../config.php";
 $userName = isset($_SESSION['user']['name']) ? $_SESSION['user']['name'] : "مستخدم غير معروف";
 
 // إحصائيات عامة
-$totalEquipments = $conn->query("SELECT COUNT(*) AS c FROM equipments")->fetch_assoc()['c'];
-$activeEquipments = $conn->query("SELECT COUNT(*) AS c FROM equipments WHERE status='نشط'")->fetch_assoc()['c'];
-$inactiveEquipments = $conn->query("SELECT COUNT(*) AS c FROM equipments WHERE status='متوقف'")->fetch_assoc()['c'];
-$totalSuppliers = $conn->query("SELECT COUNT(DISTINCT suppliers) AS c FROM equipments")->fetch_assoc()['c'];
+$totalEquipments_res = $conn->query("SELECT COUNT(*) AS c FROM equipments");
+$totalEquipments = $totalEquipments_res ? ($totalEquipments_res->fetch_assoc()['c'] ?? null) : null;
+$activeEquipments_res = $conn->query("SELECT COUNT(*) AS c FROM equipments WHERE status='نشط'");
+$activeEquipments = $activeEquipments_res ? ($activeEquipments_res->fetch_assoc()['c'] ?? null) : null;
+$inactiveEquipments_res = $conn->query("SELECT COUNT(*) AS c FROM equipments WHERE status='متوقف'");
+$inactiveEquipments = $inactiveEquipments_res ? ($inactiveEquipments_res->fetch_assoc()['c'] ?? null) : null;
+$totalSuppliers_res = $conn->query("SELECT COUNT(DISTINCT suppliers) AS c FROM equipments");
+$totalSuppliers = $totalSuppliers_res ? ($totalSuppliers_res->fetch_assoc()['c'] ?? null) : null;
 
 // جلب أول 50 معدة مع اسم المورد
 $equipments = $conn->query("
@@ -163,7 +167,7 @@ $equipments = $conn->query("
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($row = $equipments->fetch_assoc()): ?>
+                    <?php if ($equipments): while ($row = $equipments->fetch_assoc()): ?>
                         <tr>
                             <td><?= $row['id'] ?></td>
                             <td><?= htmlspecialchars($row['code'], ENT_QUOTES, 'UTF-8') ?></td>
@@ -172,7 +176,7 @@ $equipments = $conn->query("
                             <td><?= htmlspecialchars($row['supplier_name'], ENT_QUOTES, 'UTF-8') ?></td>
                             <td><?= htmlspecialchars($row['status'] == "1" ? "في مشروع" : "خارج الخدمة", ENT_QUOTES, 'UTF-8') ?></td>
                         </tr>
-                    <?php endwhile; ?>
+                    <?php endwhile; endif; ?>
                 </tbody>
             </table>
 

@@ -695,9 +695,9 @@ include('../insidebar.php');
                                     }
                                     $suppliers_query = "SELECT id, name FROM suppliers WHERE $supplier_scope_sql ORDER BY name";
                                     $suppliers_result = mysqli_query($conn, $suppliers_query);
-                                    while ($supplier = mysqli_fetch_assoc($suppliers_result)) {
+                                    if ($suppliers_result) { while ($supplier = mysqli_fetch_assoc($suppliers_result)) {
                                         echo "<option value='" . $supplier['id'] . "'>" . htmlspecialchars($supplier['name']) . "</option>";
-                                    }
+                                    } }
                                     ?>
                                 </select>
                             </div>
@@ -712,13 +712,13 @@ include('../insidebar.php');
                                     }
                                     $projects_query = "SELECT id, name, project_code FROM project WHERE $project_scope_sql AND status = 1 ORDER BY name";
                                     $projects_result = mysqli_query($conn, $projects_query);
-                                    while ($project = mysqli_fetch_assoc($projects_result)) {
+                                    if ($projects_result) { while ($project = mysqli_fetch_assoc($projects_result)) {
                                         $project_display = htmlspecialchars($project['name']);
                                         if (!empty($project['project_code'])) {
                                             $project_display .= " (" . htmlspecialchars($project['project_code']) . ")";
                                         }
                                         echo "<option value='" . $project['id'] . "'>" . $project_display . "</option>";
-                                    }
+                                    } }
                                     ?>
                                 </select>
                             </div>
@@ -1015,7 +1015,7 @@ include('../insidebar.php');
                     $result = mysqli_query($conn, $query);
                     $i = 1;
 
-                    while ($row = mysqli_fetch_assoc($result)) {
+                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
                         $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">✅ مفعّل</span>' : '<span class="status-pill status-inactive">❌ موقف</span>';
                         $driver_name_cell = "<a class='client-name-link' href='driver_profile.php?id=" . intval($row['id']) . "'><strong>" . htmlspecialchars($row['name']) . "</strong></a>";
                         if (intval($row['numcontracts']) === 0) {
@@ -1069,7 +1069,7 @@ include('../insidebar.php');
                         }
                         echo "</div></td>";
                         echo "</tr>";
-                    }
+                    } }
                     ?>
                 </tbody>
             </table>

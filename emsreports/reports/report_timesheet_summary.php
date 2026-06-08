@@ -367,9 +367,11 @@ if (isset($_POST['export_format'])) {
                         <option value="">جميع المشاريع</option>
                         <?php
                         $projects = mysqli_query($conn, "SELECT id, name FROM project ORDER BY name");
+                        if ($projects) {
                         while ($proj = mysqli_fetch_assoc($projects)) {
                             $selected = ($projectId == $proj['id']) ? 'selected' : '';
                             echo '<option value="' . $proj['id'] . '" ' . $selected . '>' . htmlspecialchars($proj['name']) . '</option>';
+                        }
                         }
                         ?>
                     </select>

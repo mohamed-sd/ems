@@ -153,10 +153,10 @@ if ($contract_filter > 0) {
                     <label><i class="fas fa-file-signature"></i> اختر العقد</label>
                     <select name="contract">
                         <option value="">-- اختر --</option>
-                        <?php while($row = mysqli_fetch_assoc($contracts)) {
+                        <?php if ($contracts) { while($row = mysqli_fetch_assoc($contracts)) {
                             $selected = ($contract_filter == $row['id']) ? "selected" : "";
                             echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['project_name']}</option>";
-                        } ?>
+                        } } ?>
                     </select>
                 </div>
                 <button type="submit"><i class="fa fa-eye"></i> عرض التقرير</button>

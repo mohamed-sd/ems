@@ -7,10 +7,14 @@ $userName = isset($_SESSION['user']['name']) ? $_SESSION['user']['name'] : "مس
 
 
 // إحصائيات عامة
-$totalProjects = $conn->query("SELECT COUNT(*) AS c FROM project")->fetch_assoc()['c'];
-$completed = $conn->query("SELECT COUNT(*) AS c FROM project WHERE status='منجز'")->fetch_assoc()['c'];
-$inProgress = $conn->query("SELECT COUNT(*) AS c FROM project WHERE status='جاري'")->fetch_assoc()['c'];
-$totalAmount = $conn->query("SELECT SUM(total) AS s FROM project")->fetch_assoc()['s'];
+$totalProjects_res = $conn->query("SELECT COUNT(*) AS c FROM project");
+$totalProjects = $totalProjects_res ? ($totalProjects_res->fetch_assoc()['c'] ?? null) : null;
+$completed_res = $conn->query("SELECT COUNT(*) AS c FROM project WHERE status='منجز'");
+$completed = $completed_res ? ($completed_res->fetch_assoc()['c'] ?? null) : null;
+$inProgress_res = $conn->query("SELECT COUNT(*) AS c FROM project WHERE status='جاري'");
+$inProgress = $inProgress_res ? ($inProgress_res->fetch_assoc()['c'] ?? null) : null;
+$totalAmount_res = $conn->query("SELECT SUM(total) AS s FROM project");
+$totalAmount = $totalAmount_res ? ($totalAmount_res->fetch_assoc()['s'] ?? null) : null;
 
 // جلب أول 50 مشروع
 $projects = $conn->query("SELECT id, name, client, location, total, status, create_at 
@@ -160,7 +164,7 @@ $projects = $conn->query("SELECT id, name, client, location, total, status, crea
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while ($row = $projects->fetch_assoc()): ?>
+                    <?php if ($projects): while ($row = $projects->fetch_assoc()): ?>
                         <tr>
                             <td><?= $row['id'] ?></td>
                             <td><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') ?></td>
@@ -170,7 +174,7 @@ $projects = $conn->query("SELECT id, name, client, location, total, status, crea
                             <td><?= htmlspecialchars($row['status'] == "1" ? "جاري" : "منتهى", ENT_QUOTES, 'UTF-8') ?></td>
                             <td><?= $row['create_at'] ?></td>
                         </tr>
-                    <?php endwhile; ?>
+                    <?php endwhile; endif; ?>
                 </tbody>
             </table>
 

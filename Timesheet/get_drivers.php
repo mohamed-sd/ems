@@ -34,7 +34,8 @@ if (isset($_GET['operation_id'])) {
     }
 
     // جلب الآلية من جدول التشغيل ضمن نطاق الشركة
-    $op = mysqli_fetch_assoc(mysqli_query($conn, "SELECT equipment FROM operations WHERE id = $operation_id" . $operation_scope));
+    $op_res = mysqli_query($conn, "SELECT equipment FROM operations WHERE id = $operation_id" . $operation_scope);
+    $op = $op_res ? mysqli_fetch_assoc($op_res) : null;
     if (!$op || !isset($op['equipment'])) {
         while (ob_get_level()) ob_end_clean();
         echo "<option value=''>-- اختر السائق --</option>";
@@ -81,8 +82,10 @@ if (isset($_GET['operation_id'])) {
 
     while (ob_get_level()) ob_end_clean();
     echo "<option value=''>-- اختر السائق --</option>";
-    while ($row = mysqli_fetch_assoc($result)) {
-        echo "<option value='{$row['id']}'>{$row['name']}</option>";
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "<option value='{$row['id']}'>{$row['name']}</option>";
+        }
     }
 }
 ?>
