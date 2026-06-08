@@ -108,14 +108,14 @@ if (!$project_result) {
     exit();
 }
 
-// if (mysqli_num_rows($project_result) > 0) {
-//     $selected_project = mysqli_fetch_assoc($project_result);
-// } else {
-//     // المشروع غير موجود أو غير نشط
-//     unset($_SESSION['operations_project_id']);
-//     echo "<script>alert('❌ المشروع المحفوظ في الجلسة غير متاح أو غير نشط'); window.location.href='../main/dashboard.php';</script>";
-//     exit();
-// }
+if (mysqli_num_rows($project_result) > 0) {
+    $selected_project = mysqli_fetch_assoc($project_result);
+} else {
+    // المشروع غير موجود أو غير نشط
+    unset($_SESSION['operations_project_id']);
+    echo "<script>alert('❌ المشروع المحفوظ في الجلسة غير متاح أو غير نشط'); window.location.href='../main/dashboard.php';</script>";
+    exit();
+}
 
 // (mine filtering removed - operations filter by project_id directly)
 $selected_mine = null;
@@ -904,12 +904,15 @@ include('../insidebar.php');
                       GROUP BY o.id
                       ORDER BY o.id DESC";
                             $result = mysqli_query($conn, $query);
-                            // تقسيم التشغيلات إلى أساسية / احتياطية
+                            // تقسيم التشغيلات: المنتهية (status=0) في جدول مستقل؛ السارية تُقسَّم أساسية/احتياطية
                             $primary_rows = [];
                             $reserve_rows = [];
+                            $ended_rows = [];
                             if ($result) {
                                 while ($row = mysqli_fetch_assoc($result)) {
-                                    if (($row['equipment_category'] ?? '') === 'أساسي') {
+                                    if (intval($row['status']) !== 1) {
+                                        $ended_rows[] = $row;
+                                    } elseif (($row['equipment_category'] ?? '') === 'أساسي') {
                                         $primary_rows[] = $row;
                                     } else {
                                         $reserve_rows[] = $row;
@@ -1049,13 +1052,43 @@ include('../insidebar.php');
                         </tbody>
                     </table>
                 </div>
+
+                <!-- ===== جدول التشغيلات المنتهية ===== -->
+                <h6 style="margin:18px 14px 8px;font-size:15px;font-weight:800;color:#1a1208;display:flex;align-items:center;gap:8px;"><span class="legend-dot" style="color:#9aa0a6;">■</span> التشغيلات المنتهية</h6>
+                <div class="tbl-scroll-wrap tbl-scroll-zero">
+                    <table id="endedTable" class="display nowrap table-full-width">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>المعدة</th>
+                                <th>نوع المعدة</th>
+                                <th>المورد</th>
+                                <th>ساعات الوردية</th>
+                                <th>نظام الوردية</th>
+                                <th>تاريخ البداية</th>
+                                <th>الحالة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            // عرض الجدول الثالث: التشغيلات المنتهية (status=0)
+                            if (empty($ended_rows)) {
+                                echo "<tr><td colspan='9' style='text-align:center;color:#999;padding:16px;'>لا توجد تشغيلات منتهية</td></tr>";
+                            } else {
+                                $i = 1;
+                                foreach ($ended_rows as $r) { $render_op_row($r, $i++); }
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <!-- مكتبة jQuery (مطلوبة أولاً) -->
         <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
-        <!-- حزمة Bootstrap (تشمل Popper) -->
-        <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!-- Bootstrap محمّل مسبقاً في inheader.php (عدم تكراره يمنع تكرار تهيئة المودال) -->
         <!-- ملفات DataTables -->
         <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 
@@ -1063,7 +1096,14 @@ include('../insidebar.php');
         <!-- نافذة تفاصيل سجل التشغيل تُولَّد عبر EmsDetailsModal -->
 
         <!-- موديل إنهاء الخدمة -->
-        <div class="modal fade" id="endServiceModal" tabindex="-1" aria-labelledby="endServiceLabel" aria-hidden="true">
+        <style>
+        /* الحل الأمتن: لا backdrop منفصل (data-bs-backdrop="false")؛ المودال نفسه يُعتّم
+           الخلفية. الـbackdrop المنفصل لبوتستراب كان يُرسَم فوق المحتوى فيمنع الكتابة. */
+        #endServiceModal.modal { background: rgba(15,23,42,.55) !important; -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+        #endServiceModal .modal-dialog { pointer-events: auto; }
+        #endServiceModal .modal-content { pointer-events: auto; position: relative; }
+        </style>
+        <div class="modal fade" id="endServiceModal" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="true" aria-labelledby="endServiceLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form method="post" action="">
@@ -1199,6 +1239,7 @@ include('../insidebar.php');
                     }
                     $('#primaryTable').DataTable(opsTableConfig());
                     $('#reserveTable').DataTable(opsTableConfig());
+                    $('#endedTable').DataTable(opsTableConfig());
                 });
 
             })();
@@ -1264,12 +1305,15 @@ include('../insidebar.php');
                                     var statusClass = remaining === 0 ? 'is-active' : (addedCount > 0 ? 'is-warning' : 'is-muted');
                                     var basicInfo = item.count_basic > 0 ? '<span class="breakdown-tag is-basic">أساسي:' + item.count_basic + '</span>' : '';
                                     var backupInfo = item.count_backup > 0 ? '<span class="breakdown-tag is-backup">احتياطي:' + item.count_backup + '</span>' : '';
+                                    var outTag = item.out_of_contract ? ' <span class="breakdown-tag" style="background:#fdeaea;color:#b91c1c;font-weight:700;">⚠ خارج العقد</span>' : '';
 
-                                    return '<div class="breakdown-item">' +
-                                        '<i class="fas fa-tools"></i> <strong>' + (item.type || 'غير محدد') + '</strong>: ' +
+                                    return '<div class="breakdown-item"' + (item.out_of_contract ? ' style="border-right:3px solid #b91c1c;padding-right:6px;"' : '') + '>' +
+                                        '<i class="fas fa-tools"></i> <strong>' + (item.type || 'غير محدد') + '</strong>' + outTag + ': ' +
                                         item.count + ' متعاقد ' + basicInfo + ' ' + backupInfo + ' | ' +
                                         '<span class="breakdown-count ' + statusClass + '">' + addedCount + ' مضاف</span> | ' +
-                                        '<span class="breakdown-count ' + (remaining === 0 ? 'is-active' : 'is-warning') + '">' + remaining + ' متبقي</span> | ' +
+                                        (remaining < 0
+                                            ? '<span class="breakdown-count is-warning">تجاوز ' + Math.abs(remaining) + '</span> | '
+                                            : '<span class="breakdown-count ' + (remaining === 0 ? 'is-active' : 'is-warning') + '">' + remaining + ' متبقي</span> | ') +
                                         '<i class="fas fa-clock"></i> ' + parseFloat(item.hours || 0).toLocaleString() + ' ساعة' +
                                         '</div>';
                                 }).join('');
@@ -1309,7 +1353,9 @@ include('../insidebar.php');
                                 '<span class="' + addedBadgeClass + '"><i class="fas fa-check"></i> ' + addedEquipment + '</span>' +
                                 '</td>' +
                                 '<td class="text-center">' +
-                                '<span class="' + remainingBadgeClass + '"><i class="fas fa-' + (remainingEquipment === 0 ? 'check-circle' : 'exclamation-triangle') + '"></i> ' + remainingEquipment + '</span>' +
+                                (remainingEquipment < 0
+                                    ? '<span class="badge-busy"><i class="fas fa-exclamation-triangle"></i> تجاوز ' + Math.abs(remainingEquipment) + '</span>'
+                                    : '<span class="' + remainingBadgeClass + '"><i class="fas fa-' + (remainingEquipment === 0 ? 'check-circle' : 'exclamation-triangle') + '"></i> ' + remainingEquipment + '</span>') +
                                 '</td>' +
                                 '<td class="suppliers-breakdown">' + breakdownHtml + '</td>' +
                                 '</tr>';

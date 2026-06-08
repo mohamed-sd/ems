@@ -85,6 +85,8 @@ if ($suppliers_result) {
                                         et.type as type_name,
                                         sce.equip_type,
                                         SUM(sce.equip_count) as total_count,
+                                        SUM(sce.equip_count_basic) as total_basic,
+                                        SUM(sce.equip_count_backup) as total_backup,
                                         SUM(sce.equip_total_contract) as total_hours
                                  FROM suppliercontractequipments sce
                                  LEFT JOIN equipments_types et ON sce.equip_type = et.id
@@ -94,43 +96,90 @@ if ($suppliers_result) {
 
         $equipment_breakdown = [];
         $total_added_to_operations = 0;
+        $contracted_type_ids = [];
 
         if ($equip_details_result) { while ($equip = mysqli_fetch_assoc($equip_details_result)) {
             $equip_type_id = intval($equip['equip_type']);
             $contracted_count = intval($equip['total_count']);
+            $contracted_type_ids[$equip_type_id] = true;
 
+            // إصلاح العدّ المزدوج: نطابق كل عملية بـ«نوع فعّال واحد» (النوع المخزّن إن وُجد،
+            // وإلا نوع المعدة الفعلي) بدل (OR) التي كانت تحسب العملية الواحدة في نوعين.
             $added_query = "SELECT COUNT(*) as added_count
                            FROM operations o
                            LEFT JOIN equipments e ON o.equipment = e.id
                            WHERE o.status = 1
                            AND o.project_id = $project_id
                            AND o.supplier_id = " . intval($row['supplier_id']) . "
-                           AND (o.equipment_type = $equip_type_id OR e.type = $equip_type_id)";
+                           AND (CASE WHEN CAST(o.equipment_type AS UNSIGNED) > 0
+                                     THEN CAST(o.equipment_type AS UNSIGNED) ELSE e.type END) = $equip_type_id";
             $added_result = mysqli_query($conn, $added_query);
             $added_row = $added_result ? mysqli_fetch_assoc($added_result) : null;
             $added_count = intval($added_row['added_count'] ?? 0);
             $total_added_to_operations += $added_count;
 
+            // لا نُصفّر المتبقي السالب — نُبقيه ليكشف التجاوز (overage موجب عند المضاف > المتعاقد).
             $remaining = $contracted_count - $added_count;
-            if ($remaining < 0) {
-                $remaining = 0;
-            }
+            $overage = $added_count > $contracted_count ? ($added_count - $contracted_count) : 0;
 
             $equipment_breakdown[] = [
                 'type' => $equip['type_name'] ?: 'غير محدد',
                 'type_id' => $equip_type_id,
                 'count' => $contracted_count,
+                'count_basic' => intval($equip['total_basic'] ?? 0),
+                'count_backup' => intval($equip['total_backup'] ?? 0),
                 'hours' => floatval($equip['total_hours']),
                 'added_count' => $added_count,
-                'remaining' => $remaining
+                'remaining' => $remaining,
+                'overage' => $overage,
+                'out_of_contract' => false
             ];
         } }
 
-        $equipment_count = intval($row['equipment_count']);
-        $remaining_to_add = $equipment_count - $total_added_to_operations;
-        if ($remaining_to_add < 0) {
-            $remaining_to_add = 0;
+        // أنواع مُضافة «خارج العقد»: تُعرض لتظهر كل المعدات المضافة للمورّد (متعاقد=0، تجاوز=المضاف).
+        $extra_query = "SELECT
+                            (CASE WHEN CAST(o.equipment_type AS UNSIGNED) > 0
+                                  THEN CAST(o.equipment_type AS UNSIGNED) ELSE e.type END) AS eff_type,
+                            COUNT(*) AS added_count
+                        FROM operations o
+                        LEFT JOIN equipments e ON o.equipment = e.id
+                        WHERE o.status = 1
+                          AND o.project_id = $project_id
+                          AND o.supplier_id = " . intval($row['supplier_id']) . "
+                        GROUP BY eff_type";
+        $extra_result = mysqli_query($conn, $extra_query);
+        if ($extra_result) {
+            while ($ex = mysqli_fetch_assoc($extra_result)) {
+                $ex_type = intval($ex['eff_type']);
+                if ($ex_type <= 0 || isset($contracted_type_ids[$ex_type])) {
+                    continue; // ضمن العقد (مُحتسب سلفاً) أو نوع غير صالح
+                }
+                $ex_added = intval($ex['added_count']);
+                $tn = '';
+                $tn_res = mysqli_query($conn, "SELECT type FROM equipments_types WHERE id = $ex_type LIMIT 1");
+                if ($tn_res && mysqli_num_rows($tn_res) > 0) {
+                    $tn = mysqli_fetch_assoc($tn_res)['type'];
+                }
+                $total_added_to_operations += $ex_added; // يدخل في إجمالي المضاف للمورّد
+                $equipment_breakdown[] = [
+                    'type' => $tn !== '' ? $tn : ('نوع #' . $ex_type),
+                    'type_id' => $ex_type,
+                    'count' => 0,
+                    'count_basic' => 0,
+                    'count_backup' => 0,
+                    'hours' => 0,
+                    'added_count' => $ex_added,
+                    'remaining' => -$ex_added,
+                    'overage' => $ex_added,
+                    'out_of_contract' => true
+                ];
+            }
         }
+
+        $equipment_count = intval($row['equipment_count']);
+        // لا نُصفّر المتبقي — نُبقيه (قد يكون سالباً) ليكشف التجاوز في الواجهة.
+        $remaining_to_add = $equipment_count - $total_added_to_operations;
+        $supplier_overage = $total_added_to_operations > $equipment_count ? ($total_added_to_operations - $equipment_count) : 0;
 
         $suppliers[] = [
             'id' => $row['id'],
@@ -142,6 +191,7 @@ if ($suppliers_result) {
             'equipment_count_backup' => intval($row['equipment_count_backup']),
             'added_to_equipments' => $total_added_to_operations,
             'remaining_to_add' => $remaining_to_add,
+            'overage' => $supplier_overage,
             'equipment_breakdown' => $equipment_breakdown
         ];
         $total_supplier_hours += floatval($row['forecasted_contracted_hours']);

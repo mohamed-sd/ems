@@ -60,7 +60,7 @@ if ($shift_type === 'D' || $shift_type === 'N') {
 $query = "SELECT o.id, e.code, e.name
           FROM operations o
           JOIN equipments e ON o.equipment = e.id
-          WHERE o.status = '1' $scope_sql $type_filter_sql $shift_filter_sql
+          WHERE o.status = '1' AND o.equipment_category = 'أساسي' $scope_sql $type_filter_sql $shift_filter_sql
           ORDER BY e.code ASC, e.name ASC";
 
 $result = mysqli_query($conn, $query);

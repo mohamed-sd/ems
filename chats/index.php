@@ -118,6 +118,20 @@ include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main chat-main-page">
+<style>
+/* إصلاح رأس المراسلات: نظام «التوحيد» العام يجعل .contacts-header شبكة (grid) بثلاثة
+   أعمدة مع overflow:hidden، فيتداخل صندوق البحث ويتحوّل زر البثّ لدائرة. نُعيده هنا
+   لتخطيط عمودي طبيعي وصندوق بحث بعرض كامل (خاص بشاشة المراسلات فقط). */
+body.ems-site .main #contactsPanel .contacts-header {
+    display: block !important;
+    overflow: visible !important;
+    min-height: 0 !important;
+    direction: rtl !important;
+}
+body.ems-site .main #contactsPanel .contacts-header > * { width: auto !important; justify-self: auto !important; }
+body.ems-site .main #contactsPanel .contacts-header .search-box { display: block !important; width: 100% !important; margin-top: 10px !important; }
+body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 100% !important; box-sizing: border-box !important; }
+</style>
 <div class="chat-wrapper">
 
     <!-- ===== لوحة جهات الاتصال ===== -->

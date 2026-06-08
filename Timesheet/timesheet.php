@@ -602,7 +602,7 @@ if ($today_rows_result) {
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o." . $operations_project_column . " = p.id
-                                            WHERE 1 $type_filter AND o.status = '1'" . $project_filter . " $timesheet_project_scope_sql");
+                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " $timesheet_project_scope_sql");
 
 
 
@@ -947,7 +947,7 @@ if ($today_rows_result) {
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o." . $operations_project_column . " = p.id
-                                            WHERE 1 $type_filter AND o.status = '1'" . $project_filter . " $timesheet_project_scope_sql");
+                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " $timesheet_project_scope_sql");
 
 
 
@@ -1338,7 +1338,7 @@ if ($today_rows_result) {
                                             FROM operations o
                                             JOIN equipments e ON o.equipment = e.id
                                             JOIN project p ON o." . $operations_project_column . " = p.id
-                                            WHERE 1 $type_filter AND o.status = '1'" . $project_filter . " $timesheet_project_scope_sql");
+                                            WHERE 1 $type_filter AND o.status = '1' AND o.equipment_category = 'أساسي'" . $project_filter . " $timesheet_project_scope_sql");
 
 
 
