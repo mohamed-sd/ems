@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once '../includes/driver_contract_dates.php';
 
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
@@ -551,7 +552,7 @@ include("../insidebar.php");
                                 </td>
                                 <td><?php echo htmlspecialchars($as['supplier_name']); ?></td>
                                 <td><?php echo htmlspecialchars($as['start_date'] ? $as['start_date'] : '-'); ?></td>
-                                <td><?php echo htmlspecialchars($as['end_date'] ? $as['end_date'] : '-'); ?></td>
+                                <td><?php echo htmlspecialchars(ems_format_open_end($as['end_date'])); ?></td>
                                 <td>
                                     <span class="assignment-status <?php echo $is_active_assignment ? 'active' : 'old'; ?>">
                                         <?php echo $is_active_assignment ? 'يعمل حالياً' : 'سابق'; ?>

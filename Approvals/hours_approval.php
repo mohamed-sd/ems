@@ -293,8 +293,28 @@ include('../inheader.php');
      CSS الصفحة
 ============================================================ -->
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
+
+<style>
+/* تفعيل التمرير الأفقي بنفس نمط صفحة المتابعة */
+.hours-approval-main .table-wrap {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+.hours-approval-main .table-wrap > .dataTables_wrapper {
+  overflow: visible;
+}
+.hours-approval-main .table-wrap .dataTables_scroll,
+.hours-approval-main .table-wrap .dataTables_scrollHead,
+.hours-approval-main .table-wrap .dataTables_scrollBody {
+  overflow-x: auto !important;
+}
+.hours-approval-main .ha-table {
+  width: max-content !important;
+  min-width: 100%;
+}
+</style>
 
 <!-- ============================================================
      HTML
@@ -419,14 +439,17 @@ include '../insidebar.php';
       <span class="fw-semibold text-muted me-2" style="font-size:.82rem;">
         <i class="fa fa-table-columns me-1"></i> الأعمدة الإضافية:
       </span>
-      <button class="cg-btn cg-hours" data-group="hours" onclick="toggleColGroup(this)">
+      <button type="button" class="btn-group-toggle" data-group="hours">
         <i class="fa fa-clock"></i> ساعات تفصيلية
       </button>
-      <button class="cg-btn cg-faults" data-group="faults" onclick="toggleColGroup(this)">
+      <button type="button" class="btn-group-toggle" data-group="faults">
         <i class="fa fa-tools"></i> الأعطال
       </button>
-      <button class="cg-btn cg-notes" data-group="notes" onclick="toggleColGroup(this)">
+      <button type="button" class="btn-group-toggle" data-group="notes">
         <i class="fa fa-sticky-note"></i> ملاحظات
+      </button>
+      <button type="button" class="btn-group-toggle-all">
+        <i class="fa fa-eye"></i> الكل
       </button>
       <small class="text-muted ms-auto" style="font-size:.75rem;">
         <i class="fa fa-info-circle me-1"></i> المجموع = الساعات المنفذة + الانتظار
@@ -533,7 +556,7 @@ include '../insidebar.php';
     <?php endif; ?>
 
     <!-- الجدول -->
-    <div class="table-responsive">
+    <div class="table-wrap">
       <table id="tbl-pending" class="ha-table display nowrap" style="width:100%">
         <thead>
           <tr>
@@ -722,7 +745,7 @@ include '../insidebar.php';
       <span class="badge-count badge" style="background:#5B7F1E;"><?= count($approved_rows) ?> سجل</span>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-wrap">
       <table id="tbl-approved" class="ha-table display nowrap" style="width:100%">
         <thead>
           <tr>
@@ -749,10 +772,9 @@ include '../insidebar.php';
             <th class="col-g-faults nosort">الأعطال</th>
             <th class="col-g-notes nosort">ملاحظات العمل</th>
             <th class="col-g-faults nosort">ملاحظات الأعطال</th>
-            <th class="nosort">اعتمد بواسطة</th>
+            <th class="nosort">مسار الاعتماد</th>
             <th class="nosort">تاريخ الاعتماد</th>
             <th class="nosort">ملاحظات</th>
-            <th class="nosort" style="white-space:nowrap;"></th>
           </tr>
         </thead>
         <tbody>
@@ -1070,7 +1092,6 @@ include '../insidebar.php';
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 
 <script>
@@ -1084,8 +1105,10 @@ var dtApproved  = null;
 $(function () {
   var dtOpts = {
     language : { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json' },
-    responsive: true,
     pageLength: 25,
+    scrollX   : true,
+    scrollCollapse: true,
+    autoWidth : false,
     order     : [[1, 'desc']],
     dom       : '<"row mb-2"<"col-sm-6"l><"col-sm-6"f>>rt<"row mt-2"<"col-sm-6"i><"col-sm-6"p>>',
   };
@@ -1094,18 +1117,31 @@ $(function () {
     order: [[<?= (!$is_admin && !$is_site_manager) ? 2 : 1 ?>, 'desc']],
     columnDefs: [{ orderable: false, targets: '.nosort' }]
   }));
-  // إخفاء المجموعات عند التحميل
-  dtPending.columns('.col-g-hours').visible(false);
-  dtPending.columns('.col-g-faults').visible(false);
-  dtPending.columns('.col-g-notes').visible(false);
-
   dtApproved = $('#tbl-approved').DataTable($.extend({}, dtOpts, {
     order: [[1, 'desc']],
     columnDefs: [{ orderable: false, targets: '.nosort' }]
   }));
-  dtApproved.columns('.col-g-hours').visible(false);
-  dtApproved.columns('.col-g-faults').visible(false);
-  dtApproved.columns('.col-g-notes').visible(false);
+
+  // إعادة ضبط قياسات الأعمدة لضمان ظهور شريط التمرير الأفقي بعد التحميل.
+  setTimeout(function () {
+    if (dtPending) dtPending.columns.adjust();
+    if (dtApproved) dtApproved.columns.adjust();
+  }, 50);
+
+  $(window).on('resize', function () {
+    if (dtPending) dtPending.columns.adjust();
+    if (dtApproved) dtApproved.columns.adjust();
+  });
+
+  // إظهار/إخفاء المجموعات — موحّد عبر assets/js/column-groups.js (يطبّق على الجدولين)
+  if (window.EmsColumnGroups) {
+    EmsColumnGroups.init({
+      storageKey: 'hoursApprovalGroupStates',
+      mode: 'datatable',
+      tables: [dtPending, dtApproved],
+      columnClass: true
+    });
+  }
 
   // حساب إجمالي الملاحظات
   var totalNotes = 0;
@@ -1146,17 +1182,8 @@ $(function () {
 });
 
 // ── دوال الاعتماد والرفض ─────────────────────────────────────
-// ── تبديل مجموعات الأعمدة ────────────────────────────────────
-var groupState = { hours: false, faults: false, notes: false };
-function toggleColGroup(btn) {
-  var group = btn.getAttribute('data-group');
-  groupState[group] = !groupState[group];
-  var vis = groupState[group];
-  if (dtPending)  dtPending.columns('.col-g-' + group).visible(vis);
-  if (dtApproved) dtApproved.columns('.col-g-' + group).visible(vis);
-  if (vis) $(btn).addClass('cg-active');
-  else     $(btn).removeClass('cg-active');
-}
+// تبديل مجموعات الأعمدة: مُوحّد الآن عبر assets/js/column-groups.js
+// (يُهيّأ داخل كتلة DataTables أعلاه).
 
 function approveSingle(id) {
   pendingApproveIds = [id];
@@ -1384,7 +1411,7 @@ $(document).on('click', '.btn-fault-badge', function() {
   modal.show();
   $.getJSON('../Timesheet/get_timesheet_failures.php?timesheet_id=' + tsId, function(res) {
     if (res && res.success && res.data && res.data.length > 0) {
-      var html = '<div class="table-responsive"><table class="table table-sm table-hover table-bordered">';
+      var html = '<div class="table"><table class="table table-sm table-hover table-bordered">';
       html += '<thead class="table-dark"><tr><th>#</th><th>الكود الكامل</th><th>نوع الحدث</th><th>الفئة الرئيسية</th><th>الفئة الفرعية</th><th>تفصيل العطل</th></tr></thead><tbody>';
       $.each(res.data, function(i, f) {
         html += '<tr>';

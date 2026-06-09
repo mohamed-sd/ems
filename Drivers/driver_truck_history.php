@@ -6,6 +6,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+require_once '../includes/driver_contract_dates.php';
 
 $driver_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $driver = null;
@@ -113,7 +114,7 @@ include("../insidebar.php");
                             echo "<td>" . $i++ . "</td>";
                             echo "<td>" . $truck_label . "</td>";
                             echo "<td>" . htmlspecialchars($row['start_date'] ?: '-') . "</td>";
-                            echo "<td>" . htmlspecialchars($row['end_date'] ?: '-') . "</td>";
+                            echo "<td>" . htmlspecialchars(ems_format_open_end($row['end_date'])) . "</td>";
                             echo "<td>" . htmlspecialchars($row['supplier_name'] ?: '-') . "</td>";
                             echo "<td>" . $status_text . "</td>";
                             echo "</tr>";

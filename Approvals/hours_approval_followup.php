@@ -316,7 +316,6 @@ $page_title = 'متابعة الاعتمادات المنقولة';
 include('../inheader.php');
 ?>
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
 
 <div class="main hours-approval-followup-main">
 <div class="page-wrapper">
@@ -516,9 +515,9 @@ include('../inheader.php');
                 $_fup_badge = $_fup_fc_cnt > 0 ? $_fup_fc_cnt : ($_fup_leg_has ? 1 : 0);
               ?>
               <?php if ($_fup_badge > 0): ?>
-              <button class="note-btn fup-fault-btn" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="border-color:#dc3545;color:#dc3545;">
-                <i class="fa fa-exclamation-triangle" style="color:#dc3545;"></i>
-                <span class="note-badge" style="background:#dc3545;"><?= $_fup_badge ?></span>
+              <button class="note-btn fup-fault-btn" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="border-color:#dc3545;color:#fff;">
+                <i class="fa fa-exclamation-triangle" style="color:#dc3545;color:#fff;"></i>
+                <span class="note-badge" style="background:#dc3545;color:#fff;"><?= $_fup_badge ?></span>
               </button>
               <?php else: ?>
               <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
@@ -734,7 +733,6 @@ include('../inheader.php');
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script>
 var dtFollow = null;
 var dtFinal = null;

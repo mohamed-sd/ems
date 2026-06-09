@@ -487,15 +487,22 @@ table.dataTable thead .sorting_desc::after {
     color: var(--gold);
 }
 
+/* ============================================================
+   COLUMN-GROUP TOGGLE BUTTONS — SINGLE SOURCE OF TRUTH
+   Used by the unified feature (assets/js/column-groups.js) on
+   all 8 group pages. Do NOT redefine .btn-group-toggle elsewhere.
+   - inactive: light gray (NOT white)
+   - active  : dark-yellow gradient
+   ============================================================ */
 .btn-group-toggle {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1.5px solid #D7DBE0;
-    background: #fff;
-    color: #4d4d4d;
+    border: 1.5px solid #D7DBE0 !important;
+    background: #F1F2F4 !important;
+    color: #5A6270 !important;
     font-weight: 700;
     font-size: 0.85rem;
     cursor: pointer;
@@ -504,36 +511,55 @@ table.dataTable thead .sorting_desc::after {
 }
 
 .btn-group-toggle:hover {
-    border-color: #D9AB32;
-    color: #2A2010;
+    border-color: #D9AB32 !important;
+    color: #2A2010 !important;
+    background: #ECEDEF !important;
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
 .btn-group-toggle.active {
-    background: linear-gradient(135deg, #D9AB32 0%, #C2941C 100%);
-    color: #2A2010;
-    border-color: #B0851A;
+    background: linear-gradient(135deg, #D9AB32 0%, #C2941C 100%) !important;
+    color: #2A2010 !important;
+    border-color: #B0851A !important;
     box-shadow: var(--shadow-md);
 }
 
+.btn-group-toggle.active:hover {
+    background: linear-gradient(135deg, #C2941C 0%, #B0851A 100%) !important;
+    color: #2A2010 !important;
+}
+
 .btn-group-toggle-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1px solid var(--border-accent);
-    background: var(--gold-light);
-    color: var(--text-muted);
+    border: 1.5px solid #D7DBE0 !important;
+    background: #F1F2F4 !important;
+    color: #5A6270 !important;
     font-weight: 700;
     cursor: pointer;
     font-size: 0.85rem;
     transition: all 0.18s ease;
     margin-left: auto;
+    white-space: nowrap;
 }
 
 .btn-group-toggle-all:hover {
-    background: var(--gold);
-    color: #fff;
-    border-color: var(--gold-dark);
+    border-color: #D9AB32 !important;
+    color: #2A2010 !important;
+    background: #ECEDEF !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-group-toggle-all.active {
+    background: linear-gradient(135deg, #D9AB32 0%, #C2941C 100%) !important;
+    color: #2A2010 !important;
+    border-color: #B0851A !important;
+    box-shadow: var(--shadow-md);
 }
 
 /* ========== PRINT STYLES ========== */

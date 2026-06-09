@@ -5235,23 +5235,8 @@ table.d-bd {
   margin-bottom: 10px;
 }
 
-.equipments-fleet-main .toggle-group-btn,
-.equipments-fleet-main .toggle-all-btn {
-  border: 1px solid var(--bdr);
-  background: var(--s1);
-  color: var(--t2);
-  border-radius: 999px;
-  padding: 7px 12px;
-  font-weight: 700;
-  font-size: .82rem;
-  cursor: pointer;
-}
-
-.equipments-fleet-main .toggle-group-btn.active {
-  background: var(--s3);
-  border-color: var(--or);
-  color: var(--or3);
-}
+/* (removed) .equipments-fleet-main .toggle-group-btn — column-group buttons
+   are unified as .btn-group-toggle in assets/css/alltables.css */
 
 .equipments-fleet-main .supplier-name { color: var(--t1); font-weight: 800; }
 .equipments-fleet-main .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -8557,7 +8542,7 @@ table.d-bd {
 }
 
 .contracts-details-page .page-hero {
-  background: linear-gradient(140deg, #161008 0%, #1f1509 55%, #2a1b0c 100%);
+  background: #ddd;
   border: 1px solid rgba(244,197,66,0.24);
   border-bottom: 2px solid var(--or);
   border-radius: var(--radius-lg);
@@ -8609,14 +8594,14 @@ table.d-bd {
 .contracts-details-page .hero-icon {
   width: 64px;
   height: 64px;
-  background: rgba(244,197,66,0.18);
+  background: var(--yellow-deep);
   border: 2px solid rgba(244,197,66,0.4);
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 26px;
-  color: var(--accent);
+  color: #fff;
   flex-shrink: 0;
 }
 
@@ -10309,54 +10294,8 @@ table.d-bd {
    GROUP TOGGLE BUTTONS (Contracts Tables)
    أزرار التحكم في مجموعات أعمدة الجداول
 ══════════════════════════════════════════════════════════════ */
-.btn-group-toggle {
-  padding: 6px 12px;
-  border: 1.5px solid var(--bdr);
-  background: #fff;
-  color: var(--t2);
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: .8rem;
-  font-weight: 700;
-  transition: all 0.22s cubic-bezier(.4,0,.2,1);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-group-toggle:hover {
-  border-color: var(--or);
-  color: var(--s0);
-  transform: translateY(-1px);
-  box-shadow: var(--sh);
-}
-
-.btn-group-toggle.active {
-  background: linear-gradient(135deg, var(--or2, #D9AB32), #C2941C);
-  color: #2A2010;
-  border-color: #B0851A;
-  box-shadow: var(--sh);
-}
-
-.btn-group-toggle-all {
-  padding: 6px 14px;
-  border: 1.5px solid var(--ok);
-  background: linear-gradient(135deg, var(--ok), #20c997);
-  color: #fff;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: .8rem;
-  font-weight: 800;
-  transition: all 0.22s cubic-bezier(.4,0,.2,1);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-group-toggle-all:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--sh);
-}
+/* .btn-group-toggle / .btn-group-toggle-all — moved to the single source of
+   truth in assets/css/alltables.css (do not redefine here). */
 
 .group-hidden {
   display: none !important;
@@ -11676,25 +11615,8 @@ table.dataTable thead th {
   gap: 10px;
 }
 
-.hours-approval-main .cg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: .78rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1.5px solid;
-  background: transparent;
-}
-
-.hours-approval-main .cg-btn.cg-hours { color: #0d47a1; border-color: #0d47a1; }
-.hours-approval-main .cg-btn.cg-faults { color: #bf360c; border-color: #bf360c; }
-.hours-approval-main .cg-btn.cg-notes { color: #1b5e20; border-color: #1b5e20; }
-.hours-approval-main .cg-btn.cg-active.cg-hours { background: #0d47a1; color: #fff; }
-.hours-approval-main .cg-btn.cg-active.cg-faults { background: #bf360c; color: #fff; }
-.hours-approval-main .cg-btn.cg-active.cg-notes { background: #1b5e20; color: #fff; }
+/* (removed) .hours-approval-main .cg-btn — column-group buttons are unified
+   as .btn-group-toggle in assets/css/alltables.css */
 
 .hours-approval-main .apv-circle-wrap { position: relative; display: inline-flex; }
 
@@ -11797,7 +11719,7 @@ table.dataTable thead th {
   min-width: 18px;
   height: 18px;
   border-radius: 999px;
-  background: #dc2626;
+  background: #bbb;;
   color: #fff;
   font-size: .66rem;
   font-weight: 800;

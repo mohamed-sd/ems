@@ -935,25 +935,25 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
             
             <!-- أزرار إظهار/إخفاء المجموعات -->
             <div class="column-groups-toggle">
-                <button type="button" class="toggle-group-btn active" data-group="basic" title="المعلومات الأساسية">
+                <button type="button" class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
                     <i class="fas fa-info-circle"></i> أساسية
                 </button>
-                <button type="button" class="toggle-group-btn active" data-group="identification" title="بيانات التعريف">
+                <button type="button" class="btn-group-toggle active" data-group="identification" title="بيانات التعريف">
                     <i class="fas fa-id-card"></i> التعريف
                 </button>
-                <button type="button" class="toggle-group-btn" data-group="manufacturing" title="بيانات الصنع">
+                <button type="button" class="btn-group-toggle" data-group="manufacturing" title="بيانات الصنع">
                     <i class="fas fa-industry"></i> الصنع
                 </button>
-                <button type="button" class="toggle-group-btn" data-group="technical" title="الحالة الفنية">
+                <button type="button" class="btn-group-toggle" data-group="technical" title="الحالة الفنية">
                     <i class="fas fa-wrench"></i> فنية
                 </button>
-                <button type="button" class="toggle-group-btn active" data-group="ownership" title="بيانات الملكية">
+                <button type="button" class="btn-group-toggle active" data-group="ownership" title="بيانات الملكية">
                     <i class="fas fa-user-tie"></i> الملكية
                 </button>
-                <button type="button" class="toggle-group-btn active" data-group="status" title="الحالة والإجراءات">
+                <button type="button" class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
                     <i class="fas fa-toggle-on"></i> الحالة
                 </button>
-                <button type="button" class="toggle-all-btn" title="إظهار/إخفاء الكل">
+                <button type="button" class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
                     <i class="fas fa-eye"></i> الكل
                 </button>
             </div>
@@ -1311,7 +1311,8 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 }
             });
             
-            // نظام إظهار/إخفاء المجموعات
+            // نظام إظهار/إخفاء المجموعات — خريطة الفهارس تُمرّر للوحدة الموحّدة.
+            // الحالة الافتراضية تؤخذ من كلاس active على الأزرار (الصنع/الفنية مخفيتان).
             var columnGroups = {
                 'basic': [0, 1, 2, 4, 5],        // #، المورد، كود المعدة، النوع، الاسم
                 'identification': [3],            // رقم تسلسلي
@@ -1320,24 +1321,6 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 'ownership': [9],                 // المالك
                 'status': [11, 12]                // الحالة، الإجراءات
             };
-            
-            // حفظ حالة المجموعات (الصنع والفنية مخفيتين بشكل افتراضي)
-            var groupsState = {
-                'basic': true,
-                'identification': true,
-                'manufacturing': false,
-                'technical': false,
-                'ownership': true,
-                'status': true
-            };
-            
-            // إخفاء الأعمدة المخفية بشكل افتراضي عند التحميل
-            columnGroups['manufacturing'].forEach(function(colIndex) {
-                table.column(colIndex).visible(false);
-            });
-            columnGroups['technical'].forEach(function(colIndex) {
-                table.column(colIndex).visible(false);
-            });
             
             // نظام الفلترة الاحترافي
             var activeFilters = {
@@ -1456,46 +1439,20 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                 }, 300);
             });
             
-            // وظيفة إظهار/إخفاء مجموعة
-            function toggleGroup(groupName) {
-                var columns = columnGroups[groupName];
-                var isVisible = groupsState[groupName];
-                
-                columns.forEach(function(colIndex) {
-                    table.column(colIndex).visible(!isVisible);
-                });
-                
-                groupsState[groupName] = !isVisible;
-            }
-            
-            // معالج النقر على أزرار المجموعات
-            $('.toggle-group-btn').on('click', function() {
-                var groupName = $(this).data('group');
-                toggleGroup(groupName);
-                $(this).toggleClass('active');
-            });
-            
-            // زر إظهار/إخفاء الكل
-            var allVisible = true;
-            $('.toggle-all-btn').on('click', function() {
-                allVisible = !allVisible;
-                
-                Object.keys(columnGroups).forEach(function(groupName) {
-                    var columns = columnGroups[groupName];
-                    columns.forEach(function(colIndex) {
-                        table.column(colIndex).visible(allVisible);
-                    });
-                    groupsState[groupName] = allVisible;
-                });
-                
-                if (allVisible) {
-                    $('.toggle-group-btn').addClass('active');
-                    $(this).html('<i class="fas fa-eye"></i> الكل');
-                } else {
-                    $('.toggle-group-btn').removeClass('active');
-                    $(this).html('<i class="fas fa-eye-slash"></i> إخفاء الكل');
+            // إظهار/إخفاء المجموعات — موحّد عبر assets/js/column-groups.js
+            (function () {
+                function go() {
+                    if (window.EmsColumnGroups) {
+                        EmsColumnGroups.init({
+                            storageKey: 'equipmentDriversGroupStates',
+                            mode: 'datatable',
+                            table: table,
+                            columnMap: columnGroups
+                        });
+                    }
                 }
-            });
+                if (window.EmsColumnGroups) { go(); } else { window.addEventListener('DOMContentLoaded', go); }
+            })();
         });
 
         const toggleFormBtn = document.getElementById('toggleForm');

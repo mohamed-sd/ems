@@ -457,34 +457,8 @@
     border: 2px solid var(--border);
 }
 
-.toggle-group-btn,
-.toggle-all-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 14px;
-    border-radius: 999px;
-    border: 1.5px solid var(--border);
-    background: #fff;
-    color: var(--txt);
-    font-weight: 700;
-    font-size: .78rem;
-    transition: all var(--ease);
-    cursor: pointer;
-}
-
-.toggle-group-btn.active {
-    background: var(--navy);
-    color: var(--gold);
-    border-color: rgba(12,28,62,.28);
-}
-
-.toggle-group-btn:hover,
-.toggle-all-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
-    border-color: var(--gold);
-}
+/* (removed) .toggle-group-btn / .toggle-all-btn — column-group buttons are
+   unified as .btn-group-toggle in assets/css/alltables.css */
 
 /* ══════════════════════════════════
    FORM HELPERS
@@ -1493,54 +1467,8 @@ table.dataTable.no-footer { border: none !important; }
     box-shadow: var(--shadow-md);
 }
 
-.btn-group-toggle {
-    padding: 6px 12px;
-    border: 1.5px solid var(--border);
-    background: #fff;
-    color: var(--sub);
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: .8rem;
-    font-weight: 700;
-    transition: all var(--ease);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.btn-group-toggle:hover {
-    border-color: var(--gold);
-    color: var(--navy);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
-}
-
-.btn-group-toggle.active {
-    background: linear-gradient(135deg, #D9AB32, #C2941C);
-    color: #2A2010;
-    border-color: #B0851A;
-    box-shadow: var(--shadow-sm);
-}
-
-.btn-group-toggle-all {
-    padding: 6px 14px;
-    border: 1.5px solid var(--green);
-    background: linear-gradient(135deg, var(--green), #20c997);
-    color: #fff;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: .8rem;
-    font-weight: 800;
-    transition: all var(--ease);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.btn-group-toggle-all:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
-}
+/* .btn-group-toggle / .btn-group-toggle-all — moved to the single source of
+   truth in assets/css/alltables.css (do not redefine here). */
 
 .group-hidden { display: none !important; }
 

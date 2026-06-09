@@ -1502,7 +1502,8 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                     }
                 });
 
-                // نظام إظهار/إخفاء المجموعات
+                // نظام إظهار/إخفاء المجموعات — خريطة الفهارس تُمرّر للوحدة الموحّدة.
+                // الحالة الافتراضية (المُفعّلة/المخفية) تؤخذ من كلاس active على الأزرار.
                 var columnGroups = {
                     'basic': [0, 1, 2, 3],          // إجراءات، الكود، المورد، النوع
                     'manufacturing': [4, 5],        // الموديل، سنة الصنع
@@ -1510,23 +1511,6 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                     'ownership': [7],               // المالك
                     'status': [8, 9]                // التوفر، الحالة
                 };
-
-                // حفظ حالة المجموعات (الصنع والفنية مخفيتين بشكل افتراضي)
-                var groupsState = {
-                    'basic': true,
-                    'manufacturing': false,
-                    'technical': false,
-                    'ownership': true,
-                    'status': true
-                };
-
-                // إخفاء الأعمدة المخفية بشكل افتراضي عند التحميل
-                columnGroups['manufacturing'].forEach(function (colIndex) {
-                    table.column(colIndex).visible(false);
-                });
-                columnGroups['technical'].forEach(function (colIndex) {
-                    table.column(colIndex).visible(false);
-                });
 
                 // نظام الفلترة الاحترافي
                 var activeFilters = {
@@ -1645,46 +1629,20 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                     }, 300);
                 });
 
-                // وظيفة إظهار/إخفاء مجموعة
-                function toggleGroup(groupName) {
-                    var columns = columnGroups[groupName];
-                    var isVisible = groupsState[groupName];
-
-                    columns.forEach(function (colIndex) {
-                        table.column(colIndex).visible(!isVisible);
-                    });
-
-                    groupsState[groupName] = !isVisible;
-                }
-
-                // معالج النقر على أزرار المجموعات
-                $('.btn-group-toggle').on('click', function () {
-                    var groupName = $(this).data('group');
-                    toggleGroup(groupName);
-                    $(this).toggleClass('active');
-                });
-
-                // زر إظهار/إخفاء الكل
-                var allVisible = true;
-                $('.btn-group-toggle-all').on('click', function () {
-                    allVisible = !allVisible;
-
-                    Object.keys(columnGroups).forEach(function (groupName) {
-                        var columns = columnGroups[groupName];
-                        columns.forEach(function (colIndex) {
-                            table.column(colIndex).visible(allVisible);
-                        });
-                        groupsState[groupName] = allVisible;
-                    });
-
-                    if (allVisible) {
-                        $('.btn-group-toggle').addClass('active');
-                        $(this).html('<i class="fas fa-eye"></i> الكل');
-                    } else {
-                        $('.btn-group-toggle').removeClass('active');
-                        $(this).html('<i class="fas fa-eye-slash"></i> إخفاء الكل');
+                // إظهار/إخفاء المجموعات — موحّد عبر assets/js/column-groups.js
+                (function () {
+                    function go() {
+                        if (window.EmsColumnGroups) {
+                            EmsColumnGroups.init({
+                                storageKey: 'fleetGroupStates',
+                                mode: 'datatable',
+                                table: table,
+                                columnMap: columnGroups
+                            });
+                        }
                     }
-                });
+                    if (window.EmsColumnGroups) { go(); } else { window.addEventListener('DOMContentLoaded', go); }
+                })();
 
                 const statsToggleBtn = $('#toggleStats');
                 const statsSection = $('#fleetStatsSection');

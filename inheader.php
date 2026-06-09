@@ -23,6 +23,9 @@ if (!function_exists('ems_css_ver')) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php if (function_exists('csrf_meta')) { echo csrf_meta(); } ?>
+    <!-- CSRF: يُلحق التوكن تلقائياً بكل طلب POST/PUT/DELETE (يجب أن يُحمّل قبل أي سكربت يطلب البيانات) -->
+    <script src="/ems/assets/js/csrf.js"></script>
     <title><?php echo $page_title ; ?></title>
 
     <!-- Font awsome icon link مكتبة الايقونات -->
@@ -43,6 +46,8 @@ if (!function_exists('ems_css_ver')) {
     <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css<?php echo ems_css_ver('ems.main.all.style.css'); ?>">
     <script src="../assets/js/performance-boost.js" defer></script>
     <script src="/ems/assets/js/ui-unification.js" defer></script>
+    <!-- Unified column-groups show/hide (activated per-page via EmsColumnGroups.init) -->
+    <script src="/ems/assets/js/column-groups.js" defer></script>
     <!-- Unified Details/View Modal System (نظام نافذة العرض الموحّد) -->
     <script src="/ems/assets/js/ems-details-modal.js" defer></script>
     <!-- Bootstrap Bundle JS (local, CSP-safe) -->

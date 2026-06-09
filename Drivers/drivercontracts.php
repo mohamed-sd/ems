@@ -90,6 +90,8 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
   <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
   <link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
   <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
+  <!-- Unified column-groups module (this page uses insidebar, not inheader) -->
+  <script src="/ems/assets/js/column-groups.js"></script>
 </head>
 
 <body class="ems-site">
@@ -652,7 +654,7 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
       </div>
 
       <div class="card-body contracts-table-body">
-        <table id="projectsTable" class="display nowrap contracts-table contracts-table-nowrap">
+        <table id="projectsTable" class="display nowrap contracts-table contracts-table-nowrap no-datatable">
           <thead>
             <tr>
               <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
@@ -1035,11 +1037,6 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
   <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
   <!-- DataTables JS -->
   <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-
-  <!-- JS -->
-  <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-  <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
-  <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
   <script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
   <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
   <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
@@ -1097,6 +1094,9 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
 
       $(document).ready(function () {
+        if ($.fn.dataTable.isDataTable('#projectsTable')) {
+          return; // already initialised elsewhere — avoid "Cannot reinitialise"
+        }
         $('#projectsTable').DataTable({
           dom: 'Bfrtip', // Buttons + Search + Pagination
           scrollX: true,
@@ -1727,93 +1727,16 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
       $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
     });
 
-    // ==================== Group Toggle Functionality ====================
-    // حفظ حالة المجموعات في localStorage
-    const groupStates = JSON.parse(localStorage.getItem('supplierContractGroupStates')) || {
-      basic: true,
-      dates: true,
-      hours: true,
-      parties: false,
-      services: false,
-      operations: false,
-      status: true
-    };
-
-    // تطبيق الحالة المحفوظة عند تحميل الصفحة
-    function applyGroupStates() {
-      Object.keys(groupStates).forEach(group => {
-        const isActive = groupStates[group];
-        const btn = $(`.btn-group-toggle[data-group="${group}"]`);
-        const columns = $(`.group-${group}`);
-
-        if (isActive) {
-          btn.addClass('active');
-          columns.removeClass('group-hidden');
-        } else {
-          btn.removeClass('active');
-          columns.addClass('group-hidden');
+    // ==================== Group Toggle (unified) ====================
+    // موحّد عبر assets/js/column-groups.js — مفتاح مستقل خاص بعقود السائقين.
+    (function () {
+      function go() {
+        if (window.EmsColumnGroups) {
+          EmsColumnGroups.init({ storageKey: 'driverContractGroupStates', mode: 'classic' });
         }
-      });
-    }
-
-    // تطبيق الحالة عند تحميل الصفحة
-    applyGroupStates();
-
-    // التحكم في إظهار/إخفاء المجموعات
-    $('.btn-group-toggle').on('click', function () {
-      const group = $(this).data('group');
-      const isActive = $(this).hasClass('active');
-
-      if (isActive) {
-        // إخفاء المجموعة
-        $(this).removeClass('active');
-        $(`.group-${group}`).addClass('group-hidden');
-        groupStates[group] = false;
-      } else {
-        // إظهار المجموعة
-        $(this).addClass('active');
-        $(`.group-${group}`).removeClass('group-hidden');
-        groupStates[group] = true;
       }
-
-      // حفظ الحالة
-      localStorage.setItem('supplierContractGroupStates', JSON.stringify(groupStates));
-    });
-
-    // محدد أعمدة المجموعات فقط (يستهدف خلايا الجدول دون أزرار التحكم)
-    const groupColumnsSelector = Object.keys(groupStates).map(g => '.group-' + g).join(',');
-
-    // زر إظهار/إخفاء الكل
-    $('.btn-group-toggle-all').on('click', function () {
-      const allActive = Object.values(groupStates).every(state => state);
-
-      if (allActive) {
-        // إخفاء الكل
-        $('.btn-group-toggle').removeClass('active');
-        $(groupColumnsSelector).addClass('group-hidden');
-        Object.keys(groupStates).forEach(key => groupStates[key] = false);
-        $(this).html('<i class="fas fa-eye-slash"></i> إظهار الكل');
-      } else {
-        // إظهار الكل
-        $('.btn-group-toggle').addClass('active');
-        $(groupColumnsSelector).removeClass('group-hidden');
-        Object.keys(groupStates).forEach(key => groupStates[key] = true);
-        $(this).html('<i class="fas fa-eye"></i> الكل');
-      }
-
-      // حفظ الحالة
-      localStorage.setItem('supplierContractGroupStates', JSON.stringify(groupStates));
-    });
-
-    // تحديث نص زر "الكل" عند التحميل
-    $(document).ready(function () {
-      const allActive = Object.values(groupStates).every(state => state);
-      if (allActive) {
-        $('.btn-group-toggle-all').html('<i class="fas fa-eye"></i> الكل');
-      } else {
-        $('.btn-group-toggle-all').html('<i class="fas fa-eye-slash"></i> إظهار الكل');
-      }
-    });
+      if (window.EmsColumnGroups) { go(); } else { window.addEventListener('DOMContentLoaded', go); }
+    })();
   </script>
 
 <?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>

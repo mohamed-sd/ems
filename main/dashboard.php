@@ -479,13 +479,6 @@ include '../insidebar.php';
 }
 
 body.ems-site,
-body.ems-site .sidebar,
-body.ems-site .sidebar a,
-body.ems-site .sidebar span,
-body.ems-site .sidebar li,
-body.ems-site .sidebar .logo,
-body.ems-site .sidebar .toggle-btn,
-body.ems-site .sidebar .logout,
 .ems-dash.main,
 .ems-dash.main h1,
 .ems-dash.main h2,
@@ -512,150 +505,9 @@ body.ems-site .sidebar .logout,
   box-sizing: border-box;
 }
 
-/* Right vertical icon sidebar (desktop) */
-body.ems-site .mobile-menu-btn,
-body.ems-site .sidebar-overlay {
-  display: none;
-}
-
-body.ems-site .sidebar {
-  position: fixed;
-  top: 50px;
-  right: 0;
-  left: auto;
-  width: 286px;
-  height: calc(100vh - 50px);
-  background: #efefef;
-  border-right: 1px solid #c8c8c8;
-  border-left: 1px solid #c8c8c8;
-  box-shadow: none;
-  z-index: 50;
-  transition: width .3s ease;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-}
-
-body.ems-site .sidebar.closed {
-  width: 68px;
-}
-
-body.ems-site .sidebar .toggle-btn {
-  display: flex;
-  width: 100%;
-  min-height: 42px;
-  align-items: center;
-  justify-content: center;
-  color: #333;
-  border-bottom: 1px solid #d0d0d0;
-  background: #e5e5e5;
-}
-
-body.ems-site .sidebar .logo {
-  display: block;
-  padding: 10px 12px;
-  color: #151515;
-  font-size: 1.2rem;
-  border-bottom: 1px solid #d0d0d0;
-  background: #ececec;
-}
-
-body.ems-site .sidebar.closed .logo {
-  display: none;
-}
-
-body.ems-site .sidebar ul {
-  padding: 8px 0 12px;
-  overflow-y: visible !important;
-  max-height: none !important;
-}
-
-body.ems-site .sidebar ul li {
-  margin: 6px 8px;
-  width: auto;
-  min-height: 42px;
-  padding: 0 8px;
-  border-radius: 10px;
-  background: transparent;
-  display: flex;
-  justify-content: flex-start;
-}
-
-body.ems-site .sidebar ul li::before {
-  display: none;
-}
-
-body.ems-site .sidebar ul li a {
-  justify-content: flex-start;
-  align-items: center;
-  padding: 0;
-}
-
-body.ems-site .sidebar ul li i {
-  margin: 0;
-  color: #6e6e6e;
-  font-size: 1.05rem;
-}
-
-body.ems-site .sidebar ul li span {
-  display: inline;
-  color: #222;
-  margin-right: 10px;
-  font-size: .95rem;
-  font-weight: 700;
-}
-
-body.ems-site .sidebar.closed ul li {
-  margin: 6px auto;
-  width: 48px;
-  justify-content: center;
-  padding: 0;
-}
-
-body.ems-site .sidebar.closed ul li a {
-  justify-content: center;
-}
-
-body.ems-site .sidebar.closed ul li span {
-  display: none;
-}
-
-body.ems-site .sidebar ul li.active,
-body.ems-site .sidebar ul li:hover {
-  background: #efefef;
-  border: 1px solid #d4d4d4;
-}
-
-body.ems-site .sidebar ul li.active i,
-body.ems-site .sidebar ul li:hover i {
-  color: #111;
-}
-
-body.ems-site .sidebar .logout {
-  margin: 8px 8px 12px;
-  width: auto;
-  min-height: 42px;
-  padding: 0 10px;
-  justify-content: flex-start;
-  border-radius: 10px;
-  background: transparent;
-  border: 1px solid #cfcfcf;
-  color: #a12727;
-}
-
-body.ems-site .sidebar .logout i {
-  margin: 0;
-}
-
-body.ems-site .sidebar.closed .logout {
-  width: 48px;
-  margin: 8px auto 12px;
-  justify-content: center;
-  padding: 0;
-}
-
-body.ems-site .sidebar.closed .logout span {
-  display: none;
-}
+/* Sidebar: inherits the unified layout from ems.main.all.style.css
+   (GLOBAL SIDEBAR section). Dashboard no longer redefines its
+   position/dimensions/colors — single source of truth. */
 
 /* ── Top bar ──────────────────────────────────────────────────
    The bar itself now lives in the shared component
@@ -672,12 +524,7 @@ body.ems-site .sidebar.closed .logout span {
 .shot-body {
   padding: 0 0px 14px;
   background: #e2e2e2;
-  margin-right: 68px;
   margin-top: -1px;
-}
-
-body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
-  margin-right: 286px;
 }
 
 .shot-breadcrumb {
@@ -1079,46 +926,11 @@ body.ems-site .sidebar:not(.closed) ~ .ems-dash .shot-body {
 }
 
 @media (max-width: 900px) {
-  .ems-dash.main {
-    margin-right: 0;
-  }
-
-  body.ems-site .mobile-menu-btn {
-    display: inline-flex;
-  }
-
-  body.ems-site .sidebar {
-    top: 50px;
-    width: 280px;
-    height: calc(100vh - 50px);
-    right: auto;
-    left: 0;
-    background: #fff;
-    transform: translateX(-110%);
-    transition: transform .3s ease;
-  }
-
-  body.ems-site .sidebar.active {
-    transform: translateX(0);
-  }
-
-  body.ems-site .sidebar ul li span,
-  body.ems-site .sidebar .logout span,
-  body.ems-site .sidebar .logo {
-    display: initial;
-  }
-
-  body.ems-site .sidebar .toggle-btn,
-  body.ems-site .sidebar .logo,
-  body.ems-site .sidebar .logout span,
-  body.ems-site .sidebar ul li span {
-    display: initial;
-  }
-
+  /* Sidebar mobile behavior (off-canvas) is governed by the unified
+     CSS breakpoint (≤768px); the dashboard only adjusts its content here. */
   .shot-body {
     padding-top: 10px;
     margin-top: 0;
-    margin-right: 0;
   }
 
   .shot-breadcrumb {

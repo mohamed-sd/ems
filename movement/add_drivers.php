@@ -6,6 +6,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+require_once '../includes/driver_contract_dates.php';
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
@@ -994,18 +995,12 @@ include("../inheader.php");
                 <input type="hidden" name="equipment_id" value="<?php echo $equipment_id; ?>">
 
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-calendar-check"></i> تاريخ بداية القيادة <span style="color: red;">*</span>
+                    <div class="driver-form-check-row" style="grid-column: 1 / -1;">
+                        <i class="fas fa-info-circle" style="color: var(--blue);"></i>
+                        <label class="driver-form-check-label" style="margin:0;">
+                            تُحتسب تواريخ بداية/نهاية التشغيل تلقائياً من عقد المشغل الساري؛
+                            وإن لم يوجد عقد ساري تبدأ من تاريخ اليوم وتبقى مفتوحة حتى إنهاء العمل.
                         </label>
-                        <input type="date" name="start_date" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-calendar-times"></i> تاريخ نهاية القيادة (اختياري)
-                        </label>
-                        <input type="date" name="end_date">
                     </div>
 
                     <div class="form-group">
@@ -1179,7 +1174,7 @@ include("../inheader.php");
                                     <td><?php echo htmlspecialchars($row['phone']); ?></td>
                                     <td><?php echo $row['start_date'] ? date('Y-m-d', strtotime($row['start_date'])) : '-'; ?>
                                     </td>
-                                    <td><?php echo $row['end_date'] ? date('Y-m-d', strtotime($row['end_date'])) : '-'; ?></td>
+                                    <td><?php echo htmlspecialchars(ems_format_open_end($row['end_date'])); ?></td>
                                     <td class="shift-cell" data-relation-id="<?php echo $row['id']; ?>" data-current-shift="<?php echo $shift_type; ?>" style="cursor: pointer;" title="انقر للتعديل">
                                         <span class="shift-badge <?php echo $shift_class; ?>">
                                             <?php echo $shift_label; ?>

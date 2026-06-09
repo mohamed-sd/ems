@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 require_once '../includes/approval_workflow.php';
+require_once '../includes/driver_contract_dates.php';
 
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
@@ -83,43 +84,14 @@ if (isset($_POST['equipment_id'])) {
         exit;
     }
 
-    $start_date = isset($_POST['start_date']) ? trim($_POST['start_date']) : '';
-    $end_date = isset($_POST['end_date']) ? trim($_POST['end_date']) : '';
     $shift_type_raw = isset($_POST['shift_type']) ? strval($_POST['shift_type']) : 'B';
     $auto_replace = isset($_POST['auto_replace']) ? intval($_POST['auto_replace']) : 0;
 
     $allowed_shift_types = array('D', 'N', 'B');
     $shift_type = in_array($shift_type_raw, $allowed_shift_types, true) ? $shift_type_raw : 'B';
 
-    $start_valid = false;
-    if ($start_date !== '') {
-        $start_dt = DateTime::createFromFormat('Y-m-d', $start_date);
-        $start_valid = $start_dt && $start_dt->format('Y-m-d') === $start_date;
-    }
-
-    $end_valid = false;
-    if ($end_date !== '') {
-        $end_dt = DateTime::createFromFormat('Y-m-d', $end_date);
-        $end_valid = $end_dt && $end_dt->format('Y-m-d') === $end_date;
-    }
-
-    if (!$start_valid) {
-        echo "❌ تاريخ البداية غير صحيح.";
-        exit;
-    }
-
-    if ($end_date !== '' && !$end_valid) {
-        echo "❌ تاريخ النهاية غير صحيح.";
-        exit;
-    }
-
-    if ($end_date !== '' && strtotime($start_date) > strtotime($end_date)) {
-        echo "❌ تاريخ البداية يجب أن يكون قبل تاريخ النهاية.";
-        exit;
-    }
-
-    $start_sql = "'" . mysqli_real_escape_string($conn, $start_date) . "'";
-    $end_sql = $end_date !== '' ? "'" . mysqli_real_escape_string($conn, $end_date) . "'" : "'2099-12-31'";
+    // ملاحظة: تواريخ بداية/نهاية التشغيل لم تعد تؤخذ من الفورم، بل تُشتق آلياً
+    // لكل سائق من عقده الساري (راجع includes/driver_contract_dates.php).
 
     // جلب معلومات الآلية
     $equipment_res = mysqli_query($conn, "SELECT e.code, e.name FROM equipments e WHERE e.id = $equipment_id AND $equipment_scope_sql LIMIT 1");
@@ -163,6 +135,11 @@ if (isset($_POST['equipment_id'])) {
             }
             $driver_name = $driver_info ? $driver_info['name'] : "سائق #$driver_id";
 
+            // اشتقاق التواريخ من عقد السائق الساري (وليس من الفورم)
+            $dates = ems_resolve_equipment_driver_dates($conn, $driver_id, $company_id, $is_super_admin);
+            $start_date = $dates['start'];
+            $end_date = $dates['end'];
+
             $payload = [
                 'summary' => [
                     'driver_id' => $driver_id,
@@ -171,7 +148,7 @@ if (isset($_POST['equipment_id'])) {
                     'equipment_code' => $equipment_code,
                     'equipment_name' => $equipment_name,
                     'start_date' => $start_date,
-                    'end_date' => $end_date !== '' ? $end_date : '2099-12-31',
+                    'end_date' => $end_date,
                     'shift_type' => $shift_type,
                     'action' => 'تشغيل مشغل جديد',
                     'requested_by_role' => '10',
@@ -185,7 +162,7 @@ if (isset($_POST['equipment_id'])) {
                             'equipment_id' => $equipment_id,
                             'driver_id' => $driver_id,
                             'start_date' => $start_date,
-                            'end_date' => $end_date !== '' ? $end_date : '2099-12-31',
+                            'end_date' => $end_date,
                             'status' => 1,
                             'shift_type' => $shift_type
                         ]
@@ -232,6 +209,11 @@ if (isset($_POST['equipment_id'])) {
     // المستخدمون الآخرون: إضافة مباشرة
     foreach ($drivers as $driver_id) {
         $driver_id = intval($driver_id);
+
+        // اشتقاق التواريخ من عقد السائق الساري (وليس من الفورم)
+        $dates = ems_resolve_equipment_driver_dates($conn, $driver_id, $company_id, $is_super_admin);
+        $start_sql = "'" . mysqli_real_escape_string($conn, $dates['start']) . "'";
+        $end_sql = "'" . mysqli_real_escape_string($conn, $dates['end']) . "'";
 
         // التحقق من عدم وجود ربط نشط بالفعل
         $check_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";

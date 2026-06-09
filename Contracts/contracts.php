@@ -1796,93 +1796,16 @@ include('../insidebar.php');
     $("html, body").animate({ scrollTop: $("#projectForm").offset().top }, 500);
   });
 
-  // ==================== Group Toggle Functionality ====================
-  // حفظ حالة المجموعات في localStorage
-  const groupStates = JSON.parse(localStorage.getItem('contractGroupStates')) || {
-    basic: true,
-    dates: true,
-    hours: true,
-    parties: false,
-    services: false,
-    operations: false,
-    status: true
-  };
-
-  // تطبيق الحالة المحفوظة عند تحميل الصفحة
-  function applyGroupStates() {
-    Object.keys(groupStates).forEach(group => {
-      const isActive = groupStates[group];
-      const btn = $(`.btn-group-toggle[data-group="${group}"]`);
-      const columns = $(`.group-${group}`);
-
-      if (isActive) {
-        btn.addClass('active');
-        columns.removeClass('group-hidden');
-      } else {
-        btn.removeClass('active');
-        columns.addClass('group-hidden');
+  // ==================== Group Toggle (unified) ====================
+  // موحّد عبر assets/js/column-groups.js — مصدر واحد للحقيقة.
+  (function () {
+    function go() {
+      if (window.EmsColumnGroups) {
+        EmsColumnGroups.init({ storageKey: 'contractGroupStates', mode: 'classic' });
       }
-    });
-  }
-
-  // تطبيق الحالة عند تحميل الصفحة
-  applyGroupStates();
-
-  // التحكم في إظهار/إخفاء المجموعات
-  $('.btn-group-toggle').on('click', function () {
-    const group = $(this).data('group');
-    const isActive = $(this).hasClass('active');
-
-    if (isActive) {
-      // إخفاء المجموعة
-      $(this).removeClass('active');
-      $(`.group-${group}`).addClass('group-hidden');
-      groupStates[group] = false;
-    } else {
-      // إظهار المجموعة
-      $(this).addClass('active');
-      $(`.group-${group}`).removeClass('group-hidden');
-      groupStates[group] = true;
     }
-
-    // حفظ الحالة
-    localStorage.setItem('contractGroupStates', JSON.stringify(groupStates));
-  });
-
-  // محدد أعمدة المجموعات فقط (يستهدف خلايا الجدول دون أزرار التحكم)
-  const groupColumnsSelector = Object.keys(groupStates).map(g => '.group-' + g).join(',');
-
-  // زر إظهار/إخفاء الكل
-  $('.btn-group-toggle-all').on('click', function () {
-    const allActive = Object.values(groupStates).every(state => state);
-
-    if (allActive) {
-      // إخفاء الكل
-      $('.btn-group-toggle').removeClass('active');
-      $(groupColumnsSelector).addClass('group-hidden');
-      Object.keys(groupStates).forEach(key => groupStates[key] = false);
-      $(this).html('<i class="fas fa-eye-slash"></i> إظهار الكل');
-    } else {
-      // إظهار الكل
-      $('.btn-group-toggle').addClass('active');
-      $(groupColumnsSelector).removeClass('group-hidden');
-      Object.keys(groupStates).forEach(key => groupStates[key] = true);
-      $(this).html('<i class="fas fa-eye"></i> الكل');
-    }
-
-    // حفظ الحالة
-    localStorage.setItem('contractGroupStates', JSON.stringify(groupStates));
-  });
-
-  // تحديث نص زر "الكل" عند التحميل
-  $(document).ready(function () {
-    const allActive = Object.values(groupStates).every(state => state);
-    if (allActive) {
-      $('.btn-group-toggle-all').html('<i class="fas fa-eye"></i> الكل');
-    } else {
-      $('.btn-group-toggle-all').html('<i class="fas fa-eye-slash"></i> إظهار الكل');
-    }
-  });
+    if (window.EmsColumnGroups) { go(); } else { window.addEventListener('DOMContentLoaded', go); }
+  })();
 </script>
 
 <?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>

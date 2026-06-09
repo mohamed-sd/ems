@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 require_once '../includes/approval_workflow.php';
+require_once '../includes/driver_contract_dates.php';
 
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
@@ -83,6 +84,12 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
              VALUES ('driver', '$action_type', '3,-1', 1, 1, NOW())"
         );
 
+        // عند الإيقاف: سجّل تاريخ اليوم كنهاية فعلية للعمل إن كانت النهاية مفتوحة
+        $op_data = ['status' => $new_status];
+        if ($new_status == 0 && ems_is_open_end_date(isset($row['end_date']) ? $row['end_date'] : null)) {
+            $op_data['end_date'] = date('Y-m-d');
+        }
+
         $payload = [
             'summary' => [
                 'equipment_driver_id' => $id,
@@ -102,7 +109,7 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
                     'db_action' => 'update',
                     'table' => 'equipment_drivers',
                     'where' => ['id' => $id],
-                    'data' => ['status' => $new_status]
+                    'data' => $op_data
                 ]
             ]
         ];
@@ -126,7 +133,13 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
 
     // المستخدمون الآخرون: تغيير الحالة مباشرة
     $update_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";
-    mysqli_query($conn, "UPDATE equipment_drivers SET status=$new_status WHERE id=$id$update_scope");
+    // عند الإيقاف: سجّل تاريخ اليوم كنهاية فعلية للعمل إن كانت النهاية مفتوحة
+    if ($new_status == 0 && ems_is_open_end_date(isset($row['end_date']) ? $row['end_date'] : null)) {
+        $today = date('Y-m-d');
+        mysqli_query($conn, "UPDATE equipment_drivers SET status=0, end_date='$today' WHERE id=$id$update_scope");
+    } else {
+        mysqli_query($conn, "UPDATE equipment_drivers SET status=$new_status WHERE id=$id$update_scope");
+    }
     header("Location: add_drivers.php?equipment_id=$equipment_id");
     exit;
 }

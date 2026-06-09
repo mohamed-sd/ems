@@ -964,31 +964,15 @@ include('../includes/page_header.php');
             <h5><i class="fas fa-layer-group"></i> إظهار وإخفاء مجموعات الحقول</h5>
         </div>
         <div class="card-body">
-            <div class="group-panel">
-                <div class="group-grid">
-                    <label class="group-item"><input type="checkbox" class="group-toggle" data-group="basic" checked>المعلومات العامة</label>
-                    <label class="group-item"><input type="checkbox" class="group-toggle" data-group="work" checked>ساعات العمل</label>
-                    <label class="group-item"><input type="checkbox" class="group-toggle" data-group="fault_hours" checked>ساعات الأعطال</label>
-                    <label class="group-item"><input type="checkbox" class="group-toggle" data-group="counter" checked>عداد الساعات</label>
-                    <label class="group-item"><input type="checkbox" class="group-toggle" data-group="fault_details" checked>تفاصيل الأعطال</label>
-                    <label class="group-item"><input type="checkbox" class="group-toggle" data-group="operator" checked>ساعات المشغل</label>
-                    <label class="group-item"><input type="checkbox" class="group-toggle" data-group="notes" checked>الملاحظات</label>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow-sm pu-form-card">
-        <div class="card-header">
-            <h5><i class="fas fa-columns"></i> اختيار الحقول المعروضة</h5>
-        </div>
-        <div class="card-body">
-            <div class="group-panel">
-                <div style="display:flex; gap:10px; margin-bottom:12px;">
-                    <button type="button" id="showAllFields" class="btn-submit" style="padding:8px 14px;">إظهار كل الحقول</button>
-                    <button type="button" id="hideAllFields" class="btn-cancel" style="padding:8px 14px;">إخفاء كل الحقول</button>
-                </div>
-                <div class="group-grid" id="fieldSelectorGrid"></div>
+            <div class="column-groups-toggle">
+                <button type="button" class="btn-group-toggle active" data-group="basic"><i class="fas fa-info-circle"></i> المعلومات العامة</button>
+                <button type="button" class="btn-group-toggle active" data-group="work"><i class="fas fa-clock"></i> ساعات العمل</button>
+                <button type="button" class="btn-group-toggle active" data-group="fault_hours"><i class="fas fa-tools"></i> ساعات الأعطال</button>
+                <button type="button" class="btn-group-toggle active" data-group="counter"><i class="fas fa-tachometer-alt"></i> عداد الساعات</button>
+                <button type="button" class="btn-group-toggle active" data-group="fault_details"><i class="fas fa-exclamation-triangle"></i> تفاصيل الأعطال</button>
+                <button type="button" class="btn-group-toggle active" data-group="operator"><i class="fas fa-user-cog"></i> ساعات المشغل</button>
+                <button type="button" class="btn-group-toggle active" data-group="notes"><i class="fas fa-sticky-note"></i> الملاحظات</button>
+                <button type="button" class="btn-group-toggle-all active"><i class="fas fa-eye"></i> الكل</button>
             </div>
         </div>
     </div>
@@ -1230,101 +1214,15 @@ $(document).ready(function () {
         }
     });
 
-    var columnMeta = [];
-    table.columns().every(function (idx) {
-        var header = this.header();
-        var label = $(header).text().trim();
-        var group = $(header).data('group') || '';
-        if (label !== '') {
-            columnMeta.push({ idx: idx, label: label, group: group });
-        }
-    });
-
-    function setColumnVisibilityByIdx(idx, visible, redraw) {
-        table.column(idx).visible(visible, false);
-        if (redraw !== false) {
-            table.columns.adjust().draw(false);
-        }
-    }
-
-    function syncGroupToggles() {
-        $('.group-toggle').each(function () {
-            var groupName = $(this).data('group');
-            var allVisible = true;
-            var groupCols = columnMeta.filter(function (c) { return c.group === groupName; });
-            groupCols.forEach(function (c) {
-                if (!table.column(c.idx).visible()) {
-                    allVisible = false;
-                }
-            });
-            $(this).prop('checked', allVisible);
+    // إظهار/إخفاء المجموعات — موحّد عبر assets/js/column-groups.js
+    // (تُشتق فهارس الأعمدة من سمة data-group على الرؤوس).
+    if (window.EmsColumnGroups) {
+        EmsColumnGroups.init({
+            storageKey: 'timesheetGroupStates',
+            mode: 'datatable',
+            table: table
         });
     }
-
-    function buildFieldSelector() {
-        var container = $('#fieldSelectorGrid');
-        container.empty();
-        columnMeta.forEach(function (c) {
-            var checkedAttr = table.column(c.idx).visible() ? 'checked' : '';
-            var item = $('<label class="group-item"><input type="checkbox" class="field-toggle" ' + checkedAttr + ' data-idx="' + c.idx + '">' + c.label + '</label>');
-            container.append(item);
-        });
-    }
-
-    function applyGroupVisibility(groupName, visible) {
-        var groupCols = columnMeta.filter(function (c) { return c.group === groupName; });
-        groupCols.forEach(function (c) {
-            setColumnVisibilityByIdx(c.idx, visible, false);
-            $('.field-toggle[data-idx="' + c.idx + '"]').prop('checked', visible);
-        });
-        table.columns.adjust().draw(false);
-    }
-
-    buildFieldSelector();
-
-    $(document).on('change', '.group-toggle', function () {
-        var groupName = $(this).data('group');
-        var visible = $(this).is(':checked');
-        applyGroupVisibility(groupName, visible);
-        syncGroupToggles();
-    });
-
-    $(document).on('change', '.field-toggle', function () {
-        var idx = parseInt($(this).data('idx'), 10);
-        var visible = $(this).is(':checked');
-        setColumnVisibilityByIdx(idx, visible);
-        syncGroupToggles();
-    });
-
-    $('#showAllFields').on('click', function () {
-        $('.field-toggle').each(function () {
-            $(this).prop('checked', true);
-            var idx = parseInt($(this).data('idx'), 10);
-            setColumnVisibilityByIdx(idx, true, false);
-        });
-        table.columns.adjust().draw(false);
-        syncGroupToggles();
-    });
-
-    $('#hideAllFields').on('click', function () {
-        $('.field-toggle').each(function () {
-            $(this).prop('checked', false);
-            var idx = parseInt($(this).data('idx'), 10);
-            setColumnVisibilityByIdx(idx, false, false);
-        });
-        // Keep details column visible to avoid a blank table state.
-        var detailsIdx = $('#timesheetTable thead th').filter(function () {
-            return $(this).text().trim() === 'التفاصيل';
-        }).first().index();
-        if (detailsIdx >= 0) {
-            setColumnVisibilityByIdx(detailsIdx, true, false);
-            $('.field-toggle[data-idx="' + detailsIdx + '"]').prop('checked', true);
-        }
-        table.columns.adjust().draw(false);
-        syncGroupToggles();
-    });
-
-    syncGroupToggles();
 });
 </script>
 

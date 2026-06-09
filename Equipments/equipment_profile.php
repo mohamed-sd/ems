@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once '../includes/driver_contract_dates.php';
 
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
@@ -193,7 +194,7 @@ include '../insidebar.php';
                         <tr>
                             <td><a href="../Drivers/driver_profile.php?id=<?php echo intval($row['id']); ?>"><?php echo htmlspecialchars($row['name']); ?></a></td>
                             <td><?php echo htmlspecialchars($row['start_date']); ?></td>
-                            <td><?php echo htmlspecialchars($row['end_date'] ?: '-'); ?></td>
+                            <td><?php echo htmlspecialchars(ems_format_open_end($row['end_date'])); ?></td>
                             <td><?php echo intval($row['status']) === 1 ? 'نشط' : 'متوقف'; ?></td>
                         </tr>
                     <?php endwhile; endif; ?>

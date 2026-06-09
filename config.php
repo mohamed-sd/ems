@@ -109,6 +109,18 @@ if (PHP_SAPI !== 'cli') {
     if (!in_array('ems_fix_mojibake_output', $handlers, true)) {
         ob_start('ems_fix_mojibake_output');
     }
+    // حقن حقل csrf_token المخفي تلقائياً في كل فورم POST مُولّد من الخادم.
+    if (function_exists('ems_inject_csrf_fields') && !in_array('ems_inject_csrf_fields', $handlers, true)) {
+        ob_start('ems_inject_csrf_fields');
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CSRF: وضع التطبيق (false = مراقبة/تسجيل فقط، true = حجب فعلي 403)
+// المرحلة 1 الحالية: مراقبة فقط حتى نتأكد من تغطية كل المسارات من السجلات.
+// ═══════════════════════════════════════════════════════════════════════════
+if (!defined('EMS_CSRF_ENFORCE')) {
+    define('EMS_CSRF_ENFORCE', false);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -369,6 +381,11 @@ function ems_enforce_ajax_endpoint_security()
 }
 
 ems_enforce_ajax_endpoint_security();
+
+// الحارس المركزي لـ CSRF (يستثني /api/ و/admin/؛ مراقبة أو حجب حسب EMS_CSRF_ENFORCE)
+if (function_exists('ems_enforce_csrf_protection')) {
+    ems_enforce_csrf_protection();
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 4. Global Security Functions Shortcuts

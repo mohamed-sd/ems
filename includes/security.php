@@ -254,6 +254,176 @@ function csrf_meta() {
     return '<meta name="csrf-token" content="' . $token . '">';
 }
 
+/**
+ * حقن حقل csrf_token المخفي تلقائياً داخل كل فورم POST مُولّد من الخادم.
+ *
+ * يُستخدم كمُعالِج output-buffer (ob_start) فيغطّي كل الفورمات دون تعديل ملفاتها.
+ * - يعمل على استجابات HTML فقط.
+ * - يحقن فقط في الفورمات ذات method=post (الافتراضي GET فيُتجاهَل).
+ * - يتجاهل الفورمات التي تُرسِل لنطاق خارجي (منع تسريب التوكن).
+ * - يُقنّع كتل <script> أولاً حتى لا يُفسد أي قالب HTML داخل JS.
+ * - لوحة الأدمن مُستثناة (لها حماية CSRF خاصة بها).
+ */
+function ems_inject_csrf_fields($buffer) {
+    if (php_sapi_name() === 'cli') {
+        return $buffer;
+    }
+
+    // استجابات HTML فقط.
+    $contentType = '';
+    if (function_exists('headers_list')) {
+        foreach (headers_list() as $h) {
+            if (stripos($h, 'Content-Type:') === 0) {
+                $contentType = strtolower($h);
+                break;
+            }
+        }
+    }
+    if ($contentType !== '' && stripos($contentType, 'text/html') === false) {
+        return $buffer;
+    }
+
+    // الأدمن له حماية CSRF خاصة — لا نزدوج عليه.
+    $uri = isset($_SERVER['REQUEST_URI']) ? str_replace('\\', '/', $_SERVER['REQUEST_URI']) : '';
+    if (strpos($uri, '/admin/') !== false) {
+        return $buffer;
+    }
+
+    if (stripos($buffer, '<form') === false || !isset($_SESSION['csrf_token'])) {
+        return $buffer;
+    }
+
+    $token = $_SESSION['csrf_token'];
+    $field = '<input type="hidden" name="csrf_token" value="' . $token . '">';
+    $host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
+
+    // 1) تقنيع كتل <script> ... </script> بعلامات نائبة كي لا نحقن داخل قوالب JS.
+    $scripts = array();
+    $masked = preg_replace_callback('/<script\b[^>]*>.*?<\/script>/is', function ($m) use (&$scripts) {
+        $key = "\x01EMSCSRFSCRIPT" . count($scripts) . "\x01";
+        $scripts[] = $m[0];
+        return $key;
+    }, $buffer);
+    if (!is_string($masked)) {
+        return $buffer; // فشل preg (حد backtrack مثلاً) — لا نخاطر، نُعيد الأصل.
+    }
+
+    // 2) الحقن بعد كل وسم <form ... method=post> فعلي.
+    $injected = preg_replace_callback('/<form\b[^>]*>/i', function ($m) use ($field, $host) {
+        $tag = $m[0];
+        if (!preg_match('/method\s*=\s*["\']?\s*post/i', $tag)) {
+            return $tag; // فورم GET — لا حاجة.
+        }
+        // تجاهل الفورمات المُوجَّهة لنطاق خارجي.
+        if (preg_match('/action\s*=\s*["\']?\s*(?:https?:)?\/\/([^\/"\'\s]+)/i', $tag, $am)) {
+            $actionHost = strtolower($am[1]);
+            if ($host !== '' && $actionHost !== '' && $actionHost !== $host) {
+                return $tag;
+            }
+        }
+        return $tag . $field;
+    }, $masked);
+    if (!is_string($injected)) {
+        return $buffer;
+    }
+
+    // 3) استعادة كتل <script>.
+    if (!empty($scripts)) {
+        $keys = array();
+        foreach ($scripts as $i => $_s) {
+            $keys[] = "\x01EMSCSRFSCRIPT" . $i . "\x01";
+        }
+        $injected = str_replace($keys, $scripts, $injected);
+    }
+
+    return $injected;
+}
+
+/**
+ * الحارس المركزي للتحقق من CSRF لكل طلب يُغيّر الحالة.
+ *
+ * - يعمل على POST/PUT/PATCH/DELETE فقط.
+ * - يستثني الـ API (مصادقة Bearer) ولوحة الأدمن (حماية خاصة).
+ * - يقرأ التوكن من $_POST['csrf_token'] أو ترويسة X-CSRF-Token.
+ * - وضعان حسب الثابت EMS_CSRF_ENFORCE:
+ *     false (افتراضي) → مراقبة فقط: يُسجّل المخالفة دون حجب.
+ *     true            → تطبيق: يرفض الطلب (403) عند غياب/خطأ التوكن.
+ */
+function ems_enforce_csrf_protection() {
+    if (php_sapi_name() === 'cli') {
+        return;
+    }
+
+    $method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper($_SERVER['REQUEST_METHOD']) : 'GET';
+    if (!in_array($method, array('POST', 'PUT', 'PATCH', 'DELETE'), true)) {
+        return;
+    }
+
+    $uri = isset($_SERVER['REQUEST_URI']) ? str_replace('\\', '/', $_SERVER['REQUEST_URI']) : '';
+    $script = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : '';
+
+    // استثناء الـ API (Bearer) ولوحة الأدمن (CSRF خاص بها).
+    if (strpos($uri, '/api/') !== false || strpos($script, '/api/') !== false) {
+        return;
+    }
+    if (strpos($uri, '/admin/') !== false || strpos($script, '/admin/') !== false) {
+        return;
+    }
+
+    $token = '';
+    if (isset($_POST['csrf_token'])) {
+        $token = $_POST['csrf_token'];
+    } elseif (isset($_SERVER['HTTP_X_CSRF_TOKEN'])) {
+        $token = $_SERVER['HTTP_X_CSRF_TOKEN'];
+    }
+
+    if (verify_csrf_token($token)) {
+        return; // توكن صحيح.
+    }
+
+    // مخالفة: سجّلها دائماً.
+    if (function_exists('log_security_event')) {
+        log_security_event('csrf_violation', sprintf(
+            'method=%s script=%s token=%s',
+            $method,
+            $script !== '' ? $script : $uri,
+            $token === '' ? 'missing' : 'invalid'
+        ));
+    }
+
+    $enforce = defined('EMS_CSRF_ENFORCE') && EMS_CSRF_ENFORCE === true;
+    if (!$enforce) {
+        return; // المرحلة 1: مراقبة فقط، لا حجب.
+    }
+
+    // المرحلة 2: حجب الطلب.
+    $isAjax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+        || isset($_SERVER['HTTP_X_CSRF_TOKEN'])
+        || (isset($_SERVER['HTTP_ACCEPT']) && stripos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
+
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    http_response_code(403);
+
+    if ($isAjax) {
+        header('Content-Type: application/json; charset=UTF-8');
+        echo json_encode(
+            array('success' => false, 'message' => 'فشل التحقق الأمني (CSRF). يرجى تحديث الصفحة والمحاولة مجدداً.'),
+            JSON_UNESCAPED_UNICODE
+        );
+    } else {
+        header('Content-Type: text/html; charset=UTF-8');
+        echo '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>فشل التحقق الأمني</title></head>'
+            . '<body style="font-family:Cairo,Arial;text-align:center;padding:50px;background:#f5f5f5">'
+            . '<div style="background:#fff;max-width:520px;margin:0 auto;padding:40px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1)">'
+            . '<h1 style="color:#dc2626">⛔ فشل التحقق الأمني</h1>'
+            . '<p>انتهت صلاحية الجلسة أو الطلب غير موثوق. يرجى تحديث الصفحة والمحاولة مجدداً.</p>'
+            . '</div></body></html>';
+    }
+    exit();
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // 3. حماية من XSS (Cross-Site Scripting)
 // ═══════════════════════════════════════════════════════════════════════════

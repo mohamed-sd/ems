@@ -69,7 +69,7 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
 <div class="sidebar closed" id="sidebar">
   <div>
     <div class="toggle-btn" id="toggleBtn"><i class="fa fa-bars"></i></div>
-    <h2 class="logo">Equipation</h2>
+    <!-- <h2 class="logo">Equipation</h2> -->
 
     <?php
     $hoursApprovalPendingCount = 0;
