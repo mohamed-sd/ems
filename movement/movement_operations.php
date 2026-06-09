@@ -7,7 +7,6 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 include '../includes/permissions_helper.php';
-require_once '../includes/driver_contract_dates.php';
 
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
@@ -369,8 +368,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $shift_type = 'B';
                 }
 
-                // التواريخ تُشتق من عقد السائق (عقد ساري => تواريخ العقد، وإلا اليوم + نهاية مفتوحة)
-                $dates = ems_resolve_equipment_driver_dates($conn, $driver_id, $company_id, $is_super_admin);
+                $start_date = isset($_POST['start_date']) ? trim((string)$_POST['start_date']) : date('Y-m-d');
+                $end_date = isset($_POST['end_date']) ? trim((string)$_POST['end_date']) : '2099-12-31';
 
                 // التحقق من وجود معدة في التشغيلات النشطة
                 $eq_check = mysqli_query($conn, "SELECT 1 FROM operations WHERE equipment = $equipment_id AND project_id = $selected_project_id AND status = 1 LIMIT 1");
@@ -379,8 +378,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 }
 
                 $shift_sql = mysqli_real_escape_string($conn, $shift_type);
-                $start_save = mysqli_real_escape_string($conn, $dates['start']);
-                $end_save = mysqli_real_escape_string($conn, $dates['end']);
+                $start_save = mysqli_real_escape_string($conn, $start_date);
+                $end_save = mysqli_real_escape_string($conn, $end_date);
 
                 // إنهاء التعيينات السابقة النشطة للسائق
                 mysqli_query($conn, "UPDATE equipment_drivers SET status = 0, end_date = '$start_save' WHERE driver_id = $driver_id AND status = 1$ed_company_scope_inline");
@@ -447,14 +446,7 @@ if ($operations_res) {
 
 $operations_rows_day = [];
 $operations_rows_night = [];
-$operations_rows_reserve = [];
 foreach ($operations_rows as $op_row) {
-    // المعدات الاحتياطية تظهر في جدولها الخاص فقط (لا ضمن جداول النهار/الليل)
-    $op_category = isset($op_row['equipment_category']) ? $op_row['equipment_category'] : 'أساسي';
-    if ($op_category === 'احتياطي') {
-        $operations_rows_reserve[] = $op_row;
-        continue;
-    }
     $shift_code = isset($op_row['shift_type']) ? strtoupper((string)$op_row['shift_type']) : 'B';
     if ($shift_code === 'D' || $shift_code === 'B') {
         $operations_rows_day[] = $op_row;
@@ -961,7 +953,6 @@ include '../insidebar.php';
         $operations_tables = [
             ['title' => 'إدارة تشغيلات النهار', 'rows' => $operations_rows_day,   'table_key' => 'day'],
             ['title' => 'إدارة تشغيلات الليل',  'rows' => $operations_rows_night, 'table_key' => 'night'],
-            ['title' => 'إدارة تشغيلات المعدات الاحتياطية', 'rows' => $operations_rows_reserve, 'table_key' => 'reserve'],
         ];
         foreach ($operations_tables as $operations_table):
         ?>
@@ -1171,12 +1162,13 @@ include '../insidebar.php';
                                                                 <option value="B" selected>نهاري + ليلي</option>
                                                             </select>
                                                         </div>
-                                                        <div class="form-group" style="flex:2;">
-                                                            <label>&nbsp;</label>
-                                                            <small style="color:#6b7280;display:block;line-height:1.5;">
-                                                                <i class="fas fa-info-circle"></i>
-                                                                تُحدَّد تواريخ البداية/النهاية تلقائياً من عقد السائق الساري، وإن لم يوجد عقد ساري تبدأ من اليوم وتبقى النهاية مفتوحة (مستمر).
-                                                            </small>
+                                                        <div class="form-group">
+                                                            <label>بداية التعيين</label>
+                                                            <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>نهاية التعيين</label>
+                                                            <input type="date" name="end_date">
                                                         </div>
                                                         <div class="form-group" style="justify-content:flex-end;">
                                                             <label>&nbsp;</label>
@@ -1300,13 +1292,16 @@ include '../insidebar.php';
         event.preventDefault();
         var driverSel  = form.querySelector('[name="driver_id"]');
         var shiftSel   = form.querySelector('[name="shift_type"]');
+        var startInput = form.querySelector('[name="start_date"]');
+        var endInput   = form.querySelector('[name="end_date"]');
         if (!driverSel || !driverSel.value) { alert('يرجى اختيار السائق'); return; }
         var formData = new FormData();
         formData.append('action', 'add_new_driver');
         formData.append('driver_id',   driverSel.value);
         formData.append('equipment_id', equipmentId);
         formData.append('shift_type',  shiftSel   ? shiftSel.value   : 'B');
-        // التواريخ تُشتق من العقد في الخادم — لا تُرسَل من الفورم
+        formData.append('start_date',  startInput ? startInput.value : '');
+        formData.append('end_date',    endInput   ? endInput.value   : '');
         formData.append('json', '1');
         fetch(window.location.href, { method: 'POST', body: formData })
             .then(function(r) { return r.json(); })

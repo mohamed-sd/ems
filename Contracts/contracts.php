@@ -1133,6 +1133,8 @@ include('../insidebar.php');
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- DataTables JS -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<!-- مكوّن مجموعات الأعمدة (إظهار/إخفاء + تمييز لون الزر النشط) -->
+<script src="/ems/assets/js/column-groups.js"></script>
 
 <!-- JS -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>

@@ -562,6 +562,27 @@ table.dataTable thead .sorting_desc::after {
     box-shadow: var(--shadow-md);
 }
 
+/* ── تغلّب على توحيد الأزرار العام (.ems-site .main button) ذي التخصيص الأعلى،
+      الذي كان يطمس ألوان أزرار المجموعات وحالة active. نرفع التخصيص بـ .ems-site .main ── */
+.ems-site .main .btn-group-toggle,
+.ems-site .main .btn-group-toggle-all {
+    background: #F1F2F4 !important;
+    color: #5A6270 !important;
+    border: 1.5px solid #D7DBE0 !important;
+}
+.ems-site .main .btn-group-toggle:hover,
+.ems-site .main .btn-group-toggle-all:hover {
+    background: #ECEDEF !important;
+    border-color: #D9AB32 !important;
+    color: #2A2010 !important;
+}
+.ems-site .main .btn-group-toggle.active,
+.ems-site .main .btn-group-toggle-all.active {
+    background: linear-gradient(135deg, #D9AB32 0%, #C2941C 100%) !important;
+    color: #2A2010 !important;
+    border-color: #B0851A !important;
+}
+
 /* ========== PRINT STYLES ========== */
 @media print {
     .display,

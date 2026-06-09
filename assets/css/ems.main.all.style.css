@@ -14392,7 +14392,7 @@ body.ems-site .main table.dataTable thead > tr > th.sorting_desc::before {
 }
 
 /* ── Unified buttons ── */
-body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close) {
+body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):not(.btn-group-toggle):not(.btn-group-toggle-all) {
   min-height: 36px !important;
   padding: 7px 14px !important;
   border-radius: 12px !important;
@@ -14406,7 +14406,7 @@ body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"]
   transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease !important;
 }
 
-body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):hover {
+body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):not(.btn-group-toggle):not(.btn-group-toggle-all):hover {
   background: #e8e8e8 !important;
   border-color: #717171 !important;
   color: #111111 !important;
@@ -14414,17 +14414,17 @@ body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"]
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
-body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):active {
+body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):not(.btn-group-toggle):not(.btn-group-toggle-all):active {
   transform: translateY(0) !important;
   background: #dcdcdc !important;
 }
 
-body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):focus-visible {
+body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):not(.btn-group-toggle):not(.btn-group-toggle-all):focus-visible {
   outline: 0 !important;
   box-shadow: 0 0 0 3px var(--ems-ui-focus), 0 1px 2px rgba(0, 0, 0, 0.11) !important;
 }
 
-body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):disabled,
+body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button):not(.btn-close):not(.close):not(.btn-group-toggle):not(.btn-group-toggle-all):disabled,
 body.ems-site .main :is(button, .btn, input[type="button"], input[type="submit"], input[type="reset"], .dt-button).disabled {
   opacity: 0.6 !important;
   cursor: not-allowed !important;
