@@ -719,13 +719,15 @@ include('../insidebar.php');
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
   margin-bottom: 20px;
+  margin-right: 20px;
+  margin-left: 20px;
 }
 
 .stats-card {
-  background: #fff;
-  border: 1px solid #e8dcc8;
-  border-radius: 12px;
-  padding: 14px;
+  background: #eee;
+  border: 1px solid #aaa;
+  border-radius: 35px;
+  padding: 18px;
   box-shadow: 0 2px 8px rgba(26, 18, 8, 0.07);
   position: relative;
   overflow: hidden;
@@ -742,67 +744,74 @@ include('../insidebar.php');
 }
 
 .stats-card .stats-icon {
-  width: 44px;
-  height: 44px;
+  width: 55px;
+  height: 55px;
   border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
   margin-bottom: 10px;
+  float:left;
+  vertical-align:middle;
+  margin-top: 15px ;
+  border: 1px solid #999;
 }
 
 .stats-card .stats-title {
-  color: #6b4e2a;
-  font-size: 0.82rem;
+  color: #555;
+  font-size: 0.92rem;
   font-weight: 700;
-  margin-bottom: 7px;
+  margin-top: 5px;
   line-height: 1.3;
+
 }
 
 .stats-card .stats-value {
-  color: #1a1208;
+  color: #222;
   font-size: 1.8rem;
   line-height: 1;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
+   margin-top: 10px;
+  font-size: 40px;
 }
 
 /* Color variants */
 .ts-stats-executed::before {
-  background: linear-gradient(90deg, #1d4ed8, #2563eb);
+  /* background: linear-gradient(90deg, #1d4ed8, #2563eb); */
 }
 
 .ts-stats-executed .stats-icon {
-  background: rgba(37, 99, 235, 0.14);
-  color: #1d4ed8;
+  background: #fff;
+  color: #000;
 }
 
 .ts-stats-standby::before {
-  background: linear-gradient(90deg, #15803d, #16a34a);
+  /* background: linear-gradient(90deg, #15803d, #16a34a); */
 }
 
 .ts-stats-standby .stats-icon {
-  background: rgba(22, 163, 74, 0.14);
-  color: #15803d;
+   background: #fff;
+  color: #000;
 }
 
 .ts-stats-fault::before {
-  background: linear-gradient(90deg, #b91c1c, #dc2626);
+  /* background: linear-gradient(90deg, #b91c1c, #dc2626); */
 }
 
 .ts-stats-fault .stats-icon {
-  background: rgba(220, 38, 38, 0.14);
-  color: #b91c1c;
+  background: #fff;
+  color: #000;
 }
 
 .ts-stats-total::before {
-  background: linear-gradient(90deg, #b45309, #d97706);
+  /* background: linear-gradient(90deg, #b45309, #d97706); */
 }
 
 .ts-stats-total .stats-icon {
-  background: rgba(217, 119, 6, 0.14);
-  color: #b45309;
+  background: #fff;
+  color: #000;
 }
 
 /* Hover effect */
@@ -857,23 +866,23 @@ include('../includes/page_header.php');
     <div class="stats-grid ts-stats-grid">
         <div class="stats-card ts-stats-executed">
             <div class="stats-icon"><i class="fas fa-check-circle"></i></div>
-            <div class="stats-title">إجمالي الساعات المنفذة</div>
             <div class="stats-value"><?= number_format((float) $stats['executed_sum'], 2) ?></div>
+            <div class="stats-title">إجمالي الساعات المنفذة</div>
         </div>
         <div class="stats-card ts-stats-standby">
             <div class="stats-icon"><i class="fas fa-pause-circle"></i></div>
+             <div class="stats-value"><?= number_format((float) $stats['standby_sum'], 2) ?></div>
             <div class="stats-title">إجمالي ساعات الاستعداد</div>
-            <div class="stats-value"><?= number_format((float) $stats['standby_sum'], 2) ?></div>
         </div>
         <div class="stats-card ts-stats-fault">
             <div class="stats-icon"><i class="fas fa-exclamation-triangle"></i></div>
-            <div class="stats-title">إجمالي ساعات الأعطال</div>
             <div class="stats-value"><?= number_format((float) $stats['fault_sum'], 2) ?></div>
+            <div class="stats-title">إجمالي ساعات الأعطال</div>
         </div>
         <div class="stats-card ts-stats-total">
             <div class="stats-icon"><i class="fas fa-chart-pie"></i></div>
+             <div class="stats-value"><?= number_format((float) $stats['work_sum'], 2) ?></div>
             <div class="stats-title">إجمالي ساعات العمل</div>
-            <div class="stats-value"><?= number_format((float) $stats['work_sum'], 2) ?></div>
         </div>
     </div>
 

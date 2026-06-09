@@ -751,53 +751,53 @@ include('../insidebar.php');
         <div class="stats-grid">
             <div class="stats-card stats-primary">
                 <div class="stats-icon"><i class="fas fa-users"></i></div>
-                <div class="stats-title">إجمالي العملاء</div>
                 <div class="stats-value"><?php echo $clients_total_count; ?></div>
+                <div class="stats-title">إجمالي العملاء</div>
             </div>
             <div class="stats-card stats-success">
                 <div class="stats-icon"><i class="fas fa-user-check"></i></div>
-                <div class="stats-title">العملاء النشطون</div>
                 <div class="stats-value"><?php echo $clients_active_count; ?></div>
+                <div class="stats-title">العملاء النشطون</div>
             </div>
             <div class="stats-card stats-danger">
                 <div class="stats-icon"><i class="fas fa-user-slash"></i></div>
-                <div class="stats-title">العملاء المتوقفون</div>
                 <div class="stats-value"><?php echo $clients_stopped_count; ?></div>
+                <div class="stats-title">العملاء المتوقفون</div>
             </div>
             <div class="stats-card stats-purple">
                 <div class="stats-icon"><i class="fas fa-diagram-project"></i></div>
-                <div class="stats-title">إجمالي المشاريع المرتبطة</div>
                 <div class="stats-value"><?php echo $clients_projects_total; ?></div>
+                <div class="stats-title">إجمالي المشاريع المرتبطة</div>
             </div>
             <div class="stats-card stats-success">
                 <div class="stats-icon"><i class="fas fa-folder-open"></i></div>
+                 <div class="stats-value"><?php echo $clients_projects_active_total; ?></div>
                 <div class="stats-title">المشاريع النشطة</div>
-                <div class="stats-value"><?php echo $clients_projects_active_total; ?></div>
             </div>
             <div class="stats-card stats-danger">
                 <div class="stats-icon"><i class="fas fa-folder"></i></div>
+                 <div class="stats-value"><?php echo $clients_projects_inactive_total; ?></div>
                 <div class="stats-title clients-danger-text">المشاريع غير النشطة</div>
-                <div class="stats-value"><?php echo $clients_projects_inactive_total; ?></div>
             </div>
             <div class="stats-card stats-orange">
                 <div class="stats-icon"><i class="fas fa-building"></i></div>
-                <div class="stats-title">عدد الشركات</div>
                 <div class="stats-value"><?php echo $clients_companies_count; ?></div>
+                <div class="stats-title">عدد الشركات</div>
             </div>
             <div class="stats-card stats-cyan">
                 <div class="stats-icon"><i class="fas fa-user"></i></div>
+                 <div class="stats-value"><?php echo $clients_individuals_count; ?></div>
                 <div class="stats-title">عدد الأفراد</div>
-                <div class="stats-value"><?php echo $clients_individuals_count; ?></div>
             </div>
             <div class="stats-card stats-slate">
                 <div class="stats-icon"><i class="fas fa-question-circle"></i></div>
+                 <div class="stats-value"><?php echo $clients_unknown_entity_count; ?></div>
                 <div class="stats-title">كيان غير محدد</div>
-                <div class="stats-value"><?php echo $clients_unknown_entity_count; ?></div>
             </div>
             <div class="stats-card stats-emerald">
                 <div class="stats-icon"><i class="fas fa-link-slash"></i></div>
+                  <div class="stats-value"><?php echo $clients_without_projects; ?></div>
                 <div class="stats-title">عملاء بلا مشاريع</div>
-                <div class="stats-value"><?php echo $clients_without_projects; ?></div>
             </div>
         </div>
 
@@ -921,6 +921,7 @@ include('../insidebar.php');
 
     <div class="card">
         <div class="card-body">
+            <h2 calss="card-title"> فلاتر البحث </h2>
             <div class="row clients-filter-row">
                 <div class="col-md-3 col-sm-6 clients-filter-col">
                     <select id="filterEntityType" class="form-control" placeholder="">
@@ -1441,6 +1442,7 @@ include('../insidebar.php');
     }
 
     .clients-main .table-container {
+        padding-top: -50px !important;
         overflow-x: auto;
     }
 

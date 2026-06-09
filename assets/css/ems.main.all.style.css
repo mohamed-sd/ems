@@ -677,10 +677,12 @@ table.dataTable tbody tr:last-child td {
 .dataTables_wrapper .dataTables_length,
 .dataTables_wrapper .dataTables_info,
 .dataTables_wrapper .dataTables_paginate {
-  margin: 8px 0;
+  margin: 8px 0 10px;
   font-size: .86rem;
   color: var(--t2);
 }
+
+
 
 .dataTables_wrapper .dt-buttons {
   display: flex;
@@ -7193,13 +7195,15 @@ table.d-bd {
   grid-template-columns: repeat(4, minmax(170px, 1fr));
   gap: 12px;
   margin-bottom: 12px;
+    margin-right: 20px;
+  margin-left: 20px;
 }
 
 .clients-main .stats-card {
-  background: var(--s1);
-  border: 1px solid var(--bdr);
-  border-radius: 12px;
-  padding: 12px;
+  background: #eee;
+  border: 1px solid #aaa;
+  border-radius: 35px;
+  padding: 18px;
   box-shadow: 0 2px 8px rgba(26,18,8,.07);
   position: relative;
   overflow: hidden;
@@ -7212,44 +7216,44 @@ table.d-bd {
   right: 0;
   left: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--or), var(--or2));
   opacity: .9;
 }
 
 .clients-main .stats-card .stats-icon {
-  width: 40px;
-  height: 40px;
+  width: 55px;
+  height: 55px;
   border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  float:left;
+  vertical-align:middle;
+  margin-top: 15px ;
+  border: 1px solid #999;
+  background-color: #fff;;
 }
 
 .clients-main .stats-card .stats-title {
-  margin-top: 10px;
-  color: var(--t2);
-  font-size: .82rem;
+  color: #555;
+  font-size: 0.92rem;
   font-weight: 700;
+  margin-top: 5px;
+  line-height: 1.3;
 }
 
 .clients-main .stats-card .stats-value {
-  margin-top: 7px;
-  color: var(--t1);
-  font-size: 1.62rem;
+  color: #222;
+  font-size: 1.8rem;
   line-height: 1;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
+   margin-top: 10px;
+  font-size: 35px;
 }
 
-.clients-main .stats-primary .stats-icon { background: rgba(37,99,235,.14); color: #1d4ed8; }
-.clients-main .stats-success .stats-icon { background: rgba(22,163,74,.14); color: #15803d; }
-.clients-main .stats-danger .stats-icon { background: rgba(220,38,38,.14); color: #b91c1c; }
-.clients-main .stats-purple .stats-icon { background: rgba(124,58,237,.14); color: #6d28d9; }
-.clients-main .stats-orange .stats-icon { background: rgba(217,119,6,.14); color: #b45309; }
-.clients-main .stats-cyan .stats-icon { background: rgba(8,145,178,.14); color: #0e7490; }
-.clients-main .stats-slate .stats-icon { background: rgba(51,65,85,.12); color: #334155; }
-.clients-main .stats-emerald .stats-icon { background: rgba(5,150,105,.14); color: #047857; }
+
 
 .clients-main .sector-cards-grid {
   display: grid;
@@ -14845,13 +14849,13 @@ body.ems-site .main.ems-unified-page-shell > .card .table-container {
   color: #1f1f1f;
   font-weight: 800;
   padding: 5px 12px;
-  border-radius: 30px 30px 0px 0px;
+  border-radius: 30px;
   border: 1px solid var(--yellow-line);
-  margin-bottom: 0px;
+  margin-bottom: 10px;
+    margin-bottom: 0px;
   padding-bottom: 40px;
   position: relative;
   bottom: -35px;
-
 }
 
 .dataTables_wrapper .dataTables_length label {
@@ -14867,4 +14871,14 @@ body.ems-site .main.ems-unified-page-shell > .card .table-container {
   font-weight: 800;
   margin: 0 4px;
   width: 55px;
+}
+
+.dataTables_wrapper .dataTables_filter{
+  position: relative !important;
+  top : 40px !important;
+}
+
+/* ------------------- تجهيز تصميم حاويات الاحصائيات  -------------------*/
+.allstatus-card{
+  background-color: red;
 }
