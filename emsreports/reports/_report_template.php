@@ -1117,30 +1117,7 @@ body {
     min-height: 100vh;
 }
 
-/* ── Topbar ─────────────────────────────── */
-.rpt-topbar {
-    position: sticky; top: 0; z-index: 40;
-    background: linear-gradient(120deg, var(--navy), var(--navy-l));
-    color: #fff; padding: 10px 18px;
-    border-bottom: 2px solid rgba(232,184,0,.52);
-    box-shadow: 0 4px 18px rgba(12,28,62,.22);
-    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-}
-.rpt-brand { display: flex; align-items: center; gap: 10px; }
-.rpt-brand-icon {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
-    display: flex; align-items: center; justify-content: center;
-}
-.rpt-brand-icon i { color: var(--gold); font-size: .95rem; }
-.rpt-brand-text .sys { font-size: .62rem; font-weight: 700; letter-spacing: .08em; color: rgba(255,255,255,.65); text-transform: uppercase; }
-.rpt-brand-text .pg  { font-size: .9rem;  font-weight: 900; color: #fff8dd; }
-.rpt-topbar-btns { display: flex; gap: 8px; }
-.rpt-topbar-btns .btn {
-    border-radius: 999px; font-weight: 700; font-size: .8rem;
-    padding: 5px 14px; border-color: rgba(255,255,255,.4); color: #fff;
-}
-.rpt-topbar-btns .btn:hover { background: rgba(255,255,255,.14); }
+/* ── Topbar: يستخدم الشريط العلوي المشترك (.ems-topbar) من includes/topbar.php ── */
 
 /* ── Page ───────────────────────────────── */
 .rpt-page {
@@ -1149,49 +1126,16 @@ body {
 }
 @keyframes rptFadeIn { from{opacity:0;transform:translateY(9px)} to{opacity:1;transform:translateY(0)} }
 
-/* ── Back btn ───────────────────────────── */
-.btn-back {
-    border-radius: 10px; font-weight: 700; font-size: .82rem;
-    border: 1px solid rgba(12,28,62,.16); color: var(--navy-l); background: #fff;
-    padding: 7px 16px; transition: all .2s;
+/* ── Header subtitle (وصف التقرير + التصنيف أسفل شريط الرأس الموحّد) ─── */
+.rpt-subtitle {
+    margin: -4px 4px 14px; font-size: .85rem; color: var(--muted);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.rpt-subtitle-cat {
     display: inline-flex; align-items: center; gap: 6px;
-}
-.btn-back:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
-
-/* ── Hero ───────────────────────────────── */
-.rpt-hero {
-    position: relative; overflow: hidden; border-radius: var(--rl);
-    background: linear-gradient(140deg, #2e1401 0%, #2d1605 55%, #210801 100%);
-    color: #fff; padding: 22px 26px; margin-bottom: 16px;
-    box-shadow: var(--s3); border: 1px solid rgba(57, 33, 18, 0.07);
-    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
-}
-.rpt-hero::before {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 80% 50%, rgba(255,204,0,.10), transparent 65%);
-    pointer-events: none;
-}
-.rpt-hero-ico {
-    flex-shrink: 0; width: 58px; height: 58px; border-radius: 14px;
-    background: rgba(255,204,0,.14); border: 1px solid rgba(255,204,0,.34);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.45rem; color: #ffcc00; position: relative; z-index: 1;
-}
-.rpt-hero-body { flex: 1; min-width: 0; position: relative; z-index: 1; }
-.rpt-hero-body h1 {
-    margin: 0;
-    font-size: 1.3rem;
-    font-weight: 900;
-    color: #fff;
-    text-shadow: 0 2px 10px rgba(0,0,0,.32);
-    letter-spacing: .2px;
-}
-.rpt-hero-body p  { margin: 5px 0 0; font-size: .84rem; color: rgba(255,255,210,.72); }
-.rpt-hero-badge {
-    flex-shrink: 0; position: relative; z-index: 1;
-    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18);
-    border-radius: 10px; padding: 6px 14px; font-size: .8rem; font-weight: 700; color: #fff8dd;
-    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(247,147,26,.12); border: 1px solid rgba(247,147,26,.26);
+    color: #2d200a; border-radius: 999px; padding: 4px 12px;
+    font-size: .78rem; font-weight: 800;
 }
 
 /* ── Filter Card ────────────────────────── */
@@ -1391,57 +1335,52 @@ body {
 
 @media (max-width: 768px) {
     .rpt-page { padding: 10px; }
-    .rpt-hero { padding: 14px 16px; }
-    .rpt-hero-ico { width: 44px; height: 44px; font-size: 1.1rem; }
-    .rpt-hero-body h1 { font-size: 1.05rem; }
     .rpt-charts-row.two-cols { grid-template-columns: 1fr; }
     .rpt-kpi-val { font-size: 1.22rem; }
-    .rpt-brand-text .sys { display: none; }
 }
 </style>
 </head>
 <body class="ems-site">
 
-<!-- ═══ TOPBAR ═══════════════════════════════════════════════════════════ -->
-<div class="rpt-topbar main_head">
-    <div class="head_actions rpt-topbar-btns">
-        <a href="../index.php" class="btn btn-sm btn-outline-light">
-            <i class="fas fa-th-large me-1"></i> قائمة التقارير
-        </a>
-    </div>
-
-    <h1 class="head-title">
-        <div class="title-icon"><i class="fas fa-chart-pie"></i></div>
-        مركز التقارير
-    </h1>
-
-    <div class="head_back">
-        <a href="/ems/main/dashboard.php" class="btn btn-sm btn-outline-light">
-            <i class="fas fa-home me-1"></i> لوحة التحكم
-        </a>
-    </div>
-</div>
+<!-- ═══ TOPBAR — الشريط العلوي المشترك لكل الموقع (.ems-topbar) ═══════════ -->
+<?php require_once __DIR__ . '/../../includes/topbar.php'; ?>
 
 <!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
-<main>
+<main class="main">
 <div class="rpt-page">
 
-    <a href="../index.php" class="btn-back mb-3 d-inline-flex">
-        <i class="fas fa-chevron-right"></i> العودة لقائمة التقارير
-    </a>
-
-    <!-- HERO ─────────────────────────────────────────────────────────── -->
-    <div class="rpt-hero">
-        <div class="rpt-hero-ico"><i class="fas <?php echo rr($meta['icon']); ?>"></i></div>
-        <div class="rpt-hero-body">
-            <h1><?php echo rr($page_title); ?></h1>
-            <p><?php echo rr($meta['description']); ?></p>
+    <!-- HEADER — نفس شريط رأس الصفحة الموحّد في بقية الموقع (.main_head) ─── -->
+    <div class="main_head emsreports-head">
+        <div class="head_actions">
+            <a href="../index.php" class="add-btn">
+                <i class="fas fa-th-large"></i> قائمة التقارير
+            </a>
+            <a href="/ems/main/dashboard.php" class="back-btn">
+                <i class="fas fa-home"></i> لوحة التحكم
+            </a>
         </div>
-        <div class="rpt-hero-badge">
-            <i class="fas <?php echo rr(getCategoryIcon($reportCategory)); ?>"></i>
-            <?php echo rr(getCategoryLabel($reportCategory)); ?>
+        <h1 class="head-title">
+            <div class="title-icon"><i class="fas <?php echo rr($meta['icon']); ?>"></i></div>
+            <?php echo rr($page_title); ?>
+        </h1>
+        <div class="head_back">
+            <a href="../index.php" class="back-btn">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
         </div>
     </div>
+
+    <?php if (!empty($meta['description']) || $reportCategory !== ''): ?>
+    <p class="rpt-subtitle">
+        <?php if ($reportCategory !== ''): ?>
+        <span class="rpt-subtitle-cat">
+            <i class="fas <?php echo rr(getCategoryIcon($reportCategory)); ?>"></i>
+            <?php echo rr(getCategoryLabel($reportCategory)); ?>
+        </span>
+        <?php endif; ?>
+        <?php echo rr($meta['description']); ?>
+    </p>
+    <?php endif; ?>
 
     <!-- FILTERS ──────────────────────────────────────────────────────── -->
     <?php

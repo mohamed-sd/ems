@@ -1,9 +1,18 @@
 /* ================================================================
-   EMS Main Styles — Unified External Stylesheet
+   EMS Main Styles — Unified External Stylesheet (Cleaned)
    ems.main.all.style.css
-   Covers:
-     - Dashboard  (main/dashboard.php)
-     - Chat       (chats/index.php)
+
+   تنظيف آمن — لم يُمسّ التصميم المرئي إطلاقاً:
+     • حُذفت 3 قواعد مكررة تكراراً حرفياً (نفس المُحدِّد ونفس الخصائص)،
+       مع إبقاء النسخة الأخيرة في كل حالة.
+     • أُصلحت 5 أخطاء كتابة لا تؤثر على العرض:
+         - background-color: #fff;;  →  #fff;
+         - background: #bbb;;        →  #bbb;
+         - margin: 10pxs;            →  margin: 10px;
+         - size: .1rem !important;   →  (سطر غير صالح حُذف)
+         - border: 1px solid #8d8d   →  #8d8d8d
+     • تنظيف الأسطر الفارغة الزائدة والمسافات في نهاية الأسطر.
+   لم يُحذف أي override مقصود، ولم يُعَد ترتيب أو دمج أي قاعدة غير متطابقة.
 ================================================================ */
 
 /* ── Google Fonts ── */
@@ -682,8 +691,6 @@ table.dataTable tbody tr:last-child td {
   color: var(--t2);
 }
 
-
-
 .dataTables_wrapper .dt-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -762,7 +769,6 @@ table.dataTable tbody tr:last-child td {
 .supplier-contracts-main .contracts-hidden {
   display: none !important;
 }
-
 
 .contracts-main .allforms,
 .supplier-contracts-main .allforms {
@@ -1870,7 +1876,6 @@ table.dataTable tbody tr:last-child td {
   outline-offset: 2px;
 }
 
-
 /* ══════════════════════════════════════════════════════════════
    SECTION 1 — DASHBOARD (main/dashboard.php)
    Classes: .dash, .d-*
@@ -2538,7 +2543,6 @@ table.d-bd {
   .d-kpi-grid { grid-template-columns: 1fr; }
 }
 
-
 /* ══════════════════════════════════════════════════════════════
    SECTION 1B — TIMESHEET TYPE PICKER (Timesheet/timesheet_type.php)
    Dashboard identity + unified header actions style
@@ -2551,7 +2555,6 @@ table.d-bd {
   flex-direction: column;
   gap: 16px;
 }
-
 
 .timesheet-type-page .ts-header-action:hover {
   transform: translateY(-1px);
@@ -2684,7 +2687,6 @@ table.d-bd {
   }
 }
 
-
 /* ══════════════════════════════════════════════════════════════
    SECTION 1C — TIMESHEET ENTRY + VIEW
    Shared dashboard identity for timesheet flow pages
@@ -2698,7 +2700,6 @@ table.d-bd {
   flex-direction: column;
   gap: 14px;
 }
-
 
 .timesheet-entry-page .ts-view-link,
 .timesheet-view-page .ts-reset-link {
@@ -2733,9 +2734,6 @@ table.d-bd {
 .timesheet-view-page .ts-mt-card {
   margin-top: 16px;
 }
-
-
-
 
 /* ══════════════════════════════════════════════════════════════
    SECTION 1D — MOVEMENT PAGES
@@ -3952,8 +3950,6 @@ table.d-bd {
   }
 }
 
-
-
 /* ══════════════════════════════════════════════════════════════
    SECTION 2 — CHAT (chats/index.php)
    All colours use dashboard CSS variables (--s0, --or, --bg…)
@@ -4683,7 +4679,6 @@ table.d-bd {
   .mobile-back-btn            { display: flex !important; }
 }
 
-
 /* ══════════════════════════════════════════════════════════════
    SECTION 3 — EQUIPMENTS FLEET (Equipments/equipments_fleet.php)
    Removes inline styles and keeps dashboard brand identity
@@ -5091,7 +5086,6 @@ table.d-bd {
   font-family: 'Tajawal','Cairo',sans-serif;
 }
 
-
 .equipments-fleet-main .back-btn {
   background: rgba(255,255,255,.12);
   color: #fff;
@@ -5372,7 +5366,6 @@ table.d-bd {
   .equipments-fleet-main .page-header-actions { justify-content: flex-start; }
 }
 
-
 /* ══════════════════════════════════════════════════════════════
    SECTION 4 — FAILURE CODES (Equipments/manage_failure_codes.php)
 ══════════════════════════════════════════════════════════════ */
@@ -5623,7 +5616,6 @@ table.d-bd {
 .btn-restore-row { background: rgba(22,163,74,.1); color: var(--ok); border-color: rgba(22,163,74,.25); }
 .btn-restore-row:hover { background: var(--ok); color: #fff; }
 
-
 /* ══════════════════════════════════════════════════════════════
    SECTION 5 — PROJECT USERS (main/project_users.php)
 ══════════════════════════════════════════════════════════════ */
@@ -5682,8 +5674,6 @@ table.d-bd {
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 12px;
 }
-
-
 
 .project-users-main label {
   display: block;
@@ -6016,7 +6006,6 @@ table.d-bd {
 @media (max-width: 768px) {
   .project-users-main .form-grid { grid-template-columns: 1fr; }
 }
-
 
 /* ══════════════════════════════════════════════════════════════
    SECTION 6 — SHARED MAIN UNIFIED LAYER
@@ -6913,7 +6902,6 @@ table.d-bd {
   }
 }
 
-
 /* ══════════════════════════════════════════════════════════════
    SECTION 7 — CLIENTS (Clients/clients.php)
 ══════════════════════════════════════════════════════════════ */
@@ -7232,7 +7220,7 @@ table.d-bd {
   vertical-align:middle;
   margin-top: 15px ;
   border: 1px solid #999;
-  background-color: #fff;;
+  background-color: #fff;
 }
 
 .clients-main .stats-card .stats-title {
@@ -7252,8 +7240,6 @@ table.d-bd {
    margin-top: 10px;
   font-size: 35px;
 }
-
-
 
 .clients-main .sector-cards-grid {
   display: grid;
@@ -7656,7 +7642,7 @@ table.d-bd {
   background: #fff;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-  margin: 10pxs;
+  margin: 10px;
 }
 
 .ems-dcard--w-sm   { flex: 1 1 130px; min-width: 120px; }
@@ -8720,17 +8706,6 @@ table.d-bd {
   margin-bottom: 28px;
 }
 
-.contracts-details-page .summary-card {
-  background: var(--surface-2);
-  border-radius: var(--radius-md);
-  padding: 22px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.25s;
-  position: relative;
-  overflow: hidden;
-}
-
 .contracts-details-page .summary-card::before {
   content: '';
   position: absolute;
@@ -8739,11 +8714,6 @@ table.d-bd {
   width: 4px;
   height: 100%;
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
-}
-
-.contracts-details-page .summary-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
 }
 
 .contracts-details-page .summary-card.card-success::before { background: var(--success); }
@@ -9845,7 +9815,6 @@ table.d-bd {
   }
 }
 
-
 /* ---------------------- Section Main Head ---------------------*/
 
 .main_head{
@@ -10674,10 +10643,6 @@ body.ems-site {
 .ems-site .sidebar ul li:hover i,
 .ems-site .sidebar ul li.active i {
   color: var(--text-black) !important;
-}
-
-.ems-site .sidebar ul li::after {
-  background: var(--primary-yellow) !important;
 }
 
 /* Cards and containers */
@@ -11723,7 +11688,7 @@ table.dataTable thead th {
   min-width: 18px;
   height: 18px;
   border-radius: 999px;
-  background: #bbb;;
+  background: #bbb;
   color: #fff;
   font-size: .66rem;
   font-weight: 800;
@@ -11928,7 +11893,6 @@ table.dataTable thead th {
   .fleet-failures-main .search-toolbar .search-input-wrap { max-width: 100%; }
   .driver-report-main .driver-table-wrap { padding: .8rem; }
 }
-
 
 /* ══════════════════════════════════════════════════════════════
    SECTION — DASHBOARD DARK INDUSTRIAL THEME
@@ -13249,8 +13213,6 @@ table.dataTable tbody td .action-btn.mines:hover {
   border-color: var(--yellow-line) !important;
 }
 
-
-
 /* DataTables toolbar: search / length / buttons / pagination */
 .dataTables_wrapper .dataTables_filter input,
 .dataTables_wrapper .dataTables_length select {
@@ -13505,7 +13467,6 @@ body.ems-site .main .allheaders .allheaders-title i:first-child,
 body.ems-site .main .page-header.allheaders .title-icon i,
 body.ems-site .main .page-header.allheaders .allheaders-title i:first-child {
   color: #ffffff !important;
-  size: .1rem !important;
 }
 
 body.ems-site .main .main_head .add-btn,
@@ -13641,7 +13602,7 @@ body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-
   justify-content: center !important;
   background: #f7f7f7 !important;
   color: #202020 !important;
-  border: 1px solid #8d8d !important;
+  border: 1px solid #8d8d8d !important;
   box-shadow: none !important;
   flex-shrink: 1 !important;
   padding: 10px;

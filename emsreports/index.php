@@ -52,147 +52,41 @@ $page_title = 'التقارير';
     --s3: 0 14px 40px rgba(0, 0, 34, .34);
 }
 
-body {
-    margin: 0;
-    font-family: "Cairo", sans-serif;
-    background:
-      radial-gradient(circle at 85% 8%, rgba(232, 184, 0, .14), transparent 28%),
-      radial-gradient(circle at 8% 88%, rgba(37, 99, 235, .10), transparent 30%),
-      var(--bg);
-}
-
-.topbar-lite {
-    position: sticky;
-    top: 0;
-    z-index: 30;
-    background: linear-gradient(120deg, var(--navy), var(--navy-l));
-    color: #fff;
-    padding: 10px 16px;
-    border-bottom: 2px solid rgba(232, 184, 0, .52);
-    box-shadow: 0 4px 16px rgba(12, 28, 62, .2);
-}
-
-.brand { display: flex; align-items: center; gap: 10px; }
-
-.brand-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--navy), var(--navy-l));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--s1);
-}
-
-.brand-icon i { color: var(--gold); font-size: .95rem; }
-
-.brand-info .sys {
-    font-size: .66rem;
-    font-weight: 700;
-    letter-spacing: .08em;
-    color: rgba(255, 255, 255, .7);
-    text-transform: uppercase;
-}
-
-.brand-info .greet {
-    font-size: .9rem;
-    font-weight: 900;
-    color: #fff8dd;
-}
-
-.topbar-lite .btn {
-    border-radius: 999px;
-    font-weight: 700;
-    border-color: rgba(255, 255, 255, .55);
-    padding: 6px 14px;
-}
-
-.reports-shell {
-    padding: 20px;
-    animation: pageFade .45s ease;
-}
-
 @keyframes pageFade {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-.hero {
-    background: linear-gradient(135deg, #000022 0%, #0d1a5c 60%, #1a0a3e 100%);
-    color: #fff;
-    border-radius: 18px;
-    padding: 22px 24px;
-    margin-bottom: 24px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--s3);
-}
-
-.hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 82% 50%, rgba(255, 204, 0, .10) 0%, transparent 70%);
-}
-
-.hero h1 {
-    margin: 0;
-    font-size: 1.32rem;
-    font-weight: 900;
-    color: #ffcc00;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.hero h1 i {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    background: rgba(255, 204, 0, .15);
-    border: 1px solid rgba(255, 204, 0, .32);
-    color: #ffcc00;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.hero p {
-    margin: 8px 0 0;
-    font-size: .86rem;
-    color: rgba(255, 255, 210, .74);
-}
-
-.category-section { margin-bottom: 28px; }
+.category-section {margin: 0px 15px 25px 15px;}
 
 .category-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-    padding: 10px 12px;
-    border: 1px solid var(--line);
-    background: var(--card);
-    border-radius: 12px;
+    gap: 8px;
+    margin-bottom:10px;
+    padding: 5px;
+    border-radius: 15px;
     box-shadow: var(--s1);
+    background-color: #eee;
+    border: 1px solid #555;
 }
 
 .category-header .cat-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(125deg, var(--navy), var(--navy-l));
-    color: #fff;
+    width: 35px;
+    height: 35px;
+    background: #fff;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 1.2rem;
+    color: #000;
+    border: 1px solid #555;
 }
 
 .category-header h2 {
-    font-size: 1rem;
-    font-weight: 800;
+    font-size: 1.2rem;
+    font-weight: 700;
     color: var(--txt);
     margin: 0;
 }
@@ -202,26 +96,21 @@ body {
     color: #1f2937;
     font-size: .72rem;
     font-weight: 900;
-    border-radius: 999px;
+    border-radius: 10px;
     padding: 6px 10px;
 }
 
 .report-card {
-    background: var(--card);
-    border-radius: var(--rl);
-    border: 1px solid var(--line);
-    padding: 0;
-    height: 100%;
+    background:#eee;
+    border-radius:20px;
+    height: auto;
     transition: box-shadow .2s, transform .2s, border-color .2s;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     box-shadow: var(--s1);
-}
-
-.report-card .card-band {
-    height: 4px;
-    background: linear-gradient(90deg, var(--gold), var(--gold-l));
+    margin: 0px;
+    padding: 5px;;
 }
 
 .report-card:hover {
@@ -231,27 +120,31 @@ body {
 }
 
 .report-card .card-inner {
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    padding: 5px;
 }
 
 .report-card .rc-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: linear-gradient(125deg, rgba(37, 99, 235, .12), rgba(13, 148, 136, .12));
-    color: var(--blue);
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    background: #fff;
+    color: #000;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.22rem;
-    margin-bottom: 12px;
+    font-size: 1.3rem;
+    float:left;
+    margin-top: 5px;
+    vertical-align: middle;
 }
 
+.report-card .rc-icon i{
+    float : left;
+}
+
+
 .report-card h3 {
-    font-size: .97rem;
+    font-size: 1.1rem;
     font-weight: 800;
     color: var(--txt);
     margin-bottom: 6px;
@@ -260,18 +153,27 @@ body {
 
 .report-card p {
     font-size: .82rem;
-    color: var(--muted);
+    color: #888;
     flex: 1;
     margin-bottom: 12px;
 }
 
-.report-card a.btn {
-    border-radius: 999px;
-    font-size: .81rem;
-    font-weight: 700;
-    border-color: rgba(12, 28, 62, .16);
-    color: var(--navy-l);
-    padding: 6px 12px;
+.report-card a {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    background: #fff;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    float:left;
+    margin-top: 5px;
+    vertical-align: middle;
+    border: none !important;
+    margin: 5px;
+    text-decoration: none;
 }
 
 .report-card a.btn:hover {
@@ -332,11 +234,6 @@ include '../insidebar.php';
         </div>
     </div>
 
-    <div>
-        <h1><i class="fas fa-chart-pie"></i> التقارير</h1>
-        <p>مرحباً <?php echo $userName; ?> — إليك التقارير المتاحة لك</p>
-    </div>
-
     <?php if (empty($byCategory)): ?>
         <div class="no-reports">
             <i class="fas fa-lock"></i>
@@ -353,20 +250,32 @@ include '../insidebar.php';
                 <span class="badge bg-secondary ms-auto"><?php echo count($reports); ?> تقرير</span>
             </div>
             <div class="row g-3">
-                <?php foreach ($reports as $report): ?>
-                <div class="col-xl-3 col-lg-4 col-md-6">
+                <?php
+                $total = count($reports);
+                $rem   = $total % 3;                 // كم كارت متبقي في الصف الأخير
+                foreach ($reports as $i => $report):
+                    $isLastRow = $rem !== 0 && $i >= $total - $rem;
+                    if ($isLastRow && $rem === 1) {
+                        $colClass = 'col-12';                       // كارت واحد يملأ الصف
+                    } elseif ($isLastRow && $rem === 2) {
+                        $colClass = 'col-lg-6 col-md-6';            // كارتان يملآن الصف
+                    } else {
+                        $colClass = 'col-xl-4 col-lg-4 col-md-6';   // 3 كروت في الصف
+                    }
+                ?>
+                <div class="<?php echo $colClass; ?>">
                     <div class="report-card">
                         <div class="card-band"></div>
                         <div class="card-inner">
                             <div class="rc-icon">
                                 <i class="fas <?php echo htmlspecialchars($report['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i>
                             </div>
+                            <a href="<?php echo htmlspecialchars($report['url'], ENT_QUOTES, 'UTF-8'); ?>">
+                               <i class="fa-regular fa-eye"></i>
+                            </a>
                             <h3><?php echo htmlspecialchars($report['name_ar'], ENT_QUOTES, 'UTF-8'); ?></h3>
                             <p><?php echo htmlspecialchars($report['description'], ENT_QUOTES, 'UTF-8'); ?></p>
-                            <a href="<?php echo htmlspecialchars($report['url'], ENT_QUOTES, 'UTF-8'); ?>"
-                               class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-eye me-1"></i> عرض التقرير
-                            </a>
+
                         </div>
                     </div>
                 </div>
