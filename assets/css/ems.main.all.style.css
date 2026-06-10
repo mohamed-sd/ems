@@ -391,367 +391,6 @@ samp,
   overflow-x: auto;
 }
 
-.alltables,
-.alltable,
-table.alltables,
-table.alltable,
-table.display,
-table.dataTable {
-  width: 100%;
-  margin: 0;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: var(--s1);
-  border: 1px solid var(--bdr);
-  border-radius: var(--rl);
-  box-shadow: var(--sh);
-  color: var(--t1);
-  font-size: .85rem;
-}
-
-.alltables thead th,
-.alltable thead th,
-table.alltables thead th,
-table.alltable thead th,
-table.display thead th,
-table.dataTable thead th {
-  background: #666 ;
-  color: #F4C542 !important;
-  padding: 12px 10px;
-  text-align: center;
-  font-weight: 900;
-  font-size: 18px;
-  white-space: nowrap;
-  border-bottom: 2px solid var(--or) !important;
-}
-
-.alltables thead th i,
-.alltable thead th i,
-table.alltables thead th i,
-table.alltable thead th i,
-table.display thead th i,
-table.dataTable thead th i {
-  color: var(--or) !important;
-}
-
-.alltables tbody td,
-.alltable tbody td,
-.alltables tfoot td,
-.alltable tfoot td,
-table.alltables tbody td,
-table.alltables tfoot td,
-table.alltable tbody td,
-table.alltable tfoot td,
-table.display tbody td,
-table.display tfoot td,
-table.dataTable tbody td,
-table.dataTable tfoot td {
-  padding: 10px;
-  border-bottom: 1px solid var(--bdr2);
-  color: var(--t1);
-  vertical-align: middle;
-  background: var(--s1);
-  text-align: center !important;
-}
-
-.alltables tbody td > a:not(.action-btn),
-.alltable tbody td > a:not(.action-btn),
-table.alltables tbody td > a:not(.action-btn),
-table.alltable tbody td > a:not(.action-btn),
-table.display tbody td > a:not(.action-btn),
-table.dataTable tbody td > a:not(.action-btn) {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 11px;
-  border-radius: 999px;
-  border: 1px solid rgba(244,197,66,.28);
-  background: linear-gradient(135deg, #fff7ea 0%, #fff2db 100%);
-  color: #7a4a12 !important;
-  font-weight: 800;
-  font-size: .79rem;
-  text-decoration: none;
-  transition: all .2s ease;
-}
-
-.alltables tbody td > a:not(.action-btn):hover,
-.alltable tbody td > a:not(.action-btn):hover,
-table.alltables tbody td > a:not(.action-btn):hover,
-table.alltable tbody td > a:not(.action-btn):hover,
-table.display tbody td > a:not(.action-btn):hover,
-table.dataTable tbody td > a:not(.action-btn):hover {
-  background: linear-gradient(135deg, #F4C542 0%, #E0AE2E 100%);
-  color: #fff !important;
-  border-color: rgba(244,197,66,.65);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(244,197,66,.24);
-}
-
-.alltables tbody td .action-btn,
-.alltable tbody td .action-btn,
-table.alltables tbody td .action-btn,
-table.alltable tbody td .action-btn,
-table.display tbody td .action-btn,
-table.dataTable tbody td .action-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--bdr);
-  background: #fff;
-  color: var(--t2);
-  text-decoration: none;
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease, background .2s ease;
-}
-
-.alltables tbody td .action-btn i,
-.alltable tbody td .action-btn i,
-table.alltables tbody td .action-btn i,
-table.alltable tbody td .action-btn i,
-table.display tbody td .action-btn i,
-table.dataTable tbody td .action-btn i {
-  font-size: 14px;
-  transition: transform .18s ease, filter .18s ease;
-}
-
-.alltables tbody td .action-btn:hover,
-.alltable tbody td .action-btn:hover,
-table.alltables tbody td .action-btn:hover,
-table.alltable tbody td .action-btn:hover,
-table.display tbody td .action-btn:hover,
-table.dataTable tbody td .action-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(26,18,8,.14);
-}
-
-.alltables tbody td .action-btn:hover i,
-.alltable tbody td .action-btn:hover i,
-table.alltables tbody td .action-btn:hover i,
-table.alltable tbody td .action-btn:hover i,
-table.display tbody td .action-btn:hover i,
-table.dataTable tbody td .action-btn:hover i {
-  transform: scale(1.08);
-}
-
-.alltables tbody td .action-btn.view,
-.alltable tbody td .action-btn.view,
-table.alltables tbody td .action-btn.view,
-table.alltable tbody td .action-btn.view,
-table.display tbody td .action-btn.view,
-table.dataTable tbody td .action-btn.view,
-.alltables tbody td .action-btn.mines,
-.alltable tbody td .action-btn.mines,
-table.alltables tbody td .action-btn.mines,
-table.alltable tbody td .action-btn.mines,
-table.display tbody td .action-btn.mines,
-table.dataTable tbody td .action-btn.mines {
-  color: #975300;
-  border-color: rgba(244,197,66,.35);
-  background: linear-gradient(135deg, #fff7ea 0%, #ffeed5 100%);
-}
-
-.alltables tbody td .action-btn.contracts,
-.alltable tbody td .action-btn.contracts,
-table.alltables tbody td .action-btn.contracts,
-table.alltable tbody td .action-btn.contracts,
-table.display tbody td .action-btn.contracts,
-table.dataTable tbody td .action-btn.contracts {
-  color: #7c4a0d;
-  border-color: rgba(168,117,54,.3);
-  background: linear-gradient(135deg, #f8efe2 0%, #f2e2cf 100%);
-}
-
-.alltables tbody td .action-btn.delete,
-.alltable tbody td .action-btn.delete,
-table.alltables tbody td .action-btn.delete,
-table.alltable tbody td .action-btn.delete,
-table.display tbody td .action-btn.delete,
-table.dataTable tbody td .action-btn.delete {
-  color: #b42318;
-  border-color: rgba(220,38,38,.25);
-  background: linear-gradient(135deg, #fff1f2 0%, #ffe5e8 100%);
-}
-
-.alltables tbody td .action-btn.view:hover,
-.alltable tbody td .action-btn.view:hover,
-table.alltables tbody td .action-btn.view:hover,
-table.alltable tbody td .action-btn.view:hover,
-table.display tbody td .action-btn.view:hover,
-table.dataTable tbody td .action-btn.view:hover,
-.alltables tbody td .action-btn.mines:hover,
-.alltable tbody td .action-btn.mines:hover,
-table.alltables tbody td .action-btn.mines:hover,
-table.alltable tbody td .action-btn.mines:hover,
-table.display tbody td .action-btn.mines:hover,
-table.dataTable tbody td .action-btn.mines:hover {
-  background: linear-gradient(135deg, #F4C542 0%, #d97706 100%);
-  color: #fff;
-  border-color: rgba(244,197,66,.75);
-}
-
-.alltables tbody td .action-btn.contracts:hover,
-.alltable tbody td .action-btn.contracts:hover,
-table.alltables tbody td .action-btn.contracts:hover,
-table.alltable tbody td .action-btn.contracts:hover,
-table.display tbody td .action-btn.contracts:hover,
-table.dataTable tbody td .action-btn.contracts:hover {
-  background: linear-gradient(135deg, #a0662c 0%, #7a4a12 100%);
-  color: #fff;
-  border-color: rgba(122,74,18,.75);
-}
-
-.alltables tbody td .action-btn.delete:hover,
-.alltable tbody td .action-btn.delete:hover,
-table.alltables tbody td .action-btn.delete:hover,
-table.alltable tbody td .action-btn.delete:hover,
-table.display tbody td .action-btn.delete:hover,
-table.dataTable tbody td .action-btn.delete:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  color: #fff;
-  border-color: rgba(185,28,28,.75);
-}
-
-.alltables tbody td .action-btn.view i,
-.alltable tbody td .action-btn.view i,
-table.alltables tbody td .action-btn.view i,
-table.alltable tbody td .action-btn.view i,
-table.display tbody td .action-btn.view i,
-table.dataTable tbody td .action-btn.view i {
-  color: #a16207;
-}
-
-.alltables tbody td .action-btn.mines i,
-.alltable tbody td .action-btn.mines i,
-table.alltables tbody td .action-btn.mines i,
-table.alltable tbody td .action-btn.mines i,
-table.display tbody td .action-btn.mines i,
-table.dataTable tbody td .action-btn.mines i,
-.alltables tbody td .action-btn i.fa-mountain,
-.alltable tbody td .action-btn i.fa-mountain,
-table.alltables tbody td .action-btn i.fa-mountain,
-table.alltable tbody td .action-btn i.fa-mountain,
-table.display tbody td .action-btn i.fa-mountain,
-table.dataTable tbody td .action-btn i.fa-mountain {
-  color: #9a600d;
-}
-
-.alltables tbody td .action-btn.delete i,
-.alltable tbody td .action-btn.delete i,
-table.alltables tbody td .action-btn.delete i,
-table.alltable tbody td .action-btn.delete i,
-table.display tbody td .action-btn.delete i,
-table.dataTable tbody td .action-btn.delete i,
-.alltables tbody td .action-btn i.fa-trash,
-.alltables tbody td .action-btn i.fa-trash-alt,
-table.dataTable tbody td .action-btn i.fa-trash,
-table.dataTable tbody td .action-btn i.fa-trash-alt {
-  color: #b42318;
-}
-
-.alltables tbody td .action-btn:hover i,
-.alltable tbody td .action-btn:hover i,
-table.alltables tbody td .action-btn:hover i,
-table.alltable tbody td .action-btn:hover i,
-table.display tbody td .action-btn:hover i,
-table.dataTable tbody td .action-btn:hover i {
-  color: #fff !important;
-}
-
-.alltables tbody tr:hover td,
-.alltable tbody tr:hover td,
-table.alltables tbody tr:hover td,
-table.alltable tbody tr:hover td,
-table.display tbody tr:hover td,
-table.dataTable tbody tr:hover td {
-  background: var(--s3);
-}
-
-.alltables tbody tr:last-child td,
-.alltable tbody tr:last-child td,
-table.alltables tbody tr:last-child td,
-table.alltable tbody tr:last-child td,
-table.display tbody tr:last-child td,
-table.dataTable tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.dataTables_wrapper {
-  color: var(--t1);
-  font-family: 'Tajawal','Cairo',sans-serif;
-}
-
-.dataTables_wrapper .dataTables_filter,
-.dataTables_wrapper .dataTables_length,
-.dataTables_wrapper .dataTables_info,
-.dataTables_wrapper .dataTables_paginate {
-  margin: 8px 0 10px;
-  font-size: .86rem;
-  color: var(--t2);
-}
-
-.dataTables_wrapper .dt-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.dataTables_wrapper .dt-buttons .dt-button {
-  background: var(--s2) !important;
-  border: 1px solid var(--bdr) !important;
-  color: var(--t2) !important;
-  border-radius: var(--r) !important;
-  font-weight: 700;
-  padding: 5px 11px !important;
-}
-
-.dataTables_wrapper .dt-buttons .dt-button:hover {
-  background: var(--s3) !important;
-  border-color: var(--or) !important;
-  color: var(--or3) !important;
-}
-
-.dataTables_wrapper .dataTables_filter input,
-.dataTables_wrapper .dataTables_length select {
-  border: 1px solid var(--bdr);
-  border-radius: var(--r);
-  padding: 6px 10px;
-  background: var(--s1);
-  color: var(--t1);
-}
-
-.dataTables_wrapper .dataTables_filter input:focus,
-.dataTables_wrapper .dataTables_length select:focus {
-  outline: none;
-  border-color: var(--or);
-  box-shadow: 0 0 0 3px rgba(244,197,66,.12);
-}
-
-.dataTables_wrapper .dataTables_info {
-  font-size: .8rem;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-  border: 1px solid var(--bdr) !important;
-  border-radius: var(--r) !important;
-  padding: 5px 10px !important;
-  background: var(--s1) !important;
-  color: var(--t2) !important;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button.current,
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: var(--s3) !important;
-  border-color: var(--or) !important;
-  color: var(--or3) !important;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-  opacity: .55 !important;
-  cursor: not-allowed !important;
-}
 
 /* ══════════════════════════════════════════════════════════════
    SECTION 9 — CONTRACTS (Contracts/contracts.php + Suppliers/supplierscontracts.php)
@@ -4143,17 +3782,19 @@ table.d-bd {
 .contact-time { font-size: 0.7rem; color: var(--t3); }
 
 .unread-badge {
-  background: var(--err);
-  color: #fff;
-  font-size: 0.65rem;
-  font-weight: 700;
-  border-radius: 10px;
-  min-width: 18px;
-  height: 18px;
+  background: var(--or2);            /* أصفر عميق */
+  color: var(--text-black);
+  font-size: 0.75rem;               /* رقم أكبر وأوضح */
+  font-weight: 800;
+  line-height: 0.5;
+  border-radius: 12px;
+  min-width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 5px;
+  padding: 2px;
+  box-shadow: 0 2px 6px rgba(217,171,50,.45);
 }
 
 .no-contacts { text-align: center; padding: 40px 16px; color: var(--t3); font-size: 0.85rem; }
@@ -5232,7 +4873,7 @@ table.d-bd {
 }
 
 /* (removed) .equipments-fleet-main .toggle-group-btn — column-group buttons
-   are unified as .btn-group-toggle in assets/css/alltables.css */
+   are unified as .btn-group-toggle in assets/css/ems-tables.css */
 
 .equipments-fleet-main .supplier-name { color: var(--t1); font-weight: 800; }
 .equipments-fleet-main .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -6615,28 +6256,6 @@ table.d-bd {
   width: 100% !important;
 }
 
-.suppliers-main #projectsTable thead th {
-  background: linear-gradient(180deg, #2C2C2C 0%, #3D3D3D 45%, #24180d 100%) !important;
-  color: #F4C542 !important;
-  border-bottom: 2px solid var(--or) !important;
-  font-size: .82rem;
-  white-space: nowrap;
-}
-
-.suppliers-main #projectsTable thead th i {
-  color: var(--or);
-}
-
-.suppliers-main #projectsTable tbody td {
-  border-bottom: 1px solid var(--bdr2);
-  color: var(--t1);
-  font-size: .87rem;
-  vertical-align: middle;
-}
-
-.suppliers-main #projectsTable tbody tr:hover {
-  background: var(--s3);
-}
 
 .suppliers-main .stat-cell {
   background: var(--s0);
@@ -9458,16 +9077,6 @@ table.d-bd {
   padding-bottom: 0;
 }
 
-/* Global enforced table head colors across all system pages */
-.ems-site table thead th {
-  background: linear-gradient(180deg, #2C2C2C 0%, #3D3D3D 45%, #24180d 100%) !important;
-  color: #F4C542 !important;
-  border-bottom-color: var(--or) !important;
-}
-
-.ems-site table thead th i {
-  color: var(--or) !important;
-}
 
 /* =====================================================================
    FINAL LOCK — ALLHEADERS GLOBAL OVERRIDE (applies on all sidebar pages)
@@ -9974,6 +9583,29 @@ table.d-bd {
   background: transparent;
 }
 
+/* ── أزرار الهيدر الدائرية: زر العودة (fa-share) وزر الإضافة (fa-plus) ──
+   كلاهما أيقونة فقط ويحمل كلاس .ems-head-circle من page_header.php. نجعلهما
+   دائرة تامة. الخصوصية العالية + حُرّاس :not للتغلّب على موحّد الأزرار العام
+   (body.ems-site .main :is(button,.btn,...) بأربع :not) الذي يفرض 12px. */
+body.ems-site .main .main_head :is(.head_actions, .head_back) .ems-head-circle:not(.btn-close):not(.close):not(.dt-button) {
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  flex: 0 0 auto !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+/* حاوية العودة لها خلفية وزوايا 12px تلتف حول الزر؛ نُدوّرها لتطابق الدائرة
+   حين تحوي زر العودة وحده (لا تتأثر القوائم متعددة العناصر). */
+body.ems-site .main .main_head .head_back:has(> .ems-head-circle:only-child) {
+  border-radius: 50% !important;
+}
+
 @media (max-width: 991px){
   .main_head{
     grid-template-columns: 1fr;
@@ -10268,7 +9900,7 @@ table.d-bd {
    أزرار التحكم في مجموعات أعمدة الجداول
 ══════════════════════════════════════════════════════════════ */
 /* .btn-group-toggle / .btn-group-toggle-all — moved to the single source of
-   truth in assets/css/alltables.css (do not redefine here). */
+   truth in assets/css/ems-tables.css (do not redefine here). */
 
 .group-hidden {
   display: none !important;
@@ -10756,86 +10388,6 @@ body.ems-site {
   filter: brightness(1.03);
 }
 
-/* Tables and DataTables unification */
-.ems-site table,
-.ems-site .table,
-.ems-site table.dataTable,
-.ems-site .dataTables_wrapper table {
-  background: var(--white) !important;
-}
-
-.ems-site table thead th,
-.ems-site .table thead th,
-.ems-site table.dataTable thead th,
-.ems-site .dataTables_wrapper table thead th,
-.alltables thead th,
-.alltable thead th,
-table.display thead th,
-table.dataTable thead th {
-  background: var(--dark-gray) !important;
-  color: var(--white) !important;
-  border-bottom: 2px solid var(--primary-yellow) !important;
-  border-color: #4A4A4A !important;
-}
-
-.ems-site table thead th i,
-.ems-site .table thead th i,
-.ems-site table.dataTable thead th i,
-.ems-site .dataTables_wrapper table thead th i {
-  color: var(--white) !important;
-}
-
-.ems-site table tbody td,
-.ems-site .table tbody td,
-.ems-site table.dataTable tbody td,
-.ems-site .dataTables_wrapper table tbody td {
-  background: var(--white) !important;
-  color: var(--text-black) !important;
-  border-color: #E5E9EF !important;
-}
-
-.ems-site table tbody tr:hover td,
-.ems-site .table tbody tr:hover td,
-.ems-site table.dataTable tbody tr:hover td,
-.ems-site .dataTables_wrapper table tbody tr:hover td {
-  background: #F8F9FB !important;
-}
-
-.ems-site .dataTables_wrapper,
-.ems-site .dataTables_wrapper .dataTables_filter,
-.ems-site .dataTables_wrapper .dataTables_length,
-.ems-site .dataTables_wrapper .dataTables_info,
-.ems-site .dataTables_wrapper .dataTables_paginate {
-  color: #232A32 !important;
-}
-
-.ems-site .dataTables_wrapper .dataTables_filter input,
-.ems-site .dataTables_wrapper .dataTables_length select {
-  background: var(--light-gray) !important;
-  border: 1px solid #CDD3DB !important;
-  border-radius: 10px !important;
-  color: var(--text-black) !important;
-}
-
-.ems-site .dataTables_wrapper .dataTables_filter input:focus,
-.ems-site .dataTables_wrapper .dataTables_length select:focus {
-  border-color: var(--primary-yellow) !important;
-  box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.25) !important;
-}
-
-.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button {
-  background: var(--white) !important;
-  border: 1px solid #D1D7DF !important;
-  color: #20252C !important;
-  border-radius: 8px !important;
-}
-
-.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button.current,
-.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: var(--primary-yellow) !important;
-  border-color: #D9AA30 !important;
-  color: var(--text-black) !important;
-}
 
 /* Modal harmonization */
 .ems-site .main .modal-content {
@@ -11237,17 +10789,6 @@ table.dataTable thead th {
 .timesheet-daily-main .stat-card.fault { border-top: 3px solid #dc2626; }
 .timesheet-daily-main .stat-card.standby { border-top: 3px solid #e8b800; }
 
-.timesheet-daily-main .report-table thead th {
-  background: #f8fafc;
-  color: #0c1c3e;
-  font-weight: 800;
-  border-color: rgba(12, 28, 62, .1);
-}
-
-.timesheet-daily-main .report-table td {
-  border-color: rgba(12, 28, 62, .08);
-  color: #0c1c3e;
-}
 
 .hours-approval-main .page-wrapper,
 .hours-approval-followup-main .page-wrapper {
@@ -11369,14 +10910,6 @@ table.dataTable thead th {
   font-size: .82rem;
 }
 
-.hours-approval-main .ha-table thead th,
-.hours-approval-followup-main .ha-table thead th {
-  background: #0f172a;
-  color: #fff;
-  font-weight: 700;
-  white-space: nowrap;
-  font-size: .8rem;
-}
 
 .hours-approval-main .ha-table td,
 .hours-approval-followup-main .ha-table td {
@@ -11585,7 +11118,7 @@ table.dataTable thead th {
 }
 
 /* (removed) .hours-approval-main .cg-btn — column-group buttons are unified
-   as .btn-group-toggle in assets/css/alltables.css */
+   as .btn-group-toggle in assets/css/ems-tables.css */
 
 .hours-approval-main .apv-circle-wrap { position: relative; display: inline-flex; }
 
@@ -11861,7 +11394,6 @@ table.dataTable thead th {
   font-weight: 700;
 }
 
-.fleet-failures-main .table thead th { white-space: nowrap; }
 
 .fleet-failures-main code {
   color: #0c1c3e;
@@ -13151,144 +12683,6 @@ body.ems-site {
   color: #fff !important;
 }
 
-/* ── 3) Tables / DataTables — dark-gray head, white body ──────────────────── */
-.alltables thead th,
-.alltable thead th,
-table.alltables thead th,
-table.alltable thead th,
-table.display thead th,
-table.dataTable thead th {
-  background: #999999 !important;
-  color: #fff !important;
-  border-bottom: 2px solid #999999 !important;
-  font-size: 15px;
-}
-.alltables thead th i,
-.alltable thead th i,
-table.alltables thead th i,
-table.alltable thead th i,
-table.display thead th i,
-table.dataTable thead th i {
-  color: var(--primary-yellow) !important;
-}
-
-/* Cell link-pills → neutral light-gray, dark-blue hover */
-.alltables tbody td > a:not(.action-btn),
-.alltable tbody td > a:not(.action-btn),
-table.alltables tbody td > a:not(.action-btn),
-table.alltable tbody td > a:not(.action-btn),
-table.display tbody td > a:not(.action-btn),
-table.dataTable tbody td > a:not(.action-btn) {
-  background: var(--light-gray) !important;
-  border: 1px solid var(--line) !important;
-  color: var(--dark-blue) !important;
-}
-.alltables tbody td > a:not(.action-btn):hover,
-.alltable tbody td > a:not(.action-btn):hover,
-table.alltables tbody td > a:not(.action-btn):hover,
-table.alltable tbody td > a:not(.action-btn):hover,
-table.display tbody td > a:not(.action-btn):hover,
-table.dataTable tbody td > a:not(.action-btn):hover {
-  background: var(--dark-blue) !important;
-  border-color: var(--dark-blue) !important;
-  color: #fff !important;
-  box-shadow: 0 6px 14px rgba(30, 58, 95, 0.22) !important;
-}
-
-/* "view / mines" action buttons → yellow identity (delete stays red) */
-.alltables tbody td .action-btn.view:hover,
-.alltable tbody td .action-btn.view:hover,
-table.alltables tbody td .action-btn.view:hover,
-table.alltable tbody td .action-btn.view:hover,
-table.display tbody td .action-btn.view:hover,
-table.dataTable tbody td .action-btn.view:hover,
-.alltables tbody td .action-btn.mines:hover,
-.alltable tbody td .action-btn.mines:hover,
-table.alltables tbody td .action-btn.mines:hover,
-table.alltable tbody td .action-btn.mines:hover,
-table.display tbody td .action-btn.mines:hover,
-table.dataTable tbody td .action-btn.mines:hover {
-  background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--yellow-deep) 100%) !important;
-  color: #1a1a1a !important;
-  border-color: var(--yellow-line) !important;
-}
-
-/* DataTables toolbar: search / length / buttons / pagination */
-.dataTables_wrapper .dataTables_filter input,
-.dataTables_wrapper .dataTables_length select {
-  background: var(--light-gray) !important;
-  border: 1px solid var(--line) !important;
-  color: #121212 !important;
-}
-.dataTables_wrapper .dataTables_filter input:focus,
-.dataTables_wrapper .dataTables_length select:focus {
-  border-color: var(--primary-yellow) !important;
-  box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.22) !important;
-}
-.dataTables_wrapper .dt-buttons .dt-button {
-  background: var(--light-gray) !important;
-  border: 1px solid var(--line) !important;
-  color: var(--dark-gray) !important;
-}
-.dataTables_wrapper .dt-buttons .dt-button:hover {
-  background: #fff !important;
-  border-color: var(--dark-blue) !important;
-  color: var(--dark-blue) !important;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: var(--yellow-soft) !important;
-  border-color: var(--primary-yellow) !important;
-  color: #111 !important;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button.current,
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-  background: var(--primary-yellow) !important;
-  border-color: var(--yellow-line) !important;
-  color: #111 !important;
-}
-
-/* ── Unified table row identity — zebra striping for EVERY table ────────────
-   White / subtle light-gray alternating rows on ALL tables across the system
-   (DataTables, report tables, Bootstrap .table, .modern-table, plain <table>…),
-   matching the official reference row design. Scoped to the app shell
-   (body.ems-site) so the standalone login/admin layouts stay untouched. */
-body.ems-site table tbody tr:nth-child(odd),
-body.ems-site table tbody tr:nth-child(odd) > td,
-body.ems-site table tbody tr:nth-child(odd) > th,
-body.ems-site table.dataTable tbody tr.odd,
-body.ems-site table.dataTable tbody tr.odd > td {
-  background-color: #FFFFFF !important;
-  border: solid #000 1px;
-}
-body.ems-site table tbody tr:nth-child(even),
-body.ems-site table tbody tr:nth-child(even) > td,
-body.ems-site table tbody tr:nth-child(even) > th,
-body.ems-site table.dataTable tbody tr.even,
-body.ems-site table.dataTable tbody tr.even > td {
-  background-color: #e6e6e6  !important;
-  border: solid #000 1px;
-}
-/* Within the GRAY (even) rows only: alternate two shades of gray per column
-   — light-gray column / darker-gray column …. White (odd) rows stay plain. */
-body.ems-site table tbody tr:nth-child(even) > td:nth-child(even),
-body.ems-site table tbody tr:nth-child(even) > th:nth-child(even),
-body.ems-site table.dataTable tbody tr.even > td:nth-child(even) {
-  background-color: #e6e6e6 !important;
-  border: solid #000 1px;
-}
-/* Thin horizontal row separators like the reference design */
-body.ems-site table tbody td,
-body.ems-site table tbody th {
-  border-bottom: 1px solid #ECEEF1 !important;
-}
-/* Gentle hover highlight (keeps the zebra readable, uses the yellow identity).
-   The nth-child variant out-specifies the per-column gray rule above. */
-body.ems-site table tbody tr:hover > td,
-body.ems-site table tbody tr:hover > th,
-body.ems-site table tbody tr:hover > td:nth-child(even),
-body.ems-site table tbody tr:hover > th:nth-child(even) {
-  background-color: #FCF3D6 !important;
-}
 
 /* ── 4) Forms — light-gray fields, soft border, yellow focus ──────────────── */
 .allforms .card-body { background: #fff !important; }
@@ -13596,7 +12990,7 @@ body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-
   width: 30px !important;
   height: 30px !important;
   min-width: 30px !important;
-  border-radius: 50% !important;
+  border-radius: 10px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -13605,7 +12999,7 @@ body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-
   border: 1px solid #8d8d8d !important;
   box-shadow: none !important;
   flex-shrink: 1 !important;
-  padding: 10px;
+  padding: 15px !important;
 }
 
 body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-header="1"], .allheaders, .page-header.allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) :is(.head-title, .title, .title-content, .page-title, h1, h2, h3) .title-icon i,
@@ -13702,70 +13096,6 @@ body.ems-site .main :is(.main_head, .ems-header-shell, .header[data-ems-unified-
 }
 
 /* Global tables header color override (system-wide) */
-body.ems-site .main table thead,
-body.ems-site .main .table thead,
-body.ems-site .main table.dataTable thead,
-body.ems-site .main .dataTables_scrollHead table thead {
-  background: #eeeeee !important;
-  color: #000000 !important;
-}
-
-body.ems-site .main table thead th,
-body.ems-site .main table thead td,
-body.ems-site .main .table thead th,
-body.ems-site .main .table thead td,
-body.ems-site .main table.dataTable thead th,
-body.ems-site .main table.dataTable thead td,
-body.ems-site .main .dataTables_scrollHead table thead th,
-body.ems-site .main .dataTables_scrollHead table thead td {
-  background: #eeeeee !important;
-  color: #000000 !important;
-}
-
-body.ems-site .main table thead th i,
-body.ems-site .main .table thead th i,
-body.ems-site .main table.dataTable thead th i,
-body.ems-site .main .dataTables_scrollHead table thead th i,
-body.ems-site .main table.dataTable thead .sorting::before,
-body.ems-site .main table.dataTable thead .sorting::after,
-body.ems-site .main table.dataTable thead .sorting_asc::before,
-body.ems-site .main table.dataTable thead .sorting_asc::after,
-body.ems-site .main table.dataTable thead .sorting_desc::before,
-body.ems-site .main table.dataTable thead .sorting_desc::after {
-  color: #000000 !important;
-}
-
-/* Absolute global fallback (no layout scope) */
-table thead,
-.table thead,
-table.dataTable thead,
-.dataTables_scrollHead table thead {
-  background: #eeeeee !important;
-  color: #000000 !important;
-  background-image: none !important;
-}
-
-table thead th,
-table thead td,
-.table thead th,
-.table thead td,
-table.dataTable thead th,
-table.dataTable thead td,
-.dataTables_scrollHead table thead th,
-.dataTables_scrollHead table thead td {
-  background: #eeeeee !important;
-  color: #000000 !important;
-  background-image: none !important;
-}
-
-table.dataTable thead .sorting::before,
-table.dataTable thead .sorting::after,
-table.dataTable thead .sorting_asc::before,
-table.dataTable thead .sorting_asc::after,
-table.dataTable thead .sorting_desc::before,
-table.dataTable thead .sorting_desc::after {
-  color: #000000 !important;
-}
 
 /* ============================================================
    FINAL UNIFIED THEME (Reference Header + DataTables)
@@ -13880,136 +13210,6 @@ body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .a
   color: #191919 !important;
 }
 
-/* DataTables and unified tables */
-body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) {
-  border-collapse: separate !important;
-  border-spacing: 0 !important;
-  border: 1px solid var(--ref-cell-border) !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  background: #e9e9e9 !important;
-  box-shadow: none !important;
-}
-
-body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead,
-body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead tr,
-body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead th {
-  background: var(--ref-head-bg) !important;
-  color: #ffffff !important;
-  background-image: none !important;
-  border-color: #707070 !important;
-  background: #999999 !important;
-}
-
-body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead th {
-  padding: 9px 10px !important;
-  font-size: 0.93rem !important;
-  font-weight: 900 !important;
-  line-height: 1.1 !important;
-  text-align: center !important;
-  white-space: nowrap !important;
-}
-
-body.ems-site .main table.dataTable thead .sorting::before,
-body.ems-site .main table.dataTable thead .sorting::after,
-body.ems-site .main table.dataTable thead .sorting_asc::before,
-body.ems-site .main table.dataTable thead .sorting_asc::after,
-body.ems-site .main table.dataTable thead .sorting_desc::before,
-body.ems-site .main table.dataTable thead .sorting_desc::after {
-  color: #ffffff !important;
-  opacity: 0.9 !important;
-}
-
-body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:nth-child(odd) {
-  background: var(--ref-row-a) !important;
-}
-
-body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:nth-child(even) {
-  background: var(--ref-row-b) !important;
-}
-
-body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:hover,
-body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:hover td {
-  background: var(--ref-row-hover) !important;
-}
-
-body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody td {
-  color: #161616 !important;
-  font-size: 0.95rem !important;
-  font-weight: 600 !important;
-  padding: 6px 10px !important;
-  border-bottom: 1px solid var(--ref-cell-border) !important;
-  border-left: 1px solid var(--ref-cell-border) !important;
-  text-align: center !important;
-  vertical-align: middle !important;
-}
-
-body.ems-site .main :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody td:last-child {
-  border-left: 0 !important;
-}
-
-body.ems-site .main .dataTables_wrapper {
-  margin-top: 6px !important;
-}
-
-body.ems-site .main .dataTables_wrapper :is(.dataTables_filter, .dataTables_length, .dataTables_info, .dataTables_paginate) {
-  color: #242424 !important;
-  font-size: 0.9rem !important;
-  font-weight: 700 !important;
-}
-
-body.ems-site .main .dataTables_wrapper .dataTables_filter input,
-body.ems-site .main .dataTables_wrapper .dataTables_length select {
-  background: #f3f3f3 !important;
-  border: 1px solid #c5c5c5 !important;
-  border-radius: 999px !important;
-  min-height: 34px !important;
-  padding: 6px 12px !important;
-  color: #181818 !important;
-}
-
-body.ems-site .main .dataTables_wrapper .dataTables_filter input:focus,
-body.ems-site .main .dataTables_wrapper .dataTables_length select:focus {
-  border-color: #9b9b9b !important;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
-}
-
-body.ems-site .main .dataTables_wrapper .dt-buttons .dt-button {
-  border: 1px solid #8f8f8f !important;
-  border-radius: 999px !important;
-  background: #f5f5f5 !important;
-  color: #202020 !important;
-  font-weight: 800 !important;
-  box-shadow: none !important;
-}
-
-body.ems-site .main .dataTables_wrapper .dt-buttons .dt-button:hover {
-  background: #ebebeb !important;
-  border-color: #7e7e7e !important;
-}
-
-body.ems-site .main .dataTables_wrapper .dataTables_paginate .paginate_button {
-  border: 1px solid #c3c3c3 !important;
-  border-radius: 999px !important;
-  background: #f3f3f3 !important;
-  color: #222 !important;
-  margin: 0 2px !important;
-  min-width: 32px !important;
-}
-
-body.ems-site .main .dataTables_wrapper .dataTables_paginate .paginate_button.current,
-body.ems-site .main .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-  background: linear-gradient(180deg, var(--ref-yellow-1) 0%, var(--ref-yellow-2) 100%) !important;
-  border-color: var(--ref-yellow-border) !important;
-  color: #161616 !important;
-  font-weight: 900 !important;
-}
-
-body.ems-site .main .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: #e9e9e9 !important;
-  border-color: #b4b4b4 !important;
-  color: #111 !important;
-}
 
 @media (max-width: 991px) {
   body.ems-site .main :is(.main_head, .ems-header-shell, .header, .page-header, .allheaders, .rpt-topbar, .d-top, .contacts-header, .broadcast-header) {
@@ -14025,199 +13225,8 @@ body.ems-site .main .dataTables_wrapper .dataTables_paginate .paginate_button:ho
     white-space: normal !important;
   }
 
-  body.ems-site .main .dataTables_wrapper :is(.dataTables_filter, .dataTables_length) {
-    width: 100% !important;
-    margin-bottom: 6px !important;
-  }
 }
 
-/* ============================================================
-   ACTION ICONS UNIFICATION (All Tables / All Modules)
-   Reference style: compact circular icon actions + neutral gray shell.
-============================================================ */
-body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
-  .action-btn,
-  .eye-btn,
-  .edit-btn,
-  .delete-btn,
-  .edit-icon,
-  .delete-icon,
-  .view-icon,
-  .btn-edit,
-  .btn-delete,
-  .btn-view,
-  [title*="عرض"],
-  [title*="مشاهدة"],
-  [title*="تعديل"],
-  [title*="حذف"],
-  [title*="طباعة"],
-  [title*="تحميل"],
-  [title*="اعتماد"],
-  [title*="إلغاء"],
-  [title*="view"],
-  [title*="edit"],
-  [title*="delete"],
-  [title*="print"],
-  [title*="download"],
-  [title*="approve"],
-  [title*="cancel"]
-) {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-  min-height: 30px !important;
-  min-width: 30px !important;
-  padding: 5px 8px !important;
-  border-radius: 999px !important;
-  border: 1px solid #8d8d8d !important;
-  background: linear-gradient(180deg, #f8f8f8 0%, #ececec 100%) !important;
-  color: #1a1a1a !important;
-  text-decoration: none !important;
-  font-size: 0.78rem !important;
-  font-weight: 800 !important;
-  line-height: 1 !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.11) !important;
-  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease !important;
-}
-
-body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
-  .action-btn,
-  .eye-btn,
-  .edit-btn,
-  .delete-btn,
-  .edit-icon,
-  .delete-icon,
-  .view-icon,
-  .btn-edit,
-  .btn-delete,
-  .btn-view,
-  [title*="عرض"],
-  [title*="مشاهدة"],
-  [title*="تعديل"],
-  [title*="حذف"],
-  [title*="طباعة"],
-  [title*="تحميل"],
-  [title*="اعتماد"],
-  [title*="إلغاء"],
-  [title*="view"],
-  [title*="edit"],
-  [title*="delete"],
-  [title*="print"],
-  [title*="download"],
-  [title*="approve"],
-  [title*="cancel"]
-):hover {
-  background: #e5e5e5 !important;
-  border-color: #707070 !important;
-  color: #111 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
-}
-
-body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
-  .action-btn,
-  .eye-btn,
-  .edit-btn,
-  .delete-btn,
-  .edit-icon,
-  .delete-icon,
-  .view-icon,
-  .btn-edit,
-  .btn-delete,
-  .btn-view,
-  [title*="عرض"],
-  [title*="مشاهدة"],
-  [title*="تعديل"],
-  [title*="حذف"],
-  [title*="طباعة"],
-  [title*="تحميل"],
-  [title*="اعتماد"],
-  [title*="إلغاء"],
-  [title*="view"],
-  [title*="edit"],
-  [title*="delete"],
-  [title*="print"],
-  [title*="download"],
-  [title*="approve"],
-  [title*="cancel"]
-):active {
-  transform: translateY(0) !important;
-  background: #dbdbdb !important;
-}
-
-body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
-  .action-btn,
-  .eye-btn,
-  .edit-btn,
-  .delete-btn,
-  .edit-icon,
-  .delete-icon,
-  .view-icon,
-  .btn-edit,
-  .btn-delete,
-  .btn-view,
-  [title*="عرض"],
-  [title*="مشاهدة"],
-  [title*="تعديل"],
-  [title*="حذف"],
-  [title*="طباعة"],
-  [title*="تحميل"],
-  [title*="اعتماد"],
-  [title*="إلغاء"],
-  [title*="view"],
-  [title*="edit"],
-  [title*="delete"],
-  [title*="print"],
-  [title*="download"],
-  [title*="approve"],
-  [title*="cancel"]
-):focus-visible {
-  outline: 2px solid rgba(0, 0, 0, 0.4) !important;
-  outline-offset: 1px !important;
-}
-
-body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
-  .action-btn,
-  .eye-btn,
-  .edit-btn,
-  .delete-btn,
-  .edit-icon,
-  .delete-icon,
-  .view-icon,
-  .btn-edit,
-  .btn-delete,
-  .btn-view,
-  [title*="عرض"],
-  [title*="مشاهدة"],
-  [title*="تعديل"],
-  [title*="حذف"],
-  [title*="طباعة"],
-  [title*="تحميل"],
-  [title*="اعتماد"],
-  [title*="إلغاء"],
-  [title*="view"],
-  [title*="edit"],
-  [title*="delete"],
-  [title*="print"],
-  [title*="download"],
-  [title*="approve"],
-  [title*="cancel"]
-) i {
-  color: inherit !important;
-  font-size: 0.9rem !important;
-}
-
-/* Make semantic variants subtle while keeping one visual system */
-body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(.delete-btn, .delete-icon, .action-btn.delete, [title*="حذف"], [title*="delete"]) {
-  border-color: #a15b5b !important;
-  color: #6d1d1d !important;
-}
-
-body.ems-site .main :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(.delete-btn, .delete-icon, .action-btn.delete, [title*="حذف"], [title*="delete"]):hover {
-  background: #f0dfdf !important;
-  border-color: #8b4444 !important;
-}
 
 /* ============================================================
    HEADER ADD BUTTON UNIFICATION

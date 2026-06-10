@@ -1133,7 +1133,7 @@ body {
 }
 .rpt-subtitle-cat {
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(247,147,26,.12); border: 1px solid rgba(247,147,26,.26);
+    background: #efefef;
     color: #2d200a; border-radius: 999px; padding: 4px 12px;
     font-size: .78rem; font-weight: 800;
 }
@@ -1154,7 +1154,7 @@ body {
     gap: 6px;
     padding: 8px 10px;
     border-radius: 10px;
-    background: linear-gradient(120deg, rgba(247,147,26,.12), rgba(201,106,0,.08));
+    background: #efefef;
     border: 1px solid rgba(247,147,26,.24);
 }
 .rpt-filter .fc-filter-label { min-width: 100%; }
@@ -1172,44 +1172,41 @@ body {
 }
 .btn-reset:hover { background: #e2e8f0; color: var(--txt); }
 
-/* ── KPI Grid ───────────────────────────── */
+/* ── KPI Grid — مطابقة لكاردات إحصائيات صفحة العملاء (.clients-main .stats-card) ── */
 .rpt-kpi-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-    gap: 10px; margin-bottom: 14px;
+    display: flex; flex-wrap: wrap;
+    gap: 12px; margin-bottom: 14px;
 }
 .rpt-kpi {
-    background: linear-gradient(145deg, #fffdf9, #f8efe0);
-    border: 1px solid rgba(247,147,26,.18);
-    border-radius: var(--r); position: relative; overflow: hidden;
-    padding: 14px; box-shadow: var(--s1);
+    /* 4 كاردات كحد أقصى في السطر؛ والسطر الأخير الناقص يتمدد ليملأ العرض كاملًا */
+    flex: 1 1 calc(25% - 9px);
+    min-width: 190px;
+    background: #eee;
+    border: 1px solid #aaa;
+    border-radius: 35px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(26,18,8,.07);
+    position: relative; overflow: hidden;
     transition: transform .2s, box-shadow .2s;
 }
 .rpt-kpi:hover { transform: translateY(-2px); box-shadow: var(--s2); }
 .rpt-kpi::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; opacity: .9;
 }
-.rpt-kpi.blue::before   { background: linear-gradient(90deg, var(--blue),   var(--blue-l)); }
-.rpt-kpi.green::before  { background: linear-gradient(90deg, var(--green),  #4ade80); }
-.rpt-kpi.gold::before   { background: linear-gradient(90deg, var(--gold),   var(--gold-l)); }
-.rpt-kpi.red::before    { background: linear-gradient(90deg, var(--red),    #f87171); }
-.rpt-kpi.teal::before   { background: linear-gradient(90deg, var(--teal),   #2dd4bf); }
-.rpt-kpi.purple::before { background: linear-gradient(90deg, var(--purple), #a78bfa); }
-.rpt-kpi.orange::before { background: linear-gradient(90deg, var(--orange), #fb923c); }
-.rpt-kpi-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
 .rpt-kpi-ico {
-    width: 42px; height: 42px; border-radius: 11px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.05rem; flex-shrink: 0;
+    width: 55px; height: 55px; border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; margin-bottom: 10px; margin-top: 6px;
+    float: left; vertical-align: middle;
+    border: 1px solid #999; background-color: #fff;
 }
-.rpt-kpi.blue   .rpt-kpi-ico { background: rgba(37,99,235,.1);  color: var(--blue);   }
-.rpt-kpi.green  .rpt-kpi-ico { background: rgba(22,163,74,.1);  color: var(--green);  }
-.rpt-kpi.gold   .rpt-kpi-ico { background: rgba(232,184,0,.12); color: var(--gold);   }
-.rpt-kpi.red    .rpt-kpi-ico { background: rgba(220,38,38,.1);  color: var(--red);    }
-.rpt-kpi.teal   .rpt-kpi-ico { background: rgba(13,148,136,.1); color: var(--teal);   }
-.rpt-kpi.purple .rpt-kpi-ico { background: rgba(124,58,237,.1); color: var(--purple); }
-.rpt-kpi.orange .rpt-kpi-ico { background: rgba(234,111,0,.1);  color: var(--orange); }
-.rpt-kpi-val { font-size: 1.52rem; font-weight: 900; color: var(--txt); line-height: 1.1; }
-.rpt-kpi-lbl { font-size: .74rem; color: var(--muted); margin-top: 3px; font-weight: 600; }
+
+.rpt-kpi-val {
+    color: #222; font-size: 35px; line-height: 1; font-weight: 900;
+    font-variant-numeric: tabular-nums; margin-top: 10px;
+}
+.rpt-kpi-lbl { color: #555; font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
 
 /* ── Charts ─────────────────────────────── */
 .rpt-charts-row {
@@ -1238,14 +1235,14 @@ body {
 
 /* ── Data Card ──────────────────────────── */
 .rpt-data-card {
-    background: linear-gradient(180deg, #fffefc 0%, #f7efe1 100%);
+    background: #efefef;
     border: 1px solid rgba(247,147,26,.2);
     border-radius: var(--r); box-shadow: var(--s1);
     overflow: hidden; margin-bottom: 20px;
 }
 .rpt-data-head {
     padding: 12px 16px; border-bottom: 1px solid var(--line);
-    background: linear-gradient(120deg, rgba(247,147,26,.15), rgba(255,179,71,.16));
+    background:#efefef;
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 10px;
 }
@@ -1292,40 +1289,77 @@ body {
 }
 #rTable tbody tr:nth-child(even) { background: #f8fafd; }
 #rTable tbody tr:hover { background: #fff4e6; }
-.dataTables_wrapper .dataTables_filter input,
-.dataTables_wrapper .dataTables_length select {
-    border: 1px solid rgba(12,28,62,.14); border-radius: 8px;
-    background: #fff; padding: 4px 8px; font-size: .82rem;
+/* ── DataTables toolbars — نفس مواضع شاشة العملاء ──
+   أعلى الجدول: عدد المدخلات (يسارًا) + حقل البحث (يمينًا) والأزرار في الوسط.
+   أسفل الجدول: معلومات السجلات (يسارًا) + الترقيم (يمينًا).
+   نستخدم direction:ltr على الحاوية لتثبيت المواضع الفيزيائية، ونعيد rtl
+   داخل كل خلية ليبقى النص العربي صحيحًا. */
+.rpt-dt-top, .rpt-dt-bottom {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px;
+    direction: ltr;
 }
+.rpt-dt-top { margin-bottom: 12px; }
+.rpt-dt-bottom { margin-top: 12px; }
+.rpt-dt-top > div, .rpt-dt-bottom > div { direction: rtl; }
+.rpt-dt-btns { margin-left: auto; margin-right: auto; }   /* الأزرار في الوسط */
+.rpt-dt-page { margin-left: auto; }                       /* الترقيم إلى أقصى اليمين */
 .dataTables_wrapper .dataTables_length,
-.dataTables_wrapper .dataTables_filter {
-    margin-bottom: 6px;
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    float: none !important; margin: 0 !important; width: auto !important; white-space: nowrap;
 }
-.dataTables_wrapper .dataTables_filter {
-    text-align: left !important;
-}
-.dataTables_wrapper .dataTables_length {
-    text-align: right !important;
+
+/* ── DataTables controls — تنسيق دائري مطابق لشاشة العملاء (مرجع: ems-tables.css) ── */
+.dataTables_wrapper :is(.dataTables_filter, .dataTables_length, .dataTables_info, .dataTables_paginate) {
+    color: #242424; font-size: .9rem; font-weight: 700;
 }
 .dataTables_wrapper .dataTables_filter label,
 .dataTables_wrapper .dataTables_length label {
-    font-size: .82rem;
-    font-weight: 700;
-    color: var(--txt);
+    display: inline-flex; align-items: center; gap: 8px; margin: 0;
+    font-size: .9rem; font-weight: 700; color: #242424;
 }
-.dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background: linear-gradient(120deg, var(--blue), var(--blue-l)) !important;
-    color: #fff !important; border: none !important; border-radius: 8px !important;
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+    background: #f3f3f3 !important; border: 1px solid #c5c5c5 !important;
+    border-radius: 999px !important; min-height: 34px; padding: 6px 12px;
+    color: #181818; font-size: .85rem; width: auto;
 }
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    background: rgba(37,99,235,.1) !important; border-color: transparent !important;
-    color: var(--blue) !important; border-radius: 8px !important;
+.dataTables_wrapper .dataTables_filter input:focus,
+.dataTables_wrapper .dataTables_length select:focus {
+    border-color: #9b9b9b !important; box-shadow: 0 0 0 2px rgba(0,0,0,.08); outline: none;
 }
-.dataTables_wrapper .dataTables_info { font-size: .8rem; color: var(--muted); }
-/* ── Buttons ────────────────────────────── */
-.dt-buttons { display: flex; flex-wrap: wrap; gap: 5px; }
+.dataTables_wrapper .dataTables_info { font-size: .85rem; color: #242424; }
+/* أزرار الترقيم — شكل حبّة دائرية، والصفحة الحالية بلون الثيم (ذهبي) كما في العملاء.
+   ندعم نمط DataTables القديم (.paginate_button) ونمط Bootstrap5 (.page-link). */
+.dataTables_wrapper .dataTables_paginate .paginate_button,
+.dataTables_wrapper .pagination .page-link {
+    border: 1px solid #c3c3c3 !important; border-radius: 999px !important;
+    background: #f3f3f3 !important; color: #222 !important;
+    margin: 0 2px !important; min-width: 32px !important; text-align: center;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+.dataTables_wrapper .pagination .page-item.active .page-link {
+    background: linear-gradient(180deg, var(--gold), var(--gold-l)) !important;
+    border-color: rgba(247,147,26,.55) !important; color: #161616 !important; font-weight: 900 !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+.dataTables_wrapper .pagination .page-link:hover {
+    background: #e9e9e9 !important; border-color: #b4b4b4 !important; color: #111 !important;
+}
+/* ── أزرار التصدير (نسخ / Excel / PDF / طباعة) — حبّة رمادية كما في العملاء ── */
+.dt-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
 .dt-button { font-family: Cairo, sans-serif !important; }
-.dt-button.btn { font-size: .8rem !important; padding: 5px 12px !important; }
+.dataTables_wrapper .dt-buttons .dt-button {
+    border: 1px solid #8f8f8f !important; border-radius: 999px !important;
+    background: #f5f5f5 !important; color: #202020 !important;
+    font-weight: 800 !important; font-size: .8rem !important; padding: 5px 14px !important;
+    box-shadow: none !important;
+}
+.dataTables_wrapper .dt-buttons .dt-button:hover {
+    background: #ebebeb !important; border-color: #7e7e7e !important;
+}
 .dt-button-collection { z-index: 9999 !important; }
 /* ── Scroll fix ─────────────────────────── */
 .dataTables_wrapper { width: 100%; }
@@ -1380,6 +1414,19 @@ body {
         <?php endif; ?>
         <?php echo rr($meta['description']); ?>
     </p>
+    <?php endif; ?>
+
+    <!-- KPI ──────────────────────────────────────────────────────────── -->
+    <?php if (!empty($kpi)): ?>
+    <div class="rpt-kpi-grid">
+        <?php foreach ($kpi as $k): ?>
+        <div class="rpt-kpi <?php echo rr($k['color']); ?>">
+            <div class="rpt-kpi-ico"><i class="fas <?php echo rr($k['icon']); ?>"></i></div>
+            <div class="rpt-kpi-val"><?php echo rr($k['value']); ?></div>
+            <div class="rpt-kpi-lbl"><?php echo rr($k['label']); ?></div>
+        </div>
+        <?php endforeach; ?>
+    </div>
     <?php endif; ?>
 
     <!-- FILTERS ──────────────────────────────────────────────────────── -->
@@ -1585,23 +1632,6 @@ body {
         </form>
     </div>
 
-    <!-- KPI ──────────────────────────────────────────────────────────── -->
-    <?php if (!empty($kpi)): ?>
-    <div class="rpt-kpi-grid">
-        <?php foreach ($kpi as $k): ?>
-        <div class="rpt-kpi <?php echo rr($k['color']); ?>">
-            <div class="rpt-kpi-row">
-                <div>
-                    <div class="rpt-kpi-val"><?php echo rr($k['value']); ?></div>
-                    <div class="rpt-kpi-lbl"><?php echo rr($k['label']); ?></div>
-                </div>
-                <div class="rpt-kpi-ico"><i class="fas <?php echo rr($k['icon']); ?>"></i></div>
-            </div>
-        </div>
-        <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
-
     <!-- CHARTS ───────────────────────────────────────────────────────── -->
     <?php if ($chartData && count($rows) > 1): ?>
     <div class="rpt-charts-row <?php echo $chart2 ? 'two-cols' : ''; ?>">
@@ -1708,9 +1738,9 @@ $(function(){
             order: [],
             autoWidth: false,
             processing: true,
-            dom: '<"row align-items-center mb-2"<"col-sm-6"B><"col-sm-6 d-flex justify-content-end gap-2"lf>>'
+            dom: '<"rpt-dt-top"<"rpt-dt-len"l><"rpt-dt-btns"B><"rpt-dt-search"f>>'
                + 'rt'
-               + '<"row align-items-center mt-2"<"col-sm-5"i><"col-sm-7"p>>',
+               + '<"rpt-dt-bottom"<"rpt-dt-info"i><"rpt-dt-page"p>>',
             buttons: [
                 {
                     extend: 'copyHtml5',

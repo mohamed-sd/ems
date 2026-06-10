@@ -458,7 +458,7 @@
 }
 
 /* (removed) .toggle-group-btn / .toggle-all-btn — column-group buttons are
-   unified as .btn-group-toggle in assets/css/alltables.css */
+   unified as .btn-group-toggle in assets/css/ems-tables.css */
 
 /* ══════════════════════════════════
    FORM HELPERS
@@ -741,24 +741,7 @@ div[style*="flex"][style*="gap"][style*="margin-top"] {
 #projectsTable,
 #projectsTable table { width: 100% !important; font-family: 'Cairo', sans-serif; }
 
-#clientsTable thead th,
-#projectsTable thead th,
-#projectsTable table thead th {
-    background: var(--gray-50, #FAFAF9) !important;
-    color: var(--gray-900, #1C1917) !important;
-    padding: 14px 12px !important;
-    font-weight: 600 !important;
-    font-size: .8rem !important;
-    text-align: center !important;
-    border-bottom: 2px solid var(--gray-200, #E7E5E4) !important;
-    white-space: nowrap;
-}
-#clientsTable thead th:first-child,
-#projectsTable thead th:first-child,
-#projectsTable table thead th:first-child { border-radius: 0 var(--radius) var(--radius) 0 !important; }
-#clientsTable thead th:last-child,
-#projectsTable thead th:last-child,
-#projectsTable table thead th:last-child  { border-radius: var(--radius) 0 0 var(--radius) !important; }
+/* (table thead design removed — unified by assets/css/ems-tables.css) */
 
 #clientsTable tbody tr,
 #projectsTable tbody tr,
@@ -1468,7 +1451,7 @@ table.dataTable.no-footer { border: none !important; }
 }
 
 /* .btn-group-toggle / .btn-group-toggle-all — moved to the single source of
-   truth in assets/css/alltables.css (do not redefine here). */
+   truth in assets/css/ems-tables.css (do not redefine here). */
 
 .group-hidden { display: none !important; }
 

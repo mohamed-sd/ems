@@ -382,8 +382,8 @@ $projects_stats_query = "SELECT
     WHERE $project_scope_stats_sql AND $project_not_deleted_stats_sql";
 $projects_stats_result = mysqli_query($conn, $projects_stats_query);
 if ($projects_stats_result && ($projects_stats_row = mysqli_fetch_assoc($projects_stats_result))) {
-        $projects_total_count = intval($projects_stats_row['total_projects']);
-        $projects_active_count = intval($projects_stats_row['active_projects']);
+    $projects_total_count = intval($projects_stats_row['total_projects']);
+    $projects_active_count = intval($projects_stats_row['active_projects']);
 }
 $projects_inactive_count = max(0, $projects_total_count - $projects_active_count);
 
@@ -393,7 +393,7 @@ $projects_with_contracts_query = "SELECT COUNT(DISTINCT c.project_id) AS project
     WHERE $project_scope_stats_sql AND $project_not_deleted_stats_sql AND c.status = 1";
 $projects_with_contracts_result = mysqli_query($conn, $projects_with_contracts_query);
 if ($projects_with_contracts_result && ($projects_with_contracts_row = mysqli_fetch_assoc($projects_with_contracts_result))) {
-        $projects_with_contracts_count = intval($projects_with_contracts_row['projects_with_contracts']);
+    $projects_with_contracts_count = intval($projects_with_contracts_row['projects_with_contracts']);
 }
 
 $projects_active_contracts_query = "SELECT COUNT(*) AS total_active_contracts
@@ -402,7 +402,7 @@ $projects_active_contracts_query = "SELECT COUNT(*) AS total_active_contracts
     WHERE $project_scope_stats_sql AND $project_not_deleted_stats_sql AND c.status = 1";
 $projects_active_contracts_result = mysqli_query($conn, $projects_active_contracts_query);
 if ($projects_active_contracts_result && ($projects_active_contracts_row = mysqli_fetch_assoc($projects_active_contracts_result))) {
-        $projects_active_contracts_count = intval($projects_active_contracts_row['total_active_contracts']);
+    $projects_active_contracts_count = intval($projects_active_contracts_row['total_active_contracts']);
 }
 ?>
 
@@ -420,7 +420,7 @@ include('../insidebar.php');
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     $header_title = 'إدارة المشاريع';
-    $header_icon  = 'fas fa-project-diagram';
+    $header_icon = 'fas fa-project-diagram';
     $header_actions = array();
     if ($can_add) {
         $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fa fa-solid fa-plus', 'label' => '');
@@ -470,28 +470,28 @@ include('../insidebar.php');
         <div class="stats-grid">
             <div class="stats-card stats-primary">
                 <div class="stats-icon"><i class="fas fa-project-diagram"></i></div>
+                 <div class="stats-value"><?php echo $projects_total_count; ?></div>
                 <div class="stats-title">إجمالي المشاريع</div>
-                <div class="stats-value"><?php echo $projects_total_count; ?></div>
             </div>
             <div class="stats-card stats-success">
                 <div class="stats-icon"><i class="fas fa-check-circle"></i></div>
+                 <div class="stats-value"><?php echo $projects_active_count; ?></div>
                 <div class="stats-title">المشاريع النشطة</div>
-                <div class="stats-value"><?php echo $projects_active_count; ?></div>
             </div>
             <div class="stats-card stats-danger">
                 <div class="stats-icon"><i class="fas fa-times-circle"></i></div>
-                <div class="stats-title">المشاريع غير النشطة</div>
                 <div class="stats-value"><?php echo $projects_inactive_count; ?></div>
+                <div class="stats-title">المشاريع غير النشطة</div>
             </div>
             <div class="stats-card stats-cyan">
                 <div class="stats-icon"><i class="fas fa-file-contract"></i></div>
-                <div class="stats-title">المشاريع التي لها عقود</div>
                 <div class="stats-value"><?php echo $projects_with_contracts_count; ?></div>
+                <div class="stats-title">المشاريع التي لها عقود</div>
             </div>
             <div class="stats-card stats-purple">
                 <div class="stats-icon"><i class="fas fa-clipboard-list"></i></div>
-                <div class="stats-title">إجمالي العقود النشطة</div>
                 <div class="stats-value"><?php echo $projects_active_contracts_count; ?></div>
+                <div class="stats-title">إجمالي العقود النشطة</div>
             </div>
         </div>
     </div>
@@ -514,9 +514,11 @@ include('../insidebar.php');
                             <option value="">-- اختر العميل --</option>
                             <?php
                             $clients_query = mysqli_query($conn, "SELECT c.id, c.client_code, c.client_name FROM clients c WHERE c.status = 'نشط' AND $client_scope_sql ORDER BY c.client_name ASC");
-                            if ($clients_query) { while ($cli = mysqli_fetch_assoc($clients_query)) {
-                                echo "<option value='" . intval($cli['id']) . "'>[" . e($cli['client_code']) . "] " . e($cli['client_name']) . "</option>";
-                            } }
+                            if ($clients_query) {
+                                while ($cli = mysqli_fetch_assoc($clients_query)) {
+                                    echo "<option value='" . intval($cli['id']) . "'>[" . e($cli['client_code']) . "] " . e($cli['client_name']) . "</option>";
+                                }
+                            }
                             ?>
                         </select>
                     </div>
@@ -589,7 +591,7 @@ include('../insidebar.php');
 
     <!-- جدول المشاريع -->
     <div class="card">
-             <div class="card-body">
+        <div class="card-body">
             <div class="table-container">
                 <table id="projectsTable" class="display projects-table-nowrap" style="width:100%;">
                     <thead>
@@ -636,11 +638,12 @@ include('../insidebar.php');
                       ORDER BY op.id DESC";
 
                         $result = mysqli_query($conn, $query);
-                        if ($result) { while ($row = mysqli_fetch_assoc($result)) {
-                            $project_name_cell = "<a class='client-name-link' href='project_profile.php?id=" . intval($row['id']) . "'><strong>" . e($row['name']) . "</strong></a>";
+                        if ($result) {
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                $project_name_cell = "<a class='client-name-link' href='project_profile.php?id=" . intval($row['id']) . "'><strong>" . e($row['name']) . "</strong></a>";
 
-                            echo "<tr>";
-                            echo "<td>
+                                echo "<tr>";
+                                echo "<td>
                             <div class='action-btns'>
                                 <a href='javascript:void(0)'
                                    class='action-btn view viewBtn'
@@ -665,8 +668,8 @@ include('../insidebar.php');
                                    <i class='fas fa-eye'></i>
                                           </a>";
 
-                            if ($can_edit) {
-                                echo "<a href='javascript:void(0)'
+                                if ($can_edit) {
+                                    echo "<a href='javascript:void(0)'
                                                     class='action-btn edit editBtn'
                                                     data-id='" . intval($row['id']) . "'
                                                     data-client-id='" . intval(isset($row['client_id']) ? $row['client_id'] : 0) . "'
@@ -685,32 +688,32 @@ include('../insidebar.php');
                                                     title='تعديل'>
                                                     <i class='fas fa-edit'></i>
                                                 </a>";
-                            }
+                                }
 
-                            if ($can_delete) {
-                                echo "<a href='projects.php?delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode(generate_csrf_token()) . "'
+                                if ($can_delete) {
+                                    echo "<a href='projects.php?delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode(generate_csrf_token()) . "'
                                                     class='action-btn delete'
                                                     onclick='return confirm(\"هل أنت متأكد من حذف هذا المشروع؟\")'
                                                     title='حذف'>
                                                     <i class='fas fa-trash-alt'></i>
                                                 </a>";
-                            }
+                                }
 
-                            echo "</div>
+                                echo "</div>
                       </td>";
-                            echo "<td>" . $project_name_cell . "</td>";
-                            echo "<td>" . e($row['create_at']) . "</td>";
-                            echo "<td>" . e(isset($row['client_name']) && $row['client_name'] !== '' ? $row['client_name'] : $row['client']) . "</td>";
-                            echo "<td>" . e(isset($row['project_code']) && $row['project_code'] !== '' ? $row['project_code'] : '-') . "</td>";
-                            echo "<td>" . e(isset($row['mine_code']) && $row['mine_code'] !== '' ? $row['mine_code'] : '-') . "</td>";
-                            echo "<td><span class='action-btn'>" . intval($row['total_suppliers']) . "</span></td>";
-                            if ($row['status'] == "1") {
-                                echo "<td><span class='status-active'><i class='fa-regular fa-circle-check'></i> نشط</span></td>";
-                            } else {
-                                echo "<td><span class='status-inactive'><i class='fas fa-times-circle'></i> غير نشط</span></td>";
-                            }
+                                echo "<td>" . $project_name_cell . "</td>";
+                                echo "<td>" . e($row['create_at']) . "</td>";
+                                echo "<td>" . e(isset($row['client_name']) && $row['client_name'] !== '' ? $row['client_name'] : $row['client']) . "</td>";
+                                echo "<td>" . e(isset($row['project_code']) && $row['project_code'] !== '' ? $row['project_code'] : '-') . "</td>";
+                                echo "<td>" . e(isset($row['mine_code']) && $row['mine_code'] !== '' ? $row['mine_code'] : '-') . "</td>";
+                                echo "<td><span class='action-btn'>" . intval($row['total_suppliers']) . "</span></td>";
+                                if ($row['status'] == "1") {
+                                    echo "<td><span class='status-active'><i class='fa-regular fa-circle-check'></i> نشط</span></td>";
+                                } else {
+                                    echo "<td><span class='status-inactive'><i class='fas fa-times-circle'></i> غير نشط</span></td>";
+                                }
 
-                            echo "<td>
+                                echo "<td>
                              <a href='../Contracts/contracts.php?filter_project_id=" . intval($row['id']) . "'
                                        class='mines-count-link'
                                        title='عرض عقود المشروع'>
@@ -719,8 +722,9 @@ include('../insidebar.php');
                              </a>
                         </td>";
 
-                            echo "</tr>";
-                        } }
+                                echo "</tr>";
+                            }
+                        }
                         ?>
                     </tbody>
                 </table>
@@ -934,10 +938,10 @@ include('../insidebar.php');
                 onClick: function () { window.location.href = '../Contracts/contracts.php?filter_project_id=' + d.id; }
             });
             <?php if ($can_edit): ?>
-            actions.push({
-                label: 'تعديل المشروع', icon: 'fas fa-edit', variant: 'primary',
-                onClick: function () { EmsDetailsModal.close(); fillProjectEditForm(d); }
-            });
+                actions.push({
+                    label: 'تعديل المشروع', icon: 'fas fa-edit', variant: 'primary',
+                    onClick: function () { EmsDetailsModal.close(); fillProjectEditForm(d); }
+                });
             <?php endif; ?>
             actions.push({ label: 'إغلاق', icon: 'fas fa-times', variant: 'secondary', close: true });
 
@@ -1020,10 +1024,10 @@ include('../insidebar.php');
     }
 
     .projects-main .stats-card {
-        background: var(--s1);
-        border: 1px solid var(--bdr);
-        border-radius: 12px;
-        padding: 12px;
+        background: #eee;
+        border: 1px solid #aaa;
+        border-radius: 35px;
+        padding: 18px;
         box-shadow: 0 2px 8px rgba(26, 18, 8, .07);
         position: relative;
         overflow: hidden;
@@ -1036,41 +1040,67 @@ include('../insidebar.php');
         right: 0;
         left: 0;
         height: 3px;
-        background: linear-gradient(90deg, var(--or), var(--or2));
         opacity: .9;
     }
 
     .projects-main .stats-card .stats-icon {
-        width: 40px;
-        height: 40px;
+        width: 55px;
+        height: 55px;
         border-radius: 12px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 1rem;
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        float: left;
+        vertical-align: middle;
+        margin-top: 15px;
+        border: 1px solid #999;
+        background-color: #fff;
     }
 
     .projects-main .stats-card .stats-title {
-        margin-top: 10px;
-        color: var(--t2);
-        font-size: .82rem;
+        color: #555;
+        font-size: 0.92rem;
         font-weight: 700;
+        margin-top: 5px;
+        line-height: 1.3;
     }
 
     .projects-main .stats-card .stats-value {
-        margin-top: 7px;
-        color: var(--t1);
-        font-size: 1.62rem;
+        color: #222;
+        font-size: 1.8rem;
         line-height: 1;
         font-weight: 900;
         font-variant-numeric: tabular-nums;
+        margin-top: 10px;
+        font-size: 35px;
     }
 
-    .projects-main .stats-primary .stats-icon { background: rgba(37, 99, 235, .14); color: #1d4ed8; }
-    .projects-main .stats-success .stats-icon { background: rgba(22, 163, 74, .14); color: #15803d; }
-    .projects-main .stats-danger .stats-icon { background: rgba(220, 38, 38, .14); color: #b91c1c; }
-    .projects-main .stats-purple .stats-icon { background: rgba(124, 58, 237, .14); color: #6d28d9; }
-    .projects-main .stats-cyan .stats-icon { background: rgba(8, 145, 178, .14); color: #0e7490; }
+    .projects-main .stats-primary .stats-icon {
+        background: fff;
+        color: #000;
+    }
+
+    .projects-main .stats-success .stats-icon {
+       background: fff;
+        color: #000;
+    }
+
+    .projects-main .stats-danger .stats-icon {
+         background: fff;
+        color: #000;
+    }
+
+    .projects-main .stats-purple .stats-icon {
+          background: fff;
+        color: #000;
+    }
+
+    .projects-main .stats-cyan .stats-icon {
+         background: fff;
+        color: #000;
+    }
 
     .table-container {
         overflow-x: auto;
@@ -1100,7 +1130,9 @@ include('../insidebar.php');
     }
 </style>
 
-<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
+<?php if (function_exists('ems_excel_render')) {
+    ems_excel_render();
+} ?>
 </body>
 
 </html>

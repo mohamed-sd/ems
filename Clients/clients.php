@@ -734,7 +734,7 @@ include('../insidebar.php');
     foreach (ems_excel_header_actions('clients', 'العملاء', $can_add) as $__xlAction) {
         $header_actions[] = $__xlAction;
     }
-    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
     ?>
 
@@ -771,12 +771,12 @@ include('../insidebar.php');
             </div>
             <div class="stats-card stats-success">
                 <div class="stats-icon"><i class="fas fa-folder-open"></i></div>
-                 <div class="stats-value"><?php echo $clients_projects_active_total; ?></div>
+                <div class="stats-value"><?php echo $clients_projects_active_total; ?></div>
                 <div class="stats-title">المشاريع النشطة</div>
             </div>
             <div class="stats-card stats-danger">
                 <div class="stats-icon"><i class="fas fa-folder"></i></div>
-                 <div class="stats-value"><?php echo $clients_projects_inactive_total; ?></div>
+                <div class="stats-value"><?php echo $clients_projects_inactive_total; ?></div>
                 <div class="stats-title clients-danger-text">المشاريع غير النشطة</div>
             </div>
             <div class="stats-card stats-orange">
@@ -786,17 +786,17 @@ include('../insidebar.php');
             </div>
             <div class="stats-card stats-cyan">
                 <div class="stats-icon"><i class="fas fa-user"></i></div>
-                 <div class="stats-value"><?php echo $clients_individuals_count; ?></div>
+                <div class="stats-value"><?php echo $clients_individuals_count; ?></div>
                 <div class="stats-title">عدد الأفراد</div>
             </div>
             <div class="stats-card stats-slate">
                 <div class="stats-icon"><i class="fas fa-question-circle"></i></div>
-                 <div class="stats-value"><?php echo $clients_unknown_entity_count; ?></div>
+                <div class="stats-value"><?php echo $clients_unknown_entity_count; ?></div>
                 <div class="stats-title">كيان غير محدد</div>
             </div>
             <div class="stats-card stats-emerald">
                 <div class="stats-icon"><i class="fas fa-link-slash"></i></div>
-                  <div class="stats-value"><?php echo $clients_without_projects; ?></div>
+                <div class="stats-value"><?php echo $clients_without_projects; ?></div>
                 <div class="stats-title">عملاء بلا مشاريع</div>
             </div>
         </div>
@@ -919,21 +919,30 @@ include('../insidebar.php');
         </div>
     </form>
 
-    <div class="card">
-        <div class="card-body">
-            <h2 calss="card-title"> فلاتر البحث </h2>
-            <div class="row clients-filter-row">
-                <div class="col-md-3 col-sm-6 clients-filter-col">
-                    <select id="filterEntityType" class="form-control" placeholder="">
+    <div class="filter">
+        <div class="filter-title">
+            <span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span>
+            فلاتر البحث
+        </div>
+        <div class="filter-body">
+            <div class="filter-field">
+                <label><i class="fa fa-calendar"></i> نوع الكيان </label>
+               <select id="filterEntityType" class="form-control" placeholder="">
                         <option value="">-- حدد نوع الكيان --</option>
                     </select>
-                </div>
-                <div class="col-md-3 col-sm-6 clients-filter-col">
-                    <select id="filterSectorCategory" class="form-control">
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-calendar"></i> تصنيف القطاع</label>
+                <select id="filterSectorCategory" class="form-control">
                         <option value=""> -- حدد تصنيف القطاع -- </option>
                     </select>
-                </div>
             </div>
+            <!-- كرّر .filter-field بقدر ما تريد من الحقول -->
+            <div class="filter-actions">
+                <button type="button" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
+                <button type="button" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+            </div>
+
         </div>
     </div>
 
@@ -1142,11 +1151,8 @@ include('../insidebar.php');
 
         formToggleBtn.toggleClass('is-active', isOpen);
         formToggleBtn.attr('aria-expanded', isOpen ? 'true' : 'false');
-        formToggleBtn.find('.clients-toggle-form-text').text(isOpen ? 'إخفاء فورم الإضافة' : 'إضافة عميل جديد');
-
-        const icon = formToggleBtn.find('i').first();
-        icon.toggleClass('fa-plus-circle', !isOpen);
-        icon.toggleClass('fa-minus-circle', isOpen);
+        // زر الإضافة موحّد: أيقونة fa-solid fa-plus دائماً وبدون نص — لا نبدّل
+        // الأيقونة ولا نحقن نصاً عند الفتح/الإغلاق.
     }
 
     function updateStatsToggleState(isVisible) {

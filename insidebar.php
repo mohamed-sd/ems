@@ -26,8 +26,8 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
     var cssFiles = [
       '/ems/assets/css/local-fonts.css',
       '/ems/assets/css/design-tokens.css',
-      '/ems/assets/css/alltables.css<?php echo $__sb_ver('alltables.css'); ?>',
-      '/ems/assets/css/ems.main.all.style.css<?php echo $__sb_ver('ems.main.all.style.css'); ?>'
+      '/ems/assets/css/ems.main.all.style.css<?php echo $__sb_ver('ems.main.all.style.css'); ?>',
+      '/ems/assets/css/ems-tables.css<?php echo $__sb_ver('ems-tables.css'); ?>'
     ];
 
     cssFiles.forEach(function (href) {

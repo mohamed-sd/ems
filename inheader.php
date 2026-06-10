@@ -38,12 +38,12 @@ if (!function_exists('ems_css_ver')) {
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/responsive.dataTables.min.css">
     <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
-    <!-- Unified Table Styles -->
-    <link rel="stylesheet" href="/ems/assets/css/alltables.css<?php echo ems_css_ver('alltables.css'); ?>">
     <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
     <link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
     <!-- Unified page styles: Dashboard + Chat -->
     <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css<?php echo ems_css_ver('ems.main.all.style.css'); ?>">
+    <!-- Unified Table Styles — loaded LAST so ems-tables.css is the single authoritative source for all table design -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-tables.css<?php echo ems_css_ver('ems-tables.css'); ?>">
     <script src="../assets/js/performance-boost.js" defer></script>
     <script src="/ems/assets/js/ui-unification.js" defer></script>
     <!-- Unified column-groups show/hide (activated per-page via EmsColumnGroups.init) -->

@@ -114,7 +114,20 @@ if ($__showBack && isset($header_back) && !empty($header_back)) {
 ?>
 <div class="main_head">
     <div class="head_actions">
-        <?php foreach ($__actions as $__a) { echo render_header_action($__a); } ?>
+        <?php foreach ($__actions as $__a) {
+            // توحيد زر الإضافة عبر كل الصفحات: أي إجراء أيقونته تحوي fa-plus
+            // (fa-plus / fa-plus-circle ...) يُعرض دائماً بأيقونة fa-solid fa-plus
+            // وبدون نص. يُنقل النص الأصلي إلى tooltip، وتُزال label_class حتى لا
+            // يبقى span فارغ قد تملؤه سكربتات الصفحة.
+            if (!empty($__a['icon']) && strpos($__a['icon'], 'fa-plus') !== false) {
+                if (empty($__a['title']) && !empty($__a['label'])) { $__a['title'] = $__a['label']; }
+                $__a['icon']  = 'fa-solid fa-plus';
+                $__a['label'] = '';
+                unset($__a['label_class']);
+                $__a['class'] = trim((isset($__a['class']) ? $__a['class'] : '') . ' ems-head-circle');
+            }
+            echo render_header_action($__a);
+        } ?>
     </div>
 
     <h1 class="head-title">
@@ -124,7 +137,18 @@ if ($__showBack && isset($header_back) && !empty($header_back)) {
 
     <?php if ($__showBack) { ?>
     <div class="head_back">
-        <?php foreach ($__backItems as $__b) { echo render_header_action($__b); } ?>
+        <?php foreach ($__backItems as $__b) {
+            // توحيد زر العودة عبر كل الصفحات: أي عنصر عودة نصُّه «رجوع» يُعرض دائماً
+            // بأيقونة fa-solid fa-share وبدون كلمة. لا يمسّ الأزرار الأخرى (مثل
+            // «الرئيسية» أو أزرار التبديل) لأن شرطه نصُّ العنوان «رجوع» تحديداً.
+            if (isset($__b['label']) && trim($__b['label']) === 'رجوع') {
+                $__b['icon']  = 'fa-solid fa-share';
+                $__b['label'] = '';
+                if (empty($__b['title'])) { $__b['title'] = 'رجوع'; }
+                $__b['class'] = trim((isset($__b['class']) ? $__b['class'] : '') . ' ems-head-circle');
+            }
+            echo render_header_action($__b);
+        } ?>
     </div>
     <?php } ?>
 </div>

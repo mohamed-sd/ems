@@ -1,0 +1,1083 @@
+/*=============================================
+  ems-tables.css — CENTRAL TABLE STYLESHEET (EMS)
+  (Renamed from alltables.css on 2026-06-10; history preserved via git mv.)
+
+  This is the single, app-wide home for the BASE table styling. It is linked
+  on every sidebar page through inheader.php (and the defensive loader in
+  insidebar.php), loaded just before ems.main.all.style.css.
+
+  Framework: Bootstrap 5 + DataTables.
+
+  Scope note — table styling that intentionally lives ELSEWHERE (NOT moved here
+  to keep the cascade byte-for-byte identical; see FRONTEND_REFACTOR_AUDIT.md):
+    • ems.main.all.style.css — the "OFFICIAL UNIFIED THEME" table overrides
+      (dark-gray thead, zebra striping, toolbar colours). These are load-bearing
+      cascade WINNERS entangled with the shared theme block and must stay last.
+    • assets/css/style.css — table rules for Reports/Drivers/Settings pages that
+      load a separate stylesheet stack.
+    • assets/css/main_admin_style.css — the admin portal's own table styling
+      (admin layout never loads this file).
+    • Page-level inline <style> blocks — load-bearing overrides; lowering them
+      to this file would let conflicting rules re-emerge.
+  =============================================*/
+
+/* ========== ROOT VARIABLES ========== */
+:root {
+    --gold: #f7931a;
+    --gold-dark: #da7c05;
+    --gold-light: #fff8ec;
+    --gold-vlight: #fffaf2;
+    --text-primary: #1f1509;
+    --text-muted: #7a4a12;
+    --border-color: rgba(247, 147, 26, 0.22);
+    --border-accent: rgba(247, 147, 26, 0.28);
+    --red: #c81f24;
+    --red-dark: #a01818;
+    --green: #10a860;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* ========== ACTION BUTTONS STYLING ========== */
+/* Eye/View Button */
+.action-btn.view,
+.eye-btn,
+a[title*="عرض"],
+a[title*="مشاهدة"],
+a[title*="view"],
+a.view-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-accent);
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-vlight) 100%);
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.action-btn.view:hover,
+.eye-btn:hover,
+a[title*="عرض"]:hover,
+a[title*="مشاهدة"]:hover,
+a[title*="view"]:hover,
+a.view-icon:hover {
+    color: #fff;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+    border-color: rgba(247, 147, 26, 0.7);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.action-btn.view i,
+.eye-btn i,
+a[title*="عرض"] i,
+a[title*="مشاهدة"] i,
+a[title*="view"] i,
+a.view-icon i {
+    color: inherit;
+    font-size: 1rem;
+}
+
+/* Edit Button */
+.action-btn.edit,
+.edit-btn,
+.edit-icon,
+a[title*="تعديل"],
+a[title*="edit"],
+button.edit-btn-small {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-accent);
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-vlight) 100%);
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.action-btn.edit:hover,
+.edit-btn:hover,
+.edit-icon:hover,
+a[title*="تعديل"]:hover,
+a[title*="edit"]:hover,
+button.edit-btn-small:hover {
+    color: #fff;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+    border-color: rgba(247, 147, 26, 0.7);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.action-btn.edit i,
+.edit-btn i,
+.edit-icon i,
+a[title*="تعديل"] i,
+a[title*="edit"] i,
+button.edit-btn-small i {
+    color: inherit;
+    font-size: 1rem;
+}
+
+/* Delete Button */
+.action-btn.delete,
+.delete-btn,
+.delete-icon,
+a[title*="حذف"],
+a[title*="delete"],
+button.delete-btn-small {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(220, 38, 38, 0.22);
+    background: linear-gradient(135deg, #fff3f4 0%, #ffe7ea 100%);
+    color: var(--red);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.action-btn.delete:hover,
+.delete-btn:hover,
+.delete-icon:hover,
+a[title*="حذف"]:hover,
+a[title*="delete"]:hover,
+button.delete-btn-small:hover {
+    color: #fff;
+    background: linear-gradient(135deg, #dc2626 0%, var(--red-dark) 100%);
+    border-color: rgba(185, 28, 28, 0.78);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.action-btn.delete i,
+.delete-btn i,
+.delete-icon i,
+a[title*="حذف"] i,
+a[title*="delete"] i,
+button.delete-btn-small i {
+    color: inherit;
+    font-size: 1rem;
+}
+
+/* ========== BADGE STYLES ========== */
+.badge-count,
+.badge-basic,
+.badge-backup,
+.badge-shifts,
+span[class*="badge-"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-vlight) 100%);
+    color: var(--text-muted);
+    border: 1px solid var(--border-accent);
+    min-width: 28px;
+    height: 28px;
+}
+
+.badge-count {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3f4f6 100%);
+    color: #1565c0;
+}
+
+.badge-basic {
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    color: #059669;
+}
+
+.badge-backup {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #d97706;
+}
+
+.badge-shifts {
+    background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+    color: #be185d;
+}
+
+/* Global hard override for table headers across the whole system */
+table thead,
+.table thead,
+table.dataTable thead,
+.dataTables_scrollHead table thead {
+    background: #eeeeee !important;
+    color: #000000 !important;
+    background-image: none !important;
+}
+
+table thead th,
+table thead td,
+.table thead th,
+.table thead td,
+table.dataTable thead th,
+table.dataTable thead td,
+.dataTables_scrollHead table thead th,
+.dataTables_scrollHead table thead td {
+    background: #eeeeee !important;
+    color: #000000 !important;
+    background-image: none !important;
+}
+
+table thead th i,
+.table thead th i,
+table.dataTable thead th i,
+.dataTables_scrollHead table thead th i,
+table.dataTable thead .sorting::before,
+table.dataTable thead .sorting::after,
+table.dataTable thead .sorting_asc::before,
+table.dataTable thead .sorting_asc::after,
+table.dataTable thead .sorting_desc::before,
+table.dataTable thead .sorting_desc::after {
+    color: #000000 !important;
+}
+
+/* ========== PRICE CHIPS ========== */
+.price-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-vlight) 100%);
+    color: var(--text-muted);
+    font-weight: 800;
+    font-size: 0.85rem;
+    border: 1px solid var(--border-accent);
+}
+
+/* ========== STATUS BADGES ========== */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 0.8rem;
+}
+
+.status-badge.active {
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.status-badge.inactive {
+    background: linear-gradient(135deg, #fef2f2 0%, #fce7f3 100%);
+    color: var(--red);
+    border: 1px solid rgba(200, 31, 36, 0.22);
+}
+
+/* ========== EMPTY STATE ========== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    opacity: 0.3;
+    color: var(--gold);
+}
+
+.empty-state p {
+    margin: 0;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* ========== RESPONSIVE TABLE WRAPPER ========== */
+.table-responsive-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 20px;
+}
+
+.table-responsive-wrapper table {
+    min-width: 100%;
+}
+
+/* ========== FILTER AND CONTROL SECTIONS ========== */
+.contracts-table-filter-wrap,
+.contracts-group-toolbar-wrap {
+    background: linear-gradient(135deg, #fffaf2 0%, #fff4e4 100%);
+    border-radius: 9px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-accent);
+}
+
+.contracts-group-toolbar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 12px 0;
+}
+
+.contracts-group-toolbar-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 12px;
+    font-weight: 800;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.contracts-group-toolbar-label i {
+    color: var(--gold);
+}
+
+/* ============================================================
+   COLUMN-GROUP TOGGLE BUTTONS — SINGLE SOURCE OF TRUTH
+   Used by the unified feature (assets/js/column-groups.js) on
+   all 8 group pages. Do NOT redefine .btn-group-toggle elsewhere.
+   - inactive: light gray (NOT white)
+   - active  : dark-yellow gradient
+   ============================================================ */
+.btn-group-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #D7DBE0 !important;
+    background: #F1F2F4 !important;
+    color: #5A6270 !important;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+
+.btn-group-toggle:hover {
+    border-color: #D9AB32 !important;
+    color: #2A2010 !important;
+    background: #ECEDEF !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-group-toggle.active {
+    background: linear-gradient(135deg, #D9AB32 0%, #C2941C 100%) !important;
+    color: #2A2010 !important;
+    border-color: #B0851A !important;
+    box-shadow: var(--shadow-md);
+}
+
+.btn-group-toggle.active:hover {
+    background: linear-gradient(135deg, #C2941C 0%, #B0851A 100%) !important;
+    color: #2A2010 !important;
+}
+
+.btn-group-toggle-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #D7DBE0 !important;
+    background: #F1F2F4 !important;
+    color: #5A6270 !important;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.18s ease;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.btn-group-toggle-all:hover {
+    border-color: #D9AB32 !important;
+    color: #2A2010 !important;
+    background: #ECEDEF !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-group-toggle-all.active {
+    background: linear-gradient(135deg, #D9AB32 0%, #C2941C 100%) !important;
+    color: #2A2010 !important;
+    border-color: #B0851A !important;
+    box-shadow: var(--shadow-md);
+}
+
+/* ── تغلّب على توحيد الأزرار العام (.ems-site .main button) ذي التخصيص الأعلى،
+      الذي كان يطمس ألوان أزرار المجموعات وحالة active. نرفع التخصيص بـ .ems-site .main ── */
+.ems-site .main .btn-group-toggle,
+.ems-site .main .btn-group-toggle-all {
+    background: #F1F2F4 !important;
+    color: #5A6270 !important;
+    border: 1.5px solid #D7DBE0 !important;
+}
+.ems-site .main .btn-group-toggle:hover,
+.ems-site .main .btn-group-toggle-all:hover {
+    background: #ECEDEF !important;
+    border-color: #D9AB32 !important;
+    color: #2A2010 !important;
+}
+.ems-site .main .btn-group-toggle.active,
+.ems-site .main .btn-group-toggle-all.active {
+    background: linear-gradient(135deg, #D9AB32 0%, #C2941C 100%) !important;
+    color: #2A2010 !important;
+    border-color: #B0851A !important;
+}
+
+/* ========== PRINT STYLES ========== */
+@media print {
+    .display,
+    .modern-table,
+    .contracts-table {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .display thead,
+    .modern-table thead,
+    .contracts-table thead {
+        background: #f5f5f5 !important;
+        color: #000 !important;
+    }
+
+    .action-btn {
+        display: none;
+    }
+}
+
+/* ========== MOBILE RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .display thead th,
+    .modern-table thead th,
+    .contracts-table thead th {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+    }
+
+    .display tbody td,
+    .modern-table tbody td,
+    .contracts-table tbody td {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+    }
+
+    .action-btn {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+
+    .contracts-group-toolbar {
+        gap: 6px;
+        padding: 8px 0;
+    }
+
+    .btn-group-toggle {
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
+
+    .btn-group-toggle-all {
+        margin-left: 0;
+        margin-top: 6px;
+    }
+}
+
+/*=============================================
+  UNIFIED TABLE DESIGN — SINGLE SOURCE
+  Relocated from ems.main.all.style.css (FINAL UNIFIED THEME) and broadened
+  from `.main` to all `body.ems-site` tables. This is now the ONE place that
+  defines system-wide table / DataTables visual design.
+=============================================*/
+/* cell-link pills */
+.alltables tbody td > a:not(.action-btn),
+.alltable tbody td > a:not(.action-btn),
+table.alltables tbody td > a:not(.action-btn),
+table.alltable tbody td > a:not(.action-btn),
+table.display tbody td > a:not(.action-btn),
+table.dataTable tbody td > a:not(.action-btn) {
+  background: var(--light-gray) !important;
+  border: 1px solid var(--line) !important;
+  color: var(--dark-blue) !important;
+}
+.alltables tbody td > a:not(.action-btn):hover,
+.alltable tbody td > a:not(.action-btn):hover,
+table.alltables tbody td > a:not(.action-btn):hover,
+table.alltable tbody td > a:not(.action-btn):hover,
+table.display tbody td > a:not(.action-btn):hover,
+table.dataTable tbody td > a:not(.action-btn):hover {
+  background: var(--dark-blue) !important;
+  border-color: var(--dark-blue) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 14px rgba(30, 58, 95, 0.22) !important;
+}
+
+/* DataTables and unified tables */
+body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border: 1px solid #ECEEF1 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead,
+body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead tr,
+body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead th {
+  background: var(--ref-head-bg) !important;
+  color: #ffffff !important;
+  background-image: none !important;
+  border-color: #999 !important;
+  background: #999 !important;
+}
+
+body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead th {
+  padding: 9px 10px !important;
+  font-size: 0.93rem !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+body.ems-site table.dataTable thead .sorting::before,
+body.ems-site table.dataTable thead .sorting::after,
+body.ems-site table.dataTable thead .sorting_asc::before,
+body.ems-site table.dataTable thead .sorting_asc::after,
+body.ems-site table.dataTable thead .sorting_desc::before,
+body.ems-site table.dataTable thead .sorting_desc::after {
+  color: #ffffff !important;
+  opacity: 0.9 !important;
+}
+
+/* Keep the ACTIVE sort column header dark too (override DataTables' sorted-column highlight) */
+body.ems-site table.dataTable thead th.sorting,
+body.ems-site table.dataTable thead th.sorting_asc,
+body.ems-site table.dataTable thead th.sorting_desc,
+body.ems-site table.dataTable thead td.sorting,
+body.ems-site table.dataTable thead td.sorting_asc,
+body.ems-site table.dataTable thead td.sorting_desc {
+  background: #999 !important;
+  color: #ffffff !important;
+}
+
+/* DataTables scrollX clones the header into .dataTables_scrollHead — keep it dark too */
+body.ems-site .dataTables_scrollHead table thead th,
+body.ems-site .dataTables_scrollHead table thead td,
+body.ems-site .dataTables_scrollHeadInner table thead th {
+  background: #3D3D3D !important;
+  color: #ffffff !important;
+  background-image: none !important;
+}
+
+body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:nth-child(odd) {
+  background: #FFFFFF !important;
+}
+
+body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:nth-child(even) {
+  background: #e6e6e6 !important;
+}
+
+body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:hover,
+body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:hover td {
+  background: #FCF3D6 !important;
+}
+
+body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody td {
+  color: #161616 !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  padding: 9px 12px !important;
+  border-bottom: 1px solid #ECEEF1 !important;
+  border-left: 0 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+   border: 1px solid #ccc !important;
+}
+
+body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody td:last-child {
+  border-left: 0 !important;
+}
+
+body.ems-site .dataTables_wrapper {
+  margin-top: 0 !important;
+}
+
+/* ── إزالة المساحة الرمادية الفارغة أعلى الجدول ──
+   الثيم القديم كان يدفع "حبّة عدد المدخلات" وصندوق البحث للأسفل
+   (bottom:-35px / top:40px) مع حشوة علوية للبطاقة، فتظهر مساحة رمادية
+   كبيرة فوق الجدول. نلغي الدفع للأسفل ونترك 5px فقط أعلى الجدول بما
+   يطابق مسافة الجانبين والأسفل — بدون أي تغيير في الألوان أو الأشكال. */
+body.ems-site .dataTables_wrapper .dataTables_length {
+  position: static !important;
+  bottom: auto !important;
+  padding-bottom: 6px !important;
+  margin-bottom: 0px !important;
+  border-radius: 30px 30px 0px 0px !important;
+}
+body.ems-site .dataTables_wrapper .dataTables_filter {
+  position: static !important;
+  top: auto !important;
+}
+body.ems-site .main.ems-unified-page-shell > .card > .card-body:has(.table-container),
+body.ems-site .main.ems-unified-page-shell > .card > .card-body.table-container {
+  padding: 10px !important;
+  border-radius: 25px !important;
+}
+
+/* ── عنوان البطاقة الموحّد: h2.card-title داخل .card-body ──
+   خلفية رمادية غامقة وخط 20px، قابل لإعادة الاستخدام في كل الصفحات. */
+body.ems-site .card .card-body > h2.card-title {
+  background: #ddd !important;
+  color: #000 !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  margin: 0 0 16px 0 !important;
+  padding: 10px !important;
+  border-radius: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+body.ems-site .card .card-body > h2.card-title > i {
+  color: #000 !important;   /* أيقونة بلون الثيم الأصفر */
+}
+
+body.ems-site .dataTables_wrapper :is(.dataTables_filter, .dataTables_length, .dataTables_info, .dataTables_paginate) {
+  color: #242424 !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+}
+
+body.ems-site .dataTables_wrapper .dataTables_filter input,
+body.ems-site .dataTables_wrapper .dataTables_length select {
+  background: #f3f3f3 !important;
+  border: 1px solid #c5c5c5 !important;
+  border-radius: 999px !important;
+  min-height: 34px !important;
+  padding: 6px 12px !important;
+  color: #181818 !important;
+}
+
+body.ems-site .dataTables_wrapper .dataTables_filter input:focus,
+body.ems-site .dataTables_wrapper .dataTables_length select:focus {
+  border-color: #9b9b9b !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
+}
+
+body.ems-site .dataTables_wrapper .dt-buttons .dt-button {
+  border: 1px solid #8f8f8f !important;
+  border-radius: 999px !important;
+  background: #f5f5f5 !important;
+  color: #202020 !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+}
+
+body.ems-site .dataTables_wrapper .dt-buttons .dt-button:hover {
+  background: #ebebeb !important;
+  border-color: #7e7e7e !important;
+}
+
+body.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button {
+  border: 1px solid #c3c3c3 !important;
+  border-radius: 999px !important;
+  background: #f3f3f3 !important;
+  color: #222 !important;
+  margin: 0 2px !important;
+  min-width: 32px !important;
+}
+
+body.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+body.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: linear-gradient(180deg, var(--ref-yellow-1) 0%, var(--ref-yellow-2) 100%) !important;
+  border-color: var(--ref-yellow-border) !important;
+  color: #161616 !important;
+  font-weight: 900 !important;
+}
+
+body.ems-site .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #e9e9e9 !important;
+  border-color: #b4b4b4 !important;
+  color: #111 !important;
+}
+
+@media (max-width: 991px) {
+  body.ems-site .dataTables_wrapper :is(.dataTables_filter, .dataTables_length) {
+    width: 100% !important;
+    margin-bottom: 6px !important;
+  }
+}
+
+/* ============================================================
+   ACTION ICONS UNIFICATION (All Tables / All Modules)
+   Reference style: compact circular icon actions + neutral gray shell.
+============================================================ */
+body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
+  .action-btn,
+  .eye-btn,
+  .edit-btn,
+  .delete-btn,
+  .edit-icon,
+  .delete-icon,
+  .view-icon,
+  .btn-edit,
+  .btn-delete,
+  .btn-view,
+  [title*="عرض"],
+  [title*="مشاهدة"],
+  [title*="تعديل"],
+  [title*="حذف"],
+  [title*="طباعة"],
+  [title*="تحميل"],
+  [title*="اعتماد"],
+  [title*="إلغاء"],
+  [title*="view"],
+  [title*="edit"],
+  [title*="delete"],
+  [title*="print"],
+  [title*="download"],
+  [title*="approve"],
+  [title*="cancel"]
+) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  min-height: 30px !important;
+  min-width: 30px !important;
+  padding: 5px 8px !important;
+  border-radius: 999px !important;
+  border: 1px solid #8d8d8d !important;
+  background: linear-gradient(180deg, #f8f8f8 0%, #ececec 100%) !important;
+  color: #1a1a1a !important;
+  text-decoration: none !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.11) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease !important;
+}
+
+body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
+  .action-btn,
+  .eye-btn,
+  .edit-btn,
+  .delete-btn,
+  .edit-icon,
+  .delete-icon,
+  .view-icon,
+  .btn-edit,
+  .btn-delete,
+  .btn-view,
+  [title*="عرض"],
+  [title*="مشاهدة"],
+  [title*="تعديل"],
+  [title*="حذف"],
+  [title*="طباعة"],
+  [title*="تحميل"],
+  [title*="اعتماد"],
+  [title*="إلغاء"],
+  [title*="view"],
+  [title*="edit"],
+  [title*="delete"],
+  [title*="print"],
+  [title*="download"],
+  [title*="approve"],
+  [title*="cancel"]
+):hover {
+  background: #e5e5e5 !important;
+  border-color: #707070 !important;
+  color: #111 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
+  .action-btn,
+  .eye-btn,
+  .edit-btn,
+  .delete-btn,
+  .edit-icon,
+  .delete-icon,
+  .view-icon,
+  .btn-edit,
+  .btn-delete,
+  .btn-view,
+  [title*="عرض"],
+  [title*="مشاهدة"],
+  [title*="تعديل"],
+  [title*="حذف"],
+  [title*="طباعة"],
+  [title*="تحميل"],
+  [title*="اعتماد"],
+  [title*="إلغاء"],
+  [title*="view"],
+  [title*="edit"],
+  [title*="delete"],
+  [title*="print"],
+  [title*="download"],
+  [title*="approve"],
+  [title*="cancel"]
+):active {
+  transform: translateY(0) !important;
+  background: #dbdbdb !important;
+}
+
+body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
+  .action-btn,
+  .eye-btn,
+  .edit-btn,
+  .delete-btn,
+  .edit-icon,
+  .delete-icon,
+  .view-icon,
+  .btn-edit,
+  .btn-delete,
+  .btn-view,
+  [title*="عرض"],
+  [title*="مشاهدة"],
+  [title*="تعديل"],
+  [title*="حذف"],
+  [title*="طباعة"],
+  [title*="تحميل"],
+  [title*="اعتماد"],
+  [title*="إلغاء"],
+  [title*="view"],
+  [title*="edit"],
+  [title*="delete"],
+  [title*="print"],
+  [title*="download"],
+  [title*="approve"],
+  [title*="cancel"]
+):focus-visible {
+  outline: 2px solid rgba(0, 0, 0, 0.4) !important;
+  outline-offset: 1px !important;
+}
+
+body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(
+  .action-btn,
+  .eye-btn,
+  .edit-btn,
+  .delete-btn,
+  .edit-icon,
+  .delete-icon,
+  .view-icon,
+  .btn-edit,
+  .btn-delete,
+  .btn-view,
+  [title*="عرض"],
+  [title*="مشاهدة"],
+  [title*="تعديل"],
+  [title*="حذف"],
+  [title*="طباعة"],
+  [title*="تحميل"],
+  [title*="اعتماد"],
+  [title*="إلغاء"],
+  [title*="view"],
+  [title*="edit"],
+  [title*="delete"],
+  [title*="print"],
+  [title*="download"],
+  [title*="approve"],
+  [title*="cancel"]
+) i {
+  color: inherit !important;
+  font-size: 0.9rem !important;
+}
+
+/* Make semantic variants subtle while keeping one visual system */
+body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(.delete-btn, .delete-icon, .action-btn.delete, [title*="حذف"], [title*="delete"]) {
+  border-color: #a15b5b !important;
+  color: #6d1d1d !important;
+}
+
+body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tbody td :is(.delete-btn, .delete-icon, .action-btn.delete, [title*="حذف"], [title*="delete"]):hover {
+  background: #f0dfdf !important;
+  border-color: #8b4444 !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   قالب الفلاتر الموحّد — Reusable Filter Panel
+   ────────────────────────────────────────────────────────────────────
+   البنية المتوقّعة (نفس الأسماء تُستخدم في أي صفحة):
+
+   <div class="filter-container">
+     <div class="filter-title">
+       <span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span>
+       فلاتر البحث
+     </div>
+     <div class="filter-body">
+       <div class="filter-field">
+         <label><i class="fa fa-calendar"></i> من تاريخ</label>
+         <input type="date">
+       </div>
+       <!-- ... المزيد من .filter-field حسب الحاجة ... -->
+       <div class="filter-actions">           <!-- دائماً في الأخير -->
+         <button type="button" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
+         <button type="button" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+       </div>
+     </div>
+   </div>
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ملاحظة تنطيق: القالب يُستخدم داخل .main في صفحات الجداول. نُنطّقه تحت
+   `body.ems-site .main` ونضيف حُرّاس :not(...) على الحقول والأزرار حتى تتجاوز
+   خصوصيتُه طبقةَ «التوحيد» العامة في ems.main.all.style.css (موحّد الأزرار
+   هناك يستخدم 4 × :not فيمنح خصوصية عالية تُسقِط ألوان الأزرار بدونها). */
+
+/* الحاوية الخارجية — رمادي فاتح #eee + خط علوي أصفر */
+body.ems-site .main .filter {
+  background: #eee !important;
+  border: 1px solid #ddd !important;
+  border-radius: 25px !important;
+  margin-bottom: 5px !important;
+  overflow: hidden !important;
+  direction: rtl !important;
+  padding: 5px !important;
+}
+
+/* شريط العنوان + الأيقونة (العنوان لليمين في RTL = flex-start) */
+body.ems-site .main .filter .filter-title {
+  background: #ddd !important;
+  border-radius:20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;   /* البداية = اليمين في RTL */
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 5px !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  color: #2c2c2c !important;
+}
+
+/* صف الحقول + الأزرار */
+body.ems-site .main .filter .filter-body {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-end !important;
+  gap: 14px !important;
+  padding: 0px!important;
+}
+
+/* الحقل الواحد: label فوق input/select */
+body.ems-site .main .filter .filter-field {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  flex: 1 1 180px !important;
+  min-width: 150px !important;
+  margin: 0 !important;
+    border-radius: 20px !important;
+}
+
+
+body.ems-site .main .filter .filter-field :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):focus {
+  border-color: #F4C542 !important;
+  background: #fffdf5 !important;
+  box-shadow: 0 0 0 3px rgba(244, 197, 66, .25) !important;
+  outline: none !important;
+  border-radius: 20px !important;
+}
+
+/* مجموعة الأزرار — تُدفع دائماً لطرف السطر (يسار في RTL) */
+body.ems-site .main .filter .filter-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-inline-start: auto !important;
+}
+
+/* زر تطبيق الفلتر — أصفر (الحُرّاس :not ترفع الخصوصية فوق موحّد الأزرار) */
+body.ems-site .main .filter .filter-actions .btn-ok:not(.btn-close):not(.close):not(.dt-button) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  box-sizing: border-box !important;
+  padding: 0 22px !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background: #F4C542 !important;
+  background-image: none !important;
+  color: #2a2300 !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 6px rgba(244, 197, 66, .45) !important;
+  transition: background .18s ease, transform .18s ease !important;
+}
+body.ems-site .main .filter .filter-actions .btn-ok:not(.btn-close):not(.close):not(.dt-button):hover {
+  background: #e6b52f !important;
+  background-image: none !important;
+  transform: translateY(-1px) !important;
+}
+
+/* زر إعادة تعيين الفلتر — دائري */
+body.ems-site .main .filter .filter-actions .btn-reset:not(.btn-close):not(.close):not(.dt-button) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 42px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  border: 1px solid #cfcfcf !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  background-image: none !important;
+  color: #555 !important;
+  font-size: 15px !important;
+  cursor: pointer !important;
+  transition: background .18s ease, color .18s ease, transform .25s ease !important;
+}
+body.ems-site .main .filter .filter-actions .btn-reset:not(.btn-close):not(.close):not(.dt-button):hover {
+  background: #f0f0f0 !important;
+  color: #222 !important;
+  transform: rotate(-90deg) !important;
+}
+
+/* موبايل: الأزرار تأخذ سطراً كاملاً */
+@media (max-width: 640px) {
+  body.ems-site .main .filter .filter-field { flex: 1 1 100% !important; }
+  body.ems-site .main .filter .filter-actions { width: 100% !important; justify-content: flex-start !important; }
+}
