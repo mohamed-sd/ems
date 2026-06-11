@@ -586,13 +586,13 @@ samp,
 }
 
 .contracts-table-wrap {
-  padding: 2rem;
+  padding: 0.5rem 2rem 2rem;   /* قلّلنا الحشوة العلوية لتقريب الجدول من شريط المجموعات */
   overflow-x: auto;
 }
 
 .contracts-table {
   width: 100%;
-  margin-top: 20px;
+  margin-top: 4px;             /* كان 20px — تقليل الفراغ أعلى الجدول */
 }
 
 .project-hours-info {
@@ -5674,6 +5674,15 @@ table.d-bd {
 .ems-unified-page-shell > .success-message,
 .ems-unified-page-shell > .fc-stats {
   margin: 0;
+}
+
+/* Unified page header (.main_head) inside the flex shell: the shell's `gap`
+   (14px) already separates it from the next element, so its own 14px
+   margin-bottom was stacking on top (=28px below the header). Trim the margin
+   so the total space below the header is a single, deliberate 15px (14px gap
+   + 1px), in line with the spacing between the rest of the cards. */
+.ems-unified-page-shell > .main_head {
+  margin-bottom: 1px;
 }
 
 @media (max-width: 768px) {

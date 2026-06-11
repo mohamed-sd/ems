@@ -344,7 +344,25 @@ table.dataTable thead .sorting_desc::after {
     gap: 8px;
     align-items: center;
     flex-wrap: wrap;
-    padding: 12px 0;
+    padding: 6px 0 0;   /* كان 12px 0 — تقليل المسافة خصوصاً من الأسفل */
+}
+
+/* ملء الصف: أزرار المجموعات تتمدد بالتساوي لتملأ عرض الصف بالكامل */
+.contracts-group-toolbar .btn-group-toggle,
+.contracts-group-toolbar .btn-group-toggle-all {
+    flex: 1 1 auto;
+    justify-content: center;
+}
+
+/* كان margin-left:auto يفصل زر «الكل» للطرف؛ الآن يشارك بقية الأزرار في ملء الصف */
+.contracts-group-toolbar .btn-group-toggle-all {
+    margin-left: 0;
+}
+
+/* تقليل حشوة الحاوية حول شريط المجموعات — خصوصاً من الأسفل (المسافة قبل الجدول) */
+body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
+    padding-top: 8px !important;
+    padding-bottom: 0 !important;
 }
 
 .contracts-group-toolbar-label {
@@ -646,8 +664,9 @@ body.ems-site .dataTables_wrapper .dataTables_length {
   position: static !important;
   bottom: auto !important;
   padding-bottom: 6px !important;
-  margin-bottom: 0px !important;
-  border-radius: 30px 30px 0px 0px !important;
+  margin-bottom: 10px !important;
+  border-radius: 20px !important;
+  max-height: 40px !important;
 }
 body.ems-site .dataTables_wrapper .dataTables_filter {
   position: static !important;
@@ -969,22 +988,23 @@ body.ems-site .main .filter {
   margin-bottom: 5px !important;
   overflow: hidden !important;
   direction: rtl !important;
-  padding: 5px !important;
+  padding: 10px !important;
 }
 
 /* شريط العنوان + الأيقونة (العنوان لليمين في RTL = flex-start) */
 body.ems-site .main .filter .filter-title {
-  background: #ddd !important;
-  border-radius:20px !important;
+  background: #e6e6e6 !important;
+  border-radius:25px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: flex-start !important;   /* البداية = اليمين في RTL */
   gap: 10px !important;
   margin: 0 !important;
   padding: 5px !important;
-  font-size: 18px !important;
+  font-size: 20px !important;
   font-weight: 800 !important;
   color: #2c2c2c !important;
+  margin-bottom: 10px !important;
 }
 
 /* صف الحقول + الأزرار */

@@ -949,7 +949,7 @@ include('../insidebar.php');
     <div class="card">
         <div class="card-body">
             <div class="table-container">
-                <table id="clientsTable" class="display clients-table-nowrap">
+                <table id="clientsTable" class="display clients-table-nowrap no-datatable">
                     <thead>
                         <tr>
                             <th> إجراءات</th>
@@ -1058,6 +1058,7 @@ include('../insidebar.php');
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -1069,8 +1070,16 @@ include('../insidebar.php');
     $(document).ready(function () {
         // تهيئة جدول العملاء بالعربية
         const clientsTable = $('#clientsTable').DataTable({
-            scrollX: true,
+            // responsive (لا scrollX) لتوحيد الشكل مع جدول المشاريع وبقية الجداول:
+            // scrollX كان يفصل الرأس عن الجسم (جدولا scrollHead/scrollBody) ويُظهر
+            // شريطاً رمادياً أعلى الجسم. responsive يبقي الجدول قطعة واحدة موحّدة.
+            responsive: true,
             autoWidth: false,
+            // تعطيل حفظ الحالة: الفلاتر هنا تُدار عبر قوائم منفصلة (fillFilterOptions)
+            // تملأ بحث الأعمدة، وحالة الـ <select> ليست جزءاً من حالة DataTables.
+            // مع stateSave العام (performance-boost.js) كان بحث عمود محفوظ يُستعاد
+            // فيُخفي كل الصفوف («مرشّحة من 4 ← 0») والقوائم تبدو فارغة. (ظهر في Edge)
+            stateSave: false,
             language: {
                 url: '/ems/assets/i18n/datatables/ar.json'
             }

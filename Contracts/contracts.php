@@ -178,14 +178,16 @@ include('../insidebar.php');
   <?php
   // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
   $header_title = 'إدارة العقود';
-  $header_icon  = 'fas fa-file-contract';
+  $header_icon = 'fas fa-file-contract';
   $header_actions = array();
   if ($can_add) {
-      $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'عقد جديد');
+    $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'عقد جديد');
   }
   // ── نظام Excel الموحّد (Unified Excel Framework) ──
   require_once __DIR__ . '/../includes/excel_ui.php';
-  foreach (ems_excel_header_actions('contracts', 'عقود المشاريع', $can_add) as $__xlAction) { $header_actions[] = $__xlAction; }
+  foreach (ems_excel_header_actions('contracts', 'عقود المشاريع', $can_add) as $__xlAction) {
+    $header_actions[] = $__xlAction;
+  }
   $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
   include('../includes/page_header.php');
   ?>
@@ -206,25 +208,25 @@ include('../insidebar.php');
           value="<?php echo htmlspecialchars($contracts_csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
 
         <div class="section-title"><span class="chip">1</span> اختيار المشروع</div>
-          <br>
+        <br>
 
-          <div class="form-grid">
-            <div class="field md-6 sm-6">
-              <label>المشروع <font color="red">*</font></label>
-              <div class="control">
-                <select name="project_id" id="contract_project_id" required>
-                  <option value="">— اختر المشروع —</option>
-                  <?php foreach ($form_projects as $project): ?>
-                    <option value="<?php echo intval($project['id']); ?>"
-                      <?php echo ($project_id > 0 && intval($project['id']) === $project_id) ? 'selected' : ''; ?>>
-                      <?php echo htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8'); ?></option>
-                  <?php endforeach; ?>
-                </select>
-              </div>
+        <div class="form-grid">
+          <div class="field md-6 sm-6">
+            <label>المشروع <font color="red">*</font></label>
+            <div class="control">
+              <select name="project_id" id="contract_project_id" required>
+                <option value="">— اختر المشروع —</option>
+                <?php foreach ($form_projects as $project): ?>
+                  <option value="<?php echo intval($project['id']); ?>" <?php echo ($project_id > 0 && intval($project['id']) === $project_id) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($project['name'], ENT_QUOTES, 'UTF-8'); ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
             </div>
           </div>
+        </div>
 
-          <hr class="hr" />
+        <hr class="hr" />
 
         <!-- القسم 1: إجماليات الساعات (يومياً وللعقد) -->
         <div class="section-title"><span class="chip">2</span> إجماليات الساعات (يومياً وللعقد)</div>
@@ -645,28 +647,39 @@ include('../insidebar.php');
       </div>
     </div>
   </form>
-  <div class="card">
-    <div class="card-body contracts-table-filter-wrap">
-      <form method="get" action="contracts.php" class="contracts-table-filter-form">
-        <div class="contracts-filter-field">
-          <label class="contracts-filter-label">فلتر المشروع</label>
-          <select name="filter_project_id" id="filter_project_select" class="form-control">
-            <option value="0">كل المشاريع</option>
-            <?php foreach ($projects_filter_options as $project_option_id => $project_option_name): ?>
-              <option value="<?php echo intval($project_option_id); ?>" <?php echo ($filter_project_id === intval($project_option_id)) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($project_option_name, ENT_QUOTES, 'UTF-8'); ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
-        </div>
 
-        <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> تطبيق</button>
-        <a href="contracts.php" class="btn btn-secondary"><i class="fas fa-undo"></i> مسح</a>
-      </form>
+  <form method="get" action="contracts.php">
+  <div class="filter">
+    <div class="filter-title">
+      <span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span>
+      فلاتر البحث
     </div>
+    <div class="filter-body">
+      <div class="filter-field">
+        <label><i class="fa fa-calendar"></i> فلتر المشروع</label>
+        <select name="filter_project_id" id="filter_project_select" class="form-control">
+          <option value="0">كل المشاريع</option>
+          <?php foreach ($projects_filter_options as $project_option_id => $project_option_name): ?>
+            <option value="<?php echo intval($project_option_id); ?>" <?php echo ($filter_project_id === intval($project_option_id)) ? 'selected' : ''; ?>>
+              <?php echo htmlspecialchars($project_option_name, ENT_QUOTES, 'UTF-8'); ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <!-- كرّر .filter-field بقدر ما تريد من الحقول -->
+      <div class="filter-actions">
+        <button type="submit" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
+        <button type="button" class="btn-reset" title="إعادة تعيين"><a href="contracts.php" style="text-decoration: none; color: inherit;"><i
+              class="fa fa-rotate-right"></i></a></button>
+      </div>
+    </div>
+  </div>
+  </form>
 
+  <div class="card">
+    <div class="card-body">
     <!-- أزرار التحكم في المجموعات -->
-    <div class="card-body contracts-group-toolbar-wrap">
+    <div class="card-body">
       <div class="contracts-group-toolbar">
         <span class="contracts-group-toolbar-label">
           <i class="fas fa-filter"></i> عرض المجموعات:
@@ -697,6 +710,8 @@ include('../insidebar.php');
         </button>
       </div>
     </div>
+
+
 
     <div class="card-body contracts-table-wrap table-container">
       <table id="projectsTable" class="display nowrap contracts-table contracts-table-nowrap">
@@ -1013,24 +1028,25 @@ include('../insidebar.php');
           $i = 1;
 
 
-          if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+          if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) {
 
-            // عرض حالة العقد من status
-            $contractStatus = isset($row['status']) ? $row['status'] : 1;
-            $statusColor = 'green';
-            $statusText = 'ساري';
-            if ($contractStatus == 1) {
+              // عرض حالة العقد من status
+              $contractStatus = isset($row['status']) ? $row['status'] : 1;
               $statusColor = 'green';
               $statusText = 'ساري';
-            } else {
-              $statusColor = 'red';
-              $statusText = 'غير ساري';
-            }
-            $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
-            $actions_html = "<div class='action-btns'>";
-            $actions_html .= "<a href='contracts_details.php?id=" . $row['id'] . "' class='action-btn view' title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
-            if ($can_edit) {
-              $actions_html .= "<a href='javascript:void(0)' class='editBtn action-btn edit'
+              if ($contractStatus == 1) {
+                $statusColor = 'green';
+                $statusText = 'ساري';
+              } else {
+                $statusColor = 'red';
+                $statusText = 'غير ساري';
+              }
+              $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
+              $actions_html = "<div class='action-btns'>";
+              $actions_html .= "<a href='contracts_details.php?id=" . $row['id'] . "' class='action-btn view' title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
+              if ($can_edit) {
+                $actions_html .= "<a href='javascript:void(0)' class='editBtn action-btn edit'
              data-id='" . $row['id'] . "'
                data-project_id='" . (isset($row['project_id']) ? intval($row['project_id']) : 0) . "'
              data-contract_signing_date='" . $row['contract_signing_date'] . "'
@@ -1062,66 +1078,67 @@ include('../insidebar.php');
 
              data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'
              title='تعديل'><i class='fas fa-edit'></i></a>";
+              }
+
+              if ($can_delete) {
+                $delete_project_id = $project_id > 0 ? $project_id : intval(isset($row['project_id']) ? $row['project_id'] : 0);
+                $actions_html .= "<a href='contracts.php?id=" . $delete_project_id . "&delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode($contracts_csrf_token) . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></a>";
+              }
+              $actions_html .= "</div>";
+
+
+
+              echo "<tr>";
+              echo "<td class='group-status'>" . $actions_html . "</td>";
+
+              // المعلومات الأساسية
+              echo "<td class='group-basic'> " . $row['id'] . "#</td>";
+              echo "<td class='group-basic'>" . (isset($row['project_name']) && $row['project_name'] !== '' ? $row['project_name'] : '-') . "</td>";
+
+              // التواريخ والمدد
+              echo "<td class='group-dates'>" . $row['contract_signing_date'] . "</td>";
+              echo "<td class='group-dates'>" . (isset($row['grace_period_days']) ? $row['grace_period_days'] : 0) . "</td>";
+              echo "<td class='group-dates'>" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "</td>";
+              echo "<td class='group-dates'>" . $row['actual_start'] . "</td>";
+              echo "<td class='group-dates'>" . $row['actual_end'] . "</td>";
+
+              // الساعات والأهداف
+              echo "<td class='group-hours'>" . $row['hours_monthly_target'] . "</td>";
+              echo "<td class='group-hours'>" . $row['forecasted_contracted_hours'] . "</td>";
+
+              // أطراف العقد
+              echo "<td class='group-parties'>" . (isset($row['first_party']) ? $row['first_party'] : '-') . "</td>";
+              echo "<td class='group-parties'>" . (isset($row['second_party']) ? $row['second_party'] : '-') . "</td>";
+              echo "<td class='group-parties'>" . (isset($row['witness_one']) ? $row['witness_one'] : '-') . "</td>";
+              echo "<td class='group-parties'>" . (isset($row['witness_two']) ? $row['witness_two'] : '-') . "</td>";
+
+              // الخدمات المقدمة
+              $transportationText = isset($row['transportation']) && $row['transportation'] ? $row['transportation'] : '-';
+              $accommodationText = isset($row['accommodation']) && $row['accommodation'] ? $row['accommodation'] : '-';
+              $place_for_livingText = isset($row['place_for_living']) && $row['place_for_living'] ? $row['place_for_living'] : '-';
+              $workshopText = isset($row['workshop']) && $row['workshop'] ? $row['workshop'] : '-';
+
+              echo "<td class='group-services'>" . $transportationText . "</td>";
+              echo "<td class='group-services'>" . $accommodationText . "</td>";
+              echo "<td class='group-services'>" . $place_for_livingText . "</td>";
+              echo "<td class='group-services'>" . $workshopText . "</td>";
+
+              // التشغيل اليومي
+              echo "<td class='group-operations'>" . (isset($row['daily_work_hours']) ? $row['daily_work_hours'] : '-') . "</td>";
+              echo "<td class='group-operations'>" . (isset($row['daily_operators']) ? $row['daily_operators'] : '-') . "</td>";
+
+              // البيانات المالية
+              echo "<td class='group-basic'>" . (isset($row['price_currency_contract']) && $row['price_currency_contract'] ? $row['price_currency_contract'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . (isset($row['paid_contract']) && $row['paid_contract'] ? $row['paid_contract'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . (isset($row['payment_time']) && $row['payment_time'] ? $row['payment_time'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . (isset($row['guarantees']) && $row['guarantees'] ? $row['guarantees'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . (isset($row['payment_date']) && $row['payment_date'] ? $row['payment_date'] : '-') . "</td>";
+
+              // الحالة والإجراءات
+              echo "<td class='group-status'>" . $status . "</td>";
+              echo "</tr>";
             }
-
-            if ($can_delete) {
-              $delete_project_id = $project_id > 0 ? $project_id : intval(isset($row['project_id']) ? $row['project_id'] : 0);
-              $actions_html .= "<a href='contracts.php?id=" . $delete_project_id . "&delete_id=" . intval($row['id']) . "&csrf_token=" . urlencode($contracts_csrf_token) . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></a>";
-            }
-            $actions_html .= "</div>";
-
-
-
-            echo "<tr>";
-            echo "<td class='group-status'>" . $actions_html . "</td>";
-
-            // المعلومات الأساسية
-            echo "<td class='group-basic'> " . $row['id'] . "#</td>";
-            echo "<td class='group-basic'>" . (isset($row['project_name']) && $row['project_name'] !== '' ? $row['project_name'] : '-') . "</td>";
-
-            // التواريخ والمدد
-            echo "<td class='group-dates'>" . $row['contract_signing_date'] . "</td>";
-            echo "<td class='group-dates'>" . (isset($row['grace_period_days']) ? $row['grace_period_days'] : 0) . "</td>";
-            echo "<td class='group-dates'>" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "</td>";
-            echo "<td class='group-dates'>" . $row['actual_start'] . "</td>";
-            echo "<td class='group-dates'>" . $row['actual_end'] . "</td>";
-
-            // الساعات والأهداف
-            echo "<td class='group-hours'>" . $row['hours_monthly_target'] . "</td>";
-            echo "<td class='group-hours'>" . $row['forecasted_contracted_hours'] . "</td>";
-
-            // أطراف العقد
-            echo "<td class='group-parties'>" . (isset($row['first_party']) ? $row['first_party'] : '-') . "</td>";
-            echo "<td class='group-parties'>" . (isset($row['second_party']) ? $row['second_party'] : '-') . "</td>";
-            echo "<td class='group-parties'>" . (isset($row['witness_one']) ? $row['witness_one'] : '-') . "</td>";
-            echo "<td class='group-parties'>" . (isset($row['witness_two']) ? $row['witness_two'] : '-') . "</td>";
-
-            // الخدمات المقدمة
-            $transportationText = isset($row['transportation']) && $row['transportation'] ? $row['transportation'] : '-';
-            $accommodationText = isset($row['accommodation']) && $row['accommodation'] ? $row['accommodation'] : '-';
-            $place_for_livingText = isset($row['place_for_living']) && $row['place_for_living'] ? $row['place_for_living'] : '-';
-            $workshopText = isset($row['workshop']) && $row['workshop'] ? $row['workshop'] : '-';
-
-            echo "<td class='group-services'>" . $transportationText . "</td>";
-            echo "<td class='group-services'>" . $accommodationText . "</td>";
-            echo "<td class='group-services'>" . $place_for_livingText . "</td>";
-            echo "<td class='group-services'>" . $workshopText . "</td>";
-
-            // التشغيل اليومي
-            echo "<td class='group-operations'>" . (isset($row['daily_work_hours']) ? $row['daily_work_hours'] : '-') . "</td>";
-            echo "<td class='group-operations'>" . (isset($row['daily_operators']) ? $row['daily_operators'] : '-') . "</td>";
-
-            // البيانات المالية
-            echo "<td class='group-basic'>" . (isset($row['price_currency_contract']) && $row['price_currency_contract'] ? $row['price_currency_contract'] : '-') . "</td>";
-            echo "<td class='group-basic'>" . (isset($row['paid_contract']) && $row['paid_contract'] ? $row['paid_contract'] : '-') . "</td>";
-            echo "<td class='group-basic'>" . (isset($row['payment_time']) && $row['payment_time'] ? $row['payment_time'] : '-') . "</td>";
-            echo "<td class='group-basic'>" . (isset($row['guarantees']) && $row['guarantees'] ? $row['guarantees'] : '-') . "</td>";
-            echo "<td class='group-basic'>" . (isset($row['payment_date']) && $row['payment_date'] ? $row['payment_date'] : '-') . "</td>";
-
-            // الحالة والإجراءات
-            echo "<td class='group-status'>" . $status . "</td>";
-            echo "</tr>";
-          } }
+          }
           ?>
         </tbody>
       </table>
@@ -1227,13 +1244,38 @@ include('../insidebar.php');
     transition: all .2s ease;
   }
 
-  #projectsTable .action-btn.view { background: rgba(232, 184, 0, .18); color: #9a7b00; }
-  #projectsTable .action-btn.edit { background: rgba(12, 28, 62, .08); color: #0c1c3e; }
-  #projectsTable .action-btn.delete { background: rgba(220, 38, 38, .12); color: #b91c1c; }
+  #projectsTable .action-btn.view {
+    background: rgba(232, 184, 0, .18);
+    color: #9a7b00;
+  }
 
-  #projectsTable .action-btn.view:hover { background: #e8b800; color: #0c1c3e; transform: translateY(-2px); }
-  #projectsTable .action-btn.edit:hover { background: #0c1c3e; color: #fff; transform: translateY(-2px); }
-  #projectsTable .action-btn.delete:hover { background: #dc2626; color: #fff; transform: translateY(-2px); }
+  #projectsTable .action-btn.edit {
+    background: rgba(12, 28, 62, .08);
+    color: #0c1c3e;
+  }
+
+  #projectsTable .action-btn.delete {
+    background: rgba(220, 38, 38, .12);
+    color: #b91c1c;
+  }
+
+  #projectsTable .action-btn.view:hover {
+    background: #e8b800;
+    color: #0c1c3e;
+    transform: translateY(-2px);
+  }
+
+  #projectsTable .action-btn.edit:hover {
+    background: #0c1c3e;
+    color: #fff;
+    transform: translateY(-2px);
+  }
+
+  #projectsTable .action-btn.delete:hover {
+    background: #dc2626;
+    color: #fff;
+    transform: translateY(-2px);
+  }
 </style>
 
 <script>
@@ -1553,7 +1595,7 @@ include('../insidebar.php');
 
 
   // تعبئة الفورم عند التعديل
-    $(document).on("click", ".editBtn", function () {
+  $(document).on("click", ".editBtn", function () {
     $("#projectForm").addClass('allforms-visible');
     $("#contract_id").val($(this).data("id"));
 
@@ -1810,7 +1852,9 @@ include('../insidebar.php');
   })();
 </script>
 
-<?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
+<?php if (function_exists('ems_excel_render')) {
+  ems_excel_render();
+} ?>
 </body>
 
 </html>
