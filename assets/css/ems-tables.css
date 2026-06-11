@@ -464,9 +464,9 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
 }
 .ems-site .main .btn-group-toggle:hover,
 .ems-site .main .btn-group-toggle-all:hover {
-    background: #7d7d7d !important;
+    background: #D9AB32 !important;
     border-color: #D9AB32 !important;
-    color: #ffffff !important;
+    color: #000 !important;
 }
 .ems-site .main .btn-group-toggle.active,
 .ems-site .main .btn-group-toggle-all.active {
