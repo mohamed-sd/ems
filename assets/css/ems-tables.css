@@ -383,8 +383,8 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
    COLUMN-GROUP TOGGLE BUTTONS — SINGLE SOURCE OF TRUTH
    Used by the unified feature (assets/js/column-groups.js) on
    all 8 group pages. Do NOT redefine .btn-group-toggle elsewhere.
-   - inactive: light gray (NOT white)
-   - active  : dark-yellow gradient
+   - inactive: gray #6d6d6d (white text)
+   - active  : solid site-gold #D9AB32 (dark text)
    ============================================================ */
 .btn-group-toggle {
     display: inline-flex;
@@ -392,9 +392,9 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
     gap: 6px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1.5px solid #D7DBE0 !important;
-    background: #F1F2F4 !important;
-    color: #5A6270 !important;
+    border: 1.5px solid #6d6d6d !important;
+    background: #6d6d6d !important;
+    color: #000 !important;
     font-weight: 700;
     font-size: 0.85rem;
     cursor: pointer;
@@ -404,21 +404,21 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
 
 .btn-group-toggle:hover {
     border-color: #D9AB32 !important;
-    color: #2A2010 !important;
-    background: #ECEDEF !important;
+    color: #ffffff !important;
+    background: #7d7d7d !important;
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
 .btn-group-toggle.active {
-    background: linear-gradient(135deg, #D9AB32 0%, #C2941C 100%) !important;
+    background: #f5c64f !important;
     color: #2A2010 !important;
-    border-color: #B0851A !important;
+    border-color: #C2941C !important;
     box-shadow: var(--shadow-md);
 }
 
 .btn-group-toggle.active:hover {
-    background: linear-gradient(135deg, #C2941C 0%, #B0851A 100%) !important;
+    background: #e8b637 !important;
     color: #2A2010 !important;
 }
 
@@ -428,9 +428,9 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
     gap: 6px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1.5px solid #D7DBE0 !important;
-    background: #F1F2F4 !important;
-    color: #5A6270 !important;
+    border: 1.5px solid #6d6d6d !important;
+    background: #6d6d6d !important;
+    color: #000 !important;
     font-weight: 700;
     cursor: pointer;
     font-size: 0.85rem;
@@ -441,16 +441,16 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
 
 .btn-group-toggle-all:hover {
     border-color: #D9AB32 !important;
-    color: #2A2010 !important;
-    background: #ECEDEF !important;
+    color: #000 !important;
+    background: #7d7d7d !important;
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
 .btn-group-toggle-all.active {
-    background: linear-gradient(135deg, #D9AB32 0%, #C2941C 100%) !important;
+    background: #D9AB32 !important;
     color: #2A2010 !important;
-    border-color: #B0851A !important;
+    border-color: #C2941C !important;
     box-shadow: var(--shadow-md);
 }
 
@@ -458,21 +458,21 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
       الذي كان يطمس ألوان أزرار المجموعات وحالة active. نرفع التخصيص بـ .ems-site .main ── */
 .ems-site .main .btn-group-toggle,
 .ems-site .main .btn-group-toggle-all {
-    background: #F1F2F4 !important;
-    color: #5A6270 !important;
-    border: 1.5px solid #D7DBE0 !important;
+    background: #e6e6e6 !important;
+    color: #000 !important;
+    border: 1.5px solid #6d6d6d !important;
 }
 .ems-site .main .btn-group-toggle:hover,
 .ems-site .main .btn-group-toggle-all:hover {
-    background: #ECEDEF !important;
+    background: #7d7d7d !important;
     border-color: #D9AB32 !important;
-    color: #2A2010 !important;
+    color: #ffffff !important;
 }
 .ems-site .main .btn-group-toggle.active,
 .ems-site .main .btn-group-toggle-all.active {
-    background: linear-gradient(135deg, #D9AB32 0%, #C2941C 100%) !important;
+    background: #D9AB32 !important;
     color: #2A2010 !important;
-    border-color: #B0851A !important;
+    border-color: #C2941C !important;
 }
 
 /* ========== PRINT STYLES ========== */
