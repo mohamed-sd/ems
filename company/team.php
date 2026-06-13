@@ -280,6 +280,7 @@ $csrf = generate_csrf_token();
         @media(max-width:900px){.grid{grid-template-columns:1fr}}
     </style>
     <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
+    <link rel="stylesheet" href="/ems/assets/css/ems-forms.css">
 </head>
 <body class="standalone-brand">
 <div class="wrap">
@@ -296,7 +297,7 @@ $csrf = generate_csrf_token();
             <?php if ($ok !== ''): ?><div class="alert ok"><?php echo e($ok); ?></div><?php endif; ?>
             <?php if ($error !== ''): ?><div class="alert err"><?php echo e($error); ?></div><?php endif; ?>
 
-            <form method="post" action="" autocomplete="off">
+            <form method="post" action="" autocomplete="off" class="ems-form auth-form">
                 <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
 
                 <div class="field"><label for="name">الاسم الكامل *</label><input id="name" name="name" required maxlength="150" value="<?php echo isset($_POST['name']) ? e($_POST['name']) : ''; ?>"></div>
@@ -452,7 +453,7 @@ $csrf = generate_csrf_token();
         <h3 style="margin:0 0 18px;color:#102443;font-size:1.1rem;">تعديل بيانات المستخدم</h3>
         <div id="editAlert" style="display:none;padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:.9rem;"></div>
 
-        <form id="editForm" method="post" action="" autocomplete="off">
+        <form id="editForm" method="post" action="" autocomplete="off" class="ems-form auth-form">
             <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
             <input type="hidden" name="action" value="edit_user">
             <input type="hidden" name="edit_user_id" id="edit_user_id">

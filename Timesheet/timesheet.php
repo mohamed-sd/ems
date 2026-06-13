@@ -403,7 +403,7 @@ if ($type !== "1" && $type !== "2" && $type !== "3") {
 
 $page_title = "إيكوبيشن | ساعات العمل ";
 include("../inheader.php");
-// include('../insidebar.php');
+include('../insidebar.php');
 // تحديد النوع من الرابط (إن وجد)
 $type_filter = "";
 if ($type != "") {

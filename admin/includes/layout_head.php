@@ -409,6 +409,10 @@ textarea.form-ctrl { resize: vertical; min-height: 80px; }
     .phead { flex-direction: column; }
 }
 </style>
+<!-- Unified Form Styles — single authoritative source for all form design (loaded after the inline block so it wins) -->
+<link rel="stylesheet" href="/ems/assets/css/ems-forms.css<?php $__emsf=__DIR__.'/../../assets/css/ems-forms.css'; echo is_file($__emsf)?('?v='.filemtime($__emsf)):''; ?>">
+<!-- Unified Custom Select dropdown for forms -->
+<script src="/ems/assets/js/ems-select.js<?php $__emsjs2=__DIR__.'/../../assets/js/ems-select.js'; echo is_file($__emsjs2)?('?v='.filemtime($__emsjs2)):''; ?>" defer></script>
 </head>
 <body>
 <div class="layout">

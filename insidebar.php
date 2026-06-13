@@ -27,7 +27,8 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       '/ems/assets/css/local-fonts.css',
       '/ems/assets/css/design-tokens.css',
       '/ems/assets/css/ems.main.all.style.css<?php echo $__sb_ver('ems.main.all.style.css'); ?>',
-      '/ems/assets/css/ems-tables.css<?php echo $__sb_ver('ems-tables.css'); ?>'
+      '/ems/assets/css/ems-tables.css<?php echo $__sb_ver('ems-tables.css'); ?>',
+      '/ems/assets/css/ems-forms.css<?php echo $__sb_ver('ems-forms.css'); ?>'
     ];
 
     cssFiles.forEach(function (href) {
@@ -43,6 +44,13 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       script.src = '/ems/assets/js/ui-unification.js';
       script.defer = true;
       head.appendChild(script);
+    }
+
+    if (!document.querySelector('script[src^="/ems/assets/js/ems-select.js"]')) {
+      var emsSelectScript = document.createElement('script');
+      emsSelectScript.src = '/ems/assets/js/ems-select.js';
+      emsSelectScript.defer = true;
+      head.appendChild(emsSelectScript);
     }
 
     if (document.body) {
@@ -330,7 +338,34 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
   </a> -->
 </div>
 
+<style>
+/* الصفحة الحالية في الشريط الجانبي — لون الأيقونة والاسم #E0AE2E (عدا عدّاد الرقم) */
+.ems-site .sidebar ul li.active > a,
+.ems-site .sidebar ul li.active > a .sidebar-link-text,
+.ems-site .sidebar ul li.active > a span:not(.nav-count-badge) { color: #E0AE2E !important; }
+.ems-site .sidebar ul li.active > a i { color: #E0AE2E !important; }
+/* عدّاد الرقم (الرسائل/الاعتمادات) يبقى أبيض دائماً (عادي + hover + active) كي يظل ظاهراً */
+.ems-site .sidebar ul li .nav-count-badge,
+.ems-site .sidebar ul li:hover .nav-count-badge,
+.ems-site .sidebar ul li.active .nav-count-badge { color: #fff !important; }
+</style>
+
 <script>
+  // تحديد الصفحة المفتوحة حالياً في الشريط الجانبي (تلوين أيقونتها واسمها)
+  (function () {
+    var sb = document.getElementById('sidebar');
+    if (sb) {
+      var current = (window.location.pathname || '').replace(/\/+$/, '').toLowerCase();
+      sb.querySelectorAll('li a[href]').forEach(function (a) {
+        var p = (a.pathname || '').replace(/\/+$/, '').toLowerCase();
+        if (p && p === current) {
+          var li = a.closest('li');
+          if (li) li.classList.add('active');
+        }
+      });
+    }
+  })();
+
   const sidebar       = document.getElementById('sidebar');
   const toggleBtn     = document.getElementById('toggleBtn');
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');

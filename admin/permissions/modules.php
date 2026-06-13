@@ -383,7 +383,7 @@ input[type="radio"] {
     <?php endif; ?>
 
     <!-- نموذج إضافة / تعديل -->
-    <form id="moduleForm" action="" method="post">
+    <form id="moduleForm" action="" method="post" class="ems-form">
         <div class="card">
             <div class="card-header">
                 <h5 style="margin: 0;">

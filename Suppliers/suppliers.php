@@ -526,7 +526,7 @@ include '../insidebar.php';
                                 <option value="معفى من التسجيل">معفى من التسجيل</option>
                             </select>
                         </div>
-                        <div class="form-group allforms-span-full">
+                        <div class="form-group">
                             <label>العنوان الكامل</label>
                             <textarea name="full_address" id="full_address" rows="3"></textarea>
                         </div>

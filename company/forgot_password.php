@@ -48,6 +48,7 @@ $csrf = generate_csrf_token();
         a { color:#30527f; text-decoration:none; font-weight:700; font-size:.88rem; }
     </style>
     <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
+    <link rel="stylesheet" href="/ems/assets/css/ems-forms.css">
 </head>
 <body class="standalone-brand">
     <div class="card">
@@ -57,7 +58,7 @@ $csrf = generate_csrf_token();
         <?php if ($message !== ''): ?><div class="alert ok"><?php echo e($message); ?></div><?php endif; ?>
         <?php if ($error !== ''): ?><div class="alert err"><?php echo e($error); ?></div><?php endif; ?>
 
-        <form method="post" action="">
+        <form method="post" action="" class="ems-form auth-form">
             <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
             <label for="email">البريد الإلكتروني</label>
             <input type="email" id="email" name="email" maxlength="150" required value="<?php echo isset($_POST['email']) ? e($_POST['email']) : ''; ?>">

@@ -463,15 +463,6 @@
 /* ══════════════════════════════════
    FORM HELPERS
 ══════════════════════════════════ */
-.form-grid-full { grid-column: 1 / -1; }
-
-.form-actions {
-    grid-column: 1 / -1;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-
 .text-center { text-align: center; }
 
 .is-hidden { display: none; }
@@ -639,28 +630,6 @@
 /* ══════════════════════════════════
    FORM GRID
 ══════════════════════════════════ */
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
-}
-.form-grid > div {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-.form-grid label {
-    font-size: .7rem;
-    font-weight: 700;
-    color: var(--sub);
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    font-family: 'Cairo', sans-serif;
-}
-.form-grid label i { color: var(--gold); margin-left: 4px; }
-
-.form-grid input,
-.form-grid select,
 .form-control {
     padding: 10px 14px;
     border: 1.5px solid var(--border);
@@ -673,18 +642,13 @@
     outline: none;
     font-family: 'Cairo', sans-serif;
 }
-.form-grid input:focus,
-.form-grid select:focus,
 .form-control:focus {
     border-color: var(--gold);
     background: #fff;
     box-shadow: 0 0 0 3px rgba(232,184,0,.14);
 }
-.form-grid input::placeholder { color: #b0bac9; font-weight: 400; }
 
 /* Buttons in forms */
-.form-grid button[type="submit"],
-.form-grid button[type="reset"],
 .btn {
     border-radius: 50px;
     padding: 10px 24px;
@@ -700,32 +664,26 @@
     font-family: 'Cairo', sans-serif;
 }
 
-.form-grid button[type="submit"],
 .btn-success {
     background: linear-gradient(135deg, var(--brand-black), var(--brand-black-soft));
     color: #fff;
     box-shadow: 0 4px 16px rgba(26,26,26,.22);
 }
-.form-grid button[type="submit"]:hover,
 .btn-success:hover {
     transform: translateY(-2px);
     box-shadow: 0 7px 22px rgba(26,26,26,.28);
 }
 
-.form-grid button[type="reset"],
 .btn-secondary {
     background: linear-gradient(135deg, #6c757d, #545b62);
     color: #fff;
     box-shadow: 0 4px 16px rgba(108,117,125,.22);
 }
-.form-grid button[type="reset"]:hover,
 .btn-secondary:hover {
     transform: translateY(-2px);
     box-shadow: 0 7px 22px rgba(108,117,125,.28);
 }
 
-#clientForm,
-#projectForm { animation: fadeIn .4s ease; }
 
 /* Button Container */
 div[style*="flex"][style*="gap"][style*="margin-top"] {
@@ -927,29 +885,6 @@ table.dataTable.no-footer { border: none !important; }
 /* ══════════════════════════════════
    FORM SECTION HEADERS
 ══════════════════════════════════ */
-.form-section-header {
-    grid-column: 1 / -1;
-    background: linear-gradient(135deg, var(--navy) 0%, rgba(12,28,62,.8) 100%);
-    color: white;
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-top: 15px;
-    border-right: 4px solid var(--gold);
-}
-
-.form-section-header h6 {
-    margin: 0;
-    font-weight: 700;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.form-section-header i {
-    color: var(--gold);
-    font-size: 1.1rem;
-}
 
 .info-label {
     font-weight: 700;
@@ -1838,61 +1773,8 @@ table.dataTable.no-footer { border: none !important; }
     .page-title {
         font-size: 1.15rem;
     }
-    .form-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
 }
 
-/* ══════════════════════════════════
-   SUBMIT & CANCEL BUTTONS STYLES
-══════════════════════════════════ */
-.btn-submit {
-    background: linear-gradient(135deg, var(--navy), var(--navy-l));
-    color: #fff;
-    padding: 11px 26px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: .85rem;
-    border: none;
-    cursor: pointer;
-    transition: all var(--ease);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'Cairo', sans-serif;
-    box-shadow: 0 4px 16px rgba(12,28,62,.22);
-}
-.btn-submit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 7px 22px rgba(12,28,62,.28);
-}
-.btn-submit:active {
-    transform: translateY(0);
-}
-
-.btn-cancel {
-    background: linear-gradient(135deg, #6c757d, #545b62);
-    color: #fff;
-    padding: 11px 26px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: .85rem;
-    border: none;
-    cursor: pointer;
-    transition: all var(--ease);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'Cairo', sans-serif;
-    box-shadow: 0 4px 16px rgba(108,117,125,.22);
-}
-.btn-cancel:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 7px 22px rgba(108,117,125,.28);
-}
-.btn-cancel:active {
-    transform: translateY(0);
-}
 
 .action-btn.history {
     background: rgba(111,66,193,.12);
@@ -1943,9 +1825,6 @@ table.dataTable.no-footer { border: none !important; }
     .page-header {
         flex-direction: column;
         align-items: flex-start;
-    }
-    .form-grid {
-        grid-template-columns: 1fr;
     }
     .modal-content {
         width: 95%;

@@ -44,12 +44,16 @@ if (!function_exists('ems_css_ver')) {
     <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css<?php echo ems_css_ver('ems.main.all.style.css'); ?>">
     <!-- Unified Table Styles — loaded LAST so ems-tables.css is the single authoritative source for all table design -->
     <link rel="stylesheet" href="/ems/assets/css/ems-tables.css<?php echo ems_css_ver('ems-tables.css'); ?>">
+    <!-- Unified Form Styles — loaded LAST so ems-forms.css is the single authoritative source for ALL form design -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-forms.css<?php echo ems_css_ver('ems-forms.css'); ?>">
     <script src="../assets/js/performance-boost.js" defer></script>
     <script src="/ems/assets/js/ui-unification.js" defer></script>
     <!-- Unified column-groups show/hide (activated per-page via EmsColumnGroups.init) -->
     <script src="/ems/assets/js/column-groups.js" defer></script>
     <!-- Unified Details/View Modal System (نظام نافذة العرض الموحّد) -->
     <script src="/ems/assets/js/ems-details-modal.js" defer></script>
+    <!-- Unified Custom Select dropdown for forms (نظام القوائم المنسدلة الموحّد) -->
+    <script src="/ems/assets/js/ems-select.js<?php $__emsjs=__DIR__.'/assets/js/ems-select.js'; echo is_file($__emsjs)?('?v='.filemtime($__emsjs)):''; ?>" defer></script>
     <!-- Bootstrap Bundle JS (local, CSP-safe) -->
     <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 

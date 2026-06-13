@@ -415,77 +415,6 @@ body {
   background-color: var(--equipation-gold);
 }
 
-/* ================== Project Form ================== */
-#projectForm {
-  display: none;
-  margin-bottom: 10px;
-  background: var(--light-gray);
-  /* padding: 25px; */
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s ease-in-out;
-}
-
-#projectForm h3 {
-  font-size: 22px;
-  margin-bottom: 0px;
-  font-weight: 800;
-  color: var(--btn-color);
-  text-align: center;
-}
-
-#projectForm .form-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  /* Desktop: 4 في الصف */
-  gap: 20px;
-}
-
-#projectForm label {
-  font-weight: 600;
-  margin-bottom: 6px;
-  display: block;
-  color: var(--text-color);
-}
-
-#projectForm input,
-#projectForm select,
-#projectForm textarea {
-  padding: 12px 14px;
-  width: 100%;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 15px;
-  transition: border 0.3s, box-shadow 0.3s;
-  text-align: center;
-}
-
-#projectForm input:focus,
-#projectForm select:focus,
-#projectForm textarea:focus {
-  border-color: var(--btn-color);
-  box-shadow: 0 0 5px rgba(255, 170, 51, 0.5);
-  outline: none;
-  text-align: center;
-}
-
-#projectForm button {
-  grid-column: span 5;
-  /* زر ياخذ صف كامل */
-  padding: 10px;
-  background: var(--btn-color);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;
-  color: #000;
-  transition: background 0.3s;
-}
-
-#projectForm button:hover {
-  background-color: var(--btn-hover);
-}
 
 
 /* ================== Reports Table ================== */
@@ -601,15 +530,6 @@ table {
     background: #d4a800;
   }
 
-  #projectForm .form-grid {
-    grid-template-columns: 1fr;
-    /* جوال: عنصر واحد في الصف */
-  }
-
-  #projectForm button {
-    grid-column: span 1;
-    /* زر ياخذ صف واحد */
-  }
 
 
 }

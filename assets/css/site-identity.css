@@ -295,11 +295,12 @@ textarea,
 .form-control,
 .form-select,
 .dataTables_filter input {
-  border: 1px solid #d4dce8 !important;
-  border-radius: 10px !important;
+  border: 1px solid #999999 !important;
+  border-radius: 16px !important;
   background: #ffffff !important;
   min-height: 40px;
 }
+textarea, .form-control[rows] { border-radius: 16px !important; }
 
 input:focus,
 select:focus,

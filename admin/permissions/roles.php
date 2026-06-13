@@ -283,7 +283,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
     <?php endif; ?>
 
     <!-- نموذج إضافة / تعديل -->
-    <form id="roleForm" action="" method="post">
+    <form id="roleForm" action="" method="post" class="ems-form">
         <div class="card">
             <div class="card-header">
                 <h5 style="margin: 0;">

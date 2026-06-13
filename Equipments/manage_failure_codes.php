@@ -224,7 +224,7 @@ $stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
 
     <!-- ══ نموذج الإضافة / التعديل ══ -->
     <?php if ($can_add): ?>
-    <div class="card <?= ($edit_data || $error_msg) ? '' : 'fc-hidden' ?>" id="addEditCard">
+    <div class="card ems-form <?= ($edit_data || $error_msg) ? '' : 'fc-hidden' ?>" id="addEditCard">
         <div class="card-header">
             <h5>
                 <i class="fas fa-<?= $edit_data ? 'edit' : 'plus-circle' ?>"></i>
@@ -237,7 +237,7 @@ $stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
                     <input type="hidden" name="edit_id" value="<?= intval($edit_data['id']) ?>">
                 <?php endif; ?>
 
-                <div class="fc-form-grid">
+                <div class="form-grid">
 
                     <!-- نوع المعدة -->
                     <div>
@@ -313,11 +313,11 @@ $stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
                     </div>
 
                     <!-- أزرار -->
-                    <div class="span3 fc-form-actions">
-                        <button type="submit" class="btn btn-primary">
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
                             <i class="fas fa-save"></i> <?= $edit_data ? 'حفظ التعديلات' : 'إضافة الكود' ?>
                         </button>
-                        <a href="manage_failure_codes.php" class="btn btn-light border">
+                        <a href="manage_failure_codes.php" class="btn-cancel">
                             <i class="fas fa-times"></i> إلغاء
                         </a>
                     </div>

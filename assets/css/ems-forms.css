@@ -1,0 +1,840 @@
+/* ════════════════════════════════════════════════════════════════════════
+   ems-forms.css — المصدر الوحيد لتصميم كل الفورمات في نظام EMS
+   ------------------------------------------------------------------------
+   SINGLE SOURCE OF TRUTH for every add/edit form across the whole system.
+   Loaded LAST (after ems.main.all.style.css / ems-tables.css) so it is the
+   authoritative layer — no form design lives anywhere else.
+
+   Hooks (deliberately separated):
+     • .allforms  → SKIN + visibility (display:none by default, shown via
+                    .allforms-visible). On every Group-A app form.
+     • .ems-form  → SKIN ONLY (no hide). On admin-portal + auth/public forms
+                    + inverted-structure forms where the class is on the card.
+     Skin targets :is(.allforms, .ems-form); visibility is .allforms-only.
+
+   Field-markup variants supported:
+     .form-grid > div   |   .form-group   |   .field > .control > input
+
+   Self-contained tokens so it also styles admin/auth pages that don't load
+   ems.main.all.style.css.
+══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    --emsf-yellow: #f4c542;
+    --emsf-yellow-d: #eab92f;
+    --emsf-panel: #e6e6e6;
+    --emsf-field-bg: #ffffff;
+    --emsf-field-bdr: #999999;
+    --emsf-pill-bg: #ddd;
+    --emsf-pill-txt: #2b2f36;
+    --emsf-ico: #1e3a5f;
+    --emsf-text: #1f2227;
+    --emsf-radius: 16px; /* حواف الحقول مستديرة باعتدال */
+}
+
+/* ── 0) الإظهار/الإخفاء — على .allforms فقط ──────────────────────────────── */
+.allforms {
+    display: none;
+}
+.allforms.allforms-visible {
+    display: block;
+}
+
+.allforms,
+.ems-form {
+    margin-bottom: 20px;
+    counter-reset: emsf-step;
+}
+.allforms.allforms-visible,
+.ems-form {
+    animation: emsfSlideIn 0.32s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes emsfSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── 1) صندوق الفورم — لوح رمادي مستدير ───────────────────────────────────── */
+:is(.allforms, .ems-form) .card,
+.allforms.card,
+.ems-form.card {
+    background: var(--emsf-panel) !important;
+    border: 1px solid #e3e6ea !important;
+    border-radius: 18px !important;
+    box-shadow: 0 6px 22px rgba(20, 24, 31, 0.07) !important;
+    overflow: visible !important;
+}
+:is(.allforms, .ems-form) .card-body,
+.allforms.card .card-body,
+.ems-form.card .card-body {
+    background: #f1f1f1 !important;
+    background-image: none !important;
+    padding: 30px 24px 24px !important;
+    position: relative; /* يفعّل z-index كي يطغى الجسم على العنوان */
+    z-index: 1000;
+    margin-top: -20px !important; /* يُسحب الجسم لأعلى ليغطّي أسفل العنوان (قيمة التداخل) */
+}
+
+/* ── 2) ترويسة الفورم → تبويب ذهبي خلف جسم الفورم ─────────────────────────── */
+:is(.allforms, .ems-form) .card-header {
+    width: 300px !important;
+    min-width: 300px !important;
+    border-bottom: none !important;
+    padding: 0 2px 0 !important; /* لا فراغ أسفل العنوان كي يتداخل الجسم معه */
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start !important;
+    gap: 10px;
+    border: none;
+}
+:is(.allforms, .ems-form) .card-header h5,
+:is(.allforms, .ems-form) .card-header h4,
+:is(.allforms, .ems-form) .card-header h3 {
+    margin: 0 !important;
+    background-color: var(--emsf-yellow) !important;
+    color: #1f1f1f !important;
+    width: 350px !important;
+    max-width: 100%;
+    padding: 2px 20px 20px !important;
+    border-radius: 20px 20px 0 0 !important;
+    font-weight: 500 !important;
+    font-size: 20px !important;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    z-index: 1; /* أقل من الجسم (1000) فيظهر خلفه */
+}
+:is(.allforms, .ems-form) .card-header :is(h5, h4, h3) i {
+    color: #1f1f1f !important;
+}
+
+/* ── 3) عناوين الأقسام — أيقونة محاطة يمين + نص أسود + شارة رقم محاطة يسار ─────
+   (يطابق الصورة: خلفيات بيضاء، حدود/نص/أيقونات سوداء، حواف دائرية) ──────────── */
+:is(.allforms, .ems-form) .form-section,
+:is(.allforms, .ems-form) .form-section-header {
+    counter-increment: emsf-step;
+}
+:is(.allforms, .ems-form) .form-section {
+    margin-bottom: 22px;
+}
+:is(.allforms, .ems-form) .form-section > h6,
+:is(.allforms, .ems-form) .form-section-header,
+:is(.allforms, .ems-form) .form-section-header > h6 {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    background: #fff !important;
+    border: solid #999 1px !important;
+    border-radius: 20px !important;
+    padding: 5px;
+    color: #000 !important;
+    font-size: 1.05rem;
+    margin: 0 0 16px 0 !important;
+    font-weight: 800;
+}
+/* الأيقونة محاطة بصندوق أبيض مستدير بحدّ أسود (أقصى اليمين) */
+:is(.allforms, .ems-form) .form-section > h6 i,
+:is(.allforms, .ems-form) .form-section-header > h6 i,
+:is(.allforms, .ems-form) .form-section-header > i {
+    /* display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 40px !important;
+    height: 40px !important;
+    flex-shrink: 0;
+    background: #fff !important;
+    border: 1.5px solid #000 !important;
+    border-radius: 12px !important;
+    color: #000 !important;
+    font-size: 1rem !important; */
+    width: 30px !important;
+    hight: 30px !important;
+    border: 1px solid #999 !important;
+    padding: 5px !important;
+    border-radius: 20px !important;
+}
+/* شارة الرقم (مثل 02) أقصى اليسار — صندوق أبيض بحدّ أسود */
+:is(.allforms, .ems-form) .form-section > h6::after,
+:is(.allforms, .ems-form) .form-section-header::after {
+    content: counter(emsf-step, decimal-leading-zero);
+    margin-right: auto; /* يدفع الشارة لأقصى اليسار */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    background: #fff;
+    border: 1.5px solid #000;
+    border-radius: 12px;
+    padding: 8px 16px;
+    line-height: 1;
+    width: 30px !important;
+    hight: 30px !important;
+    border: 1px solid #999 !important;
+    padding: 5px !important;
+    border-radius: 20px !important;
+    font-weight: 400;
+    font-size: 1rem !important;
+}
+
+/* ── 4) شبكة الحقول (flexbox) — 5 في الصف، والحقل الأخير يملأ بقية الصف الأخير ─
+   flexbox بدل grid كي يتمكّن :last-child من التمدّد (flex-grow) لملء الفراغ في
+   الصف الأخير غير المكتمل، فلا تبقى مساحات فارغة. ───────────────────────────── */
+:is(.allforms, .ems-form) .form-grid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 3px 14px !important;                          /* row-gap 3px · column-gap 14px */
+    align-items: flex-start;
+}
+:is(.allforms, .ems-form) .form-grid > * {
+    flex: 0 1 calc((100% - 56px) / 5) !important;      /* 5 أعمدة (4 فجوات × 14px) */
+    min-width: 0;
+}
+/* الحقل الأخير وحده يتمدّد لملء الفراغ في الصف الأخير غير المكتمل */
+:is(.allforms, .ems-form) .form-grid > *:last-child {
+    flex-grow: 1 !important;
+}
+/* صفّ الأزرار / العناصر الممتدّة داخل الشبكة تبقى بعرض كامل */
+:is(.allforms, .ems-form) .form-grid > .form-actions,
+:is(.allforms, .ems-form) .form-grid > .pu-form-actions,
+:is(.allforms, .ems-form) .form-grid > .form-actions-row {
+    flex-basis: 100% !important;
+    flex-grow: 1 !important;
+}
+@media (min-width: 992px) and (max-width: 1366px) {
+    :is(.allforms, .ems-form) .form-grid > * {
+        flex-basis: calc((100% - 42px) / 4) !important;   /* 4 أعمدة (3 فجوات) */
+    }
+}
+@media (max-width: 991px) {
+    :is(.allforms, .ems-form) .form-grid > * {
+        flex-basis: calc((100% - 14px) / 2) !important;   /* عمودان (فجوة واحدة) */
+    }
+}
+@media (max-width: 640px) {
+    :is(.allforms, .ems-form) .form-grid > * {
+        flex-basis: 100% !important;                       /* عمود واحد */
+    }
+}
+
+/* ── 5) غلاف الحقل ────────────────────────────────────────────────────────── */
+:is(.allforms, .ems-form) .form-grid > div,
+:is(.allforms, .ems-form) .form-group,
+:is(.allforms, .ems-form) .field {
+    position: relative !important;
+    display: block !important;
+    padding-top: 13px !important;
+    margin: 0;
+}
+
+/* ── 6) عنوان الحقل — تبويب خلف الحقل (z-index) ──────────────────────────── */
+:is(.allforms, .ems-form) .form-grid > div > label,
+:is(.allforms, .ems-form) .form-group > label,
+:is(.allforms, .ems-form) .field > label {
+    position: relative;
+    top: 10px;
+    z-index: 1; /* خلف الحقل (الحقل z-index:2) */
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+    width: fit-content !important;
+    margin: 0 !important;
+    padding: 4px 15px 15px !important;
+    background: #e6e6e6 !important;
+    border: 1px solid #b1b1b1 !important;
+    border-radius: 20px 20px 0 0 !important;
+    font-size: 0.8rem !important;
+    font-weight: 800 !important;
+    line-height: 1.2;
+    color: #000 !important;
+    white-space: nowrap;
+    cursor: default;
+}
+:is(.allforms, .ems-form) label i {
+    color: #000 !important;
+    font-size: 0.78rem;
+}
+:is(.allforms, .ems-form) label .required,
+:is(.allforms, .ems-form) label .required-indicator,
+:is(.allforms, .ems-form) label span[style*="red"] {
+    color: #dc2626 !important;
+    font-weight: 900;
+}
+
+/* حقل مميّز (مثل بداية/نهاية الوردية): حبّة ذهبية ممتلئة */
+:is(.allforms, .ems-form) .emsf-accent > label,
+:is(.allforms, .ems-form) .field.emsf-accent > label {
+    background: var(--emsf-yellow) !important;
+    border-color: var(--emsf-yellow) !important;
+    color: #1f1f1f !important;
+}
+:is(.allforms, .ems-form) .emsf-accent label i {
+    color: #1f1f1f !important;
+}
+
+/* ── 7) الحقول نفسها — بيضاء، حواف دائرية تماماً، أمام العنوان ────────────── */
+:is(.allforms, .ems-form) .form-grid > div > input,
+:is(.allforms, .ems-form) .form-grid > div > select,
+:is(.allforms, .ems-form) .form-grid > div > textarea,
+:is(.allforms, .ems-form) .form-group > input,
+:is(.allforms, .ems-form) .form-group > select,
+:is(.allforms, .ems-form) .form-group > textarea,
+:is(.allforms, .ems-form) .field .control input,
+:is(.allforms, .ems-form) .field .control select,
+:is(.allforms, .ems-form) .field .control textarea,
+:is(.allforms, .ems-form) .field > input,
+:is(.allforms, .ems-form) .field > select,
+:is(.allforms, .ems-form) .field > textarea {
+    width: 100% !important;
+    box-sizing: border-box !important; /* عرض موحّد لكل أنواع الحقول */
+    min-width: 0 !important; /* يمنع الحقول الرقمية من أن تكون أضيق */
+    max-width: 100% !important;
+    background: #ffffff !important; /* خلفية بيضاء سادة */
+    border: 1.5px solid var(--emsf-field-bdr) !important;
+    border-radius: var(--emsf-radius) !important; /* 999px — دائري تماماً */
+    padding: 10px 22px !important;
+    height: 45px !important;
+    line-height: 1.2 !important;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: "Tajawal", "Cairo", sans-serif;
+    color: var(--emsf-text) !important;
+    text-align: center !important;
+    box-shadow: inset 0 1px 2px rgba(20, 24, 31, 0.03) !important;
+    position: relative !important; /* أمام العنوان في z-index */
+    z-index: 2;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease;
+    height: 40px !important; /* تعديل ارتفاع الحقول ليتناسب مع الحواف الدائرية */
+}
+/* توحيد الحقول الرقمية مع النصية — إخفاء أسهم الدوّار */
+:is(.allforms, .ems-form) input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+:is(.allforms, .ems-form) input[type="number"]::-webkit-outer-spin-button,
+:is(.allforms, .ems-form) input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+:is(.allforms, .ems-form) .field .control {
+    display: block;
+    position: relative;
+}
+:is(.allforms, .ems-form) .form-grid > div > textarea,
+:is(.allforms, .ems-form) .form-group > textarea,
+:is(.allforms, .ems-form) .field .control textarea,
+:is(.allforms, .ems-form) .field > textarea {
+    text-align: right !important;
+    height: 40px !important;
+    min-height: 96px;
+    border-radius: 5px !important; /* مطابق للحقول */
+    resize: vertical;
+}
+:is(.allforms, .ems-form) input::placeholder,
+:is(.allforms, .ems-form) textarea::placeholder {
+    color: #9aa0a8;
+    font-weight: 600;
+}
+
+:is(.allforms, .ems-form) .form-grid > div > input:hover,
+:is(.allforms, .ems-form) .form-grid > div > select:hover,
+:is(.allforms, .ems-form) .form-group > input:hover,
+:is(.allforms, .ems-form) .form-group > select:hover,
+:is(.allforms, .ems-form) .field .control input:hover,
+:is(.allforms, .ems-form) .field .control select:hover,
+:is(.allforms, .ems-form) .field > input:hover,
+:is(.allforms, .ems-form) .field > select:hover {
+    border-color: var(--emsf-yellow) !important;
+}
+:is(.allforms, .ems-form) .form-grid > div > input:focus,
+:is(.allforms, .ems-form) .form-grid > div > select:focus,
+:is(.allforms, .ems-form) .form-grid > div > textarea:focus,
+:is(.allforms, .ems-form) .form-group > input:focus,
+:is(.allforms, .ems-form) .form-group > select:focus,
+:is(.allforms, .ems-form) .form-group > textarea:focus,
+:is(.allforms, .ems-form) .field .control input:focus,
+:is(.allforms, .ems-form) .field .control select:focus,
+:is(.allforms, .ems-form) .field .control textarea:focus,
+:is(.allforms, .ems-form) .field > input:focus,
+:is(.allforms, .ems-form) .field > select:focus,
+:is(.allforms, .ems-form) .field > textarea:focus {
+    outline: none !important;
+    background: #fff !important;
+    border-color: var(--emsf-yellow) !important;
+    box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.22) !important;
+}
+:is(.allforms, .ems-form) .form-grid > div > input:disabled,
+:is(.allforms, .ems-form) .form-grid > div > select:disabled,
+:is(.allforms, .ems-form) .form-grid > div > input[readonly],
+:is(.allforms, .ems-form) .form-group > input:disabled,
+:is(.allforms, .ems-form) .field .control input:disabled,
+:is(.allforms, .ems-form) .field .control input[readonly],
+:is(.allforms, .ems-form) .field > input:disabled,
+:is(.allforms, .ems-form) .field > input[readonly] {
+    background: #e7e9ed !important;
+    color: #8b8f96 !important;
+    cursor: not-allowed;
+}
+
+/* ── 8) شبكات الاختيار (checkbox) ────────────────────────────────────────── */
+:is(.allforms, .ems-form) .checkbox-grid,
+:is(.allforms, .ems-form) .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+}
+:is(.allforms, .ems-form) .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 13px;
+    border: 1.5px solid var(--emsf-field-bdr);
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    color: #41464d;
+    transition: all 0.15s ease;
+}
+:is(.allforms, .ems-form) .checkbox-label:hover {
+    border-color: var(--emsf-yellow);
+    background: #fffdf4;
+    color: #1f1f1f;
+}
+:is(.allforms, .ems-form) .checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--emsf-yellow);
+    flex-shrink: 0;
+    min-height: 0 !important;
+    padding: 0 !important;
+}
+
+/* ── 9) حقول خاصّة ───────────────────────────────────────────────────────── */
+:is(.allforms, .ems-form) #generated_code_wrapper {
+    position: relative;
+    padding-top: 13px;
+}
+:is(.allforms, .ems-form) .generated-code-field {
+    background: #fff7df !important;
+    border: 1.5px dashed var(--emsf-yellow) !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px;
+}
+:is(.allforms, .ems-form) .generated-code-hint {
+    display: none;
+}
+
+:is(.allforms, .ems-form) .counter-input-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+:is(.allforms, .ems-form) .counter-field {
+    text-align: center;
+}
+:is(.allforms, .ems-form) .counter-field input::-webkit-outer-spin-button,
+:is(.allforms, .ems-form) .counter-field input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+:is(.allforms, .ems-form) .counter-field input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+:is(.allforms, .ems-form) .counter-separator {
+    font-weight: 800;
+    color: #6b7178;
+}
+
+:is(.allforms, .ems-form) .toggle-password {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #7a8089;
+    font-size: 1rem;
+    z-index: 4;
+    padding: 4px;
+    min-height: 0 !important;
+}
+:is(.allforms, .ems-form) .toggle-password:hover {
+    color: var(--emsf-ico);
+}
+:is(.allforms, .ems-form) .password-strength {
+    margin-top: 10px;
+}
+:is(.allforms, .ems-form) .strength-bar {
+    height: 6px;
+    border-radius: 6px;
+    background: #e7e9ed;
+    overflow: hidden;
+}
+:is(.allforms, .ems-form) .strength-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: 6px;
+    transition:
+        width 0.25s ease,
+        background 0.25s ease;
+}
+:is(.allforms, .ems-form) .strength-weak > span {
+    width: 33%;
+    background: #dc2626;
+}
+:is(.allforms, .ems-form) .strength-medium > span {
+    width: 66%;
+    background: var(--emsf-yellow);
+}
+:is(.allforms, .ems-form) .strength-strong > span {
+    width: 100%;
+    background: #16a34a;
+}
+:is(.allforms, .ems-form) .password-requirements {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+}
+:is(.allforms, .ems-form) .requirement-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: #7a8089;
+    font-weight: 600;
+}
+:is(.allforms, .ems-form) .requirement-item.met {
+    color: #16a34a;
+}
+
+:is(.allforms, .ems-form) .form-grid-modal {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+@media (max-width: 640px) {
+    :is(.allforms, .ems-form) .form-grid-modal {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── 10) أزرار الإجراءات — حفظ ذهبي / إلغاء أسود ─────────────────────────── */
+:is(.allforms, .ems-form) .form-actions,
+:is(.allforms, .ems-form) .pu-form-actions,
+:is(.allforms, .ems-form) .form-actions-row {
+    display: flex;
+    gap: 14px;
+    justify-content: flex-end; /* الأزرار مُجمّعة يسار الفورم كما في التصميم */
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+    grid-column: 1 / -1;
+}
+:is(.allforms, .ems-form) .btn-save,
+:is(.allforms, .ems-form) .btn-submit,
+:is(.allforms, .ems-form) .btn-modal-save,
+:is(.allforms, .ems-form) .btn-submit-contract,
+:is(.allforms, .ems-form) button[type="submit"],
+:is(.allforms, .ems-form) .control button[type="submit"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--emsf-yellow) !important;
+    color: #1f1f1f !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    font-size: 0.92rem !important;
+    padding: 13px 26px !important;
+    min-height: 0 !important;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(244, 197, 66, 0.42) !important;
+    transition: all 0.2s ease;
+}
+:is(.allforms, .ems-form) .btn-save:hover,
+:is(.allforms, .ems-form) .btn-submit:hover,
+:is(.allforms, .ems-form) .btn-modal-save:hover,
+:is(.allforms, .ems-form) .btn-submit-contract:hover,
+:is(.allforms, .ems-form) button[type="submit"]:hover {
+    background: var(--emsf-yellow-d) !important;
+    box-shadow: 0 8px 20px rgba(244, 197, 66, 0.5) !important;
+    transform: translateY(-2px);
+}
+:is(.allforms, .ems-form) .btn-save i,
+:is(.allforms, .ems-form) .btn-submit i,
+:is(.allforms, .ems-form) button[type="submit"] i {
+    color: #1f1f1f !important;
+}
+
+:is(.allforms, .ems-form) .btn-cancel,
+:is(.allforms, .ems-form) .btn-close,
+:is(.allforms, .ems-form) .btn-reset,
+:is(.allforms, .ems-form) .btn-reset-contract,
+:is(.allforms, .ems-form) .btn-modal-cancel,
+:is(.allforms, .ems-form) button[type="reset"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #141414 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    font-size: 0.92rem !important;
+    padding: 13px 24px !important;
+    min-height: 0 !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+:is(.allforms, .ems-form) .btn-cancel:hover,
+:is(.allforms, .ems-form) .btn-close:hover,
+:is(.allforms, .ems-form) .btn-reset:hover,
+:is(.allforms, .ems-form) .btn-reset-contract:hover,
+:is(.allforms, .ems-form) .btn-modal-cancel:hover,
+:is(.allforms, .ems-form) button[type="reset"]:hover {
+    background: #000 !important;
+    color: #fff !important;
+}
+:is(.allforms, .ems-form) .btn-cancel i,
+:is(.allforms, .ems-form) .btn-close i,
+:is(.allforms, .ems-form) button[type="reset"] i {
+    color: #fff !important;
+}
+
+/* رفع الأولوية فوق محرّك الأزرار العام في ems.main: أزرار <button> يطالها المحرّك
+   بمحدّد عالٍ (0,6,2)!important فيلوّنها رماديًّا. :not(#_) يرفع المحدّد لمستوى ID
+   فيتجاوز المحرّك ويثبّت ألوان الحفظ الذهبي / الإلغاء الأسود في كل الفورمات. */
+:is(.allforms, .ems-form):not(#_)
+    :is(.btn-save, .btn-submit, .btn-modal-save, .btn-submit-contract, button[type="submit"]) {
+    background: var(--emsf-yellow) !important;
+    color: #1f1f1f !important;
+    border: none !important;
+    box-shadow: 0 6px 15px rgba(244, 197, 66, 0.42) !important;
+}
+:is(.allforms, .ems-form):not(#_) :is(.btn-save, .btn-submit, button[type="submit"]):hover {
+    background: var(--emsf-yellow-d) !important;
+}
+:is(.allforms, .ems-form):not(#_) :is(.btn-save, .btn-submit, button[type="submit"]) i {
+    color: #1f1f1f !important;
+}
+
+:is(.allforms, .ems-form):not(#_)
+    :is(.btn-cancel, .btn-close, .btn-reset, .btn-reset-contract, .btn-modal-cancel, button[type="reset"]) {
+    background: #141414 !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+:is(.allforms, .ems-form):not(#_)
+    :is(.btn-cancel, .btn-close, .btn-reset, .btn-reset-contract, .btn-modal-cancel, button[type="reset"]):hover {
+    background: #000 !important;
+}
+:is(.allforms, .ems-form):not(#_) :is(.btn-cancel, .btn-close, button[type="reset"]) i {
+    color: #fff !important;
+}
+
+/* ── 11) مساعدات العرض / امتداد الأعمدة ──────────────────────────────────── */
+:is(.allforms, .ems-form) .allforms-span-full,
+:is(.allforms, .ems-form) .form-grid-full,
+:is(.allforms, .ems-form) .field.span-full {
+    flex-basis: 100% !important;
+}
+:is(.allforms, .ems-form) .form-grid > .span2 {
+    flex-basis: calc((100% - 56px) / 5 * 2 + 14px) !important;   /* عمودان */
+}
+:is(.allforms, .ems-form) .form-grid > .span3 {
+    flex-basis: calc((100% - 56px) / 5 * 3 + 28px) !important;   /* ثلاثة أعمدة */
+}
+
+/* العناوين داخل الشبكة + أي حقل يحوي textarea (ملاحظات) + أي عنصر مُعلَّم
+   بـ grid-column…/-1 القديمة → صفّ كامل لوحده (التقسيم 5 يبقى للحقول فقط). */
+:is(.allforms, .ems-form) .form-grid > h1,
+:is(.allforms, .ems-form) .form-grid > h2,
+:is(.allforms, .ems-form) .form-grid > h3,
+:is(.allforms, .ems-form) .form-grid > h4,
+:is(.allforms, .ems-form) .form-grid > h5,
+:is(.allforms, .ems-form) .form-grid > h6,
+:is(.allforms, .ems-form) .form-grid > [style*="grid-column: 1/-1"],
+:is(.allforms, .ems-form) .form-grid > [style*="grid-column:1/-1"],
+:is(.allforms, .ems-form) .form-grid > [style*="grid-column: 1 / -1"],
+:is(.allforms, .ems-form) .form-grid > [style*="grid-column:1 / -1"] {
+    flex-basis: 100% !important;
+    flex-grow: 0 !important;
+}
+
+/* أي حقل يسبق مباشرةً عنوانًا أو فاصلًا بعرض كامل → يتمدّد ليملأ بقية صفّه،
+   فلا تبقى مساحات فارغة قبل العناوين (إضافةً إلى آخر حقل بالفورم عبر :last-child)،
+   ويعمل عند أي عدد أعمدة (5 / 4 / 2). */
+:is(.allforms, .ems-form) .form-grid > *:has(+ h1),
+:is(.allforms, .ems-form) .form-grid > *:has(+ h2),
+:is(.allforms, .ems-form) .form-grid > *:has(+ h3),
+:is(.allforms, .ems-form) .form-grid > *:has(+ h4),
+:is(.allforms, .ems-form) .form-grid > *:has(+ h5),
+:is(.allforms, .ems-form) .form-grid > *:has(+ h6),
+:is(.allforms, .ems-form) .form-grid > *:has(+ [style*="grid-column"]) {
+    flex-grow: 1 !important;
+}
+
+/* ── 12) صفحات الدخول/التسجيل (auth) — حقول موحّدة دون لوح رمادي ──────────── */
+.ems-form.auth-form,
+.ems-form.auth-form .card {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* ── 13) القائمة المنسدلة المخصّصة (ems-select.js) ───────────────────────────
+   تستبدل مظهر <select> بقائمة منسّقة: حاوية بحواف مستديرة + تظليل أصفر عند
+   المرور. الـ <select> الأصلي يبقى مخفيّاً للحفظ. ───────────────────────────── */
+:is(.allforms, .ems-form) .emsf-select-wrap {
+    position: relative;
+    width: 100%;
+}
+/* إخفاء الـ <select> الأصلي — محدّد أعلى من قاعدة الحقول (.field .control select)
+   كي لا يظهر ويأخذ مساحة فوق الزرّ في نمط .field/.control (مثل صفحة العقود). */
+:is(.allforms, .ems-form) .emsf-select-wrap select[data-emsf-select="1"],
+:is(.allforms, .ems-form):not(#_) select[data-emsf-select="1"] {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* الزرّ الظاهر — يطابق شكل حقول النصّ */
+:is(.allforms, .ems-form) .emsf-select-trigger {
+    width: 100% !important;
+    box-sizing: border-box;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: #fff !important; /* أبيض رغم محرّك الأزرار العام */
+    border: 1.5px solid var(--emsf-field-bdr) !important;
+    border-radius: var(--emsf-radius) !important; /* حواف دائرية رغم محرّك الأزرار */
+    height: 40px !important;
+    line-height: 1.2 !important;
+    padding: 10px 22px !important;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: "Tajawal", "Cairo", sans-serif;
+    color: var(--emsf-text) !important;
+    box-shadow: none !important; /* إلغاء ظلّ الأزرار الذهبي */
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+:is(.allforms, .ems-form) .emsf-select-trigger:hover {
+    transform: none !important;
+    background: #fff !important;
+}
+:is(.allforms, .ems-form) .emsf-select-trigger .emsf-select-text {
+    flex: 1;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+:is(.allforms, .ems-form) .emsf-select-trigger.is-placeholder .emsf-select-text {
+    color: #9aa0a8;
+    font-weight: 600;
+}
+:is(.allforms, .ems-form) .emsf-select-trigger.is-disabled {
+    background: #e7e9ed;
+    color: #8b8f96;
+    cursor: not-allowed;
+}
+:is(.allforms, .ems-form) .emsf-select-arrow {
+    color: #666;
+    font-size: 0.8rem;
+    transition: transform 0.18s ease;
+    flex-shrink: 0;
+}
+:is(.allforms, .ems-form) .emsf-select-wrap.is-open .emsf-select-trigger {
+    border-color: var(--emsf-yellow) !important;
+    box-shadow: 0 0 0 3px rgba(244, 197, 66, 0.22) !important;
+}
+:is(.allforms, .ems-form) .emsf-select-wrap.is-open .emsf-select-arrow {
+    transform: rotate(180deg);
+}
+
+/* حاوية عناصر القائمة عند الفتح — حواف مستديرة + ظلّ */
+/* قائمة عناصر الـ select — تُنقَل إلى <body> عند الفتح (portal) لتظهر فوق كل شيء،
+   فتتجاوز كل سياقات التكديس و overflow:hidden. لذا محدّداتها مستقلة (بلا .allforms)
+   وب z-index عالٍ جدًّا، وموضعها يُضبط بـ JS (position:fixed). ───────────────── */
+.emsf-select-menu {
+    position: fixed;
+    z-index: 2147483000;              /* فوق كل شيء */
+    display: none;
+    background: #fff !important;       /* خلفية القائمة بيضاء */
+    border: 1px solid #e3e6ea !important;
+    border-radius: 20px !important;   /* حواف القائمة دائرية */
+    box-shadow: 0 14px 34px rgba(20, 24, 31, 0.18);
+    padding: 6px;
+    max-height: 264px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.emsf-select-menu.is-open {
+    display: block;
+}
+/* عنصر القائمة */
+.emsf-select-option {
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #1f2227;
+    text-align: center;
+    transition: background-color 0.12s ease;
+}
+/* العنصر عند المرور بالماوس — خلفية صفراء عميقة خفيفة */
+.emsf-select-option:hover {
+    background: #fbe6a8;
+}
+.emsf-select-option.is-selected {
+    background: rgba(244, 197, 66, 0.42);
+    font-weight: 800;
+}
+.emsf-select-option.is-placeholder {
+    color: #9aa0a8;
+}
+.emsf-select-option.is-disabled {
+    color: #b8bcc2;
+    cursor: not-allowed;
+}
+.emsf-select-option.is-disabled:hover {
+    background: transparent;
+}

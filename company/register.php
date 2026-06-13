@@ -946,6 +946,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
 @media (max-width:520px) { .grid2 { grid-template-columns:1fr; } .plans-grid { grid-template-columns:1fr; } .card { padding:22px 16px; } }
     </style>
     <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
+    <link rel="stylesheet" href="/ems/assets/css/ems-forms.css">
 </head>
 <body class="standalone-brand">
 <div class="page">
@@ -1075,7 +1076,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
             <div class="alert alert-err"><i class="fas fa-exclamation-circle"></i><span><?php echo e($error); ?></span></div>
             <?php endif; ?>
 
-            <form method="post" action="" autocomplete="off" id="registerForm">
+            <form method="post" action="" autocomplete="off" id="registerForm" class="ems-form auth-form">
                 <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
 
                 <!-- ══ STEP 1: Company Identity ══ -->

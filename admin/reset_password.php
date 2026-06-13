@@ -111,6 +111,7 @@ $csrf = generate_csrf_token();
         button { border: none; background: #102443; color: #fff; cursor: pointer; }
         a { display: inline-flex; margin-top: 12px; background: #f3f5f8; color: #102443; }
     </style>
+    <link rel="stylesheet" href="/ems/assets/css/ems-forms.css">
 </head>
 <body>
     <div class="card">
@@ -120,7 +121,7 @@ $csrf = generate_csrf_token();
             <div class="error"><?php echo e($error); ?></div>
         <?php endif; ?>
         <?php if ($error === '' && $resetRow): ?>
-            <form method="post" action="">
+            <form method="post" action="" class="ems-form auth-form">
                 <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
                 <input type="hidden" name="token" value="<?php echo e($token); ?>">
                 <div class="field">

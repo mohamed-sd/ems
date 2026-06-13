@@ -1058,7 +1058,6 @@ include('../insidebar.php');
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
@@ -1070,10 +1069,6 @@ include('../insidebar.php');
     $(document).ready(function () {
         // تهيئة جدول العملاء بالعربية
         const clientsTable = $('#clientsTable').DataTable({
-            // responsive (لا scrollX) لتوحيد الشكل مع جدول المشاريع وبقية الجداول:
-            // scrollX كان يفصل الرأس عن الجسم (جدولا scrollHead/scrollBody) ويُظهر
-            // شريطاً رمادياً أعلى الجسم. responsive يبقي الجدول قطعة واحدة موحّدة.
-            responsive: true,
             autoWidth: false,
             // تعطيل حفظ الحالة: الفلاتر هنا تُدار عبر قوائم منفصلة (fillFilterOptions)
             // تملأ بحث الأعمدة، وحالة الـ <select> ليست جزءاً من حالة DataTables.
@@ -1260,6 +1255,7 @@ include('../insidebar.php');
         $('#email').val(clientData.email);
         $('#whatsapp').val(clientData.whatsapp);
         $('#status').val(clientData.status);
+        if (window.EmsSelect) EmsSelect.refresh();
         setClientFormEditMode();
 
         // عرض الفورم إذا كان مخفياً
@@ -1374,6 +1370,7 @@ include('../insidebar.php');
         $('#email').val(c.email);
         $('#whatsapp').val(c.whatsapp);
         $('#status').val(c.status);
+        if (window.EmsSelect) EmsSelect.refresh();
 
         if (!clientForm.is(':visible')) {
             clientForm.addClass('allforms-visible').hide();

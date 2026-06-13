@@ -122,10 +122,11 @@ select,
 textarea,
 .form-control,
 .form-select {
-  border: 1px solid #d7deea;
-  border-radius: 10px;
+  border: 1px solid #999999;
+  border-radius: 16px;
   background: #ffffff;
 }
+textarea { border-radius: 16px; }
 
 input:focus,
 select:focus,

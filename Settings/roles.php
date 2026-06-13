@@ -131,7 +131,7 @@ include('../insidebar.php');
     <?php endif; ?>
 
     <!-- فورم إضافة / تعديل -->
-    <form id="roleForm" action="" method="post" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>">
+    <form id="roleForm" action="" method="post" class="ems-form" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>">
         <div class="card">
             <div class="card-header">
                 <h5><i class="fas fa-edit"></i> <?= !empty($editData) ? 'تعديل الصلاحية' : 'إضافة صلاحية جديدة'; ?></h5>

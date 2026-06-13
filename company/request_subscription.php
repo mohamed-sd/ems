@@ -298,6 +298,7 @@ $csrf = generate_csrf_token();
         }
     </style>
     <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
+    <link rel="stylesheet" href="/ems/assets/css/ems-forms.css">
 </head>
 <body class="standalone-brand">
 <div class="shell">
@@ -323,7 +324,7 @@ $csrf = generate_csrf_token();
             <div class="alert err"><?php echo e($error); ?></div>
         <?php endif; ?>
 
-        <form method="post" action="">
+        <form method="post" action="" class="ems-form auth-form">
             <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
 
             <div class="field">
