@@ -827,17 +827,18 @@ include('../insidebar.php');
 
     <!-- فورم إضافة / تعديل عميل -->
     <form id="clientForm" action="" method="post" class="allforms">
+         <div class="card-header">
+                <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة عميل جديد</span></h5>
+        </div>
         <input type="hidden" name="client_id" id="client_id" value="">
         <input type="hidden" name="csrf_token" value="<?php echo clients_e($clients_csrf_token); ?>">
         <div class="card shadow-sm pu-form-card">
-            <div class="card-header">
-                <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة عميل جديد</span></h5>
-            </div>
+
             <div class="card-body">
                 <div class="form-grid">
 
                     <!-- ══ حقل الكود المولد تلقائياً (قراءة فقط - لا يُرسَل لقاعدة البيانات) ══ -->
-                    <div id="generated_code_wrapper">
+                    <div id="generated_code_wrapper" class="auto">
                         <label><i class="fas fa-magic"></i> كود العميل المولد <i
                                 class="fas fa-info-circle clients-info-icon"></i></label>
                         <input type="text" id="generated_client_code" class="generated-code-field"

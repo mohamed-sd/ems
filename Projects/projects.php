@@ -500,10 +500,11 @@ include('../insidebar.php');
 
     <!-- فورم إضافة / تعديل مشروع -->
     <form id="projectForm" action="" method="post" class="allforms">
-        <div class="card shadow-sm pu-form-card">
-            <div class="card-header">
+           <div class="card-header">
                 <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة مشروع جديد</span></h5>
             </div>
+        <div class="card shadow-sm pu-form-card">
+
             <div class="card-body">
                 <input type="hidden" name="id" id="project_id" value="">
                 <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">

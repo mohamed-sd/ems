@@ -30,6 +30,8 @@
     --emsf-ico: #1e3a5f;
     --emsf-text: #1f2227;
     --emsf-radius: 16px; /* حواف الحقول مستديرة باعتدال */
+    --emsf-auto-bg: #ffe6c7;  /* عنوان حقل محسوب تلقائياً — برتقالي فاتح */
+    --emsf-auto-bdr: #FAE29A; /* حدّ العنوان البرتقالي */
 }
 
 /* ── 0) الإظهار/الإخفاء — على .allforms فقط ──────────────────────────────── */
@@ -66,9 +68,10 @@
 .ems-form.card {
     background: var(--emsf-panel) !important;
     border: 1px solid #e3e6ea !important;
-    border-radius: 18px !important;
+    border-radius: 20px !important;
     box-shadow: 0 6px 22px rgba(20, 24, 31, 0.07) !important;
     overflow: visible !important;
+
 }
 :is(.allforms, .ems-form) .card-body,
 .allforms.card .card-body,
@@ -78,7 +81,8 @@
     padding: 30px 24px 24px !important;
     position: relative; /* يفعّل z-index كي يطغى الجسم على العنوان */
     z-index: 1000;
-    margin-top: -20px !important; /* يُسحب الجسم لأعلى ليغطّي أسفل العنوان (قيمة التداخل) */
+    margin-top: -20px !important;
+    border-radius: 18px !important; /* يُسحب الجسم لأعلى ليغطّي أسفل العنوان (قيمة التداخل) */
 }
 
 /* ── 2) ترويسة الفورم → تبويب ذهبي خلف جسم الفورم ─────────────────────────── */
@@ -133,7 +137,7 @@
     justify-content: flex-start !important;
     background: #fff !important;
     border: solid #999 1px !important;
-    border-radius: 20px !important;
+    border-radius: 25px !important;
     padding: 5px;
     color: #000 !important;
     font-size: 1.05rem;
@@ -277,6 +281,19 @@
 }
 :is(.allforms, .ems-form) .emsf-accent label i {
     color: #1f1f1f !important;
+}
+
+/* حقل محسوب تلقائياً (.auto): عنوان برتقالي فاتح يميّزه عن الحقول العادية الرمادية.
+   تُضاف الفئة .auto على غلاف الحقل (div / .form-group / .field) أو على الـ label مباشرةً. */
+:is(.allforms, .ems-form) .form-grid > div.auto > label,
+:is(.allforms, .ems-form) .form-group.auto > label,
+:is(.allforms, .ems-form) .field.auto > label,
+:is(.allforms, .ems-form) .form-grid > div > label.auto,
+:is(.allforms, .ems-form) .form-group > label.auto,
+:is(.allforms, .ems-form) .field > label.auto {
+    background: var(--emsf-auto-bg) !important;
+    border-color: var(--emsf-auto-bdr) !important;
+    color: #000 !important;
 }
 
 /* ── 7) الحقول نفسها — بيضاء، حواف دائرية تماماً، أمام العنوان ────────────── */
@@ -669,7 +686,11 @@
 }
 
 /* العناوين داخل الشبكة + أي حقل يحوي textarea (ملاحظات) + أي عنصر مُعلَّم
-   بـ grid-column…/-1 القديمة → صفّ كامل لوحده (التقسيم 5 يبقى للحقول فقط). */
+   بـ grid-column…/-1 القديمة → صفّ كامل لوحده (التقسيم 5 يبقى للحقول فقط).
+   ملاحظة: عناوين الأقسام المُهيكلة (.form-section-header) تُعامَل كصفّ كامل
+   تمامًا مثل العناوين البسيطة <h3 grid-column:1/-1> في صفحة ساعات العمل. */
+:is(.allforms, .ems-form) .form-grid > .form-section-header,
+:is(.allforms, .ems-form) .form-grid > .form-section,
 :is(.allforms, .ems-form) .form-grid > h1,
 :is(.allforms, .ems-form) .form-grid > h2,
 :is(.allforms, .ems-form) .form-grid > h3,
@@ -686,13 +707,18 @@
 
 /* أي حقل يسبق مباشرةً عنوانًا أو فاصلًا بعرض كامل → يتمدّد ليملأ بقية صفّه،
    فلا تبقى مساحات فارغة قبل العناوين (إضافةً إلى آخر حقل بالفورم عبر :last-child)،
-   ويعمل عند أي عدد أعمدة (5 / 4 / 2). */
+   ويعمل عند أي عدد أعمدة (5 / 4 / 2). يشمل عناوين الأقسام المُهيكلة وكتل
+   الملاحظات بعرض كامل وصفّ الأزرار كي يملأ آخر حقل بقية الصفّ الناقص. */
 :is(.allforms, .ems-form) .form-grid > *:has(+ h1),
 :is(.allforms, .ems-form) .form-grid > *:has(+ h2),
 :is(.allforms, .ems-form) .form-grid > *:has(+ h3),
 :is(.allforms, .ems-form) .form-grid > *:has(+ h4),
 :is(.allforms, .ems-form) .form-grid > *:has(+ h5),
 :is(.allforms, .ems-form) .form-grid > *:has(+ h6),
+:is(.allforms, .ems-form) .form-grid > *:has(+ .form-section-header),
+:is(.allforms, .ems-form) .form-grid > *:has(+ .form-section),
+:is(.allforms, .ems-form) .form-grid > *:has(+ .form-grid-full),
+:is(.allforms, .ems-form) .form-grid > *:has(+ .form-actions),
 :is(.allforms, .ems-form) .form-grid > *:has(+ [style*="grid-column"]) {
     flex-grow: 1 !important;
 }

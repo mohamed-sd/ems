@@ -372,10 +372,10 @@ include '../insidebar.php';
 
     <!-- ══ فورم إضافة / تعديل مورد ══════════════════════════════════════════ -->
     <form id="projectForm" action="" method="post" class="allforms">
-        <div class="card">
-            <div class="card-header">
+           <div class="card-header">
                 <h5><i class="fas fa-edit"></i> إضافة / تعديل مورد</h5>
             </div>
+        <div class="card">
             <div class="card-body">
                 <input type="hidden" name="id" id="supplier_id" value="">
 

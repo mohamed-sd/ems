@@ -662,13 +662,13 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
         <!-- فورم إضافة / تعديل معدة -->
         <form id="projectForm" action="" method="post"
             class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
-            <div class="card">
-                <div class="card-header">
+              <div class="card-header">
                     <h5>
                         <i class="fas fa-<?php echo !empty($editData) ? 'edit' : 'plus-circle'; ?>"></i>
                         <?php echo !empty($editData) ? "تعديل الآلية" : "إضافة آلية جديدة"; ?>
                     </h5>
                 </div>
+            <div class="card">
                 <div class="card-body">
                     <div class="form-grid">
                         <?php if (!empty($editData)) { ?>
@@ -738,7 +738,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         <!-- ================================= -->
                         <!-- قسم: المعلومات الأساسية والتعريفية -->
                         <!-- ================================= -->
-                        <div class="form-section-header">
+                        <div class="form-section">
                             <h6><i class="fas fa-id-card"></i> المعلومات الأساسية والتعريفية</h6>
                         </div>
 
@@ -774,7 +774,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         <!-- ================================= -->
                         <!-- قسم: بيانات الصنع والموديل -->
                         <!-- ================================= -->
-                        <div class="form-section-header">
+                        <div class="form-section">
                             <h6><i class="fas fa-industry"></i> بيانات الصنع والموديل</h6>
                         </div>
 
@@ -820,7 +820,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         <!-- ================================= -->
                         <!-- قسم: الحالة الفنية والمواصفات -->
                         <!-- ================================= -->
-                        <div class="form-section-header">
+                        <div class="form-section">
                             <h6><i class="fas fa-wrench"></i> الحالة الفنية والمواصفات</h6>
                         </div>
 
@@ -892,7 +892,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         <!-- ================================= -->
                         <!-- قسم: بيانات الملكية -->
                         <!-- ================================= -->
-                        <div class="form-section-header">
+                        <div class="form-section">
                             <h6><i class="fas fa-user-tie"></i> بيانات الملكية</h6>
                         </div>
 
@@ -949,7 +949,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         <!-- ================================= -->
                         <!-- قسم: الوثائق والتسجيلات -->
                         <!-- ================================= -->
-                        <div class="form-section-header">
+                        <div class="form-section">
                             <h6><i class="fas fa-file-contract"></i> الوثائق والتسجيلات</h6>
                         </div>
 
@@ -1017,7 +1017,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         <!-- ================================= -->
                         <!-- قسم: الموقع والتوفر -->
                         <!-- ================================= -->
-                        <div class="form-section-header">
+                        <div class="form-section">
                             <h6><i class="fas fa-map-marker-alt"></i> الموقع والتوفر</h6>
                         </div>
 
@@ -1085,7 +1085,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         <!-- ================================= -->
                         <!-- قسم: البيانات المالية والقيمة -->
                         <!-- ================================= -->
-                        <div class="form-section-header">
+                        <div class="form-section">
                             <h6><i class="fas fa-dollar-sign"></i> البيانات المالية والقيمة</h6>
                         </div>
 
@@ -1138,7 +1138,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         <!-- ================================= -->
                         <!-- قسم: ملاحظات وسجل الصيانة -->
                         <!-- ================================= -->
-                        <div class="form-section-header">
+                        <div class="form-section">
                             <h6><i class="fas fa-tools"></i> ملاحظات وسجل الصيانة</h6>
                         </div>
 

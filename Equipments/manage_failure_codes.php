@@ -222,21 +222,18 @@ $stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
         </div>
     </div>
 
-    <!-- ══ نموذج الإضافة / التعديل ══ -->
+    <!-- ══ نموذج الإضافة / التعديل (بنفس بنية وتصميم فورم صفحة العملاء) ══ -->
     <?php if ($can_add): ?>
-    <div class="card ems-form <?= ($edit_data || $error_msg) ? '' : 'fc-hidden' ?>" id="addEditCard">
+    <form method="POST" action="" id="fcForm" class="allforms<?= ($edit_data || $error_msg) ? ' allforms-visible' : '' ?>">
         <div class="card-header">
             <h5>
                 <i class="fas fa-<?= $edit_data ? 'edit' : 'plus-circle' ?>"></i>
-                <?= $edit_data ? 'تعديل كود العطل' : 'إضافة كود عطل جديد' ?>
+                <span id="fcFormTitle"><?= $edit_data ? 'تعديل كود العطل' : 'إضافة كود عطل جديد' ?></span>
             </h5>
         </div>
-        <div class="card-body">
-            <form method="POST" action="" id="fcForm">
-                <?php if ($edit_data): ?>
-                    <input type="hidden" name="edit_id" value="<?= intval($edit_data['id']) ?>">
-                <?php endif; ?>
-
+        <input type="hidden" name="edit_id" id="edit_id" value="<?= $edit_data ? intval($edit_data['id']) : '' ?>">
+        <div class="card shadow-sm pu-form-card">
+            <div class="card-body">
                 <div class="form-grid">
 
                     <!-- نوع المعدة -->
@@ -312,20 +309,18 @@ $stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
                         </select>
                     </div>
 
-                    <!-- أزرار -->
-                    <div class="form-actions">
-                        <button type="submit" class="btn-submit">
-                            <i class="fas fa-save"></i> <?= $edit_data ? 'حفظ التعديلات' : 'إضافة الكود' ?>
-                        </button>
-                        <a href="manage_failure_codes.php" class="btn-cancel">
-                            <i class="fas fa-times"></i> إلغاء
-                        </a>
-                    </div>
-
                 </div>
-            </form>
+                <div class="pu-form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i> <span id="fcSubmitText"><?= $edit_data ? 'حفظ التعديلات' : 'إضافة الكود' ?></span>
+                    </button>
+                    <button type="button" class="btn-cancel" onclick="hideFcForm()">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
+    </form>
     <?php endif; ?>
 
     <!-- ══ الجدول ══ -->
@@ -550,26 +545,34 @@ $(document).ready(function () {
 });
 
 function toggleForm() {
-    var card = document.getElementById('addEditCard');
-    if (card.classList.contains('fc-hidden')) {
-        card.classList.remove('fc-hidden');
-        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // مسح التعديل إن وجد
-        document.querySelector('[name="edit_id"]') && (document.querySelector('[name="edit_id"]').value = '');
-        document.getElementById('fcForm').reset();
-        card.querySelector('.card-header h5').innerHTML = '<i class="fas fa-plus-circle"></i> إضافة كود عطل جديد';
+    var form = document.getElementById('fcForm');
+    if (!form.classList.contains('allforms-visible')) {
+        // وضع الإضافة: تصفير الحقول والعنوان
+        form.reset();
+        var hid = form.querySelector('[name="edit_id"]');
+        if (hid) hid.value = '';
+        var icon = form.querySelector('.card-header h5 i');
+        if (icon) icon.className = 'fas fa-plus-circle';
+        document.getElementById('fcFormTitle').textContent = 'إضافة كود عطل جديد';
+        document.getElementById('fcSubmitText').textContent = 'إضافة الكود';
+        form.classList.add('allforms-visible');
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
-        card.classList.add('fc-hidden');
+        form.classList.remove('allforms-visible');
     }
 }
 
-function editRow(data) {
-    var card = document.getElementById('addEditCard');
-    card.classList.remove('fc-hidden');
-    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    card.querySelector('.card-header h5').innerHTML = '<i class="fas fa-edit"></i> تعديل كود العطل';
+function hideFcForm() {
+    document.getElementById('fcForm').classList.remove('allforms-visible');
+}
 
+function editRow(data) {
     var form = document.getElementById('fcForm');
+    form.classList.add('allforms-visible');
+    var icon = form.querySelector('.card-header h5 i');
+    if (icon) icon.className = 'fas fa-edit';
+    document.getElementById('fcFormTitle').textContent = 'تعديل كود العطل';
+    document.getElementById('fcSubmitText').textContent = 'حفظ التعديلات';
 
     // إضافة حقل edit_id إن لم يكن موجوداً
     var hiddenId = form.querySelector('[name="edit_id"]');
@@ -591,6 +594,8 @@ function editRow(data) {
     form.failure_detail.value   = data.failure_detail;
     form.full_code.value        = data.full_code;
     form.status.value           = data.status;
+
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 </script>
 <?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>

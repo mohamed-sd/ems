@@ -224,15 +224,13 @@ include('../insidebar.php');
   <!-- فورم إضافة عقد -->
   <?php if ($can_add || $can_edit): ?>
     <form id="projectForm" action="" method="post" class="allforms">
-
-      <div class="card">
         <div class="card-header">
           <h5>
             <i class="fas fa-file-signature"></i> إضافة / تعديل عقد المورد
           </h5>
         </div>
+      <div class="card">
         <div class="card-body">
-
           <input type="hidden" name="id" id="contract_id" value="">
           <?php if ($has_supplier_filter): ?>
             <input type="hidden" name="supplier_id" value="<?php echo $supplier_id; ?>" required />
