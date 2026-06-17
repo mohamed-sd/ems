@@ -28,6 +28,10 @@ $equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id')
 $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
 $equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
 
+// صلاحية اعتماد الكرت = صلاحية تعديل المعدات (دور الأسطول)
+$__pp = function_exists('check_page_permissions') ? check_page_permissions($conn, 'equipments_fleet') : ['can_edit' => true];
+$can_edit = !empty($__pp['can_edit']);
+
 $scope = "e.id = $equipment_id";
 if (!$is_super_admin && $equipments_has_company) {
     $scope .= " AND e.company_id = $company_id";
@@ -153,6 +157,65 @@ include '../insidebar.php';
             الموديل: <?php echo htmlspecialchars($equipment['model'] ?: '-'); ?> |
             سنة الصنع: <?php echo htmlspecialchars($equipment['manufacturing_year'] ?: '-'); ?> |
             رقم الهيكل: <?php echo htmlspecialchars($equipment['chassis_number'] ?: '-'); ?>
+        </div>
+        <?php
+        // حالة الكرت (حوكمة خفيفة)
+        $card_state = isset($equipment['card_state']) ? $equipment['card_state'] : 'active';
+        $card_is_active = ($card_state === 'active');
+        ?>
+        <div style="margin-top:10px;">
+            <?php if ($card_is_active): ?>
+                <span class="status-active" style="padding:4px 10px;border-radius:6px;background:#e7f7ee;color:#1f9d55;font-weight:700;">
+                    <i class="fas fa-id-card"></i> كرت نشط (معتمد)
+                </span>
+            <?php else: ?>
+                <span class="status-inactive" style="padding:4px 10px;border-radius:6px;background:#fdeaea;color:#c0392b;font-weight:700;">
+                    <i class="fas fa-id-card"></i> كرت مسودة
+                </span>
+                <?php if (!empty($can_edit ?? true)): ?>
+                    <form method="post" action="approve_card.php" class="d-inline" style="margin-inline-start:8px"
+                          onsubmit="return confirm('اعتماد كرت هذه المعدة؟');">
+                        <input type="hidden" name="equipment_id" value="<?php echo intval($equipment_id); ?>">
+                        <input type="hidden" name="return" value="equipment_profile.php">
+                        <input type="hidden" name="return_id" value="<?php echo intval($equipment_id); ?>">
+                        <button type="submit" class="btn btn-success" style="padding:4px 12px;">
+                            <i class="fas fa-circle-check"></i> اعتماد الكرت
+                        </button>
+                    </form>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <?php
+    // ── بطاقة: الهوية والمصدر + العدّاد (كرت المعدة) ──
+    $pf = function ($k) use ($equipment) {
+        return isset($equipment[$k]) && $equipment[$k] !== '' && $equipment[$k] !== null
+            ? htmlspecialchars((string) $equipment[$k]) : '—';
+    };
+    $cap = (isset($equipment['capacity']) && $equipment['capacity'] !== '' && $equipment['capacity'] !== null)
+        ? (htmlspecialchars((string) $equipment['capacity']) . ' ' . htmlspecialchars((string) ($equipment['capacity_uom'] ?? ''))) : '—';
+    $acq = (isset($equipment['acquisition_cost']) && $equipment['acquisition_cost'] !== '' && $equipment['acquisition_cost'] !== null)
+        ? (htmlspecialchars((string) $equipment['acquisition_cost']) . ' ' . htmlspecialchars((string) ($equipment['acquisition_currency'] ?? ''))) : '—';
+    $meter = (isset($equipment['opening_meter']) && $equipment['opening_meter'] !== '' && $equipment['opening_meter'] !== null)
+        ? (htmlspecialchars((string) $equipment['opening_meter']) . ' ' . htmlspecialchars((string) ($equipment['meter_uom'] ?? ''))) : '—';
+    ?>
+    <div class="card" style="margin-bottom:14px;">
+        <div class="card-header"><h5><i class="fas fa-id-badge"></i> الهوية والمصدر والعدّاد</h5></div>
+        <div class="card-body">
+            <div class="profile-grid">
+                <div class="profile-card"><div class="label">الفئة التشغيلية</div><div><?php echo $pf('operating_category'); ?></div></div>
+                <div class="profile-card"><div class="label">بلد الصنع</div><div><?php echo $pf('origin_country'); ?></div></div>
+                <div class="profile-card"><div class="label">رقم الموتور</div><div><?php echo $pf('engine_no'); ?></div></div>
+                <div class="profile-card"><div class="label">رقم اللوحة</div><div><?php echo $pf('plate_no'); ?></div></div>
+                <div class="profile-card"><div class="label">السعة/القدرة</div><div><?php echo $cap; ?></div></div>
+                <div class="profile-card"><div class="label">المقاسات الفنية</div><div><?php echo $pf('dimensions'); ?></div></div>
+                <div class="profile-card"><div class="label">نوع المصدر</div><div><?php echo $pf('source_type'); ?></div></div>
+                <div class="profile-card"><div class="label">تاريخ الدخول</div><div><?php echo $pf('entry_date'); ?></div></div>
+                <div class="profile-card"><div class="label">تكلفة الشراء</div><div><?php echo $acq; ?></div></div>
+                <div class="profile-card"><div class="label">العدّاد الافتتاحي</div><div><?php echo $meter; ?></div></div>
+                <div class="profile-card"><div class="label">مصدر العدّاد</div><div><?php echo $pf('meter_source'); ?></div></div>
+            </div>
         </div>
     </div>
 

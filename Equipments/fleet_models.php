@@ -108,7 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $std_capacity       = (isset($_POST['std_capacity']) && $_POST['std_capacity'] !== '') ? (float) $_POST['std_capacity'] : null;
     $std_capacity_uom   = trim($_POST['std_capacity_uom'] ?? '');
     $tech_reference     = trim($_POST['tech_reference'] ?? '');
-    $default_supplier_id = (isset($_POST['default_supplier_id']) && $_POST['default_supplier_id'] !== '') ? (int) $_POST['default_supplier_id'] : null;
+    // المورد الافتراضي: إدخال يدوي حرّ (غير مربوط بجدول الموردين)
+    $default_supplier_name = trim($_POST['default_supplier_name'] ?? '');
     $status             = (isset($_POST['status']) && $_POST['status'] === 'inactive') ? 'inactive' : 'active';
 
     if ($code === '')       $errors[] = 'كود الموديل مطلوب';
@@ -138,23 +139,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         if ($edit_id > 0) {
-            $sql = "UPDATE fleet_model SET code=?, manufacturer=?, model_name=?, equipment_type_id=?, operating_category=?, fuel_type=?, std_capacity=?, std_capacity_uom=?, tech_reference=?, default_supplier_id=?, status=? WHERE id=? AND is_deleted=0" . $company_scope;
+            $sql = "UPDATE fleet_model SET code=?, manufacturer=?, model_name=?, equipment_type_id=?, operating_category=?, fuel_type=?, std_capacity=?, std_capacity_uom=?, tech_reference=?, default_supplier_name=?, status=? WHERE id=? AND is_deleted=0" . $company_scope;
             $stmt = $conn->prepare($sql);
             $stmt->bind_param(
-                "sssissdssisi",
+                "sssissdssssi",
                 $code, $manufacturer, $model_name, $equipment_type_id, $operating_category,
-                $fuel_type, $std_capacity, $std_capacity_uom, $tech_reference, $default_supplier_id,
+                $fuel_type, $std_capacity, $std_capacity_uom, $tech_reference, $default_supplier_name,
                 $status, $edit_id
             );
             $stmt->execute();
             $model_id = $edit_id;
         } else {
-            $sql = "INSERT INTO fleet_model (company_id, code, manufacturer, model_name, equipment_type_id, operating_category, fuel_type, std_capacity, std_capacity_uom, tech_reference, default_supplier_id, status, created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            $sql = "INSERT INTO fleet_model (company_id, code, manufacturer, model_name, equipment_type_id, operating_category, fuel_type, std_capacity, std_capacity_uom, tech_reference, default_supplier_name, status, created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param(
-                "isssissdssisi",
+                "isssissdssssi",
                 $company_val, $code, $manufacturer, $model_name, $equipment_type_id, $operating_category,
-                $fuel_type, $std_capacity, $std_capacity_uom, $tech_reference, $default_supplier_id,
+                $fuel_type, $std_capacity, $std_capacity_uom, $tech_reference, $default_supplier_name,
                 $status, $user_id
             );
             $stmt->execute();
@@ -228,10 +229,7 @@ $equipment_types = [];
 $rt = $conn->query("SELECT id, type FROM equipments_types WHERE status = 'active' ORDER BY type ASC");
 if ($rt) while ($r = $rt->fetch_assoc()) { $equipment_types[] = $r; }
 
-$suppliers = [];
-$supplier_scope = $is_super_admin ? '' : " AND company_id = $company_id";
-$rsup = $conn->query("SELECT id, name FROM suppliers WHERE status = 1$supplier_scope ORDER BY name ASC");
-if ($rsup) while ($r = $rsup->fetch_assoc()) { $suppliers[] = $r; }
+// المورد الافتراضي صار إدخالاً يدوياً حرّاً (غير مربوط بجدول الموردين) — لا حاجة لجلب الموردين.
 
 // مصنّعون مقترحون (datalist): من الموديلات + المعدات
 $manufacturers = [];
@@ -386,15 +384,9 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 
                     <div>
                         <label>المورد الافتراضي</label>
-                        <select name="default_supplier_id">
-                            <option value="">-- اختر المورد --</option>
-                            <?php foreach ($suppliers as $s): ?>
-                                <option value="<?= (int) $s['id']; ?>"
-                                    <?= (!empty($editData) && (int) $editData['default_supplier_id'] === (int) $s['id']) ? 'selected' : ''; ?>>
-                                    <?= $e($s['name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <input type="text" name="default_supplier_name" autocomplete="off"
+                               placeholder="اكتب اسم المورد (إدخال يدوي)"
+                               value="<?= $e($editData['default_supplier_name'] ?? ''); ?>">
                     </div>
 
                     <?php if ($has_dep_profile): ?>
@@ -540,11 +532,10 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                         $dep_select = $has_dep_profile ? ", dp.code AS dep_code, dp.asset_category AS dep_category" : "";
                         $dep_join   = $has_dep_profile ? " LEFT JOIN fleet_depreciation_profile dp ON dp.id = fm.depreciation_profile_id" : "";
                         $listSql =
-                            "SELECT fm.*, et.type AS type_name, su.name AS supplier_name$dep_select,
+                            "SELECT fm.*, et.type AS type_name, fm.default_supplier_name AS supplier_name$dep_select,
                                     (SELECT COUNT(*) FROM equipments eq WHERE eq.model_id = fm.id) AS unit_count
                              FROM fleet_model fm
-                             LEFT JOIN equipments_types et ON et.id = fm.equipment_type_id
-                             LEFT JOIN suppliers su ON su.id = fm.default_supplier_id" . $dep_join . "
+                             LEFT JOIN equipments_types et ON et.id = fm.equipment_type_id" . $dep_join . "
                              WHERE fm.is_deleted = 0" . ($is_super_admin ? '' : " AND fm.company_id = $company_id") . "
                              ORDER BY fm.id DESC";
                         $list = $conn->query($listSql);

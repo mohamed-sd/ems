@@ -295,21 +295,11 @@ class ExcelRegistry
             new Column('std_capacity', 'السعة القياسية', ['type' => Column::TYPE_FLOAT, 'width' => 14, 'example' => '1.2']),
             new Column('std_capacity_uom', 'وحدة القياس', ['width' => 14, 'example' => 'م³']),
             new Column('tech_reference', 'مرجع فني', ['width' => 20]),
-            // المورد الافتراضي — يُحوّل اسم/كود المورد إلى معرفه في suppliers ويخزّنه في default_supplier_id.
-            new Column('default_supplier_id', 'المورد الافتراضي (اسم أو كود)', [
-                'width'      => 24,
-                'example'    => 'مؤسسة المعدات الحديثة',
-                'hint'       => 'اختياري: المورد الافتراضي — أدخل اسمه أو كوده (مثل SUP-0001).',
-                'lookup'     => [
-                    'table'      => 'suppliers',
-                    'idColumn'   => 'id',
-                    'storeIdIn'  => 'default_supplier_id',
-                    'matchBy'    => ['supplier_code', 'name'],
-                    'nameColumn' => 'name',
-                    'scoped'     => true,
-                    'softDelete' => 'is_deleted',
-                ],
-                'exportExpr' => "(SELECT s.name FROM suppliers s WHERE s.id = fleet_model.default_supplier_id)",
+            // المورد الافتراضي — إدخال نصّي حرّ (غير مربوط بجدول الموردين).
+            new Column('default_supplier_name', 'المورد الافتراضي', [
+                'width'   => 24,
+                'example' => 'مؤسسة المعدات الحديثة',
+                'hint'    => 'اختياري: اسم المورد الافتراضي (إدخال يدوي).',
             ]),
             new Column('status', 'الحالة', ['type' => Column::TYPE_ENUM, 'enum' => ['active', 'inactive'], 'default' => 'active', 'width' => 14]),
             new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
