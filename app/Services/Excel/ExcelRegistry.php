@@ -270,6 +270,84 @@ class ExcelRegistry
             'instructions'     => ['الحقول المطلوبة: كود الشكل + اسم النوع.'],
         ]);
 
+        // ─────────────────────────── سجل النوع والموديل (Fleet Model Master) ───────────────────────────
+        $defs['fleet_models'] = new EntityDefinition('fleet_models', 'سجل النوع والموديل', 'fleet_model', [
+            new Column('code', 'كود الموديل', ['required' => true, 'unique' => true, 'width' => 16, 'example' => 'CAT-320']),
+            new Column('manufacturer', 'الصانع', ['width' => 20, 'example' => 'Caterpillar']),
+            new Column('model_name', 'اسم/رقم الموديل', ['required' => true, 'width' => 22, 'example' => '320 GC']),
+            // نوع المعدة — يُحوّل اسم النوع إلى معرفه في equipments_types ويخزّنه في equipment_type_id.
+            new Column('equipment_type_id', 'نوع المعدة (اسم أو كود)', [
+                'width'      => 18,
+                'example'    => 'حفار',
+                'hint'       => 'أدخل اسم النوع كما هو مسجّل في أنواع المعدات (مثل: حفار).',
+                'lookup'     => [
+                    'table'      => 'equipments_types',
+                    'idColumn'   => 'id',
+                    'storeIdIn'  => 'equipment_type_id',
+                    'matchBy'    => ['type', 'form'],
+                    'nameColumn' => 'type',
+                    'scoped'     => false,
+                ],
+                'exportExpr' => "(SELECT et.type FROM equipments_types et WHERE et.id = fleet_model.equipment_type_id)",
+            ]),
+            new Column('operating_category', 'فئة التشغيل', ['width' => 16, 'example' => 'حفر']),
+            new Column('fuel_type', 'نوع الوقود', ['width' => 14, 'example' => 'ديزل']),
+            new Column('std_capacity', 'السعة القياسية', ['type' => Column::TYPE_FLOAT, 'width' => 14, 'example' => '1.2']),
+            new Column('std_capacity_uom', 'وحدة القياس', ['width' => 14, 'example' => 'م³']),
+            new Column('tech_reference', 'مرجع فني', ['width' => 20]),
+            // المورد الافتراضي — يُحوّل اسم/كود المورد إلى معرفه في suppliers ويخزّنه في default_supplier_id.
+            new Column('default_supplier_id', 'المورد الافتراضي (اسم أو كود)', [
+                'width'      => 24,
+                'example'    => 'مؤسسة المعدات الحديثة',
+                'hint'       => 'اختياري: المورد الافتراضي — أدخل اسمه أو كوده (مثل SUP-0001).',
+                'lookup'     => [
+                    'table'      => 'suppliers',
+                    'idColumn'   => 'id',
+                    'storeIdIn'  => 'default_supplier_id',
+                    'matchBy'    => ['supplier_code', 'name'],
+                    'nameColumn' => 'name',
+                    'scoped'     => true,
+                    'softDelete' => 'is_deleted',
+                ],
+                'exportExpr' => "(SELECT s.name FROM suppliers s WHERE s.id = fleet_model.default_supplier_id)",
+            ]),
+            new Column('status', 'الحالة', ['type' => Column::TYPE_ENUM, 'enum' => ['active', 'inactive'], 'default' => 'active', 'width' => 14]),
+            new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
+        ], [
+            'moduleCode'       => 'Equipments/fleet_models.php',
+            'companyScoped'    => true,
+            'softDeleteColumn' => 'is_deleted',
+            'createdByColumn'  => 'created_by',
+            'instructions'     => [
+                'الحقول المطلوبة: كود الموديل + اسم/رقم الموديل.',
+                'نوع المعدة: أدخل اسم النوع كما هو مسجّل في أنواع المعدات.',
+                'المورد الافتراضي اختياري — إن أدخلته (اسماً أو كوداً) يُربط تلقائياً.',
+            ],
+        ]);
+
+        // ─────────────────────────── ملف الافتراضات المالية والإهلاك (Depreciation Profile) ───────────────────────────
+        $defs['fleet_depreciation_profiles'] = new EntityDefinition('fleet_depreciation_profiles', 'ملف الإهلاك المالي', 'fleet_depreciation_profile', [
+            new Column('code', 'الكود', ['width' => 14, 'importable' => false, 'example' => 'DEP-001']),
+            new Column('asset_category', 'فئة الأصل', ['required' => true, 'width' => 24, 'example' => 'حفّار 22ط جديد']),
+            new Column('brand', 'الماركة', ['width' => 18]),
+            new Column('method', 'الطريقة', ['type' => Column::TYPE_ENUM, 'enum' => ['uop', 'sl'], 'default' => 'uop', 'width' => 12, 'hint' => 'uop=بالساعة · sl=بالسنوات']),
+            new Column('useful_life', 'العمر الإنتاجي', ['type' => Column::TYPE_FLOAT, 'required' => true, 'width' => 16, 'example' => '15000']),
+            new Column('salvage_pct', 'نسبة التخريد', ['type' => Column::TYPE_FLOAT, 'required' => true, 'width' => 14, 'example' => '0.08', 'hint' => 'بين 0 و 1']),
+            new Column('state', 'الحالة', ['type' => Column::TYPE_ENUM, 'enum' => ['draft', 'approved'], 'default' => 'draft', 'width' => 12, 'importable' => false]),
+            new Column('notes', 'ملاحظات', ['width' => 28]),
+            new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
+        ], [
+            'moduleCode'       => 'Equipments/fleet_depreciation_profiles.php',
+            'companyScoped'    => true,
+            'softDeleteColumn' => 'is_deleted',
+            'createdByColumn'  => 'created_by',
+            'instructions'     => [
+                'الحقول المطلوبة: فئة الأصل + العمر الإنتاجي + نسبة التخريد.',
+                'الطريقة: uop (بالساعة التشغيلية) أو sl (زمني بالسنوات).',
+                'نسبة التخريد بين 0 و 1 (مثل 0.08). الكود والحالة تُدار من الشاشة.',
+            ],
+        ]);
+
         // ─────────────────────────── أكواد الأعطال (Failure Codes) ───────────────────────────
         $defs['failure_codes'] = new EntityDefinition('failure_codes', 'أكواد الأعطال', 'failure_codes', [
             new Column('equipment_type', 'نوع المعدة (كود)', ['type' => Column::TYPE_INT, 'required' => true, 'width' => 16, 'example' => '1']),

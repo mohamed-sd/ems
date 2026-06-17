@@ -15,6 +15,7 @@ $equipment_has_site_supervisor_name = db_table_has_column($conn, 'equipments', '
 $equipment_has_site_supervisor_contact = db_table_has_column($conn, 'equipments', 'site_supervisor_contact');
 $equipment_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
 $equipment_has_company_id = db_table_has_column($conn, 'equipments', 'company_id');
+$equipment_has_model_id = db_table_has_column($conn, 'equipments', 'model_id'); // ربط المعدة بالموديل (سجل النوع والموديل)
 $operations_project_col = db_table_has_column($conn, 'operations', 'project_id') ? 'project_id' : 'project';
 
 // company isolation (SaaS)
@@ -212,6 +213,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     // بيانات الصنع والموديل
     $manufacturer = mysqli_real_escape_string($conn, trim($_POST['manufacturer'] ?? ''));
     $model = mysqli_real_escape_string($conn, trim($_POST['model'] ?? ''));
+    // الموديل المرجعي من سجل النوع والموديل (fleet_model) — اختياري
+    $model_id = (isset($_POST['model_id']) && $_POST['model_id'] !== '') ? intval($_POST['model_id']) : 0;
     $manufacturing_year = !empty($_POST['manufacturing_year']) ? intval($_POST['manufacturing_year']) : 'NULL';
     $import_year = !empty($_POST['import_year']) ? intval($_POST['import_year']) : 'NULL';
 
@@ -340,6 +343,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     if ($equipment_has_availability_state) {
         $equipment_save_fields[] = "availability_state='$availability_state'";
     }
+    if ($equipment_has_model_id) {
+        $equipment_save_fields[] = "model_id=" . ($model_id > 0 ? $model_id : 'NULL');
+    }
 
     if ($edit_id > 0) {
         // التحقق: إذا كانت المعدة تعمل في مشروع نشط، لا يُسمح بتغيير الحالة
@@ -454,6 +460,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
         if ($equipment_has_company_id && $current_company_id > 0) {
             $insert_columns[] = 'company_id';
             $insert_values[] = "'$current_company_id'";
+        }
+        if ($equipment_has_model_id) {
+            $insert_columns[] = 'model_id';
+            $insert_values[] = ($model_id > 0 ? $model_id : 'NULL');
         }
 
         $sql = "INSERT INTO equipments (" . implode(', ', $insert_columns) . ") VALUES (" . implode(', ', $insert_values) . ")";
@@ -777,6 +787,36 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         <div class="form-section">
                             <h6><i class="fas fa-industry"></i> بيانات الصنع والموديل</h6>
                         </div>
+
+                        <?php if ($equipment_has_model_id): ?>
+                        <div>
+                            <label>
+                                <i class="fas fa-clipboard-list"></i>
+                                الموديل المرجعي (سجل النوع والموديل)
+                            </label>
+                            <select name="model_id" id="model_id">
+                                <option value="">-- اختر من السجل (اختياري) --</option>
+                                <?php
+                                $fm_scope = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
+                                $fm_q = @mysqli_query($conn, "SELECT id, code, model_name, manufacturer, equipment_type_id, operating_category FROM fleet_model WHERE is_deleted = 0 AND status = 'active'$fm_scope ORDER BY code ASC");
+                                $cur_model_id = isset($editData['model_id']) ? intval($editData['model_id']) : 0;
+                                if ($fm_q) {
+                                    while ($fm_row = mysqli_fetch_assoc($fm_q)) {
+                                        $sel = ($cur_model_id === intval($fm_row['id'])) ? 'selected' : '';
+                                        $label = $fm_row['code'] . ' — ' . $fm_row['model_name'];
+                                        echo "<option value='" . intval($fm_row['id']) . "' $sel"
+                                            . " data-type='" . intval($fm_row['equipment_type_id']) . "'"
+                                            . " data-manufacturer='" . htmlspecialchars($fm_row['manufacturer'] ?? '', ENT_QUOTES) . "'"
+                                            . " data-model='" . htmlspecialchars($fm_row['model_name'] ?? '', ENT_QUOTES) . "'"
+                                            . " data-category='" . htmlspecialchars($fm_row['operating_category'] ?? '', ENT_QUOTES) . "'>"
+                                            . htmlspecialchars($label) . "</option>";
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <small style="color:#777">عند الاختيار تُملأ تلقائياً حقول النوع والماركة والموديل من السجل.</small>
+                        </div>
+                        <?php endif; ?>
 
                         <div>
                             <label>
@@ -1714,6 +1754,24 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                 });
             }
 
+            // ── وراثة بيانات الموديل المرجعي (سجل النوع والموديل) ──
+            var fleetModelSelect = document.getElementById('model_id');
+            if (fleetModelSelect) {
+                fleetModelSelect.addEventListener('change', function () {
+                    var opt = this.options[this.selectedIndex];
+                    if (!opt || !this.value) { return; }
+                    var typeId = opt.getAttribute('data-type') || '';
+                    var manuf  = opt.getAttribute('data-manufacturer') || '';
+                    var modelN = opt.getAttribute('data-model') || '';
+                    var typeSel = document.getElementById('type');
+                    var manufInp = document.getElementById('manufacturer');
+                    var modelInp = document.getElementById('model');
+                    if (typeSel && typeId && typeId !== '0') { typeSel.value = typeId; }
+                    if (manufInp && manuf) { manufInp.value = manuf; }
+                    if (modelInp && modelN) { modelInp.value = modelN; }
+                });
+            }
+
             function normalizeAvailabilityState(value, statusValue) {
                 if (value === 'متوفرة' || value === 'غير متوفرة') {
                     return value;
@@ -1836,6 +1894,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                     { label: 'رقم الماكينة', value: eqVal(data.machine_number), icon: 'fas fa-microchip' },
                     { label: 'الشركة المصنعة', value: eqVal(data.manufacturer), icon: 'fas fa-industry' },
                     { label: 'الموديل', value: eqVal(data.model), icon: 'fas fa-car-side' },
+                    { label: 'الموديل المرجعي (السجل)', value: (data.fleet_model_code ? (data.fleet_model_code + (data.fleet_model_name ? ' — ' + data.fleet_model_name : '')) : 'غير محدد'), icon: 'fas fa-clipboard-list' },
                     { label: 'سنة الصنع', value: eqVal(data.manufacturing_year), icon: 'fas fa-calendar' },
                     { label: 'سنة الاستيراد', value: eqVal(data.import_year), icon: 'fas fa-calendar-plus' },
                     { label: 'حالة المعدة', value: eqVal(data.equipment_condition), icon: 'fas fa-cogs' },

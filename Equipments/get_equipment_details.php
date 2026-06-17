@@ -62,6 +62,7 @@ $equipments_has_site_supervisor_name = db_table_has_column($conn, 'equipments', 
 $equipments_has_site_supervisor_contact = db_table_has_column($conn, 'equipments', 'site_supervisor_contact');
 $equipments_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
 $equipments_has_company_id = db_table_has_column($conn, 'equipments', 'company_id');
+$equipments_has_model_id = db_table_has_column($conn, 'equipments', 'model_id');
 $operations_has_project_id = db_table_has_column($conn, 'operations', 'project_id');
 $operations_has_project = db_table_has_column($conn, 'operations', 'project');
 $operations_project_col = $operations_has_project_id ? 'project_id' : ($operations_has_project ? 'project' : '');
@@ -83,14 +84,21 @@ $company_scope = ($equipments_has_company_id && $current_company_id > 0)
     : "";
 
 // جلب جميع بيانات المعدة
+$fleet_model_select = $equipments_has_model_id
+    ? ", fm.code AS fleet_model_code, fm.model_name AS fleet_model_name"
+    : "";
+$fleet_model_join = $equipments_has_model_id
+    ? " LEFT JOIN fleet_model fm ON fm.id = e.model_id"
+    : "";
+
 $query = "
     SELECT
         e.*,
         et.type AS equipment_type_name,
-        s.name AS supplier_name
+        s.name AS supplier_name$fleet_model_select
     FROM equipments e
     LEFT JOIN suppliers s ON e.suppliers = s.id
-    LEFT JOIN equipments_types et ON et.id = e.type
+    LEFT JOIN equipments_types et ON et.id = e.type$fleet_model_join
     WHERE e.id = $equipment_id $company_scope
     LIMIT 1
 ";
