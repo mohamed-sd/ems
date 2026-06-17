@@ -1941,6 +1941,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                     { label: 'الموديل', value: eqVal(data.model), icon: 'fas fa-car-side' },
                     { label: 'الموديل المرجعي (السجل)', value: (data.fleet_model_code ? (data.fleet_model_code + (data.fleet_model_name ? ' — ' + data.fleet_model_name : '')) : 'غير محدد'), icon: 'fas fa-clipboard-list' },
                     { label: 'حالة الكرت', value: (data.card_state === 'active' ? 'نشط (معتمد)' : 'مسودة'), icon: 'fas fa-id-card' },
+                    { label: 'تنبيهات الوثائق', value: (function(){ var e=parseInt(data.docs_expired||0), s=parseInt(data.docs_soon||0); if(!e&&!s) return 'لا تنبيهات'; var p=[]; if(e)p.push(e+' منتهية'); if(s)p.push(s+' قاربت'); return p.join(' · '); })(), icon: 'fas fa-file-circle-exclamation' },
                     { label: 'الفئة التشغيلية', value: eqVal(data.operating_category), icon: 'fas fa-layer-group' },
                     { label: 'بلد الصنع', value: eqVal(data.origin_country), icon: 'fas fa-globe' },
                     { label: 'رقم الموتور', value: eqVal(data.engine_no), icon: 'fas fa-cog' },

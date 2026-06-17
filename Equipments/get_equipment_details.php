@@ -174,6 +174,25 @@ $equipment['availability_status'] = normalize_equipment_availability_status(
     isset($equipment['availability_status']) ? $equipment['availability_status'] : ''
 );
 
+// ملخّص تنبيهات الوثائق (كرت المعدة) — للعرض في نافذة التفاصيل
+$equipment['docs_expired'] = 0;
+$equipment['docs_soon'] = 0;
+$equipment['docs_critical_expired'] = 0;
+if (db_table_has_column($conn, 'fleet_equipment_compliance', 'id')) {
+    $today = date('Y-m-d');
+    $cscope = ($equipments_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
+    $cq = mysqli_query($conn, "SELECT
+            SUM(expiry_date IS NOT NULL AND expiry_date <> '0000-00-00' AND expiry_date < '$today') AS expired,
+            SUM(expiry_date IS NOT NULL AND expiry_date >= '$today' AND expiry_date <= DATE_ADD('$today', INTERVAL 30 DAY)) AS soon,
+            SUM(expiry_date IS NOT NULL AND expiry_date <> '0000-00-00' AND expiry_date < '$today' AND is_critical = 1) AS crit
+        FROM fleet_equipment_compliance WHERE equipment_id = $equipment_id AND is_deleted = 0$cscope");
+    if ($cq && ($cr = mysqli_fetch_assoc($cq))) {
+        $equipment['docs_expired'] = intval($cr['expired']);
+        $equipment['docs_soon'] = intval($cr['soon']);
+        $equipment['docs_critical_expired'] = intval($cr['crit']);
+    }
+}
+
 echo json_encode([
     'success' => true,
     'data' => $equipment
