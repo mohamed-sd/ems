@@ -625,12 +625,12 @@ include('../insidebar.php');
           </div>
 
 
-          <div class="contracts-form-actions">
-            <button type="reset" class="contracts-btn-reset">
-              <i class="fas fa-eraser"></i> تفريغ الحقول
-            </button>
-            <button type="submit" class="primary contracts-btn-submit-wide">
+          <div class="pu-form-actions">
+            <button type="submit" class="btn-submit">
               <i class="fas fa-save"></i> حفظ البيانات
+            </button>
+            <button type="button" id="contractFormCancelBtn" class="btn-cancel">
+              <i class="fas fa-times"></i> إلغاء
             </button>
           </div>
         </div>
@@ -1186,6 +1186,17 @@ include('../insidebar.php');
       if (toggleContractFormBtn && contractForm) {
         toggleContractFormBtn.addEventListener('click', function () {
           contractForm.classList.toggle('allforms-visible');
+        });
+      }
+
+      // زر الإلغاء — إخفاء الفورم وتفريغ الحقول
+      const contractFormCancelBtn = document.getElementById('contractFormCancelBtn');
+      if (contractFormCancelBtn && contractForm) {
+        contractFormCancelBtn.addEventListener('click', function () {
+          contractForm.classList.remove('allforms-visible');
+          contractForm.reset();
+          const cid = document.getElementById('contract_id');
+          if (cid) cid.value = '';
         });
       }
 

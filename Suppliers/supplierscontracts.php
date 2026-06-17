@@ -720,13 +720,12 @@ include('../insidebar.php');
             </div>
 
 
-            <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center;">
-              <button type="reset"
-                style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                <i class="fas fa-eraser"></i> تفريغ الحقول
-              </button>
-              <button type="submit" class="primary" style="padding: 0.75rem 3rem;">
+            <div class="pu-form-actions">
+              <button type="submit" class="btn-submit">
                 <i class="fas fa-save"></i> حفظ البيانات
+              </button>
+              <button type="button" id="contractFormCancelBtn" class="btn-cancel">
+                <i class="fas fa-times"></i> إلغاء
               </button>
             </div>
           </div>
@@ -1284,6 +1283,17 @@ include('../insidebar.php');
     if (toggleContractFormBtn && contractForm) {
       toggleContractFormBtn.addEventListener('click', function () {
         contractForm.style.display = contractForm.style.display === "none" ? "block" : "none";
+      });
+    }
+
+    // زر الإلغاء — إخفاء الفورم وتفريغ الحقول
+    const contractFormCancelBtn = document.getElementById('contractFormCancelBtn');
+    if (contractFormCancelBtn && contractForm) {
+      contractFormCancelBtn.addEventListener('click', function () {
+        contractForm.style.display = "none";
+        contractForm.reset();
+        const cid = document.getElementById('contract_id');
+        if (cid) cid.value = '';
       });
     }
   })();

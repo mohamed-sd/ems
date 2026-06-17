@@ -1432,6 +1432,142 @@ include('../insidebar.php');
 </script>
 
 <style>
+    /* ── كاردات الإحصائيات — نفس تصميم شاشة المشاريع (Projects/projects.php) ── */
+    .clients-main .stats-section {
+        border: 1px solid var(--bdr);
+        border-radius: var(--rl);
+        background: linear-gradient(180deg, rgba(255, 255, 255, .95) 0%, var(--s2) 100%);
+        box-shadow: var(--sh);
+        padding: 14px;
+        margin-bottom: 14px;
+    }
+
+    .clients-main .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(170px, 1fr));
+        gap: 12px;
+    }
+
+    .clients-main .stats-card {
+        background: #eee;
+        border: 1px solid #aaa;
+        border-radius: 35px;
+        padding: 18px;
+        box-shadow: 0 2px 8px rgba(26, 18, 8, .07);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .clients-main .stats-card .stats-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        float: left;
+        vertical-align: middle;
+        margin-top: 15px;
+        border: 1px solid #999;
+        background-color: #fff;
+        color: #000;
+    }
+
+    .clients-main .stats-card .stats-title {
+        color: #555;
+        font-size: 0.92rem;
+        font-weight: 700;
+        margin-top: 5px;
+        line-height: 1.3;
+    }
+
+    .clients-main .stats-card .stats-value {
+        color: #222;
+        line-height: 1;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+        margin-top: 10px;
+        font-size: 35px;
+    }
+
+    @media (max-width: 900px) {
+        .clients-main .stats-grid {
+            grid-template-columns: repeat(2, minmax(150px, 1fr));
+        }
+    }
+
+    @media (max-width: 560px) {
+        .clients-main .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ── كروت القطاعات — بنفس لغة تصميم كاردات الإحصائيات ── */
+    .clients-main .sector-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(170px, 1fr));
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .clients-main .sector-card {
+        background: #eee;
+        border: 1px solid #aaa;
+        border-radius: 35px;
+        padding: 16px 22px;
+        box-shadow: 0 2px 8px rgba(26, 18, 8, .07);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .clients-main .sector-card .label {
+        color: #555;
+        font-size: 0.95rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .clients-main .sector-card .label i {
+        color: #000;
+    }
+
+    .clients-main .sector-card .value {
+        color: #222;
+        font-size: 35px;
+        font-weight: 900;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .clients-main .sector-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .clients-main .sector-tag {
+        background: #fff;
+        border: 1px solid var(--bdr);
+        border-radius: 999px;
+        padding: 5px 12px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #444;
+    }
+
+    @media (max-width: 560px) {
+        .clients-main .sector-cards-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
     .clients-main .clients-summary-pill-danger,
     .clients-main .clients-inline-pill-danger {
         background: rgba(220, 38, 38, 0.12) !important;

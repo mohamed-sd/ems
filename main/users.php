@@ -284,11 +284,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     ?>
 
     <form id="projectForm" action="" method="post" class="allforms">
-        <input type="hidden" name="uid" id="uid" value="0" />
-        <div class="card">
-            <div class="card-header">
+         <div class="card-header">
                 <h5><i class="fas fa-user-edit"></i> إضافة / تعديل مستخدم</h5>
             </div>
+        <input type="hidden" name="uid" id="uid" value="0" />
+        <div class="card">
             <div class="card-body">
                 <div class="form-grid">
                     <div>
@@ -473,6 +473,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 </div>
 
 <style>
+    /* قاعدة ems-forms.css ':is(.allforms,.ems-form) .form-grid > div { display:block !important }'
+       تتغلّب على '.pu-hidden' بسبب خصوصية أعلى، فتُظهر حقلي المشروع والعقد لكل الأدوار.
+       نعيد الإخفاء بخصوصية أعلى ليظهرا فقط للأدوار ذات role_scope='mine' (مدير الموقع / حركة وتشغيل). */
+    .project-users-main .allforms .form-grid > div.pu-hidden {
+        display: none !important;
+    }
+
     .project-users-main .table-container {
         overflow-x: auto;
     }

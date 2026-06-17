@@ -63,6 +63,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
+<style>
+    /* خلفية الصفحة بيضاء */
+    body:has(.equipments-types-main) {
+        background: #ffffff !important;
+    }
+
+    /* منطقة المحتوى الرئيسية: خلفية بيضاء + هامش 10 */
+    .ems-site .main.equipments-types-main {
+        background: #ffffff !important;
+        margin: 10px !important;
+    }
+</style>
+
 <div class="main equipments-types-main">
 
     <?php
@@ -87,14 +100,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- نموذج إضافة / تعديل -->
     <form id="projectForm" method="post" class="allforms<?= !empty($editData) ? ' allforms-visible' : ''; ?>">
-
-        <div class="card">
-            <div class="card-header">
+        <div class="card-header">
                 <h5>
                     <?= !empty($editData) ? 'تعديل نوع المعدة' : 'إضافة نوع جديد'; ?>
                 </h5>
             </div>
-
+        <div class="card">
             <div class="card-body">
                 <div class="form-grid">
 
@@ -135,10 +146,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-success">
-                        <i class="fa-solid fa-save"></i> حفظ
-                    </button>
+                </div>
 
+                <div class="pu-form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i> <?= !empty($editData) ? 'تحديث' : 'حفظ'; ?>
+                    </button>
+                    <button type="button" id="equipmentTypeFormCancelBtn" class="btn-cancel">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
                 </div>
             </div>
         </div>
@@ -243,6 +259,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $form.addClass('allforms-visible').hide().slideDown(250);
             }
+        });
+
+        $('#equipmentTypeFormCancelBtn').on('click', function () {
+            $('#projectForm').removeClass('allforms-visible').slideUp(200);
         });
 
         $('.delete-disabled').on('click', function () {

@@ -240,16 +240,7 @@ $page_title = 'سجل النشاطات';
         include(__DIR__ . '/../includes/page_header.php');
         ?>
 
-        <div class="activity-page-hero">
-            <div class="activity-page-hero-icon"><i class="fa fa-layer-group"></i></div>
-            <div class="activity-page-hero-content">
-                <span class="activity-page-hero-label">عنوان الصفحة</span>
-                <h2 class="activity-page-hero-title"><?= $selectedRoleName ?></h2>
-            </div>
-            <?php if ($selectedRoleId > 0): ?>
-                <span class="activity-page-hero-count" id="heroLogCount"><?= $selectedRoleCount ?> سجل</span>
-            <?php endif; ?>
-        </div>
+
 
         <!-- ══════════════════════════════════════════
              PHASE 1 — Role Cards
@@ -277,17 +268,15 @@ $page_title = 'سجل النشاطات';
                                             <i class="fa <?= $ico['icon'] ?> fa-lg"></i>
                                         </div>
                                         <div class="flex-grow-1 min-w-0">
-                                            <div class="fw-semibold text-dark text-truncate" style="font-size:.95rem"><?= $name ?>
-                                            </div>
-                                            <div class="text-muted small mt-1">
-                                                <i class="fa fa-list-ul me-1"></i><?= $total ?>
-                                                سجل
-                                            </div>
-                                            <div class="text-muted activity-role-last">
+                                            <div class="role-card-name text-truncate"><?= $name ?></div>
+                                            <div class="role-card-last">
                                                 <i class="fa fa-clock me-1"></i>آخر نشاط: <?= $lastAt ?>
                                             </div>
                                         </div>
-                                        <i class="fa fa-chevron-left text-muted" style="font-size:.8rem"></i>
+                                        <div class="role-card-stat">
+                                            <span class="role-card-stat-num"><?= $total ?></span>
+                                            <span class="role-card-stat-label">سجل</span>
+                                        </div>
                                     </div>
                                 </div>
                             </a>
@@ -401,54 +390,74 @@ $page_title = 'سجل النشاطات';
 </div>
 
 <style>
-    /* Force visible layout/design for activity logs page (high-priority local overrides) */
-    .activity-logs-main .activity-page-hero {
-        display: flex !important;
-        align-items: center !important;
-        gap: 12px !important;
-        padding: 12px 14px !important;
-        border-radius: 14px !important;
-        border: 1px solid rgba(247, 147, 26, .32) !important;
-        background: linear-gradient(140deg, #fffdf8 0%, #fff5e6 100%) !important;
-        box-shadow: 0 2px 10px rgba(26, 18, 8, .08) !important;
-        margin-bottom: 10px !important;
+    /* ═══════════════════════════════════════════════════════════════
+       Activity Logs — موحّد مع ثيم النظام الأصفر الرسمي
+       (لوحة التحكم + صفحة العملاء): بطاقات بيضاء، حدود --bdr،
+       لمسة ذهبية على الحافة، ظلال --sh، وتدرّجات ذهبية للأيقونات.
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* ── خلفية الشاشة بيضاء + كل الكاردات رمادي فاتح ── */
+    body:has(.activity-logs-main) {
+        background: #fff !important;
+    }
+
+    .ems-site .main.activity-logs-main {
+        background: #fff !important;
+    }
+
+    /* خصوصية أعلى من قاعدة النظام العامة 'body.ems-site .main .card { background:#fff }' */
+    body.ems-site .main.activity-logs-main .card {
+        background: var(--light-gray) !important;
     }
 
     .activity-logs-main .activity-page-hero-icon {
-        width: 48px !important;
-        height: 48px !important;
+        width: 50px !important;
+        height: 50px !important;
         border-radius: 50% !important;
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
-        background: rgba(247, 147, 26, .14) !important;
-        color: #e67e00 !important;
-        font-size: 1.15rem !important;
+        background: linear-gradient(135deg, var(--or), var(--or2)) !important;
+        color: #1f1f1f !important;
+        font-size: 1.2rem !important;
+        box-shadow: 0 4px 12px rgba(244, 197, 66, .4) !important;
+        flex-shrink: 0 !important;
+    }
+
+    .activity-logs-main .activity-page-hero-content {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 2px !important;
+        min-width: 0 !important;
+    }
+
+    .activity-logs-main .activity-page-hero-label {
+        color: var(--t3) !important;
+        font-size: .78rem !important;
+        font-weight: 700 !important;
+        letter-spacing: .02em !important;
     }
 
     .activity-logs-main .activity-page-hero-title {
         margin: 0 !important;
-        font-size: 1.08rem !important;
+        font-size: 1.1rem !important;
         font-weight: 900 !important;
-        color: #1a1208 !important;
-    }
-
-    .activity-logs-main .activity-page-hero-label {
-        color: #a07848 !important;
-        font-size: .8rem !important;
-        font-weight: 700 !important;
+        color: var(--t1) !important;
     }
 
     .activity-logs-main .activity-page-hero-count {
         margin-inline-start: auto !important;
-        padding: 6px 12px !important;
+        padding: 7px 14px !important;
         border-radius: 999px !important;
-        background: linear-gradient(135deg, #f7931a, #e67e00) !important;
-        color: #fff !important;
+        background: linear-gradient(135deg, var(--or), var(--or2)) !important;
+        color: #1f1f1f !important;
         font-weight: 800 !important;
         font-size: .85rem !important;
+        box-shadow: 0 4px 12px rgba(244, 197, 66, .35) !important;
+        white-space: nowrap !important;
     }
 
+    /* ── بطاقات الأدوار (تنقّل) — رمادي فاتح + نص أسود + رقم كبير لليسار ── */
     .activity-logs-main .role-cards-flex {
         display: flex !important;
         flex-wrap: wrap !important;
@@ -467,24 +476,96 @@ $page_title = 'سجل النشاطات';
         height: 100% !important;
     }
 
-    .activity-logs-main .role-card {
+    /* بطاقات الأدوار متداخلة (ليست أبناء مباشرين للـ shell)، لذا تفرض عليها
+       'body.ems-site .main .card' خلفية بيضاء (0,3,1). نرفع الخصوصية إلى (0,4,1)
+       حتى يظهر الرمادي الفاتح + الحدّ الذهبي. */
+    body.ems-site .main.activity-logs-main .role-card {
         height: 100% !important;
-        border: 1.5px solid #e8dcc8 !important;
-        border-right: 4px solid #f7931a !important;
-        border-radius: 12px !important;
-        box-shadow: 0 1px 3px rgba(26, 18, 8, .08), 0 4px 12px rgba(26, 18, 8, .06) !important;
-        background: #fdf8f0 !important;
+        border: 1px solid #888 !important;
+        border-radius: 25px !important;
+        box-shadow: var(--sh) !important;
+        background: var(--light-gray) !important;
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease !important;
+    }
+
+    body.ems-site .main.activity-logs-main .role-card:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: var(--sh2) !important;
+        border-color: var(--or) !important;
+    }
+
+    /* كل العناصر داخل البطاقة باللون الأسود */
+    .activity-logs-main .role-card,
+    .activity-logs-main .role-card *,
+    .activity-logs-main .role-card i {
+        color: #000 !important;
     }
 
     .activity-logs-main .activity-role-icon {
-        background: rgba(247, 147, 26, .14) !important;
+        width: 46px !important;
+        height: 46px !important;
+        background: rgba(0, 0, 0, .06) !important;
+        flex-shrink: 0 !important;
     }
 
-    .activity-logs-main .activity-role-icon i,
-    .activity-logs-main .role-card .fa-list-ul {
-        color: #f7931a !important;
+    .activity-logs-main .role-card-name {
+        font-weight: 800 !important;
+        font-size: .98rem !important;
     }
 
+    .activity-logs-main .role-card-last {
+        font-size: .76rem !important;
+        margin-top: 4px !important;
+        font-weight: 600 !important;
+    }
+
+    /* رقم الإحصائية — كبير ومحاذى لليسار (نهاية البطاقة في RTL) */
+    .activity-logs-main .role-card-stat {
+        margin-inline-start: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        line-height: 1 !important;
+        flex-shrink: 0 !important;
+        padding-inline-start: 10px !important;
+    }
+
+    .activity-logs-main .role-card-stat-num {
+        font-size: 2.1rem !important;
+        font-weight: 900 !important;
+        letter-spacing: -.5px !important;
+    }
+
+    .activity-logs-main .role-card-stat-label {
+        font-size: .72rem !important;
+        font-weight: 700 !important;
+        margin-top: 2px !important;
+    }
+
+    /* ── صف أزرار الفلاتر ── */
+    .activity-logs-main .activity-filter-actions {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        justify-content: flex-end !important;
+    }
+
+    /* "تفريغ السجلات" إجراء حذف → لون تحذيري مميّز عن زر الحفظ */
+    .activity-logs-main .allforms .activity-clear-btn {
+        background: var(--err) !important;
+        box-shadow: 0 6px 15px rgba(220, 38, 38, .32) !important;
+        color: #fff !important;
+    }
+
+    .activity-logs-main .allforms .activity-clear-btn:hover {
+        background: #b91c1c !important;
+    }
+
+    .activity-logs-main .allforms .activity-clear-btn i {
+        color: #fff !important;
+    }
+
+    /* ── استجابة الشاشات ── */
     @media (max-width:1199px) {
         .activity-logs-main .role-card-wrap {
             flex-basis: calc(50% - 10px) !important;

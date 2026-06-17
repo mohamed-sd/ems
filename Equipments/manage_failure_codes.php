@@ -198,30 +198,6 @@ $stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
         <div class="success-message is-error"><i class="fas fa-exclamation-circle"></i> <?= $error_msg ?></div>
     <?php endif; ?>
 
-    <!-- ══ إحصائيات ══ -->
-    <div class="fc-stats">
-        <div class="fc-stat-card">
-            <div class="sc-num"><?= number_format($stat_total) ?></div>
-            <div class="sc-lbl"><i class="fas fa-database"></i> إجمالي الأكواد</div>
-        </div>
-        <div class="fc-stat-card">
-            <div class="sc-num sc-num-ok"><?= number_format($stat_active) ?></div>
-            <div class="sc-lbl"><i class="fas fa-check-circle"></i> كود نشط</div>
-        </div>
-        <div class="fc-stat-card">
-            <div class="sc-num sc-num-navy"><?= number_format($stat_eq1) ?></div>
-            <div class="sc-lbl"><i class="fas fa-tractor"></i> حفار</div>
-        </div>
-        <div class="fc-stat-card">
-            <div class="sc-num sc-num-gold"><?= number_format($stat_eq2) ?></div>
-            <div class="sc-lbl"><i class="fas fa-truck-moving"></i> قلاب</div>
-        </div>
-        <div class="fc-stat-card">
-            <div class="sc-num sc-num-ok"><?= number_format($stat_eq3) ?></div>
-            <div class="sc-lbl"><i class="fas fa-cogs"></i> خرامة</div>
-        </div>
-    </div>
-
     <!-- ══ نموذج الإضافة / التعديل (بنفس بنية وتصميم فورم صفحة العملاء) ══ -->
     <?php if ($can_add): ?>
     <form method="POST" action="" id="fcForm" class="allforms<?= ($edit_data || $error_msg) ? ' allforms-visible' : '' ?>">
@@ -322,6 +298,35 @@ $stat_eq3    = $_se3_res ? (mysqli_fetch_assoc($_se3_res)['c'] ?? null) : null;
         </div>
     </form>
     <?php endif; ?>
+
+    <!-- ══ إحصائيات ══ -->
+    <div class="fc-stats">
+        <div class="fc-stat-card">
+            <div class="sc-icon"><i class="fas fa-database"></i></div>
+            <div class="sc-num"><?= number_format($stat_total) ?></div>
+            <div class="sc-lbl">إجمالي الأكواد</div>
+        </div>
+        <div class="fc-stat-card">
+            <div class="sc-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="sc-num sc-num-ok"><?= number_format($stat_active) ?></div>
+            <div class="sc-lbl">كود نشط</div>
+        </div>
+        <div class="fc-stat-card">
+            <div class="sc-icon"><i class="fas fa-tractor"></i></div>
+            <div class="sc-num sc-num-navy"><?= number_format($stat_eq1) ?></div>
+            <div class="sc-lbl">حفار</div>
+        </div>
+        <div class="fc-stat-card">
+            <div class="sc-icon"><i class="fas fa-truck-moving"></i></div>
+            <div class="sc-num sc-num-gold"><?= number_format($stat_eq2) ?></div>
+            <div class="sc-lbl">قلاب</div>
+        </div>
+        <div class="fc-stat-card">
+            <div class="sc-icon"><i class="fas fa-cogs"></i></div>
+            <div class="sc-num sc-num-ok"><?= number_format($stat_eq3) ?></div>
+            <div class="sc-lbl">خرامة</div>
+        </div>
+    </div>
 
     <!-- ══ الجدول ══ -->
     <div class="card">
