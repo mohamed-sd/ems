@@ -1228,18 +1228,18 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                                 <option value="5" <?php echo (!empty($editData) && $editData['status'] == "5") ? "selected" : ""; ?>>مسحوبة</option>
                             </select>
                         </div>
+                    </div>
 
-                        <div class="form-actions">
-                            <button type="submit">
-                                <i class="fas fa-save"></i>
-                                <?php echo !empty($editData) ? "تحديث المعدة" : "حفظ المعدة"; ?>
-                            </button>
-                            <button type="button" class="btn-secondary"
-                                onclick="document.getElementById('projectForm').classList.remove('allforms-visible'); document.getElementById('projectForm').reset();">
-                                <i class="fas fa-times"></i>
-                                إلغاء
-                            </button>
-                        </div>
+                    <div class="pu-form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-save"></i>
+                            <span><?php echo !empty($editData) ? "تحديث المعدة" : "حفظ المعدة"; ?></span>
+                        </button>
+                        <button type="button" id="equipmentFormCancelBtn" class="btn-cancel"
+                            onclick="document.getElementById('projectForm').classList.remove('allforms-visible'); document.getElementById('projectForm').reset();">
+                            <i class="fas fa-times"></i>
+                            إلغاء
+                        </button>
                     </div>
                 </div>
             </div>

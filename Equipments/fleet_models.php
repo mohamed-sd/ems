@@ -257,7 +257,7 @@ include("../insidebar.php");
 $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); };
 ?>
 
-<div class="main fleet-models-main">
+<div style="background-color:#fff; padding: 10px;;" class="main">
 
     <?php
     $header_title   = 'سجل النوع والموديل';
@@ -287,14 +287,12 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
     <!-- نموذج إضافة / تعديل -->
     <form id="projectForm" method="post" enctype="multipart/form-data"
           class="allforms<?= (!empty($editData) || !empty($errors)) ? ' allforms-visible' : ''; ?>">
-
-        <div class="card">
-            <div class="card-header">
+         <div class="card-header">
                 <h5><i class="fas fa-clipboard-list"></i>
                     <?= !empty($editData) ? 'تعديل الموديل' : 'إضافة موديل جديد'; ?>
                 </h5>
             </div>
-
+        <div class="card">
             <div class="card-body">
                 <?php if (!empty($editData)): ?>
                     <input type="hidden" name="edit_id" value="<?= (int) $editData['id']; ?>">
@@ -489,9 +487,13 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                     </div>
                 </div>
 
-                <div style="margin-top:14px;">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fa-solid fa-save"></i> حفظ
+                <div class="pu-form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i>
+                        <span><?= !empty($editData) ? 'تحديث الموديل' : 'حفظ الموديل'; ?></span>
+                    </button>
+                    <button type="button" id="projectFormCancelBtn" class="btn-cancel">
+                        <i class="fas fa-times"></i> إلغاء
                     </button>
                 </div>
             </div>
@@ -507,15 +509,13 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
     </datalist>
 
     <!-- جدول الموديلات -->
-    <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-list"></i> قائمة الموديلات</h5>
-        </div>
+    <div class="card models-list-card">
         <div class="card-body">
             <div class="table-container">
                 <table id="projectsTable" class="display fleet-models-table">
                     <thead>
                         <tr>
+                            <th>الإجراءات</th>
                             <th>#</th>
                             <th>الكود</th>
                             <th>الصانع</th>
@@ -524,7 +524,6 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                             <th>الفئة</th>
                             <th>عدد الوحدات</th>
                             <th>الحالة</th>
-                            <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -571,18 +570,6 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                             ];
                             ?>
                             <tr>
-                                <td><?= $i++; ?></td>
-                                <td><?= $e($row['code']); ?></td>
-                                <td><?= $e($row['manufacturer']); ?></td>
-                                <td><?= $e($row['model_name']); ?></td>
-                                <td><?= $e($row['type_name'] ?? '—'); ?></td>
-                                <td><?= $e($row['operating_category'] ?: '—'); ?></td>
-                                <td class="text-center"><?= (int) $row['unit_count']; ?></td>
-                                <td>
-                                    <?= $row['status'] === 'active'
-                                        ? "<span class='status-active'>نشط</span>"
-                                        : "<span class='status-inactive'>غير نشط</span>"; ?>
-                                </td>
                                 <td class="text-center">
                                     <div class="action-btns">
                                         <a href="javascript:void(0)" class="action-btn view viewSpecBtn" data-id="<?= (int) $row['id']; ?>" title="عرض المواصفات">
@@ -603,6 +590,18 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                         <?php endif; ?>
                                     </div>
                                 </td>
+                                <td><?= $i++; ?></td>
+                                <td><?= $e($row['code']); ?></td>
+                                <td><?= $e($row['manufacturer']); ?></td>
+                                <td><?= $e($row['model_name']); ?></td>
+                                <td><?= $e($row['type_name'] ?? '—'); ?></td>
+                                <td><?= $e($row['operating_category'] ?: '—'); ?></td>
+                                <td class="text-center"><?= (int) $row['unit_count']; ?></td>
+                                <td>
+                                    <?= $row['status'] === 'active'
+                                        ? "<span class='status-active'>نشط</span>"
+                                        : "<span class='status-inactive'>غير نشط</span>"; ?>
+                                </td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -613,6 +612,25 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 </div>
 
 <style>
+    /* مساحة خارجية حول منطقة المحتوى الرئيسية + خلفية بيضاء للصفحة */
+    .fleet-models-main { margin: 10px; background: #fff; }
+
+    /* خلفية بطاقة الجدول رمادي فاتح (نفس درجة --light-gray في صفحة المشاريع).
+       محدّد عالي الأولوية لتجاوز القاعدة العامة body.ems-site .main .card { background:#fff !important } */
+    body.ems-site .main.fleet-models-main .models-list-card { background: #F2F3F5 !important; }
+
+    /* عمود الإجراءات: الأزرار الثلاثة في صفّ واحد بجانب بعضها */
+    .fleet-models-table th:first-child,
+    .fleet-models-table td:first-child { white-space: nowrap; }
+    .fleet-models-table .action-btns {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 6px;
+        align-items: center;
+        justify-content: center;
+    }
+    .fleet-models-table .action-btns .delete-model-form { display: inline-flex; margin: 0; }
+
     .spec-section { margin-top: 18px; border-top: 1px dashed #d8d8d8; padding-top: 14px; }
     .spec-section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .spec-section-head h6 { margin: 0; font-weight: 700; }
@@ -677,11 +695,11 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 <!-- JS -->
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="../includes/js/jquery.dataTables.main.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script>
     $(document).ready(function () {
         $('#projectsTable').DataTable({
-            responsive: true,
+            order: [],                                  // إبقاء ترتيب الاستعلام (الأحدث أولاً)
+            columnDefs: [{ orderable: false, targets: 0 }], // عمود الإجراءات (الأول) غير قابل للفرز
             language: { url: "/ems/assets/i18n/datatables/ar.json" }
         });
 
@@ -692,6 +710,11 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
             } else {
                 $form.addClass('allforms-visible').hide().slideDown(250);
             }
+        });
+
+        // زر الإلغاء: إخفاء فورم الإضافة/التعديل (مطابق لسلوك شاشة المشاريع)
+        $('#projectFormCancelBtn').on('click', function () {
+            $('#projectForm').removeClass('allforms-visible').slideUp(200);
         });
 
         // إضافة سطر مواصفة
