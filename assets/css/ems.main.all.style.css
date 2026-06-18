@@ -1803,146 +1803,278 @@ table.d-bd {
 
 /* ══════════════════════════════════════════════════════════════
    SECTION 1B — TIMESHEET TYPE PICKER (Timesheet/timesheet_type.php)
-   Dashboard identity + unified header actions style
+   Unified system identity: gold hero + choice cards + steps strip
 ══════════════════════════════════════════════════════════════ */
 .timesheet-type-page {
   background: var(--bg);
   min-height: calc(100vh - 56px);
-  padding: 16px;
+}
+
+/* ── Hero band (matches dashboard gold identity) ── */
+.timesheet-type-page .tst-hero {
+  position: relative;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 22px;
+  padding: 26px 30px;
+  border: 1px solid var(--bdr);
+  border-radius: 22px;
+  background:
+    radial-gradient(1100px 220px at 88% -45%, rgba(244,197,66,.20), transparent 70%),
+    linear-gradient(135deg, #FFFBEF 0%, var(--s1) 55%);
+  box-shadow: var(--sh);
 }
 
-.timesheet-type-page .ts-header-action:hover {
-  transform: translateY(-1px);
-  border-color: rgba(244,197,66,.45);
-  color: #fff;
+.timesheet-type-page .tst-hero-text {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.timesheet-type-page .ts-action-heavy {
+.timesheet-type-page .tst-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(244,197,66,.16);
+  border: 1px solid rgba(244,197,66,.35);
+  color: #946a00;
+  font-size: .8rem;
+  font-weight: 800;
+}
+
+.timesheet-type-page .tst-hero-title {
+  margin: 13px 0 7px;
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: var(--t1);
+}
+
+.timesheet-type-page .tst-hero-sub {
+  margin: 0;
+  max-width: 640px;
+  color: var(--t2);
+  font-size: .96rem;
+  line-height: 1.75;
+}
+
+.timesheet-type-page .tst-hero-deco {
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+  border-radius: 28px;
+  display: grid;
+  place-items: center;
+  font-size: 2.5rem;
+  color: #1a1407;
   background: linear-gradient(135deg, var(--or), var(--or2));
-  border-color: transparent;
+  box-shadow: 0 12px 30px rgba(244,197,66,.42);
 }
 
-.timesheet-type-page .ts-action-truck {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  border-color: transparent;
-}
-
-.timesheet-type-page .ts-action-drill {
-  background: linear-gradient(135deg, #ea6f00, #c2410c);
-  border-color: transparent;
-}
-
+/* ── Choice cards ── */
 .timesheet-type-page .ts-type-cards {
   display: grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
 }
 
 .timesheet-type-page .ts-type-card {
   text-decoration: none;
   color: inherit;
+  display: block;
 }
 
 .timesheet-type-page .ts-type-card-inner {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
   background: var(--s1);
   border: 1px solid var(--bdr);
-  border-radius: var(--rl);
-  padding: 22px 16px;
+  border-radius: 22px;
+  padding: 30px 22px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 12px;
+  gap: 13px;
   box-shadow: var(--sh);
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+
+.timesheet-type-page .ts-type-card-inner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
 }
 
 .timesheet-type-page .ts-type-card:hover .ts-type-card-inner {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   box-shadow: var(--sh2);
 }
 
 .timesheet-type-page .ts-type-card-icon {
-  width: 66px;
-  height: 66px;
-  border-radius: 18px;
+  width: 86px;
+  height: 86px;
+  border-radius: 26px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.65rem;
+  font-size: 2.15rem;
+  transition: transform .25s ease;
+}
+
+.timesheet-type-page .ts-type-card:hover .ts-type-card-icon {
+  transform: scale(1.07) rotate(-3deg);
 }
 
 .timesheet-type-page .ts-type-card-label {
-  font-size: 1.03rem;
+  font-size: 1.22rem;
   font-weight: 900;
   color: var(--t1);
 }
 
 .timesheet-type-page .ts-type-card-desc {
-  font-size: .82rem;
+  font-size: .88rem;
   color: var(--t2);
-  line-height: 1.5;
+  line-height: 1.7;
+  max-width: 260px;
+}
+
+.timesheet-type-page .ts-type-tags {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.timesheet-type-page .ts-type-tags li {
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--s2);
+  border: 1px solid var(--bdr2);
+  color: var(--t3);
+  font-size: .72rem;
+  font-weight: 700;
 }
 
 .timesheet-type-page .ts-type-card-arrow {
+  margin-top: auto;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 9px;
+  padding: 11px 22px;
   border-radius: 999px;
-  padding: 6px 14px;
-  font-size: .78rem;
+  font-size: .86rem;
   font-weight: 800;
+  transition: gap .2s ease, filter .2s ease;
 }
+
+.timesheet-type-page .ts-type-card-arrow i {
+  font-size: .8rem;
+}
+
+.timesheet-type-page .ts-type-card:hover .ts-type-card-arrow {
+  gap: 13px;
+  filter: brightness(1.03);
+}
+
 
 .timesheet-type-page .ts-type-heavy .ts-type-card-icon {
-  background: rgba(232,184,0,.13);
-  color: #b45309;
+  background: #ddd;
+  color: #000;
 }
-
 .timesheet-type-page .ts-type-heavy .ts-type-card-arrow {
-  background: rgba(232,184,0,.15);
-  color: #b45309;
+  background: linear-gradient(135deg, #E8B800, var(--or2));
+  color: #1a1407;
 }
-
 .timesheet-type-page .ts-type-heavy:hover .ts-type-card-inner { border-color: rgba(232,184,0,.55); }
 
 .timesheet-type-page .ts-type-truck .ts-type-card-icon {
-  background: rgba(37,99,235,.12);
-  color: #1d4ed8;
+  background: #ddd;
+  color: #000;
 }
-
 .timesheet-type-page .ts-type-truck .ts-type-card-arrow {
-  background: rgba(37,99,235,.14);
-  color: #1d4ed8;
+  background: linear-gradient(135deg, #E8B800, var(--or2));
+  color: #1a1407;
 }
-
 .timesheet-type-page .ts-type-truck:hover .ts-type-card-inner { border-color: rgba(37,99,235,.45); }
 
 .timesheet-type-page .ts-type-drill .ts-type-card-icon {
-  background: rgba(234,111,0,.12);
-  color: #c2410c;
+  background: #ddd;
+  color: #000;
 }
-
 .timesheet-type-page .ts-type-drill .ts-type-card-arrow {
-  background: rgba(234,111,0,.15);
-  color: #c2410c;
+  background: linear-gradient(135deg, #E8B800, var(--or2));
+  color: #1a1407;
 }
-
 .timesheet-type-page .ts-type-drill:hover .ts-type-card-inner { border-color: rgba(234,111,0,.48); }
 
+/* ── Steps strip ── */
+.timesheet-type-page .tst-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 18px 20px;
+  background: var(--s1);
+  border: 1px solid var(--bdr);
+  border-radius: 18px;
+  box-shadow: var(--sh);
+}
+
+.timesheet-type-page .tst-step {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.timesheet-type-page .tst-step + .tst-step {
+  border-right: 1px solid var(--bdr2);
+  padding-right: 16px;
+}
+
+.timesheet-type-page .tst-step-num {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  font-weight: 900;
+  background: rgba(244,197,66,.16);
+  color: #946a00;
+}
+
+.timesheet-type-page .tst-step-txt b {
+  display: block;
+  color: var(--t1);
+  font-size: .94rem;
+  font-weight: 800;
+}
+
+.timesheet-type-page .tst-step-txt span {
+  color: var(--t3);
+  font-size: .78rem;
+}
+
+/* ── Responsive ── */
 @media (max-width: 980px) {
-  .timesheet-type-page .ts-type-cards {
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
-  }
+  .timesheet-type-page .ts-type-cards { grid-template-columns: repeat(2, 1fr); }
+  .timesheet-type-page .tst-steps { grid-template-columns: 1fr; }
+  .timesheet-type-page .tst-step + .tst-step { border-right: 0; padding-right: 0; }
 }
 
 @media (max-width: 760px) {
-  .timesheet-type-page .ts-type-cards {
-    grid-template-columns: 1fr;
-  }
+  .timesheet-type-page .ts-type-cards { grid-template-columns: 1fr; }
+  .timesheet-type-page .tst-hero { flex-direction: column-reverse; text-align: center; }
+  .timesheet-type-page .tst-hero-sub { margin-inline: auto; }
 }
 
 /* ══════════════════════════════════════════════════════════════

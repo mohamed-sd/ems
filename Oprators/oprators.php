@@ -595,6 +595,20 @@ include('../insidebar.php');
     max-height: 90vh;
   }
 }
+
+/* ── خلفية main العامة بيضاء (#fff) ── */
+.main.movement-ops-page {
+  background: #fff;
+}
+
+/* ── عنوان الفورم (التبويب الذهبي) خلف كارد الفورم تماماً كصفحة المشاريع ──
+   main_admin_style.css يضيف animation/transform على .card فينشئ سياق تراصّ
+   (stacking context) يحبس z-index جسم الفورم (1000) داخل الكارد، فيظهر العنوان
+   فوقه. إلغاء الـ transform يعيد الجسم ليطغى على أسفل العنوان كما في المشاريع. */
+.movement-ops-page .allforms .card {
+  animation: none !important;
+  transform: none !important;
+}
 </style>
 
 <div class="main movement-page movement-ops-page">
@@ -633,12 +647,12 @@ include('../insidebar.php');
         <!-- فورم إضافة تشغيل -->
         <?php if ($can_add || $can_edit): ?>
             <form id="projectForm" action="" method="post" class="allforms">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 id="formTitle">
-                            <i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد
-                        </h5>
+
+              <div class="card-header">
+                        <h5><i class="fas fa-edit"></i> <span id="formTitle">اضافة تشغيل آلية جديد</span></h5>
                     </div>
+
+                <div class="card shadow-sm pu-form-card">
                     <div class="card-body">
                         <div class="form-grid">
                             <!-- المعرّف أثناء التعديل -->
@@ -649,46 +663,64 @@ include('../insidebar.php');
                                 value="<?php echo $selected_project_id; ?>">
 
                             <!-- العقود -->
-                            <select name="contract_id" id="contract_id" required>
-                                <option value="">-- اختر العقد --</option>
-                            </select>
-
-                            <!-- المورد -->
-                            <select name="supplier_id" id="supplier_id" required>
-                                <option value="">-- اختر المورد --</option>
-                            </select>
-
-                            <select name="type" id="type" required>
-                                <option value=""> -- حدد نوع المعدة --- </option>
-                                <?php
-                                $type_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
-                                $type_result = mysqli_query($conn, $type_query);
-                                if ($type_result) {
-                                    while ($type_row = mysqli_fetch_assoc($type_result)) {
-                                        echo "<option value='" . intval($type_row['id']) . "'> " . htmlspecialchars($type_row['type']) . " </option>";
-                                    }
-                                }
-                                ?>
-                            </select>
-
-                            <select name="equipment" id="equipment" required>
-                                <option value="">-- اختر المعدة --</option>
-                                <!-- سيتم ملؤها ديناميكيًا عبر AJAX -->
-                            </select>
-
                             <div>
-                                <div>
-                                    <label><i class="fas fa-check-circle"></i> نوع المعدة</label>
-                                    <select name="equipment_category" id="equipment_category" required>
-                                        <option value="">-- أساسي / احتياطي --</option>
-                                        <option value="أساسي"> أساسي</option>
-                                        <option value="احتياطي"> احتياطي</option>
-                                    </select>
-                                </div>
+                                <label><i class="fas fa-file-contract"></i> العقد</label>
+                                <select name="contract_id" id="contract_id" required>
+                                    <option value="">-- اختر العقد --</option>
+                                </select>
                             </div>
 
-                            <input type="date" name="start" id="start_date" required placeholder="تاريخ البداية" />
-                            <input type="date" name="end" id="end_date" required placeholder="تاريخ النهاية" />
+                            <!-- المورد -->
+                            <div>
+                                <label><i class="fas fa-truck"></i> المورد</label>
+                                <select name="supplier_id" id="supplier_id" required>
+                                    <option value="">-- اختر المورد --</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label><i class="fas fa-cogs"></i> نوع المعدة</label>
+                                <select name="type" id="type" required>
+                                    <option value=""> -- حدد نوع المعدة --- </option>
+                                    <?php
+                                    $type_query = "SELECT id, type FROM equipments_types WHERE status = 1 ORDER BY type";
+                                    $type_result = mysqli_query($conn, $type_query);
+                                    if ($type_result) {
+                                        while ($type_row = mysqli_fetch_assoc($type_result)) {
+                                            echo "<option value='" . intval($type_row['id']) . "'> " . htmlspecialchars($type_row['type']) . " </option>";
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label><i class="fas fa-tractor"></i> المعدة</label>
+                                <select name="equipment" id="equipment" required>
+                                    <option value="">-- اختر المعدة --</option>
+                                    <!-- سيتم ملؤها ديناميكيًا عبر AJAX -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <label><i class="fas fa-check-circle"></i> فئة المعدة</label>
+                                <select name="equipment_category" id="equipment_category" required>
+                                    <option value="">-- أساسي / احتياطي --</option>
+                                    <option value="أساسي"> أساسي</option>
+                                    <option value="احتياطي"> احتياطي</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label><i class="fas fa-calendar-alt"></i> تاريخ البداية</label>
+                                <input type="date" name="start" id="start_date" required placeholder="تاريخ البداية" />
+                            </div>
+
+                            <div>
+                                <label><i class="fas fa-calendar-check"></i> تاريخ النهاية</label>
+                                <input type="date" name="end" id="end_date" required placeholder="تاريخ النهاية" />
+                            </div>
+
                             <input type="hidden" step="0.01" name="hours" placeholder="عدد الساعات" value="0" />
 
                             <div>
@@ -712,13 +744,24 @@ include('../insidebar.php');
                                 </select>
                             </div>
 
-                            <select name="status" id="status" required>
-                                <option value="1">ساري</option>
-                                <option value="0">منتهي</option>
-                            </select>
+                            <div>
+                                <label><i class="fas fa-toggle-on"></i> الحالة</label>
+                                <select name="status" id="status" required>
+                                    <option value="1">ساري</option>
+                                    <option value="0">منتهي</option>
+                                </select>
+                            </div>
+
                             <input type="hidden" name="action" value="save_operation" />
-                            <button type="submit" name="save_operation_submit" id="save_operation_submit">حفظ
-                                التشغيل</button>
+                        </div>
+
+                        <div class="pu-form-actions">
+                            <button type="submit" name="save_operation_submit" id="save_operation_submit" class="btn-submit">
+                                <i class="fas fa-save"></i> <span>حفظ التشغيل</span>
+                            </button>
+                            <button type="button" id="operationFormCancel" class="btn-cancel">
+                                <i class="fas fa-times"></i> إلغاء
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -786,10 +829,7 @@ include('../insidebar.php');
             </div>
         </div>
         <div class="card">
-            <div class="card-header">
-                <h5><i class="fas fa-cogs"></i> قائمة التشغيل</h5>
-            </div>
-            <div class="card-body card-body-zero">
+            <div class="card-body">
                 <!-- ===== جدول المعدات الأساسية ===== -->
                 <h6 style="margin:6px 14px 8px;font-size:15px;font-weight:800;color:#1a1208;display:flex;align-items:center;gap:8px;"><span class="legend-dot legend-basic">■</span> المعدات الأساسية</h6>
                 <div class="tbl-scroll-wrap tbl-scroll-zero">
@@ -1158,7 +1198,7 @@ include('../insidebar.php');
                 if (!form.classList.contains('allforms-visible')) {
                     const formTitle = document.getElementById('formTitle');
                     if (formTitle) {
-                        formTitle.innerHTML = '<i class="fa fa-plus-circle"></i> اضافة تشغيل آلية جديد';
+                        formTitle.textContent = 'اضافة تشغيل آلية جديد';
                     }
 
                     const operationId = document.getElementById('operation_id');
@@ -1246,13 +1286,22 @@ include('../insidebar.php');
 
             document.addEventListener('DOMContentLoaded', function () {
                 const toggleFormBtn = document.getElementById('toggleForm');
-                if (!toggleFormBtn) {
-                    return;
+                if (toggleFormBtn) {
+                    toggleFormBtn.addEventListener('click', function (event) {
+                        toggleOperationForm(event);
+                    });
                 }
 
-                toggleFormBtn.addEventListener('click', function (event) {
-                    toggleOperationForm(event);
-                });
+                // زر الإلغاء: يطوي نموذج الإضافة/التعديل (بنفس سلوك شاشة العملاء)
+                const cancelFormBtn = document.getElementById('operationFormCancel');
+                if (cancelFormBtn) {
+                    cancelFormBtn.addEventListener('click', function () {
+                        const form = document.getElementById('projectForm');
+                        if (form) {
+                            form.classList.remove('allforms-visible');
+                        }
+                    });
+                }
             });
 
             $(document).ready(function () {
@@ -1468,7 +1517,7 @@ include('../insidebar.php');
                     console.log('ðŸ”§ بدء التعديل - ID:', btn.data('id'));
 
                     // تغيير عنوان النموذج
-                    $('#formTitle').html('<i class="fa fa-edit"></i> تعديل بيانات التشغيل');
+                    $('#formTitle').text('تعديل بيانات التشغيل');
 
                     // إظهار النموذج
                     $('#projectForm').addClass('allforms-visible').show();

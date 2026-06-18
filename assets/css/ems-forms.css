@@ -97,6 +97,17 @@
     gap: 10px;
     border: none;
 }
+/* إزالة الخلفية الرمادية الفاتحة خلف التبويب الذهبي للعنوان — الاكتفاء بالأصفر.
+   مرفوع التخصيص ليتجاوز القاعدة العامة .ems-site .main .card-header (0,3,0)
+   التي تفرض خلفية رمادية وحدًّا سفليًا على حاوية العنوان. */
+.ems-site .main :is(.allforms, .ems-form) .card-header,
+:is(.allforms, .ems-form) .card-header {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
 :is(.allforms, .ems-form) .card-header h5,
 :is(.allforms, .ems-form) .card-header h4,
 :is(.allforms, .ems-form) .card-header h3 {
@@ -120,12 +131,21 @@
 
 /* ── 3) عناوين الأقسام — أيقونة محاطة يمين + نص أسود + شارة رقم محاطة يسار ─────
    (يطابق الصورة: خلفيات بيضاء، حدود/نص/أيقونات سوداء، حواف دائرية) ──────────── */
-:is(.allforms, .ems-form) .form-section,
+/* عدّاد ترقيم الأقسام: يُزاد مرّة واحدة فقط لكل قسم.
+   كان يُزاد على .form-section و .form-section-header معاً، وعند تداخلهما
+   (قسم يحوي رأسه كما في فورم المشغلين) ينتج 2،4،6 بدل 1،2،3.
+   الحل: نزيده على رأس القسم، وعلى .form-section فقط إن لم تحوِ رأساً صريحاً
+   (للحفاظ على الفورمات التي تستخدم .form-section مع <h6> مباشرة). */
 :is(.allforms, .ems-form) .form-section-header {
     counter-increment: emsf-step;
 }
+:is(.allforms, .ems-form) .form-section:not(:has(.form-section-header)) {
+    counter-increment: emsf-step;
+}
 :is(.allforms, .ems-form) .form-section {
-    margin-bottom: 22px;
+    padding: 10px !important;
+    border-radius: 25px !important;
+    background: #fff !important;
 }
 :is(.allforms, .ems-form) .form-section > h6,
 :is(.allforms, .ems-form) .form-section-header,

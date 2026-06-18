@@ -181,7 +181,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : 'بالساعة التشغيلية'; };
 ?>
 
-<div class="main fleet-dep-main">
+<div class="main fleet-dep-main" style="padding:15px;background:#fff;">
 
     <?php
     $header_title   = 'ملف الافتراضات المالية والإهلاك';
@@ -211,11 +211,17 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
     </div>
 
     <!-- نموذج إضافة / تعديل -->
-    <form id="projectForm" method="post" class="allforms<?= (!empty($editData) || !empty($errors)) ? ' allforms-visible' : ''; ?>">
-        <div class="card">
-            <div class="card-header">
-                <h5><i class="fas fa-coins"></i> <?= !empty($editData) ? 'تعديل الملف' : 'إضافة ملف جديد'; ?></h5>
+    <form id="projectForm" method="post" class="allforms<?= (!empty($editData) || !empty($errors)) ? ' allforms-visible' : ''; ?>" style="margin:10px;">
+    <div class="card-header">
+                <h5><i class="fas fa-coins"></i> <?= !empty($editData) ? 'تعديل الملف' : 'إضافة ملف جديد'; ?>
+                    <?php if (!empty($editData) && $editData['state'] === 'approved'): ?>
+                        <span class="status-active" style="margin-inline-start:10px"><i class="fas fa-check-circle"></i> معتمد</span>
+                    <?php elseif (!empty($editData)): ?>
+                        <span class="status-inactive" style="margin-inline-start:10px">مسودة</span>
+                    <?php endif; ?>
+                </h5>
             </div>
+    <div class="card">
             <div class="card-body">
                 <?php if (!empty($editData)): ?>
                     <input type="hidden" name="edit_id" value="<?= (int) $editData['id']; ?>">
@@ -286,13 +292,11 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                     </div>
                 </div>
 
-                <div style="margin-top:14px;">
-                    <button type="submit" class="btn btn-success"><i class="fa-solid fa-save"></i> حفظ</button>
-                    <?php if (!empty($editData) && $editData['state'] === 'approved'): ?>
-                        <span class="status-active" style="margin-inline-start:10px"><i class="fas fa-check-circle"></i> معتمد</span>
-                    <?php elseif (!empty($editData)): ?>
-                        <span class="status-inactive" style="margin-inline-start:10px">مسودة</span>
-                    <?php endif; ?>
+                <div class="pu-form-actions">
+                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> حفظ</button>
+                    <button type="button" id="depFormCancel" class="btn-cancel"<?= !empty($editData) ? ' data-redirect="fleet_depreciation_profiles.php"' : ''; ?>>
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
                 </div>
             </div>
         </div>
@@ -300,12 +304,12 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
 
     <!-- جدول الملفات -->
     <div class="card">
-        <div class="card-header"><h5><i class="fas fa-list"></i> ملفات الافتراضات المالية</h5></div>
-        <div class="card-body">
+         <div class="card-body">
             <div class="table-container">
                 <table id="projectsTable" class="display fleet-dep-table">
                     <thead>
                         <tr>
+                            <th>الإجراءات</th>
                             <th>#</th>
                             <th>الكود</th>
                             <th>فئة الأصل</th>
@@ -314,7 +318,6 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                             <th>العمر</th>
                             <th>التخريد</th>
                             <th>الحالة</th>
-                            <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -332,18 +335,6 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                             $brand_model = trim(($row['brand'] ?? '') . (!empty($row['model_code']) ? (($row['brand'] ? ' / ' : '') . $row['model_code']) : ''));
                             ?>
                             <tr>
-                                <td><?= $i++; ?></td>
-                                <td><?= $e($row['code']); ?></td>
-                                <td><?= $e($row['asset_category']); ?></td>
-                                <td><?= $e($brand_model !== '' ? $brand_model : '—'); ?></td>
-                                <td><?= $e($method_label($row['method'])); ?></td>
-                                <td><?= $e(rtrim(rtrim(number_format((float) $row['useful_life'], 2, '.', ''), '0'), '.')); ?> <?= $e($unit); ?></td>
-                                <td><?= $e(rtrim(rtrim(number_format((float) $row['salvage_pct'] * 100, 2, '.', ''), '0'), '.')); ?>%</td>
-                                <td>
-                                    <?= $row['state'] === 'approved'
-                                        ? "<span class='status-active'><i class='fas fa-check-circle'></i> معتمد</span>"
-                                        : "<span class='status-inactive'>مسودة</span>"; ?>
-                                </td>
                                 <td class="text-center">
                                     <div class="action-btns">
                                         <?php if ($perms['can_edit']): ?>
@@ -367,6 +358,18 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                                         <?php endif; ?>
                                     </div>
                                 </td>
+                                <td><?= $i++; ?></td>
+                                <td><?= $e($row['code']); ?></td>
+                                <td><?= $e($row['asset_category']); ?></td>
+                                <td><?= $e($brand_model !== '' ? $brand_model : '—'); ?></td>
+                                <td><?= $e($method_label($row['method'])); ?></td>
+                                <td><?= $e(rtrim(rtrim(number_format((float) $row['useful_life'], 2, '.', ''), '0'), '.')); ?> <?= $e($unit); ?></td>
+                                <td><?= $e(rtrim(rtrim(number_format((float) $row['salvage_pct'] * 100, 2, '.', ''), '0'), '.')); ?>%</td>
+                                <td>
+                                    <?= $row['state'] === 'approved'
+                                        ? "<span class='status-active'><i class='fas fa-check-circle'></i> معتمد</span>"
+                                        : "<span class='status-inactive'>مسودة</span>"; ?>
+                                </td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -378,11 +381,9 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="../includes/js/jquery.dataTables.main.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.responsive.min.js"></script>
 <script>
     $(document).ready(function () {
         $('#projectsTable').DataTable({
-            responsive: true,
             language: { url: "/ems/assets/i18n/datatables/ar.json" }
         });
 
@@ -393,6 +394,13 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
             } else {
                 $form.addClass('allforms-visible').hide().slideDown(250);
             }
+        });
+
+        // زر الإلغاء: في وضع التعديل يعود للقائمة، وفي وضع الإضافة يطوي النموذج
+        $('#depFormCancel').on('click', function () {
+            const redirect = $(this).data('redirect');
+            if (redirect) { window.location.href = redirect; return; }
+            $('#projectForm').removeClass('allforms-visible').slideUp(200);
         });
 
         // تبديل وحدة العمر الإنتاجي حسب الطريقة

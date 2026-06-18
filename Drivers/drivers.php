@@ -347,12 +347,25 @@ include("../inheader.php");
     }
 
     .equipments-fleet-main .form-section-header i {
-        color: var(--or);
+        color: #1a1a1a;
     }
 
     .equipments-fleet-main .form-section-header .toggle-icon {
-        margin-right: auto;
+        /* السهم في أقصى اليسار، والشارة الرقمية بجانبه مباشرة */
+        order: 100;
+        margin-right: 0;
+        margin-left: 0;
+        color: #000;
+        font-size: 1rem;
         transition: transform .25s ease;
+    }
+
+    /* شارة الرقم التلقائية (نظام الفورم الموحّد) تلتصق بالسهم في أقصى اليسار،
+       فلا يبقى أي رقم عائم في منتصف رأس البلوك */
+    .equipments-fleet-main .form-section-header::after {
+        order: 99;
+        margin-right: auto;
+        margin-left: 0;
     }
 
     .equipments-fleet-main .form-section-header.collapsed .toggle-icon {
@@ -439,6 +452,70 @@ include("../inheader.php");
             box-shadow: 0 5px 12px rgba(217, 119, 6, 0.28);
         }
     }
+
+    /* خلفية الجزء الرئيسي بيضاء */
+    .main.drivers-main {
+        background: #fff;
+    }
+
+    /* أيقونات حقول الفورم سوداء */
+    .equipments-fleet-main .form-section-body label i,
+    .equipments-fleet-main .form-section-body > div > label i {
+        color: #1a1a1a;
+    }
+
+    /* عمود الإجراءات: نفس هوية أزرار جدول العرض في صفحة المشاريع (شكل دوائر ذهبية) */
+    .drivers-main .action-btns {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+        flex-wrap: nowrap;
+    }
+
+    .drivers-main .action-btns .action-btn {
+        width: 34px;
+        height: 34px;
+        margin: 0;
+        padding: 0;
+        border-radius: 8px;
+        font-size: .9rem;
+        border: 1px solid rgba(247, 147, 26, .28);
+        background: linear-gradient(135deg, #fff8ec 0%, #fffaf2 100%);
+        color: #9a7b00;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+    }
+
+    .drivers-main .action-btns .action-btn:hover {
+        color: #fff;
+        background: linear-gradient(135deg, #f7931a 0%, #d97706 100%);
+        border-color: rgba(247, 147, 26, .7);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
+    }
+
+    .drivers-main .action-btns .action-btn.history {
+        border-color: rgba(111, 66, 193, .22);
+        background: rgba(111, 66, 193, .10);
+        color: #6f42c1;
+    }
+
+    .drivers-main .action-btns .action-btn.history:hover {
+        background: #6f42c1;
+        color: #fff;
+        border-color: rgba(111, 66, 193, .6);
+    }
+
+    .drivers-main .action-btns .action-btn.delete {
+        border-color: rgba(220, 38, 38, .25);
+        background: rgba(220, 38, 38, .08);
+        color: #dc2626;
+    }
+
+    .drivers-main .action-btns .action-btn.delete:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #a01818 100%);
+        color: #fff;
+        border-color: rgba(220, 38, 38, .6);
+    }
 </style>
 
 <?php
@@ -478,10 +555,10 @@ include('../insidebar.php');
 
     <!-- فورم إضافة / تعديل مشغل -->
     <form id="projectForm" action="" method="post" class="allforms">
-        <div class="card shadow-sm">
-            <div class="card-header">
-                <h5><i class="fas fa-edit"></i> إضافة / تعديل مشغل - نموذج شامل</h5>
+         <div class="card-header">
+                <h5><i class="fas fa-edit"></i> إضافة / تعديل مشغل </h5>
             </div>
+        <div class="card shadow-sm">
             <div class="card-body">
                 <input type="hidden" name="id" id="drivers_id" value="">
 
@@ -489,7 +566,7 @@ include('../insidebar.php');
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-info-circle"></i>
-                        <span>1. المعلومات الأساسية والتعريفية</span>
+                        <span>المعلومات الأساسية والتعريفية</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
@@ -516,7 +593,7 @@ include('../insidebar.php');
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-id-card"></i>
-                        <span>2. بيانات الهوية والتوثيق</span>
+                        <span>بيانات الهوية والتوثيق</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
@@ -542,12 +619,12 @@ include('../insidebar.php');
                                 <input type="date" name="identity_expiry_date" id="identity_expiry_date" />
                             </div>
                             <div>
-                                <label><i class="fas fa-camera"></i> صورة السائق (تجهيزي - غير مفعلة الآن)</label>
+                                <label><i class="fas fa-camera"></i> صورة السائق ( تحت التجهيز)</label>
                                 <input type="text" name="driver_photo" id="driver_photo"
                                     placeholder="سيتم تفعيل رفع صورة السائق لاحقاً" readonly />
                             </div>
                             <div>
-                                <label><i class="fas fa-id-card"></i> صورة هوية السائق (تجهيزي - غير مفعلة الآن)</label>
+                                <label><i class="fas fa-id-card"></i> صورة هوية السائق ( تحت التجهيز)</label>
                                 <input type="text" name="identity_photo" id="identity_photo"
                                     placeholder="سيتم تفعيل رفع صورة الهوية لاحقاً" readonly />
                             </div>
@@ -559,7 +636,7 @@ include('../insidebar.php');
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-car"></i>
-                        <span>3. رخصة القيادة والمهارات</span>
+                        <span>رخصة القيادة والمهارات</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
@@ -599,7 +676,7 @@ include('../insidebar.php');
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-cogs"></i>
-                        <span>4. التخصص والمهارات</span>
+                        <span>التخصص والمهارات</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
@@ -635,7 +712,7 @@ include('../insidebar.php');
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-medal"></i>
-                        <span>5. سنوات الخبرة والكفاءة</span>
+                        <span>سنوات الخبرة والكفاءة</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
@@ -674,7 +751,7 @@ include('../insidebar.php');
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-users"></i>
-                        <span>6. علاقة العمل والتبعية</span>
+                        <span>علاقة العمل والتبعية</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
@@ -756,7 +833,7 @@ include('../insidebar.php');
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-address-book"></i>
-                        <span>7. البيانات التواصلية</span>
+                        <span>البيانات التواصلية</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
@@ -788,7 +865,7 @@ include('../insidebar.php');
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-star-half-alt"></i>
-                        <span>8. تقييم الأداء والسلوك</span>
+                        <span>تقييم الأداء والسلوك</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
@@ -835,7 +912,7 @@ include('../insidebar.php');
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-heartbeat"></i>
-                        <span>9. الصحة والسلامة</span>
+                        <span>الصحة والسلامة</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
@@ -874,7 +951,7 @@ include('../insidebar.php');
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-history"></i>
-                        <span>10. المراجع والسجل</span>
+                        <span>المراجع والسجل</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
@@ -907,7 +984,7 @@ include('../insidebar.php');
                 <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-toggle-on"></i>
-                        <span>11. الحالة والتفعيل</span>
+                        <span>الحالة والتفعيل</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
@@ -941,22 +1018,19 @@ include('../insidebar.php');
                     </div>
                 </div>
 
-                <div
-                    style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border); justify-content: center;">
-                    <button type="submit" class="btn-submit" style="padding: 15px 40px; font-size: 1.1rem;">
+                <div class="pu-form-actions">
+                    <button type="button" class="btn-submit" onclick="expandAllSections()">
+                        <i class="fas fa-expand-alt"></i> فتح جميع المجموعات
+                    </button>
+                    <button type="button" class="btn-submit" onclick="collapseAllSections()">
+                        <i class="fas fa-compress-alt"></i> إغلاق جميع المجموعات
+                    </button>
+                    <button type="submit" class="btn-submit">
                         <i class="fas fa-save"></i> حفظ المشغل
                     </button>
                     <button type="button" class="btn-cancel"
                         onclick="document.getElementById('projectForm').classList.remove('allforms-visible');">
                         <i class="fas fa-times"></i> إلغاء
-                    </button>
-                    <button type="button" class="btn-submit"
-                        style="background: linear-gradient(135deg, #10b981, #059669);" onclick="expandAllSections()">
-                        <i class="fas fa-expand-alt"></i> فتح جميع المجموعات
-                    </button>
-                    <button type="button" class="btn-submit"
-                        style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="collapseAllSections()">
-                        <i class="fas fa-compress-alt"></i> إغلاق جميع المجموعات
                     </button>
                 </div>
             </div>
@@ -964,14 +1038,12 @@ include('../insidebar.php');
     </form>
 
     <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-list-alt"></i> قائمة المشغلين</h5>
-        </div>
         <div class="card-body">
             <div class="table-scroll-wrap">
             <table id="driversTable" class="display nowrap">
                 <thead>
                     <tr>
+                        <th>الإجراءات</th>
                         <th>#</th>
                         <th>الكود</th>
                         <th>اسم المشغل</th>
@@ -979,7 +1051,6 @@ include('../insidebar.php');
                         <th>المشروع</th>
                         <th>عدد العقود</th>
                         <th>الحالة</th>
-                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1022,32 +1093,17 @@ include('../insidebar.php');
                             $driver_name_cell .= " <span class='link-alert-chip' title='المشغل ليس لديه عقد'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
                         }
 
-                        echo "<tr>";
-                        echo "<td>" . $i++ . "</td>";
-                        echo "<td><code>" . htmlspecialchars($row['driver_code'] ?: 'N/A') . "</code></td>";
-                        echo "<td>" . $driver_name_cell . "</td>";
-                        echo "<td>" . htmlspecialchars($row['supplier_name'] ?: '-') . "</td>";
-                        $project_display = '-';
-                        if (!empty($row['project_name'])) {
-                            $project_display = htmlspecialchars($row['project_name']);
-                            if (!empty($row['project_code'])) {
-                                $project_display .= " <code style='font-size:0.7rem;'>" . htmlspecialchars($row['project_code']) . "</code>";
-                            }
-                        }
-                        echo "<td>" . $project_display . "</td>";
-
-                        echo "<td><span class='badge badge-info'>" . $row['numcontracts'] . " عقد</span></td>";
-                        echo "<td>" . $statusBadge . "</td>";
-                        echo "<td><div class='action-btns'>";
+                        // بناء خلية الإجراءات أولاً لوضعها كأول عمود في الجدول
+                        $actions_cell = "<div class='action-btns'>";
                         if ($can_edit) {
-                            echo "<a href='javascript:void(0)'
+                            $actions_cell .= "<a href='javascript:void(0)'
                                        class='action-btn edit editBtn'
                                        data-id='" . $row['id'] . "'
                                        title='تعديل'>
                                         <i class='fas fa-edit'></i>
                                     </a>";
                         }
-                        echo "<a href='drivercontracts.php?id=" . $row['id'] . "'
+                        $actions_cell .= "<a href='drivercontracts.php?id=" . $row['id'] . "'
                                        class='action-btn view'
                                        title='عرض العقود'>
                                         <i class='fas fa-file-contract'></i>
@@ -1063,11 +1119,29 @@ include('../insidebar.php');
                                         <i class='fas fa-history'></i>
                                     </a>";
                         if ($can_delete) {
-                            echo "<a href='drivers.php?delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف المشغل؟\")' title='حذف'>
+                            $actions_cell .= "<a href='drivers.php?delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف المشغل؟\")' title='حذف'>
                                         <i class='fas fa-trash'></i>
                                     </a>";
                         }
-                        echo "</div></td>";
+                        $actions_cell .= "</div>";
+
+                        $project_display = '-';
+                        if (!empty($row['project_name'])) {
+                            $project_display = htmlspecialchars($row['project_name']);
+                            if (!empty($row['project_code'])) {
+                                $project_display .= " <code style='font-size:0.7rem;'>" . htmlspecialchars($row['project_code']) . "</code>";
+                            }
+                        }
+
+                        echo "<tr>";
+                        echo "<td>" . $actions_cell . "</td>";
+                        echo "<td>" . $i++ . "</td>";
+                        echo "<td><code>" . htmlspecialchars($row['driver_code'] ?: 'N/A') . "</code></td>";
+                        echo "<td>" . $driver_name_cell . "</td>";
+                        echo "<td>" . htmlspecialchars($row['supplier_name'] ?: '-') . "</td>";
+                        echo "<td>" . $project_display . "</td>";
+                        echo "<td><span class='badge badge-info'>" . $row['numcontracts'] . " عقد</span></td>";
+                        echo "<td>" . $statusBadge . "</td>";
                         echo "</tr>";
                     } }
                     ?>
