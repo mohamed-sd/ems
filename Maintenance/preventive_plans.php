@@ -406,8 +406,9 @@ function mnt_opt($value, $label, $selected) {
 <?php
     // جلب الخطط النشطة وحساب الاستحقاق
     $rows = array();
-    $sql = "SELECT pl.*, e.name AS equipment_name FROM mnt_plan pl
+    $sql = "SELECT pl.*, e.name AS equipment_name, ct.type AS category_name FROM mnt_plan pl
              LEFT JOIN equipments e ON e.id = pl.equipment_id
+             LEFT JOIN equipments_types ct ON ct.id = pl.category_id
             WHERE $company_scope_sql AND COALESCE(pl.is_deleted,0)=0
             ORDER BY pl.id DESC";
     if ($res = mysqli_query($conn, $sql)) { while ($x = mysqli_fetch_assoc($res)) $rows[] = $x; }
@@ -465,9 +466,25 @@ function mnt_opt($value, $label, $selected) {
                 <thead><tr><th>الإجراءات</th><th>المرجع</th><th>الخطة</th><th>المعدة</th><th>الأساس</th><th>الفاصل</th><th>الاستحقاق القادم</th><th>الحالة</th></tr></thead>
                 <tbody>
                     <?php foreach ($rows as $row):
+                        $st = (string) $row['state'];
+                        $da =
+                            "data-code='"      . htmlspecialchars((string) $row['code'], ENT_QUOTES) . "' " .
+                            "data-name='"      . htmlspecialchars((string) $row['name'], ENT_QUOTES) . "' " .
+                            "data-scope='"     . htmlspecialchars((string) ($row['scope'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-equipment='" . htmlspecialchars((string) ($row['equipment_name'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-category='"  . htmlspecialchars((string) ($row['category_name'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-basis='"     . htmlspecialchars((string) $row['trigger_basis'], ENT_QUOTES) . "' " .
+                            "data-interval='"  . htmlspecialchars((string) ($row['interval_value'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-tolerance='" . htmlspecialchars((string) ($row['tolerance'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-lastdate='"  . htmlspecialchars((string) ($row['last_done_date'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-lastmeter='" . htmlspecialchars((string) ($row['last_done_meter'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-duedate='"   . htmlspecialchars((string) ($row['next_due_date'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-duemeter='"  . htmlspecialchars((string) ($row['next_due_meter'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-state='"     . htmlspecialchars($st, ENT_QUOTES) . "'";
                         echo "<tr>";
                         echo "<td><div class='action-btns'>";
-                        echo "<a href='preventive_plans.php?id=" . intval($row['id']) . "' class='action-btn edit' title='فتح/تحرير'><i class='fas fa-pen-to-square'></i></a>";
+                        echo "<a href='javascript:void(0)' class='viewBtn action-btn view' $da title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
+                        if ($can_edit) echo "<a href='preventive_plans.php?id=" . intval($row['id']) . "' class='action-btn edit' title='فتح/تحرير'><i class='fas fa-pen-to-square'></i></a>";
                         if ($can_delete) echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف الخطة؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
                         echo "</div></td>";
                         echo "<td><strong>" . htmlspecialchars((string) $row['code']) . "</strong></td>";
@@ -506,6 +523,30 @@ function mnt_opt($value, $label, $selected) {
                 "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
             });
         }
+
+        // ════════ نافذة العرض الموحّدة ════════
+        $(document).on('click', '.viewBtn', function () {
+            var d = $(this).data();
+            EmsDetailsModal.open({
+                title: 'تفاصيل الخطة الوقائية',
+                icon: 'fas fa-calendar-check',
+                fields: [
+                    { label: 'المرجع', value: d.code, icon: 'fas fa-hashtag' },
+                    { label: 'الحالة', value: d.state, icon: 'fas fa-flag', type: 'status' },
+                    { label: 'اسم الخطة', value: d.name, icon: 'fas fa-clipboard-list', size: 'lg' },
+                    { label: 'النطاق', value: d.scope, icon: 'fas fa-layer-group' },
+                    { label: 'المعدة', value: d.equipment, icon: 'fas fa-tractor' },
+                    { label: 'الفئة', value: d.category, icon: 'fas fa-tags' },
+                    { label: 'الأساس', value: d.basis, icon: 'fas fa-sliders' },
+                    { label: 'الفاصل', value: d.interval, icon: 'fas fa-ruler' },
+                    { label: 'السماحية', value: d.tolerance, icon: 'fas fa-arrows-left-right' },
+                    { label: 'آخر تنفيذ (تاريخ)', value: d.lastdate, icon: 'fas fa-calendar' },
+                    { label: 'آخر تنفيذ (عداد)', value: d.lastmeter, icon: 'fas fa-gauge' },
+                    { label: 'الاستحقاق القادم (تاريخ)', value: d.duedate, icon: 'fas fa-calendar-day' },
+                    { label: 'الاستحقاق القادم (عداد)', value: d.duemeter, icon: 'fas fa-gauge-high' }
+                ]
+            });
+        });
     });
 
     // ════════ صفحة التحرير: مهام الخطة عبر AJAX + فتح/إغلاق الفورم ════════

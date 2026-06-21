@@ -30,6 +30,14 @@ $is_maintenance = mnt_user_is_maintenance($conn);
 
 $severities = array('منخفضة', 'متوسطة', 'عالية', 'حرجة');
 $company_scope_sql = $is_super_admin ? "1=1" : "b.company_id = " . intval($company_id);
+$current_role_int  = intval($current_role);
+
+// عمود «موجَّه إلى (الدور/القسم)» — يُضاف تلقائياً مرة واحدة إن لم يكن موجوداً (نمط add-if-missing).
+$breakdown_has_target_role = db_table_has_column($conn, 'mnt_breakdown', 'target_role');
+if (!$breakdown_has_target_role) {
+    @mysqli_query($conn, "ALTER TABLE mnt_breakdown ADD COLUMN target_role INT NULL DEFAULT NULL AFTER reporter_dept");
+    $breakdown_has_target_role = db_table_has_column($conn, 'mnt_breakdown', 'target_role');
+}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // إصدار أمر صيانة من بلاغ (مستخدم الصيانة فقط)
@@ -126,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['description'])) {
 
     $equipment_id  = !empty($_POST['equipment_id']) ? intval($_POST['equipment_id']) : null;
     $project_id    = !empty($_POST['project_id']) ? intval($_POST['project_id']) : null;
+    $target_role   = !empty($_POST['target_role']) ? intval($_POST['target_role']) : null;
     $reporter_dept = trim($_POST['reporter_dept'] ?? '');
     $report_dt     = trim($_POST['report_datetime'] ?? '');
     $failure_code  = !empty($_POST['failure_code_id']) ? intval($_POST['failure_code_id']) : null;
@@ -138,6 +147,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['description'])) {
     else { $report_dt = str_replace('T', ' ', $report_dt); }
     if ($description === '') {
         header("Location: breakdowns.php?msg=وصف+البلاغ+مطلوب+❌"); exit();
+    }
+    if ($target_role === null) {
+        header("Location: breakdowns.php?msg=القسم+الموجَّه+له+البلاغ+مطلوب+❌"); exit();
     }
 
     // مرفق اختياري (تحقّق صارم من الامتداد)
@@ -158,16 +170,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['description'])) {
     $code = mnt_next_code($conn, 'mnt_breakdown', 'BR', $company_id);
 
     $sql = "INSERT INTO mnt_breakdown
-            (company_id, code, equipment_id, project_id, reported_by, reporter_dept, report_datetime,
+            (company_id, code, equipment_id, project_id, reported_by, reporter_dept, target_role, report_datetime,
              failure_code_id, severity, is_stopped, description, attachment, state, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'جديد', ?)";
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'جديد', ?)";
     if ($stmt = mysqli_prepare($conn, $sql)) {
-        // أنواع الربط بالترتيب: company_id,i code,s equipment_id,i project_id,i reported_by,i
-        // reporter_dept,s report_datetime,s failure_code_id,i severity,s is_stopped,i
-        // description,s attachment,s created_by,i  ⇒ "isiiissisissi"
+        // الترتيب: company_id,i code,s equipment_id,i project_id,i reported_by,i reporter_dept,s
+        // target_role,i report_datetime,s failure_code_id,i severity,s is_stopped,i description,s
+        // attachment,s created_by,i  ⇒ "isiiisisisissi"
         mysqli_stmt_bind_param(
-            $stmt, 'isiiissisissi',
-            $company_id, $code, $equipment_id, $project_id, $current_user_id, $reporter_dept, $report_dt,
+            $stmt, 'isiiisisisissi',
+            $company_id, $code, $equipment_id, $project_id, $current_user_id, $reporter_dept, $target_role, $report_dt,
             $failure_code, $severity, $is_stopped, $description, $attachment, $current_user_id
         );
         mysqli_stmt_execute($stmt);
@@ -189,6 +201,11 @@ $failure_codes = array();
 $fc_sql = "SELECT id, full_code, failure_detail, main_category_name FROM failure_codes WHERE status = 1 ORDER BY full_code ASC";
 if ($r = mysqli_query($conn, $fc_sql)) { while ($row = mysqli_fetch_assoc($r)) { $failure_codes[] = $row; } }
 
+// الأقسام/الأدوار المتاحة للتوجيه (تصنيف عام؛ العزل يضمنه نطاق الشركة على البلاغات).
+$roles_list = array();
+$roles_sql = "SELECT id, name FROM roles WHERE (status = '1' OR status = 1) AND id <> -1 ORDER BY name ASC";
+if ($r = mysqli_query($conn, $roles_sql)) { while ($row = mysqli_fetch_assoc($r)) { $roles_list[] = $row; } }
+
 $page_title = 'إيكوبيشن | البلاغات';
 include '../inheader.php';
 include '../insidebar.php';
@@ -197,8 +214,8 @@ include '../insidebar.php';
 <div class="main mnt-breakdowns-main ems-unified-page-shell">
 
     <?php
-    $new_count = ($company_id > 0) ? mnt_new_breakdowns_count($conn, $company_id) : 0;
-    $header_title_html = 'البلاغات' . ($new_count > 0 ? ' <span class="mnt-head-badge">' . intval($new_count) . ' جديد</span>' : '');
+    $new_count = ($company_id > 0) ? mnt_new_breakdowns_count($conn, $company_id, $current_role_int) : 0;
+    $header_title_html = 'البلاغات' . ($new_count > 0 ? ' <span class="mnt-head-badge">' . intval($new_count) . ' وارد</span>' : '');
     $header_icon    = 'fa fa-triangle-exclamation';
     $header_actions = array();
     $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'بلاغ جديد');
@@ -247,6 +264,15 @@ include '../insidebar.php';
                             <input type="text" name="reporter_dept" id="bk_dept" placeholder="مثال: التشغيل">
                         </div>
                         <div class="form-group">
+                            <label>موجَّه إلى (القسم) <span class="required">*</span></label>
+                            <select name="target_role" id="bk_target_role" required>
+                                <option value="">-- اختر القسم --</option>
+                                <?php foreach ($roles_list as $rl): ?>
+                                    <option value="<?php echo intval($rl['id']); ?>"><?php echo htmlspecialchars($rl['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>تاريخ ووقت البلاغ</label>
                             <input type="datetime-local" name="report_datetime" id="bk_dt">
                         </div>
@@ -289,10 +315,80 @@ include '../insidebar.php';
         </div>
     </form>
 
-    <!-- ══ فلتر الحالة + جدول البلاغات ══ -->
+    <?php
+    // ══ دالة رسم صف بلاغ واحد (تُستخدم لكلا التبويبين) ══
+    $render_breakdown_row = function ($row) use ($is_maintenance) {
+        $sev = (string) $row['severity'];
+        $sev_class = ($sev === 'حرجة' || $sev === 'عالية') ? 'status-inactive' : 'status-active';
+        $state = (string) $row['state'];
+        $view_attrs =
+            "data-code='" . htmlspecialchars((string) $row['code'], ENT_QUOTES) . "' " .
+            "data-equipment='" . htmlspecialchars((string) ($row['equipment_name'] ?? ''), ENT_QUOTES) . "' " .
+            "data-project='" . htmlspecialchars((string) ($row['project_name'] ?? ''), ENT_QUOTES) . "' " .
+            "data-dept='" . htmlspecialchars((string) ($row['reporter_dept'] ?? ''), ENT_QUOTES) . "' " .
+            "data-reporter='" . htmlspecialchars((string) ($row['reporter_name'] ?? ''), ENT_QUOTES) . "' " .
+            "data-target='" . htmlspecialchars((string) ($row['target_role_name'] ?? ''), ENT_QUOTES) . "' " .
+            "data-severity='" . htmlspecialchars($sev, ENT_QUOTES) . "' " .
+            "data-stopped='" . (intval($row['is_stopped']) ? 'نعم' : 'لا') . "' " .
+            "data-dt='" . htmlspecialchars((string) ($row['report_datetime'] ?? ''), ENT_QUOTES) . "' " .
+            "data-state='" . htmlspecialchars($state, ENT_QUOTES) . "' " .
+            "data-desc='" . htmlspecialchars((string) ($row['description'] ?? ''), ENT_QUOTES) . "'";
+        echo "<tr>";
+        echo "<td><div class='action-btns'>";
+        echo "<a href='javascript:void(0)' class='viewBtn action-btn view' $view_attrs title='عرض'><i class='fas fa-eye'></i></a>";
+        if ($is_maintenance) {
+            if ($state === 'جديد' || $state === 'قيد التقييم') {
+                echo "<form method='post' style='display:inline' onsubmit='return confirm(\"إصدار أمر صيانة من هذا البلاغ؟\")'>"
+                   . "<input type='hidden' name='action' value='issue_order'>"
+                   . "<input type='hidden' name='breakdown_id' value='" . intval($row['id']) . "'>"
+                   . "<button type='submit' class='action-btn edit' title='إصدار أمر صيانة'><i class='fas fa-wrench'></i></button>"
+                   . "</form>";
+                echo "<a href='?close_id=" . intval($row['id']) . "' class='action-btn' title='إغلاق البلاغ' onclick='return confirm(\"إغلاق البلاغ بدون أمر؟\")'><i class='fas fa-times-circle'></i></a>";
+            } elseif (intval($row['order_id']) > 0) {
+                echo "<a href='orders.php?id=" . intval($row['order_id']) . "' class='action-btn' title='فتح أمر الصيانة'><i class='fas fa-up-right-from-square'></i></a>";
+            }
+            echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف البلاغ؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
+        }
+        echo "</div></td>";
+        echo "<td><strong>" . htmlspecialchars((string) $row['code']) . "</strong></td>";
+        echo "<td>" . htmlspecialchars((string) ($row['equipment_name'] ?? '-')) . "</td>";
+        echo "<td>" . htmlspecialchars((string) ($row['project_name'] ?? '-')) . "</td>";
+        echo "<td>" . htmlspecialchars((string) ($row['reporter_name'] ?? '-')) . "</td>";
+        echo "<td>" . htmlspecialchars((string) ($row['target_role_name'] ?? '-')) . "</td>";
+        echo "<td><span class='$sev_class'>" . htmlspecialchars($sev) . "</span></td>";
+        echo "<td>" . (intval($row['is_stopped']) ? '<i class="fas fa-ban" style="color:#dc2626"></i>' : '—') . "</td>";
+        echo "<td>" . htmlspecialchars((string) ($row['report_datetime'] ?? '')) . "</td>";
+        echo "<td><span class='action-btn'>" . htmlspecialchars($state) . "</span></td>";
+        echo "</tr>";
+    };
+
+    // ══ جلب البلاغات: «بلاغاتي» (أنا المُبلِّغ) و«الواردة إليّ» (target_role = دوري) ══
+    $bk_select = "SELECT b.id, b.code, b.severity, b.is_stopped, b.report_datetime, b.state, b.order_id,
+                         e.name AS equipment_name, p.name AS project_name, b.description, b.reporter_dept,
+                         r.name AS target_role_name, u.name AS reporter_name
+                    FROM mnt_breakdown b
+                    LEFT JOIN equipments e ON e.id = b.equipment_id
+                    LEFT JOIN project p ON p.id = b.project_id
+                    LEFT JOIN roles r ON r.id = b.target_role
+                    LEFT JOIN users u ON u.id = b.reported_by
+                   WHERE $company_scope_sql AND COALESCE(b.is_deleted,0)=0 ";
+    $mine_rows = array();
+    $in_rows   = array();
+    $mine_q = mysqli_query($conn, $bk_select . " AND b.reported_by = " . intval($current_user_id) . " ORDER BY b.id DESC");
+    if ($mine_q) { while ($row = mysqli_fetch_assoc($mine_q)) { $mine_rows[] = $row; } }
+    $in_q = mysqli_query($conn, $bk_select . " AND b.target_role = " . $current_role_int . " ORDER BY b.id DESC");
+    if ($in_q) { while ($row = mysqli_fetch_assoc($in_q)) { $in_rows[] = $row; } }
+    ?>
+
+    <!-- ══ تبويبان: بلاغاتي / الواردة إليّ ══ -->
     <div class="card">
         <div class="card-body">
-            <div class="form-grid">
+            <div class="bk-tabs" role="tablist">
+                <button type="button" class="bk-tab is-active" data-bk-tab="mine"><i class="fas fa-paper-plane"></i> بلاغاتي <span class="bk-tab-badge"><?php echo count($mine_rows); ?></span></button>
+                <button type="button" class="bk-tab" data-bk-tab="in"><i class="fas fa-inbox"></i> الواردة إليّ <span class="bk-tab-badge"><?php echo count($in_rows); ?></span></button>
+            </div>
+
+            <div class="form-grid" style="margin-top:12px;">
                 <div class="form-group">
                     <label>تصفية حسب الحالة</label>
                     <select id="filterState">
@@ -305,75 +401,37 @@ include '../insidebar.php';
                 </div>
             </div>
 
-            <div class="table-container">
-                <table id="mntTable" class="display nowrap alltables no-datatable" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th>الإجراءات</th>
-                            <th>المرجع</th>
-                            <th>المعدة</th>
-                            <th>المشروع</th>
-                            <th>الخطورة</th>
-                            <th>متوقفة</th>
-                            <th>التاريخ</th>
-                            <th>الحالة</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $sql = "SELECT b.id, b.code, b.severity, b.is_stopped, b.report_datetime, b.state, b.order_id,
-                                       e.name AS equipment_name, p.name AS project_name, b.description, b.reporter_dept
-                                  FROM mnt_breakdown b
-                                  LEFT JOIN equipments e ON e.id = b.equipment_id
-                                  LEFT JOIN project p ON p.id = b.project_id
-                                 WHERE $company_scope_sql AND COALESCE(b.is_deleted,0)=0
-                                 ORDER BY b.id DESC";
-                        $result = mysqli_query($conn, $sql);
-                        if ($result) { while ($row = mysqli_fetch_assoc($result)) {
-                            $sev = (string) $row['severity'];
-                            $sev_class = ($sev === 'حرجة' || $sev === 'عالية') ? 'status-inactive' : 'status-active';
-                            $state = (string) $row['state'];
+            <?php
+            $bk_thead = '<thead><tr>'
+                . '<th>الإجراءات</th><th>المرجع</th><th>المعدة</th><th>المشروع</th>'
+                . '<th>المُبلِّغ</th><th>موجَّه إلى</th><th>الخطورة</th><th>متوقفة</th><th>التاريخ</th><th>الحالة</th>'
+                . '</tr></thead>';
+            ?>
 
-                            echo "<tr>";
-                            echo "<td><div class='action-btns'>";
-                            $view_attrs =
-                                "data-code='" . htmlspecialchars((string) $row['code'], ENT_QUOTES) . "' " .
-                                "data-equipment='" . htmlspecialchars((string) ($row['equipment_name'] ?? ''), ENT_QUOTES) . "' " .
-                                "data-project='" . htmlspecialchars((string) ($row['project_name'] ?? ''), ENT_QUOTES) . "' " .
-                                "data-dept='" . htmlspecialchars((string) ($row['reporter_dept'] ?? ''), ENT_QUOTES) . "' " .
-                                "data-severity='" . htmlspecialchars($sev, ENT_QUOTES) . "' " .
-                                "data-stopped='" . (intval($row['is_stopped']) ? 'نعم' : 'لا') . "' " .
-                                "data-dt='" . htmlspecialchars((string) ($row['report_datetime'] ?? ''), ENT_QUOTES) . "' " .
-                                "data-state='" . htmlspecialchars($state, ENT_QUOTES) . "' " .
-                                "data-desc='" . htmlspecialchars((string) ($row['description'] ?? ''), ENT_QUOTES) . "'";
-                            echo "<a href='javascript:void(0)' class='viewBtn action-btn view' $view_attrs title='عرض'><i class='fas fa-eye'></i></a>";
-                            if ($is_maintenance) {
-                                if ($state === 'جديد' || $state === 'قيد التقييم') {
-                                    echo "<form method='post' style='display:inline' onsubmit='return confirm(\"إصدار أمر صيانة من هذا البلاغ؟\")'>"
-                                       . "<input type='hidden' name='action' value='issue_order'>"
-                                       . "<input type='hidden' name='breakdown_id' value='" . intval($row['id']) . "'>"
-                                       . "<button type='submit' class='action-btn edit' title='إصدار أمر صيانة'><i class='fas fa-wrench'></i></button>"
-                                       . "</form>";
-                                    echo "<a href='?close_id=" . intval($row['id']) . "' class='action-btn' title='إغلاق البلاغ' onclick='return confirm(\"إغلاق البلاغ بدون أمر؟\")'><i class='fas fa-times-circle'></i></a>";
-                                } elseif (intval($row['order_id']) > 0) {
-                                    echo "<a href='orders.php?id=" . intval($row['order_id']) . "' class='action-btn' title='فتح أمر الصيانة'><i class='fas fa-up-right-from-square'></i></a>";
-                                }
-                                echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف البلاغ؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
-                            }
-                            echo "</div></td>";
+            <div class="bk-panel is-active" id="bk-mine">
+                <div class="table-container">
+                    <table id="mntTableMine" class="display nowrap alltables no-datatable" style="width:100%;">
+                        <?php echo $bk_thead; ?>
+                        <tbody>
+                            <?php if (empty($mine_rows)): ?>
+                                <tr><td colspan="10" style="text-align:center;color:#888;padding:14px;">لا توجد بلاغات رفعتَها بعد</td></tr>
+                            <?php else: foreach ($mine_rows as $row) { $render_breakdown_row($row); } endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                            echo "<td><strong>" . htmlspecialchars((string) $row['code']) . "</strong></td>";
-                            echo "<td>" . htmlspecialchars((string) ($row['equipment_name'] ?? '-')) . "</td>";
-                            echo "<td>" . htmlspecialchars((string) ($row['project_name'] ?? '-')) . "</td>";
-                            echo "<td><span class='$sev_class'>" . htmlspecialchars($sev) . "</span></td>";
-                            echo "<td>" . (intval($row['is_stopped']) ? '<i class="fas fa-ban" style="color:#dc2626"></i>' : '—') . "</td>";
-                            echo "<td>" . htmlspecialchars((string) ($row['report_datetime'] ?? '')) . "</td>";
-                            echo "<td><span class='action-btn'>" . htmlspecialchars($state) . "</span></td>";
-                            echo "</tr>";
-                        } }
-                        ?>
-                    </tbody>
-                </table>
+            <div class="bk-panel" id="bk-in">
+                <div class="table-container">
+                    <table id="mntTableIn" class="display nowrap alltables no-datatable" style="width:100%;">
+                        <?php echo $bk_thead; ?>
+                        <tbody>
+                            <?php if (empty($in_rows)): ?>
+                                <tr><td colspan="10" style="text-align:center;color:#888;padding:14px;">لا توجد بلاغات واردة إلى قسمك</td></tr>
+                            <?php else: foreach ($in_rows as $row) { $render_breakdown_row($row); } endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -391,18 +449,43 @@ include '../insidebar.php';
 <script>
 (function () {
     $(document).ready(function () {
-        var table = $('#mntTable').DataTable({
+        // 1) ربط زر «بلاغ جديد» والتبويبات أولاً — حتى لا يعطّلها أي خطأ في DataTables.
+        var toggleBtn = document.getElementById('toggleForm');
+        if (toggleBtn) { toggleBtn.addEventListener('click', function () { $('#mntForm').toggleClass('allforms-visible'); }); }
+
+        var dtConfig = {
             scrollX: true, autoWidth: false, stateSave: false, order: [[1, 'desc']],
             dom: 'Bfrtip',
             buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
             "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
+        };
+        // تهيئة كسولة: الجدول المخفي (داخل تبويب display:none) يُهيّأ عند أول إظهار فقط — لتفادي خطأ scrollX.
+        var dtCache = {};
+        function initTable(sel) {
+            try {
+                if (!dtCache[sel] && $(sel).length && !$.fn.dataTable.isDataTable(sel)) {
+                    dtCache[sel] = $(sel).DataTable(dtConfig);
+                }
+            } catch (e) {}
+            return dtCache[sel];
+        }
+        initTable('#mntTableMine'); // المرئي افتراضياً
+
         $('#filterState').on('change', function () {
             var v = this.value ? '^' + $.fn.dataTable.util.escapeRegex(this.value) + '$' : '';
-            table.column(7).search(v, true, false).draw();
+            $.each(dtCache, function (k, t) { try { t.column(9).search(v, true, false).draw(); } catch (e) {} });
         });
-        var toggleBtn = document.getElementById('toggleForm');
-        if (toggleBtn) { toggleBtn.addEventListener('click', function () { $('#mntForm').toggleClass('allforms-visible'); }); }
+
+        // تبديل التبويبات + تهيئة/ضبط أعمدة الجدول المُظهَر
+        $(document).on('click', '.bk-tab', function () {
+            var key = $(this).data('bk-tab');
+            $('.bk-tab').removeClass('is-active');
+            $(this).addClass('is-active');
+            $('.bk-panel').removeClass('is-active');
+            $('#bk-' + key).addClass('is-active');
+            var t = initTable(key === 'in' ? '#mntTableIn' : '#mntTableMine');
+            if (t) { try { t.columns.adjust(); } catch (e) {} }
+        });
 
         $(document).on('click', '.viewBtn', function () {
             var $t = $(this);
@@ -412,7 +495,9 @@ include '../insidebar.php';
                     { label: 'المرجع', value: $t.data('code'), icon: 'fas fa-hashtag' },
                     { label: 'المعدة', value: $t.data('equipment'), icon: 'fas fa-tractor' },
                     { label: 'المشروع', value: $t.data('project'), icon: 'fas fa-folder-open' },
+                    { label: 'المُبلِّغ', value: $t.data('reporter'), icon: 'fas fa-user' },
                     { label: 'القسم المُبلِّغ', value: $t.data('dept'), icon: 'fas fa-building' },
+                    { label: 'موجَّه إلى', value: $t.data('target'), icon: 'fas fa-share-from-square' },
                     { label: 'الخطورة', value: $t.data('severity'), icon: 'fas fa-fire' },
                     { label: 'متوقفة', value: $t.data('stopped'), icon: 'fas fa-ban' },
                     { label: 'التاريخ', value: $t.data('dt'), icon: 'fas fa-clock' },
@@ -427,6 +512,15 @@ include '../insidebar.php';
 </script>
 <style>
     .mnt-head-badge { background:#dc2626;color:#fff;border-radius:999px;padding:2px 9px;font-size:.7rem;font-weight:800;margin-inline-start:8px;vertical-align:middle; }
+    .bk-tabs { display:flex; flex-wrap:wrap; gap:6px; padding:4px; border:1px solid var(--gray-200,#E7E5E4); border-radius:var(--radius-lg,12px); background:var(--gray-50,#FAFAF9); }
+    .bk-tab { appearance:none; border:0; cursor:pointer; font-family:inherit; font-weight:700; font-size:13.5px; display:inline-flex; align-items:center; gap:7px; padding:9px 16px; border-radius:var(--radius-md,8px); color:var(--gray-700,#44403C); background:transparent; transition:all .15s ease; }
+    .bk-tab i { font-size:14px; opacity:.9; }
+    .bk-tab:hover { background:var(--gray-100,#F5F5F4); color:var(--gray-900,#1C1917); }
+    .bk-tab.is-active { background:linear-gradient(160deg,var(--brand-amber,#F2AA2A),var(--brand-orange-bright,#E67E00)); color:#fff; box-shadow:0 4px 12px rgba(230,126,0,.28); }
+    .bk-tab-badge { font-size:11px; font-weight:800; min-width:19px; height:19px; padding:0 6px; border-radius:10px; display:inline-grid; place-items:center; background:var(--gray-200,#E7E5E4); color:var(--gray-700,#44403C); }
+    .bk-tab.is-active .bk-tab-badge { background:rgba(255,255,255,.30); color:#fff; }
+    .bk-panel { display:none; }
+    .bk-panel.is-active { display:block; }
 </style>
 </body>
 </html>

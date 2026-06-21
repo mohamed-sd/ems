@@ -153,6 +153,23 @@ if (!defined('MNT_HELPERS_LOADED')) {
             mysqli_stmt_bind_param($stmt, 'ii', $equipment_id, $company_id);
             $ok = mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
+
+            // استعادة الدور التشغيلي السابق (أساسي/احتياطي) لتشغيلات هذه المعدة التي حُوّلت فئتها إلى «متعطل»
+            // عند تحويلها للصيانة من شاشة الحركة — لتعود تلقائياً لجدول دورها (وتعود للتايم‌شيت إن كانت أساسية).
+            if (function_exists('db_table_has_column')
+                && db_table_has_column($conn, 'operations', 'prev_equipment_category')) {
+                $op_scope = '';
+                if (db_table_has_column($conn, 'operations', 'company_id')) {
+                    $op_scope = " AND (company_id = " . intval($company_id) . " OR company_id IS NULL)";
+                }
+                @mysqli_query($conn, "UPDATE operations
+                                         SET equipment_category = COALESCE(NULLIF(prev_equipment_category, ''), 'أساسي'),
+                                             prev_equipment_category = NULL
+                                       WHERE equipment = " . intval($equipment_id) . "
+                                         AND equipment_category = 'متعطل'
+                                         $op_scope");
+            }
+
             return (bool) $ok;
         }
         return false;
@@ -371,13 +388,29 @@ if (!defined('MNT_HELPERS_LOADED')) {
     /**
      * عدّاد البلاغات «الجديدة» لشركة المستخدم (للتوبار وقوائم الصيانة).
      */
-    function mnt_new_breakdowns_count($conn, $company_id)
+    function mnt_new_breakdowns_count($conn, $company_id, $target_role = null)
     {
         $company_id = intval($company_id);
         if ($company_id <= 0) {
             return 0;
         }
         $count = 0;
+        // عند تمرير الدور وتوفّر عمود التوجيه: نعدّ «الواردة إلى دوري الجديدة» فقط.
+        $use_role = ($target_role !== null && $target_role !== '' && function_exists('db_table_has_column')
+            && db_table_has_column($conn, 'mnt_breakdown', 'target_role'));
+        if ($use_role) {
+            $sql = "SELECT COUNT(*) AS c FROM mnt_breakdown
+                     WHERE company_id = ? AND target_role = ? AND state = 'جديد' AND COALESCE(is_deleted,0)=0";
+            if ($stmt = mysqli_prepare($conn, $sql)) {
+                $tr = intval($target_role);
+                mysqli_stmt_bind_param($stmt, 'ii', $company_id, $tr);
+                mysqli_stmt_execute($stmt);
+                $res = mysqli_stmt_get_result($stmt);
+                if ($res && ($r = mysqli_fetch_assoc($res))) { $count = intval($r['c']); }
+                mysqli_stmt_close($stmt);
+            }
+            return $count;
+        }
         $sql = "SELECT COUNT(*) AS c FROM mnt_breakdown
                  WHERE company_id = ? AND state = 'جديد' AND COALESCE(is_deleted,0)=0";
         if ($stmt = mysqli_prepare($conn, $sql)) {
@@ -457,6 +490,49 @@ if (!defined('MNT_HELPERS_LOADED')) {
         }
 
         // ضمان ظهور المعدة المختارة حالياً في فورم التحرير (حتى لو لم تَعُد «تحت الصيانة»).
+        if ($include_id > 0 && empty($seen[$include_id])) {
+            if ($stmt = mysqli_prepare($conn, "SELECT id, name, code FROM equipments WHERE id = ? AND (company_id = ? OR company_id IS NULL) LIMIT 1")) {
+                mysqli_stmt_bind_param($stmt, 'ii', $include_id, $company_id);
+                mysqli_stmt_execute($stmt);
+                $res = mysqli_stmt_get_result($stmt);
+                if ($res && ($r = mysqli_fetch_assoc($res))) { array_unshift($out, $r); }
+                mysqli_stmt_close($stmt);
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * كل معدات المشروع (أي حالة إتاحة) — تُستخدم في شاشة التفتيش لاختيار المعدة بعد المشروع.
+     * بخلاف mnt_maint_equipment_in_project لا تُقيِّد النتيجة بـ availability_status.
+     *
+     * @param int $include_id يضمن ظهور معدة محدّدة في فورم التحرير حتى لو لم تَعُد مرتبطة بتشغيل المشروع.
+     */
+    function mnt_all_equipment_in_project($conn, $company_id, $project_id, $include_id = 0)
+    {
+        $company_id = intval($company_id);
+        $project_id = intval($project_id);
+        $include_id = intval($include_id);
+        $out = array();
+        $seen = array();
+
+        if ($project_id > 0) {
+            $sql = "SELECT DISTINCT e.id, e.name, e.code
+                      FROM equipments e
+                      INNER JOIN operations o ON o.equipment = e.id AND o.project_id = ?
+                     WHERE (e.company_id = ? OR e.company_id IS NULL)
+                     ORDER BY e.name";
+            if ($stmt = mysqli_prepare($conn, $sql)) {
+                mysqli_stmt_bind_param($stmt, 'ii', $project_id, $company_id);
+                mysqli_stmt_execute($stmt);
+                $res = mysqli_stmt_get_result($stmt);
+                while ($res && ($r = mysqli_fetch_assoc($res))) { $out[] = $r; $seen[intval($r['id'])] = true; }
+                mysqli_stmt_close($stmt);
+            }
+        }
+
+        // ضمان ظهور المعدة المختارة حالياً في فورم التحرير.
         if ($include_id > 0 && empty($seen[$include_id])) {
             if ($stmt = mysqli_prepare($conn, "SELECT id, name, code FROM equipments WHERE id = ? AND (company_id = ? OR company_id IS NULL) LIMIT 1")) {
                 mysqli_stmt_bind_param($stmt, 'ii', $include_id, $company_id);

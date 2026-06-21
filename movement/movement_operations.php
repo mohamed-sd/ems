@@ -43,6 +43,12 @@ if (!$equipment_drivers_has_shift_type) {
     @mysqli_query($conn, "ALTER TABLE equipment_drivers ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER end_date");
     $equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
 }
+// عمود حفظ الدور السابق (أساسي/احتياطي) قبل تحويل الفئة إلى «متعطل» — لاستعادته بعد إصلاح الصيانة.
+$operations_has_prev_category = db_table_has_column($conn, 'operations', 'prev_equipment_category');
+if (!$operations_has_prev_category) {
+    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN prev_equipment_category VARCHAR(20) NULL DEFAULT NULL AFTER equipment_category");
+    $operations_has_prev_category = db_table_has_column($conn, 'operations', 'prev_equipment_category');
+}
 
 // الصلاحيات
 $ops_perm = check_page_permissions($conn, 'movement/move_oprators.php');
@@ -132,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 }
 
                 $equipment_category = isset($_POST['equipment_category']) ? trim((string)$_POST['equipment_category']) : 'أساسي';
-                if ($equipment_category !== 'أساسي' && $equipment_category !== 'احتياطي') {
+                if ($equipment_category !== 'أساسي' && $equipment_category !== 'احتياطي' && $equipment_category !== 'متعطل') {
                     $equipment_category = 'أساسي';
                 }
 
@@ -285,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 }
 
                 $equipment_category = isset($_POST['equipment_category']) ? trim((string)$_POST['equipment_category']) : 'أساسي';
-                if ($equipment_category !== 'أساسي' && $equipment_category !== 'احتياطي') {
+                if ($equipment_category !== 'أساسي' && $equipment_category !== 'احتياطي' && $equipment_category !== 'متعطل') {
                     $equipment_category = 'أساسي';
                 }
 
@@ -455,6 +461,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                LIMIT 1";
                 if (!mysqli_query($conn, $maint_sql)) {
                     throw new Exception('خطأ في تحويل المعدة إلى وضع الصيانة');
+                }
+
+                // تحويل فئة تشغيلات هذه المعدة (في هذا المشروع) إلى «متعطل»، مع حفظ الدور السابق لاستعادته بعد الإصلاح.
+                if (!empty($operations_has_prev_category)) {
+                    @mysqli_query($conn, "UPDATE operations
+                                             SET prev_equipment_category = equipment_category,
+                                                 equipment_category = 'متعطل'
+                                           WHERE equipment = $equipment_id
+                                             AND project_id = $selected_project_id
+                                             AND equipment_category <> 'متعطل'
+                                             $operations_company_scope_inline");
+                } else {
+                    @mysqli_query($conn, "UPDATE operations
+                                             SET equipment_category = 'متعطل'
+                                           WHERE equipment = $equipment_id
+                                             AND project_id = $selected_project_id
+                                             AND equipment_category <> 'متعطل'
+                                             $operations_company_scope_inline");
                 }
 
                 if (isset($_POST['json']) && $_POST['json'] === '1') {
@@ -1044,10 +1068,31 @@ include '../insidebar.php';
         <?php endif; ?>
 
         <?php
-        $operations_tables = [
-            ['title' => 'إدارة تشغيلات النهار', 'rows' => $operations_rows_day,   'table_key' => 'day'],
-            ['title' => 'إدارة تشغيلات الليل',  'rows' => $operations_rows_night, 'table_key' => 'night'],
+        // تقسيم كل وردية (نهار/ليل) إلى ثلاثة جداول حسب الفئة: أساسية / احتياطية / متعطلة.
+        $ems_cat_groups = [
+            ['key' => 'basic',  'label' => 'الأساسية',   'cat' => 'أساسي'],
+            ['key' => 'backup', 'label' => 'الاحتياطية', 'cat' => 'احتياطي'],
+            ['key' => 'broken', 'label' => 'المتعطلة',   'cat' => 'متعطل'],
         ];
+        $ems_shift_groups = [
+            ['key' => 'day',   'title' => 'تشغيلات النهار', 'rows' => $operations_rows_day],
+            ['key' => 'night', 'title' => 'تشغيلات الليل',  'rows' => $operations_rows_night],
+        ];
+        $operations_tables = [];
+        foreach ($ems_shift_groups as $ems_sg) {
+            foreach ($ems_cat_groups as $ems_cg) {
+                $ems_filtered = array_values(array_filter($ems_sg['rows'], function ($r) use ($ems_cg) {
+                    $c = isset($r['equipment_category']) && $r['equipment_category'] !== '' ? $r['equipment_category'] : 'أساسي';
+                    return $c === $ems_cg['cat'];
+                }));
+                $operations_tables[] = [
+                    'title'     => 'إدارة ' . $ems_sg['title'] . ' — ' . $ems_cg['label'],
+                    'rows'      => $ems_filtered,
+                    'table_key' => $ems_sg['key'] . '_' . $ems_cg['key'],
+                    'cat'       => $ems_cg['cat'],
+                ];
+            }
+        }
         foreach ($operations_tables as $operations_table):
         ?>
         <div class="card">
@@ -1098,6 +1143,7 @@ include '../insidebar.php';
                                             <select class="op_category" data-op="<?php echo $op_id; ?>">
                                                 <option value="أساسي" <?php echo $category === 'أساسي' ? 'selected' : ''; ?>>أساسي</option>
                                                 <option value="احتياطي" <?php echo $category === 'احتياطي' ? 'selected' : ''; ?>>احتياطي</option>
+                                                <option value="متعطل" <?php echo $category === 'متعطل' ? 'selected' : ''; ?>>متعطل</option>
                                             </select>
                                         <?php else: ?>
                                             <span><?php echo htmlspecialchars($category); ?></span>

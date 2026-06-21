@@ -474,7 +474,7 @@ function handle_save_operation(): void
     }
 
     // فئة المعدة — قيم مسموحة فقط
-    if (!in_array($equipment_category, ['أساسي', 'احتياطي'], true)) {
+    if (!in_array($equipment_category, ['أساسي', 'احتياطي', 'متعطل'], true)) {
         redirect_to_page('فئة المعدة غير صحيحة', false);
     }
 
@@ -975,6 +975,7 @@ function get_shift_info(string $code): array
                                 <option value="">-- أساسي / احتياطي --</option>
                                 <option value="أساسي">أساسي</option>
                                 <option value="احتياطي">احتياطي</option>
+                                <option value="متعطل">متعطل</option>
                             </select>
                         </div>
 

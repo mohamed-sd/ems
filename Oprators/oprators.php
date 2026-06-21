@@ -705,9 +705,10 @@ include('../insidebar.php');
                             <div>
                                 <label><i class="fas fa-check-circle"></i> فئة المعدة</label>
                                 <select name="equipment_category" id="equipment_category" required>
-                                    <option value="">-- أساسي / احتياطي --</option>
+                                    <option value="">-- أساسي / احتياطي / متعطل --</option>
                                     <option value="أساسي"> أساسي</option>
                                     <option value="احتياطي"> احتياطي</option>
+                                    <option value="متعطل"> متعطل</option>
                                 </select>
                             </div>
 
@@ -947,6 +948,7 @@ include('../insidebar.php');
                             // تقسيم التشغيلات: المنتهية (status=0) في جدول مستقل؛ السارية تُقسَّم أساسية/احتياطية
                             $primary_rows = [];
                             $reserve_rows = [];
+                            $broken_rows = [];
                             $ended_rows = [];
                             if ($result) {
                                 while ($row = mysqli_fetch_assoc($result)) {
@@ -954,6 +956,8 @@ include('../insidebar.php');
                                         $ended_rows[] = $row;
                                     } elseif (($row['equipment_category'] ?? '') === 'أساسي') {
                                         $primary_rows[] = $row;
+                                    } elseif (($row['equipment_category'] ?? '') === 'متعطل') {
+                                        $broken_rows[] = $row;
                                     } else {
                                         $reserve_rows[] = $row;
                                     }
@@ -1087,6 +1091,37 @@ include('../insidebar.php');
                             } else {
                                 $i = 1;
                                 foreach ($reserve_rows as $r) { $render_op_row($r, $i++); }
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ===== جدول المعدات المتعطلة ===== -->
+                <h6 style="margin:18px 14px 8px;font-size:15px;font-weight:800;color:#1a1208;display:flex;align-items:center;gap:8px;"><span class="legend-dot" style="color:#c0392b;">■</span> المعدات المتعطلة</h6>
+                <div class="tbl-scroll-wrap tbl-scroll-zero">
+                    <table id="brokenTable" class="display nowrap table-full-width">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>المعدة</th>
+                                <th>نوع المعدة</th>
+                                <th>المورد</th>
+                                <th>ساعات الوردية</th>
+                                <th>نظام الوردية</th>
+                                <th>تاريخ البداية</th>
+                                <th>الحالة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            // عرض صفوف الجدول الثالث: المعدات المتعطلة
+                            if (empty($broken_rows)) {
+                                echo "<tr><td colspan='9' style='text-align:center;color:#999;padding:16px;'>لا توجد معدات متعطلة</td></tr>";
+                            } else {
+                                $i = 1;
+                                foreach ($broken_rows as $r) { $render_op_row($r, $i++); }
                             }
                             ?>
                         </tbody>
@@ -1279,6 +1314,7 @@ include('../insidebar.php');
                     }
                     $('#primaryTable').DataTable(opsTableConfig());
                     $('#reserveTable').DataTable(opsTableConfig());
+                    $('#brokenTable').DataTable(opsTableConfig());
                     $('#endedTable').DataTable(opsTableConfig());
                 });
 

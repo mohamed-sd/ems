@@ -199,6 +199,75 @@ $mnt_mtbf  = $mnt_failures > 0 ? ($hours_sum / $mnt_failures) : null;
 $mnt_mttr  = $mnt_closed   > 0 ? ($mnt_downtime / $mnt_closed) : null;
 $mnt_avail = ($hours_sum + $mnt_downtime) > 0 ? ($hours_sum / ($hours_sum + $mnt_downtime) * 100) : null;
 
+// ═══════════════════════════════════════════════════════════════════
+//  قسم التفتيش الفني — تفتيشات هذه المعدة (المصدر: mnt_inspection، معزول بالشركة)
+// ═══════════════════════════════════════════════════════════════════
+$ins_rows = array();
+$ins_total = $ins_done = $ins_open = $ins_critical = 0;
+$ins_last = null;
+if (db_table_has_column($conn, 'mnt_inspection', 'id')) {
+    $ins_scope = $is_super_admin ? "" : " AND i.company_id = $company_id";
+    $q = mysqli_query($conn, "SELECT i.id, i.code, i.inspection_type, i.scheduled_date, i.completed_at,
+                                     i.overall_result, i.state, u.name AS inspector_name
+                                FROM mnt_inspection i
+                                LEFT JOIN users u ON u.id = i.inspector_id
+                               WHERE i.equipment_id = $equipment_id AND COALESCE(i.is_deleted,0)=0 $ins_scope
+                               ORDER BY i.id DESC LIMIT 50");
+    if ($q) while ($r = mysqli_fetch_assoc($q)) { $ins_rows[] = $r; }
+
+    $agg = mysqli_query($conn, "SELECT COUNT(*) total,
+                                       SUM(state IN ('مكتمل','مغلق')) done,
+                                       SUM(state IN ('جديد','مجدول','قيد التنفيذ')) opened,
+                                       MAX(COALESCE(completed_at, scheduled_date)) last_at
+                                  FROM mnt_inspection i
+                                 WHERE i.equipment_id = $equipment_id AND COALESCE(i.is_deleted,0)=0 $ins_scope");
+    if ($agg && ($a = mysqli_fetch_assoc($agg))) {
+        $ins_total = intval($a['total']);
+        $ins_done  = intval($a['done']);
+        $ins_open  = intval($a['opened']);
+        $ins_last  = !empty($a['last_at']) ? $a['last_at'] : null;
+    }
+    // ملاحظات حرجة من بنود الفحص لهذه المعدة
+    if (db_table_has_column($conn, 'mnt_inspection_line', 'id')) {
+        $cq = mysqli_query($conn, "SELECT COUNT(*) c
+                                     FROM mnt_inspection_line l
+                                     INNER JOIN mnt_inspection i ON i.id = l.inspection_id
+                                    WHERE i.equipment_id = $equipment_id AND COALESCE(i.is_deleted,0)=0
+                                      AND l.condition_state = 'حرج' $ins_scope");
+        if ($cq && ($c = mysqli_fetch_assoc($cq))) { $ins_critical = intval($c['c']); }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  قسم الصيانة الوقائية — خطط هذه المعدة (المصدر: mnt_plan، معزول بالشركة)
+// ═══════════════════════════════════════════════════════════════════
+$pln_rows = array();
+$pln_total = $pln_active = $pln_due = 0;
+$pln_last = null; $pln_next = null;
+$today_str = date('Y-m-d');
+if (db_table_has_column($conn, 'mnt_plan', 'id')) {
+    $pln_scope = $is_super_admin ? "" : " AND pl.company_id = $company_id";
+    $q = mysqli_query($conn, "SELECT pl.id, pl.code, pl.name, pl.trigger_basis, pl.interval_value,
+                                     pl.last_done_date, pl.last_done_meter, pl.next_due_date, pl.next_due_meter, pl.state
+                                FROM mnt_plan pl
+                               WHERE pl.equipment_id = $equipment_id AND COALESCE(pl.is_deleted,0)=0 $pln_scope
+                               ORDER BY pl.id DESC LIMIT 50");
+    if ($q) while ($r = mysqli_fetch_assoc($q)) {
+        $pln_rows[] = $r;
+        if ($r['state'] === 'نشطة') {
+            $pln_active++;
+            if ($r['trigger_basis'] === 'ساعات') {
+                if ($r['next_due_meter'] !== null && $hours_sum >= floatval($r['next_due_meter'])) { $pln_due++; }
+            } else {
+                if (!empty($r['next_due_date']) && $r['next_due_date'] <= $today_str) { $pln_due++; }
+            }
+        }
+        if (!empty($r['next_due_date']) && ($pln_next === null || $r['next_due_date'] < $pln_next)) { $pln_next = $r['next_due_date']; }
+        if (!empty($r['last_done_date']) && ($pln_last === null || $r['last_done_date'] > $pln_last)) { $pln_last = $r['last_done_date']; }
+    }
+    $pln_total = count($pln_rows);
+}
+
 // المنفّذ/المورد صار إدخالاً يدوياً حرّاً (غير مربوط بجدول الموردين) — لا حاجة لجلب الموردين.
 
 // حساب حالة الوثيقة من تاريخ الانتهاء (سارية/قاربت/منتهية) + تنبيهات حرجة
@@ -228,10 +297,93 @@ include '../insidebar.php';
 ?>
 
 <style>
-.equipment-profile-page .profile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
-.equipment-profile-page .profile-card { background:#fff; border:1px solid #ece6d8; border-radius:12px; padding:12px; }
-.equipment-profile-page .kpi { font-weight:800; font-size:1.4rem; color:#0f766e; }
-.equipment-profile-page .label { color:#6b7280; font-size:.9rem; }
+/* ════════ بطاقة المعدة — إعادة تصميم مواءِمة لهوية الموقع (برتقالي/كهرماني + design-tokens) ════════ */
+.equipment-profile-page{ --ep-accent:var(--brand-orange-bright,#E67E00); }
+
+/* الهيرو */
+.equipment-profile-page .ep-hero{
+  position:relative; overflow:hidden; padding:18px 20px; margin-bottom:14px;
+  border:1px solid var(--gray-200,#E7E5E4); border-radius:var(--radius-xl,16px);
+  background:
+    radial-gradient(120% 150% at 100% 0%, rgba(247,147,26,.10) 0%, rgba(247,147,26,0) 46%),
+    linear-gradient(180deg,#fff 0%, var(--gray-50,#FAFAF9) 100%);
+  box-shadow:var(--shadow-sm,0 1px 2px rgba(0,0,0,.05));
+}
+.equipment-profile-page .ep-hero::before{
+  content:""; position:absolute; inset-inline-start:0; top:0; bottom:0; width:5px;
+  background:linear-gradient(180deg,var(--brand-amber,#F2AA2A),var(--brand-orange-bright,#E67E00));
+}
+.equipment-profile-page .ep-hero-top{ display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start; justify-content:space-between; }
+.equipment-profile-page .ep-hero-name{ display:flex; align-items:center; gap:14px; min-width:0; }
+.equipment-profile-page .ep-hero-ic{
+  width:50px; height:50px; flex:0 0 50px; border-radius:14px; display:grid; place-items:center; color:#fff; font-size:22px;
+  background:linear-gradient(160deg,var(--brand-amber,#F2AA2A),var(--brand-orange-bright,#E67E00));
+  box-shadow:0 6px 16px rgba(230,126,0,.30);
+}
+.equipment-profile-page .ep-hero-name h2{ margin:0; font-size:var(--text-h1,24px); font-weight:800; color:var(--gray-900,#1C1917); line-height:1.2; }
+.equipment-profile-page .ep-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+.equipment-profile-page .ep-chip{
+  display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:3px 10px;
+  border-radius:var(--radius-pill,9999px); background:var(--gray-100,#F5F5F4); color:var(--gray-700,#44403C); border:1px solid var(--gray-200,#E7E5E4);
+}
+.equipment-profile-page .ep-chip i{ color:var(--ep-accent); }
+.equipment-profile-page .ep-hero-actions{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.equipment-profile-page .ep-pill{ display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:var(--radius-pill,9999px); font-weight:700; font-size:12.5px; }
+.equipment-profile-page .ep-pill i{ font-size:9px; }
+
+/* شريط الحقائق */
+.equipment-profile-page .ep-facts{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; margin-top:16px;
+  background:var(--gray-200,#E7E5E4); border:1px solid var(--gray-200,#E7E5E4); border-radius:var(--radius-md,8px); overflow:hidden;
+}
+.equipment-profile-page .ep-fact{ background:#fff; padding:10px 13px; }
+.equipment-profile-page .ep-fact .k{ font-size:11px; color:var(--gray-500,#78716C); font-weight:600; }
+.equipment-profile-page .ep-fact .v{ font-size:14px; color:var(--gray-900,#1C1917); font-weight:700; margin-top:2px; }
+
+/* التبويبات */
+.equipment-profile-page .ep-tabs{
+  position:sticky; top:var(--topbar-height,60px); z-index:var(--z-sticky,10);
+  display:flex; flex-wrap:wrap; gap:6px; padding:6px; margin-bottom:16px;
+  background:rgba(255,255,255,.94); backdrop-filter:blur(8px);
+  border:1px solid var(--gray-200,#E7E5E4); border-radius:var(--radius-lg,12px); box-shadow:var(--shadow-sm,0 1px 2px rgba(0,0,0,.05));
+}
+.equipment-profile-page .ep-tab{
+  appearance:none; border:0; cursor:pointer; font-family:inherit; font-weight:700; font-size:13.5px;
+  display:inline-flex; align-items:center; gap:7px; padding:9px 16px; border-radius:var(--radius-md,8px);
+  color:var(--gray-700,#44403C); background:transparent; transition:all var(--transition-fast,150ms ease);
+}
+.equipment-profile-page .ep-tab i{ font-size:14px; opacity:.9; }
+.equipment-profile-page .ep-tab:hover{ background:var(--gray-100,#F5F5F4); color:var(--gray-900,#1C1917); }
+.equipment-profile-page .ep-tab.is-active{
+  background:linear-gradient(160deg,var(--brand-amber,#F2AA2A),var(--brand-orange-bright,#E67E00)); color:#fff;
+  box-shadow:0 4px 12px rgba(230,126,0,.28);
+}
+.equipment-profile-page .ep-tab-badge{
+  font-size:11px; font-weight:800; min-width:19px; height:19px; padding:0 6px; border-radius:10px;
+  display:inline-grid; place-items:center; background:var(--gray-200,#E7E5E4); color:var(--gray-700,#44403C);
+}
+.equipment-profile-page .ep-tab.is-active .ep-tab-badge{ background:rgba(255,255,255,.30); color:#fff; }
+
+/* اللوحات */
+.equipment-profile-page .ep-tab-panel{ display:none; }
+.equipment-profile-page .ep-tab-panel.is-active{ display:block; animation:epFade .25s ease; }
+@keyframes epFade{ from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:none;} }
+
+/* الشبكات والمؤشرات — تملأ العرض بلا فراغات */
+.equipment-profile-page .profile-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); gap:12px; margin-bottom:0; grid-auto-flow:dense; }
+.equipment-profile-page .profile-card{
+  background:#fff; border:1px solid var(--gray-200,#E7E5E4); border-radius:var(--radius-md,8px); padding:12px 14px;
+  transition:border-color var(--transition-fast,150ms ease), box-shadow var(--transition-fast,150ms ease);
+}
+.equipment-profile-page .profile-card:hover{ border-color:var(--gray-300,#D6D3D1); box-shadow:var(--shadow-sm,0 1px 2px rgba(0,0,0,.05)); }
+.equipment-profile-page .kpi{ font-weight:800; font-size:1.55rem; color:var(--gray-900,#1C1917); line-height:1.1; }
+.equipment-profile-page .label{ color:var(--gray-500,#78716C); font-size:.86rem; }
+.equipment-profile-page .profile-card > div:not(.label):not(.kpi){ font-weight:600; color:var(--gray-900,#1C1917); margin-top:2px; }
+
+/* تجميل البطاقات داخل الصفحة */
+.equipment-profile-page .card{ border:1px solid var(--gray-200,#E7E5E4); border-radius:var(--radius-lg,12px); box-shadow:var(--shadow-sm,0 1px 2px rgba(0,0,0,.05)); margin-bottom:14px; }
+.equipment-profile-page .card-header h5{ font-size:var(--text-h3,16px); font-weight:700; color:var(--gray-900,#1C1917); display:flex; align-items:center; gap:8px; }
+.equipment-profile-page .card-header h5 i{ color:var(--ep-accent); }
 </style>
 
 <div class="main equipment-profile-page ems-unified-page-shell">
@@ -247,47 +399,63 @@ include '../insidebar.php';
     include('../includes/page_header.php');
     ?>
 
-    <div class="profile-card" style="margin-bottom:12px;">
-        <h2 style="margin:0 0 8px 0;"><?php echo htmlspecialchars($equipment['name']); ?></h2>
-        <div class="label">
-            الكود: <?php echo htmlspecialchars($equipment['code']); ?> |
-            النوع: <?php echo htmlspecialchars($equipment['equipment_type_name'] ?: $equipment['type']); ?> |
-            المورد: <?php echo htmlspecialchars($equipment['supplier_name'] ?: '-'); ?> |
-            الحالة: <?php echo intval($equipment['status']) === 1 ? 'متاحة' : 'مشغولة'; ?>
-        </div>
-        <div class="label" style="margin-top:6px;">
-            الموديل: <?php echo htmlspecialchars($equipment['model'] ?: '-'); ?> |
-            سنة الصنع: <?php echo htmlspecialchars($equipment['manufacturing_year'] ?: '-'); ?> |
-            رقم الهيكل: <?php echo htmlspecialchars($equipment['chassis_number'] ?: '-'); ?>
-        </div>
-        <?php
-        // حالة الكرت (حوكمة خفيفة)
-        $card_state = isset($equipment['card_state']) ? $equipment['card_state'] : 'active';
-        $card_is_active = ($card_state === 'active');
-        ?>
-        <div style="margin-top:10px;">
-            <?php if ($card_is_active): ?>
-                <span class="status-active" style="padding:4px 10px;border-radius:6px;background:#e7f7ee;color:#1f9d55;font-weight:700;">
-                    <i class="fas fa-id-card"></i> كرت نشط (معتمد)
+    <?php
+    // حالة الكرت (حوكمة خفيفة) + الحالة التشغيلية
+    $card_state     = isset($equipment['card_state']) ? $equipment['card_state'] : 'active';
+    $card_is_active = ($card_state === 'active');
+    $status_avail   = intval($equipment['status']) === 1;
+    ?>
+    <div class="ep-hero">
+        <div class="ep-hero-top">
+            <div class="ep-hero-name">
+                <div class="ep-hero-ic"><i class="fas fa-truck-monster"></i></div>
+                <div>
+                    <h2><?php echo $ee($equipment['name']); ?></h2>
+                    <div class="ep-chips">
+                        <span class="ep-chip"><i class="fas fa-barcode"></i> <?php echo $ee($equipment['code']); ?></span>
+                        <span class="ep-chip"><i class="fas fa-layer-group"></i> <?php echo $ee($equipment['equipment_type_name'] ?: $equipment['type']); ?></span>
+                        <span class="ep-chip"><i class="fas fa-truck"></i> <?php echo $ee($equipment['supplier_name'] ?: '—'); ?></span>
+                    </div>
+                </div>
+            </div>
+            <div class="ep-hero-actions">
+                <span class="ep-pill <?php echo $status_avail ? 'status-active' : 'status-inactive'; ?>">
+                    <i class="fas fa-circle"></i> <?php echo $status_avail ? 'متاحة' : 'مشغولة'; ?>
                 </span>
-            <?php else: ?>
-                <span class="status-inactive" style="padding:4px 10px;border-radius:6px;background:#fdeaea;color:#c0392b;font-weight:700;">
-                    <i class="fas fa-id-card"></i> كرت مسودة
-                </span>
-                <?php if (!empty($can_edit ?? true)): ?>
-                    <form method="post" action="approve_card.php" class="d-inline" style="margin-inline-start:8px"
-                          onsubmit="return confirm('اعتماد كرت هذه المعدة؟');">
-                        <input type="hidden" name="equipment_id" value="<?php echo intval($equipment_id); ?>">
-                        <input type="hidden" name="return" value="equipment_profile.php">
-                        <input type="hidden" name="return_id" value="<?php echo intval($equipment_id); ?>">
-                        <button type="submit" class="btn btn-success" style="padding:4px 12px;">
-                            <i class="fas fa-circle-check"></i> اعتماد الكرت
-                        </button>
-                    </form>
+                <?php if ($card_is_active): ?>
+                    <span class="ep-pill status-active"><i class="fas fa-id-card"></i> كرت معتمد</span>
+                <?php else: ?>
+                    <span class="ep-pill status-inactive"><i class="fas fa-id-card"></i> كرت مسودة</span>
+                    <?php if (!empty($can_edit)): ?>
+                        <form method="post" action="approve_card.php" class="d-inline" onsubmit="return confirm('اعتماد كرت هذه المعدة؟');">
+                            <input type="hidden" name="equipment_id" value="<?php echo intval($equipment_id); ?>">
+                            <input type="hidden" name="return" value="equipment_profile.php">
+                            <input type="hidden" name="return_id" value="<?php echo intval($equipment_id); ?>">
+                            <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-circle-check"></i> اعتماد الكرت</button>
+                        </form>
+                    <?php endif; ?>
                 <?php endif; ?>
-            <?php endif; ?>
+            </div>
+        </div>
+        <div class="ep-facts">
+            <div class="ep-fact"><div class="k">الموديل</div><div class="v"><?php echo $ee($equipment['model'] ?: '—'); ?></div></div>
+            <div class="ep-fact"><div class="k">سنة الصنع</div><div class="v"><?php echo $ee($equipment['manufacturing_year'] ?: '—'); ?></div></div>
+            <div class="ep-fact"><div class="k">رقم الهيكل</div><div class="v"><?php echo $ee($equipment['chassis_number'] ?: '—'); ?></div></div>
+            <div class="ep-fact"><div class="k">ساعات التشغيل</div><div class="v"><?php echo number_format($hours_sum, 0); ?></div></div>
         </div>
     </div>
+
+    <!-- ════════ شريط التبويبات ════════ -->
+    <div class="ep-tabs" role="tablist">
+        <button type="button" class="ep-tab is-active" data-ep-tab="overview"><i class="fas fa-circle-info"></i> نظرة عامة</button>
+        <button type="button" class="ep-tab" data-ep-tab="operations"><i class="fas fa-diagram-project"></i> التشغيل <span class="ep-tab-badge"><?php echo intval($projects_count); ?></span></button>
+        <button type="button" class="ep-tab" data-ep-tab="maintenance"><i class="fas fa-wrench"></i> الصيانة والتفتيش <span class="ep-tab-badge"><?php echo intval($mnt_total + $ins_total + $pln_total); ?></span></button>
+        <button type="button" class="ep-tab" data-ep-tab="records"><i class="fas fa-folder-open"></i> الوثائق والسجل <span class="ep-tab-badge"><?php echo intval(count($compliance_rows) + count($protection_rows) + count($component_rows)); ?></span></button>
+    </div>
+
+    <div class="ep-panels">
+    <!-- ════════ لوحة: نظرة عامة ════════ -->
+    <div class="ep-tab-panel is-active" id="tab-overview">
 
     <?php
     // ── بطاقة: الهوية والمصدر + العدّاد (كرت المعدة) ──
@@ -321,15 +489,23 @@ include '../insidebar.php';
         </div>
     </div>
 
-    <div class="profile-grid">
-        <div class="profile-card"><div class="kpi"><?php echo $operations_count; ?></div><div class="label">إجمالي عمليات التشغيل</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $active_operations; ?></div><div class="label">عمليات نشطة</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $projects_count; ?></div><div class="label">المشاريع المرتبطة</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $drivers_count; ?></div><div class="label">المشغلون النشطون</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo number_format($hours_sum, 0); ?></div><div class="label">ساعات التشغيل</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo number_format($standby_sum, 0); ?></div><div class="label">ساعات الاستعداد</div></div>
+    <div class="card" style="margin-bottom:14px;">
+        <div class="card-header"><h5><i class="fas fa-gauge-high"></i> ملخص التشغيل</h5></div>
+        <div class="card-body">
+            <div class="profile-grid">
+                <div class="profile-card"><div class="kpi"><?php echo $operations_count; ?></div><div class="label">إجمالي عمليات التشغيل</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo $active_operations; ?></div><div class="label">عمليات نشطة</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo $projects_count; ?></div><div class="label">المشاريع المرتبطة</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo $drivers_count; ?></div><div class="label">المشغلون النشطون</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo number_format($hours_sum, 0); ?></div><div class="label">ساعات التشغيل</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo number_format($standby_sum, 0); ?></div><div class="label">ساعات الاستعداد</div></div>
+            </div>
+        </div>
     </div>
+    </div><!-- /#tab-overview -->
 
+    <!-- ════════ لوحة: التشغيل ════════ -->
+    <div class="ep-tab-panel" id="tab-operations">
     <div class="card" style="margin-bottom:14px;">
         <div class="card-header"><h5><i class="fas fa-project-diagram"></i> المشاريع المرتبطة بالمعدة</h5></div>
         <div class="card-body">
@@ -368,7 +544,11 @@ include '../insidebar.php';
         </div>
     </div>
 
-    <!-- ════════════════ قسم الصيانة (مؤشرات + أوامر) — مرئي لكل من يفتح الكرت ════════════════ -->
+    </div><!-- /#tab-operations -->
+
+    <!-- ════════ لوحة: الصيانة والتفتيش ════════ -->
+    <div class="ep-tab-panel" id="tab-maintenance">
+    <!-- قسم الصيانة (مؤشرات + أوامر) -->
     <div class="card" id="sec-maintenance" style="margin-bottom:14px;">
         <div class="card-header"><h5><i class="fas fa-wrench"></i> الصيانة — المؤشرات وأوامر الصيانة</h5></div>
         <div class="card-body">
@@ -407,7 +587,85 @@ include '../insidebar.php';
         </div>
     </div>
 
-    <!-- ════════════════ كرت المعدة: جداول الأبناء ════════════════ -->
+    <!-- ════════════════ قسم التفتيش الفني — مرئي لكل من يفتح الكرت ════════════════ -->
+    <div class="card" id="sec-inspections" style="margin-bottom:14px;">
+        <div class="card-header"><h5><i class="fas fa-clipboard-check"></i> التفتيش الفني — المؤشرات والتفتيشات</h5></div>
+        <div class="card-body">
+            <div class="profile-grid">
+                <div class="profile-card"><div class="kpi"><?php echo intval($ins_total); ?></div><div class="label">إجمالي التفتيشات</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo intval($ins_done); ?></div><div class="label">مكتملة</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo intval($ins_open); ?></div><div class="label">مجدولة/مفتوحة</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo intval($ins_critical); ?></div><div class="label">ملاحظات حرجة</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo $ins_last ? htmlspecialchars((string) $ins_last) : '—'; ?></div><div class="label">آخر تفتيش</div></div>
+            </div>
+
+            <div class="table-container" style="margin-top:12px;">
+                <table class="display" style="width:100%;">
+                    <thead><tr><th>المرجع</th><th>النوع</th><th>الفاحص</th><th>التاريخ المجدول</th><th>تاريخ الإكمال</th><th>النتيجة</th><th>الحالة</th></tr></thead>
+                    <tbody>
+                        <?php if (empty($ins_rows)): ?>
+                            <tr><td colspan="7" style="text-align:center;color:#888;">لا توجد تفتيشات لهذه المعدة</td></tr>
+                        <?php else: foreach ($ins_rows as $ir): ?>
+                            <tr>
+                                <td><strong><?php echo htmlspecialchars((string) $ir['code']); ?></strong></td>
+                                <td><?php echo htmlspecialchars((string) ($ir['inspection_type'] ?: '—')); ?></td>
+                                <td><?php echo htmlspecialchars((string) ($ir['inspector_name'] ?: '—')); ?></td>
+                                <td><?php echo htmlspecialchars((string) ($ir['scheduled_date'] ?: '—')); ?></td>
+                                <td><?php echo htmlspecialchars((string) ($ir['completed_at'] ?: '—')); ?></td>
+                                <td><?php echo htmlspecialchars((string) ($ir['overall_result'] ?: '—')); ?></td>
+                                <td><span class="action-btn"><?php echo htmlspecialchars((string) $ir['state']); ?></span></td>
+                            </tr>
+                        <?php endforeach; endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════ قسم الصيانة الوقائية — مرئي لكل من يفتح الكرت ════════════════ -->
+    <div class="card" id="sec-preventive" style="margin-bottom:14px;">
+        <div class="card-header"><h5><i class="fas fa-calendar-check"></i> الصيانة الوقائية — الخطط المسندة للمعدة</h5></div>
+        <div class="card-body">
+            <div class="profile-grid">
+                <div class="profile-card"><div class="kpi"><?php echo intval($pln_total); ?></div><div class="label">إجمالي الخطط</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo intval($pln_active); ?></div><div class="label">نشطة</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo intval($pln_due); ?></div><div class="label">مستحقة الآن</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo $pln_last ? htmlspecialchars((string) $pln_last) : '—'; ?></div><div class="label">آخر تنفيذ</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo $pln_next ? htmlspecialchars((string) $pln_next) : '—'; ?></div><div class="label">الاستحقاق القادم</div></div>
+            </div>
+
+            <div class="table-container" style="margin-top:12px;">
+                <table class="display" style="width:100%;">
+                    <thead><tr><th>المرجع</th><th>الخطة</th><th>الأساس</th><th>الفاصل</th><th>آخر تنفيذ</th><th>الاستحقاق القادم</th><th>الحالة</th></tr></thead>
+                    <tbody>
+                        <?php if (empty($pln_rows)): ?>
+                            <tr><td colspan="7" style="text-align:center;color:#888;">لا توجد خطط وقائية لهذه المعدة</td></tr>
+                        <?php else: foreach ($pln_rows as $pr):
+                            $pr_due = ($pr['trigger_basis'] === 'ساعات')
+                                ? (($pr['next_due_meter'] !== null && $pr['next_due_meter'] !== '') ? $pr['next_due_meter'] : '—')
+                                : (!empty($pr['next_due_date']) ? $pr['next_due_date'] : '—');
+                        ?>
+                            <tr>
+                                <td><strong><?php echo htmlspecialchars((string) $pr['code']); ?></strong></td>
+                                <td><?php echo htmlspecialchars((string) $pr['name']); ?></td>
+                                <td><?php echo htmlspecialchars((string) $pr['trigger_basis']); ?></td>
+                                <td><?php echo htmlspecialchars((string) ($pr['interval_value'] ?: '—')); ?></td>
+                                <td><?php echo htmlspecialchars((string) ($pr['last_done_date'] ?: '—')); ?></td>
+                                <td><?php echo htmlspecialchars((string) $pr_due); ?></td>
+                                <td><span class="action-btn"><?php echo htmlspecialchars((string) $pr['state']); ?></span></td>
+                            </tr>
+                        <?php endforeach; endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    </div><!-- /#tab-maintenance -->
+
+    <!-- ════════ لوحة: الوثائق والسجل ════════ -->
+    <div class="ep-tab-panel" id="tab-records">
+    <!-- جداول الأبناء: الوثائق · الحماية · المكوّنات · السجل -->
     <?php if ($critical_expired > 0): ?>
         <div class="success-message is-error" style="margin:12px 0;font-weight:700;">
             <i class="fa-solid fa-triangle-exclamation"></i>
@@ -602,6 +860,8 @@ include '../insidebar.php';
             <?php endif; ?>
         </div>
     </div>
+    </div><!-- /#tab-records -->
+    </div><!-- /.ep-panels -->
 
 </div>
 
@@ -620,5 +880,26 @@ function emsToggle(id){ var el=document.getElementById(id); if(el){ el.style.dis
 $(function () {
     $('#equipmentProjectsTable').DataTable({ language: { url: '/ems/assets/i18n/datatables/ar.json' } });
     $('#equipmentDriversTable').DataTable({ language: { url: '/ems/assets/i18n/datatables/ar.json' } });
+});
+
+// ════════ تبديل التبويبات (hash-linkable) + ضبط أعمدة DataTables عند الإظهار ════════
+$(function () {
+    var page = document.querySelector('.equipment-profile-page');
+    if (!page) return;
+    var tabs   = page.querySelectorAll('.ep-tab');
+    var panels = page.querySelectorAll('.ep-tab-panel');
+    function activate(name) {
+        var found = false;
+        tabs.forEach(function (t) { t.classList.toggle('is-active', t.getAttribute('data-ep-tab') === name); });
+        panels.forEach(function (p) { var on = (p.id === 'tab-' + name); p.classList.toggle('is-active', on); if (on) found = true; });
+        if (!found) return;
+        try { history.replaceState(null, '', '#' + name); } catch (e) {}
+        if (window.jQuery && $.fn.dataTable) {
+            setTimeout(function () { try { $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust(); } catch (e) {} }, 40);
+        }
+    }
+    tabs.forEach(function (t) { t.addEventListener('click', function () { activate(t.getAttribute('data-ep-tab')); }); });
+    var h = (location.hash || '').replace('#', '');
+    if (h && page.querySelector('#tab-' + h)) activate(h);
 });
 </script>

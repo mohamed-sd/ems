@@ -263,14 +263,14 @@ function mnt_cond_class($c) {
                 <div class="form-group"><label>نوع التفتيش</label>
                     <select name="inspection_type"><?php foreach ($types as $t) echo mnt_opt($t, $t, $ins['inspection_type'] === $t); ?></select>
                 </div>
-                <div class="form-group"><label>المعدة</label>
-                    <select name="equipment_id"><option value="">-- اختر --</option>
-                        <?php foreach ($equipments as $e) echo mnt_opt($e['id'], $e['name'] . (!empty($e['code']) ? ' (' . $e['code'] . ')' : ''), intval($ins['equipment_id']) === intval($e['id'])); ?>
+                <div class="form-group"><label>المشروع</label>
+                    <select name="project_id" class="mnt-proj"><option value="">— اختر المشروع —</option>
+                        <?php foreach ($projects as $p) echo mnt_opt($p['id'], $p['name'], intval($ins['project_id']) === intval($p['id'])); ?>
                     </select>
                 </div>
-                <div class="form-group"><label>المشروع</label>
-                    <select name="project_id"><option value="">-- اختر --</option>
-                        <?php foreach ($projects as $p) echo mnt_opt($p['id'], $p['name'], intval($ins['project_id']) === intval($p['id'])); ?>
+                <div class="form-group"><label>المعدة</label>
+                    <select name="equipment_id" class="mnt-eq" data-selected="<?php echo intval($ins['equipment_id']); ?>"><option value="">— اختر المشروع أولاً —</option>
+                        <?php foreach ($equipments as $e) echo mnt_opt($e['id'], $e['name'] . (!empty($e['code']) ? ' (' . $e['code'] . ')' : ''), intval($ins['equipment_id']) === intval($e['id'])); ?>
                     </select>
                 </div>
                 <div class="form-group"><label>الفاحص</label>
@@ -375,15 +375,13 @@ function mnt_cond_class($c) {
                 <div class="form-group"><label>نوع التفتيش</label>
                     <select name="inspection_type"><?php foreach ($types as $t) echo mnt_opt($t, $t, $t === 'دوري'); ?></select>
                 </div>
-                <div class="form-group"><label>المعدة</label>
-                    <select name="equipment_id"><option value="">-- اختر --</option>
-                        <?php foreach ($equipments as $e) echo mnt_opt($e['id'], $e['name'] . (!empty($e['code']) ? ' (' . $e['code'] . ')' : ''), false); ?>
-                    </select>
-                </div>
                 <div class="form-group"><label>المشروع</label>
-                    <select name="project_id"><option value="">-- اختر --</option>
+                    <select name="project_id" class="mnt-proj"><option value="">— اختر المشروع —</option>
                         <?php foreach ($projects as $p) echo mnt_opt($p['id'], $p['name'], false); ?>
                     </select>
+                </div>
+                <div class="form-group"><label>المعدة</label>
+                    <select name="equipment_id" class="mnt-eq" data-selected=""><option value="">— اختر المشروع أولاً —</option></select>
                 </div>
                 <div class="form-group"><label>الفاحص</label>
                     <select name="inspector_id"><option value="">-- اختر --</option>
@@ -414,18 +412,41 @@ function mnt_cond_class($c) {
                 <thead><tr><th>الإجراءات</th><th>المرجع</th><th>النوع</th><th>المعدة</th><th>الفاحص</th><th>التاريخ</th><th>الحالة</th></tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT i.id, i.code, i.inspection_type, i.scheduled_date, i.state,
-                                   e.name AS equipment_name, u.name AS inspector_name
+                    $sql = "SELECT i.id, i.code, i.inspection_type, i.scheduled_date, i.completed_at,
+                                   i.score, i.overall_result, i.tech_readiness_state,
+                                   i.equipment_condition, i.engine_condition, i.notes, i.state,
+                                   e.name AS equipment_name, p.name AS project_name, u.name AS inspector_name
                               FROM mnt_inspection i
                               LEFT JOIN equipments e ON e.id = i.equipment_id
+                              LEFT JOIN project p    ON p.id = i.project_id
                               LEFT JOIN users u ON u.id = i.inspector_id
                              WHERE $company_scope_sql AND COALESCE(i.is_deleted,0)=0
                              ORDER BY i.id DESC";
+                    $insp_ids = array();
                     $result = mysqli_query($conn, $sql);
                     if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                        $insp_ids[] = intval($row['id']);
+                        $st = (string) $row['state'];
+                        $da =
+                            "data-id='"        . intval($row['id']) . "' " .
+                            "data-code='"      . htmlspecialchars((string) $row['code'], ENT_QUOTES) . "' " .
+                            "data-type='"      . htmlspecialchars((string) $row['inspection_type'], ENT_QUOTES) . "' " .
+                            "data-equipment='" . htmlspecialchars((string) ($row['equipment_name'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-project='"   . htmlspecialchars((string) ($row['project_name'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-inspector='" . htmlspecialchars((string) ($row['inspector_name'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-scheduled='" . htmlspecialchars((string) ($row['scheduled_date'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-completed='" . htmlspecialchars((string) ($row['completed_at'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-score='"     . htmlspecialchars((string) ($row['score'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-overall='"   . htmlspecialchars((string) ($row['overall_result'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-readiness='" . htmlspecialchars((string) ($row['tech_readiness_state'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-eqcond='"    . htmlspecialchars((string) ($row['equipment_condition'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-engcond='"   . htmlspecialchars((string) ($row['engine_condition'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-notes='"     . htmlspecialchars((string) ($row['notes'] ?? ''), ENT_QUOTES) . "' " .
+                            "data-state='"     . htmlspecialchars($st, ENT_QUOTES) . "'";
                         echo "<tr>";
                         echo "<td><div class='action-btns'>";
-                        echo "<a href='inspections.php?id=" . intval($row['id']) . "' class='action-btn edit' title='فتح/تحرير'><i class='fas fa-pen-to-square'></i></a>";
+                        echo "<a href='javascript:void(0)' class='viewBtn action-btn view' $da title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
+                        if ($can_edit) echo "<a href='inspections.php?id=" . intval($row['id']) . "' class='action-btn edit' title='فتح/تحرير'><i class='fas fa-pen-to-square'></i></a>";
                         if ($can_delete) echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف التفتيش؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
                         echo "</div></td>";
                         echo "<td><strong>" . htmlspecialchars((string) $row['code']) . "</strong></td>";
@@ -441,6 +462,31 @@ function mnt_cond_class($c) {
             </table>
         </div>
     </div></div>
+    <?php
+    // ════════ خريطة بنود الفحص لكل تفتيش (لعرضها داخل نافذة التفاصيل) ════════
+    $mnt_insp_lines_map = array();
+    if (!empty($insp_ids)) {
+        $ids_csv = implode(',', array_map('intval', $insp_ids));
+        $cid     = intval($company_id);
+        $lq = "SELECT inspection_id, component, condition_state, recommendation
+                 FROM mnt_inspection_line
+                WHERE inspection_id IN ($ids_csv) AND company_id = $cid
+                ORDER BY id";
+        if ($lr = mysqli_query($conn, $lq)) {
+            while ($x = mysqli_fetch_assoc($lr)) {
+                $iid = intval($x['inspection_id']);
+                $mnt_insp_lines_map[$iid][] = array(
+                    (string) $x['component'],
+                    (string) ($x['condition_state'] ?? ''),
+                    (string) ($x['recommendation'] ?? '')
+                );
+            }
+        }
+    }
+    echo '<script>window.MNT_INSP_LINES = '
+        . json_encode($mnt_insp_lines_map, JSON_UNESCAPED_UNICODE)
+        . ';</script>';
+    ?>
 <?php endif; ?>
 </div>
 
@@ -467,6 +513,39 @@ function mnt_cond_class($c) {
                 table.column(6).search(v, true, false).draw();
             });
         }
+
+        // ════════ نافذة العرض الموحّدة ════════
+        $(document).on('click', '.viewBtn', function () {
+            var d = $(this).data();
+            var linesMap = window.MNT_INSP_LINES || {};
+            var lines = linesMap[String(d.id)] || [];
+            EmsDetailsModal.open({
+                title: 'تفاصيل التفتيش',
+                icon: 'fas fa-clipboard-check',
+                fields: [
+                    { label: 'المرجع', value: d.code, icon: 'fas fa-hashtag' },
+                    { label: 'الحالة', value: d.state, icon: 'fas fa-flag', type: 'status' },
+                    { label: 'النوع', value: d.type, icon: 'fas fa-list' },
+                    { label: 'المعدة', value: d.equipment, icon: 'fas fa-tractor' },
+                    { label: 'المشروع', value: d.project, icon: 'fas fa-folder-open' },
+                    { label: 'الفاحص', value: d.inspector, icon: 'fas fa-user-gear' },
+                    { label: 'التاريخ المجدول', value: d.scheduled, icon: 'fas fa-calendar' },
+                    { label: 'تاريخ الإكمال', value: d.completed, icon: 'fas fa-calendar-check' },
+                    { label: 'التقييم', value: d.score, icon: 'fas fa-star' },
+                    { label: 'النتيجة العامة', value: d.overall, icon: 'fas fa-clipboard-check' },
+                    { label: 'الجاهزية الفنية', value: d.readiness, icon: 'fas fa-gauge-high' },
+                    { label: 'حالة المعدة', value: d.eqcond, icon: 'fas fa-tractor' },
+                    { label: 'حالة المحرك', value: d.engcond, icon: 'fas fa-gears' },
+                    { label: 'ملاحظات', value: d.notes, icon: 'fas fa-note-sticky', size: 'full' }
+                ],
+                sections: [
+                    { title: 'بنود الفحص', icon: 'fas fa-list-check',
+                      pills: [ { label: 'عدد البنود', value: lines.length } ],
+                      table: { columns: ['المكوّن', 'الحالة', 'التوصية'], rows: lines },
+                      empty: 'لا توجد بنود فحص' }
+                ]
+            });
+        });
     });
 
     // ════════ صفحة التحرير: بنود الفحص عبر AJAX + فتح/إغلاق الفورم ════════
@@ -536,6 +615,36 @@ function mnt_cond_class($c) {
         else { $createForm.addClass('allforms-visible').hide().stop(true, true).slideDown(220); $('html, body').animate({ scrollTop: $createForm.offset().top - 90 }, 360); }
     });
     $('#cancelCreateForm').on('click', closeCreateForm);
+
+    // ════════ تسلسل المشروع ← المعدة: عند اختيار المشروع تُحمَّل معداته فقط ════════
+    function inspLoadProjectEquipment($proj){
+        var $form = $proj.closest('form');
+        var $eq = $form.find('.mnt-eq');
+        if (!$eq.length) return;
+        var projectId = $proj.val();
+        var current = $eq.val() || $eq.attr('data-selected') || '';
+        if (!projectId) { $eq.html('<option value="">— اختر المشروع أولاً —</option>'); return; }
+        $eq.html('<option value="">جارٍ التحميل…</option>');
+        var url = '/ems/Maintenance/get_project_equipment.php?mode=all&project_id=' + encodeURIComponent(projectId)
+                + (current ? '&include_id=' + encodeURIComponent(current) : '');
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function(r){ return r.json(); })
+            .then(function(res){
+                var list = res.equipment || [];
+                if (list.length === 0) { $eq.html('<option value="">لا توجد معدات في هذا المشروع</option>'); return; }
+                var opts = '<option value="">— اختر المعدة —</option>';
+                list.forEach(function(e){
+                    var label = e.name + (e.code ? ' (' + e.code + ')' : '');
+                    var sel = (String(e.id) === String(current)) ? ' selected' : '';
+                    opts += '<option value="' + e.id + '"' + sel + '>' + $('<div>').text(label).html() + '</option>';
+                });
+                $eq.html(opts);
+            })
+            .catch(function(){ $eq.html('<option value="">تعذّر تحميل المعدات</option>'); });
+    }
+    $(document).on('change', '.mnt-proj', function(){ inspLoadProjectEquipment($(this)); });
+    // تحميل أولي لفورم التحرير: لو كان المشروع محدّداً مسبقاً، حمّل معداته (مع إبقاء المعدة المختارة).
+    $('.mnt-proj').each(function(){ if ($(this).val()) inspLoadProjectEquipment($(this)); });
 })();
 </script>
 <style>

@@ -200,7 +200,7 @@ function operations_create(): void
     }
 
     $equipment_category = api_str('equipment_category', 'أساسي');
-    if ($equipment_category !== 'أساسي' && $equipment_category !== 'احتياطي') {
+    if ($equipment_category !== 'أساسي' && $equipment_category !== 'احتياطي' && $equipment_category !== 'متعطل') {
         $equipment_category = 'أساسي';
     }
 
@@ -306,7 +306,7 @@ function operations_update(int $opId): void
     }
 
     $equipment_category = api_str('equipment_category', 'أساسي');
-    if ($equipment_category !== 'أساسي' && $equipment_category !== 'احتياطي') {
+    if ($equipment_category !== 'أساسي' && $equipment_category !== 'احتياطي' && $equipment_category !== 'متعطل') {
         $equipment_category = 'أساسي';
     }
 

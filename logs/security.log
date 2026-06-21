@@ -169,3 +169,5 @@
 [2026-06-21 08:57:33] [csrf_violation] IP: ::1 | User: GUEST (GUEST) | Event: csrf_violation | Details: method=POST script=/ems/login.php token=invalid | UA: curl/8.7.1
 [2026-06-21 08:58:08] [csrf_violation] IP: ::1 | User: GUEST (GUEST) | Event: csrf_violation | Details: method=POST script=/ems/login.php token=invalid | UA: curl/8.7.1
 [2026-06-21 08:58:32] [csrf_violation] IP: ::1 | User: GUEST (GUEST) | Event: csrf_violation | Details: method=POST script=/ems/login.php token=invalid | UA: curl/8.7.1
+[2026-06-21 14:33:57] [csrf_violation] IP: ::1 | User: يسن (6) | Event: csrf_violation | Details: method=POST script=/ems/Oprators/get_mine_contracts.php token=invalid | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+[2026-06-21 14:55:05] [csrf_violation] IP: ::1 | User: يسن (6) | Event: csrf_violation | Details: method=POST script=/ems/Oprators/get_mine_contracts.php token=invalid | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36

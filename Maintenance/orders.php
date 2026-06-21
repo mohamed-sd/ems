@@ -757,11 +757,14 @@ function mnt_state_class($st) {
                               LEFT JOIN failure_codes fc ON fc.id = o.failure_code_id
                              WHERE $company_scope_sql AND COALESCE(o.is_deleted,0)=0
                              ORDER BY o.id DESC";
+                    $order_ids = array();
                     $result = mysqli_query($conn, $sql);
                     if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                        $order_ids[] = intval($row['id']);
                         $st = (string) $row['state'];
                         $failure = trim(((string) ($row['full_code'] ?? '')) . ' ' . ((string) ($row['failure_detail'] ?? '')));
                         $da =
+                            "data-id='" . intval($row['id']) . "' " .
                             "data-code='" . htmlspecialchars((string) $row['code'], ENT_QUOTES) . "' " .
                             "data-equipment='" . htmlspecialchars((string) ($row['eq_name'] ?? ''), ENT_QUOTES) . "' " .
                             "data-project='" . htmlspecialchars((string) ($row['proj_name'] ?? ''), ENT_QUOTES) . "' " .
@@ -788,7 +791,9 @@ function mnt_state_class($st) {
                         echo "<tr>";
                         echo "<td><div class='action-btns'>";
                         echo "<a href='javascript:void(0)' class='viewBtn action-btn view' $da title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";
-                        echo "<a href='orders.php?id=" . intval($row['id']) . "' class='action-btn edit' title='فتح/تحرير'><i class='fas fa-pen-to-square'></i></a>";
+                        if ($can_edit) {
+                            echo "<a href='orders.php?id=" . intval($row['id']) . "' class='action-btn edit' title='فتح/تحرير'><i class='fas fa-pen-to-square'></i></a>";
+                        }
                         if ($can_delete) {
                             echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف الأمر؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
                         }
@@ -807,6 +812,52 @@ function mnt_state_class($st) {
             </table>
         </div>
     </div></div>
+    <?php
+    // ════════ خريطة أسطر العمالة/القطع لكل أمر (لعرضها داخل نافذة التفاصيل) ════════
+    $mnt_labor_map = array();
+    $mnt_parts_map = array();
+    if (!empty($order_ids)) {
+        $ids_csv = implode(',', array_map('intval', $order_ids));
+        $cid     = intval($company_id);
+
+        $lq = "SELECT l.order_id, u.name AS emp, l.role, l.hours, l.hourly_rate, l.cost
+                 FROM mnt_order_labor l LEFT JOIN users u ON u.id = l.employee_id
+                WHERE l.order_id IN ($ids_csv) AND l.company_id = $cid
+                ORDER BY l.id";
+        if ($lr = mysqli_query($conn, $lq)) {
+            while ($x = mysqli_fetch_assoc($lr)) {
+                $oid = intval($x['order_id']);
+                $mnt_labor_map[$oid][] = array(
+                    ($x['emp'] !== null && $x['emp'] !== '') ? $x['emp'] : '—',
+                    (string) $x['hours'],
+                    number_format((float) $x['hourly_rate'], 2),
+                    number_format((float) $x['cost'], 2)
+                );
+            }
+        }
+
+        $pq = "SELECT order_id, part_name, category, quantity, unit_cost, subtotal, is_major_component
+                 FROM mnt_order_part
+                WHERE order_id IN ($ids_csv) AND company_id = $cid
+                ORDER BY id";
+        if ($pr = mysqli_query($conn, $pq)) {
+            while ($x = mysqli_fetch_assoc($pr)) {
+                $oid = intval($x['order_id']);
+                $mnt_parts_map[$oid][] = array(
+                    (string) $x['part_name'],
+                    (string) ($x['category'] ?? ''),
+                    (string) $x['quantity'],
+                    number_format((float) $x['unit_cost'], 2),
+                    number_format((float) $x['subtotal'], 2),
+                    intval($x['is_major_component']) ? 'نعم' : 'لا'
+                );
+            }
+        }
+    }
+    echo '<script>window.MNT_ORDER_LINES = '
+        . json_encode(array('labor' => $mnt_labor_map, 'parts' => $mnt_parts_map), JSON_UNESCAPED_UNICODE)
+        . ';</script>';
+    ?>
 <?php endif; ?>
 </div>
 
@@ -837,6 +888,10 @@ function mnt_state_class($st) {
 
             $(document).on('click', '.viewBtn', function () {
                 var d = $(this).data();
+                var lines  = window.MNT_ORDER_LINES || { labor: {}, parts: {} };
+                var oid    = String(d.id);
+                var labor  = (lines.labor && lines.labor[oid]) || [];
+                var parts  = (lines.parts && lines.parts[oid]) || [];
                 EmsDetailsModal.open({
                     title: 'تفاصيل أمر الصيانة',
                     icon: 'fas fa-wrench',
@@ -862,6 +917,16 @@ function mnt_state_class($st) {
                         { label: 'الإجمالي', value: d.total, icon: 'fas fa-sack-dollar', size: 'lg' },
                         { label: 'التشخيص', value: d.diagnosis, icon: 'fas fa-stethoscope', size: 'full' },
                         { label: 'الإجراءات المتخذة', value: d.actions, icon: 'fas fa-list-check', size: 'full' }
+                    ],
+                    sections: [
+                        { title: 'أسطر العمالة', icon: 'fas fa-user-gear',
+                          pills: [ { label: 'عدد الأسطر', value: labor.length }, { label: 'إجمالي العمالة', value: d.labor } ],
+                          table: { columns: ['الموظف', 'الساعات', 'تكلفة الساعة', 'التكلفة'], rows: labor },
+                          empty: 'لا توجد أسطر عمالة' },
+                        { title: 'أسطر القطع', icon: 'fas fa-gears',
+                          pills: [ { label: 'عدد الأسطر', value: parts.length }, { label: 'إجمالي القطع', value: d.parts } ],
+                          table: { columns: ['اسم القطعة', 'الفئة', 'الكمية', 'تكلفة الوحدة', 'الإجمالي', 'مكوّن رئيسي'], rows: parts },
+                          empty: 'لا توجد أسطر قطع' }
                     ]
                 });
             });

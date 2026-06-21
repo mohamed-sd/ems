@@ -14,9 +14,11 @@ if (!isset($_SESSION['user'])) {
 require_once '../config.php';
 require_once __DIR__ . '/mnt_helpers.php';
 
-$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$company_id  = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$target_role = isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : null;
 
-$count = ($company_id > 0) ? mnt_new_breakdowns_count($conn, $company_id) : 0;
+// شارة التوبار تعكس «الواردة إلى دوري الجديدة».
+$count = ($company_id > 0) ? mnt_new_breakdowns_count($conn, $company_id, $target_role) : 0;
 
 // إيقاف أي output buffers قبل إرجاع JSON (نمط chats/get_unread_count.php).
 while (ob_get_level()) {
