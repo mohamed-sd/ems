@@ -157,6 +157,48 @@ if ($fh_exists) {
     if ($q) while ($r = mysqli_fetch_assoc($q)) $history_rows[] = $r;
 }
 
+// ═══════════════════════════════════════════════════════════════════
+//  قسم الصيانة — أوامر هذه المعدة + مؤشرات (مرئي لكل من يفتح الكرت/قراءة)
+//  المصدر: mnt_order (معزول بالشركة). المؤشرات تُحتسب من بيانات الأوامر + ساعات التشغيل.
+// ═══════════════════════════════════════════════════════════════════
+$mnt_orders = array();
+$mnt_total = $mnt_closed = $mnt_failures = $mnt_open = 0;
+$mnt_downtime = 0.0; $mnt_cost = 0.0;
+$mnt_last = isset($equipment['last_maintenance_date']) ? $equipment['last_maintenance_date'] : null;
+$mnt_scope = $is_super_admin ? "" : " AND mo.company_id = $company_id";
+if (db_table_has_column($conn, 'mnt_order', 'id')) {
+    $q = mysqli_query($conn, "SELECT mo.id, mo.code, mo.source, mo.maint_type, mo.state,
+                                     mo.downtime_hours, mo.total_cost, mo.work_start, mo.work_end, mo.closed_at
+                                FROM mnt_order mo
+                               WHERE mo.equipment_id = $equipment_id AND COALESCE(mo.is_deleted,0)=0 $mnt_scope
+                               ORDER BY mo.id DESC LIMIT 50");
+    if ($q) while ($r = mysqli_fetch_assoc($q)) { $mnt_orders[] = $r; }
+
+    $agg = mysqli_query($conn, "SELECT COUNT(*) total,
+                                       SUM(state='إغلاق') closed,
+                                       SUM(state IN ('بلاغ','تنفيذ','فحص')) opened,
+                                       COALESCE(SUM(downtime_hours),0) downtime,
+                                       COALESCE(SUM(total_cost),0) cost,
+                                       SUM(source='بلاغ') failures,
+                                       MAX(closed_at) last_closed
+                                  FROM mnt_order mo
+                                 WHERE mo.equipment_id = $equipment_id AND COALESCE(mo.is_deleted,0)=0 $mnt_scope");
+    if ($agg && ($a = mysqli_fetch_assoc($agg))) {
+        $mnt_total    = intval($a['total']);
+        $mnt_closed   = intval($a['closed']);
+        $mnt_open     = intval($a['opened']);
+        $mnt_downtime = floatval($a['downtime']);
+        $mnt_cost     = floatval($a['cost']);
+        $mnt_failures = intval($a['failures']);
+        if (!empty($a['last_closed'])) { $mnt_last = $a['last_closed']; }
+    }
+}
+// المؤشرات: MTBF = ساعات التشغيل / عدد الأعطال · MTTR = إجمالي التوقّف / الأوامر المغلقة
+// نسبة الجاهزية = التشغيل / (التشغيل + التوقّف) ×100
+$mnt_mtbf  = $mnt_failures > 0 ? ($hours_sum / $mnt_failures) : null;
+$mnt_mttr  = $mnt_closed   > 0 ? ($mnt_downtime / $mnt_closed) : null;
+$mnt_avail = ($hours_sum + $mnt_downtime) > 0 ? ($hours_sum / ($hours_sum + $mnt_downtime) * 100) : null;
+
 // المنفّذ/المورد صار إدخالاً يدوياً حرّاً (غير مربوط بجدول الموردين) — لا حاجة لجلب الموردين.
 
 // حساب حالة الوثيقة من تاريخ الانتهاء (سارية/قاربت/منتهية) + تنبيهات حرجة
@@ -323,6 +365,45 @@ include '../insidebar.php';
                     <?php endwhile; endif; ?>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- ════════════════ قسم الصيانة (مؤشرات + أوامر) — مرئي لكل من يفتح الكرت ════════════════ -->
+    <div class="card" id="sec-maintenance" style="margin-bottom:14px;">
+        <div class="card-header"><h5><i class="fas fa-wrench"></i> الصيانة — المؤشرات وأوامر الصيانة</h5></div>
+        <div class="card-body">
+            <div class="profile-grid">
+                <div class="profile-card"><div class="kpi"><?php echo intval($mnt_total); ?></div><div class="label">إجمالي أوامر الصيانة</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo intval($mnt_open); ?></div><div class="label">أوامر مفتوحة</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo intval($mnt_failures); ?></div><div class="label">أعطال (من بلاغ)</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo number_format($mnt_downtime, 1); ?></div><div class="label">ساعات التوقّف</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo number_format($mnt_cost, 0); ?></div><div class="label">إجمالي تكلفة الصيانة</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo $mnt_last ? htmlspecialchars((string) $mnt_last) : '—'; ?></div><div class="label">آخر صيانة</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo $mnt_mtbf !== null ? number_format($mnt_mtbf, 1) : '—'; ?></div><div class="label">MTBF (ساعة/عطل)</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo $mnt_mttr !== null ? number_format($mnt_mttr, 1) : '—'; ?></div><div class="label">MTTR (ساعة/أمر)</div></div>
+                <div class="profile-card"><div class="kpi"><?php echo $mnt_avail !== null ? number_format($mnt_avail, 1) . '%' : '—'; ?></div><div class="label">نسبة الجاهزية</div></div>
+            </div>
+
+            <div class="table-container" style="margin-top:12px;">
+                <table class="display" style="width:100%;">
+                    <thead><tr><th>المرجع</th><th>المصدر</th><th>النوع</th><th>الحالة</th><th>التوقّف (ساعة)</th><th>التكلفة</th><th>الإغلاق</th></tr></thead>
+                    <tbody>
+                        <?php if (empty($mnt_orders)): ?>
+                            <tr><td colspan="7" style="text-align:center;color:#888;">لا توجد أوامر صيانة لهذه المعدة</td></tr>
+                        <?php else: foreach ($mnt_orders as $mo): ?>
+                            <tr>
+                                <td><strong><?php echo htmlspecialchars((string) $mo['code']); ?></strong></td>
+                                <td><?php echo htmlspecialchars((string) $mo['source']); ?></td>
+                                <td><?php echo htmlspecialchars((string) ($mo['maint_type'] ?: '—')); ?></td>
+                                <td><span class="action-btn"><?php echo htmlspecialchars((string) $mo['state']); ?></span></td>
+                                <td><?php echo number_format((float) $mo['downtime_hours'], 1); ?></td>
+                                <td><?php echo number_format((float) $mo['total_cost'], 2); ?></td>
+                                <td><?php echo htmlspecialchars((string) ($mo['closed_at'] ?: '—')); ?></td>
+                            </tr>
+                        <?php endforeach; endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

@@ -190,6 +190,16 @@ function getReportsCatalog() {
             'url'         => 'reports/drivers_contracts.php',
         ],
 
+        // ── الصيانة ─────────────────────────────────────────────
+        'maintenance_summary' => [
+            'code'        => 'maintenance_summary',
+            'name_ar'     => 'مؤشرات الصيانة',
+            'icon'        => 'fa-wrench',
+            'category'    => 'maintenance',
+            'description' => 'مؤشرات الصيانة لكل معدة: الأوامر، التوقّف، التكلفة، MTBF، MTTR، نسبة الجاهزية',
+            'url'         => 'reports/maintenance_summary.php',
+        ],
+
         // ── التشغيل ─────────────────────────────────────────────
         'operations_summary' => [
             'code'        => 'operations_summary',
@@ -266,6 +276,7 @@ function getCategoryLabel($category) {
         'fleet'      => 'الأسطول',
         'drivers'    => 'المشغلون',
         'operations' => 'التشغيل',
+        'maintenance' => 'الصيانة',
     ];
     return isset($labels[$category]) ? $labels[$category] : $category;
 }
@@ -282,6 +293,7 @@ function getCategoryIcon($category) {
         'fleet'      => 'fa-tractor',
         'drivers'    => 'fa-id-card',
         'operations' => 'fa-cogs',
+        'maintenance' => 'fa-wrench',
     ];
     return isset($icons[$category]) ? $icons[$category] : 'fa-chart-bar';
 }

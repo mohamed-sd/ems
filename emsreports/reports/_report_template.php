@@ -1027,6 +1027,81 @@ case 'drivers_contracts': {
     break;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   MAINTENANCE (الصيانة) — مؤشرات الصيانة لكل معدة (معزول بالشركة)
+───────────────────────────────────────────────────────────────────────── */
+case 'maintenance_summary': {
+    $scMo  = rptCompanyScope($conn, 'mo', 'mnt_order', $companyId, $isSuperAdmin);
+    $where = ["($scMo)", "COALESCE(mo.is_deleted,0)=0"];
+    if ($fDateFrom)    $where[] = "DATE(mo.created_at) >= '" . mysqli_real_escape_string($conn, $fDateFrom) . "'";
+    if ($fDateTo)      $where[] = "DATE(mo.created_at) <= '" . mysqli_real_escape_string($conn, $fDateTo) . "'";
+    if ($fEquipId > 0) $where[] = "mo.equipment_id = $fEquipId";
+    $ws = implode(' AND ', $where);
+
+    $kpiSql = "SELECT COUNT(*) total,
+                      SUM(mo.state='إغلاق') closed,
+                      SUM(mo.state IN ('بلاغ','تنفيذ','فحص')) open_cnt,
+                      SUM(mo.source='بلاغ') failures,
+                      ROUND(IFNULL(SUM(mo.downtime_hours),0),1) downtime,
+                      ROUND(IFNULL(SUM(mo.total_cost),0),2) cost
+               FROM mnt_order mo WHERE $ws";
+    $kr = mysqli_query($conn, $kpiSql);
+    $ka = $kr ? mysqli_fetch_assoc($kr) : [];
+    $kpi = [
+        ['icon'=>'fa-wrench',               'value'=> number_format($ka['total']    ?? 0),          'label'=>'إجمالي الأوامر', 'color'=>'blue'],
+        ['icon'=>'fa-spinner',              'value'=> number_format($ka['open_cnt'] ?? 0),          'label'=>'أوامر مفتوحة',   'color'=>'gold'],
+        ['icon'=>'fa-check-circle',         'value'=> number_format($ka['closed']   ?? 0),          'label'=>'أوامر مغلقة',    'color'=>'green'],
+        ['icon'=>'fa-triangle-exclamation', 'value'=> number_format($ka['failures'] ?? 0),          'label'=>'أعطال',          'color'=>'red'],
+        ['icon'=>'fa-hourglass-half',       'value'=> number_format($ka['downtime'] ?? 0,1) . ' س', 'label'=>'ساعات التوقّف',  'color'=>'teal'],
+        ['icon'=>'fa-coins',                'value'=> number_format($ka['cost']     ?? 0,0),        'label'=>'إجمالي التكلفة', 'color'=>'purple'],
+    ];
+
+    $headers = ['الكود','المعدة','إجمالي الأوامر','أعطال','مغلقة','ساعات التوقّف','التكلفة','ساعات التشغيل','MTBF','MTTR','نسبة الجاهزية%'];
+    $sql = "SELECT IFNULL(e.code,'-') AS code,
+                   IFNULL(e.name,'غير محدد') AS equipment_name,
+                   COUNT(mo.id) AS total_orders,
+                   SUM(mo.source='بلاغ') AS failures,
+                   SUM(mo.state='إغلاق') AS closed_orders,
+                   ROUND(IFNULL(SUM(mo.downtime_hours),0),1) AS downtime,
+                   ROUND(IFNULL(SUM(mo.total_cost),0),2) AS cost,
+                   IFNULL((SELECT ROUND(SUM(t.operator_hours),1) FROM timesheet t JOIN operations o2 ON o2.id=t.operator WHERE o2.equipment=e.id),0) AS op_hours
+            FROM mnt_order mo
+            LEFT JOIN equipments e ON e.id = mo.equipment_id
+            WHERE $ws
+            GROUP BY e.id, e.code, e.name
+            ORDER BY total_orders DESC";
+    $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
+    $result = mysqli_query($conn, $sql);
+    if (!$result) die('خطأ: ' . mysqli_error($conn));
+    while ($r = mysqli_fetch_assoc($result)) {
+        $f  = floatval($r['failures']);
+        $cl = floatval($r['closed_orders']);
+        $dt = floatval($r['downtime']);
+        $oh = floatval($r['op_hours']);
+        $rows[] = [
+            'code'          => $r['code'],
+            'equipment_name'=> $r['equipment_name'],
+            'total_orders'  => $r['total_orders'],
+            'failures'      => $r['failures'],
+            'closed_orders' => $r['closed_orders'],
+            'downtime'      => $r['downtime'],
+            'cost'          => $r['cost'],
+            'op_hours'      => $r['op_hours'],
+            'mtbf'          => $f  > 0 ? round($oh / $f, 1) : 0,
+            'mttr'          => $cl > 0 ? round($dt / $cl, 1) : 0,
+            'availability'  => ($oh + $dt) > 0 ? round($oh / ($oh + $dt) * 100, 1) . '%' : '—',
+        ];
+    }
+    if (count($rows) > 0) {
+        $cl2 = []; $cv = [];
+        foreach (array_slice($rows, 0, 8) as $r) { $cl2[] = mb_substr($r['equipment_name'], 0, 14, 'UTF-8'); $cv[] = floatval($r['downtime']); }
+        $chartData = ['type'=>'bar','labels'=>$cl2,'datasets'=>[
+            ['label'=>'ساعات التوقّف','data'=>$cv,'color'=>'rgba(220,38,38,0.70)'],
+        ],'title'=>'أعلى المعدات في ساعات التوقّف'];
+    }
+    break;
+}
+
 default:
     $kpi     = [];
     $headers = ['رسالة'];

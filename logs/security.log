@@ -118,3 +118,54 @@
 [2026-06-18 13:21:35] [csrf_violation] IP: ::1 | User: يسن (6) | Event: csrf_violation | Details: method=POST script=/ems/Oprators/get_mine_contracts.php token=invalid | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0
 [2026-06-18 13:39:34] [csrf_violation] IP: ::1 | User: يسن (6) | Event: csrf_violation | Details: method=POST script=/ems/Oprators/get_mine_contracts.php token=invalid | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0
 [2026-06-18 13:40:18] [csrf_violation] IP: ::1 | User: يسن (6) | Event: csrf_violation | Details: method=POST script=/ems/Oprators/get_mine_contracts.php token=invalid | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0
+[2026-06-20 19:26:26] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/breakdowns.php token=missing | UA: curl/8.7.1
+[2026-06-20 19:26:26] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/breakdowns.php token=missing | UA: curl/8.7.1
+[2026-06-20 19:26:27] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: curl/8.7.1
+[2026-06-20 19:26:27] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: curl/8.7.1
+[2026-06-20 19:26:27] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: curl/8.7.1
+[2026-06-20 19:26:27] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: curl/8.7.1
+[2026-06-20 19:26:27] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: curl/8.7.1
+[2026-06-20 19:26:29] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/breakdowns.php token=missing | UA: curl/8.7.1
+[2026-06-20 19:28:45] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/_probe.php token=missing | UA: curl/8.7.1
+[2026-06-20 19:29:28] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/_probe.php token=missing | UA: curl/8.7.1
+[2026-06-20 19:31:22] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/breakdowns.php token=missing | UA: UNKNOWN
+[2026-06-20 19:31:22] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/breakdowns.php token=missing | UA: UNKNOWN
+[2026-06-20 19:31:22] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 19:31:22] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 19:31:22] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 19:31:22] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 19:31:22] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 19:31:23] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/breakdowns.php token=missing | UA: UNKNOWN
+[2026-06-20 19:31:23] [csrf_violation] IP: ::1 | User: maint_sup (20) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 19:36:58] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/inspections.php token=missing | UA: UNKNOWN
+[2026-06-20 19:36:58] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/inspections.php token=missing | UA: UNKNOWN
+[2026-06-20 19:36:58] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/inspections.php token=missing | UA: UNKNOWN
+[2026-06-20 19:36:58] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/preventive_plans.php token=missing | UA: UNKNOWN
+[2026-06-20 19:36:58] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/preventive_plans.php token=missing | UA: UNKNOWN
+[2026-06-20 19:36:58] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/preventive_plans.php token=missing | UA: UNKNOWN
+[2026-06-20 19:36:58] [csrf_violation] IP: ::1 | User: maint_mgr (19) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 19:45:10] [csrf_violation] IP: ::1 | User: ops_test (22) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/breakdowns.php token=missing | UA: UNKNOWN
+[2026-06-20 20:22:37] [csrf_violation] IP: ::1 | User: mnt_qa (25) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 20:22:38] [csrf_violation] IP: ::1 | User: mnt_qa (25) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 20:22:38] [csrf_violation] IP: ::1 | User: mnt_qa (25) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 20:22:38] [csrf_violation] IP: ::1 | User: mnt_qa (25) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 20:22:38] [csrf_violation] IP: ::1 | User: mnt_qa (25) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 20:22:38] [csrf_violation] IP: ::1 | User: mnt_qa (25) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 21:04:31] [csrf_violation] IP: ::1 | User: qa_mnt (36) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 21:04:31] [csrf_violation] IP: ::1 | User: qa_mnt (36) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 21:04:31] [csrf_violation] IP: ::1 | User: qa_mnt (36) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 21:13:37] [csrf_violation] IP: ::1 | User: qa_mnt (37) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/inspections.php token=missing | UA: UNKNOWN
+[2026-06-20 21:13:38] [csrf_violation] IP: ::1 | User: qa_mnt (37) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/inspections.php token=missing | UA: UNKNOWN
+[2026-06-20 21:13:38] [csrf_violation] IP: ::1 | User: qa_mnt (37) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/inspections.php token=missing | UA: UNKNOWN
+[2026-06-20 21:13:38] [csrf_violation] IP: ::1 | User: qa_mnt (37) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/inspections.php token=missing | UA: UNKNOWN
+[2026-06-20 21:21:11] [csrf_violation] IP: ::1 | User: qa_mnt (38) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/inspections.php token=missing | UA: UNKNOWN
+[2026-06-20 21:42:38] [csrf_violation] IP: ::1 | User: qa_mnt (39) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/preventive_plans.php token=missing | UA: UNKNOWN
+[2026-06-20 21:42:38] [csrf_violation] IP: ::1 | User: qa_mnt (39) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/preventive_plans.php token=missing | UA: UNKNOWN
+[2026-06-20 21:42:38] [csrf_violation] IP: ::1 | User: qa_mnt (39) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/preventive_plans.php token=missing | UA: UNKNOWN
+[2026-06-20 21:51:15] [csrf_violation] IP: ::1 | User: qa_mnt (40) | Event: csrf_violation | Details: method=POST script=/ems/Maintenance/orders.php token=missing | UA: UNKNOWN
+[2026-06-20 22:10:10] [csrf_violation] IP: ::1 | User: GUEST (GUEST) | Event: csrf_violation | Details: method=POST script=/ems/login.php token=invalid | UA: UNKNOWN
+[2026-06-20 22:10:55] [csrf_violation] IP: ::1 | User: يسن (6) | Event: csrf_violation | Details: method=POST script=/ems/Oprators/get_mine_contracts.php token=invalid | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+[2026-06-21 08:54:59] [csrf_violation] IP: ::1 | User: GUEST (GUEST) | Event: csrf_violation | Details: method=POST script=/ems/login.php token=invalid | UA: curl/8.7.1
+[2026-06-21 08:57:33] [csrf_violation] IP: ::1 | User: GUEST (GUEST) | Event: csrf_violation | Details: method=POST script=/ems/login.php token=invalid | UA: curl/8.7.1
+[2026-06-21 08:58:08] [csrf_violation] IP: ::1 | User: GUEST (GUEST) | Event: csrf_violation | Details: method=POST script=/ems/login.php token=invalid | UA: curl/8.7.1
+[2026-06-21 08:58:32] [csrf_violation] IP: ::1 | User: GUEST (GUEST) | Event: csrf_violation | Details: method=POST script=/ems/login.php token=invalid | UA: curl/8.7.1

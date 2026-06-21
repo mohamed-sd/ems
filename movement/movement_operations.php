@@ -29,6 +29,9 @@ $drivers_has_status = db_table_has_column($conn, 'drivers', 'status');
 $drivers_has_project_id = db_table_has_column($conn, 'drivers', 'project_id');
 $equipments_has_lat = db_table_has_column($conn, 'equipments', 'latitude');
 $equipments_has_lng = db_table_has_column($conn, 'equipments', 'longitude');
+$equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
+$equipments_has_availability_status = db_table_has_column($conn, 'equipments', 'availability_status');
+$equipments_has_availability_state = db_table_has_column($conn, 'equipments', 'availability_state');
 $project_has_lat = db_table_has_column($conn, 'project', 'latitude');
 $project_has_lng = db_table_has_column($conn, 'project', 'longitude');
 
@@ -412,6 +415,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 }
             }
         }
+
+        // تحويل المعدة إلى وضع الصيانة (مدير الحركة أول من يعلم بالعطل من السائق)
+        // ملاحظة: الحالة الفعلية للمعدة تُدار عبر availability_status / availability_state،
+        // وليس عبر العمود العام status (الذي هو علم «صف نشط» = 1). لا نمسّ operations.status
+        // ولا equipments.status — تغيير الصحة الفنية للتشغيل من اختصاص أمر الصيانة نفسه.
+        elseif ($action === 'set_equipment_maintenance') {
+            try {
+                $equipment_id = intval($_POST['equipment_id'] ?? 0);
+                if ($equipment_id <= 0) {
+                    throw new Exception('معرّف المعدة غير صحيح');
+                }
+                if (!$equipments_has_availability_status) {
+                    throw new Exception('عمود حالة التوفر غير متاح في جدول المعدات');
+                }
+
+                // التأكد أن المعدة مرتبطة بتشغيل في هذا المشروع (وضمن نطاق الشركة)
+                $check_sql = "SELECT 1 FROM operations
+                              WHERE equipment = $equipment_id
+                                AND project_id = $selected_project_id
+                                $operations_company_scope_inline
+                              LIMIT 1";
+                $check_res = mysqli_query($conn, $check_sql);
+                if (!$check_res || mysqli_num_rows($check_res) === 0) {
+                    throw new Exception('المعدة غير مرتبطة بهذا المشروع');
+                }
+
+                $maint_sets = ["availability_status = 'تحت الصيانة'"];
+                if ($equipments_has_availability_state) {
+                    $maint_sets[] = "availability_state = 'غير متوفرة'";
+                }
+                $equip_company_scope = (!$is_super_admin && $equipments_has_company)
+                    ? " AND (company_id = $company_id OR company_id IS NULL)"
+                    : "";
+
+                $maint_sql = "UPDATE equipments
+                                 SET " . implode(', ', $maint_sets) . "
+                               WHERE id = $equipment_id$equip_company_scope
+                               LIMIT 1";
+                if (!mysqli_query($conn, $maint_sql)) {
+                    throw new Exception('خطأ في تحويل المعدة إلى وضع الصيانة');
+                }
+
+                if (isset($_POST['json']) && $_POST['json'] === '1') {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode(['success' => true, 'message' => 'تم تحويل المعدة إلى وضع الصيانة ✅']);
+                    exit;
+                }
+                $msg = 'تم تحويل المعدة إلى وضع الصيانة ✅';
+                $is_success = true;
+            } catch (Exception $ex) {
+                $msg = $ex->getMessage() . ' ❌';
+                $is_success = false;
+                if (isset($_POST['json']) && $_POST['json'] === '1') {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode(['success' => false, 'message' => $msg]);
+                    exit;
+                }
+            }
+        }
     }
 }
 
@@ -422,6 +484,7 @@ $equip_lng_select = $equipments_has_lng ? 'e.longitude AS longitude' : 'NULL AS 
 $operations_sql = "SELECT o.id, o.equipment, o.equipment_category, o.start, o.end, o.shift_type, o.status,
                           o.total_equipment_hours, o.shift_hours,
                           e.code AS equipment_code, e.name AS equipment_name,
+                          e.availability_status AS equipment_availability_status,
                           et.type AS equipment_type_name,
                           s.name AS supplier_name,
                           $equip_lat_select,
@@ -705,6 +768,21 @@ include '../insidebar.php';
         font-weight: 600;
     }
 
+    .movement-unified-page .status-maint {
+        background: #fde7c8;
+        color: #92400e;
+        border: 1px solid #f0c98a;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-right: 4px;
+        white-space: nowrap;
+    }
+
     .movement-unified-page .btn-save-row {
         background: #0b4c8c;
         color: #fff;
@@ -734,6 +812,22 @@ include '../insidebar.php';
 
     .movement-unified-page .btn-end-row:hover {
         background: #b91c1c;
+    }
+
+    .movement-unified-page .btn-maint-row {
+        background: #d97706;
+        color: #fff;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        margin-right: 4px;
+    }
+
+    .movement-unified-page .btn-maint-row:hover {
+        background: #b45309;
     }
 
     .movement-unified-page #monitoringMap {
@@ -988,6 +1082,8 @@ include '../insidebar.php';
                                     $category   = isset($op['equipment_category']) ? $op['equipment_category'] : 'أساسي';
                                     $shift      = isset($op['shift_type']) ? $op['shift_type'] : 'B';
                                     $is_running = ($status === 1);
+                                    $equip_avail   = isset($op['equipment_availability_status']) ? trim((string)$op['equipment_availability_status']) : '';
+                                    $is_under_maint = in_array($equip_avail, ['تحت الصيانة', 'موقوفة للصيانة'], true);
                                     $shift_label = ($shift === 'D') ? 'نهاري' : (($shift === 'N') ? 'ليلي' : 'نهاري + ليلي');
                                     $eq_drivers  = isset($drivers_by_equipment[$eq_id]) ? $drivers_by_equipment[$eq_id] : [];
                                     $tkey        = $operations_table['table_key'];
@@ -1051,10 +1147,16 @@ include '../insidebar.php';
                                         <?php else: ?>
                                             <span class="status-idle">منتهي</span>
                                         <?php endif; ?>
+                                        <?php if ($is_under_maint): ?>
+                                            <span class="status-maint"><i class="fas fa-wrench"></i> تحت الصيانة</span>
+                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php if ($is_running && $can_edit): ?>
                                             <button type="button" class="btn-save-row" onclick="saveOperation(<?php echo $op_id; ?>, this)"><i class="fas fa-save"></i> حفظ</button>
+                                            <?php if (!$is_under_maint): ?>
+                                            <button type="button" class="btn-maint-row" onclick="setMaintenance(<?php echo $eq_id; ?>, this)" title="تحويل المعدة إلى وضع الصيانة"><i class="fas fa-wrench"></i> صيانة</button>
+                                            <?php endif; ?>
                                         <?php else: ?>
                                             <span>-</span>
                                         <?php endif; ?>
@@ -1234,6 +1336,19 @@ include '../insidebar.php';
             .then(function(r) { return r.json(); })
             .then(function(d) { d.success ? (alert('✅ تم الحفظ'), location.reload()) : alert('❌ ' + d.message); })
             .catch(function()  { alert('❌ خطأ في الاتصال'); });
+    }
+
+    function setMaintenance(equipmentId, triggerBtn) {
+        if (!confirm('هل تريد تحويل هذه المعدة إلى وضع الصيانة؟ ستصبح متاحة في قائمة معدات أوامر الصيانة.')) return;
+        if (triggerBtn) triggerBtn.disabled = true;
+        var formData = new FormData();
+        formData.append('action', 'set_equipment_maintenance');
+        formData.append('equipment_id', equipmentId);
+        formData.append('json', '1');
+        fetch(window.location.href, { method: 'POST', body: formData })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { d.success ? (alert('✅ ' + d.message), location.reload()) : (alert('❌ ' + d.message), triggerBtn && (triggerBtn.disabled = false)); })
+            .catch(function()  { alert('❌ خطأ في الاتصال'); if (triggerBtn) triggerBtn.disabled = false; });
     }
 
     function endOperation(opId, triggerBtn) {

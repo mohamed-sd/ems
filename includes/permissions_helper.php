@@ -480,6 +480,12 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
         return;
     }
 
+    // شاشة البلاغات موحّدة لكل الإدارات (نمط المراسلات): يصلها كل مستخدم مسجّل
+    // عبر أيقونة التوبار. صلاحياتها لا تُفحص على مستوى الموديول هنا.
+    if (strpos($relative_script, 'Maintenance/breakdowns.php') !== false) {
+        return;
+    }
+
     if (strpos($relative_script, 'emsreports/') === 0) {
         $role_id = intval($_SESSION['user']['role']);
         $has_reports_permission = false;

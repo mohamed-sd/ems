@@ -1,0 +1,153 @@
+%% ERD - قسم الصيانة (مسؤول الصيانة) - بدون اعتماد
+%% الكيانات الجديدة لها بادئة mnt_ ، والكيانات المعاد استخدامها معلّمة (reused)
+erDiagram
+    mnt_order ||--o{ mnt_order_labor : "عمالة"
+    mnt_order ||--o{ mnt_order_part  : "قطع"
+    mnt_inspection ||--o{ mnt_inspection_line : "بنود"
+    mnt_plan ||--o{ mnt_plan_task : "مهام"
+    mnt_plan ||--o{ mnt_order : "تولّد"
+    mnt_inspection ||--o{ mnt_order : "قد تُطلق"
+    mnt_parts ||--o{ mnt_order_part : "صنف"
+    mnt_lookup ||--o{ mnt_order : "سبب"
+    mnt_lookup ||--o{ mnt_plan_task : "نوع مهمة"
+
+    equipments ||--o{ mnt_order : "معدة"
+    equipments ||--o{ mnt_inspection : "معدة"
+    equipments ||--o{ mnt_plan : "معدة"
+    equipments_types ||--o{ mnt_plan : "فئة"
+    failure_codes ||--o{ mnt_order : "نوع عطل"
+    suppliers ||--o{ mnt_order : "ورشة خارجية"
+    users ||--o{ mnt_order : "فني"
+    users ||--o{ mnt_order_labor : "موظف"
+    users ||--o{ mnt_inspection : "فاحص"
+    project ||--o{ mnt_order : "مشروع"
+    project ||--o{ mnt_inspection : "مشروع"
+
+    mnt_order {
+        int id PK
+        string code
+        int company_id
+        string source "بلاغ/وقائي/تفتيش"
+        datetime report_datetime
+        string severity
+        bool is_stopped
+        string maint_type
+        text diagnosis
+        int cause_id FK
+        decimal downtime_hours
+        decimal labor_cost
+        decimal parts_cost
+        decimal external_cost
+        decimal total_cost
+        string inspection_result
+        string stage "بلاغ/تنفيذ/فحص/إغلاق"
+        int equipment_id FK
+        int failure_type_id FK
+        int vendor_id FK
+        int technician_id FK
+        int plan_id FK
+        int inspection_id FK
+        int project_id FK
+    }
+    mnt_order_labor {
+        int id PK
+        int order_id FK
+        int employee_id FK
+        string role
+        decimal hours
+        decimal hourly_rate
+        decimal cost
+    }
+    mnt_order_part {
+        int id PK
+        int order_id FK
+        int part_id FK
+        string category
+        decimal quantity
+        string source "مخزون/شراء"
+        decimal unit_cost
+        decimal subtotal
+        bool is_major_component
+    }
+    mnt_inspection {
+        int id PK
+        string code
+        int company_id
+        string inspection_type "دوري/زيارة ميدانية/..."
+        date scheduled_date
+        int score
+        string overall_result
+        string tech_readiness_state "نتيجة فحص"
+        string state "جديد/مجدول/قيد التنفيذ/مكتمل/مغلق"
+        int equipment_id FK
+        int project_id FK
+        int inspector_id FK
+    }
+    mnt_inspection_line {
+        int id PK
+        int inspection_id FK
+        string component
+        string condition "سليم/ملاحظة/حرج"
+        text recommendation
+    }
+    mnt_plan {
+        int id PK
+        string code
+        int company_id
+        string name
+        string scope
+        string trigger_basis "ساعات/زمن"
+        int interval
+        date next_due_date
+        decimal next_due_meter
+        string state
+        int equipment_id FK
+        int category_id FK
+    }
+    mnt_plan_task {
+        int id PK
+        int plan_id FK
+        string name
+        int task_type FK
+        string component
+        decimal est_hours
+    }
+    mnt_lookup {
+        int id PK
+        int company_id
+        string type "سبب عطل/سبب توقّف/نوع مهمة/ورشة"
+        string name
+        string extra
+    }
+    mnt_parts {
+        int id PK
+        int company_id
+        string name
+        string part_no
+        decimal stock_qty
+        decimal unit_cost
+    }
+    equipments {
+        int id PK
+        string name "(reused)"
+    }
+    equipments_types {
+        int id PK
+        string name "(reused)"
+    }
+    failure_codes {
+        int id PK
+        string name "(reused)"
+    }
+    suppliers {
+        int id PK
+        string name "(reused)"
+    }
+    users {
+        int id PK
+        string name "(reused)"
+    }
+    project {
+        int id PK
+        string name "(reused)"
+    }

@@ -64,6 +64,8 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
     $ems_tb_logout  = function_exists('ems_url') ? ems_url('logout.php') : '/ems/logout.php';
     $ems_tb_profile = function_exists('ems_url') ? ems_url('main/profile.php') : '/ems/main/profile.php';
     $ems_tb_settings = function_exists('ems_url') ? ems_url('Settings/settings.php') : '/ems/Settings/settings.php';
+    // شاشة البلاغات الموحّدة (متاحة لكل المستخدمين عبر التوبار، نمط المراسلات).
+    $ems_tb_breakdowns = function_exists('ems_url') ? ems_url('Maintenance/breakdowns.php') : '/ems/Maintenance/breakdowns.php';
     ?>
     <header class="<?php echo $ems_tb_barClass; ?>">
         <div class="ems-topbar-logo">
@@ -78,10 +80,62 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
         </div>
 
         <div class="ems-topbar-actions">
+            <a href="<?php echo htmlspecialchars($ems_tb_breakdowns, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-breakdowns" id="emsTopbarBreakdowns" title="البلاغات" aria-label="البلاغات"><i class="fas fa-triangle-exclamation"></i><span id="emsBreakdownBadge" class="ems-topbar-badge" style="display:none;"></span></a>
             <a href="<?php echo htmlspecialchars($ems_tb_logout, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-icon--power" title="تسجيل الخروج" aria-label="تسجيل الخروج"><i class="fas fa-power-off"></i></a>
             <a href="<?php echo htmlspecialchars($ems_tb_profile, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="الملف الشخصي" aria-label="الملف الشخصي"><i class="far fa-user"></i></a>
             <a href="<?php echo htmlspecialchars($ems_tb_settings, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon" title="الإعدادات" aria-label="الإعدادات"><i class="fas fa-gear"></i></a>
         </div>
     </header>
+    <style>
+        /* شارة عدّاد البلاغات على أيقونة التوبار — بنفس روح ألوان النظام (تنبيه أحمر). */
+        .ems-topbar-breakdowns { position: relative; }
+        .ems-topbar-badge {
+            position: absolute; top: -4px; inset-inline-end: -4px;
+            min-width: 18px; height: 18px; padding: 0 5px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: #dc2626; color: #fff; font-size: .68rem; font-weight: 800;
+            border-radius: 999px; line-height: 1; box-shadow: 0 0 0 2px rgba(255,255,255,.85);
+        }
+    </style>
+    <script>
+        // ===== شارة عدّاد البلاغات الجديدة في التوبار =====
+        (function () {
+            var badge = document.getElementById('emsBreakdownBadge');
+            if (!badge) return;
+            var inFlight = false;
+
+            function updateBreakdownBadge() {
+                if (document.hidden || inFlight) return;
+                inFlight = true;
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/ems/Maintenance/get_breakdown_count.php', true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.onload = function () {
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        var c = parseInt(data.count, 10) || 0;
+                        if (c > 0) {
+                            badge.textContent = c > 99 ? '99+' : String(c);
+                            badge.style.display = 'inline-flex';
+                            badge.setAttribute('aria-label', c + ' بلاغ جديد');
+                        } else {
+                            badge.style.display = 'none';
+                            badge.removeAttribute('aria-label');
+                        }
+                    } catch (e) {}
+                    inFlight = false;
+                };
+                xhr.onerror = function () { inFlight = false; };
+                xhr.onabort = function () { inFlight = false; };
+                xhr.send();
+            }
+
+            updateBreakdownBadge();
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) updateBreakdownBadge();
+            });
+            setInterval(updateBreakdownBadge, 60000);
+        })();
+    </script>
     <?php
 }
