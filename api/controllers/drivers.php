@@ -228,9 +228,9 @@ function drivers_available(): void
     $isSuper = $ctx['is_super'];
     $companyId = intval($ctx['company_id']);
 
-    $drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
-    $drivers_has_status = db_table_has_column($conn, 'drivers', 'status');
-    $drivers_has_project = db_table_has_column($conn, 'drivers', 'project_id');
+    $drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
+    $drivers_has_status = db_table_has_column($conn, 'employees', 'status');
+    $drivers_has_project = db_table_has_column($conn, 'employees', 'project_id');
     $ed_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
 
     $driver_company_scope = (!$isSuper && $drivers_has_company) ? ' AND d.company_id = ' . $companyId : '';
@@ -238,7 +238,7 @@ function drivers_available(): void
     $driver_project_scope = $drivers_has_project ? " AND (d.project_id = $projectId OR d.project_id IS NULL)" : '';
 
     $all_drivers_sql = "SELECT DISTINCT d.id, d.name, d.phone, d.driver_code, d.skill_level
-                        FROM drivers d
+                        FROM employees d
                         WHERE 1=1
                           $driver_company_scope
                           $driver_status_scope

@@ -85,7 +85,7 @@ class ExcelRegistry
         ]);
 
         // ─────────────────────────── السائقون (Drivers) ───────────────────────────
-        $defs['drivers'] = new EntityDefinition('drivers', 'السائقون', 'drivers', [
+        $defs['drivers'] = new EntityDefinition('drivers', 'السائقون', 'employees', [
             new Column('driver_code', 'كود السائق', ['unique' => true, 'width' => 18, 'example' => 'DRV-0001']),
             new Column('name', 'اسم السائق', ['required' => true, 'width' => 32, 'example' => 'محمد أحمد علي']),
             new Column('phone', 'رقم الهاتف', ['type' => Column::TYPE_PHONE, 'required' => true, 'example' => '+249912345678']),
@@ -112,7 +112,7 @@ class ExcelRegistry
                     'scoped'     => true,
                     'softDelete' => 'is_deleted',
                 ],
-                'exportExpr' => "(SELECT s.name FROM suppliers s WHERE s.id = drivers.supplier_id)",
+                'exportExpr' => "(SELECT s.name FROM suppliers s WHERE s.id = employees.supplier_id)",
             ]),
             // المشروع المرتبط (اختياري) — يُحوّل الاسم/الكود إلى project_id.
             new Column('project_id', 'المشروع المرتبط (اسم أو كود)', [
@@ -128,7 +128,7 @@ class ExcelRegistry
                     'scoped'     => true,
                     'softDelete' => 'is_deleted',
                 ],
-                'exportExpr' => "(SELECT p.name FROM project p WHERE p.id = drivers.project_id)",
+                'exportExpr' => "(SELECT p.name FROM project p WHERE p.id = employees.project_id)",
             ]),
             new Column('driver_status', 'الحالة', ['type' => Column::TYPE_ENUM, 'enum' => ['نشط', 'متوقف'], 'default' => 'نشط', 'width' => 14]),
         ], [
@@ -438,14 +438,14 @@ class ExcelRegistry
                 'hint'       => 'أدخل اسم السائق كما هو مسجّل أو كوده (مثل DRV-0001).',
                 // بحث/Lookup: يحوّل اسم/كود السائق إلى معرفه ويخزّنه في نفس العمود (driver يخزّن معرف السائق).
                 'lookup'     => [
-                    'table'     => 'drivers',
+                    'table'     => 'employees',
                     'idColumn'  => 'id',
                     'storeIdIn' => 'driver',
                     'matchBy'   => ['driver_code', 'name'],
                     'nameColumn' => 'name',
                     'scoped'    => true,
                 ],
-                'exportExpr' => "(SELECT d.name FROM drivers d WHERE d.id = timesheet.driver)",
+                'exportExpr' => "(SELECT d.name FROM employees d WHERE d.id = timesheet.driver)",
             ]),
             new Column('shift', 'الوردية', ['required' => true, 'width' => 12, 'example' => 'D']),
             new Column('date', 'التاريخ', ['required' => true, 'width' => 16, 'example' => '2026-01-15']),
@@ -556,14 +556,14 @@ class ExcelRegistry
                 'example'    => 'محمد أحمد علي',
                 'hint'       => 'أدخل اسم السائق كما هو مسجّل أو كوده (مثل DRV-0001).',
                 'lookup'     => [
-                    'table'     => 'drivers',
+                    'table'     => 'employees',
                     'idColumn'  => 'id',
                     'storeIdIn' => 'driver_id',
                     'matchBy'   => ['driver_code', 'name'],
                     'nameColumn' => 'name',
                     'scoped'    => true,
                 ],
-                'exportExpr' => "(SELECT d.name FROM drivers d WHERE d.id = drivercontracts.driver_id)",
+                'exportExpr' => "(SELECT d.name FROM employees d WHERE d.id = drivercontracts.driver_id)",
             ]),
             new Column('project_id', 'المشروع (اسم أو كود)', [
                 'required'   => true,

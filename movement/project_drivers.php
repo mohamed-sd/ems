@@ -19,8 +19,8 @@ $project_has_company_id = db_table_has_column($conn, 'project', 'company_id');
 $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
 $equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
 $equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
-$drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
-$drivers_has_status = db_table_has_column($conn, 'drivers', 'status');
+$drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
+$drivers_has_status = db_table_has_column($conn, 'employees', 'status');
 
 if (!$is_super_admin && $company_id <= 0) {
     header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
@@ -157,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $inserted_count = 0;
                     $skipped_count = 0;
                     foreach ($normalized_driver_ids as $driver_id) {
-                        $driver_check_sql = "SELECT d.id FROM drivers d
+                        $driver_check_sql = "SELECT d.id FROM employees d
                                              WHERE d.id = $driver_id
                                                $driver_company_scope
                                                $driver_status_scope
@@ -392,7 +392,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $normalized_new_driver_ids = array_values(array_unique($normalized_new_driver_ids));
 
                     foreach ($normalized_new_driver_ids as $driver_id) {
-                        $driver_check_sql = "SELECT d.id FROM drivers d
+                        $driver_check_sql = "SELECT d.id FROM employees d
                                              WHERE d.id = $driver_id
                                                $driver_company_scope
                                                $driver_status_scope
@@ -630,10 +630,10 @@ if ($equipments_result) {
 }
 
 $available_drivers_sql = "SELECT d.id, d.name, d.phone
-                          FROM drivers d
+                          FROM employees d
                           WHERE 1=1
                             $driver_company_scope
-                            $driver_status_scope
+                            $driver_status_scope" . ems_operation_types_in_sql($conn, 'd') . "
                             AND NOT EXISTS (
                                 SELECT 1
                                 FROM equipment_drivers ed
@@ -656,7 +656,7 @@ if ($available_drivers_result) {
 $active_assignments_sql = "SELECT ed.id, ed.equipment_id, ed.driver_id, ed.start_date, ed.end_date, ed.status,
                                   ed.shift_type, d.name AS driver_name, d.phone AS driver_phone
                            FROM equipment_drivers ed
-                           INNER JOIN drivers d ON d.id = ed.driver_id
+                           INNER JOIN employees d ON d.id = ed.driver_id
                            WHERE ed.status = 1
                              $ed_company_scope
                              AND EXISTS (
@@ -682,10 +682,10 @@ if ($active_assignments_res) {
 }
 
 $all_project_drivers_sql = "SELECT DISTINCT d.id, d.name, d.phone
-                            FROM drivers d
+                            FROM employees d
                             WHERE 1=1
                               $driver_company_scope
-                              $driver_status_scope
+                              $driver_status_scope" . ems_operation_types_in_sql($conn, 'd') . "
                             ORDER BY d.name ASC";
 $all_project_drivers_res = mysqli_query($conn, $all_project_drivers_sql);
 $all_project_drivers = [];
@@ -701,7 +701,7 @@ $drivers_sql = "SELECT ed.id, ed.equipment_id, ed.driver_id, ed.start_date, ed.e
                        d.name AS driver_name, d.phone AS driver_phone
                 FROM equipment_drivers ed
                 INNER JOIN equipments e ON e.id = ed.equipment_id
-                INNER JOIN drivers d ON d.id = ed.driver_id
+                INNER JOIN employees d ON d.id = ed.driver_id
                 WHERE EXISTS (
                     SELECT 1
                     FROM operations o

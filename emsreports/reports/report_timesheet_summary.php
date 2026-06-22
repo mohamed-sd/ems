@@ -115,7 +115,7 @@ $query = "SELECT
         LEFT JOIN equipments e ON o.equipment = e.id
         LEFT JOIN suppliers s ON o.supplier_id = s.id
         LEFT JOIN project p ON o.project_id = p.id
-        LEFT JOIN drivers d ON t.driver = d.id
+        LEFT JOIN employees d ON t.driver = d.id
         $whereClause
         ORDER BY STR_TO_DATE(t.date, '%Y-%m-%d') DESC, t.id DESC";
 

@@ -16,7 +16,7 @@ if (!$is_super_admin && $company_id <= 0) {
 
 $drivers_scope_sql = '1=1';
 if (!$is_super_admin) {
-  if (db_table_has_column($conn, 'drivers', 'company_id')) {
+  if (db_table_has_column($conn, 'employees', 'company_id')) {
     $drivers_scope_sql = 'd.company_id = ' . $company_id;
   } else {
     $drivers_scope_sql = "EXISTS (
@@ -65,7 +65,7 @@ if (!isset($_GET['id'])) {
 
 $driver_id = intval($_GET['id']);
 
-$driver_check_sql = "SELECT d.id FROM drivers d WHERE d.id = $driver_id AND $drivers_scope_sql LIMIT 1";
+$driver_check_sql = "SELECT d.id FROM employees d WHERE d.id = $driver_id AND $drivers_scope_sql LIMIT 1";
 $driver_check_result = mysqli_query($conn, $driver_check_sql);
 if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
   header('Location: drivers.php');

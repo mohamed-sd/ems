@@ -17,37 +17,18 @@ if (!$is_super_admin && $company_id <= 0) {
     exit();
 }
 
-$drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
+$drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
 $suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
 $drivercontracts_has_company = db_table_has_column($conn, 'drivercontracts', 'company_id');
-$drivers_has_driver_photo = db_table_has_column($conn, 'drivers', 'driver_photo');
-$drivers_has_identity_photo = db_table_has_column($conn, 'drivers', 'identity_photo');
-$drivers_has_project_id = db_table_has_column($conn, 'drivers', 'project_id');
+$drivers_has_driver_photo = db_table_has_column($conn, 'employees', 'driver_photo');
+$drivers_has_identity_photo = db_table_has_column($conn, 'employees', 'identity_photo');
+$drivers_has_project_id = db_table_has_column($conn, 'employees', 'project_id');
 
-if (!$drivers_has_company) {
-    @mysqli_query($conn, "ALTER TABLE drivers ADD COLUMN company_id INT NULL AFTER id");
-    @mysqli_query($conn, "ALTER TABLE drivers ADD INDEX idx_drivers_company_id (company_id)");
-    $drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
-}
-
-if (!$drivers_has_driver_photo) {
-    @mysqli_query($conn, "ALTER TABLE drivers ADD COLUMN driver_photo VARCHAR(255) NULL AFTER identity_expiry_date");
-    $drivers_has_driver_photo = db_table_has_column($conn, 'drivers', 'driver_photo');
-}
-
-if (!$drivers_has_identity_photo) {
-    @mysqli_query($conn, "ALTER TABLE drivers ADD COLUMN identity_photo VARCHAR(255) NULL AFTER driver_photo");
-    $drivers_has_identity_photo = db_table_has_column($conn, 'drivers', 'identity_photo');
-}
-
-if (!$drivers_has_project_id) {
-    @mysqli_query($conn, "ALTER TABLE drivers ADD COLUMN project_id INT NULL AFTER company_id");
-    @mysqli_query($conn, "ALTER TABLE drivers ADD INDEX idx_drivers_project_id (project_id)");
-    $drivers_has_project_id = db_table_has_column($conn, 'drivers', 'project_id');
-}
+// ملاحظة: أعمدة employees دائمة (أُنشئت في الترحيل) — لا حاجة لإضافتها ديناميكياً.
+$employees_has_employee_type = db_table_has_column($conn, 'employees', 'employee_type');
 
 if (!$is_super_admin && !$drivers_has_company) {
-    die('لا يمكن تطبيق العزل التام للمشغلين لأن عمود company_id غير متاح في جدول drivers.');
+    die('لا يمكن تطبيق العزل التام للموظفين لأن عمود company_id غير متاح في جدول الموظفين.');
 }
 
 $driver_scope_where = "id = %d";
@@ -60,7 +41,7 @@ if (!$is_super_admin) {
             FROM drivercontracts dsc
             INNER JOIN project sp ON sp.id = dsc.project_id
             INNER JOIN users su ON su.id = sp.created_by
-            WHERE dsc.driver_id = drivers.id
+            WHERE dsc.driver_id = employees.id
               AND su.company_id = $company_id
         )";
     }
@@ -84,7 +65,7 @@ if (!$can_view) {
     exit();
 }
 
-$page_title = "إيكوبيشن | المشغلين";
+$page_title = "إيكوبيشن | سجل الموظفين";
 
 // معالجة إضافة/تعديل مشغل عند إرسال الفورم
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
@@ -168,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         // التحقق من فرادة كود المشغل على مستوى الشركة (عند التعديل)
         if (!empty($driver_code)) {
             $code_company_scope = $drivers_has_company ? " AND company_id = $company_id" : "";
-            $code_check_edit = mysqli_query($conn, "SELECT id FROM drivers WHERE driver_code = '$driver_code' AND id != $id$code_company_scope LIMIT 1");
+            $code_check_edit = mysqli_query($conn, "SELECT id FROM employees WHERE driver_code = '$driver_code' AND id != $id$code_company_scope LIMIT 1");
             if ($code_check_edit && mysqli_num_rows($code_check_edit) > 0) {
                 header("Location: drivers.php?msg=كود+المشغل+موجود+مسبقاً+❌");
                 exit;
@@ -185,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $monthly_salary_sql = $monthly_salary !== NULL ? $monthly_salary : "NULL";
 
         $scope_where = sprintf($driver_scope_where, $id);
-        $update_query = "UPDATE drivers SET
+        $update_query = "UPDATE employees SET
             name='$name', driver_code='$driver_code', nickname='$nickname',
             identity_type='$identity_type', identity_number='$identity_number', identity_expiry_date=$identity_expiry_sql,
             driver_photo='$driver_photo', identity_photo='$identity_photo',
@@ -202,7 +183,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             WHERE $scope_where";
 
         if (mysqli_query($conn, $update_query)) {
-            header("Location: drivers.php?msg=تم+تعديل+المشغل+بنجاح+✅");
+            $emp_scope = (!$is_super_admin && $drivers_has_company) ? " AND company_id = $company_id" : "";
+            ems_save_employee_extra($conn, $id, $emp_scope); // employee_type + الحقول العامة الجديدة
+            header("Location: drivers.php?msg=تم+تعديل+الموظف+بنجاح+✅");
             exit;
         } else {
             header("Location: drivers.php?msg=حدث+خطأ+أثناء+التعديل+❌: " . mysqli_error($conn));
@@ -222,14 +205,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         // التحقق من فرادة كود المشغل على مستوى الشركة (عند الإضافة)
         if (!empty($driver_code)) {
             $code_company_scope = $drivers_has_company ? " AND company_id = $company_id" : "";
-            $code_check_insert = mysqli_query($conn, "SELECT id FROM drivers WHERE driver_code = '$driver_code'$code_company_scope LIMIT 1");
+            $code_check_insert = mysqli_query($conn, "SELECT id FROM employees WHERE driver_code = '$driver_code'$code_company_scope LIMIT 1");
             if ($code_check_insert && mysqli_num_rows($code_check_insert) > 0) {
                 header("Location: drivers.php?msg=كود+المشغل+موجود+مسبقاً+❌");
                 exit;
             }
         }
 
-        $insert_query = "INSERT INTO drivers (
+        $insert_query = "INSERT INTO employees (
             name, driver_code, nickname,
             identity_type, identity_number, identity_expiry_date, driver_photo, identity_photo,
             license_number, license_type, license_expiry_date, license_issuer,
@@ -256,7 +239,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         )";
 
         if (mysqli_query($conn, $insert_query)) {
-            header("Location: drivers.php?msg=تم+إضافة+المشغل+بنجاح+✅");
+            $emp_scope = (!$is_super_admin && $drivers_has_company) ? " AND company_id = $company_id" : "";
+            ems_save_employee_extra($conn, mysqli_insert_id($conn), $emp_scope); // employee_type + الحقول العامة الجديدة
+            header("Location: drivers.php?msg=تم+إضافة+الموظف+بنجاح+✅");
             exit;
         } else {
             header("Location: drivers.php?msg=حدث+خطأ+أثناء+الإضافة+❌: " . mysqli_error($conn));
@@ -300,7 +285,7 @@ if (isset($_GET['delete_id'])) {
         exit();
     }
 
-    $delete_sql = "DELETE FROM drivers WHERE $scope_where";
+    $delete_sql = "DELETE FROM employees WHERE $scope_where";
     if (mysqli_query($conn, $delete_sql) && mysqli_affected_rows($conn) > 0) {
         header("Location: drivers.php?msg=تم+حذف+المشغل+بنجاح+✅");
         exit();
@@ -527,11 +512,11 @@ include('../insidebar.php');
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     // NOTE: the gradient button inline styles are preserved as-is for now (separate CSS-consolidation task).
-    $header_title = 'إدارة المشغلين';
+    $header_title = 'سجل الموظفين';
     $header_icon  = 'fas fa-id-card';
     $header_actions = array();
     if ($can_add) {
-        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مشغل جديد');
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة موظف جديد');
     }
     // ── نظام Excel الموحّد (Unified Excel Framework) ──
     require_once __DIR__ . '/../includes/excel_ui.php';
@@ -556,7 +541,7 @@ include('../insidebar.php');
     <!-- فورم إضافة / تعديل مشغل -->
     <form id="projectForm" action="" method="post" class="allforms">
          <div class="card-header">
-                <h5><i class="fas fa-edit"></i> إضافة / تعديل مشغل </h5>
+                <h5><i class="fas fa-edit"></i> إضافة / تعديل موظف </h5>
             </div>
         <div class="card shadow-sm">
             <div class="card-body">
@@ -584,6 +569,42 @@ include('../insidebar.php');
                             <div>
                                 <label><i class="fas fa-signature"></i> اسم الشهرة/الكنية</label>
                                 <input type="text" name="nickname" id="nickname" placeholder="مثال: أبو محمد" />
+                            </div>
+                            <div>
+                                <label><i class="fas fa-user-tag"></i> نوع الموظف <span style="color: red;">*</span></label>
+                                <select name="employee_type" id="employee_type" onchange="emsToggleEmpType()" required>
+                                    <?php foreach (ems_employee_types() as $__et) {
+                                        echo '<option value="' . htmlspecialchars($__et, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($__et, ENT_QUOTES, 'UTF-8') . '</option>';
+                                    } ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label><i class="fas fa-calendar-day"></i> تاريخ الميلاد</label>
+                                <input type="date" name="birth_date" id="birth_date" />
+                            </div>
+                            <div>
+                                <label><i class="fas fa-flag"></i> الجنسية</label>
+                                <input type="text" name="nationality" id="nationality" placeholder="مثال: سوداني" />
+                            </div>
+                            <div>
+                                <label><i class="fas fa-droplet"></i> فصيلة الدم</label>
+                                <input type="text" name="blood_type" id="blood_type" placeholder="مثال: O+" />
+                            </div>
+                            <div>
+                                <label><i class="fab fa-whatsapp"></i> واتساب</label>
+                                <input type="text" name="whatsapp" id="whatsapp" placeholder="مثال: +249912345678" />
+                            </div>
+                            <div>
+                                <label><i class="fas fa-user-shield"></i> جهة الطوارئ (الاسم)</label>
+                                <input type="text" name="emergency_contact_name" id="emergency_contact_name" />
+                            </div>
+                            <div>
+                                <label><i class="fas fa-people-arrows"></i> صلة جهة الطوارئ</label>
+                                <input type="text" name="emergency_contact_relation" id="emergency_contact_relation" placeholder="مثال: أخ" />
+                            </div>
+                            <div>
+                                <label><i class="fas fa-phone-volume"></i> هاتف الطوارئ</label>
+                                <input type="text" name="emergency_contact_phone" id="emergency_contact_phone" />
                             </div>
                         </div>
                     </div>
@@ -632,8 +653,8 @@ include('../insidebar.php');
                     </div>
                 </div>
 
-                <!-- 3. رخصة القيادة والمهارات -->
-                <div class="form-section">
+                <!-- 3. رخصة القيادة والمهارات (خاص بأنواع التشغيل) -->
+                <div class="form-section op-only">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-car"></i>
                         <span>رخصة القيادة والمهارات</span>
@@ -668,12 +689,20 @@ include('../insidebar.php');
                                 <input type="text" name="license_issuer" id="license_issuer"
                                     placeholder="مثال: إدارة المرور - الخرطوم" />
                             </div>
+                            <div>
+                                <label><i class="fas fa-calendar-check"></i> تاريخ إصدار الرخصة</label>
+                                <input type="date" name="license_issue_date" id="license_issue_date" />
+                            </div>
+                            <div>
+                                <label><i class="fas fa-layer-group"></i> درجة الرخصة</label>
+                                <input type="text" name="license_grade" id="license_grade" placeholder="مثال: درجة أولى" />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 4. التخصص والمهارات -->
-                <div class="form-section">
+                <!-- 4. التخصص والمهارات (خاص بأنواع التشغيل) -->
+                <div class="form-section op-only">
                     <div class="form-section-header" onclick="toggleSection(this)">
                         <i class="fas fa-cogs"></i>
                         <span>التخصص والمهارات</span>
@@ -1045,8 +1074,9 @@ include('../insidebar.php');
                     <tr>
                         <th>الإجراءات</th>
                         <th>#</th>
-                        <th>الكود</th>
-                        <th>اسم المشغل</th>
+                        <th>كود الموظف</th>
+                        <th>النوع</th>
+                        <th>اسم الموظف</th>
                         <th>المورد</th>
                         <th>المشروع</th>
                         <th>عدد العقود</th>
@@ -1078,7 +1108,7 @@ include('../insidebar.php');
 
                     $query = "SELECT d.*, s.name as supplier_name, p.name as project_name, p.project_code,
                              (SELECT COUNT(*) FROM drivercontracts WHERE driver_id = d.id$drivercontracts_scope_sql) as numcontracts
-                             FROM drivers d
+                             FROM employees d
                              LEFT JOIN suppliers s ON d.supplier_id = s.id
                              LEFT JOIN project p ON d.project_id = p.id
                              WHERE $drivers_scope_sql
@@ -1137,6 +1167,7 @@ include('../insidebar.php');
                         echo "<td>" . $actions_cell . "</td>";
                         echo "<td>" . $i++ . "</td>";
                         echo "<td><code>" . htmlspecialchars($row['driver_code'] ?: 'N/A') . "</code></td>";
+                        echo "<td><span class='badge badge-info'>" . htmlspecialchars($row['employee_type'] ?? '-') . "</span></td>";
                         echo "<td>" . $driver_name_cell . "</td>";
                         echo "<td>" . htmlspecialchars($row['supplier_name'] ?: '-') . "</td>";
                         echo "<td>" . $project_display . "</td>";
@@ -1191,10 +1222,22 @@ include('../insidebar.php');
         });
     }
 
+    // إظهار/إخفاء الأقسام الخاصة بأنواع التشغيل (op-only) حسب نوع الموظف
+    var EMS_OP_TYPES = <?php echo json_encode(ems_operation_employee_types(), JSON_UNESCAPED_UNICODE); ?>;
+    function emsToggleEmpType() {
+        var sel = document.getElementById('employee_type');
+        var v = sel ? sel.value : '';
+        var show = (EMS_OP_TYPES.indexOf(v) !== -1) || v === '';
+        document.querySelectorAll('#projectForm .op-only').forEach(function (el) {
+            el.style.display = show ? '' : 'none';
+        });
+    }
+    document.addEventListener('DOMContentLoaded', emsToggleEmpType);
+
     (function () {
         // تشغيل DataTable بالعربية
         $(document).ready(function () {
-            $('#driversTable').DataTable({
+            var empTable = $('#driversTable').DataTable({
                 dom: 'Bfrtip',
                 scrollX: true,
                 scrollCollapse: true,
@@ -1209,6 +1252,17 @@ include('../insidebar.php');
                     "url": "/ems/assets/i18n/datatables/ar.json"
                 }
             });
+
+            // فلتر حسب نوع الموظف (العمود 3 = النوع)
+            var empTypes = <?php echo json_encode(ems_employee_types(), JSON_UNESCAPED_UNICODE); ?>;
+            var $f = $('<select id="empTypeFilter" style="margin-inline-start:8px;padding:6px 10px;border:1px solid #ccc;border-radius:8px;"></select>');
+            $f.append('<option value="">كل الأنواع</option>');
+            empTypes.forEach(function (t) { $f.append('<option value="' + t + '">' + t + '</option>'); });
+            $f.on('change', function () {
+                var v = this.value;
+                empTable.column(3).search(v ? ('^' + v + '$') : '', true, false).draw();
+            });
+            $('#driversTable_filter').append($('<span style="margin-inline-start:14px;">نوع الموظف: </span>')).append($f);
         });
 
         // التحكم في إظهار وإخفاء الفورم
@@ -1223,6 +1277,7 @@ include('../insidebar.php');
                     // تنظيف جميع الحقول
                     projectForm.reset();
                     $("#drivers_id").val("");
+                    emsToggleEmpType();
                     // فتح المجموعة الأولى فقط
                     collapseAllSections();
                     document.querySelector('.form-section-header').classList.remove('collapsed');
@@ -1254,6 +1309,17 @@ include('../insidebar.php');
                         $("#name").val(driver.name);
                         $("#driver_code").val(driver.driver_code);
                         $("#nickname").val(driver.nickname);
+                        // الحقول الجديدة لسجل الموظفين
+                        $("#employee_type").val(driver.employee_type || 'سائق/مشغّل');
+                        $("#birth_date").val(driver.birth_date || '');
+                        $("#nationality").val(driver.nationality || '');
+                        $("#blood_type").val(driver.blood_type || '');
+                        $("#whatsapp").val(driver.whatsapp || '');
+                        $("#emergency_contact_name").val(driver.emergency_contact_name || '');
+                        $("#emergency_contact_relation").val(driver.emergency_contact_relation || '');
+                        $("#emergency_contact_phone").val(driver.emergency_contact_phone || '');
+                        $("#license_issue_date").val(driver.license_issue_date || '');
+                        $("#license_grade").val(driver.license_grade || '');
                         $("#identity_type").val(driver.identity_type);
                         $("#identity_number").val(driver.identity_number);
                         $("#identity_expiry_date").val(driver.identity_expiry_date);
@@ -1302,6 +1368,7 @@ include('../insidebar.php');
                         // عرض الفورم وفتح جميع المجموعات
                         projectForm.classList.add('allforms-visible');
                         expandAllSections();
+                        emsToggleEmpType();
                         $("html, body").animate({ scrollTop: $("#projectForm").offset().top - 100 }, 500);
                     } else {
                         alert('❌ خطأ في تحميل البيانات: ' + (data.message || 'سبب غير معروف'));

@@ -84,7 +84,7 @@ function operations_index(): void
                            $shift_select,
                            d.name AS driver_name, d.phone AS driver_phone
                     FROM equipment_drivers ed
-                    INNER JOIN drivers d ON d.id = ed.driver_id
+                    INNER JOIN employees d ON d.id = ed.driver_id
                     INNER JOIN equipments e ON e.id = ed.equipment_id
                     WHERE EXISTS (
                         SELECT 1 FROM operations o

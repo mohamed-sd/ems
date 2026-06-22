@@ -940,7 +940,7 @@ include('../insidebar.php');
                       LEFT JOIN project p ON o.project_id = p.id
                       LEFT JOIN suppliers s ON e.suppliers = s.id
                       LEFT JOIN equipment_drivers ed ON o.equipment = ed.equipment_id
-                      LEFT JOIN drivers d ON ed.driver_id = d.id
+                      LEFT JOIN employees d ON ed.driver_id = d.id
                       WHERE o.project_id = $selected_project_id$operations_scope_sql
                       GROUP BY o.id
                       ORDER BY o.id DESC";

@@ -18,7 +18,7 @@ if (!$is_super_admin && $company_id <= 0) {
     exit();
 }
 
-$drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
+$drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
 $timesheet_has_company = db_table_has_column($conn, 'timesheet', 'company_id');
 $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
 $equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
@@ -41,7 +41,7 @@ if (!$is_super_admin && $suppliers_has_company) {
 }
 
 $driver_sql = "SELECT d.*, s.name AS supplier_name
-               FROM drivers d
+               FROM employees d
                LEFT JOIN suppliers s ON d.supplier_id = s.id$supplier_join_scope
                WHERE $driver_scope
                LIMIT 1";
@@ -253,10 +253,16 @@ include("../insidebar.php");
                     <span
                         class="driver-badge <?php echo $driver_status_class; ?>"><?php echo htmlspecialchars($driver_status_text); ?></span>
                 </div>
-                <div class="driver-profile-id-note">بطاقة تعريف المشغل داخل النظام</div>
+                <div class="driver-profile-id-note">بطاقة تعريف الموظف داخل النظام</div>
                 <div class="id-meta">
                     <div class="item">
-                        <div class="label">كود السائق</div>
+                        <div class="label">نوع الموظف</div>
+                        <div class="value">
+                            <?php echo htmlspecialchars(!empty($driver['employee_type']) ? $driver['employee_type'] : 'سائق/مشغّل'); ?>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">كود الموظف</div>
                         <div class="value">
                             <?php echo htmlspecialchars($driver['driver_code'] ? $driver['driver_code'] : 'غير محدد'); ?>
                         </div>
@@ -272,6 +278,16 @@ include("../insidebar.php");
                             <?php echo htmlspecialchars(($driver['identity_type'] ? $driver['identity_type'] : '-') . ' / ' . ($driver['identity_number'] ? $driver['identity_number'] : '-')); ?>
                         </div>
                     </div>
+                    <?php
+                    $__pf = function ($k) use ($driver) {
+                        return htmlspecialchars((isset($driver[$k]) && $driver[$k] !== '' && $driver[$k] !== null) ? $driver[$k] : '-');
+                    };
+                    ?>
+                    <div class="item"><div class="label">الجنسية</div><div class="value"><?php echo $__pf('nationality'); ?></div></div>
+                    <div class="item"><div class="label">تاريخ الميلاد</div><div class="value"><?php echo $__pf('birth_date'); ?></div></div>
+                    <div class="item"><div class="label">فصيلة الدم</div><div class="value"><?php echo $__pf('blood_type'); ?></div></div>
+                    <div class="item"><div class="label">واتساب</div><div class="value"><?php echo $__pf('whatsapp'); ?></div></div>
+                    <div class="item"><div class="label">جهة الطوارئ</div><div class="value"><?php echo htmlspecialchars(trim(((isset($driver['emergency_contact_name']) ? $driver['emergency_contact_name'] : '') . ' ' . (isset($driver['emergency_contact_phone']) ? $driver['emergency_contact_phone'] : ''))) ?: '-'); ?></div></div>
                     <div class="item">
                         <div class="label">المورد</div>
                         <div class="value">

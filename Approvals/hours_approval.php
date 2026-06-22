@@ -144,7 +144,7 @@ $pending_sql = "
     LEFT JOIN equipments    e ON e.id      = o.equipment
     LEFT JOIN suppliers     s ON s.id      = e.suppliers
     LEFT JOIN project       p ON p.id      = o.$ops_project_col
-    LEFT JOIN drivers       d ON d.id      = t.driver
+    LEFT JOIN employees       d ON d.id      = t.driver
     LEFT JOIN users         u ON u.id      = t.user_id
     WHERE t.status = 1
       AND $pending_condition
@@ -183,7 +183,7 @@ $approved_sql = "
     LEFT JOIN equipments    e ON e.id      = o.equipment
     LEFT JOIN suppliers     s ON s.id      = e.suppliers
     LEFT JOIN project       p ON p.id      = o.$ops_project_col
-    LEFT JOIN drivers       d ON d.id      = t.driver
+    LEFT JOIN employees       d ON d.id      = t.driver
     LEFT JOIN users         u ON u.id      = t.user_id
     WHERE t.status = 1
       $company_scope_ts

@@ -466,7 +466,7 @@ $today_rows_query = "SELECT t.id, t.shift, t.date, t.executed_hours,
                       JOIN operations o ON t.operator = o.id
                       JOIN equipments e ON o.equipment = e.id
                       JOIN project p ON o." . $operations_project_column . " = p.id
-                      JOIN drivers d ON t.driver = d.id
+                      JOIN employees d ON t.driver = d.id
                       WHERE " . $today_filter_sql . $type_sql . $tenant_timesheet_filter_sql . $role6_sql . "
                       ORDER BY t.date DESC, t.id DESC";
 
@@ -971,7 +971,7 @@ if ($today_rows_result) {
             <?php
             $driver_scope_sql = "1=1";
             if (!$is_super_admin) {
-              if (db_table_has_column($conn, 'drivers', 'company_id')) {
+              if (db_table_has_column($conn, 'employees', 'company_id')) {
                 $driver_scope_sql = "company_id = $company_id";
               } else {
                 $driver_scope_sql = "EXISTS (
@@ -982,12 +982,12 @@ if ($today_rows_result) {
                   LEFT JOIN users su ON su.id = p.created_by
                   LEFT JOIN clients sc ON sc.id = p.client_id
                   LEFT JOIN users scu ON scu.id = sc.created_by
-                  WHERE ed.driver_id = drivers.id
+                  WHERE ed.driver_id = employees.id
                     AND (su.company_id = $company_id OR scu.company_id = $company_id)
                 )";
               }
             }
-            $dr_res = mysqli_query($conn, "SELECT id, name FROM drivers WHERE $driver_scope_sql");
+            $dr_res = mysqli_query($conn, "SELECT id, name FROM employees WHERE $driver_scope_sql" . ems_operation_types_in_sql($conn, ''));
             while ($dr = mysqli_fetch_assoc($dr_res)) {
               echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
             }

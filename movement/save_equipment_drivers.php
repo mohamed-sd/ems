@@ -19,8 +19,8 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 $equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
-$drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
-$drivers_has_supplier = db_table_has_column($conn, 'drivers', 'supplier_id');
+$drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
+$drivers_has_supplier = db_table_has_column($conn, 'employees', 'supplier_id');
 $suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
 $equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
 $equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
@@ -127,7 +127,7 @@ if (isset($_POST['equipment_id'])) {
             }
 
             // جلب معلومات السائق
-            $driver_res = mysqli_query($conn, "SELECT d.name, d.phone FROM drivers d WHERE d.id = $driver_id AND $driver_scope_sql LIMIT 1");
+            $driver_res = mysqli_query($conn, "SELECT d.name, d.phone FROM employees d WHERE d.id = $driver_id AND $driver_scope_sql LIMIT 1");
             $driver_info = $driver_res ? mysqli_fetch_assoc($driver_res) : null;
             if (!$driver_info) {
                 $error_messages[] = "السائق #$driver_id خارج النطاق";
@@ -241,7 +241,7 @@ if (isset($_POST['equipment_id'])) {
             }
         }
 
-        $driver_res = mysqli_query($conn, "SELECT d.id FROM drivers d WHERE d.id = $driver_id AND $driver_scope_sql LIMIT 1");
+        $driver_res = mysqli_query($conn, "SELECT d.id FROM employees d WHERE d.id = $driver_id AND $driver_scope_sql LIMIT 1");
         if (!$driver_res || mysqli_num_rows($driver_res) === 0) {
             continue;
         }

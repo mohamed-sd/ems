@@ -377,8 +377,8 @@ function getSuppliersForDropdown($conn, $companyId, $isSuperAdmin) {
  * جلب المشغلين للـ dropdown
  */
 function getDriversForDropdown($conn, $companyId, $isSuperAdmin) {
-    $scope = rptCompanyScope($conn, 'd', 'drivers', $companyId, $isSuperAdmin);
-    $sql   = "SELECT id, name, driver_code FROM drivers d WHERE ($scope) ORDER BY name ASC";
+    $scope = rptCompanyScope($conn, 'd', 'employees', $companyId, $isSuperAdmin);
+    $sql   = "SELECT id, name, driver_code FROM employees d WHERE ($scope) ORDER BY name ASC";
     $res   = mysqli_query($conn, $sql);
     $list  = [];
     if ($res) while ($r = mysqli_fetch_assoc($res)) $list[] = $r;

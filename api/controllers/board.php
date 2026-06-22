@@ -93,7 +93,7 @@ function board_index(): void
                    d.years_on_equipment, d.driver_status, d.employment_affiliation,
                    d.specialized_equipment
             FROM equipment_drivers ed
-            JOIN drivers d ON ed.driver_id = d.id
+            JOIN employees d ON ed.driver_id = d.id
             WHERE ed.equipment_id IN ($eq_ids_str)
               AND ed.status = 1
               AND d.status = 1

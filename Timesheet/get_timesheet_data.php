@@ -86,7 +86,7 @@ $totalQuery = "SELECT COUNT(*) as total
                JOIN operations o ON t.operator = o.id
                JOIN equipments e ON o.equipment = e.id
                JOIN project p ON o.$operations_project_column = p.id
-               JOIN drivers d ON t.driver = d.id
+               JOIN employees d ON t.driver = d.id
                WHERE 1=1" . $type_filter . $tenant_scope . $today_filter;
 
 if ($_SESSION['user']['role'] == "6") {
@@ -102,7 +102,7 @@ $filteredQuery = "SELECT COUNT(*) as total
                   JOIN operations o ON t.operator = o.id
                   JOIN equipments e ON o.equipment = e.id
                   JOIN project p ON o.$operations_project_column = p.id
-                  JOIN drivers d ON t.driver = d.id
+                  JOIN employees d ON t.driver = d.id
                   $where";
 
 $filteredResult = mysqli_query($conn, $filteredQuery);
@@ -121,7 +121,7 @@ $query = "SELECT t.id, t.shift, t.date, t.executed_hours,
           JOIN operations o ON t.operator = o.id
           JOIN equipments e ON o.equipment = e.id
           JOIN project p ON o.$operations_project_column = p.id
-          JOIN drivers d ON t.driver = d.id
+          JOIN employees d ON t.driver = d.id
           $where
           ORDER BY $orderColumn $orderDir
           LIMIT $start, $length";

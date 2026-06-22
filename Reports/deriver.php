@@ -21,7 +21,7 @@ SELECT
     t.date,
     SUM(t.total_work_hours) AS total_hours
 FROM timesheet t
-JOIN drivers d ON t.driver = d.id
+JOIN employees d ON t.driver = d.id
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id
 JOIN project p ON o.project_id = p.id
@@ -108,7 +108,7 @@ $result = mysqli_query($conn, $sql);
                     <div class="control"><select name="driver">
                         <option value="">-- الكل --</option>
                         <?php
-                        $drv = mysqli_query($conn, "SELECT id, name FROM drivers where status = '1' ");
+                        $drv = mysqli_query($conn, "SELECT id, name FROM employees where status = '1' ");
                         if ($drv) {
                         while ($drvRow = mysqli_fetch_assoc($drv)) {
                             $selected = ($driver_filter == $drvRow['id']) ? "selected" : "";

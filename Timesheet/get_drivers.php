@@ -51,12 +51,12 @@ if (isset($_GET['operation_id'])) {
     // جلب السائقين المرتبطين بهذه الآلية (النشطين فقط)
     $sql = "SELECT d.id, d.name
             FROM equipment_drivers ed
-            JOIN drivers d ON ed.driver_id = d.id
+            JOIN employees d ON ed.driver_id = d.id
             WHERE ed.equipment_id = $equipment_id
               AND ed.status = 1" . $shift_filter_sql;
 
     if (!$is_super_admin) {
-        if (db_table_has_column($conn, 'drivers', 'company_id')) {
+        if (db_table_has_column($conn, 'employees', 'company_id')) {
             $sql .= " AND d.company_id = $company_id";
         } else {
             $sql .= " AND EXISTS (
@@ -74,9 +74,12 @@ if (isset($_GET['operation_id'])) {
     }
 
     // فلترة السائقين النشطين فقط (إن وُجد عمود status)
-    if (db_table_has_column($conn, 'drivers', 'status')) {
+    if (db_table_has_column($conn, 'employees', 'status')) {
         $sql .= " AND d.status = 1";
     }
+
+    // قصر القائمة على أنواع الموظفين المشغّلة للمعدات
+    $sql .= ems_operation_types_in_sql($conn, 'd');
 
     $result = mysqli_query($conn, $sql);
 

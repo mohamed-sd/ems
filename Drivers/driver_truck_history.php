@@ -11,7 +11,7 @@ require_once '../includes/driver_contract_dates.php';
 $driver_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $driver = null;
 if ($driver_id > 0) {
-    $driver_result = mysqli_query($conn, "SELECT id, name, phone, status FROM drivers WHERE id = $driver_id");
+    $driver_result = mysqli_query($conn, "SELECT id, name, phone, status FROM employees WHERE id = $driver_id");
     if ($driver_result && mysqli_num_rows($driver_result) > 0) {
         $driver = mysqli_fetch_assoc($driver_result);
     }

@@ -41,7 +41,7 @@ if ($driver_id <= 0) {
 }
 
 // الحصول على بيانات المشغل الحالية
-$driver_query = "SELECT id, name, driver_code, driver_status FROM drivers WHERE id = $driver_id";
+$driver_query = "SELECT id, name, driver_code, driver_status FROM employees WHERE id = $driver_id";
 $driver_result = mysqli_query($conn, $driver_query);
 
 if (!$driver_result || mysqli_num_rows($driver_result) === 0) {

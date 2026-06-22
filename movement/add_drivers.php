@@ -17,8 +17,8 @@ if (!$is_super_admin && $company_id <= 0) {
 
 $equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
 $equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
-$drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
-$drivers_has_supplier = db_table_has_column($conn, 'drivers', 'supplier_id');
+$drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
+$drivers_has_supplier = db_table_has_column($conn, 'employees', 'supplier_id');
 $suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
 
 $equipment_scope_sql = '1=1';
@@ -78,7 +78,7 @@ $current = [];
 $linked = [];
 $res = mysqli_query($conn, "SELECT ed.id, ed.start_date, ed.end_date, ed.shift_type, d.id AS driver_id, d.name, d.phone, ed.status
                              FROM equipment_drivers ed
-                             JOIN drivers d ON ed.driver_id = d.id
+                             JOIN employees d ON ed.driver_id = d.id
                                                          WHERE ed.equipment_id = $equipment_id
                                                              AND $driver_scope_sql" . (($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND ed.company_id = $company_id"));
 if ($res) {
@@ -1051,13 +1051,13 @@ include("../inheader.php");
                         <div class="drivers-grid" id="driversGrid">
                             <?php
                             $drivers = mysqli_query($conn, "SELECT d.id, d.name, d.phone
-                                                            FROM drivers d
+                                                            FROM employees d
                                                             WHERE d.id NOT IN (
                                                                 SELECT driver_id
                                                                 FROM equipment_drivers
                                                                 WHERE status = 1" . (($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id") . "
                                                             ) AND d.status = 1
-                                                            AND $driver_scope_sql
+                                                            AND $driver_scope_sql" . ems_operation_types_in_sql($conn, 'd') . "
                                                             ORDER BY d.name");
 
                             if ($drivers && mysqli_num_rows($drivers) > 0) {

@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jun 06, 2026 at 11:33 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: 127.0.0.1:3306
+-- Generation Time: Jun 21, 2026 at 03:31 PM
+-- Server version: 8.4.7
+-- PHP Version: 8.3.31
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -27,31 +27,44 @@ SET time_zone = "+00:00";
 -- Table structure for table `activity_logs`
 --
 
-CREATE TABLE `activity_logs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `company_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `project_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `contract_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `role_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `role_name` varchar(255) DEFAULT NULL,
-  `session_id` varchar(255) DEFAULT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
-  `user_agent` text DEFAULT NULL,
-  `screen_name` varchar(255) DEFAULT NULL,
-  `module_name` varchar(255) DEFAULT NULL,
-  `action_type` varchar(50) DEFAULT NULL,
-  `button_name` varchar(255) DEFAULT NULL,
-  `field_name` varchar(255) DEFAULT NULL,
-  `record_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `old_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`old_value`)),
-  `new_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`new_value`)),
-  `url` text DEFAULT NULL,
-  `http_method` varchar(10) DEFAULT NULL,
-  `request_payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`request_payload`)),
-  `response_status` int(11) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجل نشاطات المستخدمين — Activity Tracking Log';
+DROP TABLE IF EXISTS `activity_logs`;
+CREATE TABLE IF NOT EXISTS `activity_logs` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `company_id` bigint UNSIGNED DEFAULT NULL,
+  `project_id` bigint UNSIGNED DEFAULT NULL,
+  `contract_id` bigint UNSIGNED DEFAULT NULL,
+  `user_id` bigint UNSIGNED DEFAULT NULL,
+  `role_id` bigint UNSIGNED DEFAULT NULL,
+  `role_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `session_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `screen_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `module_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `action_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `button_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `field_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `record_id` bigint UNSIGNED DEFAULT NULL,
+  `old_value` longtext COLLATE utf8mb4_unicode_ci,
+  `new_value` longtext COLLATE utf8mb4_unicode_ci,
+  `url` text COLLATE utf8mb4_unicode_ci,
+  `http_method` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `request_payload` longtext COLLATE utf8mb4_unicode_ci,
+  `response_status` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_company_created` (`company_id`,`created_at`),
+  KEY `idx_user_created` (`user_id`,`created_at`),
+  KEY `idx_role_created` (`role_id`,`created_at`),
+  KEY `idx_action_created` (`action_type`,`created_at`),
+  KEY `idx_module_screen_created` (`module_name`,`screen_name`,`created_at`),
+  KEY `idx_record_module` (`record_id`,`module_name`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_screen_name` (`screen_name`),
+  KEY `idx_module_name` (`module_name`),
+  KEY `idx_action_type` (`action_type`),
+  KEY `idx_record_id` (`record_id`)
+) ;
 
 --
 -- Dumping data for table `activity_logs`
@@ -438,7 +451,786 @@ INSERT INTO `activity_logs` (`id`, `company_id`, `project_id`, `contract_id`, `u
 (375, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'aTmL9OS61jfylVSVfJC,PCObEnGZmDOiSpWJsZ0MtelCthMB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php?timeout=1', 'POST', '{\"username\":\"مبيعات\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 09:04:53'),
 (376, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'aTmL9OS61jfylVSVfJC,PCObEnGZmDOiSpWJsZ0MtelCthMB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'projects', 'projects', 'import_preview', 'import_preview', NULL, NULL, NULL, NULL, 'http://localhost/ems/Projects/projects.php', 'POST', '{\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 09:05:08'),
 (377, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'aTmL9OS61jfylVSVfJC,PCObEnGZmDOiSpWJsZ0MtelCthMB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'projects', 'projects', 'import_preview', 'import_preview', NULL, NULL, NULL, NULL, 'http://localhost/ems/Projects/projects.php', 'POST', '{\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 09:05:42'),
-(378, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'aTmL9OS61jfylVSVfJC,PCObEnGZmDOiSpWJsZ0MtelCthMB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'projects', 'projects', 'template', 'template', NULL, NULL, NULL, NULL, 'http://localhost/ems/Projects/projects.php', 'GET', '{\"entity\":\"projects\",\"action\":\"template\"}', 200, '2026-06-06 09:06:18');
+(378, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'aTmL9OS61jfylVSVfJC,PCObEnGZmDOiSpWJsZ0MtelCthMB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'projects', 'projects', 'template', 'template', NULL, NULL, NULL, NULL, 'http://localhost/ems/Projects/projects.php', 'GET', '{\"entity\":\"projects\",\"action\":\"template\"}', 200, '2026-06-06 09:06:18'),
+(379, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'EXCuWnbRF438fRdEtdDGhC2zW4IOW7YGKVw6RJpYUjq-y4Rz', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 09:52:02'),
+(380, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'mMNdPX7mOUx1fHUJXQhP3JFLUEY1PHJBUnHXWadk8y,8drNN', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 09:52:16'),
+(381, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'mMNdPX7mOUx1fHUJXQhP3JFLUEY1PHJBUnHXWadk8y,8drNN', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'template', 'template', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php', 'GET', '{\"entity\":\"equipments\",\"action\":\"template\"}', 200, '2026-06-06 10:07:31'),
+(382, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'mMNdPX7mOUx1fHUJXQhP3JFLUEY1PHJBUnHXWadk8y,8drNN', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'import_preview', 'import_preview', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php', 'POST', '{\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:08:06'),
+(383, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'mMNdPX7mOUx1fHUJXQhP3JFLUEY1PHJBUnHXWadk8y,8drNN', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'import_preview', 'import_preview', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php', 'POST', '{\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:12:48'),
+(384, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'mMNdPX7mOUx1fHUJXQhP3JFLUEY1PHJBUnHXWadk8y,8drNN', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'import_commit', 'import_commit', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php', 'POST', '{\"token\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:13:02'),
+(385, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'mMNdPX7mOUx1fHUJXQhP3JFLUEY1PHJBUnHXWadk8y,8drNN', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=18', 'POST', '{\"edit_id\":\"18\",\"suppliers\":\"7\",\"code\":\"EQP-02001-3\",\"type\":\"1\",\"name\":\"EXC\",\"serial_number\":\"EXC-2024-001\",\"chassis_number\":\"CAT320-ABC123456\",\"machine_number\":\"\",\"manufacturer\":\"كاتربيلر\",\"model\":\"320D\",\"manufacturing_year\":\"2018\",\"import_year\":\"2020\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"5400\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"محمد علي أحمد\",\"owner_type\":\"مالك فردي\",\"owner_phone\":\"249912345678\",\"owner_supplier_relation\":\"تابع للمورد (مملوكة للمورد نفسه)\",\"license_number\":\"VEH-2024-12345\",\"license_authority\":\"المرور\",\"document_type\":\"\",\"license_expiry_date\":\"2025-12-31\",\"inspection_certificate_number\":\"INS-2024-001\",\"last_inspection_date\":\"2024-06-15\",\"current_location\":\"منجم الذهب الشرقي\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"150000.00\",\"daily_rental_price\":\"500.00\",\"monthly_rental_price\":\"10000.00\",\"insurance_status\":\"مؤمن بالكامل\",\"general_notes\":\"معدة موثوقة، تحتاج صيانة دورية\",\"last_maintenance_date\":\"2024-05-10\",\"status\":\"0\"}', 302, '2026-06-06 10:13:32'),
+(386, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'mMNdPX7mOUx1fHUJXQhP3JFLUEY1PHJBUnHXWadk8y,8drNN', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 10:13:43'),
+(387, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '8cRuIaHF6mCr3IKE3V,U8hLq0CQu2UNgYc488X2Utva9B2SH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"اروينا\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:13:49'),
+(388, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '8cRuIaHF6mCr3IKE3V,U8hLq0CQu2UNgYc488X2Utva9B2SH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'template', 'template', NULL, NULL, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php', 'GET', '{\"entity\":\"drivers\",\"action\":\"template\"}', 200, '2026-06-06 10:13:56'),
+(389, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '8cRuIaHF6mCr3IKE3V,U8hLq0CQu2UNgYc488X2Utva9B2SH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'import_preview', 'import_preview', NULL, NULL, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php', 'POST', '{\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:14:34'),
+(390, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '8cRuIaHF6mCr3IKE3V,U8hLq0CQu2UNgYc488X2Utva9B2SH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'import_preview', 'import_preview', NULL, NULL, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php', 'POST', '{\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:14:53'),
+(391, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '8cRuIaHF6mCr3IKE3V,U8hLq0CQu2UNgYc488X2Utva9B2SH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'import_preview', 'import_preview', NULL, NULL, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php', 'POST', '{\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:16:07'),
+(392, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '8cRuIaHF6mCr3IKE3V,U8hLq0CQu2UNgYc488X2Utva9B2SH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'import_commit', 'import_commit', NULL, NULL, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php', 'POST', '{\"token\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:16:18'),
+(393, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '8cRuIaHF6mCr3IKE3V,U8hLq0CQu2UNgYc488X2Utva9B2SH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'import_preview', 'import_preview', NULL, NULL, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php', 'POST', '{\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:38:29'),
+(394, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '8cRuIaHF6mCr3IKE3V,U8hLq0CQu2UNgYc488X2Utva9B2SH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 10:39:13'),
+(395, 4, 4, 4, 12, 5, 'مدير الموقع', 'idrhTZGXJyWPjcTzv5OUOP,aIafctD8KJzSd-9fzYb3y1kVE', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:39:35'),
+(396, 4, 4, 4, 12, 5, 'مدير الموقع', 'idrhTZGXJyWPjcTzv5OUOP,aIafctD8KJzSd-9fzYb3y1kVE', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-06 10:39:40'),
+(397, 4, 4, 4, 12, 5, 'مدير الموقع', 'idrhTZGXJyWPjcTzv5OUOP,aIafctD8KJzSd-9fzYb3y1kVE', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-06 10:39:40'),
+(398, 4, 4, 4, 12, 5, 'مدير الموقع', 'idrhTZGXJyWPjcTzv5OUOP,aIafctD8KJzSd-9fzYb3y1kVE', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-06 10:39:40'),
+(399, 4, 4, 4, 12, 5, 'مدير الموقع', 'idrhTZGXJyWPjcTzv5OUOP,aIafctD8KJzSd-9fzYb3y1kVE', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'template', 'template', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"entity\":\"timesheet\",\"action\":\"template\"}', 200, '2026-06-06 10:39:45'),
+(400, 4, 4, 4, 12, 5, 'مدير الموقع', 'idrhTZGXJyWPjcTzv5OUOP,aIafctD8KJzSd-9fzYb3y1kVE', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'import_preview', 'import_preview', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'POST', '{\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:40:36'),
+(401, 4, 4, 4, 12, 5, 'مدير الموقع', 'idrhTZGXJyWPjcTzv5OUOP,aIafctD8KJzSd-9fzYb3y1kVE', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 10:41:13'),
+(402, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'sdGT-LOXgm,jXTQuXHHLfnn8LeZBivMmxskDfSGc4odwD9hj', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مبيعات\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:41:25'),
+(403, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'sdGT-LOXgm,jXTQuXHHLfnn8LeZBivMmxskDfSGc4odwD9hj', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'contracts', 'contracts', 'template', 'template', NULL, NULL, NULL, NULL, 'http://localhost/ems/Contracts/contracts.php?filter_project_id=8', 'GET', '{\"entity\":\"contracts\",\"action\":\"template\"}', 200, '2026-06-06 10:41:39'),
+(404, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'sdGT-LOXgm,jXTQuXHHLfnn8LeZBivMmxskDfSGc4odwD9hj', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'contracts', 'contracts', 'export', 'export', NULL, NULL, NULL, NULL, 'http://localhost/ems/Contracts/contracts.php?filter_project_id=8', 'GET', '{\"entity\":\"contracts\",\"action\":\"export\"}', 200, '2026-06-06 10:42:04'),
+(405, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'sdGT-LOXgm,jXTQuXHHLfnn8LeZBivMmxskDfSGc4odwD9hj', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'clients', 'clients', 'template', 'template', NULL, NULL, NULL, NULL, 'http://localhost/ems/Clients/clients.php', 'GET', '{\"entity\":\"clients\",\"action\":\"template\"}', 200, '2026-06-06 10:56:31'),
+(406, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'sdGT-LOXgm,jXTQuXHHLfnn8LeZBivMmxskDfSGc4odwD9hj', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'clients', 'clients', 'import_preview', 'import_preview', NULL, NULL, NULL, NULL, 'http://localhost/ems/Clients/clients.php', 'POST', '{\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:57:20'),
+(407, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'sdGT-LOXgm,jXTQuXHHLfnn8LeZBivMmxskDfSGc4odwD9hj', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'clients', 'clients', 'import_commit', 'import_commit', NULL, NULL, NULL, NULL, 'http://localhost/ems/Clients/clients.php', 'POST', '{\"token\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 10:57:31'),
+(408, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'sdGT-LOXgm,jXTQuXHHLfnn8LeZBivMmxskDfSGc4odwD9hj', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 11:03:59'),
+(409, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'gzR4fg3IrZSdk,vuZuJl,Sb2AR2AKeD,rZmyVgjeakkOqI2H', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"اروينا\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 11:04:05'),
+(410, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'gzR4fg3IrZSdk,vuZuJl,Sb2AR2AKeD,rZmyVgjeakkOqI2H', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'template', 'template', NULL, NULL, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php', 'GET', '{\"entity\":\"drivers\",\"action\":\"template\"}', 200, '2026-06-06 11:04:15'),
+(411, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'gzR4fg3IrZSdk,vuZuJl,Sb2AR2AKeD,rZmyVgjeakkOqI2H', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 11:22:04'),
+(412, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'eWn2wGZT1BdNk2X6madUrt6yHOeGyp73ttN,grMZo0oSI9r9', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مبيعات\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 11:22:23'),
+(413, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'eWn2wGZT1BdNk2X6madUrt6yHOeGyp73ttN,grMZo0oSI9r9', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'clients', 'clients', 'template', 'template', NULL, NULL, NULL, NULL, 'http://localhost/ems/Clients/clients.php', 'GET', '{\"entity\":\"clients\",\"action\":\"template\"}', 200, '2026-06-06 11:22:27'),
+(414, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'eWn2wGZT1BdNk2X6madUrt6yHOeGyp73ttN,grMZo0oSI9r9', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'clients', 'clients', 'import_preview', 'import_preview', NULL, NULL, NULL, NULL, 'http://localhost/ems/Clients/clients.php', 'POST', '{\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 11:22:34'),
+(415, 4, 0, 0, 13, 12, 'ادارة المبيعات', '-v0MRqtW3Ey76MRQQwZZqoNBRQpxaCmjP9F3AsJyONtNyYUt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 12:00:46'),
+(416, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'v3yivHHK-2A3jQqAAyE87k82YjnsXLSbGB1ImsV94Dbzbp7R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"اروينا\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 12:00:51'),
+(417, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'v3yivHHK-2A3jQqAAyE87k82YjnsXLSbGB1ImsV94Dbzbp7R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 12:00:57'),
+(418, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'GUV,sOYc2VRQr8rOkjvlm4aaeVw5x-53eYVkEXxG0sJvyT-r', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 12:01:05'),
+(419, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'GUV,sOYc2VRQr8rOkjvlm4aaeVw5x-53eYVkEXxG0sJvyT-r', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 12:01:29'),
+(420, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'Vc5BI2WJpEeIryvRQ8-cKTSgP8WNE8qLFGLLaLeN2883fNeS', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 12:10:35'),
+(421, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'jSRBZFNUanfpi5HvWsEjGkSQU9t3IZje1YczmRAz2tAkrCqP', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 13:47:53'),
+(422, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'Vc5BI2WJpEeIryvRQ8-cKTSgP8WNE8qLFGLLaLeN2883fNeS', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 14:25:16'),
+(423, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'h10YZlWxSE3HE95jr3ME,u0JiCZRbSxjA88wWZogaf1u0gHJ', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مبيعات\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 14:25:23'),
+(424, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'h10YZlWxSE3HE95jr3ME,u0JiCZRbSxjA88wWZogaf1u0gHJ', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 14:34:06'),
+(425, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'piJ9ApKPJ6AK7QQnPbDT,zxlZiJOEI9zOSPZR1kt1ojX7b8x', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 14:34:12'),
+(426, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'XolJhBmW3Rb6rniQddSiK6ya1WZ0oWtud,C9Ql0YDovJuAvu', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php?timeout=1', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-06 15:08:46'),
+(427, NULL, NULL, NULL, NULL, NULL, NULL, 'xhRbq4Y7d,nFh7oo9GxQ2mP59vO-ttkIYwrtcKV1pXJ46eGg', '::1', 'curl/8.7.1', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/login', 'POST', NULL, 401, '2026-06-06 18:23:23'),
+(428, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', ',Akr53d-6TSNk22AfAUINGBjHNr3f-svv5KyowNWe4PMbe2N', '::1', 'curl/8.7.1', 'operations', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/operations', 'POST', NULL, 409, '2026-06-06 18:24:40'),
+(429, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'iDrx-AIjerxldSgozjepvzg7gn0LxBPZpeEeyCHriuaMFDL4', '::1', 'curl/8.7.1', '13', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/operations/13', 'PUT', NULL, 404, '2026-06-06 18:24:40'),
+(430, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'VB4EvAMjkzvBQCZ,ds6R7M856k5UOSI4pQg9qOVybxib5yin', '::1', 'curl/8.7.1', '13', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/operations/13', 'PUT', NULL, 422, '2026-06-06 18:24:40'),
+(431, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'b7YIDrPSrNJKNLiKlAwA1dxgJU9jl2V4GEtvY18OOml4yWKZ', '::1', 'curl/8.7.1', '13', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/operations/13', 'PUT', NULL, 200, '2026-06-06 18:26:09'),
+(432, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'tL8,nH2iaLi5NWRJise4xJ1k0S4ucdZTnahriNbbBAL7rXVh', '::1', 'curl/8.7.1', '999999', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/operations/999999', 'PUT', NULL, 404, '2026-06-06 18:26:09'),
+(433, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'ox78zvtLETPgy4vGD2bMFHVjOHGiObPf3Y7ViyH8jguPl9VB', '::1', 'curl/8.7.1', 'equipment-drivers', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/equipment-drivers', 'POST', NULL, 201, '2026-06-06 18:26:09'),
+(434, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'Jw9DSEoUUdCgmHZAgOfGJGLZNzu1AfIHMYX1Wd33KPlhwyIM', '::1', 'curl/8.7.1', 'equipment-drivers', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/equipment-drivers', 'POST', NULL, 409, '2026-06-06 18:26:10'),
+(435, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'RZ1xUZmhRoybJn1ZlxKwSyzlm8xev-B37f3Evaa4HrxDTVoO', '::1', 'curl/8.7.1', '26', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/equipment-drivers/26', 'PUT', NULL, 200, '2026-06-06 18:26:33'),
+(436, NULL, NULL, NULL, NULL, NULL, NULL, 'lQtMfnNGa0hTPmR0-jCpz28yQuoWwVN-cqf8adon6LV2RWv6', '::1', 'curl/8.7.1', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/login', 'POST', NULL, 401, '2026-06-06 19:02:44'),
+(437, NULL, NULL, NULL, NULL, NULL, NULL, 'YsvSUgEOJkSEa09,8BJLJb2dybN0U2ZfcsqvMRAGrI14kszB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.122.1 Chrome/142.0.7444.265 Electron/39.8.8 Safari/537.36', 'web', 'flutter_app', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/flutter_app/build/web/', 'POST', NULL, 200, '2026-06-06 19:05:23'),
+(438, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'YsvSUgEOJkSEa09,8BJLJb2dybN0U2ZfcsqvMRAGrI14kszB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.122.1 Chrome/142.0.7444.265 Electron/39.8.8 Safari/537.36', 'web', 'flutter_app', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/flutter_app/build/web/', 'POST', NULL, 201, '2026-06-06 19:05:58'),
+(439, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'YsvSUgEOJkSEa09,8BJLJb2dybN0U2ZfcsqvMRAGrI14kszB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.122.1 Chrome/142.0.7444.265 Electron/39.8.8 Safari/537.36', 'web', 'flutter_app', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/flutter_app/build/web/', 'PUT', NULL, 200, '2026-06-06 19:07:50'),
+(440, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'YsvSUgEOJkSEa09,8BJLJb2dybN0U2ZfcsqvMRAGrI14kszB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.122.1 Chrome/142.0.7444.265 Electron/39.8.8 Safari/537.36', 'web', 'flutter_app', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/flutter_app/build/web/', 'PUT', NULL, 200, '2026-06-06 19:08:15'),
+(441, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'YsvSUgEOJkSEa09,8BJLJb2dybN0U2ZfcsqvMRAGrI14kszB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.122.1 Chrome/142.0.7444.265 Electron/39.8.8 Safari/537.36', 'web', 'flutter_app', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/flutter_app/build/web/', 'POST', NULL, 201, '2026-06-06 19:09:58'),
+(442, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'YsvSUgEOJkSEa09,8BJLJb2dybN0U2ZfcsqvMRAGrI14kszB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.122.1 Chrome/142.0.7444.265 Electron/39.8.8 Safari/537.36', 'web', 'flutter_app', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/flutter_app/build/web/', 'PUT', NULL, 200, '2026-06-06 19:11:22'),
+(443, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'jSRBZFNUanfpi5HvWsEjGkSQU9t3IZje1YczmRAz2tAkrCqP', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-06 19:17:44'),
+(444, NULL, NULL, NULL, NULL, NULL, NULL, 'uz3sgyaOOhioEruv3y-pTaFU9AKQE5lAYgR9Gx1fp500XQhE', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'web', 'flutter_app', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/flutter_app/build/web/', 'POST', NULL, 200, '2026-06-06 19:54:42'),
+(445, NULL, NULL, NULL, NULL, NULL, NULL, 'A3cCF07qV9ex2TCXpxsWcHtz0PgQEZ0J5Wm4EOkVajfers0-', '192.168.1.21', 'Dart/3.6 (dart:io)', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/login', 'POST', NULL, 401, '2026-06-06 20:18:10'),
+(446, NULL, NULL, NULL, NULL, NULL, NULL, 'z,lPD5Hi-W-aJ,BflXLgADt6DRa6YkaUKPi-,W6pw3HPHH5-', '192.168.1.21', 'Dart/3.6 (dart:io)', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/login', 'POST', NULL, 200, '2026-06-06 20:18:27'),
+(447, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'pQ0wCK8tPNR6wYNfKlyy8W1ffRcRED2gNHcjl43,6jqt3w,H', '192.168.1.21', 'Dart/3.6 (dart:io)', '17', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/operations/17', 'PUT', NULL, 200, '2026-06-06 20:19:21'),
+(448, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'pxSuGFo5Oy21gh9dMd3hPXFwM80lbsrJ9irrZPSL54HKnId7', '192.168.1.21', 'Dart/3.6 (dart:io)', '17', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/operations/17', 'PUT', NULL, 200, '2026-06-06 20:19:31'),
+(449, NULL, NULL, NULL, NULL, NULL, NULL, 'g7,lnAvu2ZAJ1V7,IToh8HrSBT6Rt4M59g9dyaiLT3lKS26S', '192.168.1.21', 'Dart/3.6 (dart:io)', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/login', 'POST', NULL, 200, '2026-06-07 07:33:00'),
+(450, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'bJ9XZoZ0g7FLJ-Ss0s8cONulvB3B6AHe5rKxkF0z5h-TSYf5', '192.168.1.21', 'Dart/3.6 (dart:io)', 'logout', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/logout', 'POST', NULL, 200, '2026-06-07 07:33:04'),
+(451, NULL, NULL, NULL, NULL, NULL, NULL, 'kUt7na2kvw-POOk0-UKncBFbPTKcfHDMPsSG,f18Hnnc16su', '192.168.1.21', 'Dart/3.6 (dart:io)', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/login', 'POST', NULL, 200, '2026-06-07 07:33:21'),
+(452, 4, 0, 0, 4, 1, 'ادارة التشغيل', '4HF2FjFu-oW1ijBqhBucKhlqWCOHN0R0x9dlZxEyZTjXoRRo', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php?timeout=1', 'POST', '{\"username\":\"محمد\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-07 11:41:42'),
+(453, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'u89Cj5c9hmAEfc9tSu9rMBi2wZIXaS5TVh8qeB7MV8ETUeVA', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"محمد\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-07 14:44:08'),
+(454, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'u89Cj5c9hmAEfc9tSu9rMBi2wZIXaS5TVh8qeB7MV8ETUeVA', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'send_message', 'chats', 'send', 'إرسال', NULL, 42, NULL, '{\"receiver_id\":5,\"message_id\":42}', 'http://localhost/ems/chats/send_message.php', 'POST', '{\"receiver_id\":\"5\",\"message\":\"lflmvc\"}', 200, '2026-06-07 14:44:27'),
+(455, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'LB02CWfYz2PzH,EtSSRK8rPGKV2ot5aXtePwJkimSu2jdQf5', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-07 14:47:46'),
+(456, 4, 0, 0, 4, 1, 'ادارة التشغيل', '0ZFSxC5bKNRFLettSA1jU26eCM6hxkiZrVtmU4cslGfXPybw', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"محمد\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-07 14:47:52'),
+(457, 4, 0, 0, 4, 1, 'ادارة التشغيل', '0ZFSxC5bKNRFLettSA1jU26eCM6hxkiZrVtmU4cslGfXPybw', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-07 14:47:56'),
+(458, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'HsqO,XgZkwrrNh4nB9kOMHT8lr,klB7Ae6X4iYdbHwPSPbTL', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مبيعات\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-07 14:48:04'),
+(459, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'HsqO,XgZkwrrNh4nB9kOMHT8lr,klB7Ae6X4iYdbHwPSPbTL', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-07 14:48:44'),
+(460, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'vTl4mv8giuihgC3NJHGAZ40RfpSc9w7gIIK-96M9LYokFFot', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-07 14:48:49'),
+(461, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'vTl4mv8giuihgC3NJHGAZ40RfpSc9w7gIIK-96M9LYokFFot', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-07 14:49:56'),
+(462, 4, 4, 4, 12, 5, 'مدير الموقع', ',okGsbNMFma7aqdL8bbN84sknrTAzelYv1OxXN02sFTSHCsO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-07 14:50:06'),
+(463, 4, 4, 4, 12, 5, 'مدير الموقع', ',okGsbNMFma7aqdL8bbN84sknrTAzelYv1OxXN02sFTSHCsO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-07 14:50:10');
+INSERT INTO `activity_logs` (`id`, `company_id`, `project_id`, `contract_id`, `user_id`, `role_id`, `role_name`, `session_id`, `ip_address`, `user_agent`, `screen_name`, `module_name`, `action_type`, `button_name`, `field_name`, `record_id`, `old_value`, `new_value`, `url`, `http_method`, `request_payload`, `response_status`, `created_at`) VALUES
+(464, 4, 4, 4, 12, 5, 'مدير الموقع', ',okGsbNMFma7aqdL8bbN84sknrTAzelYv1OxXN02sFTSHCsO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-07 14:50:10'),
+(465, 4, 4, 4, 12, 5, 'مدير الموقع', ',okGsbNMFma7aqdL8bbN84sknrTAzelYv1OxXN02sFTSHCsO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-07 14:50:10'),
+(466, 4, 4, 4, 12, 5, 'مدير الموقع', ',okGsbNMFma7aqdL8bbN84sknrTAzelYv1OxXN02sFTSHCsO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-07 14:50:15'),
+(467, 4, 4, 4, 12, 5, 'مدير الموقع', ',okGsbNMFma7aqdL8bbN84sknrTAzelYv1OxXN02sFTSHCsO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-07 14:50:15'),
+(468, 4, 4, 4, 12, 5, 'مدير الموقع', ',okGsbNMFma7aqdL8bbN84sknrTAzelYv1OxXN02sFTSHCsO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-07 14:50:15'),
+(469, 4, 4, 4, 12, 5, 'مدير الموقع', ',okGsbNMFma7aqdL8bbN84sknrTAzelYv1OxXN02sFTSHCsO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-07 15:07:21'),
+(470, 4, 4, 4, 12, 5, 'مدير الموقع', ',okGsbNMFma7aqdL8bbN84sknrTAzelYv1OxXN02sFTSHCsO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-07 15:07:21'),
+(471, 4, 4, 4, 12, 5, 'مدير الموقع', ',okGsbNMFma7aqdL8bbN84sknrTAzelYv1OxXN02sFTSHCsO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-07 15:07:21'),
+(472, 4, 4, 5, 14, 5, 'مدير الموقع', 'kChWy-L1vCAgcxGAWCGVP9pTWLUsQ,Qp4mrdgxZId-NWet3C', '::1', 'curl/8.7.1', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/timesheets', 'POST', NULL, 201, '2026-06-07 16:50:05'),
+(473, 4, 4, 5, 14, 5, 'مدير الموقع', 'TY6APOYAuhPTzEpvZk,EnYpPy6Ad,h6sjNwJHrA,gBqw7d-D', '::1', 'curl/8.7.1', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/timesheets', 'POST', NULL, 422, '2026-06-07 16:50:06'),
+(474, 4, 4, 5, 14, 5, 'مدير الموقع', 'aXhErgEDI-,izz85aRVxGQHbAh8Y0R1FhwRkqKbz2o0TqTxh', '::1', 'curl/8.7.1', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 16:51:11'),
+(475, 4, 4, 5, 14, 5, 'مدير الموقع', '8X1CCAeCmFUhla0a8O7ae7WaRuv9skJQj9tJprB0ONPRcOjC', '::1', 'curl/8.7.1', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 16:51:12'),
+(476, 4, 4, 5, 14, 5, 'مدير الموقع', 'M5fjxRfihricm5edGPKu0PH2u8k07sN5jojcG9J9KJ3hL,en', '::1', 'curl/8.7.1', '250', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/timesheets/250', 'DELETE', NULL, 200, '2026-06-07 16:51:48'),
+(477, 4, 4, 5, 14, 5, 'مدير الموقع', 'Qs0yz1pcFm8fW0YO7F2Cc8ul7dB3z5KimydWLVk,kMJk8G86', '::1', 'curl/8.7.1', '251', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/api/timesheets/251', 'DELETE', NULL, 200, '2026-06-07 16:51:48'),
+(478, 4, 0, 0, 4, 1, 'ادارة التشغيل', '4HF2FjFu-oW1ijBqhBucKhlqWCOHN0R0x9dlZxEyZTjXoRRo', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-07 17:41:48'),
+(479, NULL, NULL, NULL, NULL, NULL, NULL, 'cCIhAFBCVoOu1hoH0or-AXZIncTkgjXkljaIZf2TeUNqoZk-', '192.168.1.21', 'Dart/3.6 (dart:io)', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/login', 'POST', NULL, 200, '2026-06-07 17:42:46'),
+(480, 4, 4, 4, 12, 5, 'مدير الموقع', 'irQFlEgWHr7g7dctr2JCo7lwbxqX2AmmHLKztGS8odb54vDk', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 17:45:22'),
+(481, 4, 4, 4, 12, 5, 'مدير الموقع', 'ExUUc,LNPdy,Xi8Z4NemSFQc4KFgN0qD-GLeIOnRDDaGksja', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-07 17:45:49'),
+(482, 4, 4, 4, 12, 5, 'مدير الموقع', 'ExUUc,LNPdy,Xi8Z4NemSFQc4KFgN0qD-GLeIOnRDDaGksja', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-07 17:45:57'),
+(483, 4, 4, 4, 12, 5, 'مدير الموقع', 'ExUUc,LNPdy,Xi8Z4NemSFQc4KFgN0qD-GLeIOnRDDaGksja', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-07 17:45:57'),
+(484, 4, 4, 4, 12, 5, 'مدير الموقع', 'ExUUc,LNPdy,Xi8Z4NemSFQc4KFgN0qD-GLeIOnRDDaGksja', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-07 17:45:57'),
+(485, 4, 4, 4, 12, 5, 'مدير الموقع', 'ppaVi-zQbxaasW-rYPuD3W-oVE6Wkw4bRIqUPOu78IxrS7RN', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 17:59:26'),
+(486, 4, 4, 4, 12, 5, 'مدير الموقع', '9n6q14M9nmie9PvacIxJGca7ul4WRJgNWgnKoPZPlBsqfNuf', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 20:06:07'),
+(487, NULL, NULL, NULL, NULL, NULL, NULL, '6t,vEyr3i3HcYKUyEa3GmOUpzdl7HygeDt7sk6b1aOLCsMRE', '192.168.1.21', 'Dart/3.6 (dart:io)', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/login', 'POST', NULL, 401, '2026-06-07 20:40:28'),
+(488, NULL, NULL, NULL, NULL, NULL, NULL, 'OGuuPWyeSSedNbzwnWHjk0miof0gZwa42hVwg-khng3XZWF8', '192.168.1.21', 'Dart/3.6 (dart:io)', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/login', 'POST', NULL, 401, '2026-06-07 20:40:34'),
+(489, NULL, NULL, NULL, NULL, NULL, NULL, 'MAeUAf,yNejuaA1prAyajHgPx0Ytbzc6AYOEkgZWHYCQW,Oj', '192.168.1.21', 'Dart/3.6 (dart:io)', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/login', 'POST', NULL, 200, '2026-06-07 20:40:46'),
+(490, 4, 4, 4, 12, 5, 'مدير الموقع', ',okGsbNMFma7aqdL8bbN84sknrTAzelYv1OxXN02sFTSHCsO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-07 20:52:31'),
+(491, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'SG,G63E9,Ay5kulQGaR,0mZrco,SIWS11jaBTqZAK2aUz2v2', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-07 20:52:37'),
+(492, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'SG,G63E9,Ay5kulQGaR,0mZrco,SIWS11jaBTqZAK2aUz2v2', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-07 20:52:54'),
+(493, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'Jo4MKZjWqhH3ttus8WdIXWUQQnOL0p6Luq0kWjjGMwfSWYaO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-07 20:53:00'),
+(494, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'Jo4MKZjWqhH3ttus8WdIXWUQQnOL0p6Luq0kWjjGMwfSWYaO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 7, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"4\",\"supplier_id\":\"7\",\"type\":\"1\",\"equipment\":\"18\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-07\",\"end\":\"2027-02-19\",\"hours\":\"0\",\"total_equipment_hours\":\"500\",\"shift_hours\":\"10\",\"shift_type\":\"D\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-07 20:54:02'),
+(495, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'AIlgHQgElnHmuGciD0lV4Xib23DaZUKoqdFgXZPIuFdEfkeC', '192.168.1.21', 'Dart/3.6 (dart:io)', 'equipment-drivers', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/equipment-drivers', 'POST', NULL, 201, '2026-06-07 20:55:18'),
+(496, 4, 4, 4, 12, 5, 'مدير الموقع', '44souziOLlWIpg4l1YH1YbZ0DqLVExX1-JtkUlIlWLP7zIvs', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 20:58:07'),
+(497, 4, 4, 4, 12, 5, 'مدير الموقع', 'KxWI7SobTuQWPcuGnP-PJzy7LfCb6AX8aeVYoPIglfytntOt', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 20:58:20'),
+(498, 4, 4, 4, 12, 5, 'مدير الموقع', 'vP7q2lqF8Xc9iXISXh2MaM4yy897IddncR4Qmb6ntSIdnZL-', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 20:59:23'),
+(499, 4, 4, 4, 12, 5, 'مدير الموقع', 'cNTICyww51m-e1hhM7D7tzcP6Wpxqc1Cpx6HH1,Gd0reploY', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 20:59:26'),
+(500, 4, 4, 4, 12, 5, 'مدير الموقع', 'qqTld3MYu86ThPKpMW6VpDmAGPuS4xQc2PhOLcNMq2FE4Ki7', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 21:00:04'),
+(501, 4, 4, 4, 12, 5, 'مدير الموقع', 'IuDswl6n8gBTbw5DM8O7Zj6BTr2HbhmXiXBgPclxkN7i-2tR', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 21:00:12'),
+(502, 4, 4, 4, 12, 5, 'مدير الموقع', 'nHxk3I8ytN-ogZ8OOyU090MFNViYTuTvcCGhSBB0ENCzPGVa', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-07 21:00:20'),
+(503, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'Jo4MKZjWqhH3ttus8WdIXWUQQnOL0p6Luq0kWjjGMwfSWYaO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'project_users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/project_users.php', 'POST', '{\"username\":\"يسن\",\"uid\":\"0\"}', 200, '2026-06-08 06:10:41'),
+(504, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'Jo4MKZjWqhH3ttus8WdIXWUQQnOL0p6Luq0kWjjGMwfSWYaO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'project_users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/project_users.php', 'POST', '{\"username\":\"يسن\",\"uid\":\"0\"}', 200, '2026-06-08 06:21:52'),
+(505, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'Jo4MKZjWqhH3ttus8WdIXWUQQnOL0p6Luq0kWjjGMwfSWYaO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 06:27:19'),
+(506, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'AZ2KjerLo8dxl58wRX819oqlyuuc0qUA-6,JnPRnEAsZkt6-', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 06:27:22'),
+(507, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'AZ2KjerLo8dxl58wRX819oqlyuuc0qUA-6,JnPRnEAsZkt6-', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 06:27:42'),
+(508, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'inkBgOvJrlPVATQCu9KGLwcnvZwMwrWGYOQT1O4x,JSRwpBn', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"محمد\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 06:27:48'),
+(509, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'inkBgOvJrlPVATQCu9KGLwcnvZwMwrWGYOQT1O4x,JSRwpBn', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 06:35:19'),
+(510, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', '1k1x,X57ZBKZzZGd8XARWnjd7Y6he4SSwDx4ELPdlT15Qisd', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 06:35:25'),
+(511, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', '1k1x,X57ZBKZzZGd8XARWnjd7Y6he4SSwDx4ELPdlT15Qisd', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'movement_operations', 'movement', 'save_single_driver', 'save_single_driver', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php?project_id=4', 'POST', '{\"action\":\"save_single_driver\",\"rel_id\":\"14\",\"shift_type\":\"B\",\"status\":\"0\",\"end_date\":\"2026-06-08\",\"json\":\"1\"}', 200, '2026-06-08 06:35:49'),
+(512, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', '1k1x,X57ZBKZzZGd8XARWnjd7Y6he4SSwDx4ELPdlT15Qisd', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 06:36:31'),
+(513, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'JCIX,mKJiNcXkJA8sO2le7cI1CjOuscYNR6RdJc7PiiJZFAf', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"اروينا\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 06:36:40'),
+(514, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'JCIX,mKJiNcXkJA8sO2le7cI1CjOuscYNR6RdJc7PiiJZFAf', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'update', 'update', NULL, 23, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php', 'POST', '{\"id\":\"23\",\"name\":\"جديد فضل جديد\",\"driver_code\":\"131355\",\"nickname\":\"جديد\",\"identity_type\":\"بطاقة هوية وطنية\",\"identity_number\":\"3132131331\",\"identity_expiry_date\":\"2026-05-08\",\"driver_photo\":\"\",\"identity_photo\":\"\",\"license_number\":\"61313\",\"license_type\":\"فئة د (شاحنات ثقيلة)\",\"license_expiry_date\":\"2026-05-03\",\"license_issuer\":\"مرور عطبرة\",\"specialized_equipment\":[\"حفارة (Excavator)\",\"دوزر (Dozer)\",\"جرافة (Loader)\"],\"years_in_field\":\"8\",\"years_on_equipment\":\"5\",\"skill_level\":\"كفء (3-5 سنوات)\",\"certificates\":\"\",\"owner_supervisor\":\"شركة صابركو\",\"supplier_id\":\"5\",\"project_id\":\"4\",\"employment_affiliation\":\"تابع لمالك المعدة مباشرة\",\"salary_type\":\"شهري\",\"monthly_salary\":\"1000.00\",\"email\":\"sudan@gmail.com\",\"phone\":\"6531533161\",\"phone_alternative\":\"532121235855\",\"address\":\"الخناق\",\"performance_rating\":\"جيد جداً\",\"behavior_record\":\"ممتاز (لا توجد شكاوى)\",\"accident_record\":\"نظيف (لا توجد حوادث)\",\"health_status\":\"سليم تماماً\",\"vaccinations_status\":\"محدثة\",\"health_issues\":\"\",\"previous_employer\":\"دال للتعدين\",\"employment_duration\":\"4\",\"reference_contact\":\"\",\"general_notes\":\"\",\"driver_status\":\"نشط\",\"start_date\":\"2025-09-08\",\"status\":\"1\"}', 302, '2026-06-08 06:37:20'),
+(515, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'JCIX,mKJiNcXkJA8sO2le7cI1CjOuscYNR6RdJc7PiiJZFAf', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 06:37:24'),
+(516, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'Zbv7F2-ZDIpviK54iy1haCBg3XUgnWtObGnGqKxlEuVDvv8R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 06:37:50'),
+(517, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'PCbIjZhenys0j6zuoQWvElLuvREVywNs2kT7kd-dWphOaWx8', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 06:48:46'),
+(518, 4, 4, 4, 12, 5, 'مدير الموقع', 'ChC1HZHEZyaYpElFaz5455PTOPW4,,12GjYxaGHWWCIBnr4M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 06:48:54'),
+(519, 4, 4, 4, 12, 5, 'مدير الموقع', 'ChC1HZHEZyaYpElFaz5455PTOPW4,,12GjYxaGHWWCIBnr4M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 06:49:03'),
+(520, 4, 4, 4, 12, 5, 'مدير الموقع', 'ChC1HZHEZyaYpElFaz5455PTOPW4,,12GjYxaGHWWCIBnr4M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 06:49:03'),
+(521, 4, 4, 4, 12, 5, 'مدير الموقع', 'ChC1HZHEZyaYpElFaz5455PTOPW4,,12GjYxaGHWWCIBnr4M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 06:49:03'),
+(522, 4, 4, 4, 12, 5, 'مدير الموقع', 'ChC1HZHEZyaYpElFaz5455PTOPW4,,12GjYxaGHWWCIBnr4M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 06:49:12'),
+(523, 4, 4, 4, 12, 5, 'مدير الموقع', 'ChC1HZHEZyaYpElFaz5455PTOPW4,,12GjYxaGHWWCIBnr4M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 06:49:12'),
+(524, 4, 4, 4, 12, 5, 'مدير الموقع', 'ChC1HZHEZyaYpElFaz5455PTOPW4,,12GjYxaGHWWCIBnr4M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 06:49:12'),
+(525, 4, 4, 4, 12, 5, 'مدير الموقع', 'ChC1HZHEZyaYpElFaz5455PTOPW4,,12GjYxaGHWWCIBnr4M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 06:49:20'),
+(526, 4, 4, 4, 12, 5, 'مدير الموقع', 'ChC1HZHEZyaYpElFaz5455PTOPW4,,12GjYxaGHWWCIBnr4M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 06:49:20'),
+(527, 4, 4, 4, 12, 5, 'مدير الموقع', 'ChC1HZHEZyaYpElFaz5455PTOPW4,,12GjYxaGHWWCIBnr4M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 06:49:20'),
+(528, 4, 4, 4, 12, 5, 'مدير الموقع', 'ChC1HZHEZyaYpElFaz5455PTOPW4,,12GjYxaGHWWCIBnr4M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 06:51:46'),
+(529, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'WLI,txHETVrP9soomxBVdDFrHjSkh0axh6F90LTJ9nT4sjIm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"محمد\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 06:51:52'),
+(530, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'WLI,txHETVrP9soomxBVdDFrHjSkh0axh6F90LTJ9nT4sjIm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 07:00:39'),
+(531, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 07:00:45'),
+(532, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 07:00:49'),
+(533, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 07:00:49'),
+(534, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 07:00:49'),
+(535, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_main_cats', 'get_main_cats', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_main_cats\",\"equipment_type\":\"1\",\"event_type_code\":\"OPR\"}', 200, '2026-06-08 07:00:55'),
+(536, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_sub_cats', 'get_sub_cats', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_sub_cats\",\"equipment_type\":\"1\",\"event_type_code\":\"OPR\",\"main_cat_code\":\"OPP\"}', 200, '2026-06-08 07:00:57'),
+(537, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_details', 'get_details', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_details\",\"equipment_type\":\"1\",\"event_type_code\":\"OPR\",\"main_cat_code\":\"OPP\",\"sub_cat\":\"ساعات إنتاج\"}', 200, '2026-06-08 07:00:58'),
+(538, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_main_cats', 'get_main_cats', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_main_cats\",\"equipment_type\":\"1\",\"event_type_code\":\"CST\"}', 200, '2026-06-08 07:01:03'),
+(539, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_sub_cats', 'get_sub_cats', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_sub_cats\",\"equipment_type\":\"1\",\"event_type_code\":\"CST\",\"main_cat_code\":\"CSP\"}', 200, '2026-06-08 07:01:05'),
+(540, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_details', 'get_details', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_details\",\"equipment_type\":\"1\",\"event_type_code\":\"CST\",\"main_cat_code\":\"CSP\",\"sub_cat\":\"عدم جهوزية الإنتاج\"}', 200, '2026-06-08 07:01:07'),
+(541, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'send_message', 'chats', 'send', 'إرسال', NULL, 43, NULL, '{\"receiver_id\":5,\"message_id\":43}', 'http://localhost/ems/chats/send_message.php', 'POST', '{\"receiver_id\":\"5\",\"message\":\"ةن\"}', 200, '2026-06-08 07:07:31'),
+(542, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'hours_approval', 'approvals', 'get_notes', 'get_notes', NULL, 240, NULL, NULL, 'http://localhost/ems/Approvals/hours_approval.php', 'POST', '{\"action\":\"get_notes\",\"timesheet_id\":\"240\"}', 200, '2026-06-08 07:08:00'),
+(543, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'hours_approval', 'approvals', 'create', 'add_note', NULL, 240, NULL, NULL, 'http://localhost/ems/Approvals/hours_approval.php', 'POST', '{\"action\":\"add_note\",\"timesheet_id\":\"240\",\"column_name\":\"shift\",\"column_label\":\"الوردية\",\"note_text\":\"ةةم\"}', 200, '2026-06-08 07:08:07'),
+(544, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'hours_approval', 'approvals', 'get_notes', 'get_notes', NULL, 240, NULL, NULL, 'http://localhost/ems/Approvals/hours_approval.php', 'POST', '{\"action\":\"get_notes\",\"timesheet_id\":\"240\"}', 200, '2026-06-08 07:08:07'),
+(545, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 07:09:04'),
+(546, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 07:09:04'),
+(547, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 07:09:04'),
+(548, 4, 4, 4, 12, 5, 'مدير الموقع', 'NEWdTME0xb0tctFdmJDJ7ajRa0uHp,FNSOnc0wqHBKk8FVTC', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-08 07:09:39'),
+(549, 4, 4, 4, 12, 5, 'مدير الموقع', 'Yy6a7bbRzBpQx5BZlYsgHLfVNnCiFypzobY9RMhEbqVHvSiJ', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-08 07:10:02'),
+(550, 4, 4, 4, 12, 5, 'مدير الموقع', 'sDADgBGco1LmCoZ9rWSqWQN1zU9S,xVNbDW4gELeWdRcMMRq', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 07:10:59'),
+(551, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'rFWUrTasVWlv1M5RKfrHgAAF5mREfSttMxG3PztbhT3sygOD', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 07:11:08'),
+(552, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'rFWUrTasVWlv1M5RKfrHgAAF5mREfSttMxG3PztbhT3sygOD', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'movement_operations', 'movement', 'create', 'add_new_driver', NULL, 23, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"add_new_driver\",\"driver_id\":\"23\",\"equipment_id\":\"15\",\"shift_type\":\"N\",\"start_date\":\"2026-06-08\",\"end_date\":\"\",\"json\":\"1\"}', 200, '2026-06-08 07:11:39'),
+(553, 4, 4, 4, 12, 5, 'مدير الموقع', 'BURWfOTNANmgsh9Cf9SCUTQ-Tx35JIRySG6OE8PJdSZClJPT', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-08 07:12:41'),
+(554, 4, 4, 4, 12, 5, 'مدير الموقع', 'JfscYG,ZHpKFre3P0hL2peYxOgy6,flKChMVOc1QHyM17tPM', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-08 07:13:06'),
+(555, 4, 4, 4, 12, 5, 'مدير الموقع', 'fLCRYyAGP0cBtE,M17WzjPet1jT,7GfB5P1AV4RRP6IXVGYp', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-08 07:13:39'),
+(556, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'rFWUrTasVWlv1M5RKfrHgAAF5mREfSttMxG3PztbhT3sygOD', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'movement_operations', 'movement', 'save_single_driver', 'save_single_driver', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"save_single_driver\",\"rel_id\":\"29\",\"shift_type\":\"B\",\"status\":\"1\",\"start_date\":\"2026-06-07\",\"end_date\":\"\",\"json\":\"1\"}', 200, '2026-06-08 07:14:15'),
+(557, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'rFWUrTasVWlv1M5RKfrHgAAF5mREfSttMxG3PztbhT3sygOD', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'movement_operations', 'movement', 'save_single_driver', 'save_single_driver', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"save_single_driver\",\"rel_id\":\"25\",\"shift_type\":\"N\",\"status\":\"0\",\"end_date\":\"2026-06-08\",\"json\":\"1\"}', 200, '2026-06-08 07:14:51'),
+(558, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'rFWUrTasVWlv1M5RKfrHgAAF5mREfSttMxG3PztbhT3sygOD', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'movement_operations', 'movement', 'create', 'add_new_driver', NULL, 11, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"add_new_driver\",\"driver_id\":\"11\",\"equipment_id\":\"18\",\"shift_type\":\"B\",\"start_date\":\"2026-06-08\",\"end_date\":\"\",\"json\":\"1\"}', 200, '2026-06-08 07:15:04'),
+(559, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'rFWUrTasVWlv1M5RKfrHgAAF5mREfSttMxG3PztbhT3sygOD', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 07:20:08'),
+(560, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'IH6yKu26S3GviABY72v18QEgCQ6-5NvIlYbXceGeAli,WofZ', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 07:20:13'),
+(561, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'IH6yKu26S3GviABY72v18QEgCQ6-5NvIlYbXceGeAli,WofZ', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php', 'POST', '{\"suppliers\":\"5\",\"code\":\"mcc120\",\"type\":\"1\",\"name\":\"m\",\"serial_number\":\"\",\"chassis_number\":\"\",\"machine_number\":\"\",\"manufacturer\":\"\",\"model\":\"\",\"manufacturing_year\":\"\",\"import_year\":\"\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"\",\"owner_type\":\"\",\"owner_phone\":\"\",\"owner_supplier_relation\":\"\",\"license_number\":\"\",\"license_authority\":\"\",\"document_type\":\"\",\"license_expiry_date\":\"\",\"inspection_certificate_number\":\"\",\"last_inspection_date\":\"\",\"current_location\":\"\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"\",\"daily_rental_price\":\"\",\"monthly_rental_price\":\"\",\"insurance_status\":\"\",\"general_notes\":\"\",\"last_maintenance_date\":\"\",\"status\":\"0\"}', 302, '2026-06-08 07:22:20'),
+(562, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'IH6yKu26S3GviABY72v18QEgCQ6-5NvIlYbXceGeAli,WofZ', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 5, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"5\",\"type\":\"1\",\"equipment\":\"19\",\"equipment_category\":\"احتياطي\",\"start\":\"2026-06-08\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"0\",\"shift_hours\":\"8.94\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 07:23:15'),
+(563, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'xbkPttyAh4o-Y2nK2,ZgLtAyHTQ2tXlmJP8XyQRfbFWUSJPp', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 19, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"19\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"5\",\"type\":\"1\",\"equipment\":\"19\",\"equipment_category\":\"احتياطي\",\"start\":\"2026-06-08\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"0.00\",\"shift_hours\":\"9\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 07:54:31'),
+(564, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'xEtOY7m8SFENq7CH5vZ1AjvG3Dru8tkj-QbWl44D8YHdFEW4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'manage_failure_codes', 'equipments', 'export', 'export', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/manage_failure_codes.php', 'GET', '{\"entity\":\"failure_codes\",\"action\":\"export\"}', 200, '2026-06-08 08:33:13'),
+(565, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'xEtOY7m8SFENq7CH5vZ1AjvG3Dru8tkj-QbWl44D8YHdFEW4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 08:34:07'),
+(566, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'Sh93yY4JCJp,uGH03QYxv4GQw4aZa5mP45eMEah-WzY8iEOa', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 08:34:13'),
+(567, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'Sh93yY4JCJp,uGH03QYxv4GQw4aZa5mP45eMEah-WzY8iEOa', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 09:05:28'),
+(568, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'L4RZU5UXFkVMlrt0yBv,DMQ5HHTsuhHr,emVgs,i3fpE8lJO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"اروينا\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 09:05:45'),
+(569, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'L4RZU5UXFkVMlrt0yBv,DMQ5HHTsuhHr,emVgs,i3fpE8lJO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivercontracts', 'drivers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Drivers/drivercontracts.php?id=27', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-08 09:06:22'),
+(570, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'L4RZU5UXFkVMlrt0yBv,DMQ5HHTsuhHr,emVgs,i3fpE8lJO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivercontracts', 'drivers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Drivers/drivercontracts.php?id=27', 'POST', '{\"project_contract_id\":\"4\",\"driver_contract_id\":\"0\"}', 200, '2026-06-08 09:06:24'),
+(571, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'L4RZU5UXFkVMlrt0yBv,DMQ5HHTsuhHr,emVgs,i3fpE8lJO', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 09:52:12'),
+(572, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'cW0iIgEIiGA998l5oRt1xQr9ct,qWRDRfAq9rDKWvd9-GyNt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 09:52:25'),
+(573, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'dZp1tUiPP7wfm4BeZlw18pYABqbYhrqhXjYta3p2k9VthA-1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 5, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"5\",\"type\":\"1\",\"equipment\":\"19\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-08\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"0\",\"shift_hours\":\"0\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 11:12:01'),
+(574, 4, 0, 0, 6, 3, 'ادارة الاسطول', '6S5ZeL7R6AWkx92hrNG9pCuT8Y4ESCNT53R3zcVJFDIgbMKw', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php', 'POST', '{\"suppliers\":\"8\",\"code\":\"tx10\",\"type\":\"1\",\"name\":\"tx10\",\"serial_number\":\"\",\"chassis_number\":\"\",\"machine_number\":\"\",\"manufacturer\":\"\",\"model\":\"\",\"manufacturing_year\":\"\",\"import_year\":\"\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"\",\"owner_type\":\"\",\"owner_phone\":\"\",\"owner_supplier_relation\":\"\",\"license_number\":\"\",\"license_authority\":\"\",\"document_type\":\"\",\"license_expiry_date\":\"\",\"inspection_certificate_number\":\"\",\"last_inspection_date\":\"\",\"current_location\":\"\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"\",\"daily_rental_price\":\"\",\"monthly_rental_price\":\"\",\"insurance_status\":\"\",\"general_notes\":\"\",\"last_maintenance_date\":\"\",\"status\":\"0\"}', 302, '2026-06-08 11:36:30'),
+(575, 4, 0, 0, 6, 3, 'ادارة الاسطول', '6S5ZeL7R6AWkx92hrNG9pCuT8Y4ESCNT53R3zcVJFDIgbMKw', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 8, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"8\",\"type\":\"1\",\"equipment\":\"20\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-08\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"0\",\"shift_hours\":\"0\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 11:37:14'),
+(576, 4, 0, 0, 6, 3, 'ادارة الاسطول', '6S5ZeL7R6AWkx92hrNG9pCuT8Y4ESCNT53R3zcVJFDIgbMKw', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:38:37'),
+(577, 4, 0, 0, 5, 2, 'ادارة الموردين', 'opWqhHQ1zPF-cnNKafxIfUcPK8EUsECqHNuVatNFhtQchdZV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مصعب\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:38:46');
+INSERT INTO `activity_logs` (`id`, `company_id`, `project_id`, `contract_id`, `user_id`, `role_id`, `role_name`, `session_id`, `ip_address`, `user_agent`, `screen_name`, `module_name`, `action_type`, `button_name`, `field_name`, `record_id`, `old_value`, `new_value`, `url`, `http_method`, `request_payload`, `response_status`, `created_at`) VALUES
+(578, 4, 0, 0, 5, 2, 'ادارة الموردين', 'opWqhHQ1zPF-cnNKafxIfUcPK8EUsECqHNuVatNFhtQchdZV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=8', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-08 11:39:17'),
+(579, 4, 0, 0, 5, 2, 'ادارة الموردين', 'opWqhHQ1zPF-cnNKafxIfUcPK8EUsECqHNuVatNFhtQchdZV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=8', 'POST', '{\"contract_id\":\"6\"}', 200, '2026-06-08 11:39:18'),
+(580, 4, 0, 0, 5, 2, 'ادارة الموردين', 'opWqhHQ1zPF-cnNKafxIfUcPK8EUsECqHNuVatNFhtQchdZV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=8', 'POST', '{\"project_contract_id\":\"5\",\"supplier_contract_id\":\"6\"}', 200, '2026-06-08 11:39:18'),
+(581, 4, 0, 0, 5, 2, 'ادارة الموردين', 'opWqhHQ1zPF-cnNKafxIfUcPK8EUsECqHNuVatNFhtQchdZV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'update', 'update', NULL, 6, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=8', 'POST', '{\"id\":\"6\",\"supplier_id\":\"8\",\"project_id\":\"4\",\"project_contract_id\":\"5\",\"hours_monthly_target\":\"10\",\"forecasted_contracted_hours\":\"890\",\"contract_signing_date\":\"2026-04-26\",\"grace_period_days\":\"5\",\"actual_start\":\"2026-05-04\",\"actual_end\":\"2026-08-01\",\"contract_duration_days\":\"89\",\"price_currency_contract\":\"دولار\",\"paid_contract\":\"\",\"payment_time\":\" مؤخر\",\"guarantees\":\"\",\"payment_date\":\"2026-08-08\",\"equip_shifts_contract\":\"2\",\"shift_contract\":\"10\",\"equip_total_contract\":\"20\",\"total_contract_permonth\":\"600\",\"total_contract\":\"1800\",\"daily_operators\":\"1\",\"transportation\":\"مالك المعدة\",\"place_for_living\":\"مالك المشروع\",\"accommodation\":\"مالك المشروع\",\"workshop\":\"مالك المعدة\",\"equip_type_1\":\"3\",\"equip_size_1\":\"340\",\"equip_count_1\":\"2\",\"equip_count_basic_1\":\"1\",\"equip_count_backup_1\":\"1\",\"equip_operators_1\":\"\",\"equip_assistants_1\":\"1\",\"equip_shifts_1\":\"2\",\"shift1_start_1\":\"18:00:00\",\"shift1_end_1\":\"04:00:00\",\"shift2_start_1\":\"06:00:00\",\"shift2_end_1\":\"16:00:00\",\"equip_unit_1\":\"متر طولي\",\"shift_hours_1\":\"10.00\",\"equip_total_month_1\":\"10\",\"equip_target_per_month_1\":\"\",\"equip_total_contract_1\":\"890\",\"equip_price_currency_1\":\"دولار\",\"equip_price_1\":\"50.00\",\"equip_supervisors_1\":\"0\",\"equip_technicians_1\":\"0\",\"daily_work_hours\":\"20\",\"first_party\":\"\",\"second_party\":\"\",\"witness_one\":\"\",\"witness_two\":\"\"}', 200, '2026-06-08 11:39:43'),
+(582, 4, 0, 0, 5, 2, 'ادارة الموردين', 'opWqhHQ1zPF-cnNKafxIfUcPK8EUsECqHNuVatNFhtQchdZV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=8', 'POST', '{\"contract_id\":\"6\"}', 200, '2026-06-08 11:39:46'),
+(583, 4, 0, 0, 5, 2, 'ادارة الموردين', 'opWqhHQ1zPF-cnNKafxIfUcPK8EUsECqHNuVatNFhtQchdZV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=8', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-08 11:39:46'),
+(584, 4, 0, 0, 5, 2, 'ادارة الموردين', 'opWqhHQ1zPF-cnNKafxIfUcPK8EUsECqHNuVatNFhtQchdZV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=8', 'POST', '{\"project_contract_id\":\"5\",\"supplier_contract_id\":\"6\"}', 200, '2026-06-08 11:39:46'),
+(585, 4, 0, 0, 5, 2, 'ادارة الموردين', 'opWqhHQ1zPF-cnNKafxIfUcPK8EUsECqHNuVatNFhtQchdZV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:39:58'),
+(586, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'rYaDoqJ8gRoxsMdxpx0ARvkrgWvmn3UuOMOLbz826YHThTvb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:40:10'),
+(587, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'rYaDoqJ8gRoxsMdxpx0ARvkrgWvmn3UuOMOLbz826YHThTvb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 8, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"8\",\"type\":\"1\",\"equipment\":\"20\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-08\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"0\",\"shift_hours\":\"0\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 11:40:58'),
+(588, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'rYaDoqJ8gRoxsMdxpx0ARvkrgWvmn3UuOMOLbz826YHThTvb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 8, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"8\",\"type\":\"1\",\"equipment\":\"20\",\"equipment_category\":\"احتياطي\",\"start\":\"2026-06-08\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"100\",\"shift_hours\":\"10\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 11:41:31'),
+(589, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'rYaDoqJ8gRoxsMdxpx0ARvkrgWvmn3UuOMOLbz826YHThTvb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:42:30'),
+(590, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'PRgWUTjmu5ZuRfJEa2NI5HI0zgCXk1xFdkUmpv0qGV0KiUqh', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:42:33'),
+(591, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'PRgWUTjmu5ZuRfJEa2NI5HI0zgCXk1xFdkUmpv0qGV0KiUqh', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=20', 'POST', '{\"edit_id\":\"20\",\"suppliers\":\"8\",\"code\":\"tx10\",\"type\":\"3\",\"name\":\"tx10\",\"serial_number\":\"\",\"chassis_number\":\"\",\"machine_number\":\"\",\"manufacturer\":\"\",\"model\":\"\",\"manufacturing_year\":\"\",\"import_year\":\"\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"\",\"owner_type\":\"\",\"owner_phone\":\"\",\"owner_supplier_relation\":\"\",\"license_number\":\"\",\"license_authority\":\"\",\"document_type\":\"\",\"license_expiry_date\":\"\",\"inspection_certificate_number\":\"\",\"last_inspection_date\":\"\",\"current_location\":\"\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"\",\"daily_rental_price\":\"\",\"monthly_rental_price\":\"\",\"insurance_status\":\"\",\"general_notes\":\"\",\"last_maintenance_date\":\"\",\"status\":\"0\"}', 302, '2026-06-08 11:42:49'),
+(592, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'PRgWUTjmu5ZuRfJEa2NI5HI0zgCXk1xFdkUmpv0qGV0KiUqh', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'project_users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/project_users.php', 'POST', '{\"username\":\"يسن\",\"uid\":\"0\"}', 200, '2026-06-08 11:42:55'),
+(593, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'PRgWUTjmu5ZuRfJEa2NI5HI0zgCXk1xFdkUmpv0qGV0KiUqh', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 8, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"8\",\"type\":\"3\",\"equipment\":\"20\",\"equipment_category\":\"احتياطي\",\"start\":\"2026-06-08\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"100\",\"shift_hours\":\"9.99\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 11:43:27'),
+(594, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'PRgWUTjmu5ZuRfJEa2NI5HI0zgCXk1xFdkUmpv0qGV0KiUqh', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 8, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"8\",\"type\":\"3\",\"equipment\":\"20\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-08\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"0\",\"shift_hours\":\"0\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 11:45:26'),
+(595, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'PRgWUTjmu5ZuRfJEa2NI5HI0zgCXk1xFdkUmpv0qGV0KiUqh', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:46:44'),
+(596, 4, 0, 0, 5, 2, 'ادارة الموردين', 'pn7Br7zyiytlv,hpze8gzYc1oH6TqpFB9vSKzt456IcyShp,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مصعب\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:46:56'),
+(597, 4, 0, 0, 5, 2, 'ادارة الموردين', 'pn7Br7zyiytlv,hpze8gzYc1oH6TqpFB9vSKzt456IcyShp,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:47:52'),
+(598, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'JipM,l17J12L5MzWCk2uWyCmhyOQOJa7X4I1uy01S08rPJrA', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:48:02'),
+(599, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'JipM,l17J12L5MzWCk2uWyCmhyOQOJa7X4I1uy01S08rPJrA', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:48:33'),
+(600, 4, 0, 0, 5, 2, 'ادارة الموردين', 'eeJPE89zfJU7v2vC5USutA-tP229JrgXmAZaTKTh8Xp78SB7', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مصعب\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:48:38'),
+(601, 4, 0, 0, 5, 2, 'ادارة الموردين', 'eeJPE89zfJU7v2vC5USutA-tP229JrgXmAZaTKTh8Xp78SB7', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'suppliers', 'suppliers', 'delete', 'delete', NULL, 4, NULL, NULL, 'http://localhost/ems/Suppliers/suppliers.php', 'GET', '{\"delete_id\":\"4\"}', 302, '2026-06-08 11:48:53'),
+(602, 4, 0, 0, 5, 2, 'ادارة الموردين', 'eeJPE89zfJU7v2vC5USutA-tP229JrgXmAZaTKTh8Xp78SB7', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:49:13'),
+(603, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'ZtIQ2Nt3lx3wgCYhNF74Zbm4mXZebN2zAsshDfrVJTDbcdNP', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:49:24'),
+(604, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'ZtIQ2Nt3lx3wgCYhNF74Zbm4mXZebN2zAsshDfrVJTDbcdNP', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=14', 'POST', '{\"edit_id\":\"14\",\"suppliers\":\"7\",\"code\":\"tq10\",\"type\":\"2\",\"name\":\"tq10\",\"serial_number\":\"\",\"chassis_number\":\"\",\"machine_number\":\"\",\"manufacturer\":\"\",\"model\":\"\",\"manufacturing_year\":\"\",\"import_year\":\"\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"\",\"owner_type\":\"\",\"owner_phone\":\"\",\"owner_supplier_relation\":\"\",\"license_number\":\"\",\"license_authority\":\"\",\"document_type\":\"\",\"license_expiry_date\":\"\",\"inspection_certificate_number\":\"\",\"last_inspection_date\":\"\",\"current_location\":\"\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"\",\"daily_rental_price\":\"\",\"monthly_rental_price\":\"\",\"insurance_status\":\"\",\"general_notes\":\"\",\"last_maintenance_date\":\"\",\"status\":\"0\"}', 302, '2026-06-08 11:49:44'),
+(605, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'ZtIQ2Nt3lx3wgCYhNF74Zbm4mXZebN2zAsshDfrVJTDbcdNP', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=13', 'POST', '{\"edit_id\":\"13\",\"suppliers\":\"7\",\"code\":\"H1\",\"type\":\"3\",\"name\":\"h1\",\"serial_number\":\"\",\"chassis_number\":\"\",\"machine_number\":\"\",\"manufacturer\":\"\",\"model\":\"\",\"manufacturing_year\":\"\",\"import_year\":\"\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"\",\"owner_type\":\"\",\"owner_phone\":\"\",\"owner_supplier_relation\":\"\",\"license_number\":\"\",\"license_authority\":\"\",\"document_type\":\"\",\"license_expiry_date\":\"\",\"inspection_certificate_number\":\"\",\"last_inspection_date\":\"\",\"current_location\":\"\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"\",\"daily_rental_price\":\"\",\"monthly_rental_price\":\"\",\"insurance_status\":\"\",\"general_notes\":\"\",\"last_maintenance_date\":\"\",\"status\":\"0\"}', 302, '2026-06-08 11:49:58'),
+(606, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'ZtIQ2Nt3lx3wgCYhNF74Zbm4mXZebN2zAsshDfrVJTDbcdNP', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=12', 'POST', '{\"edit_id\":\"12\",\"suppliers\":\"7\",\"code\":\"DM01\",\"type\":\"3\",\"name\":\"Drill Machine\",\"serial_number\":\"20251101\",\"chassis_number\":\"20251101\",\"machine_number\":\"DTH Drilling RIG ADET D3\",\"manufacturer\":\"ADET\",\"model\":\"DTH Drilling RIG ADET D3\",\"manufacturing_year\":\"2025\",\"import_year\":\"2024\",\"equipment_condition\":\"جديدة (لم تستخدم)\",\"operating_hours\":\"\",\"engine_condition\":\"ممتازة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"شركة إكوبيشن للإستثمار المحدودة\",\"owner_type\":\"شركة متخصصة\",\"owner_phone\":\"249912345678\",\"owner_supplier_relation\":\"مالك مباشر (يتعاقد معنا مباشرة)\",\"license_number\":\"PZUN02021016811\",\"license_authority\":\"الجمارك\",\"document_type\":\"شهادة وارد\",\"license_expiry_date\":\"2026-05-07\",\"inspection_certificate_number\":\"\",\"last_inspection_date\":\"2026-05-07\",\"current_location\":\"الشركة الروسية\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"100000.00\",\"daily_rental_price\":\"\",\"monthly_rental_price\":\"\",\"insurance_status\":\"\",\"general_notes\":\"\",\"last_maintenance_date\":\"\",\"status\":\"0\"}', 302, '2026-06-08 11:50:14'),
+(607, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'ZtIQ2Nt3lx3wgCYhNF74Zbm4mXZebN2zAsshDfrVJTDbcdNP', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=5', 'POST', '{\"edit_id\":\"5\",\"suppliers\":\"8\",\"code\":\"EX26\",\"type\":\"1\",\"name\":\"HMK220LC-2\",\"serial_number\":\"6D16-A73071\",\"chassis_number\":\"HMKH2520V0J125053\",\"machine_number\":\"\",\"manufacturer\":\"HIDROMEK\",\"model\":\"HMK220LC-2\",\"manufacturing_year\":\"2019\",\"import_year\":\"2019\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"12000\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"EQUIPATION\",\"owner_type\":\"\",\"owner_phone\":\"249912345678\",\"owner_supplier_relation\":\"\",\"license_number\":\"PZUS02019024755\",\"license_authority\":\"الجمارك\",\"document_type\":\"\",\"license_expiry_date\":\"2019-11-23\",\"inspection_certificate_number\":\"1319126\",\"last_inspection_date\":\"2021-10-15\",\"current_location\":\"الشركة الروسية\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"95000.01\",\"daily_rental_price\":\"800.00\",\"monthly_rental_price\":\"24000.00\",\"insurance_status\":\"\",\"general_notes\":\"\",\"last_maintenance_date\":\"2026-04-10\",\"status\":\"0\"}', 302, '2026-06-08 11:50:31'),
+(608, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'ZtIQ2Nt3lx3wgCYhNF74Zbm4mXZebN2zAsshDfrVJTDbcdNP', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:50:38'),
+(609, 4, 0, 0, 5, 2, 'ادارة الموردين', 'uqu-hPrNlSl6DDK1ixcvXotlwMC3KCMeyMqm5ldFtK0ruqJK', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مصعب\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:50:46'),
+(610, 4, 0, 0, 5, 2, 'ادارة الموردين', 'uqu-hPrNlSl6DDK1ixcvXotlwMC3KCMeyMqm5ldFtK0ruqJK', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'suppliers', 'suppliers', 'delete', 'delete', NULL, 4, NULL, NULL, 'http://localhost/ems/Suppliers/suppliers.php', 'GET', '{\"delete_id\":\"4\"}', 302, '2026-06-08 11:50:55'),
+(611, 4, 0, 0, 5, 2, 'ادارة الموردين', 'uqu-hPrNlSl6DDK1ixcvXotlwMC3KCMeyMqm5ldFtK0ruqJK', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:51:31'),
+(612, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3wJd1HppnINuvJj5I-t-V2Bp4Ryjs5mApSg,bTj4G7pBb6,J', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:51:36'),
+(613, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3wJd1HppnINuvJj5I-t-V2Bp4Ryjs5mApSg,bTj4G7pBb6,J', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:52:02'),
+(614, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'Fy6SHk27sMvCAO,P9Q5MbCkLsByQPebN,af91t0abHqRKaNg', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:52:04'),
+(615, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'Fy6SHk27sMvCAO,P9Q5MbCkLsByQPebN,af91t0abHqRKaNg', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=8', 'POST', '{\"edit_id\":\"8\",\"suppliers\":\"5\",\"code\":\"EX22\",\"type\":\"1\",\"name\":\"HX 340 SL\",\"serial_number\":\"82463818\",\"chassis_number\":\"HHKHE944CN0000360\",\"machine_number\":\"\",\"manufacturer\":\"HYUNDAI\",\"model\":\"HX340SL\",\"manufacturing_year\":\"2022\",\"import_year\":\"2022\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"10000\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"EQUIPATION\",\"owner_type\":\"أخرى\",\"owner_phone\":\"249912345678\",\"owner_supplier_relation\":\"\",\"license_number\":\"PZUN02021014933\",\"license_authority\":\"الجمارك\",\"document_type\":\"\",\"license_expiry_date\":\"0001-01-01\",\"inspection_certificate_number\":\"\",\"last_inspection_date\":\"\",\"current_location\":\"نورايا\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"180000.00\",\"daily_rental_price\":\"800.00\",\"monthly_rental_price\":\"24000.00\",\"insurance_status\":\"مؤمن بالكامل\",\"general_notes\":\"\",\"last_maintenance_date\":\"2026-05-04\",\"status\":\"0\"}', 302, '2026-06-08 11:52:24'),
+(616, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'Fy6SHk27sMvCAO,P9Q5MbCkLsByQPebN,af91t0abHqRKaNg', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:52:33'),
+(617, 4, 0, 0, 5, 2, 'ادارة الموردين', '04Pu6Xpb7JrKqb13QGJ2Rkzjju54NLpx1e-hfVcoT0mVHcif', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مصعب\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:52:39'),
+(618, 4, 0, 0, 5, 2, 'ادارة الموردين', '04Pu6Xpb7JrKqb13QGJ2Rkzjju54NLpx1e-hfVcoT0mVHcif', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'suppliers', 'suppliers', 'delete', 'delete', NULL, 4, NULL, NULL, 'http://localhost/ems/Suppliers/suppliers.php', 'GET', '{\"delete_id\":\"4\"}', 302, '2026-06-08 11:52:46'),
+(619, 4, 0, 0, 5, 2, 'ادارة الموردين', '04Pu6Xpb7JrKqb13QGJ2Rkzjju54NLpx1e-hfVcoT0mVHcif', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:52:51'),
+(620, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'r3v3w0wWgO8ZG3z0flhyldmz7hBLM4ik,FR7S74OhJHXRiMc', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:52:58'),
+(621, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'r3v3w0wWgO8ZG3z0flhyldmz7hBLM4ik,FR7S74OhJHXRiMc', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=17', 'POST', '{\"edit_id\":\"17\",\"suppliers\":\"7\",\"code\":\"EQP-00201-2\",\"type\":\"1\",\"name\":\"EXC\",\"serial_number\":\"EXC-2024-001\",\"chassis_number\":\"CAT320-ABC123456\",\"machine_number\":\"\",\"manufacturer\":\"كاتربيلر\",\"model\":\"320D\",\"manufacturing_year\":\"2018\",\"import_year\":\"2020\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"5400\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"محمد علي أحمد\",\"owner_type\":\"مالك فردي\",\"owner_phone\":\"249912345678\",\"owner_supplier_relation\":\"تابع للمورد (مملوكة للمورد نفسه)\",\"license_number\":\"VEH-2024-12345\",\"license_authority\":\"المرور\",\"document_type\":\"\",\"license_expiry_date\":\"2025-12-31\",\"inspection_certificate_number\":\"INS-2024-001\",\"last_inspection_date\":\"2024-06-15\",\"current_location\":\"منجم الذهب الشرقي\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"150000.00\",\"daily_rental_price\":\"500.00\",\"monthly_rental_price\":\"10000.00\",\"insurance_status\":\"مؤمن بالكامل\",\"general_notes\":\"معدة موثوقة، تحتاج صيانة دورية\",\"last_maintenance_date\":\"2024-05-10\",\"status\":\"0\"}', 302, '2026-06-08 11:54:09'),
+(622, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'r3v3w0wWgO8ZG3z0flhyldmz7hBLM4ik,FR7S74OhJHXRiMc', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=16', 'POST', '{\"edit_id\":\"16\",\"suppliers\":\"7\",\"code\":\"EQP-02001\",\"type\":\"1\",\"name\":\"EXC\",\"serial_number\":\"EXC-2024-001\",\"chassis_number\":\"CAT320-ABC123456\",\"machine_number\":\"\",\"manufacturer\":\"كاتربيلر\",\"model\":\"320D\",\"manufacturing_year\":\"2018\",\"import_year\":\"2020\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"5400\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"محمد علي أحمد\",\"owner_type\":\"مالك فردي\",\"owner_phone\":\"249912345678\",\"owner_supplier_relation\":\"تابع للمورد (مملوكة للمورد نفسه)\",\"license_number\":\"VEH-2024-12345\",\"license_authority\":\"المرور\",\"document_type\":\"\",\"license_expiry_date\":\"2025-12-31\",\"inspection_certificate_number\":\"INS-2024-001\",\"last_inspection_date\":\"2024-06-15\",\"current_location\":\"منجم الذهب الشرقي\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"150000.00\",\"daily_rental_price\":\"500.00\",\"monthly_rental_price\":\"10000.00\",\"insurance_status\":\"مؤمن بالكامل\",\"general_notes\":\"معدة موثوقة، تحتاج صيانة دورية\",\"last_maintenance_date\":\"2024-05-10\",\"status\":\"0\"}', 302, '2026-06-08 11:54:20'),
+(623, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'r3v3w0wWgO8ZG3z0flhyldmz7hBLM4ik,FR7S74OhJHXRiMc', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 7, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"4\",\"supplier_id\":\"7\",\"type\":\"1\",\"equipment\":\"16\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-08\",\"end\":\"2027-02-19\",\"hours\":\"0\",\"total_equipment_hours\":\"100\",\"shift_hours\":\"10\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 11:55:04'),
+(624, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'r3v3w0wWgO8ZG3z0flhyldmz7hBLM4ik,FR7S74OhJHXRiMc', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 7, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"4\",\"supplier_id\":\"7\",\"type\":\"1\",\"equipment\":\"16\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-08\",\"end\":\"2027-02-19\",\"hours\":\"0\",\"total_equipment_hours\":\"0\",\"shift_hours\":\"0\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 11:56:11'),
+(625, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'r3v3w0wWgO8ZG3z0flhyldmz7hBLM4ik,FR7S74OhJHXRiMc', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 11:56:41'),
+(626, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مصعب\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 11:56:49'),
+(627, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-08 11:57:41'),
+(628, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php', 'POST', '{\"contract_id\":\"7\"}', 200, '2026-06-08 11:57:41'),
+(629, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php', 'POST', '{\"project_contract_id\":\"4\",\"supplier_contract_id\":\"7\"}', 200, '2026-06-08 11:57:41'),
+(630, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'update', 'update', NULL, 7, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php', 'POST', '{\"id\":\"7\",\"supplier_id\":\"7\",\"project_id\":\"4\",\"project_contract_id\":\"4\",\"hours_monthly_target\":\"60\",\"forecasted_contracted_hours\":\"2160\",\"contract_signing_date\":\"2026-05-01\",\"grace_period_days\":\"2\",\"actual_start\":\"2026-07-09\",\"actual_end\":\"2026-08-14\",\"contract_duration_days\":\"36\",\"price_currency_contract\":\"دولار\",\"paid_contract\":\"2000\",\"payment_time\":\"مقدم\",\"guarantees\":\"\",\"payment_date\":\"\",\"equip_shifts_contract\":\"0\",\"shift_contract\":\"0\",\"equip_total_contract\":\"0\",\"total_contract_permonth\":\"0\",\"total_contract\":\"0\",\"daily_operators\":\"0\",\"transportation\":\"\",\"place_for_living\":\"\",\"accommodation\":\"\",\"workshop\":\"\",\"equip_type_1\":\"1\",\"equip_size_1\":\"56\",\"equip_count_1\":\"5\",\"equip_count_basic_1\":\"3\",\"equip_count_backup_1\":\"0\",\"equip_operators_1\":\"\",\"equip_assistants_1\":\"0\",\"equip_shifts_1\":\"2\",\"shift1_start_1\":\"00:00:00\",\"shift1_end_1\":\"00:00:00\",\"shift2_start_1\":\"00:00:00\",\"shift2_end_1\":\"00:00:00\",\"equip_unit_1\":\"\",\"shift_hours_1\":\"20.00\",\"equip_total_month_1\":\"60\",\"equip_target_per_month_1\":\"\",\"equip_total_contract_1\":\"2160\",\"equip_price_currency_1\":\"\",\"equip_price_1\":\"0.00\",\"equip_supervisors_1\":\"0\",\"equip_technicians_1\":\"0\",\"daily_work_hours\":\"20\",\"first_party\":\"\",\"second_party\":\"\",\"witness_one\":\"\",\"witness_two\":\"\"}', 200, '2026-06-08 11:57:56'),
+(631, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-08 11:59:17'),
+(632, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"contract_id\":\"7\"}', 200, '2026-06-08 11:59:17'),
+(633, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_contract_id\":\"4\",\"supplier_contract_id\":\"7\"}', 200, '2026-06-08 11:59:17'),
+(634, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'update', 'update', NULL, 7, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"id\":\"7\",\"supplier_id\":\"7\",\"project_id\":\"4\",\"project_contract_id\":\"4\",\"hours_monthly_target\":\"60\",\"forecasted_contracted_hours\":\"2160\",\"contract_signing_date\":\"2026-05-01\",\"grace_period_days\":\"2\",\"actual_start\":\"2026-07-09\",\"actual_end\":\"2026-08-14\",\"contract_duration_days\":\"36\",\"price_currency_contract\":\"دولار\",\"paid_contract\":\"2000\",\"payment_time\":\"مقدم\",\"guarantees\":\"\",\"payment_date\":\"\",\"equip_shifts_contract\":\"0\",\"shift_contract\":\"0\",\"equip_total_contract\":\"0\",\"total_contract_permonth\":\"0\",\"total_contract\":\"0\",\"daily_operators\":\"0\",\"transportation\":\"\",\"place_for_living\":\"\",\"accommodation\":\"\",\"workshop\":\"\",\"equip_type_1\":\"1\",\"equip_size_1\":\"56\",\"equip_count_1\":\"5\",\"equip_count_basic_1\":\"3\",\"equip_count_backup_1\":\"1\",\"equip_operators_1\":\"2\",\"equip_assistants_1\":\"2\",\"equip_shifts_1\":\"2\",\"shift1_start_1\":\"00:00:00\",\"shift1_end_1\":\"00:00:00\",\"shift2_start_1\":\"00:00:00\",\"shift2_end_1\":\"00:00:00\",\"equip_unit_1\":\"\",\"shift_hours_1\":\"20.00\",\"equip_total_month_1\":\"60\",\"equip_target_per_month_1\":\"\",\"equip_total_contract_1\":\"2160\",\"equip_price_currency_1\":\"\",\"equip_price_1\":\"0.00\",\"equip_supervisors_1\":\"2\",\"equip_technicians_1\":\"0\",\"daily_work_hours\":\"20\",\"first_party\":\"\",\"second_party\":\"\",\"witness_one\":\"\",\"witness_two\":\"\"}', 200, '2026-06-08 12:00:22'),
+(635, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-08 12:04:27'),
+(636, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"contract_id\":\"7\"}', 200, '2026-06-08 12:04:27'),
+(637, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_contract_id\":\"4\",\"supplier_contract_id\":\"7\"}', 200, '2026-06-08 12:04:27'),
+(638, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'update', 'update', NULL, 7, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"id\":\"7\",\"supplier_id\":\"7\",\"project_id\":\"4\",\"project_contract_id\":\"4\",\"hours_monthly_target\":\"60\",\"forecasted_contracted_hours\":\"2160\",\"contract_signing_date\":\"2026-05-01\",\"grace_period_days\":\"2\",\"actual_start\":\"2026-07-09\",\"actual_end\":\"2026-08-14\",\"contract_duration_days\":\"36\",\"price_currency_contract\":\"دولار\",\"paid_contract\":\"2000\",\"payment_time\":\"مقدم\",\"guarantees\":\"\",\"payment_date\":\"\",\"equip_shifts_contract\":\"0\",\"shift_contract\":\"0\",\"equip_total_contract\":\"0\",\"total_contract_permonth\":\"0\",\"total_contract\":\"0\",\"daily_operators\":\"0\",\"transportation\":\"\",\"place_for_living\":\"\",\"accommodation\":\"\",\"workshop\":\"\",\"equip_type_1\":\"1\",\"equip_size_1\":\"56\",\"equip_count_1\":\"5\",\"equip_count_basic_1\":\"3\",\"equip_count_backup_1\":\"1\",\"equip_operators_1\":\"\",\"equip_assistants_1\":\"2\",\"equip_shifts_1\":\"2\",\"shift1_start_1\":\"00:00:00\",\"shift1_end_1\":\"00:00:00\",\"shift2_start_1\":\"00:00:00\",\"shift2_end_1\":\"00:00:00\",\"equip_unit_1\":\"\",\"shift_hours_1\":\"20.00\",\"equip_total_month_1\":\"60\",\"equip_target_per_month_1\":\"\",\"equip_total_contract_1\":\"2160\",\"equip_price_currency_1\":\"\",\"equip_price_1\":\"0.00\",\"equip_supervisors_1\":\"2\",\"equip_technicians_1\":\"0\",\"daily_work_hours\":\"20\",\"first_party\":\"\",\"second_party\":\"\",\"witness_one\":\"\",\"witness_two\":\"\"}', 200, '2026-06-08 12:04:40'),
+(639, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-08 12:04:59'),
+(640, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"contract_id\":\"7\"}', 200, '2026-06-08 12:04:59'),
+(641, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_contract_id\":\"4\",\"supplier_contract_id\":\"7\"}', 200, '2026-06-08 12:04:59'),
+(642, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'update', 'update', NULL, 7, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"id\":\"7\",\"supplier_id\":\"7\",\"project_id\":\"4\",\"project_contract_id\":\"4\",\"hours_monthly_target\":\"60\",\"forecasted_contracted_hours\":\"2160\",\"contract_signing_date\":\"2026-05-01\",\"grace_period_days\":\"2\",\"actual_start\":\"2026-07-09\",\"actual_end\":\"2026-08-14\",\"contract_duration_days\":\"36\",\"price_currency_contract\":\"دولار\",\"paid_contract\":\"2000\",\"payment_time\":\"مقدم\",\"guarantees\":\"\",\"payment_date\":\"\",\"equip_shifts_contract\":\"0\",\"shift_contract\":\"0\",\"equip_total_contract\":\"0\",\"total_contract_permonth\":\"0\",\"total_contract\":\"0\",\"daily_operators\":\"0\",\"transportation\":\"\",\"place_for_living\":\"\",\"accommodation\":\"\",\"workshop\":\"\",\"equip_type_1\":\"1\",\"equip_size_1\":\"56\",\"equip_count_1\":\"5\",\"equip_count_basic_1\":\"3\",\"equip_count_backup_1\":\"2\",\"equip_operators_1\":\"2\",\"equip_assistants_1\":\"2\",\"equip_shifts_1\":\"2\",\"shift1_start_1\":\"00:00:00\",\"shift1_end_1\":\"00:00:00\",\"shift2_start_1\":\"00:00:00\",\"shift2_end_1\":\"00:00:00\",\"equip_unit_1\":\"\",\"shift_hours_1\":\"20.00\",\"equip_total_month_1\":\"60\",\"equip_target_per_month_1\":\"\",\"equip_total_contract_1\":\"2160\",\"equip_price_currency_1\":\"\",\"equip_price_1\":\"0.00\",\"equip_supervisors_1\":\"2\",\"equip_technicians_1\":\"0\",\"daily_work_hours\":\"20\",\"first_party\":\"\",\"second_party\":\"\",\"witness_one\":\"\",\"witness_two\":\"\"}', 200, '2026-06-08 12:05:16'),
+(643, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-08 12:05:30'),
+(644, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"contract_id\":\"7\"}', 200, '2026-06-08 12:05:30'),
+(645, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_contract_id\":\"4\",\"supplier_contract_id\":\"7\"}', 200, '2026-06-08 12:05:30'),
+(646, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'update', 'update', NULL, 7, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"id\":\"7\",\"supplier_id\":\"7\",\"project_id\":\"4\",\"project_contract_id\":\"4\",\"hours_monthly_target\":\"60\",\"forecasted_contracted_hours\":\"2160\",\"contract_signing_date\":\"2026-05-01\",\"grace_period_days\":\"2\",\"actual_start\":\"2026-07-09\",\"actual_end\":\"2026-08-14\",\"contract_duration_days\":\"36\",\"price_currency_contract\":\"دولار\",\"paid_contract\":\"2000\",\"payment_time\":\"مقدم\",\"guarantees\":\"\",\"payment_date\":\"\",\"equip_shifts_contract\":\"0\",\"shift_contract\":\"0\",\"equip_total_contract\":\"0\",\"total_contract_permonth\":\"0\",\"total_contract\":\"0\",\"daily_operators\":\"0\",\"transportation\":\"\",\"place_for_living\":\"\",\"accommodation\":\"\",\"workshop\":\"\",\"equip_type_1\":\"1\",\"equip_size_1\":\"56\",\"equip_count_1\":\"5\",\"equip_count_basic_1\":\"3\",\"equip_count_backup_1\":\"2\",\"equip_operators_1\":\"0\",\"equip_assistants_1\":\"2\",\"equip_shifts_1\":\"2\",\"shift1_start_1\":\"00:00:00\",\"shift1_end_1\":\"00:00:00\",\"shift2_start_1\":\"00:00:00\",\"shift2_end_1\":\"00:00:00\",\"equip_unit_1\":\"\",\"shift_hours_1\":\"20.00\",\"equip_total_month_1\":\"60\",\"equip_target_per_month_1\":\"\",\"equip_total_contract_1\":\"2160\",\"equip_price_currency_1\":\"\",\"equip_price_1\":\"0.00\",\"equip_supervisors_1\":\"2\",\"equip_technicians_1\":\"0\",\"daily_work_hours\":\"20\",\"first_party\":\"\",\"second_party\":\"\",\"witness_one\":\"\",\"witness_two\":\"\"}', 200, '2026-06-08 12:05:42'),
+(647, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-08 12:05:45'),
+(648, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"contract_id\":\"7\"}', 200, '2026-06-08 12:05:45'),
+(649, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_contract_id\":\"4\",\"supplier_contract_id\":\"7\"}', 200, '2026-06-08 12:05:45'),
+(650, 4, 0, 0, 5, 2, 'ادارة الموردين', '72U4A,KDM6MInOBgenxD8,ABfSi2,PWE4lD3SalS3psRQwS6', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 12:06:02'),
+(651, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'WLXUSKlmB71qEDEX3X,DptiGcc4-02Us0MVMwHYBzI6hT,bT', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 12:06:13');
+INSERT INTO `activity_logs` (`id`, `company_id`, `project_id`, `contract_id`, `user_id`, `role_id`, `role_name`, `session_id`, `ip_address`, `user_agent`, `screen_name`, `module_name`, `action_type`, `button_name`, `field_name`, `record_id`, `old_value`, `new_value`, `url`, `http_method`, `request_payload`, `response_status`, `created_at`) VALUES
+(652, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'WLXUSKlmB71qEDEX3X,DptiGcc4-02Us0MVMwHYBzI6hT,bT', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 7, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"4\",\"supplier_id\":\"7\",\"type\":\"1\",\"equipment\":\"16\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-08\",\"end\":\"2027-02-19\",\"hours\":\"0\",\"total_equipment_hours\":\"10\",\"shift_hours\":\"10\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 12:07:18'),
+(653, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'WLXUSKlmB71qEDEX3X,DptiGcc4-02Us0MVMwHYBzI6hT,bT', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 12:08:09'),
+(654, 4, 0, 0, 5, 2, 'ادارة الموردين', 'GQZxGuwtLK5XX3A-Ri9uZfmJuxM3Y2Ul2g8c4mx9G95CvuYm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مصعب\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 12:08:15'),
+(655, 4, 0, 0, 5, 2, 'ادارة الموردين', 'GQZxGuwtLK5XX3A-Ri9uZfmJuxM3Y2Ul2g8c4mx9G95CvuYm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-08 12:08:21'),
+(656, 4, 0, 0, 5, 2, 'ادارة الموردين', 'GQZxGuwtLK5XX3A-Ri9uZfmJuxM3Y2Ul2g8c4mx9G95CvuYm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php', 'POST', '{\"contract_id\":\"7\"}', 200, '2026-06-08 12:08:21'),
+(657, 4, 0, 0, 5, 2, 'ادارة الموردين', 'GQZxGuwtLK5XX3A-Ri9uZfmJuxM3Y2Ul2g8c4mx9G95CvuYm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php', 'POST', '{\"project_contract_id\":\"4\",\"supplier_contract_id\":\"7\"}', 200, '2026-06-08 12:08:21'),
+(658, 4, 0, 0, 5, 2, 'ادارة الموردين', 'GQZxGuwtLK5XX3A-Ri9uZfmJuxM3Y2Ul2g8c4mx9G95CvuYm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'update', 'update', NULL, 7, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php', 'POST', '{\"id\":\"7\",\"supplier_id\":\"7\",\"project_id\":\"4\",\"project_contract_id\":\"4\",\"hours_monthly_target\":\"80\",\"forecasted_contracted_hours\":\"2880\",\"contract_signing_date\":\"2026-05-01\",\"grace_period_days\":\"2\",\"actual_start\":\"2026-07-09\",\"actual_end\":\"2026-08-14\",\"contract_duration_days\":\"36\",\"price_currency_contract\":\"دولار\",\"paid_contract\":\"2000\",\"payment_time\":\"مقدم\",\"guarantees\":\"\",\"payment_date\":\"\",\"equip_shifts_contract\":\"0\",\"shift_contract\":\"0\",\"equip_total_contract\":\"0\",\"total_contract_permonth\":\"0\",\"total_contract\":\"0\",\"daily_operators\":\"0\",\"transportation\":\"\",\"place_for_living\":\"\",\"accommodation\":\"\",\"workshop\":\"\",\"equip_type_1\":\"1\",\"equip_size_1\":\"56\",\"equip_count_1\":\"6\",\"equip_count_basic_1\":\"4\",\"equip_count_backup_1\":\"2\",\"equip_operators_1\":\"\",\"equip_assistants_1\":\"2\",\"equip_shifts_1\":\"2\",\"shift1_start_1\":\"00:00:00\",\"shift1_end_1\":\"00:00:00\",\"shift2_start_1\":\"00:00:00\",\"shift2_end_1\":\"00:00:00\",\"equip_unit_1\":\"\",\"shift_hours_1\":\"20.00\",\"equip_total_month_1\":\"80\",\"equip_target_per_month_1\":\"\",\"equip_total_contract_1\":\"2880\",\"equip_price_currency_1\":\"\",\"equip_price_1\":\"0.00\",\"equip_supervisors_1\":\"2\",\"equip_technicians_1\":\"0\",\"daily_work_hours\":\"20\",\"first_party\":\"\",\"second_party\":\"\",\"witness_one\":\"\",\"witness_two\":\"\"}', 200, '2026-06-08 12:08:50'),
+(659, 4, 0, 0, 5, 2, 'ادارة الموردين', 'GQZxGuwtLK5XX3A-Ri9uZfmJuxM3Y2Ul2g8c4mx9G95CvuYm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-08 12:09:05'),
+(660, 4, 0, 0, 5, 2, 'ادارة الموردين', 'GQZxGuwtLK5XX3A-Ri9uZfmJuxM3Y2Ul2g8c4mx9G95CvuYm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"contract_id\":\"7\"}', 200, '2026-06-08 12:09:05'),
+(661, 4, 0, 0, 5, 2, 'ادارة الموردين', 'GQZxGuwtLK5XX3A-Ri9uZfmJuxM3Y2Ul2g8c4mx9G95CvuYm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"project_contract_id\":\"4\",\"supplier_contract_id\":\"7\"}', 200, '2026-06-08 12:09:05'),
+(662, 4, 0, 0, 5, 2, 'ادارة الموردين', 'GQZxGuwtLK5XX3A-Ri9uZfmJuxM3Y2Ul2g8c4mx9G95CvuYm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'supplierscontracts', 'suppliers', 'update', 'update', NULL, 7, NULL, NULL, 'http://localhost/ems/Suppliers/supplierscontracts.php?id=7', 'POST', '{\"id\":\"7\",\"supplier_id\":\"7\",\"project_id\":\"4\",\"project_contract_id\":\"4\",\"hours_monthly_target\":\"80\",\"forecasted_contracted_hours\":\"2880\",\"contract_signing_date\":\"2026-05-01\",\"grace_period_days\":\"2\",\"actual_start\":\"2026-07-09\",\"actual_end\":\"2026-08-14\",\"contract_duration_days\":\"36\",\"price_currency_contract\":\"دولار\",\"paid_contract\":\"2000\",\"payment_time\":\"مقدم\",\"guarantees\":\"\",\"payment_date\":\"\",\"equip_shifts_contract\":\"0\",\"shift_contract\":\"0\",\"equip_total_contract\":\"0\",\"total_contract_permonth\":\"0\",\"total_contract\":\"0\",\"daily_operators\":\"0\",\"transportation\":\"\",\"place_for_living\":\"\",\"accommodation\":\"\",\"workshop\":\"\",\"equip_type_1\":\"1\",\"equip_size_1\":\"56\",\"equip_count_1\":\"6\",\"equip_count_basic_1\":\"4\",\"equip_count_backup_1\":\"2\",\"equip_operators_1\":\"2\",\"equip_assistants_1\":\"2\",\"equip_shifts_1\":\"2\",\"shift1_start_1\":\"00:00:00\",\"shift1_end_1\":\"00:00:00\",\"shift2_start_1\":\"00:00:00\",\"shift2_end_1\":\"00:00:00\",\"equip_unit_1\":\"\",\"shift_hours_1\":\"20.00\",\"equip_total_month_1\":\"80\",\"equip_target_per_month_1\":\"\",\"equip_total_contract_1\":\"2880\",\"equip_price_currency_1\":\"\",\"equip_price_1\":\"0.00\",\"equip_supervisors_1\":\"2\",\"equip_technicians_1\":\"0\",\"daily_work_hours\":\"20\",\"first_party\":\"\",\"second_party\":\"\",\"witness_one\":\"\",\"witness_two\":\"\"}', 200, '2026-06-08 12:09:29'),
+(663, 4, 0, 0, 5, 2, 'ادارة الموردين', 'GQZxGuwtLK5XX3A-Ri9uZfmJuxM3Y2Ul2g8c4mx9G95CvuYm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 12:09:37'),
+(664, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'lM-CWzPvcz-SXz,aPURR1d1uUlFfUjBgyD4fNzNXRQrq7,Oo', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 12:09:45'),
+(665, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'lM-CWzPvcz-SXz,aPURR1d1uUlFfUjBgyD4fNzNXRQrq7,Oo', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 7, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"4\",\"supplier_id\":\"7\",\"type\":\"1\",\"equipment\":\"16\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-09\",\"end\":\"2027-02-19\",\"hours\":\"0\",\"total_equipment_hours\":\"100\",\"shift_hours\":\"10\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 12:10:43'),
+(666, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'lM-CWzPvcz-SXz,aPURR1d1uUlFfUjBgyD4fNzNXRQrq7,Oo', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=13', 'POST', '{\"edit_id\":\"13\",\"suppliers\":\"8\",\"code\":\"H1\",\"type\":\"3\",\"name\":\"h1\",\"serial_number\":\"\",\"chassis_number\":\"\",\"machine_number\":\"\",\"manufacturer\":\"\",\"model\":\"\",\"manufacturing_year\":\"\",\"import_year\":\"\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"\",\"owner_type\":\"\",\"owner_phone\":\"\",\"owner_supplier_relation\":\"\",\"license_number\":\"\",\"license_authority\":\"\",\"document_type\":\"\",\"license_expiry_date\":\"\",\"inspection_certificate_number\":\"\",\"last_inspection_date\":\"\",\"current_location\":\"\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"\",\"daily_rental_price\":\"\",\"monthly_rental_price\":\"\",\"insurance_status\":\"\",\"general_notes\":\"\",\"last_maintenance_date\":\"\",\"status\":\"0\"}', 302, '2026-06-08 12:13:17'),
+(667, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'lM-CWzPvcz-SXz,aPURR1d1uUlFfUjBgyD4fNzNXRQrq7,Oo', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 12:18:14'),
+(668, 4, 0, 0, 5, 2, 'ادارة الموردين', 'K589GtGxYD3QMVgw-3GPQ5qpHhD1vJtpTZ0OJfVOQGFk6VZK', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مصعب\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 12:18:22'),
+(669, 4, 0, 0, 5, 2, 'ادارة الموردين', 'K589GtGxYD3QMVgw-3GPQ5qpHhD1vJtpTZ0OJfVOQGFk6VZK', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 12:18:55'),
+(670, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'tNlbbm423muAhsJ1ynsqCWoaG4TRyKlxEuWN2W4JV1yjS3Op', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 12:19:00'),
+(671, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'tNlbbm423muAhsJ1ynsqCWoaG4TRyKlxEuWN2W4JV1yjS3Op', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 7, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"4\",\"supplier_id\":\"7\",\"type\":\"1\",\"equipment\":\"16\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-08\",\"end\":\"2027-02-19\",\"hours\":\"0\",\"total_equipment_hours\":\"200\",\"shift_hours\":\"10\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 12:26:34'),
+(672, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'tNlbbm423muAhsJ1ynsqCWoaG4TRyKlxEuWN2W4JV1yjS3Op', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 7, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"4\",\"supplier_id\":\"7\",\"type\":\"1\",\"equipment\":\"17\",\"equipment_category\":\"احتياطي\",\"start\":\"2026-06-02\",\"end\":\"2027-02-19\",\"hours\":\"0\",\"total_equipment_hours\":\"10\",\"shift_hours\":\"20\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 12:29:27'),
+(673, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'tNlbbm423muAhsJ1ynsqCWoaG4TRyKlxEuWN2W4JV1yjS3Op', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 12:29:41'),
+(674, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'PdHwNpMbFRLivdt4RBVbz6Wx5OTMZySPrb9nuNupJGGrvkOP', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 12:29:48'),
+(675, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'PdHwNpMbFRLivdt4RBVbz6Wx5OTMZySPrb9nuNupJGGrvkOP', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 12:30:02'),
+(676, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'g1xAQFZUZalehGFafpNGrL6y8EFkzx5bEXP2xnVh8z0PwspG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 12:30:07'),
+(677, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'g1xAQFZUZalehGFafpNGrL6y8EFkzx5bEXP2xnVh8z0PwspG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 12:35:24'),
+(678, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'M-z97OcSC,bVHigTve2-bOK-B72ue1COpBcJiNnjq7teRrcH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 12:35:31'),
+(679, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'M-z97OcSC,bVHigTve2-bOK-B72ue1COpBcJiNnjq7teRrcH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'movement_operations', 'movement', 'save_single_driver', 'save_single_driver', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"save_single_driver\",\"rel_id\":\"16\",\"shift_type\":\"N\",\"status\":\"1\",\"start_date\":\"2025-12-01\",\"end_date\":\"2026-04-30\",\"json\":\"1\"}', 200, '2026-06-08 12:36:44'),
+(680, 4, 4, 4, 12, 5, 'مدير الموقع', 'dJ7n2O1rTHSmrXsZWKuzNzQWRHv5hlwWRRElL6K-l5TXAjn2', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-08 12:37:29'),
+(681, NULL, NULL, NULL, NULL, NULL, NULL, 'r5,TLcqlt97fryLT-lSRMtF90JM0tgkUuP8f,F-E7,mBZzEz', '192.168.1.21', 'Dart/3.6 (dart:io)', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/login', 'POST', NULL, 200, '2026-06-08 12:38:45'),
+(682, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'dQ1aF5GPkk45bJ9nwIaAIrhw-NbA0rC3r5hlmf5BeD0j31qv', '192.168.1.21', 'Dart/3.6 (dart:io)', '16', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/equipment-drivers/16', 'PUT', NULL, 200, '2026-06-08 12:39:27'),
+(683, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'eNB1G-9cCeG9FtRnMs6JRPuSyeP4g1iHSAxsAVtiYwAqDhjN', '192.168.1.21', 'Dart/3.6 (dart:io)', '14', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/operations/14', 'PUT', NULL, 200, '2026-06-08 12:39:54'),
+(684, 4, 4, 4, 12, 5, 'مدير الموقع', 'x4ITeODh4xZdB,FifvOPrKT8se3Zec6z-mWY-oqXWN8N5MAs', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-08 12:40:37'),
+(685, 4, 4, 4, 12, 5, 'مدير الموقع', 'mPsqpECj2ne4YffIAQ4hhgMY61u3KAdJILs4psyQbxKUr77F', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-08 12:41:12'),
+(686, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', '5BZtkTJ2KnlnCvJetbgaVm,Bu8uppA7G6HsMsOCONdXNJQvp', '192.168.1.21', 'Dart/3.6 (dart:io)', 'equipment-drivers', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/equipment-drivers', 'POST', NULL, 201, '2026-06-08 12:42:27'),
+(687, 4, 4, 4, 12, 5, 'مدير الموقع', 'iGQKC5cDWbBQLWgQCrzT5GeWF1gMQDbAkT9nqY4NHbm9ZURQ', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-08 12:42:58'),
+(688, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'W09qM-dWuwKsH-41sI8C1dnl4BUHsqUtaLmhQVAvVHKEvH6D', '192.168.1.21', 'Dart/3.6 (dart:io)', 'equipment-drivers', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/equipment-drivers', 'POST', NULL, 201, '2026-06-08 12:45:04'),
+(689, 4, 4, 4, 12, 5, 'مدير الموقع', 'WAyuZkgl-98zYhZ3R-PJzntvuDUIXLhjz5Z-Mh2JHAiza-pZ', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-08 12:45:29'),
+(690, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'M-z97OcSC,bVHigTve2-bOK-B72ue1COpBcJiNnjq7teRrcH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 12:50:13'),
+(691, 4, 4, 4, 12, 5, 'مدير الموقع', 'CtG843XwrrN0l4gCjRiv81myScda-uOeGAycshsNx,GxOQbV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 12:50:19'),
+(692, 4, 4, 4, 12, 5, 'مدير الموقع', 'CtG843XwrrN0l4gCjRiv81myScda-uOeGAycshsNx,GxOQbV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 12:50:22'),
+(693, 4, 4, 4, 12, 5, 'مدير الموقع', 'CtG843XwrrN0l4gCjRiv81myScda-uOeGAycshsNx,GxOQbV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 12:50:22'),
+(694, 4, 4, 4, 12, 5, 'مدير الموقع', 'CtG843XwrrN0l4gCjRiv81myScda-uOeGAycshsNx,GxOQbV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 12:50:22'),
+(695, 4, 4, 4, 12, 5, 'مدير الموقع', 'CtG843XwrrN0l4gCjRiv81myScda-uOeGAycshsNx,GxOQbV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 12:50:54'),
+(696, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'A0tqPwq6Yo6BGt8BWPprbpGHakAxeTtXu75rHbUKGVMCKdu,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 12:51:10'),
+(697, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'A0tqPwq6Yo6BGt8BWPprbpGHakAxeTtXu75rHbUKGVMCKdu,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 8, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"8\",\"type\":\"3\",\"equipment\":\"20\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-08\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"121212\",\"shift_hours\":\"10\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 12:59:13'),
+(698, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'A0tqPwq6Yo6BGt8BWPprbpGHakAxeTtXu75rHbUKGVMCKdu,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'end_service', 'end_service', NULL, 15, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"action\":\"end_service\",\"operation_id\":\"15\",\"end_date\":\"2026-06-08\",\"reason\":\"\",\"end_service_submit\":\"\"}', 200, '2026-06-08 13:03:07'),
+(699, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'A0tqPwq6Yo6BGt8BWPprbpGHakAxeTtXu75rHbUKGVMCKdu,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 8, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"8\",\"type\":\"1\",\"equipment\":\"5\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-08\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"200\",\"shift_hours\":\"10\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 13:03:55'),
+(700, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'A0tqPwq6Yo6BGt8BWPprbpGHakAxeTtXu75rHbUKGVMCKdu,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'end_service', 'end_service', NULL, 16, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"action\":\"end_service\",\"operation_id\":\"16\",\"end_date\":\"2026-06-10\",\"reason\":\"\",\"end_service_submit\":\"\"}', 200, '2026-06-08 13:17:29'),
+(701, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'lTRcg9ojD8HkbT9Sm2n3,MmfUTpcP09Ey8yV9x6YF386-JRA', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 13:51:03'),
+(702, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'lTRcg9ojD8HkbT9Sm2n3,MmfUTpcP09Ey8yV9x6YF386-JRA', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 13, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"13\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"5\",\"type\":\"1\",\"equipment\":\"10\",\"equipment_category\":\"أساسي\",\"start\":\"2025-12-01\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"8787\",\"shift_hours\":\"10.00\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 14:02:19'),
+(703, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'lTRcg9ojD8HkbT9Sm2n3,MmfUTpcP09Ey8yV9x6YF386-JRA', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'oprators', 'oprators', 'update', 'save_operation', NULL, 8, NULL, NULL, 'http://localhost/ems/Oprators/oprators.php?project_id=4', 'POST', '{\"operation_id\":\"\",\"project_id\":\"4\",\"contract_id\":\"5\",\"supplier_id\":\"8\",\"type\":\"3\",\"equipment\":\"13\",\"equipment_category\":\"أساسي\",\"start\":\"2026-06-08\",\"end\":\"2026-11-01\",\"hours\":\"0\",\"total_equipment_hours\":\"120\",\"shift_hours\":\"10\",\"shift_type\":\"B\",\"status\":\"1\",\"action\":\"save_operation\",\"save_operation_submit\":\"\"}', 200, '2026-06-08 14:15:12'),
+(704, NULL, NULL, NULL, NULL, NULL, NULL, 'zhktV9otw,hZuFMk67ZkHGkILQcY-SvD,3iVSIyKIAhb7RXl', '192.168.1.21', 'Dart/3.6 (dart:io)', 'login', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/login', 'POST', NULL, 200, '2026-06-08 14:17:02'),
+(705, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'lTRcg9ojD8HkbT9Sm2n3,MmfUTpcP09Ey8yV9x6YF386-JRA', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 14:18:08'),
+(706, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'o1D8-8Z1V2iRkAqlhx9uZpmoUuoyRFjhnLKCqsGgCho9e,OF', '192.168.1.21', 'Dart/3.6 (dart:io)', 'equipment-drivers', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/equipment-drivers', 'POST', NULL, 201, '2026-06-08 14:18:26'),
+(707, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'fq,tqmRqq0YNWkFybgHTdO2EbWAstBX3rROKrWvJCXbRrQvl', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"يسن\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 14:19:42'),
+(708, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'fq,tqmRqq0YNWkFybgHTdO2EbWAstBX3rROKrWvJCXbRrQvl', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 14:21:04'),
+(709, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', '6a43H17bsAP-gNOY1hcsHjw9HyCmE60pXLWT7X1ioD0jrEAv', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 14:21:11'),
+(710, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', '6a43H17bsAP-gNOY1hcsHjw9HyCmE60pXLWT7X1ioD0jrEAv', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 14:22:34'),
+(711, 4, 4, 4, 12, 5, 'مدير الموقع', 'WkSN5FUotPj9,gxUglnLCF7lRS6OFDl573wyAkFfMCOjd51p', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 14:22:40'),
+(712, 4, 4, 4, 12, 5, 'مدير الموقع', 'WkSN5FUotPj9,gxUglnLCF7lRS6OFDl573wyAkFfMCOjd51p', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:22:43'),
+(713, 4, 4, 4, 12, 5, 'مدير الموقع', 'WkSN5FUotPj9,gxUglnLCF7lRS6OFDl573wyAkFfMCOjd51p', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 14:22:43'),
+(714, 4, 4, 4, 12, 5, 'مدير الموقع', 'WkSN5FUotPj9,gxUglnLCF7lRS6OFDl573wyAkFfMCOjd51p', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:22:43'),
+(715, 4, 4, 4, 12, 5, 'مدير الموقع', 'WkSN5FUotPj9,gxUglnLCF7lRS6OFDl573wyAkFfMCOjd51p', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:27:36'),
+(716, 4, 4, 4, 12, 5, 'مدير الموقع', 'WkSN5FUotPj9,gxUglnLCF7lRS6OFDl573wyAkFfMCOjd51p', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 14:27:36'),
+(717, 4, 4, 4, 12, 5, 'مدير الموقع', 'WkSN5FUotPj9,gxUglnLCF7lRS6OFDl573wyAkFfMCOjd51p', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:27:36'),
+(718, 4, 4, 4, 12, 5, 'مدير الموقع', 'WkSN5FUotPj9,gxUglnLCF7lRS6OFDl573wyAkFfMCOjd51p', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 14:27:52'),
+(719, 4, 4, 4, 12, 5, 'مدير الموقع', 'WkSN5FUotPj9,gxUglnLCF7lRS6OFDl573wyAkFfMCOjd51p', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:27:52'),
+(720, 4, 4, 4, 12, 5, 'مدير الموقع', 'WkSN5FUotPj9,gxUglnLCF7lRS6OFDl573wyAkFfMCOjd51p', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:27:52'),
+(721, 4, 4, 4, 12, 5, 'مدير الموقع', 'WkSN5FUotPj9,gxUglnLCF7lRS6OFDl573wyAkFfMCOjd51p', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 14:29:18'),
+(722, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', '8Z,7mY6fomQ,TViXZIcvsCpLDPDd79MwM9zPjDvT7OMbe5Gs', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 14:29:24'),
+(723, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', '8Z,7mY6fomQ,TViXZIcvsCpLDPDd79MwM9zPjDvT7OMbe5Gs', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 14:29:48'),
+(724, 4, 4, 4, 12, 5, 'مدير الموقع', 'lqu8mJ1VHuuSBtF2iR6w2doFokKmbo4uGuqdWbkD,8saCIPb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 14:29:59'),
+(725, 4, 4, 4, 12, 5, 'مدير الموقع', 'lqu8mJ1VHuuSBtF2iR6w2doFokKmbo4uGuqdWbkD,8saCIPb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:30:02'),
+(726, 4, 4, 4, 12, 5, 'مدير الموقع', 'lqu8mJ1VHuuSBtF2iR6w2doFokKmbo4uGuqdWbkD,8saCIPb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 14:30:02'),
+(727, 4, 4, 4, 12, 5, 'مدير الموقع', 'lqu8mJ1VHuuSBtF2iR6w2doFokKmbo4uGuqdWbkD,8saCIPb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:30:02'),
+(728, 4, 4, 4, 12, 5, 'مدير الموقع', 'lqu8mJ1VHuuSBtF2iR6w2doFokKmbo4uGuqdWbkD,8saCIPb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:31:52'),
+(729, 4, 4, 4, 12, 5, 'مدير الموقع', 'lqu8mJ1VHuuSBtF2iR6w2doFokKmbo4uGuqdWbkD,8saCIPb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 14:31:52'),
+(730, 4, 4, 4, 12, 5, 'مدير الموقع', 'lqu8mJ1VHuuSBtF2iR6w2doFokKmbo4uGuqdWbkD,8saCIPb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:31:52'),
+(731, 4, 4, 4, 12, 5, 'مدير الموقع', 'lqu8mJ1VHuuSBtF2iR6w2doFokKmbo4uGuqdWbkD,8saCIPb', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 14:32:06'),
+(732, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'TOTIj7uq-H9EYqeOWqIyOMSPTQ5UaON0fHNnBAHFt2tR,c8S', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 14:32:12'),
+(733, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'TOTIj7uq-H9EYqeOWqIyOMSPTQ5UaON0fHNnBAHFt2tR,c8S', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-08 14:34:45'),
+(734, 4, 4, 4, 12, 5, 'مدير الموقع', 'AwJ4vFLDL4kDeUiBlCVT7Lw2O-nTbYArhdHZgIc4-6mtkjPu', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-08 14:34:50'),
+(735, 4, 4, 4, 12, 5, 'مدير الموقع', 'AwJ4vFLDL4kDeUiBlCVT7Lw2O-nTbYArhdHZgIc4-6mtkjPu', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:34:53'),
+(736, 4, 4, 4, 12, 5, 'مدير الموقع', 'AwJ4vFLDL4kDeUiBlCVT7Lw2O-nTbYArhdHZgIc4-6mtkjPu', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-08 14:34:53'),
+(737, 4, 4, 4, 12, 5, 'مدير الموقع', 'AwJ4vFLDL4kDeUiBlCVT7Lw2O-nTbYArhdHZgIc4-6mtkjPu', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-08 14:34:54'),
+(738, 4, 4, 4, 12, 5, 'مدير الموقع', 'AwJ4vFLDL4kDeUiBlCVT7Lw2O-nTbYArhdHZgIc4-6mtkjPu', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 07:46:59'),
+(739, 4, 0, 0, 13, 12, 'ادارة المبيعات', '0CrFW89MdLirwvOLKyvMKc0f80mRcAOemtCQFBVsNrqQAerB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 07:47:14'),
+(740, 4, 0, 0, 13, 12, 'ادارة المبيعات', '0CrFW89MdLirwvOLKyvMKc0f80mRcAOemtCQFBVsNrqQAerB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 07:48:46'),
+(741, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Sz-4L7ssW8MZjiuz3U02MY1w7mOaZF2msylSLhjcSbumOWTa', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 07:48:52'),
+(742, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Sz-4L7ssW8MZjiuz3U02MY1w7mOaZF2msylSLhjcSbumOWTa', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 07:50:22'),
+(743, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', ',4IsVVJbkeKpqnA9,kGVYSlCQALWQsgAZW-AQENRLqksIyAF', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"اروينا\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 07:50:32'),
+(744, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', ',4IsVVJbkeKpqnA9,kGVYSlCQALWQsgAZW-AQENRLqksIyAF', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'update', 'update', NULL, 27, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"id\":\"27\",\"name\":\"مروان\",\"driver_code\":\"DRV-0001-3\",\"nickname\":\"\",\"identity_number\":\"\",\"identity_expiry_date\":\"\",\"driver_photo\":\"\",\"identity_photo\":\"\",\"license_number\":\"\",\"license_expiry_date\":\"2027-01-01\",\"license_issuer\":\"\",\"years_in_field\":\"\",\"years_on_equipment\":\"\",\"certificates\":\"\",\"owner_supervisor\":\"\",\"supplier_id\":\"\",\"project_id\":\"4\",\"employment_affiliation\":\"\",\"salary_type\":\"\",\"monthly_salary\":\"\",\"email\":\"\",\"phone\":\"249912345678\",\"phone_alternative\":\"\",\"address\":\"\",\"performance_rating\":\"\",\"behavior_record\":\"\",\"accident_record\":\"\",\"health_status\":\"\",\"vaccinations_status\":\"\",\"health_issues\":\"\",\"previous_employer\":\"\",\"employment_duration\":\"\",\"reference_contact\":\"\",\"general_notes\":\"\",\"driver_status\":\"نشط\",\"start_date\":\"\",\"status\":\"1\"}', 302, '2026-06-09 07:52:17'),
+(745, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', ',4IsVVJbkeKpqnA9,kGVYSlCQALWQsgAZW-AQENRLqksIyAF', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 07:52:35'),
+(746, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'Ggd6xRDF1XeQ,LUpE2Uo2t5l4nZMc7lKCk8ZYESTQvPBOZfV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 07:52:44'),
+(747, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'Ggd6xRDF1XeQ,LUpE2Uo2t5l4nZMc7lKCk8ZYESTQvPBOZfV', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 07:54:51'),
+(748, 4, 4, 4, 12, 5, 'مدير الموقع', '9Nm8t8-JTIE79,ElkFxuo-hg,GNq4GzmhJuFGGu3616CDG0S', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 07:55:00'),
+(749, 4, 4, 4, 12, 5, 'مدير الموقع', '9Nm8t8-JTIE79,ElkFxuo-hg,GNq4GzmhJuFGGu3616CDG0S', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-09 07:55:06'),
+(750, 4, 4, 4, 12, 5, 'مدير الموقع', '9Nm8t8-JTIE79,ElkFxuo-hg,GNq4GzmhJuFGGu3616CDG0S', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-09 07:55:06'),
+(751, 4, 4, 4, 12, 5, 'مدير الموقع', '9Nm8t8-JTIE79,ElkFxuo-hg,GNq4GzmhJuFGGu3616CDG0S', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-09 07:55:06'),
+(752, 4, 4, 4, 12, 5, 'مدير الموقع', '9Nm8t8-JTIE79,ElkFxuo-hg,GNq4GzmhJuFGGu3616CDG0S', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 07:57:11'),
+(753, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'RWKAOqsSuAbW-jijRvLPwjXgliq07V9Gec1L,ZCccIXgDejJ', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php?timeout=1', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 08:59:15'),
+(754, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'mWS8h5VV,tPKLmbVOCweyw5OHRlXFeHoR6VAH0VUFYtsO,9Z', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 09:52:01'),
+(755, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'mWS8h5VV,tPKLmbVOCweyw5OHRlXFeHoR6VAH0VUFYtsO,9Z', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 09:53:07'),
+(756, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'Qhz6a8v4I9GZJzUgQrFjASXc6bhMx3a12OdGmGMlV7ph8Acm', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 09:53:15'),
+(757, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'Qhz6a8v4I9GZJzUgQrFjASXc6bhMx3a12OdGmGMlV7ph8Acm', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 09:56:29');
+INSERT INTO `activity_logs` (`id`, `company_id`, `project_id`, `contract_id`, `user_id`, `role_id`, `role_name`, `session_id`, `ip_address`, `user_agent`, `screen_name`, `module_name`, `action_type`, `button_name`, `field_name`, `record_id`, `old_value`, `new_value`, `url`, `http_method`, `request_payload`, `response_status`, `created_at`) VALUES
+(758, 4, 4, 4, 12, 5, 'مدير الموقع', 'QrMWL35IAfxWdAQmGJ7dR1Sz95rlTwXWcj8Z6XiRro4tAQUH', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 09:56:36'),
+(759, 4, 4, 4, 12, 5, 'مدير الموقع', 'QrMWL35IAfxWdAQmGJ7dR1Sz95rlTwXWcj8Z6XiRro4tAQUH', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-09 09:56:39'),
+(760, 4, 4, 4, 12, 5, 'مدير الموقع', 'QrMWL35IAfxWdAQmGJ7dR1Sz95rlTwXWcj8Z6XiRro4tAQUH', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-09 09:56:39'),
+(761, 4, 4, 4, 12, 5, 'مدير الموقع', 'QrMWL35IAfxWdAQmGJ7dR1Sz95rlTwXWcj8Z6XiRro4tAQUH', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-09 09:56:39'),
+(762, 4, 4, 4, 12, 5, 'مدير الموقع', 'QrMWL35IAfxWdAQmGJ7dR1Sz95rlTwXWcj8Z6XiRro4tAQUH', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 09:57:51'),
+(763, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 09:58:14'),
+(764, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-09 09:58:30'),
+(765, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-09 09:58:30'),
+(766, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-09 09:58:30'),
+(767, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=2', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-09 10:02:11'),
+(768, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=2', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"2\"}', 200, '2026-06-09 10:02:11'),
+(769, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=2', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"2\"}', 200, '2026-06-09 10:02:11'),
+(770, 4, 4, 4, 12, 5, 'مدير الموقع', '2SEiiYueZ-5ofvRwWZaO4GxFY-P06w5XK,ViezTwz7HPPp-e', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-09 11:18:41'),
+(771, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'NCuT6U,3nwsW5HDrKnODNkW1oZpTa6rh,I1K-qFRx9ijLxiQ', '192.168.1.21', 'Dart/3.6 (dart:io)', '33', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/operations/33', 'PUT', NULL, 200, '2026-06-09 11:25:25'),
+(772, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', '6NqyKlR,4TTBCnZenMtJ8,L24LKrMLxUFdVikTdhsghhRvey', '192.168.1.21', 'Dart/3.6 (dart:io)', '31', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/operations/31', 'PUT', NULL, 200, '2026-06-09 11:27:38'),
+(773, 4, 4, 4, 12, 5, 'مدير الموقع', 'mijRQSCF2-,4RivkQ27xa4TRD5uuTMeoU-UH2FSuHhH73jGe', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-09 11:40:20'),
+(774, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'RWKAOqsSuAbW-jijRvLPwjXgliq07V9Gec1L,ZCccIXgDejJ', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 12:47:56'),
+(775, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'B9EjGcKxWKwCpJiMk0hreKLmvPPcNYjQ9OapEettpXPsJ0rH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 12:48:06'),
+(776, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'B9EjGcKxWKwCpJiMk0hreKLmvPPcNYjQ9OapEettpXPsJ0rH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 12:48:16'),
+(777, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'q0C0He98ku67dXweakyJld7Vf0c760Hit425FR5FSXgV1ODt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"اروينا\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 12:48:23'),
+(778, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'q0C0He98ku67dXweakyJld7Vf0c760Hit425FR5FSXgV1ODt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'update', 'update', NULL, 26, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"id\":\"26\",\"name\":\"محمد أحمد علي\",\"driver_code\":\"DRV-0001\",\"nickname\":\"\",\"identity_number\":\"\",\"identity_expiry_date\":\"\",\"driver_photo\":\"\",\"identity_photo\":\"\",\"license_number\":\"\",\"license_expiry_date\":\"2027-01-01\",\"license_issuer\":\"\",\"years_in_field\":\"\",\"years_on_equipment\":\"\",\"certificates\":\"\",\"owner_supervisor\":\"\",\"supplier_id\":\"\",\"project_id\":\"4\",\"employment_affiliation\":\"\",\"salary_type\":\"\",\"monthly_salary\":\"\",\"email\":\"\",\"phone\":\"249912345678\",\"phone_alternative\":\"\",\"address\":\"\",\"performance_rating\":\"\",\"behavior_record\":\"\",\"accident_record\":\"\",\"health_status\":\"\",\"vaccinations_status\":\"\",\"health_issues\":\"\",\"previous_employer\":\"\",\"employment_duration\":\"\",\"reference_contact\":\"\",\"general_notes\":\"\",\"driver_status\":\"نشط\",\"start_date\":\"\",\"status\":\"1\"}', 302, '2026-06-09 12:48:49'),
+(779, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'q0C0He98ku67dXweakyJld7Vf0c760Hit425FR5FSXgV1ODt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'update', 'update', NULL, 8, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php?msg=%D8%AA%D9%85+%D8%AA%D8%B9%D8%AF%D9%8A%D9%84+%D8%A7%D9%84%D9%85%D8%B4%D8%BA%D9%84+%D8%A8%D9%86%D8%AC%D8%A7%D8%AD+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"id\":\"\",\"name\":\"Madonna Hewitt\",\"driver_code\":\"Fugit veniam bland\",\"nickname\":\"Stacy Miles\",\"identity_type\":\"بطاقة أخرى\",\"identity_number\":\"723\",\"identity_expiry_date\":\"1987-01-10\",\"driver_photo\":\"\",\"identity_photo\":\"\",\"license_number\":\"591\",\"license_type\":\"فئة ج (شاحنات خفيفة)\",\"license_expiry_date\":\"2016-02-09\",\"license_issuer\":\"Non laborum eiusmod \",\"specialized_equipment\":[\"حفارة (Excavator)\",\"مثقاب/مكنة تخريم (Drill Machine)\",\"شاحنة تناكر/صهريج (Tanker Truck)\"],\"years_in_field\":\"\",\"years_on_equipment\":\"0\",\"skill_level\":\"كفء (3-5 سنوات)\",\"certificates\":\"Obcaecati temporibus\",\"owner_supervisor\":\"Consequatur elit n\",\"supplier_id\":\"8\",\"project_id\":\"4\",\"employment_affiliation\":\"تابع للمورد/الوسيط\",\"salary_type\":\"شهري\",\"monthly_salary\":\"5\",\"email\":\"kyvykyqa@mailinator.com\",\"phone\":\"+1 (706) 711-3047\",\"phone_alternative\":\"+1 (275) 107-3097\",\"address\":\"Ut qui nostrum nostr\",\"performance_rating\":\"ممتاز\",\"behavior_record\":\"جيد (شكاوى نادرة)\",\"accident_record\":\"نظيف (لا توجد حوادث)\",\"health_status\":\"غير محدد\",\"vaccinations_status\":\"قديمة\",\"health_issues\":\"Magnam consequatur \",\"previous_employer\":\"Veniam quidem et no\",\"employment_duration\":\"Pariatur Sed aut do\",\"reference_contact\":\"Quaerat incidunt ip\",\"general_notes\":\"Rerum earum ipsam la\",\"driver_status\":\"مفصول\",\"start_date\":\"1981-12-19\",\"status\":\"0\"}', 302, '2026-06-09 12:51:00'),
+(780, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'q0C0He98ku67dXweakyJld7Vf0c760Hit425FR5FSXgV1ODt', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 12:52:56'),
+(781, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'NJ83aIZsj0BwrSvfNVHn2vyV5ciQV3KX9bVELLozPesIOJjH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 12:53:03'),
+(782, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'NJ83aIZsj0BwrSvfNVHn2vyV5ciQV3KX9bVELLozPesIOJjH', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 12:53:22'),
+(783, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'tD3oTQknrJ7Ul4acYCajAqhsyRKrndX5waJzjp0clY7XEk4f', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"اروينا\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 12:53:29'),
+(784, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'tD3oTQknrJ7Ul4acYCajAqhsyRKrndX5waJzjp0clY7XEk4f', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivers', 'drivers', 'update', 'update', NULL, 28, NULL, NULL, 'http://localhost/ems/Drivers/drivers.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"id\":\"28\",\"name\":\"Madonna Hewitt\",\"driver_code\":\"Fugit veniam bland\",\"nickname\":\"Stacy Miles\",\"identity_type\":\"بطاقة أخرى\",\"identity_number\":\"723\",\"identity_expiry_date\":\"1987-01-10\",\"driver_photo\":\"\",\"identity_photo\":\"\",\"license_number\":\"591\",\"license_type\":\"فئة ج (شاحنات خفيفة)\",\"license_expiry_date\":\"2016-02-09\",\"license_issuer\":\"Non laborum eiusmod\",\"specialized_equipment\":[\"حفارة (Excavator)\",\"مثقاب/مكنة تخريم (Drill Machine)\",\"شاحنة تناكر/صهريج (Tanker Truck)\"],\"years_in_field\":\"\",\"years_on_equipment\":\"\",\"skill_level\":\"كفء (3-5 سنوات)\",\"certificates\":\"Obcaecati temporibus\",\"owner_supervisor\":\"Consequatur elit n\",\"supplier_id\":\"8\",\"project_id\":\"4\",\"employment_affiliation\":\"تابع للمورد/الوسيط\",\"salary_type\":\"شهري\",\"monthly_salary\":\"5.00\",\"email\":\"kyvykyqa@mailinator.com\",\"phone\":\"+1 (706) 711-3047\",\"phone_alternative\":\"+1 (275) 107-3097\",\"address\":\"Ut qui nostrum nostr\",\"performance_rating\":\"ممتاز\",\"behavior_record\":\"جيد (شكاوى نادرة)\",\"accident_record\":\"نظيف (لا توجد حوادث)\",\"health_status\":\"غير محدد\",\"vaccinations_status\":\"قديمة\",\"health_issues\":\"Magnam consequatur\",\"previous_employer\":\"Veniam quidem et no\",\"employment_duration\":\"Pariatur Sed aut do\",\"reference_contact\":\"Quaerat incidunt ip\",\"general_notes\":\"Rerum earum ipsam la\",\"driver_status\":\"مفصول\",\"start_date\":\"1981-12-19\",\"status\":\"1\"}', 302, '2026-06-09 12:53:55'),
+(785, 4, 4, 4, 12, 5, 'مدير الموقع', '-bTLOF2oXhsfWSHIskXg9FXMcu2HfcPwqvq43j,9CSReTfpe', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-09 13:27:08'),
+(786, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'tD3oTQknrJ7Ul4acYCajAqhsyRKrndX5waJzjp0clY7XEk4f', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 17:52:01'),
+(787, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'GubzAe-51H7bSvFk3YQjuDifL8EQx7Ib6qC604sT0T8aYgah', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 17:52:07'),
+(788, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'GubzAe-51H7bSvFk3YQjuDifL8EQx7Ib6qC604sT0T8aYgah', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 18:00:20'),
+(789, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'scDnLlOMtcVahZpUGqQrbSAplkAZRAlwWzMYQgbknjtaoFBr', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 18:00:26'),
+(790, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'scDnLlOMtcVahZpUGqQrbSAplkAZRAlwWzMYQgbknjtaoFBr', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'movement_operations', 'movement', 'create', 'add_new_driver', NULL, 28, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"add_new_driver\",\"driver_id\":\"28\",\"equipment_id\":\"16\",\"shift_type\":\"B\",\"start_date\":\"2026-06-09\",\"end_date\":\"\",\"json\":\"1\"}', 200, '2026-06-09 18:00:38'),
+(791, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'ciHEKobnSv0zC9SgJKRThdMyD,Wkaoj7zK,PeqZXjB,Et0BD', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 18:52:00'),
+(792, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'ciHEKobnSv0zC9SgJKRThdMyD,Wkaoj7zK,PeqZXjB,Et0BD', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'contracts', 'contracts', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Contracts/contracts.php', 'POST', '{\"contract_id\":\"5\"}', 200, '2026-06-09 19:23:34'),
+(793, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'ciHEKobnSv0zC9SgJKRThdMyD,Wkaoj7zK,PeqZXjB,Et0BD', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-09 19:23:50'),
+(794, 4, 4, 4, 12, 5, 'مدير الموقع', 'zPk-TiJyH,B98RR5lKO8UG3-S-aweqJAcnKE0VWqwe2mFmY3', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-09 19:24:01'),
+(795, 4, 4, 4, 12, 5, 'مدير الموقع', 'zPk-TiJyH,B98RR5lKO8UG3-S-aweqJAcnKE0VWqwe2mFmY3', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-09 19:24:07'),
+(796, 4, 4, 4, 12, 5, 'مدير الموقع', 'zPk-TiJyH,B98RR5lKO8UG3-S-aweqJAcnKE0VWqwe2mFmY3', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-09 19:24:07'),
+(797, 4, 4, 4, 12, 5, 'مدير الموقع', 'zPk-TiJyH,B98RR5lKO8UG3-S-aweqJAcnKE0VWqwe2mFmY3', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-09 19:24:07'),
+(798, 4, 4, 4, 12, 5, 'مدير الموقع', 'ihd45rt0bg6qahv54iegvk8g5c', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-10 06:59:57'),
+(799, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'jxNOSwh4lopH2V-eyZ1yJu3pJDvIdqaJHLS0HJNWBwAAaVak', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-10 07:00:42'),
+(800, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'jxNOSwh4lopH2V-eyZ1yJu3pJDvIdqaJHLS0HJNWBwAAaVak', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-10 07:24:49'),
+(801, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'C1wAQIrjRgaFuwqUDphPx0KOlX,zazK4AK-Q3Iy9jBi7X8r4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"اروينا\",\"password\":\"[REDACTED]\"}', 200, '2026-06-10 07:25:00'),
+(802, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'C1wAQIrjRgaFuwqUDphPx0KOlX,zazK4AK-Q3Iy9jBi7X8r4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivercontracts', 'drivers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Drivers/drivercontracts.php?id=28', 'POST', '{\"project_id\":\"4\"}', 200, '2026-06-10 07:25:22'),
+(803, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'C1wAQIrjRgaFuwqUDphPx0KOlX,zazK4AK-Q3Iy9jBi7X8r4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'drivercontracts', 'drivers', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Drivers/drivercontracts.php?id=28', 'POST', '{\"project_contract_id\":\"4\",\"driver_contract_id\":\"0\"}', 200, '2026-06-10 07:25:24'),
+(804, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'C1wAQIrjRgaFuwqUDphPx0KOlX,zazK4AK-Q3Iy9jBi7X8r4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-10 08:34:54'),
+(805, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'rHkShlik1RVbgpfC7h1GaTqSKJ-56LoUgKkAIwO3zfpsVJyn', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-10 08:36:51'),
+(806, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'rHkShlik1RVbgpfC7h1GaTqSKJ-56LoUgKkAIwO3zfpsVJyn', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-10 08:38:16'),
+(807, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'SLSbpyeF4mgNCUQ9hVALxQjn8zMYSgx-UWrlDdlM02fuJwAg', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-10 08:38:44'),
+(808, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'SLSbpyeF4mgNCUQ9hVALxQjn8zMYSgx-UWrlDdlM02fuJwAg', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-10 08:44:26'),
+(809, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'nJ,jeq71uv7Y7A1RONSmrXXOmbj65T6insjC-lLd7Wbbbyi9', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-10 08:44:32'),
+(810, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'nJ,jeq71uv7Y7A1RONSmrXXOmbj65T6insjC-lLd7Wbbbyi9', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-10 08:47:05'),
+(811, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'ul6q4OxSMWUBPxhd3mCKvm0K9shWIQPRcA05U6rALK7vbwL8', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-10 08:47:15'),
+(812, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'ul6q4OxSMWUBPxhd3mCKvm0K9shWIQPRcA05U6rALK7vbwL8', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-10 08:49:10'),
+(813, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'L92,BOZMHqq9ufM8u-O-zpLKB4a8DeMLHpDRyUL0CKzpwF8a', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-10 08:49:16'),
+(814, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'PG6riY53UeArOB9GmHgkTmPRpozfF,u4kSWvHswkkaK1I1-X', '192.168.1.21', 'Dart/3.6 (dart:io)', '18', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/equipment-drivers/18', 'PUT', NULL, 200, '2026-06-10 08:52:11'),
+(815, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'oPHykobHnwBbwhodVU-dbiUk27qa3vOqh2EkR9daZLd9xd9a', '192.168.1.21', 'Dart/3.6 (dart:io)', '32', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/operations/32', 'PUT', NULL, 200, '2026-06-10 08:52:53'),
+(816, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'nYmdgKLO0nV0JRU4jotN6JfNiWfzGLMmzJN0H,Z,RPNHmHxG', '192.168.1.21', 'Dart/3.6 (dart:io)', 'equipment-drivers', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/equipment-drivers', 'POST', NULL, 201, '2026-06-10 08:54:03'),
+(817, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'XlHuJmzQNv2vHuB4K2Iyfhc3jt2fDKQSoS8XlFZx5Nc5rq0P', '192.168.1.21', 'Dart/3.6 (dart:io)', '41', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/equipment-drivers/41', 'PUT', NULL, 200, '2026-06-10 08:54:21'),
+(818, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'InJc6MEbynf8zl1WNXFvLsASNoFMhD1hFVmtUX2TBUXnv3Cd', '192.168.1.21', 'Dart/3.6 (dart:io)', '37', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/equipment-drivers/37', 'PUT', NULL, 200, '2026-06-10 08:54:29'),
+(819, 4, 4, 4, 12, 5, 'مدير الموقع', 'x-yAXGxrdFCJZfZGna9kgdORMxYd2zmRxHS2uxhsDtumJRPL', '192.168.1.21', 'Dart/3.6 (dart:io)', 'timesheets', 'api', 'create', 'create', NULL, NULL, NULL, NULL, 'http://192.168.1.9/ems/api/sync/timesheets', 'POST', NULL, 200, '2026-06-10 08:57:18'),
+(820, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=2', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"2\"}', 200, '2026-06-10 15:22:23'),
+(821, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=2', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-10 15:22:23'),
+(822, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=2', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"2\"}', 200, '2026-06-10 15:22:23'),
+(823, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=2', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"2\"}', 200, '2026-06-10 15:22:30'),
+(824, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=2', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-10 15:22:30'),
+(825, 4, 4, 4, 12, 5, 'مدير الموقع', 'dG,VgBSAcdb8ixNVcbRw7z7WZtZCM5vff5rBIX1g643kyCvn', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=2', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"2\"}', 200, '2026-06-10 15:22:30'),
+(826, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'L92,BOZMHqq9ufM8u-O-zpLKB4a8DeMLHpDRyUL0CKzpwF8a', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-10 15:30:42'),
+(827, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'obz6ERKgtIZxG5bs4GaotQ5MeD013Rm6vWcBujrFVVTFiR9A', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php?timeout=1', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-11 03:42:37'),
+(828, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'obz6ERKgtIZxG5bs4GaotQ5MeD013Rm6vWcBujrFVVTFiR9A', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-11 03:52:31'),
+(829, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'MP9yOS2YQOaNpaYvEaNok62J4MDAPhb-crLOGfB-9JlHfmGB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-11 03:52:38'),
+(830, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'MP9yOS2YQOaNpaYvEaNok62J4MDAPhb-crLOGfB-9JlHfmGB', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-11 08:25:05'),
+(831, 4, 0, 0, 13, 12, 'ادارة المبيعات', '4Zn,YD6UPfhVg2FP-PgFuB8d4u9G4ja,U4,hkNWXB3SJ6o9M', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php?timeout=1', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-11 11:56:59'),
+(832, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'ahOxdnakV-U1ySB8dl72p2VyoRbkLwYdspiZVI-1nfEF3m9v', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php?timeout=1', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-13 18:24:10'),
+(833, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'ahOxdnakV-U1ySB8dl72p2VyoRbkLwYdspiZVI-1nfEF3m9v', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-13 18:25:47'),
+(834, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'vLDOJ0S-7fKalFkU2A1gcPwlQXGioS8DSPL8bdSPPHj-hbKf', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"اروينا\",\"password\":\"[REDACTED]\"}', 200, '2026-06-13 18:25:54'),
+(835, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', 'vLDOJ0S-7fKalFkU2A1gcPwlQXGioS8DSPL8bdSPPHj-hbKf', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-13 18:26:27'),
+(836, 4, 4, 4, 12, 5, 'مدير الموقع', 'xP3uadS-6WNaIpzxR8bE8qUGrNATv8Fb5Ie6jasxtU0SW13,', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-13 18:26:39'),
+(837, 4, 4, 4, 12, 5, 'مدير الموقع', 'xP3uadS-6WNaIpzxR8bE8qUGrNATv8Fb5Ie6jasxtU0SW13,', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-13 18:26:43'),
+(838, 4, 4, 4, 12, 5, 'مدير الموقع', 'xP3uadS-6WNaIpzxR8bE8qUGrNATv8Fb5Ie6jasxtU0SW13,', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-13 18:26:43'),
+(839, 4, 4, 4, 12, 5, 'مدير الموقع', 'xP3uadS-6WNaIpzxR8bE8qUGrNATv8Fb5Ie6jasxtU0SW13,', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-13 18:26:43'),
+(840, 4, 4, 4, 12, 5, 'مدير الموقع', 'xP3uadS-6WNaIpzxR8bE8qUGrNATv8Fb5Ie6jasxtU0SW13,', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_main_cats', 'get_main_cats', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_main_cats\",\"equipment_type\":\"1\",\"event_type_code\":\"OPR\"}', 200, '2026-06-13 18:26:57'),
+(841, 4, 4, 4, 12, 5, 'مدير الموقع', 'xP3uadS-6WNaIpzxR8bE8qUGrNATv8Fb5Ie6jasxtU0SW13,', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_sub_cats', 'get_sub_cats', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_sub_cats\",\"equipment_type\":\"1\",\"event_type_code\":\"OPR\",\"main_cat_code\":\"OPP\"}', 200, '2026-06-13 18:26:59'),
+(842, 4, 4, 4, 12, 5, 'مدير الموقع', 'xP3uadS-6WNaIpzxR8bE8qUGrNATv8Fb5Ie6jasxtU0SW13,', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'send_message', 'chats', 'send', 'إرسال', NULL, 44, NULL, '{\"receiver_id\":5,\"message_id\":44}', 'http://localhost/ems/chats/send_message.php', 'POST', '{\"receiver_id\":\"5\",\"message\":\"re\"}', 200, '2026-06-13 18:27:40'),
+(843, 4, 4, 4, 12, 5, 'مدير الموقع', 'xP3uadS-6WNaIpzxR8bE8qUGrNATv8Fb5Ie6jasxtU0SW13,', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-13 18:27:54'),
+(844, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'k5Wh3TSnlKOn4cy4oYvvss1JTYmnQu8VrFqq5dQwmCRxHHaU', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-13 18:28:02'),
+(845, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'e30K44CS,tTacWaoTVHMin-WGRsmMzHIuyjaUl2PXRCjyvAM', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-15 09:54:35'),
+(846, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'e30K44CS,tTacWaoTVHMin-WGRsmMzHIuyjaUl2PXRCjyvAM', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-15 09:56:05'),
+(847, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3Oa,Jc-m,F7YLnJEFOz73E7VnPaNT95Lzy9wwa-uJNdg1JKS', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-15 09:56:14'),
+(848, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3Oa,Jc-m,F7YLnJEFOz73E7VnPaNT95Lzy9wwa-uJNdg1JKS', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-15 09:56:43'),
+(849, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '6aw92OoduWKY0biUhQowJcOefB6mQ09KC,QQTlIX7QeAtm3g', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"اروينا\",\"password\":\"[REDACTED]\"}', 200, '2026-06-15 09:56:50'),
+(850, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '6aw92OoduWKY0biUhQowJcOefB6mQ09KC,QQTlIX7QeAtm3g', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-15 09:57:28'),
+(851, 4, 4, 4, 12, 5, 'مدير الموقع', 'QhHgvxXN1I2XQxrSvcb6WuMscO38tileoRfMZYHqyaHG9QPc', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-15 09:57:41'),
+(852, 4, 4, 4, 12, 5, 'مدير الموقع', 'QhHgvxXN1I2XQxrSvcb6WuMscO38tileoRfMZYHqyaHG9QPc', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-15 09:57:44'),
+(853, 4, 4, 4, 12, 5, 'مدير الموقع', 'QhHgvxXN1I2XQxrSvcb6WuMscO38tileoRfMZYHqyaHG9QPc', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-15 09:57:44'),
+(854, 4, 4, 4, 12, 5, 'مدير الموقع', 'QhHgvxXN1I2XQxrSvcb6WuMscO38tileoRfMZYHqyaHG9QPc', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-15 09:57:44'),
+(855, 4, 4, 4, 12, 5, 'مدير الموقع', 'QhHgvxXN1I2XQxrSvcb6WuMscO38tileoRfMZYHqyaHG9QPc', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-15 09:58:17'),
+(856, 4, 4, 4, 12, 5, 'مدير الموقع', 'QhHgvxXN1I2XQxrSvcb6WuMscO38tileoRfMZYHqyaHG9QPc', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-15 09:58:18'),
+(857, 4, 4, 4, 12, 5, 'مدير الموقع', 'QhHgvxXN1I2XQxrSvcb6WuMscO38tileoRfMZYHqyaHG9QPc', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-15 09:58:18'),
+(858, 4, 4, 4, 12, 5, 'مدير الموقع', 'QhHgvxXN1I2XQxrSvcb6WuMscO38tileoRfMZYHqyaHG9QPc', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-15 11:34:08'),
+(859, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'xEbqf9F5,N6sXa,jo5gf6UuyNGesER4dxhTqUf3fiKgbZjmQ', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-15 11:34:14'),
+(860, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'xEbqf9F5,N6sXa,jo5gf6UuyNGesER4dxhTqUf3fiKgbZjmQ', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-16 15:51:49'),
+(861, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'jiTV42kDSvTe,6TiMXgc998tjbLebcaOX9YBoSDk8X4s1C6G', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-16 15:51:56'),
+(862, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'jiTV42kDSvTe,6TiMXgc998tjbLebcaOX9YBoSDk8X4s1C6G', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-16 15:52:30'),
+(863, 4, 4, 4, 12, 5, 'مدير الموقع', '47mEOPB-FICS0zg8wK1tpm7rkDxwLOi2SCFD1jJlAXjUv4Xf', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مدير موقع الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-16 15:52:36'),
+(864, 4, 4, 4, 12, 5, 'مدير الموقع', '47mEOPB-FICS0zg8wK1tpm7rkDxwLOi2SCFD1jJlAXjUv4Xf', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-16 15:52:39'),
+(865, 4, 4, 4, 12, 5, 'مدير الموقع', '47mEOPB-FICS0zg8wK1tpm7rkDxwLOi2SCFD1jJlAXjUv4Xf', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-16 15:52:39'),
+(866, 4, 4, 4, 12, 5, 'مدير الموقع', '47mEOPB-FICS0zg8wK1tpm7rkDxwLOi2SCFD1jJlAXjUv4Xf', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-16 15:52:39'),
+(867, 4, 4, 4, 12, 5, 'مدير الموقع', '47mEOPB-FICS0zg8wK1tpm7rkDxwLOi2SCFD1jJlAXjUv4Xf', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-16 15:53:39'),
+(868, 4, 0, 0, 4, 1, 'ادارة التشغيل', '78utUkUeyHk,Ofk3CfOHL8Rc,F,NJeUQdD-UZlRUknQOVVPF', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-16 15:53:50'),
+(869, 4, 0, 0, 4, 1, 'ادارة التشغيل', '78utUkUeyHk,Ofk3CfOHL8Rc,F,NJeUQdD-UZlRUknQOVVPF', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-16 15:57:47'),
+(870, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3R1LaGCaCru1oDok7JwZbkKx4R-HFlb5NHmzL9BNABrMQ1Qd', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-16 15:57:52'),
+(871, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3R1LaGCaCru1oDok7JwZbkKx4R-HFlb5NHmzL9BNABrMQ1Qd', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'fleet_models', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/fleet_models.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"code\":\"666\",\"manufacturer\":\"\",\"model_name\":\"samba\",\"equipment_type_id\":\"5\",\"operating_category\":\"تمهيد وتسوية\",\"fuel_type\":\"بنزين\",\"std_capacity\":\"700\",\"std_capacity_uom\":\"طن\",\"default_supplier_id\":\"3\",\"tech_reference\":\"احمد\",\"status\":\"active\",\"specTable_length\":\"25\",\"spec_item_type\":[\"فلتر هيدروليك\"],\"spec_recommended_ref\":[\"احمد\"],\"spec_qty\":[\"8\"],\"spec_uom\":[\"لا\"],\"spec_alt_ref\":[\"لا\"],\"spec_existing_photo\":[\"\"],\"spec_note\":[\"\"]}', 302, '2026-06-16 16:00:19'),
+(872, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3R1LaGCaCru1oDok7JwZbkKx4R-HFlb5NHmzL9BNABrMQ1Qd', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'fleet_models', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/fleet_models.php?edit_id=1', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"edit_id\":\"1\",\"code\":\"666\",\"manufacturer\":\"\",\"model_name\":\"samba\",\"equipment_type_id\":\"5\",\"operating_category\":\"تمهيد وتسوية\",\"fuel_type\":\"بنزين\",\"std_capacity\":\"700.00\",\"std_capacity_uom\":\"طن\",\"default_supplier_id\":\"3\",\"tech_reference\":\"احمد\",\"status\":\"active\",\"specTable_length\":\"25\",\"spec_item_type\":[\"فلتر هيدروليك\"],\"spec_recommended_ref\":[\"احمد\"],\"spec_qty\":[\"8.00\"],\"spec_uom\":[\"لا\"],\"spec_alt_ref\":[\"لا\"],\"spec_existing_photo\":[\"\"],\"spec_note\":[\"\"]}', 302, '2026-06-16 16:00:46');
+INSERT INTO `activity_logs` (`id`, `company_id`, `project_id`, `contract_id`, `user_id`, `role_id`, `role_name`, `session_id`, `ip_address`, `user_agent`, `screen_name`, `module_name`, `action_type`, `button_name`, `field_name`, `record_id`, `old_value`, `new_value`, `url`, `http_method`, `request_payload`, `response_status`, `created_at`) VALUES
+(873, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3R1LaGCaCru1oDok7JwZbkKx4R-HFlb5NHmzL9BNABrMQ1Qd', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=20', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"edit_id\":\"20\",\"suppliers\":\"8\",\"code\":\"tx10\",\"type\":\"5\",\"name\":\"tx10\",\"serial_number\":\"\",\"chassis_number\":\"\",\"machine_number\":\"\",\"model_id\":\"1\",\"manufacturer\":\"\",\"model\":\"samba\",\"manufacturing_year\":\"\",\"import_year\":\"\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"\",\"owner_type\":\"\",\"owner_phone\":\"\",\"owner_supplier_relation\":\"\",\"license_number\":\"\",\"license_authority\":\"\",\"document_type\":\"\",\"license_expiry_date\":\"\",\"inspection_certificate_number\":\"\",\"last_inspection_date\":\"\",\"current_location\":\"\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"\",\"daily_rental_price\":\"\",\"monthly_rental_price\":\"\",\"insurance_status\":\"\",\"general_notes\":\"\",\"last_maintenance_date\":\"\",\"status\":\"0\"}', 302, '2026-06-16 16:03:18'),
+(874, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3R1LaGCaCru1oDok7JwZbkKx4R-HFlb5NHmzL9BNABrMQ1Qd', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=20', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"edit_id\":\"20\",\"suppliers\":\"8\",\"code\":\"tx10\",\"type\":\"1\",\"name\":\"tx10\",\"serial_number\":\"\",\"chassis_number\":\"\",\"machine_number\":\"\",\"model_id\":\"1\",\"manufacturer\":\"\",\"model\":\"samba\",\"manufacturing_year\":\"\",\"import_year\":\"\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"\",\"owner_type\":\"\",\"owner_phone\":\"\",\"owner_supplier_relation\":\"\",\"license_number\":\"\",\"license_authority\":\"\",\"document_type\":\"\",\"license_expiry_date\":\"\",\"inspection_certificate_number\":\"\",\"last_inspection_date\":\"\",\"current_location\":\"\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"\",\"daily_rental_price\":\"\",\"monthly_rental_price\":\"\",\"insurance_status\":\"\",\"general_notes\":\"\",\"last_maintenance_date\":\"\",\"status\":\"0\"}', 302, '2026-06-16 16:07:51'),
+(875, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3R1LaGCaCru1oDok7JwZbkKx4R-HFlb5NHmzL9BNABrMQ1Qd', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'fleet_depreciation_profiles', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/fleet_depreciation_profiles.php?edit_id=22', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"edit_id\":\"22\",\"asset_category\":\"جهاز مسح RTK\",\"brand\":\"\",\"model_id\":\"1\",\"method\":\"sl\",\"useful_life\":\"7.00\",\"salvage_pct\":\"0.0500\",\"notes\":\"\"}', 302, '2026-06-16 17:00:11'),
+(876, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3R1LaGCaCru1oDok7JwZbkKx4R-HFlb5NHmzL9BNABrMQ1Qd', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'fleet_models', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/fleet_models.php?edit_id=1', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"edit_id\":\"1\",\"code\":\"666\",\"manufacturer\":\"\",\"model_name\":\"samba\",\"equipment_type_id\":\"5\",\"operating_category\":\"تحميل\",\"fuel_type\":\"بنزين\",\"std_capacity\":\"700.00\",\"std_capacity_uom\":\"طن\",\"default_supplier_id\":\"3\",\"depreciation_profile_id\":\"\",\"tech_reference\":\"احمد\",\"status\":\"active\",\"specTable_length\":\"25\",\"spec_item_type\":[\"فلتر هيدروليك\"],\"spec_recommended_ref\":[\"احمد\"],\"spec_qty\":[\"8.00\"],\"spec_uom\":[\"لا\"],\"spec_alt_ref\":[\"لا\"],\"spec_existing_photo\":[\"\"],\"spec_note\":[\"\"]}', 302, '2026-06-17 08:00:50'),
+(877, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3R1LaGCaCru1oDok7JwZbkKx4R-HFlb5NHmzL9BNABrMQ1Qd', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=20', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"edit_id\":\"20\",\"suppliers\":\"8\",\"code\":\"tx10\",\"type\":\"1\",\"name\":\"tx10\",\"serial_number\":\"\",\"chassis_number\":\"\",\"machine_number\":\"\",\"model_id\":\"1\",\"manufacturer\":\"\",\"model\":\"samba\",\"manufacturing_year\":\"2028\",\"import_year\":\"\",\"operating_category\":\"\",\"origin_country\":\"الصين\",\"engine_no\":\"\",\"plate_no\":\"6768978\",\"capacity\":\"\",\"capacity_uom\":\"\",\"dimensions\":\"\",\"source_type\":\"\",\"entry_date\":\"\",\"acquisition_cost\":\"\",\"acquisition_currency\":\"\",\"opening_meter\":\"\",\"meter_uom\":\"ساعات\",\"meter_source\":\"\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"\",\"owner_type\":\"\",\"owner_phone\":\"\",\"owner_supplier_relation\":\"\",\"license_number\":\"\",\"license_authority\":\"\",\"document_type\":\"\",\"license_expiry_date\":\"\",\"inspection_certificate_number\":\"\",\"last_inspection_date\":\"\",\"current_location\":\"\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"\",\"daily_rental_price\":\"\",\"monthly_rental_price\":\"\",\"insurance_status\":\"\",\"general_notes\":\"\",\"last_maintenance_date\":\"\",\"status\":\"0\"}', 302, '2026-06-17 08:04:45'),
+(878, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3R1LaGCaCru1oDok7JwZbkKx4R-HFlb5NHmzL9BNABrMQ1Qd', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'fleet_models', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/fleet_models.php?edit_id=1', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"edit_id\":\"1\",\"code\":\"666\",\"manufacturer\":\"تايوتا\",\"model_name\":\"samba\",\"equipment_type_id\":\"1\",\"operating_category\":\"تحميل\",\"fuel_type\":\"بنزين\",\"std_capacity\":\"700.00\",\"std_capacity_uom\":\"لتر\",\"default_supplier_id\":\"3\",\"depreciation_profile_id\":\"\",\"tech_reference\":\"احمد\",\"status\":\"active\",\"specTable_length\":\"25\",\"spec_item_type\":[\"فلتر هيدروليك\"],\"spec_recommended_ref\":[\"احمد\"],\"spec_qty\":[\"8.00\"],\"spec_uom\":[\"لا\"],\"spec_alt_ref\":[\"لا\"],\"spec_existing_photo\":[\"\"],\"spec_note\":[\"\"]}', 302, '2026-06-17 08:23:10'),
+(879, 4, NULL, NULL, 6, 3, 'ادارة الاسطول', '8et7pmu4kitrusmh1gh56gml4c', '::1', 'curl/8.7.1', 'fleet_models', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/fleet_models.php', 'POST', '{\"code\":\"__TESTSUP\",\"model_name\":\"????? ??????\",\"manufacturer\":\"???\",\"default_supplier_name\":\"???? ???? ?????? ???\",\"status\":\"active\"}', 302, '2026-06-17 08:49:13'),
+(880, 4, NULL, NULL, 6, 3, 'ادارة الاسطول', 'beoh9ni3vc402jf4que4tdhuro', '::1', 'curl/8.7.1', 'equipment_child_save', 'equipments', 'create', 'add', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipment_child_save.php', 'POST', '{\"entity\":\"compliance\",\"action\":\"add\",\"equipment_id\":\"20\",\"doc_type\":\"????\",\"reference\":\"__TESTDOC\",\"expiry_date\":\"2020-01-01\",\"is_critical\":\"1\"}', 302, '2026-06-17 11:40:48'),
+(881, 4, NULL, NULL, 6, 3, 'ادارة الاسطول', 'beoh9ni3vc402jf4que4tdhuro', '::1', 'curl/8.7.1', 'equipment_child_save', 'equipments', 'create', 'add', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipment_child_save.php', 'POST', '{\"entity\":\"protection\",\"action\":\"add\",\"equipment_id\":\"20\",\"protection_type\":\"???? ?????\",\"description\":\"__TESTPROT\",\"state\":\"????? ???????\"}', 302, '2026-06-17 11:40:48'),
+(882, 4, NULL, NULL, 6, 3, 'ادارة الاسطول', 'beoh9ni3vc402jf4que4tdhuro', '::1', 'curl/8.7.1', 'equipment_child_save', 'equipments', 'create', 'add', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipment_child_save.php', 'POST', '{\"entity\":\"component\",\"action\":\"add\",\"equipment_id\":\"20\",\"component_type\":\"????\",\"serial_no\":\"__TESTCMP\",\"is_current\":\"1\"}', 302, '2026-06-17 11:40:48'),
+(883, 4, NULL, NULL, 6, 3, 'ادارة الاسطول', 'beoh9ni3vc402jf4que4tdhuro', '::1', 'curl/8.7.1', 'equipment_child_save', 'equipments', 'create', 'add', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipment_child_save.php', 'POST', '{\"entity\":\"history\",\"action\":\"add\",\"equipment_id\":\"20\",\"event_type\":\"????/???\",\"event_date\":\"2026-06-17T10:30\",\"note\":\"__TESTHIST\"}', 302, '2026-06-17 11:40:48'),
+(884, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3R1LaGCaCru1oDok7JwZbkKx4R-HFlb5NHmzL9BNABrMQ1Qd', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'equipment_profile', 'equipments', 'create', 'add', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipment_profile.php?id=20', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"entity\":\"compliance\",\"action\":\"add\",\"equipment_id\":\"20\",\"doc_type\":\"تأمين\",\"reference\":\"\",\"issue_date\":\"2026-06-17\",\"expiry_date\":\"2026-06-19\"}', 302, '2026-06-17 11:43:51'),
+(885, 4, NULL, NULL, 6, 3, 'ادارة الاسطول', '3riofg8sv3d3a1nhhdlstuph4n', '::1', 'curl/8.7.1', 'equipment_child_save', 'equipments', 'create', 'add', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipment_child_save.php', 'POST', '{\"entity\":\"protection\",\"action\":\"add\",\"equipment_id\":\"20\",\"protection_type\":\"???? ?????\",\"description\":\"__TESTPROT2\",\"partner_name\":\"???? ????? ???????\",\"state\":\"?????\"}', 302, '2026-06-17 13:01:31'),
+(886, 4, NULL, NULL, 6, 3, 'ادارة الاسطول', 'h0jtm9ncm0qrtascnlrti3c2sp', '::1', 'curl/8.7.1', 'equipment_child_save', 'equipments', 'create', 'add', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipment_child_save.php', 'POST', '{\"entity\":\"protection\",\"action\":\"add\",\"equipment_id\":\"20\",\"protection_type\":\"???? ?????\",\"description\":\"__TESTPROT2\",\"partner_name\":\"PARTNER__XYZ\",\"state\":\"?????\"}', 302, '2026-06-17 13:02:18'),
+(887, 4, 0, 0, 6, 3, 'ادارة الاسطول', '3R1LaGCaCru1oDok7JwZbkKx4R-HFlb5NHmzL9BNABrMQ1Qd', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', 'equipment_profile', 'equipments', 'create', 'add', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipment_profile.php?id=20', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"entity\":\"protection\",\"action\":\"add\",\"equipment_id\":\"20\",\"protection_type\":\"نظام تتبّع\",\"description\":\"نظام جديد\",\"start_date\":\"2026-06-18\",\"cost\":\"1200\",\"state\":\"يحتاج تجديداً\",\"renewal_date\":\"2026-06-24\",\"partner_name\":\"احمد\",\"compliance_id\":\"2\"}', 302, '2026-06-17 13:02:38'),
+(888, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'uUX3,q4qw6GbjzX40spr35di6sXPF22znFyAXcStt68RKPu0', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-17 17:03:43'),
+(889, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'uUX3,q4qw6GbjzX40spr35di6sXPF22znFyAXcStt68RKPu0', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-17 17:05:01'),
+(890, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'bxKzQq3BHp2slUpHnnLsBC99zkNl3vG8,yyqXsUQQ,VQqzye', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-17 17:05:13'),
+(891, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'bxKzQq3BHp2slUpHnnLsBC99zkNl3vG8,yyqXsUQQ,VQqzye', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-17 17:07:04'),
+(892, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'TpoSCbFZB-RNNkyK3cw5PhbeaFfmaNPHhetE-igAYuXJP9,W', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-17 17:07:10'),
+(893, 4, 2, 2, 9, 5, 'مدير الموقع', 'ulMErSCyQK487mt0KWH7SX0KODeZMgU1TgWRj5i50me6T-ZG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"احمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 11:17:41'),
+(894, 4, 2, 2, 9, 5, 'مدير الموقع', 'ulMErSCyQK487mt0KWH7SX0KODeZMgU1TgWRj5i50me6T-ZG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-18 11:55:29'),
+(895, 4, 2, 2, 9, 5, 'مدير الموقع', 'ulMErSCyQK487mt0KWH7SX0KODeZMgU1TgWRj5i50me6T-ZG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-18 11:55:29'),
+(896, 4, 2, 2, 9, 5, 'مدير الموقع', 'ulMErSCyQK487mt0KWH7SX0KODeZMgU1TgWRj5i50me6T-ZG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-18 11:55:29'),
+(897, 4, 2, 2, 9, 5, 'مدير الموقع', 'ulMErSCyQK487mt0KWH7SX0KODeZMgU1TgWRj5i50me6T-ZG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-18 11:58:47'),
+(898, 4, 2, 2, 9, 5, 'مدير الموقع', 'ulMErSCyQK487mt0KWH7SX0KODeZMgU1TgWRj5i50me6T-ZG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"3\"}', 200, '2026-06-18 11:58:47'),
+(899, 4, 2, 2, 9, 5, 'مدير الموقع', 'ulMErSCyQK487mt0KWH7SX0KODeZMgU1TgWRj5i50me6T-ZG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'timesheet', 'timesheet', 'get_event_types', 'get_event_types', NULL, NULL, NULL, NULL, 'http://localhost/ems/Timesheet/timesheet.php?type=1', 'GET', '{\"action\":\"get_event_types\",\"equipment_type\":\"1\"}', 200, '2026-06-18 11:58:47'),
+(900, 4, 2, 2, 9, 5, 'مدير الموقع', 'ulMErSCyQK487mt0KWH7SX0KODeZMgU1TgWRj5i50me6T-ZG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 12:04:05'),
+(901, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'bLdhUA,o9B90A0ObbBj-JAkDszHVqb,BangyvWONmISNj4LR', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 12:04:20'),
+(902, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'bLdhUA,o9B90A0ObbBj-JAkDszHVqb,BangyvWONmISNj4LR', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 12:04:39'),
+(903, 4, 0, 0, 4, 1, 'ادارة التشغيل', '-jICfPHoZbRpquE3KQJamAzD5jDpxuN1av-th9T44TRWNTlC', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 12:04:45'),
+(904, 4, 0, 0, 4, 1, 'ادارة التشغيل', '-jICfPHoZbRpquE3KQJamAzD5jDpxuN1av-th9T44TRWNTlC', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 12:05:14'),
+(905, 4, 0, 0, 5, 2, 'ادارة الموردين', '2G0avUwQeJRA8daRlEbF6nUP2dDZh8SfStiEW5MEmeeXy0bK', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مصعب\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 12:05:27'),
+(906, 4, 0, 0, 5, 2, 'ادارة الموردين', '2G0avUwQeJRA8daRlEbF6nUP2dDZh8SfStiEW5MEmeeXy0bK', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 12:06:19'),
+(907, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'y7yMzmGsd0ZRWWCm49sTz3QBl63iTFwRGdFHlj0m6tQlUer4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 12:06:29'),
+(908, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'y7yMzmGsd0ZRWWCm49sTz3QBl63iTFwRGdFHlj0m6tQlUer4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:03:36'),
+(909, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Bv7gWVfPM3vA,QUnyephm7IphAuHy7VZaIVmY3-Nf1ZDOIa0', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:03:44'),
+(910, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Bv7gWVfPM3vA,QUnyephm7IphAuHy7VZaIVmY3-Nf1ZDOIa0', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:03:55'),
+(911, 4, 0, 0, 5, 2, 'ادارة الموردين', '765,TZM9aYy0yJKjdGsAxkYmXbK9D3ekWJ-DBRuCjYn4gZ7P', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مصعب\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:04:06'),
+(912, 4, 0, 0, 5, 2, 'ادارة الموردين', '765,TZM9aYy0yJKjdGsAxkYmXbK9D3ekWJ-DBRuCjYn4gZ7P', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:04:16'),
+(913, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'kKem049,41ol5WJU-icUuJSlk-1hZrCwj7,B1bHhlC4IJ3sk', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:04:23'),
+(914, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'kKem049,41ol5WJU-icUuJSlk-1hZrCwj7,B1bHhlC4IJ3sk', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:04:37'),
+(915, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'eqSYJzg3TLpPZoqtMQEJK2Vr,POPGkg4ywb,CardW7Fe,GwY', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:04:49'),
+(916, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'eqSYJzg3TLpPZoqtMQEJK2Vr,POPGkg4ywb,CardW7Fe,GwY', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:11:03'),
+(917, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'k1fMYPrs9lHEF5JoaggZ0KevWVLmMiE3EF1x4njbCr9MfP2o', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:11:22'),
+(918, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'k1fMYPrs9lHEF5JoaggZ0KevWVLmMiE3EF1x4njbCr9MfP2o', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:14:39'),
+(919, 4, 0, 0, 6, 3, 'ادارة الاسطول', '1pghjA1Qu-qz5,X1K80u2od2-dmb,LSlcabcivptGRC,oDk8', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:14:47'),
+(920, 4, 0, 0, 6, 3, 'ادارة الاسطول', '1pghjA1Qu-qz5,X1K80u2od2-dmb,LSlcabcivptGRC,oDk8', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:21:40'),
+(921, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'I1N3VW1uruYyyPxqinvxN2SkLhs5nxWxPjTJqEpC4XrzzOb-', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:21:46'),
+(922, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'I1N3VW1uruYyyPxqinvxN2SkLhs5nxWxPjTJqEpC4XrzzOb-', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:39:14'),
+(923, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'du0dNyHfreZDWHoDyClnRE6aeWLwqYy-uPYtqyCOxJLIGwBG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:39:22'),
+(924, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'du0dNyHfreZDWHoDyClnRE6aeWLwqYy-uPYtqyCOxJLIGwBG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:40:56'),
+(925, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '2vT1p8lY4Zrj-nUsFlh-u9dgCBzQhwcsfsmMewj,JTIRrOBY', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"اروينا\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:41:04'),
+(926, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '2vT1p8lY4Zrj-nUsFlh-u9dgCBzQhwcsfsmMewj,JTIRrOBY', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:42:38'),
+(927, 4, 0, 0, 4, 1, 'ادارة التشغيل', '2tpkAsC0bK4KMA23CHe32-ap-zEtjn9OLhjH8XYSPiQ,UvsW', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:43:18'),
+(928, 4, 0, 0, 4, 1, 'ادارة التشغيل', '2tpkAsC0bK4KMA23CHe32-ap-zEtjn9OLhjH8XYSPiQ,UvsW', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:43:20'),
+(929, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'eWc2OjlsudAQt98sOUCXPEZfMvPC4ZkR73Kf4SLFN4fweuIh', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:43:26'),
+(930, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'eWc2OjlsudAQt98sOUCXPEZfMvPC4ZkR73Kf4SLFN4fweuIh', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-18 13:43:48'),
+(931, 4, 0, 0, 7, 4, 'ادارة الموارد البشرية', '515HODsnD4DjTWscxl5oA6j8AzhIlNiwk5FRcbyANF1OoLWM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"اروينا\",\"password\":\"[REDACTED]\"}', 200, '2026-06-18 13:43:57'),
+(932, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'H15V4wjUujwqhRbevMPwvxIT3C4soh40yk,h0LNYaB9Rs6o4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 08:01:31'),
+(933, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'H15V4wjUujwqhRbevMPwvxIT3C4soh40yk,h0LNYaB9Rs6o4', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'fleet_models', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/fleet_models.php?edit_id=1', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"edit_id\":\"1\",\"code\":\"666\",\"manufacturer\":\"تايوتا\",\"model_name\":\"samba\",\"equipment_type_id\":\"1\",\"operating_category\":\"تحميل\",\"fuel_type\":\"بنزين\",\"std_capacity\":\"700.00\",\"std_capacity_uom\":\"لتر\",\"default_supplier_name\":\"إيكوبيشن\",\"depreciation_profile_id\":\"\",\"tech_reference\":\"احمد\",\"status\":\"active\",\"specTable_length\":\"25\",\"spec_item_type\":[\"فلتر هيدروليك\",\"زيت مكنة\"],\"spec_recommended_ref\":[\"احمد\",\"احمد\"],\"spec_qty\":[\"8.00\",\"4\"],\"spec_uom\":[\"لا\",\"لتر\"],\"spec_alt_ref\":[\"لا\",\"تابكو\"],\"spec_existing_photo\":[\"\",\"\"],\"spec_note\":[\"لا توجد\",\"افضل\"]}', 302, '2026-06-20 08:04:08'),
+(934, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'jt,XC5-JEAPmxJ4AV8-6VO1OutQKoEg3qUkVtCXLumu1clAt', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:15:16'),
+(935, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'QnfS,XShhQUJ2eiNVbXRZLkjGG6iWZh2dOiYIp3S2Ynozwqs', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:19:18'),
+(936, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'dsnpasIhRUG9MW2kdk7q-kRT4DXmYhW4QiwkjJo2ke0ihV1l', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:26:26'),
+(937, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'dsnpasIhRUG9MW2kdk7q-kRT4DXmYhW4QiwkjJo2ke0ihV1l', '::1', 'curl/8.7.1', 'breakdowns', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"equipment_id\":\"13\",\"severity\":\"?????\",\"description\":\"??? ?????? ???\"}', 302, '2026-06-20 19:26:26'),
+(938, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'dsnpasIhRUG9MW2kdk7q-kRT4DXmYhW4QiwkjJo2ke0ihV1l', '::1', 'curl/8.7.1', 'breakdowns', 'maintenance', 'issue_order', 'issue_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"action\":\"issue_order\",\"breakdown_id\":\"1\"}', 302, '2026-06-20 19:26:26'),
+(939, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'dsnpasIhRUG9MW2kdk7q-kRT4DXmYhW4QiwkjJo2ke0ihV1l', '::1', 'curl/8.7.1', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 1, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"save_order\",\"id\":\"1\",\"equipment_id\":\"13\",\"source\":\"????\",\"state\":\"?????\"}', 302, '2026-06-20 19:26:27'),
+(940, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'dsnpasIhRUG9MW2kdk7q-kRT4DXmYhW4QiwkjJo2ke0ihV1l', '::1', 'curl/8.7.1', 'orders', 'maintenance', 'create', 'add_labor', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"add_labor\",\"order_id\":\"1\",\"labor_role\":\"???\",\"hours\":\"3\",\"hourly_rate\":\"50\"}', 302, '2026-06-20 19:26:27'),
+(941, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'dsnpasIhRUG9MW2kdk7q-kRT4DXmYhW4QiwkjJo2ke0ihV1l', '::1', 'curl/8.7.1', 'orders', 'maintenance', 'create', 'add_part', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"add_part\",\"order_id\":\"1\",\"part_name\":\"????\",\"quantity\":\"2\",\"unit_cost\":\"100\"}', 302, '2026-06-20 19:26:27'),
+(942, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'dsnpasIhRUG9MW2kdk7q-kRT4DXmYhW4QiwkjJo2ke0ihV1l', '::1', 'curl/8.7.1', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 1, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"save_order\",\"id\":\"1\",\"equipment_id\":\"13\",\"source\":\"????\",\"state\":\"?????\",\"actions_taken\":\"?? ???????\",\"inspection_result\":\"????\"}', 302, '2026-06-20 19:26:27'),
+(943, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'dsnpasIhRUG9MW2kdk7q-kRT4DXmYhW4QiwkjJo2ke0ihV1l', '::1', 'curl/8.7.1', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 1, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"save_order\",\"id\":\"1\",\"equipment_id\":\"13\",\"source\":\"????\",\"state\":\"?????\",\"actions_taken\":\"?? ???????\",\"root_cause_id\":\"1\",\"inspection_result\":\"????\"}', 302, '2026-06-20 19:26:27'),
+(944, 1, 0, 0, 21, 13, 'ادارة الصيانة', 'nQFdfTN1YWIGhWG8Vu3bCwAs93eiFBQlUkWT2v0fOTh4p1Oc', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr_c1\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:26:28'),
+(945, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'dsnpasIhRUG9MW2kdk7q-kRT4DXmYhW4QiwkjJo2ke0ihV1l', '::1', 'curl/8.7.1', 'breakdowns', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"equipment_id\":\"13\",\"severity\":\"??????\",\"description\":\"???? ???? ???????\"}', 302, '2026-06-20 19:26:29'),
+(946, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'Mp9jkGDRNLBoBhBsgHUAf9iVsGFY094PHlv5u,BR5Hb4hUVT', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:28:45'),
+(947, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'Mp9jkGDRNLBoBhBsgHUAf9iVsGFY094PHlv5u,BR5Hb4hUVT', '::1', 'curl/8.7.1', '_probe', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/_probe.php', 'POST', '{\"v\":\"?????\"}', 200, '2026-06-20 19:28:45'),
+(948, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'sXMRdswuadG5idNHqpAotwu3D2UaXkty2s5QgT1byx7CThg8', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:29:28'),
+(949, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'sXMRdswuadG5idNHqpAotwu3D2UaXkty2s5QgT1byx7CThg8', '::1', 'curl/8.7.1', '_probe', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/_probe.php', 'POST', '{\"v\":\"تنفيذ\"}', 200, '2026-06-20 19:29:28'),
+(950, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'jNpR8KtDx4eTQxoJqo63,-vcyJuuAmL1qqdbrxEqoYNO5Y07', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:31:22'),
+(951, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'jNpR8KtDx4eTQxoJqo63,-vcyJuuAmL1qqdbrxEqoYNO5Y07', '::1', NULL, 'breakdowns', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"equipment_id\":\"13\",\"severity\":\"عالية\",\"description\":\"عطل اختبار آلي شامل\"}', 302, '2026-06-20 19:31:22'),
+(952, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'jNpR8KtDx4eTQxoJqo63,-vcyJuuAmL1qqdbrxEqoYNO5Y07', '::1', NULL, 'breakdowns', 'maintenance', 'issue_order', 'issue_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"action\":\"issue_order\",\"breakdown_id\":\"3\"}', 302, '2026-06-20 19:31:22'),
+(953, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'jNpR8KtDx4eTQxoJqo63,-vcyJuuAmL1qqdbrxEqoYNO5Y07', '::1', NULL, 'orders', 'maintenance', 'save_order', 'save_order', NULL, 2, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"save_order\",\"id\":\"2\",\"equipment_id\":\"13\",\"source\":\"بلاغ\",\"state\":\"تنفيذ\"}', 302, '2026-06-20 19:31:22'),
+(954, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'jNpR8KtDx4eTQxoJqo63,-vcyJuuAmL1qqdbrxEqoYNO5Y07', '::1', NULL, 'orders', 'maintenance', 'create', 'add_labor', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"add_labor\",\"order_id\":\"2\",\"labor_role\":\"فني\",\"hours\":\"3\",\"hourly_rate\":\"50\"}', 302, '2026-06-20 19:31:22'),
+(955, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'jNpR8KtDx4eTQxoJqo63,-vcyJuuAmL1qqdbrxEqoYNO5Y07', '::1', NULL, 'orders', 'maintenance', 'create', 'add_part', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"add_part\",\"order_id\":\"2\",\"part_name\":\"فلتر زيت\",\"quantity\":\"2\",\"unit_cost\":\"100\"}', 302, '2026-06-20 19:31:22'),
+(956, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'jNpR8KtDx4eTQxoJqo63,-vcyJuuAmL1qqdbrxEqoYNO5Y07', '::1', NULL, 'orders', 'maintenance', 'save_order', 'save_order', NULL, 2, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"save_order\",\"id\":\"2\",\"equipment_id\":\"13\",\"source\":\"بلاغ\",\"state\":\"إغلاق\",\"actions_taken\":\"تم الإصلاح\",\"inspection_result\":\"ناجح\"}', 302, '2026-06-20 19:31:22'),
+(957, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'jNpR8KtDx4eTQxoJqo63,-vcyJuuAmL1qqdbrxEqoYNO5Y07', '::1', NULL, 'orders', 'maintenance', 'save_order', 'save_order', NULL, 2, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"save_order\",\"id\":\"2\",\"equipment_id\":\"13\",\"source\":\"بلاغ\",\"state\":\"إغلاق\",\"actions_taken\":\"تم الإصلاح الكامل\",\"root_cause_id\":\"2\",\"inspection_result\":\"ناجح\"}', 302, '2026-06-20 19:31:22'),
+(958, 1, 0, 0, 21, 13, 'ادارة الصيانة', ',78,4QjHAjpaGWfwa,e4AEDTy9zE7E-lnZ85n9pdEZhbnBQG', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr_c1\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:31:23'),
+(959, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'jNpR8KtDx4eTQxoJqo63,-vcyJuuAmL1qqdbrxEqoYNO5Y07', '::1', NULL, 'breakdowns', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"equipment_id\":\"13\",\"severity\":\"متوسطة\",\"description\":\"بلاغ للعدّاد\"}', 302, '2026-06-20 19:31:23'),
+(960, 4, 0, 0, 20, 14, 'مشرف صيانة', '2VL2,D8DRcbkzhiallyB9R,Doy7FD0pdwNVJDTXo-rLhFBU4', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_sup\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:31:23'),
+(961, 4, 0, 0, 20, 14, 'مشرف صيانة', '2VL2,D8DRcbkzhiallyB9R,Doy7FD0pdwNVJDTXo-rLhFBU4', '::1', NULL, 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"new_order\"}', 302, '2026-06-20 19:31:23'),
+(962, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'VL7h0LK7NTlbN2jrBs4J281FUx4pQcSeIsSufHO0InwKqEmp', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:36:58'),
+(963, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'VL7h0LK7NTlbN2jrBs4J281FUx4pQcSeIsSufHO0InwKqEmp', '::1', NULL, 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"action\":\"new_inspection\"}', 302, '2026-06-20 19:36:58'),
+(964, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'VL7h0LK7NTlbN2jrBs4J281FUx4pQcSeIsSufHO0InwKqEmp', '::1', NULL, 'inspections', 'maintenance', 'create', 'add_line', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"action\":\"add_line\",\"inspection_id\":\"1\",\"component\":\"الفرامل\",\"condition_state\":\"ملاحظة\",\"recommendation\":\"استبدال\"}', 302, '2026-06-20 19:36:58'),
+(965, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'VL7h0LK7NTlbN2jrBs4J281FUx4pQcSeIsSufHO0InwKqEmp', '::1', NULL, 'inspections', 'maintenance', 'save_inspection', 'save_inspection', NULL, 1, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"action\":\"save_inspection\",\"id\":\"1\",\"inspection_type\":\"دوري\",\"equipment_id\":\"13\",\"equipment_condition\":\"جيدة\",\"engine_condition\":\"ممتازة\",\"tech_readiness_state\":\"جاهزة\",\"state\":\"مكتمل\"}', 302, '2026-06-20 19:36:58'),
+(966, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'VL7h0LK7NTlbN2jrBs4J281FUx4pQcSeIsSufHO0InwKqEmp', '::1', NULL, 'preventive_plans', 'maintenance', 'new_plan', 'new_plan', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php', 'POST', '{\"action\":\"new_plan\"}', 302, '2026-06-20 19:36:58'),
+(967, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'VL7h0LK7NTlbN2jrBs4J281FUx4pQcSeIsSufHO0InwKqEmp', '::1', NULL, 'preventive_plans', 'maintenance', 'save_plan', 'save_plan', NULL, 1, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php', 'POST', '{\"action\":\"save_plan\",\"id\":\"1\",\"name\":\"خطة الزيت\",\"trigger_basis\":\"ساعات\",\"interval_value\":\"250\",\"equipment_id\":\"13\",\"next_due_meter\":\"0\",\"state\":\"نشطة\"}', 302, '2026-06-20 19:36:58'),
+(968, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'VL7h0LK7NTlbN2jrBs4J281FUx4pQcSeIsSufHO0InwKqEmp', '::1', NULL, 'preventive_plans', 'maintenance', 'generate_order', 'generate_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php', 'POST', '{\"action\":\"generate_order\",\"plan_id\":\"1\"}', 302, '2026-06-20 19:36:58'),
+(969, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'VL7h0LK7NTlbN2jrBs4J281FUx4pQcSeIsSufHO0InwKqEmp', '::1', NULL, 'orders', 'maintenance', 'save_order', 'save_order', NULL, 3, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"save_order\",\"id\":\"3\",\"equipment_id\":\"13\",\"source\":\"وقائي\",\"state\":\"إغلاق\",\"actions_taken\":\"صيانة وقائية تمت\",\"root_cause_id\":\"3\",\"inspection_result\":\"ناجح\"}', 302, '2026-06-20 19:36:58'),
+(970, 4, 0, 0, 19, 13, 'ادارة الصيانة', '0U3vUvHTi1oC2MxRTY6j50-Pm8r0wxS9KyIzrodUTdQSnPem', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:37:31'),
+(971, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'E757w4rvmZ686AW3J1Akn4iSk0P6aeCh95s0qw9y2RNzTbjA', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:37:32'),
+(972, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'p7bigRHvBa4PnEFUKHlhG9,Intly9ZEW,0uWW57Ohc25GESz', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:37:33'),
+(973, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'TExAZA,D3jRPSNLMr8VgiMbUuRitjy-uTS2KihLlDh0wWp6-', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:39:33'),
+(974, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'SeBk1Ids58mGiye1xQDbmsdlwdEWQweqZ,623nWf3zkc1VlD', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:43:18'),
+(975, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'oCk61faypPNt7KiOHxOO9YW2hqQS-KeuAMbqbbZ6yNwem29P', '::1', 'curl/8.7.1', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:43:19'),
+(976, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'niZ,4m5wt,h7mAMjhbaiNjalxVIOUKQnJ0d0gdE6tj6g1cOB', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"maint_mgr\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:44:40'),
+(977, 4, 0, 0, 22, 1, 'ادارة التشغيل', 'YjhhydrqztbSankdxStfhFKFFHcQ9QhFAw0TyMC,7-Q0Jqnm', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"ops_test\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 19:45:10'),
+(978, 4, 0, 0, 22, 1, 'ادارة التشغيل', 'YjhhydrqztbSankdxStfhFKFFHcQ9QhFAw0TyMC,7-Q0Jqnm', '::1', NULL, 'breakdowns', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"equipment_id\":\"13\",\"severity\":\"منخفضة\",\"description\":\"بلاغ من التشغيل\"}', 302, '2026-06-20 19:45:10'),
+(979, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Gsq3m2yoFljvXDWcegGRu0RJsaZ3BiyxoYMyWnnPam4dcEqX', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 19:54:04'),
+(980, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Gsq3m2yoFljvXDWcegGRu0RJsaZ3BiyxoYMyWnnPam4dcEqX', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/users.php', 'POST', '{\"username\":\"صيا\",\"uid\":\"19\"}', 200, '2026-06-20 19:54:34'),
+(981, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Gsq3m2yoFljvXDWcegGRu0RJsaZ3BiyxoYMyWnnPam4dcEqX', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/users.php', 'POST', '{\"username\":\"صيان\",\"uid\":\"19\"}', 200, '2026-06-20 19:54:34'),
+(982, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Gsq3m2yoFljvXDWcegGRu0RJsaZ3BiyxoYMyWnnPam4dcEqX', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/users.php', 'POST', '{\"username\":\"صيانة\",\"uid\":\"19\"}', 200, '2026-06-20 19:54:35'),
+(983, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Gsq3m2yoFljvXDWcegGRu0RJsaZ3BiyxoYMyWnnPam4dcEqX', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/users.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"uid\":\"19\",\"name\":\"مدير الصيانة\",\"username\":\"صيانة\",\"password\":\"[REDACTED]\",\"role\":\"13\",\"phone\":\"01123475758\",\"status\":\"active\",\"project_id\":\"\",\"contract_id\":\"\"}', 200, '2026-06-20 19:54:48'),
+(984, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Gsq3m2yoFljvXDWcegGRu0RJsaZ3BiyxoYMyWnnPam4dcEqX', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/users.php', 'POST', '{\"username\":\"مصي\",\"uid\":\"20\"}', 200, '2026-06-20 19:55:12');
+INSERT INTO `activity_logs` (`id`, `company_id`, `project_id`, `contract_id`, `user_id`, `role_id`, `role_name`, `session_id`, `ip_address`, `user_agent`, `screen_name`, `module_name`, `action_type`, `button_name`, `field_name`, `record_id`, `old_value`, `new_value`, `url`, `http_method`, `request_payload`, `response_status`, `created_at`) VALUES
+(985, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Gsq3m2yoFljvXDWcegGRu0RJsaZ3BiyxoYMyWnnPam4dcEqX', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/users.php', 'POST', '{\"username\":\"مصيا\",\"uid\":\"20\"}', 200, '2026-06-20 19:55:13'),
+(986, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Gsq3m2yoFljvXDWcegGRu0RJsaZ3BiyxoYMyWnnPam4dcEqX', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/users.php', 'POST', '{\"username\":\"مصيان\",\"uid\":\"20\"}', 200, '2026-06-20 19:55:13'),
+(987, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Gsq3m2yoFljvXDWcegGRu0RJsaZ3BiyxoYMyWnnPam4dcEqX', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/users.php', 'POST', '{\"username\":\"مصيانة\",\"uid\":\"20\"}', 200, '2026-06-20 19:55:13'),
+(988, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Gsq3m2yoFljvXDWcegGRu0RJsaZ3BiyxoYMyWnnPam4dcEqX', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'users', 'main', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/main/users.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"uid\":\"20\",\"name\":\"مشرف الصيانة\",\"username\":\"مصيانة\",\"password\":\"[REDACTED]\",\"role\":\"13\",\"phone\":\"0915657579\",\"status\":\"active\",\"project_id\":\"\",\"contract_id\":\"\"}', 200, '2026-06-20 19:55:31'),
+(989, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'Gsq3m2yoFljvXDWcegGRu0RJsaZ3BiyxoYMyWnnPam4dcEqX', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-20 19:56:05'),
+(990, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"صيانة\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 19:56:13'),
+(991, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 19:56:29'),
+(992, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 19:57:34'),
+(993, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'preventive_plans', 'maintenance', 'new_plan', 'new_plan', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_plan\"}', 302, '2026-06-20 19:58:01'),
+(994, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 20:00:47'),
+(995, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'preventive_plans', 'maintenance', 'new_plan', 'new_plan', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_plan\"}', 302, '2026-06-20 20:00:54'),
+(996, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'breakdowns', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"equipment_id\":\"11\",\"project_id\":\"1\",\"reporter_dept\":\"التشغيل\",\"report_datetime\":\"2026-06-20T23:03\",\"failure_code_id\":\"41\",\"severity\":\"عالية\",\"is_stopped\":\"1\",\"description\":\"المعدة واقفة\"}', 302, '2026-06-20 20:02:34'),
+(997, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'breakdowns', 'maintenance', 'issue_order', 'issue_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php?msg=%D8%AA%D9%85+%D8%AA%D8%B3%D8%AC%D9%8A%D9%84+%D8%A7%D9%84%D8%A8%D9%84%D8%A7%D8%BA+%D8%A8%D9%86%D8%AC%D8%A7%D8%AD+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"issue_order\",\"breakdown_id\":\"6\"}', 302, '2026-06-20 20:02:55'),
+(998, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'create', 'add_labor', NULL, 5, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=5&msg=%D8%AA%D9%85+%D8%A5%D8%B5%D8%AF%D8%A7%D8%B1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%D9%85%D9%86+%D8%A7%D9%84%D8%A8%D9%84%D8%A7%D8%BA+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"add_labor\",\"order_id\":\"5\",\"employee_id\":\"9\",\"labor_role\":\"5\",\"hours\":\"10\",\"hourly_rate\":\"5\"}', 302, '2026-06-20 20:05:03'),
+(999, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'create', 'add_part', NULL, 5, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=5&msg=%D8%AA%D9%85%D8%AA+%D8%A5%D8%B6%D8%A7%D9%81%D8%A9+%D8%B3%D8%B7%D8%B1+%D8%B9%D9%85%D8%A7%D9%84%D8%A9+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"add_part\",\"order_id\":\"5\",\"part_name\":\"قطعة بيضاء\",\"category\":\"تصنيف\",\"quantity\":\"1\",\"unit_cost\":\"10\"}', 302, '2026-06-20 20:05:27'),
+(1000, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 5, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=5&msg=%D8%AA%D9%85%D8%AA+%D8%A5%D8%B6%D8%A7%D9%81%D8%A9+%D8%B3%D8%B7%D8%B1+%D9%82%D8%B7%D8%B9%D8%A9+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"5\",\"equipment_id\":\"11\",\"project_id\":\"1\",\"source\":\"بلاغ\",\"maint_type\":\"\",\"priority\":\"\",\"failure_code_id\":\"41\",\"cost_party\":\"\",\"vendor_id\":\"\",\"workshop\":\"\",\"technician_id\":\"\",\"supervisor_id\":\"\",\"external_cost\":\"0.00\",\"work_start\":\"\",\"work_end\":\"\",\"downtime_hours\":\"0.00\",\"root_cause_id\":\"\",\"inspection_result\":\"\",\"state\":\"بلاغ\",\"diagnosis\":\"\",\"actions_taken\":\"\"}', 302, '2026-06-20 20:07:56'),
+(1001, 4, 0, 0, 19, 13, 'ادارة الصيانة', '3HPuf7WpDZwlNNxYd74vL74jW-H9,TX83b-Dmw8rgfVwYAOM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-20 20:08:12'),
+(1002, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'LNmAEh6asJ9HEhhgH1voEAIDUmNOWDk5oSZXuyopFXm5XwsQ', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 20:08:18'),
+(1003, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'LNmAEh6asJ9HEhhgH1voEAIDUmNOWDk5oSZXuyopFXm5XwsQ', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-20 20:11:29'),
+(1004, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'oZBL,rX99q7dD7N0XHWcsqh-GrAwWz2l4Rjm-1AIpDHf03vF', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 20:11:36'),
+(1005, 4, 0, 0, 4, 1, 'ادارة التشغيل', 'oZBL,rX99q7dD7N0XHWcsqh-GrAwWz2l4Rjm-1AIpDHf03vF', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-20 20:20:48'),
+(1006, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'FNKVCjBOiYuRmeEH3lDNu2IYRoFlRGMbXaeX9eGjcQkjZrk1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"صيانة\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 20:20:55'),
+(1007, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'FNKVCjBOiYuRmeEH3lDNu2IYRoFlRGMbXaeX9eGjcQkjZrk1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 20:21:09'),
+(1008, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'FNKVCjBOiYuRmeEH3lDNu2IYRoFlRGMbXaeX9eGjcQkjZrk1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 20:21:35'),
+(1009, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'FNKVCjBOiYuRmeEH3lDNu2IYRoFlRGMbXaeX9eGjcQkjZrk1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'create', 'add_labor', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=6&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%D8%AC%D8%AF%D9%8A%D8%AF+%E2%9C%85', 'POST', '{\"action\":\"add_labor\",\"order_id\":\"6\",\"employee_id\":\"14\",\"labor_role\":\"5\",\"hours\":\"2\",\"hourly_rate\":\"10\",\"ajax\":\"1\"}', 200, '2026-06-20 20:21:52'),
+(1010, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'FNKVCjBOiYuRmeEH3lDNu2IYRoFlRGMbXaeX9eGjcQkjZrk1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'create', 'add_part', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=6&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%D8%AC%D8%AF%D9%8A%D8%AF+%E2%9C%85', 'POST', '{\"action\":\"add_part\",\"order_id\":\"6\",\"part_name\":\"قطعة بيضاء\",\"category\":\"تعدين\",\"quantity\":\"1\",\"unit_cost\":\"10\",\"ajax\":\"1\"}', 200, '2026-06-20 20:22:06'),
+(1011, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'FNKVCjBOiYuRmeEH3lDNu2IYRoFlRGMbXaeX9eGjcQkjZrk1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'create', 'add_part', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=6&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%D8%AC%D8%AF%D9%8A%D8%AF+%E2%9C%85', 'POST', '{\"action\":\"add_part\",\"order_id\":\"6\",\"part_name\":\"قطعة بيضاء\",\"category\":\"رقص , بالي , غناء , حفلة\",\"quantity\":\"1\",\"unit_cost\":\"10\",\"is_major_component\":\"1\",\"ajax\":\"1\"}', 200, '2026-06-20 20:22:17'),
+(1012, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'FNKVCjBOiYuRmeEH3lDNu2IYRoFlRGMbXaeX9eGjcQkjZrk1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 6, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=6&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%D8%AC%D8%AF%D9%8A%D8%AF+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"6\",\"equipment_id\":\"\",\"project_id\":\"\",\"source\":\"بلاغ\",\"maint_type\":\"\",\"priority\":\"\",\"failure_code_id\":\"\",\"cost_party\":\"\",\"vendor_id\":\"\",\"workshop\":\"\",\"technician_id\":\"\",\"supervisor_id\":\"\",\"external_cost\":\"0.00\",\"work_start\":\"\",\"work_end\":\"\",\"downtime_hours\":\"0.00\",\"root_cause_id\":\"\",\"inspection_result\":\"\",\"state\":\"بلاغ\",\"diagnosis\":\"\",\"actions_taken\":\"\"}', 302, '2026-06-20 20:22:27'),
+(1013, 4, 0, 0, 25, 13, 'ادارة الصيانة', 'e646t94219Ehya-nox2mTDz8veQNmVz0TWdpa0OIQHyju,CV', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"mnt_qa\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 20:22:37'),
+(1014, 4, 0, 0, 25, 13, 'ادارة الصيانة', 'e646t94219Ehya-nox2mTDz8veQNmVz0TWdpa0OIQHyju,CV', '::1', NULL, 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"new_order\"}', 302, '2026-06-20 20:22:37'),
+(1015, 4, 0, 0, 25, 13, 'ادارة الصيانة', 'e646t94219Ehya-nox2mTDz8veQNmVz0TWdpa0OIQHyju,CV', '::1', NULL, 'orders', 'maintenance', 'create', 'add_labor', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"ajax\":\"1\",\"action\":\"add_labor\",\"order_id\":\"7\",\"labor_role\":\"فني\",\"hours\":\"3\",\"hourly_rate\":\"50\"}', 200, '2026-06-20 20:22:38'),
+(1016, 4, 0, 0, 25, 13, 'ادارة الصيانة', 'e646t94219Ehya-nox2mTDz8veQNmVz0TWdpa0OIQHyju,CV', '::1', NULL, 'orders', 'maintenance', 'create', 'add_part', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"ajax\":\"1\",\"action\":\"add_part\",\"order_id\":\"7\",\"part_name\":\"فلتر\",\"quantity\":\"2\",\"unit_cost\":\"100\"}', 200, '2026-06-20 20:22:38'),
+(1017, 4, 0, 0, 25, 13, 'ادارة الصيانة', 'e646t94219Ehya-nox2mTDz8veQNmVz0TWdpa0OIQHyju,CV', '::1', NULL, 'orders', 'maintenance', 'del_labor', 'del_labor', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"ajax\":\"1\",\"action\":\"del_labor\",\"order_id\":\"7\",\"line_id\":\"5\"}', 200, '2026-06-20 20:22:38'),
+(1018, 4, 0, 0, 25, 13, 'ادارة الصيانة', 'e646t94219Ehya-nox2mTDz8veQNmVz0TWdpa0OIQHyju,CV', '::1', NULL, 'orders', 'maintenance', 'save_order', 'save_order', NULL, 7, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"save_order\",\"id\":\"7\",\"equipment_id\":\"13\",\"source\":\"بلاغ\",\"state\":\"تنفيذ\"}', 302, '2026-06-20 20:22:38'),
+(1019, 4, 0, 0, 25, 13, 'ادارة الصيانة', 'e646t94219Ehya-nox2mTDz8veQNmVz0TWdpa0OIQHyju,CV', '::1', NULL, 'orders', 'maintenance', 'save_order', 'save_order', NULL, 7, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"save_order\",\"id\":\"7\",\"equipment_id\":\"13\",\"source\":\"بلاغ\",\"state\":\"إغلاق\",\"actions_taken\":\"تم\",\"root_cause_id\":\"5\",\"inspection_result\":\"ناجح\"}', 302, '2026-06-20 20:22:38'),
+(1020, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'FNKVCjBOiYuRmeEH3lDNu2IYRoFlRGMbXaeX9eGjcQkjZrk1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 20:22:52'),
+(1021, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'FNKVCjBOiYuRmeEH3lDNu2IYRoFlRGMbXaeX9eGjcQkjZrk1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-20 20:23:49'),
+(1022, 4, 0, 0, 6, 3, 'ادارة الاسطول', '34pRF1SZ7b-LQ5XvzlJkshC1js22QvJZivQikhqUIuvP,r2T', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 20:23:54'),
+(1023, 4, 0, 0, 28, 3, 'ادارة الاسطول', 'MscCI5uxgqBjnnF3xESbWhM88Thb,E,4imRQ,opU8AessRqd', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_fleet\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 20:28:29'),
+(1024, 4, 0, 0, 29, 13, 'ادارة الصيانة', '9CkcmX2xuk8Y8F7IqwYy7IXsh82b-PoyYK5cRVYUFRE0ZSAe', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_maint\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 20:28:29'),
+(1025, 4, 0, 0, 30, 3, 'ادارة الاسطول', '6,9blXXucmT8AUbG1OrRCbP,2Tbeqkey3bXo45Vs7ylS76lU', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_fleet\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 20:29:16'),
+(1026, 4, 0, 0, 31, 1, 'ادارة التشغيل', '7YFGg6Wz1gxPe0JHotD7qsQuRslCUj4NWBAhN6DhCpuvaWXT', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_admin\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 20:30:40'),
+(1027, 4, 0, 0, 32, 1, 'ادارة التشغيل', 'yz-NSqV2Mi,3srbmUjVgFpy9qtv0zCiZ,5zq,d08f-eoBgGK', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_admin\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 20:31:29'),
+(1028, 4, 0, 0, 6, 3, 'ادارة الاسطول', '9xKPh,FGYR8rYDfIJ23vvookXvJc3-AafTlGJBw6HdXH7ETc', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 20:31:59'),
+(1029, 4, 0, 0, 33, 1, 'ادارة التشغيل', 'pDAKZfvjiOZqa5btreSkx2ahj--08L7RpNG1jeCZuIb0Z9XT', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_admin\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 20:33:45'),
+(1030, 4, 0, 0, 6, 3, 'ادارة الاسطول', '9xKPh,FGYR8rYDfIJ23vvookXvJc3-AafTlGJBw6HdXH7ETc', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-20 20:34:36'),
+(1031, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"صيانة\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 20:34:44'),
+(1032, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 20:35:22'),
+(1033, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 20:36:59'),
+(1034, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 20:46:23'),
+(1035, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'breakdowns', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"equipment_id\":\"11\",\"project_id\":\"1\",\"reporter_dept\":\"التشغيل\",\"report_datetime\":\"2026-06-20T23:48\",\"failure_code_id\":\"385\",\"severity\":\"حرجة\",\"is_stopped\":\"1\",\"description\":\"بلاع\"}', 302, '2026-06-20 20:48:27'),
+(1036, 4, 0, 0, 34, 13, 'ادارة الصيانة', 'ZeJpuj2twh1,QIDCbBkDvmIxBZozvQrHlsIDB,3485MSkc3T', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_mnt\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 20:48:42'),
+(1037, 4, 0, 0, 35, 13, 'ادارة الصيانة', 'hxD3gTC5jidGZ40L4JSlKUdQYdzNAzaESaSE791FZbBPjK2N', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_mnt\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 20:52:22'),
+(1038, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 20:53:02'),
+(1039, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 8, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=8', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"8\",\"equipment_id\":\"\",\"project_id\":\"\",\"source\":\"بلاغ\",\"maint_type\":\"\",\"priority\":\"\",\"failure_code_id\":\"\",\"cost_party\":\"\",\"vendor_id\":\"\",\"workshop\":\"\",\"technician_id\":\"\",\"supervisor_id\":\"\",\"external_cost\":\"0.00\",\"work_start\":\"\",\"work_end\":\"\",\"downtime_hours\":\"0.00\",\"root_cause_id\":\"\",\"inspection_result\":\"\",\"state\":\"بلاغ\",\"diagnosis\":\"\",\"actions_taken\":\"\"}', 302, '2026-06-20 20:53:47'),
+(1040, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 8, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=8&msg=%D8%AA%D9%85+%D8%AD%D9%81%D8%B8+%D8%A7%D9%84%D8%A3%D9%85%D8%B1+%D8%A8%D9%86%D8%AC%D8%A7%D8%AD+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"8\",\"equipment_id\":\"\",\"project_id\":\"\",\"source\":\"بلاغ\",\"maint_type\":\"\",\"priority\":\"\",\"failure_code_id\":\"\",\"cost_party\":\"\",\"vendor_id\":\"\",\"workshop\":\"\",\"technician_id\":\"\",\"supervisor_id\":\"\",\"external_cost\":\"0.00\",\"work_start\":\"\",\"work_end\":\"\",\"downtime_hours\":\"0.00\",\"root_cause_id\":\"\",\"inspection_result\":\"\",\"state\":\"بلاغ\",\"diagnosis\":\"\",\"actions_taken\":\"\"}', 302, '2026-06-20 20:53:53'),
+(1041, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 7, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=7', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"7\",\"equipment_id\":\"13\",\"project_id\":\"\",\"source\":\"بلاغ\",\"maint_type\":\"\",\"priority\":\"\",\"failure_code_id\":\"\",\"cost_party\":\"\",\"vendor_id\":\"\",\"workshop\":\"\",\"technician_id\":\"\",\"supervisor_id\":\"\",\"external_cost\":\"0.00\",\"work_start\":\"\",\"work_end\":\"\",\"downtime_hours\":\"0.00\",\"root_cause_id\":\"5\",\"inspection_result\":\"ناجح\",\"state\":\"تنفيذ\",\"diagnosis\":\"\",\"actions_taken\":\"تم\"}', 302, '2026-06-20 20:54:17'),
+(1042, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 20:54:37'),
+(1043, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 20:54:42'),
+(1044, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 20:55:50'),
+(1045, 4, 0, 0, 36, 13, 'ادارة الصيانة', 'tZiN,Pk2rpjR0bCMWerX47AodBOQri6Iv8DU8c5lJM,xWBLJ', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_mnt\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 21:04:31'),
+(1046, 4, 0, 0, 36, 13, 'ادارة الصيانة', 'tZiN,Pk2rpjR0bCMWerX47AodBOQri6Iv8DU8c5lJM,xWBLJ', '::1', NULL, 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"new_order\"}', 302, '2026-06-20 21:04:31'),
+(1047, 4, 0, 0, 36, 13, 'ادارة الصيانة', 'tZiN,Pk2rpjR0bCMWerX47AodBOQri6Iv8DU8c5lJM,xWBLJ', '::1', NULL, 'orders', 'maintenance', 'create', 'add_labor', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"ajax\":\"1\",\"action\":\"add_labor\",\"order_id\":\"14\",\"labor_role\":\"فني\",\"hours\":\"2\",\"hourly_rate\":\"60\"}', 200, '2026-06-20 21:04:31'),
+(1048, 4, 0, 0, 36, 13, 'ادارة الصيانة', 'tZiN,Pk2rpjR0bCMWerX47AodBOQri6Iv8DU8c5lJM,xWBLJ', '::1', NULL, 'orders', 'maintenance', 'create', 'add_part', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"ajax\":\"1\",\"action\":\"add_part\",\"order_id\":\"14\",\"part_name\":\"فلتر\",\"quantity\":\"3\",\"unit_cost\":\"40\"}', 200, '2026-06-20 21:04:31'),
+(1049, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'new_order', 'new_order', NULL, 13, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=13&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%D8%AC%D8%AF%D9%8A%D8%AF+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 21:05:12'),
+(1050, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'create', 'add_labor', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=15&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%D8%AC%D8%AF%D9%8A%D8%AF+%E2%9C%85', 'POST', '{\"action\":\"add_labor\",\"order_id\":\"15\",\"employee_id\":\"18\",\"labor_role\":\"تاتانت\",\"hours\":\"3\",\"hourly_rate\":\"10\",\"ajax\":\"1\"}', 200, '2026-06-20 21:05:43'),
+(1051, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 21:05:58'),
+(1052, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 21:06:11'),
+(1053, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 21:06:16'),
+(1054, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 21:06:22'),
+(1055, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 21:07:15'),
+(1056, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'create', 'add_line', NULL, 11, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php?id=11', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"add_line\",\"inspection_id\":\"11\",\"component\":\"نهتنتن\",\"condition_state\":\"سليم\",\"recommendation\":\"تمنتم\"}', 302, '2026-06-20 21:08:12'),
+(1057, 4, 0, 0, 37, 13, 'ادارة الصيانة', 'FRYlBugqY78CbT8YqVtV3SlQy1U8vbbGeaHvK8YyR1u,iS3c', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_mnt\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 21:13:37'),
+(1058, 4, 0, 0, 37, 13, 'ادارة الصيانة', 'FRYlBugqY78CbT8YqVtV3SlQy1U8vbbGeaHvK8YyR1u,iS3c', '::1', NULL, 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"action\":\"new_inspection\"}', 302, '2026-06-20 21:13:37'),
+(1059, 4, 0, 0, 37, 13, 'ادارة الصيانة', 'FRYlBugqY78CbT8YqVtV3SlQy1U8vbbGeaHvK8YyR1u,iS3c', '::1', NULL, 'inspections', 'maintenance', 'create', 'add_line', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"ajax\":\"1\",\"action\":\"add_line\",\"inspection_id\":\"12\",\"component\":\"الفرامل\",\"condition_state\":\"حرج\",\"recommendation\":\"استبدال\"}', 200, '2026-06-20 21:13:38'),
+(1060, 4, 0, 0, 37, 13, 'ادارة الصيانة', 'FRYlBugqY78CbT8YqVtV3SlQy1U8vbbGeaHvK8YyR1u,iS3c', '::1', NULL, 'inspections', 'maintenance', 'create', 'add_line', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"ajax\":\"1\",\"action\":\"add_line\",\"inspection_id\":\"12\",\"component\":\"المحرك\",\"condition_state\":\"سليم\"}', 200, '2026-06-20 21:13:38'),
+(1061, 4, 0, 0, 37, 13, 'ادارة الصيانة', 'FRYlBugqY78CbT8YqVtV3SlQy1U8vbbGeaHvK8YyR1u,iS3c', '::1', NULL, 'inspections', 'maintenance', 'del_line', 'del_line', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"ajax\":\"1\",\"action\":\"del_line\",\"inspection_id\":\"12\",\"line_id\":\"3\"}', 200, '2026-06-20 21:13:38'),
+(1062, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 21:14:12'),
+(1063, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\"}', 302, '2026-06-20 21:14:25'),
+(1064, 4, 0, 0, 38, 13, 'ادارة الصيانة', 'gRagRGZCaU8KSfKncKm1zxTFOQOI48citnOAEBmQUZuX2NZk', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_mnt\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 21:21:11'),
+(1065, 4, 0, 0, 38, 13, 'ادارة الصيانة', 'gRagRGZCaU8KSfKncKm1zxTFOQOI48citnOAEBmQUZuX2NZk', '::1', NULL, 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"action\":\"new_inspection\",\"inspection_type\":\"زيارة ميدانية\",\"equipment_id\":\"13\",\"scheduled_date\":\"2026-06-25\"}', 302, '2026-06-20 21:21:11'),
+(1066, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 21:22:40'),
+(1067, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\",\"inspection_type\":\"زيارة ميدانية\",\"equipment_id\":\"11\",\"project_id\":\"1\",\"inspector_id\":\"9\",\"scheduled_date\":\"2026-06-21\"}', 302, '2026-06-20 21:23:14'),
+(1068, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'create', 'add_line', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php?id=16&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A7%D9%84%D8%AA%D9%81%D8%AA%D9%8A%D8%B4+%E2%9C%85', 'POST', '{\"action\":\"add_line\",\"inspection_id\":\"16\",\"component\":\"نهتنتن\",\"condition_state\":\"سليم\",\"recommendation\":\"تمنتم\",\"ajax\":\"1\"}', 200, '2026-06-20 21:24:01'),
+(1069, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'create', 'add_line', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php?id=16&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A7%D9%84%D8%AA%D9%81%D8%AA%D9%8A%D8%B4+%E2%9C%85', 'POST', '{\"action\":\"add_line\",\"inspection_id\":\"16\",\"component\":\"نهتنتن\",\"condition_state\":\"ملاحظة\",\"recommendation\":\"تمنتم\",\"ajax\":\"1\"}', 200, '2026-06-20 21:24:09'),
+(1070, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'create', 'add_line', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php?id=16&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A7%D9%84%D8%AA%D9%81%D8%AA%D9%8A%D8%B4+%E2%9C%85', 'POST', '{\"action\":\"add_line\",\"inspection_id\":\"16\",\"component\":\"نهتنتن\",\"condition_state\":\"حرج\",\"recommendation\":\"تمنتم\",\"ajax\":\"1\"}', 200, '2026-06-20 21:24:20'),
+(1071, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'save_inspection', 'save_inspection', NULL, 16, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php?id=16&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A7%D9%84%D8%AA%D9%81%D8%AA%D9%8A%D8%B4+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_inspection\",\"id\":\"16\",\"inspection_type\":\"زيارة ميدانية\",\"equipment_id\":\"11\",\"project_id\":\"1\",\"inspector_id\":\"9\",\"scheduled_date\":\"2026-06-21\",\"score\":\"5\",\"tech_readiness_state\":\"جاهزة\",\"overall_result\":\"نتيجة\",\"equipment_condition\":\"متوسطة\",\"engine_condition\":\"ضعيفة\",\"state\":\"قيد التنفيذ\",\"notes\":\"ملاحظة\"}', 302, '2026-06-20 21:24:33'),
+(1072, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'save_inspection', 'save_inspection', NULL, 16, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php?id=16', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_inspection\",\"id\":\"16\",\"inspection_type\":\"زيارة ميدانية\",\"equipment_id\":\"11\",\"project_id\":\"1\",\"inspector_id\":\"9\",\"scheduled_date\":\"2026-06-21\",\"score\":\"5\",\"tech_readiness_state\":\"جاهزة\",\"overall_result\":\"نتيجة\",\"equipment_condition\":\"متوسطة\",\"engine_condition\":\"ضعيفة\",\"state\":\"مكتمل\",\"notes\":\"ملاحظة\"}', 302, '2026-06-20 21:25:03'),
+(1073, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'save_inspection', 'save_inspection', NULL, 16, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php?id=16&msg=%D8%AA%D9%85+%D8%AD%D9%81%D8%B8+%D8%A7%D9%84%D8%AA%D9%81%D8%AA%D9%8A%D8%B4+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_inspection\",\"id\":\"16\",\"inspection_type\":\"زيارة ميدانية\",\"equipment_id\":\"11\",\"project_id\":\"1\",\"inspector_id\":\"9\",\"scheduled_date\":\"2026-06-21\",\"score\":\"5\",\"tech_readiness_state\":\"جاهزة\",\"overall_result\":\"نتيجة\",\"equipment_condition\":\"متوسطة\",\"engine_condition\":\"ضعيفة\",\"state\":\"مغلق\",\"notes\":\"ملاحظة\"}', 302, '2026-06-20 21:25:09'),
+(1074, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'save_inspection', 'save_inspection', NULL, 16, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php?id=16', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_inspection\",\"id\":\"16\",\"inspection_type\":\"زيارة ميدانية\",\"equipment_id\":\"11\",\"project_id\":\"1\",\"inspector_id\":\"9\",\"scheduled_date\":\"2026-06-21\",\"score\":\"5\",\"tech_readiness_state\":\"جاهزة\",\"overall_result\":\"نتيجة\",\"equipment_condition\":\"متوسطة\",\"engine_condition\":\"ضعيفة\",\"state\":\"مكتمل\",\"notes\":\"ملاحظة\"}', 302, '2026-06-20 21:25:24'),
+(1075, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'preventive_plans', 'maintenance', 'new_plan', 'new_plan', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_plan\"}', 302, '2026-06-20 21:25:38'),
+(1076, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'preventive_plans', 'maintenance', 'new_plan', 'new_plan', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_plan\"}', 302, '2026-06-20 21:36:30'),
+(1077, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'fY1KThKTIhZjLFl8TQJ5WMz8qN9MG2AEokld3GF,ts3sZY5R', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'preventive_plans', 'maintenance', 'new_plan', 'new_plan', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_plan\"}', 302, '2026-06-20 21:36:44'),
+(1078, 4, 0, 0, 39, 13, 'ادارة الصيانة', 'BFJQsgTEWBugy4UMRLg29DXWgZGgcb-wx-,MgD3OAG25Pb74', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_mnt\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 21:42:38'),
+(1079, 4, 0, 0, 39, 13, 'ادارة الصيانة', 'BFJQsgTEWBugy4UMRLg29DXWgZGgcb-wx-,MgD3OAG25Pb74', '::1', NULL, 'preventive_plans', 'maintenance', 'new_plan', 'new_plan', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php', 'POST', '{\"action\":\"new_plan\",\"name\":\"خطة زيت 250\",\"equipment_id\":\"13\",\"trigger_basis\":\"ساعات\",\"interval_value\":\"250\"}', 302, '2026-06-20 21:42:38'),
+(1080, 4, 0, 0, 39, 13, 'ادارة الصيانة', 'BFJQsgTEWBugy4UMRLg29DXWgZGgcb-wx-,MgD3OAG25Pb74', '::1', NULL, 'preventive_plans', 'maintenance', 'create', 'add_task', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php', 'POST', '{\"ajax\":\"1\",\"action\":\"add_task\",\"plan_id\":\"7\",\"task_name\":\"تغيير الزيت\",\"est_hours\":\"2\"}', 200, '2026-06-20 21:42:38'),
+(1081, 4, 0, 0, 39, 13, 'ادارة الصيانة', 'BFJQsgTEWBugy4UMRLg29DXWgZGgcb-wx-,MgD3OAG25Pb74', '::1', NULL, 'preventive_plans', 'maintenance', 'del_task', 'del_task', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php', 'POST', '{\"ajax\":\"1\",\"action\":\"del_task\",\"plan_id\":\"7\",\"task_id\":\"1\"}', 200, '2026-06-20 21:42:38'),
+(1082, 4, 0, 0, 6, 3, 'ادارة الاسطول', '34pRF1SZ7b-LQ5XvzlJkshC1js22QvJZivQikhqUIuvP,r2T', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-20 21:45:38'),
+(1083, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'R2aFkXCY0-jNcX--E,yvshd7Cip04Edj6cs3I9,6w4qxRcS2', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 21:45:44'),
+(1084, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'R2aFkXCY0-jNcX--E,yvshd7Cip04Edj6cs3I9,6w4qxRcS2', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-20 21:46:16'),
+(1085, 4, 0, 0, 19, 13, 'ادارة الصيانة', '4sr1DLvOZoaGaw6k,,qTqnr7eOP8PlIaNWZui,SfK6ecFm,,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"صيانة\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 21:46:22'),
+(1086, 4, 0, 0, 19, 13, 'ادارة الصيانة', '4sr1DLvOZoaGaw6k,,qTqnr7eOP8PlIaNWZui,SfK6ecFm,,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 21:46:28'),
+(1087, 4, 0, 0, 19, 13, 'ادارة الصيانة', '4sr1DLvOZoaGaw6k,,qTqnr7eOP8PlIaNWZui,SfK6ecFm,,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\"}', 302, '2026-06-20 21:46:46');
+INSERT INTO `activity_logs` (`id`, `company_id`, `project_id`, `contract_id`, `user_id`, `role_id`, `role_name`, `session_id`, `ip_address`, `user_agent`, `screen_name`, `module_name`, `action_type`, `button_name`, `field_name`, `record_id`, `old_value`, `new_value`, `url`, `http_method`, `request_payload`, `response_status`, `created_at`) VALUES
+(1088, 4, 0, 0, 40, 13, 'ادارة الصيانة', 'NicDqq96x42v7Uw36STVFKtlEd6oZc0B3Y7KBpZMTDRpAlaY', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_mnt\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 21:51:15'),
+(1089, 4, 0, 0, 40, 13, 'ادارة الصيانة', 'NicDqq96x42v7Uw36STVFKtlEd6oZc0B3Y7KBpZMTDRpAlaY', '::1', NULL, 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"action\":\"new_order\",\"equipment_id\":\"13\",\"source\":\"بلاغ\",\"maint_type\":\"إصلاح عطل\",\"priority\":\"عالية\",\"cost_party\":\"داخلي\"}', 302, '2026-06-20 21:51:15'),
+(1090, 4, 0, 0, 19, 13, 'ادارة الصيانة', '4sr1DLvOZoaGaw6k,,qTqnr7eOP8PlIaNWZui,SfK6ecFm,,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\",\"equipment_id\":\"11\",\"project_id\":\"1\",\"source\":\"وقائي\",\"maint_type\":\"إصلاح عطل\",\"priority\":\"عادية\",\"cost_party\":\"داخلي\"}', 302, '2026-06-20 21:52:25'),
+(1091, 4, 0, 0, 19, 13, 'ادارة الصيانة', '4sr1DLvOZoaGaw6k,,qTqnr7eOP8PlIaNWZui,SfK6ecFm,,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'preventive_plans', 'maintenance', 'create', 'add_task', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/preventive_plans.php?id=1', 'POST', '{\"action\":\"add_task\",\"plan_id\":\"1\",\"task_name\":\"تغيير زيت\",\"task_type\":\"\",\"component\":\"محرك\",\"est_hours\":\"05\",\"ajax\":\"1\"}', 200, '2026-06-20 21:53:19'),
+(1092, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'DWG0GWmhwJA-OymkGP1welzogioJn9ZBvSfSKfC5RQAiYv6Z', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مبيعات\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 22:06:59'),
+(1093, 4, 0, 0, 13, 12, 'ادارة المبيعات', 'DWG0GWmhwJA-OymkGP1welzogioJn9ZBvSfSKfC5RQAiYv6Z', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-20 22:07:08'),
+(1094, 4, 0, 0, 4, 1, 'ادارة التشغيل', '7mgPfrYlumCNbQv0CN-PgzfMpUVprssMlSOUFZ,ob,M,-0mw', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"محمد\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 22:07:17'),
+(1095, 4, 0, 0, 4, 1, 'ادارة التشغيل', '7mgPfrYlumCNbQv0CN-PgzfMpUVprssMlSOUFZ,ob,M,-0mw', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-20 22:07:44'),
+(1096, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'vfJkXZFK1048ZymbkEeP9grWLAspWOeJ1X63tCdjxs-CkeZY', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مشغل الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 22:07:52'),
+(1097, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'vfJkXZFK1048ZymbkEeP9grWLAspWOeJ1X63tCdjxs-CkeZY', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'movement_operations', 'movement', 'save_single_operation', 'save_single_operation', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"save_single_operation\",\"op_id\":\"7\",\"equipment_category\":\"أساسي\",\"shift_type\":\"B\",\"status\":\"0\",\"json\":\"1\"}', 200, '2026-06-20 22:08:11'),
+(1098, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'vfJkXZFK1048ZymbkEeP9grWLAspWOeJ1X63tCdjxs-CkeZY', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-20 22:08:22'),
+(1099, 4, 0, 0, 6, 3, 'ادارة الاسطول', '86U-PimZnwK5lTMLCryCW0pEGxIR0dyNGPXwb30LuMkn9D24', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-20 22:08:32'),
+(1100, 4, 0, 0, 6, 3, 'ادارة الاسطول', '86U-PimZnwK5lTMLCryCW0pEGxIR0dyNGPXwb30LuMkn9D24', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'equipments_fleet', 'equipments', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Equipments/equipments_fleet.php?edit=9', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"edit_id\":\"9\",\"suppliers\":\"3\",\"code\":\"EX21\",\"type\":\"1\",\"name\":\"HX 340 SL\",\"serial_number\":\"8221373793\",\"chassis_number\":\"HHKH944HM0000144\",\"machine_number\":\"\",\"model_id\":\"\",\"manufacturer\":\"HYUNDAI\",\"model\":\"HX340SL\",\"manufacturing_year\":\"2021\",\"import_year\":\"2021\",\"operating_category\":\"\",\"origin_country\":\"\",\"engine_no\":\"\",\"plate_no\":\"\",\"capacity\":\"\",\"capacity_uom\":\"\",\"dimensions\":\"\",\"source_type\":\"\",\"entry_date\":\"\",\"acquisition_cost\":\"\",\"acquisition_currency\":\"\",\"opening_meter\":\"\",\"meter_uom\":\"ساعات\",\"meter_source\":\"\",\"equipment_condition\":\"في حالة جيدة\",\"operating_hours\":\"9947\",\"engine_condition\":\"جيدة\",\"tires_condition\":\"N/A\",\"actual_owner_name\":\"EQUIPATION\",\"owner_type\":\"أخرى\",\"owner_phone\":\"249912345678\",\"owner_supplier_relation\":\"غير محدد\",\"license_number\":\"PZUN02021011333\",\"license_authority\":\"الجمارك\",\"document_type\":\"\",\"license_expiry_date\":\"0001-01-01\",\"inspection_certificate_number\":\"2020286\",\"last_inspection_date\":\"2026-04-22\",\"current_location\":\"الشركة الروسية\",\"availability_state\":\"متوفرة\",\"site_supervisor_name\":\"\",\"site_supervisor_contact\":\"\",\"estimated_value\":\"180000.00\",\"daily_rental_price\":\"800.00\",\"monthly_rental_price\":\"24000.00\",\"insurance_status\":\"مؤمن بالكامل\",\"general_notes\":\"معدة موثوقة تحتاج فقط للصيانة الدورية\",\"last_maintenance_date\":\"2026-04-01\",\"status\":\"1\"}', 302, '2026-06-20 22:09:13'),
+(1101, 4, 0, 0, 42, 13, 'ادارة الصيانة', ',LlnfHhyNFFsx2m,VYZEhBDoTne6Wp6IeD4cbdkRUdXjMCd3', '::1', NULL, 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"username\":\"qa_mnt\",\"password\":\"[REDACTED]\",\"csrf_token\":\"[REDACTED]\"}', 200, '2026-06-20 22:11:57'),
+(1102, 4, 0, 0, 19, 13, 'ادارة الصيانة', '4sr1DLvOZoaGaw6k,,qTqnr7eOP8PlIaNWZui,SfK6ecFm,,', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-21 08:42:53'),
+(1103, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'eEFHrQTIoG0JoQPwZDO5vT8Bnco-2oRfcf6Kz24FphqR0xnd', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مشغل الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 08:43:36'),
+(1104, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'eEFHrQTIoG0JoQPwZDO5vT8Bnco-2oRfcf6Kz24FphqR0xnd', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-21 09:03:28'),
+(1105, 4, 0, 0, 19, 13, 'ادارة الصيانة', '1wb3un5g,xuKKVOl6oNndvGgb1KWuWnxxNdUITxTwh0OlsNo', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"صيانة\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 09:03:41'),
+(1106, 4, 0, 0, 19, 13, 'ادارة الصيانة', '1wb3un5g,xuKKVOl6oNndvGgb1KWuWnxxNdUITxTwh0OlsNo', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-21 09:11:58'),
+(1107, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'j2XDi7eX-f8nWAxLrAql5w2TK-53eWv6mU06emyUVxJjLQ37', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مشغل الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 09:12:10'),
+(1108, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'j2XDi7eX-f8nWAxLrAql5w2TK-53eWv6mU06emyUVxJjLQ37', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'movement_operations', 'movement', 'set_equipment_maintenance', 'set_equipment_maintenance', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"set_equipment_maintenance\",\"equipment_id\":\"4\",\"json\":\"1\"}', 200, '2026-06-21 09:13:35'),
+(1109, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php?timeout=1', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"صيانة\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 09:14:02'),
+(1110, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'j2XDi7eX-f8nWAxLrAql5w2TK-53eWv6mU06emyUVxJjLQ37', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'movement_operations', 'movement', 'set_equipment_maintenance', 'set_equipment_maintenance', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"set_equipment_maintenance\",\"equipment_id\":\"7\",\"json\":\"1\"}', 200, '2026-06-21 09:14:44'),
+(1111, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\",\"project_id\":\"2\",\"equipment_id\":\"9\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"متوسطة\",\"cost_party\":\"داخلي\"}', 302, '2026-06-21 09:18:45'),
+(1112, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 21, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=21&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"21\",\"project_id\":\"2\",\"equipment_id\":\"9\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"متوسطة\",\"failure_code_id\":\"\",\"cost_party\":\"داخلي\",\"vendor_id\":\"\",\"workshop\":\"\",\"technician_id\":\"\",\"supervisor_id\":\"\",\"external_cost\":\"0.00\",\"work_start\":\"\",\"work_end\":\"\",\"downtime_hours\":\"0.00\",\"root_cause_id\":\"\",\"inspection_result\":\"\",\"state\":\"تنفيذ\",\"diagnosis\":\"\",\"actions_taken\":\"\"}', 302, '2026-06-21 09:18:58'),
+(1113, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 21, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=21&msg=%D8%AA%D9%85+%D8%AD%D9%81%D8%B8+%D8%A7%D9%84%D8%A3%D9%85%D8%B1+%D8%A8%D9%86%D8%AC%D8%A7%D8%AD+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"21\",\"project_id\":\"2\",\"equipment_id\":\"9\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"متوسطة\",\"failure_code_id\":\"\",\"cost_party\":\"داخلي\",\"vendor_id\":\"\",\"workshop\":\"\",\"technician_id\":\"\",\"supervisor_id\":\"\",\"external_cost\":\"0.00\",\"work_start\":\"\",\"work_end\":\"\",\"downtime_hours\":\"0.00\",\"root_cause_id\":\"\",\"inspection_result\":\"\",\"state\":\"فحص\",\"diagnosis\":\"\",\"actions_taken\":\"\"}', 302, '2026-06-21 09:19:10'),
+(1114, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 21, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=21&msg=%D8%AA%D9%85+%D8%AD%D9%81%D8%B8+%D8%A7%D9%84%D8%A3%D9%85%D8%B1+%D8%A8%D9%86%D8%AC%D8%A7%D8%AD+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"21\",\"project_id\":\"2\",\"equipment_id\":\"9\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"متوسطة\",\"failure_code_id\":\"\",\"cost_party\":\"داخلي\",\"vendor_id\":\"\",\"workshop\":\"\",\"technician_id\":\"\",\"supervisor_id\":\"\",\"external_cost\":\"0.00\",\"work_start\":\"\",\"work_end\":\"\",\"downtime_hours\":\"0.00\",\"root_cause_id\":\"\",\"inspection_result\":\"\",\"state\":\"إغلاق\",\"diagnosis\":\"\",\"actions_taken\":\"\"}', 302, '2026-06-21 09:19:19'),
+(1115, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 21, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=21&msg=%D8%AA%D8%B9%D8%B0%D9%91%D8%B1+%D8%A7%D9%84%D8%A5%D8%BA%D9%84%D8%A7%D9%82%3A+%D9%8A%D9%84%D8%B2%D9%85+%28%D8%A7%D9%84%D8%A5%D8%AC%D8%B1%D8%A7%D8%A1%D8%A7%D8%AA+%D8%A7%D9%84%D9%85%D8%AA%D8%AE%D8%B0%D8%A9+%2B+%D8%A7%D9%84%D8%B3%D8%A8%D8%A8+%D8%A7%D9%84%D8%AC%D8%B0%D8%B1%D9%8A+%2B+%D9%86%D8%AA%D9%8A%D8%AC%D8%A9+%D8%A7%D9%84%D9%81%D8%AD%D8%B5+%C2%AB%D9%86%D8%A7%D8%AC%D8%AD%C2%BB%29.+%E2%9D%8C', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"21\",\"project_id\":\"2\",\"equipment_id\":\"9\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"متوسطة\",\"failure_code_id\":\"\",\"cost_party\":\"داخلي\",\"vendor_id\":\"\",\"workshop\":\"\",\"technician_id\":\"\",\"supervisor_id\":\"\",\"external_cost\":\"0.00\",\"work_start\":\"2026-06-21T12:19\",\"work_end\":\"2026-06-22T12:19\",\"downtime_hours\":\"5\",\"root_cause_id\":\"2\",\"inspection_result\":\"ناجح\",\"state\":\"إغلاق\",\"diagnosis\":\"تم\",\"actions_taken\":\"تم\"}', 302, '2026-06-21 09:19:58'),
+(1116, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'j2XDi7eX-f8nWAxLrAql5w2TK-53eWv6mU06emyUVxJjLQ37', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-21 09:22:03'),
+(1117, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'aqsnzGP3Pzw8mi9wqYn4WA4O27-254cPYMVZV26duwH98zfM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 09:22:11'),
+(1118, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 21, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=21', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"21\",\"project_id\":\"2\",\"equipment_id\":\"9\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"متوسطة\",\"failure_code_id\":\"\",\"cost_party\":\"داخلي\",\"vendor_id\":\"\",\"workshop\":\"\",\"technician_id\":\"\",\"supervisor_id\":\"\",\"external_cost\":\"0.00\",\"work_start\":\"2026-06-21T12:19\",\"work_end\":\"2026-06-22T12:19\",\"downtime_hours\":\"5.00\",\"root_cause_id\":\"2\",\"inspection_result\":\"ناجح\",\"state\":\"إغلاق\",\"diagnosis\":\"تم\",\"actions_taken\":\"تم\"}', 302, '2026-06-21 09:25:22'),
+(1119, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\",\"project_id\":\"2\",\"equipment_id\":\"7\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"متوسطة\",\"cost_party\":\"داخلي\"}', 302, '2026-06-21 09:27:50'),
+(1120, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'aqsnzGP3Pzw8mi9wqYn4WA4O27-254cPYMVZV26duwH98zfM', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-21 09:28:18'),
+(1121, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'Hoo1o0g7-VdnccmkIb0FfdfF6Zejk8pE7VFnw4rv0UqPjpcT', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مشغل الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 09:28:27'),
+(1122, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 22, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=22&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"22\",\"project_id\":\"2\",\"equipment_id\":\"7\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"متوسطة\",\"failure_code_id\":\"\",\"cost_party\":\"داخلي\",\"vendor_id\":\"\",\"workshop\":\"\",\"technician_id\":\"\",\"supervisor_id\":\"\",\"external_cost\":\"0.00\",\"work_start\":\"\",\"work_end\":\"2026-06-21T12:27\",\"downtime_hours\":\"0.00\",\"root_cause_id\":\"2\",\"inspection_result\":\"راسب\",\"state\":\"إغلاق\",\"diagnosis\":\"\",\"actions_taken\":\"\"}', 302, '2026-06-21 09:28:37'),
+(1123, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 22, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=22&msg=%D8%AA%D8%B9%D8%B0%D9%91%D8%B1+%D8%A7%D9%84%D8%A5%D8%BA%D9%84%D8%A7%D9%82%3A+%D9%8A%D9%84%D8%B2%D9%85+%28%D8%A7%D9%84%D8%A5%D8%AC%D8%B1%D8%A7%D8%A1%D8%A7%D8%AA+%D8%A7%D9%84%D9%85%D8%AA%D8%AE%D8%B0%D8%A9+%2B+%D8%A7%D9%84%D8%B3%D8%A8%D8%A8+%D8%A7%D9%84%D8%AC%D8%B0%D8%B1%D9%8A+%2B+%D9%86%D8%AA%D9%8A%D8%AC%D8%A9+%D8%A7%D9%84%D9%81%D8%AD%D8%B5+%C2%AB%D9%86%D8%A7%D8%AC%D8%AD%C2%BB%29.+%E2%9D%8C', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"22\",\"project_id\":\"2\",\"equipment_id\":\"7\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"متوسطة\",\"failure_code_id\":\"386\",\"cost_party\":\"خارجي\",\"vendor_id\":\"3\",\"workshop\":\"\",\"technician_id\":\"9\",\"supervisor_id\":\"9\",\"external_cost\":\"40\",\"work_start\":\"\",\"work_end\":\"2026-06-21T12:27\",\"downtime_hours\":\"6\",\"root_cause_id\":\"2\",\"inspection_result\":\"راسب\",\"state\":\"إغلاق\",\"diagnosis\":\"تام\",\"actions_taken\":\"تام\"}', 302, '2026-06-21 09:29:33'),
+(1124, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 22, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=22&msg=%D8%AA%D8%B9%D8%B0%D9%91%D8%B1+%D8%A7%D9%84%D8%A5%D8%BA%D9%84%D8%A7%D9%82%3A+%D9%8A%D9%84%D8%B2%D9%85+%28%D8%A7%D9%84%D8%A5%D8%AC%D8%B1%D8%A7%D8%A1%D8%A7%D8%AA+%D8%A7%D9%84%D9%85%D8%AA%D8%AE%D8%B0%D8%A9+%2B+%D8%A7%D9%84%D8%B3%D8%A8%D8%A8+%D8%A7%D9%84%D8%AC%D8%B0%D8%B1%D9%8A+%2B+%D9%86%D8%AA%D9%8A%D8%AC%D8%A9+%D8%A7%D9%84%D9%81%D8%AD%D8%B5+%C2%AB%D9%86%D8%A7%D8%AC%D8%AD%C2%BB%29.+%E2%9D%8C', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"22\",\"project_id\":\"2\",\"equipment_id\":\"7\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"متوسطة\",\"failure_code_id\":\"386\",\"cost_party\":\"خارجي\",\"vendor_id\":\"3\",\"workshop\":\"\",\"technician_id\":\"9\",\"supervisor_id\":\"9\",\"external_cost\":\"40.00\",\"work_start\":\"\",\"work_end\":\"2026-06-21T12:27\",\"downtime_hours\":\"6.00\",\"root_cause_id\":\"5\",\"inspection_result\":\"ناجح\",\"state\":\"إغلاق\",\"diagnosis\":\"تام\",\"actions_taken\":\"تام\"}', 302, '2026-06-21 09:30:00'),
+(1125, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'Hoo1o0g7-VdnccmkIb0FfdfF6Zejk8pE7VFnw4rv0UqPjpcT', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'movement_operations', 'movement', 'save_single_operation', 'save_single_operation', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"save_single_operation\",\"op_id\":\"5\",\"equipment_category\":\"احتياطي\",\"shift_type\":\"B\",\"status\":\"1\",\"start\":\"2026-04-01\",\"end\":\"2006-04-30\",\"json\":\"1\"}', 200, '2026-06-21 09:30:16'),
+(1126, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'Hoo1o0g7-VdnccmkIb0FfdfF6Zejk8pE7VFnw4rv0UqPjpcT', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'movement_operations', 'movement', 'save_single_operation', 'save_single_operation', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"save_single_operation\",\"op_id\":\"5\",\"equipment_category\":\"احتياطي\",\"shift_type\":\"B\",\"status\":\"1\",\"start\":\"2026-04-01\",\"end\":\"2006-04-30\",\"json\":\"1\"}', 200, '2026-06-21 09:30:21'),
+(1127, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'Hoo1o0g7-VdnccmkIb0FfdfF6Zejk8pE7VFnw4rv0UqPjpcT', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'movement_operations', 'movement', 'save_single_operation', 'save_single_operation', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"save_single_operation\",\"op_id\":\"5\",\"equipment_category\":\"احتياطي\",\"shift_type\":\"B\",\"status\":\"1\",\"start\":\"2026-04-01\",\"end\":\"2006-04-30\",\"json\":\"1\"}', 200, '2026-06-21 09:30:36'),
+(1128, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'Hoo1o0g7-VdnccmkIb0FfdfF6Zejk8pE7VFnw4rv0UqPjpcT', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'movement_operations', 'movement', 'save_single_operation', 'save_single_operation', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"save_single_operation\",\"op_id\":\"5\",\"equipment_category\":\"احتياطي\",\"shift_type\":\"B\",\"status\":\"1\",\"start\":\"2026-04-01\",\"end\":\"2026-06-30\",\"json\":\"1\"}', 200, '2026-06-21 09:31:09'),
+(1129, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'Hoo1o0g7-VdnccmkIb0FfdfF6Zejk8pE7VFnw4rv0UqPjpcT', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-21 10:28:41'),
+(1130, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'jGAbU284Ijy9jVip,7Sfyh,6C2nZuTIEuxgf7OYRNDc8wc,i', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 10:28:54'),
+(1131, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'azj6un-C62Q60o,nILgZq1e8pdIb8NKnnpBdt,0pd-DyxfQG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'inspections', 'maintenance', 'new_inspection', 'new_inspection', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/inspections.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_inspection\",\"inspection_type\":\"دوري\",\"equipment_id\":\"\",\"project_id\":\"\",\"inspector_id\":\"\",\"scheduled_date\":\"\"}', 302, '2026-06-21 10:30:54'),
+(1132, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'WmBP0GQ9CtdMMFMu7Prqjxz1Ta1F09KSC91M-xf0QUmchmXG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"صيانة\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 13:15:09'),
+(1133, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'WmBP0GQ9CtdMMFMu7Prqjxz1Ta1F09KSC91M-xf0QUmchmXG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'new_order', 'new_order', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"new_order\",\"project_id\":\"2\",\"equipment_id\":\"4\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"عالية\",\"cost_party\":\"داخلي\"}', 302, '2026-06-21 13:23:17'),
+(1134, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'WmBP0GQ9CtdMMFMu7Prqjxz1Ta1F09KSC91M-xf0QUmchmXG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'create', 'add_labor', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=23&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%E2%9C%85', 'POST', '{\"action\":\"add_labor\",\"order_id\":\"23\",\"employee_id\":\"12\",\"labor_role\":\"5\",\"hours\":\"10\",\"hourly_rate\":\"20\",\"ajax\":\"1\"}', 200, '2026-06-21 13:24:28'),
+(1135, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'WmBP0GQ9CtdMMFMu7Prqjxz1Ta1F09KSC91M-xf0QUmchmXG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'create', 'add_part', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=23&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%E2%9C%85', 'POST', '{\"action\":\"add_part\",\"order_id\":\"23\",\"part_name\":\"سلندر\",\"category\":\"كهرباء\",\"quantity\":\"1\",\"unit_cost\":\"20\",\"ajax\":\"1\"}', 200, '2026-06-21 13:24:49'),
+(1136, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'WmBP0GQ9CtdMMFMu7Prqjxz1Ta1F09KSC91M-xf0QUmchmXG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'orders', 'maintenance', 'save_order', 'save_order', NULL, 23, NULL, NULL, 'http://localhost/ems/Maintenance/orders.php?id=23&msg=%D8%AA%D9%85+%D8%A5%D9%86%D8%B4%D8%A7%D8%A1+%D8%A3%D9%85%D8%B1+%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%E2%9C%85', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"action\":\"save_order\",\"id\":\"23\",\"project_id\":\"2\",\"equipment_id\":\"4\",\"source\":\"بلاغ\",\"maint_type\":\"استبدال قطعة\",\"priority\":\"عالية\",\"failure_code_id\":\"386\",\"cost_party\":\"داخلي\",\"vendor_id\":\"3\",\"workshop\":\"ورشة\",\"technician_id\":\"9\",\"supervisor_id\":\"7\",\"external_cost\":\"100\",\"work_start\":\"2026-06-21T16:23\",\"work_end\":\"2026-06-22T17:23\",\"downtime_hours\":\"10\",\"root_cause_id\":\"2\",\"inspection_result\":\"ناجح\",\"state\":\"تنفيذ\",\"diagnosis\":\"تشخيص\",\"actions_taken\":\"تغيير السلندر\"}', 302, '2026-06-21 13:24:57'),
+(1137, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'raGDzTW04X8lZtszDw7dLTQegYCwQM9Gw3ofuGShIMpyPFIA', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 13:40:25'),
+(1138, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'WmBP0GQ9CtdMMFMu7Prqjxz1Ta1F09KSC91M-xf0QUmchmXG', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-21 14:08:35'),
+(1139, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'raGDzTW04X8lZtszDw7dLTQegYCwQM9Gw3ofuGShIMpyPFIA', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-21 14:12:29'),
+(1140, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'knSYHhIHtcZAz5h5RC42JjPzm3OZ-8SmEDMbY-LQL0-Ula-0', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"حركة - الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 14:12:48'),
+(1141, 4, 4, 4, 11, 6, 'مدير حركة وتشغيل', 'knSYHhIHtcZAz5h5RC42JjPzm3OZ-8SmEDMbY-LQL0-Ula-0', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-21 14:23:19'),
+(1142, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'vEKdgeIqlTvgtKUp--GDM3TaBWU5j9vqWif7ocDLQo0ZYSUm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"مشغل الروسية\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 14:24:08'),
+(1143, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'QysT2RptAPQ6at4jsQWySeNzer8SK3bw6vcr1q6FZvuA5f-Z', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"يسن\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 14:33:49'),
+(1144, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'vEKdgeIqlTvgtKUp--GDM3TaBWU5j9vqWif7ocDLQo0ZYSUm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'movement_operations', 'movement', 'save_single_operation', 'save_single_operation', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"save_single_operation\",\"op_id\":\"8\",\"equipment_category\":\"متعطل\",\"shift_type\":\"B\",\"status\":\"1\",\"start\":\"2026-04-25\",\"end\":\"2026-10-01\",\"json\":\"1\"}', 200, '2026-06-21 14:54:30'),
+(1145, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'vEKdgeIqlTvgtKUp--GDM3TaBWU5j9vqWif7ocDLQo0ZYSUm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'movement_operations', 'movement', 'set_equipment_maintenance', 'set_equipment_maintenance', NULL, NULL, NULL, NULL, 'http://localhost/ems/movement/movement_operations.php', 'POST', '{\"action\":\"set_equipment_maintenance\",\"equipment_id\":\"6\",\"json\":\"1\"}', 200, '2026-06-21 14:54:45'),
+(1146, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'vEKdgeIqlTvgtKUp--GDM3TaBWU5j9vqWif7ocDLQo0ZYSUm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'breakdowns', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"equipment_id\":\"11\",\"project_id\":\"1\",\"reporter_dept\":\"التشغيل\",\"target_role\":\"3\",\"report_datetime\":\"\",\"failure_code_id\":\"\",\"severity\":\"متوسطة\",\"description\":\"الا\"}', 302, '2026-06-21 15:28:02'),
+(1147, 4, 0, 0, 6, 3, 'ادارة الاسطول', 'QysT2RptAPQ6at4jsQWySeNzer8SK3bw6vcr1q6FZvuA5f-Z', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', 'breakdowns', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"equipment_id\":\"16\",\"project_id\":\"2\",\"reporter_dept\":\"التشغيل\",\"target_role\":\"13\",\"report_datetime\":\"\",\"failure_code_id\":\"\",\"severity\":\"متوسطة\",\"description\":\"تاتتان\"}', 302, '2026-06-21 15:28:39'),
+(1148, 4, 2, 2, 10, 6, 'مدير حركة وتشغيل', 'vEKdgeIqlTvgtKUp--GDM3TaBWU5j9vqWif7ocDLQo0ZYSUm', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'logout', 'auth', 'logout', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/logout.php', 'GET', NULL, 200, '2026-06-21 15:28:46'),
+(1149, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'BAp9f6O12sJZ0k,poWl2vEzrjDw,nFu4-p05BL-fnlLDcFug', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'login', 'auth', 'login', NULL, NULL, NULL, NULL, NULL, 'http://localhost/ems/login.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"username\":\"صيانة\",\"password\":\"[REDACTED]\"}', 200, '2026-06-21 15:28:52'),
+(1150, 4, 0, 0, 19, 13, 'ادارة الصيانة', 'BAp9f6O12sJZ0k,poWl2vEzrjDw,nFu4-p05BL-fnlLDcFug', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0', 'breakdowns', 'maintenance', 'create', 'create', NULL, NULL, NULL, NULL, 'http://localhost/ems/Maintenance/breakdowns.php', 'POST', '{\"csrf_token\":\"[REDACTED]\",\"equipment_id\":\"17\",\"project_id\":\"5\",\"reporter_dept\":\"التشغيل\",\"target_role\":\"3\",\"report_datetime\":\"\",\"failure_code_id\":\"\",\"severity\":\"متوسطة\",\"description\":\"ممممم\"}', 302, '2026-06-21 15:29:53');
 
 -- --------------------------------------------------------
 
@@ -446,17 +1238,22 @@ INSERT INTO `activity_logs` (`id`, `company_id`, `project_id`, `contract_id`, `u
 -- Table structure for table `admin_audit_log`
 --
 
-CREATE TABLE `admin_audit_log` (
-  `id` int(11) NOT NULL,
-  `admin_id` int(11) DEFAULT NULL COMMENT 'super_admins.id',
-  `action_type` varchar(50) NOT NULL COMMENT 'create|update|delete|approve|reject|suspend|activate|login|logout',
-  `target_name` varchar(200) DEFAULT NULL COMMENT 'human-readable target (company name, plan name, etc.)',
-  `target_id` int(11) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
-  `user_agent` varchar(300) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `admin_audit_log`;
+CREATE TABLE IF NOT EXISTS `admin_audit_log` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `admin_id` int DEFAULT NULL COMMENT 'super_admins.id',
+  `action_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'create|update|delete|approve|reject|suspend|activate|login|logout',
+  `target_name` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'human-readable target (company name, plan name, etc.)',
+  `target_id` int DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` varchar(300) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_admin_audit_admin` (`admin_id`),
+  KEY `idx_admin_audit_action` (`action_type`),
+  KEY `idx_admin_audit_date` (`created_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `admin_audit_log`
@@ -519,7 +1316,10 @@ INSERT INTO `admin_audit_log` (`id`, `admin_id`, `action_type`, `target_name`, `
 (54, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-23 15:48:14'),
 (55, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-30 09:41:38'),
 (56, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-01 11:29:41'),
-(57, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:150.0) Gecko/20100101 Firefox/150.0', '2026-06-02 09:41:43');
+(57, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:150.0) Gecko/20100101 Firefox/150.0', '2026-06-02 09:41:43'),
+(58, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-07 14:45:54'),
+(59, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-06-08 06:38:21'),
+(60, 1, 'login', 'جلسة الإدارة العليا', 1, 'تسجيل الدخول بنجاح', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36', '2026-06-20 19:52:53');
 
 -- --------------------------------------------------------
 
@@ -527,37 +1327,43 @@ INSERT INTO `admin_audit_log` (`id`, `admin_id`, `action_type`, `target_name`, `
 -- Table structure for table `admin_companies`
 --
 
-CREATE TABLE `admin_companies` (
-  `id` int(11) NOT NULL COMMENT 'معرف فريد',
-  `company_name` varchar(200) NOT NULL COMMENT 'اسم الشركة',
-  `commercial_registration` varchar(120) DEFAULT NULL COMMENT 'السجل التجاري',
-  `sector` varchar(100) DEFAULT NULL COMMENT 'القطاع',
-  `country` varchar(100) DEFAULT NULL COMMENT 'البلد',
-  `city` varchar(100) DEFAULT NULL COMMENT 'المدينة',
-  `tax_number` varchar(120) DEFAULT NULL COMMENT 'الرقم الضريبي',
-  `email` varchar(150) NOT NULL COMMENT 'البريد',
-  `phone` varchar(30) DEFAULT NULL COMMENT 'رقم الهاتف',
-  `address` text DEFAULT NULL COMMENT 'العنوان',
-  `postal_address` text DEFAULT NULL COMMENT 'العنوان البريدي',
-  `logo_path` varchar(255) DEFAULT NULL COMMENT 'الشعار',
-  `plan_id` int(11) DEFAULT NULL COMMENT 'خطة الاشتراك',
-  `modules_enabled` text DEFAULT NULL,
-  `name` varchar(200) DEFAULT NULL COMMENT 'الاسم',
-  `company_name_ar` varchar(200) DEFAULT NULL COMMENT 'اسم الشركة عربي',
-  `company_name_en` varchar(200) DEFAULT NULL COMMENT 'اسم الشركة انحليزي',
-  `status` enum('pending','active','suspended','cancelled') NOT NULL DEFAULT 'pending' COMMENT 'الحالة',
+DROP TABLE IF EXISTS `admin_companies`;
+CREATE TABLE IF NOT EXISTS `admin_companies` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد',
+  `company_name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'اسم الشركة',
+  `commercial_registration` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'السجل التجاري',
+  `sector` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'القطاع',
+  `country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'البلد',
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'المدينة',
+  `tax_number` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الرقم الضريبي',
+  `email` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'البريد',
+  `phone` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم الهاتف',
+  `address` text COLLATE utf8mb4_unicode_ci COMMENT 'العنوان',
+  `postal_address` text COLLATE utf8mb4_unicode_ci COMMENT 'العنوان البريدي',
+  `logo_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الشعار',
+  `plan_id` int DEFAULT NULL COMMENT 'خطة الاشتراك',
+  `modules_enabled` text COLLATE utf8mb4_unicode_ci,
+  `name` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الاسم',
+  `company_name_ar` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'اسم الشركة عربي',
+  `company_name_en` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'اسم الشركة انحليزي',
+  `status` enum('pending','active','suspended','cancelled') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending' COMMENT 'الحالة',
   `subscription_start` date DEFAULT NULL COMMENT 'بداية الاشتراك',
   `subscription_end` date DEFAULT NULL COMMENT 'نهاية الاشتراك',
-  `users_count` int(11) NOT NULL DEFAULT 0 COMMENT 'عدد المستخدمين',
-  `max_users` int(11) NOT NULL DEFAULT 0 COMMENT 'المستخدمين',
-  `max_equipments` int(11) NOT NULL DEFAULT 0 COMMENT 'المعدات',
-  `max_projects` int(11) NOT NULL DEFAULT 0 COMMENT 'المشاريع',
-  `currency` varchar(20) NOT NULL DEFAULT 'SAR' COMMENT 'العملة',
-  `timezone` varchar(64) NOT NULL DEFAULT 'Asia/Riyadh' COMMENT 'المنطقة الزمنية',
-  `notes` text DEFAULT NULL COMMENT 'الملاحظات',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'الانشاء',
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'التعديل'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `users_count` int NOT NULL DEFAULT '0' COMMENT 'عدد المستخدمين',
+  `max_users` int NOT NULL DEFAULT '0' COMMENT 'المستخدمين',
+  `max_equipments` int NOT NULL DEFAULT '0' COMMENT 'المعدات',
+  `max_projects` int NOT NULL DEFAULT '0' COMMENT 'المشاريع',
+  `currency` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SAR' COMMENT 'العملة',
+  `timezone` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Asia/Riyadh' COMMENT 'المنطقة الزمنية',
+  `notes` text COLLATE utf8mb4_unicode_ci COMMENT 'الملاحظات',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'الانشاء',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'التعديل',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_admin_companies_email` (`email`),
+  UNIQUE KEY `uq_admin_companies_commercial_registration` (`commercial_registration`),
+  KEY `idx_admin_companies_plan` (`plan_id`),
+  KEY `idx_admin_companies_status` (`status`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `admin_companies`
@@ -573,19 +1379,21 @@ INSERT INTO `admin_companies` (`id`, `company_name`, `commercial_registration`, 
 -- Table structure for table `admin_subscription_plans`
 --
 
-CREATE TABLE `admin_subscription_plans` (
-  `id` int(11) NOT NULL,
-  `plan_name` varchar(100) NOT NULL COMMENT 'اسم الخطة',
-  `price` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'السعر',
-  `max_users` int(11) NOT NULL DEFAULT 0 COMMENT '0 = unlimited المستخدمين',
-  `max_projects` int(11) NOT NULL DEFAULT 0 COMMENT 'المشاريع',
-  `max_equipments` int(11) NOT NULL DEFAULT 0 COMMENT 'المعدات',
-  `features` text DEFAULT NULL COMMENT 'المميزات',
-  `sort_order` int(11) NOT NULL DEFAULT 0 COMMENT 'الترتيب',
-  `is_active` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'نشط',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'الانشاء',
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'التعديل'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `admin_subscription_plans`;
+CREATE TABLE IF NOT EXISTS `admin_subscription_plans` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `plan_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'اسم الخطة',
+  `price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'السعر',
+  `max_users` int NOT NULL DEFAULT '0' COMMENT '0 = unlimited المستخدمين',
+  `max_projects` int NOT NULL DEFAULT '0' COMMENT 'المشاريع',
+  `max_equipments` int NOT NULL DEFAULT '0' COMMENT 'المعدات',
+  `features` text COLLATE utf8mb4_unicode_ci COMMENT 'المميزات',
+  `sort_order` int NOT NULL DEFAULT '0' COMMENT 'الترتيب',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'نشط',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'الانشاء',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'التعديل',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `admin_subscription_plans`
@@ -601,20 +1409,25 @@ INSERT INTO `admin_subscription_plans` (`id`, `plan_name`, `price`, `max_users`,
 -- Table structure for table `admin_subscription_requests`
 --
 
-CREATE TABLE `admin_subscription_requests` (
-  `id` int(11) NOT NULL COMMENT 'معرف فريد',
-  `company_id` int(11) DEFAULT NULL COMMENT 'null if company not  created yet رقم الشركة',
-  `company_name` varchar(200) NOT NULL COMMENT 'اسم الشركة',
-  `email` varchar(150) NOT NULL COMMENT 'البريد',
-  `phone` varchar(30) DEFAULT NULL COMMENT 'الهاتف',
-  `plan_id` int(11) DEFAULT NULL COMMENT 'خطة الاشتراك',
-  `message` text DEFAULT NULL COMMENT 'message from the requesting company جميع بيانات الشركة ',
-  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending' COMMENT 'الحالة',
-  `reviewed_by` int(11) DEFAULT NULL COMMENT 'super_admins.id المراجع',
+DROP TABLE IF EXISTS `admin_subscription_requests`;
+CREATE TABLE IF NOT EXISTS `admin_subscription_requests` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد',
+  `company_id` int DEFAULT NULL COMMENT 'null if company not  created yet رقم الشركة',
+  `company_name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'اسم الشركة',
+  `email` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'البريد',
+  `phone` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الهاتف',
+  `plan_id` int DEFAULT NULL COMMENT 'خطة الاشتراك',
+  `message` text COLLATE utf8mb4_unicode_ci COMMENT 'message from the requesting company جميع بيانات الشركة ',
+  `status` enum('pending','approved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending' COMMENT 'الحالة',
+  `reviewed_by` int DEFAULT NULL COMMENT 'super_admins.id المراجع',
   `reviewed_at` timestamp NULL DEFAULT NULL COMMENT 'زمن المراجعه',
-  `review_note` text DEFAULT NULL COMMENT 'الملاحظات',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'الانشاء'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `review_note` text COLLATE utf8mb4_unicode_ci COMMENT 'الملاحظات',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'الانشاء',
+  PRIMARY KEY (`id`),
+  KEY `idx_admin_sub_req_status` (`status`),
+  KEY `idx_admin_sub_req_plan` (`plan_id`),
+  KEY `fk_admin_sub_req_reviewer` (`reviewed_by`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `admin_subscription_requests`
@@ -629,20 +1442,61 @@ INSERT INTO `admin_subscription_requests` (`id`, `company_id`, `company_name`, `
 -- Table structure for table `admin_subscription_requests_test_probe`
 --
 
-CREATE TABLE `admin_subscription_requests_test_probe` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `company_name` varchar(200) NOT NULL,
-  `email` varchar(150) NOT NULL,
-  `phone` varchar(30) DEFAULT NULL,
-  `plan_id` int(11) DEFAULT NULL,
-  `message` text DEFAULT NULL,
-  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
-  `reviewed_by` int(11) DEFAULT NULL,
+DROP TABLE IF EXISTS `admin_subscription_requests_test_probe`;
+CREATE TABLE IF NOT EXISTS `admin_subscription_requests_test_probe` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `company_name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `plan_id` int DEFAULT NULL,
+  `message` text COLLATE utf8mb4_unicode_ci,
+  `status` enum('pending','approved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `reviewed_by` int DEFAULT NULL,
   `reviewed_at` timestamp NULL DEFAULT NULL,
-  `review_note` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `review_note` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_admin_sub_req_status` (`status`),
+  KEY `idx_admin_sub_req_plan` (`plan_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `api_tokens`
+--
+
+DROP TABLE IF EXISTS `api_tokens`;
+CREATE TABLE IF NOT EXISTS `api_tokens` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `token_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'sha256 hex ┘ä┘äÏ¬┘ê┘â┘å Ïº┘äÏ«Ïº┘à',
+  `device` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '┘êÏÁ┘ü ÏºÏ«Ï¬┘èÏºÏ▒┘è ┘ä┘äÏ¼┘çÏºÏ▓/Ïº┘äÏ¬ÏÀÏ¿┘è┘é',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_used_at` datetime DEFAULT NULL,
+  `expires_at` datetime DEFAULT NULL,
+  `revoked` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_token_hash` (`token_hash`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_active` (`revoked`,`expires_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `api_tokens`
+--
+
+INSERT INTO `api_tokens` (`id`, `user_id`, `token_hash`, `device`, `created_at`, `last_used_at`, `expires_at`, `revoked`) VALUES
+(2, 11, '7a3862cc1b80ab6b91cfa3dd3407720d7c9cf61f32ac7875801cb159bd21a362', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.122.1 Chrome/142.0.7444.265 Electron/39.8.8 Safari/537.36', '2026-06-06 19:05:23', '2026-06-06 22:52:15', '2026-07-06 21:05:23', 0),
+(3, 11, '925af84a5bc5481e0e4276057b4429ebb9877e2679c014a937d9e7d3037ce77b', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0', '2026-06-06 19:54:42', '2026-06-06 22:55:02', '2026-07-06 21:54:42', 0),
+(4, 11, 'b364bce244d6deaed6f345ba6936a4327902095fe63a78422226cb82cbc4407f', 'Dart/3.6 (dart:io)', '2026-06-06 20:18:27', '2026-06-06 23:55:58', '2026-07-06 22:18:27', 0),
+(5, 11, '7d33db2a5c15b2b5316868b3711bbdb2b4a0092552a31922237e7605e333af0f', 'Dart/3.6 (dart:io)', '2026-06-07 07:33:00', '2026-06-07 10:33:04', '2026-07-07 09:33:00', 1),
+(6, 11, '6e1f2823aeee532e2556d0f0b0ffce3464e6c6485be0b636c52174892eb850df', 'Dart/3.6 (dart:io)', '2026-06-07 07:33:21', '2026-06-07 18:54:35', '2026-07-07 09:33:21', 0),
+(8, 12, 'ea15d4afa9c30dceb531cddf020797d98861635ccdcb68aff5978a06687ef451', 'Dart/3.6 (dart:io)', '2026-06-07 17:42:46', '2026-06-10 11:59:55', '2026-07-07 19:42:46', 0),
+(10, 11, '7c8825ffa146cbe6d64dcfff0348e535caff1345b36d9dea21b5d3416a666d57', 'Dart/3.6 (dart:io)', '2026-06-07 20:40:46', '2026-06-08 10:09:52', '2026-07-07 22:40:46', 0),
+(11, 11, '8230696cd21167c23a21e337c8c2058e0d7cc86d069bd0f19b2e7133f80935e1', 'Dart/3.6 (dart:io)', '2026-06-08 12:38:45', '2026-06-08 16:51:40', '2026-07-08 14:38:45', 0),
+(12, 11, 'c331dd9d8f78d1dc8a6002e102259e656cec39dcefb7edaab8826edac25442eb', 'Dart/3.6 (dart:io)', '2026-06-08 14:17:02', '2026-06-10 12:10:37', '2026-07-08 16:17:02', 0);
 
 -- --------------------------------------------------------
 
@@ -650,22 +1504,27 @@ CREATE TABLE `admin_subscription_requests_test_probe` (
 -- Table structure for table `approval_requests`
 --
 
-CREATE TABLE `approval_requests` (
-  `id` int(11) NOT NULL,
-  `entity_type` varchar(50) NOT NULL,
-  `entity_id` int(11) NOT NULL,
-  `action` varchar(100) NOT NULL,
-  `payload` longtext NOT NULL,
-  `requested_by` int(11) NOT NULL,
-  `current_step` int(11) DEFAULT 1,
-  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
-  `rejection_reason` text DEFAULT NULL,
+DROP TABLE IF EXISTS `approval_requests`;
+CREATE TABLE IF NOT EXISTS `approval_requests` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `entity_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `entity_id` int NOT NULL,
+  `action` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `requested_by` int NOT NULL,
+  `current_step` int DEFAULT '1',
+  `status` enum('pending','approved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `rejection_reason` text COLLATE utf8mb4_unicode_ci,
   `approved_at` datetime DEFAULT NULL,
   `rejected_at` datetime DEFAULT NULL,
   `executed_at` datetime DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_approval_entity` (`entity_type`,`entity_id`),
+  KEY `idx_approval_status` (`status`),
+  KEY `idx_approval_user` (`requested_by`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `approval_requests`
@@ -684,17 +1543,22 @@ INSERT INTO `approval_requests` (`id`, `entity_type`, `entity_id`, `action`, `pa
 -- Table structure for table `approval_steps`
 --
 
-CREATE TABLE `approval_steps` (
-  `id` int(11) NOT NULL,
-  `request_id` int(11) NOT NULL,
-  `role_required` varchar(100) NOT NULL,
-  `step_order` int(11) NOT NULL,
-  `approved_by` int(11) DEFAULT NULL,
+DROP TABLE IF EXISTS `approval_steps`;
+CREATE TABLE IF NOT EXISTS `approval_steps` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `request_id` int NOT NULL,
+  `role_required` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `step_order` int NOT NULL,
+  `approved_by` int DEFAULT NULL,
   `approved_at` datetime DEFAULT NULL,
-  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
-  `note` text DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `status` enum('pending','approved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `note` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_approval_steps_request` (`request_id`),
+  KEY `idx_approval_steps_status` (`status`),
+  KEY `idx_approval_steps_order` (`step_order`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `approval_steps`
@@ -713,15 +1577,19 @@ INSERT INTO `approval_steps` (`id`, `request_id`, `role_required`, `step_order`,
 -- Table structure for table `approval_workflow_rules`
 --
 
-CREATE TABLE `approval_workflow_rules` (
-  `id` int(11) NOT NULL,
-  `entity_type` varchar(50) NOT NULL,
-  `action` varchar(100) NOT NULL,
-  `role_required` varchar(100) NOT NULL,
-  `step_order` int(11) NOT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT NULL
+DROP TABLE IF EXISTS `approval_workflow_rules`;
+CREATE TABLE IF NOT EXISTS `approval_workflow_rules` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `entity_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `action` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role_required` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `step_order` int NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_workflow_rule` (`entity_type`,`action`,`step_order`),
+  KEY `idx_workflow_rule_lookup` (`entity_type`,`action`,`is_active`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -730,17 +1598,23 @@ CREATE TABLE `approval_workflow_rules` (
 -- Table structure for table `audit_logs`
 --
 
-CREATE TABLE `audit_logs` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `action_type` varchar(80) NOT NULL,
-  `target_name` varchar(200) DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
-  `user_agent` varchar(300) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `audit_logs`;
+CREATE TABLE IF NOT EXISTS `audit_logs` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL,
+  `company_id` int DEFAULT NULL,
+  `action_type` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `target_name` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` varchar(300) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_audit_logs_user_id` (`user_id`),
+  KEY `idx_audit_logs_company_id` (`company_id`),
+  KEY `idx_audit_logs_action_type` (`action_type`),
+  KEY `idx_audit_logs_created_at` (`created_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `audit_logs`
@@ -761,24 +1635,28 @@ INSERT INTO `audit_logs` (`id`, `user_id`, `company_id`, `action_type`, `target_
 -- Table structure for table `clients`
 --
 
-CREATE TABLE `clients` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `client_code` varchar(50) NOT NULL COMMENT 'كود العميل',
-  `client_name` varchar(255) NOT NULL COMMENT 'اسم العميل',
-  `entity_type` varchar(100) DEFAULT NULL COMMENT 'نوع الكيان',
-  `sector_category` varchar(100) DEFAULT NULL COMMENT 'تصنيف القطاع',
-  `phone` varchar(50) DEFAULT NULL COMMENT 'رقم الهاتف',
-  `email` varchar(100) DEFAULT NULL COMMENT 'البريد الإلكتروني',
-  `whatsapp` varchar(50) DEFAULT NULL COMMENT 'رقم الواتساب',
-  `status` enum('نشط','متوقف') NOT NULL DEFAULT 'نشط' COMMENT 'حالة العميل',
-  `created_by` int(11) DEFAULT NULL COMMENT 'معرف المستخدم الذي أضاف العميل',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'تاريخ الإضافة',
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'تاريخ آخر تحديث',
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+DROP TABLE IF EXISTS `clients`;
+CREATE TABLE IF NOT EXISTS `clients` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `client_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'كود العميل',
+  `client_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'اسم العميل',
+  `entity_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع الكيان',
+  `sector_category` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'تصنيف القطاع',
+  `phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم الهاتف',
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'البريد الإلكتروني',
+  `whatsapp` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم الواتساب',
+  `status` enum('نشط','متوقف') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'نشط' COMMENT 'حالة العميل',
+  `created_by` int DEFAULT NULL COMMENT 'معرف المستخدم الذي أضاف العميل',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'تاريخ الإضافة',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'تاريخ آخر تحديث',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   `deleted_at` datetime DEFAULT NULL,
-  `deleted_by` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول العملاء';
+  `deleted_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_client_name` (`client_name`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول العملاء';
 
 --
 -- Dumping data for table `clients`
@@ -786,7 +1664,9 @@ CREATE TABLE `clients` (
 
 INSERT INTO `clients` (`id`, `company_id`, `client_code`, `client_name`, `entity_type`, `sector_category`, `phone`, `email`, `whatsapp`, `status`, `created_by`, `created_at`, `updated_at`, `is_deleted`, `deleted_at`, `deleted_by`) VALUES
 (1, 4, 'C001', 'شركة إليانس للتعدين المحدودة', 'دولي', 'تعدين', '249912345678', 'sudan@gmail.com', '249912345678', 'نشط', 4, '2026-04-07 11:45:22', '2026-04-25 09:57:42', 0, NULL, NULL),
-(2, 4, '58', 'شركة محمد', 'دولي', 'تعدين', '249912345678', 'sudan@gmail.com', '249912345678', 'نشط', 4, '2026-04-26 08:30:27', '2026-05-19 17:31:39', 0, NULL, NULL);
+(2, 4, '58', 'شركة محمد', 'دولي', 'تعدين', '249912345678', 'sudan@gmail.com', '249912345678', 'نشط', 4, '2026-04-26 08:30:27', '2026-05-19 17:31:39', 0, NULL, NULL),
+(3, 4, 'CLT-0001', 'شركة النيل للمقاولات', 'حكومي', 'بنية تحتية', '249123456789', 'nile@example.com', '249123456789', 'نشط', 13, '2026-06-06 10:57:31', '2026-06-06 10:57:31', 0, NULL, NULL),
+(4, 4, 'CLT-0001-2', 'شركة علي', 'حكومي', 'بنية تحتية', '249123456789', 'nile@example.com', '249123456789', 'نشط', 13, '2026-06-06 10:57:31', '2026-06-06 10:57:31', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -794,13 +1674,17 @@ INSERT INTO `clients` (`id`, `company_id`, `client_code`, `client_name`, `entity
 -- Table structure for table `company_user_password_resets`
 --
 
-CREATE TABLE `company_user_password_resets` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `token_hash` char(64) NOT NULL,
-  `expires_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+DROP TABLE IF EXISTS `company_user_password_resets`;
+CREATE TABLE IF NOT EXISTS `company_user_password_resets` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `token_hash` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expires_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `used_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_company_user_password_resets_token_hash` (`token_hash`),
+  KEY `idx_company_user_password_resets_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -809,33 +1693,36 @@ CREATE TABLE `company_user_password_resets` (
 -- Table structure for table `contractequipments`
 --
 
-CREATE TABLE `contractequipments` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `contract_id` int(11) NOT NULL COMMENT 'رقم العقد',
-  `equip_type` varchar(255) NOT NULL COMMENT 'نوع المعدة',
-  `equip_size` int(11) DEFAULT NULL COMMENT 'حجم المعدة',
-  `equip_count` int(11) DEFAULT NULL COMMENT 'عدد المعدات',
-  `equip_count_basic` int(11) DEFAULT 0 COMMENT 'عدد المعدات الأساسية',
-  `equip_count_backup` int(11) DEFAULT 0 COMMENT 'عدد المعدات الاحتياطية',
-  `equip_shifts` int(11) DEFAULT 0 COMMENT 'عدد الورديات',
-  `equip_unit` varchar(50) DEFAULT 'ساعة' COMMENT 'الوحدة',
+DROP TABLE IF EXISTS `contractequipments`;
+CREATE TABLE IF NOT EXISTS `contractequipments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `contract_id` int NOT NULL COMMENT 'رقم العقد',
+  `equip_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'نوع المعدة',
+  `equip_size` int DEFAULT NULL COMMENT 'حجم المعدة',
+  `equip_count` int DEFAULT NULL COMMENT 'عدد المعدات',
+  `equip_count_basic` int DEFAULT '0' COMMENT 'عدد المعدات الأساسية',
+  `equip_count_backup` int DEFAULT '0' COMMENT 'عدد المعدات الاحتياطية',
+  `equip_shifts` int DEFAULT '0' COMMENT 'عدد الورديات',
+  `equip_unit` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'ساعة' COMMENT 'الوحدة',
   `shift1_start` time DEFAULT NULL COMMENT 'وقت بداية الوردية الأولى',
   `shift1_end` time DEFAULT NULL COMMENT 'وقت نهاية الوردية الأولى',
   `shift2_start` time DEFAULT NULL COMMENT 'وقت بداية الوردية الثانية',
   `shift2_end` time DEFAULT NULL COMMENT 'وقت نهاية الوردية الثانية',
-  `shift_hours` int(11) DEFAULT 0 COMMENT 'إجمالي ساعات الوردية',
-  `equip_total_month` int(11) DEFAULT NULL COMMENT 'إجمالي الساعات اليومية ',
-  `equip_monthly_target` int(11) DEFAULT 0 COMMENT 'وحدات العمل في الشهر',
-  `equip_total_contract` int(11) DEFAULT NULL COMMENT 'إجمالي ساعات العقد',
-  `equip_price` decimal(10,2) DEFAULT 0.00 COMMENT 'السعر',
-  `equip_operators` int(11) DEFAULT 0 COMMENT 'المشغلين',
-  `equip_supervisors` int(11) DEFAULT 0 COMMENT 'المشرفين',
-  `equip_technicians` int(11) DEFAULT 0 COMMENT 'الفنيين',
-  `equip_assistants` int(11) DEFAULT 0 COMMENT 'المساعدين',
-  `equip_price_currency` varchar(20) DEFAULT NULL COMMENT 'تمييز السعر',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `shift_hours` int DEFAULT '0' COMMENT 'إجمالي ساعات الوردية',
+  `equip_total_month` int DEFAULT NULL COMMENT 'إجمالي الساعات اليومية ',
+  `equip_monthly_target` int DEFAULT '0' COMMENT 'وحدات العمل في الشهر',
+  `equip_total_contract` int DEFAULT NULL COMMENT 'إجمالي ساعات العقد',
+  `equip_price` decimal(10,2) DEFAULT '0.00' COMMENT 'السعر',
+  `equip_operators` int DEFAULT '0' COMMENT 'المشغلين',
+  `equip_supervisors` int DEFAULT '0' COMMENT 'المشرفين',
+  `equip_technicians` int DEFAULT '0' COMMENT 'الفنيين',
+  `equip_assistants` int DEFAULT '0' COMMENT 'المساعدين',
+  `equip_price_currency` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'تمييز السعر',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `contract_id` (`contract_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `contractequipments`
@@ -856,52 +1743,56 @@ INSERT INTO `contractequipments` (`id`, `company_id`, `contract_id`, `equip_type
 -- Table structure for table `contracts`
 --
 
-CREATE TABLE `contracts` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
+DROP TABLE IF EXISTS `contracts`;
+CREATE TABLE IF NOT EXISTS `contracts` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
   `contract_signing_date` date NOT NULL,
-  `grace_period_days` int(11) DEFAULT 0,
-  `contract_duration_months` int(11) DEFAULT 0,
-  `contract_duration_days` int(11) NOT NULL DEFAULT 0,
-  `equip_shifts_contract` int(11) DEFAULT 0 COMMENT 'عدد الورديات للعقد',
-  `shift_contract` int(11) DEFAULT 0 COMMENT 'ساعات الوردية للعقد',
-  `equip_total_contract_daily` int(11) DEFAULT 0 COMMENT 'إجمالي الوحدات يومياً للعقد',
-  `total_contract_permonth` int(11) DEFAULT 0 COMMENT 'وحدات العمل في الشهر للعقد',
-  `total_contract_units` int(11) DEFAULT 0 COMMENT 'إجمالي وحدات العقد',
+  `grace_period_days` int DEFAULT '0',
+  `contract_duration_months` int DEFAULT '0',
+  `contract_duration_days` int NOT NULL DEFAULT '0',
+  `equip_shifts_contract` int DEFAULT '0' COMMENT 'عدد الورديات للعقد',
+  `shift_contract` int DEFAULT '0' COMMENT 'ساعات الوردية للعقد',
+  `equip_total_contract_daily` int DEFAULT '0' COMMENT 'إجمالي الوحدات يومياً للعقد',
+  `total_contract_permonth` int DEFAULT '0' COMMENT 'وحدات العمل في الشهر للعقد',
+  `total_contract_units` int DEFAULT '0' COMMENT 'إجمالي وحدات العقد',
   `actual_start` date DEFAULT NULL,
   `actual_end` date DEFAULT NULL,
-  `transportation` text DEFAULT NULL,
-  `accommodation` text DEFAULT NULL,
-  `place_for_living` text DEFAULT NULL,
-  `workshop` text DEFAULT NULL,
-  `hours_monthly_target` int(11) DEFAULT 0,
-  `forecasted_contracted_hours` int(11) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
-  `daily_work_hours` varchar(20) DEFAULT NULL,
-  `daily_operators` varchar(20) DEFAULT NULL,
-  `first_party` varchar(255) DEFAULT NULL,
-  `second_party` varchar(255) DEFAULT NULL,
-  `witness_one` varchar(255) DEFAULT NULL,
-  `witness_two` varchar(255) DEFAULT NULL,
-  `price_currency_contract` varchar(20) DEFAULT NULL COMMENT 'عملة العقد',
-  `paid_contract` varchar(100) DEFAULT NULL COMMENT 'المبلغ المدفوع',
-  `payment_time` varchar(50) DEFAULT NULL COMMENT 'وقت الدفع (مقدم/مؤخر)',
-  `guarantees` text DEFAULT NULL COMMENT 'الضمانات',
+  `transportation` mediumtext COLLATE utf8mb4_unicode_ci,
+  `accommodation` mediumtext COLLATE utf8mb4_unicode_ci,
+  `place_for_living` mediumtext COLLATE utf8mb4_unicode_ci,
+  `workshop` mediumtext COLLATE utf8mb4_unicode_ci,
+  `hours_monthly_target` int DEFAULT '0',
+  `forecasted_contracted_hours` int DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `daily_work_hours` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `daily_operators` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `first_party` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `second_party` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `witness_one` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `witness_two` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `price_currency_contract` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'عملة العقد',
+  `paid_contract` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'المبلغ المدفوع',
+  `payment_time` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'وقت الدفع (مقدم/مؤخر)',
+  `guarantees` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'الضمانات',
   `payment_date` date DEFAULT NULL COMMENT 'تاريخ الدفع',
-  `contract_status` text DEFAULT NULL,
-  `pause_reason` text DEFAULT NULL,
+  `contract_status` mediumtext COLLATE utf8mb4_unicode_ci,
+  `pause_reason` mediumtext COLLATE utf8mb4_unicode_ci,
   `pause_date` date DEFAULT NULL COMMENT 'تاريخ إيقاف العقد',
   `resume_date` date DEFAULT NULL COMMENT 'تاريخ استئناف العقد',
-  `termination_type` varchar(50) DEFAULT NULL,
-  `termination_reason` text DEFAULT NULL,
-  `merged_with` int(11) DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 1 COMMENT '1=نشط, 0=موقوف',
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `termination_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `termination_reason` mediumtext COLLATE utf8mb4_unicode_ci,
+  `merged_with` int DEFAULT NULL,
+  `status` tinyint(1) DEFAULT '1' COMMENT '1=نشط, 0=موقوف',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   `deleted_at` datetime DEFAULT NULL,
-  `deleted_by` int(11) DEFAULT NULL,
-  `project_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `deleted_by` int DEFAULT NULL,
+  `project_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_contracts_merged` (`merged_with`),
+  KEY `idx_contracts_project_id` (`project_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `contracts`
@@ -920,15 +1811,20 @@ INSERT INTO `contracts` (`id`, `company_id`, `contract_signing_date`, `grace_per
 -- Table structure for table `contract_notes`
 --
 
-CREATE TABLE `contract_notes` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `contract_id` int(11) NOT NULL,
-  `note` text NOT NULL,
-  `user_id` int(11) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `created_by` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+DROP TABLE IF EXISTS `contract_notes`;
+CREATE TABLE IF NOT EXISTS `contract_notes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `contract_id` int NOT NULL,
+  `note` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` int DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `fk_contract_notes_contract` (`contract_id`),
+  KEY `fk_contract_notes_created_by` (`created_by`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `contract_notes`
@@ -943,17 +1839,18 @@ INSERT INTO `contract_notes` (`id`, `company_id`, `contract_id`, `note`, `user_i
 -- Table structure for table `drivercontractequipments`
 --
 
-CREATE TABLE `drivercontractequipments` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `contract_id` int(11) NOT NULL COMMENT 'معرف عقد السائق من جدول drivercontracts',
-  `equip_type` varchar(100) DEFAULT NULL COMMENT 'نوع المعدة (حفار، قلاب، خرامة)',
-  `equip_size` int(11) DEFAULT NULL COMMENT 'حجم المعدة',
-  `equip_count` int(11) DEFAULT NULL COMMENT 'عدد المعدات',
-  `equip_count_basic` int(11) DEFAULT 0 COMMENT 'عدد المعدات الأساسية',
-  `equip_count_backup` int(11) DEFAULT 0 COMMENT 'عدد المعدات الاحتياطية',
-  `equip_shifts` int(11) DEFAULT NULL COMMENT 'عدد الورديات',
-  `equip_unit` varchar(50) DEFAULT NULL COMMENT 'وحدة القياس (ساعة، طن، متر)',
+DROP TABLE IF EXISTS `drivercontractequipments`;
+CREATE TABLE IF NOT EXISTS `drivercontractequipments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `contract_id` int NOT NULL COMMENT 'معرف عقد السائق من جدول drivercontracts',
+  `equip_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع المعدة (حفار، قلاب، خرامة)',
+  `equip_size` int DEFAULT NULL COMMENT 'حجم المعدة',
+  `equip_count` int DEFAULT NULL COMMENT 'عدد المعدات',
+  `equip_count_basic` int DEFAULT '0' COMMENT 'عدد المعدات الأساسية',
+  `equip_count_backup` int DEFAULT '0' COMMENT 'عدد المعدات الاحتياطية',
+  `equip_shifts` int DEFAULT NULL COMMENT 'عدد الورديات',
+  `equip_unit` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'وحدة القياس (ساعة، طن، متر)',
   `shift1_start` time DEFAULT NULL COMMENT 'بداية الوردية الأولى',
   `shift1_end` time DEFAULT NULL COMMENT 'نهاية الوردية الأولى',
   `shift2_start` time DEFAULT NULL COMMENT 'بداية الوردية الثانية',
@@ -963,12 +1860,14 @@ CREATE TABLE `drivercontractequipments` (
   `equip_monthly_target` decimal(10,2) DEFAULT NULL COMMENT 'وحدات العمل في الشهر',
   `equip_total_contract` decimal(10,2) DEFAULT NULL COMMENT 'إجمالي وحدات العقد',
   `equip_price` decimal(10,2) DEFAULT NULL COMMENT 'السعر للوحدة',
-  `equip_price_currency` varchar(20) DEFAULT NULL COMMENT 'العملة (دولار، جنيه)',
-  `equip_operators` int(11) DEFAULT NULL COMMENT 'عدد المشغلين',
-  `equip_supervisors` int(11) DEFAULT NULL COMMENT 'عدد المشرفين',
-  `equip_technicians` int(11) DEFAULT NULL COMMENT 'عدد الفنيين',
-  `equip_assistants` int(11) DEFAULT NULL COMMENT 'عدد المساعدين',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `equip_price_currency` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'العملة (دولار، جنيه)',
+  `equip_operators` int DEFAULT NULL COMMENT 'عدد المشغلين',
+  `equip_supervisors` int DEFAULT NULL COMMENT 'عدد المشرفين',
+  `equip_technicians` int DEFAULT NULL COMMENT 'عدد الفنيين',
+  `equip_assistants` int DEFAULT NULL COMMENT 'عدد المساعدين',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `contract_id` (`contract_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='معدات عقود السائقين';
 
 -- --------------------------------------------------------
@@ -977,62 +1876,68 @@ CREATE TABLE `drivercontractequipments` (
 -- Table structure for table `drivercontracts`
 --
 
-CREATE TABLE `drivercontracts` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `driver_id` int(250) NOT NULL,
+DROP TABLE IF EXISTS `drivercontracts`;
+CREATE TABLE IF NOT EXISTS `drivercontracts` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `driver_id` int NOT NULL,
   `contract_signing_date` date NOT NULL,
-  `grace_period_days` int(11) DEFAULT 0,
-  `contract_duration_months` int(11) DEFAULT 0,
-  `contract_duration_days` int(11) DEFAULT 0,
-  `equip_shifts_contract` int(11) DEFAULT 0 COMMENT 'عدد ورديات المعدات في العقد',
-  `shift_contract` int(11) DEFAULT 0 COMMENT 'الوردية',
-  `equip_total_contract_daily` decimal(10,2) DEFAULT 0.00 COMMENT 'إجمالي الوحدات اليومية للعقد',
-  `total_contract_permonth` decimal(10,2) DEFAULT 0.00 COMMENT 'إجمالي وحدات العمل في الشهر',
-  `total_contract_units` decimal(10,2) DEFAULT 0.00 COMMENT 'إجمالي وحدات العمل للعقد',
+  `grace_period_days` int DEFAULT '0',
+  `contract_duration_months` int DEFAULT '0',
+  `contract_duration_days` int DEFAULT '0',
+  `equip_shifts_contract` int DEFAULT '0' COMMENT 'عدد ورديات المعدات في العقد',
+  `shift_contract` int DEFAULT '0' COMMENT 'الوردية',
+  `equip_total_contract_daily` decimal(10,2) DEFAULT '0.00' COMMENT 'إجمالي الوحدات اليومية للعقد',
+  `total_contract_permonth` decimal(10,2) DEFAULT '0.00' COMMENT 'إجمالي وحدات العمل في الشهر',
+  `total_contract_units` decimal(10,2) DEFAULT '0.00' COMMENT 'إجمالي وحدات العمل للعقد',
   `actual_start` date DEFAULT NULL,
   `actual_end` date DEFAULT NULL,
-  `transportation` text DEFAULT NULL,
-  `accommodation` text DEFAULT NULL,
-  `place_for_living` text DEFAULT NULL,
-  `workshop` text DEFAULT NULL,
-  `equip_type` varchar(100) DEFAULT NULL,
-  `equip_size` int(11) DEFAULT NULL,
-  `equip_count` int(11) DEFAULT 0,
-  `equip_target_per_month` int(11) DEFAULT 0,
-  `equip_total_month` int(11) DEFAULT 0,
-  `equip_total_contract` int(11) DEFAULT 0,
-  `mach_type` varchar(100) DEFAULT NULL,
-  `mach_size` int(11) DEFAULT NULL,
-  `mach_count` int(11) DEFAULT 0,
-  `mach_target_per_month` int(11) DEFAULT 0,
-  `mach_total_month` int(11) DEFAULT 0,
-  `mach_total_contract` int(11) DEFAULT 0,
-  `hours_monthly_target` int(11) DEFAULT 0,
-  `forecasted_contracted_hours` int(11) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
-  `daily_work_hours` varchar(20) DEFAULT NULL,
-  `daily_operators` varchar(20) DEFAULT NULL,
-  `first_party` varchar(255) DEFAULT NULL,
-  `second_party` varchar(255) DEFAULT NULL,
-  `witness_one` varchar(255) DEFAULT NULL,
-  `witness_two` varchar(255) DEFAULT NULL,
-  `price_currency_contract` varchar(50) DEFAULT NULL COMMENT 'عملة العقد',
-  `paid_contract` decimal(10,2) DEFAULT 0.00 COMMENT 'المبلغ المدفوع',
-  `payment_time` varchar(50) DEFAULT NULL COMMENT 'وقت الدفع (مقدم/مؤخر)',
-  `guarantees` text DEFAULT NULL COMMENT 'الضمانات',
+  `transportation` mediumtext COLLATE utf8mb4_unicode_ci,
+  `accommodation` mediumtext COLLATE utf8mb4_unicode_ci,
+  `place_for_living` mediumtext COLLATE utf8mb4_unicode_ci,
+  `workshop` mediumtext COLLATE utf8mb4_unicode_ci,
+  `equip_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `equip_size` int DEFAULT NULL,
+  `equip_count` int DEFAULT '0',
+  `equip_target_per_month` int DEFAULT '0',
+  `equip_total_month` int DEFAULT '0',
+  `equip_total_contract` int DEFAULT '0',
+  `mach_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `mach_size` int DEFAULT NULL,
+  `mach_count` int DEFAULT '0',
+  `mach_target_per_month` int DEFAULT '0',
+  `mach_total_month` int DEFAULT '0',
+  `mach_total_contract` int DEFAULT '0',
+  `hours_monthly_target` int DEFAULT '0',
+  `forecasted_contracted_hours` int DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `daily_work_hours` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `daily_operators` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `first_party` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `second_party` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `witness_one` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `witness_two` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `price_currency_contract` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'عملة العقد',
+  `paid_contract` decimal(10,2) DEFAULT '0.00' COMMENT 'المبلغ المدفوع',
+  `payment_time` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'وقت الدفع (مقدم/مؤخر)',
+  `guarantees` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'الضمانات',
   `payment_date` date DEFAULT NULL COMMENT 'تاريخ الدفع',
-  `pause_reason` text DEFAULT NULL COMMENT 'سبب الإيقاف',
+  `pause_reason` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'سبب الإيقاف',
   `pause_date` date DEFAULT NULL COMMENT 'تاريخ الإيقاف',
   `resume_date` date DEFAULT NULL COMMENT 'تاريخ الاستئناف',
-  `termination_type` varchar(50) DEFAULT NULL COMMENT 'نوع الإنهاء',
-  `termination_reason` text DEFAULT NULL COMMENT 'سبب الإنهاء',
-  `merged_with` int(11) DEFAULT NULL COMMENT 'دمج مع عقد آخر',
-  `project_id` int(255) NOT NULL DEFAULT 0,
-  `project_contract_id` int(11) DEFAULT NULL COMMENT 'معرف عقد المشروع',
-  `status` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `termination_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع الإنهاء',
+  `termination_reason` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'سبب الإنهاء',
+  `merged_with` int DEFAULT NULL COMMENT 'دمج مع عقد آخر',
+  `project_id` int NOT NULL DEFAULT '0',
+  `project_contract_id` int DEFAULT NULL COMMENT 'معرف عقد المشروع',
+  `status` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `idx_drivercontracts_project_contract_id` (`project_contract_id`),
+  KEY `fk_drivercontracts_driver` (`driver_id`),
+  KEY `fk_drivercontracts_project` (`project_id`),
+  KEY `fk_drivercontracts_merged` (`merged_with`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1040,51 +1945,58 @@ CREATE TABLE `drivercontracts` (
 -- Table structure for table `drivers`
 --
 
-CREATE TABLE `drivers` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `project_id` int(11) DEFAULT NULL,
-  `name` varchar(255) NOT NULL,
-  `driver_code` varchar(50) DEFAULT NULL COMMENT 'الرمز/الكود الفريد للمشغل',
-  `nickname` varchar(255) DEFAULT NULL COMMENT 'اسم الشهرة/الكنية',
-  `identity_type` varchar(50) DEFAULT NULL COMMENT 'نوع الهوية',
-  `identity_number` varchar(100) DEFAULT NULL COMMENT 'رقم الهوية',
+DROP TABLE IF EXISTS `drivers`;
+CREATE TABLE IF NOT EXISTS `drivers` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `project_id` int DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `driver_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الرمز/الكود الفريد للمشغل',
+  `nickname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'اسم الشهرة/الكنية',
+  `identity_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع الهوية',
+  `identity_number` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم الهوية',
   `identity_expiry_date` date DEFAULT NULL COMMENT 'تاريخ انتهاء الهوية',
-  `driver_photo` varchar(255) DEFAULT NULL,
-  `identity_photo` varchar(255) DEFAULT NULL,
-  `license_number` varchar(100) DEFAULT NULL COMMENT 'رقم رخصة القيادة',
-  `license_type` varchar(100) DEFAULT NULL COMMENT 'نوع رخصة القيادة',
+  `driver_photo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `identity_photo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `license_number` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم رخصة القيادة',
+  `license_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع رخصة القيادة',
   `license_expiry_date` date DEFAULT NULL COMMENT 'تاريخ انتهاء رخصة القيادة',
-  `license_issuer` varchar(255) DEFAULT NULL COMMENT 'جهة إصدار الرخصة',
-  `specialized_equipment` text DEFAULT NULL COMMENT 'نوع المعدة المتخصص فيها (متعدد)',
-  `years_in_field` int(11) DEFAULT NULL COMMENT 'سنوات العمل في المجال',
-  `years_on_equipment` int(11) DEFAULT NULL COMMENT 'سنوات العمل على هذا النوع من المعدات',
-  `skill_level` varchar(50) DEFAULT NULL COMMENT 'مستوى الكفاءة المهنية',
-  `certificates` text DEFAULT NULL COMMENT 'الشهادات والتدريبات',
-  `owner_supervisor` varchar(255) DEFAULT NULL COMMENT 'اسم المالك/المشرف المباشر',
-  `supplier_id` int(11) DEFAULT NULL COMMENT 'المورد الذي يعمل معه',
-  `employment_affiliation` varchar(100) DEFAULT NULL COMMENT 'تبعية المشغل',
-  `salary_type` varchar(50) DEFAULT NULL COMMENT 'نوع الراتب/الأجر',
+  `license_issuer` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'جهة إصدار الرخصة',
+  `specialized_equipment` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'نوع المعدة المتخصص فيها (متعدد)',
+  `years_in_field` int DEFAULT NULL COMMENT 'سنوات العمل في المجال',
+  `years_on_equipment` int DEFAULT NULL COMMENT 'سنوات العمل على هذا النوع من المعدات',
+  `skill_level` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مستوى الكفاءة المهنية',
+  `certificates` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'الشهادات والتدريبات',
+  `owner_supervisor` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'اسم المالك/المشرف المباشر',
+  `supplier_id` int DEFAULT NULL COMMENT 'المورد الذي يعمل معه',
+  `employment_affiliation` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'تبعية المشغل',
+  `salary_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع الراتب/الأجر',
   `monthly_salary` decimal(10,2) DEFAULT NULL COMMENT 'المبلغ الشهري التقريبي',
-  `email` varchar(255) DEFAULT NULL COMMENT 'البريد الإلكتروني',
-  `address` text DEFAULT NULL COMMENT 'العنوان',
-  `performance_rating` varchar(50) DEFAULT NULL COMMENT 'تقييم الكفاءة التشغيلية',
-  `behavior_record` varchar(50) DEFAULT NULL COMMENT 'سجل السلوك والانضباط',
-  `accident_record` varchar(50) DEFAULT NULL COMMENT 'سجل الحوادث والأعطال',
-  `health_status` varchar(50) DEFAULT NULL COMMENT 'الحالة الصحية',
-  `health_issues` text DEFAULT NULL COMMENT 'المشاكل الصحية المعروفة',
-  `vaccinations_status` varchar(50) DEFAULT NULL COMMENT 'التطعيمات والفحوصات',
-  `previous_employer` varchar(255) DEFAULT NULL COMMENT 'اسم جهة التوظيف السابقة',
-  `employment_duration` varchar(100) DEFAULT NULL COMMENT 'مدة العمل معهم',
-  `reference_contact` varchar(255) DEFAULT NULL COMMENT 'مرجع للاتصال',
-  `general_notes` text DEFAULT NULL COMMENT 'ملاحظات عامة',
-  `driver_status` varchar(50) DEFAULT 'نشط' COMMENT 'حالة المشغل',
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'البريد الإلكتروني',
+  `address` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'العنوان',
+  `performance_rating` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'تقييم الكفاءة التشغيلية',
+  `behavior_record` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'سجل السلوك والانضباط',
+  `accident_record` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'سجل الحوادث والأعطال',
+  `health_status` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الحالة الصحية',
+  `health_issues` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'المشاكل الصحية المعروفة',
+  `vaccinations_status` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'التطعيمات والفحوصات',
+  `previous_employer` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'اسم جهة التوظيف السابقة',
+  `employment_duration` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مدة العمل معهم',
+  `reference_contact` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجع للاتصال',
+  `general_notes` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'ملاحظات عامة',
+  `driver_status` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'نشط' COMMENT 'حالة المشغل',
   `start_date` date DEFAULT NULL COMMENT 'تاريخ البدء الفعلي',
-  `created_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'تاريخ التسجيل في النظام',
-  `phone` varchar(255) NOT NULL,
-  `phone_alternative` varchar(50) DEFAULT NULL COMMENT 'رقم هاتف بديل',
-  `status` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'تاريخ التسجيل في النظام',
+  `phone` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone_alternative` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم هاتف بديل',
+  `status` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `idx_driver_code` (`driver_code`),
+  KEY `idx_driver_name` (`name`),
+  KEY `idx_driver_status` (`driver_status`),
+  KEY `idx_supplier_id` (`supplier_id`),
+  KEY `idx_drivers_project_id` (`project_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `drivers`
@@ -1113,9 +2025,12 @@ INSERT INTO `drivers` (`id`, `company_id`, `project_id`, `name`, `driver_code`, 
 (20, 4, 4, 'محمود النيل', 'DR38', 'Kylynn Franklin', 'جواز سفر', '777', '2021-06-29', NULL, NULL, '221', 'فئة د (شاحنات ثقيلة)', '1987-07-27', 'Voluptatem Dolore a', 'جرافة (Loader), ممهدة (Grader), معدات أخرى', 5, 1, 'متدرب (1-2 سنة)', 'Doloribus officiis d', 'Laboris praesentium', 3, 'تابع لمالك المعدة مباشرة', 'حسب المشروع', 9.00, 'jyqozujyc@mailinator.com', 'Id iste explicabo U', 'ممتاز', 'غير محدد', 'ثلاثة حوادث فأكثر (خطير)', 'محتاج متابعة طبية', 'Et animi repudianda', 'محدثة', 'Praesentium natus no', 'In sunt enim vel est', 'Sit rerum dignissimo', 'Quis alias veritatis', 'نشط', '2004-04-20', '2026-04-13 13:08:49', '+1 (749) 684-7125', '+1 (362) 986-7752', 1),
 (21, 4, 4, 'نصر الدين يحيا', 'DR39', 'Eden Hogan', 'بطاقة أخرى', '994', '1976-11-11', NULL, NULL, '680', 'فئة د (شاحنات ثقيلة)', '1982-06-13', 'Accusantium in Nam m', 'دوزر (Dozer), جرافة (Loader), ممهدة (Grader)', 5, 1, 'متدرب (1-2 سنة)', 'Omnis eum nisi odit', 'Vero ut illo deserun', 3, 'مقاول مستقل', 'شهري', 6.00, 'hymog@mailinator.com', 'Eum reprehenderit a', 'غير محدد', 'ممتاز (لا توجد شكاوى)', 'غير محدد', 'غير محدد', 'Eveniet rerum nobis', 'محدثة', 'Nostrum ea maiores d', 'Nobis voluptatem Ex', 'Perspiciatis incidu', 'Dolore eiusmod culpa', 'نشط', '2011-08-15', '2026-04-13 13:09:57', '+1 (352) 765-2112', '+1 (449) 191-6255', 1),
 (22, 4, 4, 'ياسر جبارة', 'DR40', 'Theodore Wyatt', 'بطاقة لاجئ', '309', '1990-08-20', NULL, NULL, '190', 'فئة أ (دراجات نارية)', '2002-07-04', 'Inventore vero tenet', 'شاحنة قلابة (Dump Truck), ممهدة (Grader), معدات أخرى', 5, 1, 'كفء (3-5 سنوات)', 'Voluptate velit repr', 'Dolor eveniet dolor', 3, 'تابع للمورد/الوسيط', 'حسب الإنتاجية', 7.00, 'xyfiwota@mailinator.com', 'Quis repellendus Qu', 'جيد', 'غير محدد', 'حادثان (متوسط)', 'سليم تماماً', 'Aut sunt velit molli', 'محدثة', 'Id possimus autem i', 'Id modi aspernatur', 'Ab cumque nostrum la', 'Minus necessitatibus', 'نشط', '1983-02-10', '2026-04-13 13:10:50', '+1 (877) 981-3484', '+1 (416) 454-2556', 1),
-(23, 4, 2, 'جديد فضل جديد', '131355', 'جديد', 'بطاقة هوية وطنية', '3132131331', '2026-05-08', '', '', '61313', 'فئة د (شاحنات ثقيلة)', '2026-05-03', 'مرور عطبرة', 'حفارة (Excavator), دوزر (Dozer), جرافة (Loader)', 8, 5, 'كفء (3-5 سنوات)', '', 'شركة صابركو', 5, 'تابع لمالك المعدة مباشرة', 'شهري', 1000.00, 'sudan@gmail.com', 'الخناق', 'جيد جداً', 'ممتاز (لا توجد شكاوى)', 'نظيف (لا توجد حوادث)', 'سليم تماماً', '', 'محدثة', 'دال للتعدين', '4', '', '', 'نشط', '2025-09-08', '2026-04-28 11:34:00', '6531533161', '532121235855', 1),
+(23, 4, 4, 'جديد فضل جديد', '131355', 'جديد', 'بطاقة هوية وطنية', '3132131331', '2026-05-08', '', '', '61313', 'فئة د (شاحنات ثقيلة)', '2026-05-03', 'مرور عطبرة', 'حفارة (Excavator), دوزر (Dozer), جرافة (Loader)', 8, 5, 'كفء (3-5 سنوات)', '', 'شركة صابركو', 5, 'تابع لمالك المعدة مباشرة', 'شهري', 1000.00, 'sudan@gmail.com', 'الخناق', 'جيد جداً', 'ممتاز (لا توجد شكاوى)', 'نظيف (لا توجد حوادث)', 'سليم تماماً', '', 'محدثة', 'دال للتعدين', '4', '', '', 'نشط', '2025-09-08', '2026-04-28 11:34:00', '6531533161', '532121235855', 1),
 (24, 4, 5, 'على فضل الله', '946513', 'على', '', '3132131331', '2026-05-08', '', '', '61313', '', '2026-05-03', 'مرور عطبرة', 'شاحنة قلابة (Dump Truck), شاحنة تناكر/صهريج (Tanker Truck)', 8, 5, '', '', 'عمر هشام', 6, 'تابع لمالك المعدة مباشرة', 'شهري', 700.00, 'sudan@gmail.com', '', 'ممتاز', 'ممتاز (لا توجد شكاوى)', 'نظيف (لا توجد حوادث)', 'سليم تماماً', '', 'قديمة', 'دال للتعدين', '2', '', '', 'نشط', '2025-09-08', '2026-04-28 11:37:12', '6531533161', '5664+5+', 1),
-(25, 4, 5, 'حيدر محمد أحمد', '89465132', 'حيدر', 'بطاقة هوية وطنية', '3132131331', '2026-05-08', '', '', '61313', '', '2026-05-03', 'مرور عطبرة', 'شاحنة قلابة (Dump Truck), شاحنة تناكر/صهريج (Tanker Truck)', 8, 5, 'خبير (5-10 سنوات)', '', 'عمر هشام', 6, 'تابع لمالك المعدة مباشرة', 'شهري', 700.00, 'sudan@gmail.com', '', 'ممتاز', 'ممتاز (لا توجد شكاوى)', 'حادث واحد (طفيف)', 'سليم تماماً', '', 'لا يوجد فحص', 'دال للتعدين', '3', '', '', 'نشط', '2025-09-08', '2026-04-28 11:39:31', '6531533161', '', 1);
+(25, 4, 5, 'حيدر محمد أحمد', '89465132', 'حيدر', 'بطاقة هوية وطنية', '3132131331', '2026-05-08', '', '', '61313', '', '2026-05-03', 'مرور عطبرة', 'شاحنة قلابة (Dump Truck), شاحنة تناكر/صهريج (Tanker Truck)', 8, 5, 'خبير (5-10 سنوات)', '', 'عمر هشام', 6, 'تابع لمالك المعدة مباشرة', 'شهري', 700.00, 'sudan@gmail.com', '', 'ممتاز', 'ممتاز (لا توجد شكاوى)', 'حادث واحد (طفيف)', 'سليم تماماً', '', 'لا يوجد فحص', 'دال للتعدين', '3', '', '', 'نشط', '2025-09-08', '2026-04-28 11:39:31', '6531533161', '', 1),
+(26, 4, 4, 'محمد أحمد علي', 'DRV-0001', '', '', '', NULL, '', '', '', '', '2027-01-01', '', '', NULL, NULL, '', '', '', NULL, '', '', NULL, '', '', '', '', '', '', '', '', '', '', '', '', 'نشط', NULL, '2026-06-06 10:16:18', '249912345678', '', 1),
+(27, 4, 4, 'مروان', 'DRV-0001-3', '', '', '', NULL, '', '', '', '', '2027-01-01', '', '', NULL, NULL, '', '', '', NULL, '', '', NULL, '', '', '', '', '', '', '', '', '', '', '', '', 'نشط', NULL, '2026-06-06 10:16:18', '249912345678', '', 1),
+(28, 4, 4, 'Madonna Hewitt', 'Fugit veniam bland', 'Stacy Miles', 'بطاقة أخرى', '723', '1987-01-10', '', '', '591', 'فئة ج (شاحنات خفيفة)', '2016-02-09', 'Non laborum eiusmod', 'حفارة (Excavator), مثقاب/مكنة تخريم (Drill Machine), شاحنة تناكر/صهريج (Tanker Truck)', NULL, NULL, 'كفء (3-5 سنوات)', 'Obcaecati temporibus', 'Consequatur elit n', 8, 'تابع للمورد/الوسيط', 'شهري', 5.00, 'kyvykyqa@mailinator.com', 'Ut qui nostrum nostr', 'ممتاز', 'جيد (شكاوى نادرة)', 'نظيف (لا توجد حوادث)', 'غير محدد', 'Magnam consequatur', 'قديمة', 'Veniam quidem et no', 'Pariatur Sed aut do', 'Quaerat incidunt ip', 'Rerum earum ipsam la', 'مفصول', '1981-12-19', '2026-06-09 12:50:59', '+1 (706) 711-3047', '+1 (275) 107-3097', 1);
 
 -- --------------------------------------------------------
 
@@ -1123,12 +2038,15 @@ INSERT INTO `drivers` (`id`, `company_id`, `project_id`, `name`, `driver_code`, 
 -- Table structure for table `driver_contract_notes`
 --
 
-CREATE TABLE `driver_contract_notes` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `contract_id` int(11) NOT NULL COMMENT 'معرف عقد السائق',
-  `note` text NOT NULL COMMENT 'الملاحظة أو الإجراء المتخذ',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'تاريخ الإضافة'
+DROP TABLE IF EXISTS `driver_contract_notes`;
+CREATE TABLE IF NOT EXISTS `driver_contract_notes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `contract_id` int NOT NULL COMMENT 'معرف عقد السائق',
+  `note` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الملاحظة أو الإجراء المتخذ',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'تاريخ الإضافة',
+  PRIMARY KEY (`id`),
+  KEY `idx_driver_contract_notes_contract_id` (`contract_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجل التدقيق لإجراءات عقود السائقين';
 
 -- --------------------------------------------------------
@@ -1137,68 +2055,99 @@ CREATE TABLE `driver_contract_notes` (
 -- Table structure for table `equipments`
 --
 
-CREATE TABLE `equipments` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `suppliers` varchar(10) NOT NULL,
-  `code` varchar(100) NOT NULL,
-  `type` varchar(100) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `serial_number` varchar(100) DEFAULT NULL COMMENT 'رقم المعدة/الرقم التسلسلي',
-  `chassis_number` varchar(100) DEFAULT NULL COMMENT 'رقم الهيكل/الهيكل الأساسي',
-  `machine_number` varchar(100) DEFAULT NULL COMMENT 'رقم الماكينة أو المحرك',
-  `manufacturer` varchar(100) DEFAULT NULL COMMENT 'الماركة/الشركة المصنعة',
-  `model` varchar(100) DEFAULT NULL COMMENT 'الموديل/الطراز',
-  `manufacturing_year` int(4) DEFAULT NULL COMMENT 'سنة الصنع',
-  `import_year` int(4) DEFAULT NULL COMMENT 'سنة الاستيراد/البدء',
-  `equipment_condition` varchar(50) DEFAULT 'في حالة جيدة' COMMENT 'حالة المعدة',
-  `operating_hours` int(11) DEFAULT NULL COMMENT 'ساعات التشغيل',
-  `engine_condition` varchar(50) DEFAULT 'جيدة' COMMENT 'حالة المحرك',
-  `tires_condition` varchar(50) DEFAULT 'N/A' COMMENT 'حالة الإطارات',
-  `actual_owner_name` varchar(200) DEFAULT NULL COMMENT 'اسم المالك الفعلي',
-  `owner_type` varchar(50) DEFAULT NULL COMMENT 'نوع المالك',
-  `owner_phone` varchar(50) DEFAULT NULL COMMENT 'رقم هاتف المالك',
-  `owner_supplier_relation` varchar(100) DEFAULT NULL COMMENT 'علاقة المالك بالمورد',
-  `license_number` varchar(100) DEFAULT NULL COMMENT 'رقم الترخيص/التسجيل',
-  `license_authority` varchar(100) DEFAULT NULL COMMENT 'جهة الترخيص',
-  `document_type` varchar(100) DEFAULT NULL COMMENT 'نوع الوثيقة',
+DROP TABLE IF EXISTS `equipments`;
+CREATE TABLE IF NOT EXISTS `equipments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `suppliers` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `serial_number` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم المعدة/الرقم التسلسلي',
+  `chassis_number` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم الهيكل/الهيكل الأساسي',
+  `machine_number` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم الماكينة أو المحرك',
+  `manufacturer` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الماركة/الشركة المصنعة',
+  `model` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الموديل/الطراز',
+  `model_id` int DEFAULT NULL,
+  `manufacturing_year` int DEFAULT NULL COMMENT 'سنة الصنع',
+  `import_year` int DEFAULT NULL COMMENT 'سنة الاستيراد/البدء',
+  `equipment_condition` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'في حالة جيدة' COMMENT 'حالة المعدة',
+  `operating_hours` int DEFAULT NULL COMMENT 'ساعات التشغيل',
+  `engine_condition` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'جيدة' COMMENT 'حالة المحرك',
+  `tires_condition` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'N/A' COMMENT 'حالة الإطارات',
+  `actual_owner_name` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'اسم المالك الفعلي',
+  `owner_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع المالك',
+  `owner_phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم هاتف المالك',
+  `owner_supplier_relation` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'علاقة المالك بالمورد',
+  `license_number` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم الترخيص/التسجيل',
+  `license_authority` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'جهة الترخيص',
+  `document_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع الوثيقة',
   `license_expiry_date` date DEFAULT NULL COMMENT 'تاريخ انتهاء الترخيص',
-  `inspection_certificate_number` varchar(100) DEFAULT NULL COMMENT 'رقم شهادة الفحص',
+  `inspection_certificate_number` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم شهادة الفحص',
   `last_inspection_date` date DEFAULT NULL COMMENT 'تاريخ آخر فحص',
-  `current_location` varchar(255) DEFAULT NULL COMMENT 'الموقع الحالي',
-  `site_supervisor_name` varchar(200) DEFAULT NULL COMMENT 'اسم المهندس أو المشرف في الموقع',
-  `site_supervisor_contact` varchar(200) DEFAULT NULL COMMENT 'بيانات الاتصال بالمشرف في الموقع',
-  `availability_state` varchar(20) NOT NULL DEFAULT 'متوفرة' COMMENT 'التوفر: متوفرة أو غير متوفرة',
-  `availability_status` varchar(50) DEFAULT 'متاحة للعمل' COMMENT 'حالة التوفر',
+  `current_location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الموقع الحالي',
+  `site_supervisor_name` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'اسم المهندس أو المشرف في الموقع',
+  `site_supervisor_contact` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'بيانات الاتصال بالمشرف في الموقع',
+  `availability_state` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'متوفرة' COMMENT 'التوفر: متوفرة أو غير متوفرة',
+  `availability_status` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'متاحة للعمل' COMMENT 'حالة التوفر',
   `estimated_value` decimal(15,2) DEFAULT NULL COMMENT 'القيمة المقدرة للمعدة',
   `daily_rental_price` decimal(10,2) DEFAULT NULL COMMENT 'سعر التأجير اليومي',
   `monthly_rental_price` decimal(10,2) DEFAULT NULL COMMENT 'سعر التأجير الشهري',
-  `insurance_status` varchar(50) DEFAULT NULL COMMENT 'التأمين/الضمان',
-  `general_notes` text DEFAULT NULL COMMENT 'ملاحظات عامة',
+  `insurance_status` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'التأمين/الضمان',
+  `general_notes` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'ملاحظات عامة',
   `last_maintenance_date` date DEFAULT NULL COMMENT 'تاريخ آخر صيانة',
-  `status` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `status` tinyint(1) DEFAULT '1',
+  `operating_category` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `origin_country` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `engine_no` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `plate_no` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `capacity` decimal(12,2) DEFAULT NULL,
+  `capacity_uom` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dimensions` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `source_type` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `entry_date` date DEFAULT NULL,
+  `acquisition_cost` decimal(15,2) DEFAULT NULL,
+  `acquisition_currency` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `opening_meter` decimal(12,2) DEFAULT NULL,
+  `meter_uom` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'ساعات',
+  `meter_source` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `card_state` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `card_approved_by` int DEFAULT NULL,
+  `card_approved_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_serial_number` (`serial_number`),
+  KEY `idx_chassis_number` (`chassis_number`),
+  KEY `idx_manufacturer` (`manufacturer`),
+  KEY `idx_availability_status` (`availability_status`),
+  KEY `idx_equipments_model_id` (`model_id`),
+  KEY `idx_equipments_card_state` (`card_state`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `equipments`
 --
 
-INSERT INTO `equipments` (`id`, `company_id`, `suppliers`, `code`, `type`, `name`, `serial_number`, `chassis_number`, `machine_number`, `manufacturer`, `model`, `manufacturing_year`, `import_year`, `equipment_condition`, `operating_hours`, `engine_condition`, `tires_condition`, `actual_owner_name`, `owner_type`, `owner_phone`, `owner_supplier_relation`, `license_number`, `license_authority`, `document_type`, `license_expiry_date`, `inspection_certificate_number`, `last_inspection_date`, `current_location`, `site_supervisor_name`, `site_supervisor_contact`, `availability_state`, `availability_status`, `estimated_value`, `daily_rental_price`, `monthly_rental_price`, `insurance_status`, `general_notes`, `last_maintenance_date`, `status`) VALUES
-(1, 4, '1', 'EQTQ1', '1', 'Plato Roberson', '883', '751', NULL, 'Aut officia aut exce', 'Alias ducimus eius', 2001, 2008, 'في حالة ضعيفة', 40, 'جيدة', 'متوسطة', 'Keegan Blanchard', 'مؤسسة', '+1 (835) 262-4394', 'تابع للمورد (مملوكة للمورد نفسه)', '435', 'Eum alias nisi et si', NULL, '1980-03-25', '72', '2001-10-21', 'Non natus in qui exp', NULL, NULL, 'متوفرة', 'قيد الاستخدام', 81.00, 457.00, 596.00, 'مؤمن بالكامل', 'Eum nihil eveniet c', '1975-01-22', 1),
-(2, 4, '1', 'EQTQ2', '1', 'Orson Holcomb', '195', '78', '', 'Nobis ipsum eum dolo', 'Eaque ut veniam et', 1978, 2004, 'في حالة جيدة', 98, 'محتاجة صيانة', 'محتاجة تبديل', 'Rama Delaney', 'شركة متخصصة', '+1 (338) 629-2108', 'غير محدد', '93', 'Consequatur non recu', '', '1989-06-19', '36', '1985-06-18', 'Et culpa corporis au', '', '', 'متوفرة', 'قيد الاستخدام', 93.00, 259.00, 576.00, 'مؤمن بالكامل', 'Et sunt laboris volu', '1992-04-28', 0),
-(3, 4, '3', 'EX29', '1', 'HMK220LC-2', '76197', '1250048', NULL, 'HIDROMEK', 'HMK220LC-2', 2021, 2021, 'في حالة جيدة', 9050, 'جيدة', 'N/A', 'EQUIPATION', 'أخرى', '249912345678', 'مالك مباشر (يتعاقد معنا مباشرة)', '4094', 'الإدارة العامة للمرور', NULL, '2025-09-11', '0000', '2025-09-11', 'الشركة الروسية', NULL, NULL, 'متوفرة', 'قيد الاستخدام', 100000.00, 800.00, 24000.00, 'مؤمن بالكامل', 'Consequatur id prov', '2026-04-12', 0),
-(4, 4, '3', 'EX28', '1', 'HX 340 SL', '82230204', 'HHKHE944LM0000028', NULL, 'HYUNDAI', 'HX340SL', 2021, 2021, 'معطلة مؤقتاً', 11500, 'محتاجة صيانة', 'N/A', 'EQUIPATION', 'أخرى', '249912345678', 'مالك مباشر (يتعاقد معنا مباشرة)', '2224', 'الإدارة العامة للمرور', NULL, '2022-06-13', '21260051', '2021-06-13', 'الشركة الروسية', NULL, NULL, 'غير متوفرة', 'معطلة', 70000.00, 800.00, 24000.00, 'غير مؤمن', 'Corporis in doloribu', '2026-02-10', 1),
-(5, 4, '4', 'EX26', '1', 'HMK220LC-2', '6D16-A73071', 'HMKH2520V0J125053', '', 'HIDROMEK', 'HMK220LC-2', 2019, 2019, 'في حالة جيدة', 12000, 'جيدة', 'N/A', 'EQUIPATION', '', '249912345678', '', 'PZUS02019024755', 'الجمارك', '', '2019-11-23', '1319126', '2021-10-15', 'الشركة الروسية', '', '', 'متوفرة', 'قيد الاستخدام', 95000.01, 800.00, 24000.00, '', '', '2026-04-10', 0),
-(6, 4, '3', 'EX24', '1', 'HMK220LC-2', '6D16-A76592', 'HMKH2520KM125006', NULL, 'HIDROMEK', 'HMK220LC-2', 2021, 2021, 'في حالة جيدة', 10450, 'جيدة', 'N/A', 'EQUIPATION', '', '249912345678', '', '7/2374ن', 'الإدارة العامة للمرور', NULL, '2022-10-14', '21449471', '2021-10-14', 'الشركة الروسية', NULL, NULL, 'متوفرة', 'قيد الاستخدام', 150000.00, 800.00, 24000.00, '', '', '2026-04-10', 0),
-(7, 4, '3', 'EX23', '1', 'HX 340 SL', '82447788', 'HHKHE944CN0000477', NULL, 'HYUNDAI', 'HX340SL', 2022, 2022, 'في حالة جيدة', 9800, 'جيدة', 'N/A', 'EQUIPATION', '', '249912345678', '', 'PZUN02022001191', 'الجمارك', NULL, '0001-01-01', '', NULL, 'نورايا', NULL, NULL, 'غير متوفرة', 'مسحوبة', 185000.00, 800.00, 24000.00, '', '', '2026-05-04', 0),
-(8, 4, '4', 'EX22', '1', 'HX 340 SL', '82463818', 'HHKHE944CN0000360', '', 'HYUNDAI', 'HX340SL', 2022, 2022, 'في حالة جيدة', 10000, 'جيدة', 'N/A', 'EQUIPATION', 'أخرى', '249912345678', '', 'PZUN02021014933', 'الجمارك', '', '0001-01-01', '', NULL, 'نورايا', '', '', 'متوفرة', 'قيد الاستخدام', 180000.00, 800.00, 24000.00, 'مؤمن بالكامل', '', '2026-05-04', 0),
-(9, 4, '3', 'EX21', '1', 'HX 340 SL', '8221373793', 'HHKH944HM0000144', NULL, 'HYUNDAI', 'HX340SL', 2021, 2021, 'في حالة جيدة', 9947, 'جيدة', 'N/A', 'EQUIPATION', 'أخرى', '249912345678', 'غير محدد', 'PZUN02021011333', 'الجمارك', NULL, '0001-01-01', '2020286', '2026-04-22', 'الشركة الروسية', NULL, NULL, 'متوفرة', 'قيد الاستخدام', 180000.00, 800.00, 24000.00, 'مؤمن بالكامل', 'معدة موثوقة تحتاج فقط للصيانة الدورية', '2026-04-01', 0),
-(10, 4, '5', 'EQ1001', '1', 'HX 340 SL', '82463818', 'HHKHE944CN0000418', '64533131', 'HYUNDAI', 'HX340SL', 2020, 2020, 'في حالة جيدة', 5000, 'جيدة', 'N/A', 'شركة صابركو', 'شركة متخصصة', '249912345678', 'مالك مباشر (يتعاقد معنا مباشرة)', 'PZUN02021011445', 'الجمارك', 'شهادة وارد', NULL, '', NULL, 'الشركة الروسية', '', '', 'متوفرة', 'قيد الاستخدام', 180000.00, 400.00, 12000.00, 'مؤمن بالكامل', '', '2025-11-29', 0),
-(11, 4, '6', 'TQ1006', '2', 'DAWEOO', '82463818', '5464654113', '64533131', 'DAWEOO', 'K6', 2021, 2022, 'في حالة جيدة', 100000, 'جيدة', 'جديدة', 'عمر هشام فضل المولى', 'مالك فردي', '89651', 'مالك مباشر (يتعاقد معنا مباشرة)', '7/1540ن', 'الإدارة العامة للمرور', 'ترخيص ( شهادة بحث)', '2026-05-01', '', NULL, 'الشركة الروسية', '', '', 'متوفرة', 'قيد الاستخدام', 70000.00, 80.00, 4800.00, 'مؤمن جزئياً', '', '2025-11-29', 0),
-(12, 4, '4', 'DM01', '3', 'Drill Machine', '20251101', '20251101', 'DTH Drilling RIG ADET D3', 'ADET', 'DTH Drilling RIG ADET D3', 2025, 2024, 'جديدة (لم تستخدم)', NULL, 'ممتازة', 'N/A', 'شركة إكوبيشن للإستثمار المحدودة', 'شركة متخصصة', '249912345678', 'مالك مباشر (يتعاقد معنا مباشرة)', 'PZUN02021016811', 'الجمارك', 'شهادة وارد', '2026-05-07', '', '2026-05-07', 'الشركة الروسية', '', '', 'متوفرة', 'قيد الاستخدام', 100000.00, NULL, NULL, '', '', NULL, 0),
-(13, 4, '4', 'H1', '3', 'h1', '', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', '', NULL, '', NULL, '', '', '', 'متوفرة', 'قيد الاستخدام', NULL, NULL, NULL, '', '', NULL, 0),
-(14, 4, '4', 'tq10', '2', 'tq10', '', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', '', NULL, '', NULL, '', '', '', 'متوفرة', 'قيد الاستخدام', NULL, NULL, NULL, '', '', NULL, 0),
-(15, 4, '7', 'itx', '1', 'itx', '1212389', '', '', '', '', NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', '', NULL, '', NULL, '', '', '', 'متوفرة', 'قيد الاستخدام', NULL, NULL, NULL, '', '', NULL, 0);
+INSERT INTO `equipments` (`id`, `company_id`, `suppliers`, `code`, `type`, `name`, `serial_number`, `chassis_number`, `machine_number`, `manufacturer`, `model`, `model_id`, `manufacturing_year`, `import_year`, `equipment_condition`, `operating_hours`, `engine_condition`, `tires_condition`, `actual_owner_name`, `owner_type`, `owner_phone`, `owner_supplier_relation`, `license_number`, `license_authority`, `document_type`, `license_expiry_date`, `inspection_certificate_number`, `last_inspection_date`, `current_location`, `site_supervisor_name`, `site_supervisor_contact`, `availability_state`, `availability_status`, `estimated_value`, `daily_rental_price`, `monthly_rental_price`, `insurance_status`, `general_notes`, `last_maintenance_date`, `status`, `operating_category`, `origin_country`, `engine_no`, `plate_no`, `capacity`, `capacity_uom`, `dimensions`, `source_type`, `entry_date`, `acquisition_cost`, `acquisition_currency`, `opening_meter`, `meter_uom`, `meter_source`, `card_state`, `card_approved_by`, `card_approved_at`) VALUES
+(1, 4, '1', 'EQTQ1', '1', 'Plato Roberson', '883', '751', NULL, 'Aut officia aut exce', 'Alias ducimus eius', NULL, 2001, 2008, 'في حالة ضعيفة', 40, 'جيدة', 'متوسطة', 'Keegan Blanchard', 'مؤسسة', '+1 (835) 262-4394', 'تابع للمورد (مملوكة للمورد نفسه)', '435', 'Eum alias nisi et si', NULL, '1980-03-25', '72', '2001-10-21', 'Non natus in qui exp', NULL, NULL, 'متوفرة', 'قيد الاستخدام', 81.00, 457.00, 596.00, 'مؤمن بالكامل', 'Eum nihil eveniet c', '1975-01-22', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(2, 4, '1', 'EQTQ2', '1', 'Orson Holcomb', '195', '78', '', 'Nobis ipsum eum dolo', 'Eaque ut veniam et', NULL, 1978, 2004, 'في حالة جيدة', 98, 'محتاجة صيانة', 'محتاجة تبديل', 'Rama Delaney', 'شركة متخصصة', '+1 (338) 629-2108', 'غير محدد', '93', 'Consequatur non recu', '', '1989-06-19', '36', '1985-06-18', 'Et culpa corporis au', '', '', 'متوفرة', 'قيد الاستخدام', 93.00, 259.00, 576.00, 'مؤمن بالكامل', 'Et sunt laboris volu', '1992-04-28', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(3, 4, '3', 'EX29', '1', 'HMK220LC-2', '76197', '1250048', NULL, 'HIDROMEK', 'HMK220LC-2', NULL, 2021, 2021, 'في حالة جيدة', 9050, 'جيدة', 'N/A', 'EQUIPATION', 'أخرى', '249912345678', 'مالك مباشر (يتعاقد معنا مباشرة)', '4094', 'الإدارة العامة للمرور', NULL, '2025-09-11', '0000', '2025-09-11', 'الشركة الروسية', NULL, NULL, 'متوفرة', 'قيد الاستخدام', 100000.00, 800.00, 24000.00, 'مؤمن بالكامل', 'Consequatur id prov', '2026-04-12', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(4, 4, '3', 'EX28', '1', 'HX 340 SL', '82230204', 'HHKHE944LM0000028', NULL, 'HYUNDAI', 'HX340SL', NULL, 2021, 2021, 'معطلة مؤقتاً', 11500, 'محتاجة صيانة', 'N/A', 'EQUIPATION', 'أخرى', '249912345678', 'مالك مباشر (يتعاقد معنا مباشرة)', '2224', 'الإدارة العامة للمرور', NULL, '2022-06-13', '21260051', '2021-06-13', 'الشركة الروسية', NULL, NULL, 'غير متوفرة', 'تحت الصيانة', 70000.00, 800.00, 24000.00, 'غير مؤمن', 'Corporis in doloribu', '2026-02-10', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(5, 4, '8', 'EX26', '1', 'HMK220LC-2', '6D16-A73071', 'HMKH2520V0J125053', '', 'HIDROMEK', 'HMK220LC-2', NULL, 2019, 2019, 'في حالة جيدة', 12000, 'جيدة', 'N/A', 'EQUIPATION', '', '249912345678', '', 'PZUS02019024755', 'الجمارك', '', '2019-11-23', '1319126', '2021-10-15', 'الشركة الروسية', '', '', 'متوفرة', 'قيد الاستخدام', 95000.01, 800.00, 24000.00, '', '', '2026-04-10', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(6, 4, '3', 'EX24', '1', 'HMK220LC-2', '6D16-A76592', 'HMKH2520KM125006', NULL, 'HIDROMEK', 'HMK220LC-2', NULL, 2021, 2021, 'في حالة جيدة', 10450, 'جيدة', 'N/A', 'EQUIPATION', '', '249912345678', '', '7/2374ن', 'الإدارة العامة للمرور', NULL, '2022-10-14', '21449471', '2021-10-14', 'الشركة الروسية', NULL, NULL, 'غير متوفرة', 'تحت الصيانة', 150000.00, 800.00, 24000.00, '', '', '2026-04-10', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(7, 4, '3', 'EX23', '1', 'HX 340 SL', '82447788', 'HHKHE944CN0000477', NULL, 'HYUNDAI', 'HX340SL', NULL, 2022, 2022, 'في حالة جيدة', 9800, 'جيدة', 'N/A', 'EQUIPATION', '', '249912345678', '', 'PZUN02022001191', 'الجمارك', NULL, '0001-01-01', '', NULL, 'نورايا', NULL, NULL, 'متوفرة', 'متاحة للعمل', 185000.00, 800.00, 24000.00, '', '', '2026-06-21', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(8, 4, '5', 'EX22', '1', 'HX 340 SL', '82463818', 'HHKHE944CN0000360', '', 'HYUNDAI', 'HX340SL', NULL, 2022, 2022, 'في حالة جيدة', 10000, 'جيدة', 'N/A', 'EQUIPATION', 'أخرى', '249912345678', '', 'PZUN02021014933', 'الجمارك', '', '0001-01-01', '', NULL, 'نورايا', '', '', 'متوفرة', 'قيد الاستخدام', 180000.00, 800.00, 24000.00, 'مؤمن بالكامل', '', '2026-05-04', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(9, 4, '3', 'EX21', '1', 'HX 340 SL', '8221373793', 'HHKH944HM0000144', '', 'HYUNDAI', 'HX340SL', NULL, 2021, 2021, 'في حالة جيدة', 9947, 'جيدة', 'N/A', 'EQUIPATION', 'أخرى', '249912345678', 'غير محدد', 'PZUN02021011333', 'الجمارك', '', '0001-01-01', '2020286', '2026-04-22', 'الشركة الروسية', '', '', 'متوفرة', 'متاحة للعمل', 180000.00, 800.00, 24000.00, 'مؤمن بالكامل', 'معدة موثوقة تحتاج فقط للصيانة الدورية', '2026-06-21', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(10, 4, '5', 'EQ1001', '1', 'HX 340 SL', '82463818', 'HHKHE944CN0000418', '64533131', 'HYUNDAI', 'HX340SL', NULL, 2020, 2020, 'في حالة جيدة', 5000, 'جيدة', 'N/A', 'شركة صابركو', 'شركة متخصصة', '249912345678', 'مالك مباشر (يتعاقد معنا مباشرة)', 'PZUN02021011445', 'الجمارك', 'شهادة وارد', NULL, '', NULL, 'الشركة الروسية', '', '', 'متوفرة', 'قيد الاستخدام', 180000.00, 400.00, 12000.00, 'مؤمن بالكامل', '', '2025-11-29', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(11, 4, '6', 'TQ1006', '2', 'DAWEOO', '82463818', '5464654113', '64533131', 'DAWEOO', 'K6', NULL, 2021, 2022, 'متوسطة', 100000, 'ضعيفة', 'جديدة', 'عمر هشام فضل المولى', 'مالك فردي', '89651', 'مالك مباشر (يتعاقد معنا مباشرة)', '7/1540ن', 'الإدارة العامة للمرور', 'ترخيص ( شهادة بحث)', '2026-05-01', '', NULL, 'الشركة الروسية', '', '', 'متوفرة', 'قيد الاستخدام', 70000.00, 80.00, 4800.00, 'مؤمن جزئياً', '', '2025-11-29', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(12, 4, '7', 'DM01', '3', 'Drill Machine', '20251101', '20251101', 'DTH Drilling RIG ADET D3', 'ADET', 'DTH Drilling RIG ADET D3', NULL, 2025, 2024, 'جديدة (لم تستخدم)', NULL, 'ممتازة', 'N/A', 'شركة إكوبيشن للإستثمار المحدودة', 'شركة متخصصة', '249912345678', 'مالك مباشر (يتعاقد معنا مباشرة)', 'PZUN02021016811', 'الجمارك', 'شهادة وارد', '2026-05-07', '', '2026-05-07', 'الشركة الروسية', '', '', 'متوفرة', 'قيد الاستخدام', 100000.00, NULL, NULL, '', '', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(13, 4, '8', 'H1', '3', 'h1', '', '', '', '', '', NULL, NULL, NULL, 'جيدة', NULL, 'ممتازة', 'N/A', '', '', '', '', '', '', '', NULL, '', NULL, '', '', '', 'متوفرة', 'متاحة للعمل', NULL, NULL, NULL, '', '', '2026-06-20', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(14, 4, '7', 'tq10', '2', 'tq10', '', '', '', '', '', NULL, NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', '', NULL, '', NULL, '', '', '', 'متوفرة', 'قيد الاستخدام', NULL, NULL, NULL, '', '', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(15, 4, '7', 'itx', '1', 'itx', '1212389', '', '', '', '', NULL, NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', '', NULL, '', NULL, '', '', '', 'متوفرة', 'قيد الاستخدام', NULL, NULL, NULL, '', '', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(16, 4, '7', 'EQP-02001', '1', 'EXC', 'EXC-2024-001', 'CAT320-ABC123456', '', 'كاتربيلر', '320D', NULL, 2018, 2020, 'في حالة جيدة', 5400, 'جيدة', 'N/A', 'محمد علي أحمد', 'مالك فردي', '249912345678', 'تابع للمورد (مملوكة للمورد نفسه)', 'VEH-2024-12345', 'المرور', '', '2025-12-31', 'INS-2024-001', '2024-06-15', 'منجم الذهب الشرقي', '', '', 'متوفرة', 'قيد الاستخدام', 150000.00, 500.00, 10000.00, 'مؤمن بالكامل', 'معدة موثوقة، تحتاج صيانة دورية', '2024-05-10', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(17, 4, '7', 'EQP-00201-2', '1', 'EXC', 'EXC-2024-001', 'CAT320-ABC123456', '', 'كاتربيلر', '320D', NULL, 2018, 2020, 'في حالة جيدة', 5400, 'جيدة', 'N/A', 'محمد علي أحمد', 'مالك فردي', '249912345678', 'تابع للمورد (مملوكة للمورد نفسه)', 'VEH-2024-12345', 'المرور', '', '2025-12-31', 'INS-2024-001', '2024-06-15', 'منجم الذهب الشرقي', '', '', 'متوفرة', 'قيد الاستخدام', 150000.00, 500.00, 10000.00, 'مؤمن بالكامل', 'معدة موثوقة، تحتاج صيانة دورية', '2024-05-10', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(18, 4, '7', 'EQP-02001-3', '1', 'EXC', 'EXC-2024-001', 'CAT320-ABC123456', '', 'كاتربيلر', '320D', NULL, 2018, 2020, 'في حالة جيدة', 5400, 'جيدة', 'N/A', 'محمد علي أحمد', 'مالك فردي', '249912345678', 'تابع للمورد (مملوكة للمورد نفسه)', 'VEH-2024-12345', 'المرور', '', '2025-12-31', 'INS-2024-001', '2024-06-15', 'منجم الذهب الشرقي', '', '', 'متوفرة', 'قيد الاستخدام', 150000.00, 500.00, 10000.00, 'مؤمن بالكامل', 'معدة موثوقة، تحتاج صيانة دورية', '2024-05-10', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(19, 4, '5', 'mcc120', '1', 'm', '', '', '', '', '', NULL, NULL, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', '', NULL, '', NULL, '', '', '', 'متوفرة', 'قيد الاستخدام', NULL, NULL, NULL, '', '', NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL),
+(20, 4, '8', 'tx10', '1', 'tx10', '', '', '', '', 'samba', 1, 2028, NULL, 'في حالة جيدة', NULL, 'جيدة', 'N/A', '', '', '', '', '', '', '', NULL, '', NULL, '', '', '', 'متوفرة', 'قيد الاستخدام', NULL, NULL, NULL, '', '', NULL, 0, NULL, 'الصين', NULL, '6768978', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ساعات', NULL, 'active', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1206,23 +2155,25 @@ INSERT INTO `equipments` (`id`, `company_id`, `suppliers`, `code`, `type`, `name
 -- Table structure for table `equipments_types`
 --
 
-CREATE TABLE `equipments_types` (
-  `id` int(11) NOT NULL,
-  `form` varchar(20) NOT NULL,
-  `type` varchar(100) NOT NULL,
-  `status` enum('active','inactive','','') NOT NULL DEFAULT 'active',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `equipments_types`;
+CREATE TABLE IF NOT EXISTS `equipments_types` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `form` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('active','inactive','','') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `equipments_types`
 --
 
 INSERT INTO `equipments_types` (`id`, `form`, `type`, `status`, `created_at`, `updated_at`) VALUES
-(1, '1', 'حفار', 'active', '2026-04-07 11:49:34', '2026-04-07 11:49:34'),
-(2, '2', 'قلاب', 'active', '2026-04-07 11:49:43', '2026-04-07 11:49:43'),
-(3, '3', 'خرامة', 'active', '2026-05-01 07:56:22', '2026-05-01 07:56:22');
+(1, '1', 'حفار', 'active', '2026-04-07 09:49:34', '2026-04-07 09:49:34'),
+(2, '2', 'قلاب', 'active', '2026-04-07 09:49:43', '2026-04-07 09:49:43'),
+(3, '3', 'خرامة', 'active', '2026-05-01 04:56:22', '2026-05-01 04:56:22');
 
 -- --------------------------------------------------------
 
@@ -1230,16 +2181,20 @@ INSERT INTO `equipments_types` (`id`, `form`, `type`, `status`, `created_at`, `u
 -- Table structure for table `equipment_drivers`
 --
 
-CREATE TABLE `equipment_drivers` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `equipment_id` int(11) NOT NULL,
-  `driver_id` int(11) NOT NULL,
-  `start_date` varchar(50) NOT NULL,
-  `end_date` varchar(50) DEFAULT NULL,
-  `shift_type` enum('D','N','B') NOT NULL DEFAULT 'B',
-  `status` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+DROP TABLE IF EXISTS `equipment_drivers`;
+CREATE TABLE IF NOT EXISTS `equipment_drivers` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `equipment_id` int NOT NULL,
+  `driver_id` int NOT NULL,
+  `start_date` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `end_date` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `shift_type` enum('D','N','B') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'B',
+  `status` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `fk_equipment_drivers_equipment` (`equipment_id`),
+  KEY `fk_equipment_drivers_driver` (`driver_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `equipment_drivers`
@@ -1259,18 +2214,28 @@ INSERT INTO `equipment_drivers` (`id`, `company_id`, `equipment_id`, `driver_id`
 (11, 4, 4, 17, '2026-04-25', '2099-12-31', 'B', 1),
 (12, 4, 9, 6, '2025-07-01', '2026-07-01', 'B', 1),
 (13, 4, 9, 7, '2025-07-01', '2026-07-01', 'B', 1),
-(14, 4, 10, 23, '2025-12-01', '2026-04-30', 'B', 1),
+(14, 4, 10, 23, '2026-06-08', '2026-06-08', 'B', 0),
 (15, 4, 11, 25, '2025-12-01', '2026-04-30', 'B', 1),
 (16, 4, 11, 24, '2025-12-01', '2026-04-30', 'B', 1),
 (17, 4, 13, 21, '2026-05-11', '2099-12-31', 'D', 1),
-(18, 4, 5, 6, '2026-05-18', '2099-12-31', 'B', 1),
+(18, 4, 5, 6, '2026-05-18', '2099-12-31', 'D', 1),
 (19, 4, 13, 10, '2026-05-18', '2099-12-31', 'N', 0),
 (20, 4, 10, 9, '2026-05-19', '2099-12-31', 'B', 1),
 (21, 4, 10, 19, '2026-05-19', '2099-12-31', 'B', 0),
 (22, 4, 13, 10, '2026-05-01', '2099-12-31', 'B', 1),
 (23, 4, 8, 22, '2026-05-31', '2026-05-30', 'D', 0),
 (24, 4, 15, 19, '2026-05-31', '', 'B', 1),
-(25, 4, 8, 18, '2026-06-02', '', 'N', 1);
+(25, 4, 8, 18, '2026-06-08', '2026-06-08', 'N', 0),
+(27, 4, 10, 27, '2026-06-06', '2099-12-31', 'N', 1),
+(28, 4, 15, 22, '2026-06-06', '2099-12-31', 'D', 1),
+(29, 4, 18, 12, '2026-06-07', '2099-12-31', 'B', 1),
+(30, 4, 15, 23, '2026-06-08', '', 'N', 1),
+(31, 4, 18, 11, '2026-06-08', '', 'B', 1),
+(37, 4, 17, 20, '2026-06-08', '2099-12-31', 'N', 1),
+(38, 4, 16, 14, '2026-06-08', '2099-12-31', 'B', 1),
+(39, 4, 20, 13, '2026-06-08', '2099-12-31', 'B', 1),
+(40, 4, 16, 28, '2026-06-09', '', 'B', 1),
+(41, 4, 17, 18, '2026-06-10', '2099-12-31', 'D', 1);
 
 -- --------------------------------------------------------
 
@@ -1278,18 +2243,24 @@ INSERT INTO `equipment_drivers` (`id`, `company_id`, `equipment_id`, `driver_id`
 -- Table structure for table `failure_codes`
 --
 
-CREATE TABLE `failure_codes` (
-  `id` int(11) NOT NULL,
+DROP TABLE IF EXISTS `failure_codes`;
+CREATE TABLE IF NOT EXISTS `failure_codes` (
+  `id` int NOT NULL AUTO_INCREMENT,
   `equipment_type` tinyint(1) NOT NULL COMMENT '1=حفار, 2=قلاب, 3=خرامة',
-  `event_type_code` varchar(10) NOT NULL COMMENT 'كود نوع الحدث: EQF,MNT,DEP,CST,MST,HRF,MKF',
-  `event_type_name` varchar(100) NOT NULL COMMENT 'اسم نوع الحدث بالعربي',
-  `main_category_code` varchar(10) NOT NULL COMMENT 'كود الفئة الرئيسية: MEC,HYD,ELE,COL...',
-  `main_category_name` varchar(100) NOT NULL COMMENT 'اسم الفئة الرئيسية',
-  `sub_category` varchar(100) NOT NULL COMMENT 'الفئة الفرعية (الجزء المعطل)',
-  `failure_detail` varchar(200) NOT NULL COMMENT 'تفصيل العطل',
-  `full_code` varchar(30) NOT NULL COMMENT 'الكود الكامل مثل EX-EQF-MEC-01-01',
-  `status` tinyint(1) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تصنيفات أعطال المعدات - مرجع موحد';
+  `event_type_code` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'كود نوع الحدث: EQF,MNT,DEP,CST,MST,HRF,MKF',
+  `event_type_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'اسم نوع الحدث بالعربي',
+  `main_category_code` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'كود الفئة الرئيسية: MEC,HYD,ELE,COL...',
+  `main_category_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'اسم الفئة الرئيسية',
+  `sub_category` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الفئة الفرعية (الجزء المعطل)',
+  `failure_detail` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'تفصيل العطل',
+  `full_code` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الكود الكامل مثل EX-EQF-MEC-01-01',
+  `status` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `idx_equipment_type` (`equipment_type`),
+  KEY `idx_event_type` (`equipment_type`,`event_type_code`),
+  KEY `idx_main_cat` (`equipment_type`,`event_type_code`,`main_category_code`),
+  KEY `idx_sub_cat` (`equipment_type`,`event_type_code`,`main_category_code`,`sub_category`(50))
+) ENGINE=InnoDB AUTO_INCREMENT=403 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تصنيفات أعطال المعدات - مرجع موحد';
 
 --
 -- Dumping data for table `failure_codes`
@@ -1702,21 +2673,323 @@ INSERT INTO `failure_codes` (`id`, `equipment_type`, `event_type_code`, `event_t
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `fleet_depreciation_profile`
+--
+
+DROP TABLE IF EXISTS `fleet_depreciation_profile`;
+CREATE TABLE IF NOT EXISTS `fleet_depreciation_profile` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `code` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `asset_category` varchar(120) COLLATE utf8mb4_general_ci NOT NULL,
+  `brand` varchar(120) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `model_id` int DEFAULT NULL,
+  `method` enum('uop','sl') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'uop',
+  `useful_life` decimal(12,2) NOT NULL,
+  `salvage_pct` decimal(5,4) NOT NULL,
+  `notes` text COLLATE utf8mb4_general_ci,
+  `state` enum('draft','approved') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'draft',
+  `approved_by` int DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_fdp_company_code` (`company_id`,`code`),
+  KEY `idx_fdp_company` (`company_id`),
+  KEY `idx_fdp_model` (`model_id`),
+  KEY `idx_fdp_state` (`state`,`is_deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `fleet_depreciation_profile`
+--
+
+INSERT INTO `fleet_depreciation_profile` (`id`, `company_id`, `code`, `asset_category`, `brand`, `model_id`, `method`, `useful_life`, `salvage_pct`, `notes`, `state`, `approved_by`, `approved_at`, `is_deleted`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 1, 'DEP-001', 'حفّار 22ط جديد', NULL, NULL, 'uop', 15000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(2, 4, 'DEP-001', 'حفّار 22ط جديد', NULL, NULL, 'uop', 15000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(3, 1, 'DEP-002', 'حفّار 22ط مستعمل', NULL, NULL, 'uop', 8000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(4, 4, 'DEP-002', 'حفّار 22ط مستعمل', NULL, NULL, 'uop', 8000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(5, 1, 'DEP-003', 'حفّار 30ط مستعمل', NULL, NULL, 'uop', 10000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(6, 4, 'DEP-003', 'حفّار 30ط مستعمل', NULL, NULL, 'uop', 10000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(7, 1, 'DEP-004', 'حفّار 34ط جديد', NULL, NULL, 'uop', 18000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(8, 4, 'DEP-004', 'حفّار 34ط جديد', NULL, NULL, 'uop', 18000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(9, 1, 'DEP-005', 'حفّار 34ط مستعمل', NULL, NULL, 'uop', 10000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(10, 4, 'DEP-005', 'حفّار 34ط مستعمل', NULL, NULL, 'uop', 10000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(11, 1, 'DEP-006', 'قلّاب جديد', NULL, NULL, 'uop', 20000.00, 0.1000, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(12, 4, 'DEP-006', 'قلّاب جديد', NULL, NULL, 'uop', 20000.00, 0.1000, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(13, 1, 'DEP-007', 'قلّاب مستعمل', NULL, NULL, 'uop', 12000.00, 0.1000, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(14, 4, 'DEP-007', 'قلّاب مستعمل', NULL, NULL, 'uop', 12000.00, 0.1000, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(15, 1, 'DEP-008', 'خرّامة DTH جديدة', NULL, NULL, 'uop', 12000.00, 0.0500, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(16, 4, 'DEP-008', 'خرّامة DTH جديدة', NULL, NULL, 'uop', 12000.00, 0.0500, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(17, 1, 'DEP-009', 'لودر مستعمل', NULL, NULL, 'uop', 6000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(18, 4, 'DEP-009', 'لودر مستعمل', NULL, NULL, 'uop', 6000.00, 0.0800, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(19, 1, 'DEP-010', 'هامر هيدروليكي', NULL, NULL, 'uop', 6000.00, 0.0500, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(20, 4, 'DEP-010', 'هامر هيدروليكي', NULL, NULL, 'uop', 6000.00, 0.0500, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(21, 1, 'DEP-011', 'جهاز مسح RTK', NULL, NULL, 'sl', 7.00, 0.0500, NULL, 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 16:53:23'),
+(22, 4, 'DEP-011', 'جهاز مسح RTK', '', 1, 'sl', 7.00, 0.0500, '', 'approved', NULL, '2026-06-16 19:53:23', 0, NULL, '2026-06-16 16:53:23', '2026-06-16 17:00:11');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fleet_depreciation_profile_audit`
+--
+
+DROP TABLE IF EXISTS `fleet_depreciation_profile_audit`;
+CREATE TABLE IF NOT EXISTS `fleet_depreciation_profile_audit` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `profile_id` int NOT NULL,
+  `company_id` int DEFAULT NULL,
+  `action` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `changed_by` int DEFAULT NULL,
+  `changed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `old_data` text COLLATE utf8mb4_general_ci,
+  `new_data` text COLLATE utf8mb4_general_ci,
+  `note` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_fdpa_profile` (`profile_id`),
+  KEY `idx_fdpa_company` (`company_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `fleet_depreciation_profile_audit`
+--
+
+INSERT INTO `fleet_depreciation_profile_audit` (`id`, `profile_id`, `company_id`, `action`, `changed_by`, `changed_at`, `old_data`, `new_data`, `note`) VALUES
+(1, 22, 4, 'updated', 6, '2026-06-16 17:00:11', '{\"id\":22,\"company_id\":4,\"code\":\"DEP-011\",\"asset_category\":\"جهاز مسح RTK\",\"brand\":null,\"model_id\":null,\"method\":\"sl\",\"useful_life\":\"7.00\",\"salvage_pct\":\"0.0500\",\"notes\":null,\"state\":\"approved\",\"approved_by\":null,\"approved_at\":\"2026-06-16 19:53:23\",\"is_deleted\":0,\"created_by\":null,\"created_at\":\"2026-06-16 19:53:23\",\"updated_at\":\"2026-06-16 19:53:23\"}', '{\"id\":22,\"company_id\":4,\"code\":\"DEP-011\",\"asset_category\":\"جهاز مسح RTK\",\"brand\":\"\",\"model_id\":1,\"method\":\"sl\",\"useful_life\":\"7.00\",\"salvage_pct\":\"0.0500\",\"notes\":\"\",\"state\":\"approved\",\"approved_by\":null,\"approved_at\":\"2026-06-16 19:53:23\",\"is_deleted\":0,\"created_by\":null,\"created_at\":\"2026-06-16 19:53:23\",\"updated_at\":\"2026-06-16 20:00:11\"}', 'تعديل يسري مستقبلاً فقط');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fleet_equipment_compliance`
+--
+
+DROP TABLE IF EXISTS `fleet_equipment_compliance`;
+CREATE TABLE IF NOT EXISTS `fleet_equipment_compliance` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `equipment_id` int NOT NULL,
+  `doc_type` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `reference` varchar(120) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `issue_date` date DEFAULT NULL,
+  `expiry_date` date DEFAULT NULL,
+  `is_critical` tinyint(1) NOT NULL DEFAULT '0',
+  `attachment_path` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_fec_equipment` (`equipment_id`),
+  KEY `idx_fec_company` (`company_id`),
+  KEY `idx_fec_expiry` (`expiry_date`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `fleet_equipment_compliance`
+--
+
+INSERT INTO `fleet_equipment_compliance` (`id`, `company_id`, `equipment_id`, `doc_type`, `reference`, `issue_date`, `expiry_date`, `is_critical`, `attachment_path`, `is_deleted`, `created_by`, `created_at`, `updated_at`) VALUES
+(2, 4, 20, 'تأمين', NULL, '2026-06-17', '2026-06-19', 0, NULL, 0, 6, '2026-06-17 11:43:51', '2026-06-17 11:43:51');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fleet_equipment_component`
+--
+
+DROP TABLE IF EXISTS `fleet_equipment_component`;
+CREATE TABLE IF NOT EXISTS `fleet_equipment_component` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `equipment_id` int NOT NULL,
+  `component_type` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `serial_no` varchar(120) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `install_date` date DEFAULT NULL,
+  `is_current` tinyint(1) NOT NULL DEFAULT '1',
+  `replace_date` date DEFAULT NULL,
+  `component_hours` decimal(12,2) DEFAULT NULL,
+  `replace_count` int DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_fecmp_equipment` (`equipment_id`),
+  KEY `idx_fecmp_company` (`company_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fleet_equipment_history`
+--
+
+DROP TABLE IF EXISTS `fleet_equipment_history`;
+CREATE TABLE IF NOT EXISTS `fleet_equipment_history` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `equipment_id` int NOT NULL,
+  `event_date` datetime NOT NULL,
+  `event_type` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `reference_type` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `reference_id` int DEFAULT NULL,
+  `project_id` int DEFAULT NULL,
+  `site_id` varchar(120) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `in_out_date` date DEFAULT NULL,
+  `work_hours` decimal(12,2) DEFAULT NULL,
+  `down_hours` decimal(12,2) DEFAULT NULL,
+  `maintenance_cost` decimal(12,2) DEFAULT NULL,
+  `transfer_cost` decimal(12,2) DEFAULT NULL,
+  `note` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_feh_equipment` (`equipment_id`),
+  KEY `idx_feh_company` (`company_id`),
+  KEY `idx_feh_date` (`event_date`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fleet_equipment_protection`
+--
+
+DROP TABLE IF EXISTS `fleet_equipment_protection`;
+CREATE TABLE IF NOT EXISTS `fleet_equipment_protection` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `equipment_id` int NOT NULL,
+  `protection_type` varchar(40) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` varchar(200) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `start_date` date DEFAULT NULL,
+  `cost` decimal(12,2) DEFAULT NULL,
+  `state` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `renewal_date` date DEFAULT NULL,
+  `partner_id` int DEFAULT NULL,
+  `partner_name` varchar(150) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `compliance_id` int DEFAULT NULL,
+  `attachment_path` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_fep_equipment` (`equipment_id`),
+  KEY `idx_fep_company` (`company_id`),
+  KEY `idx_fep_compliance` (`compliance_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `fleet_equipment_protection`
+--
+
+INSERT INTO `fleet_equipment_protection` (`id`, `company_id`, `equipment_id`, `protection_type`, `description`, `start_date`, `cost`, `state`, `renewal_date`, `partner_id`, `partner_name`, `compliance_id`, `attachment_path`, `is_deleted`, `created_by`, `created_at`, `updated_at`) VALUES
+(4, 4, 20, 'نظام تتبّع', 'نظام جديد', '2026-06-18', 1200.00, 'يحتاج تجديداً', '2026-06-24', NULL, 'احمد', 2, NULL, 0, 6, '2026-06-17 13:02:38', '2026-06-17 13:02:38');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fleet_model`
+--
+
+DROP TABLE IF EXISTS `fleet_model`;
+CREATE TABLE IF NOT EXISTS `fleet_model` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `code` varchar(60) COLLATE utf8mb4_general_ci NOT NULL,
+  `manufacturer` varchar(120) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `model_name` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `equipment_type_id` int DEFAULT NULL,
+  `operating_category` varchar(60) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `fuel_type` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `std_capacity` decimal(14,2) DEFAULT NULL,
+  `std_capacity_uom` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tech_reference` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `default_supplier_id` int DEFAULT NULL,
+  `default_supplier_name` varchar(150) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `depreciation_profile_id` int DEFAULT NULL,
+  `status` enum('active','inactive') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'active',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_fleet_model_company` (`company_id`),
+  KEY `idx_fleet_model_type` (`equipment_type_id`),
+  KEY `idx_fleet_model_supplier` (`default_supplier_id`),
+  KEY `idx_fleet_model_status` (`status`,`is_deleted`),
+  KEY `idx_fleet_model_company_code` (`company_id`,`code`),
+  KEY `idx_fleet_model_dep_profile` (`depreciation_profile_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `fleet_model`
+--
+
+INSERT INTO `fleet_model` (`id`, `company_id`, `code`, `manufacturer`, `model_name`, `equipment_type_id`, `operating_category`, `fuel_type`, `std_capacity`, `std_capacity_uom`, `tech_reference`, `default_supplier_id`, `default_supplier_name`, `depreciation_profile_id`, `status`, `is_deleted`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 4, '666', 'تايوتا', 'samba', 1, 'تحميل', 'بنزين', 700.00, 'لتر', 'احمد', 3, 'إيكوبيشن', NULL, 'active', 0, 6, '2026-06-16 16:00:19', '2026-06-17 08:49:47');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fleet_model_service_spec`
+--
+
+DROP TABLE IF EXISTS `fleet_model_service_spec`;
+CREATE TABLE IF NOT EXISTS `fleet_model_service_spec` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `model_id` int NOT NULL,
+  `company_id` int DEFAULT NULL,
+  `item_type` varchar(80) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `recommended_ref` varchar(150) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `qty` decimal(12,2) DEFAULT NULL,
+  `uom` varchar(40) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `alt_ref` varchar(150) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `photo_path` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `note` text COLLATE utf8mb4_general_ci,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_fmss_model` (`model_id`),
+  KEY `idx_fmss_company` (`company_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `fleet_model_service_spec`
+--
+
+INSERT INTO `fleet_model_service_spec` (`id`, `model_id`, `company_id`, `item_type`, `recommended_ref`, `qty`, `uom`, `alt_ref`, `photo_path`, `note`, `created_at`) VALUES
+(7, 1, 4, 'فلتر هيدروليك', 'احمد', 8.00, 'لا', 'لا', NULL, 'لا توجد', '2026-06-20 08:04:08'),
+(8, 1, 4, 'زيت مكنة', 'احمد', 4.00, 'لتر', 'تابكو', NULL, 'افضل', '2026-06-20 08:04:08');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `messages`
 --
 
-CREATE TABLE `messages` (
-  `id` int(11) NOT NULL COMMENT 'المعرف الفريد',
-  `company_id` int(11) NOT NULL COMMENT 'رقم الشركة - لعزل الرسائل بين الشركات',
-  `sender_id` int(11) NOT NULL COMMENT 'رقم المرسل (users.id)',
-  `receiver_id` int(11) NOT NULL COMMENT 'رقم المستلم (users.id)',
-  `message` text NOT NULL COMMENT 'نص الرسالة',
-  `is_read` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0=غير مقروءة، 1=مقروءة',
+DROP TABLE IF EXISTS `messages`;
+CREATE TABLE IF NOT EXISTS `messages` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'المعرف الفريد',
+  `company_id` int NOT NULL COMMENT 'رقم الشركة - لعزل الرسائل بين الشركات',
+  `sender_id` int NOT NULL COMMENT 'رقم المرسل (users.id)',
+  `receiver_id` int NOT NULL COMMENT 'رقم المستلم (users.id)',
+  `message` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'نص الرسالة',
+  `is_read` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0=غير مقروءة، 1=مقروءة',
   `read_at` datetime DEFAULT NULL COMMENT 'وقت القراءة',
-  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'وقت الإرسال',
-  `is_deleted_sender` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'حُذفت من قِبل المرسل',
-  `is_deleted_receiver` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'حُذفت من قِبل المستلم'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الرسائل الداخلية بين مستخدمي الشركة';
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'وقت الإرسال',
+  `is_deleted_sender` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'حُذفت من قِبل المرسل',
+  `is_deleted_receiver` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'حُذفت من قِبل المستلم',
+  PRIMARY KEY (`id`),
+  KEY `idx_msg_sender` (`sender_id`),
+  KEY `idx_msg_receiver` (`receiver_id`),
+  KEY `idx_msg_company` (`company_id`),
+  KEY `idx_msg_read` (`is_read`),
+  KEY `idx_msg_created` (`created_at`),
+  KEY `idx_msg_conversation` (`sender_id`,`receiver_id`,`company_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الرسائل الداخلية بين مستخدمي الشركة';
 
 --
 -- Dumping data for table `messages`
@@ -1757,13 +3030,388 @@ INSERT INTO `messages` (`id`, `company_id`, `sender_id`, `receiver_id`, `message
 (32, 4, 7, 8, 'vfmlk', 0, NULL, '2026-06-02 12:01:55', 0, 0),
 (33, 4, 7, 9, 'vfmlk', 0, NULL, '2026-06-02 12:01:55', 0, 0),
 (34, 4, 7, 10, 'vfmlk', 0, NULL, '2026-06-02 12:01:55', 0, 0),
-(35, 4, 7, 11, 'vfmlk', 0, NULL, '2026-06-02 12:01:55', 0, 0),
-(36, 4, 7, 12, 'vfmlk', 0, NULL, '2026-06-02 12:01:55', 0, 0),
-(37, 4, 7, 13, 'vfmlk', 0, NULL, '2026-06-02 12:01:55', 0, 0),
+(35, 4, 7, 11, 'vfmlk', 1, '2026-06-07 17:49:09', '2026-06-02 12:01:55', 0, 0),
+(36, 4, 7, 12, 'vfmlk', 1, '2026-06-08 10:07:26', '2026-06-02 12:01:55', 0, 0),
+(37, 4, 7, 13, 'vfmlk', 1, '2026-06-09 22:23:42', '2026-06-02 12:01:55', 0, 0),
 (38, 4, 7, 14, 'vfmlk', 0, NULL, '2026-06-02 12:01:55', 0, 0),
 (39, 4, 7, 17, 'vfmlk', 0, NULL, '2026-06-02 12:01:55', 0, 0),
 (40, 4, 7, 18, 'vfmlk', 0, NULL, '2026-06-02 12:01:55', 0, 0),
-(41, 4, 4, 7, 'نة', 0, NULL, '2026-06-02 19:39:00', 0, 0);
+(41, 4, 4, 7, 'نة', 0, NULL, '2026-06-02 19:39:00', 0, 0),
+(42, 4, 4, 5, 'lflmvc', 0, NULL, '2026-06-07 17:44:26', 0, 0),
+(43, 4, 12, 5, 'ةن', 0, NULL, '2026-06-08 10:07:31', 0, 0),
+(44, 4, 12, 5, 're', 0, NULL, '2026-06-13 21:27:40', 0, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mnt_breakdown`
+--
+
+DROP TABLE IF EXISTS `mnt_breakdown`;
+CREATE TABLE IF NOT EXISTS `mnt_breakdown` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL COMMENT 'عزل الشركة (إجباري)',
+  `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجع البلاغ، مثل BR-2026-0001',
+  `equipment_id` int DEFAULT NULL COMMENT 'FK→equipments.id (ربط رقمي)',
+  `project_id` int DEFAULT NULL COMMENT 'FK→project.id',
+  `reported_by` int DEFAULT NULL COMMENT 'FK→users.id (المُبلِّغ)',
+  `reporter_dept` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'القسم المُبلِّغ',
+  `target_role` int DEFAULT NULL,
+  `report_datetime` datetime DEFAULT NULL,
+  `failure_code_id` int DEFAULT NULL COMMENT 'FK→failure_codes.id (إعادة استخدام دون تعديل)',
+  `severity` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'منخفضة/متوسطة/عالية/حرجة',
+  `is_stopped` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'هل المعدة متوقفة',
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `attachment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `order_id` int DEFAULT NULL COMMENT 'FK→mnt_order.id بعد التحويل لأمر',
+  `state` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'جديد' COMMENT 'جديد/قيد التقييم/محوّل/مغلق',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_breakdown_eq_company_state` (`equipment_id`,`company_id`,`state`),
+  KEY `idx_breakdown_company_state` (`company_id`,`state`),
+  KEY `idx_breakdown_order` (`order_id`),
+  KEY `idx_breakdown_deleted` (`is_deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `mnt_breakdown`
+--
+
+INSERT INTO `mnt_breakdown` (`id`, `company_id`, `code`, `equipment_id`, `project_id`, `reported_by`, `reporter_dept`, `target_role`, `report_datetime`, `failure_code_id`, `severity`, `is_stopped`, `description`, `attachment`, `order_id`, `state`, `is_deleted`, `deleted_at`, `deleted_by`, `created_by`, `created_at`, `updated_at`) VALUES
+(7, 4, 'BR-2026-0001', 11, 1, 19, 'التشغيل', NULL, '2026-06-20 23:48:00', 385, 'حرجة', 1, 'بلاع', NULL, NULL, 'جديد', 0, NULL, NULL, 19, '2026-06-20 20:48:27', '2026-06-20 20:48:27'),
+(8, 4, 'BR-2026-0002', 11, 1, 10, 'التشغيل', 3, '2026-06-21 15:28:02', NULL, 'متوسطة', 0, 'الا', NULL, NULL, 'جديد', 0, NULL, NULL, 10, '2026-06-21 15:28:02', '2026-06-21 15:28:02'),
+(9, 4, 'BR-2026-0003', 16, 2, 6, 'التشغيل', 13, '2026-06-21 15:28:39', NULL, 'متوسطة', 0, 'تاتتان', NULL, NULL, 'جديد', 0, NULL, NULL, 6, '2026-06-21 15:28:39', '2026-06-21 15:28:39'),
+(10, 4, 'BR-2026-0004', 17, 5, 19, 'التشغيل', 3, '2026-06-21 15:29:53', NULL, 'متوسطة', 0, 'ممممم', NULL, NULL, 'جديد', 0, NULL, NULL, 19, '2026-06-21 15:29:53', '2026-06-21 15:29:53');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mnt_inspection`
+--
+
+DROP TABLE IF EXISTS `mnt_inspection`;
+CREATE TABLE IF NOT EXISTS `mnt_inspection` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL COMMENT 'عزل الشركة (إجباري)',
+  `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجع التفتيش، مثل INS-2026-0001',
+  `inspection_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'دوري' COMMENT 'دوري/زيارة ميدانية/استلام/بعد حادث',
+  `equipment_id` int DEFAULT NULL COMMENT 'FK→equipments.id',
+  `project_id` int DEFAULT NULL COMMENT 'FK→project.id',
+  `inspector_id` int DEFAULT NULL COMMENT 'FK→users.id (الفاحص)',
+  `scheduled_date` date DEFAULT NULL,
+  `completed_at` datetime DEFAULT NULL,
+  `score` int DEFAULT NULL,
+  `overall_result` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tech_readiness_state` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الجاهزية الفنية',
+  `equipment_condition` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'تُكتب لكرت المعدة عند الإكمال + تُخزّن',
+  `engine_condition` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'تُكتب لكرت المعدة عند الإكمال + تُخزّن',
+  `notes` text COLLATE utf8mb4_unicode_ci,
+  `state` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'جديد' COMMENT 'جديد/مجدول/قيد التنفيذ/مكتمل/مغلق',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_inspection_equipment` (`equipment_id`),
+  KEY `idx_inspection_company_state` (`company_id`,`state`),
+  KEY `idx_inspection_deleted` (`is_deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `mnt_inspection`
+--
+
+INSERT INTO `mnt_inspection` (`id`, `company_id`, `code`, `inspection_type`, `equipment_id`, `project_id`, `inspector_id`, `scheduled_date`, `completed_at`, `score`, `overall_result`, `tech_readiness_state`, `equipment_condition`, `engine_condition`, `notes`, `state`, `is_deleted`, `deleted_at`, `deleted_by`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 4, 'INS-2026-0001', 'دوري', 13, NULL, NULL, NULL, '2026-06-20 22:36:58', NULL, '', 'جاهزة', 'جيدة', 'ممتازة', '', 'مكتمل', 0, NULL, NULL, 19, '2026-06-20 19:36:58', '2026-06-20 19:36:58'),
+(2, 4, 'INS-2026-0002', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 19:57:34', '2026-06-20 21:21:10'),
+(3, 4, 'INS-2026-0003', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 20:00:47', '2026-06-20 21:21:10'),
+(4, 4, 'INS-2026-0004', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 20:21:09', '2026-06-20 21:21:10'),
+(5, 4, 'INS-2026-0005', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 20:22:52', '2026-06-20 21:21:10'),
+(6, 4, 'INS-2026-0006', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 20:36:59', '2026-06-20 21:21:10'),
+(7, 4, 'INS-2026-0007', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 21:05:58', '2026-06-20 21:21:10'),
+(8, 4, 'INS-2026-0008', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 21:06:11', '2026-06-20 21:21:10'),
+(9, 4, 'INS-2026-0009', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 21:06:16', '2026-06-20 21:21:10'),
+(10, 4, 'INS-2026-0010', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 21:06:22', '2026-06-20 21:21:10'),
+(11, 4, 'INS-2026-0011', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 21:07:15', '2026-06-20 21:21:10'),
+(13, 4, 'INS-2026-0012', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 21:14:12', '2026-06-20 21:21:10'),
+(14, 4, 'INS-2026-0013', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:10', NULL, 19, '2026-06-20 21:14:25', '2026-06-20 21:21:10'),
+(15, 4, 'INS-2026-0014', 'زيارة ميدانية', 13, NULL, NULL, '2026-06-25', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 1, '2026-06-21 00:21:39', NULL, 38, '2026-06-20 21:21:11', '2026-06-20 21:21:39'),
+(16, 4, 'INS-2026-0015', 'زيارة ميدانية', 11, 1, 9, '2026-06-21', '2026-06-21 00:25:24', 5, 'نتيجة', 'جاهزة', 'متوسطة', 'ضعيفة', 'ملاحظة', 'مكتمل', 0, NULL, NULL, 19, '2026-06-20 21:23:14', '2026-06-20 21:25:24'),
+(17, 4, 'INS-2026-0016', 'دوري', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'جديد', 0, NULL, NULL, 19, '2026-06-21 10:30:54', '2026-06-21 10:30:54');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mnt_inspection_line`
+--
+
+DROP TABLE IF EXISTS `mnt_inspection_line`;
+CREATE TABLE IF NOT EXISTS `mnt_inspection_line` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `inspection_id` int NOT NULL COMMENT 'FK→mnt_inspection.id',
+  `component` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `condition_state` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'سليم/ملاحظة/حرج',
+  `recommendation` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_inspline_inspection` (`inspection_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `mnt_inspection_line`
+--
+
+INSERT INTO `mnt_inspection_line` (`id`, `company_id`, `inspection_id`, `component`, `condition_state`, `recommendation`, `created_at`) VALUES
+(1, 4, 1, 'الفرامل', 'ملاحظة', 'استبدال', '2026-06-20 19:36:58'),
+(2, 4, 11, 'نهتنتن', 'سليم', 'تمنتم', '2026-06-20 21:08:12'),
+(5, 4, 16, 'نهتنتن', 'سليم', 'تمنتم', '2026-06-20 21:24:01'),
+(6, 4, 16, 'نهتنتن', 'ملاحظة', 'تمنتم', '2026-06-20 21:24:09'),
+(7, 4, 16, 'نهتنتن', 'حرج', 'تمنتم', '2026-06-20 21:24:20');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mnt_lookup`
+--
+
+DROP TABLE IF EXISTS `mnt_lookup`;
+CREATE TABLE IF NOT EXISTS `mnt_lookup` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL COMMENT 'عزل الشركة (إجباري)',
+  `type` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'سبب عطل/سبب توقّف/نوع مهمة/ورشة',
+  `name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `extra` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_lookup_company_type` (`company_id`,`type`),
+  KEY `idx_lookup_deleted` (`is_deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `mnt_lookup`
+--
+
+INSERT INTO `mnt_lookup` (`id`, `company_id`, `type`, `name`, `extra`, `is_active`, `is_deleted`, `deleted_at`, `deleted_by`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 4, 'سبب عطل', 'سبب اختبار', NULL, 1, 0, NULL, NULL, NULL, '2026-06-20 19:26:25', '2026-06-20 19:26:25'),
+(2, 4, 'سبب عطل', 'سبب اختبار آلي', NULL, 1, 0, NULL, NULL, NULL, '2026-06-20 19:31:22', '2026-06-20 19:31:22'),
+(3, 4, 'سبب عطل', 'سبب وقائي اختبار', NULL, 1, 0, NULL, NULL, NULL, '2026-06-20 19:36:58', '2026-06-20 19:36:58'),
+(5, 4, 'سبب عطل', 'سبب اختبار ت', NULL, 1, 0, NULL, NULL, NULL, '2026-06-20 20:22:37', '2026-06-20 20:22:37');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mnt_order`
+--
+
+DROP TABLE IF EXISTS `mnt_order`;
+CREATE TABLE IF NOT EXISTS `mnt_order` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL COMMENT 'عزل الشركة (إجباري)',
+  `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجع الأمر، مثل MNT-2026-0001',
+  `breakdown_id` int DEFAULT NULL COMMENT 'FK→mnt_breakdown.id (مصدر بلاغ)',
+  `plan_id` int DEFAULT NULL COMMENT 'FK→mnt_plan.id (مصدر وقائي)',
+  `inspection_id` int DEFAULT NULL COMMENT 'FK→mnt_inspection.id (مصدر تفتيش)',
+  `equipment_id` int DEFAULT NULL COMMENT 'FK→equipments.id',
+  `project_id` int DEFAULT NULL COMMENT 'FK→project.id',
+  `source` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'بلاغ' COMMENT 'بلاغ/وقائي/تفتيش',
+  `maint_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع الصيانة',
+  `priority` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cost_party` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'جهة التكلفة: داخلي/خارجي',
+  `vendor_id` int DEFAULT NULL COMMENT 'FK→suppliers.id (ورشة خارجية)',
+  `workshop` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `technician_id` int DEFAULT NULL COMMENT 'FK→users.id (الفني)',
+  `supervisor_id` int DEFAULT NULL COMMENT 'FK→users.id (المشرف)',
+  `failure_code_id` int DEFAULT NULL COMMENT 'FK→failure_codes.id',
+  `diagnosis` text COLLATE utf8mb4_unicode_ci,
+  `root_cause_id` int DEFAULT NULL COMMENT 'FK→mnt_lookup.id (سبب جذري)',
+  `actions_taken` text COLLATE utf8mb4_unicode_ci,
+  `work_start` datetime DEFAULT NULL,
+  `work_end` datetime DEFAULT NULL,
+  `downtime_hours` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `labor_cost` decimal(12,2) NOT NULL DEFAULT '0.00',
+  `parts_cost` decimal(12,2) NOT NULL DEFAULT '0.00',
+  `external_cost` decimal(12,2) NOT NULL DEFAULT '0.00',
+  `total_cost` decimal(12,2) NOT NULL DEFAULT '0.00',
+  `inspection_result` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'ناجح/راسب',
+  `state` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'بلاغ' COMMENT 'بلاغ/تنفيذ/فحص/إغلاق/ملغى',
+  `closed_at` datetime DEFAULT NULL,
+  `closed_by` int DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_order_eq_company_state` (`equipment_id`,`company_id`,`state`),
+  KEY `idx_order_company_state` (`company_id`,`state`),
+  KEY `idx_order_breakdown` (`breakdown_id`),
+  KEY `idx_order_plan` (`plan_id`),
+  KEY `idx_order_inspection` (`inspection_id`),
+  KEY `idx_order_deleted` (`is_deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `mnt_order`
+--
+
+INSERT INTO `mnt_order` (`id`, `company_id`, `code`, `breakdown_id`, `plan_id`, `inspection_id`, `equipment_id`, `project_id`, `source`, `maint_type`, `priority`, `cost_party`, `vendor_id`, `workshop`, `technician_id`, `supervisor_id`, `failure_code_id`, `diagnosis`, `root_cause_id`, `actions_taken`, `work_start`, `work_end`, `downtime_hours`, `labor_cost`, `parts_cost`, `external_cost`, `total_cost`, `inspection_result`, `state`, `closed_at`, `closed_by`, `is_deleted`, `deleted_at`, `deleted_by`, `created_by`, `created_at`, `updated_at`) VALUES
+(15, 4, 'MNT-2026-0001', NULL, NULL, NULL, NULL, NULL, 'بلاغ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 30.00, 0.00, 0.00, 30.00, NULL, 'بلاغ', NULL, NULL, 0, NULL, NULL, 19, '2026-06-20 21:05:12', '2026-06-20 21:05:43'),
+(16, 4, 'MNT-2026-0002', NULL, NULL, NULL, NULL, NULL, 'بلاغ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, NULL, 'بلاغ', NULL, NULL, 1, '2026-06-21 00:51:14', NULL, 19, '2026-06-20 21:22:40', '2026-06-20 21:51:14'),
+(17, 4, 'MNT-2026-0003', NULL, NULL, NULL, NULL, NULL, 'بلاغ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, NULL, 'بلاغ', NULL, NULL, 1, '2026-06-21 00:51:14', NULL, 19, '2026-06-20 21:46:28', '2026-06-20 21:51:14'),
+(18, 4, 'MNT-2026-0004', NULL, NULL, NULL, NULL, NULL, 'بلاغ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, NULL, 'بلاغ', NULL, NULL, 1, '2026-06-21 00:51:14', NULL, 19, '2026-06-20 21:46:46', '2026-06-20 21:51:14'),
+(19, 4, 'MNT-2026-0005', NULL, NULL, NULL, 13, NULL, 'بلاغ', 'إصلاح عطل', 'عالية', 'داخلي', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, NULL, 'بلاغ', NULL, NULL, 1, NULL, NULL, 40, '2026-06-20 21:51:15', '2026-06-20 21:51:15'),
+(20, 4, 'MNT-2026-0006', NULL, NULL, NULL, 11, 1, 'وقائي', 'إصلاح عطل', 'عادية', 'داخلي', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, NULL, 'بلاغ', NULL, NULL, 0, NULL, NULL, 19, '2026-06-20 21:52:25', '2026-06-20 21:52:25'),
+(21, 4, 'MNT-2026-0007', NULL, NULL, NULL, 9, 2, 'بلاغ', 'استبدال قطعة', 'متوسطة', 'داخلي', NULL, '', NULL, NULL, NULL, 'تم', 2, 'تم', '2026-06-21 12:19:00', '2026-06-22 12:19:00', 5.00, 0.00, 0.00, 0.00, 0.00, 'ناجح', 'إغلاق', '2026-06-21 12:19:58', 19, 0, NULL, NULL, 19, '2026-06-21 09:18:44', '2026-06-21 09:19:58'),
+(22, 4, 'MNT-2026-0008', NULL, NULL, NULL, 7, 2, 'بلاغ', 'استبدال قطعة', 'متوسطة', 'خارجي', 3, '', 9, 9, 386, 'تام', 5, 'تام', NULL, '2026-06-21 12:27:00', 6.00, 0.00, 0.00, 40.00, 40.00, 'ناجح', 'إغلاق', '2026-06-21 12:30:00', 19, 0, NULL, NULL, 19, '2026-06-21 09:27:50', '2026-06-21 09:30:00'),
+(23, 4, 'MNT-2026-0009', NULL, NULL, NULL, 4, 2, 'بلاغ', 'استبدال قطعة', 'عالية', 'داخلي', 3, 'ورشة', 9, 7, 386, 'تشخيص', 2, 'تغيير السلندر', '2026-06-21 16:23:00', '2026-06-22 17:23:00', 10.00, 200.00, 20.00, 100.00, 320.00, 'ناجح', 'تنفيذ', NULL, NULL, 0, NULL, NULL, 19, '2026-06-21 13:23:17', '2026-06-21 13:24:57');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mnt_order_labor`
+--
+
+DROP TABLE IF EXISTS `mnt_order_labor`;
+CREATE TABLE IF NOT EXISTS `mnt_order_labor` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `order_id` int NOT NULL COMMENT 'FK→mnt_order.id',
+  `employee_id` int DEFAULT NULL COMMENT 'FK→users.id (اختياري)',
+  `role` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `hours` decimal(8,2) NOT NULL DEFAULT '0.00',
+  `hourly_rate` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `cost` decimal(12,2) NOT NULL DEFAULT '0.00',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_labor_order` (`order_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `mnt_order_labor`
+--
+
+INSERT INTO `mnt_order_labor` (`id`, `company_id`, `order_id`, `employee_id`, `role`, `hours`, `hourly_rate`, `cost`, `created_at`) VALUES
+(7, 4, 15, 18, 'تاتانت', 3.00, 10.00, 30.00, '2026-06-20 21:05:43'),
+(8, 4, 23, 12, '5', 10.00, 20.00, 200.00, '2026-06-21 13:24:28');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mnt_order_part`
+--
+
+DROP TABLE IF EXISTS `mnt_order_part`;
+CREATE TABLE IF NOT EXISTS `mnt_order_part` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `order_id` int NOT NULL COMMENT 'FK→mnt_order.id',
+  `part_name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `quantity` decimal(10,2) NOT NULL DEFAULT '1.00',
+  `unit_cost` decimal(12,2) NOT NULL DEFAULT '0.00',
+  `subtotal` decimal(12,2) NOT NULL DEFAULT '0.00',
+  `is_major_component` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_part_order` (`order_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `mnt_order_part`
+--
+
+INSERT INTO `mnt_order_part` (`id`, `company_id`, `order_id`, `part_name`, `category`, `quantity`, `unit_cost`, `subtotal`, `is_major_component`, `created_at`) VALUES
+(8, 4, 23, 'سلندر', 'كهرباء', 1.00, 20.00, 20.00, 0, '2026-06-21 13:24:49');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mnt_plan`
+--
+
+DROP TABLE IF EXISTS `mnt_plan`;
+CREATE TABLE IF NOT EXISTS `mnt_plan` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL COMMENT 'عزل الشركة (إجباري)',
+  `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'مرجع الخطة، مثل PLN-2026-0001',
+  `name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scope` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'معدة/فئة',
+  `equipment_id` int DEFAULT NULL COMMENT 'FK→equipments.id',
+  `category_id` int DEFAULT NULL COMMENT 'FK→equipments_types.id',
+  `trigger_basis` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ساعات' COMMENT 'ساعات/زمن',
+  `interval_value` int DEFAULT NULL COMMENT 'الفاصل (ساعات أو أيام)',
+  `tolerance` int DEFAULT NULL,
+  `last_done_date` date DEFAULT NULL,
+  `last_done_meter` decimal(12,2) DEFAULT NULL,
+  `next_due_date` date DEFAULT NULL,
+  `next_due_meter` decimal(12,2) DEFAULT NULL,
+  `state` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'نشطة' COMMENT 'نشطة/متوقفة',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_plan_eq_due` (`equipment_id`,`next_due_date`),
+  KEY `idx_plan_company_state` (`company_id`,`state`),
+  KEY `idx_plan_deleted` (`is_deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `mnt_plan`
+--
+
+INSERT INTO `mnt_plan` (`id`, `company_id`, `code`, `name`, `scope`, `equipment_id`, `category_id`, `trigger_basis`, `interval_value`, `tolerance`, `last_done_date`, `last_done_meter`, `next_due_date`, `next_due_meter`, `state`, `is_deleted`, `deleted_at`, `deleted_by`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 4, 'PLN-2026-0001', 'خطة الزيت', '', 13, NULL, 'ساعات', 250, NULL, '2026-06-20', 0.00, NULL, 250.00, 'نشطة', 0, NULL, NULL, 19, '2026-06-20 19:36:58', '2026-06-20 19:36:58'),
+(2, 4, 'PLN-2026-0002', 'خطة جديدة', NULL, NULL, NULL, 'ساعات', NULL, NULL, NULL, NULL, NULL, NULL, 'نشطة', 1, '2026-06-21 00:42:37', NULL, 19, '2026-06-20 19:58:01', '2026-06-20 21:42:37'),
+(3, 4, 'PLN-2026-0003', 'خطة جديدة', NULL, NULL, NULL, 'ساعات', NULL, NULL, NULL, NULL, NULL, NULL, 'نشطة', 1, '2026-06-21 00:42:37', NULL, 19, '2026-06-20 20:00:54', '2026-06-20 21:42:37'),
+(4, 4, 'PLN-2026-0004', 'خطة جديدة', NULL, NULL, NULL, 'ساعات', NULL, NULL, NULL, NULL, NULL, NULL, 'نشطة', 1, '2026-06-21 00:42:37', NULL, 19, '2026-06-20 21:25:38', '2026-06-20 21:42:37'),
+(5, 4, 'PLN-2026-0005', 'خطة جديدة', NULL, NULL, NULL, 'ساعات', NULL, NULL, NULL, NULL, NULL, NULL, 'نشطة', 1, '2026-06-21 00:42:37', NULL, 19, '2026-06-20 21:36:30', '2026-06-20 21:42:37'),
+(6, 4, 'PLN-2026-0006', 'خطة جديدة', NULL, NULL, NULL, 'ساعات', NULL, NULL, NULL, NULL, NULL, NULL, 'نشطة', 1, '2026-06-21 00:42:37', NULL, 19, '2026-06-20 21:36:43', '2026-06-20 21:42:37'),
+(7, 4, 'PLN-2026-0007', 'خطة زيت 250', NULL, 13, NULL, 'ساعات', 250, NULL, NULL, NULL, NULL, NULL, 'نشطة', 1, NULL, NULL, 39, '2026-06-20 21:42:38', '2026-06-20 21:42:38');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mnt_plan_task`
+--
+
+DROP TABLE IF EXISTS `mnt_plan_task`;
+CREATE TABLE IF NOT EXISTS `mnt_plan_task` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+  `plan_id` int NOT NULL COMMENT 'FK→mnt_plan.id',
+  `name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `task_type` int DEFAULT NULL COMMENT 'FK→mnt_lookup.id (نوع مهمة)',
+  `component` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `est_hours` decimal(8,2) NOT NULL DEFAULT '0.00',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_plantask_plan` (`plan_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `mnt_plan_task`
+--
+
+INSERT INTO `mnt_plan_task` (`id`, `company_id`, `plan_id`, `name`, `task_type`, `component`, `est_hours`, `created_at`) VALUES
+(2, 4, 1, 'تغيير زيت', NULL, 'محرك', 5.00, '2026-06-20 21:53:19');
 
 -- --------------------------------------------------------
 
@@ -1771,22 +3419,26 @@ INSERT INTO `messages` (`id`, `company_id`, `sender_id`, `receiver_id`, `message
 -- Table structure for table `modules`
 --
 
-CREATE TABLE `modules` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `code` varchar(50) DEFAULT NULL,
-  `owner_role_id` int(11) DEFAULT NULL,
-  `is_link` varchar(10) NOT NULL DEFAULT '0',
-  `icon` varchar(50) NOT NULL,
-  `display_order` int(11) DEFAULT 0 COMMENT 'ترتيب العرض في القوائم'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `modules`;
+CREATE TABLE IF NOT EXISTS `modules` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `owner_role_id` int DEFAULT NULL,
+  `is_link` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
+  `icon` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `display_order` int DEFAULT '0' COMMENT 'ترتيب العرض في القوائم',
+  PRIMARY KEY (`id`),
+  KEY `owner_role_id` (`owner_role_id`),
+  KEY `idx_display_order` (`display_order`)
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `modules`
 --
 
 INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `is_link`, `icon`, `display_order`) VALUES
-(1, 'حالة العملاءjtgtj', 'Clients/clients.php', 1, '1', 'fa fa-users', 10),
+(1, 'حالة العملاء', 'Clients/clients.php', 1, '1', 'fa fa-users', 10),
 (2, 'حالة المشاريع', 'Projects/projects.php', 1, '1', 'fa fa-folder-open', 20),
 (3, 'إدارة الصلاحيات', 'main/users.php', 1, '1', 'fa fa-users-cog', 30),
 (4, 'شاشة التقارير', 'Reports/reports.php', 1, '1', 'fa fa-chart-pie', 90),
@@ -1812,15 +3464,22 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `is_link`, `icon`,
 (26, 'تفاصيل عقد المورد', 'Suppliers/supplierscontracts_details.php', 2, '0', 'fa fa-link', 260),
 (27, 'المعدات', 'Equipments/equipments_drivers.php', 4, '0', 'fa fa-tractor', 20),
 (28, 'التقارير', 'Reports/reports.php', 5, '1', 'fa fa-link', 280),
-(29, 'توزيع المشغلين', 'movement/project_drivers.php', 6, '1', 'fa fa-id-card', 80),
-(30, 'تفعيل المعدات', 'movement/move_oprators.php', 6, '1', 'fa fa-tractor', 30),
+(29, 'توزيع المشغلين', 'movement/project_drivers.php', 6, '0', 'fa fa-id-card', 80),
+(30, 'إدارة الورديات', 'movement/movement_operations.php', 6, '1', 'fa fa-tractor', 30),
 (31, 'التقارير', 'Reports/reports.php', 4, '1', 'fa fa-chart-pie', 300),
 (32, 'التقارير', 'Reports/reports.php', 3, '1', 'fa fa-chart-pie', 50),
-(34, 'حالة المنجم', 'movement/map_page.php', 6, '1', 'fas fa-map-marked-alt', 20),
+(34, 'حالة المشروع', 'movement/map_page.php', 6, '1', 'fas fa-map-marked-alt', 20),
 (35, 'إدارة العملاء', 'Clients/clients.php', 12, '1', 'fa fa-users', 1),
 (36, 'إدارة المبيعات', 'Projects/projects.php', 12, '1', 'fa fa-folder-open', 2),
 (37, 'إدارة العقود', 'Contracts/contracts.php', 12, '1', 'fa-file-signature fa', 3),
-(38, 'تصنيف الاعطال', 'Equipments/manage_failure_codes.php', 3, '1', 'fa fa-screwdriver-wrench', 15);
+(38, 'تصنيف الاعطال', 'Equipments/manage_failure_codes.php', 13, '1', 'fa fa-screwdriver-wrench', 60),
+(40, 'سجل النوع والموديل', 'Equipments/fleet_models.php', 3, '1', 'fa fa-clipboard-list', 12),
+(41, 'ملف الإهلاك المالي', 'Equipments/fleet_depreciation_profiles.php', 3, '1', 'fa fa-coins', 13),
+(42, 'البلاغات', 'Maintenance/breakdowns.php', 13, '1', 'fa fa-triangle-exclamation', 10),
+(43, 'أوامر الصيانة', 'Maintenance/orders.php', 13, '1', 'fa fa-wrench', 20),
+(44, 'التفتيش الفني', 'Maintenance/inspections.php', 13, '1', 'fa fa-clipboard-check', 30),
+(45, 'الخطة الوقائية', 'Maintenance/preventive_plans.php', 13, '1', 'fa fa-calendar-check', 40),
+(46, 'إعدادات الصيانة', 'Maintenance/master_data.php', 13, '1', 'fa fa-sliders', 50);
 
 -- --------------------------------------------------------
 
@@ -1828,47 +3487,63 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `is_link`, `icon`,
 -- Table structure for table `operations`
 --
 
-CREATE TABLE `operations` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `equipment` varchar(100) NOT NULL,
-  `equipment_type` varchar(100) NOT NULL DEFAULT '0',
-  `equipment_category` varchar(20) NOT NULL,
-  `project_id` varchar(20) NOT NULL,
-  `contract_id` varchar(10) NOT NULL,
-  `supplier_id` varchar(10) NOT NULL,
-  `start` varchar(50) NOT NULL,
-  `end` varchar(50) NOT NULL,
-  `reason` text NOT NULL,
-  `days` varchar(20) NOT NULL,
-  `total_equipment_hours` decimal(10,2) DEFAULT 0.00 COMMENT 'إجمالي ساعات العمل الكلية للآلية',
-  `shift_hours` decimal(10,2) DEFAULT 0.00 COMMENT 'عدد ساعات الوردية للمعدة',
-  `shift_type` enum('D','N','B') NOT NULL DEFAULT 'B',
-  `status` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+DROP TABLE IF EXISTS `operations`;
+CREATE TABLE IF NOT EXISTS `operations` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `equipment` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `equipment_type` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
+  `equipment_category` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `prev_equipment_category` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `project_id` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `contract_id` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `supplier_id` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `start` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `end` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reason` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `days` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `total_equipment_hours` decimal(10,2) DEFAULT '0.00' COMMENT 'إجمالي ساعات العمل الكلية للآلية',
+  `shift_hours` decimal(10,2) DEFAULT '0.00' COMMENT 'عدد ساعات الوردية للمعدة',
+  `shift_type` enum('D','N','B') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'B',
+  `status` tinyint(1) DEFAULT '1',
+  `equipment_health` enum('سليمة','معطلة') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'سليمة' COMMENT 'الصحة الفنية للمعدة (مستقلة عن status التشغيلي)',
+  `health_reason` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'سبب العطل، مثل: صيانة',
+  `health_updated_at` datetime DEFAULT NULL,
+  `health_updated_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_total_equipment_hours` (`total_equipment_hours`),
+  KEY `idx_shift_hours` (`shift_hours`),
+  KEY `idx_operations_equipment_health` (`equipment_health`)
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `operations`
 --
 
-INSERT INTO `operations` (`id`, `company_id`, `equipment`, `equipment_type`, `equipment_category`, `project_id`, `contract_id`, `supplier_id`, `start`, `end`, `reason`, `days`, `total_equipment_hours`, `shift_hours`, `shift_type`, `status`) VALUES
-(1, 4, '1', '1', 'أساسي', '1', '1', '1', '2026-04-01', '2026-04-30', '', '0', 20.00, 10.00, 'B', 1),
-(2, 4, '3', '2', 'أساسي', '1', '1', '1', '2026-04-01', '2026-04-30', '', '0', 20.00, 10.00, 'B', 1),
-(3, 4, '5', '1', 'أساسي', '2', '2', '3', '2026-04-01', '2026-04-27', '', '26', 10.00, 10.00, 'B', 0),
-(4, 4, '6', '1', 'أساسي', '2', '2', '3', '2026-04-01', '2006-04-30', '', '0', 10.00, 10.00, 'B', 1),
-(5, 4, '7', '1', 'أساسي', '2', '2', '3', '2026-04-01', '2006-04-30', '', '0', 10.00, 10.00, 'B', 1),
-(6, 4, '8', '1', 'أساسي', '2', '2', '3', '2026-04-01', '2026-04-28', '', '27', 10.00, 10.00, 'B', 0),
-(7, 4, '9', '1', 'أساسي', '2', '2', '3', '2026-04-01', '2006-04-30', '', '0', 10.00, 10.00, 'B', 1),
-(8, 4, '4', '1', 'أساسي', '2', '2', '3', '2026-04-25', '2026-10-01', '', '0', 600.00, 10.00, 'B', 1),
-(9, 4, '4', '1', 'أساسي', '4', '4', '3', '2025-07-01', '2026-04-27', 'اكملت عملها\r\n', '300', 20.00, 10.00, 'B', 0),
-(10, 4, '2', '1', 'أساسي', '4', '4', '1', '2025-07-01', '2026-07-01', '', '0', 0.00, 0.00, 'B', 0),
-(11, 4, '8', '1', 'أساسي', '4', '4', '3', '2025-07-01', '2026-04-27', '', '300', 20.00, 10.00, 'B', 0),
-(12, 4, '8', '1', 'أساسي', '4', '4', '4', '2026-04-01', '2026-07-01', '', '0', 20.00, 10.00, 'B', 1),
-(13, 4, '10', '1', 'أساسي', '4', '5', '5', '2025-12-01', '2026-11-01', '', '0', 20.00, 10.00, 'B', 1),
-(14, 4, '11', '2', 'أساسي', '4', '5', '6', '2025-12-01', '2026-11-01', '', '0', 20.00, 10.00, 'N', 1),
-(15, 4, '5', '1', 'أساسي', '4', '4', '4', '2026-05-11', '2026-07-01', '', '0', 666.00, 10.00, 'N', 1),
-(16, 4, '13', '3', 'أساسي', '4', '4', '4', '2026-05-11', '2026-07-01', '', '0', 555.00, 10.00, 'N', 1),
-(17, 4, '15', '1', 'أساسي', '4', '4', '7', '2026-05-31', '2027-02-19', '', '0', 200.00, 10.00, 'N', 1);
+INSERT INTO `operations` (`id`, `company_id`, `equipment`, `equipment_type`, `equipment_category`, `prev_equipment_category`, `project_id`, `contract_id`, `supplier_id`, `start`, `end`, `reason`, `days`, `total_equipment_hours`, `shift_hours`, `shift_type`, `status`, `equipment_health`, `health_reason`, `health_updated_at`, `health_updated_by`) VALUES
+(1, 4, '1', '1', 'أساسي', NULL, '1', '1', '1', '2026-04-01', '2026-04-30', '', '0', 20.00, 10.00, 'B', 1, 'سليمة', NULL, NULL, NULL),
+(2, 4, '3', '2', 'أساسي', NULL, '1', '1', '1', '2026-04-01', '2026-04-30', '', '0', 20.00, 10.00, 'B', 1, 'سليمة', NULL, NULL, NULL),
+(3, 4, '5', '1', 'أساسي', NULL, '2', '2', '3', '2026-04-01', '2026-04-27', '', '26', 10.00, 10.00, 'B', 0, 'سليمة', NULL, NULL, NULL),
+(4, 4, '6', '1', 'متعطل', 'أساسي', '2', '2', '3', '2026-04-01', '2006-04-30', '', '0', 10.00, 10.00, 'B', 1, 'سليمة', NULL, NULL, NULL),
+(5, 4, '7', '1', 'احتياطي', NULL, '2', '2', '3', '2026-04-01', '2026-06-30', '', '0', 10.00, 10.00, 'B', 1, 'سليمة', NULL, '2026-06-21 12:30:00', 19),
+(6, 4, '8', '1', 'أساسي', NULL, '2', '2', '3', '2026-04-01', '2026-04-28', '', '27', 10.00, 10.00, 'B', 0, 'سليمة', NULL, NULL, NULL),
+(7, 4, '9', '1', 'أساسي', NULL, '2', '2', '3', '2026-04-01', '2006-04-30', '', '0', 10.00, 10.00, 'B', 0, 'سليمة', NULL, NULL, NULL),
+(8, 4, '4', '1', 'متعطل', NULL, '2', '2', '3', '2026-04-25', '2026-10-01', '', '0', 600.00, 10.00, 'B', 1, 'معطلة', 'صيانة', '2026-06-21 16:24:57', 19),
+(9, 4, '4', '1', 'أساسي', NULL, '4', '4', '3', '2025-07-01', '2026-04-27', 'اكملت عملها\r\n', '300', 20.00, 10.00, 'B', 0, 'سليمة', NULL, NULL, NULL),
+(10, 4, '2', '1', 'أساسي', NULL, '4', '4', '1', '2025-07-01', '2026-07-01', '', '0', 0.00, 0.00, 'B', 0, 'سليمة', NULL, NULL, NULL),
+(11, 4, '8', '1', 'أساسي', NULL, '4', '4', '3', '2025-07-01', '2026-04-27', '', '300', 20.00, 10.00, 'B', 0, 'سليمة', NULL, NULL, NULL),
+(12, 4, '8', '1', 'أساسي', NULL, '4', '5', '5', '2026-04-01', '2026-07-01', '', '0', 20.00, 10.00, 'B', 1, 'سليمة', NULL, NULL, NULL),
+(13, 4, '10', '1', 'أساسي', NULL, '4', '5', '5', '2025-12-01', '2026-11-01', '', '0', 8787.00, 10.00, 'B', 1, 'سليمة', NULL, NULL, NULL),
+(14, 4, '11', '2', 'أساسي', NULL, '4', '5', '6', '2025-12-01', '2026-11-01', '', '0', 20.00, 10.00, 'B', 1, 'معطلة', 'صيانة', '2026-06-20 23:07:56', 19),
+(15, 4, '5', '1', 'أساسي', NULL, '4', '5', '8', '2026-05-11', '2026-06-08', '', '28', 666.00, 10.00, 'N', 0, 'سليمة', NULL, NULL, NULL),
+(16, 4, '13', '3', 'أساسي', NULL, '4', '5', '8', '2026-05-11', '2026-06-10', '', '30', 555.00, 10.00, 'N', 0, 'سليمة', NULL, NULL, NULL),
+(17, 4, '15', '1', 'أساسي', NULL, '4', '4', '7', '2026-05-31', '2027-02-19', '', '0', 200.00, 10.00, 'N', 1, 'سليمة', NULL, NULL, NULL),
+(18, 4, '18', '1', 'أساسي', NULL, '4', '4', '7', '2026-06-07', '2027-02-19', '', '0', 500.00, 10.00, 'D', 1, 'سليمة', NULL, NULL, NULL),
+(29, 4, '16', '1', 'أساسي', NULL, '4', '4', '7', '2026-06-08', '2027-02-19', '', '0', 200.00, 10.00, 'B', 1, 'سليمة', NULL, NULL, NULL),
+(30, 4, '17', '1', 'احتياطي', NULL, '4', '4', '7', '2026-06-02', '2027-02-19', '', '0', 10.00, 20.00, 'B', 1, 'سليمة', NULL, NULL, NULL),
+(31, 4, '20', '3', 'أساسي', NULL, '4', '5', '8', '2026-06-08', '2026-11-01', '', '0', 121212.00, 10.00, 'B', 0, 'سليمة', NULL, NULL, NULL),
+(32, 4, '5', '1', 'أساسي', NULL, '4', '5', '8', '2026-06-08', '2026-11-01', '', '0', 200.00, 10.00, 'N', 1, 'سليمة', NULL, NULL, NULL),
+(33, 4, '13', '3', 'أساسي', NULL, '4', '5', '8', '2026-06-08', '2026-11-01', '', '0', 120.00, 10.00, 'N', 1, 'معطلة', 'صيانة', '2026-06-20 23:54:17', 19);
 
 -- --------------------------------------------------------
 
@@ -1876,31 +3551,36 @@ INSERT INTO `operations` (`id`, `company_id`, `equipment`, `equipment_type`, `eq
 -- Table structure for table `project`
 --
 
-CREATE TABLE `project` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `client_id` int(11) DEFAULT NULL COMMENT '┘àÏ╣Ï▒┘ü Ïº┘äÏ╣┘à┘è┘ä ┘à┘å Ï¼Ï»┘ê┘ä clients',
-  `name` varchar(150) NOT NULL,
-  `client` varchar(150) NOT NULL,
-  `location` varchar(200) NOT NULL,
-  `project_code` varchar(50) DEFAULT NULL COMMENT 'كود المشروع',
-  `mine_code` varchar(100) DEFAULT NULL COMMENT 'كود المنجم',
-  `category` varchar(100) DEFAULT NULL COMMENT 'الفئة',
-  `sub_sector` varchar(100) DEFAULT NULL COMMENT 'القطاع الفرعي',
-  `state` varchar(100) DEFAULT NULL COMMENT 'الولاية',
-  `region` varchar(100) DEFAULT NULL COMMENT 'المنطقة',
-  `nearest_market` varchar(100) DEFAULT NULL COMMENT 'أقرب سوق',
-  `latitude` varchar(50) DEFAULT NULL COMMENT 'خط العرض',
-  `longitude` varchar(50) DEFAULT NULL COMMENT 'خط الطول',
-  `total` varchar(50) NOT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `created_by` int(11) DEFAULT NULL COMMENT 'معرف المستخدم المنشئ',
-  `create_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp() COMMENT 'تاريخ آخر تحديث',
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+DROP TABLE IF EXISTS `project`;
+CREATE TABLE IF NOT EXISTS `project` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `client_id` int DEFAULT NULL COMMENT '┘àÏ╣Ï▒┘ü Ïº┘äÏ╣┘à┘è┘ä ┘à┘å Ï¼Ï»┘ê┘ä clients',
+  `name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `client` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `location` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `project_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'كود المشروع',
+  `mine_code` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'كود المنجم',
+  `category` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الفئة',
+  `sub_sector` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'القطاع الفرعي',
+  `state` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الولاية',
+  `region` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'المنطقة',
+  `nearest_market` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'أقرب سوق',
+  `latitude` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'خط العرض',
+  `longitude` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'خط الطول',
+  `total` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` tinyint(1) DEFAULT '1',
+  `created_by` int DEFAULT NULL COMMENT 'معرف المستخدم المنشئ',
+  `create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'تاريخ آخر تحديث',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   `deleted_at` datetime DEFAULT NULL,
-  `deleted_by` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `deleted_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_project_created_by` (`created_by`),
+  KEY `idx_client_id` (`client_id`),
+  KEY `idx_mine_code` (`mine_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `project`
@@ -1922,11 +3602,14 @@ INSERT INTO `project` (`id`, `company_id`, `client_id`, `name`, `client`, `locat
 -- Table structure for table `report_role_permissions`
 --
 
-CREATE TABLE `report_role_permissions` (
-  `id` int(11) NOT NULL,
-  `role_id` int(11) NOT NULL,
-  `report_code` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `report_role_permissions`;
+CREATE TABLE IF NOT EXISTS `report_role_permissions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `role_id` int NOT NULL,
+  `report_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_role_report` (`role_id`,`report_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `report_role_permissions`
@@ -1955,7 +3638,9 @@ INSERT INTO `report_role_permissions` (`id`, `role_id`, `report_code`) VALUES
 (4, 1, 'timesheet_by_equipment'),
 (3, 1, 'timesheet_by_project'),
 (2, 1, 'timesheet_detailed'),
-(1, 1, 'timesheet_summary');
+(1, 1, 'timesheet_summary'),
+(24, 13, 'maintenance_summary'),
+(25, 14, 'maintenance_summary');
 
 -- --------------------------------------------------------
 
@@ -1963,15 +3648,18 @@ INSERT INTO `report_role_permissions` (`id`, `role_id`, `report_code`) VALUES
 -- Table structure for table `roles`
 --
 
-CREATE TABLE `roles` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `parent_role_id` int(11) DEFAULT NULL,
-  `level` int(11) DEFAULT 1,
-  `role_scope` enum('gloable','mine') NOT NULL DEFAULT 'gloable',
-  `status` varchar(10) NOT NULL DEFAULT '1',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `roles`;
+CREATE TABLE IF NOT EXISTS `roles` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `parent_role_id` int DEFAULT NULL,
+  `level` int DEFAULT '1',
+  `role_scope` enum('gloable','mine') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'gloable',
+  `status` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '1',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `parent_role_id` (`parent_role_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `roles`
@@ -1988,7 +3676,9 @@ INSERT INTO `roles` (`id`, `name`, `parent_role_id`, `level`, `role_scope`, `sta
 (8, 'مشرف موردين', 2, 2, 'gloable', '1', '2026-03-04 13:34:07'),
 (10, 'مشرف اسطول', 3, 2, 'gloable', '1', '2026-03-07 08:37:24'),
 (11, 'مشغل اسطول', 3, 2, 'gloable', '1', '2026-03-09 09:45:51'),
-(12, 'ادارة المبيعات', NULL, 1, 'gloable', '1', '2026-04-28 09:16:39');
+(12, 'ادارة المبيعات', NULL, 1, 'gloable', '1', '2026-04-28 09:16:39'),
+(13, 'ادارة الصيانة', NULL, 1, 'gloable', '1', '2026-06-20 19:00:07'),
+(14, 'مشرف صيانة', 13, 2, 'gloable', '1', '2026-06-20 19:00:07');
 
 -- --------------------------------------------------------
 
@@ -1996,15 +3686,19 @@ INSERT INTO `roles` (`id`, `name`, `parent_role_id`, `level`, `role_scope`, `sta
 -- Table structure for table `role_permissions`
 --
 
-CREATE TABLE `role_permissions` (
-  `id` int(11) NOT NULL,
-  `role_id` int(11) NOT NULL,
-  `module_id` int(11) NOT NULL,
-  `can_view` tinyint(1) DEFAULT 0,
-  `can_add` tinyint(1) DEFAULT 0,
-  `can_edit` tinyint(1) DEFAULT 0,
-  `can_delete` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `role_permissions`;
+CREATE TABLE IF NOT EXISTS `role_permissions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `role_id` int NOT NULL,
+  `module_id` int NOT NULL,
+  `can_view` tinyint(1) DEFAULT '0',
+  `can_add` tinyint(1) DEFAULT '0',
+  `can_edit` tinyint(1) DEFAULT '0',
+  `can_delete` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `role_id` (`role_id`,`module_id`),
+  KEY `module_id` (`module_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=330 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `role_permissions`
@@ -2241,7 +3935,39 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (283, 12, 35, 1, 1, 1, 1),
 (284, 12, 36, 1, 1, 1, 1),
 (285, 12, 37, 1, 1, 1, 1),
-(286, 3, 38, 1, 1, 1, 1);
+(286, 3, 38, 1, 1, 1, 1),
+(287, 1, 40, 1, 1, 1, 1),
+(288, 2, 40, 1, 1, 1, 1),
+(289, 8, 40, 1, 1, 1, 1),
+(290, 3, 40, 1, 1, 1, 1),
+(291, 10, 40, 1, 0, 0, 0),
+(292, 11, 40, 1, 1, 1, 0),
+(293, 6, 40, 1, 1, 1, 1),
+(294, 4, 40, 1, 1, 1, 1),
+(295, 5, 40, 1, 1, 1, 1),
+(296, 12, 40, 1, 1, 1, 1),
+(302, 1, 41, 1, 1, 1, 1),
+(303, 2, 41, 1, 1, 1, 1),
+(304, 8, 41, 1, 1, 1, 1),
+(305, 3, 41, 1, 1, 1, 1),
+(306, 10, 41, 1, 0, 0, 0),
+(307, 11, 41, 1, 1, 1, 0),
+(308, 6, 41, 1, 1, 1, 1),
+(309, 4, 41, 1, 1, 1, 1),
+(310, 5, 41, 1, 1, 1, 1),
+(311, 12, 41, 1, 1, 1, 1),
+(317, 13, 38, 1, 1, 1, 1),
+(318, 13, 42, 1, 1, 1, 1),
+(319, 13, 43, 1, 1, 1, 1),
+(320, 13, 44, 1, 1, 1, 1),
+(321, 13, 45, 1, 1, 1, 1),
+(322, 13, 46, 1, 1, 1, 1),
+(324, 14, 38, 1, 0, 0, 0),
+(325, 14, 42, 1, 0, 0, 0),
+(326, 14, 43, 1, 0, 0, 0),
+(327, 14, 44, 1, 0, 0, 0),
+(328, 14, 45, 1, 0, 0, 0),
+(329, 14, 46, 1, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -2249,23 +3975,25 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 -- Table structure for table `super_admins`
 --
 
-CREATE TABLE `super_admins` (
-  `id` int(11) NOT NULL COMMENT 'معرف فريد',
-  `name` varchar(100) NOT NULL COMMENT 'الإسم',
-  `email` varchar(150) NOT NULL COMMENT 'البريد ',
-  `password` varchar(255) NOT NULL COMMENT 'كلمة المرور',
-  `is_active` tinyint(4) NOT NULL DEFAULT 1 COMMENT 'نشط',
+DROP TABLE IF EXISTS `super_admins`;
+CREATE TABLE IF NOT EXISTS `super_admins` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد',
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الإسم',
+  `email` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'البريد ',
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'كلمة المرور',
+  `is_active` tinyint NOT NULL DEFAULT '1' COMMENT 'نشط',
   `last_login_at` timestamp NULL DEFAULT NULL COMMENT 'آخر دخول',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'انشاء في',
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'تعديل في'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'انشاء في',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'تعديل في',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `super_admins`
 --
 
 INSERT INTO `super_admins` (`id`, `name`, `email`, `password`, `is_active`, `last_login_at`, `created_at`, `updated_at`) VALUES
-(1, 'super', 'enjaz@gmail.com', '$2y$10$auVJYb4WXFejEfthvqjpSOtyZlfdzJxM18TH6NBhPvPMyNMPq0B8K', 1, '2026-06-02 09:41:43', '2026-03-18 11:49:17', '2026-06-02 09:41:43');
+(1, 'super', 'enjaz@gmail.com', '$2y$10$auVJYb4WXFejEfthvqjpSOtyZlfdzJxM18TH6NBhPvPMyNMPq0B8K', 1, '2026-06-20 19:52:53', '2026-03-18 11:49:17', '2026-06-20 19:52:53');
 
 -- --------------------------------------------------------
 
@@ -2273,17 +4001,18 @@ INSERT INTO `super_admins` (`id`, `name`, `email`, `password`, `is_active`, `las
 -- Table structure for table `suppliercontractequipments`
 --
 
-CREATE TABLE `suppliercontractequipments` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `contract_id` int(11) NOT NULL COMMENT 'معرف عقد المورد من جدول supplierscontracts',
-  `equip_type` varchar(100) DEFAULT NULL COMMENT 'نوع المعدة (حفار، قلاب، خرامة)',
-  `equip_size` int(11) DEFAULT NULL COMMENT 'حجم المعدة',
-  `equip_count` int(11) DEFAULT NULL COMMENT 'عدد المعدات',
-  `equip_count_basic` int(11) DEFAULT 0 COMMENT 'عدد المعدات الأساسية',
-  `equip_count_backup` int(11) DEFAULT 0 COMMENT 'عدد المعدات الاحتياطية',
-  `equip_shifts` int(11) DEFAULT NULL COMMENT 'عدد الورديات',
-  `equip_unit` varchar(50) DEFAULT NULL COMMENT 'وحدة القياس (ساعة، طن، متر)',
+DROP TABLE IF EXISTS `suppliercontractequipments`;
+CREATE TABLE IF NOT EXISTS `suppliercontractequipments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `contract_id` int NOT NULL COMMENT 'معرف عقد المورد من جدول supplierscontracts',
+  `equip_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع المعدة (حفار، قلاب، خرامة)',
+  `equip_size` int DEFAULT NULL COMMENT 'حجم المعدة',
+  `equip_count` int DEFAULT NULL COMMENT 'عدد المعدات',
+  `equip_count_basic` int DEFAULT '0' COMMENT 'عدد المعدات الأساسية',
+  `equip_count_backup` int DEFAULT '0' COMMENT 'عدد المعدات الاحتياطية',
+  `equip_shifts` int DEFAULT NULL COMMENT 'عدد الورديات',
+  `equip_unit` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'وحدة القياس (ساعة، طن، متر)',
   `shift1_start` time DEFAULT NULL COMMENT 'بداية الوردية الأولى',
   `shift1_end` time DEFAULT NULL COMMENT 'نهاية الوردية الأولى',
   `shift2_start` time DEFAULT NULL COMMENT 'بداية الوردية الثانية',
@@ -2293,13 +4022,15 @@ CREATE TABLE `suppliercontractequipments` (
   `equip_monthly_target` decimal(10,2) DEFAULT NULL COMMENT 'وحدات العمل في الشهر',
   `equip_total_contract` decimal(10,2) DEFAULT NULL COMMENT 'إجمالي وحدات العقد',
   `equip_price` decimal(10,2) DEFAULT NULL COMMENT 'السعر للوحدة',
-  `equip_price_currency` varchar(20) DEFAULT NULL COMMENT 'العملة (دولار، جنيه)',
-  `equip_operators` int(11) DEFAULT NULL COMMENT 'عدد المشغلين',
-  `equip_supervisors` int(11) DEFAULT NULL COMMENT 'عدد المشرفين',
-  `equip_technicians` int(11) DEFAULT NULL COMMENT 'عدد الفنيين',
-  `equip_assistants` int(11) DEFAULT NULL COMMENT 'عدد المساعدين',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='معدات عقود الموردين';
+  `equip_price_currency` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'العملة (دولار، جنيه)',
+  `equip_operators` int DEFAULT NULL COMMENT 'عدد المشغلين',
+  `equip_supervisors` int DEFAULT NULL COMMENT 'عدد المشرفين',
+  `equip_technicians` int DEFAULT NULL COMMENT 'عدد الفنيين',
+  `equip_assistants` int DEFAULT NULL COMMENT 'عدد المساعدين',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `contract_id` (`contract_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='معدات عقود الموردين';
 
 --
 -- Dumping data for table `suppliercontractequipments`
@@ -2311,8 +4042,8 @@ INSERT INTO `suppliercontractequipments` (`id`, `company_id`, `contract_id`, `eq
 (3, NULL, 2, '1', 54, 5, 3, 2, 4, 'ساعة', '23:13:00', '21:36:00', '16:00:00', '17:47:00', 10.00, 50.00, 1.00, 2300.00, 858.00, 'دولار', 87, 37, 66, 59, '2026-04-13 13:19:02'),
 (8, NULL, 4, '1', 340, 1, 1, 0, 2, 'ساعة', '05:00:00', '15:00:00', '17:00:00', '03:00:00', 10.00, 10.00, 600.00, 1510.00, 20.00, 'دولار', 2, 1, 1, 1, '2026-04-28 10:46:57'),
 (9, NULL, 5, '2', 25, 1, 1, 1, 2, 'ساعة', '05:00:00', '15:00:00', '17:00:00', '03:00:00', 20.00, 20.00, 600.00, 3000.00, 8.00, '', 2, 1, 1, 1, '2026-04-28 10:52:36'),
-(11, NULL, 6, '3', 340, 1, 1, 0, 2, 'متر طولي', '18:00:00', '04:00:00', '06:00:00', '16:00:00', 10.00, 10.00, 0.00, 900.00, 50.00, 'دولار', 2, 0, 0, 1, '2026-05-07 06:40:28'),
-(14, NULL, 7, '1', 56, 5, 3, 0, 2, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 20.00, 60.00, 0.00, 3480.00, 0.00, '', 0, 0, 0, 0, '2026-05-12 12:08:27');
+(20, NULL, 6, '3', 340, 2, 1, 1, 2, 'متر طولي', '18:00:00', '04:00:00', '06:00:00', '16:00:00', 10.00, 10.00, 0.00, 890.00, 50.00, 'دولار', 0, 0, 0, 1, '2026-06-08 11:39:43'),
+(27, NULL, 7, '1', 56, 6, 4, 2, 2, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 20.00, 80.00, 0.00, 2880.00, 0.00, '', 2, 2, 0, 2, '2026-06-08 12:09:29');
 
 -- --------------------------------------------------------
 
@@ -2320,32 +4051,35 @@ INSERT INTO `suppliercontractequipments` (`id`, `company_id`, `contract_id`, `eq
 -- Table structure for table `suppliers`
 --
 
-CREATE TABLE `suppliers` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `name` varchar(100) NOT NULL,
-  `supplier_code` varchar(100) DEFAULT NULL COMMENT 'الرمز/الكود للمورد',
-  `supplier_type` enum('فرد','شركة','وسيط','مالك','جهة حكومية') DEFAULT NULL COMMENT 'نوع المورد',
-  `dealing_nature` varchar(255) DEFAULT NULL COMMENT 'طبيعة التعامل',
-  `equipment_types` text DEFAULT NULL COMMENT 'أنواع المعدات (مفصولة بفواصل)',
-  `commercial_registration` varchar(100) DEFAULT NULL COMMENT 'رقم التسجيل التجاري/الرخصة',
-  `identity_type` varchar(100) DEFAULT NULL COMMENT 'نوع الهوية',
-  `identity_number` varchar(100) DEFAULT NULL COMMENT 'رقم الهوية/التسجيل',
+DROP TABLE IF EXISTS `suppliers`;
+CREATE TABLE IF NOT EXISTS `suppliers` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `supplier_code` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'الرمز/الكود للمورد',
+  `supplier_type` enum('فرد','شركة','وسيط','مالك','جهة حكومية') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع المورد',
+  `dealing_nature` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'طبيعة التعامل',
+  `equipment_types` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'أنواع المعدات (مفصولة بفواصل)',
+  `commercial_registration` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم التسجيل التجاري/الرخصة',
+  `identity_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع الهوية',
+  `identity_number` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم الهوية/التسجيل',
   `identity_expiry_date` date DEFAULT NULL COMMENT 'تاريخ انتهاء الهوية',
-  `email` varchar(255) DEFAULT NULL COMMENT 'البريد الإلكتروني',
-  `phone_alternative` varchar(50) DEFAULT NULL COMMENT 'رقم هاتف بديل',
-  `full_address` text DEFAULT NULL COMMENT 'العنوان الكامل',
-  `contact_person_name` varchar(255) DEFAULT NULL COMMENT 'اسم جهة الاتصال الأساسية',
-  `contact_person_phone` varchar(50) DEFAULT NULL COMMENT 'هاتف جهة الاتصال',
-  `financial_registration_status` enum('مسجل رسميا','غير مسجل','تحت التسجيل','معفى من التسجيل') DEFAULT NULL COMMENT 'حالة التسجيل المالي',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `phone` varchar(15) NOT NULL,
-  `status` tinyint(1) DEFAULT 1,
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'البريد الإلكتروني',
+  `phone_alternative` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم هاتف بديل',
+  `full_address` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'العنوان الكامل',
+  `contact_person_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'اسم جهة الاتصال الأساسية',
+  `contact_person_phone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'هاتف جهة الاتصال',
+  `financial_registration_status` enum('مسجل رسميا','غير مسجل','تحت التسجيل','معفى من التسجيل') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'حالة التسجيل المالي',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `phone` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` tinyint(1) DEFAULT '1',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0',
   `deleted_at` datetime DEFAULT NULL,
-  `deleted_by` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `deleted_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_suppliers_is_deleted` (`is_deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `suppliers`
@@ -2355,7 +4089,7 @@ INSERT INTO `suppliers` (`id`, `company_id`, `name`, `supplier_code`, `supplier_
 (1, 4, 'مورد 1', 'MOR1', 'فرد', 'متعاقد مباشر', 'حفارات, مكنات تخريم', '12345678', 'بطاقة هوية وطنية', '839', '2026-04-30', 'sudanit2015@gmail.com', '+1 (454) 678-6091', 'عنوان كامل', 'Naomi Wilcox', '+1 (628) 682-7512', '', '2026-04-07 11:53:32', '2026-04-07 12:18:47', '0115667710', 1, 0, NULL, NULL),
 (2, 4, 'مورد 2', 'MOR2', 'شركة', 'وسيط', 'حفارات', '123', 'جواز سفر', 'P98909', '2026-04-30', 'equipation@gmail.com', '+1 (161) 121-1423', 'عنوان', 'Mary Washington', '+1 (584) 739-3927', '', '2026-04-07 11:54:24', '2026-05-12 12:04:31', '09144760109', 0, 1, '2026-05-12 15:04:31', 5),
 (3, 4, 'إيكوبيشن', 'MOR3', 'فرد', 'متعاقد مباشر', 'حفارات', '', '', '', NULL, 'sudan@gmail.com', '', '', '', '', '', '2026-04-13 11:24:53', '2026-04-13 11:24:53', '0915657576', 1, 0, NULL, NULL),
-(4, 4, 'HASAN KEHYRI', 'MOR001', 'شركة', 'متعاقد مباشر', 'حفارات, مكنات تخريم, دوازر, شاحنات قلابة, شاحنات تناكر, جرافات, معدات معالجة', '65562', 'رقم تسجيل تجاري', '24522', '2026-12-25', 'infotelecomwasla@gmail.com', '249912345678', '', 'خيري كمال خيري', '123456789', '', '2026-04-26 10:22:48', '2026-05-10 22:47:03', '249912345678', 1, 0, NULL, NULL),
+(4, 4, 'HASAN KEHYRI', 'MOR001', 'شركة', 'متعاقد مباشر', 'حفارات, مكنات تخريم, دوازر, شاحنات قلابة, شاحنات تناكر, جرافات, معدات معالجة', '65562', 'رقم تسجيل تجاري', '24522', '2026-12-25', 'infotelecomwasla@gmail.com', '249912345678', '', 'خيري كمال خيري', '123456789', '', '2026-04-26 10:22:48', '2026-06-08 11:52:46', '249912345678', 0, 1, '2026-06-08 14:52:46', 5),
 (5, 4, 'شركة صابركو للإنشاءات الهندسية والمقاولات المحدودة', 'MOR002', 'شركة', 'متعاقد مباشر', 'حفارات, شاحنات قلابة', '12345', 'رقم تسجيل تجاري', '12345', '2025-11-25', 'sudan@gmail.com', '564987123', '', 'محمد صابر طه محمد', '123654789', '', '2026-04-28 10:36:42', '2026-04-28 10:36:42', '987654321', 1, 0, NULL, NULL),
 (6, 4, 'عمر هاشم فضل المولى احمد', 'MOR003', 'فرد', 'متعاقد مباشر', 'شاحنات قلابة', '44444', 'رخصة عمل', '564646', '2026-05-09', 'sudan@gmail.com', '8765312632', '', 'عمر هاشم فضل المولى احمد', '85623151313', '', '2026-04-28 10:49:08', '2026-04-28 10:49:08', '5453533513', 1, 0, NULL, NULL),
 (7, 4, 'شوقي عبدالعظيم أحمد الخضر', 'MOR004', 'فرد', 'متعاقد مباشر', 'مكنات تخريم', '44444', 'بطاقة هوية وطنية', '564646', '2026-05-09', 'sudan@gmail.com', '546546513', '', 'شوقي عبدالعظيم أحمد الخضر', '85623151313', '', '2026-04-28 10:53:55', '2026-04-28 10:53:55', '31232133', 1, 0, NULL, NULL),
@@ -2368,62 +4102,68 @@ INSERT INTO `suppliers` (`id`, `company_id`, `name`, `supplier_code`, `supplier_
 -- Table structure for table `supplierscontracts`
 --
 
-CREATE TABLE `supplierscontracts` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `supplier_id` int(250) NOT NULL,
+DROP TABLE IF EXISTS `supplierscontracts`;
+CREATE TABLE IF NOT EXISTS `supplierscontracts` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `supplier_id` int NOT NULL,
   `contract_signing_date` date NOT NULL,
-  `grace_period_days` int(11) DEFAULT 0,
-  `contract_duration_months` int(11) DEFAULT 0,
-  `contract_duration_days` int(11) DEFAULT 0,
-  `equip_shifts_contract` int(11) DEFAULT 0 COMMENT 'عدد الورديات في العقد',
-  `shift_contract` int(11) DEFAULT 0 COMMENT 'ساعات الوردية للعقد',
-  `equip_total_contract_daily` int(11) DEFAULT 0 COMMENT 'إجمالي العقد اليومي',
-  `total_contract_permonth` int(11) DEFAULT 0 COMMENT 'إجمالي العقد شهرياً',
-  `total_contract_units` int(11) DEFAULT 0 COMMENT 'إجمالي وحدات العقد',
+  `grace_period_days` int DEFAULT '0',
+  `contract_duration_months` int DEFAULT '0',
+  `contract_duration_days` int DEFAULT '0',
+  `equip_shifts_contract` int DEFAULT '0' COMMENT 'عدد الورديات في العقد',
+  `shift_contract` int DEFAULT '0' COMMENT 'ساعات الوردية للعقد',
+  `equip_total_contract_daily` int DEFAULT '0' COMMENT 'إجمالي العقد اليومي',
+  `total_contract_permonth` int DEFAULT '0' COMMENT 'إجمالي العقد شهرياً',
+  `total_contract_units` int DEFAULT '0' COMMENT 'إجمالي وحدات العقد',
   `actual_start` date DEFAULT NULL,
   `actual_end` date DEFAULT NULL,
-  `transportation` text DEFAULT NULL,
-  `accommodation` text DEFAULT NULL,
-  `place_for_living` text DEFAULT NULL,
-  `workshop` text DEFAULT NULL,
-  `equip_type` varchar(100) DEFAULT NULL,
-  `equip_size` int(11) DEFAULT NULL,
-  `equip_count` int(11) DEFAULT 0,
-  `equip_target_per_month` int(11) DEFAULT 0,
-  `equip_total_month` int(11) DEFAULT 0,
-  `equip_total_contract` int(11) DEFAULT 0,
-  `mach_type` varchar(100) DEFAULT NULL,
-  `mach_size` int(11) DEFAULT NULL,
-  `mach_count` int(11) DEFAULT 0,
-  `mach_target_per_month` int(11) DEFAULT 0,
-  `mach_total_month` int(11) DEFAULT 0,
-  `mach_total_contract` int(11) DEFAULT 0,
-  `hours_monthly_target` int(11) DEFAULT 0,
-  `forecasted_contracted_hours` int(11) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
-  `daily_work_hours` varchar(20) DEFAULT NULL,
-  `daily_operators` varchar(20) DEFAULT NULL,
-  `first_party` varchar(255) DEFAULT NULL,
-  `second_party` varchar(255) DEFAULT NULL,
-  `witness_one` varchar(255) DEFAULT NULL,
-  `witness_two` varchar(255) DEFAULT NULL,
-  `price_currency_contract` varchar(50) DEFAULT NULL COMMENT 'عملة العقد (دولار/جنيه)',
-  `paid_contract` varchar(100) DEFAULT NULL COMMENT 'المبلغ المدفوع',
-  `payment_time` varchar(50) DEFAULT NULL COMMENT 'وقت الدفع (مقدم/مؤخر)',
-  `guarantees` text DEFAULT NULL COMMENT 'الضمانات',
+  `transportation` mediumtext COLLATE utf8mb4_unicode_ci,
+  `accommodation` mediumtext COLLATE utf8mb4_unicode_ci,
+  `place_for_living` mediumtext COLLATE utf8mb4_unicode_ci,
+  `workshop` mediumtext COLLATE utf8mb4_unicode_ci,
+  `equip_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `equip_size` int DEFAULT NULL,
+  `equip_count` int DEFAULT '0',
+  `equip_target_per_month` int DEFAULT '0',
+  `equip_total_month` int DEFAULT '0',
+  `equip_total_contract` int DEFAULT '0',
+  `mach_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `mach_size` int DEFAULT NULL,
+  `mach_count` int DEFAULT '0',
+  `mach_target_per_month` int DEFAULT '0',
+  `mach_total_month` int DEFAULT '0',
+  `mach_total_contract` int DEFAULT '0',
+  `hours_monthly_target` int DEFAULT '0',
+  `forecasted_contracted_hours` int DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `daily_work_hours` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `daily_operators` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `first_party` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `second_party` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `witness_one` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `witness_two` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `price_currency_contract` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'عملة العقد (دولار/جنيه)',
+  `paid_contract` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'المبلغ المدفوع',
+  `payment_time` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'وقت الدفع (مقدم/مؤخر)',
+  `guarantees` mediumtext COLLATE utf8mb4_unicode_ci COMMENT 'الضمانات',
   `payment_date` date DEFAULT NULL COMMENT 'تاريخ الدفع',
-  `project_id` int(255) NOT NULL DEFAULT 0,
-  `project_contract_id` int(11) DEFAULT NULL COMMENT 'معرف عقد المشروع المرتبط',
-  `status` tinyint(1) DEFAULT 1 COMMENT '1=نشط, 0=موقوف',
-  `pause_reason` text DEFAULT NULL,
+  `project_id` int NOT NULL DEFAULT '0',
+  `project_contract_id` int DEFAULT NULL COMMENT 'معرف عقد المشروع المرتبط',
+  `status` tinyint(1) DEFAULT '1' COMMENT '1=نشط, 0=موقوف',
+  `pause_reason` mediumtext COLLATE utf8mb4_unicode_ci,
   `pause_date` date DEFAULT NULL COMMENT 'تاريخ إيقاف العقد',
   `resume_date` date DEFAULT NULL COMMENT 'تاريخ استئناف العقد',
-  `termination_type` varchar(50) DEFAULT NULL COMMENT 'amicable أو hardship',
-  `termination_reason` text DEFAULT NULL,
-  `merged_with` int(11) DEFAULT NULL COMMENT 'معرف العقد المدموج معه'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `termination_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'amicable أو hardship',
+  `termination_reason` mediumtext COLLATE utf8mb4_unicode_ci,
+  `merged_with` int DEFAULT NULL COMMENT 'معرف العقد المدموج معه',
+  PRIMARY KEY (`id`),
+  KEY `idx_project_contract` (`project_contract_id`),
+  KEY `fk_supplierscontracts_supplier` (`supplier_id`),
+  KEY `fk_supplierscontracts_project` (`project_id`),
+  KEY `fk_supplierscontracts_merged` (`merged_with`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `supplierscontracts`
@@ -2434,8 +4174,8 @@ INSERT INTO `supplierscontracts` (`id`, `company_id`, `supplier_id`, `contract_s
 (2, 4, 3, '2026-04-01', 10, 0, 21, 70, 88, 87, 6, 3, '2026-04-10', '2026-04-30', 'مالك المشروع', 'مالك المعدة', 'مالك المشروع', 'مالك المعدة', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 50, 2300, '2026-04-13 13:19:02', NULL, '20', '36', 'Pariatur Debitis ex', 'Nemo debitis eveniet', 'Non maiores inventor', 'Culpa nemo nisi nih', 'دولار', 'Deleniti est qui nih', 'مقدم', 'Magna quam id delen', '1995-05-14', 2, 2, 1, NULL, NULL, NULL, NULL, NULL, NULL),
 (4, 4, 5, '2025-11-25', 5, 0, 151, 2, 10, 20, 600, 3000, '2025-12-01', '2026-04-30', 'مالك المعدة', 'مالك المشروع', 'مالك المشروع', 'مالك المعدة', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 10, 1510, '2026-04-28 10:45:08', '2026-04-28 10:46:57', '20', '1', 'شركة إكوبيشن للإستثمار المحدودة', 'شركة صابركو للإنشاءات الهندسية والمقاولات المحدودة ', 'محمد فيصل محمد صابر', 'يس سيدأحمد محمدالأمين الحسن', 'دولار', '', '', '', '0000-00-00', 4, 5, 1, NULL, NULL, NULL, NULL, NULL, NULL),
 (5, 4, 6, '2025-11-26', 4, 0, 151, 2, 10, 20, 600, 3000, '2025-12-01', '2026-04-30', 'مالك المعدة', 'مالك المشروع', 'مالك المشروع', 'مالك المعدة', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 20, 3000, '2026-04-28 10:52:36', NULL, '20', '1', 'شركة إكوبيشن للإستثمار المحدودة', 'عمر هشام فضل المولى أحمد', 'محمد فيصل محمد صابر', 'يس سيدأحمد محمدالأمين الحسن', 'دولار', '', '', '', '0000-00-00', 4, 5, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(6, 4, 8, '2026-04-26', 5, 0, 90, 2, 10, 20, 600, 1800, '2026-05-04', '2026-08-01', 'مالك المعدة', 'مالك المشروع', 'مالك المشروع', 'مالك المعدة', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 10, 900, '2026-05-07 06:22:38', '2026-05-07 06:40:28', '20', '1', '', '', '', '', 'دولار', '', ' مؤخر', '', '2026-08-08', 4, 5, 1, NULL, NULL, NULL, NULL, NULL, NULL),
-(7, 4, 7, '2026-05-01', 2, 1, 36, 0, 0, 0, 0, 0, '2026-07-09', '2026-08-14', '', '', '', '', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 60, 3480, '2026-05-12 12:08:27', '2026-05-13 08:56:16', '20', '0', '', '', '', '', 'دولار', '2000', 'مقدم', '', '0000-00-00', 4, 4, 1, NULL, NULL, NULL, NULL, NULL, NULL);
+(6, 4, 8, '2026-04-26', 5, 0, 89, 2, 10, 20, 600, 1800, '2026-05-04', '2026-08-01', 'مالك المعدة', 'مالك المشروع', 'مالك المشروع', 'مالك المعدة', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 10, 890, '2026-05-07 06:22:38', '2026-06-08 11:39:43', '20', '1', '', '', '', '', 'دولار', '', ' مؤخر', '', '2026-08-08', 4, 5, 1, NULL, NULL, NULL, NULL, NULL, NULL),
+(7, 4, 7, '2026-05-01', 2, 1, 36, 0, 0, 0, 0, 0, '2026-07-09', '2026-08-14', '', '', '', '', NULL, NULL, 0, 0, 0, 0, NULL, NULL, 0, 0, 0, 0, 80, 2880, '2026-05-12 12:08:27', '2026-06-08 12:09:29', '20', '0', '', '', '', '', 'دولار', '2000', 'مقدم', '', '0000-00-00', 4, 4, 1, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2443,14 +4183,18 @@ INSERT INTO `supplierscontracts` (`id`, `company_id`, `supplier_id`, `contract_s
 -- Table structure for table `supplier_contract_notes`
 --
 
-CREATE TABLE `supplier_contract_notes` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `contract_id` int(11) NOT NULL,
-  `note` text NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `created_by` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `supplier_contract_notes`;
+CREATE TABLE IF NOT EXISTS `supplier_contract_notes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `contract_id` int NOT NULL,
+  `note` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `contract_id` (`contract_id`),
+  KEY `fk_supplier_contract_notes_created_by` (`created_by`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `supplier_contract_notes`
@@ -2467,280 +4211,291 @@ INSERT INTO `supplier_contract_notes` (`id`, `company_id`, `contract_id`, `note`
 -- Table structure for table `timesheet`
 --
 
-CREATE TABLE `timesheet` (
-  `id` int(11) NOT NULL,
-  `company_id` int(11) DEFAULT NULL,
-  `operator` varchar(20) NOT NULL,
-  `driver` varchar(20) NOT NULL,
-  `shift` varchar(100) NOT NULL,
-  `date` varchar(30) NOT NULL,
-  `shift_hours` float DEFAULT 0,
-  `executed_hours` float DEFAULT 0,
-  `bucket_hours` float DEFAULT 0,
-  `jackhammer_hours` float DEFAULT 0,
-  `extra_hours` float DEFAULT 0,
-  `extra_hours_total` float DEFAULT 0,
-  `standby_hours` float DEFAULT 0,
-  `dependence_hours` float DEFAULT 0,
-  `total_work_hours` float DEFAULT 0,
-  `work_notes` text DEFAULT NULL,
-  `hr_fault` float DEFAULT 0,
-  `maintenance_fault` float DEFAULT 0,
-  `marketing_fault` float DEFAULT 0,
-  `approval_fault` float DEFAULT 0,
-  `other_fault_hours` float DEFAULT 0,
-  `total_fault_hours` float DEFAULT 0,
-  `fault_notes` text DEFAULT NULL,
-  `start_seconds` int(11) DEFAULT 0,
-  `start_minutes` int(11) DEFAULT 0,
-  `start_hours` int(11) DEFAULT 0,
-  `end_seconds` int(11) DEFAULT 0,
-  `end_minutes` int(11) DEFAULT 0,
-  `end_hours` int(11) DEFAULT 0,
-  `counter_diff` varchar(255) DEFAULT '0',
-  `fault_type` varchar(255) DEFAULT NULL,
-  `fault_department` varchar(255) DEFAULT NULL,
-  `fault_part` varchar(255) DEFAULT NULL,
-  `fault_details` text DEFAULT NULL,
-  `general_notes` text DEFAULT NULL,
-  `operator_hours` float DEFAULT 0,
-  `machine_standby_hours` float DEFAULT 0,
-  `jackhammer_standby_hours` float DEFAULT 0,
-  `bucket_standby_hours` float DEFAULT 0,
-  `extra_operator_hours` float DEFAULT 0,
-  `operator_standby_hours` float DEFAULT 0,
-  `operator_notes` text DEFAULT NULL,
-  `tons_count` decimal(10,2) DEFAULT 0.00 COMMENT 'عدد الأطنان - للنوع 2 (القلاب)',
-  `trips_count` int(11) DEFAULT 0 COMMENT 'عدد النقلات - للنوع 2 (القلاب)',
-  `transport_type` varchar(50) DEFAULT NULL,
-  `meters_type` varchar(50) DEFAULT NULL COMMENT 'نوع الأمتار - للنوع 3 (الخرمات)',
-  `meters_count` decimal(10,2) DEFAULT 0.00 COMMENT 'عدد الأمتار - للنوع 3 (الخرمات)',
-  `drilling_holes_count` int(11) DEFAULT 0,
-  `drilling_depth` decimal(10,2) DEFAULT 0.00,
-  `type` varchar(20) NOT NULL,
-  `user_id` int(50) NOT NULL DEFAULT 0,
-  `time_notes` text NOT NULL DEFAULT 'لاتوجد ملاحظات',
-  `status` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+DROP TABLE IF EXISTS `timesheet`;
+CREATE TABLE IF NOT EXISTS `timesheet` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int DEFAULT NULL,
+  `operator` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `driver` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `shift` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `date` date NOT NULL,
+  `shift_hours` float DEFAULT '0',
+  `executed_hours` float DEFAULT '0',
+  `bucket_hours` float DEFAULT '0',
+  `jackhammer_hours` float DEFAULT '0',
+  `extra_hours` float DEFAULT '0',
+  `extra_hours_total` float DEFAULT '0',
+  `standby_hours` float DEFAULT '0',
+  `dependence_hours` float DEFAULT '0',
+  `total_work_hours` float DEFAULT '0',
+  `work_notes` mediumtext COLLATE utf8mb4_unicode_ci,
+  `hr_fault` float DEFAULT '0',
+  `maintenance_fault` float DEFAULT '0',
+  `marketing_fault` float DEFAULT '0',
+  `approval_fault` float DEFAULT '0',
+  `other_fault_hours` float DEFAULT '0',
+  `total_fault_hours` float DEFAULT '0',
+  `fault_notes` mediumtext COLLATE utf8mb4_unicode_ci,
+  `start_seconds` int DEFAULT '0',
+  `start_minutes` int DEFAULT '0',
+  `start_hours` int DEFAULT '0',
+  `end_seconds` int DEFAULT '0',
+  `end_minutes` int DEFAULT '0',
+  `end_hours` int DEFAULT '0',
+  `counter_diff` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '0',
+  `fault_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fault_department` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fault_part` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fault_details` mediumtext COLLATE utf8mb4_unicode_ci,
+  `general_notes` mediumtext COLLATE utf8mb4_unicode_ci,
+  `operator_hours` float DEFAULT '0',
+  `machine_standby_hours` float DEFAULT '0',
+  `jackhammer_standby_hours` float DEFAULT '0',
+  `bucket_standby_hours` float DEFAULT '0',
+  `extra_operator_hours` float DEFAULT '0',
+  `operator_standby_hours` float DEFAULT '0',
+  `operator_notes` mediumtext COLLATE utf8mb4_unicode_ci,
+  `tons_count` decimal(10,2) DEFAULT '0.00' COMMENT 'عدد الأطنان - للنوع 2 (القلاب)',
+  `trips_count` int DEFAULT '0' COMMENT 'عدد النقلات - للنوع 2 (القلاب)',
+  `transport_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meters_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'نوع الأمتار - للنوع 3 (الخرمات)',
+  `meters_count` decimal(10,2) DEFAULT '0.00' COMMENT 'عدد الأمتار - للنوع 3 (الخرمات)',
+  `drilling_holes_count` int DEFAULT '0',
+  `drilling_depth` decimal(10,2) DEFAULT '0.00',
+  `type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` int NOT NULL DEFAULT '0',
+  `time_notes` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` tinyint(1) DEFAULT '1',
+  `client_uuid` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_timesheet_client_uuid` (`client_uuid`),
+  KEY `idx_timesheet_updated_at` (`updated_at`),
+  KEY `idx_timesheet_date` (`date`)
+) ENGINE=InnoDB AUTO_INCREMENT=257 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `timesheet`
 --
 
-INSERT INTO `timesheet` (`id`, `company_id`, `operator`, `driver`, `shift`, `date`, `shift_hours`, `executed_hours`, `bucket_hours`, `jackhammer_hours`, `extra_hours`, `extra_hours_total`, `standby_hours`, `dependence_hours`, `total_work_hours`, `work_notes`, `hr_fault`, `maintenance_fault`, `marketing_fault`, `approval_fault`, `other_fault_hours`, `total_fault_hours`, `fault_notes`, `start_seconds`, `start_minutes`, `start_hours`, `end_seconds`, `end_minutes`, `end_hours`, `counter_diff`, `fault_type`, `fault_department`, `fault_part`, `fault_details`, `general_notes`, `operator_hours`, `machine_standby_hours`, `jackhammer_standby_hours`, `bucket_standby_hours`, `extra_operator_hours`, `operator_standby_hours`, `operator_notes`, `tons_count`, `trips_count`, `transport_type`, `meters_type`, `meters_count`, `drilling_holes_count`, `drilling_depth`, `type`, `user_id`, `time_notes`, `status`) VALUES
-(34, 4, '5', '8', 'D', '2026-10-01', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(35, 4, '5', '9', 'N', '2026-10-01', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(36, 4, '5', '8', 'D', '2026-10-02', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(37, 4, '5', '12', 'N', '2026-10-02', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(38, 4, '5', '8', 'D', '2026-10-03', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(39, 4, '5', '8', 'N', '2026-10-03', 10, 8, 0, 0, 0, 0, 1, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(40, 4, '5', '8', 'D', '2026-10-04', 10, 6, 0, 0, 0, 0, 4, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '6 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 6, 4, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(41, 4, '5', '12', 'N', '2026-10-04', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(42, 4, '5', '8', 'D', '2026-10-05', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(43, 4, '5', '12', 'N', '2026-10-05', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(44, 4, '5', '11', 'D', '2026-10-06', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(45, 4, '5', '8', 'N', '2026-10-06', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '17 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(46, 4, '5', '9', 'D', '2026-10-07', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(47, 4, '5', '10', 'N', '2026-10-07', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(48, 4, '5', '9', 'D', '2026-10-08', 10, 6, 0, 0, 0, 0, 4, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '6 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 6, 4, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(49, 4, '5', '10', 'N', '2026-10-08', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(50, 4, '5', '11', 'D', '2026-10-09', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(51, 4, '5', '12', 'N', '2026-10-09', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(52, 4, '5', '12', 'D', '2026-10-10', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(53, 4, '5', '8', 'N', '2026-10-10', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(54, 4, '5', '12', 'D', '2026-10-11', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(55, 4, '5', '11', 'N', '2026-10-11', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(56, 4, '5', '', 'D', '2026-10-12', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(57, 4, '5', '12', 'N', '2026-10-12', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(58, 4, '5', '10', 'D', '2026-10-13', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(59, 4, '5', '8', 'N', '2026-10-13', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(60, 4, '5', '8', 'D', '2026-10-14', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(61, 4, '5', '10', 'N', '2026-10-14', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(62, 4, '5', '9', 'D', '2026-10-15', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(63, 4, '5', '11', 'N', '2026-10-15', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(64, 4, '5', '10', 'D', '2026-10-16', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(65, 4, '5', '10', 'N', '2026-10-16', 10, 2, 0, 0, 0, 0, 0.5, 0, 2.5, '', 0, 7.5, 0, 0, 0, 7.5, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 2, 0.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(66, 4, '5', '10', 'D', '2026-10-17', 10, 6, 0, 0, 0, 0, 3, 1, 9, '', 0, 0, 0, 0, 0, 1, 'لعدم توفر قلابات', 0, 0, 0, 0, 0, 0, '6 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 6, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(67, 4, '5', '8', 'N', '2026-10-17', 10, 5, 0, 0, 0, 0, 0, 0, 5, '', 5, 0, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 0, '5 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 5, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(68, 4, '5', '9', 'D', '2026-10-18', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(69, 4, '5', '9', 'N', '2026-10-18', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(70, 4, '5', '11', 'D', '2026-10-19', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(71, 4, '5', '12', 'N', '2026-10-19', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(72, 4, '5', '10', 'D', '2026-10-20', 10, 8, 0, 0, 0, 0, 1.5, 0, 9.5, '', 0.5, 0, 0, 0, 0, 0.5, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(73, 4, '5', '8', 'N', '2026-10-20', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(74, 4, '5', '8', 'D', '2026-10-21', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(75, 4, '5', '11', 'N', '2026-10-21', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(76, 4, '5', '9', 'D', '2026-10-22', 10, 4, 0, 0, 0, 0, 1, 0, 5, '', 0, 5, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 0, '4 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 4, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(77, 4, '5', '12', 'N', '2026-10-22', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(78, 4, '5', '10', 'D', '2026-10-23', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(79, 4, '5', '11', 'N', '2026-10-23', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(80, 4, '5', '11', 'D', '2026-10-24', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(81, 4, '5', '9', 'N', '2026-10-24', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(82, 4, '5', '12', 'D', '2026-10-25', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(83, 4, '5', '12', 'N', '2026-10-25', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(84, 4, '5', '12', 'D', '2026-10-26', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(85, 4, '5', '9', 'N', '2026-10-26', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(86, 4, '5', '9', 'D', '2026-10-27', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(87, 4, '5', '8', 'N', '2026-10-27', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(88, 4, '5', '8', 'D', '2026-10-28', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(89, 4, '5', '9', 'N', '2026-10-28', 10, 5, 0, 0, 0, 0, 1.5, 0, 6.5, '', 0, 3.5, 0, 0, 0, 3.5, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 5, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(90, 4, '5', '11', 'D', '2026-10-29', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(91, 4, '5', '11', 'N', '2026-10-29', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(92, 4, '5', '11', 'D', '2026-10-30', 10, 7, 0, 0, 0, 0, 2.5, 0, 9.5, '', 0.5, 0, 0, 0, 0, 0.5, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 2.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(93, 4, '5', '12', 'N', '2026-10-30', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(94, 4, '5', '8', 'D', '2026-10-31', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(95, 4, '5', '8', 'N', '2026-10-31', 10, 8, 0, 0, 0, 0, 1, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(96, 4, '5', '12', 'D', '2026-11-01', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(97, 4, '5', '10', 'N', '2026-11-01', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(98, 4, '5', '11', 'D', '2026-11-02', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(99, 4, '5', '8', 'N', '2026-11-02', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(100, 4, '5', '10', 'D', '2026-11-03', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(101, 4, '5', '9', 'N', '2026-11-03', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(102, 4, '5', '8', 'D', '2026-11-04', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(103, 4, '5', '10', 'N', '2026-11-04', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(104, 4, '5', '12', 'D', '2026-11-05', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(105, 4, '5', '9', 'N', '2026-11-05', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(106, 4, '5', '9', 'D', '2026-11-06', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(107, 4, '5', '12', 'N', '2026-11-06', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(108, 4, '5', '12', 'D', '2026-11-07', 10, 8, 0, 0, 0, 0, 1, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(109, 4, '5', '8', 'N', '2026-11-07', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(110, 4, '5', '10', 'D', '2026-11-08', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(111, 4, '5', '10', 'N', '2026-11-08', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(112, 4, '5', '9', 'D', '2026-11-09', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(113, 4, '5', '8', 'N', '2026-11-09', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(114, 4, '5', '10', 'D', '2026-11-10', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(115, 4, '5', '8', 'N', '2026-11-10', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(116, 4, '5', '12', 'D', '2026-11-11', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 10, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(117, 4, '5', '9', 'N', '2026-11-11', 10, 7, 0, 0, 0, 0, 1.5, 0, 8.5, '', 0, 1.5, 0, 0, 0, 1.5, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(118, 4, '5', '12', 'D', '2026-11-12', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(119, 4, '5', '12', 'N', '2026-11-12', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(120, 4, '5', '11', 'D', '2026-11-13', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(121, 4, '5', '12', 'N', '2026-11-13', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(122, 4, '5', '9', 'D', '2026-11-14', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(123, 4, '5', '11', 'N', '2026-11-14', 10, 7, 0, 0, 0, 0, 2, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(124, 4, '5', '10', 'D', '2026-11-15', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(125, 4, '5', '12', 'N', '2026-11-15', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(126, 4, '5', '9', 'D', '2026-11-16', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(127, 4, '5', '10', 'N', '2026-11-16', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(128, 4, '5', '', 'D', '2026-11-17', 10, 8, 0, 0, 0, 0, 1.5, 0, 9.5, '', 0, 0.5, 0, 0, 0, 0.5, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(129, 4, '5', '12', 'N', '2026-11-17', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(130, 4, '5', '8', 'D', '2026-11-18', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(131, 4, '5', '8', 'N', '2026-11-18', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(132, 4, '5', '8', 'D', '2026-11-19', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(133, 4, '5', '8', 'N', '2026-11-19', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(134, 4, '5', '10', 'D', '2026-11-20', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(135, 4, '5', '9', 'N', '2026-11-20', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(136, 4, '5', '12', 'D', '2026-11-21', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(137, 4, '5', '9', 'N', '2026-11-21', 10, 9, 0, 0, 0, 0, 0, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 9, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(138, 4, '5', '11', 'D', '2026-11-22', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(139, 4, '5', '8', 'N', '2026-11-22', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(140, 4, '5', '10', 'D', '2026-11-23', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(141, 4, '5', '11', 'N', '2026-11-23', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(142, 4, '5', '8', 'D', '2026-11-24', 10, 4, 0, 0, 0, 0, 0, 0, 4, '', 0, 6, 0, 0, 0, 6, '', 0, 0, 0, 0, 0, 0, '6 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 4, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(143, 4, '5', '8', 'N', '2026-11-24', 10, 7, 0, 0, 0, 0, 1, 0, 8, '', 0, 2, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(144, 4, '5', '', 'D', '2026-11-25', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(145, 4, '5', '8', 'N', '2026-11-25', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(146, 4, '5', '9', 'D', '2026-11-26', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(147, 4, '5', '9', 'N', '2026-11-26', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(148, 4, '5', '10', 'D', '2026-11-27', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(149, 4, '5', '8', 'N', '2026-11-27', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(150, 4, '5', '12', 'D', '2026-11-28', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(151, 4, '5', '', 'N', '2026-11-28', 10, 7, 0, 0, 0, 0, 2, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(152, 4, '5', '12', 'D', '2026-11-29', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(153, 4, '5', '8', 'N', '2026-11-29', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(154, 4, '5', '9', 'D', '2026-11-30', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(155, 4, '5', '11', 'N', '2026-11-30', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(156, 4, '5', '11', 'D', '2026-12-01', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(157, 4, '5', '9', 'N', '2026-12-01', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(158, 4, '5', '11', 'D', '2026-12-02', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(159, 4, '5', '11', 'N', '2026-12-02', 10, 8, 0, 0, 0, 0, 1.5, 0, 9.5, '', 0.5, 0, 0, 0, 0, 0.5, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(160, 4, '5', '12', 'D', '2026-12-03', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(161, 4, '5', '11', 'N', '2026-12-03', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(162, 4, '5', '10', 'D', '2026-12-04', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(163, 4, '5', '8', 'N', '2026-12-04', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(164, 4, '5', '12', 'D', '2026-12-05', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(165, 4, '5', '', 'N', '2026-12-05', 10, 8, 0, 0, 0, 0, 1, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(166, 4, '5', '8', 'D', '2026-12-06', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(167, 4, '5', '12', 'N', '2026-12-06', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(168, 4, '5', '12', 'D', '2026-12-07', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(169, 4, '5', '12', 'N', '2026-12-07', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(170, 4, '5', '', 'D', '2026-12-08', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(171, 4, '5', '12', 'N', '2026-12-08', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(172, 4, '5', '', 'D', '2026-12-09', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(173, 4, '5', '11', 'N', '2026-12-09', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(174, 4, '5', '12', 'D', '2026-12-10', 10, 6, 0, 0, 0, 0, 4, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '6 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 6, 4, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(175, 4, '5', '12', 'N', '2026-12-10', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(176, 4, '5', '', 'D', '2026-12-11', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(177, 4, '5', '', 'N', '2026-12-11', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(178, 4, '5', '12', 'D', '2026-12-12', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(179, 4, '5', '10', 'N', '2026-12-12', 10, 7, 0, 0, 0, 0, 2, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(180, 4, '5', '10', 'D', '2026-12-13', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(181, 4, '5', '11', 'N', '2026-12-13', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(182, 4, '5', '10', 'D', '2026-12-14', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(183, 4, '5', '8', 'N', '2026-12-14', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(184, 4, '5', '', 'D', '2026-12-15', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(185, 4, '5', '12', 'N', '2026-12-15', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(186, 4, '5', '8', 'D', '2026-12-16', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(187, 4, '5', '12', 'N', '2026-12-16', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(188, 4, '5', '10', 'D', '2026-12-17', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(189, 4, '5', '9', 'N', '2026-12-17', 10, 4, 0, 0, 0, 0, 1, 0, 5, '', 0, 5, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 0, '4 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 4, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(190, 4, '5', '9', 'D', '2026-12-18', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(191, 4, '5', '12', 'N', '2026-12-18', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(192, 4, '5', '12', 'D', '2026-12-19', 10, 5, 0, 0, 0, 0, 5, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '5 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 5, 5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(193, 4, '5', '12', 'N', '2026-12-19', 10, 8, 0, 0, 0, 0, 1, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(194, 4, '5', '', 'D', '2026-12-20', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(195, 4, '5', '10', 'N', '2026-12-20', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(196, 4, '5', '8', 'D', '2026-12-21', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(197, 4, '5', '9', 'N', '2026-12-21', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(198, 4, '5', '8', 'D', '2026-12-22', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(199, 4, '5', '9', 'N', '2026-12-22', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(200, 4, '5', '12', 'D', '2026-12-23', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(201, 4, '5', '10', 'N', '2026-12-23', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(202, 4, '5', '10', 'D', '2026-12-24', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(203, 4, '5', '10', 'N', '2026-12-24', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(204, 4, '5', '8', 'D', '2026-12-25', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(205, 4, '5', '', 'N', '2026-12-25', 10, 8, 0, 0, 0, 0, 1.5, 0, 9.5, '', 0, 0.5, 0, 0, 0, 0.5, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(206, 4, '5', '10', 'D', '2026-12-26', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(207, 4, '5', '', 'N', '2026-12-26', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(208, 4, '5', '9', 'D', '2026-12-27', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(209, 4, '5', '10', 'N', '2026-12-27', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(210, 4, '5', '11', 'D', '2026-12-28', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(211, 4, '5', '11', 'N', '2026-12-28', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(212, 4, '5', '8', 'D', '2026-12-29', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(213, 4, '5', '', 'N', '2026-12-29', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(214, 4, '5', '9', 'D', '2026-12-30', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(215, 4, '5', '10', 'N', '2026-12-30', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(216, 4, '5', '9', 'D', '2026-12-31', 10, 7, 0, 0, 0, 0, 0, 0, 7, '', 0, 3, 0, 0, 0, 3, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(217, 4, '5', '8', 'N', '2026-12-31', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1),
-(222, 4, '12', '3', 'D', '2026-04-27', 10, 8, 4, 4, 0, 0, 0, 0, 8, '', 0, 0, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', 'اضراب ساق', 8, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(223, 4, '12', '4', 'N', '2026-04-27', 10, 10, 0, 0, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(224, 4, '12', '3', 'N', '2026-04-27', 10, 10, 0, 0, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(225, 4, '12', '3', 'D', '2026-04-28', 10, 8, 4, 4, 0, 0, 2, 2, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 9000, 0, 0, 9008, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 2, 0, 0, 0, 2, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(226, 4, '13', '23', 'D', '2025-12-01', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل هيدروليك', 'الدوران', 'جهاز الدوران', '', '', 0, 0, 0, 0, 0, 10, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1),
-(227, 4, '13', '23', 'N', '2025-12-01', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, 'مشكلة دوران', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل صيانة', 'أعطال الميكانيكيا ', 'جهاز الدوران ', '', '', 0, 0, 0, 0, 0, 10, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1),
-(228, 4, '13', '23', 'N', '2025-12-01', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل هيدروليك', 'الدوران', 'جهاز الدوران', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1),
-(229, 4, '13', '23', 'D', '2025-12-02', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل هيدروليك', 'الدوران', 'جهاز الدوران', '', '', 0, 0, 0, 0, 0, 10, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1),
-(230, 4, '13', '23', 'N', '2025-12-02', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 10, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'غير مذكور', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1),
-(231, 4, '13', '23', 'D', '2025-12-03', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 10, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1),
-(232, 4, '14', '24', 'D', '2025-12-01', 10, 9, 0, 0, 0, 0, 0, 0, 9, '', 0, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 10, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '2', 14, 'لاتوجد ملاحظات', 1),
-(233, 4, '14', '25', 'N', '2025-12-01', 10, 10, 0, 0, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 10, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '2', 14, 'لاتوجد ملاحظات', 1),
-(234, 4, '13', '23', 'D', '2026-05-02', 10, 5, 0, 0, 0, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, '', 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1),
-(235, 4, '12', '3', 'D', '2026-05-05', 10, 5, 5, 0, 0, 0, 0, 0, 5, '', 0, 5, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'أعطال إدارة التشغيل', 'غيار زيت', 'غيار زيت الماكينة', '', '', 0, 0, 0, 0, 0, 5, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1),
-(236, 4, '12', '3', 'D', '2026-05-05', 10, 9, 9, 0, 0, 0, 0, 0, 9, '', 0, 1, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل معدة', 'أعطال الميكانيكا', 'المحرك', 'EX-EQF-MEC-01-10 | ارتفاع حرارة المحرك', '', 9, 0, 0, 0, 0, 1, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1);
-INSERT INTO `timesheet` (`id`, `company_id`, `operator`, `driver`, `shift`, `date`, `shift_hours`, `executed_hours`, `bucket_hours`, `jackhammer_hours`, `extra_hours`, `extra_hours_total`, `standby_hours`, `dependence_hours`, `total_work_hours`, `work_notes`, `hr_fault`, `maintenance_fault`, `marketing_fault`, `approval_fault`, `other_fault_hours`, `total_fault_hours`, `fault_notes`, `start_seconds`, `start_minutes`, `start_hours`, `end_seconds`, `end_minutes`, `end_hours`, `counter_diff`, `fault_type`, `fault_department`, `fault_part`, `fault_details`, `general_notes`, `operator_hours`, `machine_standby_hours`, `jackhammer_standby_hours`, `bucket_standby_hours`, `extra_operator_hours`, `operator_standby_hours`, `operator_notes`, `tons_count`, `trips_count`, `transport_type`, `meters_type`, `meters_count`, `drilling_holes_count`, `drilling_depth`, `type`, `user_id`, `time_notes`, `status`) VALUES
-(237, 4, '12', '4', 'D', '2026-05-13', 10, 6, 6, 0, 0, 0, 0, 0, 6, '', 4, 0, 0, 0, 0, 4, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل HR', 'عدم توفر المشغل', 'عدم توفر المشغل', 'EX-HRF-HRA-00-02 | تأخر مشغل الوردية البديلة', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(238, 4, '13', '4', 'D', '2026-05-05', 10, 8, 5, 3, 0, 0, 0, 0, 8, '', 0, 2, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل معدة', 'أعطال الكهرباء', 'البطارية', 'EX-EQF-ELE-01-02 | بطارية تالفة', '', 0, 0, 0, 0, 0, 2, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1),
-(239, 4, '13', '23', 'N', '2026-05-05', 10, 8, 4, 4, 0, 0, 0, 0, 8, '', 1, 1, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل HR', 'غياب المشغل', 'غياب المشغل', 'EX-HRF-HRB-00-02 | إجازة مشغل دون بديل', '', 0, 0, 0, 0, 0, 1, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(240, 4, '14', '25', 'N', '2026-09-05', 10, 10, 0, 0, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 10, 0, 0, 0, 0, 0, '', 0.00, 0, '', NULL, 0.00, 0, 0.00, '2', 12, 'لاتوجد ملاحظات', 1),
-(241, 4, '14', '25', 'D', '2026-05-09', 10, 8, 0, 0, 0, 0, 0, 0, 8, '', 1, 1, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 10, 0, 0, 0, 0, 0, '', 10.00, 2, '', NULL, 0.00, 0, 0.00, '2', 12, 'لاتوجد ملاحظات', 1),
-(242, 4, '12', '4', 'D', '2026-05-11', 10, 9, 5, 4, 0, 0, 0, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل معدة', 'أعطال الكهرباء', 'الإضاءة', 'EX-EQF-ELE-06-01 | إضاءة أمامية', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(243, 4, '12', '5', 'D', '2026-05-11', 10, 9, 7, 2, 0, 0, 0, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'توقف صيانة', 'صيانة طارئة', 'صيانة طارئة', 'EX-MNT-PME-00-02 | انقلاب', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(244, 4, '15', '2', 'N', '2026-05-11', 10, 10, 5, 5, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(245, 4, '16', '21', 'N', '2026-05-11', 10, 9, 0, 0, 0, 0, 0, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0', 'توقف اعتماد', 'اعتماد جزئي', 'اعتماد جزئي', 'DR-DEP-DPP-00-01 | تشغيل بطاقة منخفضة', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', 'امتار اخذ العينات', 16.00, 4, 4.00, '3', 12, 'لاتوجد ملاحظات', 1),
-(246, 4, '12', '4', 'D', '2026-05-16', 10, 9, 5, 3, 1, 1, 0, 0, 10, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل معدة', 'أعطال الهيدروليك', 'الطرمبة', 'EX-EQF-HYD-02-01 | طرمبة رئيسية', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(247, 4, '15', '2', 'D', '2026-05-16', 10, 10, 5, 5, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(248, 4, '12', '4', 'D', '2026-05-20', 10, 10, 5, 5, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1),
-(249, 4, '12', '', 'D', '2026-06-02', 10, 8, 6, 2, 0, 0, 0, 0, 8, '', 1, 1, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل معدة', 'أعطال التبريد والتكيف', 'الحساسات', 'EX-EQF-COL-08-01 | حساس حرارة', '', 0, 0, 0, 0, 0, 1, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1);
+INSERT INTO `timesheet` (`id`, `company_id`, `operator`, `driver`, `shift`, `date`, `shift_hours`, `executed_hours`, `bucket_hours`, `jackhammer_hours`, `extra_hours`, `extra_hours_total`, `standby_hours`, `dependence_hours`, `total_work_hours`, `work_notes`, `hr_fault`, `maintenance_fault`, `marketing_fault`, `approval_fault`, `other_fault_hours`, `total_fault_hours`, `fault_notes`, `start_seconds`, `start_minutes`, `start_hours`, `end_seconds`, `end_minutes`, `end_hours`, `counter_diff`, `fault_type`, `fault_department`, `fault_part`, `fault_details`, `general_notes`, `operator_hours`, `machine_standby_hours`, `jackhammer_standby_hours`, `bucket_standby_hours`, `extra_operator_hours`, `operator_standby_hours`, `operator_notes`, `tons_count`, `trips_count`, `transport_type`, `meters_type`, `meters_count`, `drilling_holes_count`, `drilling_depth`, `type`, `user_id`, `time_notes`, `status`, `client_uuid`, `updated_at`) VALUES
+(34, 4, '5', '8', 'D', '2026-10-01', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(35, 4, '5', '9', 'N', '2026-10-01', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(36, 4, '5', '8', 'D', '2026-10-02', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(37, 4, '5', '12', 'N', '2026-10-02', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(38, 4, '5', '8', 'D', '2026-10-03', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(39, 4, '5', '8', 'N', '2026-10-03', 10, 8, 0, 0, 0, 0, 1, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(40, 4, '5', '8', 'D', '2026-10-04', 10, 6, 0, 0, 0, 0, 4, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '6 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 6, 4, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(41, 4, '5', '12', 'N', '2026-10-04', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(42, 4, '5', '8', 'D', '2026-10-05', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(43, 4, '5', '12', 'N', '2026-10-05', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(44, 4, '5', '11', 'D', '2026-10-06', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(45, 4, '5', '8', 'N', '2026-10-06', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '17 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(46, 4, '5', '9', 'D', '2026-10-07', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(47, 4, '5', '10', 'N', '2026-10-07', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(48, 4, '5', '9', 'D', '2026-10-08', 10, 6, 0, 0, 0, 0, 4, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '6 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 6, 4, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(49, 4, '5', '10', 'N', '2026-10-08', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(50, 4, '5', '11', 'D', '2026-10-09', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(51, 4, '5', '12', 'N', '2026-10-09', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(52, 4, '5', '12', 'D', '2026-10-10', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(53, 4, '5', '8', 'N', '2026-10-10', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(54, 4, '5', '12', 'D', '2026-10-11', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(55, 4, '5', '11', 'N', '2026-10-11', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(56, 4, '5', '', 'D', '2026-10-12', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(57, 4, '5', '12', 'N', '2026-10-12', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(58, 4, '5', '10', 'D', '2026-10-13', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(59, 4, '5', '8', 'N', '2026-10-13', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(60, 4, '5', '8', 'D', '2026-10-14', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(61, 4, '5', '10', 'N', '2026-10-14', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(62, 4, '5', '9', 'D', '2026-10-15', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(63, 4, '5', '11', 'N', '2026-10-15', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(64, 4, '5', '10', 'D', '2026-10-16', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(65, 4, '5', '10', 'N', '2026-10-16', 10, 2, 0, 0, 0, 0, 0.5, 0, 2.5, '', 0, 7.5, 0, 0, 0, 7.5, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 2, 0.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(66, 4, '5', '10', 'D', '2026-10-17', 10, 6, 0, 0, 0, 0, 3, 1, 9, '', 0, 0, 0, 0, 0, 1, 'لعدم توفر قلابات', 0, 0, 0, 0, 0, 0, '6 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 6, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(67, 4, '5', '8', 'N', '2026-10-17', 10, 5, 0, 0, 0, 0, 0, 0, 5, '', 5, 0, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 0, '5 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 5, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(68, 4, '5', '9', 'D', '2026-10-18', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(69, 4, '5', '9', 'N', '2026-10-18', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(70, 4, '5', '11', 'D', '2026-10-19', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(71, 4, '5', '12', 'N', '2026-10-19', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(72, 4, '5', '10', 'D', '2026-10-20', 10, 8, 0, 0, 0, 0, 1.5, 0, 9.5, '', 0.5, 0, 0, 0, 0, 0.5, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(73, 4, '5', '8', 'N', '2026-10-20', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(74, 4, '5', '8', 'D', '2026-10-21', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(75, 4, '5', '11', 'N', '2026-10-21', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(76, 4, '5', '9', 'D', '2026-10-22', 10, 4, 0, 0, 0, 0, 1, 0, 5, '', 0, 5, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 0, '4 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 4, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(77, 4, '5', '12', 'N', '2026-10-22', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(78, 4, '5', '10', 'D', '2026-10-23', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(79, 4, '5', '11', 'N', '2026-10-23', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(80, 4, '5', '11', 'D', '2026-10-24', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(81, 4, '5', '9', 'N', '2026-10-24', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(82, 4, '5', '12', 'D', '2026-10-25', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(83, 4, '5', '12', 'N', '2026-10-25', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(84, 4, '5', '12', 'D', '2026-10-26', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(85, 4, '5', '9', 'N', '2026-10-26', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(86, 4, '5', '9', 'D', '2026-10-27', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(87, 4, '5', '8', 'N', '2026-10-27', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(88, 4, '5', '8', 'D', '2026-10-28', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(89, 4, '5', '9', 'N', '2026-10-28', 10, 5, 0, 0, 0, 0, 1.5, 0, 6.5, '', 0, 3.5, 0, 0, 0, 3.5, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 5, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(90, 4, '5', '11', 'D', '2026-10-29', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(91, 4, '5', '11', 'N', '2026-10-29', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(92, 4, '5', '11', 'D', '2026-10-30', 10, 7, 0, 0, 0, 0, 2.5, 0, 9.5, '', 0.5, 0, 0, 0, 0, 0.5, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 2.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(93, 4, '5', '12', 'N', '2026-10-30', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(94, 4, '5', '8', 'D', '2026-10-31', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(95, 4, '5', '8', 'N', '2026-10-31', 10, 8, 0, 0, 0, 0, 1, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(96, 4, '5', '12', 'D', '2026-11-01', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(97, 4, '5', '10', 'N', '2026-11-01', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(98, 4, '5', '11', 'D', '2026-11-02', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(99, 4, '5', '8', 'N', '2026-11-02', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(100, 4, '5', '10', 'D', '2026-11-03', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(101, 4, '5', '9', 'N', '2026-11-03', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(102, 4, '5', '8', 'D', '2026-11-04', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(103, 4, '5', '10', 'N', '2026-11-04', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(104, 4, '5', '12', 'D', '2026-11-05', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(105, 4, '5', '9', 'N', '2026-11-05', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(106, 4, '5', '9', 'D', '2026-11-06', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(107, 4, '5', '12', 'N', '2026-11-06', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(108, 4, '5', '12', 'D', '2026-11-07', 10, 8, 0, 0, 0, 0, 1, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(109, 4, '5', '8', 'N', '2026-11-07', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(110, 4, '5', '10', 'D', '2026-11-08', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(111, 4, '5', '10', 'N', '2026-11-08', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(112, 4, '5', '9', 'D', '2026-11-09', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(113, 4, '5', '8', 'N', '2026-11-09', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(114, 4, '5', '10', 'D', '2026-11-10', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(115, 4, '5', '8', 'N', '2026-11-10', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(116, 4, '5', '12', 'D', '2026-11-11', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 10, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(117, 4, '5', '9', 'N', '2026-11-11', 10, 7, 0, 0, 0, 0, 1.5, 0, 8.5, '', 0, 1.5, 0, 0, 0, 1.5, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(118, 4, '5', '12', 'D', '2026-11-12', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(119, 4, '5', '12', 'N', '2026-11-12', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(120, 4, '5', '11', 'D', '2026-11-13', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(121, 4, '5', '12', 'N', '2026-11-13', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(122, 4, '5', '9', 'D', '2026-11-14', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(123, 4, '5', '11', 'N', '2026-11-14', 10, 7, 0, 0, 0, 0, 2, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(124, 4, '5', '10', 'D', '2026-11-15', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(125, 4, '5', '12', 'N', '2026-11-15', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(126, 4, '5', '9', 'D', '2026-11-16', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(127, 4, '5', '10', 'N', '2026-11-16', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(128, 4, '5', '', 'D', '2026-11-17', 10, 8, 0, 0, 0, 0, 1.5, 0, 9.5, '', 0, 0.5, 0, 0, 0, 0.5, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(129, 4, '5', '12', 'N', '2026-11-17', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(130, 4, '5', '8', 'D', '2026-11-18', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(131, 4, '5', '8', 'N', '2026-11-18', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(132, 4, '5', '8', 'D', '2026-11-19', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(133, 4, '5', '8', 'N', '2026-11-19', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(134, 4, '5', '10', 'D', '2026-11-20', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(135, 4, '5', '9', 'N', '2026-11-20', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(136, 4, '5', '12', 'D', '2026-11-21', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(137, 4, '5', '9', 'N', '2026-11-21', 10, 9, 0, 0, 0, 0, 0, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 9, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(138, 4, '5', '11', 'D', '2026-11-22', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(139, 4, '5', '8', 'N', '2026-11-22', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(140, 4, '5', '10', 'D', '2026-11-23', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(141, 4, '5', '11', 'N', '2026-11-23', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(142, 4, '5', '8', 'D', '2026-11-24', 10, 4, 0, 0, 0, 0, 0, 0, 4, '', 0, 6, 0, 0, 0, 6, '', 0, 0, 0, 0, 0, 0, '6 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 4, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(143, 4, '5', '8', 'N', '2026-11-24', 10, 7, 0, 0, 0, 0, 1, 0, 8, '', 0, 2, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(144, 4, '5', '', 'D', '2026-11-25', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(145, 4, '5', '8', 'N', '2026-11-25', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(146, 4, '5', '9', 'D', '2026-11-26', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(147, 4, '5', '9', 'N', '2026-11-26', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(148, 4, '5', '10', 'D', '2026-11-27', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(149, 4, '5', '8', 'N', '2026-11-27', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(150, 4, '5', '12', 'D', '2026-11-28', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(151, 4, '5', '', 'N', '2026-11-28', 10, 7, 0, 0, 0, 0, 2, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(152, 4, '5', '12', 'D', '2026-11-29', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(153, 4, '5', '8', 'N', '2026-11-29', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(154, 4, '5', '9', 'D', '2026-11-30', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(155, 4, '5', '11', 'N', '2026-11-30', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(156, 4, '5', '11', 'D', '2026-12-01', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(157, 4, '5', '9', 'N', '2026-12-01', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(158, 4, '5', '11', 'D', '2026-12-02', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(159, 4, '5', '11', 'N', '2026-12-02', 10, 8, 0, 0, 0, 0, 1.5, 0, 9.5, '', 0.5, 0, 0, 0, 0, 0.5, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(160, 4, '5', '12', 'D', '2026-12-03', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(161, 4, '5', '11', 'N', '2026-12-03', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(162, 4, '5', '10', 'D', '2026-12-04', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(163, 4, '5', '8', 'N', '2026-12-04', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(164, 4, '5', '12', 'D', '2026-12-05', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(165, 4, '5', '', 'N', '2026-12-05', 10, 8, 0, 0, 0, 0, 1, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(166, 4, '5', '8', 'D', '2026-12-06', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(167, 4, '5', '12', 'N', '2026-12-06', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(168, 4, '5', '12', 'D', '2026-12-07', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(169, 4, '5', '12', 'N', '2026-12-07', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(170, 4, '5', '', 'D', '2026-12-08', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(171, 4, '5', '12', 'N', '2026-12-08', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(172, 4, '5', '', 'D', '2026-12-09', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(173, 4, '5', '11', 'N', '2026-12-09', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(174, 4, '5', '12', 'D', '2026-12-10', 10, 6, 0, 0, 0, 0, 4, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '6 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 6, 4, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(175, 4, '5', '12', 'N', '2026-12-10', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(176, 4, '5', '', 'D', '2026-12-11', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(177, 4, '5', '', 'N', '2026-12-11', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(178, 4, '5', '12', 'D', '2026-12-12', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(179, 4, '5', '10', 'N', '2026-12-12', 10, 7, 0, 0, 0, 0, 2, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(180, 4, '5', '10', 'D', '2026-12-13', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(181, 4, '5', '11', 'N', '2026-12-13', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(182, 4, '5', '10', 'D', '2026-12-14', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(183, 4, '5', '8', 'N', '2026-12-14', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(184, 4, '5', '', 'D', '2026-12-15', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(185, 4, '5', '12', 'N', '2026-12-15', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(186, 4, '5', '8', 'D', '2026-12-16', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(187, 4, '5', '12', 'N', '2026-12-16', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(188, 4, '5', '10', 'D', '2026-12-17', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(189, 4, '5', '9', 'N', '2026-12-17', 10, 4, 0, 0, 0, 0, 1, 0, 5, '', 0, 5, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 0, '4 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 4, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(190, 4, '5', '9', 'D', '2026-12-18', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '9 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(191, 4, '5', '12', 'N', '2026-12-18', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(192, 4, '5', '12', 'D', '2026-12-19', 10, 5, 0, 0, 0, 0, 5, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '5 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 5, 5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(193, 4, '5', '12', 'N', '2026-12-19', 10, 8, 0, 0, 0, 0, 1, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(194, 4, '5', '', 'D', '2026-12-20', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(195, 4, '5', '10', 'N', '2026-12-20', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(196, 4, '5', '8', 'D', '2026-12-21', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(197, 4, '5', '9', 'N', '2026-12-21', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(198, 4, '5', '8', 'D', '2026-12-22', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(199, 4, '5', '9', 'N', '2026-12-22', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(200, 4, '5', '12', 'D', '2026-12-23', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(201, 4, '5', '10', 'N', '2026-12-23', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(202, 4, '5', '10', 'D', '2026-12-24', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(203, 4, '5', '10', 'N', '2026-12-24', 10, 8, 0, 0, 0, 0, 2, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 8, 2, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(204, 4, '5', '8', 'D', '2026-12-25', 10, 7, 0, 0, 0, 0, 3, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 7, 3, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(205, 4, '5', '', 'N', '2026-12-25', 10, 8, 0, 0, 0, 0, 1.5, 0, 9.5, '', 0, 0.5, 0, 0, 0, 0.5, '', 0, 0, 0, 0, 0, 0, '8 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 8, 1.5, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(206, 4, '5', '10', 'D', '2026-12-26', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(207, 4, '5', '', 'N', '2026-12-26', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(208, 4, '5', '9', 'D', '2026-12-27', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(209, 4, '5', '10', 'N', '2026-12-27', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(210, 4, '5', '11', 'D', '2026-12-28', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(211, 4, '5', '11', 'N', '2026-12-28', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(212, 4, '5', '8', 'D', '2026-12-29', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20');
+INSERT INTO `timesheet` (`id`, `company_id`, `operator`, `driver`, `shift`, `date`, `shift_hours`, `executed_hours`, `bucket_hours`, `jackhammer_hours`, `extra_hours`, `extra_hours_total`, `standby_hours`, `dependence_hours`, `total_work_hours`, `work_notes`, `hr_fault`, `maintenance_fault`, `marketing_fault`, `approval_fault`, `other_fault_hours`, `total_fault_hours`, `fault_notes`, `start_seconds`, `start_minutes`, `start_hours`, `end_seconds`, `end_minutes`, `end_hours`, `counter_diff`, `fault_type`, `fault_department`, `fault_part`, `fault_details`, `general_notes`, `operator_hours`, `machine_standby_hours`, `jackhammer_standby_hours`, `bucket_standby_hours`, `extra_operator_hours`, `operator_standby_hours`, `operator_notes`, `tons_count`, `trips_count`, `transport_type`, `meters_type`, `meters_count`, `drilling_holes_count`, `drilling_depth`, `type`, `user_id`, `time_notes`, `status`, `client_uuid`, `updated_at`) VALUES
+(213, 4, '5', '', 'N', '2026-12-29', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(214, 4, '5', '9', 'D', '2026-12-30', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(215, 4, '5', '10', 'N', '2026-12-30', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(216, 4, '5', '9', 'D', '2026-12-31', 10, 7, 0, 0, 0, 0, 0, 0, 7, '', 0, 3, 0, 0, 0, 3, '', 0, 0, 0, 0, 0, 0, '7 ساعة 0 دقيقة 0 ثانية', 'عطل', '', '', '', '', 7, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(217, 4, '5', '8', 'N', '2026-12-31', 10, 9, 0, 0, 0, 0, 1, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 9, 1, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 9, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(222, 4, '12', '3', 'D', '2026-04-27', 10, 8, 4, 4, 0, 0, 0, 0, 8, '', 0, 0, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', 'اضراب ساق', 8, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(223, 4, '12', '4', 'N', '2026-04-27', 10, 10, 0, 0, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(224, 4, '12', '3', 'N', '2026-04-27', 10, 10, 0, 0, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(225, 4, '12', '3', 'D', '2026-04-28', 10, 8, 4, 4, 0, 0, 2, 2, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 9000, 0, 0, 9008, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 2, 0, 0, 0, 2, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(226, 4, '13', '23', 'D', '2025-12-01', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل هيدروليك', 'الدوران', 'جهاز الدوران', '', '', 0, 0, 0, 0, 0, 10, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(227, 4, '13', '23', 'N', '2025-12-01', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, 'مشكلة دوران', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل صيانة', 'أعطال الميكانيكيا ', 'جهاز الدوران ', '', '', 0, 0, 0, 0, 0, 10, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(228, 4, '13', '23', 'N', '2025-12-01', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل هيدروليك', 'الدوران', 'جهاز الدوران', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(229, 4, '13', '23', 'D', '2025-12-02', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل هيدروليك', 'الدوران', 'جهاز الدوران', '', '', 0, 0, 0, 0, 0, 10, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(230, 4, '13', '23', 'N', '2025-12-02', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 10, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'غير مذكور', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(231, 4, '13', '23', 'D', '2025-12-03', 10, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 10, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 10, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(232, 4, '14', '24', 'D', '2025-12-01', 10, 9, 0, 0, 0, 0, 0, 0, 9, '', 0, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 10, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '2', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(233, 4, '14', '25', 'N', '2025-12-01', 10, 10, 0, 0, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 10, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, NULL, 0.00, 0, 0.00, '2', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(234, 4, '13', '23', 'D', '2026-05-02', 10, 5, 0, 0, 0, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, NULL, '', 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(235, 4, '12', '3', 'D', '2026-05-05', 10, 5, 5, 0, 0, 0, 0, 0, 5, '', 0, 5, 0, 0, 0, 5, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'أعطال إدارة التشغيل', 'غيار زيت', 'غيار زيت الماكينة', '', '', 0, 0, 0, 0, 0, 5, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(236, 4, '12', '3', 'D', '2026-05-05', 10, 9, 9, 0, 0, 0, 0, 0, 9, '', 0, 1, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل معدة', 'أعطال الميكانيكا', 'المحرك', 'EX-EQF-MEC-01-10 | ارتفاع حرارة المحرك', '', 9, 0, 0, 0, 0, 1, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(237, 4, '12', '4', 'D', '2026-05-13', 10, 6, 6, 0, 0, 0, 0, 0, 6, '', 4, 0, 0, 0, 0, 4, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل HR', 'عدم توفر المشغل', 'عدم توفر المشغل', 'EX-HRF-HRA-00-02 | تأخر مشغل الوردية البديلة', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(238, 4, '13', '4', 'D', '2026-05-05', 10, 8, 5, 3, 0, 0, 0, 0, 8, '', 0, 2, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل معدة', 'أعطال الكهرباء', 'البطارية', 'EX-EQF-ELE-01-02 | بطارية تالفة', '', 0, 0, 0, 0, 0, 2, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 14, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(239, 4, '13', '23', 'N', '2026-05-05', 10, 8, 4, 4, 0, 0, 0, 0, 8, '', 1, 1, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل HR', 'غياب المشغل', 'غياب المشغل', 'EX-HRF-HRB-00-02 | إجازة مشغل دون بديل', '', 0, 0, 0, 0, 0, 1, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(240, 4, '14', '25', 'N', '2026-09-05', 10, 10, 0, 0, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 10, 0, 0, 0, 0, 0, '', 0.00, 0, '', NULL, 0.00, 0, 0.00, '2', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(241, 4, '14', '25', 'D', '2026-05-09', 10, 8, 0, 0, 0, 0, 0, 0, 8, '', 1, 1, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 0, 0, 0, 0, 0, 1, '', 13.00, 7, '', '', 0.00, 0, 0.00, '2', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-09 13:27:08'),
+(242, 4, '12', '4', 'D', '2026-05-11', 10, 9, 5, 4, 0, 0, 0, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل معدة', 'أعطال الكهرباء', 'الإضاءة', 'EX-EQF-ELE-06-01 | إضاءة أمامية', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(243, 4, '12', '5', 'D', '2026-05-11', 10, 9, 7, 2, 0, 0, 0, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'توقف صيانة', 'صيانة طارئة', 'صيانة طارئة', 'EX-MNT-PME-00-02 | انقلاب', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(244, 4, '15', '2', 'N', '2026-05-11', 10, 10, 5, 5, 0, 0, 0, 0, 10, '', 0, 0, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(245, 4, '16', '21', 'N', '2026-05-11', 10, 9, 0, 0, 0, 0, 0, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0', 'توقف اعتماد', 'اعتماد جزئي', 'اعتماد جزئي', 'DR-DEP-DPP-00-01 | تشغيل بطاقة منخفضة', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', 'امتار اخذ العينات', 16.00, 4, 4.00, '3', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(246, 4, '12', '4', 'D', '2026-05-16', 10, 9, 5, 3, 1, 1, 0, 0, 10, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل معدة', 'أعطال الهيدروليك', 'الطرمبة', 'EX-EQF-HYD-02-01 | طرمبة رئيسية', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(248, 4, '12', '4', 'D', '2026-05-20', 10, 8, 3, 5, 0, 0, 0, 0, 8, '', 1, 1, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 0, 0, 0, 0, 0, 1, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-08 12:40:37'),
+(249, 4, '12', '', 'D', '2026-06-02', 10, 8, 6, 2, 0, 0, 0, 0, 8, '', 1, 1, 0, 0, 0, 2, '', 0, 0, 0, 0, 0, 0, '0 ساعة 0 دقيقة 0 ثانية', 'عطل معدة', 'أعطال التبريد والتكيف', 'الحساسات', 'EX-EQF-COL-08-01 | حساس حرارة', '', 0, 0, 0, 0, 0, 1, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, NULL, '2026-06-07 16:40:20'),
+(252, 4, '12', '4', 'D', '2026-06-07', 10, 9, 2, 6, 0, 0, 0, 1, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 0, 0, 0, 0, 0, 1, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, '9e6ba75e-f378-4b49-b02b-b0b611425458', '2026-06-07 17:45:22'),
+(253, 4, '16', '10', 'N', '2026-06-07', 10, 8, 0, 0, 1, 1, 1, 1, 10, '', 0, 1, 0, 0, 0, 0, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 0, 1, 0, 0, 0, 2, '', 0.00, 0, '', '', 6.00, 4, 1.50, '3', 12, 'لاتوجد ملاحظات', 1, 'e5306170-7900-4781-94a7-d70efa7ceb5f', '2026-06-08 12:37:29'),
+(254, 4, '13', '9', 'D', '2026-06-09', 10, 6, 2, 4, 0, 0, 0, 0, 6, '', 1, 1, 1, 1, 0, 4, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 0, 0, 0, 0, 0, 2, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, '86f7099e-9ce3-4cb7-ab71-cb83492fa1c7', '2026-06-09 11:18:41'),
+(255, 4, '32', '6', 'D', '2026-06-09', 10, 9, 3, 6, 0, 0, 0, 0, 9, '', 1, 0, 0, 0, 0, 1, '', 0, 0, 0, 0, 0, 0, '0', '', '', '', '', '', 0, 0, 0, 0, 0, 0, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, '57d47fbd-7407-4e35-ab83-f07b9d08b51c', '2026-06-09 11:40:20'),
+(256, 4, '12', '4', 'D', '2026-06-10', 10, 8, 4, 4, 0, 0, 0, 0, 8, '', 0.5, 1, 0.5, 0, 0, 2, '', 0, 1, 0, 0, 0, 0, '0', '', '', '', '', '', 0, 0, 0, 0, 0, 1.5, '', 0.00, 0, '', '', 0.00, 0, 0.00, '1', 12, 'لاتوجد ملاحظات', 1, '5ff2b083-56de-4b89-bacb-98ba5043fd65', '2026-06-10 08:57:18');
 
 -- --------------------------------------------------------
 
@@ -2748,16 +4503,22 @@ INSERT INTO `timesheet` (`id`, `company_id`, `operator`, `driver`, `shift`, `dat
 -- Table structure for table `timesheet_approvals`
 --
 
-CREATE TABLE `timesheet_approvals` (
-  `id` int(11) NOT NULL,
-  `timesheet_id` int(11) NOT NULL COMMENT 'FK → timesheet.id',
-  `company_id` int(11) DEFAULT NULL,
+DROP TABLE IF EXISTS `timesheet_approvals`;
+CREATE TABLE IF NOT EXISTS `timesheet_approvals` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `timesheet_id` int NOT NULL COMMENT 'FK → timesheet.id',
+  `company_id` int DEFAULT NULL,
   `approval_level` tinyint(1) NOT NULL COMMENT '1..4',
-  `approved_by` int(11) NOT NULL COMMENT 'FK → users.id',
-  `approved_by_name` varchar(255) NOT NULL,
-  `approved_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1=اعتمد, 0=رُفض'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='اعتمادات ساعات العمل الهرمية';
+  `approved_by` int NOT NULL COMMENT 'FK → users.id',
+  `approved_by_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `approved_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1=اعتمد, 0=رُفض',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ts_level` (`timesheet_id`,`approval_level`),
+  KEY `idx_ts_id` (`timesheet_id`),
+  KEY `idx_company` (`company_id`),
+  KEY `idx_level` (`approval_level`)
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='اعتمادات ساعات العمل الهرمية';
 
 --
 -- Dumping data for table `timesheet_approvals`
@@ -2826,18 +4587,22 @@ INSERT INTO `timesheet_approvals` (`id`, `timesheet_id`, `company_id`, `approval
 -- Table structure for table `timesheet_approval_notes`
 --
 
-CREATE TABLE `timesheet_approval_notes` (
-  `id` int(11) NOT NULL,
-  `timesheet_id` int(11) NOT NULL COMMENT 'FK → timesheet.id',
-  `company_id` int(11) DEFAULT NULL,
-  `column_name` varchar(100) NOT NULL COMMENT 'اسم العمود التقني',
-  `column_label` varchar(255) NOT NULL COMMENT 'عنوان العمود بالعربية',
-  `note_text` text NOT NULL,
-  `created_by` int(11) NOT NULL COMMENT 'FK → users.id',
-  `created_by_name` varchar(255) NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `status` tinyint(1) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='ملاحظات اعتماد ساعات العمل';
+DROP TABLE IF EXISTS `timesheet_approval_notes`;
+CREATE TABLE IF NOT EXISTS `timesheet_approval_notes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `timesheet_id` int NOT NULL COMMENT 'FK → timesheet.id',
+  `company_id` int DEFAULT NULL,
+  `column_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'اسم العمود التقني',
+  `column_label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'عنوان العمود بالعربية',
+  `note_text` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_by` int NOT NULL COMMENT 'FK → users.id',
+  `created_by_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `idx_ts_id` (`timesheet_id`),
+  KEY `idx_company` (`company_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ملاحظات اعتماد ساعات العمل';
 
 --
 -- Dumping data for table `timesheet_approval_notes`
@@ -2849,7 +4614,8 @@ INSERT INTO `timesheet_approval_notes` (`id`, `timesheet_id`, `company_id`, `col
 (3, 224, 4, 'shift', 'الوردية', 'mdkl', 12, 'حسن ', '2026-05-02 12:38:55', 1),
 (4, 236, 4, 'executed_hours', 'الساعات المنفذة', 'نمثينمؤ', 12, 'حسن ', '2026-05-09 15:58:25', 1),
 (5, 245, 4, 'shift_hours', 'ساعات الوردية', 'v mvk m', 12, 'حسن ', '2026-05-11 02:17:20', 1),
-(6, 184, 4, 'marketing_fault', 'عطل تسويق', 'w;lmgfrw;l', 4, 'مسؤول التشغيل', '2026-06-02 12:39:10', 1);
+(6, 184, 4, 'marketing_fault', 'عطل تسويق', 'w;lmgfrw;l', 4, 'مسؤول التشغيل', '2026-06-02 12:39:10', 1),
+(7, 240, 4, 'shift', 'الوردية', 'ةةم', 12, 'حسن ', '2026-06-08 10:08:07', 1);
 
 -- --------------------------------------------------------
 
@@ -2857,27 +4623,37 @@ INSERT INTO `timesheet_approval_notes` (`id`, `timesheet_id`, `company_id`, `col
 -- Table structure for table `timesheet_failure_hours`
 --
 
-CREATE TABLE `timesheet_failure_hours` (
-  `id` int(11) NOT NULL,
-  `timesheet_id` int(11) NOT NULL,
-  `operation_id` int(11) NOT NULL,
-  `equipment_id` int(11) NOT NULL DEFAULT 0,
-  `failure_code_id` int(11) NOT NULL,
+DROP TABLE IF EXISTS `timesheet_failure_hours`;
+CREATE TABLE IF NOT EXISTS `timesheet_failure_hours` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `timesheet_id` int NOT NULL,
+  `operation_id` int NOT NULL,
+  `equipment_id` int NOT NULL DEFAULT '0',
+  `failure_code_id` int NOT NULL,
   `equipment_type` tinyint(1) NOT NULL COMMENT '1=حفار,2=قلاب,3=خرامة',
-  `event_type_code` varchar(20) NOT NULL,
-  `event_type_name` varchar(150) NOT NULL,
-  `main_category_code` varchar(20) NOT NULL,
-  `main_category_name` varchar(200) NOT NULL,
-  `sub_category` varchar(200) NOT NULL,
-  `failure_detail` varchar(255) NOT NULL,
-  `full_code` varchar(50) NOT NULL,
+  `event_type_code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `event_type_name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `main_category_code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `main_category_name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sub_category` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `failure_detail` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `full_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `timesheet_date` date NOT NULL,
-  `company_id` int(11) NOT NULL DEFAULT 0,
-  `created_by` int(11) NOT NULL DEFAULT 0,
-  `status` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `company_id` int NOT NULL DEFAULT '0',
+  `created_by` int NOT NULL DEFAULT '0',
+  `status` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_timesheet_id` (`timesheet_id`),
+  KEY `idx_operation_id` (`operation_id`),
+  KEY `idx_equipment_id` (`equipment_id`),
+  KEY `idx_failure_code_id` (`failure_code_id`),
+  KEY `idx_full_code` (`full_code`),
+  KEY `idx_timesheet_date` (`timesheet_date`),
+  KEY `idx_company_id` (`company_id`),
+  KEY `idx_lookup_report` (`company_id`,`timesheet_date`,`equipment_id`,`failure_code_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `timesheet_failure_hours`
@@ -2896,7 +4672,13 @@ INSERT INTO `timesheet_failure_hours` (`id`, `timesheet_id`, `operation_id`, `eq
 (10, 246, 12, 8, 41, 1, 'EQF', 'عطل معدة', 'HYD', 'أعطال الهيدروليك', 'الطرمبة', 'طرمبة رئيسية', 'EX-EQF-HYD-02-01', '2026-05-16', 4, 12, 1, '2026-05-16 09:21:00', '2026-05-16 09:21:00'),
 (11, 246, 12, 8, 177, 1, 'MST', 'استعداد تسويق', 'MSZ', 'ظروف زمنية', 'ظروف زمنية', 'الإجازات الرسمية غير المتفق عليها', 'EX-MST-MSZ-00-01', '2026-05-16', 4, 12, 1, '2026-05-16 09:21:00', '2026-05-16 09:21:00'),
 (12, 249, 12, 8, 94, 1, 'EQF', 'عطل معدة', 'COL', 'أعطال التبريد والتكيف', 'الحساسات', 'حساس حرارة', 'EX-EQF-COL-08-01', '2026-06-02', 4, 12, 1, '2026-06-02 09:32:38', '2026-06-02 09:32:38'),
-(13, 249, 12, 8, 147, 1, 'MNT', 'توقف صيانة', 'PME', 'صيانة طارئة', 'صيانة طارئة', 'انقلاب', 'EX-MNT-PME-00-02', '2026-06-02', 4, 12, 1, '2026-06-02 09:32:38', '2026-06-02 09:32:38');
+(13, 249, 12, 8, 147, 1, 'MNT', 'توقف صيانة', 'PME', 'صيانة طارئة', 'صيانة طارئة', 'انقلاب', 'EX-MNT-PME-00-02', '2026-06-02', 4, 12, 1, '2026-06-02 09:32:38', '2026-06-02 09:32:38'),
+(15, 252, 12, 8, 166, 1, 'CST', 'استعداد عميل', 'CSL', 'عدم توفر مستلزمات التشغيل', 'عدم توفر مستلزمات', 'عدم توفر مياه الرش', 'EX-CST-CSL-00-02', '2026-06-07', 4, 12, 1, '2026-06-07 17:45:22', '2026-06-07 17:45:22'),
+(17, 253, 16, 13, 375, 3, 'MNT', 'توقف صيانة', 'PMC', 'صيانة تصحيحية', 'صيانة تصحيحية', 'إصلاح عطل ميكانيكي', 'DR-MNT-PMC-00-01', '2026-06-07', 4, 12, 1, '2026-06-08 12:37:29', '2026-06-08 12:37:29'),
+(18, 254, 13, 10, 166, 1, 'CST', 'استعداد عميل', 'CSL', 'عدم توفر مستلزمات التشغيل', 'عدم توفر مستلزمات', 'عدم توفر مياه الرش', 'EX-CST-CSL-00-02', '2026-06-09', 4, 12, 1, '2026-06-09 11:18:41', '2026-06-09 11:18:41'),
+(19, 254, 13, 10, 193, 1, 'MKF', 'عطل تسويق', 'MFI', 'إشكاليات تعاقدية', 'إشكاليات تعاقدية', 'توقف بسبب تأخر مدفوعات العميل', 'EX-MKF-MFI-00-03', '2026-06-09', 4, 12, 1, '2026-06-09 11:18:41', '2026-06-09 11:18:41'),
+(20, 256, 12, 8, 57, 1, 'EQF', 'عطل معدة', 'ELE', 'أعطال الكهرباء', 'البطارية', 'بطارية تالفة', 'EX-EQF-ELE-01-02', '2026-06-10', 4, 12, 1, '2026-06-10 08:57:18', '2026-06-10 08:57:18'),
+(21, 256, 12, 8, 140, 1, 'MNT', 'توقف صيانة', 'PMC', 'صيانة تصحيحية', 'صيانة تصحيحية', 'إصلاح عطل هيدروليكي', 'EX-MNT-PMC-00-02', '2026-06-10', 4, 12, 1, '2026-06-10 08:57:18', '2026-06-10 08:57:18');
 
 -- --------------------------------------------------------
 
@@ -2904,29 +4686,37 @@ INSERT INTO `timesheet_failure_hours` (`id`, `timesheet_id`, `operation_id`, `eq
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL COMMENT 'معرف فريد',
-  `name` varchar(100) NOT NULL COMMENT 'الاسم الثلاثي',
-  `username` varchar(150) NOT NULL COMMENT 'اسم المستخدم',
-  `email` varchar(150) DEFAULT NULL COMMENT 'البريد',
-  `password` varchar(255) NOT NULL COMMENT 'كلمة المرور',
-  `phone` varchar(20) DEFAULT NULL COMMENT 'رقم الهاتف',
-  `role` varchar(30) NOT NULL COMMENT 'رقم الصلاحية',
-  `company_id` int(11) DEFAULT NULL COMMENT 'رقم الشركة',
-  `role_id` int(11) DEFAULT NULL COMMENT 'رقم الصلاحية',
-  `status` enum('active','inactive','suspended') NOT NULL DEFAULT 'active' COMMENT 'الحالة',
-  `force_password_change` tinyint(1) NOT NULL DEFAULT 0,
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد',
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'الاسم الثلاثي',
+  `username` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'اسم المستخدم',
+  `email` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'البريد',
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'كلمة المرور',
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'رقم الهاتف',
+  `role` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'رقم الصلاحية',
+  `company_id` int DEFAULT NULL COMMENT 'رقم الشركة',
+  `role_id` int DEFAULT NULL COMMENT 'رقم الصلاحية',
+  `status` enum('active','inactive','suspended') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active' COMMENT 'الحالة',
+  `force_password_change` tinyint(1) NOT NULL DEFAULT '0',
   `temp_password_set_at` timestamp NULL DEFAULT NULL,
-  `project_id` varchar(20) NOT NULL DEFAULT '0' COMMENT 'المشروع',
-  `contract_id` int(11) DEFAULT 0 COMMENT 'العقد',
-  `parent_id` varchar(20) NOT NULL DEFAULT '0' COMMENT 'المستخدم الاب',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'انشئ في',
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'عدل في',
+  `project_id` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0' COMMENT 'المشروع',
+  `contract_id` int DEFAULT '0' COMMENT 'العقد',
+  `parent_id` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0' COMMENT 'المستخدم الاب',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'انشئ في',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'عدل في',
   `last_login_at` timestamp NULL DEFAULT NULL COMMENT 'اخر دخول',
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'محذوف',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'محذوف',
   `deleted_at` datetime DEFAULT NULL COMMENT 'وقت الحذف',
-  `deleted_by` int(11) DEFAULT NULL COMMENT 'الحاذف'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `deleted_by` int DEFAULT NULL COMMENT 'الحاذف',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `uq_users_email` (`email`),
+  KEY `idx_contract_id` (`contract_id`),
+  KEY `idx_users_company_id` (`company_id`),
+  KEY `idx_users_status` (`status`),
+  KEY `idx_users_is_deleted` (`is_deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`
@@ -2948,606 +4738,10 @@ INSERT INTO `users` (`id`, `name`, `username`, `email`, `password`, `phone`, `ro
 (15, 'مشغل المجم MB1', 'مشغل المجم MB1', NULL, '$2y$10$80.Mfn.j1CDnOGVHOBukgOvDXBDzFhX9b5JryxMM5E/8JDWNVU36m', '09209303903', '6', 4, NULL, 'active', 0, NULL, '2', 5, '0', '2026-04-28 11:22:05', '2026-05-11 17:09:55', NULL, 1, '2026-05-11 20:09:55', 4),
 (16, 'مشرف المنجم MB1', 'مشرف المنجم MB1', NULL, '$2y$10$lktDGTePBGXvdWy6h9Be3u/yMsPI4Y80Q0khOsAt5bl7AxSYmjVli', '09209303903', '1', 4, NULL, 'active', 0, NULL, '0', 0, '0', '2026-04-28 12:52:52', '2026-05-11 17:08:02', NULL, 1, '2026-05-11 20:08:02', 4),
 (17, 'موقعmb1', 'موقعmb1', NULL, '$2y$10$h.Tz8Xkf4/rAkOJkrp63LezRtUfnEPgqP74m7cJTAVUFnYQpkb4h2', '09209303903', '5', 4, NULL, 'active', 0, NULL, '2', 2, '0', '2026-05-05 12:20:45', '2026-05-14 16:21:03', NULL, 0, NULL, NULL),
-(18, 'حركة - جديد', 'حركة - جديد', NULL, '$2y$10$7iLiNi.E7oRRYii6ou0vXetpO9NI4t94Njiir/JI1mO3dFB90zwNa', '09209303903', '6', 4, NULL, 'active', 0, NULL, '4', 5, '0', '2026-05-12 11:46:20', '2026-05-12 11:46:20', NULL, 0, NULL, NULL);
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `activity_logs`
---
-ALTER TABLE `activity_logs`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_company_created` (`company_id`,`created_at`),
-  ADD KEY `idx_user_created` (`user_id`,`created_at`),
-  ADD KEY `idx_role_created` (`role_id`,`created_at`),
-  ADD KEY `idx_action_created` (`action_type`,`created_at`),
-  ADD KEY `idx_module_screen_created` (`module_name`,`screen_name`,`created_at`),
-  ADD KEY `idx_record_module` (`record_id`,`module_name`),
-  ADD KEY `idx_created_at` (`created_at`),
-  ADD KEY `idx_screen_name` (`screen_name`),
-  ADD KEY `idx_module_name` (`module_name`),
-  ADD KEY `idx_action_type` (`action_type`),
-  ADD KEY `idx_record_id` (`record_id`);
-
---
--- Indexes for table `admin_audit_log`
---
-ALTER TABLE `admin_audit_log`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_admin_audit_admin` (`admin_id`),
-  ADD KEY `idx_admin_audit_action` (`action_type`),
-  ADD KEY `idx_admin_audit_date` (`created_at`);
-
---
--- Indexes for table `admin_companies`
---
-ALTER TABLE `admin_companies`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_admin_companies_email` (`email`),
-  ADD UNIQUE KEY `uq_admin_companies_commercial_registration` (`commercial_registration`),
-  ADD KEY `idx_admin_companies_plan` (`plan_id`),
-  ADD KEY `idx_admin_companies_status` (`status`);
-
---
--- Indexes for table `admin_subscription_plans`
---
-ALTER TABLE `admin_subscription_plans`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `admin_subscription_requests`
---
-ALTER TABLE `admin_subscription_requests`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_admin_sub_req_status` (`status`),
-  ADD KEY `idx_admin_sub_req_plan` (`plan_id`),
-  ADD KEY `fk_admin_sub_req_reviewer` (`reviewed_by`);
-
---
--- Indexes for table `admin_subscription_requests_test_probe`
---
-ALTER TABLE `admin_subscription_requests_test_probe`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_admin_sub_req_status` (`status`),
-  ADD KEY `idx_admin_sub_req_plan` (`plan_id`);
-
---
--- Indexes for table `approval_requests`
---
-ALTER TABLE `approval_requests`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_approval_entity` (`entity_type`,`entity_id`),
-  ADD KEY `idx_approval_status` (`status`),
-  ADD KEY `idx_approval_user` (`requested_by`);
-
---
--- Indexes for table `approval_steps`
---
-ALTER TABLE `approval_steps`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_approval_steps_request` (`request_id`),
-  ADD KEY `idx_approval_steps_status` (`status`),
-  ADD KEY `idx_approval_steps_order` (`step_order`);
-
---
--- Indexes for table `approval_workflow_rules`
---
-ALTER TABLE `approval_workflow_rules`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uniq_workflow_rule` (`entity_type`,`action`,`step_order`),
-  ADD KEY `idx_workflow_rule_lookup` (`entity_type`,`action`,`is_active`);
-
---
--- Indexes for table `audit_logs`
---
-ALTER TABLE `audit_logs`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_audit_logs_user_id` (`user_id`),
-  ADD KEY `idx_audit_logs_company_id` (`company_id`),
-  ADD KEY `idx_audit_logs_action_type` (`action_type`),
-  ADD KEY `idx_audit_logs_created_at` (`created_at`);
-
---
--- Indexes for table `clients`
---
-ALTER TABLE `clients`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_client_name` (`client_name`),
-  ADD KEY `idx_status` (`status`);
-
---
--- Indexes for table `company_user_password_resets`
---
-ALTER TABLE `company_user_password_resets`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_company_user_password_resets_token_hash` (`token_hash`),
-  ADD KEY `idx_company_user_password_resets_user_id` (`user_id`);
-
---
--- Indexes for table `contractequipments`
---
-ALTER TABLE `contractequipments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `contract_id` (`contract_id`);
-
---
--- Indexes for table `contracts`
---
-ALTER TABLE `contracts`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_contracts_merged` (`merged_with`),
-  ADD KEY `idx_contracts_project_id` (`project_id`);
-
---
--- Indexes for table `contract_notes`
---
-ALTER TABLE `contract_notes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_user_id` (`user_id`),
-  ADD KEY `fk_contract_notes_contract` (`contract_id`),
-  ADD KEY `fk_contract_notes_created_by` (`created_by`);
-
---
--- Indexes for table `drivercontractequipments`
---
-ALTER TABLE `drivercontractequipments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `contract_id` (`contract_id`);
-
---
--- Indexes for table `drivercontracts`
---
-ALTER TABLE `drivercontracts`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_drivercontracts_project_contract_id` (`project_contract_id`),
-  ADD KEY `fk_drivercontracts_driver` (`driver_id`),
-  ADD KEY `fk_drivercontracts_project` (`project_id`),
-  ADD KEY `fk_drivercontracts_merged` (`merged_with`);
-
---
--- Indexes for table `drivers`
---
-ALTER TABLE `drivers`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_driver_code` (`driver_code`),
-  ADD KEY `idx_driver_name` (`name`),
-  ADD KEY `idx_driver_status` (`driver_status`),
-  ADD KEY `idx_supplier_id` (`supplier_id`),
-  ADD KEY `idx_drivers_project_id` (`project_id`);
-
---
--- Indexes for table `driver_contract_notes`
---
-ALTER TABLE `driver_contract_notes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_driver_contract_notes_contract_id` (`contract_id`);
-
---
--- Indexes for table `equipments`
---
-ALTER TABLE `equipments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_serial_number` (`serial_number`),
-  ADD KEY `idx_chassis_number` (`chassis_number`),
-  ADD KEY `idx_manufacturer` (`manufacturer`),
-  ADD KEY `idx_availability_status` (`availability_status`);
-
---
--- Indexes for table `equipments_types`
---
-ALTER TABLE `equipments_types`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `equipment_drivers`
---
-ALTER TABLE `equipment_drivers`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_equipment_drivers_equipment` (`equipment_id`),
-  ADD KEY `fk_equipment_drivers_driver` (`driver_id`);
-
---
--- Indexes for table `failure_codes`
---
-ALTER TABLE `failure_codes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_equipment_type` (`equipment_type`),
-  ADD KEY `idx_event_type` (`equipment_type`,`event_type_code`),
-  ADD KEY `idx_main_cat` (`equipment_type`,`event_type_code`,`main_category_code`),
-  ADD KEY `idx_sub_cat` (`equipment_type`,`event_type_code`,`main_category_code`,`sub_category`(50));
-
---
--- Indexes for table `messages`
---
-ALTER TABLE `messages`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_msg_sender` (`sender_id`),
-  ADD KEY `idx_msg_receiver` (`receiver_id`),
-  ADD KEY `idx_msg_company` (`company_id`),
-  ADD KEY `idx_msg_read` (`is_read`),
-  ADD KEY `idx_msg_created` (`created_at`),
-  ADD KEY `idx_msg_conversation` (`sender_id`,`receiver_id`,`company_id`);
-
---
--- Indexes for table `modules`
---
-ALTER TABLE `modules`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `owner_role_id` (`owner_role_id`),
-  ADD KEY `idx_display_order` (`display_order`);
-
---
--- Indexes for table `operations`
---
-ALTER TABLE `operations`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_total_equipment_hours` (`total_equipment_hours`),
-  ADD KEY `idx_shift_hours` (`shift_hours`);
-
---
--- Indexes for table `project`
---
-ALTER TABLE `project`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_project_created_by` (`created_by`),
-  ADD KEY `idx_client_id` (`client_id`),
-  ADD KEY `idx_mine_code` (`mine_code`);
-
---
--- Indexes for table `report_role_permissions`
---
-ALTER TABLE `report_role_permissions`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_role_report` (`role_id`,`report_code`);
-
---
--- Indexes for table `roles`
---
-ALTER TABLE `roles`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `parent_role_id` (`parent_role_id`);
-
---
--- Indexes for table `role_permissions`
---
-ALTER TABLE `role_permissions`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `role_id` (`role_id`,`module_id`),
-  ADD KEY `module_id` (`module_id`);
-
---
--- Indexes for table `super_admins`
---
-ALTER TABLE `super_admins`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `suppliercontractequipments`
---
-ALTER TABLE `suppliercontractequipments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `contract_id` (`contract_id`);
-
---
--- Indexes for table `suppliers`
---
-ALTER TABLE `suppliers`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_suppliers_is_deleted` (`is_deleted`);
-
---
--- Indexes for table `supplierscontracts`
---
-ALTER TABLE `supplierscontracts`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_project_contract` (`project_contract_id`),
-  ADD KEY `fk_supplierscontracts_supplier` (`supplier_id`),
-  ADD KEY `fk_supplierscontracts_project` (`project_id`),
-  ADD KEY `fk_supplierscontracts_merged` (`merged_with`);
-
---
--- Indexes for table `supplier_contract_notes`
---
-ALTER TABLE `supplier_contract_notes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `contract_id` (`contract_id`),
-  ADD KEY `fk_supplier_contract_notes_created_by` (`created_by`);
-
---
--- Indexes for table `timesheet`
---
-ALTER TABLE `timesheet`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `timesheet_approvals`
---
-ALTER TABLE `timesheet_approvals`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uq_ts_level` (`timesheet_id`,`approval_level`),
-  ADD KEY `idx_ts_id` (`timesheet_id`),
-  ADD KEY `idx_company` (`company_id`),
-  ADD KEY `idx_level` (`approval_level`);
-
---
--- Indexes for table `timesheet_approval_notes`
---
-ALTER TABLE `timesheet_approval_notes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_ts_id` (`timesheet_id`),
-  ADD KEY `idx_company` (`company_id`);
-
---
--- Indexes for table `timesheet_failure_hours`
---
-ALTER TABLE `timesheet_failure_hours`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_timesheet_id` (`timesheet_id`),
-  ADD KEY `idx_operation_id` (`operation_id`),
-  ADD KEY `idx_equipment_id` (`equipment_id`),
-  ADD KEY `idx_failure_code_id` (`failure_code_id`),
-  ADD KEY `idx_full_code` (`full_code`),
-  ADD KEY `idx_timesheet_date` (`timesheet_date`),
-  ADD KEY `idx_company_id` (`company_id`),
-  ADD KEY `idx_lookup_report` (`company_id`,`timesheet_date`,`equipment_id`,`failure_code_id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD UNIQUE KEY `uq_users_email` (`email`),
-  ADD KEY `idx_contract_id` (`contract_id`),
-  ADD KEY `idx_users_company_id` (`company_id`),
-  ADD KEY `idx_users_status` (`status`),
-  ADD KEY `idx_users_is_deleted` (`is_deleted`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `activity_logs`
---
-ALTER TABLE `activity_logs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=379;
-
---
--- AUTO_INCREMENT for table `admin_audit_log`
---
-ALTER TABLE `admin_audit_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
-
---
--- AUTO_INCREMENT for table `admin_companies`
---
-ALTER TABLE `admin_companies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد', AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `admin_subscription_plans`
---
-ALTER TABLE `admin_subscription_plans`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `admin_subscription_requests`
---
-ALTER TABLE `admin_subscription_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد', AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `admin_subscription_requests_test_probe`
---
-ALTER TABLE `admin_subscription_requests_test_probe`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `approval_requests`
---
-ALTER TABLE `approval_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `approval_steps`
---
-ALTER TABLE `approval_steps`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `approval_workflow_rules`
---
-ALTER TABLE `approval_workflow_rules`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `audit_logs`
---
-ALTER TABLE `audit_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT for table `clients`
---
-ALTER TABLE `clients`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `company_user_password_resets`
---
-ALTER TABLE `company_user_password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `contractequipments`
---
-ALTER TABLE `contractequipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
-
---
--- AUTO_INCREMENT for table `contracts`
---
-ALTER TABLE `contracts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `contract_notes`
---
-ALTER TABLE `contract_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `drivercontractequipments`
---
-ALTER TABLE `drivercontractequipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `drivercontracts`
---
-ALTER TABLE `drivercontracts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `drivers`
---
-ALTER TABLE `drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
-
---
--- AUTO_INCREMENT for table `driver_contract_notes`
---
-ALTER TABLE `driver_contract_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `equipments`
---
-ALTER TABLE `equipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
---
--- AUTO_INCREMENT for table `equipments_types`
---
-ALTER TABLE `equipments_types`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `equipment_drivers`
---
-ALTER TABLE `equipment_drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
-
---
--- AUTO_INCREMENT for table `failure_codes`
---
-ALTER TABLE `failure_codes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=403;
-
---
--- AUTO_INCREMENT for table `messages`
---
-ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'المعرف الفريد', AUTO_INCREMENT=42;
-
---
--- AUTO_INCREMENT for table `modules`
---
-ALTER TABLE `modules`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
-
---
--- AUTO_INCREMENT for table `operations`
---
-ALTER TABLE `operations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
--- AUTO_INCREMENT for table `project`
---
-ALTER TABLE `project`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT for table `report_role_permissions`
---
-ALTER TABLE `report_role_permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
-
---
--- AUTO_INCREMENT for table `roles`
---
-ALTER TABLE `roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- AUTO_INCREMENT for table `role_permissions`
---
-ALTER TABLE `role_permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=287;
-
---
--- AUTO_INCREMENT for table `super_admins`
---
-ALTER TABLE `super_admins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد', AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `suppliercontractequipments`
---
-ALTER TABLE `suppliercontractequipments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
--- AUTO_INCREMENT for table `suppliers`
---
-ALTER TABLE `suppliers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT for table `supplierscontracts`
---
-ALTER TABLE `supplierscontracts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT for table `supplier_contract_notes`
---
-ALTER TABLE `supplier_contract_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `timesheet`
---
-ALTER TABLE `timesheet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=250;
-
---
--- AUTO_INCREMENT for table `timesheet_approvals`
---
-ALTER TABLE `timesheet_approvals`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
-
---
--- AUTO_INCREMENT for table `timesheet_approval_notes`
---
-ALTER TABLE `timesheet_approval_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT for table `timesheet_failure_hours`
---
-ALTER TABLE `timesheet_failure_hours`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد', AUTO_INCREMENT=19;
+(18, 'حركة - جديد', 'حركة - جديد', NULL, '$2y$10$7iLiNi.E7oRRYii6ou0vXetpO9NI4t94Njiir/JI1mO3dFB90zwNa', '09209303903', '6', 4, NULL, 'active', 0, NULL, '4', 5, '0', '2026-05-12 11:46:20', '2026-05-12 11:46:20', NULL, 0, NULL, NULL),
+(19, 'مدير الصيانة', 'صيانة', 'maint_mgr@test.local', '$2y$10$AEyurh.xOkqQ1nsjI2zh5urqf7AmbZiknkRMyC0AmIOM1DThvpa56', '01123475758', '13', 4, NULL, 'active', 0, NULL, '0', 0, '0', '2026-06-20 19:13:57', '2026-06-20 19:54:48', NULL, 0, NULL, NULL),
+(20, 'مشرف الصيانة', 'مصيانة', 'maint_sup@test.local', '$2y$10$SNIAAu9ZUuH4CUz7Snh.UuQd0FeYz6dbFrNEk52aAqxB6psvqRFKe', '0915657579', '13', 4, NULL, 'active', 0, NULL, '0', 0, '0', '2026-06-20 19:13:57', '2026-06-20 19:55:31', NULL, 0, NULL, NULL),
+(43, 'WF Probe', 'wf_mnt_probe', NULL, '$2y$12$c4ErL393ZQxHVC.UUHeFbuzo6Vp29xBlZRuNHu8l.p7hZOidUklka', NULL, '13', 4, NULL, 'active', 0, NULL, '0', 0, '0', '2026-06-21 08:57:16', '2026-06-21 08:57:16', NULL, 0, NULL, NULL);
 
 --
 -- Constraints for dumped tables
@@ -3637,6 +4831,61 @@ ALTER TABLE `driver_contract_notes`
 ALTER TABLE `equipment_drivers`
   ADD CONSTRAINT `fk_equipment_drivers_driver` FOREIGN KEY (`driver_id`) REFERENCES `drivers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_equipment_drivers_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `fleet_equipment_compliance`
+--
+ALTER TABLE `fleet_equipment_compliance`
+  ADD CONSTRAINT `fk_fec_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `fleet_equipment_component`
+--
+ALTER TABLE `fleet_equipment_component`
+  ADD CONSTRAINT `fk_fecmp_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `fleet_equipment_history`
+--
+ALTER TABLE `fleet_equipment_history`
+  ADD CONSTRAINT `fk_feh_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `fleet_equipment_protection`
+--
+ALTER TABLE `fleet_equipment_protection`
+  ADD CONSTRAINT `fk_fep_compliance` FOREIGN KEY (`compliance_id`) REFERENCES `fleet_equipment_compliance` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_fep_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `equipments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `fleet_model_service_spec`
+--
+ALTER TABLE `fleet_model_service_spec`
+  ADD CONSTRAINT `fk_fmss_model` FOREIGN KEY (`model_id`) REFERENCES `fleet_model` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `mnt_inspection_line`
+--
+ALTER TABLE `mnt_inspection_line`
+  ADD CONSTRAINT `fk_inspline_inspection` FOREIGN KEY (`inspection_id`) REFERENCES `mnt_inspection` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `mnt_order_labor`
+--
+ALTER TABLE `mnt_order_labor`
+  ADD CONSTRAINT `fk_labor_order` FOREIGN KEY (`order_id`) REFERENCES `mnt_order` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `mnt_order_part`
+--
+ALTER TABLE `mnt_order_part`
+  ADD CONSTRAINT `fk_part_order` FOREIGN KEY (`order_id`) REFERENCES `mnt_order` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `mnt_plan_task`
+--
+ALTER TABLE `mnt_plan_task`
+  ADD CONSTRAINT `fk_plantask_plan` FOREIGN KEY (`plan_id`) REFERENCES `mnt_plan` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `modules`

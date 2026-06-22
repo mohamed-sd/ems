@@ -115,7 +115,7 @@ $drivers_list = mysqli_query($conn, "SELECT
                            ed.end_date,
                            ed.status
                         FROM equipment_drivers ed
-                        INNER JOIN drivers d ON d.id = ed.driver_id
+                        INNER JOIN employees d ON d.id = ed.driver_id
                         WHERE $ed_scope
                         ORDER BY ed.id DESC
                         LIMIT 10");

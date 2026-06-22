@@ -20,6 +20,7 @@ if (PHP_SAPI !== 'cli') {
 // ═══════════════════════════════════════════════════════════════════════════
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/performance.php';
+require_once __DIR__ . '/includes/employee_types.php'; // أنواع الموظفين + فلتر أنواع التشغيل (الموجة 1)
 
 ems_performance_bootstrap();
 

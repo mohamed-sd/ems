@@ -55,7 +55,7 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
 
     $res = mysqli_query($conn, "SELECT ed.*, d.name AS driver_name, e.code AS equipment_code, e.name AS equipment_name 
                                  FROM equipment_drivers ed
-                                 JOIN drivers d ON ed.driver_id = d.id
+                                 JOIN employees d ON ed.driver_id = d.id
                                  JOIN equipments e ON ed.equipment_id = e.id
                                  WHERE ed.id=$id AND $scope_sql");
     

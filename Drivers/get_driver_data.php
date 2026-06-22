@@ -28,7 +28,7 @@ $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'][
 
 // فحص وجود عمود company_id
 $drivers_has_company = false;
-$check_column = mysqli_query($conn, "SHOW COLUMNS FROM drivers LIKE 'company_id'");
+$check_column = mysqli_query($conn, "SHOW COLUMNS FROM employees LIKE 'company_id'");
 if ($check_column && mysqli_num_rows($check_column) > 0) {
     $drivers_has_company = true;
 }
@@ -45,13 +45,13 @@ if (!$is_super_admin) {
             FROM drivercontracts dsc
             INNER JOIN project sp ON sp.id = dsc.project_id
             INNER JOIN users su ON su.id = sp.created_by
-            WHERE dsc.driver_id = drivers.id
+            WHERE dsc.driver_id = employees.id
               AND su.company_id = $company_id
         )";
     }
 }
 
-$query = "SELECT * FROM drivers WHERE $where_clause LIMIT 1";
+$query = "SELECT * FROM employees WHERE $where_clause LIMIT 1";
 $result = mysqli_query($conn, $query);
 
 if (!$result) {

@@ -442,7 +442,7 @@ $sql = "SELECT
             s.name AS driver_name,
             op.name AS project_name
         FROM drivercontracts sc
-        LEFT JOIN drivers s ON sc.driver_id = s.id
+        LEFT JOIN employees s ON sc.driver_id = s.id
         LEFT JOIN project op ON sc.project_id = op.id
         LEFT JOIN contracts c ON sc.project_contract_id = c.id
         WHERE sc.id = $contract_id AND $driver_contract_scope_sql

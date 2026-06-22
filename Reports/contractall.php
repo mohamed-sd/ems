@@ -204,7 +204,7 @@ if (!isset($_SESSION['user'])) {
         JOIN operations o ON o." . $operations_project_column . " = p.id
         JOIN equipments e ON e.id = o.equipment
         LEFT JOIN timesheet t ON t.operator = o.id
-        JOIN drivers d ON t.driver = d.id
+        JOIN employees d ON t.driver = d.id
         WHERE c.id = $contract_filter
         GROUP BY d.name";
         $drivers = mysqli_query($conn, $sql_drivers);

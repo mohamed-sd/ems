@@ -499,7 +499,7 @@ $sql = "SELECT  * , t.id,
                t.shift,
                t.date
         FROM timesheet t
-        JOIN drivers d ON t.driver = d.id
+        JOIN employees d ON t.driver = d.id
         JOIN operations o ON t.operator = o.id
         JOIN equipments e ON o.equipment = e.id
         JOIN project p ON o.project_id = p.id

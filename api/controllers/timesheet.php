@@ -515,7 +515,7 @@ function ts_load_one(mysqli $conn, array $ctx, int $projectId, int $id, bool $wi
             JOIN operations o ON o.id = t.operator
             LEFT JOIN equipments e ON e.id = o.equipment
             LEFT JOIN equipments_types et ON et.id = e.type
-            LEFT JOIN drivers d ON d.id = t.driver
+            LEFT JOIN employees d ON d.id = t.driver
             WHERE t.id = ? AND $clause $companyClause
             LIMIT 1";
     $stmt = mysqli_prepare($conn, $sql);
@@ -605,10 +605,10 @@ function timesheet_refdata(): void
     }
 
     // السائقون (ضمن الشركة/المشروع).
-    $drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
-    $drivers_has_project = db_table_has_column($conn, 'drivers', 'project_id');
+    $drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
+    $drivers_has_project = db_table_has_column($conn, 'employees', 'project_id');
     $dWhere = ['1=1'];
-    if (db_table_has_column($conn, 'drivers', 'status')) {
+    if (db_table_has_column($conn, 'employees', 'status')) {
         $dWhere[] = 'd.status = 1';
     }
     if (!$ctx['is_super'] && $drivers_has_company) {
@@ -617,7 +617,7 @@ function timesheet_refdata(): void
     if ($drivers_has_project && $projectId > 0) {
         $dWhere[] = "(d.project_id = $projectId OR d.project_id IS NULL)";
     }
-    $res = mysqli_query($conn, 'SELECT d.id, d.name, d.phone, d.driver_code FROM drivers d WHERE ' . implode(' AND ', $dWhere) . ' ORDER BY d.name ASC');
+    $res = mysqli_query($conn, 'SELECT d.id, d.name, d.phone, d.driver_code FROM employees d WHERE ' . implode(' AND ', $dWhere) . ems_operation_types_in_sql($conn, 'd') . ' ORDER BY d.name ASC');
     if ($res) {
         while ($r = mysqli_fetch_assoc($res)) {
             $drivers[] = ['id' => intval($r['id']), 'name' => $r['name'] ?? '', 'phone' => $r['phone'] ?? '', 'driver_code' => $r['driver_code'] ?? ''];
@@ -741,14 +741,14 @@ function timesheet_operation_drivers(int $operationId): void
     if ($shift === 'D' || $shift === 'N') {
         $shiftFilter = " AND (ed.shift_type = 'B' OR ed.shift_type = '" . mysqli_real_escape_string($conn, $shift) . "')";
     }
-    $driverStatus = db_table_has_column($conn, 'drivers', 'status') ? ' AND d.status = 1' : '';
-    $driverCompany = (!$ctx['is_super'] && db_table_has_column($conn, 'drivers', 'company_id'))
+    $driverStatus = db_table_has_column($conn, 'employees', 'status') ? ' AND d.status = 1' : '';
+    $driverCompany = (!$ctx['is_super'] && db_table_has_column($conn, 'employees', 'company_id'))
         ? ' AND d.company_id = ' . intval($ctx['company_id']) : '';
 
     $out = [];
     $stmt = mysqli_prepare($conn, "
         SELECT d.id, d.name, d.phone
-        FROM equipment_drivers ed JOIN drivers d ON ed.driver_id = d.id
+        FROM equipment_drivers ed JOIN employees d ON ed.driver_id = d.id
         WHERE ed.equipment_id = ? AND ed.status = 1 $shiftFilter $driverStatus $driverCompany
         ORDER BY d.name ASC");
     mysqli_stmt_bind_param($stmt, 'i', $equipmentId);
@@ -939,7 +939,7 @@ function timesheets_list(): void
         JOIN operations o ON o.id = t.operator
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN equipments_types et ON et.id = e.type
-        LEFT JOIN drivers d ON d.id = t.driver
+        LEFT JOIN employees d ON d.id = t.driver
         WHERE $whereSql
         ORDER BY t.date DESC, t.id DESC
         LIMIT 500");

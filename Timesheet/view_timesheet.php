@@ -146,7 +146,7 @@ $base_from_sql = "
     JOIN operations o ON t.operator = o.id
     JOIN equipments e ON o.equipment = e.id
     JOIN project p ON o.$operations_project_column = p.id
-    LEFT JOIN drivers d ON t.driver = d.id
+    LEFT JOIN employees d ON t.driver = d.id
 ";
 
 $order_sql = " ORDER BY t.date DESC, t.id DESC ";
@@ -246,10 +246,10 @@ if ($operation_id > 0) {
     if ($equipment_id > 0) {
         $driver_sql = "SELECT d.id, d.name
             FROM equipment_drivers ed
-            JOIN drivers d ON ed.driver_id = d.id
+            JOIN employees d ON ed.driver_id = d.id
             WHERE ed.equipment_id = $equipment_id";
 
-        if (!$is_super_admin && db_table_has_column($conn, 'drivers', 'company_id')) {
+        if (!$is_super_admin && db_table_has_column($conn, 'employees', 'company_id')) {
             $driver_sql .= " AND d.company_id = $company_id";
         } elseif (!$is_super_admin) {
             $driver_sql .= " AND EXISTS (

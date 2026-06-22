@@ -40,7 +40,7 @@ SELECT
     t.work_notes,
     t.fault_notes
 FROM timesheet t
-JOIN drivers d ON t.driver = d.id
+JOIN employees d ON t.driver = d.id
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id
 JOIN suppliers s ON e.suppliers = s.id

@@ -24,9 +24,9 @@ $operations_has_company = db_table_has_column($conn, 'operations', 'company_id')
 $operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
 $equipment_drivers_has_company = db_table_has_column($conn, 'equipment_drivers', 'company_id');
 $equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
-$drivers_has_company = db_table_has_column($conn, 'drivers', 'company_id');
-$drivers_has_status = db_table_has_column($conn, 'drivers', 'status');
-$drivers_has_project_id = db_table_has_column($conn, 'drivers', 'project_id');
+$drivers_has_company = db_table_has_column($conn, 'employees', 'company_id');
+$drivers_has_status = db_table_has_column($conn, 'employees', 'status');
+$drivers_has_project_id = db_table_has_column($conn, 'employees', 'project_id');
 $equipments_has_lat = db_table_has_column($conn, 'equipments', 'latitude');
 $equipments_has_lng = db_table_has_column($conn, 'equipments', 'longitude');
 $equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
@@ -548,7 +548,7 @@ $drivers_sql = "SELECT ed.id, ed.equipment_id, ed.driver_id, ed.start_date, ed.e
                        d.name AS driver_name, d.phone AS driver_phone,
                        e.code AS equipment_code, e.name AS equipment_name
                 FROM equipment_drivers ed
-                INNER JOIN drivers d ON d.id = ed.driver_id
+                INNER JOIN employees d ON d.id = ed.driver_id
                 INNER JOIN equipments e ON e.id = ed.equipment_id
                 WHERE EXISTS (
                     SELECT 1 FROM operations o
@@ -583,11 +583,11 @@ if ($drivers_has_project_id) {
 }
 
 $all_drivers_sql = "SELECT DISTINCT d.id, d.name, d.phone
-                    FROM drivers d
+                    FROM employees d
                     WHERE 1=1
                       $driver_company_scope
                       $driver_status_scope
-                      $driver_project_scope
+                      $driver_project_scope" . ems_operation_types_in_sql($conn, 'd') . "
                     ORDER BY d.name ASC";
 $all_drivers_res = mysqli_query($conn, $all_drivers_sql);
 $all_drivers = [];

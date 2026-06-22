@@ -20,7 +20,7 @@ $equipments_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM equipments");
 $equipments_count = $equipments_res ? (mysqli_fetch_assoc($equipments_res)['c'] ?? null) : null;
 
 // المشغلين (drivers)
-$operators_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM drivers");
+$operators_res = mysqli_query($conn, "SELECT COUNT(id) AS c FROM employees");
 $operators_count = $operators_res ? (mysqli_fetch_assoc($operators_res)['c'] ?? null) : null;
 
 // المستخدمين
