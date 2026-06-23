@@ -33,6 +33,13 @@ if (!$operations_has_shift_type) {
     $operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
 }
 
+// الحالة التشغيلية (تعمل/جاهزة/معطلة) تُدار من صفحة الحركة. هنا نقرؤها فقط لتصنيف جدول «المتعطلة».
+$operations_has_op_state = db_table_has_column($conn, 'operations', 'op_state');
+if (!$operations_has_op_state) {
+    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN op_state ENUM('تعمل','جاهزة','معطلة') NOT NULL DEFAULT 'جاهزة' AFTER status");
+    $operations_has_op_state = db_table_has_column($conn, 'operations', 'op_state');
+}
+
 if (!$is_super_admin && !$operations_has_company) {
     die('لا يمكن تطبيق عزل الشركات في شاشة التشغيل لأن عمود company_id غير متاح في جدول operations.');
 }
@@ -705,10 +712,9 @@ include('../insidebar.php');
                             <div>
                                 <label><i class="fas fa-check-circle"></i> فئة المعدة</label>
                                 <select name="equipment_category" id="equipment_category" required>
-                                    <option value="">-- أساسي / احتياطي / متعطل --</option>
+                                    <option value="">-- أساسي / احتياطي --</option>
                                     <option value="أساسي"> أساسي</option>
                                     <option value="احتياطي"> احتياطي</option>
-                                    <option value="متعطل"> متعطل</option>
                                 </select>
                             </div>
 
@@ -921,6 +927,14 @@ include('../insidebar.php');
                                     $insert_company_val = (!$is_super_admin && $operations_has_company) ? ", '$company_id'" : "";
                                      mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, shift_type, status$insert_company_col)
                                          VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$shift_type_escaped', '$status_escaped'$insert_company_val)");
+                                    // سجل «إضافة لمشروع» في سجل تحركات الآلية.
+                                    $new_op_id = intval(mysqli_insert_id($conn));
+                                    if ($new_op_id > 0) {
+                                        require_once __DIR__ . '/../includes/equipment_log_helper.php';
+                                        $ev_opts = ['project_id' => intval($project_id), 'operation_id' => $new_op_id];
+                                        if (intval($company_id) > 0) { $ev_opts['company_id'] = intval($company_id); }
+                                        log_equipment_event($conn, intval($equipment), 'إضافة لمشروع', $ev_opts);
+                                    }
                                     echo "<script>alert('✅ تم الحفظ بنجاح'); window.location.href='oprators.php?project_id=$selected_project_id';</script>";
                                 }
                             }
@@ -928,7 +942,8 @@ include('../insidebar.php');
                             // جلب بيانات التشغيل - فلتر بالمشروع
                             $operations_scope_sql = (!$is_super_admin && $operations_has_company) ? " AND o.company_id = $company_id" : "";
 
-                            $query = "SELECT o.id, o.equipment, o.equipment_type, o.equipment_category, o.contract_id, o.supplier_id,
+                            $op_state_col = $operations_has_op_state ? "o.op_state" : "'جاهزة' AS op_state";
+                            $query = "SELECT o.id, o.equipment, o.equipment_type, o.equipment_category, $op_state_col, o.contract_id, o.supplier_id,
                              o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.shift_type, o.status, o.reason,
                              e.code AS equipment_code, e.name AS equipment_name, e.type AS equipment_type_id,
                              et.type AS equipment_type_name,
@@ -945,7 +960,9 @@ include('../insidebar.php');
                       GROUP BY o.id
                       ORDER BY o.id DESC";
                             $result = mysqli_query($conn, $query);
-                            // تقسيم التشغيلات: المنتهية (status=0) في جدول مستقل؛ السارية تُقسَّم أساسية/احتياطية
+                            // تقسيم التشغيلات: المنتهية (status=0) في جدول مستقل (تاريخ فقط، بلا حالة).
+                            // السارية: المعطلة (op_state='معطلة') في جدول مستقل بصرف النظر عن الدور؛
+                            // والباقي يُقسَّم بالدور أساسي/احتياطي (الدور ثابت ولا يتأثّر بالحالة).
                             $primary_rows = [];
                             $reserve_rows = [];
                             $broken_rows = [];
@@ -954,10 +971,10 @@ include('../insidebar.php');
                                 while ($row = mysqli_fetch_assoc($result)) {
                                     if (intval($row['status']) !== 1) {
                                         $ended_rows[] = $row;
+                                    } elseif (($row['op_state'] ?? '') === 'معطلة') {
+                                        $broken_rows[] = $row;
                                     } elseif (($row['equipment_category'] ?? '') === 'أساسي') {
                                         $primary_rows[] = $row;
-                                    } elseif (($row['equipment_category'] ?? '') === 'متعطل') {
-                                        $broken_rows[] = $row;
                                     } else {
                                         $reserve_rows[] = $row;
                                     }

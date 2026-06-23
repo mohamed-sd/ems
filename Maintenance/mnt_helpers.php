@@ -170,6 +170,34 @@ if (!defined('MNT_HELPERS_LOADED')) {
                                          $op_scope");
             }
 
+            // إعادة الحالة التشغيلية «معطلة» → «جاهزة» للتشغيل الساري لهذه المعدة عند إغلاق/إلغاء أمر الصيانة
+            // (النموذج الجديد: op_state يُدار من الحركة، ويعود «جاهزة» تلقائياً بعد الإصلاح).
+            if (function_exists('db_table_has_column')
+                && db_table_has_column($conn, 'operations', 'op_state')) {
+                $op_scope2 = '';
+                if (db_table_has_column($conn, 'operations', 'company_id')) {
+                    $op_scope2 = " AND (company_id = " . intval($company_id) . " OR company_id IS NULL)";
+                }
+                @mysqli_query($conn, "UPDATE operations
+                                         SET op_state = 'جاهزة'
+                                       WHERE equipment = " . intval($equipment_id) . "
+                                         AND status = 1
+                                         AND op_state = 'معطلة'
+                                         $op_scope2");
+
+                // سجل «عودة من الصيانة» في سجل تحركات الآلية — فقط إن تغيّرت الحالة فعليًا (معطلة → جاهزة).
+                if (mysqli_affected_rows($conn) > 0) {
+                    if (!function_exists('log_equipment_event') && file_exists(__DIR__ . '/../includes/equipment_log_helper.php')) {
+                        require_once __DIR__ . '/../includes/equipment_log_helper.php';
+                    }
+                    if (function_exists('log_equipment_event')) {
+                        $log_opts = ['to' => 'جاهزة'];
+                        if (intval($company_id) > 0) { $log_opts['company_id'] = intval($company_id); }
+                        log_equipment_event($conn, intval($equipment_id), 'عودة من الصيانة', $log_opts);
+                    }
+                }
+            }
+
             return (bool) $ok;
         }
         return false;

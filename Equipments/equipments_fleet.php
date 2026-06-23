@@ -21,6 +21,7 @@ $operations_project_col = db_table_has_column($conn, 'operations', 'project_id')
 
 // company isolation (SaaS)
 $current_company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$current_user_id    = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
 $equipment_company_filter = ($equipment_has_company_id && $current_company_id > 0) ? " AND m.company_id = $current_company_id" : "";
 $equipment_company_filter_plain = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
 
@@ -466,6 +467,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
             $insert_columns[] = 'model_id';
             $insert_values[] = ($model_id > 0 ? $model_id : 'NULL');
         }
+        // تتبّع الإضافة (منشئ المعدة + تاريخ الإضافة) — لسجل «تحركات الآلية».
+        if (db_table_has_column($conn, 'equipments', 'created_by') && $current_user_id > 0) {
+            $insert_columns[] = 'created_by';
+            $insert_values[]  = intval($current_user_id);
+        }
+        if (db_table_has_column($conn, 'equipments', 'created_at')) {
+            $insert_columns[] = 'created_at';
+            $insert_values[]  = 'NOW()';
+        }
 
         $sql = "INSERT INTO equipments (" . implode(', ', $insert_columns) . ") VALUES (" . implode(', ', $insert_values) . ")";
         $msg = "تمت+إضافة+المعدة+بنجاح+✅";
@@ -474,6 +484,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
     if (mysqli_query($conn, $sql)) {
         // حفظ حقول كرت المعدة (الهوية/العدّاد) — إضافي وآمن
         $card_eq_id = ($edit_id > 0) ? $edit_id : intval(mysqli_insert_id($conn));
+        // سجل «إضافة للنظام» — فقط عند الإضافة الفعلية (لا التعديل).
+        if ($edit_id <= 0 && $card_eq_id > 0) {
+            require_once __DIR__ . '/../includes/equipment_log_helper.php';
+            $log_opts = [];
+            if ($current_company_id > 0) { $log_opts['company_id'] = $current_company_id; }
+            if ($current_user_id > 0)    { $log_opts['user_id'] = $current_user_id; }
+            log_equipment_event($conn, $card_eq_id, 'إضافة للنظام', $log_opts);
+        }
         $card_scope = ($equipment_has_company_id && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
         if (function_exists('ems_save_equipment_card_fields')) {
             ems_save_equipment_card_fields($conn, $card_eq_id, ($edit_id <= 0), $card_scope);

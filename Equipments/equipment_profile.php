@@ -153,8 +153,42 @@ if ($fcmp_exists) {
     if ($q) while ($r = mysqli_fetch_assoc($q)) $component_rows[] = $r;
 }
 if ($fh_exists) {
-    $q = mysqli_query($conn, "SELECT h.*, pr.name AS project_name FROM fleet_equipment_history h LEFT JOIN project pr ON pr.id = h.project_id WHERE h.equipment_id = $equipment_id" . (!$is_super_admin && $company_id > 0 ? " AND h.company_id = $company_id" : '') . " ORDER BY h.event_date DESC, h.id DESC LIMIT 100");
+    $q = mysqli_query($conn, "SELECT h.*, pr.name AS project_name, u.name AS created_by_name FROM fleet_equipment_history h LEFT JOIN project pr ON pr.id = h.project_id LEFT JOIN users u ON u.id = h.created_by WHERE h.equipment_id = $equipment_id" . (!$is_super_admin && $company_id > 0 ? " AND h.company_id = $company_id" : '') . " ORDER BY h.event_date DESC, h.id DESC LIMIT 100");
     if ($q) while ($r = mysqli_fetch_assoc($q)) $history_rows[] = $r;
+
+    // الزمن المستغرق: الفارق بين كل حدث والحدث الأسبق له (الصفوف تنازلية ⇒ الأسبق هو التالي).
+    if (!function_exists('ems_duration_ar')) {
+        function ems_duration_ar($sec)
+        {
+            $sec = max(0, (int) $sec);
+            $units = [['أيام', 'يوم', 86400], ['ساعات', 'ساعة', 3600], ['دقائق', 'دقيقة', 60], ['ثوانٍ', 'ثانية', 1]];
+            $parts = [];
+            $rem = $sec;
+            foreach ($units as $u) {
+                if ($rem >= $u[2]) {
+                    $v = intdiv($rem, $u[2]);
+                    $rem %= $u[2];
+                    $parts[] = $v . ' ' . (($v >= 3 && $v <= 10) ? $u[0] : $u[1]);
+                    if (count($parts) === 2) {
+                        break;
+                    }
+                }
+            }
+            return $parts ? implode(' ', $parts) : '0 ثانية';
+        }
+    }
+    $hn = count($history_rows);
+    for ($i = 0; $i < $hn; $i++) {
+        $cur  = isset($history_rows[$i]['event_date']) ? strtotime((string) $history_rows[$i]['event_date']) : false;
+        $prev = ($i + 1 < $hn && isset($history_rows[$i + 1]['event_date'])) ? strtotime((string) $history_rows[$i + 1]['event_date']) : false;
+        if ($cur !== false && $prev !== false && $cur >= $prev) {
+            $history_rows[$i]['_elapsed_seconds'] = $cur - $prev;
+            $history_rows[$i]['_elapsed_label']   = ems_duration_ar($cur - $prev);
+        } else {
+            $history_rows[$i]['_elapsed_seconds'] = null;
+            $history_rows[$i]['_elapsed_label']   = '—';
+        }
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -340,29 +374,31 @@ include '../insidebar.php';
 .equipment-profile-page .ep-fact .k{ font-size:11px; color:var(--gray-500,#78716C); font-weight:600; }
 .equipment-profile-page .ep-fact .v{ font-size:14px; color:var(--gray-900,#1C1917); font-weight:700; margin-top:2px; }
 
-/* التبويبات */
+/* التبويبات — بنفس تصميم تابات صفحة الحركة (movement_operations: .ems-tabs-nav/.ems-tab-btn) */
 .equipment-profile-page .ep-tabs{
   position:sticky; top:var(--topbar-height,60px); z-index:var(--z-sticky,10);
-  display:flex; flex-wrap:wrap; gap:6px; padding:6px; margin-bottom:16px;
-  background:rgba(255,255,255,.94); backdrop-filter:blur(8px);
-  border:1px solid var(--gray-200,#E7E5E4); border-radius:var(--radius-lg,12px); box-shadow:var(--shadow-sm,0 1px 2px rgba(0,0,0,.05));
+  display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px;
+  background:#fff; border-bottom:2px solid #dae5f1;
 }
 .equipment-profile-page .ep-tab{
-  appearance:none; border:0; cursor:pointer; font-family:inherit; font-weight:700; font-size:13.5px;
-  display:inline-flex; align-items:center; gap:7px; padding:9px 16px; border-radius:var(--radius-md,8px);
-  color:var(--gray-700,#44403C); background:transparent; transition:all var(--transition-fast,150ms ease);
+  appearance:none; cursor:pointer; font-family:inherit;
+  background:#f0f5fa; color:#0b4c8c;
+  border:1px solid #dae5f1; border-bottom:none;
+  padding:11px 26px; border-radius:10px 10px 0 0;
+  font-size:15px; font-weight:700;
+  display:inline-flex; align-items:center; gap:8px;
+  margin-bottom:-2px; transition:background .2s, color .2s;
 }
 .equipment-profile-page .ep-tab i{ font-size:14px; opacity:.9; }
-.equipment-profile-page .ep-tab:hover{ background:var(--gray-100,#F5F5F4); color:var(--gray-900,#1C1917); }
+.equipment-profile-page .ep-tab:hover{ background:#e3eef9; color:#0b4c8c; }
 .equipment-profile-page .ep-tab.is-active{
-  background:linear-gradient(160deg,var(--brand-amber,#F2AA2A),var(--brand-orange-bright,#E67E00)); color:#fff;
-  box-shadow:0 4px 12px rgba(230,126,0,.28);
+  background:#0b4c8c; color:#fff; border-color:#0b4c8c; box-shadow:none;
 }
 .equipment-profile-page .ep-tab-badge{
-  font-size:11px; font-weight:800; min-width:19px; height:19px; padding:0 6px; border-radius:10px;
-  display:inline-grid; place-items:center; background:var(--gray-200,#E7E5E4); color:var(--gray-700,#44403C);
+  font-size:12px; font-weight:700; min-width:20px; padding:1px 9px; border-radius:12px;
+  display:inline-block; text-align:center; background:rgba(11,76,140,.12); color:#0b4c8c;
 }
-.equipment-profile-page .ep-tab.is-active .ep-tab-badge{ background:rgba(255,255,255,.30); color:#fff; }
+.equipment-profile-page .ep-tab.is-active .ep-tab-badge{ background:#d4a017; color:#fff; }
 
 /* اللوحات */
 .equipment-profile-page .ep-tab-panel{ display:none; }
@@ -451,6 +487,7 @@ include '../insidebar.php';
         <button type="button" class="ep-tab" data-ep-tab="operations"><i class="fas fa-diagram-project"></i> التشغيل <span class="ep-tab-badge"><?php echo intval($projects_count); ?></span></button>
         <button type="button" class="ep-tab" data-ep-tab="maintenance"><i class="fas fa-wrench"></i> الصيانة والتفتيش <span class="ep-tab-badge"><?php echo intval($mnt_total + $ins_total + $pln_total); ?></span></button>
         <button type="button" class="ep-tab" data-ep-tab="records"><i class="fas fa-folder-open"></i> الوثائق والسجل <span class="ep-tab-badge"><?php echo intval(count($compliance_rows) + count($protection_rows) + count($component_rows)); ?></span></button>
+        <button type="button" class="ep-tab" data-ep-tab="movements"><i class="fas fa-timeline"></i> تحركات الآلية <span class="ep-tab-badge"><?php echo intval(count($history_rows)); ?></span></button>
     </div>
 
     <div class="ep-panels">
@@ -861,6 +898,46 @@ include '../insidebar.php';
         </div>
     </div>
     </div><!-- /#tab-records -->
+
+    <!-- ════════ لوحة: تحركات الآلية ════════ -->
+    <div class="ep-tab-panel" id="tab-movements">
+        <div class="card">
+            <div class="card-header"><h5><i class="fas fa-timeline"></i> تحركات الآلية</h5></div>
+            <div class="card-body">
+                <?php if (empty($history_rows)): ?>
+                    <p style="color:#888;text-align:center;padding:14px;">لا توجد تحركات مسجّلة بعد.</p>
+                <?php else: ?>
+                    <div style="overflow-x:auto;">
+                        <table id="equipmentMovementsTable" class="ep-movements-table no-datatable" style="width:100%;">
+                            <thead><tr>
+                                <th>التاريخ</th><th>الزمن المستغرق</th><th>الحدث</th><th>من</th><th>إلى</th>
+                                <th>المشروع</th><th>بواسطة</th><th>ملاحظة</th>
+                            </tr></thead>
+                            <tbody>
+                            <?php foreach ($history_rows as $h): ?>
+                                <?php
+                                $ev = (string) ($h['event_type'] ?? '');
+                                $ev_map = ['إضافة للنظام' => 'sys', 'إضافة لمشروع' => 'proj', 'تغيير وردية' => 'shift', 'تغيير حالة' => 'state', 'إسناد للصيانة' => 'maint', 'عودة من الصيانة' => 'back', 'إنهاء تشغيل' => 'end'];
+                                $ev_cls = $ev_map[$ev] ?? 'def';
+                                ?>
+                                <tr>
+                                    <td data-order="<?= isset($h['event_date']) ? (int) strtotime((string) $h['event_date']) : 0; ?>"><?= $ee($h['event_date'] ?? '-'); ?></td>
+                                    <td class="ep-elapsed" data-order="<?= ($h['_elapsed_seconds'] === null) ? -1 : (int) $h['_elapsed_seconds']; ?>"><?= $ee($h['_elapsed_label'] ?? '—'); ?></td>
+                                    <td><span class="ep-ev ep-ev-<?= $ev_cls; ?>"><?= $ee($ev !== '' ? $ev : '-'); ?></span></td>
+                                    <td><?= $ee(($h['from_value'] ?? '') !== '' ? $h['from_value'] : '-'); ?></td>
+                                    <td><?= $ee(($h['to_value'] ?? '') !== '' ? $h['to_value'] : '-'); ?></td>
+                                    <td><?= $ee(($h['project_name'] ?? '') !== '' ? $h['project_name'] : '-'); ?></td>
+                                    <td><?= $ee(($h['created_by_name'] ?? '') !== '' ? $h['created_by_name'] : '-'); ?></td>
+                                    <td class="ep-note"><?= $ee($h['note'] ?? ''); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div><!-- /#tab-movements -->
     </div><!-- /.ep-panels -->
 
 </div>
@@ -871,6 +948,22 @@ include '../insidebar.php';
     .ems-timeline li { position:relative; padding:0 26px 16px 0; }
     .ems-tl-dot { position:absolute; right:1px; top:4px; width:14px; height:14px; border-radius:50%; background:#F3BE00; border:2px solid #fff; box-shadow:0 0 0 1px #e3e3e3; }
     .child-add-form { background:#fafafa; border:1px solid #ececec; border-radius:8px; padding:12px; }
+
+    /* جدول تحركات الآلية */
+    .equipment-profile-page .ep-movements-table { font-size:13px; width:100%; }
+    .equipment-profile-page .ep-movements-table thead th { white-space:nowrap; }
+    .equipment-profile-page .ep-movements-table td { vertical-align:middle; }
+    .equipment-profile-page .ep-movements-table td.ep-note { white-space:normal; min-width:160px; color:#555; }
+    .equipment-profile-page .ep-elapsed { font-weight:700; color:#0b6b3a; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .equipment-profile-page .ep-ev { display:inline-block; padding:3px 11px; border-radius:20px; font-size:12px; font-weight:700; white-space:nowrap; }
+    .equipment-profile-page .ep-ev-sys   { background:#e0ecff; color:#1e40af; }
+    .equipment-profile-page .ep-ev-proj  { background:#d1faf0; color:#0f766e; }
+    .equipment-profile-page .ep-ev-shift { background:#ede9fe; color:#6d28d9; }
+    .equipment-profile-page .ep-ev-state { background:#fef3c7; color:#92400e; }
+    .equipment-profile-page .ep-ev-maint { background:#fee2e2; color:#b91c1c; }
+    .equipment-profile-page .ep-ev-back  { background:#dcfce7; color:#15803d; }
+    .equipment-profile-page .ep-ev-end   { background:#f1f5f9; color:#475569; }
+    .equipment-profile-page .ep-ev-def   { background:#f1f5f9; color:#475569; }
 </style>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
@@ -880,6 +973,14 @@ function emsToggle(id){ var el=document.getElementById(id); if(el){ el.style.dis
 $(function () {
     $('#equipmentProjectsTable').DataTable({ language: { url: '/ems/assets/i18n/datatables/ar.json' } });
     $('#equipmentDriversTable').DataTable({ language: { url: '/ems/assets/i18n/datatables/ar.json' } });
+    if ($('#equipmentMovementsTable').length) {
+        $('#equipmentMovementsTable').DataTable({
+            language: { url: '/ems/assets/i18n/datatables/ar.json' },
+            order: [[0, 'desc']],
+            pageLength: 25,
+            stateSave: false
+        });
+    }
 });
 
 // ════════ تبديل التبويبات (hash-linkable) + ضبط أعمدة DataTables عند الإظهار ════════

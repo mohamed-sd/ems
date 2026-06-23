@@ -684,6 +684,12 @@ function mnt_state_class($st) {
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
 ?>
+    <div class="mnt-bell-wrap">
+        <span class="mnt-bell" title="أوامر صيانة تلقائية مفتوحة">
+            <i class="fas fa-bell"></i>
+            <span class="mnt-bell-badge" id="openOrdersBadge" style="display:none">0</span>
+        </span>
+    </div>
     <?php if ($can_add): ?>
     <!-- فورم إنشاء أمر (نمط العملاء/المشاريع: يُفتح بزر «أمر صيانة جديد»، ولا يُحفظ شيء إلا عند الإرسال) -->
     <form method="post" action="" class="allforms" id="orderCreateForm">
@@ -799,7 +805,9 @@ function mnt_state_class($st) {
                         }
                         echo "</div></td>";
                         echo "<td><strong>" . htmlspecialchars((string) $row['code']) . "</strong></td>";
-                        echo "<td>" . htmlspecialchars((string) ($row['eq_name'] ?? '-')) . "</td>";
+                        echo "<td>" . htmlspecialchars((string) ($row['eq_name'] ?? '-'));
+                        if (!empty($row['is_auto'])) { echo " <span class='mnt-auto-badge'>auto</span>"; }
+                        echo "</td>";
                         echo "<td>" . htmlspecialchars((string) $row['source']) . "</td>";
                         echo "<td>" . htmlspecialchars((string) ($row['maint_type'] ?? '-')) . "</td>";
                         echo "<td>" . htmlspecialchars((string) ($row['cost_party'] ?? '-')) . "</td>";
@@ -1078,7 +1086,73 @@ function mnt_state_class($st) {
     $(document).on('change', '.mnt-proj', function(){ mntLoadProjectEquipment($(this)); });
 })();
 </script>
+<script>
+    // شارة جرس الأوامر التلقائية المفتوحة (الواردة من صفحة الحركة).
+    function refreshOpenOrdersBadge() {
+        var b = document.getElementById('openOrdersBadge');
+        if (!b) return;
+        fetch('get_open_orders_count.php', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (d.count > 0) { b.textContent = d.count; b.style.display = 'inline-block'; }
+                else { b.style.display = 'none'; }
+            })
+            .catch(function () {});
+    }
+    refreshOpenOrdersBadge();
+    setInterval(refreshOpenOrdersBadge, 60000);
+</script>
 <style>
+    /* شارة «auto» بجوار اسم المعدة للأوامر التلقائية */
+    .mnt-auto-badge {
+        display: inline-block;
+        margin-inline-start: 6px;
+        padding: 1px 7px;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 6px;
+        background: #6d28d9;
+        color: #fff;
+        letter-spacing: .5px;
+    }
+
+    /* أيقونة جرس الأوامر التلقائية المفتوحة + شارتها الحمراء */
+    .mnt-bell-wrap {
+        display: flex;
+        justify-content: flex-end;
+        margin: 6px 2px 0;
+    }
+
+    .mnt-bell {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        color: #374151;
+        font-size: 17px;
+        cursor: default;
+    }
+
+    .mnt-bell-badge {
+        position: absolute;
+        top: -4px;
+        inset-inline-end: -4px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 9px;
+        background: #dc2626;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 18px;
+        text-align: center;
+    }
+
     /* بطاقات الإحصائيات — نفس تصميم إحصائيات المشاريع والعملاء حرفياً */
     .mnt-orders-main .stats-section {
         border: 1px solid var(--bdr);
