@@ -237,14 +237,23 @@ $mnt_avail = ($hours_sum + $mnt_downtime) > 0 ? ($hours_sum / ($hours_sum + $mnt
 //  قسم التفتيش الفني — تفتيشات هذه المعدة (المصدر: mnt_inspection، معزول بالشركة)
 // ═══════════════════════════════════════════════════════════════════
 $ins_rows = array();
+$ins_lines_map = array();   // [inspection_id] => [ {sec,item,cond,mv,note,rec}, ... ] لعرض النافذة
 $ins_total = $ins_done = $ins_open = $ins_critical = 0;
 $ins_last = null;
+// مجموعات حالة البند (موائمة لمخطّطات الاستمارات: افتراضي/حادث/عمرة)
+$INS_GOOD = array('سليم', 'صالح');
+$INS_NOTE = array('ملاحظة', 'ضرر طفيف', 'ضرر متوسط', 'تآكل ضمن الحد');
+$INS_CRIT = array('حرج', 'ضرر بالغ', 'يحتاج استبدال', 'يحتاج عمرة');
+$INS_NA   = array('لا ينطبق');
 if (db_table_has_column($conn, 'mnt_inspection', 'id')) {
     $ins_scope = $is_super_admin ? "" : " AND i.company_id = $company_id";
     $q = mysqli_query($conn, "SELECT i.id, i.code, i.inspection_type, i.scheduled_date, i.completed_at,
-                                     i.overall_result, i.state, u.name AS inspector_name
+                                     i.overall_result, i.state, i.score, i.tech_readiness_state,
+                                     i.equipment_condition, i.engine_condition, i.notes,
+                                     u.name AS inspector_name, p.name AS project_name
                                 FROM mnt_inspection i
                                 LEFT JOIN users u ON u.id = i.inspector_id
+                                LEFT JOIN project p ON p.id = i.project_id
                                WHERE i.equipment_id = $equipment_id AND COALESCE(i.is_deleted,0)=0 $ins_scope
                                ORDER BY i.id DESC LIMIT 50");
     if ($q) while ($r = mysqli_fetch_assoc($q)) { $ins_rows[] = $r; }
@@ -261,14 +270,89 @@ if (db_table_has_column($conn, 'mnt_inspection', 'id')) {
         $ins_open  = intval($a['opened']);
         $ins_last  = !empty($a['last_at']) ? $a['last_at'] : null;
     }
-    // ملاحظات حرجة من بنود الفحص لهذه المعدة
-    if (db_table_has_column($conn, 'mnt_inspection_line', 'id')) {
-        $cq = mysqli_query($conn, "SELECT COUNT(*) c
+    // ملاحظات حرجة + بنود كل تفتيش (للعرض المُفصّل في النافذة)
+    if (!empty($ins_rows) && db_table_has_column($conn, 'mnt_inspection_line', 'id')) {
+        $ins_ids_csv = implode(',', array_map(function ($r) { return intval($r['id']); }, $ins_rows));
+        $lscope = $is_super_admin ? "" : " AND l.company_id = $company_id";
+        $lq = mysqli_query($conn, "SELECT l.inspection_id, l.section, l.component, l.condition_state,
+                                          l.measured_value, l.note, l.recommendation
                                      FROM mnt_inspection_line l
-                                     INNER JOIN mnt_inspection i ON i.id = l.inspection_id
-                                    WHERE i.equipment_id = $equipment_id AND COALESCE(i.is_deleted,0)=0
-                                      AND l.condition_state = 'حرج' $ins_scope");
-        if ($cq && ($c = mysqli_fetch_assoc($cq))) { $ins_critical = intval($c['c']); }
+                                    WHERE l.inspection_id IN ($ins_ids_csv)$lscope
+                                    ORDER BY l.is_template DESC, l.seq, l.id");
+        if ($lq) while ($lr = mysqli_fetch_assoc($lq)) {
+            $iid = intval($lr['inspection_id']);
+            $cs  = (string) ($lr['condition_state'] ?? '');
+            if (in_array($cs, $INS_CRIT, true)) { $ins_critical++; }
+            $ins_lines_map[$iid][] = array(
+                'sec'  => (string) ($lr['section'] ?? ''),
+                'item' => (string) ($lr['component'] ?? ''),
+                'cond' => $cs,
+                'mv'   => (string) ($lr['measured_value'] ?? ''),
+                'note' => (string) ($lr['note'] ?? ''),
+                'rec'  => (string) ($lr['recommendation'] ?? ''),
+            );
+        }
+    }
+}
+
+// شارات ملوّنة احترافية لجدول التفتيش (الدرجة/الجاهزية/الحالة)
+if (!function_exists('ems_ins_chip')) {
+    function ems_ins_chip($text, $bg, $fg, $min = 0)
+    {
+        $style = 'display:inline-block;padding:3px 11px;border-radius:999px;font-weight:700;font-size:12px;background:' . $bg . ';color:' . $fg . ';'
+               . ($min ? 'min-width:' . $min . 'px;text-align:center;' : '');
+        return '<span style="' . $style . '">' . htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8') . '</span>';
+    }
+    function ems_ins_score_chip($score)
+    {
+        if ($score === null || $score === '') return '<span style="color:#9ca3af;">—</span>';
+        $s = intval($score);
+        if ($s >= 85)      return ems_ins_chip($s . '%', 'rgba(22,163,74,.14)', '#15803d', 46);
+        elseif ($s >= 60)  return ems_ins_chip($s . '%', 'rgba(217,119,6,.16)', '#b45309', 46);
+        return ems_ins_chip($s . '%', 'rgba(220,38,38,.14)', '#b91c1c', 46);
+    }
+    function ems_ins_ready_chip($r)
+    {
+        $r = trim((string) $r);
+        if ($r === '') return '<span style="color:#9ca3af;">—</span>';
+        $map = array(
+            'جاهزة'        => array('rgba(22,163,74,.14)', '#15803d'),
+            'جاهزة بتحفّظ' => array('rgba(217,119,6,.16)', '#b45309'),
+            'غير جاهزة'    => array('rgba(220,38,38,.14)', '#b91c1c'),
+        );
+        $c = isset($map[$r]) ? $map[$r] : array('#f1f5f9', '#475569');
+        return ems_ins_chip($r, $c[0], $c[1]);
+    }
+    function ems_ins_state_chip($st)
+    {
+        $st = trim((string) $st);
+        $map = array(
+            'مكتمل'       => array('rgba(22,163,74,.14)', '#15803d'),
+            'مغلق'        => array('#e2e8f0', '#475569'),
+            'قيد التنفيذ' => array('rgba(217,119,6,.16)', '#b45309'),
+            'مجدول'       => array('rgba(37,99,235,.12)', '#1d4ed8'),
+            'جديد'        => array('rgba(37,99,235,.12)', '#1d4ed8'),
+        );
+        $c = isset($map[$st]) ? $map[$st] : array('#f1f5f9', '#475569');
+        return ems_ins_chip($st !== '' ? $st : '—', $c[0], $c[1]);
+    }
+    // عدّ بنود تفتيش واحد وإرجاع شارة ملاحظات (سليم ✓ أو ⚠ حرج/ملاحظة)
+    function ems_ins_findings_badge($lines, $GOOD, $NOTE, $CRIT, $NA)
+    {
+        if (empty($lines)) return '<span style="color:#9ca3af;">—</span>';
+        $crit = $note = $app = 0;
+        foreach ($lines as $l) {
+            $v = (string) $l['cond'];
+            if ($v === '' || in_array($v, $NA, true)) continue;
+            $app++;
+            if (in_array($v, $CRIT, true)) $crit++;
+            elseif (!in_array($v, $GOOD, true)) $note++;
+        }
+        $out = array();
+        if ($crit > 0) $out[] = ems_ins_chip('⚠ حرج ' . $crit, 'rgba(220,38,38,.14)', '#b91c1c');
+        if ($note > 0) $out[] = ems_ins_chip('ملاحظة ' . $note, 'rgba(217,119,6,.16)', '#b45309');
+        if (empty($out)) $out[] = ems_ins_chip('✓ سليم', 'rgba(22,163,74,.14)', '#15803d');
+        return '<span style="display:inline-flex;gap:5px;flex-wrap:wrap;">' . implode('', $out) . '</span>';
     }
 }
 
@@ -630,27 +714,48 @@ include '../insidebar.php';
         <div class="card-body">
             <div class="profile-grid">
                 <div class="profile-card"><div class="kpi"><?php echo intval($ins_total); ?></div><div class="label">إجمالي التفتيشات</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo intval($ins_done); ?></div><div class="label">مكتملة</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo intval($ins_open); ?></div><div class="label">مجدولة/مفتوحة</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo intval($ins_critical); ?></div><div class="label">ملاحظات حرجة</div></div>
+                <div class="profile-card"><div class="kpi" style="color:#15803d;"><?php echo intval($ins_done); ?></div><div class="label">مكتملة</div></div>
+                <div class="profile-card"><div class="kpi" style="color:#b45309;"><?php echo intval($ins_open); ?></div><div class="label">مجدولة/مفتوحة</div></div>
+                <div class="profile-card" <?php echo $ins_critical > 0 ? 'style="border-color:#fecaca;background:#fff5f5;"' : ''; ?>><div class="kpi" style="color:<?php echo $ins_critical > 0 ? '#b91c1c' : 'inherit'; ?>;"><?php echo intval($ins_critical); ?></div><div class="label">ملاحظات حرجة</div></div>
                 <div class="profile-card"><div class="kpi"><?php echo $ins_last ? htmlspecialchars((string) $ins_last) : '—'; ?></div><div class="label">آخر تفتيش</div></div>
             </div>
 
             <div class="table-container" style="margin-top:12px;">
-                <table class="display" style="width:100%;">
-                    <thead><tr><th>المرجع</th><th>النوع</th><th>الفاحص</th><th>التاريخ المجدول</th><th>تاريخ الإكمال</th><th>النتيجة</th><th>الحالة</th></tr></thead>
+                <table class="display ep-ins-table" style="width:100%;">
+                    <thead><tr><th>المرجع</th><th>النوع</th><th>الفاحص</th><th>التاريخ</th><th>الدرجة</th><th>الجاهزية</th><th>الملاحظات</th><th>الحالة</th><th>عرض</th></tr></thead>
                     <tbody>
                         <?php if (empty($ins_rows)): ?>
-                            <tr><td colspan="7" style="text-align:center;color:#888;">لا توجد تفتيشات لهذه المعدة</td></tr>
-                        <?php else: foreach ($ins_rows as $ir): ?>
+                            <tr><td colspan="9" style="text-align:center;color:#888;">لا توجد تفتيشات لهذه المعدة</td></tr>
+                        <?php else: foreach ($ins_rows as $ir):
+                            $ir_lines = isset($ins_lines_map[intval($ir['id'])]) ? $ins_lines_map[intval($ir['id'])] : array();
+                            $ir_date  = $ir['completed_at'] ?: ($ir['scheduled_date'] ?: '');
+                            // سمات البيانات للنافذة الموحّدة (EmsDetailsModal)
+                            $da =
+                                "data-id='"        . intval($ir['id']) . "' " .
+                                "data-code='"      . htmlspecialchars((string) $ir['code'], ENT_QUOTES) . "' " .
+                                "data-type='"      . htmlspecialchars((string) ($ir['inspection_type'] ?? ''), ENT_QUOTES) . "' " .
+                                "data-inspector='" . htmlspecialchars((string) ($ir['inspector_name'] ?? ''), ENT_QUOTES) . "' " .
+                                "data-project='"   . htmlspecialchars((string) ($ir['project_name'] ?? ''), ENT_QUOTES) . "' " .
+                                "data-scheduled='" . htmlspecialchars((string) ($ir['scheduled_date'] ?? ''), ENT_QUOTES) . "' " .
+                                "data-completed='" . htmlspecialchars((string) ($ir['completed_at'] ?? ''), ENT_QUOTES) . "' " .
+                                "data-score='"     . htmlspecialchars((string) ($ir['score'] ?? ''), ENT_QUOTES) . "' " .
+                                "data-overall='"   . htmlspecialchars((string) ($ir['overall_result'] ?? ''), ENT_QUOTES) . "' " .
+                                "data-readiness='" . htmlspecialchars((string) ($ir['tech_readiness_state'] ?? ''), ENT_QUOTES) . "' " .
+                                "data-eqcond='"    . htmlspecialchars((string) ($ir['equipment_condition'] ?? ''), ENT_QUOTES) . "' " .
+                                "data-engcond='"   . htmlspecialchars((string) ($ir['engine_condition'] ?? ''), ENT_QUOTES) . "' " .
+                                "data-notes='"     . htmlspecialchars((string) ($ir['notes'] ?? ''), ENT_QUOTES) . "' " .
+                                "data-state='"     . htmlspecialchars((string) $ir['state'], ENT_QUOTES) . "'";
+                        ?>
                             <tr>
                                 <td><strong><?php echo htmlspecialchars((string) $ir['code']); ?></strong></td>
                                 <td><?php echo htmlspecialchars((string) ($ir['inspection_type'] ?: '—')); ?></td>
                                 <td><?php echo htmlspecialchars((string) ($ir['inspector_name'] ?: '—')); ?></td>
-                                <td><?php echo htmlspecialchars((string) ($ir['scheduled_date'] ?: '—')); ?></td>
-                                <td><?php echo htmlspecialchars((string) ($ir['completed_at'] ?: '—')); ?></td>
-                                <td><?php echo htmlspecialchars((string) ($ir['overall_result'] ?: '—')); ?></td>
-                                <td><span class="action-btn"><?php echo htmlspecialchars((string) $ir['state']); ?></span></td>
+                                <td><?php echo htmlspecialchars((string) ($ir_date ?: '—')); ?></td>
+                                <td data-order="<?php echo $ir['score'] !== null && $ir['score'] !== '' ? intval($ir['score']) : -1; ?>"><?php echo ems_ins_score_chip($ir['score'] ?? null); ?></td>
+                                <td><?php echo ems_ins_ready_chip($ir['tech_readiness_state'] ?? ''); ?></td>
+                                <td><?php echo ems_ins_findings_badge($ir_lines, $INS_GOOD, $INS_NOTE, $INS_CRIT, $INS_NA); ?></td>
+                                <td><?php echo ems_ins_state_chip($ir['state']); ?></td>
+                                <td><a href="javascript:void(0)" class="action-btn view ep-ins-view" <?php echo $da; ?> title="عرض تفاصيل التفتيش"><i class="fas fa-eye"></i></a></td>
                             </tr>
                         <?php endforeach; endif; ?>
                     </tbody>
@@ -658,6 +763,7 @@ include '../insidebar.php';
             </div>
         </div>
     </div>
+    <script>window.EP_INS_LINES = <?php echo json_encode($ins_lines_map, JSON_UNESCAPED_UNICODE); ?>;</script>
 
     <!-- ════════════════ قسم الصيانة الوقائية — مرئي لكل من يفتح الكرت ════════════════ -->
     <div class="card" id="sec-preventive" style="margin-bottom:14px;">
@@ -1003,4 +1109,101 @@ $(function () {
     var h = (location.hash || '').replace('#', '');
     if (h && page.querySelector('#tab-' + h)) activate(h);
 });
+
+// ════════ نافذة تفاصيل التفتيش الاحترافية (تعيد استخدام EmsDetailsModal) ════════
+(function () {
+    var GOOD = ['سليم', 'صالح'],
+        NA   = ['لا ينطبق', ''],
+        CRIT = ['حرج', 'ضرر بالغ', 'يحتاج استبدال', 'يحتاج عمرة'],
+        NOTE = ['ملاحظة', 'ضرر طفيف', 'ضرر متوسط', 'تآكل ضمن الحد'];
+
+    function escH(s) {
+        s = (s == null ? '' : String(s));
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    function condMeta(cs) {
+        if (CRIT.indexOf(cs) >= 0) return { bg: 'rgba(220,38,38,.14)', fg: '#b91c1c' };
+        if (NOTE.indexOf(cs) >= 0) return { bg: 'rgba(217,119,6,.16)', fg: '#b45309' };
+        if (NA.indexOf(cs)   >= 0) return { bg: '#f1efe8', fg: '#6b7280' };
+        return { bg: 'rgba(22,163,74,.14)', fg: '#15803d' };
+    }
+    function pill(cs) {
+        var m = condMeta(cs), t = (cs && cs !== '') ? cs : '—';
+        return '<span style="display:inline-flex;align-items:center;padding:3px 11px;border-radius:999px;'
+             + 'font-size:12px;font-weight:800;background:' + m.bg + ';color:' + m.fg + ';white-space:nowrap;">'
+             + escH(t) + '</span>';
+    }
+    function detailText(l) {
+        return [l.mv, l.note].filter(function (x) { return x && x !== ''; }).join(' — ');
+    }
+
+    document.addEventListener('click', function (ev) {
+        var btn = ev.target.closest ? ev.target.closest('.ep-ins-view') : null;
+        if (!btn || typeof window.EmsDetailsModal === 'undefined') return;
+        var d = btn.dataset;
+        var lines = (window.EP_INS_LINES || {})[String(d.id)] || [];
+
+        var good = 0, note = 0, crit = 0, na = 0, app = 0;
+        lines.forEach(function (l) {
+            var v = l.cond || '';
+            if (v === '') return;
+            if (NA.indexOf(v) >= 0) { na++; return; }
+            app++;
+            if (GOOD.indexOf(v) >= 0) good++;
+            else if (CRIT.indexOf(v) >= 0) crit++;
+            else note++;
+        });
+        var score = app > 0 ? Math.round(100 * good / app) : null;
+
+        // البنود التي تحتاج إجراء (ملاحظة/حرج) — الجزء القابل للتنفيذ
+        var attn = lines.filter(function (l) {
+            var v = l.cond || '';
+            return v !== '' && GOOD.indexOf(v) < 0 && NA.indexOf(v) < 0;
+        }).map(function (l) {
+            return [l.item, { html: pill(l.cond) }, (l.rec || detailText(l) || '—')];
+        });
+        // كل البنود — مجمّعة حسب المنظومة
+        var allRows = lines.map(function (l) {
+            return [(l.sec || '—'), l.item, { html: pill(l.cond) }, (detailText(l) || '—')];
+        });
+
+        window.EmsDetailsModal.open({
+            title: 'تفتيش — ' + (d.code || ''),
+            icon: 'fas fa-clipboard-check',
+            fields: [
+                { label: 'المرجع', value: d.code, icon: 'fas fa-hashtag' },
+                { label: 'الحالة', value: d.state, icon: 'fas fa-flag', type: 'status', tone: (d.state === 'مكتمل' ? 'active' : null) },
+                { label: 'النوع', value: d.type, icon: 'fas fa-list' },
+                { label: 'الفاحص', value: d.inspector, icon: 'fas fa-user-gear' },
+                { label: 'المشروع', value: d.project, icon: 'fas fa-folder-open' },
+                { label: 'التاريخ المجدول', value: d.scheduled, icon: 'fas fa-calendar' },
+                { label: 'تاريخ الإكمال', value: d.completed, icon: 'fas fa-calendar-check' },
+                { label: 'الدرجة', value: (d.score && d.score !== '') ? d.score + '%' : '', icon: 'fas fa-star' },
+                { label: 'الجاهزية الفنية', value: d.readiness, icon: 'fas fa-gauge-high' },
+                { label: 'حالة المعدة', value: d.eqcond, icon: 'fas fa-tractor' },
+                { label: 'حالة المحرك', value: d.engcond, icon: 'fas fa-gears' },
+                { label: 'النتيجة العامة', value: d.overall, icon: 'fas fa-clipboard-check', size: 'lg' },
+                { label: 'ملاحظات', value: d.notes, icon: 'fas fa-note-sticky', size: 'full' }
+            ],
+            sections: [
+                { title: 'ملخّص الفحص', icon: 'fas fa-chart-pie',
+                  pills: [
+                      { label: 'سليم', value: good },
+                      { label: 'ملاحظة', value: note },
+                      { label: 'حرج', value: crit },
+                      { label: 'لا ينطبق', value: na },
+                      { label: 'الدرجة', value: (score === null ? '—' : score + '%') }
+                  ] },
+                { title: 'بنود تحتاج إجراء', icon: 'fas fa-triangle-exclamation',
+                  pills: [ { label: 'الإجمالي', value: attn.length } ],
+                  table: { columns: ['البند', 'الحالة', 'التوصية/الملاحظة'], rows: attn },
+                  empty: 'لا ملاحظات — كل البنود المنطبقة سليمة ✅' },
+                { title: 'كل بنود الفحص', icon: 'fas fa-list-check',
+                  pills: [ { label: 'عدد البنود', value: lines.length } ],
+                  table: { columns: ['المنظومة', 'البند', 'الحالة', 'التفاصيل'], rows: allRows },
+                  empty: 'لا توجد بنود فحص لهذا التفتيش' }
+            ]
+        });
+    });
+})();
 </script>
