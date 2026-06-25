@@ -116,33 +116,33 @@ if (isset($_POST['equipment_id'])) {
         $success_count = 0;
         $error_messages = [];
 
-        foreach ($drivers as $driver_id) {
-            $driver_id = intval($driver_id);
+        foreach ($drivers as $employee_id) {
+            $employee_id = intval($employee_id);
 
             // التحقق من عدم وجود ربط نشط بالفعل
             $check_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";
-            $check = mysqli_query($conn, "SELECT id FROM equipment_drivers WHERE equipment_id=$equipment_id AND driver_id=$driver_id AND status=1$check_scope");
+            $check = mysqli_query($conn, "SELECT id FROM equipment_drivers WHERE equipment_id=$equipment_id AND employee_id=$employee_id AND status=1$check_scope");
             if ($check && mysqli_num_rows($check) > 0) {
                 continue;
             }
 
             // جلب معلومات السائق
-            $driver_res = mysqli_query($conn, "SELECT d.name, d.phone FROM employees d WHERE d.id = $driver_id AND $driver_scope_sql LIMIT 1");
+            $driver_res = mysqli_query($conn, "SELECT d.name, d.phone FROM employees d WHERE d.id = $employee_id AND $driver_scope_sql LIMIT 1");
             $driver_info = $driver_res ? mysqli_fetch_assoc($driver_res) : null;
             if (!$driver_info) {
-                $error_messages[] = "السائق #$driver_id خارج النطاق";
+                $error_messages[] = "السائق #$employee_id خارج النطاق";
                 continue;
             }
-            $driver_name = $driver_info ? $driver_info['name'] : "سائق #$driver_id";
+            $driver_name = $driver_info ? $driver_info['name'] : "سائق #$employee_id";
 
             // اشتقاق التواريخ من عقد السائق الساري (وليس من الفورم)
-            $dates = ems_resolve_equipment_driver_dates($conn, $driver_id, $company_id, $is_super_admin);
+            $dates = ems_resolve_equipment_driver_dates($conn, $employee_id, $company_id, $is_super_admin);
             $start_date = $dates['start'];
             $end_date = $dates['end'];
 
             $payload = [
                 'summary' => [
-                    'driver_id' => $driver_id,
+                    'employee_id' => $employee_id,
                     'driver_name' => $driver_name,
                     'equipment_id' => $equipment_id,
                     'equipment_code' => $equipment_code,
@@ -160,7 +160,7 @@ if (isset($_POST['equipment_id'])) {
                         'table' => 'equipment_drivers',
                         'data' => [
                             'equipment_id' => $equipment_id,
-                            'driver_id' => $driver_id,
+                            'employee_id' => $employee_id,
                             'start_date' => $start_date,
                             'end_date' => $end_date,
                             'status' => 1,
@@ -176,7 +176,7 @@ if (isset($_POST['equipment_id'])) {
 
             $approval_result = approval_create_request(
                 'driver',
-                $driver_id,
+                $employee_id,
                 'activate_driver',
                 $payload,
                 approval_get_user_id(),
@@ -207,22 +207,22 @@ if (isset($_POST['equipment_id'])) {
     }
 
     // المستخدمون الآخرون: إضافة مباشرة
-    foreach ($drivers as $driver_id) {
-        $driver_id = intval($driver_id);
+    foreach ($drivers as $employee_id) {
+        $employee_id = intval($employee_id);
 
         // اشتقاق التواريخ من عقد السائق الساري (وليس من الفورم)
-        $dates = ems_resolve_equipment_driver_dates($conn, $driver_id, $company_id, $is_super_admin);
+        $dates = ems_resolve_equipment_driver_dates($conn, $employee_id, $company_id, $is_super_admin);
         $start_sql = "'" . mysqli_real_escape_string($conn, $dates['start']) . "'";
         $end_sql = "'" . mysqli_real_escape_string($conn, $dates['end']) . "'";
 
         // التحقق من عدم وجود ربط نشط بالفعل
         $check_scope = ($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id";
-        $check = mysqli_query($conn, "SELECT id FROM equipment_drivers WHERE equipment_id=$equipment_id AND driver_id=$driver_id AND status=1$check_scope");
+        $check = mysqli_query($conn, "SELECT id FROM equipment_drivers WHERE equipment_id=$equipment_id AND employee_id=$employee_id AND status=1$check_scope");
         if ($check && mysqli_num_rows($check) > 0) {
             continue;
         }
 
-        $active_any = mysqli_query($conn, "SELECT id, equipment_id FROM equipment_drivers WHERE driver_id=$driver_id AND status=1$check_scope LIMIT 1");
+        $active_any = mysqli_query($conn, "SELECT id, equipment_id FROM equipment_drivers WHERE employee_id=$employee_id AND status=1$check_scope LIMIT 1");
         if ($active_any && mysqli_num_rows($active_any) > 0) {
             $active_row = mysqli_fetch_assoc($active_any);
             $active_equipment_id = isset($active_row['equipment_id']) ? intval($active_row['equipment_id']) : 0;
@@ -234,14 +234,14 @@ if (isset($_POST['equipment_id'])) {
             if ($auto_replace === 1) {
                 mysqli_query(
                     $conn,
-                    "UPDATE equipment_drivers SET status=0, end_date=$start_sql WHERE driver_id=$driver_id AND status=1$check_scope"
+                    "UPDATE equipment_drivers SET status=0, end_date=$start_sql WHERE employee_id=$employee_id AND status=1$check_scope"
                 );
             } else {
                 continue;
             }
         }
 
-        $driver_res = mysqli_query($conn, "SELECT d.id FROM employees d WHERE d.id = $driver_id AND $driver_scope_sql LIMIT 1");
+        $driver_res = mysqli_query($conn, "SELECT d.id FROM employees d WHERE d.id = $employee_id AND $driver_scope_sql LIMIT 1");
         if (!$driver_res || mysqli_num_rows($driver_res) === 0) {
             continue;
         }
@@ -253,8 +253,8 @@ if (isset($_POST['equipment_id'])) {
 
         mysqli_query(
             $conn,
-            "INSERT INTO equipment_drivers (equipment_id, driver_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-             VALUES ($equipment_id, $driver_id, $start_sql, $end_sql, 1$insert_shift_val$insert_company_val)"
+            "INSERT INTO equipment_drivers (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
+             VALUES ($equipment_id, $employee_id, $start_sql, $end_sql, 1$insert_shift_val$insert_company_val)"
         );
     }
 

@@ -60,7 +60,7 @@ function operations_index(): void
                               e.code AS equipment_code, e.name AS equipment_name,
                               et.type AS equipment_type_name,
                               s.name AS supplier_name,
-                              COUNT(DISTINCT CASE WHEN ed.status = 1 THEN ed.driver_id END) AS active_drivers_count
+                              COUNT(DISTINCT CASE WHEN ed.status = 1 THEN ed.employee_id END) AS active_drivers_count
                        FROM operations o
                        LEFT JOIN equipments e ON e.id = o.equipment
                        LEFT JOIN equipments_types et ON et.id = e.type
@@ -80,11 +80,11 @@ function operations_index(): void
 
     // ── سائقو كل معدة ─────────────────────────────────────────────────────
     $shift_select = $scope['ed_has_shift'] ? 'ed.shift_type' : "'B' AS shift_type";
-    $drivers_sql = "SELECT ed.id, ed.equipment_id, ed.driver_id, ed.start_date, ed.end_date, ed.status,
+    $drivers_sql = "SELECT ed.id, ed.equipment_id, ed.employee_id, ed.start_date, ed.end_date, ed.status,
                            $shift_select,
                            d.name AS driver_name, d.phone AS driver_phone
                     FROM equipment_drivers ed
-                    INNER JOIN employees d ON d.id = ed.driver_id
+                    INNER JOIN employees d ON d.id = ed.employee_id
                     INNER JOIN equipments e ON e.id = ed.equipment_id
                     WHERE EXISTS (
                         SELECT 1 FROM operations o
@@ -104,7 +104,7 @@ function operations_index(): void
             }
             $drivers_by_equipment[$eid][] = [
                 'rel_id'       => intval($d['id']),
-                'driver_id'    => intval($d['driver_id']),
+                'employee_id'    => intval($d['employee_id']),
                 'driver_name'  => $d['driver_name'] ?? '',
                 'driver_phone' => $d['driver_phone'] ?? '',
                 'shift_type'   => $d['shift_type'] ?? 'B',

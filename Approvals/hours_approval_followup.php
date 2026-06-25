@@ -153,7 +153,7 @@ $followup_sql = "
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN suppliers s ON s.id = e.suppliers
     LEFT JOIN project p ON p.id = o.$ops_project_col
-    LEFT JOIN employees d ON d.id = t.driver
+    LEFT JOIN employees d ON d.id = t.employee_id
     WHERE t.status = 1
       AND $my_followup_where
       $company_scope_ts
@@ -191,7 +191,7 @@ $final_sql = "
     LEFT JOIN equipments e ON e.id = o.equipment
     LEFT JOIN suppliers s ON s.id = e.suppliers
     LEFT JOIN project p ON p.id = o.$ops_project_col
-    LEFT JOIN employees d ON d.id = t.driver
+    LEFT JOIN employees d ON d.id = t.employee_id
     WHERE t.status = 1
       $company_scope_ts
       $site_scope_ts

@@ -378,7 +378,7 @@ function getSuppliersForDropdown($conn, $companyId, $isSuperAdmin) {
  */
 function getDriversForDropdown($conn, $companyId, $isSuperAdmin) {
     $scope = rptCompanyScope($conn, 'd', 'employees', $companyId, $isSuperAdmin);
-    $sql   = "SELECT id, name, driver_code FROM employees d WHERE ($scope) ORDER BY name ASC";
+    $sql   = "SELECT id, name, employee_code FROM employees d WHERE ($scope) ORDER BY name ASC";
     $res   = mysqli_query($conn, $sql);
     $list  = [];
     if ($res) while ($r = mysqli_fetch_assoc($res)) $list[] = $r;

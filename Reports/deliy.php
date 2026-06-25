@@ -24,7 +24,7 @@ $sql = "
   FROM timesheet t
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id
-  JOIN employees d ON t.driver = d.id
+  JOIN employees d ON t.employee_id = d.id
   JOIN project p ON o.project_id = p.id
   WHERE 1=1
 ";

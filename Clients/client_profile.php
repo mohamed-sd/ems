@@ -107,7 +107,7 @@ if ($r) {
     $equipments_count = intval(mysqli_fetch_assoc($r)['c']);
 }
 
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT ed.driver_id) AS c
+$r = mysqli_query($conn, "SELECT COUNT(DISTINCT ed.employee_id) AS c
                          FROM operations o
                          INNER JOIN project p ON p.id = o.project_id
                          INNER JOIN equipment_drivers ed ON ed.equipment_id = o.equipment

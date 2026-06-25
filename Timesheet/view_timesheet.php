@@ -46,7 +46,7 @@ $end_date = isset($_GET['end_date']) ? mysqli_real_escape_string($conn, trim($_G
 $month_filter = isset($_GET['month']) ? mysqli_real_escape_string($conn, trim($_GET['month'])) : '';
 $project_id = isset($_GET['project_id']) ? intval($_GET['project_id']) : 0;
 $operation_id = isset($_GET['operation_id']) ? intval($_GET['operation_id']) : 0;
-$driver_id = isset($_GET['driver_id']) ? intval($_GET['driver_id']) : 0;
+$employee_id = isset($_GET['employee_id']) ? intval($_GET['employee_id']) : 0;
 $equipment_type_raw = isset($_GET['equipment_type']) ? mysqli_real_escape_string($conn, trim($_GET['equipment_type'])) : '';
 $type_from_url = isset($_GET['type']) ? trim($_GET['type']) : '';
 $equipment_type = ($equipment_type_raw === '1' || $equipment_type_raw === '2' || $equipment_type_raw === '3')
@@ -64,7 +64,7 @@ $has_filters = (
     $project_id > 0 ||
     $equipment_type !== '' ||
     $operation_id > 0 ||
-    $driver_id > 0 ||
+    $employee_id > 0 ||
     $shift_filter !== '' ||
     $status_filter !== ''
 );
@@ -121,8 +121,8 @@ if ($operation_id > 0) {
     $filter_where_parts[] = "o.id = $operation_id";
 }
 
-if ($driver_id > 0) {
-    $filter_where_parts[] = "d.id = $driver_id";
+if ($employee_id > 0) {
+    $filter_where_parts[] = "d.id = $employee_id";
 }
 
 if ($equipment_type === '1' || $equipment_type === '2' || $equipment_type === '3') {
@@ -146,7 +146,7 @@ $base_from_sql = "
     JOIN operations o ON t.operator = o.id
     JOIN equipments e ON o.equipment = e.id
     JOIN project p ON o.$operations_project_column = p.id
-    LEFT JOIN employees d ON t.driver = d.id
+    LEFT JOIN employees d ON t.employee_id = d.id
 ";
 
 $order_sql = " ORDER BY t.date DESC, t.id DESC ";
@@ -246,7 +246,7 @@ if ($operation_id > 0) {
     if ($equipment_id > 0) {
         $driver_sql = "SELECT d.id, d.name
             FROM equipment_drivers ed
-            JOIN employees d ON ed.driver_id = d.id
+            JOIN employees d ON ed.employee_id = d.id
             WHERE ed.equipment_id = $equipment_id";
 
         if (!$is_super_admin && db_table_has_column($conn, 'employees', 'company_id')) {
@@ -260,7 +260,7 @@ if ($operation_id > 0) {
                 LEFT JOIN users su2 ON su2.id = p2.created_by
                 LEFT JOIN clients sc2 ON sc2.id = p2.$project_client_column
                 LEFT JOIN users scu2 ON scu2.id = sc2.created_by
-                WHERE ed2.driver_id = d.id
+                WHERE ed2.employee_id = d.id
                   AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
             )";
         }
@@ -922,10 +922,10 @@ include('../includes/page_header.php');
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> المشغل (السائق)</label>
-                    <select name="driver_id" id="driver_filter">
+                    <select name="employee_id" id="driver_filter">
                         <option value=""><?= $operation_id > 0 ? '-- اختر السائق --' : '-- اختر الآلية أولاً --' ?></option>
                         <?php foreach ($drivers as $driver) { ?>
-                            <option value="<?= intval($driver['id']) ?>" <?= $driver_id === intval($driver['id']) ? 'selected' : '' ?>>
+                            <option value="<?= intval($driver['id']) ?>" <?= $employee_id === intval($driver['id']) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($driver['name']) ?>
                             </option>
                         <?php } ?>

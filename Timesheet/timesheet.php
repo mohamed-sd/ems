@@ -222,7 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
   // Secure form values
   $fields = [
     "operator",
-    "driver",
+    "employee_id",
     "shift",
     "date",
     "shift_hours",
@@ -466,7 +466,7 @@ $today_rows_query = "SELECT t.id, t.shift, t.date, t.executed_hours,
                       JOIN operations o ON t.operator = o.id
                       JOIN equipments e ON o.equipment = e.id
                       JOIN project p ON o." . $operations_project_column . " = p.id
-                      JOIN employees d ON t.driver = d.id
+                      JOIN employees d ON t.employee_id = d.id
                       WHERE " . $today_filter_sql . $type_sql . $tenant_timesheet_filter_sql . $role6_sql . "
                       ORDER BY t.date DESC, t.id DESC";
 
@@ -621,7 +621,7 @@ if ($today_rows_result) {
 
             <div>
               <label>السائق</label>
-              <select id="driver" name="driver">
+              <select id="driver" name="employee_id">
                 <option value="">-- اختر السائق --</option>
               </select>
             </div>
@@ -966,7 +966,7 @@ if ($today_rows_result) {
             <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
             <div>
               <label>السائق</label>
-              <!-- <select name="driver"  required>
+              <!-- <select name="employee_id"  required>
             <option value="">-- اختر السائق --</option>
             <?php
             $driver_scope_sql = "1=1";
@@ -982,7 +982,7 @@ if ($today_rows_result) {
                   LEFT JOIN users su ON su.id = p.created_by
                   LEFT JOIN clients sc ON sc.id = p.client_id
                   LEFT JOIN users scu ON scu.id = sc.created_by
-                  WHERE ed.driver_id = employees.id
+                  WHERE ed.employee_id = employees.id
                     AND (su.company_id = $company_id OR scu.company_id = $company_id)
                 )";
               }
@@ -996,7 +996,7 @@ if ($today_rows_result) {
 
 
 
-              <select id="driver" name="driver">
+              <select id="driver" name="employee_id">
                 <option value="">-- اختر السائق --</option>
               </select>
 
@@ -1357,7 +1357,7 @@ if ($today_rows_result) {
 
             <div>
               <label>السائق</label>
-              <select id="driver" name="driver">
+              <select id="driver" name="employee_id">
                 <option value="">-- اختر السائق --</option>
               </select>
             </div>
@@ -2150,7 +2150,7 @@ if ($today_rows_result) {
 
       // بعد تحميل بيانات العملية عبر AJAX نضبط السائق والوردية
       setTimeout(function () {
-        $("#driver").val(data.driver);
+        $("#driver").val(data.employee_id);
         if (data.shift) {
           $("#shift").val(data.shift);
         }

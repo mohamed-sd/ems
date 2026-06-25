@@ -78,7 +78,7 @@ $r = mysqli_query($conn, "SELECT COUNT(DISTINCT o.equipment) AS c FROM operation
 if ($r) {
     $equipments_count = intval(mysqli_fetch_assoc($r)['c']);
 }
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT ed.driver_id) AS c
+$r = mysqli_query($conn, "SELECT COUNT(DISTINCT ed.employee_id) AS c
                          FROM operations o
                          INNER JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
                          WHERE o.project_id = $project_id AND ed.status = 1");

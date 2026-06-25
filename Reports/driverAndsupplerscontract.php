@@ -77,7 +77,7 @@ SELECT
     t.date,
     SUM(t.total_work_hours) AS total_hours
 FROM timesheet t
-JOIN employees d ON t.driver = d.id
+JOIN employees d ON t.employee_id = d.id
 JOIN operations o ON t.operator = o.id
 JOIN equipments e ON o.equipment = e.id 
 JOIN project p ON o." . $operations_project_column . " = p.id

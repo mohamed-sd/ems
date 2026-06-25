@@ -1038,7 +1038,7 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
                         LEFT JOIN equipment_drivers ed
                             ON ed.equipment_id = m.id
                         LEFT JOIN employees d
-                            ON d.id = ed.driver_id
+                            ON d.id = ed.employee_id
                             AND ed.status = '1'
                         WHERE $equipment_scope_where
                         GROUP BY m.id

@@ -182,7 +182,7 @@ class ActivityLogMiddleware
 
     private static function hasUpdateHint(): bool
     {
-        $updateIdFields = ['id', 'client_id', 'supplier_id', 'driver_id', 'operation_id', 'timesheet_id', 'record_id'];
+        $updateIdFields = ['id', 'client_id', 'supplier_id', 'employee_id', 'operation_id', 'timesheet_id', 'record_id'];
         foreach ($updateIdFields as $field) {
             if (!isset($_POST[$field])) {
                 continue;
@@ -202,7 +202,7 @@ class ActivityLogMiddleware
             'id',
             'client_id',
             'supplier_id',
-            'driver_id',
+            'employee_id',
             'timesheet_id',
             'delete_id',
             'remove_id',

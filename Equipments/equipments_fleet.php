@@ -1420,7 +1420,7 @@ $fleet_active_ops_count = intval($_faoc_res ? (mysqli_fetch_assoc($_faoc_res)['t
                         LEFT JOIN equipment_drivers ed
                             ON ed.equipment_id = m.id
                         LEFT JOIN employees d
-                            ON d.id = ed.driver_id
+                            ON d.id = ed.employee_id
                             AND ed.status = '1'
                         WHERE 1=1 $equipment_company_filter
                         GROUP BY m.id

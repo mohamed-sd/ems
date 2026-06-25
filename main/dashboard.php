@@ -137,7 +137,7 @@ $so = $companyId > 0 ? "operations.project_id IN(SELECT p.id FROM project p WHER
 $hasMineId = dashboard_has_column($conn, 'operations', 'mine_id');
 $hasSuppId = dashboard_has_column($conn, 'operations', 'supplier_id');
 $hasAvail = dashboard_has_column($conn, 'equipments', 'availability_status');
-$hasDrvSt = dashboard_has_column($conn, 'employees', 'driver_status');
+$hasDrvSt = dashboard_has_column($conn, 'employees', 'employee_status');
 $hasSCMine = dashboard_has_column($conn, 'supplierscontracts', 'mine_id');
 $hasSCPCId = dashboard_has_column($conn, 'supplierscontracts', 'project_contract_id');
 $contractsProjectCol = dashboard_has_column($conn, 'contracts', 'project_id') ? 'project_id' : (dashboard_has_column($conn, 'contracts', 'project') ? 'project' : 'project_id');
@@ -199,7 +199,7 @@ if ($dashboardRole == "0" || $dashboardRole == "1" || $dashboardRole == "12") {
   $stats = [['fa-tools', $eq, 'إجمالي المعدات', 'or'], ['fa-play-circle', $ao, 'تعمل الآن', 'ok'], ['fa-exclamation-triangle', $bo, 'معطلة', 'err'], ['fa-truck', $s, 'الموردون', 'or']];
 } elseif ($dashboardRole == "4") {
   $dr = dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM employees d WHERE company_id=$companyId", 't');
-  $ad = dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM employees d JOIN equipment_drivers ed ON d.id=ed.driver_id WHERE ed.status='1' AND d.company_id=$companyId", 't');
+  $ad = dashboard_scalar($conn, "SELECT COUNT(DISTINCT d.id) AS t FROM employees d JOIN equipment_drivers ed ON d.id=ed.employee_id WHERE ed.status='1' AND d.company_id=$companyId", 't');
   $stats = [['fa-id-badge', $dr, 'إجمالي المشغلين', 'or'], ['fa-user-check', $ad, 'يعملون الآن', 'ok'], ['fa-user-clock', $dr - $ad, 'خاملون', 'warn']];
 } elseif ($dashboardRole == "5") {
   $sv = $companyId > 0 ? dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE company_id=$companyId AND role IN('6','7','8','9')", 't') : dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM users WHERE role IN('6','7','8','9')", 't');
@@ -215,9 +215,9 @@ if ($dashboardRole == "0" || $dashboardRole == "1" || $dashboardRole == "12") {
 
   $stpEq = max(0, intval($totEq) - intval($wrkEq));
 
-  $dCond = $hasDrvSt ? " AND(d.driver_status IS NULL OR d.driver_status NOT IN('موقوف','متوقف'))" : "";
-  $totOp = dashboard_scalar($conn, "SELECT COUNT(DISTINCT ed.driver_id) AS t FROM operations o JOIN equipment_drivers ed ON ed.equipment_id=o.equipment JOIN employees d ON d.id=ed.driver_id WHERE $pSql$mSql", 't');
-  $wrkOp = dashboard_scalar($conn, "SELECT COUNT(DISTINCT ed.driver_id) AS t FROM operations o JOIN equipment_drivers ed ON ed.equipment_id=o.equipment JOIN employees d ON d.id=ed.driver_id WHERE $pSql$mSql AND ed.status='1' AND d.status='1'$dCond", 't');
+  $dCond = $hasDrvSt ? " AND(d.employee_status IS NULL OR d.employee_status NOT IN('موقوف','متوقف'))" : "";
+  $totOp = dashboard_scalar($conn, "SELECT COUNT(DISTINCT ed.employee_id) AS t FROM operations o JOIN equipment_drivers ed ON ed.equipment_id=o.equipment JOIN employees d ON d.id=ed.employee_id WHERE $pSql$mSql", 't');
+  $wrkOp = dashboard_scalar($conn, "SELECT COUNT(DISTINCT ed.employee_id) AS t FROM operations o JOIN equipment_drivers ed ON ed.equipment_id=o.equipment JOIN employees d ON d.id=ed.employee_id WHERE $pSql$mSql AND ed.status='1' AND d.status='1'$dCond", 't');
   $stpOp = max(0, intval($totOp) - intval($wrkOp));
   $scMine = ($sessionMineId > 0 && $hasSCMine) ? " AND sc.mine_id=$sessionMineId" : "";
   $scCid = ($sessionContractId > 0 && $hasSCPCId) ? " AND sc.project_contract_id=$sessionContractId" : "";

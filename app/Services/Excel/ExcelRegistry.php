@@ -86,7 +86,7 @@ class ExcelRegistry
 
         // ─────────────────────────── السائقون (Drivers) ───────────────────────────
         $defs['drivers'] = new EntityDefinition('drivers', 'السائقون', 'employees', [
-            new Column('driver_code', 'كود السائق', ['unique' => true, 'width' => 18, 'example' => 'DRV-0001']),
+            new Column('employee_code', 'كود السائق', ['unique' => true, 'width' => 18, 'example' => 'DRV-0001']),
             new Column('name', 'اسم السائق', ['required' => true, 'width' => 32, 'example' => 'محمد أحمد علي']),
             new Column('phone', 'رقم الهاتف', ['type' => Column::TYPE_PHONE, 'required' => true, 'example' => '+249912345678']),
             new Column('phone_alternative', 'هاتف بديل', ['type' => Column::TYPE_PHONE]),
@@ -130,7 +130,7 @@ class ExcelRegistry
                 ],
                 'exportExpr' => "(SELECT p.name FROM project p WHERE p.id = employees.project_id)",
             ]),
-            new Column('driver_status', 'الحالة', ['type' => Column::TYPE_ENUM, 'enum' => ['نشط', 'متوقف'], 'default' => 'نشط', 'width' => 14]),
+            new Column('employee_status', 'الحالة', ['type' => Column::TYPE_ENUM, 'enum' => ['نشط', 'متوقف'], 'default' => 'نشط', 'width' => 14]),
         ], [
             'moduleCode'      => 'drivers',
             'softDeleteColumn' => null,
@@ -431,7 +431,7 @@ class ExcelRegistry
         // ─────────────────────────── ساعات العمل (Timesheet) ───────────────────────────
         $defs['timesheet'] = new EntityDefinition('timesheet', 'ساعات العمل', 'timesheet', [
             new Column('operator', 'المشغّل', ['required' => true, 'width' => 22, 'example' => 'محمد علي']),
-            new Column('driver', 'السائق (اسم أو كود)', [
+            new Column('employee_id', 'السائق (اسم أو كود)', [
                 'required'   => true,
                 'width'      => 22,
                 'example'    => 'محمد أحمد علي',
@@ -440,12 +440,12 @@ class ExcelRegistry
                 'lookup'     => [
                     'table'     => 'employees',
                     'idColumn'  => 'id',
-                    'storeIdIn' => 'driver',
-                    'matchBy'   => ['driver_code', 'name'],
+                    'storeIdIn' => 'employee_id',
+                    'matchBy'   => ['employee_code', 'name'],
                     'nameColumn' => 'name',
                     'scoped'    => true,
                 ],
-                'exportExpr' => "(SELECT d.name FROM employees d WHERE d.id = timesheet.driver)",
+                'exportExpr' => "(SELECT d.name FROM employees d WHERE d.id = timesheet.employee_id)",
             ]),
             new Column('shift', 'الوردية', ['required' => true, 'width' => 12, 'example' => 'D']),
             new Column('date', 'التاريخ', ['required' => true, 'width' => 16, 'example' => '2026-01-15']),
@@ -550,7 +550,7 @@ class ExcelRegistry
 
         // ─────────────────────────── عقود السائقين (Driver Contracts) ───────────────────────────
         $defs['driver_contracts'] = new EntityDefinition('driver_contracts', 'عقود السائقين', 'drivercontracts', [
-            new Column('driver_id', 'السائق (اسم أو كود)', [
+            new Column('employee_id', 'السائق (اسم أو كود)', [
                 'required'   => true,
                 'width'      => 24,
                 'example'    => 'محمد أحمد علي',
@@ -558,12 +558,12 @@ class ExcelRegistry
                 'lookup'     => [
                     'table'     => 'employees',
                     'idColumn'  => 'id',
-                    'storeIdIn' => 'driver_id',
-                    'matchBy'   => ['driver_code', 'name'],
+                    'storeIdIn' => 'employee_id',
+                    'matchBy'   => ['employee_code', 'name'],
                     'nameColumn' => 'name',
                     'scoped'    => true,
                 ],
-                'exportExpr' => "(SELECT d.name FROM employees d WHERE d.id = drivercontracts.driver_id)",
+                'exportExpr' => "(SELECT d.name FROM employees d WHERE d.id = drivercontracts.employee_id)",
             ]),
             new Column('project_id', 'المشروع (اسم أو كود)', [
                 'required'   => true,
@@ -586,7 +586,7 @@ class ExcelRegistry
             new Column('second_party', 'الطرف الثاني', ['width' => 26]),
             new Column('created_at', 'تاريخ الإنشاء', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
         ], [
-            'moduleCode'       => 'Drivers/drivercontracts.php',
+            'moduleCode'       => 'Employees/employee_contracts.php',
             'softDeleteColumn' => null,
             'createdByColumn'  => null,
             'instructions'     => [

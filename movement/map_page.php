@@ -127,12 +127,12 @@ if (!empty($all_eq_ids)) {
     $eq_ids_str = implode(',', array_unique($all_eq_ids));
     $drv_q = mysqli_query($conn, "
         SELECT ed.equipment_id, ed.start_date, ed.end_date,
-               d.id AS driver_id, d.name AS driver_name, d.driver_code,
+               d.id AS employee_id, d.name AS driver_name, d.employee_code,
                d.phone, d.skill_level, d.license_type, d.years_in_field,
-               d.years_on_equipment, d.driver_status, d.employment_affiliation,
+               d.years_on_equipment, d.employee_status, d.employment_affiliation,
                d.specialized_equipment
         FROM equipment_drivers ed
-        JOIN employees d ON ed.driver_id = d.id
+        JOIN employees d ON ed.employee_id = d.id
         WHERE ed.equipment_id IN ($eq_ids_str)
           AND ed.status = 1
           AND d.status = 1
@@ -408,7 +408,7 @@ foreach ($suppliers_data as $sup_id => $sup):
                         <?php else:
                             foreach ($op['drivers'] as $drv):
                                 $dn = htmlspecialchars($drv['driver_name']);
-                                $dc = htmlspecialchars($drv['driver_code'] ?? '-');
+                                $dc = htmlspecialchars($drv['employee_code'] ?? '-');
                                 $dp = htmlspecialchars($drv['phone'] ?? '-');
                                 $ds = htmlspecialchars($drv['skill_level'] ?? '-');
                                 $dy = htmlspecialchars($drv['years_in_field'] ?? '0');
@@ -490,7 +490,7 @@ foreach ($suppliers_data as $sup_id => $sup):
                         <?php else:
                             foreach ($op['drivers'] as $drv):
                                 $dn = htmlspecialchars($drv['driver_name']);
-                                $dc = htmlspecialchars($drv['driver_code'] ?? '-');
+                                $dc = htmlspecialchars($drv['employee_code'] ?? '-');
                                 $dp = htmlspecialchars($drv['phone'] ?? '-');
                                 $ds = htmlspecialchars($drv['skill_level'] ?? '-');
                                 $dy = htmlspecialchars($drv['years_in_field'] ?? '0');

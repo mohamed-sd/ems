@@ -573,21 +573,21 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'client_projects') {
                   $operations_company_filter
             ) AS equipments_working,
             (
-                SELECT COUNT(DISTINCT ed.driver_id)
+                SELECT COUNT(DISTINCT ed.employee_id)
                 FROM operations o
                 JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
                 WHERE o.project_id = p.id
-                  AND ed.driver_id IS NOT NULL
+                  AND ed.employee_id IS NOT NULL
                   $operations_company_filter
                   $equipment_drivers_company_filter
             ) AS operators_total,
             (
-                SELECT COUNT(DISTINCT ed.driver_id)
+                SELECT COUNT(DISTINCT ed.employee_id)
                 FROM operations o
                 JOIN equipment_drivers ed ON ed.equipment_id = o.equipment
                 WHERE o.project_id = p.id
                   AND ed.status = 1
-                  AND ed.driver_id IS NOT NULL
+                  AND ed.employee_id IS NOT NULL
                   $operations_company_filter
                   $equipment_drivers_company_filter
             ) AS operators_working

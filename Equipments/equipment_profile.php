@@ -79,7 +79,7 @@ $r = mysqli_query($conn, "SELECT COUNT(DISTINCT o.project_id) AS c FROM operatio
 if ($r) {
     $projects_count = intval(mysqli_fetch_assoc($r)['c']);
 }
-$r = mysqli_query($conn, "SELECT COUNT(DISTINCT ed.driver_id) AS c FROM equipment_drivers ed WHERE $ed_scope AND ed.status = 1");
+$r = mysqli_query($conn, "SELECT COUNT(DISTINCT ed.employee_id) AS c FROM equipment_drivers ed WHERE $ed_scope AND ed.status = 1");
 if ($r) {
     $drivers_count = intval(mysqli_fetch_assoc($r)['c']);
 }
@@ -115,7 +115,7 @@ $drivers_list = mysqli_query($conn, "SELECT
                            ed.end_date,
                            ed.status
                         FROM equipment_drivers ed
-                        INNER JOIN employees d ON d.id = ed.driver_id
+                        INNER JOIN employees d ON d.id = ed.employee_id
                         WHERE $ed_scope
                         ORDER BY ed.id DESC
                         LIMIT 10");
@@ -654,7 +654,7 @@ include '../insidebar.php';
                 <tbody>
                     <?php if ($drivers_list): while ($row = mysqli_fetch_assoc($drivers_list)): ?>
                         <tr>
-                            <td><a href="../Drivers/driver_profile.php?id=<?php echo intval($row['id']); ?>"><?php echo htmlspecialchars($row['name']); ?></a></td>
+                            <td><a href="../Employees/employee_profile.php?id=<?php echo intval($row['id']); ?>"><?php echo htmlspecialchars($row['name']); ?></a></td>
                             <td><?php echo htmlspecialchars($row['start_date']); ?></td>
                             <td><?php echo htmlspecialchars(ems_format_open_end($row['end_date'])); ?></td>
                             <td><?php echo intval($row['status']) === 1 ? 'نشط' : 'متوقف'; ?></td>

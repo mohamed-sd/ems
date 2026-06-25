@@ -667,7 +667,7 @@ $operations_query = "
     LEFT JOIN suppliers s          ON e.suppliers      = s.id
     LEFT JOIN contracts c          ON o.contract_id    = c.id
     LEFT JOIN equipment_drivers ed ON o.equipment      = ed.equipment_id
-    LEFT JOIN employees d            ON ed.driver_id     = d.id
+    LEFT JOIN employees d            ON ed.employee_id     = d.id
     WHERE o.project_id = ? $company_join_sql
     GROUP BY o.id
     ORDER BY o.id DESC

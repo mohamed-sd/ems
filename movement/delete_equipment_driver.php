@@ -55,7 +55,7 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
 
     $res = mysqli_query($conn, "SELECT ed.*, d.name AS driver_name, e.code AS equipment_code, e.name AS equipment_name 
                                  FROM equipment_drivers ed
-                                 JOIN employees d ON ed.driver_id = d.id
+                                 JOIN employees d ON ed.employee_id = d.id
                                  JOIN equipments e ON ed.equipment_id = e.id
                                  WHERE ed.id=$id AND $scope_sql");
     
@@ -67,7 +67,7 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
     $row = mysqli_fetch_assoc($res);
     $current_status = intval($row['status']);
     $new_status = ($current_status == 1) ? 0 : 1;
-    $driver_id = intval($row['driver_id']);
+    $employee_id = intval($row['employee_id']);
     $driver_name = $row['driver_name'];
     $equipment_code = $row['equipment_code'];
     $equipment_name = $row['equipment_name'];
@@ -93,7 +93,7 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
         $payload = [
             'summary' => [
                 'equipment_driver_id' => $id,
-                'driver_id' => $driver_id,
+                'employee_id' => $employee_id,
                 'driver_name' => $driver_name,
                 'equipment_id' => $equipment_id,
                 'equipment_code' => $equipment_code,
@@ -116,7 +116,7 @@ if (isset($_GET['id']) && isset($_GET['equipment_id'])) {
 
         $approval_result = approval_create_request(
             'driver',
-            $driver_id,
+            $employee_id,
             $action_type,
             $payload,
             approval_get_user_id(),

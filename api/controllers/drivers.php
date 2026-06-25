@@ -1,6 +1,6 @@
 <?php
 /**
- * api/controllers/drivers.php — تعيينات السائقين (equipment_drivers).
+ * api/controllers/employees.php — تعيينات السائقين (equipment_drivers).
  *   POST /api/equipment-drivers          إضافة سائق لمعدة (add_new_driver)
  *   PUT  /api/equipment-drivers/{rel_id} تعديل/إنهاء تعيين (save_single_driver)
  *   GET  /api/drivers/available?equipment_id=  السائقون المتاحون للإضافة
@@ -30,9 +30,9 @@ function driver_create(): void
         api_fail('لا توجد صلاحية للتعديل', 403);
     }
 
-    $driver_id    = api_int('driver_id');
+    $employee_id    = api_int('employee_id');
     $equipment_id = api_int('equipment_id');
-    if ($driver_id <= 0 || $equipment_id <= 0) {
+    if ($employee_id <= 0 || $equipment_id <= 0) {
         api_fail('بيانات ناقصة: اختر السائق والمعدة', 422);
     }
 
@@ -78,24 +78,24 @@ function driver_create(): void
     if ($useCompany) {
         $endPrev = mysqli_prepare(
             $conn,
-            'UPDATE equipment_drivers SET status = 0, end_date = ? WHERE driver_id = ? AND status = 1 AND company_id = ?'
+            'UPDATE equipment_drivers SET status = 0, end_date = ? WHERE employee_id = ? AND status = 1 AND company_id = ?'
         );
-        mysqli_stmt_bind_param($endPrev, 'sii', $start_date, $driver_id, $companyId);
+        mysqli_stmt_bind_param($endPrev, 'sii', $start_date, $employee_id, $companyId);
     } else {
         $endPrev = mysqli_prepare(
             $conn,
-            'UPDATE equipment_drivers SET status = 0, end_date = ? WHERE driver_id = ? AND status = 1'
+            'UPDATE equipment_drivers SET status = 0, end_date = ? WHERE employee_id = ? AND status = 1'
         );
-        mysqli_stmt_bind_param($endPrev, 'si', $start_date, $driver_id);
+        mysqli_stmt_bind_param($endPrev, 'si', $start_date, $employee_id);
     }
     mysqli_stmt_execute($endPrev);
     mysqli_stmt_close($endPrev);
 
     // الإدراج (مع الأعمدة المتاحة فقط).
-    $cols = ['equipment_id', 'driver_id', 'start_date', 'end_date', 'status'];
+    $cols = ['equipment_id', 'employee_id', 'start_date', 'end_date', 'status'];
     $place = ['?', '?', '?', '?', '1'];
     $types = 'iiss';
-    $vals = [$equipment_id, $driver_id, $start_date, $end_date];
+    $vals = [$equipment_id, $employee_id, $start_date, $end_date];
 
     if ($ed_has_shift) {
         $cols[] = 'shift_type';
@@ -237,7 +237,7 @@ function drivers_available(): void
     $driver_status_scope = $drivers_has_status ? ' AND d.status = 1' : '';
     $driver_project_scope = $drivers_has_project ? " AND (d.project_id = $projectId OR d.project_id IS NULL)" : '';
 
-    $all_drivers_sql = "SELECT DISTINCT d.id, d.name, d.phone, d.driver_code, d.skill_level
+    $all_drivers_sql = "SELECT DISTINCT d.id, d.name, d.phone, d.employee_code, d.skill_level
                         FROM employees d
                         WHERE 1=1
                           $driver_company_scope
@@ -253,7 +253,7 @@ function drivers_available(): void
                 'id'          => $intId,
                 'name'        => $d['name'] ?? '',
                 'phone'       => $d['phone'] ?? '',
-                'driver_code' => $d['driver_code'] ?? '',
+                'employee_code' => $d['employee_code'] ?? '',
                 'skill_level' => $d['skill_level'] ?? '',
             ];
         }
@@ -261,10 +261,10 @@ function drivers_available(): void
 
     // استثناء أصحاب التعيين الساري.
     $active_scope = (!$isSuper && $ed_has_company) ? ' AND company_id = ' . $companyId : '';
-    $activeRes = mysqli_query($conn, "SELECT DISTINCT driver_id FROM equipment_drivers WHERE status = 1$active_scope");
+    $activeRes = mysqli_query($conn, "SELECT DISTINCT employee_id FROM equipment_drivers WHERE status = 1$active_scope");
     if ($activeRes) {
         while ($a = mysqli_fetch_assoc($activeRes)) {
-            unset($all[intval($a['driver_id'])]);
+            unset($all[intval($a['employee_id'])]);
         }
     }
 

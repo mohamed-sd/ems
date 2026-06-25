@@ -206,7 +206,7 @@ function sync_pull(): void
         JOIN operations o ON o.id = t.operator
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN equipments_types et ON et.id = e.type
-        LEFT JOIN employees d ON d.id = t.driver
+        LEFT JOIN employees d ON d.id = t.employee_id
         WHERE $whereSql
         ORDER BY t.id DESC
         LIMIT 1000");

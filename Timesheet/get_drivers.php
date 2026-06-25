@@ -51,7 +51,7 @@ if (isset($_GET['operation_id'])) {
     // جلب السائقين المرتبطين بهذه الآلية (النشطين فقط)
     $sql = "SELECT d.id, d.name
             FROM equipment_drivers ed
-            JOIN employees d ON ed.driver_id = d.id
+            JOIN employees d ON ed.employee_id = d.id
             WHERE ed.equipment_id = $equipment_id
               AND ed.status = 1" . $shift_filter_sql;
 
@@ -67,7 +67,7 @@ if (isset($_GET['operation_id'])) {
                 LEFT JOIN users su2 ON su2.id = p2.created_by
                                 LEFT JOIN clients sc2 ON sc2.id = p2.$project_client_column
                 LEFT JOIN users scu2 ON scu2.id = sc2.created_by
-                WHERE ed2.driver_id = d.id
+                WHERE ed2.employee_id = d.id
                   AND (su2.company_id = $company_id OR scu2.company_id = $company_id)
             )";
         }

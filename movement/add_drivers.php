@@ -76,14 +76,14 @@ if (!$equipment) {
 // جلب المشغلين المرتبطين مسبقًا
 $current = [];
 $linked = [];
-$res = mysqli_query($conn, "SELECT ed.id, ed.start_date, ed.end_date, ed.shift_type, d.id AS driver_id, d.name, d.phone, ed.status
+$res = mysqli_query($conn, "SELECT ed.id, ed.start_date, ed.end_date, ed.shift_type, d.id AS employee_id, d.name, d.phone, ed.status
                              FROM equipment_drivers ed
-                             JOIN employees d ON ed.driver_id = d.id
+                             JOIN employees d ON ed.employee_id = d.id
                                                          WHERE ed.equipment_id = $equipment_id
                                                              AND $driver_scope_sql" . (($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND ed.company_id = $company_id"));
 if ($res) {
     while ($r = mysqli_fetch_assoc($res)) {
-        $current[] = $r['driver_id'];
+        $current[] = $r['employee_id'];
         $linked[] = $r;
     }
 }
@@ -1053,7 +1053,7 @@ include("../inheader.php");
                             $drivers = mysqli_query($conn, "SELECT d.id, d.name, d.phone
                                                             FROM employees d
                                                             WHERE d.id NOT IN (
-                                                                SELECT driver_id
+                                                                SELECT employee_id
                                                                 FROM equipment_drivers
                                                                 WHERE status = 1" . (($is_super_admin || !$equipment_drivers_has_company) ? "" : " AND company_id = $company_id") . "
                                                             ) AND d.status = 1

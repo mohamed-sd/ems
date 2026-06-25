@@ -32,7 +32,7 @@ $timesheets = $conn->query("
     LEFT JOIN operations o ON t.operator = o.id
     LEFT JOIN equipments e ON o.equipment = e.id
     LEFT JOIN equipment_drivers ed ON o.equipment = ed.equipment_id
-    LEFT JOIN employees d ON ed.driver_id = d.id
+    LEFT JOIN employees d ON ed.employee_id = d.id
     ORDER BY t.id DESC
     LIMIT 50
 ");

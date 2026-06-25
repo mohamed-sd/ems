@@ -127,9 +127,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             $normalized_driver_ids = [];
             foreach ($driver_ids as $driver_id_raw) {
-                $driver_id = intval($driver_id_raw);
-                if ($driver_id > 0) {
-                    $normalized_driver_ids[] = $driver_id;
+                $employee_id = intval($driver_id_raw);
+                if ($employee_id > 0) {
+                    $normalized_driver_ids[] = $employee_id;
                 }
             }
             $normalized_driver_ids = array_values(array_unique($normalized_driver_ids));
@@ -156,9 +156,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                     $inserted_count = 0;
                     $skipped_count = 0;
-                    foreach ($normalized_driver_ids as $driver_id) {
+                    foreach ($normalized_driver_ids as $employee_id) {
                         $driver_check_sql = "SELECT d.id FROM employees d
-                                             WHERE d.id = $driver_id
+                                             WHERE d.id = $employee_id
                                                $driver_company_scope
                                                $driver_status_scope
                                              LIMIT 1";
@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                         $active_any_sql = "SELECT ed.id, ed.equipment_id
                                            FROM equipment_drivers ed
-                                           WHERE ed.driver_id = $driver_id
+                                           WHERE ed.employee_id = $employee_id
                                              AND ed.status = 1
                                              $ed_company_scope
                                              AND EXISTS (
@@ -196,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                 $update_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND company_id = $company_id" : "";
                                 $close_sql = "UPDATE equipment_drivers
                                               SET status = 0, end_date = '$start_date'
-                                              WHERE driver_id = $driver_id AND status = 1$update_scope
+                                              WHERE employee_id = $employee_id AND status = 1$update_scope
                                                 AND EXISTS (
                                                     SELECT 1
                                                     FROM operations o
@@ -217,8 +217,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $insert_shift_col = $equipment_drivers_has_shift_type ? ", shift_type" : "";
                         $insert_shift_val = $equipment_drivers_has_shift_type ? ", '$shift_type'" : "";
                         $end_sql = $end_date !== '' ? "'" . mysqli_real_escape_string($conn, $end_date) . "'" : "'2099-12-31'";
-                        $insert_sql = "INSERT INTO equipment_drivers (equipment_id, driver_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-                                       VALUES ($equipment_id, $driver_id, '$start_date', $end_sql, 1$insert_shift_val$insert_company_val)";
+                        $insert_sql = "INSERT INTO equipment_drivers (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
+                                       VALUES ($equipment_id, $employee_id, '$start_date', $end_sql, 1$insert_shift_val$insert_company_val)";
 
                         if (!mysqli_query($conn, $insert_sql)) {
                             throw new Exception('فشل إضافة تشغيل أحد السائقين');
@@ -285,7 +285,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             continue;
                         }
 
-                        $rel_sql = "SELECT ed.id, ed.driver_id, ed.equipment_id, ed.status, ed.shift_type
+                        $rel_sql = "SELECT ed.id, ed.employee_id, ed.equipment_id, ed.status, ed.shift_type
                                     FROM equipment_drivers ed
                                     WHERE ed.id = $relation_id
                                       AND ed.equipment_id = $equipment_id
@@ -297,7 +297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             continue;
                         }
                         $rel_row = mysqli_fetch_assoc($rel_res);
-                        $driver_id = intval($rel_row['driver_id']);
+                        $employee_id = intval($rel_row['employee_id']);
                         $shift_type_existing = isset($rel_row['shift_type']) ? strval($rel_row['shift_type']) : 'B';
                         $current_start = isset($rel_row['start_date']) ? $rel_row['start_date'] : date('Y-m-d');
                         $current_end = isset($rel_row['end_date']) ? $rel_row['end_date'] : '2099-12-31';
@@ -373,8 +373,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $insert_company_val = (!$is_super_admin && $equipment_drivers_has_company) ? ", $company_id" : "";
                         $insert_shift_col = $equipment_drivers_has_shift_type ? ", shift_type" : "";
                         $insert_shift_val = $equipment_drivers_has_shift_type ? ", '" . mysqli_real_escape_string($conn, $shift_type_existing) . "'" : "";
-                        $insert_move_sql = "INSERT INTO equipment_drivers (equipment_id, driver_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-                                            VALUES ($target_equipment_id, $driver_id, '$close_date', '2099-12-31', 1$insert_shift_val$insert_company_val)";
+                        $insert_move_sql = "INSERT INTO equipment_drivers (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
+                                            VALUES ($target_equipment_id, $employee_id, '$close_date', '2099-12-31', 1$insert_shift_val$insert_company_val)";
                         if (mysqli_query($conn, $insert_move_sql)) {
                             $processed_move++;
                         }
@@ -384,16 +384,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $skipped_count = 0;
                     $normalized_new_driver_ids = [];
                     foreach ($add_driver_ids as $driver_id_raw) {
-                        $driver_id = intval($driver_id_raw);
-                        if ($driver_id > 0) {
-                            $normalized_new_driver_ids[] = $driver_id;
+                        $employee_id = intval($driver_id_raw);
+                        if ($employee_id > 0) {
+                            $normalized_new_driver_ids[] = $employee_id;
                         }
                     }
                     $normalized_new_driver_ids = array_values(array_unique($normalized_new_driver_ids));
 
-                    foreach ($normalized_new_driver_ids as $driver_id) {
+                    foreach ($normalized_new_driver_ids as $employee_id) {
                         $driver_check_sql = "SELECT d.id FROM employees d
-                                             WHERE d.id = $driver_id
+                                             WHERE d.id = $employee_id
                                                $driver_company_scope
                                                $driver_status_scope
                                              LIMIT 1";
@@ -405,7 +405,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                         $active_any_sql = "SELECT ed.id, ed.equipment_id
                                            FROM equipment_drivers ed
-                                           WHERE ed.driver_id = $driver_id
+                                           WHERE ed.employee_id = $employee_id
                                              AND ed.status = 1
                                              $ed_company_scope
                                              AND EXISTS (
@@ -431,7 +431,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                 $update_scope = (!$is_super_admin && $equipment_drivers_has_company) ? " AND company_id = $company_id" : "";
                                 $close_sql = "UPDATE equipment_drivers
                                               SET status = 0, end_date = '$effective_date'
-                                              WHERE driver_id = $driver_id AND status = 1$update_scope
+                                              WHERE employee_id = $employee_id AND status = 1$update_scope
                                                 AND EXISTS (
                                                     SELECT 1
                                                     FROM operations o
@@ -451,8 +451,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $insert_company_val = (!$is_super_admin && $equipment_drivers_has_company) ? ", $company_id" : "";
                         $insert_shift_col = $equipment_drivers_has_shift_type ? ", shift_type" : "";
                         $insert_shift_val = $equipment_drivers_has_shift_type ? ", '$add_shift_type'" : "";
-                        $insert_sql = "INSERT INTO equipment_drivers (equipment_id, driver_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-                                       VALUES ($equipment_id, $driver_id, '$effective_date', '2099-12-31', 1$insert_shift_val$insert_company_val)";
+                        $insert_sql = "INSERT INTO equipment_drivers (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
+                                       VALUES ($equipment_id, $employee_id, '$effective_date', '2099-12-31', 1$insert_shift_val$insert_company_val)";
                         if (mysqli_query($conn, $insert_sql)) {
                             $added_count++;
                         }
@@ -520,7 +520,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             } else {
                 mysqli_begin_transaction($conn);
                 try {
-                    $rel_sql = "SELECT ed.id, ed.driver_id, ed.equipment_id, ed.status
+                    $rel_sql = "SELECT ed.id, ed.employee_id, ed.equipment_id, ed.status
                                                                 , ed.shift_type
                                 FROM equipment_drivers ed
                                 WHERE ed.id = $relation_id
@@ -539,7 +539,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     }
 
                     $rel_row = mysqli_fetch_assoc($rel_res);
-                    $driver_id = intval($rel_row['driver_id']);
+                    $employee_id = intval($rel_row['employee_id']);
                     $old_equipment_id = intval($rel_row['equipment_id']);
                     $old_status = intval($rel_row['status']);
 
@@ -568,7 +568,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                     $active_check_sql = "SELECT ed.id
                                          FROM equipment_drivers ed
-                                         WHERE ed.driver_id = $driver_id
+                                         WHERE ed.employee_id = $employee_id
                                            AND ed.status = 1
                                            $ed_company_scope
                                            AND EXISTS (
@@ -593,8 +593,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     }
                     $insert_shift_val = $equipment_drivers_has_shift_type ? ", '" . mysqli_real_escape_string($conn, $existing_shift_type) . "'" : "";
                     $insert_sql = "INSERT INTO equipment_drivers
-                                   (equipment_id, driver_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-                                   VALUES ($new_equipment_id, $driver_id, '$move_start_date', '2099-12-31', 1$insert_shift_val$insert_company_val)";
+                                   (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
+                                   VALUES ($new_equipment_id, $employee_id, '$move_start_date', '2099-12-31', 1$insert_shift_val$insert_company_val)";
 
                     if (!mysqli_query($conn, $insert_sql)) {
                         throw new Exception('فشل تسجيل تشغيل السائق على الآلية الجديدة');
@@ -638,7 +638,7 @@ $available_drivers_sql = "SELECT d.id, d.name, d.phone
                                 SELECT 1
                                 FROM equipment_drivers ed
                                 INNER JOIN operations o ON o.equipment = ed.equipment_id
-                                WHERE ed.driver_id = d.id
+                                WHERE ed.employee_id = d.id
                                   AND ed.status = 1
                                   AND o.project_id = $selected_project_id
                                   $operations_company_scope
@@ -653,10 +653,10 @@ if ($available_drivers_result) {
     }
 }
 
-$active_assignments_sql = "SELECT ed.id, ed.equipment_id, ed.driver_id, ed.start_date, ed.end_date, ed.status,
+$active_assignments_sql = "SELECT ed.id, ed.equipment_id, ed.employee_id, ed.start_date, ed.end_date, ed.status,
                                   ed.shift_type, d.name AS driver_name, d.phone AS driver_phone
                            FROM equipment_drivers ed
-                           INNER JOIN employees d ON d.id = ed.driver_id
+                           INNER JOIN employees d ON d.id = ed.employee_id
                            WHERE ed.status = 1
                              $ed_company_scope
                              AND EXISTS (
@@ -695,13 +695,13 @@ if ($all_project_drivers_res) {
     }
 }
 
-$drivers_sql = "SELECT ed.id, ed.equipment_id, ed.driver_id, ed.start_date, ed.end_date, ed.status,
+$drivers_sql = "SELECT ed.id, ed.equipment_id, ed.employee_id, ed.start_date, ed.end_date, ed.status,
                        ed.shift_type,
                        e.code AS equipment_code, e.name AS equipment_name,
                        d.name AS driver_name, d.phone AS driver_phone
                 FROM equipment_drivers ed
                 INNER JOIN equipments e ON e.id = ed.equipment_id
-                INNER JOIN employees d ON d.id = ed.driver_id
+                INNER JOIN employees d ON d.id = ed.employee_id
                 WHERE EXISTS (
                     SELECT 1
                     FROM operations o
@@ -969,12 +969,12 @@ include '../insidebar.php';
                                 $drivers_tooltip_html = '';
                                 if ($driver_count > 0) {
                                     foreach ($eq_drivers as $drow) {
-                                        $driver_id = intval($drow['driver_id']);
+                                        $employee_id = intval($drow['employee_id']);
                                         $driver_name = isset($drow['driver_name']) ? $drow['driver_name'] : '';
                                         $driver_phone = isset($drow['driver_phone']) ? $drow['driver_phone'] : '';
                                         $shift_label = get_shift_type_label(isset($drow['shift_type']) ? $drow['shift_type'] : 'B');
                                         $tooltip_text = 'الاسم: ' . $driver_name . ' | الهاتف: ' . $driver_phone . ' | الوردية: ' . $shift_label;
-                                        $drivers_tooltip_html .= '<a class="driver-icon-link" href="../Drivers/driver_profile.php?id=' . $driver_id . '" title="' . htmlspecialchars($tooltip_text, ENT_QUOTES, 'UTF-8') . '" data-bs-toggle="tooltip" data-bs-placement="top">';
+                                        $drivers_tooltip_html .= '<a class="driver-icon-link" href="../Employees/employee_profile.php?id=' . $employee_id . '" title="' . htmlspecialchars($tooltip_text, ENT_QUOTES, 'UTF-8') . '" data-bs-toggle="tooltip" data-bs-placement="top">';
                                         $drivers_tooltip_html .= '<i class="fas fa-user"></i>';
                                         $drivers_tooltip_html .= '</a>';
                                     }
@@ -1150,7 +1150,7 @@ include '../insidebar.php';
 
                 drivers.forEach(function (driver) {
                     var relationId = parseInt(driver.id || 0, 10);
-                    var driverId = parseInt(driver.driver_id || 0, 10);
+                    var driverId = parseInt(driver.employee_id || 0, 10);
                     var driverName = driver.driver_name || '-';
                     var driverPhone = driver.driver_phone || '-';
                     var shiftType = driver.shift_type || 'B';
@@ -1168,7 +1168,7 @@ include '../insidebar.php';
 
                     var row = '';
                     row += '<tr>';
-                    row += '<td><a href="../Drivers/driver_profile.php?id=' + driverId + '" target="_blank" rel="noopener">' + $('<div>').text(driverName).html() + '</a></td>';
+                    row += '<td><a href="../Employees/employee_profile.php?id=' + driverId + '" target="_blank" rel="noopener">' + $('<div>').text(driverName).html() + '</a></td>';
                     row += '<td>' + $('<div>').text(driverPhone).html() + '</td>';
                     row += '<td>' + shiftLabel + '</td>';
                     row += '<td><input type="date" class="form-control form-control-sm" name="existing_start_date[' + relationId + ']" value="' + startDate + '"></td>';

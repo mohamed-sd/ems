@@ -359,7 +359,7 @@ function ts_load_failures(mysqli $conn, int $timesheetId): array
 function ts_writable_fields(): array
 {
     return [
-        'operator', 'driver', 'shift', 'date', 'shift_hours', 'executed_hours',
+        'operator', 'employee_id', 'shift', 'date', 'shift_hours', 'executed_hours',
         'bucket_hours', 'jackhammer_hours', 'extra_hours', 'extra_hours_total',
         'standby_hours', 'dependence_hours', 'total_work_hours', 'work_notes',
         'hr_fault', 'maintenance_fault', 'marketing_fault', 'approval_fault',
@@ -407,7 +407,7 @@ function ts_save(mysqli $conn, array $ctx, int $projectId, array $payload, ?int 
     $equipmentId = ts_assert_operation_in_project($conn, $ctx, $projectId, $operationId);
     unset($equipmentId);
 
-    $driver = intval($payload['driver'] ?? 0);
+    $driver = intval($payload['employee_id'] ?? 0);
     if ($driver <= 0) {
         throw new TimesheetError('يجب اختيار السائق', 422);
     }
@@ -432,7 +432,7 @@ function ts_save(mysqli $conn, array $ctx, int $projectId, array $payload, ?int 
         $r[$f] = isset($payload[$f]) ? (string)$payload[$f] : '';
     }
     $r['operator'] = (string)$operationId;
-    $r['driver'] = (string)$driver;
+    $r['employee_id'] = (string)$driver;
     $r['shift'] = $shift;
     $r['date'] = $date;
     $r['type'] = (string)$type;
@@ -515,7 +515,7 @@ function ts_load_one(mysqli $conn, array $ctx, int $projectId, int $id, bool $wi
             JOIN operations o ON o.id = t.operator
             LEFT JOIN equipments e ON e.id = o.equipment
             LEFT JOIN equipments_types et ON et.id = e.type
-            LEFT JOIN employees d ON d.id = t.driver
+            LEFT JOIN employees d ON d.id = t.employee_id
             WHERE t.id = ? AND $clause $companyClause
             LIMIT 1";
     $stmt = mysqli_prepare($conn, $sql);
@@ -586,7 +586,7 @@ function timesheet_refdata(): void
     if (!empty($opEqIds)) {
         $idsIn = implode(',', array_map('intval', $opEqIds));
         $res = mysqli_query($conn, "
-            SELECT ed.equipment_id, ed.driver_id, ed.shift_type
+            SELECT ed.equipment_id, ed.employee_id, ed.shift_type
             FROM equipment_drivers ed
             WHERE ed.status = 1 AND ed.equipment_id IN ($idsIn)");
         if ($res) {
@@ -597,7 +597,7 @@ function timesheet_refdata(): void
                 }
                 $equipmentDrivers[] = [
                     'equipment_id' => intval($r['equipment_id']),
-                    'driver_id'    => intval($r['driver_id']),
+                    'employee_id'    => intval($r['employee_id']),
                     'shift_type'   => $st,
                 ];
             }
@@ -617,10 +617,10 @@ function timesheet_refdata(): void
     if ($drivers_has_project && $projectId > 0) {
         $dWhere[] = "(d.project_id = $projectId OR d.project_id IS NULL)";
     }
-    $res = mysqli_query($conn, 'SELECT d.id, d.name, d.phone, d.driver_code FROM employees d WHERE ' . implode(' AND ', $dWhere) . ems_operation_types_in_sql($conn, 'd') . ' ORDER BY d.name ASC');
+    $res = mysqli_query($conn, 'SELECT d.id, d.name, d.phone, d.employee_code FROM employees d WHERE ' . implode(' AND ', $dWhere) . ems_operation_types_in_sql($conn, 'd') . ' ORDER BY d.name ASC');
     if ($res) {
         while ($r = mysqli_fetch_assoc($res)) {
-            $drivers[] = ['id' => intval($r['id']), 'name' => $r['name'] ?? '', 'phone' => $r['phone'] ?? '', 'driver_code' => $r['driver_code'] ?? ''];
+            $drivers[] = ['id' => intval($r['id']), 'name' => $r['name'] ?? '', 'phone' => $r['phone'] ?? '', 'employee_code' => $r['employee_code'] ?? ''];
         }
     }
 
@@ -748,7 +748,7 @@ function timesheet_operation_drivers(int $operationId): void
     $out = [];
     $stmt = mysqli_prepare($conn, "
         SELECT d.id, d.name, d.phone
-        FROM equipment_drivers ed JOIN employees d ON ed.driver_id = d.id
+        FROM equipment_drivers ed JOIN employees d ON ed.employee_id = d.id
         WHERE ed.equipment_id = ? AND ed.status = 1 $shiftFilter $driverStatus $driverCompany
         ORDER BY d.name ASC");
     mysqli_stmt_bind_param($stmt, 'i', $equipmentId);
@@ -756,7 +756,7 @@ function timesheet_operation_drivers(int $operationId): void
     $res = mysqli_stmt_get_result($stmt);
     if ($res) {
         while ($r = mysqli_fetch_assoc($res)) {
-            $out[] = ['driver_id' => intval($r['id']), 'name' => $r['name'] ?? '', 'phone' => $r['phone'] ?? ''];
+            $out[] = ['employee_id' => intval($r['id']), 'name' => $r['name'] ?? '', 'phone' => $r['phone'] ?? ''];
         }
     }
     mysqli_stmt_close($stmt);
@@ -833,7 +833,7 @@ function ts_format_row(array $row): array
     $out = [
         'id'             => intval($row['id']),
         'operation_id'   => intval($row['operator']),
-        'driver_id'      => intval($row['driver']),
+        'employee_id'      => intval($row['employee_id']),
         'driver_name'    => $row['driver_name'] ?? '',
         'equipment_code' => $row['equipment_code'] ?? '',
         'equipment_name' => $row['equipment_name'] ?? '',
@@ -889,9 +889,9 @@ function timesheets_list(): void
     if ($opId > 0) {
         $where[] = 't.operator = ' . $opId;
     }
-    $driverId = api_int('driver_id', 0);
+    $driverId = api_int('employee_id', 0);
     if ($driverId > 0) {
-        $where[] = 't.driver = ' . $driverId;
+        $where[] = 't.employee_id = ' . $driverId;
     }
     $shift = strtoupper(api_str('shift'));
     if ($shift === 'D' || $shift === 'N') {
@@ -939,7 +939,7 @@ function timesheets_list(): void
         JOIN operations o ON o.id = t.operator
         LEFT JOIN equipments e ON e.id = o.equipment
         LEFT JOIN equipments_types et ON et.id = e.type
-        LEFT JOIN employees d ON d.id = t.driver
+        LEFT JOIN employees d ON d.id = t.employee_id
         WHERE $whereSql
         ORDER BY t.date DESC, t.id DESC
         LIMIT 500");

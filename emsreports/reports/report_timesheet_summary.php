@@ -56,7 +56,7 @@ $dateFrom = isset($_GET['date_from']) ? $_GET['date_from'] : date('Y-m-01');
 $dateTo = isset($_GET['date_to']) ? $_GET['date_to'] : date('Y-m-d');
 $projectId = isset($_GET['project_id']) ? intval($_GET['project_id']) : 0;
 $supplierId = isset($_GET['supplier_id']) ? intval($_GET['supplier_id']) : 0;
-$driverId = isset($_GET['driver_id']) ? intval($_GET['driver_id']) : 0;
+$driverId = isset($_GET['employee_id']) ? intval($_GET['employee_id']) : 0;
 
 // بناء الاستعلام الأساسي
 $whereClause = "WHERE 1=1";
@@ -108,14 +108,14 @@ $query = "SELECT
             s.name as supplier_name,
             p.id as project_id,
             p.name as project_name,
-            d.id as driver_id,
+            d.id as employee_id,
             d.name as driver_name
         FROM timesheet t
         LEFT JOIN operations o ON t.operator = o.id
         LEFT JOIN equipments e ON o.equipment = e.id
         LEFT JOIN suppliers s ON o.supplier_id = s.id
         LEFT JOIN project p ON o.project_id = p.id
-        LEFT JOIN employees d ON t.driver = d.id
+        LEFT JOIN employees d ON t.employee_id = d.id
         $whereClause
         ORDER BY STR_TO_DATE(t.date, '%Y-%m-%d') DESC, t.id DESC";
 

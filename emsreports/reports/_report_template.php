@@ -67,7 +67,7 @@ $fDateFrom       = isset($_GET['date_from'])       ? trim($_GET['date_from'])   
 $fDateTo         = isset($_GET['date_to'])         ? trim($_GET['date_to'])         : '';
 $fProjectId      = isset($_GET['project_id'])      ? intval($_GET['project_id'])    : 0;
 $fSupplierId     = isset($_GET['supplier_id'])     ? intval($_GET['supplier_id'])   : 0;
-$fDriverId       = isset($_GET['driver_id'])       ? intval($_GET['driver_id'])     : 0;
+$fDriverId       = isset($_GET['employee_id'])       ? intval($_GET['employee_id'])     : 0;
 $fStatus         = (isset($_GET['status']) && $_GET['status'] !== '') ? intval($_GET['status']) : -1;
 $fSearch         = isset($_GET['search'])          ? trim($_GET['search'])          : '';
 // فلاتر إضافية للتقارير التفصيلية
@@ -167,11 +167,11 @@ case 'drivers_timesheet': {
                       ROUND(IFNULL(SUM($workField),0),2) AS twh,
                       ROUND(IFNULL(SUM(t.total_fault_hours),0),2) AS tfh,
                       COUNT(DISTINCT o.project_id) AS proj_cnt,
-                      COUNT(DISTINCT t.driver) AS driver_cnt
+                      COUNT(DISTINCT t.employee_id) AS driver_cnt
                FROM timesheet t
                LEFT JOIN operations o ON o.id = t.operator
                LEFT JOIN suppliers  s ON s.id = o.supplier_id
-               LEFT JOIN employees    d ON d.id = t.driver
+               LEFT JOIN employees    d ON d.id = t.employee_id
                WHERE $ws";
     $kpiRes = mysqli_query($conn, $kpiSql);
     $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
@@ -206,7 +206,7 @@ case 'drivers_timesheet': {
                 LEFT JOIN operations o ON o.id=t.operator
                 LEFT JOIN project    p ON p.id=o.project_id
                 LEFT JOIN suppliers  s ON s.id=o.supplier_id
-                LEFT JOIN employees    d ON d.id=t.driver
+                LEFT JOIN employees    d ON d.id=t.employee_id
                 WHERE $ws GROUP BY p.id,p.name ORDER BY twh DESC";
     } elseif (in_array($REPORT_CODE,['timesheet_by_equipment','fleet_timesheet'])) {
            $headers = ['الكود','المعدة','المورد','عدد السجلات','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%'];
@@ -225,7 +225,7 @@ case 'drivers_timesheet': {
                 LEFT JOIN operations o ON o.id=t.operator
                 LEFT JOIN equipments e ON e.id=o.equipment
                 LEFT JOIN suppliers  s ON s.id=o.supplier_id
-                LEFT JOIN employees    d ON d.id=t.driver
+                LEFT JOIN employees    d ON d.id=t.employee_id
                 WHERE $ws GROUP BY e.id ORDER BY twh DESC";
     } elseif (in_array($REPORT_CODE,['timesheet_by_driver','drivers_timesheet'])) {
            $headers = ['المشغل','المورد','عدد الورديات','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%'];
@@ -242,7 +242,7 @@ case 'drivers_timesheet': {
                 FROM timesheet t
                 LEFT JOIN operations o ON o.id=t.operator
                 LEFT JOIN suppliers  s ON s.id=o.supplier_id
-                LEFT JOIN employees    d ON d.id=t.driver
+                LEFT JOIN employees    d ON d.id=t.employee_id
                 WHERE $ws GROUP BY d.id ORDER BY twh DESC";
     } elseif ($REPORT_CODE === 'supplier_timesheet') {
            $headers = ['المورد','عدد السجلات','executed_hours','standby_hours','ع.العمل','ساعات الأعطال','الكفاءة%'];
@@ -258,7 +258,7 @@ case 'drivers_timesheet': {
                 FROM timesheet t
                 LEFT JOIN operations o ON o.id=t.operator
                 LEFT JOIN suppliers  s ON s.id=o.supplier_id
-                LEFT JOIN employees    d ON d.id=t.driver
+                LEFT JOIN employees    d ON d.id=t.employee_id
                 WHERE $ws GROUP BY s.id ORDER BY twh DESC";
     } else {
         // timesheet_summary / timesheet_detailed
@@ -296,7 +296,7 @@ case 'drivers_timesheet': {
                     LEFT JOIN project    p ON p.id=o.project_id
                     LEFT JOIN equipments e ON e.id=o.equipment
                     LEFT JOIN suppliers  s ON s.id=o.supplier_id
-                    LEFT JOIN employees    d ON d.id=t.driver
+                    LEFT JOIN employees    d ON d.id=t.employee_id
                     WHERE $ws ORDER BY t.date DESC, t.id DESC";
         } else {
             // timesheet_summary
@@ -320,7 +320,7 @@ case 'drivers_timesheet': {
                     LEFT JOIN project    p ON p.id=o.project_id
                     LEFT JOIN equipments e ON e.id=o.equipment
                     LEFT JOIN suppliers  s ON s.id=o.supplier_id
-                    LEFT JOIN employees    d ON d.id=t.driver
+                    LEFT JOIN employees    d ON d.id=t.employee_id
                     WHERE $ws ORDER BY t.date DESC, t.id DESC";
         }
     }
@@ -870,7 +870,7 @@ case 'drivers_detailed': {
     if ($fSupplierId > 0) $where[] = "d.supplier_id = $fSupplierId";
     if ($fSearch !== '') {
         $safe = mysqli_real_escape_string($conn, $fSearch);
-        $where[] = "(d.name LIKE '%$safe%' OR d.driver_code LIKE '%$safe%' OR d.phone LIKE '%$safe%')";
+        $where[] = "(d.name LIKE '%$safe%' OR d.employee_code LIKE '%$safe%' OR d.phone LIKE '%$safe%')";
     }
     $ws = implode(' AND ', $where);
 
@@ -889,7 +889,7 @@ case 'drivers_detailed': {
 
     if ($REPORT_CODE === 'drivers_detailed') {
         $headers = ['الكود','الاسم','المورد','الهاتف','نوع الهوية','رقم الهوية','مستوى المهارة','سنوات الخبرة','المعدات المتخصصة','جهة العمل','نوع الراتب','الراتب الشهري','تقييم الأداء','عدد الورديات','ساعات التنفيذ','ساعات الاستعداد','الحالة'];
-        $sql = "SELECT d.driver_code,
+        $sql = "SELECT d.employee_code,
                        d.name,
                        IFNULL(s.name,'—') AS supplier_name,
                        IFNULL(d.phone,'—') AS phone,
@@ -902,21 +902,21 @@ case 'drivers_detailed': {
                        IFNULL(d.salary_type,'—') AS salary_type,
                        IFNULL(d.monthly_salary,0) AS monthly_salary,
                        IFNULL(d.performance_rating,'—') AS performance_rating,
-                       IFNULL((SELECT COUNT(*) FROM timesheet t WHERE t.driver=d.id),0) AS shifts_cnt,
-                       IFNULL((SELECT ROUND(SUM(t.operator_hours),1) FROM timesheet t WHERE t.driver=d.id),0) AS total_wh,
-                       IFNULL((SELECT ROUND(SUM(t.operator_standby_hours),1) FROM timesheet t WHERE t.driver=d.id),0) AS standby_wh,
+                       IFNULL((SELECT COUNT(*) FROM timesheet t WHERE t.employee_id=d.id),0) AS shifts_cnt,
+                       IFNULL((SELECT ROUND(SUM(t.operator_hours),1) FROM timesheet t WHERE t.employee_id=d.id),0) AS total_wh,
+                       IFNULL((SELECT ROUND(SUM(t.operator_standby_hours),1) FROM timesheet t WHERE t.employee_id=d.id),0) AS standby_wh,
                        CASE WHEN d.status=1 THEN 'نشط' ELSE 'غير نشط' END AS status_txt
                 FROM employees d LEFT JOIN suppliers s ON s.id=d.supplier_id
                 WHERE $ws ORDER BY total_wh DESC, d.id DESC";
     } else {
         $headers = ['الكود','الاسم','المورد','الهاتف','الحالة','ساعات التنفيذ','ساعات الاستعداد'];
-        $sql = "SELECT d.driver_code,
+        $sql = "SELECT d.employee_code,
                        d.name,
                        IFNULL(s.name,'—') AS supplier_name,
                        IFNULL(d.phone,'—') AS phone,
                        CASE WHEN d.status=1 THEN 'نشط' ELSE 'غير نشط' END AS status_txt,
-                       IFNULL((SELECT ROUND(SUM(t.operator_hours),1) FROM timesheet t WHERE t.driver=d.id),0) AS total_wh,
-                       IFNULL((SELECT ROUND(SUM(t.operator_standby_hours),1) FROM timesheet t WHERE t.driver=d.id),0) AS standby_wh
+                       IFNULL((SELECT ROUND(SUM(t.operator_hours),1) FROM timesheet t WHERE t.employee_id=d.id),0) AS total_wh,
+                       IFNULL((SELECT ROUND(SUM(t.operator_standby_hours),1) FROM timesheet t WHERE t.employee_id=d.id),0) AS standby_wh
                 FROM employees d LEFT JOIN suppliers s ON s.id=d.supplier_id
                 WHERE $ws ORDER BY total_wh DESC, d.id DESC";
     }
@@ -956,7 +956,7 @@ case 'drivers_detailed': {
 case 'drivers_contracts': {
     $where = ["({$sc['dc']})"];
     if ($fStatus >= 0)    $where[] = "dc.status = $fStatus";
-    if ($fDriverId  > 0)  $where[] = "dc.driver_id = $fDriverId";
+    if ($fDriverId  > 0)  $where[] = "dc.employee_id = $fDriverId";
     if ($fProjectId > 0)  $where[] = "dc.project_id = $fProjectId";
     if ($fContractStatus !== '') {
         $safeCst = mysqli_real_escape_string($conn, $fContractStatus);
@@ -970,7 +970,7 @@ case 'drivers_contracts': {
                       SUM(CASE WHEN dc.status=1 THEN 1 ELSE 0 END) AS active,
                       ROUND(IFNULL(SUM(dc.forecasted_contracted_hours),0),0) AS total_hrs,
                       ROUND(AVG(dc.contract_duration_months),1) AS avg_dur,
-                      COUNT(DISTINCT dc.driver_id) AS distinct_drivers
+                      COUNT(DISTINCT dc.employee_id) AS distinct_drivers
                FROM drivercontracts dc WHERE $ws";
     $kpiRes = mysqli_query($conn, $kpiSql);
     $kpiRow = $kpiRes ? mysqli_fetch_assoc($kpiRes) : [];
@@ -986,7 +986,7 @@ case 'drivers_contracts': {
     // عرض تفصيلي كامل لهذا القسم دائمًا
     $headers = ['المشغل','الكود','المشروع','تاريخ التوقيع','تاريخ البدء','تاريخ الانتهاء','المدة','فترة السماح','نوع المعدة','عدد المعدات','نوع الآلة','عدد الآلات','الساعات الشهرية','الإجمالي المتوقع','الطرف الأول','الطرف الثاني','العملة','المبلغ المدفوع','وقت الدفع','الضمانات','الحالة'];
     $sql = "SELECT IFNULL(d.name,'—') AS driver_name,
-                   IFNULL(d.driver_code,'-') AS driver_code,
+                   IFNULL(d.employee_code,'-') AS employee_code,
                    IFNULL(p.name,'—') AS project_name,
                    IFNULL(dc.contract_signing_date,'—') AS signing_date,
                    IFNULL(dc.actual_start,'—') AS actual_start,
@@ -1009,7 +1009,7 @@ case 'drivers_contracts': {
                         WHEN dc.pause_reason IS NOT NULL AND dc.resume_date IS NULL THEN 'موقوف'
                         WHEN dc.status=1 THEN 'نشط' ELSE 'غير ساري' END AS status_txt
             FROM drivercontracts dc
-            LEFT JOIN employees d  ON d.id=dc.driver_id
+            LEFT JOIN employees d  ON d.id=dc.employee_id
             LEFT JOIN project p  ON p.id=dc.project_id
             WHERE $ws ORDER BY dc.contract_signing_date DESC";
             $sql = rptApplyInitialLimit($sql, $applyInitialLimit, $INITIAL_LOAD_LIMIT);
@@ -1595,8 +1595,8 @@ body {
             <?php if ($showDriver): ?>
             <div class="col-xl-2 col-md-4 col-sm-6">
                 <label class="fc-filter-label"><i class="fas fa-id-badge me-1" style="color:var(--purple)"></i>المشغل</label>
-                <select name="driver_id" class="form-select">
-                    <?php echo rptSelectOptions($driversList, 'id', 'name', $fDriverId, 'driver_code'); ?>
+                <select name="employee_id" class="form-select">
+                    <?php echo rptSelectOptions($driversList, 'id', 'name', $fDriverId, 'employee_code'); ?>
                 </select>
             </div>
             <?php endif; ?>

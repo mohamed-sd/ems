@@ -392,10 +392,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // إضافة سائق جديد
         elseif ($action === 'add_new_driver') {
             try {
-                $driver_id = intval($_POST['driver_id'] ?? 0);
+                $employee_id = intval($_POST['employee_id'] ?? 0);
                 $equipment_id = intval($_POST['equipment_id'] ?? 0);
 
-                if ($driver_id <= 0 || $equipment_id <= 0) {
+                if ($employee_id <= 0 || $equipment_id <= 0) {
                     throw new Exception('بيانات ناقصة: اختر السائق والمعدة');
                 }
 
@@ -418,15 +418,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $end_save = mysqli_real_escape_string($conn, $end_date);
 
                 // إنهاء التعيينات السابقة النشطة للسائق
-                mysqli_query($conn, "UPDATE equipment_drivers SET status = 0, end_date = '$start_save' WHERE driver_id = $driver_id AND status = 1$ed_company_scope_inline");
+                mysqli_query($conn, "UPDATE equipment_drivers SET status = 0, end_date = '$start_save' WHERE employee_id = $employee_id AND status = 1$ed_company_scope_inline");
 
                 $insert_company_col = (!$is_super_admin && $equipment_drivers_has_company) ? ", company_id" : "";
                 $insert_company_val = (!$is_super_admin && $equipment_drivers_has_company) ? ", $company_id" : "";
                 $insert_shift_col = $equipment_drivers_has_shift_type ? ", shift_type" : "";
                 $insert_shift_val = $equipment_drivers_has_shift_type ? ", '$shift_sql'" : "";
 
-                $insert_driver_sql = "INSERT INTO equipment_drivers (equipment_id, driver_id, start_date, end_date, status$insert_shift_col$insert_company_col)
-                                      VALUES ($equipment_id, $driver_id, '$start_save', '$end_save', 1$insert_shift_val$insert_company_val)";
+                $insert_driver_sql = "INSERT INTO equipment_drivers (equipment_id, employee_id, start_date, end_date, status$insert_shift_col$insert_company_col)
+                                      VALUES ($equipment_id, $employee_id, '$start_save', '$end_save', 1$insert_shift_val$insert_company_val)";
                 if (!mysqli_query($conn, $insert_driver_sql)) {
                     throw new Exception('خطأ في إضافة السائق');
                 }
@@ -667,12 +667,12 @@ foreach ($operations_rows as $op_row) {
     }
 }
 
-$drivers_sql = "SELECT ed.id, ed.equipment_id, ed.driver_id, ed.start_date, ed.end_date, ed.status,
+$drivers_sql = "SELECT ed.id, ed.equipment_id, ed.employee_id, ed.start_date, ed.end_date, ed.status,
                        " . ($equipment_drivers_has_shift_type ? "ed.shift_type" : "'B' AS shift_type") . ",
                        d.name AS driver_name, d.phone AS driver_phone,
                        e.code AS equipment_code, e.name AS equipment_name
                 FROM equipment_drivers ed
-                INNER JOIN employees d ON d.id = ed.driver_id
+                INNER JOIN employees d ON d.id = ed.employee_id
                 INNER JOIN equipments e ON e.id = ed.equipment_id
                 WHERE EXISTS (
                     SELECT 1 FROM operations o
@@ -710,7 +710,7 @@ foreach ($drivers_rows as $drv_item) {
         continue;
     }
     $eid = intval($drv_item['equipment_id']);
-    $did = intval($drv_item['driver_id']);
+    $did = intval($drv_item['employee_id']);
     $seen_key = $eid . ':' . $did;
     if (isset($ems_seen_active_driver[$seen_key])) {
         continue;
@@ -742,10 +742,10 @@ if ($all_drivers_res) {
 
 // السائقون الذين لديهم تعيين ساري حالياً — يُستثنون من قوائم الإضافة
 $active_driver_ids = [];
-$active_drv_res = mysqli_query($conn, "SELECT DISTINCT driver_id FROM equipment_drivers WHERE status = 1$ed_company_scope_inline");
+$active_drv_res = mysqli_query($conn, "SELECT DISTINCT employee_id FROM equipment_drivers WHERE status = 1$ed_company_scope_inline");
 if ($active_drv_res) {
     while ($adr = mysqli_fetch_assoc($active_drv_res)) {
-        $active_driver_ids[] = intval($adr['driver_id']);
+        $active_driver_ids[] = intval($adr['employee_id']);
     }
 }
 
@@ -1565,7 +1565,7 @@ include '../insidebar.php';
                                                     <div class="inline-form-row">
                                                         <div class="form-group">
                                                             <label>السائق *</label>
-                                                            <select name="driver_id" required>
+                                                            <select name="employee_id" required>
                                                                 <option value="">-- اختر السائق --</option>
                                                                 <?php foreach ($all_drivers as $d): ?>
                                                                     <?php if (in_array(intval($d['id']), $active_driver_ids)) continue; ?>
@@ -1745,14 +1745,14 @@ include '../insidebar.php';
 
     function submitAddDriver(event, form, equipmentId) {
         event.preventDefault();
-        var driverSel  = form.querySelector('[name="driver_id"]');
+        var driverSel  = form.querySelector('[name="employee_id"]');
         var shiftSel   = form.querySelector('[name="shift_type"]');
         var startInput = form.querySelector('[name="start_date"]');
         var endInput   = form.querySelector('[name="end_date"]');
         if (!driverSel || !driverSel.value) { alert('يرجى اختيار السائق'); return; }
         var formData = new FormData();
         formData.append('action', 'add_new_driver');
-        formData.append('driver_id',   driverSel.value);
+        formData.append('employee_id',   driverSel.value);
         formData.append('equipment_id', equipmentId);
         formData.append('shift_type',  shiftSel   ? shiftSel.value   : 'B');
         formData.append('start_date',  startInput ? startInput.value : '');

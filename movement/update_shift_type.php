@@ -91,7 +91,7 @@ if ($update_result && mysqli_affected_rows($conn) > 0) {
     // الحصول على اسم السائق لتسجيل التغيير
     $driver_info_sql = "SELECT d.name, e.code, e.name as equipment_name
                         FROM equipment_drivers ed
-                        JOIN employees d ON ed.driver_id = d.id
+                        JOIN employees d ON ed.employee_id = d.id
                         JOIN equipments e ON ed.equipment_id = e.id
                         WHERE ed.id = $relation_id
                         LIMIT 1";

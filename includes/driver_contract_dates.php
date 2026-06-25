@@ -48,10 +48,10 @@ if (!function_exists('ems_driver_active_contract')) {
      * أحدث عقد ساري للسائق، أو null.
      * عند تعدد العقود السارية: يُعتمد الأحدث (actual_start الأكبر ثم id الأكبر).
      */
-    function ems_driver_active_contract($conn, $driver_id, $company_id = 0, $is_super_admin = false)
+    function ems_driver_active_contract($conn, $employee_id, $company_id = 0, $is_super_admin = false)
     {
-        $driver_id = intval($driver_id);
-        if ($driver_id <= 0) {
+        $employee_id = intval($employee_id);
+        if ($employee_id <= 0) {
             return null;
         }
 
@@ -67,7 +67,7 @@ if (!function_exists('ems_driver_active_contract')) {
         // لذا نكتفي بـ IS NOT NULL و<> '0000-00-00' (صالحان لعمود DATE).
         $sql = "SELECT actual_start, actual_end
                 FROM drivercontracts
-                WHERE driver_id = $driver_id
+                WHERE employee_id = $employee_id
                   AND status = 1
                   AND actual_start IS NOT NULL
                   AND actual_start <> '0000-00-00'
@@ -87,9 +87,9 @@ if (!function_exists('ems_resolve_equipment_driver_dates')) {
      * يطبّق القاعدة ويعيد ['start' => 'Y-m-d', 'end' => 'Y-m-d', 'from_contract' => bool].
      * end يكون السنتينل '2099-12-31' عند النهاية المفتوحة.
      */
-    function ems_resolve_equipment_driver_dates($conn, $driver_id, $company_id = 0, $is_super_admin = false)
+    function ems_resolve_equipment_driver_dates($conn, $employee_id, $company_id = 0, $is_super_admin = false)
     {
-        $contract = ems_driver_active_contract($conn, $driver_id, $company_id, $is_super_admin);
+        $contract = ems_driver_active_contract($conn, $employee_id, $company_id, $is_super_admin);
 
         if ($contract && !empty($contract['actual_start']) && $contract['actual_start'] !== '0000-00-00') {
             $start = date('Y-m-d', strtotime($contract['actual_start']));
