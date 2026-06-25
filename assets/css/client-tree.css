@@ -1,0 +1,241 @@
+/* ════════════════════════════════════════════════════════════════════════
+   client-tree.css — تصميم شاشة «شجرة العميل» (معزول، محصور تحت .client-tree-page)
+   الألوان من توكنات النظام (design-tokens.css) فقط. الدلالات: أخضر=عاملة، أحمر=متوقفة.
+   لا يؤثّر على أي شاشة أخرى (كل المحدّدات تبدأ بـ .client-tree-page).
+   ════════════════════════════════════════════════════════════════════════ */
+
+.client-tree-page {
+    --ct-accent: var(--brand-amber);
+    --ct-accent-strong: var(--brand-orange-bright);
+    --ct-ok: var(--success-600);
+    --ct-ok-bg: var(--success-100);
+    --ct-bad: var(--danger-600);
+    --ct-bad-bg: var(--danger-100);
+    --ct-neutral: var(--info-600);
+    --ct-neutral-bg: var(--info-100);
+    font-family: var(--font-ar);
+    color: var(--gray-900);
+}
+
+/* ── شريط الأدوات ── */
+.client-tree-page .ctree-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: flex-end;
+    background: var(--white);
+    border: var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-4);
+    margin: var(--space-3) 0;
+    box-shadow: var(--shadow-sm);
+}
+.client-tree-page .ctree-tool label {
+    display: block;
+    font-size: var(--text-caption);
+    color: var(--gray-500);
+    margin-bottom: var(--space-1);
+    font-weight: var(--weight-bold);
+}
+.client-tree-page .ctree-tool select,
+.client-tree-page .ctree-tool input {
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-default);
+    border-radius: var(--radius-md);
+    font-family: var(--font-ar);
+    font-size: var(--text-body);
+    background: var(--white);
+    color: var(--gray-900);
+}
+.client-tree-page .ctree-tool select:focus,
+.client-tree-page .ctree-tool input:focus {
+    outline: none;
+    border: var(--border-focus);
+}
+.client-tree-page .ctree-search-wrap { flex: 1; min-width: 240px; }
+.client-tree-page #ctreeSearch { width: 100%; }
+.client-tree-page .ctree-btns { display: flex; gap: var(--space-2); }
+.client-tree-page .ctree-toolbar .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: var(--border-default);
+    background: var(--white);
+    color: var(--gray-700);
+    font-family: var(--font-ar);
+    font-weight: var(--weight-semi);
+    font-size: var(--text-caption);
+    cursor: pointer;
+    transition: all .15s ease;
+}
+.client-tree-page .ctree-toolbar .btn:hover {
+    background: var(--brand-cream-light);
+    border-color: var(--ct-accent);
+    color: var(--brand-orange-bright);
+}
+.client-tree-page .ctree-toolbar .btn-primary {
+    background: var(--ct-accent); border-color: var(--ct-accent); color: var(--brand-black);
+}
+
+/* ── شريط الإجماليات العامة ── */
+.client-tree-page .ctree-grand {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    background: var(--white);
+    border: var(--border-subtle);
+    border-inline-start: 4px solid var(--ct-accent);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-5);
+    margin-bottom: var(--space-4);
+    font-size: var(--text-body);
+    color: var(--gray-700);
+    box-shadow: var(--shadow-sm);
+}
+.client-tree-page .ctree-grand span { display: inline-flex; align-items: center; gap: 6px; }
+.client-tree-page .ctree-grand i { color: var(--gray-500); }
+.client-tree-page .ctree-grand b { color: var(--gray-900); font-weight: var(--weight-bold); font-size: var(--text-h3); }
+.client-tree-page .ctree-grand .ok i { color: var(--ct-ok); }
+.client-tree-page .ctree-grand .bad i { color: var(--ct-bad); }
+.client-tree-page .ctree-grand .hrs i { color: var(--ct-accent-strong); }
+.client-tree-page .ctree-grand .hrs b { color: var(--ct-accent-strong); }
+
+/* ── الشجرة ── */
+.client-tree-page .ctree { display: flex; flex-direction: column; gap: var(--space-2); }
+.client-tree-page .cnode { border-radius: var(--radius-lg); }
+.client-tree-page .cnode-row {
+    display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--white);
+    cursor: pointer;
+    transition: background .15s ease, box-shadow .15s ease;
+}
+.client-tree-page .cnode-row:hover { background: var(--gray-50); box-shadow: var(--shadow-sm); }
+
+/* تدرّج المستويات (levelTint) — تلوين محايد/علامة، يبقى الأخضر/الأحمر للحالة فقط */
+.client-tree-page .lvl-client > .cnode-row {
+    background: var(--brand-cream-light);
+    border-color: var(--brand-cream);
+    border-inline-start: 4px solid var(--ct-accent);
+    font-weight: var(--weight-bold);
+    padding: var(--space-3) var(--space-3);
+}
+.client-tree-page .lvl-project > .cnode-row {
+    background: var(--ct-neutral-bg);
+    border-color: var(--gray-200);
+    border-inline-start: 3px solid var(--ct-neutral);
+    font-weight: var(--weight-semi);
+}
+.client-tree-page .lvl-supplier > .cnode-row {
+    background: var(--gray-50);
+    border-inline-start: 3px solid var(--gray-300);
+}
+.client-tree-page .lvl-equip > .cnode-row { background: var(--white); }
+
+/* السهم الدوّار */
+.client-tree-page .cnode-arrow {
+    width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center;
+    color: var(--gray-500); border-radius: var(--radius-sm); transition: transform .18s ease, background .15s ease;
+}
+.client-tree-page .cnode-row:hover .cnode-arrow { background: var(--gray-200); }
+.client-tree-page .lvl-supplier .cnode-arrow i,
+.client-tree-page .lvl-equip .cnode-arrow i { transition: transform .18s ease; }
+.client-tree-page .cnode.open > .cnode-row .cnode-arrow i { transform: rotate(-90deg); }
+.client-tree-page .lvl-client.open > .cnode-row .cnode-arrow i,
+.client-tree-page .lvl-project.open > .cnode-row .cnode-arrow i { transform: none; }
+
+.client-tree-page .cnode-ico { color: var(--brand-black); width: 18px; text-align: center; }
+.client-tree-page .lvl-client .cnode-ico { color: var(--ct-accent-strong); }
+.client-tree-page .lvl-project .cnode-ico { color: var(--ct-neutral); }
+.client-tree-page .cnode-title { font-size: var(--text-body); color: var(--gray-900); }
+.client-tree-page a.cnode-title.link,
+.client-tree-page .cleaf a.link { color: var(--info-deep); text-decoration: none; font-weight: var(--weight-semi); }
+.client-tree-page a.link:hover { color: var(--ct-accent-strong); text-decoration: underline; }
+.client-tree-page .cnode-code {
+    font-size: var(--text-caption); color: var(--gray-700);
+    background: var(--gray-100); border: var(--border-subtle);
+    border-radius: var(--radius-sm); padding: 1px 8px; font-family: var(--font-mono);
+}
+.client-tree-page .cnode-loc { font-size: var(--text-caption); color: var(--gray-500); }
+
+/* الشارات/العدّادات (pill) */
+.client-tree-page .cnode-badges { display: flex; gap: var(--space-1); flex-wrap: wrap; margin-inline-start: auto; align-items: center; }
+.client-tree-page .cnode-badges .b {
+    font-size: var(--text-caption);
+    background: var(--gray-100); border: var(--border-subtle);
+    border-radius: var(--radius-pill); padding: 2px 10px; color: var(--gray-700);
+    font-weight: var(--weight-medium); white-space: nowrap;
+}
+.client-tree-page .cnode-badges .b.ok { background: var(--ct-ok-bg); color: var(--success-deep); border-color: transparent; }
+.client-tree-page .cnode-badges .b.bad { background: var(--ct-bad-bg); color: var(--danger-deep); border-color: transparent; }
+.client-tree-page .cnode-badges .b.hrs { background: var(--brand-cream-light); color: var(--ct-accent-strong); border-color: var(--brand-cream); font-weight: var(--weight-bold); }
+.client-tree-page .cnode-badges .b.share {
+    background: var(--ct-accent); color: var(--brand-black);
+    border-color: transparent; font-weight: var(--weight-bold);
+    font-size: var(--text-body); padding: 2px 12px;
+}
+
+/* شريط توزيع الحصص (نسبة المورّد من ساعات المشروع) */
+.client-tree-page .cnode-bar {
+    flex-basis: 100%; height: 6px; background: var(--gray-200);
+    border-radius: var(--radius-pill); overflow: hidden; margin-top: var(--space-1);
+}
+.client-tree-page .cnode-bar > span {
+    display: block; height: 100%;
+    background: linear-gradient(90deg, var(--brand-amber), var(--brand-orange-bright));
+    border-radius: var(--radius-pill);
+}
+
+/* نقطة الحالة */
+.client-tree-page .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; box-shadow: 0 0 0 3px var(--gray-100); }
+.client-tree-page .status-dot.ok { background: var(--ct-ok); box-shadow: 0 0 0 3px var(--ct-ok-bg); }
+.client-tree-page .status-dot.bad { background: var(--ct-bad); box-shadow: 0 0 0 3px var(--ct-bad-bg); }
+
+/* الأبناء + خطوط الربط الهرمية */
+.client-tree-page .cnode-children {
+    padding-inline-start: var(--space-5);
+    margin-top: var(--space-2);
+    margin-inline-start: var(--space-3);
+    display: flex; flex-direction: column; gap: var(--space-2);
+    border-inline-start: 2px dashed var(--gray-300);
+    animation: ctreeFade .18s ease both;
+}
+.client-tree-page .cnode:not(.open) > .cnode-children { display: none; }
+
+/* المشغّلون (ورقة) */
+.client-tree-page .cleaf {
+    display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;
+    padding: var(--space-2) var(--space-3);
+    border: 1px dashed var(--gray-200);
+    border-radius: var(--radius-md);
+    background: var(--gray-50);
+    font-size: var(--text-body);
+}
+.client-tree-page .cleaf.none { color: var(--gray-500); font-style: italic; background: var(--white); }
+.client-tree-page .cleaf-shift { font-size: var(--text-body-lg); }
+.client-tree-page .cleaf-code { font-size: var(--text-caption); color: var(--gray-700); font-family: var(--font-mono); background: var(--gray-100); border-radius: var(--radius-sm); padding: 1px 6px; }
+.client-tree-page .cleaf-phone { font-size: var(--text-caption); color: var(--gray-500); margin-inline-start: auto; }
+
+/* حالات فارغة */
+.client-tree-page .ctree-empty {
+    padding: var(--space-5); text-align: center; color: var(--gray-500);
+    background: var(--gray-50); border: 1px dashed var(--gray-200); border-radius: var(--radius-lg);
+}
+.client-tree-page .ctree-empty.sm { padding: var(--space-2); font-size: var(--text-caption); }
+
+/* إبراز نتيجة البحث */
+.client-tree-page .cnode.search-hit > .cnode-row {
+    outline: 2px solid var(--ct-accent);
+    outline-offset: 1px;
+}
+.client-tree-page .cleaf.search-hit { outline: 2px solid var(--ct-accent); outline-offset: 1px; }
+
+@keyframes ctreeFade { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+
+/* تجاوب */
+@media (max-width: 720px) {
+    .client-tree-page .cnode-badges { width: 100%; margin-inline-start: 0; }
+    .client-tree-page .ctree-grand { gap: var(--space-3); font-size: var(--text-caption); }
+}
