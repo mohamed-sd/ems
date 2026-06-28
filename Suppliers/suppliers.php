@@ -567,7 +567,6 @@ include '../insidebar.php';
                             <th> الساعات المتعاقد عليها</th>
                             <th> رقم الهاتف</th>
                             <th> الحالة</th>
-                            <th> عقود المورد</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -639,6 +638,8 @@ include '../insidebar.php';
                             if ($can_delete) {
                                 $action_btns .= "<a href='?delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف هذا المورد؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
                             }
+                            // عقود المورد — زرّ إجراء مدمج من عمود «عقود المورد» (مع عدد العقود)
+                            $action_btns .= "<a href='supplierscontracts.php?id=" . intval($row['id']) . "' class='action-btn view supplierContractsBtn' title='عقود المورد'><i class='fas fa-file-contract'></i><span style='font-size:11px;font-weight:700;margin-inline-start:3px;'>" . intval($row['num_contracts']) . "</span></a>";
                             $action_btns .= "</div></td>";
 
                             echo $action_btns;
@@ -654,15 +655,6 @@ include '../insidebar.php';
                             } else {
                                 echo "<td><span class='status-inactive'><i class='fas fa-times-circle suppliers-status-icon'></i>معلق</span></td>";
                             }
-
-                            echo "<td>
-                             <a href='supplierscontracts.php?id=" . intval($row['id']) . "'
-                                       class='suppliers-contracts-link'
-                                       title='عرض عقود المورد'>
-                                        <i class='fas fa-file-contract'></i>
-                                        <span class='action-btn'>" . intval($row['num_contracts']) . "</span>
-                             </a>
-                        </td>";
 
                             echo "</tr>";
                         } }

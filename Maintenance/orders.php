@@ -83,6 +83,27 @@ function mnt_json($data)
     exit;
 }
 
+// ── اسم الموظف + دوره من جدول الموظفين (employees) — مصدر الحقيقة لأسطر العمالة ──
+// الدور يُشتقّ تلقائياً: دور الموظف ← المسمّى الوظيفي ← نوع الموظف. يُعيد فراغاً إن لم
+// يُوجد الموظف ضمن نطاق شركة الأمر (تحقّق ملكية ضدّ ربط موظف شركة أخرى).
+function mnt_employee_role_name($conn, $employee_id, $company_id, $is_super_admin)
+{
+    $employee_id = intval($employee_id);
+    if ($employee_id <= 0) return array('name' => '', 'role' => '');
+    $scope = $is_super_admin ? '' : ' AND (e.company_id = ' . intval($company_id) . ' OR e.company_id IS NULL)';
+    $sql = "SELECT e.name,
+                   COALESCE(NULLIF(er.name,''), NULLIF(jt.name,''), NULLIF(e.employee_type,'')) AS role
+              FROM employees e
+              LEFT JOIN employee_roles er ON er.id = e.employee_role_id
+              LEFT JOIN job_titles jt ON jt.id = e.job_title_id
+             WHERE e.id = " . $employee_id . $scope . " LIMIT 1";
+    $res = mysqli_query($conn, $sql);
+    if ($res && ($x = mysqli_fetch_assoc($res))) {
+        return array('name' => (string) $x['name'], 'role' => (string) ($x['role'] ?? ''));
+    }
+    return array('name' => '', 'role' => '');
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // AJAX: إدارة أسطر العمالة/القطع دون إعادة تحميل (يحافظ على بيانات الفورم)
 // ══════════════════════════════════════════════════════════════════════════════
@@ -100,8 +121,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax
     $act = $_POST['action'];
 
     if ($act === 'add_labor') {
-        $employee_id = !empty($_POST['employee_id']) ? intval($_POST['employee_id']) : null;
-        $role  = trim($_POST['labor_role'] ?? '');
+        $employee_id = !empty($_POST['employee_id']) ? intval($_POST['employee_id']) : 0;
+        if ($employee_id <= 0) { mnt_json(array('success' => false, 'message' => 'يجب اختيار الموظف')); }
+        // الاسم والدور يُشتقّان من سجل الموظف (لا إدخال نصّي) — تماسك البيانات
+        $info = mnt_employee_role_name($conn, $employee_id, intval($order['company_id']), $is_super_admin);
+        if ($info['name'] === '') { mnt_json(array('success' => false, 'message' => 'الموظف غير موجود ضمن شركتك')); }
+        $emp   = $info['name'];
+        $role  = $info['role'];
         $hours = floatval($_POST['hours'] ?? 0);
         $rate  = floatval($_POST['hourly_rate'] ?? 0);
         $cost  = $hours * $rate;
@@ -111,12 +137,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax
             mysqli_stmt_execute($s); $lineId = mysqli_insert_id($conn); mysqli_stmt_close($s);
         }
         mnt_recalc_order_totals($conn, $oid, $company_id);
-        $emp = '';
-        if ($employee_id && ($s = mysqli_prepare($conn, "SELECT name FROM users WHERE id=?"))) {
-            mysqli_stmt_bind_param($s, 'i', $employee_id); mysqli_stmt_execute($s);
-            $r = mysqli_stmt_get_result($s); if ($r && ($x = mysqli_fetch_assoc($r))) { $emp = $x['name']; }
-            mysqli_stmt_close($s);
-        }
         mnt_json(array('success' => true, 'line' => array('id' => $lineId, 'emp' => $emp, 'role' => $role, 'hours' => $hours, 'hourly_rate' => $rate, 'cost' => $cost), 'totals' => mnt_order_totals($conn, $oid, $company_id)));
     }
 
@@ -316,11 +336,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['action'] ?? '', ar
         $order = mnt_fetch_order($conn, $oid, $company_id, $is_super_admin);
         if ($order) {
             if ($_POST['action'] === 'add_labor') {
-                $employee_id = !empty($_POST['employee_id']) ? intval($_POST['employee_id']) : null;
-                $role = trim($_POST['labor_role'] ?? ''); $hours = floatval($_POST['hours'] ?? 0); $rate = floatval($_POST['hourly_rate'] ?? 0); $cost = $hours * $rate;
-                if ($s = mysqli_prepare($conn, "INSERT INTO mnt_order_labor (company_id, order_id, employee_id, role, hours, hourly_rate, cost) VALUES (?,?,?,?,?,?,?)")) {
-                    mysqli_stmt_bind_param($s, 'iiisddd', $company_id, $oid, $employee_id, $role, $hours, $rate, $cost);
-                    mysqli_stmt_execute($s); mysqli_stmt_close($s);
+                $employee_id = !empty($_POST['employee_id']) ? intval($_POST['employee_id']) : 0;
+                $info = mnt_employee_role_name($conn, $employee_id, intval($order['company_id']), $is_super_admin);
+                if ($employee_id > 0 && $info['name'] !== '') {
+                    $role = $info['role']; $hours = floatval($_POST['hours'] ?? 0); $rate = floatval($_POST['hourly_rate'] ?? 0); $cost = $hours * $rate;
+                    if ($s = mysqli_prepare($conn, "INSERT INTO mnt_order_labor (company_id, order_id, employee_id, role, hours, hourly_rate, cost) VALUES (?,?,?,?,?,?,?)")) {
+                        mysqli_stmt_bind_param($s, 'iiisddd', $company_id, $oid, $employee_id, $role, $hours, $rate, $cost);
+                        mysqli_stmt_execute($s); mysqli_stmt_close($s);
+                    }
                 }
             } else {
                 $part_name = trim($_POST['part_name'] ?? ''); $category = trim($_POST['category'] ?? '');
@@ -369,7 +392,7 @@ if (isset($_GET['delete_id'])) {
 $edit_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $order = $edit_id > 0 ? mnt_fetch_order($conn, $edit_id, $company_id, $is_super_admin) : null;
 
-$equipments = array(); $projects = array(); $vendors = array(); $users_list = array();
+$equipments = array(); $projects = array(); $vendors = array(); $users_list = array(); $employees_list = array();
 $root_causes = array(); $failure_codes = array();
 if ($order || $edit_id === 0) {
     $cscope = $is_super_admin ? "1=1" : "company_id = " . intval($company_id);
@@ -377,6 +400,29 @@ if ($order || $edit_id === 0) {
     if ($r = mysqli_query($conn, "SELECT id, name FROM project WHERE $cscope ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $projects[] = $x; }
     if ($r = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE $cscope AND COALESCE(is_deleted,0)=0 ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $vendors[] = $x; }
     if ($r = mysqli_query($conn, "SELECT id, name FROM users WHERE $cscope AND is_deleted=0 ORDER BY name")) { while ($x = mysqli_fetch_assoc($r)) $users_list[] = $x; }
+    // الموظفون لأسطر العمالة: الفنيون/المساندون فقط — نستبعد السائقين/المشغّلين، فعمالة
+    // الصيانة ليست مشغّلي المعدات. نفس قاعدة تحديد المشغّل المعتمدة (المسمّى is_operator
+    // حاسمٌ متى وُجد، وإلا اسم الدور، وإلا نوع الموظف القديم)، مع عكسها (NOT).
+    $emp_scope = $is_super_admin ? "1=1" : "(e.company_id = " . intval($company_id) . " OR e.company_id IS NULL)";
+    $op_types_in = "''";
+    if (function_exists('ems_operation_employee_types')) {
+        $op_types_in = implode(',', array_map(function ($t) use ($conn) {
+            return "'" . mysqli_real_escape_string($conn, $t) . "'";
+        }, ems_operation_employee_types()));
+    }
+    $not_operator_sql = "NOT (
+           (e.job_title_id IS NOT NULL AND COALESCE(jt.is_operator,0) = 1)
+        OR (e.job_title_id IS NULL AND e.employee_role_id IS NOT NULL AND (er.name LIKE '%سائق%' OR er.name LIKE '%مشغّل%' OR er.name LIKE '%مشغل%'))
+        OR (e.job_title_id IS NULL AND e.employee_role_id IS NULL AND e.employee_type IN ($op_types_in))
+    )";
+    $emp_sql = "SELECT e.id, e.name,
+                       COALESCE(NULLIF(er.name,''), NULLIF(jt.name,''), NULLIF(e.employee_type,'')) AS role
+                  FROM employees e
+                  LEFT JOIN employee_roles er ON er.id = e.employee_role_id
+                  LEFT JOIN job_titles jt ON jt.id = e.job_title_id
+                 WHERE $emp_scope AND COALESCE(e.status,1)=1 AND $not_operator_sql
+                 ORDER BY e.name";
+    if ($r = mysqli_query($conn, $emp_sql)) { while ($x = mysqli_fetch_assoc($r)) $employees_list[] = $x; }
     $root_causes = mnt_lookup_options($conn, $company_id, 'سبب عطل');
     if ($r = mysqli_query($conn, "SELECT id, full_code, failure_detail FROM failure_codes WHERE status=1 ORDER BY full_code")) { while ($x = mysqli_fetch_assoc($r)) $failure_codes[] = $x; }
 }
@@ -414,7 +460,7 @@ function mnt_state_class($st) {
 
 <?php if ($order): // ═══════════════════════════ صفحة تحرير أمر ═══════════════════════════
     $labor_rows = array(); $part_rows = array();
-    if ($s = mysqli_prepare($conn, "SELECT l.id, l.role, l.hours, l.hourly_rate, l.cost, u.name AS emp FROM mnt_order_labor l LEFT JOIN users u ON u.id=l.employee_id WHERE l.order_id=? AND l.company_id=? ORDER BY l.id")) {
+    if ($s = mysqli_prepare($conn, "SELECT l.id, l.role, l.hours, l.hourly_rate, l.cost, u.name AS emp FROM mnt_order_labor l LEFT JOIN employees u ON u.id=l.employee_id WHERE l.order_id=? AND l.company_id=? ORDER BY l.id")) {
         mysqli_stmt_bind_param($s, 'ii', $edit_id, $company_id); mysqli_stmt_execute($s);
         $rr = mysqli_stmt_get_result($s); while ($rr && $x = mysqli_fetch_assoc($rr)) $labor_rows[] = $x; mysqli_stmt_close($s);
     }
@@ -577,9 +623,26 @@ function mnt_state_class($st) {
         </div>
     </div></div>
 
+    <?php if (!$st_locked && $can_edit): ?>
+    <!-- مفاتيح تفعيل بنود التكلفة: لوحتا العمالة/القطع مخفيّتان حتى يُفعّلهما المستخدم -->
+    <div class="card mnt-cost-toggles"><div class="card-body">
+        <div class="mnt-toggles-head"><i class="fas fa-sliders"></i> بنود التكلفة <span class="mnt-toggles-hint">(اختيارية — فعّل ما يلزم فقط، ويمكن حفظ الأمر بدونها)</span></div>
+        <div class="mnt-toggles-grid">
+            <label class="mnt-toggle<?php echo !empty($labor_rows) ? ' is-on' : ''; ?>" id="laborToggleWrap">
+                <span class="mnt-switch"><input type="checkbox" id="toggleLaborSection"<?php echo !empty($labor_rows) ? ' checked' : ''; ?>><span class="mnt-switch-track"></span></span>
+                <span class="mnt-toggle-text"><span class="mnt-toggle-title"><i class="fas fa-user-gear"></i> تكليف أسطر عمالة</span><span class="mnt-toggle-sub">إضافة الموظفين وساعات العمل وتكلفتها</span></span>
+            </label>
+            <label class="mnt-toggle<?php echo !empty($part_rows) ? ' is-on' : ''; ?>" id="partsToggleWrap">
+                <span class="mnt-switch"><input type="checkbox" id="togglePartsSection"<?php echo !empty($part_rows) ? ' checked' : ''; ?>><span class="mnt-switch-track"></span></span>
+                <span class="mnt-toggle-text"><span class="mnt-toggle-title"><i class="fas fa-gears"></i> تكليف أسطر قطع غيار</span><span class="mnt-toggle-sub">إضافة القطع المُستبدلة وكمياتها وتكلفتها</span></span>
+            </label>
+        </div>
+    </div></div>
+    <?php endif; ?>
+
     <div class="mnt-lines-grid">
         <!-- أسطر العمالة -->
-        <div class="card mnt-lines-card">
+        <div class="card mnt-lines-card" id="laborCard" style="<?php echo !empty($labor_rows) ? '' : 'display:none'; ?>">
             <div class="card-header mnt-lines-head">
                 <h5><i class="fas fa-user-gear"></i> أسطر العمالة <span class="mnt-count" id="laborCount"><?php echo count($labor_rows); ?></span></h5>
                 <?php if (!$st_locked && $can_edit): ?><button type="button" class="mnt-add-toggle" data-target="laborForm"><i class="fas fa-plus"></i> إضافة سطر</button><?php endif; ?>
@@ -589,9 +652,19 @@ function mnt_state_class($st) {
                 <form class="mnt-line-form" id="laborForm" onsubmit="return false;" style="display:none;">
                     <input type="hidden" name="action" value="add_labor">
                     <input type="hidden" name="order_id" value="<?php echo intval($order['id']); ?>">
+                    <div class="mnt-line-form-title"><i class="fas fa-user-plus"></i> إضافة سطر عمالة</div>
                     <div class="mnt-line-grid">
-                        <div class="form-group"><label>الموظف</label><select name="employee_id"><option value="">— اختر —</option><?php foreach ($users_list as $u) echo mnt_opt($u['id'], $u['name'], false); ?></select></div>
-                        <div class="form-group"><label>الدور</label><input type="text" name="labor_role" placeholder="فني / مساعد"></div>
+                        <div class="form-group"><label>الموظف <span class="required">*</span></label>
+                            <select name="employee_id" required>
+                                <option value="">— اختر الموظف —</option>
+                                <?php foreach ($employees_list as $e):
+                                    $erole = (string) ($e['role'] ?? '');
+                                    $lbl   = $e['name'] . ($erole !== '' ? ' — ' . $erole : ''); ?>
+                                    <option value="<?php echo intval($e['id']); ?>" data-role="<?php echo htmlspecialchars($erole, ENT_QUOTES); ?>"><?php echo htmlspecialchars($lbl); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>الدور</label><input type="text" name="labor_role_display" placeholder="يُحدّد تلقائياً من الموظف" readonly></div>
                         <div class="form-group"><label>الساعات</label><input type="number" step="0.01" name="hours" value="0"></div>
                         <div class="form-group"><label>تكلفة الساعة</label><input type="number" step="0.01" name="hourly_rate" value="0"></div>
                     </div>
@@ -622,7 +695,7 @@ function mnt_state_class($st) {
         </div>
 
         <!-- أسطر القطع -->
-        <div class="card mnt-lines-card">
+        <div class="card mnt-lines-card" id="partsCard" style="<?php echo !empty($part_rows) ? '' : 'display:none'; ?>">
             <div class="card-header mnt-lines-head">
                 <h5><i class="fas fa-gears"></i> أسطر القطع <span class="mnt-count" id="partCount"><?php echo count($part_rows); ?></span></h5>
                 <?php if (!$st_locked && $can_edit): ?><button type="button" class="mnt-add-toggle" data-target="partForm"><i class="fas fa-plus"></i> إضافة سطر</button><?php endif; ?>
@@ -632,6 +705,7 @@ function mnt_state_class($st) {
                 <form class="mnt-line-form" id="partForm" onsubmit="return false;" style="display:none;">
                     <input type="hidden" name="action" value="add_part">
                     <input type="hidden" name="order_id" value="<?php echo intval($order['id']); ?>">
+                    <div class="mnt-line-form-title"><i class="fas fa-plus"></i> إضافة سطر قطعة</div>
                     <div class="mnt-line-grid">
                         <div class="form-group"><label>اسم القطعة</label><input type="text" name="part_name" placeholder="اسم القطعة"></div>
                         <div class="form-group"><label>التصنيف</label><input type="text" name="category"></div>
@@ -829,7 +903,7 @@ function mnt_state_class($st) {
         $cid     = intval($company_id);
 
         $lq = "SELECT l.order_id, u.name AS emp, l.role, l.hours, l.hourly_rate, l.cost
-                 FROM mnt_order_labor l LEFT JOIN users u ON u.id = l.employee_id
+                 FROM mnt_order_labor l LEFT JOIN employees u ON u.id = l.employee_id
                 WHERE l.order_id IN ($ids_csv) AND l.company_id = $cid
                 ORDER BY l.id";
         if ($lr = mysqli_query($conn, $lq)) {
@@ -960,6 +1034,11 @@ function mnt_state_class($st) {
     }
 
     var $laborForm = $('#laborForm');
+    // عند اختيار الموظف: اعرض دوره المشتقّ في حقل العرض (الدور يُحفظ من سجل الموظف على الخادم)
+    $(document).on('change', '#laborForm select[name=employee_id]', function () {
+        var role = $(this).find('option:selected').data('role') || '';
+        $('#laborForm input[name=labor_role_display]').val(role);
+    });
     if ($laborForm.length) {
         $laborForm.on('submit', function (e) {
             e.preventDefault();
@@ -1037,6 +1116,38 @@ function mnt_state_class($st) {
             if (!window.confirm(msg)) { e.preventDefault(); return false; }
         }
     });
+
+    // ════════ مفاتيح تفعيل بنود التكلفة: إظهار/إخفاء لوحتي العمالة/القطع ════════
+    // اللوحات مخفيّة افتراضياً؛ تظهر فقط عند تفعيل المفتاح. لا يمكن إلغاء التفعيل
+    // ما دامت توجد أسطر مُسجّلة (الإلغاء يتطلّب حذف الأسطر أولاً — تماسك البيانات).
+    function mntToggleSection(kind, on, autoOpenForm){
+        var ids = (kind === 'labor')
+            ? { card:'#laborCard', form:'#laborForm', wrap:'#laborToggleWrap' }
+            : { card:'#partsCard', form:'#partForm', wrap:'#partsToggleWrap' };
+        $(ids.wrap).toggleClass('is-on', !!on);
+        var $card = $(ids.card), $form = $(ids.form);
+        if (on) {
+            $card.stop(true, true).slideDown(200);
+            if (autoOpenForm) { $form.stop(true, true).slideDown(200);
+                $form.find('select, input').not('[type=hidden],[readonly]').first().trigger('focus'); }
+        } else {
+            $form.stop(true, true).slideUp(160);
+            $card.stop(true, true).slideUp(200);
+        }
+    }
+    function mntBindSectionToggle(cbId, kind, tableSel){
+        var $cb = $('#' + cbId);
+        if (!$cb.length) return;
+        $cb.on('change', function(){
+            if (!this.checked && $(tableSel + ' tbody tr').length > 0) {
+                alert('يوجد أسطر مُسجّلة في هذا البند. احذفها أولاً لإلغاء التكليف.');
+                this.checked = true; return;
+            }
+            mntToggleSection(kind, this.checked, true);
+        });
+    }
+    mntBindSectionToggle('toggleLaborSection', 'labor', '#laborTable');
+    mntBindSectionToggle('togglePartsSection', 'parts', '#partTable');
 
     // ════════ فتح/إغلاق فورم إضافة سطر داخل لوحتي العمالة/القطع ════════
     $(document).on('click', '.mnt-add-toggle', function(){
@@ -1240,9 +1351,32 @@ function mnt_state_class($st) {
     .mnt-cost-total { background:linear-gradient(135deg,#1f4f7a,#2f6fa5); border:none; }
     .mnt-cost-total span, .mnt-cost-total strong { color:#fff; }
 
+    /* ══ مفاتيح تفعيل بنود التكلفة (العمالة/القطع) ══ */
+    .mnt-cost-toggles { margin-bottom:14px; border:1px solid var(--bdr,#e7dcc4); border-radius:18px; }
+    .mnt-cost-toggles .card-body { padding:16px 18px; }
+    .mnt-toggles-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-weight:800; color:#1f4f7a; font-size:.98rem; margin-bottom:14px; }
+    .mnt-toggles-head i { color:#E0AE2E; }
+    .mnt-toggles-hint { color:#9a8c6c; font-weight:600; font-size:.78rem; }
+    .mnt-toggles-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width:760px){ .mnt-toggles-grid { grid-template-columns:1fr; } }
+    .mnt-toggle { display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:14px; border:1.5px solid #e7dcc4; background:#fdfbf6; cursor:pointer; transition:border-color .18s, background .18s, box-shadow .18s; margin:0; }
+    .mnt-toggle:hover { border-color:#d7c79f; }
+    .mnt-toggle.is-on { border-color:#2f6fa5; background:linear-gradient(180deg,#f3f9ff,#eaf3fc); box-shadow:0 2px 10px rgba(47,111,165,.12); }
+    .mnt-toggle-text { display:flex; flex-direction:column; gap:3px; }
+    .mnt-toggle-title { font-weight:800; color:#1a1208; font-size:.92rem; display:flex; align-items:center; gap:7px; }
+    .mnt-toggle-title i { color:#2f6fa5; }
+    .mnt-toggle-sub { color:#8a7a5c; font-size:.76rem; font-weight:600; }
+    /* مفتاح التبديل */
+    .mnt-switch { position:relative; flex:0 0 auto; width:46px; height:26px; }
+    .mnt-switch input { position:absolute; inset:0; width:100%; height:100%; opacity:0; margin:0; cursor:pointer; z-index:2; }
+    .mnt-switch-track { position:absolute; inset:0; background:#cfc6b2; border-radius:999px; transition:background .2s; }
+    .mnt-switch-track::before { content:''; position:absolute; top:3px; inset-inline-start:3px; width:20px; height:20px; background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .2s; }
+    .mnt-switch input:checked + .mnt-switch-track { background:linear-gradient(135deg,#1f4f7a,#2f6fa5); }
+    .mnt-switch input:checked + .mnt-switch-track::before { transform:translateX(-20px); }
+
     /* ══ لوحتا أسطر العمالة والقطع — تصميم قوي متّسق مع هوية الفورمات ══ */
-    .mnt-lines-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-    .mnt-lines-card { overflow:hidden; }
+    .mnt-lines-grid { display:flex; flex-wrap:wrap; gap:14px; }
+    .mnt-lines-card { flex:1 1 380px; min-width:0; overflow:hidden; }
     .mnt-lines-card > .card-header.mnt-lines-head {
         display:flex; align-items:center; justify-content:space-between; gap:10px;
         background:linear-gradient(135deg,#1f4f7a,#2f6fa5); color:#fff; padding:13px 16px; border:none;
@@ -1256,12 +1390,19 @@ function mnt_state_class($st) {
         background:linear-gradient(135deg,#E0AE2E,#f5d27e); box-shadow:0 2px 8px rgba(224,174,46,.4); transition:transform .15s, box-shadow .15s;
     }
     .mnt-add-toggle:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(224,174,46,.5); }
-    .mnt-line-form { background:linear-gradient(180deg,#fffdf7,#fbf6ea); border:1px solid var(--bdr,#e7dcc4); border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:inset 0 1px 0 #fff, 0 2px 8px rgba(26,18,8,.05); }
-    .mnt-line-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; align-items:end; }
+    .mnt-line-form { background:linear-gradient(180deg,#fffdf7,#fbf6ea); border:1px solid #e7dcc4; border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:inset 0 1px 0 #fff, 0 2px 10px rgba(26,18,8,.06); }
+    .mnt-line-form-title { display:flex; align-items:center; gap:8px; font-weight:800; color:#6b5d3e; font-size:.86rem; margin-bottom:13px; padding-bottom:11px; border-bottom:1px dashed #e7dcc4; }
+    .mnt-line-form-title i { color:#E0AE2E; }
+    .mnt-line-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px 14px; align-items:end; }
     .mnt-line-grid .form-group { margin:0; }
-    .mnt-line-actions { display:flex; align-items:center; gap:10px; margin-top:14px; flex-wrap:wrap; padding-top:12px; border-top:1px dashed var(--bdr,#e7dcc4); }
+    .mnt-line-grid .form-group label:not(.mnt-major-chk) { display:block; font-size:.8rem; font-weight:700; color:#6b5d3e; margin-bottom:6px; }
+    .mnt-line-form input, .mnt-line-form select { width:100%; height:40px; border:1.5px solid #e2d8c0; border-radius:10px; padding:0 12px; background:#fff; color:#1a1208; font-size:.88rem; font-family:inherit; transition:border-color .15s, box-shadow .15s; }
+    .mnt-line-form input:focus, .mnt-line-form select:focus { outline:none; border-color:#2f6fa5; box-shadow:0 0 0 3px rgba(47,111,165,.14); }
+    .mnt-line-form input[readonly] { background:#f3ede0; color:#7a6a48; cursor:default; border-style:dashed; }
+    .mnt-line-actions { display:flex; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap; padding-top:13px; border-top:1px dashed #e7dcc4; }
     .mnt-line-cancel { display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
-    .mnt-major-chk { display:inline-flex; align-items:center; gap:6px; white-space:nowrap; font-weight:700; font-size:.85rem; margin:0; cursor:pointer; }
+    .mnt-major-chk { display:inline-flex; align-items:center; gap:7px; white-space:nowrap; font-weight:700; font-size:.85rem; margin:0; cursor:pointer; height:40px; }
+    .mnt-major-chk input { width:auto !important; height:auto !important; }
 
     /* جداول الأسطر — قوية وواضحة */
     .mnt-line-table { width:100%; border-collapse:separate; border-spacing:0; }

@@ -39,9 +39,9 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       head.appendChild(link);
     });
 
-    if (!document.querySelector('script[src="/ems/assets/js/ui-unification.js"]')) {
+    if (!document.querySelector('script[src^="/ems/assets/js/ui-unification.js"]')) {
       var script = document.createElement('script');
-      script.src = '/ems/assets/js/ui-unification.js';
+      script.src = '/ems/assets/js/ui-unification.js<?php $__uijs=__DIR__.'/assets/js/ui-unification.js'; echo is_file($__uijs)?('?v='.filemtime($__uijs)):''; ?>';
       script.defer = true;
       head.appendChild(script);
     }
@@ -242,7 +242,7 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
 
       <?php } ?>
 
-      <?php // صلاحيات مدير المشغلين === 3
+      <?php // صلاحيات إدارة الأسطول === 3 (Fleet)
       if ($_SESSION['user']['role'] == "3") { ?>
         <!-- <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li> -->
         <!-- <li><a href="../Employees/employees.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li>
@@ -251,7 +251,9 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
 
       <?php } ?>
 
-      <?php // صلاحيات مدير الاسطول === 4
+      <?php // صلاحيات إدارة الموارد البشرية === 4 (HR)
+      // شاشات طبقة القوى التشغيلية (Workforce/) تظهر ديناميكياً من جدول modules عبر
+      // renderDynamicNavigation أعلاه — لا تُضاف يدوياً هنا (السلوك يقوده جدول الشاشات).
       if ($_SESSION['user']['role'] == "4") { ?>
         <!-- <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li> -->
         <!-- <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>

@@ -47,7 +47,7 @@ if (!function_exists('ems_css_ver')) {
     <!-- Unified Form Styles — loaded LAST so ems-forms.css is the single authoritative source for ALL form design -->
     <link rel="stylesheet" href="/ems/assets/css/ems-forms.css<?php echo ems_css_ver('ems-forms.css'); ?>">
     <script src="../assets/js/performance-boost.js" defer></script>
-    <script src="/ems/assets/js/ui-unification.js" defer></script>
+    <script src="/ems/assets/js/ui-unification.js<?php $__uijs=__DIR__.'/assets/js/ui-unification.js'; echo is_file($__uijs)?('?v='.filemtime($__uijs)):''; ?>" defer></script>
     <!-- Unified column-groups show/hide (activated per-page via EmsColumnGroups.init) -->
     <script src="/ems/assets/js/column-groups.js" defer></script>
     <!-- Unified Details/View Modal System (نظام نافذة العرض الموحّد) -->

@@ -200,12 +200,40 @@
             if ($.fn.dataTable.isDataTable(table)) return;
             if ($table.closest('.dataTables_wrapper').length) return;
             if ($table.closest('.modal').length) return;
+            // إصلاح tn/18: أزِل صفّ العنصر النائب «لا توجد بيانات» (خليةٌ واحدةٌ تمتدّ على
+            // كل الأعمدة) قبل التهيئة، وإلا يرمي DataTables «Incorrect column count» على
+            // الجداول الفارغة. لا يمسّ صفوف البيانات الحقيقية (عدد خلاياها = عدد العناوين)؛
+            // وعند فراغ الجدول يعرض DataTables رسالة الفراغ المعرّبة من ar.json.
+            try {
+                var theadEl = table.tHead, tbodyEl = table.tBodies[0], colCount = 0;
+                if (theadEl && theadEl.rows.length) {
+                    var headerRow = theadEl.rows[theadEl.rows.length - 1];
+                    for (var hc = 0; hc < headerRow.cells.length; hc++) {
+                        colCount += headerRow.cells[hc].colSpan || 1;
+                    }
+                }
+                if (tbodyEl && colCount > 1 && tbodyEl.rows.length === 1 &&
+                    tbodyEl.rows[0].cells.length === 1 &&
+                    (tbodyEl.rows[0].cells[0].colSpan || 1) >= colCount) {
+                    tbodyEl.removeChild(tbodyEl.rows[0]);
+                }
+            } catch (ePlaceholder) { /* تجاهل: لا يؤثّر على التهيئة */ }
             $table.addClass('display');
             try {
                 $table.DataTable({
                     responsive: true,
                     autoWidth: false,
-                    language: { url: '/ems/assets/i18n/datatables/ar.json' }
+                    language: { url: '/ems/assets/i18n/datatables/ar.json' },
+                    // إصلاح tn/18 من stateSave: performance-boost.js يفعّل stateSave عمومياً،
+                    // فإن تغيّر عدد أعمدة الجدول منذ آخر زيارة تبقى حالةٌ محفوظةٌ تالفةٌ في
+                    // localStorage فترمي «Incorrect column count» حتى على جدولٍ سليمٍ ببيانات.
+                    // نرفض الحالة المحفوظة إن لم يطابق عددُ أعمدتها الجدولَ الحالي (نحفظ الباقي).
+                    stateLoadParams: function (settings, data) {
+                        if (data && data.columns && settings.aoColumns &&
+                            data.columns.length !== settings.aoColumns.length) {
+                            return false;
+                        }
+                    }
                 });
             } catch (e) { /* legacy tables may be initialized later */ }
         });

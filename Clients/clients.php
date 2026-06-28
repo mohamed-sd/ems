@@ -990,6 +990,12 @@ include('../insidebar.php');
                                        data-created='" . clients_e(isset($row['creator_name']) ? $row['creator_name'] : 'غير محدد') . "'
                                        title='عرض التفاصيل'>
                                         <i class='fas fa-eye'></i>
+                                    </a>
+                                    <a href='../movement/client_tree.php?client_id=" . urlencode($row['id']) . "'
+                                       class='action-btn view clientTreeBtn'
+                                       target='_blank' rel='noopener'
+                                       title='شجرة العميل (مشاريعه ومورّدوه ومعدّاته ومشغّلوه)'>
+                                        <i class='fas fa-sitemap'></i>
                                     </a>";
 
                             if ($can_edit) {

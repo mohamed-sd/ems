@@ -65,8 +65,13 @@ if ($period !== 'all') {
     $ts_date_clause = " AND t.date >= '$from_s' AND t.date <= '$to_s'";
 }
 
-$is_stopped = function ($avail) {
-    return in_array($avail, ['معطلة', 'مبيعة/مسحوبة', 'خارج الخدمة', 'تحت الصيانة', 'موقوفة'], true);
+// تصنيف «جاهزة/متوقفة» للمعدّة من حالة الإتاحة (equipments.availability_status):
+//   «جاهزة» = حالة الإتاحة ليست ضمن حالات التوقف (نفس قائمة map_page).
+//   تُسمّى «جاهزة» لا «عاملة» لأنها تشمل معدّاتٍ صالحةً للعمل وإن لم تُسنَد لعمليةٍ نشطة بعد؛
+//   «العاملة فعلاً» = مُضافة لجدول operations بحالة status=1 (تشغيلٌ سارٍ).
+$EMS_STOPPED_AVAIL = ['معطلة', 'مبيعة/مسحوبة', 'خارج الخدمة', 'تحت الصيانة', 'موقوفة'];
+$is_stopped = function ($avail) use ($EMS_STOPPED_AVAIL) {
+    return in_array((string) $avail, $EMS_STOPPED_AVAIL, true);
 };
 
 // ============================================================
@@ -105,27 +110,24 @@ if ($pq) while ($r = mysqli_fetch_assoc($pq)) {
 $project_ids = array_keys($project_to_client);
 
 // ============================================================
-// 3) العمليات (معدّات مشغّلة) لكل مشاريع النطاق — استعلام واحد (نمط map_page)
+// 3) العمليات — اكتشاف الموردين المُشغِّلين + ربط كل معدّة بعملياتها (لجمع الساعات لاحقاً).
+//    لا نبني المعدّات من هنا؛ معدّات المورد تُجلب بمفتاحها الأجنبي (equipments.suppliers) في الخطوة 5.
 // ============================================================
-$op_to_ctx = []; // op_id => [cid, pid, sid]
-$eq_ids = [];
+$op_to_ctx = []; // op_id => [cid, pid]
+$eq_to_ops = []; // "pid:eq_id" => [op_id, ...]  (لجمع ساعات كل معدّة من عملياتها)
 $op_ids = [];
 if (!empty($project_ids)) {
     $pids_str = implode(',', array_map('intval', $project_ids));
     $ops_company_clause = ($ops_has_company && !$is_super_admin) ? " AND o.company_id = $scope_company" : "";
     $ops_q = mysqli_query($conn, "
         SELECT o.id AS op_id, CAST(o.project_id AS UNSIGNED) AS project_id,
-               e.id AS eq_id, e.code AS eq_code, COALESCE(et.type,'') AS type_name,
-               e.availability_status AS avail,
+               CAST(o.equipment AS UNSIGNED) AS eq_id,
                COALESCE(s.id,0) AS supplier_id, COALESCE(s.name,'بدون مورد') AS supplier_name
         FROM operations o
-        JOIN equipments e ON o.equipment = e.id
-        LEFT JOIN equipments_types et ON CAST(e.type AS UNSIGNED) = et.id
         LEFT JOIN suppliers s ON CAST(o.supplier_id AS UNSIGNED) = s.id
         WHERE CAST(o.project_id AS UNSIGNED) IN ($pids_str)
           AND o.status = 1
           $ops_company_clause
-        ORDER BY supplier_name ASC, e.code ASC
     ");
     if ($ops_q) while ($op = mysqli_fetch_assoc($ops_q)) {
         $pid = (int) $op['project_id'];
@@ -133,24 +135,148 @@ if (!empty($project_ids)) {
         $cid = $project_to_client[$pid];
         $sid = (int) $op['supplier_id'];
         $opid = (int) $op['op_id'];
-        if (!isset($clients[$cid]['projects'][$pid]['suppliers'][$sid])) {
+        // المورد المُشغِّل (من العملية) يظهر كعقدة حتى لو لم تُسجَّل له عقود
+        if ($sid > 0 && !isset($clients[$cid]['projects'][$pid]['suppliers'][$sid])) {
             $clients[$cid]['projects'][$pid]['suppliers'][$sid] = [
                 'id' => $sid, 'name' => $op['supplier_name'], 'equipments' => [],
             ];
         }
-        $clients[$cid]['projects'][$pid]['suppliers'][$sid]['equipments'][$opid] = [
-            'op_id' => $opid, 'eq_id' => (int) $op['eq_id'], 'eq_code' => $op['eq_code'],
-            'type_name' => $op['type_name'], 'stopped' => $is_stopped($op['avail']),
-            'operators' => [], 'hours' => 0.0, 'hours_today' => 0.0,
-        ];
-        $op_to_ctx[$opid] = [$cid, $pid, $sid];
-        $eq_ids[(int) $op['eq_id']] = true;
+        $op_to_ctx[$opid] = [$cid, $pid];
+        $eq_to_ops[$pid . ':' . (int) $op['eq_id']][] = $opid;
         $op_ids[$opid] = true;
     }
 }
 
 // ============================================================
-// 4) المشغّلون لكل معدّة — استعلام واحد (equipment_drivers JOIN employees)
+// 3ب) الموردون التعاقديون لكل مشروع — من supplierscontracts المرتبط بالمشروع
+//     مباشرةً (project_id) أو عبر عقد المشروع (project_contract_id → contracts.id).
+//     السبب: الموردون تابعون للعميل بعقودهم لا بالعمليات؛ هذا يضمن ظهورهم
+//     واحتسابهم حتى إن لم تُسجَّل لهم عمليات بعد (كانت تُعطي 0 دائماً).
+// ============================================================
+if (!empty($project_ids)) {
+    $pids_str = implode(',', array_map('intval', $project_ids));
+
+    // خريطة: عقد المشروع → المشروع (لربط عقد المورد بعقد المشروع)
+    $contract_to_project = [];
+    $ct_company_clause = (db_table_has_column($conn, 'contracts', 'company_id') && !$is_super_admin) ? " AND ct.company_id = $scope_company" : "";
+    $ct_deleted_clause = db_table_has_column($conn, 'contracts', 'is_deleted') ? " AND ct.is_deleted = 0" : "";
+    $ct_q = mysqli_query($conn, "SELECT ct.id, CAST(ct.project_id AS UNSIGNED) AS project_id
+                                 FROM contracts ct
+                                 WHERE CAST(ct.project_id AS UNSIGNED) IN ($pids_str) $ct_company_clause $ct_deleted_clause");
+    if ($ct_q) while ($ct = mysqli_fetch_assoc($ct_q)) { $contract_to_project[(int) $ct['id']] = (int) $ct['project_id']; }
+    $contract_ids_str = !empty($contract_to_project) ? implode(',', array_map('intval', array_keys($contract_to_project))) : '0';
+
+    $sc_company_clause = (db_table_has_column($conn, 'supplierscontracts', 'company_id') && !$is_super_admin) ? " AND sc.company_id = $scope_company" : "";
+    $sc_q = mysqli_query($conn, "
+        SELECT sc.supplier_id,
+               CAST(sc.project_id AS UNSIGNED) AS project_id,
+               sc.project_contract_id,
+               COALESCE(s.name, 'مورد') AS supplier_name
+        FROM supplierscontracts sc
+        LEFT JOIN suppliers s ON s.id = sc.supplier_id
+        WHERE sc.status = 1 AND sc.supplier_id IS NOT NULL AND sc.supplier_id > 0
+          AND ( CAST(sc.project_id AS UNSIGNED) IN ($pids_str) OR sc.project_contract_id IN ($contract_ids_str) )
+          $sc_company_clause
+    ");
+    if ($sc_q) while ($sc = mysqli_fetch_assoc($sc_q)) {
+        // حدّد المشروع: مباشرةً من project_id، وإلا عبر عقد المشروع المرتبط
+        $pid = (int) $sc['project_id'];
+        if (!isset($project_to_client[$pid]) && !empty($sc['project_contract_id']) && isset($contract_to_project[(int) $sc['project_contract_id']])) {
+            $pid = $contract_to_project[(int) $sc['project_contract_id']];
+        }
+        if (!isset($project_to_client[$pid])) continue;
+        $cid = $project_to_client[$pid];
+        $sid = (int) $sc['supplier_id'];
+        if (!isset($clients[$cid]['projects'][$pid]['suppliers'][$sid])) {
+            $clients[$cid]['projects'][$pid]['suppliers'][$sid] = [
+                'id' => $sid, 'name' => $sc['supplier_name'], 'equipments' => [],
+            ];
+        }
+    }
+}
+
+// ============================================================
+// 4) الساعات المنفّذة من التايم شيت (operator = operations.id) ثم تجميعها لكل معدّة
+// ============================================================
+$op_hours = [];
+if (!empty($op_ids)) {
+    $op_ids_str = implode(',', array_map('intval', array_keys($op_ids)));
+    $ts_company_clause = ($ts_has_company && !$is_super_admin) ? " AND t.company_id = $scope_company" : "";
+    $ts_q = mysqli_query($conn, "
+        SELECT CAST(t.operator AS UNSIGNED) AS op_id,
+               SUM(t.total_work_hours) AS total_hours,
+               SUM(CASE WHEN t.date = CURDATE() THEN t.total_work_hours ELSE 0 END) AS today_hours
+        FROM timesheet t
+        WHERE CAST(t.operator AS UNSIGNED) IN ($op_ids_str)
+          AND t.status = 1
+          $ts_company_clause $ts_date_clause
+        GROUP BY t.operator
+    ");
+    if ($ts_q) while ($r = mysqli_fetch_assoc($ts_q)) {
+        $op_hours[(int) $r['op_id']] = ['total' => (float) $r['total_hours'], 'today' => (float) $r['today_hours']];
+    }
+}
+$eq_hours = []; // "pid:eq_id" => ['total'=>, 'today'=>]  (مجموع ساعات عمليات المعدّة)
+foreach ($eq_to_ops as $hk => $ops) {
+    $t = 0.0; $d = 0.0;
+    foreach ($ops as $opid) { if (isset($op_hours[$opid])) { $t += $op_hours[$opid]['total']; $d += $op_hours[$opid]['today']; } }
+    $eq_hours[$hk] = ['total' => $t, 'today' => $d];
+}
+
+// ============================================================
+// 5) معدّات كل مورّد — من المفتاح الأجنبي equipments.suppliers (التصحيح المطلوب).
+//    رقم المورد مخزّنٌ على سجل المعدّة، فعدد/قائمة معدّات المورد تُجلب به مباشرةً
+//    لا من العمليات (التي كانت تُعطي 0 لمورّدٍ بلا عمليات). الساعات/الحالة إثراءٌ فوقها.
+// ============================================================
+$eq_ids = [];
+$all_supplier_ids = [];
+foreach ($clients as $cid => $cl) {
+    foreach ($cl['projects'] as $pid => $pr) {
+        foreach ($pr['suppliers'] as $sid => $sup) { if ((int) $sid > 0) $all_supplier_ids[(int) $sid] = true; }
+    }
+}
+$eq_by_supplier = [];
+if (!empty($all_supplier_ids)) {
+    $sids_str = implode(',', array_map('intval', array_keys($all_supplier_ids)));
+    $eq_company_clause = (db_table_has_column($conn, 'equipments', 'company_id') && !$is_super_admin) ? " AND e.company_id = $scope_company" : "";
+    $eq_q = mysqli_query($conn, "
+        SELECT e.id AS eq_id, e.code AS eq_code, CAST(e.suppliers AS UNSIGNED) AS supplier_id,
+               e.availability_status AS avail, COALESCE(et.type,'') AS type_name
+        FROM equipments e
+        LEFT JOIN equipments_types et ON CAST(e.type AS UNSIGNED) = et.id
+        WHERE CAST(e.suppliers AS UNSIGNED) IN ($sids_str)
+          $eq_company_clause
+    ");
+    if ($eq_q) while ($eq = mysqli_fetch_assoc($eq_q)) { $eq_by_supplier[(int) $eq['supplier_id']][] = $eq; }
+}
+foreach ($clients as $cid => &$cl) {
+    foreach ($cl['projects'] as $pid => &$pr) {
+        foreach ($pr['suppliers'] as $sid => &$sup) {
+            if (empty($eq_by_supplier[(int) $sid])) continue;
+            foreach ($eq_by_supplier[(int) $sid] as $eq) {
+                $eqid = (int) $eq['eq_id'];
+                $hk = $pid . ':' . $eqid;
+                $sup['equipments'][$eqid] = [
+                    'op_id'       => 0,
+                    'eq_id'       => $eqid,
+                    'eq_code'     => $eq['eq_code'],
+                    'type_name'   => $eq['type_name'],
+                    'stopped'     => $is_stopped($eq['avail']),
+                    'operators'   => [],
+                    'hours'       => isset($eq_hours[$hk]) ? $eq_hours[$hk]['total'] : 0.0,
+                    'hours_today' => isset($eq_hours[$hk]) ? $eq_hours[$hk]['today'] : 0.0,
+                ];
+                $eq_ids[$eqid] = true;
+            }
+        }
+        unset($sup);
+    }
+    unset($pr);
+}
+unset($cl);
+
+// ============================================================
+// 6) المشغّلون لكل معدّة — من equipment_drivers (لكل المعدّات المجموعة)
 // ============================================================
 $eq_operators = [];
 if (!empty($eq_ids)) {
@@ -172,28 +298,6 @@ if (!empty($eq_ids)) {
 }
 
 // ============================================================
-// 5) الساعات المنفّذة من التايم شيت (operator = operations.id) — استعلام واحد بفلتر الفترة
-// ============================================================
-$op_hours = [];
-if (!empty($op_ids)) {
-    $op_ids_str = implode(',', array_map('intval', array_keys($op_ids)));
-    $ts_company_clause = ($ts_has_company && !$is_super_admin) ? " AND t.company_id = $scope_company" : "";
-    $ts_q = mysqli_query($conn, "
-        SELECT CAST(t.operator AS UNSIGNED) AS op_id,
-               SUM(t.total_work_hours) AS total_hours,
-               SUM(CASE WHEN t.date = CURDATE() THEN t.total_work_hours ELSE 0 END) AS today_hours
-        FROM timesheet t
-        WHERE CAST(t.operator AS UNSIGNED) IN ($op_ids_str)
-          AND t.status = 1
-          $ts_company_clause $ts_date_clause
-        GROUP BY t.operator
-    ");
-    if ($ts_q) while ($r = mysqli_fetch_assoc($ts_q)) {
-        $op_hours[(int) $r['op_id']] = ['total' => (float) $r['total_hours'], 'today' => (float) $r['today_hours']];
-    }
-}
-
-// ============================================================
 // التجميع: إسناد المشغّلين والساعات + حساب الإجماليات تصاعدياً
 // ============================================================
 $grand = ['clients' => 0, 'projects' => 0, 'suppliers' => 0, 'equip' => 0, 'working' => 0, 'stopped' => 0, 'operators' => 0, 'hours' => 0.0];
@@ -203,10 +307,8 @@ foreach ($clients as $cid => &$cl) {
         $pr['agg'] = ['suppliers' => 0, 'equip' => 0, 'working' => 0, 'stopped' => 0, 'operators' => 0, 'hours' => 0.0];
         foreach ($pr['suppliers'] as $sid => &$sup) {
             $sup['agg'] = ['equip' => 0, 'working' => 0, 'stopped' => 0, 'operators' => 0, 'hours' => 0.0];
-            foreach ($sup['equipments'] as $opid => &$op) {
+            foreach ($sup['equipments'] as $eqid => &$op) {
                 $op['operators'] = $eq_operators[$op['eq_id']] ?? [];
-                $op['hours']       = isset($op_hours[$opid]) ? $op_hours[$opid]['total'] : 0.0;
-                $op['hours_today'] = isset($op_hours[$opid]) ? $op_hours[$opid]['today'] : 0.0;
                 $oc = count($op['operators']);
                 $sup['agg']['equip']++;
                 $sup['agg'][$op['stopped'] ? 'stopped' : 'working']++;
@@ -305,7 +407,7 @@ include('../insidebar.php');
         <span><i class="fas fa-project-diagram"></i> مشاريع: <b><?= (int) $grand['projects']; ?></b></span>
         <span><i class="fas fa-truck-loading"></i> موردون: <b><?= (int) $grand['suppliers']; ?></b></span>
         <span><i class="fas fa-truck-monster"></i> معدّات: <b><?= (int) $grand['equip']; ?></b></span>
-        <span class="ok"><i class="fas fa-circle"></i> عاملة: <b><?= (int) $grand['working']; ?></b></span>
+        <span class="ok"><i class="fas fa-circle"></i> جاهزة: <b><?= (int) $grand['working']; ?></b></span>
         <span class="bad"><i class="fas fa-circle"></i> متوقفة: <b><?= (int) $grand['stopped']; ?></b></span>
         <span><i class="fas fa-user-hard-hat"></i> مشغّلون: <b><?= (int) $grand['operators']; ?></b></span>
         <span class="hrs"><i class="fas fa-stopwatch"></i> ساعات منفّذة: <b><?= $fmtH($grand['hours']); ?></b></span>
@@ -326,7 +428,7 @@ include('../insidebar.php');
                         <span class="b">مشاريع <?= (int) $cl['agg']['projects']; ?></span>
                         <span class="b">موردون <?= (int) $cl['agg']['suppliers']; ?></span>
                         <span class="b">معدّات <?= (int) $cl['agg']['equip']; ?></span>
-                        <span class="b ok"><?= (int) $cl['agg']['working']; ?> عاملة</span>
+                        <span class="b ok"><?= (int) $cl['agg']['working']; ?> جاهزة</span>
                         <span class="b bad"><?= (int) $cl['agg']['stopped']; ?> متوقفة</span>
                         <span class="b">مشغّلون <?= (int) $cl['agg']['operators']; ?></span>
                         <span class="b hrs"><?= $fmtH($cl['agg']['hours']); ?> س</span>
@@ -348,7 +450,7 @@ include('../insidebar.php');
                                 <span class="cnode-badges">
                                     <span class="b">موردون <?= (int) $pr['agg']['suppliers']; ?></span>
                                     <span class="b">معدّات <?= (int) $pr['agg']['equip']; ?></span>
-                                    <span class="b ok"><?= (int) $pr['agg']['working']; ?> عاملة</span>
+                                    <span class="b ok"><?= (int) $pr['agg']['working']; ?> جاهزة</span>
                                     <span class="b bad"><?= (int) $pr['agg']['stopped']; ?> متوقفة</span>
                                     <span class="b">مشغّلون <?= (int) $pr['agg']['operators']; ?></span>
                                     <span class="b hrs"><?= $fmtH($pHours); ?> س</span>
@@ -371,7 +473,7 @@ include('../insidebar.php');
                                             <span class="cnode-title"><?= $e($sup['name']); ?></span>
                                             <span class="cnode-badges">
                                                 <span class="b">معدّات <?= (int) $sup['agg']['equip']; ?></span>
-                                                <span class="b ok"><?= (int) $sup['agg']['working']; ?> عاملة</span>
+                                                <span class="b ok"><?= (int) $sup['agg']['working']; ?> جاهزة</span>
                                                 <span class="b bad"><?= (int) $sup['agg']['stopped']; ?> متوقفة</span>
                                                 <span class="b">مشغّلون <?= (int) $sup['agg']['operators']; ?></span>
                                                 <span class="b hrs"><?= $fmtH($sHours); ?> س</span>

@@ -605,7 +605,6 @@ include('../insidebar.php');
                             <th> كود المنجم</th>
                             <th> عدد الموردين</th>
                             <th> الحالة</th>
-                            <th> عقود المشروع</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -642,6 +641,10 @@ include('../insidebar.php');
                         if ($result) {
                             while ($row = mysqli_fetch_assoc($result)) {
                                 $project_name_cell = "<a class='client-name-link' href='project_profile.php?id=" . intval($row['id']) . "'><strong>" . e($row['name']) . "</strong></a>";
+                                // تنبيه: المشروع ليس لديه عقد ساري (status = 1) — بنفس نمط تنبيه العملاء بلا مشاريع
+                                if (intval($row['contracts']) === 0) {
+                                    $project_name_cell .= " <span class='link-alert-chip' title='المشروع ليس لديه عقد ساري'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
+                                }
 
                                 echo "<tr>";
                                 echo "<td>
@@ -700,6 +703,13 @@ include('../insidebar.php');
                                                 </a>";
                                 }
 
+                                // العقودات — زرّ إجراء مدمج من عمود «عقود المشروع» (مع عدد العقود السارية)
+                                echo "<a href='../Contracts/contracts.php?filter_project_id=" . intval($row['id']) . "'
+                                                class='action-btn view projectContractsBtn'
+                                                title='عقودات المشروع'>
+                                                <i class='fas fa-file-contract'></i><span style='font-size:11px;font-weight:700;margin-inline-start:3px;'>" . intval($row['contracts']) . "</span>
+                                            </a>";
+
                                 echo "</div>
                       </td>";
                                 echo "<td>" . $project_name_cell . "</td>";
@@ -713,15 +723,6 @@ include('../insidebar.php');
                                 } else {
                                     echo "<td><span class='status-inactive'><i class='fas fa-times-circle'></i> غير نشط</span></td>";
                                 }
-
-                                echo "<td>
-                             <a href='../Contracts/contracts.php?filter_project_id=" . intval($row['id']) . "'
-                                       class='mines-count-link'
-                                       title='عرض عقود المشروع'>
-                                        <i class='fas fa-file-contract'></i>
-                                        <span class='action-btn'>" . intval($row['contracts']) . "</span>
-                             </a>
-                        </td>";
 
                                 echo "</tr>";
                             }

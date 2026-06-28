@@ -94,11 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $employee_photo = mysqli_real_escape_string($conn, trim(isset($_POST['employee_photo']) ? $_POST['employee_photo'] : ''));
     $identity_photo = mysqli_real_escape_string($conn, trim(isset($_POST['identity_photo']) ? $_POST['identity_photo'] : ''));
 
-    // 3. رخصة القيادة والمهارات
-    $license_number = mysqli_real_escape_string($conn, trim($_POST['license_number']));
-    $license_type = mysqli_real_escape_string($conn, $_POST['license_type']);
+    // 3. رخصة القيادة والمعدات المتخصّصة — نُقِلت إدارتها إلى صفحة «السائقون والمشغّلون»
+    //    (لم تَعُد تُكتب من شاشة الموظفين؛ تبقى المتغيرات محميةً تجنّباً لتحذيرات المفاتيح غير المعرّفة).
+    $license_number = mysqli_real_escape_string($conn, trim($_POST['license_number'] ?? ''));
+    $license_type = mysqli_real_escape_string($conn, $_POST['license_type'] ?? '');
     $license_expiry_date = !empty($_POST['license_expiry_date']) ? mysqli_real_escape_string($conn, $_POST['license_expiry_date']) : NULL;
-    $license_issuer = mysqli_real_escape_string($conn, trim($_POST['license_issuer']));
+    $license_issuer = mysqli_real_escape_string($conn, trim($_POST['license_issuer'] ?? ''));
 
     // 4. التخصص والمهارات
     $specialized_equipment = isset($_POST['specialized_equipment']) ? implode(', ', $_POST['specialized_equipment']) : '';
@@ -170,8 +171,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             name='$name', employee_code='$employee_code', nickname='$nickname',
             identity_type='$identity_type', identity_number='$identity_number', identity_expiry_date=$identity_expiry_sql,
             employee_photo='$employee_photo', identity_photo='$identity_photo',
-            license_number='$license_number', license_type='$license_type', license_expiry_date=$license_expiry_sql, license_issuer='$license_issuer',
-            specialized_equipment='$specialized_equipment',
             years_in_field=$years_in_field_sql, years_on_equipment=$years_on_equipment_sql, skill_level='$skill_level', certificates='$certificates',
             owner_supervisor='$owner_supervisor', supplier_id=$supplier_id_sql, project_id=$project_id_sql, employment_affiliation='$employment_affiliation',
             salary_type='$salary_type', monthly_salary=$monthly_salary_sql,
@@ -184,7 +183,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
         if (mysqli_query($conn, $update_query)) {
             $emp_scope = (!$is_super_admin && $drivers_has_company) ? " AND company_id = $company_id" : "";
-            ems_save_employee_extra($conn, $id, $emp_scope); // employee_type + الحقول العامة الجديدة
+            ems_save_employee_extra($conn, $id, $emp_scope); // employee_type + المسمى/الدور + الحقول العامة (بلا حقول الرخصة)
+            ems_sync_equipment_operator($conn, $id, $emp_scope); // إنشاء/تحديث سجل المشغّل تلقائياً إن كان سائقاً/مشغّلاً
             header("Location: employees.php?msg=تم+تعديل+الموظف+بنجاح+✅");
             exit;
         } else {
@@ -215,8 +215,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $insert_query = "INSERT INTO employees (
             name, employee_code, nickname,
             identity_type, identity_number, identity_expiry_date, employee_photo, identity_photo,
-            license_number, license_type, license_expiry_date, license_issuer,
-            specialized_equipment,
             years_in_field, years_on_equipment, skill_level, certificates,
             owner_supervisor, supplier_id, project_id, employment_affiliation, salary_type, monthly_salary,
             email, phone, phone_alternative, address,
@@ -227,8 +225,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         ) VALUES (
             '$name', '$employee_code', '$nickname',
             '$identity_type', '$identity_number', $identity_expiry_sql, '$employee_photo', '$identity_photo',
-            '$license_number', '$license_type', $license_expiry_sql, '$license_issuer',
-            '$specialized_equipment',
             $years_in_field_sql, $years_on_equipment_sql, '$skill_level', '$certificates',
             '$owner_supervisor', $supplier_id_sql, $project_id_sql, '$employment_affiliation', '$salary_type', $monthly_salary_sql,
             '$email', '$phone', '$phone_alternative', '$address',
@@ -240,7 +236,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
         if (mysqli_query($conn, $insert_query)) {
             $emp_scope = (!$is_super_admin && $drivers_has_company) ? " AND company_id = $company_id" : "";
-            ems_save_employee_extra($conn, mysqli_insert_id($conn), $emp_scope); // employee_type + الحقول العامة الجديدة
+            $new_emp_id = mysqli_insert_id($conn);
+            ems_save_employee_extra($conn, $new_emp_id, $emp_scope); // employee_type + المسمى/الدور + الحقول العامة (بلا حقول الرخصة)
+            ems_sync_equipment_operator($conn, $new_emp_id, $emp_scope); // إنشاء سجل المشغّل تلقائياً إن كان سائقاً/مشغّلاً
             header("Location: employees.php?msg=تم+إضافة+الموظف+بنجاح+✅");
             exit;
         } else {
@@ -579,6 +577,34 @@ include('../insidebar.php');
                                 </select>
                             </div>
                             <div>
+                                <label><i class="fas fa-id-badge"></i> المسمى الوظيفي
+                                    <a href="job_titles.php" target="_blank" title="إدارة المسميات" style="font-size:.75rem;margin-inline-start:6px;"><i class="fas fa-gear"></i></a>
+                                </label>
+                                <select name="job_title_id" id="job_title_id">
+                                    <option value="">— اختر المسمى الوظيفي —</option>
+                                    <?php
+                                    $__jt_where = $is_super_admin ? "status=1" : "status=1 AND (company_id IS NULL OR company_id=" . intval($company_id) . ")";
+                                    $__jtq = mysqli_query($conn, "SELECT id, name FROM job_titles WHERE $__jt_where ORDER BY sort_order, name");
+                                    if ($__jtq) while ($__jt = mysqli_fetch_assoc($__jtq)) {
+                                        echo '<option value="' . intval($__jt['id']) . '">' . htmlspecialchars($__jt['name'], ENT_QUOTES, 'UTF-8') . '</option>';
+                                    } ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label><i class="fas fa-people-arrows"></i> دور الموظف
+                                    <a href="employee_roles.php" target="_blank" title="إدارة الأدوار" style="font-size:.75rem;margin-inline-start:6px;"><i class="fas fa-gear"></i></a>
+                                </label>
+                                <select name="employee_role_id" id="employee_role_id">
+                                    <option value="">— اختر الدور —</option>
+                                    <?php
+                                    $__er_where = $is_super_admin ? "status=1" : "status=1 AND (company_id IS NULL OR company_id=" . intval($company_id) . ")";
+                                    $__erq = mysqli_query($conn, "SELECT id, name FROM employee_roles WHERE $__er_where ORDER BY sort_order, name");
+                                    if ($__erq) while ($__er = mysqli_fetch_assoc($__erq)) {
+                                        echo '<option value="' . intval($__er['id']) . '">' . htmlspecialchars($__er['name'], ENT_QUOTES, 'UTF-8') . '</option>';
+                                    } ?>
+                                </select>
+                            </div>
+                            <div>
                                 <label><i class="fas fa-calendar-day"></i> تاريخ الميلاد</label>
                                 <input type="date" name="birth_date" id="birth_date" />
                             </div>
@@ -653,87 +679,21 @@ include('../insidebar.php');
                     </div>
                 </div>
 
-                <!-- 3. رخصة القيادة والمهارات (خاص بأنواع التشغيل) -->
-                <div class="form-section op-only">
+                <!-- حقول السائق/المشغّل (الرخصة والمعدات المتخصّصة) نُقِلت إلى صفحة «السائقون والمشغّلون» -->
+                <div class="form-section">
                     <div class="form-section-header" onclick="toggleSection(this)">
-                        <i class="fas fa-car"></i>
-                        <span>رخصة القيادة والمهارات</span>
+                        <i class="fas fa-id-card-clip"></i>
+                        <span>رخصة القيادة وبيانات التشغيل</span>
                         <i class="fas fa-chevron-down toggle-icon"></i>
                     </div>
                     <div class="form-section-body">
-                        <div class="form-grid">
-                            <div>
-                                <label><i class="fas fa-id-badge"></i> رقم رخصة القيادة</label>
-                                <input type="text" name="license_number" id="license_number"
-                                    placeholder="مثال: DL-2024-456789" />
-                            </div>
-                            <div>
-                                <label><i class="fas fa-certificate"></i> نوع رخصة القيادة</label>
-                                <select name="license_type" id="license_type">
-                                    <option value="">-- اختر نوع الرخصة --</option>
-                                    <option value="فئة أ (دراجات نارية)">فئة أ (دراجات نارية)</option>
-                                    <option value="فئة ب (سيارات خصوصية)">فئة ب (سيارات خصوصية)</option>
-                                    <option value="فئة ج (شاحنات خفيفة)">فئة ج (شاحنات خفيفة)</option>
-                                    <option value="فئة د (شاحنات ثقيلة)">فئة د (شاحنات ثقيلة)</option>
-                                    <option value="فئة هـ (حافلات)">فئة هـ (حافلات)</option>
-                                    <option value="متعددة الفئات">متعددة الفئات</option>
-                                    <option value="غير محدد">غير محدد</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label><i class="fas fa-calendar-times"></i> تاريخ انتهاء الرخصة</label>
-                                <input type="date" name="license_expiry_date" id="license_expiry_date" />
-                            </div>
-                            <div>
-                                <label><i class="fas fa-building"></i> جهة إصدار الرخصة</label>
-                                <input type="text" name="license_issuer" id="license_issuer"
-                                    placeholder="مثال: إدارة المرور - الخرطوم" />
-                            </div>
-                            <div>
-                                <label><i class="fas fa-calendar-check"></i> تاريخ إصدار الرخصة</label>
-                                <input type="date" name="license_issue_date" id="license_issue_date" />
-                            </div>
-                            <div>
-                                <label><i class="fas fa-layer-group"></i> درجة الرخصة</label>
-                                <input type="text" name="license_grade" id="license_grade" placeholder="مثال: درجة أولى" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. التخصص والمهارات (خاص بأنواع التشغيل) -->
-                <div class="form-section op-only">
-                    <div class="form-section-header" onclick="toggleSection(this)">
-                        <i class="fas fa-cogs"></i>
-                        <span>التخصص والمهارات</span>
-                        <i class="fas fa-chevron-down toggle-icon"></i>
-                    </div>
-                    <div class="form-section-body">
-                        <div>
-                            <label style="display: block; margin-bottom: 10px; font-weight: 700;">
-                                <i class="fas fa-tools"></i> نوع المعدة المتخصص فيها (يمكن اختيار أكثر من واحد)
-                            </label>
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" name="specialized_equipment[]" value="حفارة (Excavator)">
-                                    حفارة (Excavator)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]"
-                                        value="مثقاب/مكنة تخريم (Drill Machine)"> مثقاب/مكنة تخريم (Drill
-                                    Machine)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]" value="دوزر (Dozer)"> دوزر
-                                    (Dozer)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]"
-                                        value="شاحنة قلابة (Dump Truck)"> شاحنة قلابة (Dump Truck)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]"
-                                        value="شاحنة تناكر/صهريج (Tanker Truck)"> شاحنة تناكر/صهريج (Tanker
-                                    Truck)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]" value="جرافة (Loader)">
-                                    جرافة (Loader)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]" value="ممهدة (Grader)">
-                                    ممهدة (Grader)</label>
-                                <label><input type="checkbox" name="specialized_equipment[]" value="معدات أخرى"> معدات
-                                    أخرى</label>
-                            </div>
-                        </div>
+                        <p style="margin:6px 0;color:#555;line-height:1.9;">
+                            <i class="fas fa-circle-info"></i>
+                            بيانات رخصة القيادة والمعدات المتخصّصة باتت تُدار من صفحة
+                            <a href="equipment_operators.php" target="_blank"><strong>السائقون والمشغّلون</strong></a>
+                            (لكل موظفٍ سائق/مشغّل سجلٌّ واحد، فلا تتكرّر البيانات).
+                            احفظ الموظف هنا أولاً، ثم سجّله سائقاً/مشغّلاً وأدخِل رخصته هناك.
+                        </p>
                     </div>
                 </div>
 
@@ -1066,10 +1026,64 @@ include('../insidebar.php');
         </div>
     </form>
 
+    <!-- لوحة الفلاتر الموحّدة (نفس تصميم شاشة العملاء) — تُملأ خياراتها ديناميكياً من بيانات الجدول -->
+    <div class="filter">
+        <div class="filter-title">
+            <span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span>
+            فلاتر البحث
+        </div>
+        <div class="filter-body">
+            <div class="filter-field">
+                <label><i class="fa fa-user-tag"></i> نوع الموظف</label>
+                <select id="empFilterType" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-id-badge"></i> المسمى الوظيفي</label>
+                <select id="empFilterJobTitle" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-people-arrows"></i> دور الموظف</label>
+                <select id="empFilterEmpRole" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-star"></i> مستوى المهارة</label>
+                <select id="empFilterSkill" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-briefcase"></i> جهة التوظيف</label>
+                <select id="empFilterAffiliation" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-money-bill-wave"></i> نوع الراتب</label>
+                <select id="empFilterSalaryType" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-truck-field"></i> المورد</label>
+                <select id="empFilterSupplier" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-folder-open"></i> المشروع</label>
+                <select id="empFilterProject" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-user-check"></i> حالة الموظف</label>
+                <select id="empFilterEmpStatus" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-toggle-on"></i> الحالة</label>
+                <select id="empFilterStatus" class="form-control emp-filter-select"><option value="">— الكل —</option></select>
+            </div>
+            <div class="filter-actions">
+                <button type="button" class="btn-ok" id="empFilterApply"><i class="fa fa-search"></i> تطبيق</button>
+                <button type="button" class="btn-reset" id="empFilterReset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-body">
             <div class="table-scroll-wrap">
-            <table id="driversTable" class="display nowrap">
+            <table id="driversTable" class="display nowrap no-datatable">
                 <thead>
                     <tr>
                         <th>الإجراءات</th>
@@ -1107,10 +1121,13 @@ include('../insidebar.php');
                         : "";
 
                     $query = "SELECT d.*, s.name as supplier_name, p.name as project_name, p.project_code,
+                             jt.name AS job_title_name, er.name AS employee_role_name,
                              (SELECT COUNT(*) FROM drivercontracts WHERE employee_id = d.id$drivercontracts_scope_sql) as numcontracts
                              FROM employees d
                              LEFT JOIN suppliers s ON d.supplier_id = s.id
                              LEFT JOIN project p ON d.project_id = p.id
+                             LEFT JOIN job_titles jt ON jt.id = d.job_title_id
+                             LEFT JOIN employee_roles er ON er.id = d.employee_role_id
                              WHERE $drivers_scope_sql
                              ORDER BY d.id DESC";
                     $result = mysqli_query($conn, $query);
@@ -1163,7 +1180,20 @@ include('../insidebar.php');
                             }
                         }
 
-                        echo "<tr>";
+                        // سمات الصفّ لفلاتر اللوحة الموحّدة (تُقرأ في بحث DataTables المخصّص)
+                        $st_label = $row['status'] == "1" ? 'مفعّل' : 'موقف';
+                        $row_data = "data-type='"        . htmlspecialchars((string) ($row['employee_type'] ?? ''), ENT_QUOTES) . "' "
+                                  . "data-jobtitle='"    . htmlspecialchars((string) ($row['job_title_name'] ?? ''), ENT_QUOTES) . "' "
+                                  . "data-emprole='"     . htmlspecialchars((string) ($row['employee_role_name'] ?? ''), ENT_QUOTES) . "' "
+                                  . "data-skill='"       . htmlspecialchars((string) ($row['skill_level'] ?? ''), ENT_QUOTES) . "' "
+                                  . "data-affiliation='" . htmlspecialchars((string) ($row['employment_affiliation'] ?? ''), ENT_QUOTES) . "' "
+                                  . "data-salarytype='"  . htmlspecialchars((string) ($row['salary_type'] ?? ''), ENT_QUOTES) . "' "
+                                  . "data-supplier='"    . htmlspecialchars((string) ($row['supplier_name'] ?? ''), ENT_QUOTES) . "' "
+                                  . "data-project='"     . htmlspecialchars((string) ($row['project_name'] ?? ''), ENT_QUOTES) . "' "
+                                  . "data-empstatus='"   . htmlspecialchars((string) ($row['employee_status'] ?? ''), ENT_QUOTES) . "' "
+                                  . "data-status='"      . htmlspecialchars($st_label, ENT_QUOTES) . "'";
+
+                        echo "<tr $row_data>";
                         echo "<td>" . $actions_cell . "</td>";
                         echo "<td>" . $i++ . "</td>";
                         echo "<td><code>" . htmlspecialchars($row['employee_code'] ?: 'N/A') . "</code></td>";
@@ -1253,16 +1283,53 @@ include('../insidebar.php');
                 }
             });
 
-            // فلتر حسب نوع الموظف (العمود 3 = النوع)
-            var empTypes = <?php echo json_encode(ems_employee_types(), JSON_UNESCAPED_UNICODE); ?>;
-            var $f = $('<select id="empTypeFilter" style="margin-inline-start:8px;padding:6px 10px;border:1px solid #ccc;border-radius:8px;"></select>');
-            $f.append('<option value="">كل الأنواع</option>');
-            empTypes.forEach(function (t) { $f.append('<option value="' + t + '">' + t + '</option>'); });
-            $f.on('change', function () {
-                var v = this.value;
-                empTable.column(3).search(v ? ('^' + v + '$') : '', true, false).draw();
+            // ── لوحة الفلاتر الموحّدة: تُملأ خياراتها من بيانات الصفوف ثم تُصفّي عبر بحث مخصّص ──
+            var EMP_FILTERS = [
+                { key: 'type',        sel: '#empFilterType' },
+                { key: 'jobtitle',    sel: '#empFilterJobTitle' },
+                { key: 'emprole',     sel: '#empFilterEmpRole' },
+                { key: 'skill',       sel: '#empFilterSkill' },
+                { key: 'affiliation', sel: '#empFilterAffiliation' },
+                { key: 'salarytype',  sel: '#empFilterSalaryType' },
+                { key: 'supplier',    sel: '#empFilterSupplier' },
+                { key: 'project',     sel: '#empFilterProject' },
+                { key: 'empstatus',   sel: '#empFilterEmpStatus' },
+                { key: 'status',      sel: '#empFilterStatus' }
+            ];
+            // املأ كل قائمة من القيم المتمايزة الموجودة فعلاً في الجدول (نمط شاشة العملاء)
+            var $empRows = $(empTable.rows().nodes());
+            EMP_FILTERS.forEach(function (f) {
+                var $sel = $(f.sel); if (!$sel.length) return;
+                var seen = {}, vals = [];
+                $empRows.each(function () {
+                    var v = ($(this).attr('data-' + f.key) || '').trim();
+                    if (v && !seen[v]) { seen[v] = 1; vals.push(v); }
+                });
+                vals.sort(function (a, b) { return a.localeCompare(b, 'ar'); });
+                vals.forEach(function (v) {
+                    $sel.append('<option value="' + v.replace(/"/g, '&quot;') + '">' + v + '</option>');
+                });
             });
-            $('#driversTable_filter').append($('<span style="margin-inline-start:14px;">نوع الموظف: </span>')).append($f);
+            // بحث DataTables مخصّص يقارن قيم الفلاتر بسمات data على الصفّ (مقيّد بهذا الجدول فقط)
+            $.fn.dataTable.ext.search.push(function (settings, dataArr, dataIndex) {
+                if (settings.nTable.id !== 'driversTable') return true;
+                var node = empTable.row(dataIndex).node();
+                if (!node) return true;
+                for (var i = 0; i < EMP_FILTERS.length; i++) {
+                    var want = $(EMP_FILTERS[i].sel).val();
+                    if (want) {
+                        var have = ($(node).attr('data-' + EMP_FILTERS[i].key) || '').trim();
+                        if (have !== want) return false;
+                    }
+                }
+                return true;
+            });
+            $('.emp-filter-select').on('change', function () { empTable.draw(); });
+            $('#empFilterApply').on('click', function () { empTable.draw(); });
+            $('#empFilterReset').on('click', function () {
+                EMP_FILTERS.forEach(function (f) { $(f.sel).val(''); });
+                empTable.draw();
+            });
         });
 
         // التحكم في إظهار وإخفاء الفورم
@@ -1311,6 +1378,8 @@ include('../insidebar.php');
                         $("#nickname").val(driver.nickname);
                         // الحقول الجديدة لسجل الموظفين
                         $("#employee_type").val(driver.employee_type || 'سائق/مشغّل');
+                        $("#job_title_id").val(driver.job_title_id || '');
+                        $("#employee_role_id").val(driver.employee_role_id || '');
                         $("#birth_date").val(driver.birth_date || '');
                         $("#nationality").val(driver.nationality || '');
                         $("#blood_type").val(driver.blood_type || '');
