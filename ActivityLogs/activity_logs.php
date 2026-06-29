@@ -199,7 +199,11 @@ function renderLogRow(array $row, array $actionLabels): string
 
     return '<tr data-id="' . intval($row['id']) . '">
         <td class="px-3 text-nowrap small" data-date="' . substr($e($t), 0, 10) . '">' . $e($t) . '</td>
-        <td class="small">' . $e($row['user_name'] ?? ($row['user_id'] ?? '—')) . '</td>
+        <td class="small">' . (
+            ($row['employee_name'] ?? '') !== ''
+                ? '<strong>' . $e($row['employee_name']) . '</strong><br><small class="text-muted"><i class="fa fa-user-circle"></i> ' . $e($row['user_name'] ?? ($row['user_id'] ?? '—')) . '</small>'
+                : $e($row['user_name'] ?? ($row['user_id'] ?? '—')) . '<br><small class="text-muted">— غير مرتبط بموظف —</small>'
+        ) . '</td>
         <td class="small">' . $e($row['role_name'] ?? '—') . '</td>
         <td class="small">' . $e($row['module_name'] ?? '—') . '</td>
         <td class="small">' . $e($row['screen_name'] ?? '—') . '</td>
@@ -364,7 +368,7 @@ $page_title = 'سجل النشاطات';
                             <thead>
                                 <tr>
                                     <th class="px-3" style="min-width:140px">التاريخ والوقت</th><!-- col 0 -->
-                                    <th>المستخدم</th><!-- col 1 -->
+                                    <th>الموظف / الحساب</th><!-- col 1 -->
                                     <th>الدور</th><!-- col 2 -->
                                     <th>الوحدة</th><!-- col 3 -->
                                     <th>الشاشة</th><!-- col 4 -->
@@ -934,7 +938,8 @@ $page_title = 'سجل النشاطات';
 
                     var metaFields = [
                         ['ID', r.id], ['التاريخ', r.created_at], ['IP', r.ip_address],
-                        ['المستخدم', r.user_name || r.user_id], ['الدور', r.role_name],
+                        ['الموظف', r.employee_name || '— غير مرتبط —'],
+                        ['الحساب (المستخدم)', r.user_name || r.user_id], ['الدور', r.role_name],
                         ['الوحدة', r.module_name], ['الشاشة', r.screen_name],
                         ['الإجراء', r.action_type], ['الزر', r.button_name],
                         ['رقم السجل', r.record_id], ['URL', r.url],

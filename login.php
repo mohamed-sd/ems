@@ -43,7 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (mb_strlen($u) > 50 || mb_strlen($p) > 128) {
       $error = "بيانات الاعتماد أطول من المسموح.";
     } else {
-      $stmt = mysqli_prepare($conn, "SELECT id,name,username,password,phone,role,project_id,contract_id,company_id,parent_id,created_at,updated_at FROM users WHERE username=? LIMIT 1");
+      $login_has_employee_link = db_table_has_column($conn, 'users', 'employee_id');
+      $login_emp_col = $login_has_employee_link ? ",employee_id" : "";
+      $stmt = mysqli_prepare($conn, "SELECT id,name,username,password,phone,role,project_id,contract_id,company_id,parent_id,created_at,updated_at$login_emp_col FROM users WHERE username=? LIMIT 1");
       if ($stmt) {
         mysqli_stmt_bind_param($stmt, "s", $u);
         mysqli_stmt_execute($stmt);
@@ -81,6 +83,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
               }
 
+              // قاعدة: لا حساب يعمل بلا موظف مُسنَد له (عدا المدير الأعلى -1).
+              if ($error === '' && !$sup && $login_has_employee_link) {
+                $emp_link = isset($user['employee_id']) ? intval($user['employee_id']) : 0;
+                if ($emp_link <= 0) {
+                  $_SESSION['login_attempts']++;
+                  $_SESSION['last_attempt_time'] = time();
+                  $error = "هذا الحساب غير مرتبط بموظف. تواصل مع المسؤول لإسناد موظف للحساب.";
+                }
+              }
+
               if ($error === '') {
                 $_SESSION['login_attempts'] = 0;
                 $_SESSION['last_attempt_time'] = null;
@@ -91,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   'username' => $user['username'],
                   'phone' => $user['phone'],
                   'role' => $user['role'],
+                  'employee_id' => isset($user['employee_id']) ? intval($user['employee_id']) : null,
                   'project_id' => $user['project_id'],
                   'contract_id' => $user['contract_id'] ?? null,
                   'company_id' => $cid > 0 ? $cid : null,

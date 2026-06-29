@@ -38,7 +38,7 @@ if (!isset($_SESSION['user'])) {
     </div>
 
 <?php
-include '../config.php';
+require_once '../config.php'; // require_once يمنع إعادة تضمين config (محمّل مسبقاً عبر insidebar) → خطأ redeclare قاتل
 
 $contract_id = intval($_GET['id']);
 
@@ -80,19 +80,19 @@ if ($result) { while ($row = mysqli_fetch_assoc($result)) {
             <div class="col-lg-4 col-7"><?php echo $row['actual_end']; ?></div>
 
             <div class="col-lg-2 col-5">النقل</div>
-            <div class="col-lg-4 col-7"><?php echo $row['transportation']; ?></div>
+            <div class="col-lg-4 col-7"><?php echo htmlspecialchars((string)$row['transportation'], ENT_QUOTES, 'UTF-8'); ?></div>
 
             <div class="col-lg-2 col-5">السكن</div>
-            <div class="col-lg-4 col-7"><?php echo $row['accommodation']; ?></div>
+            <div class="col-lg-4 col-7"><?php echo htmlspecialchars((string)$row['accommodation'], ENT_QUOTES, 'UTF-8'); ?></div>
 
             <div class="col-lg-2 col-5">مكان السكن</div>
-            <div class="col-lg-4 col-7"><?php echo $row['place_for_living']; ?></div>
+            <div class="col-lg-4 col-7"><?php echo htmlspecialchars((string)$row['place_for_living'], ENT_QUOTES, 'UTF-8'); ?></div>
 
             <div class="col-lg-2 col-5">الورشة</div>
-            <div class="col-lg-4 col-7"><?php echo $row['workshop']; ?></div>
+            <div class="col-lg-4 col-7"><?php echo htmlspecialchars((string)$row['workshop'], ENT_QUOTES, 'UTF-8'); ?></div>
 
             <div class="col-lg-2 col-5">نوع المعدات</div>
-            <div class="col-lg-4 col-7"><?php echo $row['equip_type']; ?></div>
+            <div class="col-lg-4 col-7"><?php echo htmlspecialchars((string)$row['equip_type'], ENT_QUOTES, 'UTF-8'); ?></div>
 
             <div class="col-lg-2 col-5">حجم المعدات</div>
             <div class="col-lg-4 col-7"><?php echo $row['equip_size']; ?></div>
@@ -110,7 +110,7 @@ if ($result) { while ($row = mysqli_fetch_assoc($result)) {
             <div class="col-lg-4 col-7"><?php echo $row['equip_total_contract']; ?></div>
 
             <div class="col-lg-2 col-5">نوع الآلية</div>
-            <div class="col-lg-4 col-7"><?php echo $row['mach_type']; ?></div>
+            <div class="col-lg-4 col-7"><?php echo htmlspecialchars((string)$row['mach_type'], ENT_QUOTES, 'UTF-8'); ?></div>
 
             <div class="col-lg-2 col-5">حجم الآلية</div>
             <div class="col-lg-4 col-7"><?php echo $row['mach_size']; ?></div>
@@ -146,16 +146,16 @@ if ($result) { while ($row = mysqli_fetch_assoc($result)) {
             <div class="col-lg-4 col-7"><?php echo $row['daily_operators']; ?></div>
 
             <div class="col-lg-2 col-5">الطرف الأول (ممثل الشركة)</div>
-            <div class="col-lg-4 col-7"><?php echo $row['first_party']; ?></div>
+            <div class="col-lg-4 col-7"><?php echo htmlspecialchars((string)$row['first_party'], ENT_QUOTES, 'UTF-8'); ?></div>
 
             <div class="col-lg-2 col-5">الطرف الثاني (ممثل العميل)</div>
-            <div class="col-lg-4 col-7"><?php echo $row['second_party']; ?></div>
+            <div class="col-lg-4 col-7"><?php echo htmlspecialchars((string)$row['second_party'], ENT_QUOTES, 'UTF-8'); ?></div>
 
             <div class="col-lg-2 col-5">الشاهد الأول</div>
-            <div class="col-lg-4 col-7"><?php echo $row['witness_one']; ?></div>
+            <div class="col-lg-4 col-7"><?php echo htmlspecialchars((string)$row['witness_one'], ENT_QUOTES, 'UTF-8'); ?></div>
 
             <div class="col-lg-2 col-5">الشاهد الثاني</div>
-            <div class="col-lg-4 col-7"><?php echo $row['witness_two']; ?></div>
+            <div class="col-lg-4 col-7"><?php echo htmlspecialchars((string)$row['witness_two'], ENT_QUOTES, 'UTF-8'); ?></div>
         </div>
     </div>
 <?php } } ?>

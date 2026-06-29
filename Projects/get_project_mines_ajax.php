@@ -18,6 +18,16 @@ if ($project_id <= 0) {
     die(json_encode(['success' => false, 'message' => 'معرف المشروع غير صحيح']));
 }
 
+// عزل الشركة: تأكّد أن المشروع يتبع شركة المستخدم قبل إرجاع أي بيانات (المدير الأعلى -1 معفى).
+$_is_super = (isset($_SESSION['user']['role']) && strval($_SESSION['user']['role']) === '-1');
+$_cid = intval($_SESSION['user']['company_id'] ?? 0);
+if (!$_is_super && db_table_has_column($conn, 'project', 'company_id')) {
+    $_own = mysqli_query($conn, "SELECT 1 FROM project WHERE id = $project_id AND company_id = $_cid LIMIT 1");
+    if (!$_own || !mysqli_num_rows($_own)) {
+        die(json_encode(['success' => false, 'message' => 'خارج نطاق الشركة']));
+    }
+}
+
 $query = "SELECT id, mine_name, mine_code
           FROM mines
           WHERE project_id = $project_id AND status = 1

@@ -20,6 +20,17 @@ if (!$contract_id) {
     exit();
 }
 
+// عزل الشركة: تأكّد أن العقد الأب يتبع شركة المستخدم قبل إرجاع معداته (المدير الأعلى -1 معفى).
+$_is_super = (isset($_SESSION['user']['role']) && strval($_SESSION['user']['role']) === '-1');
+$_cid = intval($_SESSION['user']['company_id'] ?? 0);
+if (!$_is_super && db_table_has_column($conn, 'contracts', 'company_id')) {
+    $_own = mysqli_query($conn, "SELECT 1 FROM contracts WHERE id = $contract_id AND company_id = $_cid LIMIT 1");
+    if (!$_own || !mysqli_num_rows($_own)) {
+        echo json_encode(['success' => false, 'message' => 'خارج نطاق الشركة']);
+        exit();
+    }
+}
+
 // جلب معدات العقد مع جميع الحقول المطلوبة
 $sql = "SELECT
     ce.equip_type,

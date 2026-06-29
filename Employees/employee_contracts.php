@@ -6,12 +6,26 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once '../config.php';
+require_once '../includes/permissions_helper.php';
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string) $_SESSION['user']['role'] === '-1';
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
   die('لا يمكن تحديد الشركة الحالية');
+}
+
+// صلاحيات الصفحة (الموديول المُسجَّل). العرض يُفرَض مركزياً عبر insidebar؛ هنا نُضيف حارس الكتابة:
+// الإضافة (id=0) تتطلّب can_add، والتعديل (id>0) يتطلّب can_edit — قبل أي معالجة/إخراج.
+$pp = check_page_permissions($conn, 'Employees/employee_contracts.php');
+$ec_can_add  = $is_super_admin ? true : !empty($pp['can_add']);
+$ec_can_edit = $is_super_admin ? true : !empty($pp['can_edit']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['employee_id']) && !empty($_POST['project_id']) && !empty($_POST['project_contract_id'])) {
+  $__pid = isset($_POST['id']) ? intval($_POST['id']) : 0;
+  if (($__pid === 0 && !$ec_can_add) || ($__pid > 0 && !$ec_can_edit)) {
+    header('Location: employee_contracts.php?id=' . intval($_POST['employee_id']) . '&msg=' . urlencode('لا توجد صلاحية لهذا الإجراء ❌'));
+    exit;
+  }
 }
 
 $drivers_scope_sql = '1=1';
@@ -922,6 +936,8 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
             $result = mysqli_query($conn, $query);
             $i = 1;
 
+            // مساعد تهريب قصير لمنع XSS المخزَّن في كل قيمة تُطبع في HTML (خلايا وسمات).
+            $h = function ($v) { return htmlspecialchars((string) ($v ?? ''), ENT_QUOTES, 'UTF-8'); };
 
             if ($result) { while ($row = mysqli_fetch_assoc($result)) {
 
@@ -942,36 +958,36 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
 
               $actions_html = "<div class='action-btns'>
                         <a href='javascript:void(0)' class='editBtn action-btn edit' title='تعديل'
-             data-id='" . $row['id'] . "'
-             data-project_id='" . $row['project_id'] . "'
-             data-project_contract_id='" . (isset($row['project_contract_id']) ? $row['project_contract_id'] : '') . "'
-             data-contract_signing_date='" . $row['contract_signing_date'] . "'
-             data-grace_period_days='" . $row['grace_period_days'] . "'
-             data-contract_duration_days='" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "'
-             data-actual_start='" . $row['actual_start'] . "'
-             data-actual_end='" . $row['actual_end'] . "'
-             data-hours_monthly_target='" . $row['hours_monthly_target'] . "'
-             daily_work_hours ='" . $row['daily_work_hours'] . "'
-              daily_operators ='" . $row['daily_operators'] . "'
-               first_party ='" . $row['first_party'] . "'
-                second_party ='" . $row['second_party'] . "'
-                 witness_one ='" . $row['witness_one'] . "'
-                  witness_two ='" . $row['witness_two'] . "'
-                  transportation ='" . $row['transportation'] . "'
-                  accommodation ='" . $row['accommodation'] . "'
-                  place_for_living ='" . $row['place_for_living'] . "'
-                  workshop ='" . $row['workshop'] . "'
-                  equip_shifts_contract ='" . (isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0) . "'
-                  shift_contract ='" . (isset($row['shift_contract']) ? $row['shift_contract'] : 0) . "'
-                  equip_total_contract_daily ='" . (isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0) . "'
-                  total_contract_permonth ='" . (isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0) . "'
-                  total_contract_units ='" . (isset($row['total_contract_units']) ? $row['total_contract_units'] : 0) . "'
-                  price_currency_contract ='" . (isset($row['price_currency_contract']) ? $row['price_currency_contract'] : '') . "'
-                  paid_contract ='" . (isset($row['paid_contract']) ? $row['paid_contract'] : '') . "'
-                  payment_time ='" . (isset($row['payment_time']) ? $row['payment_time'] : '') . "'
-                  guarantees ='" . (isset($row['guarantees']) ? $row['guarantees'] : '') . "'
-                  payment_date ='" . (isset($row['payment_date']) ? $row['payment_date'] : '') . "'
-             data-forecasted_contracted_hours='" . $row['forecasted_contracted_hours'] . "'><i class='fas fa-edit'></i></a>
+             data-id='" . $h($row['id']) . "'
+             data-project_id='" . $h($row['project_id']) . "'
+             data-project_contract_id='" . $h($row['project_contract_id'] ?? '') . "'
+             data-contract_signing_date='" . $h($row['contract_signing_date']) . "'
+             data-grace_period_days='" . $h($row['grace_period_days']) . "'
+             data-contract_duration_days='" . $h($row['contract_duration_days'] ?? 0) . "'
+             data-actual_start='" . $h($row['actual_start']) . "'
+             data-actual_end='" . $h($row['actual_end']) . "'
+             data-hours_monthly_target='" . $h($row['hours_monthly_target']) . "'
+             daily_work_hours ='" . $h($row['daily_work_hours']) . "'
+              daily_operators ='" . $h($row['daily_operators']) . "'
+               first_party ='" . $h($row['first_party']) . "'
+                second_party ='" . $h($row['second_party']) . "'
+                 witness_one ='" . $h($row['witness_one']) . "'
+                  witness_two ='" . $h($row['witness_two']) . "'
+                  transportation ='" . $h($row['transportation']) . "'
+                  accommodation ='" . $h($row['accommodation']) . "'
+                  place_for_living ='" . $h($row['place_for_living']) . "'
+                  workshop ='" . $h($row['workshop']) . "'
+                  equip_shifts_contract ='" . $h($row['equip_shifts_contract'] ?? 0) . "'
+                  shift_contract ='" . $h($row['shift_contract'] ?? 0) . "'
+                  equip_total_contract_daily ='" . $h($row['equip_total_contract_daily'] ?? 0) . "'
+                  total_contract_permonth ='" . $h($row['total_contract_permonth'] ?? 0) . "'
+                  total_contract_units ='" . $h($row['total_contract_units'] ?? 0) . "'
+                  price_currency_contract ='" . $h($row['price_currency_contract'] ?? '') . "'
+                  paid_contract ='" . $h($row['paid_contract'] ?? '') . "'
+                  payment_time ='" . $h($row['payment_time'] ?? '') . "'
+                  guarantees ='" . $h($row['guarantees'] ?? '') . "'
+                  payment_date ='" . $h($row['payment_date'] ?? '') . "'
+             data-forecasted_contracted_hours='" . $h($row['forecasted_contracted_hours']) . "'><i class='fas fa-edit'></i></a>
                         <a href='delete.php?id=" . $row['id'] . "' onclick='return confirm(\"هل أنت متأكد؟\")' class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></a>
                         <a href='employee_contracts_details.php?id=" . $row['id'] . "' class='action-btn view' title='عرض التفاصيل'><i class='fas fa-eye'></i></a>
                       </div>";
@@ -979,26 +995,26 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               echo "<td class='group-status'>" . $actions_html . "</td>";
 
               // المعلومات الأساسية
-              echo "<td class='group-basic'>" . $row['id'] . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['project_name']) ? $row['project_name'] : '-') . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['project_contract_id']) ? 'عقد #' . $row['project_contract_id'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . $h($row['id']) . "</td>";
+              echo "<td class='group-basic'>" . $h($row['project_name'] ?? '-') . "</td>";
+              echo "<td class='group-basic'>" . (isset($row['project_contract_id']) ? 'عقد #' . $h($row['project_contract_id']) : '-') . "</td>";
 
               // التواريخ والمدد
-              echo "<td class='group-dates'>" . $row['contract_signing_date'] . "</td>";
-              echo "<td class='group-dates'>" . (isset($row['grace_period_days']) ? $row['grace_period_days'] : 0) . "</td>";
-              echo "<td class='group-dates'>" . (isset($row['contract_duration_days']) ? $row['contract_duration_days'] : 0) . "</td>";
-              echo "<td class='group-dates'>" . $row['actual_start'] . "</td>";
-              echo "<td class='group-dates'>" . $row['actual_end'] . "</td>";
+              echo "<td class='group-dates'>" . $h($row['contract_signing_date']) . "</td>";
+              echo "<td class='group-dates'>" . $h($row['grace_period_days'] ?? 0) . "</td>";
+              echo "<td class='group-dates'>" . $h($row['contract_duration_days'] ?? 0) . "</td>";
+              echo "<td class='group-dates'>" . $h($row['actual_start']) . "</td>";
+              echo "<td class='group-dates'>" . $h($row['actual_end']) . "</td>";
 
               // الساعات والأهداف
-              echo "<td class='group-hours'>" . $row['hours_monthly_target'] . "</td>";
-              echo "<td class='group-hours'>" . $row['forecasted_contracted_hours'] . "</td>";
+              echo "<td class='group-hours'>" . $h($row['hours_monthly_target']) . "</td>";
+              echo "<td class='group-hours'>" . $h($row['forecasted_contracted_hours']) . "</td>";
 
               // أطراف العقد
-              echo "<td class='group-parties'>" . (isset($row['first_party']) ? $row['first_party'] : '-') . "</td>";
-              echo "<td class='group-parties'>" . (isset($row['second_party']) ? $row['second_party'] : '-') . "</td>";
-              echo "<td class='group-parties'>" . (isset($row['witness_one']) ? $row['witness_one'] : '-') . "</td>";
-              echo "<td class='group-parties'>" . (isset($row['witness_two']) ? $row['witness_two'] : '-') . "</td>";
+              echo "<td class='group-parties'>" . $h($row['first_party'] ?? '-') . "</td>";
+              echo "<td class='group-parties'>" . $h($row['second_party'] ?? '-') . "</td>";
+              echo "<td class='group-parties'>" . $h($row['witness_one'] ?? '-') . "</td>";
+              echo "<td class='group-parties'>" . $h($row['witness_two'] ?? '-') . "</td>";
 
               // الخدمات المقدمة
               $transportationText = isset($row['transportation']) && $row['transportation'] ? $row['transportation'] : '-';
@@ -1006,21 +1022,21 @@ if (!$driver_check_result || mysqli_num_rows($driver_check_result) === 0) {
               $place_for_livingText = isset($row['place_for_living']) && $row['place_for_living'] ? $row['place_for_living'] : '-';
               $workshopText = isset($row['workshop']) && $row['workshop'] ? $row['workshop'] : '-';
 
-              echo "<td class='group-services'>" . $transportationText . "</td>";
-              echo "<td class='group-services'>" . $accommodationText . "</td>";
-              echo "<td class='group-services'>" . $place_for_livingText . "</td>";
-              echo "<td class='group-services'>" . $workshopText . "</td>";
+              echo "<td class='group-services'>" . $h($transportationText) . "</td>";
+              echo "<td class='group-services'>" . $h($accommodationText) . "</td>";
+              echo "<td class='group-services'>" . $h($place_for_livingText) . "</td>";
+              echo "<td class='group-services'>" . $h($workshopText) . "</td>";
 
               // التشغيل اليومي
-              echo "<td class='group-operations'>" . (isset($row['daily_work_hours']) ? $row['daily_work_hours'] : '-') . "</td>";
-              echo "<td class='group-operations'>" . (isset($row['daily_operators']) ? $row['daily_operators'] : '-') . "</td>";
+              echo "<td class='group-operations'>" . $h($row['daily_work_hours'] ?? '-') . "</td>";
+              echo "<td class='group-operations'>" . $h($row['daily_operators'] ?? '-') . "</td>";
 
               // البيانات المالية
-              echo "<td class='group-basic'>" . (isset($row['price_currency_contract']) && $row['price_currency_contract'] ? $row['price_currency_contract'] : '-') . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['paid_contract']) && $row['paid_contract'] ? $row['paid_contract'] : '-') . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['payment_time']) && $row['payment_time'] ? $row['payment_time'] : '-') . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['guarantees']) && $row['guarantees'] ? $row['guarantees'] : '-') . "</td>";
-              echo "<td class='group-basic'>" . (isset($row['payment_date']) && $row['payment_date'] ? $row['payment_date'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . $h(isset($row['price_currency_contract']) && $row['price_currency_contract'] ? $row['price_currency_contract'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . $h(isset($row['paid_contract']) && $row['paid_contract'] ? $row['paid_contract'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . $h(isset($row['payment_time']) && $row['payment_time'] ? $row['payment_time'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . $h(isset($row['guarantees']) && $row['guarantees'] ? $row['guarantees'] : '-') . "</td>";
+              echo "<td class='group-basic'>" . $h(isset($row['payment_date']) && $row['payment_date'] ? $row['payment_date'] : '-') . "</td>";
 
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";

@@ -52,6 +52,31 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
         $ems_tb_roleText = 'مستخدم';
     }
 
+    // اسم الموظف صاحب الحساب المسجَّل دخوله (عبر الربط users.employee_id).
+    // يُخزَّن في الجلسة كالدور لتفادي الاستعلام في كل صفحة.
+    $ems_tb_userId  = isset($ems_tb_user['id']) ? intval($ems_tb_user['id']) : 0;
+    $ems_tb_empName = '';
+    if ($ems_tb_userId > 0) {
+        if (
+            isset($_SESSION['ems_topbar_emp_label']['uid'], $_SESSION['ems_topbar_emp_label']['text'])
+            && (int) $_SESSION['ems_topbar_emp_label']['uid'] === $ems_tb_userId
+        ) {
+            $ems_tb_empName = $_SESSION['ems_topbar_emp_label']['text'];
+        } elseif (isset($conn) && $conn) {
+            if ($ems_tb_estmt = $conn->prepare('SELECT e.name FROM users u LEFT JOIN employees e ON e.id = u.employee_id WHERE u.id = ? LIMIT 1')) {
+                $ems_tb_estmt->bind_param('i', $ems_tb_userId);
+                $ems_tb_estmt->execute();
+                if ($ems_tb_eres = $ems_tb_estmt->get_result()) {
+                    if ($ems_tb_erow = $ems_tb_eres->fetch_assoc()) {
+                        $ems_tb_empName = (string) ($ems_tb_erow['name'] ?? '');
+                    }
+                }
+                $ems_tb_estmt->close();
+            }
+            $_SESSION['ems_topbar_emp_label'] = array('uid' => $ems_tb_userId, 'text' => $ems_tb_empName);
+        }
+    }
+
     // Per-page exceptions (set by the page BEFORE including insidebar.php):
     //   $ems_topbar_variant = 'dashboard'  → deep-yellow bar + the wide logo.
     //   anything else (default)            → gray bar + the square icon.png.
@@ -73,9 +98,18 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
         </div>
 
         <div class="ems-topbar-center">
-            <span class="ems-topbar-pill"><?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?></span>
+            <?php if ($ems_tb_empName !== ''): ?>
+                <span class="ems-topbar-pill ems-topbar-pill--employee" title="الموظف صاحب الحساب">
+                    <i class="fas fa-id-card-alt"></i><?php echo htmlspecialchars($ems_tb_empName, ENT_QUOTES, 'UTF-8'); ?>
+                </span>
+            <?php else: ?>
+                <span class="ems-topbar-pill ems-topbar-pill--muted" title="الحساب غير مرتبط بموظف">
+                    <i class="fas fa-id-card-alt"></i>غير مرتبط بموظف
+                </span>
+            <?php endif; ?>
+            <span class="ems-topbar-pill" title="الدور / الصلاحية"><i class="fas fa-user-shield"></i><?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?></span>
             <?php if ($ems_tb_userName !== ''): ?>
-                <span class="ems-topbar-pill"><?php echo htmlspecialchars($ems_tb_userName, ENT_QUOTES, 'UTF-8'); ?></span>
+                <span class="ems-topbar-pill" title="اسم الحساب"><i class="fas fa-user-circle"></i><?php echo htmlspecialchars($ems_tb_userName, ENT_QUOTES, 'UTF-8'); ?></span>
             <?php endif; ?>
         </div>
 

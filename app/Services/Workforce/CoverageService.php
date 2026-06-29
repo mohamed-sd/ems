@@ -4,7 +4,7 @@
  *
  * لعاملٍ خارجٍ (إجازة/غياب)، يرتّب البدائل: أساسي ← احتياطي ← مؤقت
  * من employees.primary_backup_id + worker_backup، ويعيد البديل المتاح الأنسب.
- * يُستدعى من worker_leave_absence.php (substitute_id) وworker_allocation.php (active_backup_id).
+ * يُستدعى من worker_leave_absence.php (substitute_id) لاختيار البديل المتاح.
  *
  * نمط دوالٍ خفيفٌ. Prepared Statements. صفر لمسٍ للقائم.
  * يعتمد على محرّك الجاهزية البشرية لفحص توفّر البديل.

@@ -63,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
     $fuel=$_POST['fuel_consumption']!==''?floatval($_POST['fuel_consumption']):null;
     $safety=$_POST['safety_score']!==''?floatval($_POST['safety_score']):null;
     $state=trim($_POST['state']??'مسودة');
+    if(!in_array($state,$STATES,true)) $state=$STATES[0];
     $notes=trim($_POST['notes']??''); $notes=$notes!==''?$notes:null;
 
     if (!$is_editing) {
@@ -72,18 +73,19 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
             (company_id,employee_id,period,score,incentive_penalty_type,amount,amount_finance_note,operating_hours,attendance_rate,productivity,misuse_faults,fuel_consumption,safety_score,state,notes,created_by)
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         // types(16): company i,worker i,period s,score d,iptype s,amount d,amtnote s,ophours d,att d,prod d,misuse i,fuel d,safety d,state s,notes s,by i
-        $st->bind_param('iisdsdsdddiddssi',
+        $nid=0;
+        if($st){ $st->bind_param('iisdsdsdddiddssi',
             $cid,$worker_id,$period,$score,$ip_type,$amount,$amt_note,$op_hours,$att,$prod,$misuse,$fuel,$safety,$state,$notes,$user_id);
-        $st->execute(); $nid=$st->insert_id; $st->close();
+        $st->execute(); $nid=$st->insert_id; $st->close(); }
         // فتح وضع التعديل ليظهر لوح بنود المؤشّرات.
         header("Location: worker_evaluation.php?edit=".$nid."&msg=✅+تم+الحفظ"); exit();
     } else {
         $sc=$is_super_admin?"":" AND company_id = ".intval($company_id);
         $st=$conn->prepare("UPDATE worker_evaluation SET period=?,score=?,incentive_penalty_type=?,amount=?,amount_finance_note=?,operating_hours=?,attendance_rate=?,productivity=?,misuse_faults=?,fuel_consumption=?,safety_score=?,state=?,notes=? WHERE id=? $sc");
         // types(14): period s,score d,iptype s,amount d,amtnote s,ophours d,att d,prod d,misuse i,fuel d,safety d,state s,notes s,id i
-        $st->bind_param('sdsdsdddiddssi',
+        if($st){ $st->bind_param('sdsdsdddiddssi',
             $period,$score,$ip_type,$amount,$amt_note,$op_hours,$att,$prod,$misuse,$fuel,$safety,$state,$notes,$id);
-        $st->execute(); $st->close();
+        $st->execute(); $st->close(); }
         // إن وُجدت بنود مؤشّرات، تتقدّم الدرجة المحسوبة على المدخلة يدوياً.
         ems_eval_recompute_store($conn,$id,$company_scope_sql);
         header("Location: worker_evaluation.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
@@ -102,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='add_kpi' &&
     if ($g){ $g->bind_param('i',$eid); $g->execute(); $own=$g->get_result()->num_rows; $g->close(); }
     if ($eid>0 && $own>0 && $kpi_name!=='') {
         $st=$conn->prepare("INSERT INTO worker_evaluation_kpi (evaluation_id,kpi_name,weight,score,notes) VALUES (?,?,?,?,?)");
-        $st->bind_param('isdds',$eid,$kpi_name,$weight,$kscore,$knote); $st->execute(); $st->close();
+        if($st){ $st->bind_param('isdds',$eid,$kpi_name,$weight,$kscore,$knote); $st->execute(); $st->close(); }
         ems_eval_recompute_store($conn,$eid,$company_scope_sql);
     }
     header("Location: worker_evaluation.php?edit=".$eid."&msg=✅+تم+حفظ+البند"); exit();
@@ -138,7 +140,7 @@ if ($edit_id>0) {
     if ($edit) { $kq=mysqli_query($conn,"SELECT * FROM worker_evaluation_kpi WHERE evaluation_id=".intval($edit_id)." ORDER BY id"); if($kq){while($k=mysqli_fetch_assoc($kq)){$kpis[]=$k;}} }
 }
 
-$workers=[]; $wq=mysqli_query($conn,"SELECT wp.id,wp.name AS name FROM employees wp WHERE wp.is_workforce=1 $wp_scope ORDER BY wp.name");
+$workers=[]; $wq=mysqli_query($conn,"SELECT wp.id,wp.name AS name FROM employees wp WHERE 1=1 $wp_scope ORDER BY wp.name");
 if($wq){while($w=mysqli_fetch_assoc($wq)){$workers[$w['id']]=$w['name'];}}
 
 $page_title="إيكوبيشن | تقييم العاملين"; include '../inheader.php'; include '../insidebar.php';
@@ -151,11 +153,11 @@ $page_title="إيكوبيشن | تقييم العاملين"; include '../inhead
     <?php if(!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
-    <form id="eForm" action="" method="post" class="allforms" style="<?= $edit?'':'display:none;' ?>">
+    <form id="eForm" action="" method="post" class="allforms" style="<?= $edit?'display:block;':'display:none;' ?>">
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $edit?intval($edit['id']):0 ?>">
         <div class="card-header"><h5><i class="fas <?= $edit?'fa-edit':'fa-plus' ?>"></i> <?= $edit?'تعديل تقييم':'تقييم عامل' ?></h5></div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
-            <div class="field"><label>العامل</label><?php if($edit): ?><input type="text" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
+            <div class="field"><label>الموظف</label><?php if($edit): ?><input type="text" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
             <div class="field"><label>الفترة</label><input type="date" name="period" value="<?= htmlspecialchars($edit['period'] ?? '') ?>"></div>
             <div class="field"><label>الدرجة <?= !empty($kpis)?'(محسوبةٌ من البنود)':'' ?></label><input type="number" step="0.01" name="score" value="<?= htmlspecialchars($edit['score'] ?? '') ?>" <?= !empty($kpis)?'readonly title="تُحتسَب آلياً من بنود المؤشّرات"':'' ?>></div>
             <div class="field"><label>الحالة</label><select name="state"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'مسودة')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
@@ -176,7 +178,7 @@ $page_title="إيكوبيشن | تقييم العاملين"; include '../inhead
     <?php if ($edit):
         $computed = ems_eval_weighted_score($conn, intval($edit['id']));
         $sumW=0; foreach($kpis as $k){ $sumW += floatval($k['weight']); } ?>
-    <div class="allforms">
+    <div class="allforms" style="display:block;">
         <div class="card-header"><h5><i class="fas fa-list-check"></i> بنود مؤشّرات الأداء (KPI) — الدرجة الموزونة المحسوبة:
             <strong><?= $computed!==null ? number_format($computed,2) : '—' ?></strong>
             <?php if($sumW>0): ?><span style="font-weight:400;color:#888;">(مجموع الأوزان: <?= number_format($sumW,2) ?>)</span><?php endif; ?>
@@ -202,14 +204,14 @@ $page_title="إيكوبيشن | تقييم العاملين"; include '../inhead
     <?php endif; ?>
 
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
-        <thead><tr><th>إجراءات</th><th>#</th><th>العامل</th><th>الفترة</th><th>الدرجة</th><th>النوع</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody>
+        <thead><tr><th>إجراءات</th><th>#</th><th>الموظف</th><th>الفترة</th><th>الدرجة</th><th>النوع</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody>
         <?php $list=mysqli_query($conn,"SELECT ev.*, e.name AS wname FROM worker_evaluation ev
             LEFT JOIN employees e ON e.id=ev.employee_id
             WHERE 1=1 $scope_sql ORDER BY ev.id DESC");
-        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)):
+        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)): $i++;
             $sc=($r['state']==='مرحّل')?'status-active':(($r['state']==='معتمد')?'status-warning':'status-inactive');
             $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل التقييم', 'fas fa-star-half-stroke', [
-                ems_wf_field('العامل', $r['wname'] ?: '-', 'fas fa-user', ['size' => 'lg']),
+                ems_wf_field('الموظف', $r['wname'] ?: '-', 'fas fa-user', ['size' => 'lg']),
                 ems_wf_field('الفترة', $r['period'] ?: '-', 'fas fa-calendar'),
                 ems_wf_field('الدرجة', $r['score'] !== null ? $r['score'] : '-', 'fas fa-star'),
                 ems_wf_field('النوع', $r['incentive_penalty_type'], 'fas fa-scale-balanced'),

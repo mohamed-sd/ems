@@ -35,27 +35,37 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
         $cid=$is_super_admin?null:$company_id;
         $st=$conn->prepare("INSERT INTO worker_settlement (company_id,employee_id,worker_contract_id,source_type,settlement_party,settlement_basis,net_amount,net_finance_note,state,notes,created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
         // types(11): company i,worker i,contract i,source s,party s,basis s,net d,netnote s,state s,notes s,by i
-        $st->bind_param('iiisssdsssi',$cid,$worker_id,$contract_id,$source,$party,$basis,$net,$net_note,$state,$notes,$user_id);
-        $st->execute(); $nid=$st->insert_id; $st->close();
+        $nid=0;
+        if($st){ $st->bind_param('iiisssdsssi',$cid,$worker_id,$contract_id,$source,$party,$basis,$net,$net_note,$state,$notes,$user_id);
+        $st->execute(); $nid=$st->insert_id; $st->close(); }
         header("Location: worker_settlement.php?edit=".$nid."&msg=✅+تم+الحفظ"); exit();
     } else {
         $sc=$is_super_admin?"":" AND company_id = ".intval($company_id);
         $st=$conn->prepare("UPDATE worker_settlement SET worker_contract_id=?,source_type=?,settlement_party=?,settlement_basis=?,net_amount=?,net_finance_note=?,state=?,notes=? WHERE id=? $sc");
         // types(9): contract i,source s,party s,basis s,net d,netnote s,state s,notes s,id i
-        $st->bind_param('isssdsssi',$contract_id,$source,$party,$basis,$net,$net_note,$state,$notes,$id);
-        $st->execute(); $st->close();
+        if($st){ $st->bind_param('isssdsssi',$contract_id,$source,$party,$basis,$net,$net_note,$state,$notes,$id);
+        $st->execute(); $st->close(); }
         header("Location: worker_settlement.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
     }
 }
 if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='add_line' && $can_edit) {
     $sid=intval($_POST['settlement_id']??0); $lt=trim($_POST['line_type']??'مستحق');
     $desc=trim($_POST['description']??''); $desc=$desc!==''?$desc:null; $amt=$_POST['amount']!==''?floatval($_POST['amount']):null;
-    if ($sid>0) { $st=$conn->prepare("INSERT INTO worker_settlement_line (settlement_id,line_type,description,amount) VALUES (?,?,?,?)");
-        $st->bind_param('issd',$sid,$lt,$desc,$amt); $st->execute(); $st->close(); }
+    if ($sid>0) {
+        // تأكّد أن التسوية الأب تتبع شركة المستخدم قبل الإدراج (worker_settlement_line بلا company_id)
+        $owned=$is_super_admin;
+        if (!$is_super_admin) { $chk=$conn->prepare("SELECT 1 FROM worker_settlement WHERE id=? AND company_id=? LIMIT 1"); $chk->bind_param('ii',$sid,$company_id); $chk->execute(); $owned=(bool)$chk->get_result()->fetch_row(); $chk->close(); }
+        if (!$owned) { header("Location: worker_settlement.php?msg=التسوية+خارج+نطاق+الشركة+❌"); exit(); }
+        $st=$conn->prepare("INSERT INTO worker_settlement_line (settlement_id,line_type,description,amount) VALUES (?,?,?,?)");
+        if($st){ $st->bind_param('issd',$sid,$lt,$desc,$amt); $st->execute(); $st->close(); }
+    }
     header("Location: worker_settlement.php?edit=".$sid."&msg=✅+تم+حفظ+البند"); exit();
 }
 if (($_GET['del_line']??'')!=='' && $can_delete) { $lid=intval($_GET['del_line']); $sid=intval($_GET['edit']??0);
-    $st=$conn->prepare("DELETE FROM worker_settlement_line WHERE id=?"); $st->bind_param('i',$lid); $st->execute(); $st->close();
+    // عزل الشركة عبر التسوية الأب (worker_settlement_line بلا company_id) — المدير الأعلى -1 معفى
+    if ($is_super_admin) { $st=$conn->prepare("DELETE FROM worker_settlement_line WHERE id=?"); $st->bind_param('i',$lid); }
+    else { $st=$conn->prepare("DELETE l FROM worker_settlement_line l JOIN worker_settlement ws ON ws.id=l.settlement_id WHERE l.id=? AND ws.company_id=?"); $st->bind_param('ii',$lid,$company_id); }
+    $st->execute(); $st->close();
     header("Location: worker_settlement.php?edit=".$sid."&msg=✅+تم+حذف+البند"); exit(); }
 if (($_GET['delete']??'')!=='' && $can_delete) { $sc=$is_super_admin?"":" AND company_id = ".intval($company_id); $d=intval($_GET['delete']);
     $st=$conn->prepare("DELETE FROM worker_settlement WHERE id=? $sc"); $st->bind_param('i',$d); $st->execute(); $st->close();
@@ -68,7 +78,7 @@ if ($edit_id>0) {
     $st->bind_param('i',$edit_id); $st->execute(); $edit=$st->get_result()->fetch_assoc(); $st->close();
     if ($edit) { $lq=mysqli_query($conn,"SELECT * FROM worker_settlement_line WHERE settlement_id=".intval($edit_id)." ORDER BY id"); if($lq){while($l=mysqli_fetch_assoc($lq)){$lines[]=$l;}} }
 }
-$workers=[]; $wq=mysqli_query($conn,"SELECT wp.id,wp.name AS name FROM employees wp WHERE wp.is_workforce=1 $wp_scope ORDER BY wp.name");
+$workers=[]; $wq=mysqli_query($conn,"SELECT wp.id,wp.name AS name FROM employees wp WHERE 1=1 $wp_scope ORDER BY wp.name");
 if($wq){while($w=mysqli_fetch_assoc($wq)){$workers[$w['id']]=$w['name'];}}
 
 $page_title="إيكوبيشن | تسوية العاملين"; include '../inheader.php'; include '../insidebar.php';
@@ -81,11 +91,11 @@ $page_title="إيكوبيشن | تسوية العاملين"; include '../inhead
     <?php if(!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
-    <form id="sForm" action="" method="post" class="allforms" style="<?= $edit?'':'display:none;' ?>">
+    <form id="sForm" action="" method="post" class="allforms" style="<?= $edit?'display:block;':'display:none;' ?>">
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $edit?intval($edit['id']):0 ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $edit?'تعديل تسوية':'تسوية جديدة' ?></h5></div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
-            <div class="field"><label>العامل</label><?php if($edit): ?><input type="text" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
+            <div class="field"><label>الموظف</label><?php if($edit): ?><input type="text" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
             <div class="field"><label>المصدر</label><select name="source_type"><option value="">—</option><?php foreach(['شركة','مورد','مقاول'] as $s): ?><option value="<?= $s ?>" <?= (($edit['source_type']??'')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
             <div class="field"><label>أساس التسوية</label><select name="settlement_basis"><option value="">—</option><?php foreach(['عمالة شركة','فاتورة مورد','مستخلص مقاول'] as $b): ?><option value="<?= $b ?>" <?= (($edit['settlement_basis']??'')===$b)?'selected':'' ?>><?= $b ?></option><?php endforeach; ?></select></div>
             <div class="field"><label>الحالة</label><select name="state"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'محتسب')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
@@ -99,7 +109,7 @@ $page_title="إيكوبيشن | تسوية العاملين"; include '../inhead
     </form>
 
     <?php if ($edit): $sum=0; foreach($lines as $l){ $sum += ($l['line_type']==='خصم'?-1:1)*floatval($l['amount']); } ?>
-    <div class="allforms">
+    <div class="allforms" style="display:block;">
         <div class="card-header"><h5><i class="fas fa-list"></i> بنود المستحقات والخصومات — الصافي المحسوب: <?= number_format($sum,2) ?></h5></div>
         <form action="" method="post" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
             <input type="hidden" name="action" value="add_line"><input type="hidden" name="settlement_id" value="<?= intval($edit['id']) ?>">
@@ -118,11 +128,11 @@ $page_title="إيكوبيشن | تسوية العاملين"; include '../inhead
     <?php endif; ?>
 
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
-        <thead><tr><th>إجراءات</th><th>#</th><th>العامل</th><th>المصدر</th><th>الأساس</th><th>الصافي</th><th>الحالة</th></tr></thead><tbody>
+        <thead><tr><th>إجراءات</th><th>#</th><th>الموظف</th><th>المصدر</th><th>الأساس</th><th>الصافي</th><th>الحالة</th></tr></thead><tbody>
         <?php $list=mysqli_query($conn,"SELECT ws.*, e.name AS wname FROM worker_settlement ws LEFT JOIN employees e ON e.id=ws.employee_id WHERE 1=1 $scope_sql ORDER BY ws.id DESC");
-        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)): $sc=($r['state']==='مدفوع')?'status-active':(($r['state']==='معتمد')?'status-warning':'status-inactive');
+        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)): $i++; $sc=($r['state']==='مدفوع')?'status-active':(($r['state']==='معتمد')?'status-warning':'status-inactive');
             $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل التسوية', 'fas fa-hand-holding-dollar', [
-                ems_wf_field('العامل', $r['wname'] ?: '-', 'fas fa-user', ['size' => 'lg']),
+                ems_wf_field('الموظف', $r['wname'] ?: '-', 'fas fa-user', ['size' => 'lg']),
                 ems_wf_field('المصدر', $r['source_type'] ?: '-', 'fas fa-sitemap'),
                 ems_wf_field('أساس التسوية', $r['settlement_basis'] ?: '-', 'fas fa-scale-balanced'),
                 ems_wf_field('جهة التسوية', $r['settlement_party'] ?: '-', 'fas fa-building'),

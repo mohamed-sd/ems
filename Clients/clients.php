@@ -987,7 +987,7 @@ include('../insidebar.php');
                                        data-whatsapp='" . clients_e($row['whatsapp']) . "'
                                        data-status='" . clients_e($row['status']) . "'
                                        data-projects-count='" . intval($row['projects_count']) . "'
-                                       data-created='" . clients_e(isset($row['creator_name']) ? $row['creator_name'] : 'غير محدد') . "'
+                                       data-created='" . clients_e(ems_actor_label($conn, isset($row['created_by']) ? $row['created_by'] : 0)) . "'
                                        title='عرض التفاصيل'>
                                         <i class='fas fa-eye'></i>
                                     </a>

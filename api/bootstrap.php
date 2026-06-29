@@ -361,6 +361,7 @@ function api_require_auth(): array
         'username'    => $user['username'],
         'phone'       => $user['phone'],
         'role'        => $user['role'],
+        'employee_id' => isset($user['employee_id']) ? intval($user['employee_id']) : null,
         'project_id'  => $user['project_id'],
         'contract_id' => $user['contract_id'] ?? null,
         'company_id'  => $companyId > 0 ? $companyId : null,

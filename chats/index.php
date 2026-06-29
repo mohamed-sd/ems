@@ -10,8 +10,16 @@ if (!isset($_SESSION['user'])) {
 
 require_once '../config.php';
 
+// اسم العرض في الدردشة = اسم الموظف المرتبط بالحساب (إن وُجد) وإلا اسم الحساب — توحيد الهوية.
+$chat_has_emp  = db_table_has_column($conn, 'users', 'employee_id');
+$chat_emp_join = $chat_has_emp ? "LEFT JOIN employees e ON e.id = u.employee_id" : "";
+$chat_name_sel = $chat_has_emp ? "COALESCE(NULLIF(e.name,''), u.name)" : "u.name";
+
 $my_id      = intval($_SESSION['user']['id']);
-$my_name    = htmlspecialchars($_SESSION['user']['name']);
+$my_name_raw = isset($_SESSION['user']['name']) ? $_SESSION['user']['name'] : '';
+$__mq = mysqli_query($conn, "SELECT $chat_name_sel AS dn FROM users u $chat_emp_join WHERE u.id = $my_id LIMIT 1");
+if ($__mq && ($__mr = mysqli_fetch_assoc($__mq))) { $my_name_raw = $__mr['dn']; }
+$my_name    = htmlspecialchars($my_name_raw);
 $my_role    = strval($_SESSION['user']['role']);
 $company_id = intval($_SESSION['user']['company_id']);
 
@@ -55,7 +63,8 @@ function getRoleInfo($role, $roles_map, $role_palette) {
 $sql_contacts = "
     SELECT
         u.id,
-        u.name,
+        $chat_name_sel AS name,
+        u.name AS account_name,
         u.role,
         u.status
         ,(SELECT m.message
@@ -83,6 +92,7 @@ $sql_contacts = "
             AND m.is_deleted_receiver = 0
          ) AS unread_count
     FROM users u
+    $chat_emp_join
     WHERE u.company_id = $safe_company
       AND u.id         != $my_id
       AND u.is_deleted  = 0
@@ -189,6 +199,9 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
                         </div>
                         <div class="contact-info">
                             <div class="contact-name"><?php echo htmlspecialchars($contact['name']); ?></div>
+                            <?php if (!empty($contact['account_name']) && trim((string)$contact['account_name']) !== trim((string)$contact['name'])): ?>
+                                <div class="contact-account" style="font-size:.72rem;color:#999;"><i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($contact['account_name']); ?></div>
+                            <?php endif; ?>
                             <div class="contact-role"><?php echo htmlspecialchars($contact['role_name']); ?></div>
                             <?php if ($last): ?>
                                 <div class="contact-last-msg"><?php echo htmlspecialchars($last); ?></div>

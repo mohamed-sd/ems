@@ -2,9 +2,8 @@
 /**
  * طبقة القوى التشغيلية (EQUIP-OPE-S04) — محرّك الحصص (L4 ≤ L3).
  *
- * قرار 9: L3 = operations (الآلية↔المشروع)، L4 = إسناد العامل (worker_allocation
- * فوق equipment_drivers). يمنع المحرّك تجاوز عدد العاملين النشطين على عمليةٍ
- * واحدةٍ سقفَها — نقطة حقيقةٍ واحدةٍ تُستدعى من كل مسار إسناد.
+ * L3 = operations (الآلية↔المشروع)، L4 = الإسناد الفعلي في equipment_drivers
+ * (العامل↔الآلية). يمنع المحرّك تجاوز عدد المشغّلين النشطين على آلية العملية سقفَها.
  *
  * مرجع السقف: drivercontracts.daily_operators (عدد المشغّلين المتعاقد عليهم لكل
  * معدةٍ يومياً). يُستنتَج عقد المعدة من العملية بالهندسة العكسية: نفس المشروع
@@ -122,18 +121,20 @@ if (!function_exists('ems_quota_ceiling_for_operation')) {
 }
 
 if (!function_exists('ems_quota_current_for_operation')) {
-    /** عدد العاملين المخصَّصين فعلياً (نشط/معتمد) على العملية، مع استثناء صفٍّ عند التعديل. */
+    /** عدد المشغّلين المُسنَدين فعلياً (نشطين) على آلية العملية — من equipment_drivers مباشرةً. */
     function ems_quota_current_for_operation($conn, $operation_id, $exclude_allocation_id = 0)
     {
         $operation_id = (int) $operation_id;
-        $exclude = (int) $exclude_allocation_id;
         if ($operation_id <= 0) return 0;
+        // المصدر الموحّد: سائقو آلية هذه العملية النشطون (operations.equipment = equipment_drivers.equipment_id).
         $stmt = $conn->prepare(
-            "SELECT COUNT(*) AS c FROM worker_allocation
-             WHERE operation_id = ? AND state IN ('معتمد','نشط') AND id <> ?"
+            "SELECT COUNT(*) AS c
+             FROM equipment_drivers ed
+             INNER JOIN operations o ON o.equipment = ed.equipment_id
+             WHERE o.id = ? AND ed.status = 1"
         );
         if (!$stmt) return 0;
-        $stmt->bind_param('ii', $operation_id, $exclude);
+        $stmt->bind_param('i', $operation_id);
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
         $stmt->close();

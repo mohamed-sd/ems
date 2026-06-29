@@ -296,7 +296,27 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
         <!-- <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a> -->
         <?php } ?>
 
-      <li><a href="../emsreports/index.php"><i class="fas fa-chart-pie"></i> <span>التقارير</span></a></li>
+      <?php
+      // رابط «التقارير» الذكي: يحترم الصلاحيات القائمة فلا يقود لصفحة مرفوضة.
+      //   • من يملك نظام التقارير الجديد (report_role_permissions) → emsreports.
+      //   • وإلا من يملك عرض التقارير القديمة (Reports/reports.php) → Reports/reports.php.
+      //   • وإلا يُخفى الرابط. (لا يُمنح أي وصول جديد هنا.)
+      $__sb_role_id = isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : 0;
+      $__sb_is_super = isset($_SESSION['user']['role']) && strval($_SESSION['user']['role']) === '-1';
+      $__sb_has_emsreports = $__sb_is_super;
+      if (!$__sb_has_emsreports && isset($conn) && $__sb_role_id !== 0) {
+        $__sb_rr = @mysqli_query($conn, "SELECT 1 FROM report_role_permissions WHERE role_id = " . $__sb_role_id . " LIMIT 1");
+        $__sb_has_emsreports = ($__sb_rr && mysqli_num_rows($__sb_rr) > 0);
+      }
+      if ($__sb_has_emsreports) {
+        echo '<li><a href="../emsreports/index.php"><i class="fas fa-chart-pie"></i> <span>التقارير</span></a></li>';
+      } else {
+        $__sb_old = function_exists('check_page_permissions') ? check_page_permissions($conn, 'Reports/reports.php') : array('can_view' => false);
+        if ($__sb_is_super || !empty($__sb_old['can_view'])) {
+          echo '<li><a href="../Reports/reports.php"><i class="fas fa-chart-pie"></i> <span>التقارير</span></a></li>';
+        }
+      }
+      ?>
 
       <li><a href="../Settings/settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
 

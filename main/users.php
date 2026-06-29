@@ -13,6 +13,7 @@ $users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');
 $users_has_deleted_at = db_table_has_column($conn, 'users', 'deleted_at');
 $users_has_deleted_by = db_table_has_column($conn, 'users', 'deleted_by');
 $users_has_status = db_table_has_column($conn, 'users', 'status');
+$users_has_employee_id = db_table_has_column($conn, 'users', 'employee_id'); // رابط الحساب↔الموظف (الخيار ب)
 
 if (!$users_has_is_deleted) {
     @mysqli_query($conn, "ALTER TABLE users ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0");
@@ -143,6 +144,48 @@ if (empty($roles)) {
     );
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// 🔗 الموظفون المتاحون للربط (الخيار ب: users.employee_id → employees.id)
+// نحمّل موظفي الشركة مع معرّف الحساب المرتبط (إن وُجد) للتعبئة والتصفية في الواجهة.
+// ════════════════════════════════════════════════════════════════════════════
+$employees_for_link = array();
+if ($users_has_employee_id) {
+    $emp_has_company = db_table_has_column($conn, 'employees', 'company_id');
+    $emp_scope = ($emp_has_company && $current_company_id > 0) ? " WHERE e.company_id = $current_company_id" : "";
+    $emp_sql = "SELECT e.id, e.name, e.phone, e.email,
+                       (SELECT u.id FROM users u WHERE u.employee_id = e.id AND $users_not_deleted_sql LIMIT 1) AS linked_uid
+                FROM employees e $emp_scope ORDER BY e.name ASC";
+    $emp_res = mysqli_query($conn, $emp_sql);
+    if ($emp_res) {
+        while ($er = mysqli_fetch_assoc($emp_res)) {
+            $employees_for_link[] = array(
+                'id'         => intval($er['id']),
+                'name'       => $er['name'],
+                'phone'      => $er['phone'],
+                'email'      => $er['email'],
+                'linked_uid' => ($er['linked_uid'] !== null) ? intval($er['linked_uid']) : 0,
+            );
+        }
+    }
+}
+
+// خريطة (معرّف الموظف ⇐ الاسم) لعرض «الموظف المرتبط» في قائمة المستخدمين.
+$emp_name_by_id = array();
+foreach ($employees_for_link as $e) {
+    $emp_name_by_id[$e['id']] = $e['name'];
+}
+
+// تهيئة مسبقة عند القدوم من بطاقة الموظف (users.php?employee_id=N):
+//   إن كان للموظف حساب مرتبط ⇒ نفتح الحساب في وضع التعديل، وإلا نفتح نموذج إضافة مهيّأً.
+$prefill_employee_id = isset($_GET['employee_id']) ? intval($_GET['employee_id']) : 0;
+$prefill_edit_uid = 0;
+if ($prefill_employee_id > 0 && $users_has_employee_id) {
+    $pf_res = mysqli_query($conn, "SELECT id FROM users WHERE employee_id = $prefill_employee_id AND $users_not_deleted_sql LIMIT 1");
+    if ($pf_res && ($pf_row = mysqli_fetch_assoc($pf_res))) {
+        $prefill_edit_uid = intval($pf_row['id']);
+    }
+}
+
 // حذف ناعم
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $delete_id = intval($_GET['delete']);
@@ -189,8 +232,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $contract = ($requires_project_context && !empty($_POST['contract_id'])) ? intval($_POST['contract_id']) : 0;
     $uid = isset($_POST['uid']) ? intval($_POST['uid']) : 0;
 
-    if ($requires_project_context && ($project <= 0 || $contract <= 0)) {
+    // 🔗 ربط الحساب بموظف (اختياري): تحقّق من الملكية والتفرّد قبل الحفظ.
+    $employee_link_id = ($users_has_employee_id && !empty($_POST['employee_id'])) ? intval($_POST['employee_id']) : 0;
+    $employee_link_valid = true;
+    if ($employee_link_id > 0) {
+        // (1) الموظف يجب أن يتبع شركة المستخدم الحالي
+        $emp_company_cond = (db_table_has_column($conn, 'employees', 'company_id') && $current_company_id > 0)
+            ? " AND company_id = $current_company_id" : "";
+        $emp_chk = mysqli_query($conn, "SELECT id FROM employees WHERE id = $employee_link_id $emp_company_cond LIMIT 1");
+        if (!$emp_chk || mysqli_num_rows($emp_chk) === 0) {
+            $employee_link_valid = false;
+        } else {
+            // (2) الموظف غير مرتبط بحسابٍ آخر (يستثني السجل الحالي عند التعديل)
+            $excl = $uid > 0 ? " AND id != $uid" : "";
+            $link_chk = mysqli_query($conn, "SELECT id FROM users WHERE employee_id = $employee_link_id $excl AND $users_not_deleted_sql LIMIT 1");
+            if ($link_chk && mysqli_num_rows($link_chk) > 0) {
+                $employee_link_valid = false;
+            }
+        }
+    }
+    // جملة العمود الجزئية لإعادة الاستخدام في INSERT/UPDATE
+    $sql_employee = $users_has_employee_id
+        ? ", employee_id=" . ($employee_link_id > 0 ? "'$employee_link_id'" : "NULL")
+        : "";
+
+    if ($users_has_employee_id && $employee_link_id <= 0) {
+        echo "<script>alert('⚠️ يجب إسناد موظف لهذا الحساب — لا يوجد حساب يعمل بلا موظف مُسنَد له');</script>";
+    } elseif ($requires_project_context && ($project <= 0 || $contract <= 0)) {
         echo "<script>alert('⚠️ هذا الدور مرتبط بمشروع محدد، يرجى اختيار المشروع والعقد');</script>";
+    } elseif ($employee_link_id > 0 && !$employee_link_valid) {
+        echo "<script>alert('⚠️ الموظف المحدد غير صالح أو مرتبط بحساب آخر');</script>";
     } elseif ($uid > 0) {
 
         // تحقق من التكرار عند التعديل (يتجاهل السجل الحالي) - التحقق عالمي عبر جميع الشركات
@@ -213,7 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 $sql_status = $users_has_status ? ", status='$status'" : "";
 
                 $sql = "UPDATE users
-                    SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', contract_id='$contract', updated_at=NOW() $sql_status $sql_pass
+                    SET name='$name', username='$username', phone='$phone', role='$role', project_id='$project', contract_id='$contract', updated_at=NOW() $sql_status $sql_pass $sql_employee
                     $company_update
                     WHERE id='$uid' AND $users_not_deleted_sql $update_scope";
             if (mysqli_query($conn, $sql)) {
@@ -246,6 +317,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 if ($users_has_company_id && $current_company_id > 0) {
                     $insert_columns .= ", company_id";
                     $insert_values .= ", '$current_company_id'";
+                }
+
+                if ($users_has_employee_id) {
+                    $insert_columns .= ", employee_id";
+                    $insert_values .= $employee_link_id > 0 ? ", '$employee_link_id'" : ", NULL";
                 }
 
                 $sql = "INSERT INTO users ($insert_columns) VALUES ($insert_values)";
@@ -333,6 +409,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         </select>
                     </div>
 
+                    <?php if ($users_has_employee_id): ?>
+                    <div>
+                        <label><i class="fas fa-id-card-alt"></i> الموظف المُسنَد <span class="pu-required-star">*</span></label>
+                        <select name="employee_id" id="employee_id_link" class="form-control" required>
+                            <option value="">— اختر الموظف —</option>
+                            <?php foreach ($employees_for_link as $emp): ?>
+                                <option value="<?php echo intval($emp['id']); ?>"
+                                    data-linked-uid="<?php echo intval($emp['linked_uid']); ?>"
+                                    data-name="<?php echo htmlspecialchars((string) $emp['name'], ENT_QUOTES, 'UTF-8'); ?>"
+                                    data-phone="<?php echo htmlspecialchars((string) $emp['phone'], ENT_QUOTES, 'UTF-8'); ?>">
+                                    <?php echo htmlspecialchars((string) $emp['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small class="text-muted"><i class="fas fa-info-circle"></i> إلزامي — لا يوجد حساب يعمل بلا موظف مُسنَد. تُعبّأ بيانات الموظف تلقائياً عند الاختيار.</small>
+                    </div>
+                    <?php endif; ?>
+
                     <div id="projectDiv" class="pu-hidden">
                         <label><i class="fas fa-project-diagram"></i> المشروع <span
                                 class="pu-required-star">*</span></label>
@@ -387,6 +481,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             <th>اسم المستخدم </th>
                             <th>كلمه المرور </th>
                             <th>الدور </th>
+                            <th>الموظف المرتبط</th>
                             <th>رقم الهاتف</th>
                             <th>الحالة</th>
                         </tr>
@@ -395,7 +490,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         <?php
                         $list_scope = $users_has_company_id ? " AND company_id = $current_company_id" : "";
                         $select_status_column = $users_has_status ? "status" : "'active' AS status";
-                        $query = "SELECT id, name, username, password, phone, role, project_id, contract_id, $select_status_column FROM users WHERE parent_id='0' AND role!='-1' AND $users_not_deleted_sql $list_scope ORDER BY id DESC";
+                        $select_employee_column = $users_has_employee_id ? "employee_id" : "NULL AS employee_id";
+                        $query = "SELECT id, name, username, password, phone, role, project_id, contract_id, $select_status_column, $select_employee_column FROM users WHERE parent_id='0' AND role!='-1' AND $users_not_deleted_sql $list_scope ORDER BY id DESC";
                         $result = mysqli_query($conn, $query);
 
                         $i = 1;
@@ -449,6 +545,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                                                      data-status='" . ($status_is_active ? 'active' : 'inactive') . "'
                                                                      data-project='{$row['project_id']}'
                                                                      data-contract='{$row['contract_id']}'
+                                                                     data-employee='" . intval($row['employee_id']) . "'
                                                                      title='تعديل'><i class='fas fa-edit'></i></a>
                                                                 <a href='?delete={$row['id']}' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>
                                                                 </div>
@@ -458,6 +555,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             echo "<td><strong>" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "</strong></td>";
                             echo "<td><span class='password-cell pu-password-cell'>••••••••</span></td>";
                             echo "<td><span class='role-badge role-" . $row['role'] . "'>" . (isset($roles[$row['role']]) ? $roles[$row['role']] : "غير معروف") . "</span></td>";
+                            $linked_emp_id = isset($row['employee_id']) ? intval($row['employee_id']) : 0;
+                            if ($linked_emp_id > 0 && isset($emp_name_by_id[$linked_emp_id])) {
+                                echo "<td><a class='client-name-link' href='../Employees/employee_profile.php?id=" . $linked_emp_id . "'><i class='fas fa-id-card-alt'></i> " . htmlspecialchars($emp_name_by_id[$linked_emp_id], ENT_QUOTES, 'UTF-8') . "</a></td>";
+                            } else {
+                                echo "<td><span style='color:#999;'>— غير مرتبط —</span></td>";
+                            }
                             echo "<td><i class='fas fa-phone'></i>" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
                                                         echo "<td>" . $status_badge . "</td>";
                             echo "</tr>";
@@ -517,6 +620,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
         const projectSelect = document.getElementById("project_id");
         const contractSelect = document.getElementById("contract_id");
+        const employeeSelect = document.getElementById("employee_id_link");
 
         const form = document.getElementById('projectForm');
         const usernameInput = document.getElementById("username");
@@ -529,6 +633,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 return false;
             }
             return roleScopes[String(roleId)] === 'mine' || roleScopes[String(roleId)] === 'project';
+        }
+
+        /* =============================
+           ربط الحساب بموظف (الخيار ب)
+        ============================== */
+        // تعطيل الموظفين المرتبطين بحسابٍ آخر، مع إبقاء الموظف المرتبط بالحساب الجاري تعديله مُتاحاً.
+        function refreshEmployeeOptions(currentUid) {
+            if (!employeeSelect) return;
+            currentUid = String(currentUid || 0);
+            Array.from(employeeSelect.options).forEach(function (opt) {
+                if (!opt.value) return; // خيار «بدون ربط»
+                const linked = String(opt.dataset.linkedUid || '0');
+                opt.disabled = (linked !== '0' && linked !== currentUid);
+            });
+        }
+
+        // عند اختيار موظف: تعبئة الاسم والهاتف تلقائياً من بطاقته.
+        if (employeeSelect) {
+            employeeSelect.addEventListener('change', function () {
+                const opt = this.options[this.selectedIndex];
+                if (opt && opt.value) {
+                    if (opt.dataset.name) document.getElementById('name').value = opt.dataset.name;
+                    if (opt.dataset.phone && opt.dataset.phone.trim() !== '') document.getElementById('phone').value = opt.dataset.phone;
+                }
+            });
         }
 
         /* =============================
@@ -639,6 +768,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         usersTable.buttons().container().appendTo('#usersExportButtons');
 
         /* =============================
+           تهيئة مسبقة عند القدوم من بطاقة الموظف (?employee_id=N)
+        ============================== */
+        const prefillEditUid = <?php echo intval($prefill_edit_uid); ?>;
+        const prefillEmployeeId = <?php echo intval($prefill_employee_id); ?>;
+        if (prefillEditUid > 0) {
+            // للموظف حساب مرتبط: افتحه في وضع التعديل
+            const $btn = $('.editBtn[data-id="' + prefillEditUid + '"]');
+            if ($btn.length) { $btn.first().trigger('click'); }
+        } else if (prefillEmployeeId > 0 && employeeSelect) {
+            // لا حساب: افتح نموذج إضافة مهيّأً بهذا الموظف
+            form.reset();
+            document.getElementById("uid").value = 0;
+            refreshEmployeeOptions(0);
+            employeeSelect.value = String(prefillEmployeeId);
+            employeeSelect.dispatchEvent(new Event('change'));
+            form.classList.add("allforms-visible");
+            $('html, body').animate({ scrollTop: $(form).offset().top - 20 }, 400);
+        }
+
+        /* =============================
            إظهار / إخفاء النموذج
         ============================== */
         document.getElementById('toggleForm').addEventListener('click', function () {
@@ -647,6 +796,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             usernameFeedback.innerHTML = "";
             usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");
             usernameValid = true;
+            if (employeeSelect) { employeeSelect.value = ""; refreshEmployeeOptions(0); }
             form.classList.toggle("allforms-visible");
         });
 
@@ -664,6 +814,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
             const projectId = $(this).data('project');
             const contractId = $(this).data('contract');
+            const employeeId = $(this).data('employee');
 
             $('#uid').val(id);
             $('#name').val(name);
@@ -671,6 +822,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             $('#phone').val(phone);
             $('#role').val(role).trigger('change');
             $('#status').val(status || 'active');
+
+            // ربط الموظف: أتح خيار الموظف الحالي ثم اضبط القيمة
+            if (employeeSelect) {
+                refreshEmployeeOptions(id);
+                employeeSelect.value = (employeeId && parseInt(employeeId, 10) > 0) ? String(employeeId) : "";
+            }
 
             // إعادة تعيين حالة التحقق من اسم المستخدم
             usernameFeedback.innerHTML = '<span class="pu-feedback-ok"><i class="fas fa-check-circle"></i> اسم المستخدم الحالي</span>';

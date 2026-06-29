@@ -53,6 +53,53 @@ if (!$driver) {
     exit();
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// 🔗 حساب الدخول المرتبط بهذا الموظف (الخيار ب: users.employee_id)
+// ════════════════════════════════════════════════════════════════════════════
+$users_has_employee_link = db_table_has_column($conn, 'users', 'employee_id');
+$users_has_company_col   = db_table_has_column($conn, 'users', 'company_id');
+$users_has_status_col    = db_table_has_column($conn, 'users', 'status');
+$users_not_deleted_cond  = db_table_has_column($conn, 'users', 'is_deleted') ? " AND COALESCE(is_deleted,0)=0" : "";
+
+// معالج «سحب الحساب» (POST) — يجب أن يسبق أي إخراج.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['account_action'] ?? '') === 'revoke' && $users_has_employee_link) {
+    $target_uid = intval($_POST['target_uid'] ?? 0);
+    $revoke_scope = (!$is_super_admin && $users_has_company_col) ? " AND company_id = $company_id" : "";
+    $revoke_status = $users_has_status_col ? ", status='inactive'" : "";
+    // يفكّ الرابط ويُعطّل الحساب، شرط أن يكون مرتبطاً فعلاً بهذا الموظف وضمن نطاق الشركة.
+    $revoke_sql = "UPDATE users SET employee_id = NULL $revoke_status, updated_at = NOW()
+                   WHERE id = $target_uid AND employee_id = $employee_id $revoke_scope";
+    if (@mysqli_query($conn, $revoke_sql) && mysqli_affected_rows($conn) > 0) {
+        header("Location: employee_profile.php?id=$employee_id&msg=" . urlencode('✅ تم سحب الحساب من الموظف وتعطيله'));
+    } else {
+        header("Location: employee_profile.php?id=$employee_id&msg=" . urlencode('❌ تعذّر سحب الحساب أو لا توجد صلاحية'));
+    }
+    exit();
+}
+
+// جلب الحساب المرتبط (إن وُجد)
+$linked_user = null;
+if ($users_has_employee_link) {
+    $lu_res = mysqli_query($conn, "SELECT id, name, username, role, " . ($users_has_status_col ? "status" : "'active' AS status") . "
+                                   FROM users WHERE employee_id = $employee_id $users_not_deleted_cond LIMIT 1");
+    if ($lu_res && mysqli_num_rows($lu_res) > 0) {
+        $linked_user = mysqli_fetch_assoc($lu_res);
+    }
+}
+
+// خريطة أسماء الأدوار للعرض
+$roles_map = array();
+$roles_map_res = mysqli_query($conn, "SELECT id, name FROM roles");
+if ($roles_map_res) {
+    while ($rm = mysqli_fetch_assoc($roles_map_res)) {
+        $roles_map[(string) $rm['id']] = $rm['name'];
+    }
+}
+
+// صلاحية إدارة الحسابات = صلاحية تعديل شاشة المستخدمين
+$acc_perms = check_page_permissions($conn, 'main/users.php');
+$can_manage_accounts = !empty($acc_perms['can_edit']);
+
 $timesheet_scope = "t.employee_id = '$employee_id' AND t.status = 1";
 $operations_scope = "o.status = 1";
 $equipment_drivers_scope = "ed.employee_id = $employee_id";
@@ -234,6 +281,12 @@ include("../insidebar.php");
     include('../includes/page_header.php');
     ?>
 
+    <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
+        <div class="alert alert-info" style="margin-bottom:14px;font-weight:700;">
+            <?php echo htmlspecialchars($_GET['msg'], ENT_QUOTES, 'UTF-8'); ?>
+        </div>
+    <?php endif; ?>
+
     <div class="identity-card">
         <div class="id-grid">
             <div class="photo-box">
@@ -309,6 +362,64 @@ include("../insidebar.php");
             </div>
         </div>
     </div>
+
+    <?php if ($users_has_employee_link): ?>
+    <div class="section-card">
+        <div class="section-head">
+            <h3 class="section-title"><i class="fas fa-user-shield"></i> حساب الدخول للنظام</h3>
+        </div>
+        <div class="section-body">
+            <?php if ($linked_user): ?>
+                <?php
+                $acc_active = in_array(strtolower(trim((string) $linked_user['status'])), array('1', 'active', 'true', 'نشط'), true);
+                $acc_role_name = isset($roles_map[(string) $linked_user['role']]) ? $roles_map[(string) $linked_user['role']] : ('دور #' . $linked_user['role']);
+                ?>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="label">اسم المستخدم</div>
+                        <div class="value"><?php echo htmlspecialchars($linked_user['username']); ?></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">الدور / الصلاحية</div>
+                        <div class="value"><?php echo htmlspecialchars($acc_role_name); ?></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">حالة الحساب</div>
+                        <div class="value">
+                            <span class="assignment-status <?php echo $acc_active ? 'active' : 'old'; ?>">
+                                <?php echo $acc_active ? 'نشط' : 'موقوف'; ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <?php if ($can_manage_accounts): ?>
+                    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+                        <a href="../main/users.php?employee_id=<?php echo intval($employee_id); ?>" class="add-btn">
+                            <i class="fas fa-user-gear"></i> إدارة الحساب / تغيير الدور
+                        </a>
+                        <form method="post" style="display:inline;margin:0;"
+                              onsubmit="return confirm('هل تريد سحب حساب الدخول من هذا الموظف وتعطيله؟');">
+                            <input type="hidden" name="account_action" value="revoke">
+                            <input type="hidden" name="target_uid" value="<?php echo intval($linked_user['id']); ?>">
+                            <button type="submit" class="add-btn" style="background:#c81f24;border-color:#c81f24;">
+                                <i class="fas fa-user-slash"></i> سحب الحساب
+                            </button>
+                        </form>
+                    </div>
+                <?php endif; ?>
+            <?php else: ?>
+                <div class="alert alert-warning mb-0">لا يملك هذا الموظف حساب دخول للنظام حالياً.</div>
+                <?php if ($can_manage_accounts): ?>
+                    <div style="margin-top:12px;">
+                        <a href="../main/users.php?employee_id=<?php echo intval($employee_id); ?>" class="add-btn">
+                            <i class="fas fa-user-plus"></i> إنشاء حساب لهذا الموظف
+                        </a>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <div class="stats-grid">
         <div class="stat-card">

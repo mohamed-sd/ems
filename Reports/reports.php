@@ -14,9 +14,10 @@ $_supplier_company_where = (!$_is_super_admin && $_suppliers_has_company_id && $
     ? " AND company_id = '$_report_company_id'"
     : "";
 
-$supplier_filter = isset($_GET['supplier']) ? $_GET['supplier'] : '';
-$project_filter = isset($_GET['project']) ? $_GET['project'] : '';
-$contract_filter = isset($_GET['contract']) ? $_GET['contract'] : '';
+// أعداد صحيحة فقط — يمنع حقن SQL في الفلاتر (المعرّفات أرقام دائماً).
+$supplier_filter = isset($_GET['supplier']) ? intval($_GET['supplier']) : 0;
+$project_filter  = isset($_GET['project'])  ? intval($_GET['project'])  : 0;
+$contract_filter = isset($_GET['contract']) ? intval($_GET['contract']) : 0;
 
 $sql = "
 SELECT
@@ -34,14 +35,14 @@ LEFT JOIN contracts c ON o.contract_id = c.id
 WHERE t.status = 1 AND o.status = 1
 ";
 
-if (!empty($supplier_filter)) {
-    $sql .= " AND s.id = '" . mysqli_real_escape_string($conn, $supplier_filter) . "' ";
+if ($supplier_filter > 0) {
+    $sql .= " AND s.id = $supplier_filter ";
 }
-if (!empty($project_filter)) {
-    $sql .= " AND p.id = '" . mysqli_real_escape_string($conn, $project_filter) . "' ";
+if ($project_filter > 0) {
+    $sql .= " AND p.id = $project_filter ";
 }
-if (!empty($contract_filter)) {
-    $sql .= " AND c.id = '" . mysqli_real_escape_string($conn, $contract_filter) . "' ";
+if ($contract_filter > 0) {
+    $sql .= " AND c.id = $contract_filter ";
 }
 $sql .= " GROUP BY s.id, s.name, p.id, p.name, c.id, c.contract_signing_date
           ORDER BY p.name, s.name ";
@@ -122,8 +123,8 @@ include('../insidebar.php');
                         <select name="contract" id="contractSelect">
                             <option value="">-- الكل --</option>
                             <?php
-                            if (!empty($project_filter)) {
-                                $contracts = mysqli_query($conn, "SELECT id, contract_signing_date FROM contracts WHERE project_id = '$project_filter' AND status = 1 ORDER BY contract_signing_date DESC");
+                            if ($project_filter > 0) {
+                                $contracts = mysqli_query($conn, "SELECT id, contract_signing_date FROM contracts WHERE project_id = $project_filter AND status = 1 ORDER BY contract_signing_date DESC");
                                 if ($contracts) {
                                 while ($row = mysqli_fetch_assoc($contracts)) {
                                     $selected = ($contract_filter == $row['id']) ? "selected" : "";

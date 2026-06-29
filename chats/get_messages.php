@@ -35,6 +35,11 @@ if (!$check || mysqli_num_rows($check) === 0) {
 // بناء شرط التحديث التزايدي
 $last_id_cond = $last_id > 0 ? "AND m.id > $last_id" : '';
 
+// اسم المُرسِل = اسم الموظف المرتبط (إن وُجد) وإلا اسم الحساب.
+$chat_has_emp  = db_table_has_column($conn, 'users', 'employee_id');
+$chat_emp_join = $chat_has_emp ? "LEFT JOIN employees e ON e.id = u.employee_id" : "";
+$chat_name_sel = $chat_has_emp ? "COALESCE(NULLIF(e.name,''), u.name)" : "u.name";
+
 $sql = "SELECT
             m.id,
             m.sender_id,
@@ -42,9 +47,10 @@ $sql = "SELECT
             m.message,
             m.is_read,
             m.created_at,
-            u.name AS sender_name
+            $chat_name_sel AS sender_name
         FROM messages m
         JOIN users u ON u.id = m.sender_id
+        $chat_emp_join
         WHERE m.company_id = $safe_company
           AND (
             (m.sender_id = $my_id   AND m.receiver_id = $safe_with AND m.is_deleted_sender = 0)

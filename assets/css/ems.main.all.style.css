@@ -12653,6 +12653,29 @@ body.ems-site {
   white-space: nowrap;
 }
 
+/* أيقونة داخل حاوية التوبار */
+.ems-topbar-pill i {
+  margin-inline-end: 6px;
+  opacity: .9;
+  font-size: .9em;
+}
+
+/* حاوية الموظف صاحب الحساب — بيضاء كبقية الحاويات (تُميَّز بأيقونة البطاقة فقط) */
+.ems-topbar-pill--employee {
+  background: #ffffff;
+  border-color: #cfcfcf;
+  color: #121212;
+  font-weight: 700;
+}
+
+/* حالة عدم الارتباط بموظف (المدير الأعلى مثلاً) */
+.ems-topbar-pill--muted {
+  background: #ededed;
+  border-color: #cfcfcf;
+  color: #8a8a8a;
+  font-weight: 600;
+}
+
 .ems-topbar-actions {
   display: flex;
   align-items: center;

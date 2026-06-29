@@ -196,3 +196,10 @@
 [2026-06-27 13:52:04] [csrf_violation] IP: ::1 | User: مبيعات (13) | Event: csrf_violation | Details: method=POST script=/ems/Contracts/contracts.php token=invalid | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0
 [2026-06-27 14:02:59] [csrf_violation] IP: ::1 | User: مصعب (5) | Event: csrf_violation | Details: method=POST script=/ems/Suppliers/get_mine_contracts.php token=invalid | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0
 [2026-06-27 14:03:01] [csrf_violation] IP: ::1 | User: مصعب (5) | Event: csrf_violation | Details: method=POST script=/ems/Suppliers/get_project_hours.php token=invalid | UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36 Edg/149.0.0.0
+[2026-06-29 16:22:32] [csrf_violation] IP: ::1 | User: GUEST (GUEST) | Event: csrf_violation | Details: method=POST script=/ems/login.php token=missing | UA: curl/8.7.1
+[2026-06-29 16:37:34] [csrf_violation] IP: ::1 | User: محمد (4) | Event: csrf_violation | Details: method=POST script=/ems/main/project_users.php token=missing | UA: curl/8.7.1
+[2026-06-29 16:37:34] [csrf_violation] IP: ::1 | User: محمد (4) | Event: csrf_violation | Details: method=POST script=/ems/main/project_users.php token=missing | UA: curl/8.7.1
+[2026-06-29 17:45:33] [csrf_violation] IP: ::1 | User: perm_mgr (56) | Event: csrf_violation | Details: method=POST script=/ems/main/all_assistants.php token=missing | UA: curl/8.7.1
+[2026-06-29 17:45:58] [csrf_violation] IP: ::1 | User: perm_mgr (56) | Event: csrf_violation | Details: method=POST script=/ems/main/all_assistants.php token=missing | UA: curl/8.7.1
+[2026-06-29 19:00:13] [csrf_violation] IP: ::1 | User: probe3 (63) | Event: csrf_violation | Details: method=POST script=/ems/Employees/employee_contracts.php token=missing | UA: curl/8.7.1
+[2026-06-29 19:22:57] [csrf_violation] IP: ::1 | User: hrqa (67) | Event: csrf_violation | Details: method=POST script=/ems/Workforce/housing_units.php token=missing | UA: curl/8.7.1

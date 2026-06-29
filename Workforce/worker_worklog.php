@@ -32,13 +32,13 @@ $page_title="إيكوبيشن | السجل التشغيلي"; include '../inhead
     <?php
     // مؤشّرات سريعة
     $kpi = ['workers'=>0,'allocated'=>0,'on_leave'=>0,'expired_critical'=>0];
-    $q1=mysqli_query($conn,"SELECT COUNT(*) c FROM employees wp WHERE wp.is_workforce=1 $scope_sql"); if($q1){$kpi['workers']=intval(mysqli_fetch_assoc($q1)['c']);}
-    $q2=mysqli_query($conn,"SELECT COUNT(DISTINCT a.employee_id) c FROM worker_allocation a JOIN employees wp ON wp.id=a.employee_id WHERE a.state='نشط' $scope_sql"); if($q2){$kpi['allocated']=intval(mysqli_fetch_assoc($q2)['c']);}
+    $q1=mysqli_query($conn,"SELECT COUNT(*) c FROM employees wp WHERE 1=1 $scope_sql"); if($q1){$kpi['workers']=intval(mysqli_fetch_assoc($q1)['c']);}
+    $q2=mysqli_query($conn,"SELECT COUNT(DISTINCT a.employee_id) c FROM equipment_drivers a JOIN employees wp ON wp.id=a.employee_id WHERE a.status=1 $scope_sql"); if($q2){$kpi['allocated']=intval(mysqli_fetch_assoc($q2)['c']);}
     $q3=mysqli_query($conn,"SELECT COUNT(DISTINCT la.employee_id) c FROM worker_leave_absence la JOIN employees wp ON wp.id=la.employee_id WHERE la.state IN ('معتمد','مفتوح','مُغطًّى') $scope_sql"); if($q3){$kpi['on_leave']=intval(mysqli_fetch_assoc($q3)['c']);}
     $q4=mysqli_query($conn,"SELECT COUNT(DISTINCT q.employee_id) c FROM worker_qualification q JOIN employees wp ON wp.id=q.employee_id WHERE q.is_critical=1 AND q.expiry_date IS NOT NULL AND q.expiry_date < CURDATE() $scope_sql"); if($q4){$kpi['expired_critical']=intval(mysqli_fetch_assoc($q4)['c']);}
     ?>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:14px 0;">
-        <div class="allforms" style="padding:14px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;"><?= $kpi['workers'] ?></div><div>العاملون</div></div>
+        <div class="allforms" style="padding:14px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;"><?= $kpi['workers'] ?></div><div>الموظفون</div></div>
         <div class="allforms" style="padding:14px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;"><?= $kpi['allocated'] ?></div><div>مخصَّصون (نشط)</div></div>
         <div class="allforms" style="padding:14px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;"><?= $kpi['on_leave'] ?></div><div>في إجازة/غياب</div></div>
         <div class="allforms" style="padding:14px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;color:#c0392b;"><?= $kpi['expired_critical'] ?></div><div>اعتماد حرج منتهٍ</div></div>
@@ -63,7 +63,7 @@ $page_title="إيكوبيشن | السجل التشغيلي"; include '../inhead
     <?php endif; ?>
 
     <div class="table-wrap"><table class="data-table" style="width:100%;">
-        <thead><tr><th>عرض</th><th>#</th><th>العامل</th><th>الفئة</th><th>الحالة</th><th>الحالة الميدانية</th><th>العمليات</th><th>ساعات مؤهَّلة</th><th>إجازات/غياب</th><th>تحرّكات</th><th>تقييمات</th><th>حوافز (معتمدة)</th><th>جزاءات (معتمدة)</th></tr></thead><tbody>
+        <thead><tr><th>عرض</th><th>#</th><th>الموظف</th><th>الفئة</th><th>الحالة</th><th>الحالة الميدانية</th><th>العمليات</th><th>ساعات مؤهَّلة</th><th>إجازات/غياب</th><th>تحرّكات</th><th>تقييمات</th><th>حوافز (معتمدة)</th><th>جزاءات (معتمدة)</th></tr></thead><tbody>
         <?php
         $sql="SELECT wl.*, pr.presence_state
               FROM v_worker_worklog wl
@@ -73,10 +73,10 @@ $page_title="إيكوبيشن | السجل التشغيلي"; include '../inhead
         $list=mysqli_query($conn,$sql); $i=1; $WF_VIEW = [];
         if($list){ while($r=mysqli_fetch_assoc($list)):
             $ev0 = $events_map[intval($r['employee_id'])] ?? ['incentive'=>0,'penalty'=>0];
-            $WF_VIEW[$r['employee_id']] = ems_wf_view_payload('سجل العامل التشغيلي المجمّع', 'fas fa-clock-rotate-left', [
-                ems_wf_field('العامل', $r['worker_name'] ?: '-', 'fas fa-user', ['size' => 'lg']),
-                ems_wf_field('الفئة', $r['worker_category'], 'fas fa-layer-group'),
-                ems_wf_field('الحالة', $r['worker_state'], 'fas fa-diagram-project', ['type' => 'status']),
+            $WF_VIEW[$r['employee_id']] = ems_wf_view_payload('سجل الموظف التشغيلي المجمّع', 'fas fa-clock-rotate-left', [
+                ems_wf_field('الموظف', $r['worker_name'] ?: '-', 'fas fa-user', ['size' => 'lg']),
+                ems_wf_field('الفئة', $r['worker_category'] ?: '-', 'fas fa-layer-group'),
+                ems_wf_field('الحالة', $r['worker_state'] ?: '-', 'fas fa-diagram-project', ['type' => 'status']),
                 ems_wf_field('الحالة الميدانية', $r['presence_state'] ?: '-', 'fas fa-location-dot'),
                 ems_wf_field('عدد العمليات', intval($r['operations_count']), 'fas fa-gears'),
                 ems_wf_field('ساعات مؤهَّلة', number_format(floatval($r['total_billable_hours']), 1), 'fas fa-clock'),
@@ -87,8 +87,8 @@ $page_title="إيكوبيشن | السجل التشغيلي"; include '../inhead
                 ems_wf_field('جزاءات (معتمدة)', number_format(floatval($ev0['penalty']), 2), 'fas fa-gavel'),
             ]); ?>
             <tr><td><?= ems_wf_view_button($r['employee_id']) ?></td><td><?= $i++ ?></td><td><strong><?= htmlspecialchars($r['worker_name'] ?: '-') ?></strong></td>
-            <td><span class="badge badge-info"><?= htmlspecialchars($r['worker_category']) ?></span></td>
-            <td><?= htmlspecialchars($r['worker_state']) ?></td>
+            <td><?php if(!empty($r['worker_category'])): ?><span class="badge badge-info"><?= htmlspecialchars($r['worker_category']) ?></span><?php else: ?>-<?php endif; ?></td>
+            <td><?= htmlspecialchars($r['worker_state'] ?: '-') ?></td>
             <td><span class="status-pill status-warning"><?= htmlspecialchars($r['presence_state'] ?: '-') ?></span></td>
             <td><?= intval($r['operations_count']) ?></td><td><?= number_format(floatval($r['total_billable_hours']),1) ?></td>
             <td><?= intval($r['leave_absence_count']) ?></td><td><?= intval($r['movement_count']) ?></td>
@@ -96,7 +96,7 @@ $page_title="إيكوبيشن | السجل التشغيلي"; include '../inhead
             $ev = $events_map[intval($r['employee_id'])] ?? ['incentive'=>0,'penalty'=>0]; ?>
             <td><?= intval($r['evaluation_count']) ?></td><td><?= number_format(floatval($ev['incentive']),2) ?></td>
             <td><?= number_format(floatval($ev['penalty']),2) ?></td></tr>
-        <?php endwhile; } if(!$list||$i===1): ?><tr><td colspan="13" style="text-align:center;color:#888;padding:18px;">لا توجد بياناتٌ بعد (طبّق التهجيرات وأضف عمالاً).</td></tr><?php endif; ?>
+        <?php endwhile; } if(!$list||$i===1): ?><tr><td colspan="13" style="text-align:center;color:#888;padding:18px;">لا توجد بياناتٌ بعد (طبّق التهجيرات وأضف موظفين).</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

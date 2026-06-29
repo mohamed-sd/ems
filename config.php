@@ -21,6 +21,7 @@ if (PHP_SAPI !== 'cli') {
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/performance.php';
 require_once __DIR__ . '/includes/employee_types.php'; // أنواع الموظفين + فلتر أنواع التشغيل (الموجة 1)
+require_once __DIR__ . '/includes/actor_helper.php';   // تسمية الفاعل الموحّدة (الموظف خلف الحساب)
 
 ems_performance_bootstrap();
 

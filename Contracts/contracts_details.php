@@ -70,6 +70,7 @@ include '../insidebar.php';
         </div>
 
         <!-- ===== ACTIONS SECTION ===== -->
+        <?php if ($can_add): // أزرار إجراءات العقد تظهر فقط لمن يملك صلاحية الإضافة (can_add) ?>
         <div class="actions-section">
             <div class="actions-header">
                 <div class="actions-header-icon">
@@ -101,6 +102,7 @@ include '../insidebar.php';
                 </button>
             </div>
         </div>
+        <?php endif; // can_add ?>
 
         <?php
 

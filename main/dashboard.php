@@ -575,6 +575,12 @@ body.ems-site,
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* قاعدة ملء الصف الأخير: يُمدّ الكارت الأخير على الأعمدة الشاغرة المتبقية
+   حتى لا تظهر فراغات في نهاية الصف. القيمة تُحسب في PHP حسب عدد الكاردات. */
+.shot-hex-grid > .shot-hex-link:last-child {
+  grid-column: span var(--last-span-desktop, 1);
+}
+
 .shot-hex-link {
   min-height: 88px;
   border: 1px solid #b7b7b7;
@@ -919,6 +925,11 @@ body.ems-site,
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  /* عند عمودين: يُمدّ الكارت الأخير لعمودين إن كان الصف الأخير ناقصاً */
+  .shot-hex-grid > .shot-hex-link:last-child {
+    grid-column: span var(--last-span-mid, 1);
+  }
+
   .shot-session-row,
   .shot-stat-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -946,6 +957,11 @@ body.ems-site,
     grid-template-columns: 1fr;
   }
 
+  /* عمود واحد: لا فراغات أصلاً، فيعود الكارت الأخير لوضعه الطبيعي */
+  .shot-hex-grid > .shot-hex-link:last-child {
+    grid-column: auto;
+  }
+
   .shot-stat-value {
     font-size: 4.2rem;
   }
@@ -963,7 +979,8 @@ body.ems-site,
     <h2 class="shot-section-title">الوصول السريع</h2>
 
     <?php
-    $quickTiles = array_slice($links, 0, 8);
+    // يعرض كل روابط جدول modules (مثل السايدبار تماماً) بلا قصّ.
+    $quickTiles = $links;
     if (empty($quickTiles)) {
       $quickTiles = [
         ['../main/dashboard.php', 'لوحة التحكم', 'fa-solid fa-house'],
@@ -971,9 +988,18 @@ body.ems-site,
     }
     $quickTilesCount = count($quickTiles);
     $quickGridClass = ($quickTilesCount > 2 && ($quickTilesCount % 2 === 1)) ? 'cols-3' : 'cols-4';
+
+    // قاعدة التصميم: إذا تبقّى فراغ في آخر صف، يُمدّ الكارت الأخير ليملأ الصف كاملاً.
+    // نحسب عدد الأعمدة التي يمتدّها الكارت الأخير عند كل قياس شاشة (سطح المكتب / متوسط).
+    $lastSpanFor = function ($cols) use ($quickTilesCount) {
+      $rem = $quickTilesCount % $cols;        // عدد الكاردات في الصف الأخير
+      return ($rem === 0) ? 1 : ($cols - $rem + 1); // يملأ الأعمدة الشاغرة + عموده
+    };
+    $lastSpanDesktop = $lastSpanFor($quickGridClass === 'cols-3' ? 3 : 4);
+    $lastSpanMid = $lastSpanFor(2); // عند ≤1280px تصبح الشبكة عمودين
     ?>
 
-    <div class="shot-hex-grid <?= $quickGridClass ?>">
+    <div class="shot-hex-grid <?= $quickGridClass ?>" style="--last-span-desktop: <?= $lastSpanDesktop ?>; --last-span-mid: <?= $lastSpanMid ?>;">
       <?php foreach ($quickTiles as $i => $lk): ?>
       <a href="<?= htmlspecialchars($lk[0]) ?>" class="shot-hex-link">
         <span class="shot-hex-icon"><i class="<?= htmlspecialchars($lk[2]) ?>"></i></span>

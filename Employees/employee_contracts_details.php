@@ -625,19 +625,19 @@ while ($row = mysqli_fetch_assoc($result)) {
             </h5>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-bus"></i> النقل</span>
-                <span class="info-value" id="transportationDisplay"><?php echo $row['transportation']; ?></span>
+                <span class="info-value" id="transportationDisplay"><?php echo htmlspecialchars((string)$row['transportation'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-hotel"></i> السكن</span>
-                <span class="info-value" id="accommodationDisplay"><?php echo $row['accommodation']; ?></span>
+                <span class="info-value" id="accommodationDisplay"><?php echo htmlspecialchars((string)$row['accommodation'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-map-marker-alt"></i> مكان السكن</span>
-                <span class="info-value" id="placeLivingDisplay"><?php echo $row['place_for_living']; ?></span>
+                <span class="info-value" id="placeLivingDisplay"><?php echo htmlspecialchars((string)$row['place_for_living'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-wrench"></i> الورشة</span>
-                <span class="info-value" id="workshopDisplay"><?php echo $row['workshop']; ?></span>
+                <span class="info-value" id="workshopDisplay"><?php echo htmlspecialchars((string)$row['workshop'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
         </div>
 
@@ -651,19 +651,19 @@ while ($row = mysqli_fetch_assoc($result)) {
             </h5>
             <div class="info-item">
                 <span class="info-label">الطرف الأول</span>
-                <span class="info-value" id="firstPartyDisplay"><?php echo $row['first_party']; ?></span>
+                <span class="info-value" id="firstPartyDisplay"><?php echo htmlspecialchars((string)$row['first_party'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label">الطرف الثاني</span>
-                <span class="info-value" id="secondPartyDisplay"><?php echo $row['second_party']; ?></span>
+                <span class="info-value" id="secondPartyDisplay"><?php echo htmlspecialchars((string)$row['second_party'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label">الشاهد الأول</span>
-                <span class="info-value" id="witnessOneDisplay"><?php echo $row['witness_one']; ?></span>
+                <span class="info-value" id="witnessOneDisplay"><?php echo htmlspecialchars((string)$row['witness_one'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label">الشاهد الثاني</span>
-                <span class="info-value" id="witnessTwoDisplay"><?php echo $row['witness_two']; ?></span>
+                <span class="info-value" id="witnessTwoDisplay"><?php echo htmlspecialchars((string)$row['witness_two'], ENT_QUOTES, 'UTF-8'); ?></span>
             </div>
         </div>
 
@@ -677,23 +677,23 @@ while ($row = mysqli_fetch_assoc($result)) {
             </h5>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-dollar-sign"></i> العملة</span>
-                <span class="info-value" id="currencyDisplay"><?php echo !empty($row['price_currency_contract']) ? $row['price_currency_contract'] : '-'; ?></span>
+                <span class="info-value" id="currencyDisplay"><?php echo !empty($row['price_currency_contract']) ? htmlspecialchars((string)$row['price_currency_contract'], ENT_QUOTES, 'UTF-8') : '-'; ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-money-check-alt"></i> المبلغ المدفوع</span>
-                <span class="info-value" id="paidAmountDisplay"><?php echo !empty($row['paid_contract']) ? $row['paid_contract'] : '-'; ?></span>
+                <span class="info-value" id="paidAmountDisplay"><?php echo !empty($row['paid_contract']) ? htmlspecialchars((string)$row['paid_contract'], ENT_QUOTES, 'UTF-8') : '-'; ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-clock"></i> وقت الدفع</span>
-                <span class="info-value" id="paymentTimeDisplay"><?php echo !empty($row['payment_time']) ? $row['payment_time'] : '-'; ?></span>
+                <span class="info-value" id="paymentTimeDisplay"><?php echo !empty($row['payment_time']) ? htmlspecialchars((string)$row['payment_time'], ENT_QUOTES, 'UTF-8') : '-'; ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-shield-alt"></i> الضمانات</span>
-                <span class="info-value" id="guaranteesDisplay"><?php echo !empty($row['guarantees']) ? $row['guarantees'] : '-'; ?></span>
+                <span class="info-value" id="guaranteesDisplay"><?php echo !empty($row['guarantees']) ? htmlspecialchars((string)$row['guarantees'], ENT_QUOTES, 'UTF-8') : '-'; ?></span>
             </div>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-calendar-check"></i> تاريخ الدفع</span>
-                <span class="info-value" id="paymentDateDisplay"><?php echo !empty($row['payment_date']) ? $row['payment_date'] : '-'; ?></span>
+                <span class="info-value" id="paymentDateDisplay"><?php echo !empty($row['payment_date']) ? htmlspecialchars((string)$row['payment_date'], ENT_QUOTES, 'UTF-8') : '-'; ?></span>
             </div>
         </div>
 
@@ -718,13 +718,13 @@ while ($row = mysqli_fetch_assoc($result)) {
         <?php if (isset($row['pause_reason']) && !empty($row['pause_reason'])): ?>
         <div class="info-item">
             <span class="info-label">سبب الإيقاف</span>
-            <span class="info-value"><?php echo $row['pause_reason']; ?></span>
+            <span class="info-value"><?php echo htmlspecialchars((string)$row['pause_reason'], ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <?php endif; ?>
         <?php if (isset($row['termination_reason']) && !empty($row['termination_reason'])): ?>
         <div class="info-item">
             <span class="info-label">سبب الإنهاء</span>
-            <span class="info-value"><?php echo $row['termination_reason']; ?></span>
+            <span class="info-value"><?php echo htmlspecialchars((string)$row['termination_reason'], ENT_QUOTES, 'UTF-8'); ?></span>
         </div>
         <?php endif; ?>
     </div>

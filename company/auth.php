@@ -282,6 +282,7 @@ function company_login_success(array $userRow, array $companyRow) {
         'username' => $userUsername,
         'phone' => isset($userRow['phone']) ? $userRow['phone'] : '',
         'role' => $userRole,
+        'employee_id' => isset($userRow['employee_id']) ? intval($userRow['employee_id']) : null,
         'project_id' => $scope['project_id'],
         'contract_id' => $scope['contract_id'],
         'company_id' => $scope['company_id'],

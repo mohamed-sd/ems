@@ -40,8 +40,11 @@ if ($employee_id <= 0) {
     die(json_encode(['success' => false, 'message' => 'معرف المشغل غير صحيح']));
 }
 
-// الحصول على بيانات المشغل الحالية
-$driver_query = "SELECT id, name, employee_code, employee_status FROM employees WHERE id = $employee_id";
+// الحصول على بيانات المشغل الحالية (مع عزل الشركة — المدير الأعلى -1 معفى)
+$_dh_is_super  = (isset($_SESSION['user']['role']) && strval($_SESSION['user']['role']) === '-1');
+$_dh_company_id = intval($_SESSION['user']['company_id'] ?? 0);
+$_dh_scope = (!$_dh_is_super && db_table_has_column($conn, 'employees', 'company_id')) ? " AND company_id = $_dh_company_id" : "";
+$driver_query = "SELECT id, name, employee_code, employee_status FROM employees WHERE id = $employee_id$_dh_scope";
 $driver_result = mysqli_query($conn, $driver_query);
 
 if (!$driver_result || mysqli_num_rows($driver_result) === 0) {
@@ -83,7 +86,7 @@ $payload = [
     'operations' => [
         [
             'type' => 'UPDATE',
-            'table' => 'drivers',
+            'table' => 'employees',
             'where' => "id = $employee_id",
             'fields' => [
                 'employee_status' => $action === 'deactivate_driver' ? 'موقوف' : 'نشط'

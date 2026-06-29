@@ -34,7 +34,7 @@ class ActivityLogRepository
     {
         $fields = [
             'company_id', 'project_id', 'contract_id',
-            'user_id', 'role_id', 'role_name',
+            'user_id', 'employee_id', 'role_id', 'role_name',
             'session_id', 'ip_address', 'user_agent',
             'screen_name', 'module_name',
             'action_type', 'button_name', 'field_name',
@@ -147,6 +147,8 @@ class ActivityLogRepository
                     al.project_id,
                     al.user_id,
                     COALESCE(u.name, u.username, CONCAT('مستخدم #', al.user_id)) AS user_name,
+                    e.name AS employee_name,
+                    COALESCE(al.employee_id, u.employee_id) AS employee_id,
                     al.role_id,
                     COALESCE(r.name, al.role_name, CONCAT('دور #', al.role_id)) AS role_name,
                     al.module_name,
@@ -159,6 +161,7 @@ class ActivityLogRepository
                     al.url
                 FROM activity_logs al
                 LEFT JOIN users u ON u.id = al.user_id
+                LEFT JOIN employees e ON e.id = COALESCE(al.employee_id, u.employee_id)
                 LEFT JOIN roles r ON r.id = al.role_id
                 $where
                 ORDER BY al.created_at DESC, al.id DESC
@@ -188,6 +191,8 @@ class ActivityLogRepository
                     al.company_id, al.project_id, al.contract_id,
                     al.user_id, al.role_id,
                     COALESCE(u.name, u.username, CONCAT('مستخدم #', al.user_id)) AS user_name,
+                    e.name AS employee_name,
+                    COALESCE(al.employee_id, u.employee_id) AS employee_id,
                     COALESCE(r.name, al.role_name, CONCAT('دور #', al.role_id)) AS role_name,
                     al.session_id, al.ip_address, al.user_agent,
                     al.module_name, al.screen_name,
@@ -197,6 +202,7 @@ class ActivityLogRepository
                     al.url, al.http_method, al.request_payload, al.response_status
                 FROM activity_logs al
                 LEFT JOIN users u ON u.id = al.user_id
+                LEFT JOIN employees e ON e.id = COALESCE(al.employee_id, u.employee_id)
                 LEFT JOIN roles r ON r.id = al.role_id
                 WHERE al.id = $id
                 LIMIT 1";
@@ -234,6 +240,8 @@ class ActivityLogRepository
                     al.project_id,
                     al.user_id,
                     COALESCE(u.name, u.username, CONCAT('مستخدم #', al.user_id)) AS user_name,
+                    e.name AS employee_name,
+                    COALESCE(al.employee_id, u.employee_id) AS employee_id,
                     al.role_id,
                     COALESCE(r.name, al.role_name, CONCAT('دور #', al.role_id)) AS role_name,
                     al.module_name,
@@ -246,6 +254,7 @@ class ActivityLogRepository
                     al.url
                 FROM activity_logs al
                 LEFT JOIN users u ON u.id = al.user_id
+                LEFT JOIN employees e ON e.id = COALESCE(al.employee_id, u.employee_id)
                 LEFT JOIN roles r ON r.id = al.role_id
                 $where
                 ORDER BY al.created_at DESC, al.id DESC

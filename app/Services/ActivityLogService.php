@@ -251,6 +251,7 @@ class ActivityLogService
             'project_id'  => isset($user['project_id'])  ? intval($user['project_id'])  : null,
             'contract_id' => isset($user['contract_id']) ? intval($user['contract_id']) : null,
             'user_id'     => isset($user['id'])          ? intval($user['id'])          : null,
+            'employee_id' => self::resolveEmployeeId($user),
             'role_id'     => isset($user['role'])        ? intval($user['role'])        : null,
             'role_name'   => self::resolveRoleName($user['role'] ?? null),
             'session_id'  => session_id() ?: null,
@@ -352,6 +353,39 @@ class ActivityLogService
             }
         }
         return $clean;
+    }
+
+    /**
+     * Resolve the acting employee id (snapshot for "who really did this").
+     * Prefers the session value; falls back to a cached lookup by user id so
+     * already-active sessions (created before the link) still attribute correctly.
+     */
+    private static function resolveEmployeeId(array $user): ?int
+    {
+        if (isset($user['employee_id']) && intval($user['employee_id']) > 0) {
+            return intval($user['employee_id']);
+        }
+
+        $userId = isset($user['id']) ? intval($user['id']) : 0;
+        if ($userId <= 0) {
+            return null;
+        }
+
+        static $cache = [];
+        if (array_key_exists($userId, $cache)) {
+            return $cache[$userId];
+        }
+
+        global $conn;
+        if (isset($conn) && $conn instanceof \mysqli) {
+            $res = @mysqli_query($conn, 'SELECT employee_id FROM users WHERE id = ' . $userId . ' LIMIT 1');
+            if ($res && ($row = mysqli_fetch_assoc($res))) {
+                $eid = ($row['employee_id'] !== null) ? intval($row['employee_id']) : 0;
+                return $cache[$userId] = ($eid > 0 ? $eid : null);
+            }
+        }
+
+        return $cache[$userId] = null;
     }
 
     private static function resolveRoleName(mixed $role): ?string

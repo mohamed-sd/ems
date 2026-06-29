@@ -77,13 +77,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
         // types: company i, worker i, code s, type s, wage d, wagenote s, method s, dstart s, dend s,
         //        state s, rot s, workdays i, leavedays i, nextrot s, mhb i, fwr d, bdt s,
         //        house d, food d, site d, trans d, anote s, term s, createdby i
-        $stmt->bind_param(
+        $ok = false;
+        if($stmt){ $stmt->bind_param(
             'iissdssssssiisidsddddssi',
             $cid, $worker_id, $code, $contract_type, $wage, $wage_note, $wage_method, $date_start, $date_end,
             $state, $rotation, $work_days, $leave_days, $next_rot, $mhb, $fwr, $bdtv,
             $a_house, $a_food, $a_site, $a_trans, $a_note, $term, $user_id
         );
-        $ok = $stmt->execute(); $stmt->close();
+        $ok = $stmt->execute(); $stmt->close(); }
         header("Location: worker_contract.php?msg=" . ($ok ? "✅+تم+حفظ+العقد" : "❌+تعذّر+الحفظ"));
         exit();
     } else {
@@ -97,13 +98,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
         $stmt = $conn->prepare($sql);
         // types: code s, type s, wage d, wnote s, method s, dstart s, dend s, state s, rot s,
         //        workdays i, leavedays i, nextrot s, mhb i, fwr d, bdt s, house d, food d, site d, trans d, anote s, term s, id i
-        $stmt->bind_param(
+        $ok = false;
+        if($stmt){ $stmt->bind_param(
             'ssdssssssiisidsddddssi',
             $code, $contract_type, $wage, $wage_note, $wage_method, $date_start, $date_end, $state, $rotation,
             $work_days, $leave_days, $next_rot, $mhb, $fwr, $bdtv, $a_house, $a_food, $a_site, $a_trans,
             $a_note, $term, $id
         );
-        $ok = $stmt->execute(); $stmt->close();
+        $ok = $stmt->execute(); $stmt->close(); }
         header("Location: worker_contract.php?edit=" . $id . "&msg=" . ($ok ? "✅+تم+التحديث" : "❌+تعذّر+التحديث"));
         exit();
     }
@@ -128,7 +130,7 @@ if ($edit_id > 0) {
 
 // قائمة العمال للاختيار
 $workers = [];
-$wq = mysqli_query($conn, "SELECT wp.id, wp.name AS name FROM employees wp WHERE wp.is_workforce = 1" . ($is_super_admin ? "" : " AND wp.company_id = " . intval($company_id)) . " ORDER BY wp.name");
+$wq = mysqli_query($conn, "SELECT wp.id, wp.name AS name FROM employees wp WHERE 1=1" . ($is_super_admin ? "" : " AND wp.company_id = " . intval($company_id)) . " ORDER BY wp.name");
 if ($wq) { while ($w = mysqli_fetch_assoc($wq)) { $workers[$w['id']] = $w['name']; } }
 
 $page_title = "إيكوبيشن | عقود العاملين";
@@ -151,7 +153,7 @@ include '../insidebar.php';
         <input type="hidden" name="id" value="<?= $edit ? intval($edit['id']) : 0 ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $edit ? 'تعديل عقد' : 'عقد عاملٍ جديد' ?></h5></div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
-            <div class="field"><label>العامل</label>
+            <div class="field"><label>الموظف</label>
                 <?php if ($edit): ?><input type="text" value="<?= htmlspecialchars($workers[$edit['employee_id']] ?? ('#'.$edit['employee_id'])) ?>" disabled>
                 <?php else: ?><select name="worker_id" required><option value="">— اختر —</option>
                     <?php foreach ($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?>
@@ -191,7 +193,7 @@ include '../insidebar.php';
 
     <div class="table-wrap" style="margin-top:14px;">
         <table class="data-table" style="width:100%;">
-            <thead><tr><th>إجراءات</th><th>#</th><th>الكود</th><th>العامل</th><th>النوع</th><th>طريقة الأجر</th><th>التناوب</th><th>بداية</th><th>نهاية</th><th>الحالة</th></tr></thead>
+            <thead><tr><th>إجراءات</th><th>#</th><th>الكود</th><th>الموظف</th><th>النوع</th><th>طريقة الأجر</th><th>التناوب</th><th>بداية</th><th>نهاية</th><th>الحالة</th></tr></thead>
             <tbody>
             <?php
             $list = mysqli_query($conn, "SELECT wc.*, e.name AS wname FROM worker_contract wc
@@ -201,7 +203,7 @@ include '../insidebar.php';
                 $sc = ($r['state']==='نافذ')?'status-active':(($r['state']==='منتهٍ')?'status-inactive':'status-warning');
                 $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل عقد العامل', 'fas fa-file-signature', [
                     ems_wf_field('الكود', $r['code'] ?: ('C-' . $r['id']), 'fas fa-barcode'),
-                    ems_wf_field('العامل', $r['wname'] ?: '-', 'fas fa-user', ['size' => 'lg']),
+                    ems_wf_field('الموظف', $r['wname'] ?: '-', 'fas fa-user', ['size' => 'lg']),
                     ems_wf_field('نوع العقد', $r['contract_type'], 'fas fa-file-contract'),
                     ems_wf_field('الحالة', $r['state'], 'fas fa-flag', ['type' => 'status']),
                     ems_wf_field('الأجر', $r['wage'] !== null ? $r['wage'] : '-', 'fas fa-money-bill'),

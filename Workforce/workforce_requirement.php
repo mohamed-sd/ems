@@ -50,15 +50,15 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='save') {
         $cid=$is_super_admin?null:$company_id;
         $st=$conn->prepare("INSERT INTO workforce_requirement (company_id,project_id,worker_category,required_qty,available_qty,shortage_qty,surplus_qty,is_critical,priority,need_date,fulfillment_stage,state,candidates_note,notes,created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         // types(15): company i,project i,cat s,req i,avail i,short i,surp i,crit i,prio s,need s,stage s,state s,cands s,notes s,by i
-        $st->bind_param('iisiiiiissssssi',$cid,$project_id,$category,$required,$available,$shortage,$surplus,$is_critical,$priority,$need_date,$stage,$state,$candidates,$notes,$user_id);
-        $st->execute(); $st->close();
+        if($st){ $st->bind_param('iisiiiiissssssi',$cid,$project_id,$category,$required,$available,$shortage,$surplus,$is_critical,$priority,$need_date,$stage,$state,$candidates,$notes,$user_id);
+        $st->execute(); $st->close(); }
         header("Location: workforce_requirement.php?msg=✅+تم+الحفظ"); exit();
     } else {
         $sc=$is_super_admin?"":" AND company_id = ".intval($company_id);
         $st=$conn->prepare("UPDATE workforce_requirement SET project_id=?,worker_category=?,required_qty=?,available_qty=?,shortage_qty=?,surplus_qty=?,is_critical=?,priority=?,need_date=?,fulfillment_stage=?,state=?,candidates_note=?,notes=? WHERE id=? $sc");
         // types(14): project i,cat s,req i,avail i,short i,surp i,crit i,prio s,need s,stage s,state s,cands s,notes s,id i
-        $st->bind_param('isiiiiissssssi',$project_id,$category,$required,$available,$shortage,$surplus,$is_critical,$priority,$need_date,$stage,$state,$candidates,$notes,$id);
-        $st->execute(); $st->close();
+        if($st){ $st->bind_param('isiiiiissssssi',$project_id,$category,$required,$available,$shortage,$surplus,$is_critical,$priority,$need_date,$stage,$state,$candidates,$notes,$id);
+        $st->execute(); $st->close(); }
         header("Location: workforce_requirement.php?edit=".$id."&msg=✅+تم+التحديث"); exit();
     }
 }
@@ -69,7 +69,8 @@ if (($_GET['delete']??'')!=='' && $can_delete) { $sc=$is_super_admin?"":" AND co
 $edit=null; $edit_id=intval($_GET['edit']??0);
 if ($edit_id>0) { $sc=$is_super_admin?"":" AND company_id = ".intval($company_id);
     $st=$conn->prepare("SELECT * FROM workforce_requirement WHERE id=? $sc LIMIT 1"); $st->bind_param('i',$edit_id); $st->execute(); $edit=$st->get_result()->fetch_assoc(); $st->close(); }
-$projects=[]; $pq=mysqli_query($conn,"SELECT id,name FROM project ORDER BY id DESC LIMIT 500"); if($pq){while($p=mysqli_fetch_assoc($pq)){$projects[$p['id']]=$p['name'];}}
+$proj_scope = $is_super_admin ? "" : " WHERE company_id = ".intval($company_id);
+$projects=[]; $pq=mysqli_query($conn,"SELECT id,name FROM project $proj_scope ORDER BY id DESC LIMIT 500"); if($pq){while($p=mysqli_fetch_assoc($pq)){$projects[$p['id']]=$p['name'];}}
 
 // معاينةٌ للمتوفّر المحسوب آلياً (PlanningService) للسجل قيد التعديل — للعرض فقط.
 $auto_preview=null;
@@ -87,7 +88,7 @@ $page_title="إيكوبيشن | الاحتياج والتخطيط"; include '../
     <?php if(!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
-    <form id="rForm" action="" method="post" class="allforms" style="<?= $edit?'':'display:none;' ?>">
+    <form id="rForm" action="" method="post" class="allforms" style="<?= $edit?'display:block;':'display:none;' ?>">
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $edit?intval($edit['id']):0 ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $edit?'تعديل احتياج':'احتياج جديد' ?></h5></div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
@@ -111,7 +112,7 @@ $page_title="إيكوبيشن | الاحتياج والتخطيط"; include '../
     <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
         <thead><tr><th>إجراءات</th><th>المشروع</th><th>الفئة</th><th>مطلوب</th><th>متوفّر</th><th>عجز</th><th>فائض</th><th>الأولوية</th><th>المرحلة</th><th>الحالة</th></tr></thead><tbody>
         <?php $list=mysqli_query($conn,"SELECT wr.*, p.name AS pname FROM workforce_requirement wr LEFT JOIN project p ON p.id=wr.project_id WHERE 1=1 $scope_sql ORDER BY wr.id DESC");
-        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)): $sc=($r['state']==='عجز')?'status-inactive':(($r['state']==='فائض')?'status-warning':'status-active');
+        $i=1; $WF_VIEW = []; if($list){ while($r=mysqli_fetch_assoc($list)): $i++; $sc=($r['state']==='عجز')?'status-inactive':(($r['state']==='فائض')?'status-warning':'status-active');
             $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل الاحتياج', 'fas fa-clipboard-list', [
                 ems_wf_field('المشروع', $r['pname'] ?: '-', 'fas fa-folder-open', ['size' => 'lg']),
                 ems_wf_field('الفئة', $r['worker_category'], 'fas fa-layer-group'),

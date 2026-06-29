@@ -6,8 +6,8 @@
  * ويعيد العجز/الفائض/الوظائف الحرجة لكل مشروعٍ وفئة. نقطة حقيقةٍ واحدةٍ تُستدعى من
  * شاشة الاحتياج (8.10) لحساب available_qty آلياً.
  *
- * «المتوفّر» = عدد العاملين المخصَّصين فعلياً (worker_allocation.state='نشط') المطابقين
- * للمشروع (عبر operations.project_id) والفئة (employees.worker_category).
+ * «المتوفّر» = عدد العاملين المُسنَدين فعلياً في equipment_drivers (status=1) المطابقين
+ * للمشروع (عبر operations.equipment→project) والفئة (employees.worker_category).
  * نمط دوالٍ خفيفٌ. Prepared Statements. صفر لمسٍ للقائم.
  */
 
@@ -29,17 +29,18 @@ if (!function_exists('ems_planning_available')) {
         if ($project_id <= 0 || $worker_category === '') {
             return 0;
         }
-        $sql = "SELECT COUNT(DISTINCT wa.employee_id) AS c
-                FROM worker_allocation wa
-                INNER JOIN employees wp ON wp.id = wa.employee_id  /* unified: worker = employee */
-                INNER JOIN operations o ON o.id = wa.operation_id
-                WHERE wa.state = 'نشط'
+        // المصدر الموحّد للإسناد = equipment_drivers (العامل↔الآلية النشط)، والمشروع عبر operations.equipment.
+        $sql = "SELECT COUNT(DISTINCT ed.employee_id) AS c
+                FROM equipment_drivers ed
+                INNER JOIN employees wp ON wp.id = ed.employee_id
+                INNER JOIN operations o ON o.equipment = ed.equipment_id AND o.status = 1
+                WHERE ed.status = 1
                   AND CAST(o.project_id AS UNSIGNED) = ?
                   AND wp.worker_category = ?";
         $params = [$project_id, $worker_category];
         $types  = 'is';
         if ($company_id !== null) {
-            $sql .= " AND wa.company_id = ?";
+            $sql .= " AND ed.company_id = ?";
             $params[] = (int) $company_id;
             $types   .= 'i';
         }

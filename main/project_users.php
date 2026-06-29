@@ -26,6 +26,7 @@ if (!$users_has_deleted_by) {
 
 $users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');
 $users_not_deleted_sql = $users_has_is_deleted ? "(COALESCE(u.is_deleted,0)=0)" : "1=1";
+$users_has_employee_id = db_table_has_column($conn, 'users', 'employee_id'); // ربط المعاون بموظف (قاعدة: لا حساب بلا موظف)
 
 if ($users_has_company_id && $current_company_id <= 0) {
     header("Location: ../login.php?msg=الحساب+غير+مرتبط+بشركة+❌");
@@ -133,9 +134,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $userId = intval($_POST['user_id']);
     $name = mysqli_real_escape_string($conn, trim($_POST['name']));
     $username = mysqli_real_escape_string($conn, trim($_POST['username']));
-    $password = !empty($_POST['password']) ? mysqli_real_escape_string($conn, $_POST['password']) : '';
+    $passwordRaw = isset($_POST['password']) ? (string) $_POST['password'] : '';
     $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
     $role = mysqli_real_escape_string($conn, $_POST['role']);
+    // منع تصعيد الصلاحيات: الدور يجب أن يكون فعلاً من الأدوار الأبناء للمستخدم الحالي
+    // (تقييد القائمة في الواجهة وحده لا يكفي — يمكن تزوير الطلب).
+    $role_check_id = intval($_POST['role']);
+    $role_chk = mysqli_query($conn, "SELECT 1 FROM roles
+            WHERE id = $role_check_id
+            AND parent_role_id = " . intval($_SESSION['user']['role']) . "
+            AND (status = '1' OR status = 1) LIMIT 1");
+    if (!$role_chk || mysqli_num_rows($role_chk) === 0) {
+        header("Location: project_users.php?msg=صلاحية+غير+مسموحة+❌");
+        exit;
+    }
     $userid = $_SESSION['user']['id'];
 
     // التحقق من أن المستخدم المراد تعديله تابع للمستخدم الحالي
@@ -156,6 +168,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit;
     }
 
+    // 🔗 ربط الموظف (إلزامي) عند التعديل
+    $employee_link_id = ($users_has_employee_id && !empty($_POST['employee_id'])) ? intval($_POST['employee_id']) : 0;
+    if ($users_has_employee_id && $employee_link_id <= 0) {
+        header("Location: project_users.php?msg=يجب+إسناد+موظف+لهذا+الحساب+❌");
+        exit;
+    }
+    if ($employee_link_id > 0) {
+        $emp_company_cond = (db_table_has_column($conn, 'employees', 'company_id') && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
+        $emp_chk  = mysqli_query($conn, "SELECT id FROM employees WHERE id = $employee_link_id $emp_company_cond LIMIT 1");
+        $link_chk = mysqli_query($conn, "SELECT id FROM users WHERE employee_id = $employee_link_id AND id != $userId AND COALESCE(is_deleted,0)=0 LIMIT 1");
+        if (!$emp_chk || mysqli_num_rows($emp_chk) === 0 || ($link_chk && mysqli_num_rows($link_chk) > 0)) {
+            header("Location: project_users.php?msg=الموظف+غير+صالح+أو+مرتبط+بحساب+آخر+❌");
+            exit;
+        }
+    }
+    $sql_employee = $users_has_employee_id ? ", employee_id = '$employee_link_id'" : "";
+
     // تحقق من تكرار اسم المستخدم (ما عدا المستخدم الحالي)
     $check_query = "SELECT id FROM users WHERE username = '$username' AND id != $userId AND COALESCE(is_deleted,0)=0";
     if ($users_has_company_id) {
@@ -170,12 +199,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
     // تحديث المستخدم
     $passwordUpdate = '';
-    if (!empty($password)) {
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    if ($passwordRaw !== '') {
+        $hashedPassword = mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_DEFAULT));
         $passwordUpdate = ", password = '$hashedPassword'";
     }
 
-    $updateSQL = "UPDATE users SET name = '$name', username = '$username', phone = '$phone', role = '$role', updated_at = NOW() $passwordUpdate";
+    $updateSQL = "UPDATE users SET name = '$name', username = '$username', phone = '$phone', role = '$role', updated_at = NOW() $passwordUpdate $sql_employee";
     if ($users_has_company_id && $current_company_id > 0) {
         $updateSQL .= ", company_id = '$current_company_id'";
     }
@@ -200,12 +229,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
     }
     $name = mysqli_real_escape_string($conn, trim($_POST['name']));
     $username = mysqli_real_escape_string($conn, trim($_POST['username']));
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    // تُجزَّأ كلمة المرور الخام ثم يُهرَّب الـhash فقط (لا تُهرَّب قبل التجزئة — وإلا فشل الدخول مع الرموز الخاصة).
+    $passwordRaw = isset($_POST['password']) ? (string) $_POST['password'] : '';
+    $hashedPassword = mysqli_real_escape_string($conn, password_hash($passwordRaw, PASSWORD_DEFAULT));
     $phone = mysqli_real_escape_string($conn, trim($_POST['phone']));
     $role = mysqli_real_escape_string($conn, $_POST['role']);
+    // منع تصعيد الصلاحيات: الدور يجب أن يكون فعلاً من الأدوار الأبناء للمستخدم الحالي
+    // (تقييد القائمة في الواجهة وحده لا يكفي — يمكن تزوير الطلب).
+    $role_check_id = intval($_POST['role']);
+    $role_chk = mysqli_query($conn, "SELECT 1 FROM roles
+            WHERE id = $role_check_id
+            AND parent_role_id = " . intval($_SESSION['user']['role']) . "
+            AND (status = '1' OR status = 1) LIMIT 1");
+    if (!$role_chk || mysqli_num_rows($role_chk) === 0) {
+        header("Location: project_users.php?msg=صلاحية+غير+مسموحة+❌");
+        exit;
+    }
     $project = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
     $parent_id = intval($_SESSION['user']['id']);
+
+    // 🔗 ربط الموظف (إلزامي): لا يوجد حساب معاون يعمل بلا موظف مُسنَد.
+    $employee_link_id = ($users_has_employee_id && !empty($_POST['employee_id'])) ? intval($_POST['employee_id']) : 0;
+    if ($users_has_employee_id && $employee_link_id <= 0) {
+        header("Location: project_users.php?msg=يجب+إسناد+موظف+لهذا+الحساب+❌");
+        exit;
+    }
+    if ($employee_link_id > 0) {
+        $emp_company_cond = (db_table_has_column($conn, 'employees', 'company_id') && $current_company_id > 0) ? " AND company_id = $current_company_id" : "";
+        $emp_chk  = mysqli_query($conn, "SELECT id FROM employees WHERE id = $employee_link_id $emp_company_cond LIMIT 1");
+        $link_chk = mysqli_query($conn, "SELECT id FROM users WHERE employee_id = $employee_link_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
+        if (!$emp_chk || mysqli_num_rows($emp_chk) === 0 || ($link_chk && mysqli_num_rows($link_chk) > 0)) {
+            header("Location: project_users.php?msg=الموظف+غير+صالح+أو+مرتبط+بحساب+آخر+❌");
+            exit;
+        }
+    }
 
     // تحقق من تكرار اسم المستخدم
     $check_query = "SELECT id FROM users WHERE username = '$username' AND COALESCE(is_deleted,0)=0";
@@ -226,6 +283,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
         $insert_columns .= ", company_id";
         $insert_values .= ", '$current_company_id'";
     }
+    if ($users_has_employee_id) {
+        $insert_columns .= ", employee_id";
+        $insert_values .= ", '$employee_link_id'";
+    }
     $sql = "INSERT INTO users ($insert_columns) VALUES ($insert_values)";
 
     if (mysqli_query($conn, $sql)) {
@@ -234,6 +295,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
     } else {
         header("Location: project_users.php?msg=حدث+خطأ+أثناء+الإضافة+❌");
         exit;
+    }
+}
+
+// قائمة الموظفين المتاحين للربط (موظفو الشركة + معرّف الحساب المرتبط إن وُجد).
+$employees_for_link = array();
+$emp_name_by_id = array();
+if ($users_has_employee_id) {
+    $emp_has_company = db_table_has_column($conn, 'employees', 'company_id');
+    $emp_scope = ($emp_has_company && $current_company_id > 0) ? " WHERE e.company_id = $current_company_id" : "";
+    $emp_sql = "SELECT e.id, e.name, e.phone,
+                       (SELECT u2.id FROM users u2 WHERE u2.employee_id = e.id AND COALESCE(u2.is_deleted,0)=0 LIMIT 1) AS linked_uid
+                FROM employees e $emp_scope ORDER BY e.name ASC";
+    $emp_res = mysqli_query($conn, $emp_sql);
+    if ($emp_res) {
+        while ($er = mysqli_fetch_assoc($emp_res)) {
+            $employees_for_link[] = array(
+                'id'         => intval($er['id']),
+                'name'       => $er['name'],
+                'phone'      => $er['phone'],
+                'linked_uid' => ($er['linked_uid'] !== null) ? intval($er['linked_uid']) : 0,
+            );
+            $emp_name_by_id[intval($er['id'])] = $er['name'];
+        }
     }
 }
 
@@ -320,6 +404,23 @@ include('../insidebar.php');
                             ?>
                         </select>
                     </div>
+                    <?php if ($users_has_employee_id): ?>
+                    <div>
+                        <label><i class="fas fa-id-card-alt"></i> الموظف المُسنَد *</label>
+                        <select name="employee_id" id="employee_id_link" required>
+                            <option value="">— اختر الموظف —</option>
+                            <?php foreach ($employees_for_link as $emp): ?>
+                                <option value="<?= intval($emp['id']) ?>"
+                                    data-linked-uid="<?= intval($emp['linked_uid']) ?>"
+                                    data-name="<?= htmlspecialchars((string) $emp['name'], ENT_QUOTES, 'UTF-8') ?>"
+                                    data-phone="<?= htmlspecialchars((string) $emp['phone'], ENT_QUOTES, 'UTF-8') ?>">
+                                    <?= htmlspecialchars((string) $emp['name'], ENT_QUOTES, 'UTF-8') ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small class="pu-password-hint">إلزامي — لا حساب يعمل بلا موظف مُسنَد. تُعبّأ بيانات الموظف تلقائياً عند الاختيار.</small>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 <div class="pu-form-actions">
                     <button type="submit" class="btn-submit">
@@ -344,6 +445,7 @@ include('../insidebar.php');
                         <th>اسم المستخدم</th>
                         <th>رقم الهاتف</th>
                         <th>الصلاحية</th>
+                        <th>الموظف المرتبط</th>
                         <th>تاريخ الإنشاء</th>
                         <th>الإجراءات</th>
                     </tr>
@@ -356,7 +458,7 @@ include('../insidebar.php');
                     $userid = $_SESSION['user']['id'];
                     $currentRole = $_SESSION['user']['role'];
 
-                    $query = "SELECT DISTINCT u.id, u.name, u.username, u.phone, u.role, u.created_at, ro.name AS role_name
+                    $query = "SELECT DISTINCT u.id, u.name, u.username, u.phone, u.role, u.employee_id, u.created_at, ro.name AS role_name
                              FROM users u
                              LEFT JOIN roles ro ON ro.id = u.role
                                                   WHERE " . ($users_has_company_id ? "u.company_id = '$current_company_id' AND " : "") . "COALESCE(u.is_deleted,0)=0 AND (
@@ -384,6 +486,12 @@ include('../insidebar.php');
                         echo "<td><code class='pu-code'>" . htmlspecialchars($row['username']) . "</code></td>";
                         echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
                         echo "<td>" . $roleText . "</td>";
+                        $linked_emp_id = isset($row['employee_id']) ? intval($row['employee_id']) : 0;
+                        if ($linked_emp_id > 0 && isset($emp_name_by_id[$linked_emp_id])) {
+                            echo "<td><a class='client-name-link' href='../Employees/employee_profile.php?id=" . $linked_emp_id . "'><i class='fas fa-id-card-alt'></i> " . htmlspecialchars($emp_name_by_id[$linked_emp_id], ENT_QUOTES, 'UTF-8') . "</a></td>";
+                        } else {
+                            echo "<td><span class='pu-text-muted'>— غير مرتبط —</span></td>";
+                        }
                         echo "<td>" . $createdDate . "</td>";
 
                         $action_btns = "<td><div class='action-btns'>";
@@ -392,7 +500,7 @@ include('../insidebar.php');
                                        class='action-btn edit'
                                        onclick='editUser({$row['id']}, \"" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "\", \""
                                 . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "\", \""
-                                . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "\", {$row['role']})'
+                                . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "\", {$row['role']}, " . intval($row['employee_id']) . ")'
                                        title='تعديل'><i class='fas fa-edit'></i></a>";
                         }
                         if ($can_delete) {
@@ -468,6 +576,27 @@ include('../insidebar.php');
         const usernameFeedback = document.getElementById('usernameFeedback');
         let usernameValid = true;
 
+        // ===== ربط الموظف (إلزامي) =====
+        const employeeSelect = document.getElementById('employee_id_link');
+        function refreshEmployeeOptions(currentUid) {
+            if (!employeeSelect) return;
+            currentUid = String(currentUid || 0);
+            Array.from(employeeSelect.options).forEach(function (opt) {
+                if (!opt.value) return;
+                const linked = String(opt.dataset.linkedUid || '0');
+                opt.disabled = (linked !== '0' && linked !== currentUid);
+            });
+        }
+        if (employeeSelect) {
+            employeeSelect.addEventListener('change', function () {
+                const opt = this.options[this.selectedIndex];
+                if (opt && opt.value) {
+                    if (opt.dataset.name) document.getElementById('name').value = opt.dataset.name;
+                    if (opt.dataset.phone && opt.dataset.phone.trim() !== '') document.getElementById('phone').value = opt.dataset.phone;
+                }
+            });
+        }
+
         function setUsernameFeedback(state, message) {
             usernameFeedback.className = 'pu-username-feedback pu-feedback-' + state;
             usernameFeedback.innerHTML = message;
@@ -531,13 +660,19 @@ include('../insidebar.php');
         });
 
         // دالة تعديل المستخدم — تملأ الفورم ببيانات المستخدم المحدد
-        window.editUser = function (userId, name, username, phone, role) {
+        window.editUser = function (userId, name, username, phone, role, employeeId) {
             document.getElementById('user_id').value = userId;
             document.getElementById('name').value = name;
             document.getElementById('username').value = username;
             document.getElementById('phone').value = phone;
             document.getElementById('role').value = role;
             document.getElementById('password').value = '';
+
+            // ربط الموظف: أتح خيار الموظف الحالي ثم اضبط القيمة
+            if (employeeSelect) {
+                refreshEmployeeOptions(userId);
+                employeeSelect.value = (employeeId && parseInt(employeeId, 10) > 0) ? String(employeeId) : '';
+            }
 
             // تغيير نص الفورم والزر ليدل على التعديل
             document.getElementById('formTitle').textContent = 'تعديل المستخدم';
@@ -575,6 +710,8 @@ include('../insidebar.php');
             usernameFeedback.className = 'pu-username-feedback';
             usernameInput.classList.remove('pu-input-warn', 'pu-input-success', 'pu-input-error');
             usernameValid = true;
+
+            if (employeeSelect) { employeeSelect.value = ''; refreshEmployeeOptions(0); }
         };
 
     })();
