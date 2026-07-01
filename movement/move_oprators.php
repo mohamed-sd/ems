@@ -75,6 +75,13 @@ if (!$operations_has_shift_type) {
     $operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
 }
 
+// الساعات اليومية المستهدفة للآلية (مرجع المقارنة منفّذ/مستهدف) — ترحيل ذاتي محمي
+$operations_has_target = db_table_has_column($conn, 'operations', 'target_daily_hours');
+if (!$operations_has_target) {
+    mysqli_query($conn, "ALTER TABLE operations ADD COLUMN target_daily_hours DECIMAL(10,2) NULL DEFAULT NULL AFTER shift_hours");
+    $operations_has_target = db_table_has_column($conn, 'operations', 'target_daily_hours');
+}
+
 if (!$is_super_admin && !$operations_has_company) {
     die('لا يمكن تطبيق عزل الشركات في شاشة التشغيل لأن عمود company_id غير متاح في جدول operations.');
 }
@@ -449,6 +456,10 @@ function handle_save_operation(): void
     $shift_type_raw     = strtoupper(trim($_POST['shift_type'] ?? 'B'));
     $shift_type         = in_array($shift_type_raw, ['D', 'N', 'B'], true) ? $shift_type_raw : 'B';
     $status             = intval($_POST['status'] ?? 1);
+    // الهدف اليومي: قيمة المستخدم إن وُجدت، وإلا افتراضي (الاحتياطية=0، غيرها=ساعات الوردية×عدد الورديات)
+    $target_daily_hours = (isset($_POST['target_daily_hours']) && $_POST['target_daily_hours'] !== '')
+        ? floatval($_POST['target_daily_hours'])
+        : (($equipment_category === 'احتياطي') ? 0.0 : ($shift_hours * ($shift_type === 'B' ? 2 : 1)));
 
     // التحقق من الصلاحيات
     if ($operation_id > 0 && !$can_edit) {
@@ -503,16 +514,16 @@ function handle_save_operation(): void
                     equipment = ?, equipment_type = ?, equipment_category = ?,
                     contract_id = ?, supplier_id = ?,
                     start = ?, end = ?,
-                    total_equipment_hours = ?, shift_hours = ?,
+                    total_equipment_hours = ?, shift_hours = ?, target_daily_hours = ?,
                     shift_type = ?, status = ?
                  WHERE id = ? AND project_id = ? AND company_id = ?"
             );
             $stmt->bind_param(
-                'iisissddssiii i',
+                'iisiissdddsiiii',
                 $equipment, $equipment_type, $equipment_category,
                 $contract_id, $supplier_id,
                 $start, $end,
-                $total_equip_hours, $shift_hours,
+                $total_equip_hours, $shift_hours, $target_daily_hours,
                 $shift_type, $status,
                 $operation_id, $selected_project_id, $company_id
             );
@@ -522,16 +533,16 @@ function handle_save_operation(): void
                     equipment = ?, equipment_type = ?, equipment_category = ?,
                     contract_id = ?, supplier_id = ?,
                     start = ?, end = ?,
-                    total_equipment_hours = ?, shift_hours = ?,
+                    total_equipment_hours = ?, shift_hours = ?, target_daily_hours = ?,
                     shift_type = ?, status = ?
                  WHERE id = ? AND project_id = ?"
             );
             $stmt->bind_param(
-                'iisissddssii i',
+                'iisiissdddsiii',
                 $equipment, $equipment_type, $equipment_category,
                 $contract_id, $supplier_id,
                 $start, $end,
-                $total_equip_hours, $shift_hours,
+                $total_equip_hours, $shift_hours, $target_daily_hours,
                 $shift_type, $status,
                 $operation_id, $selected_project_id
             );
@@ -547,28 +558,28 @@ function handle_save_operation(): void
             "INSERT INTO operations
                 (equipment, equipment_type, equipment_category, project_id,
                  contract_id, supplier_id, start, end, days,
-                 total_equipment_hours, shift_hours, shift_type, status, company_id)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?)"
+                 total_equipment_hours, shift_hours, target_daily_hours, shift_type, status, company_id)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
-            'iiiiisssddssi',
+            'iisiiissdddsii',
             $equipment, $equipment_type, $equipment_category, $selected_project_id,
             $contract_id, $supplier_id, $start, $end,
-            $total_equip_hours, $shift_hours, $shift_type, $status, $company_id
+            $total_equip_hours, $shift_hours, $target_daily_hours, $shift_type, $status, $company_id
         );
     } else {
         $stmt = $conn->prepare(
             "INSERT INTO operations
                 (equipment, equipment_type, equipment_category, project_id,
                  contract_id, supplier_id, start, end, days,
-                 total_equipment_hours, shift_hours, shift_type, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)"
+                 total_equipment_hours, shift_hours, target_daily_hours, shift_type, status)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?)"
         );
         $stmt->bind_param(
-            'iiiiisssdds i',
+            'iisiiissdddsi',
             $equipment, $equipment_type, $equipment_category, $selected_project_id,
             $contract_id, $supplier_id, $start, $end,
-            $total_equip_hours, $shift_hours, $shift_type, $status
+            $total_equip_hours, $shift_hours, $target_daily_hours, $shift_type, $status
         );
     }
     $stmt->execute();
@@ -649,6 +660,7 @@ $operations_query = "
         o.days,
         o.total_equipment_hours,
         o.shift_hours,
+        o.target_daily_hours,
         o.shift_type,
         o.status,
         o.reason,
@@ -999,6 +1011,12 @@ function get_shift_info(string $code): array
                         </div>
 
                         <div>
+                            <label><i class="fa fa-bullseye"></i> الساعات اليومية المستهدفة <small style="color:#888">(تلقائي ويمكن تعديله)</small></label>
+                            <input type="number" name="target_daily_hours" id="target_daily_hours"
+                                   step="0.01" placeholder="الهدف اليومي للآلية" value="0" min="0">
+                        </div>
+
+                        <div>
                             <label><i class="fa fa-sync-alt"></i> نظام الوردية</label>
                             <select name="shift_type" id="shift_type" required>
                                 <option value="D">☀️ نهاري فقط</option>
@@ -1185,6 +1203,7 @@ function get_shift_info(string $code): array
                                        data-end="<?= htmlspecialchars($row['end'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                                        data-total-hours="<?= htmlspecialchars((string)($row['total_equipment_hours'] ?? '0'), ENT_QUOTES, 'UTF-8') ?>"
                                        data-shift-hours="<?= htmlspecialchars((string)($row['shift_hours'] ?? '0'), ENT_QUOTES, 'UTF-8') ?>"
+                                       data-target-hours="<?= htmlspecialchars((string)($row['target_daily_hours'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
                                        data-shift-type="<?= htmlspecialchars($shift_code, ENT_QUOTES, 'UTF-8') ?>"
                                        data-shift-type-label="<?= htmlspecialchars($shift_info['label'], ENT_QUOTES, 'UTF-8') ?>"
                                        data-category="<?= $category_display ?>"
@@ -1209,6 +1228,7 @@ function get_shift_info(string $code): array
                                        data-end="<?= htmlspecialchars($row['end'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                                        data-total-hours="<?= htmlspecialchars((string)($row['total_equipment_hours'] ?? '0'), ENT_QUOTES, 'UTF-8') ?>"
                                        data-shift-hours="<?= htmlspecialchars((string)($row['shift_hours'] ?? '0'), ENT_QUOTES, 'UTF-8') ?>"
+                                       data-target-hours="<?= htmlspecialchars((string)($row['target_daily_hours'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
                                        data-shift-type="<?= htmlspecialchars($shift_code, ENT_QUOTES, 'UTF-8') ?>"
                                        data-status="<?= $status_value ?>"
                                        title="تعديل">
@@ -1396,6 +1416,8 @@ function resetForm() {
     document.getElementById('end_date').value         = '';
     document.getElementById('total_equipment_hours').value = '0';
     document.getElementById('shift_hours').value      = '0';
+    var _tdh = document.getElementById('target_daily_hours');
+    if (_tdh) _tdh.value = '0';
     document.getElementById('shift_type').value       = 'B';
     document.getElementById('status').value           = '1';
     document.getElementById('equipment_category').value = '';
@@ -1541,6 +1563,19 @@ $(document).ready(function () {
         $('#service_reason').val('');
     });
 
+    // اقتراح تلقائي للهدف اليومي: ساعات الوردية × عدد الورديات (الاحتياطية=0)، ما لم يُدخِل المستخدم قيمة غير صفرية
+    function emsSuggestTargetDaily() {
+        var $t = $('#target_daily_hours');
+        if (!$t.length) return;
+        var cur = String($t.val() || '').trim();
+        if (cur !== '' && cur !== '0' && parseFloat(cur) !== 0) return;
+        var sh = parseFloat($('#shift_hours').val()) || 0;
+        var st = $('#shift_type').val() || 'B';
+        var cat = String($('#equipment_category').val() || '');
+        $t.val((cat === 'احتياطي') ? 0 : (sh * (st === 'B' ? 2 : 1)));
+    }
+    $(document).on('input change', '#shift_hours, #shift_type, #equipment_category', emsSuggestTargetDaily);
+
     /* ── زر التعديل — async/await بدلاً من Callback Hell ── */
     $(document).on('click', '.editOperationBtn', async function () {
         const btn = $(this);
@@ -1558,6 +1593,7 @@ $(document).ready(function () {
         $('#end_date').val(btn.data('end'));
         $('#total_equipment_hours').val(btn.data('total-hours'));
         $('#shift_hours').val(btn.data('shift-hours'));
+        $('#target_daily_hours').val(btn.data('target-hours'));
         $('#shift_type').val(btn.data('shift-type') || 'B');
         $('#status').val(btn.data('status'));
         $('#equipment_category').val(btn.data('equipment-category'));

@@ -16,6 +16,7 @@ function moduleColumnExists($conn, $column_name) {
 
 $module_has_icon_column = moduleColumnExists($conn, 'icon');
 $module_has_display_order_column = moduleColumnExists($conn, 'display_order');
+$module_has_is_quick_column = moduleColumnExists($conn, 'is_quick');
 $default_module_icon = 'fa fa-link';
 $common_sidebar_icons = array(
     array('class' => 'fa fa-link', 'label' => 'رابط عام'),
@@ -61,6 +62,9 @@ if (isset($_GET['edit_id'])) {
     }
     if ($module_has_display_order_column) {
         $select_columns .= ", `display_order`";
+    }
+    if ($module_has_is_quick_column) {
+        $select_columns .= ", `is_quick`";
     }
     $stmt = $conn->prepare("SELECT " . $select_columns . " FROM `modules` WHERE id = ?");
     $stmt->bind_param("i", $id);
@@ -150,6 +154,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (!isset($error_msg) && $stmt->execute()) {
+            // is_quick (عمود اختياري): يُحدَّث بعد الحفظ الأساسي حتى لا نمسّ فروع الاستعلامات القائمة
+            if ($module_has_is_quick_column) {
+                $is_quick = (isset($_POST['is_quick']) && $_POST['is_quick'] == '1') ? 1 : 0;
+                $target_id = !empty($_POST['edit_id']) ? (int) $_POST['edit_id'] : (int) $conn->insert_id;
+                if ($target_id > 0 && ($uq = $conn->prepare("UPDATE `modules` SET `is_quick` = ? WHERE `id` = ?"))) {
+                    $uq->bind_param("ii", $is_quick, $target_id);
+                    $uq->execute();
+                    $uq->close();
+                }
+            }
             header("Location: modules.php?msg=تم+البحفاظ+على+البيانات+بنجاح+✔");
             exit;
         } elseif (!isset($error_msg)) {
@@ -425,10 +439,19 @@ input[type="radio"] {
 
                     <!-- رابط -->
                     <div style="display: flex; align-items: center; padding-top: 1.5rem;">
-                        <input type="checkbox" name="is_link" id="is_link" value="1" 
+                        <input type="checkbox" name="is_link" id="is_link" value="1"
                                <?= (!empty($editData) && $editData['is_link'] == 1) ? 'checked' : ''; ?> />
                         <label for="is_link" style="margin: 0; margin-right: 8px; cursor: pointer;">
                             <i class="fas fa-link"></i> رابط
+                        </label>
+                    </div>
+
+                    <!-- الوصول السريع -->
+                    <div style="display: flex; align-items: center; padding-top: 1.5rem;">
+                        <input type="checkbox" name="is_quick" id="is_quick" value="1"
+                               <?= (!empty($editData) && isset($editData['is_quick']) && $editData['is_quick'] == 1) ? 'checked' : ''; ?> />
+                        <label for="is_quick" style="margin: 0; margin-right: 8px; cursor: pointer;">
+                            <i class="fas fa-bolt"></i> يظهر في الوصول السريع
                         </label>
                     </div>
 
@@ -532,6 +555,7 @@ input[type="radio"] {
                             <th width="150"><i class="fas fa-code"></i> الكود</th>
                             <th><i class="fas fa-user-tie"></i> الدور المسؤول</th>
                             <th width="80"><i class="fas fa-link"></i> رابط</th>
+                            <th width="90"><i class="fas fa-bolt"></i> وصول سريع</th>
                             <th width="150"><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
@@ -544,6 +568,9 @@ input[type="radio"] {
                         }
                         if ($module_has_icon_column) {
                             $select_cols .= ", m.`icon`";
+                        }
+                        if ($module_has_is_quick_column) {
+                            $select_cols .= ", m.`is_quick`";
                         }
                         $result = $conn->query("
                             SELECT 
@@ -599,6 +626,17 @@ input[type="radio"] {
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center">
+                                        <?php if (isset($row['is_quick']) && $row['is_quick'] == 1): ?>
+                                            <span style="display: inline-block; background: var(--gold-soft, #fff4d6); color: #b8860b; padding: 4px 8px; border-radius: 4px; font-weight: 600;">
+                                                <i class="fas fa-bolt"></i> نعم
+                                            </span>
+                                        <?php else: ?>
+                                            <span style="display: inline-block; background: #f0f0f0; color: #999; padding: 4px 8px; border-radius: 4px; font-weight: 600;">
+                                                ✖ لا
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-center">
                                         <a href="?edit_id=<?= $row['id']; ?>&action=edit" class="btn btn-sm btn-primary" title="تعديل">
                                             <i class="fas fa-edit"></i>
                                         </a>
@@ -630,7 +668,7 @@ $(document).ready(function () {
         },
         order: [[1, 'asc']], // الترتيب الافتراضي حسب عمود الترتيب
         columnDefs: [
-            { "orderable": false, "targets": [7] } // منع ترتيب عمود الإجراءات
+            { "orderable": false, "targets": [8] } // منع ترتيب عمود الإجراءات (تحرّك بعد إضافة عمود الوصول السريع)
         ]
     });
 

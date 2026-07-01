@@ -42,6 +42,10 @@ if (mysqli_num_rows($contract_result) == 0) {
 $contract = mysqli_fetch_assoc($contract_result);
 $project_id = intval($contract['project_id']);
 
+// أساس احتساب الهدف: أيام العقد الفعلية. الهدف اليومي = نصيب الآلية ÷ الأيام، والشهري = اليومي × 30.
+// استخدام الأيام الفعلية أدقّ من تقريب الأشهر ويتجنّب تشويه العقود الأقصر من شهر.
+$dur_days = intval($contract['contract_duration_days']);
+
 if ($is_role10) {
     $user_project_id = isset($_SESSION['user']['project_id']) ? intval($_SESSION['user']['project_id']) : 0;
     if ($user_project_id > 0 && $project_id !== $user_project_id) {
@@ -78,6 +82,7 @@ $suppliers_result = mysqli_query($conn, $suppliers_query);
 $suppliers = [];
 $total_supplier_hours = 0;
 $total_supplier_equipment = 0;
+$total_contract_primary = 0; // إجمالي الآليات الأساسية في العقد (المقسوم عليه للهدف العام)
 
 if ($suppliers_result) {
     while ($row = mysqli_fetch_assoc($suppliers_result)) {
@@ -122,6 +127,13 @@ if ($suppliers_result) {
             $remaining = $contracted_count - $added_count;
             $overage = $added_count > $contracted_count ? ($added_count - $contracted_count) : 0;
 
+            // الهدف التقريبي للآلية: ساعات النوع ÷ أساسيات النوع (الاحتياطية هدفها صفر) ثم اشتقاق الشهري واليومي
+            $primary_n = intval($equip['total_basic'] ?? 0);
+            $type_hours = floatval($equip['total_hours']);
+            $per_primary_total = $primary_n > 0 ? $type_hours / $primary_n : 0;
+            $per_primary_daily = ($per_primary_total > 0 && $dur_days > 0) ? $per_primary_total / $dur_days : 0;
+            $per_primary_monthly = $per_primary_daily * 30;
+
             $equipment_breakdown[] = [
                 'type' => $equip['type_name'] ?: 'غير محدد',
                 'type_id' => $equip_type_id,
@@ -129,6 +141,9 @@ if ($suppliers_result) {
                 'count_basic' => intval($equip['total_basic'] ?? 0),
                 'count_backup' => intval($equip['total_backup'] ?? 0),
                 'hours' => floatval($equip['total_hours']),
+                'hours_per_primary' => round($per_primary_total, 1),
+                'monthly_per_primary' => round($per_primary_monthly, 1),
+                'daily_per_primary' => round($per_primary_daily, 1),
                 'added_count' => $added_count,
                 'remaining' => $remaining,
                 'overage' => $overage,
@@ -196,8 +211,15 @@ if ($suppliers_result) {
         ];
         $total_supplier_hours += floatval($row['forecasted_contracted_hours']);
         $total_supplier_equipment += $equipment_count;
+        $total_contract_primary += intval($row['equipment_count_basic']);
     }
 }
+
+// الهدف العام التقريبي للآلية على مستوى العقد = إجمالي ساعات العقد ÷ إجمالي الأساسيات
+$overall_total_hours = floatval($contract['forecasted_contracted_hours']);
+$overall_per_primary_total = $total_contract_primary > 0 ? $overall_total_hours / $total_contract_primary : 0;
+$overall_per_primary_daily = ($overall_per_primary_total > 0 && $dur_days > 0) ? $overall_per_primary_total / $dur_days : 0;
+$overall_per_primary_monthly = $overall_per_primary_daily * 30;
 
 $response = [
     'success' => true,
@@ -206,7 +228,11 @@ $response = [
         'duration' => $contract['contract_duration_months'] . ' شهر',
         'total_hours' => floatval($contract['forecasted_contracted_hours']),
         'equipment_count' => $active_equipment_count,
-        'project_name' => $contract['project_name']
+        'project_name' => $contract['project_name'],
+        'total_primary' => $total_contract_primary,
+        'target_per_primary_total' => round($overall_per_primary_total, 1),
+        'target_per_primary_monthly' => round($overall_per_primary_monthly, 1),
+        'target_per_primary_daily' => round($overall_per_primary_daily, 1)
     ],
     'suppliers' => $suppliers,
     'summary' => [

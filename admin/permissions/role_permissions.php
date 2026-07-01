@@ -171,10 +171,33 @@ function get_assigned_modules($conn, $role_id) {
 // جلب البيانات
 $selected_role_id = isset($_GET['role_id']) ? (int)$_GET['role_id'] : null;
 
-$roles_result = $conn->query("SELECT id, name FROM roles WHERE status = 1 ORDER BY name");
+$roles_result = $conn->query("SELECT id, name, parent_role_id FROM roles WHERE status = 1 ORDER BY name");
 $roles = [];
 while ($role = $roles_result->fetch_assoc()) {
     $roles[] = $role;
+}
+
+// فصل الأدوار الأساسية (بلا أب) عن المشرفين التابعين لكل دور — لبناء قائمتين متتاليتين
+$base_roles = [];
+$role_by_id = [];
+foreach ($roles as $role) {
+    $role_by_id[(int)$role['id']] = $role;
+    if ($role['parent_role_id'] === null) {
+        $base_roles[] = $role;
+    }
+}
+
+// تحديد الدور الأساسي المختار والمشرف المختار (إن كان المحدد مشرفاً تابعاً)
+$selected_base_id  = null;
+$selected_child_id = null;
+if ($selected_role_id && isset($role_by_id[$selected_role_id])) {
+    $sr = $role_by_id[$selected_role_id];
+    if ($sr['parent_role_id'] === null) {
+        $selected_base_id = (int)$selected_role_id;
+    } else {
+        $selected_base_id  = (int)$sr['parent_role_id'];
+        $selected_child_id = (int)$selected_role_id;
+    }
 }
 
 $modules = [];
@@ -514,18 +537,27 @@ require_once __DIR__ . '/../includes/layout_head.php';
         </div>
         <div class="card-body-custom">
             <div class="filters-section">
-                <form method="GET">
+                <form method="GET" id="roleFilterForm">
+                    <!-- الدور الفعّال المُرسَل للخادم = المشرف المختار إن وُجد، وإلا الدور الأساسي نفسه -->
+                    <input type="hidden" name="role_id" id="effectiveRoleId" value="<?php echo $selected_role_id ? (int)$selected_role_id : ''; ?>">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                         <div>
-                            <label class="form-label">الدور</label>
-                            <select name="role_id" class="form-select" onchange="this.form.submit()">
-                                <option value="">-- اختر الدور --</option>
-                                <?php foreach ($roles as $role): ?>
-                                    <option value="<?php echo $role['id']; ?>" 
-                                        <?php echo ($selected_role_id == $role['id']) ? 'selected' : ''; ?>>
+                            <label class="form-label"><i class="fas fa-layer-group"></i> الدور الأساسي</label>
+                            <select id="baseRoleSelect" class="form-select">
+                                <option value="">-- اختر الدور الأساسي --</option>
+                                <?php foreach ($base_roles as $role): ?>
+                                    <option value="<?php echo (int)$role['id']; ?>"
+                                        <?php echo ($selected_base_id === (int)$role['id']) ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($role['name']); ?>
                                     </option>
                                 <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label"><i class="fas fa-user-shield"></i> المشرف التابع
+                                <span style="font-weight:400;color:#777;">(اختياري)</span></label>
+                            <select id="childRoleSelect" class="form-select">
+                                <!-- تُملأ ديناميكياً حسب الدور الأساسي المختار -->
                             </select>
                         </div>
                     </div>
@@ -636,7 +668,52 @@ require_once __DIR__ . '/../includes/layout_head.php';
 <script src="../../includes/js/jquery-3.7.1.main.js"></script>
 <script>
 $(document).ready(function () {
-    // يمكن إضافة تحسينات إضافية هنا
+    // قائمتان متتاليتان: الدور الأساسي ← المشرفون التابعون له
+    var rolesData = <?php echo json_encode($roles, JSON_UNESCAPED_UNICODE); ?>;
+    var $base   = $('#baseRoleSelect');
+    var $child  = $('#childRoleSelect');
+    var $roleId = $('#effectiveRoleId');
+    var $form   = $('#roleFilterForm');
+
+    // يملأ قائمة المشرفين بناءً على الدور الأساسي المختار
+    function populateChildren(baseId, selectedChildId) {
+        $child.empty();
+        $child.append($('<option>', { value: '', text: '— إدارة الدور الأساسي نفسه —' }));
+        var count = 0;
+        if (baseId !== '' && baseId != null) {
+            rolesData.forEach(function (r) {
+                if (r.parent_role_id != null && String(r.parent_role_id) === String(baseId)) {
+                    var opt = $('<option>', { value: r.id, text: r.name });
+                    if (String(selectedChildId) === String(r.id)) opt.prop('selected', true);
+                    $child.append(opt);
+                    count++;
+                }
+            });
+        }
+        $child.prop('disabled', baseId === '' || baseId == null);
+        // تلميح عند عدم وجود مشرفين تابعين
+        if (count === 0 && baseId !== '' && baseId != null) {
+            $child.find('option[value=""]').text('— لا مشرفين تابعين: إدارة الدور الأساسي —');
+        }
+    }
+
+    // التهيئة الأولية حسب الاختيار الحالي (المخدوم من الخادم)
+    populateChildren($base.val(), '<?php echo $selected_child_id ? (int)$selected_child_id : ''; ?>');
+
+    // تغيير الدور الأساسي: يعيد بناء قائمة المشرفين ويحمّل صلاحيات الدور الأساسي مباشرة
+    $base.on('change', function () {
+        var b = $(this).val();
+        populateChildren(b, '');
+        $roleId.val(b);
+        $form.submit();
+    });
+
+    // تغيير المشرف: يحمّل صلاحيات المشرف، أو الدور الأساسي إن اختير «الدور الأساسي نفسه»
+    $child.on('change', function () {
+        var c = $(this).val();
+        $roleId.val(c !== '' ? c : ($base.val() || ''));
+        $form.submit();
+    });
 });
 </script>
 

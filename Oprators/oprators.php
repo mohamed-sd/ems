@@ -33,6 +33,13 @@ if (!$operations_has_shift_type) {
     $operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
 }
 
+// الساعات اليومية المستهدفة للآلية (مرجع المقارنة منفّذ/مستهدف) — ترحيل ذاتي محمي
+$operations_has_target = db_table_has_column($conn, 'operations', 'target_daily_hours');
+if (!$operations_has_target) {
+    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN target_daily_hours DECIMAL(10,2) NULL DEFAULT NULL AFTER shift_hours");
+    $operations_has_target = db_table_has_column($conn, 'operations', 'target_daily_hours');
+}
+
 // الحالة التشغيلية (تعمل/جاهزة/معطلة) تُدار من صفحة الحركة. هنا نقرؤها فقط لتصنيف جدول «المتعطلة».
 $operations_has_op_state = db_table_has_column($conn, 'operations', 'op_state');
 if (!$operations_has_op_state) {
@@ -743,6 +750,12 @@ include('../insidebar.php');
                             </div>
 
                             <div>
+                                <label><i class="fa fa-bullseye"></i> الساعات اليومية المستهدفة <small style="color:#888">(تلقائي ويمكن تعديله)</small></label>
+                                <input type="number" name="target_daily_hours" id="target_daily_hours" step="0.01"
+                                    placeholder="الهدف اليومي للآلية" value="0" />
+                            </div>
+
+                            <div>
                                 <label><i class="fa fa-sync-alt"></i> نظام الوردية</label>
                                 <select name="shift_type" id="shift_type" required>
                                     <option value="D">نهاري فقط</option>
@@ -779,7 +792,7 @@ include('../insidebar.php');
         <div id="contractStats" class="contract-stats is-hidden">
             <h5 class="stats-title">
                 <i class="fas fa-chart-line"></i>
-                إحصائيات عقد المنجم
+                إحصائيات عقد المشروع
             </h5>
 
             <div id="suppliersSection" class="suppliers-section">
@@ -832,6 +845,24 @@ include('../insidebar.php');
                     <div class="stat-card-icon"><i class="fas fa-cogs"></i></div>
                     <div class="stat-card-value" id="stat_equipment_count">0</div>
                     <div class="stat-card-label">عدد المعدات المشغلة</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-icon"><i class="fas fa-bullseye"></i></div>
+                    <div class="stat-card-value" id="stat_target_per_primary">0</div>
+                    <div class="stat-card-label">الهدف التقريبي للآلية (كلي)</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="stat-card-value" id="stat_target_monthly">0</div>
+                    <div class="stat-card-label">الهدف الشهري التقريبي للآلية</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-icon"><i class="fas fa-sun"></i></div>
+                    <div class="stat-card-value" id="stat_target_daily">0</div>
+                    <div class="stat-card-label">الهدف اليومي التقريبي للآلية</div>
                 </div>
             </div>
         </div>
@@ -889,6 +920,12 @@ include('../insidebar.php');
                                 $allowed_shift_types = array('D', 'N', 'B');
                                 $shift_type = in_array($shift_type_raw, $allowed_shift_types, true) ? $shift_type_raw : 'B';
                                 $shift_type_escaped = mysqli_real_escape_string($conn, $shift_type);
+                                // الهدف اليومي: قيمة المستخدم إن وُجدت، وإلا افتراضي (الاحتياطية=0، غيرها=ساعات الوردية×عدد الورديات)
+                                if (isset($_POST['target_daily_hours']) && $_POST['target_daily_hours'] !== '') {
+                                    $target_daily_hours = floatval($_POST['target_daily_hours']);
+                                } else {
+                                    $target_daily_hours = ($equipment_category === 'احتياطي') ? 0.0 : ($shift_hours * ($shift_type === 'B' ? 2 : 1));
+                                }
                                 $status = intval($_POST['status']);
 
                                 // التحقق من عدم وجود سجل ساري آخر لنفس المعدة
@@ -916,6 +953,7 @@ include('../insidebar.php');
                                     days = '$hours',
                                     total_equipment_hours = '$total_equipment_hours',
                                     shift_hours = '$shift_hours',
+                                    target_daily_hours = '$target_daily_hours',
                                     shift_type = '$shift_type_escaped',
                                     status = '$status_escaped'
                                         WHERE id = $operation_id AND project_id = '$project_id'$operations_company_scope";
@@ -925,8 +963,8 @@ include('../insidebar.php');
                                     // إضافة سجل جديد
                                     $insert_company_col = (!$is_super_admin && $operations_has_company) ? ", company_id" : "";
                                     $insert_company_val = (!$is_super_admin && $operations_has_company) ? ", '$company_id'" : "";
-                                     mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, shift_type, status$insert_company_col)
-                                         VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$shift_type_escaped', '$status_escaped'$insert_company_val)");
+                                     mysqli_query($conn, "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, target_daily_hours, shift_type, status$insert_company_col)
+                                         VALUES ('$equipment', '$equipment_type', '$equipment_category', '$project_id', '$contract_id', '$supplier_id', '$start', '$end', '$hours', '$total_equipment_hours', '$shift_hours', '$target_daily_hours', '$shift_type_escaped', '$status_escaped'$insert_company_val)");
                                     // سجل «إضافة لمشروع» في سجل تحركات الآلية.
                                     $new_op_id = intval(mysqli_insert_id($conn));
                                     if ($new_op_id > 0) {
@@ -944,7 +982,7 @@ include('../insidebar.php');
 
                             $op_state_col = $operations_has_op_state ? "o.op_state" : "'جاهزة' AS op_state";
                             $query = "SELECT o.id, o.equipment, o.equipment_type, o.equipment_category, $op_state_col, o.contract_id, o.supplier_id,
-                             o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.shift_type, o.status, o.reason,
+                             o.start, o.end, o.days, o.total_equipment_hours, o.shift_hours, o.target_daily_hours, o.shift_type, o.status, o.reason,
                              e.code AS equipment_code, e.name AS equipment_name, e.type AS equipment_type_id,
                              et.type AS equipment_type_name,
                              p.name AS project_name, s.name AS suppliers_name,
@@ -1044,6 +1082,7 @@ include('../insidebar.php');
                                                                  data-end='" . $row['end'] . "'
                                                                  data-total-hours='" . $row['total_equipment_hours'] . "'
                                                                  data-shift-hours='" . $row['shift_hours'] . "'
+                                                                 data-target-hours='" . ($row['target_daily_hours'] ?? '') . "'
                                                                  data-shift-type='" . htmlspecialchars($row['shift_type'] ?? 'B', ENT_QUOTES) . "'
                                                                  data-shift-type-label='" . htmlspecialchars($shift_type_label, ENT_QUOTES) . "'
                                                                  data-category='" . htmlspecialchars($row['equipment_category'], ENT_QUOTES) . "'
@@ -1062,6 +1101,7 @@ include('../insidebar.php');
                                                                  data-end='" . $row['end'] . "'
                                                                  data-total-hours='" . $row['total_equipment_hours'] . "'
                                                                  data-shift-hours='" . $row['shift_hours'] . "'
+                                                                 data-target-hours='" . ($row['target_daily_hours'] ?? '') . "'
                                                                 data-shift-type='" . htmlspecialchars($row['shift_type'] ?? 'B', ENT_QUOTES) . "'
                                                                  data-status='" . $row['status'] . "'
                                                                  title='تعديل'><i class='fa fa-edit'></i></a>" : "") . "
@@ -1275,6 +1315,9 @@ include('../insidebar.php');
                     if (totalEquipmentHours) totalEquipmentHours.value = '0';
                     if (shiftHours) shiftHours.value = '0';
                     if (shiftType) shiftType.value = 'B';
+                    var targetDailyEl = document.getElementById('target_daily_hours');
+                    if (targetDailyEl) targetDailyEl.value = '0';
+                    window.emsTargetDirty = false; // فورم إضافة جديد: فعّل الاقتراح التلقائي
                     if (status) status.value = '1';
 
                     form.classList.add('allforms-visible');
@@ -1372,6 +1415,9 @@ include('../insidebar.php');
                     $("#suppliersTableBody").html("<tr><td colspan='9' class='suppliers-empty'><i class='fas fa-info-circle'></i> لا توجد بيانات</td></tr>");
                     $("#stat_total_hours").text("0");
                     $("#stat_equipment_count").text("0");
+                    $("#stat_target_per_primary").text("0");
+                    $("#stat_target_monthly").text("0");
+                    $("#stat_target_daily").text("0");
                     $("#total_supplier_hours").text("0");
                     $("#total_supplier_equipment").text("0");
                     $("#total_supplier_basic").text("0");
@@ -1389,6 +1435,9 @@ include('../insidebar.php');
                     $("#contractStats").show();
                     $("#stat_total_hours").text(parseFloat(response.contract.total_hours || 0).toLocaleString());
                     $("#stat_equipment_count").text(parseInt(response.contract.equipment_count || 0, 10).toLocaleString());
+                    $("#stat_target_per_primary").text(parseFloat(response.contract.target_per_primary_total || 0).toLocaleString());
+                    $("#stat_target_monthly").text(parseFloat(response.contract.target_per_primary_monthly || 0).toLocaleString());
+                    $("#stat_target_daily").text(parseFloat(response.contract.target_per_primary_daily || 0).toLocaleString());
 
                     if (response.suppliers && response.suppliers.length > 0) {
                         $("#suppliersSection").show();
@@ -1417,6 +1466,12 @@ include('../insidebar.php');
                                             ? '<span class="breakdown-count is-warning">تجاوز ' + Math.abs(remaining) + '</span> | '
                                             : '<span class="breakdown-count ' + (remaining === 0 ? 'is-active' : 'is-warning') + '">' + remaining + ' متبقي</span> | ') +
                                         '<i class="fas fa-clock"></i> ' + parseFloat(item.hours || 0).toLocaleString() + ' ساعة' +
+                                        (item.daily_per_primary > 0
+                                            ? ' | <span class="breakdown-target" title="مستهدف تقريبي إرشادي للآلية الأساسية"><i class="fas fa-bullseye"></i> هدف الآلية: '
+                                                + parseFloat(item.hours_per_primary || 0).toLocaleString() + ' س · شهري '
+                                                + parseFloat(item.monthly_per_primary || 0).toLocaleString() + ' · يومي '
+                                                + parseFloat(item.daily_per_primary || 0).toLocaleString() + '</span>'
+                                            : '') +
                                         '</div>';
                                 }).join('');
                             } else {
@@ -1564,6 +1619,22 @@ include('../insidebar.php');
                 });
 
                 // وظيفة التعديل
+                // اقتراح تلقائي للهدف اليومي: ساعات الوردية × عدد الورديات (الاحتياطية=0).
+                // يُعاد الحساب دائماً ما لم يكن المستخدم قد عدّل حقل الهدف يدوياً (window.emsTargetDirty)،
+                // حتى لا يتوقف الحساب على قيمة وسيطة أثناء كتابة ساعات الوردية رقماً رقماً.
+                function emsSuggestTargetDaily() {
+                    var $t = $('#target_daily_hours');
+                    if (!$t.length) return;
+                    if (window.emsTargetDirty) return;
+                    var sh = parseFloat($('#shift_hours').val()) || 0;
+                    var st = $('#shift_type').val() || 'B';
+                    var cat = String($('#equipment_category').val() || '');
+                    $t.val((cat === 'احتياطي') ? 0 : (sh * (st === 'B' ? 2 : 1)));
+                }
+                $(document).on('input change', '#shift_hours, #shift_type, #equipment_category', emsSuggestTargetDaily);
+                // تعديل المستخدم لحقل الهدف مباشرةً يوقف الاقتراح التلقائي (لا يُرفع العلم بالتعبئة البرمجية عبر .val())
+                $(document).on('input', '#target_daily_hours', function () { window.emsTargetDirty = true; });
+
                 $(document).on('click', '.editOperationBtn', function () {
                     var btn = $(this);
 
@@ -1582,6 +1653,8 @@ include('../insidebar.php');
                     $('#end_date').val(btn.data('end'));
                     $('#total_equipment_hours').val(btn.data('total-hours'));
                     $('#shift_hours').val(btn.data('shift-hours'));
+                    $('#target_daily_hours').val(btn.data('target-hours'));
+                    window.emsTargetDirty = true; // تعديل: احفظ القيمة المخزَّنة ولا تُعِد حسابها تلقائياً
                     $('#shift_type').val(btn.data('shift-type') || 'B');
                     $('#status').val(btn.data('status'));
                     $('#equipment_category').val(btn.data('equipment-category'));
@@ -1704,7 +1777,7 @@ include('../insidebar.php');
                         { label: 'المعدة', value: btn.data('equipment'), icon: 'fas fa-cogs', size: 'lg' },
                         { label: 'تصنيف المعدة', value: btn.data('equipment-type'), icon: 'fas fa-tools' },
                         { label: 'المورد', value: btn.data('supplier'), icon: 'fas fa-truck', size: 'lg' },
-                        { label: 'المنجم', value: btn.data('mine'), icon: 'fas fa-mountain' },
+                        { label: 'المشروع', value: btn.data('mine'), icon: 'fas fa-building' },
                         { label: 'تاريخ توقيع العقد', value: btn.data('contract'), icon: 'fas fa-file-contract' },
                         { label: 'السائقون', value: btn.data('drivers'), icon: 'fas fa-id-badge', size: 'lg' },
                         { label: 'فئة المعدة', value: btn.data('category'), icon: 'fas fa-check-circle' },
@@ -1712,6 +1785,7 @@ include('../insidebar.php');
                         { label: 'تاريخ النهاية', value: btn.data('end'), icon: 'fas fa-calendar-check' },
                         { label: 'ساعات العمل الكلية', value: btn.data('total-hours') || '0', icon: 'fas fa-clock' },
                         { label: 'ساعات الوردية', value: btn.data('shift-hours') || '0', icon: 'fas fa-hourglass-half' },
+                        { label: 'الساعات اليومية المستهدفة', value: (btn.data('target-hours') === '' || btn.data('target-hours') === undefined) ? '—' : btn.data('target-hours'), icon: 'fas fa-bullseye' },
                         { label: 'نظام الوردية', value: btn.data('shift-type-label'), icon: 'fas fa-sync-alt' },
                         { label: 'الحالة', icon: 'fas fa-toggle-on', type: 'html',
                           value: "<span class='status-pill " + statusClass + "'>" + statusLabel + "</span>" }

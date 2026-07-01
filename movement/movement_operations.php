@@ -41,6 +41,10 @@ if (!$operations_has_shift_type) {
     @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER shift_hours");
     $operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
 }
+// الساعات اليومية المستهدفة — ترحيل ذاتي محمي
+if (!db_table_has_column($conn, 'operations', 'target_daily_hours')) {
+    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN target_daily_hours DECIMAL(10,2) NULL DEFAULT NULL AFTER shift_hours");
+}
 if (!$equipment_drivers_has_shift_type) {
     @mysqli_query($conn, "ALTER TABLE equipment_drivers ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER end_date");
     $equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
@@ -356,6 +360,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $shift_hours = floatval($_POST['shift_hours'] ?? 0);
                 $status = intval($_POST['status'] ?? 1);
                 $status = ($status === 0) ? 0 : 1;
+                // الهدف اليومي: قيمة المستخدم إن وُجدت، وإلا افتراضي (الاحتياطية=0، غيرها=ساعات الوردية×عدد الورديات)
+                $target_daily_hours = (isset($_POST['target_daily_hours']) && $_POST['target_daily_hours'] !== '')
+                    ? floatval($_POST['target_daily_hours'])
+                    : (($equipment_category === 'احتياطي') ? 0.0 : ($shift_hours * ($shift_type === 'B' ? 2 : 1)));
 
                 $category_sql = mysqli_real_escape_string($conn, $equipment_category);
                 $shift_sql = mysqli_real_escape_string($conn, $shift_type);
@@ -365,8 +373,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $insert_company_col = (!$is_super_admin && $operations_has_company) ? ", company_id" : "";
                 $insert_company_val = (!$is_super_admin && $operations_has_company) ? ", $company_id" : "";
 
-                $insert_sql = "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, shift_type, status$insert_company_col)
-                               VALUES ($equipment, $equipment_type, '$category_sql', $selected_project_id, $contract_id, $supplier_id, '$start_sql', '$end_sql', 0, $total_equipment_hours, $shift_hours, '$shift_sql', $status$insert_company_val)";
+                $insert_sql = "INSERT INTO operations (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, days, total_equipment_hours, shift_hours, target_daily_hours, shift_type, status$insert_company_col)
+                               VALUES ($equipment, $equipment_type, '$category_sql', $selected_project_id, $contract_id, $supplier_id, '$start_sql', '$end_sql', 0, $total_equipment_hours, $shift_hours, $target_daily_hours, '$shift_sql', $status$insert_company_val)";
                 if (!mysqli_query($conn, $insert_sql)) {
                     throw new Exception('خطأ في إضافة التشغيل الجديد');
                 }
@@ -725,12 +733,23 @@ if ($drivers_has_project_id) {
     $driver_project_scope = " AND (d.project_id = $selected_project_id OR d.project_id IS NULL)";
 }
 
+// قائمة المرشّحين لإسناد قيادة المعدّة: موظفون مسجَّلون كسائقين/مشغّلين فقط — أي لهم سجلٌ
+// نشطٌ في equipment_operators (المرجع المعتمد، راجع Employees/equipment_operators.php:
+// «جميع السائقين موظفون وليس كل الموظفين سائقين»). حارس توافق رجعي: إن غاب الجدول نعود
+// لفلتر أنواع التشغيل القديم (employee_type) فلا تظهر القائمة فارغة.
+if (db_table_has_column($conn, 'equipment_operators', 'employee_id')) {
+    $eo_status_clause = db_table_has_column($conn, 'equipment_operators', 'status') ? " AND eo.status = 1" : "";
+    $driver_operator_filter = " AND EXISTS (SELECT 1 FROM equipment_operators eo WHERE eo.employee_id = d.id$eo_status_clause)";
+} else {
+    $driver_operator_filter = ems_operation_types_in_sql($conn, 'd');
+}
 $all_drivers_sql = "SELECT DISTINCT d.id, d.name, d.phone
                     FROM employees d
                     WHERE 1=1
                       $driver_company_scope
                       $driver_status_scope
-                      $driver_project_scope" . ems_operation_types_in_sql($conn, 'd') . "
+                      $driver_project_scope
+                      $driver_operator_filter
                     ORDER BY d.name ASC";
 $all_drivers_res = mysqli_query($conn, $all_drivers_sql);
 $all_drivers = [];

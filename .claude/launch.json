@@ -5,7 +5,8 @@
       "name": "ems",
       "runtimeExecutable": "C:\\wamp64\\bin\\php\\php8.3.28\\php.exe",
       "runtimeArgs": ["-S", "localhost:8765", "-t", "C:\\wamp64\\www"],
-      "port": 8765
+      "port": 8765,
+      "env": { "PHP_CLI_SERVER_WORKERS": "6" }
     }
   ]
 }

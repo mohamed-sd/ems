@@ -225,7 +225,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             </div>
             <div class="info-row">
                 <span class="info-label"><i class="fas fa-bullseye"></i> الهدف الشهري</span>
-                <span class="info-value"><?php echo $row['hours_monthly_target'] * 30; ?> ساعة</span>
+                <span class="info-value"><?php echo $row['hours_monthly_target']; ?> ساعة</span>
             </div>
             <div class="info-row">
                 <span class="info-label"><i class="fas fa-chart-line"></i> المتوقعة</span>

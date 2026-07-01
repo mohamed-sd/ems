@@ -466,6 +466,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         </div>
     </form>
 
+    <div class="filter">
+        <div class="filter-title">
+            <span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span>
+            فلاتر البحث
+        </div>
+        <div class="filter-body">
+            <div class="filter-field">
+                <label><i class="fa fa-user-shield"></i> الدور</label>
+                <select id="filterRole" class="form-control">
+                    <option value="">-- كل الأدوار --</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-toggle-on"></i> الحالة</label>
+                <select id="filterStatus" class="form-control">
+                    <option value="">-- كل الحالات --</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label><i class="fa fa-id-card-alt"></i> الارتباط بموظف</label>
+                <select id="filterLinked" class="form-control">
+                    <option value="">-- الكل --</option>
+                    <option value="linked">مرتبط بموظف</option>
+                    <option value="unlinked">غير مرتبط</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="button" id="usersFilterApply" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
+                <button type="button" id="usersFilterReset" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-body">
             <div class="users-table-actions-row">
@@ -753,6 +786,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             dom: 'Bfrtip',
             scrollX: true,
             autoWidth: false,
+            // الفلاتر الخارجية تُدار يدوياً؛ نُعطّل حفظ الحالة لتفادي استعادة بحثٍ محفوظ يُخفي الصفوف
+            stateSave: false,
             buttons: [
                 { extend: 'copy', text: '<i class="fas fa-copy"></i> نسخ', className: 'users-table-action' },
                 { extend: 'excel', text: '<i class="fas fa-file-excel"></i> Excel', className: 'users-table-action' },
@@ -766,6 +801,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         });
 
         usersTable.buttons().container().appendTo('#usersExportButtons');
+
+        /* =============================
+           فلاتر المستخدمين — نفس هوية/تصميم فلاتر شاشة العملاء
+           تقرأ نص الخلية مباشرةً لتجاوز شارات الـHTML (الدور/الحالة/الارتباط)
+        ============================== */
+        function fillUserFilter(columnIndex, selectId) {
+            const select = $(selectId);
+            const values = [];
+            usersTable.column(columnIndex).nodes().each(function (node) {
+                const text = $(node).text().trim();
+                if (text !== '' && values.indexOf(text) === -1) values.push(text);
+            });
+            values.sort(function (a, b) { return a.localeCompare(b, 'ar'); });
+            values.forEach(function (val) {
+                select.append('<option value="' + val.replace(/"/g, '&quot;') + '">' + val + '</option>');
+            });
+        }
+        fillUserFilter(5, '#filterRole');    // الدور
+        fillUserFilter(8, '#filterStatus');  // الحالة
+
+        $.fn.dataTable.ext.search.push(function (settings, rowData, dataIndex) {
+            // تطبيق على جدول المستخدمين فقط (دالة البحث عامة لكل الجداول)
+            if (settings.nTable !== usersTable.table().node()) return true;
+            const roleSel = $('#filterRole').val();
+            const statusSel = $('#filterStatus').val();
+            const linkedSel = $('#filterLinked').val();
+            if (roleSel && $(usersTable.cell(dataIndex, 5).node()).text().trim() !== roleSel) return false;
+            if (statusSel && $(usersTable.cell(dataIndex, 8).node()).text().trim() !== statusSel) return false;
+            if (linkedSel) {
+                const linkedText = $(usersTable.cell(dataIndex, 6).node()).text();
+                const isUnlinked = (linkedText.indexOf('غير مرتبط') !== -1) || (linkedText.trim() === '');
+                if (linkedSel === 'linked' && isUnlinked) return false;
+                if (linkedSel === 'unlinked' && !isUnlinked) return false;
+            }
+            return true;
+        });
+
+        $('#filterRole, #filterStatus, #filterLinked').on('change', function () { usersTable.draw(); });
+        $('#usersFilterApply').on('click', function () { usersTable.draw(); });
+        $('#usersFilterReset').on('click', function () {
+            $('#filterRole, #filterStatus, #filterLinked').val('');
+            usersTable.search('').draw();
+        });
 
         /* =============================
            تهيئة مسبقة عند القدوم من بطاقة الموظف (?employee_id=N)

@@ -82,70 +82,65 @@ include('../insidebar.php');
         include('../includes/page_header.php');
         ?>
 
-        <div class="card">
-            <div class="card-header">
-                <h5><i class="fas fa-filter"></i> فلاتر التقارير</h5>
+        <form method="GET" class="filter">
+            <div class="filter-title">
+                <span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span>
+                فلاتر التقارير
             </div>
-            <div class="card-body fc-filter-body">
-                <form method="GET" class="fc-filter-bar" style="margin-bottom: 0;">
-                    <div>
-                        <label class="fc-filter-label"><i class="fas fa-truck-loading"></i> المورد</label>
-                        <select name="supplier">
-                            <option value="">-- الكل --</option>
-                            <?php
-                            $sup = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE status = '1'$_supplier_company_where ORDER BY name");
-                            if ($sup) {
-                            while ($row = mysqli_fetch_assoc($sup)) {
-                                $selected = ($supplier_filter == $row['id']) ? "selected" : "";
-                                echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+            <div class="filter-body">
+                <div class="filter-field">
+                    <label><i class="fas fa-truck-loading"></i> المورد</label>
+                    <select name="supplier" class="form-control">
+                        <option value="">-- الكل --</option>
+                        <?php
+                        $sup = mysqli_query($conn, "SELECT id, name FROM suppliers WHERE status = '1'$_supplier_company_where ORDER BY name");
+                        if ($sup) {
+                        while ($row = mysqli_fetch_assoc($sup)) {
+                            $selected = ($supplier_filter == $row['id']) ? "selected" : "";
+                            echo "<option value='{$row['id']}' $selected>{$row['name']}</option>";
+                        }
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="filter-field">
+                    <label><i class="fas fa-project-diagram"></i> المشروع</label>
+                    <select name="project" id="projectSelect" class="form-control">
+                        <option value="">-- الكل --</option>
+                        <?php
+                        $prj = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name");
+                        if ($prj) {
+                        while ($row = mysqli_fetch_assoc($prj)) {
+                            $selected = ($project_filter == $row['id']) ? "selected" : "";
+                            echo "<option value='{$row['id']}' $selected>{$row['name']} ({$row['project_code']})</option>";
+                        }
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="filter-field">
+                    <label><i class="fas fa-file-contract"></i> العقد</label>
+                    <select name="contract" id="contractSelect" class="form-control">
+                        <option value="">-- الكل --</option>
+                        <?php
+                        if ($project_filter > 0) {
+                            $contracts = mysqli_query($conn, "SELECT id, contract_signing_date FROM contracts WHERE project_id = $project_filter AND status = 1 ORDER BY contract_signing_date DESC");
+                            if ($contracts) {
+                            while ($row = mysqli_fetch_assoc($contracts)) {
+                                $selected = ($contract_filter == $row['id']) ? "selected" : "";
+                                echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['contract_signing_date']}</option>";
                             }
                             }
-                            ?>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="fc-filter-label"><i class="fas fa-project-diagram"></i> المشروع</label>
-                        <select name="project" id="projectSelect">
-                            <option value="">-- الكل --</option>
-                            <?php
-                            $prj = mysqli_query($conn, "SELECT id, name, project_code FROM project WHERE status = '1' ORDER BY name");
-                            if ($prj) {
-                            while ($row = mysqli_fetch_assoc($prj)) {
-                                $selected = ($project_filter == $row['id']) ? "selected" : "";
-                                echo "<option value='{$row['id']}' $selected>{$row['name']} ({$row['project_code']})</option>";
-                            }
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="fc-filter-label"><i class="fas fa-file-contract"></i> العقد</label>
-                        <select name="contract" id="contractSelect">
-                            <option value="">-- الكل --</option>
-                            <?php
-                            if ($project_filter > 0) {
-                                $contracts = mysqli_query($conn, "SELECT id, contract_signing_date FROM contracts WHERE project_id = $project_filter AND status = 1 ORDER BY contract_signing_date DESC");
-                                if ($contracts) {
-                                while ($row = mysqli_fetch_assoc($contracts)) {
-                                    $selected = ($contract_filter == $row['id']) ? "selected" : "";
-                                    echo "<option value='{$row['id']}' $selected>عقد #{$row['id']} - {$row['contract_signing_date']}</option>";
-                                }
-                                }
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="fc-filter-actions" style="gap: 10px;">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-filter"></i> تطبيق الفلتر
-                        </button>
-                        <a href="reports.php" class="btn btn-secondary">
-                            <i class="fa fa-redo"></i> إعادة تعيين
-                        </a>
-                    </div>
-                </form>
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
+                    <a href="reports.php" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></a>
+                </div>
             </div>
-        </div>
+        </form>
 
         <div class="card">
             <div class="card-header">

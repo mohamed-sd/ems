@@ -140,11 +140,9 @@
     color: var(--gray-500); border-radius: var(--radius-sm); transition: transform .18s ease, background .15s ease;
 }
 .client-tree-page .cnode-row:hover .cnode-arrow { background: var(--gray-200); }
-.client-tree-page .lvl-supplier .cnode-arrow i,
-.client-tree-page .lvl-equip .cnode-arrow i { transition: transform .18s ease; }
+/* السهم يدور موحّداً لكل المستويات: ◄ مغلق ← ▼ مفتوح (نفس سلوك المورد/الآلية) */
+.client-tree-page .cnode-arrow i { transition: transform .18s ease; }
 .client-tree-page .cnode.open > .cnode-row .cnode-arrow i { transform: rotate(-90deg); }
-.client-tree-page .lvl-client.open > .cnode-row .cnode-arrow i,
-.client-tree-page .lvl-project.open > .cnode-row .cnode-arrow i { transform: none; }
 
 .client-tree-page .cnode-ico { color: var(--brand-black); width: 18px; text-align: center; }
 .client-tree-page .lvl-client .cnode-ico { color: var(--ct-accent-strong); }
@@ -177,9 +175,9 @@
     font-size: var(--text-body); padding: 2px 12px;
 }
 
-/* شريط توزيع الحصص (نسبة المورّد من ساعات المشروع) */
+/* شريط نسبة الإنجاز من العقد — يمتد بعرض الكارد كاملاً (عنصر مباشر في .cnode-row) */
 .client-tree-page .cnode-bar {
-    flex-basis: 100%; height: 6px; background: var(--gray-200);
+    flex-basis: 100%; width: 100%; height: 6px; background: var(--gray-200);
     border-radius: var(--radius-pill); overflow: hidden; margin-top: var(--space-1);
 }
 .client-tree-page .cnode-bar > span {
@@ -216,7 +214,7 @@
 .client-tree-page .cleaf.none { color: var(--gray-500); font-style: italic; background: var(--white); }
 .client-tree-page .cleaf-shift { font-size: var(--text-body-lg); }
 .client-tree-page .cleaf-code { font-size: var(--text-caption); color: var(--gray-700); font-family: var(--font-mono); background: var(--gray-100); border-radius: var(--radius-sm); padding: 1px 6px; }
-.client-tree-page .cleaf-phone { font-size: var(--text-caption); color: var(--gray-500); margin-inline-start: auto; }
+.client-tree-page .cleaf-phone { font-size: var(--text-caption); color: var(--gray-500); }
 
 /* حالات فارغة */
 .client-tree-page .ctree-empty {

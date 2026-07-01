@@ -231,7 +231,7 @@ include('../insidebar.php');
           <div class="totals">
             <div class="kpi">
               <div class="v" id="kpi_month_total">0</div>
-              <div class="t">الساعات اليومية المطلوبة</div>
+              <div class="t">الهدف الشهري للساعات</div>
               <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
             </div>
             <div class="kpi">
@@ -241,7 +241,7 @@ include('../insidebar.php');
             </div>
             <div class="kpi">
               <div class="v" id="kpi_equip_month">0</div>
-              <div class="t">معدات × ساعات لليوم</div>
+              <div class="t">الساعات اليومية المطلوبة</div>
             </div>
           </div>
         </div>
@@ -851,8 +851,11 @@ include('../insidebar.php');
                 $interval = $start_date->diff($end_date);
                 // توحيد المنطق مع الواجهة: الفرق الفعلي بين التاريخين بدون إضافة يوم إضافي
                 $contract_duration_days = $interval->days;
+                // ملء مدة العقد بالأشهر (نفس صيغة معالج التجديد) لتفادي صفر/القسمة على صفر في التقارير
+                $contract_duration_months = ($interval->y * 12) + $interval->m;
               } else {
                 $contract_duration_days = 0;
+                $contract_duration_months = 0;
               }
 
               $transportation = $_POST['transportation'];
@@ -894,6 +897,7 @@ include('../insidebar.php');
             contract_signing_date='$contract_signing_date',
             grace_period_days='$grace_period_days',
             contract_duration_days='$contract_duration_days',
+            contract_duration_months='$contract_duration_months',
             equip_shifts_contract='$equip_shifts_contract',
             shift_contract='$shift_contract',
             equip_total_contract_daily='$equip_total_contract_daily',
@@ -925,14 +929,14 @@ include('../insidebar.php');
                 $contract_insert_col = ($contracts_has_company && $contract_insert_company_id > 0) ? ", company_id" : "";
                 $contract_insert_val = ($contracts_has_company && $contract_insert_company_id > 0) ? ", '$contract_insert_company_id'" : "";
                 $sql = "INSERT INTO contracts (
-            contract_signing_date, project_id, grace_period_days, contract_duration_days,
+            contract_signing_date, project_id, grace_period_days, contract_duration_days, contract_duration_months,
             equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
             actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
             hours_monthly_target, forecasted_contracted_hours,
             daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two,
             price_currency_contract, paid_contract, payment_time, guarantees, payment_date$contract_insert_col
         ) VALUES (
-            '$contract_signing_date', '$posted_project_id','$grace_period_days', '$contract_duration_days',
+            '$contract_signing_date', '$posted_project_id','$grace_period_days', '$contract_duration_days', '$contract_duration_months',
             '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
             '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
             '$hours_monthly_target','$forecasted_contracted_hours',
@@ -1547,7 +1551,7 @@ include('../insidebar.php');
       const contractTotal = totalEquipContract;
 
       fields.kpiEquipMonth.textContent = fmt(totalEquipMonth);
-      fields.kpiMonthTotal.textContent = fmt(monthTotal);
+      fields.kpiMonthTotal.textContent = fmt(totalMonthlyUnits);
       fields.kpiContractTotal.textContent = fmt(contractTotal);
 
       fields.hoursMonthlyTarget.value = totalMonthlyUnits;

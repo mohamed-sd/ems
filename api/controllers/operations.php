@@ -233,31 +233,36 @@ function operations_create(): void
     $status = (api_int('status', 1) === 0) ? 0 : 1;
     $days = '0';
     $reason = '';
+    // الهدف اليومي: قيمة الطلب إن كانت موجبة، وإلا افتراضي (الاحتياطية=0، غيرها=ساعات الوردية×عدد الورديات)
+    $target_daily_hours = api_float('target_daily_hours');
+    if ($target_daily_hours <= 0) {
+        $target_daily_hours = ($equipment_category === 'احتياطي') ? 0.0 : ($shift_hours * ($shift_type === 'B' ? 2 : 1));
+    }
 
     $useCompany = (!$ctx['is_super'] && $scope['ops_has_company']);
     $companyId = intval($ctx['company_id']);
 
     if ($useCompany) {
         $sql = 'INSERT INTO operations
-                (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, reason, days, total_equipment_hours, shift_hours, shift_type, status, company_id)
+                (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, reason, days, total_equipment_hours, shift_hours, target_daily_hours, shift_type, status, company_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param(
+            $stmt,
+            'iisiiissssdddsii',
+            $equipment, $equipment_type, $equipment_category, $projectId, $contract_id, $supplier_id,
+            $start, $end, $reason, $days, $total_equipment_hours, $shift_hours, $target_daily_hours, $shift_type, $status, $companyId
+        );
+    } else {
+        $sql = 'INSERT INTO operations
+                (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, reason, days, total_equipment_hours, shift_hours, target_daily_hours, shift_type, status)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param(
             $stmt,
-            'iisiiissssddsii',
+            'iisiiissssdddsi',
             $equipment, $equipment_type, $equipment_category, $projectId, $contract_id, $supplier_id,
-            $start, $end, $reason, $days, $total_equipment_hours, $shift_hours, $shift_type, $status, $companyId
-        );
-    } else {
-        $sql = 'INSERT INTO operations
-                (equipment, equipment_type, equipment_category, project_id, contract_id, supplier_id, start, end, reason, days, total_equipment_hours, shift_hours, shift_type, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param(
-            $stmt,
-            'iisiiissssddsi',
-            $equipment, $equipment_type, $equipment_category, $projectId, $contract_id, $supplier_id,
-            $start, $end, $reason, $days, $total_equipment_hours, $shift_hours, $shift_type, $status
+            $start, $end, $reason, $days, $total_equipment_hours, $shift_hours, $target_daily_hours, $shift_type, $status
         );
     }
 

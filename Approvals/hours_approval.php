@@ -458,64 +458,62 @@ include '../insidebar.php';
   </div>
 
   <!-- ── شريط الفلاتر المتقدمة ── -->
-  <div class="filters-bar" id="main-filters-bar">
-    <div style="font-size:.8rem;font-weight:700;color:#0B1E3F;flex-basis:100%;margin-bottom:6px;">
-      <i class="fa fa-filter me-1"></i> فلاتر البحث المتقدمة
+  <div class="filter" id="main-filters-bar">
+    <div class="filter-title">
+      <span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span>
+      فلاتر البحث المتقدمة
     </div>
+    <div class="filter-body">
+      <div class="filter-field">
+        <label for="filter-project"><i class="fa fa-project-diagram me-1"></i>المشروع</label>
+        <select id="filter-project" class="form-control">
+          <option value="">— كل المشاريع —</option>
+          <?php foreach ($filter_projects as $fp_val): ?>
+          <option value="<?= htmlspecialchars($fp_val) ?>"><?= htmlspecialchars($fp_val) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
 
-    <div class="filter-group">
-      <label for="filter-project"><i class="fa fa-project-diagram me-1"></i>المشروع</label>
-      <select id="filter-project">
-        <option value="">— كل المشاريع —</option>
-        <?php foreach ($filter_projects as $fp_val): ?>
-        <option value="<?= htmlspecialchars($fp_val) ?>"><?= htmlspecialchars($fp_val) ?></option>
-        <?php endforeach; ?>
-      </select>
+      <div class="filter-field">
+        <label for="filter-supplier"><i class="fa fa-truck me-1"></i>المورد</label>
+        <select id="filter-supplier" class="form-control">
+          <option value="">— كل الموردين —</option>
+          <?php foreach ($filter_suppliers as $fs_val): ?>
+          <option value="<?= htmlspecialchars($fs_val) ?>"><?= htmlspecialchars($fs_val) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label for="filter-driver"><i class="fa fa-user-hard-hat me-1"></i>المشغل</label>
+        <select id="filter-driver" class="form-control">
+          <option value="">— كل المشغلين —</option>
+          <?php foreach ($filter_drivers as $fd_val): ?>
+          <option value="<?= htmlspecialchars($fd_val) ?>"><?= htmlspecialchars($fd_val) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label for="filter-equip"><i class="fa fa-cogs me-1"></i>الآلية</label>
+        <select id="filter-equip" class="form-control">
+          <option value="">— كل الآليات —</option>
+          <?php foreach ($filter_equips as $fe_val): ?>
+          <option value="<?= htmlspecialchars($fe_val) ?>"><?= htmlspecialchars($fe_val) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" class="btn-ok" onclick="applyFilters()"><i class="fa fa-search"></i> تطبيق</button>
+        <button type="button" class="btn-reset" title="إعادة تعيين" onclick="resetFilters()"><i class="fa fa-rotate-left"></i></button>
+      </div>
+
+      <span class="active-filters-info" id="active-filters-info" style="flex-basis:100%;">
+        <i class="fa fa-check-circle me-1"></i>
+        <span id="active-filters-text"></span>
+      </span>
     </div>
-
-    <div class="filter-group">
-      <label for="filter-supplier"><i class="fa fa-truck me-1"></i>المورد</label>
-      <select id="filter-supplier">
-        <option value="">— كل الموردين —</option>
-        <?php foreach ($filter_suppliers as $fs_val): ?>
-        <option value="<?= htmlspecialchars($fs_val) ?>"><?= htmlspecialchars($fs_val) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="filter-driver"><i class="fa fa-user-hard-hat me-1"></i>المشغل</label>
-      <select id="filter-driver">
-        <option value="">— كل المشغلين —</option>
-        <?php foreach ($filter_drivers as $fd_val): ?>
-        <option value="<?= htmlspecialchars($fd_val) ?>"><?= htmlspecialchars($fd_val) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="filter-equip"><i class="fa fa-cogs me-1"></i>الآلية</label>
-      <select id="filter-equip">
-        <option value="">— كل الآليات —</option>
-        <?php foreach ($filter_equips as $fe_val): ?>
-        <option value="<?= htmlspecialchars($fe_val) ?>"><?= htmlspecialchars($fe_val) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-
-    <div class="filter-actions">
-      <button class="btn-filter-apply" onclick="applyFilters()">
-        <i class="fa fa-search"></i> تطبيق
-      </button>
-      <button class="btn-filter-reset" onclick="resetFilters()">
-        <i class="fa fa-rotate-left"></i> إلغاء
-      </button>
-    </div>
-
-    <span class="active-filters-info" id="active-filters-info">
-      <i class="fa fa-check-circle me-1"></i>
-      <span id="active-filters-text"></span>
-    </span>
   </div>
 
   <!-- ══════════════════════════════════════════════════════════

@@ -121,8 +121,23 @@ if ($projectId > 0) {
 }
 
 $dynamicLinks = getDynamicNavLinks($conn, $role);
+
+// روابط «الوصول السريع» = فقط الصفحات المؤشَّرة بـ is_quick (تُضبط من admin/permissions/modules.php).
+// دفاعياً: إن لم يوجد العمود (قواعد قديمة) نُبقي السلوك السابق (كل روابط الدور).
+$dashHasIsQuick = dashboard_has_column($conn, 'modules', 'is_quick');
+$dashQuickIds = [];
+if ($dashHasIsQuick) {
+  if ($qr = $conn->query("SELECT id FROM modules WHERE is_quick = 1")) {
+    while ($qq = $qr->fetch_assoc()) {
+      $dashQuickIds[(int) $qq['id']] = true;
+    }
+  }
+}
 $links = [];
 foreach ($dynamicLinks as $l) {
+  if ($dashHasIsQuick && empty($dashQuickIds[(int) ($l['id'] ?? 0)])) {
+    continue; // ليست ضمن الوصول السريع
+  }
   $links[] = [
     '../' . $l['code'],
     $l['name'],

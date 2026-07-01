@@ -325,7 +325,7 @@ include('../insidebar.php');
           <div class="totals">
             <div class="kpi">
               <div class="v" id="kpi_month_total">0</div>
-              <div class="t">الساعات اليومية المطلوبة</div>
+              <div class="t">الهدف الشهري للساعات</div>
               <input type="hidden" name="hours_monthly_target" id="hours_monthly_target" value="0" />
             </div>
             <div class="kpi">
@@ -335,7 +335,7 @@ include('../insidebar.php');
             </div>
             <div class="kpi">
               <div class="v" id="kpi_equip_month">0</div>
-              <div class="t">معدات × ساعات لليوم</div>
+              <div class="t">الساعات اليومية المطلوبة</div>
             </div>
           </div>
 
@@ -894,8 +894,11 @@ include('../insidebar.php');
               $interval = $start_date->diff($end_date);
               // توحيد المنطق مع الواجهة: الفرق الفعلي بدون إضافة يوم إضافي
               $contract_duration_days = $interval->days;
+              // ملء مدة العقد بالأشهر (نفس صيغة معالج التجديد) لتفادي صفر/القسمة على صفر
+              $contract_duration_months = ($interval->y * 12) + $interval->m;
             } else {
               $contract_duration_days = 0;
+              $contract_duration_months = 0;
             }
 
             $transportation = mysqli_real_escape_string($conn, $_POST['transportation']);
@@ -940,6 +943,7 @@ include('../insidebar.php');
             contract_signing_date='$contract_signing_date',
             grace_period_days='$grace_period_days',
             contract_duration_days='$contract_duration_days',
+            contract_duration_months='$contract_duration_months',
             equip_shifts_contract='$equip_shifts_contract',
             shift_contract='$shift_contract',
             equip_total_contract_daily='$equip_total_contract_daily',
@@ -964,17 +968,17 @@ include('../insidebar.php');
             payment_time='$payment_time',
             guarantees='$guarantees',
             payment_date='$payment_date'
-          WHERE sc.id=$id AND sc.supplier_id=$supplier_id AND $supplier_contract_scope_sql";
+          WHERE sc.id=$id AND sc.supplier_id=$supplier_id_post AND $supplier_contract_scope_sql";
             } else {
               // إضافة
-              $insert_columns = "supplier_id, project_id, project_contract_id, contract_signing_date, grace_period_days, contract_duration_days,
+              $insert_columns = "supplier_id, project_id, project_contract_id, contract_signing_date, grace_period_days, contract_duration_days, contract_duration_months,
             equip_shifts_contract, shift_contract, equip_total_contract_daily, total_contract_permonth, total_contract_units,
             actual_start, actual_end, transportation, accommodation, place_for_living, workshop,
             hours_monthly_target, forecasted_contracted_hours,
             daily_work_hours, daily_operators, first_party, second_party, witness_one, witness_two,
             price_currency_contract, paid_contract, payment_time, guarantees, payment_date";
 
-              $insert_values = "'$supplier_id_post', '$project_id', '$project_contract_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days',
+              $insert_values = "'$supplier_id_post', '$project_id', '$project_contract_id', '$contract_signing_date', '$grace_period_days', '$contract_duration_days', '$contract_duration_months',
             '$equip_shifts_contract', '$shift_contract', '$equip_total_contract_daily', '$total_contract_permonth', '$total_contract_units',
             '$actual_start','$actual_end', '$transportation','$accommodation','$place_for_living','$workshop',
             '$hours_monthly_target','$forecasted_contracted_hours',
@@ -1049,7 +1053,7 @@ include('../insidebar.php');
                                  FROM suppliercontractequipments sce
                                  JOIN supplierscontracts sc ON sc.id = sce.contract_id
                                  WHERE sce.contract_id = $contract_id
-                                   AND sc.supplier_id = $supplier_id
+                                   AND sc.supplier_id = $supplier_id_post
                                    AND $supplier_contract_scope_sql";
                 mysqli_query($conn, $delete_sql);
 
@@ -1650,12 +1654,14 @@ include('../insidebar.php');
 
     const monthTotal = totalEquipMonth;
     const contractTotal = totalEquipContract;
+    // الهدف الشهري = إجمالي الساعات اليومية للأسطول × 30 (وحدة شهرية متّسقة مع اسم العمود والتقارير)
+    const monthlyTotal = monthTotal * 30;
 
     fields.kpiEquipMonth.textContent = fmt(totalEquipMonth);
-    fields.kpiMonthTotal.textContent = fmt(monthTotal);
+    fields.kpiMonthTotal.textContent = fmt(monthlyTotal);
     fields.kpiContractTotal.textContent = fmt(contractTotal);
 
-    fields.hoursMonthlyTarget.value = monthTotal;
+    fields.hoursMonthlyTarget.value = monthlyTotal;
     fields.forecastedContractedHours.value = contractTotal;
   }
 
