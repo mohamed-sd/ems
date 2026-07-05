@@ -27522,3 +27522,43 @@ Stack trace:
 [01-Jul-2026 19:37:42 UTC] PHP Warning:  include(): Failed opening '../config.php' for inclusion (include_path='.;C:\php\pear') in C:\wamp64\www\ems\admin\permissions\modules.php on line 9
 [01-Jul-2026 19:37:42 UTC] PHP Stack trace:
 [01-Jul-2026 19:37:42 UTC] PHP   1. {main}() C:\wamp64\www\ems\admin\permissions\modules.php:0
+[05-Jul-2026 13:56:05 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\wamp64\www\ems\main\users.php on line 576
+[05-Jul-2026 13:56:05 UTC] PHP Stack trace:
+[05-Jul-2026 13:56:05 UTC] PHP   1. {main}() C:\wamp64\www\ems\main\users.php:0
+[05-Jul-2026 13:56:05 UTC] PHP   2. htmlspecialchars($string = NULL, $flags = 3, $encoding = 'UTF-8') C:\wamp64\www\ems\main\users.php:576
+[05-Jul-2026 13:56:05 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\wamp64\www\ems\main\users.php on line 597
+[05-Jul-2026 13:56:05 UTC] PHP Stack trace:
+[05-Jul-2026 13:56:05 UTC] PHP   1. {main}() C:\wamp64\www\ems\main\users.php:0
+[05-Jul-2026 13:56:05 UTC] PHP   2. htmlspecialchars($string = NULL, $flags = 3, $encoding = 'UTF-8') C:\wamp64\www\ems\main\users.php:597
+[05-Jul-2026 13:56:19 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\wamp64\www\ems\main\users.php on line 576
+[05-Jul-2026 13:56:19 UTC] PHP Stack trace:
+[05-Jul-2026 13:56:19 UTC] PHP   1. {main}() C:\wamp64\www\ems\main\users.php:0
+[05-Jul-2026 13:56:19 UTC] PHP   2. htmlspecialchars($string = NULL, $flags = 3, $encoding = 'UTF-8') C:\wamp64\www\ems\main\users.php:576
+[05-Jul-2026 13:56:19 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\wamp64\www\ems\main\users.php on line 597
+[05-Jul-2026 13:56:19 UTC] PHP Stack trace:
+[05-Jul-2026 13:56:19 UTC] PHP   1. {main}() C:\wamp64\www\ems\main\users.php:0
+[05-Jul-2026 13:56:19 UTC] PHP   2. htmlspecialchars($string = NULL, $flags = 3, $encoding = 'UTF-8') C:\wamp64\www\ems\main\users.php:597
+[05-Jul-2026 13:56:27 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\wamp64\www\ems\main\users.php on line 576
+[05-Jul-2026 13:56:27 UTC] PHP Stack trace:
+[05-Jul-2026 13:56:27 UTC] PHP   1. {main}() C:\wamp64\www\ems\main\users.php:0
+[05-Jul-2026 13:56:27 UTC] PHP   2. htmlspecialchars($string = NULL, $flags = 3, $encoding = 'UTF-8') C:\wamp64\www\ems\main\users.php:576
+[05-Jul-2026 13:56:27 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\wamp64\www\ems\main\users.php on line 597
+[05-Jul-2026 13:56:27 UTC] PHP Stack trace:
+[05-Jul-2026 13:56:27 UTC] PHP   1. {main}() C:\wamp64\www\ems\main\users.php:0
+[05-Jul-2026 13:56:27 UTC] PHP   2. htmlspecialchars($string = NULL, $flags = 3, $encoding = 'UTF-8') C:\wamp64\www\ems\main\users.php:597
+[05-Jul-2026 13:57:22 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\wamp64\www\ems\main\users.php on line 576
+[05-Jul-2026 13:57:22 UTC] PHP Stack trace:
+[05-Jul-2026 13:57:22 UTC] PHP   1. {main}() C:\wamp64\www\ems\main\users.php:0
+[05-Jul-2026 13:57:22 UTC] PHP   2. htmlspecialchars($string = NULL, $flags = 3, $encoding = 'UTF-8') C:\wamp64\www\ems\main\users.php:576
+[05-Jul-2026 13:57:22 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\wamp64\www\ems\main\users.php on line 597
+[05-Jul-2026 13:57:22 UTC] PHP Stack trace:
+[05-Jul-2026 13:57:22 UTC] PHP   1. {main}() C:\wamp64\www\ems\main\users.php:0
+[05-Jul-2026 13:57:22 UTC] PHP   2. htmlspecialchars($string = NULL, $flags = 3, $encoding = 'UTF-8') C:\wamp64\www\ems\main\users.php:597
+[05-Jul-2026 13:57:46 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\wamp64\www\ems\main\users.php on line 576
+[05-Jul-2026 13:57:46 UTC] PHP Stack trace:
+[05-Jul-2026 13:57:46 UTC] PHP   1. {main}() C:\wamp64\www\ems\main\users.php:0
+[05-Jul-2026 13:57:46 UTC] PHP   2. htmlspecialchars($string = NULL, $flags = 3, $encoding = 'UTF-8') C:\wamp64\www\ems\main\users.php:576
+[05-Jul-2026 13:57:46 UTC] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\wamp64\www\ems\main\users.php on line 597
+[05-Jul-2026 13:57:46 UTC] PHP Stack trace:
+[05-Jul-2026 13:57:46 UTC] PHP   1. {main}() C:\wamp64\www\ems\main\users.php:0
+[05-Jul-2026 13:57:46 UTC] PHP   2. htmlspecialchars($string = NULL, $flags = 3, $encoding = 'UTF-8') C:\wamp64\www\ems\main\users.php:597

@@ -1,0 +1,201 @@
+<?php
+/**
+ * Finance/tax_fin.php — الضرائب / القيمة المضافة (fin_tax_codes + fin_tax_transactions).
+ * ضريبة مخرجات (مبيعات) − ضريبة مدخلات (مشتريات) = صافي الضريبة المستحقة. مبلغ الضريبة عمود مولّد.
+ * شاشة مستقلة — عزل شركة + حذف ناعم. لا FK للخارج.
+ */
+session_start();
+if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
+include '../config.php';
+include '../includes/permissions_helper.php';
+require_once __DIR__ . '/fin_helpers.php';
+
+$ctx = fin_ctx();
+$is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
+if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+
+$perms = fin_page_perms($conn, 'Finance/tax_fin.php', $is_super_admin);
+$can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
+if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الضرائب+❌"); exit(); }
+$company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
+$tax_types = array('output' => 'مخرجات (مبيعات)', 'input' => 'مدخلات (مشتريات)', 'both' => 'كلاهما');
+
+// ── حفظ رمز ضريبة ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tax_code'])) {
+    if (!$can_add) { header("Location: tax_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    $code = trim($_POST['tax_code'] ?? ''); $name = trim($_POST['tax_name'] ?? '');
+    $rate = round(floatval($_POST['rate'] ?? 0), 2);
+    $type = isset($tax_types[$_POST['tax_type'] ?? '']) ? $_POST['tax_type'] : 'both';
+    if ($code === '' || $name === '') { header("Location: tax_fin.php?msg=بيانات+الرمز+غير+مكتملة+❌"); exit(); }
+    $sql = "INSERT INTO fin_tax_codes (company_id, code, name, rate, tax_type, created_by) VALUES (?,?,?,?,?,?)";
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+        mysqli_stmt_bind_param($stmt, 'issdsi', $company_id, $code, $name, $rate, $type, $current_user_id);
+        mysqli_stmt_execute($stmt);
+        if (mysqli_errno($conn) === 1062) { mysqli_stmt_close($stmt); header("Location: tax_fin.php?msg=رمز+الضريبة+مكرر+❌"); exit(); }
+        mysqli_stmt_close($stmt);
+    }
+    header("Location: tax_fin.php?msg=تمت+إضافة+رمز+الضريبة+✅"); exit();
+}
+
+// ── حفظ حركة ضريبية ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
+    if (!$can_add) { header("Location: tax_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    $dir = ($_POST['direction'] ?? '') === 'input' ? 'input' : 'output';
+    $tcid = intval($_POST['tax_code_id'] ?? 0) ?: null;
+    $base = round(floatval($_POST['base_amount'] ?? 0), 2);
+    $rate = round(floatval($_POST['tax_rate'] ?? 0), 2);
+    $ref = trim($_POST['source_ref'] ?? '');
+    $period = trim($_POST['period_ref'] ?? '') ?: date('Y-m');
+    if ($base <= 0) { header("Location: tax_fin.php?msg=الوعاء+غير+صحيح+❌"); exit(); }
+    $sql = "INSERT INTO fin_tax_transactions (company_id, tax_code_id, direction, base_amount, tax_rate, source_ref, period_ref, created_by)
+            VALUES (?,?,?,?,?,?,?,?)";
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+        mysqli_stmt_bind_param($stmt, 'iisddssi', $company_id, $tcid, $dir, $base, $rate, $ref, $period, $current_user_id);
+        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    }
+    header("Location: tax_fin.php?msg=تمت+إضافة+الحركة+الضريبية+✅"); exit();
+}
+
+if (isset($_GET['del_code'])) {
+    if (!$can_delete) { header("Location: tax_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    $d = intval($_GET['del_code']);
+    mysqli_query($conn, "UPDATE fin_tax_codes SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    header("Location: tax_fin.php?msg=تم+حذف+الرمز+✅"); exit();
+}
+if (isset($_GET['del_tx'])) {
+    if (!$can_delete) { header("Location: tax_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    $d = intval($_GET['del_tx']);
+    mysqli_query($conn, "UPDATE fin_tax_transactions SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    header("Location: tax_fin.php?msg=تم+حذف+الحركة+✅"); exit();
+}
+
+// إقرار الضريبة للفترة المختارة (افتراضي: الشهر الحالي)
+$sel_period = isset($_GET['period']) && preg_match('/^\d{4}-\d{2}$/', $_GET['period']) ? $_GET['period'] : date('Y-m');
+$pw = $is_super_admin ? "company_id > 0" : "company_id = " . intval($company_id);
+$out_tax = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(tax_amount),0) v FROM fin_tax_transactions WHERE $pw AND COALESCE(is_deleted,0)=0 AND direction='output' AND period_ref='$sel_period'")->fetch_assoc()['v'] ?? 0);
+$in_tax  = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(tax_amount),0) v FROM fin_tax_transactions WHERE $pw AND COALESCE(is_deleted,0)=0 AND direction='input' AND period_ref='$sel_period'")->fetch_assoc()['v'] ?? 0);
+$net_tax = $out_tax - $in_tax;
+
+$page_title = 'إيكوبيشن | الضرائب';
+include '../inheader.php';
+include '../insidebar.php';
+?>
+<div class="main fin-tax-main ems-unified-page-shell">
+    <?php
+    $header_title = 'الضرائب / القيمة المضافة'; $header_icon = 'fa fa-percent';
+    $header_actions = array();
+    if ($can_add) {
+        $header_actions[] = array('id' => 'toggleCode', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'رمز ضريبة');
+        $header_actions[] = array('id' => 'toggleTx', 'class' => 'add-btn', 'icon' => 'fas fa-receipt', 'label' => 'حركة ضريبية');
+    }
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
+    <?php fin_msg_banner(); ?>
+
+    <!-- إقرار الضريبة -->
+    <div class="card"><div class="card-body">
+        <form method="get" style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+            <strong><i class="fas fa-file-invoice"></i> إقرار الضريبة للفترة:</strong>
+            <input type="month" name="period" value="<?php echo htmlspecialchars($sel_period); ?>" onchange="this.form.submit()">
+        </form>
+        <div class="form-grid">
+            <div class="card" style="text-align:center"><div class="card-body">
+                <div class="text-muted">ضريبة المخرجات (مبيعات)</div>
+                <div style="font-size:22px;font-weight:700;margin:6px 0"><?php echo number_format($out_tax, 2); ?></div>
+            </div></div>
+            <div class="card" style="text-align:center"><div class="card-body">
+                <div class="text-muted">ضريبة المدخلات (مشتريات)</div>
+                <div style="font-size:22px;font-weight:700;margin:6px 0">(<?php echo number_format($in_tax, 2); ?>)</div>
+            </div></div>
+            <div class="card" style="text-align:center"><div class="card-body">
+                <div class="text-muted"><?php echo $net_tax >= 0 ? 'صافي الضريبة المستحقة للسداد' : 'رصيد ضريبي قابل للاسترداد'; ?></div>
+                <div style="font-size:22px;font-weight:700;margin:6px 0"><span class="badge badge-<?php echo $net_tax >= 0 ? 'danger' : 'success'; ?>"><?php echo number_format(abs($net_tax), 2); ?></span></div>
+            </div></div>
+        </div>
+    </div></div>
+
+    <!-- فورم رمز -->
+    <form id="codeForm" action="" method="post" class="allforms">
+        <div class="card-header"><h5><i class="fas fa-percent"></i> رمز ضريبة</h5></div>
+        <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
+            <div class="form-group"><label>الكود <span class="required">*</span></label><input type="text" name="tax_code" required placeholder="VAT15"></div>
+            <div class="form-group"><label>الاسم <span class="required">*</span></label><input type="text" name="tax_name" required></div>
+            <div class="form-group"><label>النسبة %</label><input type="number" step="0.01" name="rate" value="15"></div>
+            <div class="form-group"><label>النوع</label><select name="tax_type"><?php foreach ($tax_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+        </div></div>
+        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-cancel" onclick="$('#codeForm').removeClass('allforms-visible')">إلغاء</button></div>
+        </div></div>
+    </form>
+
+    <!-- فورم حركة -->
+    <form id="txForm" action="" method="post" class="allforms">
+        <div class="card-header"><h5><i class="fas fa-receipt"></i> حركة ضريبية</h5></div>
+        <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
+            <div class="form-group"><label>النوع</label><select name="direction"><option value="output">مخرجات (مبيعات)</option><option value="input">مدخلات (مشتريات)</option></select></div>
+            <div class="form-group"><label>رمز الضريبة</label>
+                <select name="tax_code_id" id="tx_code"><option value="">— بلا —</option>
+                <?php $cq = mysqli_query($conn, "SELECT id, CONCAT(code,' (',rate,'%)') AS label, rate FROM fin_tax_codes WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0 AND active=1 ORDER BY code");
+                $rates = array(); if ($cq) { while ($x = mysqli_fetch_assoc($cq)) { echo "<option value='" . intval($x['id']) . "' data-rate='" . htmlspecialchars($x['rate']) . "'>" . htmlspecialchars($x['label']) . "</option>"; } } ?>
+                </select></div>
+            <div class="form-group"><label>الوعاء الضريبي <span class="required">*</span></label><input type="number" step="0.01" min="0" name="base_amount" required></div>
+            <div class="form-group"><label>النسبة %</label><input type="number" step="0.01" name="tax_rate" id="tx_rate" value="15"></div>
+            <div class="form-group"><label>المرجع</label><input type="text" name="source_ref" placeholder="فاتورة/أمر"></div>
+            <div class="form-group"><label>الفترة</label><input type="month" name="period_ref" value="<?php echo date('Y-m'); ?>"></div>
+        </div></div>
+        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-cancel" onclick="$('#txForm').removeClass('allforms-visible')">إلغاء</button></div>
+        </div></div>
+    </form>
+
+    <div class="card"><div class="card-body">
+        <h5 style="margin:0 0 10px"><i class="fas fa-list"></i> الحركات الضريبية</h5>
+        <div class="table-container">
+            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+                <thead><tr><th>الإجراءات</th><th>النوع</th><th>الرمز</th><th>الوعاء</th><th>النسبة</th><th>الضريبة</th><th>المرجع</th><th>الفترة</th></tr></thead>
+                <tbody>
+                <?php
+                $sql = "SELECT t.*, c.code AS code FROM fin_tax_transactions t LEFT JOIN fin_tax_codes c ON c.id=t.tax_code_id
+                        WHERE t.company_id" . ($is_super_admin ? " > 0" : " = " . intval($company_id)) . " AND COALESCE(t.is_deleted,0)=0 ORDER BY t.id DESC";
+                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                    $dir = $row['direction'] === 'input' ? 'مدخلات' : 'مخرجات';
+                    echo "<tr><td><div class='action-btns'>";
+                    if ($can_delete) echo "<a href='?del_tx=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
+                    echo "</div></td>";
+                    echo "<td><span class='badge badge-" . ($row['direction'] === 'output' ? 'primary' : 'secondary') . "'>" . $dir . "</span></td>";
+                    echo "<td>" . htmlspecialchars((string)($row['code'] ?? '—')) . "</td>";
+                    echo "<td>" . number_format((float)$row['base_amount'], 2) . "</td>";
+                    echo "<td>" . number_format((float)$row['tax_rate'], 2) . "%</td>";
+                    echo "<td><strong>" . number_format((float)$row['tax_amount'], 2) . "</strong></td>";
+                    echo "<td>" . htmlspecialchars((string)($row['source_ref'] ?? '')) . "</td>";
+                    echo "<td>" . htmlspecialchars((string)$row['period_ref']) . "</td>";
+                    echo "</tr>";
+                } }
+                ?>
+                </tbody>
+            </table>
+        </div>
+    </div></div>
+</div>
+
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
+<script>
+$(document).ready(function () {
+    $('#finTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
+        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
+        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    $('#toggleCode').on('click', function () { $('#codeForm').toggleClass('allforms-visible'); });
+    $('#toggleTx').on('click', function () { $('#txForm').toggleClass('allforms-visible'); });
+    $('#tx_code').on('change', function () { var r = $(this).find(':selected').data('rate'); if (r !== undefined && r !== '') $('#tx_rate').val(r); });
+});
+</script>
+</body>
+</html>

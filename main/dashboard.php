@@ -290,6 +290,23 @@ if ($dashboardRole == "0" || $dashboardRole == "1" || $dashboardRole == "12") {
     ['fa-play-circle', $ao, 'تعمل الآن', 'ok'],
     ['fa-exclamation-triangle', $bo, 'معطلة', 'err']
   ];
+} elseif ($dashboardRole == "17") {
+  // الإدارة المالية — محمي بفحص وجود الجدول حتى يبقى آمناً قبل/بعد أي migration مالي.
+  if (dashboard_table_exists($conn, 'fin_financial_events')) {
+    $feScope = $companyId > 0 ? "company_id=$companyId AND " : "";
+    $evTotal = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM fin_financial_events WHERE {$feScope}COALESCE(is_deleted,0)=0", 't');
+    $evPend  = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM fin_financial_events WHERE {$feScope}COALESCE(is_deleted,0)=0 AND state IN('dept_review','fin_review','audited')", 't');
+    $evAppr  = dashboard_scalar($conn, "SELECT COUNT(*) AS t FROM fin_financial_events WHERE {$feScope}COALESCE(is_deleted,0)=0 AND state IN('approved','posted','settled')", 't');
+    $evAmt   = dashboard_scalar($conn, "SELECT COALESCE(SUM(amount),0) AS t FROM fin_financial_events WHERE {$feScope}COALESCE(is_deleted,0)=0 AND state<>'rejected'", 't');
+    $stats = [
+      ['fa-file-invoice-dollar', (int) $evTotal, 'إجمالي الأحداث المالية', 'or'],
+      ['fa-hourglass-half', (int) $evPend, 'بانتظار الاعتماد', 'warn'],
+      ['fa-check-circle', (int) $evAppr, 'معتمدة/مقيدة', 'ok'],
+      ['fa-coins', number_format((float) $evAmt, 0), 'إجمالي القيمة', 'or']
+    ];
+  } else {
+    $stats = [['fa-file-invoice-dollar', 0, 'الأحداث المالية', 'or']];
+  }
 }
 
 /* ════════════════  DASHBOARD ANALYTICS  ════════════════ */

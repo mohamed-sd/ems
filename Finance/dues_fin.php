@@ -1,0 +1,237 @@
+<?php
+/**
+ * Finance/dues_fin.php — الذمم والمستحقات (fin_dues موحّد + fin_receivables) — §3.11-§3.13/§7.3.
+ * محرك التسوية: صافي المورد = Σله − Σعليه؛ التسوية شرطٌ للصرف (يُفرض في شاشة المدفوعات).
+ * شاشة مستقلة — عزل شركة + حذف ناعم. الأطراف تُقرأ قراءةً فقط من suppliers/employees/clients.
+ */
+session_start();
+if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
+include '../config.php';
+include '../includes/permissions_helper.php';
+require_once __DIR__ . '/fin_helpers.php';
+
+$ctx = fin_ctx();
+$is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
+if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+
+$perms = fin_page_perms($conn, 'Finance/dues_fin.php', $is_super_admin);
+$can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
+if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+الذمم+❌"); exit(); }
+
+$company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
+$due_types = fin_due_types(); $settle_states = fin_settlement_states(); $party_types = fin_party_types();
+
+// ── تسوية مورد (محرك التسوية) ──
+if (isset($_GET['settle_supplier'])) {
+    if (!$can_edit) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+التسوية+❌"); exit(); }
+    if (!fin_verify_action_token()) { header("Location: dues_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); } // إصلاح #2
+    if (!fin_can_perform($conn, $ctx['role'], 'treasurer')) { header("Location: dues_fin.php?msg=التسوية+تخصّ+أمين+الخزينة+فقط+❌"); exit(); } // فصل الواجبات
+    $sid = intval($_GET['settle_supplier']);
+    $net = fin_supplier_net($conn, $company_id, $sid);
+    mysqli_query($conn, "UPDATE fin_dues SET settlement_state='settled'
+                         WHERE company_id=$company_id AND party_type='supplier' AND party_ref=$sid
+                           AND settlement_state='pending' AND COALESCE(is_deleted,0)=0");
+    header("Location: dues_fin.php?msg=تمت+تسوية+المورد+(صافي=" . number_format($net, 2) . ")+✅"); exit();
+}
+
+// ── حذف ناعم ──
+if (isset($_GET['delete_due'])) {
+    if (!$can_delete) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    $d = intval($_GET['delete_due']);
+    mysqli_query($conn, "UPDATE fin_dues SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id AND settlement_state<>'paid'");
+    header("Location: dues_fin.php?msg=تم+حذف+المستحق+✅"); exit();
+}
+if (isset($_GET['delete_recv'])) {
+    if (!$can_delete) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    $d = intval($_GET['delete_recv']);
+    mysqli_query($conn, "UPDATE fin_receivables SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    header("Location: dues_fin.php?msg=تم+حذف+الذمّة+✅"); exit();
+}
+
+// ── حفظ مستحق ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['due_type'])) {
+    if (!$can_add) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    $party_type = ($_POST['party_type'] ?? '') === 'employee' ? 'employee' : 'supplier';
+    $party_ref  = intval($party_type === 'employee' ? ($_POST['employee_ref'] ?? 0) : ($_POST['supplier_ref'] ?? 0));
+    $due_type   = trim($_POST['due_type'] ?? '');
+    $direction  = ($_POST['direction'] ?? 'credit') === 'debit' ? 'debit' : 'credit';
+    $amount     = round(floatval($_POST['amount'] ?? 0), 2);
+    if ($party_ref <= 0 || !isset($due_types[$due_type]) || $amount <= 0) {
+        header("Location: dues_fin.php?msg=بيانات+غير+صحيحة+(طرف/نوع/مبلغ)+❌"); exit();
+    }
+    $sql = "INSERT INTO fin_dues (company_id, party_type, party_ref, due_type, direction, amount, created_by) VALUES (?,?,?,?,?,?,?)";
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+        mysqli_stmt_bind_param($stmt, 'isissdi', $company_id, $party_type, $party_ref, $due_type, $direction, $amount, $current_user_id);
+        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    }
+    header("Location: dues_fin.php?msg=تمت+إضافة+المستحق+✅"); exit();
+}
+
+// ── حفظ ذمّة عميل ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
+    if (!$can_add) { header("Location: dues_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    $cust = intval($_POST['customer_entity_id'] ?? 0);
+    $doc_type = ($_POST['doc_type'] ?? '') === 'statement' ? 'statement' : 'invoice';
+    $doc_ref  = trim($_POST['doc_ref'] ?? '');
+    $amount   = round(floatval($_POST['r_amount'] ?? 0), 2);
+    $due_date = trim($_POST['due_date'] ?? '') ?: null;
+    if ($cust <= 0 || $amount <= 0) { header("Location: dues_fin.php?msg=بيانات+الذمّة+غير+صحيحة+❌"); exit(); }
+    $sql = "INSERT INTO fin_receivables (company_id, customer_entity_id, doc_type, doc_ref, amount, due_date, state, created_by) VALUES (?,?,?,?,?,?, 'open', ?)";
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+        mysqli_stmt_bind_param($stmt, 'iissdsi', $company_id, $cust, $doc_type, $doc_ref, $amount, $due_date, $current_user_id);
+        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    }
+    header("Location: dues_fin.php?msg=تمت+إضافة+الذمّة+✅"); exit();
+}
+
+$page_title = 'إيكوبيشن | الذمم والمستحقات';
+include '../inheader.php';
+include '../insidebar.php';
+?>
+<div class="main fin-dues-main ems-unified-page-shell">
+    <?php
+    $header_title = 'الذمم والمستحقات'; $header_icon = 'fa fa-hand-holding-dollar';
+    $header_actions = array();
+    if ($can_add) {
+        $header_actions[] = array('id' => 'toggleDue', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مستحق');
+        $header_actions[] = array('id' => 'toggleRecv', 'class' => 'add-btn', 'icon' => 'fas fa-file-invoice', 'label' => 'إضافة ذمّة عميل');
+    }
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
+    <?php fin_msg_banner(); ?>
+
+    <!-- فورم مستحق -->
+    <form id="dueForm" action="" method="post" class="allforms">
+        <div class="card-header"><h5><i class="fas fa-hand-holding-dollar"></i> إضافة مستحق (مورد/موظف)</h5></div>
+        <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
+            <div class="form-group"><label>نوع الطرف <span class="required">*</span></label>
+                <select name="party_type" id="d_ptype"><option value="supplier">مورد</option><option value="employee">موظف</option></select></div>
+            <div class="form-group" id="d_supwrap"><label>المورد</label>
+                <select name="supplier_ref" id="d_sup"><?php echo fin_supplier_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group" id="d_empwrap" style="display:none"><label>الموظف</label>
+                <select name="employee_ref" id="d_emp"><?php echo fin_employee_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label>نوع المستحق <span class="required">*</span></label>
+                <select name="due_type"><?php foreach ($due_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label>الاتجاه</label>
+                <select name="direction"><option value="credit">له (دائن)</option><option value="debit">عليه (مدين)</option></select></div>
+            <div class="form-group"><label>المبلغ <span class="required">*</span></label>
+                <input type="number" step="0.01" min="0" name="amount" required></div>
+        </div></div>
+        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-cancel" onclick="$('#dueForm').removeClass('allforms-visible')">إلغاء</button></div>
+        </div></div>
+    </form>
+
+    <!-- فورم ذمّة عميل -->
+    <form id="recvForm" action="" method="post" class="allforms">
+        <div class="card-header"><h5><i class="fas fa-file-invoice"></i> إضافة ذمّة عميل</h5></div>
+        <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
+            <div class="form-group"><label>العميل <span class="required">*</span></label>
+                <select name="customer_entity_id" required><?php echo fin_client_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label>نوع المستند</label>
+                <select name="doc_type"><option value="invoice">فاتورة</option><option value="statement">مستخلص</option></select></div>
+            <div class="form-group"><label>مرجع المستند</label><input type="text" name="doc_ref"></div>
+            <div class="form-group"><label>المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="r_amount" required></div>
+            <div class="form-group"><label>تاريخ الاستحقاق</label><input type="date" name="due_date"></div>
+        </div></div>
+        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-cancel" onclick="$('#recvForm').removeClass('allforms-visible')">إلغاء</button></div>
+        </div></div>
+    </form>
+
+    <div class="card"><div class="card-body">
+        <h5 style="margin:0 0 10px"><i class="fas fa-hand-holding-dollar"></i> مستحقات الموردين والموظفين</h5>
+        <div class="table-container">
+            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+                <thead><tr><th>الإجراءات</th><th>الطرف</th><th>الاسم</th><th>النوع</th><th>الاتجاه</th><th>المبلغ</th><th>التسوية</th></tr></thead>
+                <tbody>
+                <?php
+                $scope_d = fin_scope('d.company_id', $is_super_admin, $company_id);
+                $sql = "SELECT d.*, COALESCE(s.name, e.name) AS party_name
+                        FROM fin_dues d
+                        LEFT JOIN suppliers s ON (d.party_type='supplier' AND s.id=d.party_ref)
+                        LEFT JOIN employees e ON (d.party_type='employee' AND e.id=d.party_ref)
+                        WHERE $scope_d AND COALESCE(d.is_deleted,0)=0 ORDER BY d.id DESC";
+                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                    $ss = (string)$row['settlement_state'];
+                    $ss_tone = $ss === 'paid' ? 'success' : ($ss === 'settled' ? 'primary' : 'secondary');
+                    echo "<tr><td><div class='action-btns'>";
+                    if ($can_edit && $row['party_type'] === 'supplier' && $ss === 'pending') {
+                        echo "<a href='?settle_supplier=" . intval($row['party_ref']) . "&_t=" . fin_action_token() . "' class='action-btn edit' title='تسوية المورد' onclick='return confirm(\"تسوية كل مستحقات هذا المورد؟\")'><i class='fas fa-scale-balanced'></i></a>";
+                    }
+                    if ($can_delete && $ss !== 'paid') {
+                        echo "<a href='?delete_due=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
+                    }
+                    echo "</div></td>";
+                    echo "<td>" . htmlspecialchars($party_types[$row['party_type']] ?? $row['party_type']) . "</td>";
+                    echo "<td>" . htmlspecialchars((string)($row['party_name'] ?? ('#' . $row['party_ref']))) . "</td>";
+                    echo "<td>" . htmlspecialchars($due_types[$row['due_type']] ?? $row['due_type']) . "</td>";
+                    echo "<td>" . ($row['direction'] === 'credit' ? 'له' : 'عليه') . "</td>";
+                    echo "<td>" . number_format((float)$row['amount'], 2) . "</td>";
+                    echo "<td><span class='badge badge-" . $ss_tone . "'>" . htmlspecialchars($settle_states[$ss] ?? $ss) . "</span></td>";
+                    echo "</tr>";
+                } }
+                ?>
+                </tbody>
+            </table>
+        </div>
+
+        <h5 style="margin:18px 0 10px"><i class="fas fa-file-invoice"></i> الذمم المدينة (العملاء)</h5>
+        <div class="table-container">
+            <table id="recvTable" class="display nowrap alltables no-datatable" style="width:100%;">
+                <thead><tr><th>الإجراءات</th><th>العميل</th><th>المستند</th><th>المرجع</th><th>المبلغ</th><th>المحصّل</th><th>المتبقّي</th><th>الاستحقاق</th><th>الحالة</th></tr></thead>
+                <tbody>
+                <?php
+                $scope_r = fin_scope('r.company_id', $is_super_admin, $company_id);
+                $sql = "SELECT r.*, c.client_name FROM fin_receivables r
+                        LEFT JOIN clients c ON c.id = r.customer_entity_id
+                        WHERE $scope_r AND COALESCE(r.is_deleted,0)=0 ORDER BY r.id DESC";
+                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                    $overdue = ($row['due_date'] && $row['due_date'] < date('Y-m-d') && (float)$row['outstanding'] > 0);
+                    $st = $overdue ? 'overdue' : (string)$row['state'];
+                    $st_tone = $st === 'collected' ? 'success' : ($st === 'overdue' ? 'danger' : ($st === 'partial' ? 'primary' : 'secondary'));
+                    $st_lbl = array('open' => 'مفتوحة', 'partial' => 'جزئي', 'collected' => 'محصّلة', 'overdue' => 'متأخرة');
+                    echo "<tr><td><div class='action-btns'>";
+                    if ($can_delete) { echo "<a href='?delete_recv=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>"; }
+                    echo "</div></td>";
+                    echo "<td>" . htmlspecialchars((string)($row['client_name'] ?? ('#' . $row['customer_entity_id']))) . "</td>";
+                    echo "<td>" . ($row['doc_type'] === 'statement' ? 'مستخلص' : 'فاتورة') . "</td>";
+                    echo "<td>" . htmlspecialchars((string)($row['doc_ref'] ?? '')) . "</td>";
+                    echo "<td>" . number_format((float)$row['amount'], 2) . "</td>";
+                    echo "<td>" . number_format((float)$row['collected'], 2) . "</td>";
+                    echo "<td>" . number_format((float)$row['outstanding'], 2) . "</td>";
+                    echo "<td>" . htmlspecialchars((string)($row['due_date'] ?? '—')) . "</td>";
+                    echo "<td><span class='badge badge-" . $st_tone . "'>" . ($st_lbl[$st] ?? $st) . "</span></td>";
+                    echo "</tr>";
+                } }
+                ?>
+                </tbody>
+            </table>
+        </div>
+    </div></div>
+</div>
+
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
+<script>
+$(document).ready(function () {
+    $('#finTable, #recvTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
+        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
+        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    $('#toggleDue').on('click', function () { $('#dueForm').toggleClass('allforms-visible'); });
+    $('#toggleRecv').on('click', function () { $('#recvForm').toggleClass('allforms-visible'); });
+    $('#d_ptype').on('change', function () {
+        var emp = this.value === 'employee';
+        $('#d_empwrap').toggle(emp); $('#d_supwrap').toggle(!emp);
+    });
+});
+</script>
+</body>
+</html>
