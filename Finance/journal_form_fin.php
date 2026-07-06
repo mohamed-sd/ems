@@ -64,7 +64,9 @@ if (isset($_GET['post_id'])) {
         mysqli_query($conn, "UPDATE fin_financial_events SET state='posted', journal_entry_id=$pid
                              WHERE id=$eid AND company_id=$company_id AND COALESCE(is_deleted,0)=0");
     }
-    header("Location: journal_form_fin.php?msg=تم+ترحيل+القيد+بنجاح+✅"); exit();
+    // (فجوة 3) الانحراف المستمر: تغذية «الفعلي» في الموازنة من القيود المرحّلة فورًا
+    $fed = fin_recalc_budget_actuals($conn, $company_id);
+    header("Location: journal_form_fin.php?msg=تم+ترحيل+القيد+وتحدّث+فعلي+الموازنة+($fed+بند)+✅"); exit();
 }
 
 // ── حذف ناعم (مسودة فقط) ──

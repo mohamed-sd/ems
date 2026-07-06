@@ -37,6 +37,9 @@ $source_modules = fin_source_modules();
 $event_states   = fin_event_states();
 $currencies     = fin_currencies();
 
+// (فجوة 4) تعليم الإشعارات مقروءة
+fin_handle_notif_read($conn, $company_id, 'events_list_fin.php');
+
 // ── حفظ (إضافة/تعديل) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -111,9 +114,41 @@ if (isset($_GET['advance_id'])) {
         if (!fin_can_perform($conn, $ctx['role'], $level)) {
             header("Location: events_list_fin.php?msg=هذا+الإجراء+(" . urlencode($lbl) . ")+يخصّ+" . urlencode(fin_level_owner_label($level)) . "+❌"); exit();
         }
+        $evr = mysqli_query($conn, "SELECT * FROM fin_financial_events WHERE id=$aid AND company_id=$company_id LIMIT 1");
+        $event = $evr ? mysqli_fetch_assoc($evr) : null;
+
+        // (فجوة 1) الاعتماد النهائي يخضع لمصفوفة الاعتماد بالمبلغ
+        if ($next === 'approved' && $event) {
+            $base = round((float)$event['amount'] * (($event['currency'] === 'USD') ? (float)($event['fx_rate'] ?: 600) : 1), 2);
+            list($allowed, $required) = fin_matrix_gate($conn, $company_id, $ctx['role'], $event['event_type'], $base);
+            if (!$allowed) {
+                fin_notify($conn, $company_id, 'finance_manager', 'الحدث ' . $event['event_no'] . ' (' . number_format($base, 0) . ') يتطلب اعتماد ' . fin_matrix_level_label($required), 'events_list_fin.php?fstate=audited');
+                header("Location: events_list_fin.php?msg=المصفوفة:+هذا+المبلغ+يتطلب+اعتماد+(" . urlencode(fin_matrix_level_label($required)) . ")+—+المدير+الأعلى+❌"); exit();
+            }
+        }
+
         mysqli_query($conn, "UPDATE fin_financial_events SET state='$next' WHERE id=$aid AND company_id=$company_id AND state='$cur'");
         fin_log_approval($conn, $company_id, $aid, $cur, $next, 'advance', $level, $current_user_id, $lbl);
-        header("Location: events_list_fin.php?msg=تم+($lbl)+✅"); exit();
+
+        // (فجوة 4) إشعار صاحب الخطوة التالية
+        $next_owner = array('dept_review' => 'dept_manager', 'dept_approved' => 'dept_manager',
+                            'fin_review' => 'finance_reviewer', 'audited' => 'finance_manager');
+        if ($event && isset($next_owner[$next])) {
+            fin_notify($conn, $company_id, $next_owner[$next], 'الحدث ' . $event['event_no'] . ' بانتظارك: ' . ($event_states[$next] ?? $next), 'events_list_fin.php?fstate=' . $next);
+        }
+
+        // (فجوة 2) عند الاعتماد النهائي: توليد القيد آليًا (مسودة مرتبطة)
+        $auto_msg = '';
+        if ($next === 'approved' && $event) {
+            $jid = fin_auto_journal($conn, $company_id, $event, $current_user_id);
+            if ($jid > 0) {
+                $jr = mysqli_query($conn, "SELECT entry_no FROM fin_journal_entries WHERE id=$jid");
+                $jno = ($jr && ($j = mysqli_fetch_assoc($jr))) ? $j['entry_no'] : ('#' . $jid);
+                $auto_msg = '+وتولّد+القيد+' . urlencode($jno) . '+آليًا';
+                fin_notify($conn, $company_id, 'finance_manager', 'قيد آلي ' . $jno . ' جاهز للترحيل (من ' . $event['event_no'] . ')', 'journal_form_fin.php');
+            }
+        }
+        header("Location: events_list_fin.php?msg=تم+($lbl)+✅$auto_msg"); exit();
     }
     header("Location: events_list_fin.php?msg=لا+انتقال+متاح+من+هذه+الحالة+❌"); exit();
 }
@@ -127,6 +162,7 @@ if (isset($_GET['reject_id'])) {
     if ($cur !== null && !in_array($cur, array('posted','settled','closed','rejected'), true)) {
         mysqli_query($conn, "UPDATE fin_financial_events SET state='rejected' WHERE id=$rid AND company_id=$company_id");
         fin_log_approval($conn, $company_id, $rid, $cur, 'rejected', 'reject', null, $current_user_id, 'رفض/إعادة');
+        fin_notify($conn, $company_id, 'dept_accountant', 'حدث مرفوض أُعيد إليك للتصحيح', 'events_list_fin.php?fstate=rejected');
         header("Location: events_list_fin.php?msg=تم+رفض+الحدث+✅"); exit();
     }
     header("Location: events_list_fin.php?msg=لا+يمكن+رفض+هذه+الحالة+❌"); exit();
@@ -164,6 +200,7 @@ include '../insidebar.php';
     ?>
 
     <?php fin_msg_banner(); ?>
+    <?php fin_notifications_panel($conn, $ctx, 'events_list_fin.php'); ?>
 
     <!-- فورم إضافة/تعديل -->
     <form id="finForm" action="" method="post" class="allforms">

@@ -1,0 +1,280 @@
+<?php
+/**
+ * Finance/unit_records_fin.php — كشف الوحدات التشغيلية اليومي والتطابق الثلاثي (§3.23/§7.1/§12).
+ * الكميات الثلاث (تشغيل/عميل/مورد) — لا اعتماد قبل تطابقها. قاعدة السبب: لا توقف بلا سبب.
+ * «اعتماد التطابق» يولّد الحدثين التوأمين: إيراد العميل (fin_financial_events) +
+ * مستحق المورد (fin_dues) — بالوحدة نفسها والكمية نفسها. هامش الوحدة عمود مولّد.
+ * شاشة مستقلة — عزل شركة + حذف ناعم + CSRF + فصل واجبات (الاعتماد للمدير المالي).
+ */
+session_start();
+if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
+include '../config.php';
+include '../includes/permissions_helper.php';
+require_once __DIR__ . '/fin_helpers.php';
+
+$ctx = fin_ctx();
+$is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
+if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+❌"); exit(); }
+
+$perms = fin_page_perms($conn, 'Finance/unit_records_fin.php', $is_super_admin);
+$can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
+if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+كشف+الوحدات+❌"); exit(); }
+
+$company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
+$work_models = fin_work_models(); $match_states = fin_match_states(); $downtime_causes = fin_downtime_causes();
+
+// ── اعتماد التطابق وتوليد الحدثين التوأمين (المدير المالي + CSRF) ──
+if (isset($_GET['approve_id'])) {
+    if (!$can_edit) { header("Location: unit_records_fin.php?msg=لا+توجد+صلاحية+الاعتماد+❌"); exit(); }
+    if (!fin_verify_action_token()) { header("Location: unit_records_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+    if (!fin_can_perform($conn, $ctx['role'], 'finance_manager')) { header("Location: unit_records_fin.php?msg=اعتماد+التطابق+يخصّ+المدير+المالي+فقط+❌"); exit(); }
+    $rid = intval($_GET['approve_id']);
+    $rr = mysqli_query($conn, "SELECT * FROM fin_unit_records WHERE id=$rid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
+    $rec = $rr ? mysqli_fetch_assoc($rr) : null;
+    if (!$rec) { header("Location: unit_records_fin.php?msg=السجل+غير+موجود+❌"); exit(); }
+    // قاعدة التطابق الثلاثي: لا اعتماد إلا لسجل متطابق
+    if ($rec['match_state'] !== 'matched') { header("Location: unit_records_fin.php?msg=لا+اعتماد:+الكميات+الثلاث+غير+متطابقة+❌"); exit(); }
+    if ($rec['client_unit_price'] === null || $rec['supplier_unit_price'] === null) {
+        header("Location: unit_records_fin.php?msg=لا+اعتماد:+أدخل+سعرَي+عقد+العميل+والمورد+أولًا+❌"); exit();
+    }
+
+    $qty = round((float)$rec['ops_qty'], 2);
+    $rev_amount = round($qty * (float)$rec['client_unit_price'], 2);
+    $due_amount = round($qty * (float)$rec['supplier_unit_price'], 2);
+    $pid = intval($rec['project_id']) ?: null; $eqid = intval($rec['equipment_id']) ?: null;
+    $sup = intval($rec['supplier_entity_id']) ?: null;
+    $rno = $rec['record_no'];
+
+    // التوأم 1: حدث إيراد على العميل (يدخل دورة الاعتماد كمسودة)
+    $event_no = fin_gen_code($conn, 'fin_financial_events', 'FIN-EV', $company_id);
+    $note = 'توأم إيراد من كشف وحدات ' . $rno;
+    $sql = "INSERT INTO fin_financial_events (company_id, event_no, event_type, source_module, source_ref, amount, currency, project_id, equipment_id, notes, state, created_by)
+            VALUES (?,?, 'revenue', 'projects', ?, ?, 'SDG', ?, ?, ?, 'draft', ?)";
+    $rev_id = 0;
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+        mysqli_stmt_bind_param($stmt, 'issdiisi', $company_id, $event_no, $rno, $rev_amount, $pid, $eqid, $note, $current_user_id);
+        mysqli_stmt_execute($stmt); $rev_id = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
+    }
+    // التوأم 2: مستحق مورد بالوحدة نفسها (إن وُجد شريك إنتاج)
+    $due_id = null;
+    if ($sup) {
+        $due_type = fin_unit_due_type($rec['work_model']);
+        $per = date('Y-m', strtotime($rec['record_date']));
+        $sql = "INSERT INTO fin_dues (company_id, party_type, party_ref, due_type, direction, amount, period_ref, event_id, created_by)
+                VALUES (?, 'supplier', ?, ?, 'credit', ?, ?, ?, ?)";
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            mysqli_stmt_bind_param($stmt, 'iisdsii', $company_id, $sup, $due_type, $due_amount, $per, $rev_id, $current_user_id);
+            mysqli_stmt_execute($stmt); $due_id = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
+        }
+    }
+    mysqli_query($conn, "UPDATE fin_unit_records SET match_state='approved', approved_qty=$qty,
+                         revenue_event_id=" . intval($rev_id) . ", supplier_due_id=" . ($due_id ? intval($due_id) : "NULL") . "
+                         WHERE id=$rid AND company_id=$company_id");
+    fin_log_approval($conn, $company_id, $rid, 'matched', 'approved', 'advance', 'finance_manager', $current_user_id, 'اعتماد تطابق ' . $rno . ' وتوليد التوأمين');
+    // (فجوة 4) إشعارات التوأمين
+    fin_notify($conn, $company_id, 'dept_accountant', 'توأم إيراد ' . $event_no . ' من ' . $rno . ' بانتظار رفعه للدورة', 'events_list_fin.php?fstate=draft');
+    if ($due_id) { fin_notify($conn, $company_id, 'treasurer', 'مستحق مورد جديد من ' . $rno . ' بانتظار التسوية', 'dues_fin.php'); }
+    $margin = number_format(($qty * ((float)$rec['client_unit_price'] - (float)$rec['supplier_unit_price'])), 0);
+    header("Location: unit_records_fin.php?msg=اعتُمد+التطابق+وتولّد+التوأمان+(هامش+الوحدة=" . $margin . ")+✅"); exit();
+}
+
+// ── حذف ناعم (غير المعتمد فقط) ──
+if (isset($_GET['delete_id'])) {
+    if (!$can_delete) { header("Location: unit_records_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    $d = intval($_GET['delete_id']);
+    mysqli_query($conn, "UPDATE fin_unit_records SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id AND match_state<>'approved'");
+    header("Location: unit_records_fin.php?msg=تم+حذف+السجل+✅"); exit();
+}
+
+// ── حفظ/تعديل سجل وحدات ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['work_model'])) {
+    $id = intval($_POST['id'] ?? 0); $is_editing = $id > 0;
+    if ($is_editing && !$can_edit) { header("Location: unit_records_fin.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
+    if (!$is_editing && !$can_add) { header("Location: unit_records_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+
+    $rdate = trim($_POST['record_date'] ?? '') ?: date('Y-m-d');
+    $pid = intval($_POST['project_id'] ?? 0);
+    $eqid = intval($_POST['equipment_id'] ?? 0) ?: null;
+    $sup = intval($_POST['supplier_entity_id'] ?? 0) ?: null;
+    $wm = isset($work_models[$_POST['work_model'] ?? '']) ? $_POST['work_model'] : '';
+    $ops = round(floatval($_POST['ops_qty'] ?? 0), 2);
+    $cq = ($_POST['client_qty'] ?? '') === '' ? null : round(floatval($_POST['client_qty']), 2);
+    $sq = ($_POST['supplier_qty'] ?? '') === '' ? null : round(floatval($_POST['supplier_qty']), 2);
+    $cp = ($_POST['client_unit_price'] ?? '') === '' ? null : round(floatval($_POST['client_unit_price']), 2);
+    $sp = ($_POST['supplier_unit_price'] ?? '') === '' ? null : round(floatval($_POST['supplier_unit_price']), 2);
+    $dh = ($_POST['downtime_hours'] ?? '') === '' ? null : round(floatval($_POST['downtime_hours']), 2);
+    $dc = isset($downtime_causes[$_POST['downtime_cause'] ?? '']) ? $_POST['downtime_cause'] : null;
+    $vn = trim($_POST['variance_note'] ?? '');
+    $ref = trim($_POST['source_ref'] ?? '');
+
+    if ($pid <= 0 || $wm === '' || $ops <= 0) { header("Location: unit_records_fin.php?msg=بيانات+ناقصة+(مشروع/نموذج/كمية+التشغيل)+❌"); exit(); }
+    // قاعدة السبب: لا ساعة توقف بلا سبب مصنَّف
+    if ($dh !== null && $dh > 0 && $dc === null) { header("Location: unit_records_fin.php?msg=قاعدة+السبب:+لا+توقف+بلا+سبب+مصنَّف+❌"); exit(); }
+    $mstate = fin_compute_match_state($ops, $cq, $sq);
+
+    if ($is_editing) {
+        // لا تعديل على المعتمد
+        $cur = mysqli_query($conn, "SELECT match_state FROM fin_unit_records WHERE id=$id AND company_id=$company_id LIMIT 1");
+        $c = $cur ? mysqli_fetch_assoc($cur) : null;
+        if (!$c || $c['match_state'] === 'approved') { header("Location: unit_records_fin.php?msg=لا+تعديل+على+سجل+معتمد+❌"); exit(); }
+        // تحديث بقيم مؤمَّنة (الأرقام عبر intval/round والنصوص عبر escape)
+        $set = "record_date='" . mysqli_real_escape_string($conn, $rdate) . "', project_id=$pid,"
+             . " equipment_id=" . ($eqid ?: "NULL") . ", supplier_entity_id=" . ($sup ?: "NULL") . ","
+             . " work_model='" . mysqli_real_escape_string($conn, $wm) . "', ops_qty=$ops,"
+             . " client_qty=" . ($cq === null ? "NULL" : $cq) . ", supplier_qty=" . ($sq === null ? "NULL" : $sq) . ","
+             . " client_unit_price=" . ($cp === null ? "NULL" : $cp) . ", supplier_unit_price=" . ($sp === null ? "NULL" : $sp) . ","
+             . " downtime_hours=" . ($dh === null ? "NULL" : $dh) . ","
+             . " downtime_cause=" . ($dc === null ? "NULL" : "'" . mysqli_real_escape_string($conn, $dc) . "'") . ","
+             . " variance_note='" . mysqli_real_escape_string($conn, $vn) . "', source_ref='" . mysqli_real_escape_string($conn, $ref) . "',"
+             . " match_state='" . mysqli_real_escape_string($conn, $mstate) . "'";
+        mysqli_query($conn, "UPDATE fin_unit_records SET $set WHERE id=$id AND company_id=$company_id AND match_state<>'approved'");
+        header("Location: unit_records_fin.php?msg=تم+تعديل+السجل+(الحالة:+" . urlencode($match_states[$mstate]) . ")+✅"); exit();
+    } else {
+        $record_no = fin_gen_code($conn, 'fin_unit_records', 'FIN-UR', $company_id);
+        $cols = "company_id, record_no, record_date, project_id, equipment_id, supplier_entity_id, work_model, ops_qty,
+                 client_qty, supplier_qty, client_unit_price, supplier_unit_price, downtime_hours, downtime_cause,
+                 variance_note, source_ref, match_state, created_by";
+        $vals = "$company_id, '" . mysqli_real_escape_string($conn, $record_no) . "', '" . mysqli_real_escape_string($conn, $rdate) . "', $pid, "
+              . ($eqid ?: "NULL") . ", " . ($sup ?: "NULL") . ", '" . mysqli_real_escape_string($conn, $wm) . "', $ops, "
+              . ($cq === null ? "NULL" : $cq) . ", " . ($sq === null ? "NULL" : $sq) . ", "
+              . ($cp === null ? "NULL" : $cp) . ", " . ($sp === null ? "NULL" : $sp) . ", "
+              . ($dh === null ? "NULL" : $dh) . ", " . ($dc === null ? "NULL" : "'" . mysqli_real_escape_string($conn, $dc) . "'") . ", "
+              . "'" . mysqli_real_escape_string($conn, $vn) . "', '" . mysqli_real_escape_string($conn, $ref) . "', '"
+              . mysqli_real_escape_string($conn, $mstate) . "', $current_user_id";
+        mysqli_query($conn, "INSERT INTO fin_unit_records ($cols) VALUES ($vals)");
+        header("Location: unit_records_fin.php?msg=أُنشئ+السجل+(الحالة:+" . urlencode($match_states[$mstate]) . ")+✅"); exit();
+    }
+}
+
+$page_title = 'إيكوبيشن | كشف الوحدات والتطابق';
+include '../inheader.php';
+include '../insidebar.php';
+?>
+<div class="main fin-units-main ems-unified-page-shell">
+    <?php
+    $header_title = 'كشف الوحدات التشغيلية والتطابق الثلاثي'; $header_icon = 'fa fa-cubes';
+    $header_actions = array();
+    if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'سجل وحدات يومي'); }
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
+    <?php fin_msg_banner(); ?>
+
+    <div class="card"><div class="card-body" style="padding-bottom:6px">
+        <p class="text-muted" style="margin:0"><i class="fas fa-shield-halved"></i>
+        <strong>قاعدة التطابق الثلاثي:</strong> لا تتحول وحدة إلى فاتورة قبل تطابق كمية التشغيل = مصادقة العميل = حساب المورد.
+        عند الاعتماد يتولّد <strong>الحدثان التوأمان</strong>: إيراد العميل + مستحق المورد بالكمية نفسها — والفرق بين السعرين = <strong>هامش الوحدة</strong>.
+        <strong>قاعدة السبب:</strong> لا ساعة توقف بلا سبب مصنَّف.</p>
+    </div></div>
+
+    <form id="finForm" action="" method="post" class="allforms">
+        <div class="card-header"><h5><i class="fas fa-edit"></i> سجل وحدات يومي</h5></div>
+        <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
+            <input type="hidden" name="id" id="u_id" value="">
+            <div class="form-group"><label>التاريخ <span class="required">*</span></label><input type="date" name="record_date" id="u_date" value="<?php echo date('Y-m-d'); ?>" required></div>
+            <div class="form-group"><label>المشروع <span class="required">*</span></label><select name="project_id" id="u_project" required><?php echo fin_project_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label>المعدة</label><select name="equipment_id" id="u_equipment"><?php echo fin_equipment_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label>المورد (شريك الإنتاج)</label><select name="supplier_entity_id" id="u_supplier"><?php echo fin_supplier_options($conn, $is_super_admin, $company_id); ?></select></div>
+            <div class="form-group"><label>نموذج العمل <span class="required">*</span></label><select name="work_model" id="u_model" required><?php foreach ($work_models as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label>كمية كشوف التشغيل <span class="required">*</span></label><input type="number" step="0.01" min="0" name="ops_qty" id="u_ops" required></div>
+            <div class="form-group"><label>كمية مصادقة العميل</label><input type="number" step="0.01" min="0" name="client_qty" id="u_client" placeholder="عند وصول المصادقة"></div>
+            <div class="form-group"><label>كمية حساب المورد</label><input type="number" step="0.01" min="0" name="supplier_qty" id="u_supqty" placeholder="عند مطابقة المورد"></div>
+            <div class="form-group"><label>سعر وحدة عقد العميل</label><input type="number" step="0.01" min="0" name="client_unit_price" id="u_cprice"></div>
+            <div class="form-group"><label>سعر وحدة عقد المورد</label><input type="number" step="0.01" min="0" name="supplier_unit_price" id="u_sprice"></div>
+            <div class="form-group"><label>ساعات التوقف</label><input type="number" step="0.01" min="0" name="downtime_hours" id="u_dh"></div>
+            <div class="form-group"><label>سبب التوقف (إلزامي إن وُجد)</label><select name="downtime_cause" id="u_dc"><option value="">— بلا توقف —</option><?php foreach ($downtime_causes as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
+            <div class="form-group"><label>المرجع الميداني</label><input type="text" name="source_ref" id="u_ref" placeholder="كشف تشغيل / تذكرة وزن / محضر قياس"></div>
+            <div class="form-group" style="grid-column:1/-1"><label>توثيق الفرق (إن وُجد)</label><input type="text" name="variance_note" id="u_vn"></div>
+        </div></div>
+        <div class="form-actions"><button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
+            <button type="button" class="btn-cancel" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
+        </div></div>
+    </form>
+
+    <div class="card"><div class="card-body">
+        <div class="table-container">
+            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+                <thead><tr>
+                    <th>الإجراءات</th><th>الرقم</th><th>التاريخ</th><th>المشروع</th><th>النموذج</th>
+                    <th>تشغيل</th><th>عميل</th><th>مورد</th><th>التطابق</th><th>هامش الوحدة</th><th>توقف</th>
+                </tr></thead>
+                <tbody>
+                <?php
+                $scope_u = fin_scope('u.company_id', $is_super_admin, $company_id);
+                $sql = "SELECT u.*, p.name AS project_name FROM fin_unit_records u
+                        LEFT JOIN project p ON p.id = u.project_id
+                        WHERE $scope_u AND COALESCE(u.is_deleted,0)=0 ORDER BY u.record_date DESC, u.id DESC";
+                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                    $ms = (string)$row['match_state'];
+                    $tone = $ms === 'approved' ? 'success' : ($ms === 'matched' ? 'primary' : ($ms === 'variance' ? 'danger' : 'secondary'));
+                    $data =
+                        "data-id='" . intval($row['id']) . "' data-date='" . htmlspecialchars((string)$row['record_date'], ENT_QUOTES) . "'"
+                        . " data-project='" . intval($row['project_id']) . "' data-equipment='" . intval($row['equipment_id']) . "'"
+                        . " data-supplier='" . intval($row['supplier_entity_id']) . "' data-model='" . htmlspecialchars((string)$row['work_model'], ENT_QUOTES) . "'"
+                        . " data-ops='" . htmlspecialchars((string)$row['ops_qty'], ENT_QUOTES) . "' data-client='" . htmlspecialchars((string)($row['client_qty'] ?? ''), ENT_QUOTES) . "'"
+                        . " data-supqty='" . htmlspecialchars((string)($row['supplier_qty'] ?? ''), ENT_QUOTES) . "'"
+                        . " data-cprice='" . htmlspecialchars((string)($row['client_unit_price'] ?? ''), ENT_QUOTES) . "'"
+                        . " data-sprice='" . htmlspecialchars((string)($row['supplier_unit_price'] ?? ''), ENT_QUOTES) . "'"
+                        . " data-dh='" . htmlspecialchars((string)($row['downtime_hours'] ?? ''), ENT_QUOTES) . "'"
+                        . " data-dc='" . htmlspecialchars((string)($row['downtime_cause'] ?? ''), ENT_QUOTES) . "'"
+                        . " data-ref='" . htmlspecialchars((string)($row['source_ref'] ?? ''), ENT_QUOTES) . "'"
+                        . " data-vn='" . htmlspecialchars((string)($row['variance_note'] ?? ''), ENT_QUOTES) . "'";
+                    echo "<tr><td><div class='action-btns'>";
+                    if ($ms === 'matched' && $can_edit) {
+                        echo "<a href='?approve_id=" . intval($row['id']) . "&_t=" . fin_action_token() . "' class='action-btn edit' title='اعتماد التطابق وتوليد التوأمين' onclick='return confirm(\"اعتماد التطابق وتوليد الحدثين التوأمين؟\")'><i class='fas fa-check-double'></i></a>";
+                    }
+                    if ($ms !== 'approved') {
+                        if ($can_edit) echo "<a href='javascript:void(0)' class='editBtn action-btn edit' $data title='تعديل'><i class='fas fa-edit'></i></a>";
+                        if ($can_delete) echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
+                    }
+                    echo "</div></td>";
+                    echo "<td>" . htmlspecialchars((string)$row['record_no']) . "</td>";
+                    echo "<td>" . htmlspecialchars((string)$row['record_date']) . "</td>";
+                    echo "<td>" . htmlspecialchars((string)($row['project_name'] ?? '#' . $row['project_id'])) . "</td>";
+                    echo "<td>" . htmlspecialchars($work_models[$row['work_model']] ?? $row['work_model']) . "</td>";
+                    echo "<td>" . number_format((float)$row['ops_qty'], 2) . "</td>";
+                    echo "<td>" . ($row['client_qty'] !== null ? number_format((float)$row['client_qty'], 2) : '—') . "</td>";
+                    echo "<td>" . ($row['supplier_qty'] !== null ? number_format((float)$row['supplier_qty'], 2) : '—') . "</td>";
+                    echo "<td><span class='badge badge-" . $tone . "'>" . htmlspecialchars($match_states[$ms] ?? $ms) . "</span></td>";
+                    echo "<td>" . ($ms === 'approved' ? "<strong>" . number_format((float)$row['unit_margin'], 2) . "</strong>" : '—') . "</td>";
+                    echo "<td>" . ($row['downtime_hours'] !== null && (float)$row['downtime_hours'] > 0
+                            ? number_format((float)$row['downtime_hours'], 1) . ' س (' . htmlspecialchars($downtime_causes[$row['downtime_cause']] ?? '') . ')'
+                            : '—') . "</td>";
+                    echo "</tr>";
+                } }
+                ?>
+                </tbody>
+            </table>
+        </div>
+    </div></div>
+</div>
+
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
+<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
+<script>
+$(document).ready(function () {
+    $('#finTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
+        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
+        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    $('#toggleForm').on('click', function () { document.getElementById('finForm').reset(); $('#u_id').val(''); $('#finForm').toggleClass('allforms-visible'); });
+    $(document).on('click', '.editBtn', function () {
+        var t = $(this);
+        $('#u_id').val(t.data('id')); $('#u_date').val(t.data('date'));
+        $('#u_project').val(String(t.data('project'))); $('#u_equipment').val(String(t.data('equipment')));
+        $('#u_supplier').val(String(t.data('supplier'))); $('#u_model').val(t.data('model'));
+        $('#u_ops').val(t.data('ops')); $('#u_client').val(t.data('client')); $('#u_supqty').val(t.data('supqty'));
+        $('#u_cprice').val(t.data('cprice')); $('#u_sprice').val(t.data('sprice'));
+        $('#u_dh').val(t.data('dh')); $('#u_dc').val(t.data('dc')); $('#u_ref').val(t.data('ref')); $('#u_vn').val(t.data('vn'));
+        $('#finForm').addClass('allforms-visible');
+        $('html, body').animate({ scrollTop: $('#finForm').offset().top }, 400);
+    });
+});
+</script>
+</body>
+</html>

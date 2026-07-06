@@ -350,6 +350,233 @@ if (!function_exists('fin_center_options')) {
     }
 }
 
+// ═══ إغلاق فجوات الأتمتة الأربع (§7/§9/§ب.9) ═══
+
+// ── (فجوة 1) فرض مصفوفة الاعتماد بالمبلغ ──
+if (!function_exists('fin_level_rank')) {
+    /** رتبة مستويات المصفوفة تصاعديًا. */
+    function fin_level_rank($level)
+    {
+        $r = array('dept_accountant' => 1, 'dept_manager' => 2, 'finance_manager' => 3, 'executive' => 4, 'board' => 5);
+        return isset($r[$level]) ? $r[$level] : 0;
+    }
+}
+if (!function_exists('fin_matrix_level_label')) {
+    function fin_matrix_level_label($level)
+    {
+        $m = array('dept_accountant' => 'محاسب الإدارة', 'dept_manager' => 'مدير الإدارة',
+                   'finance_manager' => 'المدير المالي', 'executive' => 'المدير التنفيذي', 'board' => 'مجلس الإدارة');
+        return isset($m[$level]) ? $m[$level] : $level;
+    }
+}
+if (!function_exists('fin_matrix_gate')) {
+    /**
+     * بوابة الاعتماد النهائي بالقيمة: تقرأ الشريحة من fin_approval_matrix (بمبلغ الأساس SDG).
+     * المدير المالي يعتمد حتى مستواه؛ executive/board حكرٌ على المدير الأعلى (-1).
+     * تعيد array(allowed, required_level).
+     */
+    function fin_matrix_gate($conn, $company_id, $role_id, $event_type, $base_amount)
+    {
+        $required = fin_required_level($conn, $company_id, $event_type, $base_amount);
+        if ($required === null) { return array(true, null); } // لا شرائح معرّفة ⇒ لا تقييد إضافي
+        if ((string)$role_id === '-1') { return array(true, $required); } // المدير الأعلى يغطي الكل
+        $userLevel = fin_user_level($conn, $role_id);
+        $userRank = $userLevel === 'finance_manager' ? fin_level_rank('finance_manager') : fin_level_rank($userLevel);
+        return array($userRank >= fin_level_rank($required), $required);
+    }
+}
+
+// ── (فجوة 2) توليد القيد آليًا من الحدث المعتمد ──
+if (!function_exists('fin_account_by_code')) {
+    /** حساب بالكود، وإلا أول حساب قابل للقيد من النوع المطلوب (احتياط). */
+    function fin_account_by_code($conn, $company_id, $code, $fallback_type)
+    {
+        $company_id = intval($company_id);
+        $code = mysqli_real_escape_string($conn, $code);
+        $r = mysqli_query($conn, "SELECT id FROM fin_chart_of_accounts WHERE company_id=$company_id AND code='$code' AND is_postable=1 AND COALESCE(is_deleted,0)=0 LIMIT 1");
+        if ($r && ($x = mysqli_fetch_assoc($r))) { return intval($x['id']); }
+        $ft = mysqli_real_escape_string($conn, $fallback_type);
+        $r = mysqli_query($conn, "SELECT id FROM fin_chart_of_accounts WHERE company_id=$company_id AND account_type='$ft' AND is_postable=1 AND COALESCE(is_deleted,0)=0 ORDER BY code LIMIT 1");
+        return ($r && ($x = mysqli_fetch_assoc($r))) ? intval($x['id']) : 0;
+    }
+}
+if (!function_exists('fin_auto_journal')) {
+    /**
+     * محرّك القيد الآلي (§7.2): يشتقّ المدين/الدائن من نوع الحدث وينشئ قيدًا متوازنًا
+     * «مسودة» مرتبطًا بالحدث (الترحيل يبقى خطوة محكومة بالفترة والدور). يعيد entry_id أو 0.
+     */
+    function fin_auto_journal($conn, $company_id, $event, $user_id)
+    {
+        $company_id = intval($company_id);
+        $amount = round((float)$event['amount'] * (($event['currency'] ?? 'SDG') === 'USD' ? (float)($event['fx_rate'] ?: 600) : 1), 2);
+        if ($amount <= 0) { return 0; }
+        $type = $event['event_type']; $src = $event['source_module'] ?? '';
+        $has_supplier = intval($event['supplier_entity_id'] ?? 0) > 0;
+
+        // اشتقاق الحسابات (بأكواد دليلنا القياسية مع احتياط بالنوع)
+        $AR = fin_account_by_code($conn, $company_id, '1200', 'asset');
+        $CASH = fin_account_by_code($conn, $company_id, '1100', 'asset');
+        $AP = fin_account_by_code($conn, $company_id, '2100', 'liability');
+        $REV = fin_account_by_code($conn, $company_id, ($src === 'sales' ? '4200' : '4100'), 'revenue');
+        $expCode = $src === 'workforce' ? '5100' : ($src === 'maintenance' ? '5300' : '5200');
+        $EXP = fin_account_by_code($conn, $company_id, $expCode, 'expense');
+        $SAL = fin_account_by_code($conn, $company_id, '5100', 'expense');
+
+        switch ($type) {
+            case 'revenue': case 'receivable': $debit = $AR; $credit = $REV; break;
+            case 'expense': case 'payable':    $debit = $EXP; $credit = $has_supplier ? $AP : $CASH; break;
+            case 'payroll':                    $debit = $SAL; $credit = $AP; break;
+            case 'settlement':                 $debit = $AP;  $credit = $CASH; break;
+            default:                           $debit = $EXP; $credit = $CASH;
+        }
+        if (!$debit || !$credit || $debit === $credit) { return 0; }
+
+        $entry_no = fin_gen_code($conn, 'fin_journal_entries', 'FIN-JV', $company_id);
+        $eid = intval($event['id']); $today = date('Y-m-d');
+        $memo = 'قيد آلي من الحدث ' . $event['event_no'];
+        $sql = "INSERT INTO fin_journal_entries (company_id, entry_no, event_id, posting_date, total_debit, total_credit, memo, state, created_by)
+                VALUES (?,?,?,?,?,?,?, 'draft', ?)";
+        $entry_id = 0;
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            mysqli_stmt_bind_param($stmt, 'isisddsi', $company_id, $entry_no, $eid, $today, $amount, $amount, $memo, $user_id);
+            mysqli_stmt_execute($stmt); $entry_id = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
+        }
+        if ($entry_id > 0) {
+            $pid = intval($event['project_id'] ?? 0) ?: 'NULL';
+            $eqid = intval($event['equipment_id'] ?? 0) ?: 'NULL';
+            $m = mysqli_real_escape_string($conn, $memo);
+            mysqli_query($conn, "INSERT INTO fin_journal_lines (company_id, entry_id, account_id, debit, credit, project_id, equipment_id, memo)
+                VALUES ($company_id, $entry_id, $debit, $amount, 0, $pid, $eqid, '$m'),
+                       ($company_id, $entry_id, $credit, 0, $amount, $pid, $eqid, '$m')");
+        }
+        return $entry_id;
+    }
+}
+
+// ── (فجوة 3) تغذية «الفعلي» في الموازنة من القيود المرحّلة ──
+if (!function_exists('fin_recalc_budget_actuals')) {
+    /**
+     * محرّك الانحراف المستمر (§7.3): يعيد احتساب actual_amount لكل بند موازنة (معتمدة/نشطة)
+     * له حساب مرتبط، من مجموع القيود المرحّلة على حسابه ضمن نافذة فترته — idempotent.
+     * (الأعمدة المولّدة variance/variance_pct تتحدث تلقائيًا.) يعيد عدد البنود المحدَّثة.
+     */
+    function fin_recalc_budget_actuals($conn, $company_id)
+    {
+        $cid = intval($company_id); $n = 0;
+        $bl = mysqli_query($conn, "SELECT l.id, l.account_id, l.line_kind, b.fiscal_year, b.period_type, b.period_no
+                                   FROM fin_budget_lines l JOIN fin_budgets b ON b.id = l.budget_id
+                                   WHERE l.company_id=$cid AND l.account_id IS NOT NULL
+                                     AND b.state IN('approved','active') AND COALESCE(b.is_deleted,0)=0");
+        if (!$bl) { return 0; }
+        while ($L = mysqli_fetch_assoc($bl)) {
+            $acc = intval($L['account_id']); $fy = intval($L['fiscal_year']);
+            $win = "YEAR(je.posting_date)=$fy";
+            if ($L['period_type'] === 'monthly' && $L['period_no'])   { $win .= " AND MONTH(je.posting_date)=" . intval($L['period_no']); }
+            if ($L['period_type'] === 'quarterly' && $L['period_no']) { $win .= " AND QUARTER(je.posting_date)=" . intval($L['period_no']); }
+            $natural = $L['line_kind'] === 'revenue' ? "jl.credit - jl.debit" : "jl.debit - jl.credit";
+            $r = mysqli_query($conn, "SELECT COALESCE(SUM($natural),0) v FROM fin_journal_lines jl
+                                      JOIN fin_journal_entries je ON je.id=jl.entry_id AND je.state='posted' AND COALESCE(je.is_deleted,0)=0
+                                      WHERE jl.company_id=$cid AND jl.account_id=$acc AND $win");
+            $v = ($r && ($x = mysqli_fetch_assoc($r))) ? round((float)$x['v'], 2) : 0;
+            mysqli_query($conn, "UPDATE fin_budget_lines SET actual_amount=$v WHERE id=" . intval($L['id']) . " AND company_id=$cid");
+            $n++;
+        }
+        return $n;
+    }
+}
+
+// ── (فجوة 4) الإشعارات ──
+if (!function_exists('fin_notify')) {
+    /** إشعار لمستوى دور (أو للجميع). مع منع تكرار نفس العنوان في نفس اليوم. */
+    function fin_notify($conn, $company_id, $target_level, $title, $link = null)
+    {
+        $cid = intval($company_id);
+        $lvl = mysqli_real_escape_string($conn, $target_level);
+        $t = mysqli_real_escape_string($conn, mb_substr($title, 0, 200));
+        $chk = mysqli_query($conn, "SELECT 1 FROM fin_notifications WHERE company_id=$cid AND target_level='$lvl' AND title='$t' AND DATE(created_at)=CURDATE() LIMIT 1");
+        if ($chk && mysqli_num_rows($chk) > 0) { return; }
+        $l = $link === null ? 'NULL' : "'" . mysqli_real_escape_string($conn, $link) . "'";
+        mysqli_query($conn, "INSERT INTO fin_notifications (company_id, target_level, title, link) VALUES ($cid, '$lvl', '$t', $l)");
+    }
+}
+if (!function_exists('fin_handle_notif_read')) {
+    /** يُستدعى أول الصفحة (قبل أي إخراج): تعليم إشعار مقروءًا ثم إعادة توجيه. */
+    function fin_handle_notif_read($conn, $company_id, $redirect)
+    {
+        if (!isset($_GET['notif_read'])) { return; }
+        $cid = intval($company_id);
+        if (($_GET['notif_read'] ?? '') === 'all') {
+            mysqli_query($conn, "UPDATE fin_notifications SET is_read=1 WHERE company_id=$cid");
+        } else {
+            $id = intval($_GET['notif_read']);
+            mysqli_query($conn, "UPDATE fin_notifications SET is_read=1 WHERE id=$id AND company_id=$cid");
+        }
+        header("Location: $redirect"); exit();
+    }
+}
+if (!function_exists('fin_notifications_panel')) {
+    /** لوحة الإشعارات غير المقروءة لمستوى المستخدم الحالي (تُضمَّن أعلى الشاشة). */
+    function fin_notifications_panel($conn, $ctx, $self_url)
+    {
+        $cid = intval($ctx['company_id']);
+        $lvl = fin_user_level($conn, $ctx['role']);
+        if ($lvl === 'none') { return; }
+        $where = $lvl === 'all' ? "1=1" : "(target_level='" . mysqli_real_escape_string($conn, $lvl) . "' OR target_level='all')";
+        $r = mysqli_query($conn, "SELECT * FROM fin_notifications WHERE company_id=$cid AND is_read=0 AND $where ORDER BY id DESC LIMIT 8");
+        if (!$r || mysqli_num_rows($r) === 0) { return; }
+        $sep = strpos($self_url, '?') === false ? '?' : '&';
+        echo '<div class="card"><div class="card-body" style="padding:10px 14px">';
+        echo '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+        echo '<strong><i class="fas fa-bell"></i> تنبيهاتك (' . mysqli_num_rows($r) . ')</strong>';
+        echo '<a href="' . htmlspecialchars($self_url . $sep . 'notif_read=all') . '" class="badge badge-secondary" style="text-decoration:none">تعليم الكل مقروءًا</a></div>';
+        while ($nf = mysqli_fetch_assoc($r)) {
+            echo '<div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px dashed #e5e7eb">';
+            echo '<span style="font-size:13px">🔔 ' . htmlspecialchars($nf['title'])
+               . ($nf['link'] ? ' — <a href="' . htmlspecialchars($nf['link']) . '">فتح</a>' : '') . '</span>';
+            echo '<a href="' . htmlspecialchars($self_url . $sep . 'notif_read=' . intval($nf['id'])) . '" title="مقروء" style="text-decoration:none">✓</a></div>';
+        }
+        echo '</div></div>';
+    }
+}
+
+// ── اقتصاد الوحدة والتطابق الثلاثي (§3.23/§12) ──
+if (!function_exists('fin_work_models')) {
+    function fin_work_models()
+    {
+        return array('hour' => 'ساعة (تأجير)', 'ton' => 'طن (مقاولة)', 'meter' => 'متر (حفر)');
+    }
+}
+if (!function_exists('fin_match_states')) {
+    function fin_match_states()
+    {
+        return array('pending' => 'بانتظار المصادقات', 'matched' => 'متطابق ✓', 'variance' => 'فرق — يُعالَج', 'approved' => 'معتمد (توأمان)');
+    }
+}
+if (!function_exists('fin_downtime_causes')) {
+    function fin_downtime_causes()
+    {
+        return array('breakdown' => 'عطل', 'standby' => 'انتظار', 'operator_shortage' => 'نقص مشغّلين',
+                     'mobilization' => 'نقل وتحريك', 'client' => 'بسبب العميل');
+    }
+}
+if (!function_exists('fin_unit_due_type')) {
+    /** نوع مستحق المورد المقابل لنموذج العمل. */
+    function fin_unit_due_type($work_model)
+    {
+        $m = array('hour' => 'hours', 'ton' => 'tons', 'meter' => 'meters');
+        return isset($m[$work_model]) ? $m[$work_model] : 'other';
+    }
+}
+if (!function_exists('fin_compute_match_state')) {
+    /** التطابق الثلاثي: الثلاثة متساوية=matched · ناقصة=pending · مختلفة=variance. */
+    function fin_compute_match_state($ops, $client, $supplier)
+    {
+        if ($client === null || $supplier === null) { return 'pending'; }
+        $ops = round((float)$ops, 2); $client = round((float)$client, 2); $supplier = round((float)$supplier, 2);
+        return ($ops === $client && $client === $supplier) ? 'matched' : 'variance';
+    }
+}
+
 // ── المطابقة البنكية ──
 if (!function_exists('fin_bank_account_options')) {
     function fin_bank_account_options($conn, $is_super, $company_id, $selected = 0)

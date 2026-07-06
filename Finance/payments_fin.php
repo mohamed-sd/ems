@@ -59,10 +59,14 @@ if (isset($_GET['execute_id'])) {
     }
     if ($pay['direction'] === 'collection' && intval($pay['receivable_id']) > 0) {
         $rid = intval($pay['receivable_id']); $amt = (float)$pay['amount'];
+        // ملاحظة: SET تُقيَّم يسارًا→يمينًا في MySQL، فـ collected في الشرط هي القيمة المحدَّثة
         mysqli_query($conn, "UPDATE fin_receivables SET collected = LEAST(amount, collected + $amt),
-                             state = CASE WHEN collected + $amt >= amount THEN 'collected' ELSE 'partial' END
+                             state = CASE WHEN collected >= amount THEN 'collected' ELSE 'partial' END
                              WHERE id=$rid AND company_id=$company_id");
     }
+    // (فجوة 4) إشعار المدير المالي بحركة الخزينة
+    $dir_lbl = $pay['direction'] === 'collection' ? 'تحصيل' : 'صرف';
+    fin_notify($conn, $company_id, 'finance_manager', 'نُفِّذ ' . $dir_lbl . ' ' . $pay['payment_no'] . ' بمبلغ ' . number_format((float)$pay['amount'], 0), 'payments_fin.php');
     header("Location: payments_fin.php?msg=تم+تنفيذ+الحركة+بنجاح+✅"); exit();
 }
 
