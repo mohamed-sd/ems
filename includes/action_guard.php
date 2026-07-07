@@ -1,0 +1,213 @@
+<?php
+/**
+ * حارس صلاحية الفعل لمعالجات AJAX — Action Permission Guard (ADR-06 · المرحلة 1)
+ * ───────────────────────────────────────────────────────────────────────────
+ * علاج الخطر R3: الحارس المركزي القائم يتأكد «من أنت» (جلسة + AJAX + معدل)،
+ * لكن لا يسأل «هل يحق لك هذا الفعل؟». هذا الملف يضيف السؤال الثاني في نفس
+ * نقطة الاعتراض المركزية (config.php · ems_enforce_ajax_endpoint_security) —
+ * فيغطّي كل الـ34 معالجًا ولاحقًا كل معالجٍ جديد تلقائيًا، بلا تعديل أي ملف.
+ *
+ * سجل المعالجات (fail-closed): كل معالجٍ يُربط بشاشته الأم (كود الموديول)
+ * والفعل المطلوب. معالجٌ غير مسجَّل ⇒ يُرصد؛ وعند الإنفاذ يُرفض (سجّله واعيًا).
+ *
+ * الأفعال: 'view' لـ get_* · للمعالجات (*_handler) يُشتق الفعل من
+ * $_POST['action'] عبر ACTION_VERB_MAP (add/edit/delete)، وإلا 'edit' تحفّظًا.
+ *
+ * ثلاثة أوضاع (نمط CSRF/DDL المجرَّب — مراقبة ← إنفاذ ← تراجع):
+ *   EMS_ACTION_GUARD='monitor' (افتراضي) → يسجّل action_permission_violation بلا حجب.
+ *   EMS_ACTION_GUARD='enforce'           → يرفض (403 JSON) عند غياب الصلاحية.
+ *   القيمة من .env؛ التراجع = إعادتها إلى monitor (بلا نشر كود).
+ */
+
+if (!function_exists('ems_action_guard_registry')) {
+
+    /**
+     * خريطة المعالج → [موديولاته الأم، الفعل]. المفتاح مسارٌ منتهٍ به السكربت
+     * (يُطابَق بنهاية SCRIPT_NAME، أحرف صغيرة). 'modules' قد تحمل أكثر من كودٍ
+     * (نقطة مشتركة بين شاشات) — يكفي امتلاك الصلاحية على أحدها.
+     * 'action':
+     *   'view'   قراءة (get_*).
+     *   'auto'   يُشتق من $_POST['action'] (المعالجات).
+     *   'public' متاحٌ لأي مستخدمٍ مصادَقٍ بقرارٍ واعٍ (لا فحص فعل) — موثّق أدناه.
+     */
+    function ems_action_guard_registry()
+    {
+        return array(
+            // ── Timesheet — شاشة الساعات ──
+            'timesheet/get_timesheet.php'          => array('modules' => array('Timesheet/'), 'action' => 'view'),
+            'timesheet/get_timesheet_data.php'     => array('modules' => array('Timesheet/'), 'action' => 'view'),
+            'timesheet/get_timesheet_failures.php' => array('modules' => array('Timesheet/'), 'action' => 'view'),
+            'timesheet/get_operations.php'         => array('modules' => array('Timesheet/'), 'action' => 'view'),
+            'timesheet/get_drivers.php'            => array('modules' => array('Timesheet/'), 'action' => 'view'),
+            'timesheet/get_failure_codes.php'      => array('modules' => array('Timesheet/'), 'action' => 'view'),
+            'timesheet/get_contract_hours.php'     => array('modules' => array('Timesheet/'), 'action' => 'view'),
+
+            // ── Contracts ──
+            'contracts/get_contract_equipments.php'   => array('modules' => array('Contracts/'), 'action' => 'view'),
+            'contracts/get_equipments.php'            => array('modules' => array('Contracts/'), 'action' => 'view'),
+            'contracts/contract_actions_handler.php'  => array('modules' => array('Contracts/'), 'action' => 'auto'),
+            'contracts/contractequipments_handler.php'=> array('modules' => array('Contracts/'), 'action' => 'auto'),
+
+            // ── Suppliers ──
+            'suppliers/get_mine_contracts.php'                => array('modules' => array('Suppliers/'), 'action' => 'view'),
+            'suppliers/get_project_hours.php'                 => array('modules' => array('Suppliers/'), 'action' => 'view'),
+            'suppliers/get_supplier_contract_equipments.php'  => array('modules' => array('Suppliers/'), 'action' => 'view'),
+            'suppliers/supplier_contract_actions_handler.php' => array('modules' => array('Suppliers/'), 'action' => 'auto'),
+
+            // ── Equipments ──
+            'equipments/get_contract_stats.php'    => array('modules' => array('Equipments/'), 'action' => 'view'),
+            'equipments/get_equipment_details.php' => array('modules' => array('Equipments/'), 'action' => 'view'),
+            'equipments/get_mine_contracts.php'    => array('modules' => array('Equipments/'), 'action' => 'view'),
+            'equipments/get_model_data.php'        => array('modules' => array('Equipments/'), 'action' => 'view'),
+
+            // ── Oprators — شاشة التشغيل ──
+            'oprators/get_contract_stats.php'    => array('modules' => array('Oprators/'), 'action' => 'view'),
+            'oprators/get_contract_suppliers.php'=> array('modules' => array('Oprators/'), 'action' => 'view'),
+            'oprators/get_mine_contracts.php'    => array('modules' => array('Oprators/'), 'action' => 'view'),
+
+            // ── Employees ──
+            'employees/get_employee_data.php'               => array('modules' => array('Employees/'), 'action' => 'view'),
+            'employees/get_employee_contract_equipments.php'=> array('modules' => array('Employees/'), 'action' => 'view'),
+            'employees/get_mine_contracts.php'              => array('modules' => array('Employees/'), 'action' => 'view'),
+            'employees/get_project_hours.php'               => array('modules' => array('Employees/'), 'action' => 'view'),
+            'employees/employee_contract_actions_handler.php'=> array('modules' => array('Employees/'), 'action' => 'auto'),
+
+            // ── Maintenance — عدّادات الجرس قراءةٌ خفيفة ──
+            'maintenance/get_breakdown_count.php'   => array('modules' => array('Maintenance/'), 'action' => 'view'),
+            'maintenance/get_open_orders_count.php' => array('modules' => array('Maintenance/'), 'action' => 'view'),
+            'maintenance/get_project_equipment.php' => array('modules' => array('Maintenance/'), 'action' => 'view'),
+
+            // ── Reports ──
+            'reports/get_mine_contracts.php' => array('modules' => array('Reports/'), 'action' => 'view'),
+
+            // ── Approvals — محصّنٌ أصلًا بمجموعة أدواره؛ نبقيه بفحص view على شاشته ──
+            'approvals/hours_approval_handler.php' => array('modules' => array('Approvals/'), 'action' => 'auto'),
+
+            // ── الدردشة: متاحة لأي مستخدمٍ مصادَق بقرارٍ واعٍ (رسائل داخلية عامة) ──
+            'chats/get_messages.php'     => array('modules' => array(), 'action' => 'public'),
+            'chats/get_unread_count.php' => array('modules' => array(), 'action' => 'public'),
+        );
+    }
+
+    /** خريطة قيمة $_POST['action'] → فعل الصلاحية. */
+    function ems_action_verb_map($rawAction)
+    {
+        $a = strtolower(trim((string) $rawAction));
+        if ($a === '') {
+            return 'edit'; // معالجٌ بلا فعلٍ محدد ⇒ يُعامَل ككتابة تحفّظًا.
+        }
+        $add = array('add', 'create', 'insert', 'new', 'store', 'assign', 'approve');
+        $del = array('delete', 'remove', 'destroy', 'cancel', 'unassign');
+        foreach ($add as $k) { if (strpos($a, $k) !== false) { return 'add'; } }
+        foreach ($del as $k) { if (strpos($a, $k) !== false) { return 'delete'; } }
+        // get_/list_/fetch_ داخل معالجٍ = قراءة.
+        if (strpos($a, 'get') === 0 || strpos($a, 'list') === 0 || strpos($a, 'fetch') === 0 || strpos($a, 'load') === 0) {
+            return 'view';
+        }
+        return 'edit';
+    }
+
+    /**
+     * الحارس — يُستدعى من نقطة اعتراض AJAX المركزية. لا يعمل إلا على معالجٍ
+     * فعلي وبجلسة مستخدمٍ نظامي (super admin والبوابات الأخرى تمر).
+     */
+    function ems_enforce_action_permission($conn)
+    {
+        if (php_sapi_name() === 'cli') {
+            return;
+        }
+        $mode = function_exists('ems_env') ? strtolower((string) ems_env('EMS_ACTION_GUARD', 'monitor')) : 'monitor';
+        if ($mode !== 'monitor' && $mode !== 'enforce') {
+            $mode = 'monitor';
+        }
+
+        $script = isset($_SERVER['SCRIPT_NAME']) ? strtolower(str_replace('\\', '/', $_SERVER['SCRIPT_NAME'])) : '';
+        if ($script === '') {
+            return;
+        }
+
+        // المدير الأعلى يمر (يملك كل شيء).
+        $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+        $superRole = defined('EMS_ROLE_SUPER_ADMIN') ? EMS_ROLE_SUPER_ADMIN : '-1';
+        if ($role === $superRole) {
+            return;
+        }
+        // بوابات غير مستخدمي النظام (super_admin panel / company_user) خارج النطاق هنا.
+        if (!isset($_SESSION['user'])) {
+            return;
+        }
+
+        // مطابقة السجل بنهاية المسار.
+        $entry = null;
+        foreach (ems_action_guard_registry() as $suffix => $def) {
+            if (substr($script, -strlen($suffix)) === $suffix) {
+                $entry = $def;
+                break;
+            }
+        }
+
+        if ($entry === null) {
+            // معالجٌ غير مسجَّل — fail-closed.
+            ems_action_guard_log('unregistered', $script, '-', $mode);
+            if ($mode === 'enforce') {
+                ems_ajax_guard_response(403, 'هذا الإجراء غير مُصرَّح (معالج غير مسجَّل).');
+            }
+            return;
+        }
+
+        if ($entry['action'] === 'public') {
+            return; // قرارٌ واعٍ موثَّق في السجل.
+        }
+
+        $verb = $entry['action'] === 'auto'
+            ? ems_action_verb_map(isset($_POST['action']) ? $_POST['action'] : '')
+            : $entry['action'];
+
+        // هل يملك الدور الصلاحية على أيٍّ من موديولات الشاشة الأم؟
+        // دوال الصلاحيات تُحمَّل من الصفحات لا من config — نحمّلها هنا لأن الحارس
+        // يعمل أثناء تضمين config قبل أن يحمّلها المعالج (تعريفات دوالٍ آمنة).
+        if (!function_exists('check_page_permissions')) {
+            $helper = __DIR__ . '/permissions_helper.php';
+            if (is_readable($helper)) {
+                require_once $helper;
+            }
+        }
+        if (!function_exists('check_page_permissions')) {
+            // تعذّر تحميلها — سجّل ولا تحجب أعمى (fail-safe للتوفّر لا للأمن).
+            ems_action_guard_log('helper_unavailable', $script, '-', $mode);
+            return;
+        }
+        $key = 'can_' . $verb; // can_view | can_add | can_edit | can_delete
+        $allowed = false;
+        foreach ($entry['modules'] as $code) {
+            $perms = check_page_permissions($conn, $code);
+            if (!empty($perms[$key])) {
+                $allowed = true;
+                break;
+            }
+        }
+
+        if ($allowed) {
+            return;
+        }
+
+        ems_action_guard_log('denied', $script, $verb, $mode);
+        if ($mode === 'enforce') {
+            ems_ajax_guard_response(403, 'ليس لديك صلاحية تنفيذ هذا الإجراء.');
+        }
+    }
+
+    /** تسجيل مخالفةٍ في security.log (مراقبةً أو إنفاذًا). */
+    function ems_action_guard_log($kind, $script, $verb, $mode)
+    {
+        if (!function_exists('log_security_event')) {
+            return;
+        }
+        $user = isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : 'GUEST';
+        $role = isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : '-';
+        log_security_event('action_permission_violation', sprintf(
+            'mode=%s kind=%s script=%s verb=%s user=%s role=%s',
+            $mode, $kind, $script, $verb, $user, $role
+        ));
+    }
+}

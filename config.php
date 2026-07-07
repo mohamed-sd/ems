@@ -403,6 +403,16 @@ function ems_enforce_ajax_endpoint_security()
 
 ems_enforce_ajax_endpoint_security();
 
+// حارس صلاحية الفعل لمعالجات AJAX (ADR-06): يسأل «هل يحق لك هذا الفعل؟» بعد
+// أن تأكّد الحارس أعلاه «من أنت». يعمل فقط على معالجات AJAX (get_*/*_handler)
+// بنفس بوابة الحارس أعلاه — لا على الصفحات العادية. مراقبة/إنفاذ من .env.
+if (ems_is_ajax_endpoint_request()) {
+    require_once __DIR__ . '/includes/action_guard.php';
+    if (function_exists('ems_enforce_action_permission')) {
+        ems_enforce_action_permission($conn);
+    }
+}
+
 // الحارس المركزي لـ CSRF (يستثني /api/ و/admin/؛ مراقبة أو حجب حسب EMS_CSRF_ENFORCE)
 if (function_exists('ems_enforce_csrf_protection')) {
     ems_enforce_csrf_protection();
