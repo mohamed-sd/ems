@@ -35,7 +35,7 @@ if (!function_exists('approval_user_can_match_role')) {
         $roles = array_map('trim', explode(',', strval($role_required)));
         $roles = array_filter($roles, function($r) { return $r !== ''; });
 
-        if ($user_role === '-1') {
+        if ($user_role === EMS_ROLE_SUPER_ADMIN) {
             return true;
         }
 
@@ -160,7 +160,7 @@ if (!function_exists('approval_get_workflow_rules')) {
         }
 
         return [
-            ['role_required' => '-1', 'step_order' => 1]
+            ['role_required' => EMS_ROLE_SUPER_ADMIN, 'step_order' => 1]
         ];
     }
 }

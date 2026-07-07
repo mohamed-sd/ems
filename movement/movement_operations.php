@@ -38,27 +38,27 @@ $project_has_lat = db_table_has_column($conn, 'project', 'latitude');
 $project_has_lng = db_table_has_column($conn, 'project', 'longitude');
 
 if (!$operations_has_shift_type) {
-    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER shift_hours");
+    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER shift_hours", 'movement/movement_operations.php');
     $operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
 }
 // الساعات اليومية المستهدفة — ترحيل ذاتي محمي
 if (!db_table_has_column($conn, 'operations', 'target_daily_hours')) {
-    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN target_daily_hours DECIMAL(10,2) NULL DEFAULT NULL AFTER shift_hours");
+    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN target_daily_hours DECIMAL(10,2) NULL DEFAULT NULL AFTER shift_hours", 'movement/movement_operations.php');
 }
 if (!$equipment_drivers_has_shift_type) {
-    @mysqli_query($conn, "ALTER TABLE equipment_drivers ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER end_date");
+    ems_runtime_ddl($conn, "ALTER TABLE equipment_drivers ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER end_date", 'movement/movement_operations.php');
     $equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
 }
 // عمود حفظ الدور السابق (أساسي/احتياطي) قبل تحويل الفئة إلى «متعطل» — لاستعادته بعد إصلاح الصيانة.
 $operations_has_prev_category = db_table_has_column($conn, 'operations', 'prev_equipment_category');
 if (!$operations_has_prev_category) {
-    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN prev_equipment_category VARCHAR(20) NULL DEFAULT NULL AFTER equipment_category");
+    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN prev_equipment_category VARCHAR(20) NULL DEFAULT NULL AFTER equipment_category", 'movement/movement_operations.php');
     $operations_has_prev_category = db_table_has_column($conn, 'operations', 'prev_equipment_category');
 }
 // عمود الحالة التشغيلية (تعمل/جاهزة/معطلة) — يُدار من صفحة الحركة فقط، منفصل عن الدور (أساسي/احتياطي).
 $operations_has_op_state = db_table_has_column($conn, 'operations', 'op_state');
 if (!$operations_has_op_state) {
-    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN op_state ENUM('تعمل','جاهزة','معطلة') NOT NULL DEFAULT 'جاهزة' AFTER status");
+    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN op_state ENUM('تعمل','جاهزة','معطلة') NOT NULL DEFAULT 'جاهزة' AFTER status", 'movement/movement_operations.php');
     $operations_has_op_state = db_table_has_column($conn, 'operations', 'op_state');
 }
 

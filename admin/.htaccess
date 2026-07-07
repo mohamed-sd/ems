@@ -16,6 +16,7 @@ RewriteRule ^subscriptions/requests/?$  subscriptions/requests.php [L,QSA]
 RewriteRule ^plans/?$            plans.php           [L,QSA]
 RewriteRule ^support/view/?$     support/view.php    [L,QSA]
 RewriteRule ^audit-log/?$              audit_log.php              [L,QSA]
+RewriteRule ^csrf-monitor/?$           csrf_monitor.php           [L,QSA]
 RewriteRule ^reports-permissions/?$    reports_permissions.php    [L,QSA]
 RewriteRule ^settings/?$               settings.php               [L,QSA]
 

@@ -61,7 +61,7 @@ if (!$project_has_is_deleted || !$project_has_deleted_at || !$project_has_delete
         $alter_parts[] = "ADD COLUMN deleted_by INT(11) NULL DEFAULT NULL";
     }
     if (!empty($alter_parts)) {
-        @mysqli_query($conn, "ALTER TABLE project " . implode(', ', $alter_parts));
+        ems_runtime_ddl($conn, "ALTER TABLE project " . implode(', ', $alter_parts), 'Projects/projects.php');
     }
 
     $project_has_is_deleted = db_table_has_column($conn, 'project', 'is_deleted');

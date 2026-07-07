@@ -60,8 +60,8 @@ $equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id')
 $suppliers_has_company = db_table_has_column($conn, 'suppliers', 'company_id');
 
 if (!$equipments_has_company) {
-    @mysqli_query($conn, "ALTER TABLE equipments ADD COLUMN company_id INT(11) NULL DEFAULT NULL");
-    @mysqli_query($conn, "CREATE INDEX idx_equipments_company_id ON equipments (company_id)");
+    ems_runtime_ddl($conn, "ALTER TABLE equipments ADD COLUMN company_id INT(11) NULL DEFAULT NULL", 'Equipments/equipments_drivers.php');
+    ems_runtime_ddl($conn, "CREATE INDEX idx_equipments_company_id ON equipments (company_id)", 'Equipments/equipments_drivers.php');
     $equipments_has_company = db_table_has_column($conn, 'equipments', 'company_id');
 }
 

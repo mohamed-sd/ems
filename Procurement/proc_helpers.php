@@ -18,7 +18,7 @@ if (!function_exists('proc_ctx')) {
         $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
         return array(
             'role'          => $role,
-            'is_super'      => ($role === '-1'),
+            'is_super'      => ($role === EMS_ROLE_SUPER_ADMIN),
             'company_id'    => isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0,
             'user_id'       => isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0,
         );

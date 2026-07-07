@@ -29,6 +29,7 @@ $_admin_nav = [
     ['slug' => 'plans',         'label' => 'خطط الاشتراك',    'icon' => 'fa-layer-group',       'url' => 'plans'],
     ['slug' => 'support',       'label' => 'الدعم الفني',     'icon' => 'fa-headset',           'url' => 'support/view'],
     ['slug' => 'audit-log',          'label' => 'سجل المراجعة',         'icon' => 'fa-scroll',            'url' => 'audit-log'],
+    ['slug' => 'csrf-monitor',       'label' => 'مراقبة CSRF',          'icon' => 'fa-shield-halved',     'url' => 'csrf-monitor'],
     ['slug' => 'report-permissions', 'label' => 'صلاحيات التقارير',     'icon' => 'fa-chart-pie',         'url' => 'reports-permissions'],
     ['slug' => 'settings',           'label' => 'الإعدادات',            'icon' => 'fa-gear',              'url' => 'settings'],
 ];

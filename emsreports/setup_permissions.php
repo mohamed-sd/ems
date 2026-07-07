@@ -31,7 +31,7 @@ $createSQL = "CREATE TABLE IF NOT EXISTS `report_role_permissions` (
   UNIQUE KEY `unique_role_report` (`role_id`, `report_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
-$r = mysqli_query($conn, $createSQL);
+$r = ems_runtime_ddl($conn, $createSQL, 'emsreports/setup_permissions.php');
 $msgs = [];
 $msgs[] = $r ? '✅ الجدول جاهز (أُنشئ أو كان موجوداً)' : '❌ خطأ في إنشاء الجدول: ' . mysqli_error($conn);
 

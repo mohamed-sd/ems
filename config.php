@@ -16,6 +16,14 @@ if (PHP_SAPI !== 'cli') {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 0. متغيرات البيئة (.env) — أول ما يُحمَّل: كل الأسرار منه حصريًا (ADR-04)
+// ═══════════════════════════════════════════════════════════════════════════
+require_once __DIR__ . '/includes/env.php';
+
+// فهرس ثوابت الأدوار — المصدر الوحيد لأرقام الأدوار (ADR-07؛ لا أرقام سحرية جديدة)
+require_once __DIR__ . '/includes/roles.php';
+
+// ═══════════════════════════════════════════════════════════════════════════
 // 1. تحميل نظام الأمان المركزي
 // ═══════════════════════════════════════════════════════════════════════════
 require_once __DIR__ . '/includes/security.php';
@@ -157,15 +165,17 @@ if (function_exists('mysqli_report')) {
     mysqli_report(MYSQLI_REPORT_OFF);
 }
 
-// $host = "srv1986.hstgr.io";
-// $user = "u359449619_ems";
-// $pass = "Aaammm@1110"; // ← كلمة المرور الصحيحة
-// $db   = "u359449619_ems";
+// بيانات الاتصال من .env حصريًا (ADR-04) — لا تُكتب أي قيمة اتصالٍ هنا.
+// fallback مؤقت لقيم التطوير المحلية: غياب .env لا يكسر البيئة المحلية،
+// ويُسجَّل تحذير حتى تُنشأ من القالب .env.example (على الإنتاج .env إلزامي).
+if (!ems_env_loaded()) {
+    error_log('EMS WARNING [ADR-04]: .env missing — running on local dev fallback credentials. Create it from .env.example');
+}
 
- $host = "localhost";
- $user = "root";
- $pass = ""; // ← كلمة المرور الصحيحة
- $db   = "equipation_manage";
+$host = ems_env('DB_HOST', 'localhost');
+$user = ems_env('DB_USER', 'root');
+$pass = ems_env('DB_PASS', '');
+$db   = ems_env('DB_NAME', 'equipation_manage');
 
 // Establish Secure Connection
 $conn = new mysqli($host, $user, $pass, $db);
@@ -206,6 +216,15 @@ mysqli_query($conn, "SET collation_connection = 'utf8mb4_unicode_ci'");
 
 // تهيئة إعدادات أداء اتصال قاعدة البيانات
 ems_optimize_db_session($conn);
+
+// حارس مطابقة فهرس الأدوار (ADR-07): مرة لكل جلسة — أي انحرافٍ بين الثوابت
+// وجدول roles الحي يُسجَّل في security.log (role_constant_mismatch).
+if (PHP_SAPI !== 'cli'
+    && session_status() === PHP_SESSION_ACTIVE
+    && empty($_SESSION['ems_roles_verified'])) {
+    ems_roles_verify_against_db($conn);
+    $_SESSION['ems_roles_verified'] = 1;
+}
 
 /**
  * Check if a table has a specific column (standalone for early auth guard).
@@ -433,6 +452,68 @@ function db_table_has_column($conn, $tableName, $columnName) {
     $cache[$key] = $res && mysqli_num_rows($res) > 0;
 
     return $cache[$key];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// تجميد DDL وقت التشغيل (ADR-03 · المرحلة 0) — نفس نمط EMS_CSRF_ENFORCE:
+// false = مراقبة: يُنفَّذ كما كان، مع تسجيل كل تنفيذٍ فعليٍّ في logs/security.log.
+// true  = تجميد: لا يُنفَّذ؛ تُسجَّل المحاولة فقط (RUNTIME_DDL_BLOCKED).
+// يُقلَب إلى true بعد أسبوع مراقبةٍ خالٍ من RUNTIME_DDL_EXECUTED.
+// ═══════════════════════════════════════════════════════════════════════════
+if (!defined('EMS_DDL_FREEZE')) {
+    define('EMS_DDL_FREEZE', false);
+}
+
+/**
+ * الغلاف المركزي الوحيد لأي DDL وقت التشغيل — كل تغيير مخطّطٍ جديدٍ يُكتب
+ * ترحيلًا في database/migrations ويُطبَّق بـ migrate.php، لا استدعاءً جديدًا هنا
+ * (قائمة التجميد · EQUIP-ARC-R02 §5).
+ */
+function ems_runtime_ddl($conn, $sql, $origin = '')
+{
+    if (EMS_DDL_FREEZE === true) {
+        if (function_exists('log_security_event')) {
+            log_security_event('RUNTIME_DDL_BLOCKED', $origin . ' :: ' . substr(trim($sql), 0, 300));
+        }
+        return false;
+    }
+
+    $ok = @mysqli_query($conn, $sql);
+
+    // CREATE ... IF NOT EXISTS على جدولٍ قائم = لا-شيء (تحذير 1050 فقط) — لا يُسجَّل
+    // حتى لا يمتلئ السجل من الصفحات التي تستدعيه غير مشروطٍ مع كل طلب.
+    $isNoop = $ok && stripos($sql, 'IF NOT EXISTS') !== false && mysqli_warning_count($conn) > 0;
+    if (!$isNoop && function_exists('log_security_event')) {
+        log_security_event($ok ? 'RUNTIME_DDL_EXECUTED' : 'RUNTIME_DDL_FAILED', $origin . ' :: ' . substr(trim($sql), 0, 300));
+    }
+
+    return $ok;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// بوابة العزل / DAO (ADR-02 · المرحلة 1) — للشاشات المُهاجَرة والوحدات الجديدة.
+// العقد: docs/TENANT_GATE_CONTRACT_ar.md — الشاشات القديمة تبقى على mysqli
+// الخام حتى دور هجرتها (لا تغيير في سلوكها).
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * مصنع كسول لبوابة العزل بهوية الجلسة الحالية. الاستخدام في شاشةٍ مُهاجَرة:
+ *   $gate = ems_tenant_db();
+ *   $rows = $gate->select('mnt_breakdown', ['orderBy' => 'id DESC', 'limit' => 50]);
+ * تحميل الأصناف مباشر (لا اعتماد على المُحمِّل التلقائي — يعمل في CLI أيضًا).
+ */
+function ems_tenant_db()
+{
+    static $gate = null;
+    if ($gate === null) {
+        require_once __DIR__ . '/app/Core/TenantGateException.php';
+        require_once __DIR__ . '/app/Core/TenantRegistry.php';
+        require_once __DIR__ . '/app/Core/TenantContext.php';
+        require_once __DIR__ . '/app/Core/TenantDb.php';
+        global $conn;
+        $gate = new \App\Core\TenantDb($conn, \App\Core\TenantContext::fromSession());
+    }
+    return $gate;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

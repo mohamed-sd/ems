@@ -191,7 +191,7 @@ function ensure_saas_subscription_tables($conn) {
     }
 
     foreach ($queries as $sql) {
-        if (!@mysqli_query($conn, $sql)) {
+        if (!ems_runtime_ddl($conn, $sql, 'company/register.php')) {
             return mysqli_error($conn);
         }
     }

@@ -16,9 +16,12 @@ $IS_CLI = (PHP_SAPI === 'cli');
 require __DIR__ . '/../config.php';
 require_once __DIR__ . '/trs_helpers.php';
 
+// حارس التشغيل عبر المتصفح: ?key=... يُطابَق مع TRANSPORT_CRON_KEY من .env (ADR-04).
+// fail-closed: مفتاح غير مضبوط في .env = لا مسار ويب إطلاقًا (CLI لا يتأثر).
 if (!$IS_CLI) {
-    $key = isset($_GET['key']) ? $_GET['key'] : '';
-    if ($key !== 'transport-cron') { http_response_code(403); exit('forbidden'); }
+    $key = isset($_GET['key']) ? (string) $_GET['key'] : '';
+    $expected = (string) ems_env('TRANSPORT_CRON_KEY', '');
+    if ($expected === '' || !hash_equals($expected, $key)) { http_response_code(403); exit('forbidden'); }
     header('Content-Type: text/plain; charset=UTF-8');
 }
 

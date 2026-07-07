@@ -82,7 +82,11 @@ if (isset($conn) && $conn instanceof \mysqli) {
                 if ($ddl !== false) {
                     // Extract only the CREATE TABLE block.
                     if (preg_match('/(CREATE TABLE IF NOT EXISTS.*?;)/si', $ddl, $m)) {
-                        @mysqli_query($conn, $m[1]);
+                        if (function_exists('ems_runtime_ddl')) {
+                            ems_runtime_ddl($conn, $m[1], 'app/bootstrap.php');
+                        } else {
+                            @mysqli_query($conn, $m[1]);
+                        }
                     }
                 }
             }

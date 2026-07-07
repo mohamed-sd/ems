@@ -13,8 +13,9 @@ DirectoryIndex index.php index.html
 # 1. حماية الملفات الحساسة
 # ═══════════════════════════════════════════════════════════════════════════
 
-# منع الوصول لملفات .htaccess و .env
-<FilesMatch "^\.(htaccess|htpasswd|env)$">
+# منع الوصول لملفات .htaccess و .env وأخواتها (قائمة صريحة — لا نستخدم ^\. الشامل
+# حتى لا نكسر .well-known المطلوب لتجديد شهادات SSL على الاستضافة)
+<FilesMatch "^\.(htaccess|htpasswd|env|env\.example|gitignore)$">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>

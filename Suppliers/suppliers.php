@@ -27,13 +27,13 @@ $suppliers_has_deleted_at = db_table_has_column($conn, 'suppliers', 'deleted_at'
 $suppliers_has_deleted_by = db_table_has_column($conn, 'suppliers', 'deleted_by');
 
 if (!$suppliers_has_is_deleted) {
-    @mysqli_query($conn, "ALTER TABLE suppliers ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0");
+    ems_runtime_ddl($conn, "ALTER TABLE suppliers ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0", 'Suppliers/suppliers.php');
 }
 if (!$suppliers_has_deleted_at) {
-    @mysqli_query($conn, "ALTER TABLE suppliers ADD COLUMN deleted_at DATETIME NULL");
+    ems_runtime_ddl($conn, "ALTER TABLE suppliers ADD COLUMN deleted_at DATETIME NULL", 'Suppliers/suppliers.php');
 }
 if (!$suppliers_has_deleted_by) {
-    @mysqli_query($conn, "ALTER TABLE suppliers ADD COLUMN deleted_by INT NULL");
+    ems_runtime_ddl($conn, "ALTER TABLE suppliers ADD COLUMN deleted_by INT NULL", 'Suppliers/suppliers.php');
 }
 
 $suppliers_has_is_deleted = db_table_has_column($conn, 'suppliers', 'is_deleted');

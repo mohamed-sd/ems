@@ -1,0 +1,198 @@
+<?php
+/**
+ * سجل الجداول — قلب مبدأ Fail-Closed في بوابة العزل (ADR-02 · المرحلة 1)
+ * ───────────────────────────────────────────────────────────────────────────
+ * كل جدولٍ في القاعدة مصنَّفٌ هنا صراحةً. أي جدولٍ غير مسجَّل تُرفض كل
+ * عملياته عبر البوابة (TenantGateException + تسجيل tenant_gate_violation) —
+ * الجدول الجديد يُسجَّل واعيًا مع هجرته، لا افتراضات صامتة.
+ *
+ * الفئات:
+ *   T_TENANT     بيانات مستأجرٍ (يحمل company_id) — يُحقن العزل قراءةً وكتابة.
+ *   T_CHILD      ابنٌ بلا company_id — يُعزل عبر أبيه (EXISTS على الأب).
+ *   T_GLOBAL     مرجع نظامٍ عام — قراءته متاحة، كتابته للمدير الأعلى فقط.
+ *   T_RESTRICTED جداول منصةٍ/محرّكاتٍ لم تُهاجَر بعد — البوابة ترفضها كليًا
+ *                حتى يُعرَّف عقدها مع هجرة وحدتها (fail-closed).
+ *
+ * 'soft' = يملك أعمدة الحذف الناعم (الحذف عبر البوابة = ناعم حصريًا؛
+ * والقراءة تستبعد المحذوف افتراضيًا).
+ *
+ * القسم T_TENANT مولَّدٌ آليًا من information_schema (2026-07-07 · 121 جدولًا
+ * بعد استبعاد جدول اختبارٍ شارد). عدّله بوعي: إضافة جدولٍ = قرار تصنيفٍ
+ * موثَّق في العقد docs/TENANT_GATE_CONTRACT_ar.md §3.
+ */
+
+namespace App\Core;
+
+class TenantRegistry
+{
+    const T_TENANT = 'tenant';
+    const T_CHILD = 'child';
+    const T_GLOBAL = 'global';
+    const T_RESTRICTED = 'restricted';
+
+    private static $tables = array(
+        // ── بيانات المستأجرين (مولَّد من القاعدة الحية) ─────────────────────
+        'activities' => array('type' => self::T_TENANT, 'soft' => true),
+        'activity_logs' => array('type' => self::T_TENANT, 'soft' => false),
+        'admin_subscription_requests' => array('type' => self::T_TENANT, 'soft' => false),
+        'audit_logs' => array('type' => self::T_TENANT, 'soft' => false),
+        'clients' => array('type' => self::T_TENANT, 'soft' => true),
+        'commercial_risks' => array('type' => self::T_TENANT, 'soft' => true),
+        'contract_amendments' => array('type' => self::T_TENANT, 'soft' => true),
+        'contract_events' => array('type' => self::T_TENANT, 'soft' => true),
+        'contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
+        'contractequipments' => array('type' => self::T_TENANT, 'soft' => false),
+        'contracts' => array('type' => self::T_TENANT, 'soft' => true),
+        'driver_contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
+        'drivercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
+        'drivercontracts' => array('type' => self::T_TENANT, 'soft' => false),
+        'employee_roles' => array('type' => self::T_TENANT, 'soft' => false),
+        'employees' => array('type' => self::T_TENANT, 'soft' => false),
+        'equipment_drivers' => array('type' => self::T_TENANT, 'soft' => false),
+        'equipment_operators' => array('type' => self::T_TENANT, 'soft' => false),
+        'equipments' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_accountants' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_approval_matrix' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_approvals' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_assets' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_bank_accounts' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_bank_statement_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_budget_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_budgets' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_cash_forecasts' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_chart_of_accounts' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_closing_items' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_cost_centers' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_cost_records' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_depreciation' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_dues' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_financial_events' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_financial_periods' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_funding_facilities' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_funding_schedules' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_internal_allocations' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_journal_entries' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_journal_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_notifications' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_payments' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_receivables' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_tax_codes' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_tax_transactions' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_unit_records' => array('type' => self::T_TENANT, 'soft' => true),
+        'fin_units' => array('type' => self::T_TENANT, 'soft' => true),
+        'fleet_depreciation_profile' => array('type' => self::T_TENANT, 'soft' => true),
+        'fleet_depreciation_profile_audit' => array('type' => self::T_TENANT, 'soft' => false),
+        'fleet_equipment_compliance' => array('type' => self::T_TENANT, 'soft' => true),
+        'fleet_equipment_component' => array('type' => self::T_TENANT, 'soft' => true),
+        'fleet_equipment_history' => array('type' => self::T_TENANT, 'soft' => false),
+        'fleet_equipment_protection' => array('type' => self::T_TENANT, 'soft' => true),
+        'fleet_model' => array('type' => self::T_TENANT, 'soft' => true),
+        'fleet_model_service_spec' => array('type' => self::T_TENANT, 'soft' => false),
+        'housing_unit' => array('type' => self::T_TENANT, 'soft' => false),
+        'job_titles' => array('type' => self::T_TENANT, 'soft' => false),
+        'messages' => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_breakdown' => array('type' => self::T_TENANT, 'soft' => true),
+        'mnt_inspection' => array('type' => self::T_TENANT, 'soft' => true),
+        'mnt_inspection_line' => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_inspection_template' => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_lookup' => array('type' => self::T_TENANT, 'soft' => true),
+        'mnt_order' => array('type' => self::T_TENANT, 'soft' => true),
+        'mnt_order_labor' => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_order_part' => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_plan' => array('type' => self::T_TENANT, 'soft' => true),
+        'mnt_plan_task' => array('type' => self::T_TENANT, 'soft' => false),
+        'operations' => array('type' => self::T_TENANT, 'soft' => false),
+        'opportunities' => array('type' => self::T_TENANT, 'soft' => true),
+        'pricelists' => array('type' => self::T_TENANT, 'soft' => true),
+        'proc_custody' => array('type' => self::T_TENANT, 'soft' => true),
+        'proc_issue' => array('type' => self::T_TENANT, 'soft' => true),
+        'proc_issue_line' => array('type' => self::T_TENANT, 'soft' => false),
+        'proc_item' => array('type' => self::T_TENANT, 'soft' => true),
+        'proc_lookup' => array('type' => self::T_TENANT, 'soft' => true),
+        'proc_order' => array('type' => self::T_TENANT, 'soft' => true),
+        'proc_order_line' => array('type' => self::T_TENANT, 'soft' => false),
+        'proc_orderpoint' => array('type' => self::T_TENANT, 'soft' => true),
+        'proc_receipt_custody' => array('type' => self::T_TENANT, 'soft' => true),
+        'proc_receipt_line' => array('type' => self::T_TENANT, 'soft' => false),
+        'proc_request' => array('type' => self::T_TENANT, 'soft' => true),
+        'proc_request_line' => array('type' => self::T_TENANT, 'soft' => false),
+        'proc_stock_move' => array('type' => self::T_TENANT, 'soft' => false),
+        'proc_supplier' => array('type' => self::T_TENANT, 'soft' => true),
+        'proc_warehouse' => array('type' => self::T_TENANT, 'soft' => true),
+        'products' => array('type' => self::T_TENANT, 'soft' => true),
+        'project' => array('type' => self::T_TENANT, 'soft' => true),
+        'quotations' => array('type' => self::T_TENANT, 'soft' => true),
+        'supplier_contract_notes' => array('type' => self::T_TENANT, 'soft' => false),
+        'suppliercontractequipments' => array('type' => self::T_TENANT, 'soft' => false),
+        'suppliers' => array('type' => self::T_TENANT, 'soft' => true),
+        'supplierscontracts' => array('type' => self::T_TENANT, 'soft' => false),
+        'tenders' => array('type' => self::T_TENANT, 'soft' => true),
+        'timesheet' => array('type' => self::T_TENANT, 'soft' => false),
+        'timesheet_approval_notes' => array('type' => self::T_TENANT, 'soft' => false),
+        'timesheet_approvals' => array('type' => self::T_TENANT, 'soft' => false),
+        'timesheet_failure_hours' => array('type' => self::T_TENANT, 'soft' => false),
+        'transfer_attachments' => array('type' => self::T_TENANT, 'soft' => false),
+        'transfer_cost_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        'transfer_cost_rules' => array('type' => self::T_TENANT, 'soft' => false),
+        'transfer_events' => array('type' => self::T_TENANT, 'soft' => false),
+        'transfer_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        'transfer_orders' => array('type' => self::T_TENANT, 'soft' => false),
+        'transfer_permits' => array('type' => self::T_TENANT, 'soft' => false),
+        'transfer_requests' => array('type' => self::T_TENANT, 'soft' => false),
+        'transfer_types' => array('type' => self::T_TENANT, 'soft' => false),
+        'trs_locations' => array('type' => self::T_TENANT, 'soft' => false),
+        'trs_notifications' => array('type' => self::T_TENANT, 'soft' => false),
+        'units_of_measure' => array('type' => self::T_TENANT, 'soft' => true),
+        'users' => array('type' => self::T_TENANT, 'soft' => true),
+        'worker_backup' => array('type' => self::T_TENANT, 'soft' => false),
+        'worker_contract' => array('type' => self::T_TENANT, 'soft' => false),
+        'worker_evaluation' => array('type' => self::T_TENANT, 'soft' => false),
+        'worker_leave_absence' => array('type' => self::T_TENANT, 'soft' => false),
+        'worker_movement' => array('type' => self::T_TENANT, 'soft' => false),
+        'worker_qualification' => array('type' => self::T_TENANT, 'soft' => false),
+        'worker_restricted_site' => array('type' => self::T_TENANT, 'soft' => false),
+        'worker_settlement' => array('type' => self::T_TENANT, 'soft' => false),
+        'workforce_requirement' => array('type' => self::T_TENANT, 'soft' => false),
+
+        // ── أبناء يُعزلون عبر آبائهم ─────────────────────────────────────────
+        'worker_settlement_line' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'worker_settlement', 'fk' => 'settlement_id'),
+        'worker_evaluation_kpi' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'worker_evaluation', 'fk' => 'evaluation_id'),
+        'mnt_inspection_template_line' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'mnt_inspection_template', 'fk' => 'template_id'),
+
+        // ── مراجع نظامٍ عامة (قراءة للجميع، كتابة للمدير الأعلى) ────────────
+        'roles' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'modules' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'role_permissions' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'report_role_permissions' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'equipments_types' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'failure_codes' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'admin_subscription_plans' => array('type' => self::T_GLOBAL, 'soft' => false),
+
+        // ── منصة/محرّكات لم تُهاجَر — مرفوضة عبر البوابة حتى تعريف عقدها ────
+        'admin_companies' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        'admin_audit_log' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        'super_admins' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        'super_admin_password_resets' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        'company_user_password_resets' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        'api_tokens' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        'schema_migrations' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        'approval_requests' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        'approval_steps' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        'approval_workflow_rules' => array('type' => self::T_RESTRICTED, 'soft' => false),
+    );
+
+    /** تعريف جدولٍ أو null إن لم يكن مسجَّلًا. */
+    public static function get($table)
+    {
+        return isset(self::$tables[$table]) ? self::$tables[$table] : null;
+    }
+
+    /** كل السجل (للاختبارات والتدقيق). */
+    public static function all()
+    {
+        return self::$tables;
+    }
+}

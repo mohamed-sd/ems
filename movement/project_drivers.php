@@ -28,7 +28,7 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 if (!$equipment_drivers_has_shift_type) {
-    @mysqli_query($conn, "ALTER TABLE equipment_drivers ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER end_date");
+    ems_runtime_ddl($conn, "ALTER TABLE equipment_drivers ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER end_date", 'movement/project_drivers.php');
     $equipment_drivers_has_shift_type = db_table_has_column($conn, 'equipment_drivers', 'shift_type');
 }
 

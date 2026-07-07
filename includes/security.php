@@ -207,19 +207,18 @@ function validate_session_fingerprint() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * توليد CSRF Token
+ * توليد CSRF Token — رمز واحد ثابت لعمر الجلسة (نمط OWASP القياسي).
+ *
+ * قرار ADR-05 (2026-07-07): أُلغي التجديد الساعيّ الذي كان هنا. الدليل من
+ * security.log: 150 من 152 مخالفة متصفحٍ حقيقيةً كانت token=invalid سببها
+ * شاشات مفتوحة أكثر من ساعة (رمز الصفحة يتقادم بينما الجلسة صالحة) — أي أن
+ * التجديد الساعيّ كان يُنتج رفضًا لعملٍ مشروع دون مكسبٍ أمنيٍّ يُذكر.
+ * الرمز يتجدد طبيعيًا مع كل جلسةٍ جديدة (secure_session_start يعيد توليد
+ * معرف الجلسة عند الدخول)، وهذا هو النمط المعتمد. لا تُعِد التجديد الزمني
+ * دون قرارٍ مُرقَّمٍ يعالج الشاشات طويلة العمر (مثلاً تحديث meta دوريًا).
  */
 function generate_csrf_token() {
     if (!isset($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-
-    if (!isset($_SESSION['csrf_token_time'])) {
-        $_SESSION['csrf_token_time'] = time();
-    }
-
-    // تجديد التوكن كل ساعة
-    if (time() - $_SESSION['csrf_token_time'] > 3600) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         $_SESSION['csrf_token_time'] = time();
     }
@@ -340,14 +339,53 @@ function ems_inject_csrf_fields($buffer) {
 }
 
 /**
+ * قائمة مسارات الإنفاذ المتدرج — من CSRF_ENFORCE_PATHS في .env (ADR-05).
+ * قيم مفصولة بفواصل تُطابَق كأجزاء من مسار السكربت:
+ *   "/Finance/"                → إنفاذ على وحدة المالية كاملة
+ *   "/Oprators/oprators.php"   → إنفاذ على صفحة واحدة
+ * التراجع عن أي مسار = حذفه من .env (بلا نشر كود). عند اكتمال التعميم
+ * يُقلب EMS_CSRF_ENFORCE=true وتفقد القائمة أثرها (الكل مُنفَذ).
+ * قاعدة الصفحات الجديدة: أي وحدة/صفحة جديدة تدخل هذه القائمة من يوم إطلاقها.
+ */
+function ems_csrf_enforced_paths() {
+    static $paths = null;
+    if ($paths !== null) {
+        return $paths;
+    }
+    $paths = array();
+    $csv = function_exists('ems_env') ? (string) ems_env('CSRF_ENFORCE_PATHS', '') : '';
+    foreach (explode(',', $csv) as $p) {
+        $p = trim($p);
+        if ($p !== '') {
+            $paths[] = $p;
+        }
+    }
+    return $paths;
+}
+
+/** هل هذا السكربت ضمن مسارات الإنفاذ المتدرج؟ */
+function ems_csrf_path_enforced($script) {
+    if ($script === '') {
+        return false;
+    }
+    foreach (ems_csrf_enforced_paths() as $prefix) {
+        if (stripos($script, $prefix) !== false) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * الحارس المركزي للتحقق من CSRF لكل طلب يُغيّر الحالة.
  *
  * - يعمل على POST/PUT/PATCH/DELETE فقط.
  * - يستثني الـ API (مصادقة Bearer) ولوحة الأدمن (حماية خاصة).
  * - يقرأ التوكن من $_POST['csrf_token'] أو ترويسة X-CSRF-Token.
- * - وضعان حسب الثابت EMS_CSRF_ENFORCE:
- *     false (افتراضي) → مراقبة فقط: يُسجّل المخالفة دون حجب.
- *     true            → تطبيق: يرفض الطلب (403) عند غياب/خطأ التوكن.
+ * - ثلاثة أوضاع (ADR-05 — مراقبة ← حجب متدرج ← تعميم):
+ *     EMS_CSRF_ENFORCE=false والمسار خارج القائمة → مراقبة: تسجيل بلا حجب.
+ *     EMS_CSRF_ENFORCE=false والمسار في CSRF_ENFORCE_PATHS → حجب هذا المسار.
+ *     EMS_CSRF_ENFORCE=true → حجب شامل (نهاية التدرج).
  */
 function ems_enforce_csrf_protection() {
     if (php_sapi_name() === 'cli') {
@@ -391,9 +429,11 @@ function ems_enforce_csrf_protection() {
         ));
     }
 
-    $enforce = defined('EMS_CSRF_ENFORCE') && EMS_CSRF_ENFORCE === true;
+    // الإنفاذ: شامل (الثابت) أو متدرج (قائمة المسارات من .env).
+    $enforce = (defined('EMS_CSRF_ENFORCE') && EMS_CSRF_ENFORCE === true)
+        || ems_csrf_path_enforced($script !== '' ? $script : $uri);
     if (!$enforce) {
-        return; // المرحلة 1: مراقبة فقط، لا حجب.
+        return; // وضع المراقبة: تسجيل فقط، لا حجب.
     }
 
     // المرحلة 2: حجب الطلب.

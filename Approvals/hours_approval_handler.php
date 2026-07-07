@@ -22,7 +22,7 @@ $user_name  = mysqli_real_escape_string($conn, $_SESSION['user']['name'] ?? 'غ�
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 
 // الأدوار المسموح لها: المدراء الرئيسيون والأدمن
-$allowed_roles = ['-1', '1', '2', '3', '4' , '5'];
+$allowed_roles = EMS_ROLES_HOURS_APPROVAL_ACCESS; // فهرس ثوابت الأدوار (ADR-07)
 if (!in_array($role, $allowed_roles)) {
     die(json_encode(['success' => false, 'message' => 'ليس لديك صلاحية'], JSON_UNESCAPED_UNICODE));
 }
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // التأكد من وجود الجداول
-$conn->query("CREATE TABLE IF NOT EXISTS `timesheet_approvals` (
+ems_runtime_ddl($conn, "CREATE TABLE IF NOT EXISTS `timesheet_approvals` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `timesheet_id` int(11) NOT NULL,
   `company_id` int(11) DEFAULT NULL,
@@ -43,9 +43,9 @@ $conn->query("CREATE TABLE IF NOT EXISTS `timesheet_approvals` (
   `status` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_ts_level` (`timesheet_id`, `approval_level`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci");
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", 'Approvals/hours_approval_handler.php');
 
-$conn->query("CREATE TABLE IF NOT EXISTS `timesheet_approval_notes` (
+ems_runtime_ddl($conn, "CREATE TABLE IF NOT EXISTS `timesheet_approval_notes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `timesheet_id` int(11) NOT NULL,
   `company_id` int(11) DEFAULT NULL,
@@ -57,7 +57,7 @@ $conn->query("CREATE TABLE IF NOT EXISTS `timesheet_approval_notes` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `status` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci");
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", 'Approvals/hours_approval_handler.php');
 
 $action = isset($_POST['action']) ? trim($_POST['action']) : '';
 

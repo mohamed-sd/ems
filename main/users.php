@@ -16,16 +16,16 @@ $users_has_status = db_table_has_column($conn, 'users', 'status');
 $users_has_employee_id = db_table_has_column($conn, 'users', 'employee_id'); // رابط الحساب↔الموظف (الخيار ب)
 
 if (!$users_has_is_deleted) {
-    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0");
+    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0", 'main/users.php');
 }
 if (!$users_has_deleted_at) {
-    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN deleted_at DATETIME NULL");
+    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN deleted_at DATETIME NULL", 'main/users.php');
 }
 if (!$users_has_deleted_by) {
-    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN deleted_by INT NULL");
+    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN deleted_by INT NULL", 'main/users.php');
 }
 if (!$users_has_status) {
-    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'active'");
+    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'active'", 'main/users.php');
 }
 
 $users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');

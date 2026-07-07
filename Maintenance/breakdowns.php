@@ -35,7 +35,7 @@ $current_role_int  = intval($current_role);
 // عمود «موجَّه إلى (الدور/القسم)» — يُضاف تلقائياً مرة واحدة إن لم يكن موجوداً (نمط add-if-missing).
 $breakdown_has_target_role = db_table_has_column($conn, 'mnt_breakdown', 'target_role');
 if (!$breakdown_has_target_role) {
-    @mysqli_query($conn, "ALTER TABLE mnt_breakdown ADD COLUMN target_role INT NULL DEFAULT NULL AFTER reporter_dept");
+    ems_runtime_ddl($conn, "ALTER TABLE mnt_breakdown ADD COLUMN target_role INT NULL DEFAULT NULL AFTER reporter_dept", 'Maintenance/breakdowns.php');
     $breakdown_has_target_role = db_table_has_column($conn, 'mnt_breakdown', 'target_role');
 }
 

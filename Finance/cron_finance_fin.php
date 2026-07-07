@@ -7,10 +7,12 @@
 $IS_CLI = (PHP_SAPI === 'cli');
 require __DIR__ . '/../config.php';
 
-// حارس بسيط للتشغيل عبر المتصفح (اختياري): ?key=finance-cron
+// حارس التشغيل عبر المتصفح: ?key=... يُطابَق مع FINANCE_CRON_KEY من .env (ADR-04).
+// fail-closed: مفتاح غير مضبوط في .env = لا مسار ويب إطلاقًا (CLI لا يتأثر).
 if (!$IS_CLI) {
-    $key = isset($_GET['key']) ? $_GET['key'] : '';
-    if ($key !== 'finance-cron') { http_response_code(403); exit('forbidden'); }
+    $key = isset($_GET['key']) ? (string) $_GET['key'] : '';
+    $expected = (string) ems_env('FINANCE_CRON_KEY', '');
+    if ($expected === '' || !hash_equals($expected, $key)) { http_response_code(403); exit('forbidden'); }
     header('Content-Type: text/plain; charset=UTF-8');
 }
 

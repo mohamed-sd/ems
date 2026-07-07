@@ -22,28 +22,28 @@ if (!$is_super_admin && $company_id <= 0) {
 
 $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
 if (!$operations_has_company) {
-    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN company_id INT NULL AFTER project_id");
-    @mysqli_query($conn, "ALTER TABLE operations ADD INDEX idx_operations_company_id (company_id)");
+    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN company_id INT NULL AFTER project_id", 'Oprators/oprators.php');
+    ems_runtime_ddl($conn, "ALTER TABLE operations ADD INDEX idx_operations_company_id (company_id)", 'Oprators/oprators.php');
     $operations_has_company = db_table_has_column($conn, 'operations', 'company_id');
 }
 
 $operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
 if (!$operations_has_shift_type) {
-    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER shift_hours");
+    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN shift_type ENUM('D','N','B') NOT NULL DEFAULT 'B' AFTER shift_hours", 'Oprators/oprators.php');
     $operations_has_shift_type = db_table_has_column($conn, 'operations', 'shift_type');
 }
 
 // الساعات اليومية المستهدفة للآلية (مرجع المقارنة منفّذ/مستهدف) — ترحيل ذاتي محمي
 $operations_has_target = db_table_has_column($conn, 'operations', 'target_daily_hours');
 if (!$operations_has_target) {
-    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN target_daily_hours DECIMAL(10,2) NULL DEFAULT NULL AFTER shift_hours");
+    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN target_daily_hours DECIMAL(10,2) NULL DEFAULT NULL AFTER shift_hours", 'Oprators/oprators.php');
     $operations_has_target = db_table_has_column($conn, 'operations', 'target_daily_hours');
 }
 
 // الحالة التشغيلية (تعمل/جاهزة/معطلة) تُدار من صفحة الحركة. هنا نقرؤها فقط لتصنيف جدول «المتعطلة».
 $operations_has_op_state = db_table_has_column($conn, 'operations', 'op_state');
 if (!$operations_has_op_state) {
-    @mysqli_query($conn, "ALTER TABLE operations ADD COLUMN op_state ENUM('تعمل','جاهزة','معطلة') NOT NULL DEFAULT 'جاهزة' AFTER status");
+    ems_runtime_ddl($conn, "ALTER TABLE operations ADD COLUMN op_state ENUM('تعمل','جاهزة','معطلة') NOT NULL DEFAULT 'جاهزة' AFTER status", 'Oprators/oprators.php');
     $operations_has_op_state = db_table_has_column($conn, 'operations', 'op_state');
 }
 

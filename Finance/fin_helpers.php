@@ -30,7 +30,7 @@ if (!function_exists('fin_user_level')) {
     /** مستوى المستخدم الحالي؛ 'all' للمدير الأعلى، 'none' لغير المعرّف. */
     function fin_user_level($conn, $role_id)
     {
-        if ((string)$role_id === '-1') { return 'all'; }
+        if ((string)$role_id === EMS_ROLE_SUPER_ADMIN) { return 'all'; }
         $rid = intval($role_id);
         $r = mysqli_query($conn, "SELECT name FROM roles WHERE id = $rid LIMIT 1");
         $name = ($r && ($x = mysqli_fetch_assoc($r))) ? trim($x['name']) : '';
@@ -113,7 +113,7 @@ if (!function_exists('fin_ctx')) {
         $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
         return array(
             'role'       => $role,
-            'is_super'   => ($role === '-1'),
+            'is_super'   => ($role === EMS_ROLE_SUPER_ADMIN),
             'company_id' => isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0,
             'user_id'    => isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0,
         );

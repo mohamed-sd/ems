@@ -15,13 +15,13 @@ $users_has_deleted_at = db_table_has_column($conn, 'users', 'deleted_at');
 $users_has_deleted_by = db_table_has_column($conn, 'users', 'deleted_by');
 
 if (!$users_has_is_deleted) {
-    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0");
+    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0", 'main/project_users.php');
 }
 if (!$users_has_deleted_at) {
-    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN deleted_at DATETIME NULL");
+    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN deleted_at DATETIME NULL", 'main/project_users.php');
 }
 if (!$users_has_deleted_by) {
-    @mysqli_query($conn, "ALTER TABLE users ADD COLUMN deleted_by INT NULL");
+    ems_runtime_ddl($conn, "ALTER TABLE users ADD COLUMN deleted_by INT NULL", 'main/project_users.php');
 }
 
 $users_has_is_deleted = db_table_has_column($conn, 'users', 'is_deleted');

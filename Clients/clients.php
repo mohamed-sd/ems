@@ -179,7 +179,7 @@ if (!$clients_has_is_deleted || !$clients_has_deleted_at || !$clients_has_delete
     }
 
     if (!empty($alter_parts)) {
-        @mysqli_query($conn, "ALTER TABLE clients " . implode(', ', $alter_parts));
+        ems_runtime_ddl($conn, "ALTER TABLE clients " . implode(', ', $alter_parts), 'Clients/clients.php');
     }
 
     // إعادة الفحص بعد التعديل

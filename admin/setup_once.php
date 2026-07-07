@@ -99,13 +99,13 @@ $sql_create_resets = "CREATE TABLE IF NOT EXISTS super_admin_password_resets (
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
-if (!mysqli_query($conn, $sql_create_admins)) {
+if (!ems_runtime_ddl($conn, $sql_create_admins, 'admin/setup_once.php')) {
     echo '<div class="error"><strong>خطأ في إنشاء جدول super_admins:</strong> ' . htmlspecialchars(mysqli_error($conn)) . '</div>';
     echo '</div></body></html>';
     exit;
 }
 
-if (!mysqli_query($conn, $sql_create_resets)) {
+if (!ems_runtime_ddl($conn, $sql_create_resets, 'admin/setup_once.php')) {
     echo '<div class="error"><strong>خطأ في إنشاء جدول super_admin_password_resets:</strong> ' . htmlspecialchars(mysqli_error($conn)) . '</div>';
     echo '</div></body></html>';
     exit;

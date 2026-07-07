@@ -43,7 +43,7 @@ if (!$contracts_has_is_deleted || !$contracts_has_deleted_at || !$contracts_has_
     $alter_parts[] = "ADD COLUMN deleted_by INT(11) NULL DEFAULT NULL";
   }
   if (!empty($alter_parts)) {
-    @mysqli_query($conn, "ALTER TABLE contracts " . implode(', ', $alter_parts));
+    ems_runtime_ddl($conn, "ALTER TABLE contracts " . implode(', ', $alter_parts), 'Contracts/contracts.php');
   }
 
   $contracts_has_is_deleted = db_table_has_column($conn, 'contracts', 'is_deleted');
