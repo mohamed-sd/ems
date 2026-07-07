@@ -1,0 +1,302 @@
+<?php
+/**
+ * Transport/trs_locations_config.php — إعداد المواقع (قاعدة/مشروع/ورشة/مكتب) — §4.
+ * نمط موحّد: ترويسة + توبار + DataTables + فورم .allforms + عزل الشركة.
+ * شاشة جديدة مستقلة تماماً — لا تلمس أي جدول قائم.
+ */
+session_start();
+if (!isset($_SESSION['user'])) {
+    header("Location: ../login.php");
+    exit();
+}
+include '../config.php';
+include '../includes/permissions_helper.php';
+require_once __DIR__ . '/trs_helpers.php';
+
+$ctx             = trs_ctx();
+$is_super_admin  = $ctx['is_super'];
+$company_id      = $ctx['company_id'];
+$current_user_id = $ctx['user_id'];
+
+if (!$is_super_admin && $company_id <= 0) {
+    header("Location: ../login.php?msg=لا+توجد+بيئة+شركة+صالحة+للمستخدم+❌");
+    exit();
+}
+
+$perms = trs_page_perms($conn, 'Transport/trs_locations_config.php', $is_super_admin);
+$can_view = $perms['can_view']; $can_add = $perms['can_add'];
+$can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
+if (!$can_view) {
+    header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+المواقع+❌");
+    exit();
+}
+
+$company_scope_sql = trs_scope('company_id', $is_super_admin, $company_id);
+$loc_types = trs_location_types();
+
+// ── حفظ (إضافة/تعديل) ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
+    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $is_editing = $id > 0;
+    if ($is_editing && !$can_edit) { header("Location: trs_locations_config.php?msg=لا+توجد+صلاحية+تعديل+❌"); exit(); }
+    if (!$is_editing && !$can_add) { header("Location: trs_locations_config.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
+    if ($company_id <= 0)         { header("Location: trs_locations_config.php?msg=لا+يمكن+الحفظ+بلا+شركة+صالحة+❌"); exit(); }
+
+    $name = trim($_POST['name'] ?? '');
+    $location_type = trim($_POST['location_type'] ?? 'base');
+    $project_id = ($_POST['project_id'] ?? '') !== '' ? intval($_POST['project_id']) : null;
+    $active = isset($_POST['active']) ? 1 : 0;
+
+    if ($name === '' || !array_key_exists($location_type, $loc_types)) {
+        header("Location: trs_locations_config.php?msg=بيانات+غير+مكتملة+❌"); exit();
+    }
+    // المشروع يُربط فقط عندما يكون النوع مشروعاً
+    if ($location_type !== 'project') { $project_id = null; }
+
+    if ($is_editing) {
+        $sql = "UPDATE trs_locations SET name=?, location_type=?, project_id=?, active=?
+                WHERE id=? AND company_id=?";
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            mysqli_stmt_bind_param($stmt, 'ssiiii', $name, $location_type, $project_id, $active, $id, $company_id);
+            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        }
+        header("Location: trs_locations_config.php?msg=تم+تعديل+الموقع+بنجاح+✅"); exit();
+    } else {
+        $code = trs_gen_code($conn, 'trs_locations', 'LOC', $company_id);
+        $sql = "INSERT INTO trs_locations (company_id, code, name, location_type, project_id, active)
+                VALUES (?,?,?,?,?,?)";
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            mysqli_stmt_bind_param($stmt, 'isssii', $company_id, $code, $name, $location_type, $project_id, $active);
+            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        }
+        header("Location: trs_locations_config.php?msg=تمت+إضافة+الموقع+بنجاح+✅"); exit();
+    }
+}
+
+// ── حذف (فعلي — لا سجلّات تشغيلية مربوطة بعد؛ FK RESTRICT يحمي من الحذف الخاطئ) ──
+if (isset($_GET['delete_id'])) {
+    if (!$can_delete) { header("Location: trs_locations_config.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
+    $delete_id = intval($_GET['delete_id']);
+    $sql = "DELETE FROM trs_locations WHERE id=? AND company_id=?";
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+        mysqli_stmt_bind_param($stmt, 'ii', $delete_id, $company_id);
+        if (!mysqli_stmt_execute($stmt)) {
+            mysqli_stmt_close($stmt);
+            header("Location: trs_locations_config.php?msg=تعذّر+الحذف+—+الموقع+مستخدم+في+أوامر+ترحيل+❌"); exit();
+        }
+        mysqli_stmt_close($stmt);
+    }
+    header("Location: trs_locations_config.php?msg=تم+حذف+الموقع+بنجاح+✅"); exit();
+}
+
+$page_title = 'إيكوبيشن | إعداد المواقع';
+include '../inheader.php';
+include '../insidebar.php';
+?>
+
+<div class="main trs-locations-main ems-unified-page-shell">
+    <?php
+    $header_title = 'إعداد المواقع';
+    $header_icon  = 'fa fa-location-dot';
+    $header_actions = array();
+    if ($can_add) {
+        $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة موقع');
+    }
+    $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+    include('../includes/page_header.php');
+    ?>
+
+    <?php trs_msg_banner(); ?>
+
+    <!-- فورم إضافة/تعديل -->
+    <form id="trsForm" action="" method="post" class="allforms">
+        <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة / تعديل موقع</h5></div>
+        <div class="card"><div class="card-body">
+            <input type="hidden" name="id" id="l_id" value="">
+            <div class="form-section">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>اسم الموقع <span class="required">*</span></label>
+                        <input type="text" name="name" id="l_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>نوع الموقع <span class="required">*</span></label>
+                        <select name="location_type" id="l_type" required>
+                            <?php foreach ($loc_types as $k => $v): ?>
+                                <option value="<?php echo htmlspecialchars($k); ?>"><?php echo htmlspecialchars($v); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group" id="l_project_wrap">
+                        <label>المشروع المرتبط (عند نوع «مشروع»)</label>
+                        <select name="project_id" id="l_project">
+                            <?php echo trs_project_options($conn, $is_super_admin, $company_id, 0); ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>مفعّل؟</label>
+                        <label class="switch-inline"><input type="checkbox" name="active" id="l_active" value="1" checked> نعم، مفعّل</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-save"><i class="fas fa-save"></i> حفظ</button>
+                <button type="button" class="btn-cancel" onclick="trsToggleForm()"><i class="fas fa-times"></i> إلغاء</button>
+            </div>
+        </div></div>
+    </form>
+
+    <!-- فلاتر البحث -->
+    <div class="filter">
+        <div class="filter-title">
+            <span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span>
+            فلاتر البحث
+        </div>
+        <div class="filter-body">
+            <div class="filter-field">
+                <label><i class="fa fa-map"></i> نوع الموقع</label>
+                <select id="filterType" class="form-control">
+                    <option value="">-- كل الأنواع --</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="button" class="btn-ok"><i class="fa fa-search"></i> تطبيق</button>
+                <button type="button" class="btn-reset" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card"><div class="card-body">
+        <div class="table-container">
+            <table id="trsTable" class="display nowrap alltables no-datatable" style="width:100%;">
+                <thead><tr>
+                    <th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>النوع</th><th>المشروع</th><th>الحالة</th>
+                </tr></thead>
+                <tbody>
+                    <?php
+                    $loc_scope = $is_super_admin ? '1=1' : ('l.company_id = ' . intval($company_id));
+                    $sql = "SELECT l.id, l.code, l.name, l.location_type, l.project_id, l.active, p.name AS project_name
+                            FROM trs_locations l
+                            LEFT JOIN project p ON p.id = l.project_id
+                            WHERE $loc_scope
+                            ORDER BY l.name ASC";
+                    $result = mysqli_query($conn, $sql);
+                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                        $type_ar = trs_label($loc_types, $row['location_type']);
+                        $data_attrs =
+                            "data-id='" . intval($row['id']) . "' " .
+                            "data-name='" . htmlspecialchars((string)$row['name'], ENT_QUOTES) . "' " .
+                            "data-type='" . htmlspecialchars((string)$row['location_type'], ENT_QUOTES) . "' " .
+                            "data-project='" . intval($row['project_id'] ?? 0) . "' " .
+                            "data-active='" . intval($row['active']) . "'";
+                        echo "<tr>";
+                        echo "<td><div class='action-btns'>";
+                        if ($can_edit) {
+                            echo "<a href='javascript:void(0)' class='editBtn action-btn edit' $data_attrs title='تعديل'><i class='fas fa-edit'></i></a>";
+                        }
+                        if ($can_delete) {
+                            echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
+                        }
+                        echo "</div></td>";
+                        echo "<td>" . htmlspecialchars((string)$row['code']) . "</td>";
+                        echo "<td>" . htmlspecialchars((string)$row['name']) . "</td>";
+                        echo "<td>" . htmlspecialchars($type_ar) . "</td>";
+                        echo "<td>" . htmlspecialchars((string)($row['project_name'] ?? '—')) . "</td>";
+                        echo "<td>" . ((int)$row['active'] === 1 ? "<span class='action-btn' style='color:#1e7e34'>مفعّل</span>" : "<span class='action-btn' style='color:#c0392b'>معطّل</span>") . "</td>";
+                        echo "</tr>";
+                    } }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div></div>
+</div>
+
+<script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
+<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
+<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
+<script>
+(function () {
+    $(document).ready(function () {
+        var trsTable = $('#trsTable').DataTable({
+            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
+            buttons: [
+                { extend: 'copy', text: '📋 نسخ' },
+                { extend: 'excel', text: '📊 Excel' },
+                { extend: 'print', text: '🖨️ طباعة' }
+            ],
+            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
+        });
+
+        function fillFilterOptions(columnIndex, selectId) {
+            var select = $(selectId);
+            var values = [];
+            trsTable.column(columnIndex).data().each(function (value) {
+                var text = $('<div>').html(value).text().trim();
+                if (text !== '' && values.indexOf(text) === -1) { values.push(text); }
+            });
+            values.sort();
+            values.forEach(function (val) {
+                select.append('<option value="' + val.replace(/"/g, '&quot;') + '">' + val + '</option>');
+            });
+        }
+        fillFilterOptions(3, '#filterType');
+
+        $('#filterType').on('change', function () {
+            var value = $.fn.dataTable.util.escapeRegex($(this).val());
+            trsTable.column(3).search(value ? '^' + value + '$' : '', true, false).draw();
+        });
+        $('.filter .btn-ok').on('click', function () { trsTable.draw(); });
+        $('.filter .btn-reset').on('click', function () {
+            $('#filterType').val('');
+            trsTable.column(3).search('').draw();
+        });
+
+        // إظهار/إخفاء حقل المشروع حسب النوع
+        function toggleProjectField() {
+            if ($('#l_type').val() === 'project') { $('#l_project_wrap').show(); }
+            else { $('#l_project_wrap').hide(); $('#l_project').val(''); }
+        }
+        $('#l_type').on('change', toggleProjectField);
+        toggleProjectField();
+
+        var toggleBtn = document.getElementById('toggleForm');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function () {
+                document.getElementById('trsForm').reset();
+                $('#l_id').val('');
+                toggleProjectField();
+                $('#trsForm').toggleClass('allforms-visible');
+            });
+        }
+
+        $(document).on('click', '.editBtn', function () {
+            var $t = $(this);
+            $('#l_id').val($t.data('id'));
+            $('#l_name').val($t.data('name'));
+            $('#l_type').val($t.data('type'));
+            $('#l_project').val($t.data('project') ? String($t.data('project')) : '');
+            $('#l_active').prop('checked', String($t.data('active')) === '1');
+            toggleProjectField();
+            $('#trsForm').addClass('allforms-visible');
+            $('html, body').animate({ scrollTop: $('#trsForm').offset().top }, 400);
+        });
+    });
+
+    window.trsToggleForm = function () {
+        var form = $('#trsForm');
+        if (form.hasClass('allforms-visible')) {
+            form.removeClass('allforms-visible').slideUp();
+        } else {
+            document.getElementById('trsForm').reset();
+            $('#l_id').val('');
+            form.addClass('allforms-visible').slideDown();
+        }
+    };
+})();
+</script>
+</body>
+</html>

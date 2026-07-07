@@ -1,0 +1,6 @@
+# منع تنفيذ أي كود داخل مجلد الإثباتات + منع سرد المحتويات
+php_flag engine off
+Options -Indexes
+<FilesMatch "\.(php|phtml|phar|cgi|pl)$">
+  Require all denied
+</FilesMatch>
