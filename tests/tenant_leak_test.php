@@ -79,6 +79,62 @@ $MIGRATED_SCREENS = array(
         },
         'cleanup' => "DELETE FROM proc_request WHERE code LIKE 'LEAKTEST_%'",
     ),
+    // ── K9-M2b: شاشات النقل الستة (u78 دور 23 شركة 4) — FKs تشير لصفوفٍ قائمة
+    //    (type 1 / locations 3,4)؛ FK لا يفرض تطابق الشركة فزرع الشركة الأخرى ممكن.
+    'Transport/transfer_orders_list.php' => array(
+        'login_user' => 78, 'user_company' => 4, 'other_company' => 1,
+        'table' => 'transfer_orders',
+        'row' => function ($companyId, $mark) {
+            return "INSERT INTO transfer_orders (company_id, order_no, transfer_type_id, direction, source_module, from_location_id, to_location_id, request_date)
+                    VALUES ({$companyId}, '{$mark}', 1, 'direct', 'operations', 3, 4, CURDATE())";
+        },
+        'cleanup' => "DELETE FROM transfer_orders WHERE order_no LIKE 'LEAKTEST_%'",
+    ),
+    'Transport/transfer_dashboard.php' => array( // الكانبان (stage=request الافتراضية) يعرض order_no
+        'login_user' => 78, 'user_company' => 4, 'other_company' => 1,
+        'table' => 'transfer_orders',
+        'row' => function ($companyId, $mark) {
+            return "INSERT INTO transfer_orders (company_id, order_no, transfer_type_id, direction, source_module, from_location_id, to_location_id, request_date)
+                    VALUES ({$companyId}, '{$mark}', 1, 'direct', 'operations', 3, 4, CURDATE())";
+        },
+        'cleanup' => "DELETE FROM transfer_orders WHERE order_no LIKE 'LEAKTEST_%'",
+    ),
+    'Transport/transfer_requests.php' => array(
+        'login_user' => 78, 'user_company' => 4, 'other_company' => 1,
+        'table' => 'transfer_requests',
+        'row' => function ($companyId, $mark) {
+            return "INSERT INTO transfer_requests (company_id, code, transfer_type_id, source_module, reason)
+                    VALUES ({$companyId}, '{$mark}', 1, 'operations', '{$mark}')";
+        },
+        'cleanup' => "DELETE FROM transfer_requests WHERE code LIKE 'LEAKTEST_%'",
+    ),
+    'Transport/transfer_types_config.php' => array(
+        'login_user' => 78, 'user_company' => 4, 'other_company' => 1,
+        'table' => 'transfer_types',
+        'row' => function ($companyId, $mark) {
+            return "INSERT INTO transfer_types (company_id, code, name, operational_category)
+                    VALUES ({$companyId}, '{$mark}', '{$mark}', 'equipment_transfer')";
+        },
+        'cleanup' => "DELETE FROM transfer_types WHERE code LIKE 'LEAKTEST_%'",
+    ),
+    'Transport/trs_locations_config.php' => array(
+        'login_user' => 78, 'user_company' => 4, 'other_company' => 1,
+        'table' => 'trs_locations',
+        'row' => function ($companyId, $mark) {
+            return "INSERT INTO trs_locations (company_id, code, name, location_type)
+                    VALUES ({$companyId}, '{$mark}', '{$mark}', 'base')";
+        },
+        'cleanup' => "DELETE FROM trs_locations WHERE code LIKE 'LEAKTEST_%'",
+    ),
+    'Transport/transfer_cost_rules_config.php' => array( // العلامة في basis_note (النص الحر الوحيد المعروض)
+        'login_user' => 78, 'user_company' => 4, 'other_company' => 1,
+        'table' => 'transfer_cost_rules',
+        'row' => function ($companyId, $mark) {
+            return "INSERT INTO transfer_cost_rules (company_id, movement_type, default_bearer, basis_note)
+                    VALUES ({$companyId}, 'mob', 'client', '{$mark}')";
+        },
+        'cleanup' => "DELETE FROM transfer_cost_rules WHERE basis_note LIKE 'LEAKTEST_%'",
+    ),
 );
 
 // ── عدّة التقرير ─────────────────────────────────────────────────────────────
