@@ -26,12 +26,11 @@ if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صل
 $scope_val = $is_super_admin ? null : intval($company_id);
 $order_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-/** تأكيد ملكية الشركة لأمرٍ ما. */
+/** تأكيد ملكية الشركة لأمرٍ ما — عبر البوابة (نقطة واحدة تؤمّن 9 مسارات POST). */
 function trs_order_owned($conn, $order_id, $is_super, $company_id) {
-    $order_id = intval($order_id);
-    $cond = $is_super ? '' : (' AND company_id = ' . intval($company_id));
-    $res = mysqli_query($conn, "SELECT id FROM transfer_orders WHERE id = $order_id $cond LIMIT 1");
-    return $res && mysqli_num_rows($res) > 0;
+    return trs_gate($is_super)->count('transfer_orders', array(
+        'where' => array('id' => intval($order_id)),
+    )) > 0;
 }
 
 /** إعادة حساب actual_cost_usd = Σ بنود التكلفة. */
@@ -98,10 +97,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: transfer_order_form.php?id=$id&msg=تم+حفظ+رأس+الأمر+✅"); exit();
         } else {
             // كود الحركة من كود المركبة إن وُجدت
+            // قراءة مرجعية معزولة: الأصل قرأ الكود بلا فلتر شركة — البوابة تحصرها
+            // بمعدات الشركة (تشديد عزلٍ موثَّق؛ القوائم الشرعية أصلًا من نفس الشركة)
             $veh_code = '';
             if ($vehicle_id) {
-                $r = mysqli_query($conn, "SELECT code FROM equipments WHERE id=" . intval($vehicle_id) . " LIMIT 1");
-                if ($r && ($rr = mysqli_fetch_assoc($r))) { $veh_code = (string)$rr['code']; }
+                $vrow = trs_gate($is_super_admin)->selectOne('equipments', array(
+                    'columns' => array('code'), 'where' => array('id' => intval($vehicle_id)),
+                ));
+                if ($vrow) { $veh_code = (string)$vrow['code']; }
             }
             $order_no = trs_gen_order_no($conn, $company_id, $direction, $veh_code);
             $stage = 'request';
@@ -211,8 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$need_perm) { header("Location: transfer_order_form.php?id=$id&msg=لا+توجد+صلاحية+لهذا+الإجراء+❌"); exit(); }
 
         // تحميل الأمر للتحقق من المرحلة والحرّاس
-        $cond = $is_super_admin ? '' : (' AND company_id = ' . intval($company_id));
-        $orow = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM transfer_orders WHERE id=" . intval($id) . " $cond LIMIT 1"));
+        $orow = trs_gate($is_super_admin)->selectOne('transfer_orders', array('where' => array('id' => $id)));
         if (!$orow || $orow['stage'] !== $t['from']) {
             header("Location: transfer_order_form.php?id=$id&msg=المرحلة+الحالية+لا+تسمح+بهذا+الانتقال+❌"); exit();
         }
@@ -227,9 +229,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$has_center) { $err = 'الاعتماد+يتطلب+ربطاً+بمشروع+أو+مركز+تكلفة'; }
         } elseif ($trans === 'prepare') {
             // عناصر + مسار؛ وللمعدة: وسيلة نقل + تصريح ساري (§ب.8 / §7.6)
-            $nlines = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM transfer_lines WHERE order_id=$id AND company_id=$company_of"))['c']);
-            $has_equip = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM transfer_lines WHERE order_id=$id AND company_id=$company_of AND item_type IN('equipment','attachment')"))['c']) > 0;
-            $has_valid_permit = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM transfer_permits WHERE order_id=$id AND company_id=$company_of AND state='valid'"))['c']) > 0;
+            $nlines = trs_gate($is_super_admin)->count('transfer_lines', array('where' => array('order_id' => $id)));
+            $has_equip = trs_gate($is_super_admin)->count('transfer_lines', array(
+                'where' => array('order_id' => $id),
+                'whereRaw' => "item_type IN('equipment','attachment')",
+            )) > 0;
+            $has_valid_permit = trs_gate($is_super_admin)->count('transfer_permits', array(
+                'where' => array('order_id' => $id, 'state' => 'valid'),
+            )) > 0;
             if ($nlines === 0) { $err = 'لا+تجهيز+دون+عنصرٍ+منقولٍ+واحدٍ+على+الأقل'; }
             elseif (trim((string)$orow['route']) === '') { $err = 'لا+تجهيز+دون+تحديد+المسار'; }
             elseif ($has_equip && (empty($orow['vehicle_id']) || !$has_valid_permit)) { $err = 'ترحيل+المعدة+يتطلب+مركبة+ناقلة+وتصريحاً+سارياً'; }
@@ -244,7 +251,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             else { $set_extra = ', arrival_datetime = NOW()'; }
         } elseif ($trans === 'close') {
             // لا إغلاق بلا مصدر تحميل: متحمِّل الأمر محدَّد + كل بند تكلفة له مركز (§7.6)
-            $no_center = intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) c FROM transfer_cost_lines WHERE order_id=$id AND company_id=$company_of AND (analytic_cost_center IS NULL OR analytic_cost_center='')"))['c']);
+            $no_center = trs_gate($is_super_admin)->count('transfer_cost_lines', array(
+                'where' => array('order_id' => $id),
+                'whereRaw' => "(analytic_cost_center IS NULL OR analytic_cost_center='')",
+            ));
             if (empty($orow['cost_bearer'])) { $err = 'لا+إغلاق+دون+تحديد+متحمِّل+التكلفة'; }
             elseif ($no_center > 0) { $err = 'كل+بند+تكلفة+يجب+أن+يحمل+مركز+تكلفة+قبل+الإغلاق'; }
         }
@@ -264,8 +274,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $reason = trim($_POST['reason'] ?? '');
         if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
         if ($reason === '') { header("Location: transfer_order_form.php?id=$id&msg=الإلغاء+يتطلب+سبباً+❌"); exit(); }
-        $cond = $is_super_admin ? '' : (' AND company_id = ' . intval($company_id));
-        $orow = mysqli_fetch_assoc(mysqli_query($conn, "SELECT stage, company_id FROM transfer_orders WHERE id=" . intval($id) . " $cond LIMIT 1"));
+        $orow = trs_gate($is_super_admin)->selectOne('transfer_orders', array(
+            'columns' => array('stage', 'company_id'), 'where' => array('id' => $id),
+        ));
         if (!$orow || in_array($orow['stage'], array('closed', 'cancelled'), true)) {
             header("Location: transfer_order_form.php?id=$id&msg=لا+يمكن+إلغاء+أمرٍ+مغلقٍ+أو+ملغى+❌"); exit();
         }
