@@ -22,7 +22,6 @@ $perms = trs_page_perms($conn, 'Transport/transfer_orders_list.php', $is_super_a
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+أوامر+الترحيل+❌"); exit(); }
 
-$scope = $is_super_admin ? '1=1' : ('o.company_id = ' . intval($company_id));
 $types_map     = trs_movement_types();
 $dir_map       = trs_directions();
 $bearer_map    = trs_bearers();
@@ -74,19 +73,24 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT o.id, o.order_no, o.direction, o.stage, o.planned_date, o.cost_bearer, o.actual_cost_usd,
-                               tt.name AS type_name, p.name AS project_name,
-                               fl.name AS from_name, tl.name AS to_name,
-                               (o.planned_date IS NOT NULL AND o.planned_date < CURDATE() AND o.stage NOT IN ('arrived','closed','cancelled')) AS is_delayed
-                        FROM transfer_orders o
-                        LEFT JOIN transfer_types tt ON tt.id = o.transfer_type_id
-                        LEFT JOIN project p ON p.id = o.project_id
-                        LEFT JOIN trs_locations fl ON fl.id = o.from_location_id
-                        LEFT JOIN trs_locations tl ON tl.id = o.to_location_id
-                        WHERE $scope
-                        ORDER BY o.id DESC";
-                $res = mysqli_query($conn, $sql);
-                if ($res) { while ($row = mysqli_fetch_assoc($res)) {
+                // scopedQuery (عقد §10): النص الأصلي حرفيًا + {TENANT_SCOPE}؛ 4 إثراءات LEFT
+                $order_rows = trs_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('o' => 'transfer_orders'),
+                          'enrich' => array('tt' => 'transfer_types', 'p' => 'project',
+                                            'fl' => 'trs_locations', 'tl' => 'trs_locations')),
+                    "SELECT o.id, o.order_no, o.direction, o.stage, o.planned_date, o.cost_bearer, o.actual_cost_usd,
+                            tt.name AS type_name, p.name AS project_name,
+                            fl.name AS from_name, tl.name AS to_name,
+                            (o.planned_date IS NOT NULL AND o.planned_date < CURDATE() AND o.stage NOT IN ('arrived','closed','cancelled')) AS is_delayed
+                     FROM transfer_orders o
+                     LEFT JOIN transfer_types tt ON tt.id = o.transfer_type_id
+                     LEFT JOIN project p ON p.id = o.project_id
+                     LEFT JOIN trs_locations fl ON fl.id = o.from_location_id
+                     LEFT JOIN trs_locations tl ON tl.id = o.to_location_id
+                     WHERE {TENANT_SCOPE}
+                     ORDER BY o.id DESC"
+                );
+                { foreach ($order_rows as $row) {
                     $dir_ar    = trs_label($dir_map, $row['direction']);
                     $bearer_ar = $row['cost_bearer'] ? trs_label($bearer_map, $row['cost_bearer']) : '—';
                     $cost      = $row['actual_cost_usd'] !== null ? number_format((float)$row['actual_cost_usd'], 2) : '0.00';
