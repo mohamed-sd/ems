@@ -279,21 +279,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // ════════════════ تحميل الأمر للعرض ════════════════
 $order = null;
 if ($order_id > 0) {
-    $cond = $is_super_admin ? '' : (' AND o.company_id = ' . intval($company_id));
-    $res = mysqli_query($conn, "SELECT o.*, tt.name AS type_name, p.name AS project_name,
-            fl.name AS from_name, tl.name AS to_name, u.name AS requester_name,
-            e.code AS vehicle_code, d.name AS driver_name, s.name AS carrier_name
-        FROM transfer_orders o
-        LEFT JOIN transfer_types tt ON tt.id = o.transfer_type_id
-        LEFT JOIN project p ON p.id = o.project_id
-        LEFT JOIN trs_locations fl ON fl.id = o.from_location_id
-        LEFT JOIN trs_locations tl ON tl.id = o.to_location_id
-        LEFT JOIN users u ON u.id = o.requested_by_user_id
-        LEFT JOIN equipments e ON e.id = o.vehicle_id
-        LEFT JOIN employees d ON d.id = o.driver_id
-        LEFT JOIN suppliers s ON s.id = o.carrier_entity_id
-        WHERE o.id = " . intval($order_id) . " $cond LIMIT 1");
-    $order = ($res && mysqli_num_rows($res)) ? mysqli_fetch_assoc($res) : null;
+    // scopedQuery (عقد §10): النص الأصلي حرفيًا + الرمز؛ 8 إثراءات LEFT مرجعية
+    $order_rows = trs_gate($is_super_admin)->scopedQuery(
+        array('scope' => array('o' => 'transfer_orders'),
+              'enrich' => array('tt' => 'transfer_types', 'p' => 'project',
+                                'fl' => 'trs_locations', 'tl' => 'trs_locations',
+                                'u' => 'users', 'e' => 'equipments',
+                                'd' => 'employees', 's' => 'suppliers')),
+        "SELECT o.*, tt.name AS type_name, p.name AS project_name,
+                fl.name AS from_name, tl.name AS to_name, u.name AS requester_name,
+                e.code AS vehicle_code, d.name AS driver_name, s.name AS carrier_name
+         FROM transfer_orders o
+         LEFT JOIN transfer_types tt ON tt.id = o.transfer_type_id
+         LEFT JOIN project p ON p.id = o.project_id
+         LEFT JOIN trs_locations fl ON fl.id = o.from_location_id
+         LEFT JOIN trs_locations tl ON tl.id = o.to_location_id
+         LEFT JOIN users u ON u.id = o.requested_by_user_id
+         LEFT JOIN equipments e ON e.id = o.vehicle_id
+         LEFT JOIN employees d ON d.id = o.driver_id
+         LEFT JOIN suppliers s ON s.id = o.carrier_entity_id
+         WHERE {TENANT_SCOPE} AND o.id = ? LIMIT 1",
+        array($order_id)
+    );
+    $order = $order_rows ? $order_rows[0] : null;
     if (!$order) { header("Location: transfer_orders_list.php?msg=الأمر+غير+موجود+❌"); exit(); }
 }
 
@@ -514,13 +522,19 @@ include '../insidebar.php';
                 <th>الإجراءات</th><th>النوع</th><th>المعدة</th><th>المرفق</th><th>الصنف</th><th>الموظف</th><th>الكمية</th><th>ملاحظة</th>
             </tr></thead><tbody>
             <?php
-            $r = mysqli_query($conn, "SELECT ln.*, e.code AS ecode, pi.name AS pname, em.name AS emname
-                FROM transfer_lines ln
-                LEFT JOIN equipments e ON e.id = ln.equipment_id
-                LEFT JOIN proc_item pi ON pi.id = ln.product_id
-                LEFT JOIN employees em ON em.id = ln.employee_id
-                WHERE ln.order_id = " . intval($order_id) . " AND ln.company_id = " . intval($company_id) . " ORDER BY ln.id");
-            if ($r) while ($x = mysqli_fetch_assoc($r)) {
+            // scopedQuery: العزل بالرمز (company_id اليدوي يسقط — مسؤولية البوابة)
+            $line_rows = trs_gate($is_super_admin)->scopedQuery(
+                array('scope' => array('ln' => 'transfer_lines'),
+                      'enrich' => array('e' => 'equipments', 'pi' => 'proc_item', 'em' => 'employees')),
+                "SELECT ln.*, e.code AS ecode, pi.name AS pname, em.name AS emname
+                 FROM transfer_lines ln
+                 LEFT JOIN equipments e ON e.id = ln.equipment_id
+                 LEFT JOIN proc_item pi ON pi.id = ln.product_id
+                 LEFT JOIN employees em ON em.id = ln.employee_id
+                 WHERE {TENANT_SCOPE} AND ln.order_id = ? ORDER BY ln.id",
+                array($order_id)
+            );
+            foreach ($line_rows as $x) {
                 echo "<tr><td><div class='action-btns'>";
                 if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف العنصر؟\")'><input type='hidden' name='action' value='del_line'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='line_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
                 echo "</div></td>";
@@ -563,9 +577,11 @@ include '../insidebar.php';
                 <th>الإجراءات</th><th>النوع</th><th>المبلغ المحلي</th><th>العملة</th><th>سعر الصرف</th><th>USD</th><th>المتحمِّل</th><th>مركز التكلفة</th>
             </tr></thead><tbody>
             <?php
-            $r = mysqli_query($conn, "SELECT * FROM transfer_cost_lines WHERE order_id = " . intval($order_id) . " AND company_id = " . intval($company_id) . " ORDER BY id");
+            $cost_rows = trs_gate($is_super_admin)->select('transfer_cost_lines', array(
+                'where' => array('order_id' => $order_id), 'orderBy' => 'id',
+            ));
             $sum = 0;
-            if ($r) while ($x = mysqli_fetch_assoc($r)) {
+            foreach ($cost_rows as $x) {
                 $sum += (float)$x['amount_usd'];
                 echo "<tr><td><div class='action-btns'>";
                 if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف البند؟\")'><input type='hidden' name='action' value='del_cost'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='cost_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
@@ -609,8 +625,10 @@ include '../insidebar.php';
                 <th>الإجراءات</th><th>النوع</th><th>الجهة</th><th>الإصدار</th><th>الانتهاء</th><th>الحالة</th>
             </tr></thead><tbody>
             <?php
-            $r = mysqli_query($conn, "SELECT * FROM transfer_permits WHERE order_id = " . intval($order_id) . " AND company_id = " . intval($company_id) . " ORDER BY id");
-            if ($r) while ($x = mysqli_fetch_assoc($r)) {
+            $permit_rows = trs_gate($is_super_admin)->select('transfer_permits', array(
+                'where' => array('order_id' => $order_id), 'orderBy' => 'id',
+            ));
+            foreach ($permit_rows as $x) {
                 echo "<tr><td><div class='action-btns'>";
                 if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف التصريح؟\")'><input type='hidden' name='action' value='del_permit'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='permit_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
                 echo "</div></td>";
@@ -632,8 +650,10 @@ include '../insidebar.php';
                 <th>التاريخ</th><th>النوع</th><th>الوصف</th><th>قبل</th><th>بعد</th>
             </tr></thead><tbody>
             <?php
-            $r = mysqli_query($conn, "SELECT * FROM transfer_events WHERE order_id = " . intval($order_id) . " AND company_id = " . intval($company_id) . " ORDER BY id DESC");
-            if ($r) while ($x = mysqli_fetch_assoc($r)) {
+            $event_rows = trs_gate($is_super_admin)->select('transfer_events', array(
+                'where' => array('order_id' => $order_id), 'orderBy' => 'id DESC',
+            ));
+            foreach ($event_rows as $x) {
                 echo "<tr><td>" . htmlspecialchars((string)$x['created_at']) . "</td>";
                 echo "<td>" . htmlspecialchars((string)$x['event_type']) . "</td>";
                 echo "<td>" . htmlspecialchars((string)($x['body'] ?? '')) . "</td>";
