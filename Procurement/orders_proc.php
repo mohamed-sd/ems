@@ -38,10 +38,16 @@ $currencies   = proc_currencies();
 $pay_times    = proc_payment_times();
 $recv_types   = proc_receipt_types();
 
-// خيارات طلبات الشراء المفتوحة (للربط)
-$req_scope = proc_scope('company_id', $is_super_admin, $company_id);
-$requests_sql = "SELECT id, CONCAT(COALESCE(NULLIF(code,''),CONCAT('#',id)),' — ',op_classification) AS label
-                 FROM proc_request WHERE $req_scope AND COALESCE(is_deleted,0)=0 ORDER BY id DESC";
+// خيارات طلبات الشراء المفتوحة (للربط) — عبر البوابة والتسمية في PHP
+$request_option_rows = proc_gate($is_super_admin)->select('proc_request', array(
+    'columns' => array('id', 'code', 'op_classification'),
+    'orderBy' => 'id DESC',
+));
+foreach ($request_option_rows as &$ror) {
+    $rc = (string) $ror['code'];
+    $ror['label'] = (($rc === '') ? ('#' . intval($ror['id'])) : $rc) . ' — ' . $ror['op_classification'];
+}
+unset($ror);
 
 // ── حفظ (إضافة/تعديل) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
@@ -85,51 +91,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
         $total += ((float)($qtys[$i] ?? 0)) * ((float)($prices[$i] ?? 0));
     }
 
-    mysqli_begin_transaction($conn);
+    // K9-M1: الأب عبر البوابة والسطور عبر replaceChildren (النمط المبرَّر §8)
+    $parent = array(
+        'supplier_id' => $supplier_id, 'request_id' => $request_id,
+        'fin_approval_ref' => $fin_approval_ref, 'op_classification' => $op_classification,
+        'currency' => $currency, 'fx_rate' => $fx_rate, 'payment_time' => $payment_time,
+        'expected_receipt_type' => $expected_receipt_type, 'total_amount' => $total,
+        'state' => $state, 'notes' => $notes,
+    );
+    $line_rows = array();
+    for ($i = 0; $i < count($item_names); $i++) {
+        $iname = trim($item_names[$i] ?? '');
+        if ($iname === '') { continue; }
+        $qty = (float)($qtys[$i] ?? 1);
+        $price = (float)($prices[$i] ?? 0);
+        $cls = trim($classes[$i] ?? '');
+        if (!in_array($cls, $classifications, true)) { $cls = $op_classification; }
+        $line_rows[] = array(
+            'item_id' => (isset($item_ids[$i]) && $item_ids[$i] !== '') ? intval($item_ids[$i]) : null,
+            'item_name' => $iname, 'qty' => $qty, 'unit_price' => $price,
+            'op_classification' => $cls, 'subtotal' => $qty * $price,
+        );
+    }
     try {
+        $g = proc_gate(false);
         if ($is_editing) {
-            $sql = "UPDATE proc_order SET supplier_id=?, request_id=?, fin_approval_ref=?, op_classification=?, currency=?,
-                    fx_rate=?, payment_time=?, expected_receipt_type=?, total_amount=?, state=?, notes=?
-                    WHERE id=? AND company_id=? AND COALESCE(is_deleted,0)=0";
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'iisssdssdssii', $supplier_id, $request_id, $fin_approval_ref, $op_classification,
-                $currency, $fx_rate, $payment_time, $expected_receipt_type, $total, $state, $notes, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+            $g->update('proc_order', $parent, array('id' => $id, 'is_deleted' => 0));
             $order_id = $id;
-            $d = mysqli_prepare($conn, "DELETE FROM proc_order_line WHERE order_id=? AND company_id=?");
-            mysqli_stmt_bind_param($d, 'ii', $order_id, $company_id);
-            mysqli_stmt_execute($d); mysqli_stmt_close($d);
         } else {
-            $code = proc_gen_code($conn, 'proc_order', 'PRC-PO', $company_id);
-            $sql = "INSERT INTO proc_order (company_id, code, supplier_id, request_id, fin_approval_ref, op_classification,
-                    currency, fx_rate, payment_time, expected_receipt_type, total_amount, state, notes, created_by)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'isiisssdssdssi', $company_id, $code, $supplier_id, $request_id, $fin_approval_ref,
-                $op_classification, $currency, $fx_rate, $payment_time, $expected_receipt_type, $total, $state, $notes, $current_user_id);
-            mysqli_stmt_execute($stmt);
-            $order_id = mysqli_insert_id($conn);
-            mysqli_stmt_close($stmt);
+            $parent['code'] = proc_gen_code($conn, 'proc_order', 'PRC-PO', $company_id);
+            $parent['created_by'] = $current_user_id;
+            $order_id = $g->insert('proc_order', $parent);
         }
-
-        $ln = mysqli_prepare($conn, "INSERT INTO proc_order_line (company_id, order_id, item_id, item_name, qty, unit_price, op_classification, subtotal)
-                                     VALUES (?,?,?,?,?,?,?,?)");
-        for ($i = 0; $i < count($item_names); $i++) {
-            $iname = trim($item_names[$i] ?? '');
-            if ($iname === '') { continue; }
-            $iid = (isset($item_ids[$i]) && $item_ids[$i] !== '') ? intval($item_ids[$i]) : null;
-            $qty = (float)($qtys[$i] ?? 1);
-            $price = (float)($prices[$i] ?? 0);
-            $cls = trim($classes[$i] ?? '');
-            if (!in_array($cls, $classifications, true)) { $cls = $op_classification; }
-            $sub = $qty * $price;
-            mysqli_stmt_bind_param($ln, 'iissddsd', $company_id, $order_id, $iid, $iname, $qty, $price, $cls, $sub);
-            mysqli_stmt_execute($ln);
-        }
-        mysqli_stmt_close($ln);
-        mysqli_commit($conn);
+        $g->replaceChildren('proc_order', $order_id, 'proc_order_line', 'order_id', $line_rows, 'order lines rewrite');
     } catch (\Throwable $e) {
-        mysqli_rollback($conn);
+        error_log('orders_proc save refused: ' . $e->getMessage());
         header("Location: orders_proc.php?msg=تعذّر+الحفظ+❌"); exit();
     }
     header("Location: orders_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الأمر+بنجاح+✅' : 'تمت+إضافة+الأمر+بنجاح+✅')); exit();
@@ -139,10 +135,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: orders_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "UPDATE proc_order SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    try {
+        proc_gate(false)->softDelete('proc_order', $delete_id);
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('orders_proc softDelete refused: ' . $e->getMessage());
     }
     header("Location: orders_proc.php?msg=تم+حذف+الأمر+بنجاح+✅"); exit();
 }
@@ -151,19 +147,11 @@ if (isset($_GET['delete_id'])) {
 $edit = null; $edit_lines = array();
 if (isset($_GET['edit_id']) && $can_edit) {
     $eid = intval($_GET['edit_id']);
-    $q = mysqli_prepare($conn, "SELECT * FROM proc_order WHERE id=? AND " . proc_scope('company_id', $is_super_admin, $company_id) . " AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    mysqli_stmt_bind_param($q, 'i', $eid);
-    mysqli_stmt_execute($q);
-    $r = mysqli_stmt_get_result($q);
-    $edit = $r ? mysqli_fetch_assoc($r) : null;
-    mysqli_stmt_close($q);
+    $edit = proc_gate($is_super_admin)->selectOne('proc_order', array('where' => array('id' => $eid)));
     if ($edit) {
-        $lq = mysqli_prepare($conn, "SELECT * FROM proc_order_line WHERE order_id=? ORDER BY id ASC");
-        mysqli_stmt_bind_param($lq, 'i', $eid);
-        mysqli_stmt_execute($lq);
-        $lr = mysqli_stmt_get_result($lq);
-        while ($lr && ($lrow = mysqli_fetch_assoc($lr))) { $edit_lines[] = $lrow; }
-        mysqli_stmt_close($lq);
+        $edit_lines = proc_gate($is_super_admin)->select('proc_order_line', array(
+            'where' => array('order_id' => $eid), 'orderBy' => 'id ASC',
+        ));
     }
 }
 
@@ -222,7 +210,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     </div>
                     <div class="form-group">
                         <label>مرجع طلب الشراء</label>
-                        <select name="request_id"><?php echo proc_options_from_query($conn, $requests_sql, $edit ? intval($edit['request_id']) : 0, '— بلا طلب —'); ?></select>
+                        <select name="request_id"><?php echo proc_options_from_rows($request_option_rows, $edit ? intval($edit['request_id']) : 0, '— بلا طلب —'); ?></select>
                     </div>
                     <div class="form-group">
                         <label>مرجع الاعتماد المالي <span class="required">*</span> <small>(شرط الإصدار)</small></label>
@@ -314,13 +302,27 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT o.id, o.code, o.op_classification, o.currency, o.total_amount, o.state, o.fin_approval_ref, o.created_at,
-                            s.name AS supplier_name
-                            FROM proc_order o LEFT JOIN proc_supplier s ON s.id=o.supplier_id
-                            WHERE " . proc_scope('o.company_id', $is_super_admin, $company_id) . " AND COALESCE(o.is_deleted,0)=0
-                            ORDER BY o.id DESC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    // ترطيب ثنائي: الأوامر ثم أسماء الموردين بجلبٍ واحد (دلالة LEFT JOIN)
+                    $gv = proc_gate($is_super_admin);
+                    $order_rows = $gv->select('proc_order', array(
+                        'columns' => array('id', 'code', 'op_classification', 'currency', 'total_amount', 'state', 'fin_approval_ref', 'created_at', 'supplier_id'),
+                        'orderBy' => 'id DESC',
+                    ));
+                    $sup_names = array();
+                    $sids = array();
+                    foreach ($order_rows as $orow) {
+                        if ($orow['supplier_id'] !== null) { $sids[intval($orow['supplier_id'])] = true; }
+                    }
+                    if (!empty($sids)) {
+                        foreach ($gv->select('proc_supplier', array(
+                            'columns' => array('id', 'name'),
+                            'whereRaw' => 'id IN (' . implode(',', array_keys($sids)) . ')',
+                            'includeDeleted' => true,
+                        )) as $sr) { $sup_names[intval($sr['id'])] = $sr['name']; }
+                    }
+                    { foreach ($order_rows as $row) {
+                        $row['supplier_name'] = ($row['supplier_id'] !== null && isset($sup_names[intval($row['supplier_id'])]))
+                            ? $sup_names[intval($row['supplier_id'])] : null;
                         echo "<tr>";
                         echo "<td><div class='action-btns'>";
                         if ($can_edit) {
