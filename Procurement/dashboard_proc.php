@@ -27,24 +27,15 @@ if (!$perms['can_view']) {
     exit();
 }
 
-/** عدّاد بسيط مقيّد بالشركة. */
-function proc_count($conn, $sql)
-{
-    $n = 0;
-    if ($res = mysqli_query($conn, $sql)) {
-        if ($row = mysqli_fetch_assoc($res)) { $n = intval($row['c']); }
-    }
-    return $n;
-}
-
-$sc = proc_scope('company_id', $is_super_admin, $company_id);
-$k_items    = proc_count($conn, "SELECT COUNT(*) c FROM proc_item WHERE $sc AND COALESCE(is_deleted,0)=0");
-$k_critical = proc_count($conn, "SELECT COUNT(*) c FROM proc_item WHERE $sc AND COALESCE(is_deleted,0)=0 AND is_critical=1");
-$k_req_open = proc_count($conn, "SELECT COUNT(*) c FROM proc_request WHERE $sc AND COALESCE(is_deleted,0)=0 AND state NOT IN ('مغلق','مرفوض')");
-$k_po_conf  = proc_count($conn, "SELECT COUNT(*) c FROM proc_order WHERE $sc AND COALESCE(is_deleted,0)=0 AND state='مؤكَّد'");
-$k_rc_open  = proc_count($conn, "SELECT COUNT(*) c FROM proc_receipt_custody WHERE $sc AND COALESCE(is_deleted,0)=0 AND state<>'مسلَّمة للوجهة'");
-$k_issues   = proc_count($conn, "SELECT COUNT(*) c FROM proc_issue WHERE $sc AND COALESCE(is_deleted,0)=0");
-$k_suppliers= proc_count($conn, "SELECT COUNT(*) c FROM proc_supplier WHERE $sc AND COALESCE(is_deleted,0)=0");
+// K9-M1: العدّادات عبر البوابة (العزل والحذف الناعم مسؤوليتها؛ العربية بمعاملات محضّرة)
+$g = proc_gate($is_super_admin);
+$k_items    = $g->count('proc_item');
+$k_critical = $g->count('proc_item', array('where' => array('is_critical' => 1)));
+$k_req_open = $g->count('proc_request', array('whereRaw' => 'state NOT IN (?, ?)', 'params' => array('مغلق', 'مرفوض')));
+$k_po_conf  = $g->count('proc_order', array('where' => array('state' => 'مؤكَّد')));
+$k_rc_open  = $g->count('proc_receipt_custody', array('whereRaw' => 'state <> ?', 'params' => array('مسلَّمة للوجهة')));
+$k_issues   = $g->count('proc_issue');
+$k_suppliers= $g->count('proc_supplier');
 
 $cards = array(
     array('label' => 'الأصناف',                 'value' => $k_items,    'icon' => 'fa fa-boxes-stacked',       'href' => 'items.php'),
@@ -115,10 +106,12 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT code, name, category, min_qty, safety_stock, lead_time_days
-                            FROM proc_item WHERE $sc AND COALESCE(is_deleted,0)=0 AND is_critical=1 ORDER BY name ASC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    $critical_rows = $g->select('proc_item', array(
+                        'columns' => array('code', 'name', 'category', 'min_qty', 'safety_stock', 'lead_time_days'),
+                        'where'   => array('is_critical' => 1),
+                        'orderBy' => 'name ASC',
+                    ));
+                    { foreach ($critical_rows as $row) {
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars((string)($row['code'] ?? '')) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['name']) . "</td>";
