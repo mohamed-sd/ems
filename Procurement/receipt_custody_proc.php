@@ -34,10 +34,16 @@ $company_scope_sql = proc_scope('company_id', $is_super_admin, $company_id);
 $states       = proc_receipt_states();
 $destinations = proc_destinations();
 
-// خيارات أوامر الشراء (للربط)
-$ord_scope = proc_scope('company_id', $is_super_admin, $company_id);
-$orders_sql = "SELECT id, CONCAT(COALESCE(NULLIF(code,''),CONCAT('#',id))) AS label
-               FROM proc_order WHERE $ord_scope AND COALESCE(is_deleted,0)=0 ORDER BY id DESC";
+// خيارات أوامر الشراء (للربط) — عبر البوابة والتسمية في PHP
+$order_option_rows = proc_gate($is_super_admin)->select('proc_order', array(
+    'columns' => array('id', 'code'),
+    'orderBy' => 'id DESC',
+));
+foreach ($order_option_rows as &$oor) {
+    $oc = (string) $oor['code'];
+    $oor['label'] = ($oc === '') ? ('#' . intval($oor['id'])) : $oc;
+}
+unset($oor);
 
 // ── حفظ (إضافة/تعديل) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'])) {
@@ -60,48 +66,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
     if (!in_array($expected_destination, $destinations, true)) { $expected_destination = 'مخزن'; }
     if (!in_array($state, $states, true)) { $state = 'مستلَمة'; }
 
-    mysqli_begin_transaction($conn);
+    // K9-M1: الأب عبر البوابة، والسطور عبر قناة replaceChildren (عقد البوابة §8 —
+    // النمط المبرَّر: تحرير أبٍ يعيد كتابة تفاصيله). حذف/إدراج السطور ذرّيٌّ داخل
+    // القناة؛ نافذة «رأسٌ محدَّث وسطور سابقة» الضيقة بين العمليتين لا تُفقد فيها
+    // السطور أبدًا (تبقى القديمة كاملةً حتى ينجح الاستبدال ذرّيًا).
+    $parent = array(
+        'holder_name' => $holder_name, 'receipt_date' => $receipt_date,
+        'supplier_id' => $supplier_id, 'order_id' => $order_id,
+        'receipt_location' => $receipt_location, 'expected_destination' => $expected_destination,
+        'state' => $state, 'notes' => $notes,
+    );
+    $item_ids = $_POST['line_item_id'] ?? array();
+    $item_names = $_POST['line_item_name'] ?? array();
+    $qtys = $_POST['line_qty'] ?? array();
+    $line_rows = array();
+    for ($i = 0; $i < count($item_names); $i++) {
+        $iname = trim($item_names[$i] ?? '');
+        if ($iname === '') { continue; }
+        $line_rows[] = array(
+            'item_id'   => (isset($item_ids[$i]) && $item_ids[$i] !== '') ? intval($item_ids[$i]) : null,
+            'item_name' => $iname,
+            'qty'       => (float)($qtys[$i] ?? 1),
+        );
+    }
     try {
+        $g = proc_gate(false);
         if ($is_editing) {
-            $sql = "UPDATE proc_receipt_custody SET holder_name=?, receipt_date=?, supplier_id=?, order_id=?, receipt_location=?,
-                    expected_destination=?, state=?, notes=? WHERE id=? AND company_id=? AND COALESCE(is_deleted,0)=0";
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'ssiisssssii', $holder_name, $receipt_date, $supplier_id, $order_id, $receipt_location,
-                $expected_destination, $state, $notes, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+            $g->update('proc_receipt_custody', $parent, array('id' => $id, 'is_deleted' => 0));
             $custody_id = $id;
-            $d = mysqli_prepare($conn, "DELETE FROM proc_receipt_line WHERE custody_id=? AND company_id=?");
-            mysqli_stmt_bind_param($d, 'ii', $custody_id, $company_id);
-            mysqli_stmt_execute($d); mysqli_stmt_close($d);
         } else {
-            $code = proc_gen_code($conn, 'proc_receipt_custody', 'PRC-RC', $company_id);
-            $sql = "INSERT INTO proc_receipt_custody (company_id, code, holder_name, receipt_date, supplier_id, order_id,
-                    receipt_location, expected_destination, state, notes, created_by)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'isssiissssi', $company_id, $code, $holder_name, $receipt_date, $supplier_id, $order_id,
-                $receipt_location, $expected_destination, $state, $notes, $current_user_id);
-            mysqli_stmt_execute($stmt);
-            $custody_id = mysqli_insert_id($conn);
-            mysqli_stmt_close($stmt);
+            $parent['code'] = proc_gen_code($conn, 'proc_receipt_custody', 'PRC-RC', $company_id);
+            $parent['created_by'] = $current_user_id;
+            $custody_id = $g->insert('proc_receipt_custody', $parent);
         }
-
-        $item_ids = $_POST['line_item_id'] ?? array();
-        $item_names = $_POST['line_item_name'] ?? array();
-        $qtys = $_POST['line_qty'] ?? array();
-        $ln = mysqli_prepare($conn, "INSERT INTO proc_receipt_line (company_id, custody_id, item_id, item_name, qty) VALUES (?,?,?,?,?)");
-        for ($i = 0; $i < count($item_names); $i++) {
-            $iname = trim($item_names[$i] ?? '');
-            if ($iname === '') { continue; }
-            $iid = (isset($item_ids[$i]) && $item_ids[$i] !== '') ? intval($item_ids[$i]) : null;
-            $qty = (float)($qtys[$i] ?? 1);
-            mysqli_stmt_bind_param($ln, 'iissd', $company_id, $custody_id, $iid, $iname, $qty);
-            mysqli_stmt_execute($ln);
-        }
-        mysqli_stmt_close($ln);
-        mysqli_commit($conn);
+        $g->replaceChildren('proc_receipt_custody', $custody_id, 'proc_receipt_line', 'custody_id', $line_rows, 'receipt lines rewrite');
     } catch (\Throwable $e) {
-        mysqli_rollback($conn);
+        error_log('receipt_custody_proc save refused: ' . $e->getMessage());
         header("Location: receipt_custody_proc.php?msg=تعذّر+الحفظ+❌"); exit();
     }
     header("Location: receipt_custody_proc.php?msg=" . ($is_editing ? 'تم+تعديل+العهدة+بنجاح+✅' : 'تمت+إضافة+العهدة+بنجاح+✅')); exit();
@@ -111,10 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: receipt_custody_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "UPDATE proc_receipt_custody SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    try {
+        proc_gate(false)->softDelete('proc_receipt_custody', $delete_id);
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('receipt_custody softDelete refused: ' . $e->getMessage());
     }
     header("Location: receipt_custody_proc.php?msg=تم+حذف+العهدة+بنجاح+✅"); exit();
 }
@@ -123,19 +123,11 @@ if (isset($_GET['delete_id'])) {
 $edit = null; $edit_lines = array();
 if (isset($_GET['edit_id']) && $can_edit) {
     $eid = intval($_GET['edit_id']);
-    $q = mysqli_prepare($conn, "SELECT * FROM proc_receipt_custody WHERE id=? AND " . proc_scope('company_id', $is_super_admin, $company_id) . " AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    mysqli_stmt_bind_param($q, 'i', $eid);
-    mysqli_stmt_execute($q);
-    $r = mysqli_stmt_get_result($q);
-    $edit = $r ? mysqli_fetch_assoc($r) : null;
-    mysqli_stmt_close($q);
+    $edit = proc_gate($is_super_admin)->selectOne('proc_receipt_custody', array('where' => array('id' => $eid)));
     if ($edit) {
-        $lq = mysqli_prepare($conn, "SELECT * FROM proc_receipt_line WHERE custody_id=? ORDER BY id ASC");
-        mysqli_stmt_bind_param($lq, 'i', $eid);
-        mysqli_stmt_execute($lq);
-        $lr = mysqli_stmt_get_result($lq);
-        while ($lr && ($lrow = mysqli_fetch_assoc($lr))) { $edit_lines[] = $lrow; }
-        mysqli_stmt_close($lq);
+        $edit_lines = proc_gate($is_super_admin)->select('proc_receipt_line', array(
+            'where' => array('custody_id' => $eid), 'orderBy' => 'id ASC',
+        ));
     }
 }
 
@@ -193,7 +185,7 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
                     </div>
                     <div class="form-group">
                         <label>المرجع الشرائي (أمر شراء)</label>
-                        <select name="order_id"><?php echo proc_options_from_query($conn, $orders_sql, $edit ? intval($edit['order_id']) : 0, '— بلا أمر —'); ?></select>
+                        <select name="order_id"><?php echo proc_options_from_rows($order_option_rows, $edit ? intval($edit['order_id']) : 0, '— بلا أمر —'); ?></select>
                     </div>
                     <div class="form-group">
                         <label>موقع الاستلام</label>
@@ -256,14 +248,38 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT c.id, c.code, c.holder_name, c.receipt_date, c.receipt_location, c.expected_destination, c.state,
-                            s.name AS supplier_name,
-                            (SELECT COUNT(*) FROM proc_receipt_line l WHERE l.custody_id=c.id) AS line_count
-                            FROM proc_receipt_custody c LEFT JOIN proc_supplier s ON s.id=c.supplier_id
-                            WHERE " . proc_scope('c.company_id', $is_super_admin, $company_id) . " AND COALESCE(c.is_deleted,0)=0
-                            ORDER BY c.id DESC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    // ترطيب ثنائي عبر البوابة (أسماء الموردين + عدّ السطور بجلبٍ واحد لكل منهما)
+                    $gv = proc_gate($is_super_admin);
+                    $custody_rows = $gv->select('proc_receipt_custody', array(
+                        'columns' => array('id', 'code', 'holder_name', 'receipt_date', 'receipt_location', 'expected_destination', 'state', 'supplier_id'),
+                        'orderBy' => 'id DESC',
+                    ));
+                    $sup_names = array(); $line_counts = array();
+                    if (!empty($custody_rows)) {
+                        $sids = array(); $cids = array();
+                        foreach ($custody_rows as $cr) {
+                            if ($cr['supplier_id'] !== null) { $sids[intval($cr['supplier_id'])] = true; }
+                            $cids[] = intval($cr['id']);
+                        }
+                        if (!empty($sids)) {
+                            foreach ($gv->select('proc_supplier', array(
+                                'columns' => array('id', 'name'),
+                                'whereRaw' => 'id IN (' . implode(',', array_keys($sids)) . ')',
+                                'includeDeleted' => true, // كدلالة LEFT JOIN الأصلية
+                            )) as $sr) { $sup_names[intval($sr['id'])] = $sr['name']; }
+                        }
+                        foreach ($gv->select('proc_receipt_line', array(
+                            'columns' => array('custody_id'),
+                            'whereRaw' => 'custody_id IN (' . implode(',', $cids) . ')',
+                        )) as $lr) {
+                            $lcid = intval($lr['custody_id']);
+                            $line_counts[$lcid] = ($line_counts[$lcid] ?? 0) + 1;
+                        }
+                    }
+                    { foreach ($custody_rows as $row) {
+                        $row['supplier_name'] = ($row['supplier_id'] !== null && isset($sup_names[intval($row['supplier_id'])]))
+                            ? $sup_names[intval($row['supplier_id'])] : null;
+                        $row['line_count'] = $line_counts[intval($row['id'])] ?? 0;
                         echo "<tr>";
                         echo "<td><div class='action-btns'>";
                         if ($can_edit) {
