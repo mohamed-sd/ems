@@ -73,7 +73,13 @@ if (!function_exists('ems_action_guard_registry')) {
             'employees/employee_contract_actions_handler.php'=> array('modules' => array('Employees/'), 'action' => 'auto'),
 
             // ── Maintenance — عدّادات الجرس قراءةٌ خفيفة ──
-            'maintenance/get_breakdown_count.php'   => array('modules' => array('Maintenance/'), 'action' => 'view'),
+            // breakdown_count عمومي-بوعي (K10 · قرار المستخدم 2026-07-09): شارة
+            // التوبار المشتركة تستطلعه من كل صفحةٍ لكل الأدوار (صنف chats) —
+            // ربطه بMaintenance/ أنتج 12 would-block حقيقيًا لمستخدم مبيعات في
+            // نافذة المراقبة. النقطة حميدة: عدّاد معزول بشركة الجلسة يعيد رقمًا
+            // فقط. إخفاء الشارة بشرط صلاحيةٍ = قرار مُلّاكٍ منفصلٌ لاحقًا —
+            // الهجرة لا تغيّر ما يراه المستخدم.
+            'maintenance/get_breakdown_count.php'   => array('modules' => array(), 'action' => 'public'),
             'maintenance/get_open_orders_count.php' => array('modules' => array('Maintenance/'), 'action' => 'view'),
             'maintenance/get_project_equipment.php' => array('modules' => array('Maintenance/'), 'action' => 'view'),
 
