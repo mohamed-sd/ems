@@ -57,22 +57,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entity'])) {
             header("Location: master_data_proc.php?msg=بيانات+غير+مكتملة+❌"); exit();
         }
 
-        if ($is_editing) {
-            $sql = "UPDATE proc_lookup SET type=?, name=?, extra=?
-                    WHERE id=? AND company_id=? AND COALESCE(is_deleted,0)=0";
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                mysqli_stmt_bind_param($stmt, 'sssii', $type, $name, $extra, $id, $company_id);
-                mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        try {
+            if ($is_editing) {
+                proc_gate(false)->update('proc_lookup', array('type' => $type, 'name' => $name, 'extra' => $extra), array('id' => $id, 'is_deleted' => 0));
+                header("Location: master_data_proc.php?msg=تم+تعديل+القيمة+المرجعية+بنجاح+✅"); exit();
+            } else {
+                proc_gate(false)->insert('proc_lookup', array('type' => $type, 'name' => $name, 'extra' => $extra, 'created_by' => $current_user_id));
+                header("Location: master_data_proc.php?msg=تمت+إضافة+القيمة+المرجعية+بنجاح+✅"); exit();
             }
-            header("Location: master_data_proc.php?msg=تم+تعديل+القيمة+المرجعية+بنجاح+✅"); exit();
-        } else {
-            $sql = "INSERT INTO proc_lookup (company_id, type, name, extra, created_by)
-                    VALUES (?,?,?,?,?)";
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                mysqli_stmt_bind_param($stmt, 'isssi', $company_id, $type, $name, $extra, $current_user_id);
-                mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-            }
-            header("Location: master_data_proc.php?msg=تمت+إضافة+القيمة+المرجعية+بنجاح+✅"); exit();
+        } catch (\App\Core\TenantGateException $e) {
+            error_log('master_data lookup save refused: ' . $e->getMessage());
+            header("Location: master_data_proc.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
         }
     }
 
@@ -87,23 +82,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entity'])) {
             header("Location: master_data_proc.php?msg=بيانات+غير+مكتملة+❌"); exit();
         }
 
-        if ($is_editing) {
-            $sql = "UPDATE proc_warehouse SET name=?, type=?, location=?, notes=?
-                    WHERE id=? AND company_id=? AND COALESCE(is_deleted,0)=0";
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                mysqli_stmt_bind_param($stmt, 'ssssii', $name, $type, $location, $notes, $id, $company_id);
-                mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        try {
+            if ($is_editing) {
+                proc_gate(false)->update('proc_warehouse', array('name' => $name, 'type' => $type, 'location' => $location, 'notes' => $notes), array('id' => $id, 'is_deleted' => 0));
+                header("Location: master_data_proc.php?msg=تم+تعديل+المخزن+بنجاح+✅"); exit();
+            } else {
+                proc_gate(false)->insert('proc_warehouse', array(
+                    'code' => proc_gen_code($conn, 'proc_warehouse', 'PRC-WH', $company_id),
+                    'name' => $name, 'type' => $type, 'location' => $location, 'notes' => $notes,
+                    'created_by' => $current_user_id,
+                ));
+                header("Location: master_data_proc.php?msg=تمت+إضافة+المخزن+بنجاح+✅"); exit();
             }
-            header("Location: master_data_proc.php?msg=تم+تعديل+المخزن+بنجاح+✅"); exit();
-        } else {
-            $code = proc_gen_code($conn, 'proc_warehouse', 'PRC-WH', $company_id);
-            $sql = "INSERT INTO proc_warehouse (company_id, code, name, type, location, notes, created_by)
-                    VALUES (?,?,?,?,?,?,?)";
-            if ($stmt = mysqli_prepare($conn, $sql)) {
-                mysqli_stmt_bind_param($stmt, 'isssssi', $company_id, $code, $name, $type, $location, $notes, $current_user_id);
-                mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-            }
-            header("Location: master_data_proc.php?msg=تمت+إضافة+المخزن+بنجاح+✅"); exit();
+        } catch (\App\Core\TenantGateException $e) {
+            error_log('master_data warehouse save refused: ' . $e->getMessage());
+            header("Location: master_data_proc.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
         }
     }
 
@@ -116,22 +109,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entity'])) {
 if (isset($_GET['delete_lookup_id'])) {
     if (!$can_delete) { header("Location: master_data_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_lookup_id']);
-    $sql = "UPDATE proc_lookup SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    try { proc_gate(false)->softDelete('proc_lookup', $delete_id); }
+    catch (\App\Core\TenantGateException $e) { error_log('master_data lookup softDelete refused: ' . $e->getMessage()); }
     header("Location: master_data_proc.php?msg=تم+حذف+القيمة+المرجعية+بنجاح+✅"); exit();
 }
 
 if (isset($_GET['delete_wh_id'])) {
     if (!$can_delete) { header("Location: master_data_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_wh_id']);
-    $sql = "UPDATE proc_warehouse SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    try { proc_gate(false)->softDelete('proc_warehouse', $delete_id); }
+    catch (\App\Core\TenantGateException $e) { error_log('master_data warehouse softDelete refused: ' . $e->getMessage()); }
     header("Location: master_data_proc.php?msg=تم+حذف+المخزن+بنجاح+✅"); exit();
 }
 
@@ -207,11 +194,11 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT id, type, name, extra, is_active FROM proc_lookup
-                            WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0
-                            ORDER BY type ASC, name ASC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    $lookup_rows = proc_gate($is_super_admin)->select('proc_lookup', array(
+                        'columns' => array('id', 'type', 'name', 'extra', 'is_active'),
+                        'orderBy' => 'type ASC, name ASC',
+                    ));
+                    { foreach ($lookup_rows as $row) {
                         $data_attrs =
                             "data-id='" . intval($row['id']) . "' " .
                             "data-type='" . htmlspecialchars((string)$row['type'], ENT_QUOTES) . "' " .
@@ -282,11 +269,11 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT id, code, name, type, location, notes FROM proc_warehouse
-                            WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0
-                            ORDER BY name ASC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    $wh_rows = proc_gate($is_super_admin)->select('proc_warehouse', array(
+                        'columns' => array('id', 'code', 'name', 'type', 'location', 'notes'),
+                        'orderBy' => 'name ASC',
+                    ));
+                    { foreach ($wh_rows as $row) {
                         $data_attrs =
                             "data-id='" . intval($row['id']) . "' " .
                             "data-name='" . htmlspecialchars((string)$row['name'], ENT_QUOTES) . "' " .
