@@ -13,19 +13,14 @@ if (!headers_sent()) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// K9-M0: بوابة العزل — كل استعلامات الشاشة عبرها حصريًا (ADR-02):
+// العزل بالشركة والحذف الناعم مسؤولية البوابة، لا شروط company_id يدوية هنا.
+// ══════════════════════════════════════════════════════════════════════════════
+$gate = ems_tenant_db();
+
+// ══════════════════════════════════════════════════════════════════════════════
 // دوال مساعدة
 // ══════════════════════════════════════════════════════════════════════════════
-if (!function_exists('opp_table_has_column')) {
-    function opp_table_has_column($conn, $tableName, $columnName)
-    {
-        $safeTable = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
-        $safeCol   = preg_replace('/[^a-zA-Z0-9_]/', '', $columnName);
-        $sql = "SHOW COLUMNS FROM " . $safeTable . " LIKE '" . mysqli_real_escape_string($conn, $safeCol) . "'";
-        $res = @mysqli_query($conn, $sql);
-        return $res && mysqli_num_rows($res) > 0;
-    }
-}
-
 if (!function_exists('opp_e')) {
     function opp_e($value)
     {
@@ -56,13 +51,6 @@ if ($company_id <= 0) {
     header('Location: ../login.php?msg=' . urlencode('الحساب غير مرتبط بشركة.'));
     exit();
 }
-
-// ══════════════════════════════════════════════════════════════════════════════
-// شروط النطاق والحذف الناعم
-// ══════════════════════════════════════════════════════════════════════════════
-$scope_sql        = "o.company_id = $company_id";
-$scope_update_sql = "company_id = $company_id";
-$not_deleted_sql  = "o.is_deleted = 0";
 
 // ══════════════════════════════════════════════════════════════════════════════
 // رمز CSRF
@@ -99,22 +87,30 @@ $OPP_STAGE_PROB = array(
 // توليد الكود المقترح التالي (OPP-NNNN) — للعرض فقط
 // ══════════════════════════════════════════════════════════════════════════════
 $next_opp_code = 'OPP-0001';
-$last_code_sql = "SELECT opp_code FROM opportunities
-                  WHERE opp_code REGEXP '^OPP-[0-9]+$' AND company_id = $company_id AND is_deleted = 0
-                  ORDER BY CAST(SUBSTRING(opp_code, 5) AS UNSIGNED) DESC LIMIT 1";
-$last_code_res = @mysqli_query($conn, $last_code_sql);
-if ($last_code_res && mysqli_num_rows($last_code_res) > 0) {
-    $last_code_row = mysqli_fetch_assoc($last_code_res);
-    $last_num = intval(substr($last_code_row['opp_code'], 4));
+// عبر البوابة: الجلب المرشَّح ثم إيجاد الأقصى في PHP (تعبير CAST/SUBSTRING في
+// ORDER BY خارج صرامة معرّفات البوابة — والصفوف قليلة بطبيعتها)
+$code_rows = $gate->select('opportunities', array(
+    'columns'  => array('opp_code'),
+    'whereRaw' => "opp_code REGEXP '^OPP-[0-9]+$'",
+));
+$last_num = 0;
+foreach ($code_rows as $code_row) {
+    $n = intval(substr($code_row['opp_code'], 4));
+    if ($n > $last_num) {
+        $last_num = $n;
+    }
+}
+if ($last_num > 0) {
     $next_opp_code = 'OPP-' . str_pad($last_num + 1, 4, '0', STR_PAD_LEFT);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // صلاحيات المستخدم على وحدة الفرص
 // ══════════════════════════════════════════════════════════════════════════════
-$module_query = "SELECT id FROM modules WHERE code = 'Opportunities/opportunities.php' LIMIT 1";
-$module_result = $conn->query($module_query);
-$module_info = $module_result ? $module_result->fetch_assoc() : null;
+$module_info = $gate->selectOne('modules', array(
+    'columns' => array('id'),
+    'where'   => array('code' => 'Opportunities/opportunities.php'),
+));
 $module_id = $module_info ? $module_info['id'] : null;
 
 $can_view = false;
@@ -183,97 +179,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
         $study_decision_raw = '';
     }
 
-    // العميل المرتبط — يجب أن يتبع الشركة نفسها (إن حُدِّد)
+    // العميل المرتبط — البوابة تعزل بالشركة والحذف الناعم آليًا
     $client_id_in = isset($_POST['client_id']) ? intval($_POST['client_id']) : 0;
     if ($client_id_in > 0) {
-        $client_ok = mysqli_query($conn, "SELECT id FROM clients WHERE id = $client_id_in AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$client_ok || mysqli_num_rows($client_ok) === 0) {
+        $client_row = $gate->selectOne('clients', array('columns' => array('id'), 'where' => array('id' => $client_id_in)));
+        if ($client_row === null) {
             opp_redirect_with_msg('العميل المحدد غير موجود أو خارج نطاق شركتك ❌');
         }
     }
-    $client_sql = $client_id_in > 0 ? "'$client_id_in'" : 'NULL';
 
-    // تنظيف بقية الحقول
-    $opp_code        = mysqli_real_escape_string($conn, $opp_code_raw);
-    $title           = mysqli_real_escape_string($conn, trim($_POST['title']));
-    $source          = mysqli_real_escape_string($conn, isset($_POST['source']) ? trim($_POST['source']) : '');
-    $sector_category = mysqli_real_escape_string($conn, isset($_POST['sector_category']) ? trim($_POST['sector_category']) : '');
-    $state_region    = mysqli_real_escape_string($conn, isset($_POST['state_region']) ? trim($_POST['state_region']) : '');
-    $revenue_model   = $revenue_model_raw !== '' ? "'" . mysqli_real_escape_string($conn, $revenue_model_raw) . "'" : 'NULL';
-    $expected_revenue = isset($_POST['expected_revenue']) ? (float) $_POST['expected_revenue'] : 0;
-    $funding_needed   = isset($_POST['funding_needed']) ? (float) $_POST['funding_needed'] : 0;
-    $probability      = isset($_POST['probability']) && $_POST['probability'] !== ''
-        ? max(0, min(100, (float) $_POST['probability']))
-        : (isset($OPP_STAGE_PROB[$stage_raw]) ? $OPP_STAGE_PROB[$stage_raw] : 0);
-    $currency        = mysqli_real_escape_string($conn, $currency_raw);
-    $stage           = mysqli_real_escape_string($conn, $stage_raw);
-    $attractiveness  = $attractiveness_raw !== '' ? "'" . mysqli_real_escape_string($conn, $attractiveness_raw) . "'" : 'NULL';
-    $strategy_fit    = $strategy_fit_raw !== '' ? "'" . mysqli_real_escape_string($conn, $strategy_fit_raw) . "'" : 'NULL';
-    $study_decision  = $study_decision_raw !== '' ? "'" . mysqli_real_escape_string($conn, $study_decision_raw) . "'" : 'NULL';
-    $capacity_summary = mysqli_real_escape_string($conn, isset($_POST['capacity_summary']) ? trim($_POST['capacity_summary']) : '');
-    $lost_reason     = mysqli_real_escape_string($conn, isset($_POST['lost_reason']) ? trim($_POST['lost_reason']) : '');
-    $win_reason      = mysqli_real_escape_string($conn, isset($_POST['win_reason']) ? trim($_POST['win_reason']) : '');
-    $review_notes    = mysqli_real_escape_string($conn, isset($_POST['review_notes']) ? trim($_POST['review_notes']) : '');
-    $notes           = mysqli_real_escape_string($conn, isset($_POST['notes']) ? trim($_POST['notes']) : '');
-    $close_date_raw  = isset($_POST['expected_close_date']) ? trim($_POST['expected_close_date']) : '';
-    $close_date_sql  = preg_match('/^\d{4}-\d{2}-\d{2}$/', $close_date_raw) ? "'$close_date_raw'" : 'NULL';
-    $created_by      = intval($_SESSION['user']['id']);
+    // القيم خامًا — البوابة تحضّر (prepared) فلا هروب يدويًا ولا أجزاء SQL
+    $close_date_raw = isset($_POST['expected_close_date']) ? trim($_POST['expected_close_date']) : '';
+    $data = array(
+        'opp_code'         => $opp_code_raw,
+        'title'            => trim($_POST['title']),
+        'client_id'        => $client_id_in > 0 ? $client_id_in : null,
+        'source'           => isset($_POST['source']) ? trim($_POST['source']) : '',
+        'sector_category'  => isset($_POST['sector_category']) ? trim($_POST['sector_category']) : '',
+        'state_region'     => isset($_POST['state_region']) ? trim($_POST['state_region']) : '',
+        'revenue_model'    => $revenue_model_raw !== '' ? $revenue_model_raw : null,
+        'expected_revenue' => isset($_POST['expected_revenue']) ? (float) $_POST['expected_revenue'] : 0,
+        'currency'         => $currency_raw,
+        'probability'      => isset($_POST['probability']) && $_POST['probability'] !== ''
+            ? max(0, min(100, (float) $_POST['probability']))
+            : (isset($OPP_STAGE_PROB[$stage_raw]) ? $OPP_STAGE_PROB[$stage_raw] : 0),
+        'stage'            => $stage_raw,
+        'attractiveness'   => $attractiveness_raw !== '' ? $attractiveness_raw : null,
+        'strategy_fit'     => $strategy_fit_raw !== '' ? $strategy_fit_raw : null,
+        'capacity_summary' => isset($_POST['capacity_summary']) ? trim($_POST['capacity_summary']) : '',
+        'funding_needed'   => isset($_POST['funding_needed']) ? (float) $_POST['funding_needed'] : 0,
+        'study_decision'   => $study_decision_raw !== '' ? $study_decision_raw : null,
+        'expected_close_date' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $close_date_raw) ? $close_date_raw : null,
+        'lost_reason'      => isset($_POST['lost_reason']) ? trim($_POST['lost_reason']) : '',
+        'win_reason'       => isset($_POST['win_reason']) ? trim($_POST['win_reason']) : '',
+        'review_notes'     => isset($_POST['review_notes']) ? trim($_POST['review_notes']) : '',
+        'notes'            => isset($_POST['notes']) ? trim($_POST['notes']) : '',
+    );
 
-    if ($is_editing) {
-        // تحقق من الملكية
-        $owner = mysqli_query($conn, "SELECT id FROM opportunities WHERE id = $opp_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-        if (!$owner || mysqli_num_rows($owner) === 0) {
-            opp_redirect_with_msg('لا يمكنك تعديل فرصة لا تتبع لشركتك ❌');
-        }
-        // منع تكرار الكود
-        $dup = mysqli_query($conn, "SELECT id FROM opportunities WHERE opp_code = '$opp_code' AND id != $opp_id AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
-            opp_redirect_with_msg('كود الفرصة موجود مسبقاً داخل شركتك ❌');
-        }
-
-        $update_query = "UPDATE opportunities SET
-            opp_code = '$opp_code', title = '$title', client_id = $client_sql, source = '$source',
-            sector_category = '$sector_category', state_region = '$state_region', revenue_model = $revenue_model,
-            expected_revenue = '$expected_revenue', currency = '$currency', probability = '$probability',
-            stage = '$stage', attractiveness = $attractiveness, strategy_fit = $strategy_fit,
-            capacity_summary = '$capacity_summary', funding_needed = '$funding_needed', study_decision = $study_decision,
-            expected_close_date = $close_date_sql, lost_reason = '$lost_reason', win_reason = '$win_reason',
-            review_notes = '$review_notes', notes = '$notes'
-            WHERE id = $opp_id AND $scope_update_sql AND is_deleted = 0";
-
-        if (mysqli_query($conn, $update_query)) {
+    try {
+        if ($is_editing) {
+            // تحقق الملكية (البوابة تعزل — الفحص للرسالة الدقيقة نفسها)
+            $owner = $gate->selectOne('opportunities', array('columns' => array('id'), 'where' => array('id' => $opp_id)));
+            if ($owner === null) {
+                opp_redirect_with_msg('لا يمكنك تعديل فرصة لا تتبع لشركتك ❌');
+            }
+            // منع تكرار الكود داخل الشركة
+            $dup = $gate->count('opportunities', array(
+                'where'    => array('opp_code' => $opp_code_raw),
+                'whereRaw' => 'id != ?', 'params' => array($opp_id),
+            ));
+            if ($dup > 0) {
+                opp_redirect_with_msg('كود الفرصة موجود مسبقاً داخل شركتك ❌');
+            }
+            $gate->update('opportunities', $data, array('id' => $opp_id, 'is_deleted' => 0));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logUpdate('opportunities', 'opportunities', $opp_id, null, ['opp_code' => $opp_code_raw, 'title' => trim($_POST['title'])]);
             }
             opp_redirect_with_msg('تم تعديل الفرصة بنجاح ✅');
-        }
-        error_log('opportunities.php update failed: ' . mysqli_error($conn));
-        opp_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
-    } else {
-        // منع تكرار الكود
-        $dup = mysqli_query($conn, "SELECT id FROM opportunities WHERE opp_code = '$opp_code' AND company_id = $company_id AND is_deleted = 0");
-        if ($dup && mysqli_num_rows($dup) > 0) {
-            opp_redirect_with_msg('كود الفرصة موجود مسبقاً داخل شركتك ❌');
-        }
-
-        $insert_query = "INSERT INTO opportunities
-            (company_id, opp_code, title, client_id, source, sector_category, state_region, revenue_model,
-             expected_revenue, currency, probability, stage, attractiveness, strategy_fit, capacity_summary,
-             funding_needed, study_decision, expected_close_date, lost_reason, win_reason, review_notes, notes, created_by)
-            VALUES
-            ('$company_id', '$opp_code', '$title', $client_sql, '$source', '$sector_category', '$state_region', $revenue_model,
-             '$expected_revenue', '$currency', '$probability', '$stage', $attractiveness, $strategy_fit, '$capacity_summary',
-             '$funding_needed', $study_decision, $close_date_sql, '$lost_reason', '$win_reason', '$review_notes', '$notes', '$created_by')";
-
-        if (mysqli_query($conn, $insert_query)) {
-            $new_id = (int) mysqli_insert_id($conn);
+        } else {
+            $dup = $gate->count('opportunities', array('where' => array('opp_code' => $opp_code_raw)));
+            if ($dup > 0) {
+                opp_redirect_with_msg('كود الفرصة موجود مسبقاً داخل شركتك ❌');
+            }
+            $data['created_by'] = intval($_SESSION['user']['id']);
+            // لا company_id هنا — البوابة تحقنه من هوية الجلسة حصريًا
+            $new_id = $gate->insert('opportunities', $data);
             if (class_exists('\\App\\Services\\ActivityLogService')) {
                 \App\Services\ActivityLogService::logCreate('opportunities', 'opportunities', $new_id, ['opp_code' => $opp_code_raw, 'title' => trim($_POST['title'])]);
             }
             opp_redirect_with_msg('تم إضافة الفرصة بنجاح ✅');
         }
-        error_log('opportunities.php insert failed: ' . mysqli_error($conn));
-        opp_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('opportunities.php gate refused write: ' . $e->getMessage());
+        opp_redirect_with_msg($is_editing ? 'حدث خطأ أثناء التعديل ❌' : 'حدث خطأ أثناء الإضافة ❌');
     }
 }
 
@@ -290,21 +268,21 @@ if (isset($_GET['delete_id'])) {
     if (empty($delete_csrf) || !hash_equals($opp_csrf_token, $delete_csrf)) {
         opp_redirect_with_msg('جلسة الحذف غير صالحة، يرجى إعادة المحاولة ❌');
     }
-    $chk = mysqli_query($conn, "SELECT id FROM opportunities WHERE id = $delete_id AND company_id = $company_id AND is_deleted = 0 LIMIT 1");
-    if (!$chk || mysqli_num_rows($chk) === 0) {
+    $chk = $gate->selectOne('opportunities', array('columns' => array('id'), 'where' => array('id' => $delete_id)));
+    if ($chk === null) {
         opp_redirect_with_msg('لا يمكنك حذف فرصة لا تتبع لشركتك ❌');
     }
-    $deleted_by = intval($_SESSION['user']['id']);
-    $del = "UPDATE opportunities SET is_deleted = 1, deleted_at = NOW(), deleted_by = $deleted_by
-            WHERE id = $delete_id AND $scope_update_sql AND is_deleted = 0";
-    if (mysqli_query($conn, $del)) {
+    try {
+        // حذفٌ ناعم حصري عبر البوابة (is_deleted/deleted_at/deleted_by من هوية الجلسة)
+        $gate->softDelete('opportunities', $delete_id);
         if (class_exists('\\App\\Services\\ActivityLogService')) {
             \App\Services\ActivityLogService::logDelete('opportunities', 'opportunities', $delete_id);
         }
         opp_redirect_with_msg('تم حذف الفرصة بنجاح ✅');
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('opportunities.php soft delete refused: ' . $e->getMessage());
+        opp_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
     }
-    error_log('opportunities.php soft delete failed: ' . mysqli_error($conn));
-    opp_redirect_with_msg('حدث خطأ أثناء الحذف ❌');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -312,12 +290,12 @@ if (isset($_GET['delete_id'])) {
 // ══════════════════════════════════════════════════════════════════════════════
 $clients_options = array();
 $clients_map = array();
-$cl_res = mysqli_query($conn, "SELECT id, client_code, client_name FROM clients WHERE company_id = $company_id AND is_deleted = 0 ORDER BY client_name ASC");
-if ($cl_res) {
-    while ($cl = mysqli_fetch_assoc($cl_res)) {
-        $clients_options[] = $cl;
-        $clients_map[intval($cl['id'])] = $cl['client_name'];
-    }
+foreach ($gate->select('clients', array(
+    'columns' => array('id', 'client_code', 'client_name'),
+    'orderBy' => 'client_name ASC',
+)) as $cl) {
+    $clients_options[] = $cl;
+    $clients_map[intval($cl['id'])] = $cl['client_name'];
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -334,15 +312,35 @@ $pipeline_value = 0.0;    // قيمة المسار (المفتوحة)
 $negotiation_value = 0.0; // قيمة تحت التفاوض
 $won_value = 0.0;
 
-$q = "SELECT o.*, c.client_name, u.name AS creator_name
-      FROM opportunities o
-      LEFT JOIN clients c ON c.id = o.client_id
-      LEFT JOIN users u ON u.id = o.created_by
-      WHERE $scope_sql AND $not_deleted_sql
-      ORDER BY o.id DESC";
-$res = mysqli_query($conn, $q);
-if ($res) {
-    while ($row = mysqli_fetch_assoc($res)) {
+// ترطيبٌ ثنائي الخطوة عبر البوابة بدل JOIN (قرار خطة K9 §4): أسماء العملاء من
+// $clients_map المبنية أعلاه (صفر استعلام إضافي)، وأسماء المنشئين بجلبٍ واحد.
+$opp_rows = $gate->select('opportunities', array('orderBy' => 'id DESC'));
+
+$creator_ids = array();
+foreach ($opp_rows as $r) {
+    $cid = intval($r['created_by']);
+    if ($cid > 0) {
+        $creator_ids[$cid] = true;
+    }
+}
+$creators_map = array();
+if (!empty($creator_ids)) {
+    $ids_in = implode(',', array_map('intval', array_keys($creator_ids)));
+    foreach ($gate->select('users', array(
+        'columns' => array('id', 'name'),
+        'whereRaw' => 'id IN (' . $ids_in . ')',
+        'includeDeleted' => true, // كالسلوك القائم: LEFT JOIN بلا شرط حذفٍ على المنشئ
+    )) as $u) {
+        $creators_map[intval($u['id'])] = $u['name'];
+    }
+}
+
+if ($opp_rows) {
+    foreach ($opp_rows as $row) {
+        $row_client_id = intval($row['client_id']);
+        $row['client_name'] = isset($clients_map[$row_client_id]) ? $clients_map[$row_client_id] : null;
+        $row_creator_id = intval($row['created_by']);
+        $row['creator_name'] = isset($creators_map[$row_creator_id]) ? $creators_map[$row_creator_id] : null;
         $rows[] = $row;
         $stat_total++;
         $stg = trim($row['stage']);
