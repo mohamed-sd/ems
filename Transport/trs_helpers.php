@@ -500,12 +500,16 @@ if (!function_exists('trs_save_proof')) {
         $rel = 'uploads/proofs/' . $safe;
         $lat = ($gps_lat === null || $gps_lat === '') ? null : (float)$gps_lat;
         $lng = ($gps_lng === null || $gps_lng === '') ? null : (float)$gps_lng;
-        $stmt = mysqli_prepare($conn, "INSERT INTO transfer_attachments
-            (company_id, order_id, file_path, file_type, gps_lat, gps_lng, captured_at, uploaded_by)
-            VALUES (?,?,?,?,?,?,NOW(),?)");
-        if ($stmt) {
-            mysqli_stmt_bind_param($stmt, 'iissddi', $company_id, $order_id, $rel, $file_type, $lat, $lng, $uploaded_by);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        // عبر البوابة (سياق ويب — مستدعيه order_form)؛ فشل القيد لا يمنع إرجاع
+        // المسار كسلوك الأصل (الملف حُفظ فعلًا)
+        try {
+            trs_gate(false)->insert('transfer_attachments', array(
+                'order_id' => $order_id, 'file_path' => $rel, 'file_type' => $file_type,
+                'gps_lat' => $lat, 'gps_lng' => $lng,
+                'captured_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $uploaded_by,
+            ));
+        } catch (\App\Core\TenantGateException $e) {
+            error_log('trs_save_proof insert refused: ' . $e->getMessage());
         }
         return $rel;
     }
