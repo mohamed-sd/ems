@@ -244,6 +244,49 @@ expect_throw('m7: TENANT_ENFORCE_PATHS يغلب monitor (fail-closed)', function
 TenantDb::$enforcePathsOverride = null;
 unset($_SERVER['SCRIPT_NAME']);
 
+// ═════ 6جـ) قناة replaceChildren — اختبارات تسرّبٍ خاصة (شرط الاستعمال المسبق) ═════
+echo "── 6جـ) replaceChildren (نمط استبدال الأبناء — قناة مقيدة) ──\n";
+$poA = $gateA->insert('proc_order', array());
+$cleanup[] = array('proc_order', $poA);
+$poB = $gateB->insert('proc_order', array());
+$cleanup[] = array('proc_order', $poB);
+$gateA->replaceChildren('proc_order', $poA, 'proc_order_line', 'order_id',
+    array(array('item_name' => $MARK_A . '_L1'), array('item_name' => $MARK_A . '_L2')));
+$gateB->replaceChildren('proc_order', $poB, 'proc_order_line', 'order_id',
+    array(array('item_name' => $MARK_B . '_L1')));
+
+// c1: الاستبدال المشروع يعمل ذرّيًا (القديم يُزال والجديد يُدرج بعدّه الدقيق)
+$r = $gateA->replaceChildren('proc_order', $poA, 'proc_order_line', 'order_id',
+    array(array('item_name' => $MARK_A . '_NEW1'), array('item_name' => $MARK_A . '_NEW2'), array('item_name' => $MARK_A . '_NEW3')));
+$namesA = array_map(function ($x) { return $x['item_name']; },
+    $gateA->select('proc_order_line', array('where' => array('order_id' => $poA))));
+ok('c1: الاستبدال المشروع (حذف 2 → إدراج 3، القديم زال)', $r['deleted'] === 2 && $r['inserted'] === 3
+    && count($namesA) === 3 && !in_array($MARK_A . '_L1', $namesA, true) && in_array($MARK_A . '_NEW1', $namesA, true));
+
+// c2: أبٌ غير مملوك (أب B عبر بوابة A) يُرفض — وسطور B لا تُمسّ
+expect_throw('c2: أبٌ من شركةٍ أخرى يُرفض (النطاق المزدوج)', function () use ($gateA, $poB, $MARK_A) {
+    $gateA->replaceChildren('proc_order', $poB, 'proc_order_line', 'order_id',
+        array(array('item_name' => $MARK_A . '_HACK')));
+});
+$linesB = $gateB->select('proc_order_line', array('where' => array('order_id' => $poB)));
+ok('c3: سطور الشركة الأخرى سليمة لم تُمسّ', count($linesB) === 1 && $linesB[0]['item_name'] === $MARK_B . '_L1');
+
+// c4: الذرّية — صفٌّ فاسد وسط الدفعة ⇒ لا شيء يتغير (القديم باقٍ بعدّه)
+expect_throw('c4a: دفعة فيها صفٌّ فاسد تُرفض كاملةً', function () use ($gateA, $poA, $MARK_A) {
+    $gateA->replaceChildren('proc_order', $poA, 'proc_order_line', 'order_id',
+        array(array('item_name' => $MARK_A . '_X1'), array('no_such_column' => 'boom')));
+});
+$namesA2 = array_map(function ($x) { return $x['item_name']; },
+    $gateA->select('proc_order_line', array('where' => array('order_id' => $poA))));
+ok('c4b: الذرّية صانت القديم (3 أسطر NEW كما كانت — rollback كامل)',
+    count($namesA2) === 3 && in_array($MARK_A . '_NEW2', $namesA2, true) && !in_array($MARK_A . '_X1', $namesA2, true));
+
+// c5: الأثر مسجَّل (تحذف بيانات — أثرٌ إلزامي)
+clearstatcache();
+ok('c5: كل استبدالٍ مسجَّل (tenant_gate_replace_children)',
+    strpos(file_get_contents(dirname(__DIR__) . '/logs/security.log'), 'tenant_gate_replace_children') !== false);
+mysqli_query($conn, "DELETE FROM proc_order_line WHERE item_name LIKE 'LEAKTEST_%'");
+
 // ═════ 7) الشاشات المُهاجَرة (HTTP — T2) ═════
 echo "── 7) الشاشات المُهاجَرة (زيارة فعلية بجلسة) ──\n";
 if (empty($MIGRATED_SCREENS)) {

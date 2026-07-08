@@ -18,24 +18,48 @@
  * ملاحظة نطاق: البوابة تخدم الشاشات المُهاجَرة والوحدات الجديدة. الشاشات
  * القديمة تبقى على mysqli الخام حتى دور هجرتها (خارطة R02 §3.4) — المؤشر:
  * «100% من استعلامات الشاشة المُهاجَرة عبر البوابة».
+ *
+ * وضع المراقبة log-only (K1 · خطة المرحلة 1 §7-2 — نمط CSRF حرفيًا):
+ *   • غياب EMS_TENANT_GATE من .env (أو enforce) = fail-closed صافٍ (الافتراض الآمن).
+ *   • EMS_TENANT_GATE=monitor = حالات سياق العزل الثلاث (جدول غير مسجَّل، جدول
+ *     مقيَّد، لا شركة في السياق) تُسجَّل tenant_gate_would_deny ثم تُمرَّر بسلوك
+ *     الشاشة قبل الهجرة — قراءةً وإدراجًا حصرًا؛ المسارات المسجَّلة في
+ *     TENANT_ENFORCE_PATHS تبقى fail-closed (إنفاذ شاشةً شاشة).
+ *   • المسار السوي المعزول مطابقٌ تمامًا في الوضعين — monitor لا يلمسه.
+ *   • لا تمرير أبدًا لأخطاء البرمجة والهجمات والكتابات التعديلية: تزوير الهوية،
+ *     update/softDelete عبر التمرير، update بلا شرط، الحذف الصلب، كتابة مرجعٍ
+ *     عام، ابنٌ لأبٍ غير مملوك، company_id في whereRaw، معرّفات فاسدة — تُرمى دائمًا.
  */
 
 namespace App\Core;
 
 class TenantDb
 {
+    /** نوع تعريفٍ داخلي لعبور المراقبة (ليس نوع سجل) — قراءة/إدراج بلا حقن عزل. */
+    const T_MONITOR_PASS = 'monitor_pass';
+
+    /** حقن قائمة مسارات الإنفاذ في الاختبارات CLI حصرًا (بديل .env). */
+    public static $enforcePathsOverride = null;
+
     /** @var \mysqli */
     private $conn;
     /** @var TenantContext */
     private $ctx;
     /** @var bool وضع القراءة العابرة للشركات (super admin، مُسجَّل) */
     private $crossTenant;
+    /** @var string 'enforce' | 'monitor' — من .env أو صريحًا للاختبارات */
+    private $mode;
 
-    public function __construct(\mysqli $conn, TenantContext $ctx, $crossTenant = false)
+    public function __construct(\mysqli $conn, TenantContext $ctx, $crossTenant = false, $mode = null)
     {
         $this->conn = $conn;
         $this->ctx = $ctx;
         $this->crossTenant = (bool) $crossTenant;
+        if ($mode === null) {
+            $mode = (function_exists('ems_env') && ems_env('EMS_TENANT_GATE') === 'monitor')
+                ? 'monitor' : 'enforce';
+        }
+        $this->mode = ($mode === 'monitor') ? 'monitor' : 'enforce';
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -111,10 +135,11 @@ class TenantDb
         return $this->conn->insert_id;
     }
 
-    /** تحديث صفوف ضمن نطاق العزل. تغيير company_id ممنوع (إلا crossTenant). */
+    /** تحديث صفوف ضمن نطاق العزل. تغيير company_id ممنوع (إلا crossTenant).
+     *  الكتابة التعديلية لا يشملها تمرير المراقبة أبدًا (strict). */
     public function update($table, array $data, array $where, $whereRaw = '', array $rawParams = array())
     {
-        $def = $this->requireTable($table);
+        $def = $this->requireTable($table, true /* strict: لا عبور مراقبةٍ للتعديل */);
         $this->assertWritable($table, $def);
 
         if (array_key_exists('company_id', $data) && !$this->crossTenant) {
@@ -138,6 +163,7 @@ class TenantDb
         list($cond, $condParams) = $this->buildWhere($table, $def, array(
             'where' => $where, 'whereRaw' => $whereRaw, 'params' => $rawParams,
             'includeDeleted' => true, // التحديث لا يستثني المحذوف ضمنيًا (قد نحدّث حالة الحذف نفسها)
+            '__strictTenant' => true, // كتابة تعديلية: لا تمرير مراقبةٍ لغياب الشركة أبدًا
         ));
 
         $sql = 'UPDATE `' . $table . '` SET ' . implode(', ', $sets) . ' WHERE ' . $cond;
@@ -151,7 +177,7 @@ class TenantDb
      */
     public function softDelete($table, $id)
     {
-        $def = $this->requireTable($table);
+        $def = $this->requireTable($table, true /* strict: كتابة تعديلية — لا عبور مراقبة */);
         if (empty($def['soft'])) {
             $this->deny('hard delete refused (no soft-delete columns)', $table);
         }
@@ -160,6 +186,86 @@ class TenantDb
             'deleted_at' => date('Y-m-d H:i:s'),
             'deleted_by' => $this->ctx->userId(),
         ), array('id' => intval($id)));
+    }
+
+    /**
+     * قناة إعادة كتابة الأبناء — replaceChildren (K9-M1 · قرار المستخدم جـ 2026-07-08)
+     * ───────────────────────────────────────────────────────────────────────
+     * قناة استثنائية معرَّفة بدقة لنمط «الاستبدال الكامل» التقني (تحرير أبٍ
+     * يعيد كتابة كل سطوره): حذفٌ مقيَّدٌ بنطاقٍ مزدوجٍ إلزامي (الشركة **و**
+     * الأبِ المملوكِ المتحقَّق — لا يكفي أحدهما) + إدراج البديل، **ذرّيًّا في
+     * معاملةٍ واحدة** (انقطاعٌ = لا شيء؛ لا تضيع السطور القديمة دون الجديدة).
+     * ليست بديلًا عن softDelete: سجلات الأعمال تُؤرشف؛ هذه لأسطر التفاصيل
+     * القابلة لإعادة الكتابة حصرًا، وكل استدعاءٍ يُسجَّل (أثر إلزامي — تحذف
+     * بيانات). أي شاشةٍ تستعملها تُبرّر أنها نمط أب-أبناء فعلًا (العقد §8).
+     * تدير معاملتها بنفسها — لا تُستدعى داخل معاملةٍ مفتوحة.
+     *
+     * @param string $parentTable جدول الأب (مستأجَر — تُتحقق ملكيته للشركة)
+     * @param int    $parentId
+     * @param string $childTable  جدول الأبناء (مستأجَر بcompany_id)
+     * @param string $parentCol   عمود إشارة الابن لأبيه
+     * @param array  $rows        صفوف الإدراج الجديدة (قد تكون فارغة = محوٌ مشروع للسطور)
+     * @return array{deleted:int, inserted:int}
+     */
+    public function replaceChildren($parentTable, $parentId, $childTable, $parentCol, array $rows, $note = '')
+    {
+        $parentId = intval($parentId);
+        $this->assertIdent($parentCol);
+        $pDef = $this->requireTable($parentTable, true); // strict — لا عبور مراقبةٍ للحذف أبدًا
+        $cDef = $this->requireTable($childTable, true);
+        if ($pDef['type'] !== TenantRegistry::T_TENANT || $cDef['type'] !== TenantRegistry::T_TENANT) {
+            $this->deny('replaceChildren requires tenant-scoped parent and child', $parentTable . '/' . $childTable);
+        }
+        $this->requireTenant($parentTable);
+
+        // النطاق 1: الأب مملوكٌ لشركة السياق (تحقُّق صريح — يُرفض غير المملوك)
+        $owned = $this->selectOne($parentTable, array('columns' => array('id'), 'where' => array('id' => $parentId), 'includeDeleted' => true));
+        if ($owned === null) {
+            $this->deny('replaceChildren: parent not owned by tenant', $parentTable . '#' . $parentId);
+        }
+
+        $this->conn->begin_transaction();
+        try {
+            // النطاق 2: حذف الأبناء بالشرطين معًا إلزامًا (الأب + الشركة)
+            $stmt = $this->conn->prepare(
+                'DELETE FROM `' . $childTable . '` WHERE `' . $parentCol . '` = ? AND `company_id` = ?'
+            );
+            if (!$stmt) {
+                throw new TenantGateException('replaceChildren prepare failed: ' . $this->conn->error);
+            }
+            $cid = $this->ctx->companyId();
+            $stmt->bind_param('ii', $parentId, $cid);
+            if (!$stmt->execute()) {
+                $err = $stmt->error;
+                $stmt->close();
+                throw new TenantGateException('replaceChildren delete failed: ' . $err);
+            }
+            $deleted = $stmt->affected_rows;
+            $stmt->close();
+
+            $inserted = 0;
+            foreach ($rows as $row) {
+                $row[$parentCol] = $parentId; // ربط الابن بأبيه المتحقَّق حصرًا
+                $this->insert($childTable, $row); // حقن الشركة وحراس التزوير كالمعتاد
+                $inserted++;
+            }
+            $this->conn->commit();
+        } catch (\Throwable $t) {
+            $this->conn->rollback(); // ذرّية: لا شيء يتغير عند أي فشل
+            if ($t instanceof TenantGateException) {
+                throw $t;
+            }
+            throw new TenantGateException('replaceChildren aborted (rolled back): ' . $t->getMessage());
+        }
+
+        if (function_exists('log_security_event')) {
+            log_security_event('tenant_gate_replace_children',
+                $parentTable . '#' . $parentId . ' -> ' . $childTable
+                . ' deleted=' . $deleted . ' inserted=' . $inserted
+                . ' | user=' . $this->ctx->userId() . ' company=' . $this->ctx->companyId()
+                . ($note !== '' ? ' note=' . substr($note, 0, 120) : ''));
+        }
+        return array('deleted' => $deleted, 'inserted' => $inserted);
     }
 
     /**
@@ -177,7 +283,7 @@ class TenantDb
             log_security_event('tenant_gate_cross_tenant',
                 'user=' . $this->ctx->userId() . ' caller=' . $caller . ($reason !== '' ? ' reason=' . $reason : ''));
         }
-        return new self($this->conn, $this->ctx, true);
+        return new self($this->conn, $this->ctx, true, $this->mode);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -224,19 +330,21 @@ class TenantDb
         // 1) حقن العزل — القلب.
         if (!$this->crossTenant) {
             if ($def['type'] === TenantRegistry::T_TENANT) {
-                $this->requireTenant($table);
-                $conds[] = '`' . $table . '`.`company_id` = ?';
-                $params[] = $this->ctx->companyId();
+                if ($this->tenantScopeRequired($table, $opts)) {
+                    $conds[] = '`' . $table . '`.`company_id` = ?';
+                    $params[] = $this->ctx->companyId();
+                }
             } elseif ($def['type'] === TenantRegistry::T_CHILD) {
-                $this->requireTenant($table);
-                $parent = $def['parent'];
-                $fk = $def['fk'];
-                $this->assertIdent($parent);
-                $this->assertIdent($fk);
-                $conds[] = 'EXISTS (SELECT 1 FROM `' . $parent . '` __p WHERE __p.`id` = `' . $table . '`.`' . $fk . '` AND __p.`company_id` = ?)';
-                $params[] = $this->ctx->companyId();
+                if ($this->tenantScopeRequired($table, $opts)) {
+                    $parent = $def['parent'];
+                    $fk = $def['fk'];
+                    $this->assertIdent($parent);
+                    $this->assertIdent($fk);
+                    $conds[] = 'EXISTS (SELECT 1 FROM `' . $parent . '` __p WHERE __p.`id` = `' . $table . '`.`' . $fk . '` AND __p.`company_id` = ?)';
+                    $params[] = $this->ctx->companyId();
+                }
             }
-            // T_GLOBAL: قراءة بلا نطاق.
+            // T_GLOBAL: قراءة بلا نطاق. · T_MONITOR_PASS: عبور مراقبةٍ مُسجَّل بلا حقن.
         }
 
         // 2) استبعاد المحذوف ناعمًا (افتراضيًا).
@@ -313,14 +421,25 @@ class TenantDb
     // الحرّاس
     // ─────────────────────────────────────────────────────────────────────────
 
-    private function requireTable($table)
+    /**
+     * @param bool $strict كتابة تعديلية (update/softDelete): لا عبور مراقبةٍ أبدًا.
+     */
+    private function requireTable($table, $strict = false)
     {
         $this->assertIdent($table);
         $def = TenantRegistry::get($table);
         if ($def === null) {
+            if (!$strict && $this->monitorPass('unregistered table', $table)) {
+                // عبور مراقبة: قراءة/إدراج بسلوك ما قبل الهجرة (بلا حقن ولا مرشّح حذفٍ ناعم
+                // — أعمدته مجهولة لجدولٍ خارج السجل). أخطاء SQL الحقيقية تظهر كما هي.
+                return array('type' => self::T_MONITOR_PASS, 'soft' => false);
+            }
             $this->deny('unregistered table', $table);
         }
         if ($def['type'] === TenantRegistry::T_RESTRICTED) {
+            if (!$strict && $this->monitorPass('restricted table (pending its module migration)', $table)) {
+                return array('type' => self::T_MONITOR_PASS, 'soft' => !empty($def['soft']));
+            }
             $this->deny('restricted table (pending its module migration)', $table);
         }
         return $def;
@@ -333,11 +452,76 @@ class TenantDb
         }
     }
 
+    /**
+     * هل يُحقن شرط العزل؟ true = احقن (المسار السوي). عند غياب شركة السياق:
+     * قراءةٌ في وضع المراقبة خارج مسارات الإنفاذ → تُسجَّل وتُمرَّر بلا شرط (false)؛
+     * وإلا (enforce، أو مسار إنفاذ، أو كتابة strict) → رفضٌ مغلق.
+     */
+    private function tenantScopeRequired($table, array $opts)
+    {
+        if ($this->ctx->hasTenant()) {
+            return true;
+        }
+        if (empty($opts['__strictTenant']) && $this->monitorPass('no tenant in context', $table)) {
+            return false; // عبور مراقبةٍ مُسجَّل — سلوك الشاشة قبل الهجرة
+        }
+        $this->deny('no tenant in context (fail-closed)', $table);
+    }
+
     private function assertWritable($table, array $def)
     {
+        if ($def['type'] === self::T_MONITOR_PASS) {
+            return; // إدراجٌ عابرٌ مُسجَّل (سلوك ما قبل الهجرة) — التعديل لا يصل هنا (strict)
+        }
         if ($def['type'] === TenantRegistry::T_GLOBAL && !$this->ctx->isSuperAdmin()) {
             $this->deny('write to global reference refused', $table);
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // آلية المراقبة log-only (K1)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * true = مسموح العبور: الوضع monitor والمسار الحالي خارج TENANT_ENFORCE_PATHS —
+     * ويُسجَّل tenant_gate_would_deny (ما كان الإنفاذ سيحجبه). غير ذلك false.
+     */
+    private function monitorPass($reason, $detail)
+    {
+        if ($this->mode !== 'monitor' || $this->isEnforcedPath()) {
+            return false;
+        }
+        if (function_exists('log_security_event')) {
+            $script = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : 'cli';
+            log_security_event('tenant_gate_would_deny',
+                $reason . ($detail !== '' ? ' :: ' . substr($detail, 0, 200) : '')
+                . ' | script=' . $script
+                . ' | user=' . $this->ctx->userId() . ' company=' . $this->ctx->companyId());
+        }
+        return true;
+    }
+
+    /** مطابقة مسار السكربت الحالي ضد TENANT_ENFORCE_PATHS (نمط CSRF_ENFORCE_PATHS). */
+    private function isEnforcedPath()
+    {
+        $paths = self::$enforcePathsOverride;
+        if ($paths === null) {
+            $raw = function_exists('ems_env') ? ems_env('TENANT_ENFORCE_PATHS', '') : '';
+            $paths = array_filter(array_map('trim', explode(',', (string) $raw)));
+        }
+        if (empty($paths)) {
+            return false;
+        }
+        $script = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
+        if ($script === '') {
+            return false; // CLI: الوضع يُضبط صراحةً في الاختبارات
+        }
+        foreach ($paths as $p) {
+            if ($p !== '' && stripos($script, $p) !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** لإدراج ابنٍ: الأب المُشار إليه يجب أن يملكه مستأجر السياق. */
