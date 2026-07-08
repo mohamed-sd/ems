@@ -86,22 +86,6 @@ if (!function_exists('proc_msg_banner')) {
     }
 }
 
-if (!function_exists('proc_options_from_query')) {
-    /**
-     * ⚠ جسر توافقٍ مؤقت أثناء دفعة M1: ثلاث شاشات (orders/receipt/issue) تمرّر
-     * SQL خاصًا بها هنا — يتحول كلٌّ عند هجرة ملفه إلى صفوف بوابة، ثم تُزال هذه
-     * الدالة في ختام الدفعة (حينها T3=0 على الوحدة كلها).
-     */
-    function proc_options_from_query($conn, $sql, $selected = 0, $placeholder = '— اختر —')
-    {
-        $rows = array();
-        if ($res = mysqli_query($conn, $sql)) {
-            while ($r = mysqli_fetch_assoc($res)) { $rows[] = $r; }
-        }
-        return proc_options_from_rows($rows, $selected, $placeholder);
-    }
-}
-
 if (!function_exists('proc_options_from_rows')) {
     /** بناء <option> من صفوف (id + label جاهزان) — بديل التنفيذ بالنص الخام. */
     function proc_options_from_rows(array $rows, $selected = 0, $placeholder = '— اختر —')
