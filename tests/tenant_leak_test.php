@@ -433,6 +433,35 @@ expect_throw('e7: UNION = رفض', function () use ($gateA) {
 });
 mysqli_query($conn, "DELETE FROM proc_stock_move WHERE ref_type='leaktest'");
 
+// ═════ 6و) forSystem — سياق النظام المحوكم (القدرة الخامسة) ═════
+echo "── 6و) forSystem (شركة واحدة لكل دورة · قناة محروسة · مسجَّلة) ──\n";
+// f1: دورتان معزولتان — A لا ترى/لا تكتب في B والعكس (قراءةً وكتابةً)
+$sysA = new TenantDb($conn, TenantContext::forSystem($COMPANY_A, 0, ''), false, 'enforce');
+$sysB = new TenantDb($conn, TenantContext::forSystem($COMPANY_B, 0, ''), false, 'enforce');
+$sA = $sysA->insert('clients', array('client_name' => $MARK_A . '_SYS', 'client_code' => $MARK_A . '_SYS'));
+$cleanup[] = array('clients', $sA);
+ok('f1a: كتابة دورة النظام A حُقنت بشركتها', intval($conn->query("SELECT company_id FROM clients WHERE id={$sA}")->fetch_row()[0]) === $COMPANY_A);
+$seenB = array_map(function ($r) { return $r['client_name']; },
+    $sysB->select('clients', array('whereRaw' => "client_name LIKE 'LEAKTEST_%'", 'includeDeleted' => true)));
+ok('f1b: دورة النظام B لا ترى ما كتبته دورة A', !in_array($MARK_A . '_SYS', $seenB, true));
+ok('f1c: تحديث B لصف دورة A = صفر صفوف', $sysB->update('clients', array('client_name' => 'X'), array('id' => $sA)) === 0);
+
+// f2: القناة محروسة — محاكاة مسار ويب (sapiOverride) بلا تفويض = رفض؛ بتفويض cron مُتحقق = قبول
+TenantContext::$sapiOverride = 'fpm-fcgi';
+expect_throw('f2a: forSystem من مسار ويب بلا تفويض نظامٍ يُرفض', function () use ($COMPANY_A) {
+    TenantContext::forSystem($COMPANY_A);
+});
+$okAuth = TenantContext::forSystem($COMPANY_A, 0, '', true); // كما يمرّره حارس cron بعد hash_equals
+ok('f2b: بتفويض cron المتحقق يُقبل', $okAuth instanceof TenantContext && $okAuth->companyId() === $COMPANY_A);
+TenantContext::$sapiOverride = null;
+
+// f3: الأثر مسجَّل (granted وREFUSED كلاهما)
+clearstatcache();
+$logTail = file_get_contents(dirname(__DIR__) . '/logs/security.log');
+ok('f3: إنشاء سياق النظام مسجَّل (granted + REFUSED)',
+    strpos($logTail, 'tenant_gate_system_context') !== false
+    && strpos($logTail, 'REFUSED (no system authorization)') !== false);
+
 // ═════ 7) الشاشات المُهاجَرة (HTTP — T2) ═════
 echo "── 7) الشاشات المُهاجَرة (زيارة فعلية بجلسة) ──\n";
 if (empty($MIGRATED_SCREENS)) {

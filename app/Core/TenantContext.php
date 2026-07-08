@@ -36,12 +36,42 @@ class TenantContext
         );
     }
 
+    /** حقن SAPI في الاختبارات حصرًا (محاكاة مسار ويب لاختبار رفض القناة). */
+    public static $sapiOverride = null;
+
     /**
-     * سياق خادمي صريح (cron / API token). يُستخدم فقط حيث تحققت هوية
-     * المستأجر خادميًا — تمرير قيمةٍ من مدخلات العميل هنا خرقٌ للعقد.
+     * سياق خادمي صريح — القدرة الخامسة المحوكمة (K9-M2b · عقد §11 · 2026-07-08)
+     * ───────────────────────────────────────────────────────────────────────
+     * شركةٌ واحدة صريحة لكل سياق (البوابة تعزل به كسياق مستخدمٍ تمامًا — لا
+     * سياق «يرى الكل»؛ الرؤية العابرة حكر forAllTenants بحارسها).
+     *
+     * **قناة محروسة لا تجاوز**: التفويض إلزامي بأحد مصدرين حصرًا:
+     *   • CLI (PHP_SAPI === 'cli') — جدولة النظام؛
+     *   • $systemAuth === true — مرّره المستدعي **فقط** بعد تحقق مفتاح cron
+     *     بـ hash_equals ضد مفتاح .env غير الفارغ (مفتاح غائب/فارغ = fail-closed
+     *     في حارس المستدعي نفسه — شرط المستخدم).
+     * غيابهما = TenantGateException — مسار الويب المصادَق لا يمكنه تركيب
+     * سياق نظامٍ (جلساته عبر fromSession حصرًا).
+     *
+     * **مسجَّل كنمط forAllTenants**: كل إنشاءٍ يقيَّد tenant_gate_system_context.
      */
-    public static function forSystem($companyId, $userId = 0, $role = '')
+    public static function forSystem($companyId, $userId = 0, $role = '', $systemAuth = false)
     {
+        $sapi = self::$sapiOverride !== null ? self::$sapiOverride : PHP_SAPI;
+        if ($sapi !== 'cli' && $systemAuth !== true) {
+            if (function_exists('log_security_event')) {
+                log_security_event('tenant_gate_system_context',
+                    'REFUSED (no system authorization) | company=' . intval($companyId)
+                    . ' sapi=' . $sapi . ' script=' . (isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '?'));
+            }
+            require_once __DIR__ . '/TenantGateException.php';
+            throw new TenantGateException('forSystem refused: system authorization required (CLI or verified cron key)');
+        }
+        if (function_exists('log_security_event')) {
+            log_security_event('tenant_gate_system_context',
+                'granted | company=' . intval($companyId) . ' sapi=' . $sapi
+                . ' script=' . (isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : 'cli'));
+        }
         return new self($companyId, $userId, $role);
     }
 
