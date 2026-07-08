@@ -32,8 +32,21 @@ use App\Core\TenantDb;
 use App\Core\TenantGateException;
 
 // ── الشاشات المُهاجَرة للبوابة (تُضاف مع كل هجرة — إلزامي قبل الاعتماد) ─────
+// T2 (خطة K9 §2): لكل شاشة: مسارها، مستخدم دخولٍ حقيقي يراها، وبذرتا علامةٍ
+// تُزرعان خامًا (شركة المستخدم mine / شركة أخرى other) في جدولها الرئيس —
+// القسم 7 يزور الشاشة بجلسةٍ فعلية ويؤكد ظهور mine وغياب other ثم ينظّف.
 $MIGRATED_SCREENS = array(
-    // 'Maintenance/breakdowns.php',   ← مثال: يُفعَّل مع هجرة الشاشة في المرحلة 2
+    'Opportunities/opportunities.php' => array(
+        'login_user' => 13,          // مبيعات (دور 12) — يملك عرض الفرص
+        'user_company' => 4,
+        'other_company' => 1,
+        'table' => 'opportunities',
+        'row' => function ($companyId, $mark) {
+            return "INSERT INTO opportunities (company_id, opp_code, title, stage, created_by)
+                    VALUES ({$companyId}, '{$mark}', '{$mark}', 'جديدة', 1)";
+        },
+        'cleanup' => "DELETE FROM opportunities WHERE opp_code LIKE 'LEAKTEST_%'",
+    ),
 );
 
 // ── عدّة التقرير ─────────────────────────────────────────────────────────────
@@ -76,10 +89,12 @@ if ($COMPANY_A <= 0 || $COMPANY_B <= 0) {
 }
 echo "شركتا الاختبار: A={$COMPANY_A} · B={$COMPANY_B}\n\n";
 
-$gateA = new TenantDb($conn, TenantContext::forSystem($COMPANY_A, 999901, '1'));
-$gateB = new TenantDb($conn, TenantContext::forSystem($COMPANY_B, 999902, '1'));
-$gateSuper = new TenantDb($conn, TenantContext::forSystem($COMPANY_A, 999903, EMS_ROLE_SUPER_ADMIN));
-$gateNoTenant = new TenantDb($conn, TenantContext::forSystem(0, 999904, '1'));
+// الأوضاع صريحة: هذه الأقسام تختبر ميكانيكا fail-closed ذاتها، لا وضع البيئة —
+// فمع بدء طرح K9 صار .env يحمل EMS_TENANT_GATE=monitor والافتراض يتبعه (بالتصميم).
+$gateA = new TenantDb($conn, TenantContext::forSystem($COMPANY_A, 999901, '1'), false, 'enforce');
+$gateB = new TenantDb($conn, TenantContext::forSystem($COMPANY_B, 999902, '1'), false, 'enforce');
+$gateSuper = new TenantDb($conn, TenantContext::forSystem($COMPANY_A, 999903, EMS_ROLE_SUPER_ADMIN), false, 'enforce');
+$gateNoTenant = new TenantDb($conn, TenantContext::forSystem(0, 999904, '1'), false, 'enforce');
 
 try {
 
@@ -179,15 +194,107 @@ ok('المدير الأعلى المتجاوز يرى علامتي الشركت�
 clearstatcache();
 ok('كل تجاوزٍ مُسجَّل (tenant_gate_cross_tenant)', filesize(dirname(__DIR__) . '/logs/security.log') > $logBefore);
 
-// ═════ 7) الشاشات المُهاجَرة (HTTP) ═════
-echo "── 7) الشاشات المُهاجَرة ──\n";
+// ═════ 6ب) وضع المراقبة log-only (K1 — خطة المرحلة 1 §7-2) ═════
+echo "── 6ب) وضع المراقبة log-only ──\n";
+$gateMonA = new TenantDb($conn, TenantContext::forSystem($COMPANY_A, 999905, '1'), false, 'monitor');
+$gateMonNoTenant = new TenantDb($conn, TenantContext::forSystem(0, 999906, '1'), false, 'monitor');
+$secLog = dirname(__DIR__) . '/logs/security.log';
+
+// m1: الافتراض يتبع .env بالتصميم (نمط CSRF) — منذ طرح K9 المفتاح monitor،
+// فالاختبار الثابت بيئيًا: enforce الصريح يرفض المقيَّد (fail-closed ميكانيكيًا).
+$gateDefault = new TenantDb($conn, TenantContext::forSystem($COMPANY_A, 999907, '1'), false, 'enforce');
+expect_throw('m1: enforce الصريح — المقيَّد يُرفض (ميكانيكا fail-closed سليمة)', function () use ($gateDefault) {
+    $gateDefault->select('schema_migrations', array('limit' => 1));
+});
+
+// m2: monitor — الجدول المقيَّد يُقرأ (عبور مُسجَّل) بدل الرفض.
+$before = filesize($secLog); clearstatcache();
+$rows = $gateMonA->select('schema_migrations', array('limit' => 1));
+ok('m2: monitor يمرّر قراءة المقيَّد (عبورًا لا حجبًا)', is_array($rows));
+clearstatcache();
+ok('m3: العبور مُسجَّل tenant_gate_would_deny', filesize($secLog) > $before
+    && strpos(file_get_contents($secLog), 'tenant_gate_would_deny') !== false);
+
+// m4: monitor بلا شركة في السياق — القراءة تمرّ بلا نطاق (سلوك ما قبل الهجرة): يرى العلامتين.
+$namesMon = array_map(function ($r) { return $r['client_name']; },
+    $gateMonNoTenant->select('clients', array('whereRaw' => "client_name LIKE 'LEAKTEST_%'", 'includeDeleted' => true)));
+ok('m4: monitor بلا سياقٍ يمرّر القراءة بلا نطاق (يرى A وB معًا)',
+    in_array($MARK_A, $namesMon, true) && in_array($MARK_B, $namesMon, true));
+
+// m5: المسار السوي المعزول مطابق تمامًا في monitor — أ لا ترى ب.
+$seenMonA = array_map(function ($r) { return $r['client_name']; },
+    $gateMonA->select('clients', array('columns' => array('client_name'), 'includeDeleted' => true)));
+ok('m5: monitor بسياقٍ سويٍّ معزولٌ كـ enforce (أ لا ترى ب)',
+    !in_array($MARK_B, $seenMonA, true));
+
+// m6: حرّاس الكتابة تُرمى دائمًا حتى في monitor (تزوير الهوية + update بلا شرط).
+expect_throw('m6a: تزوير الهوية يُرفض حتى في monitor', function () use ($gateMonA, $COMPANY_B, $MARK_A) {
+    $gateMonA->insert('clients', array('client_name' => $MARK_A . '_mforge', 'client_code' => 'x', 'company_id' => $COMPANY_B));
+});
+expect_throw('m6b: update عبر عبور المراقبة يُرفض (strict)', function () use ($gateMonA) {
+    $gateMonA->update('schema_migrations', array('status' => 'x'), array('id' => 0));
+});
+
+// m7: مسار الإنفاذ يغلب monitor — تسجيل المسار في القائمة يعيد fail-closed.
+TenantDb::$enforcePathsOverride = array('/tests/tenant_leak_test');
+$_SERVER['SCRIPT_NAME'] = '/tests/tenant_leak_test.php';
+expect_throw('m7: TENANT_ENFORCE_PATHS يغلب monitor (fail-closed)', function () use ($gateMonA) {
+    $gateMonA->select('schema_migrations', array('limit' => 1));
+});
+TenantDb::$enforcePathsOverride = null;
+unset($_SERVER['SCRIPT_NAME']);
+
+// ═════ 7) الشاشات المُهاجَرة (HTTP — T2) ═════
+echo "── 7) الشاشات المُهاجَرة (زيارة فعلية بجلسة) ──\n";
 if (empty($MIGRATED_SCREENS)) {
-    echo "  (لا شاشات مُهاجَرة بعد — القسم يتفعّل تلقائيًا مع أول هجرةٍ في المرحلة 2)\n";
+    echo "  (لا شاشات مُهاجَرة بعد)\n";
 } else {
-    // يتطلب Apache: دخول بمستخدم أ ثم زيارة كل شاشةٍ والتأكد من خلوّها من MARK_B.
-    // (التنفيذ التفصيلي يُستكمل مع أول شاشةٍ — البنية جاهزة.)
-    foreach ($MIGRATED_SCREENS as $screen) {
-        echo "  ! screen test TODO: {$screen}\n";
+    foreach ($MIGRATED_SCREENS as $screenPath => $cfg) {
+        $mineMark  = 'LEAKTEST_MINE_' . getmypid();
+        $otherMark = 'LEAKTEST_OTHER_' . getmypid();
+        $rowSql = $cfg['row'];
+        mysqli_query($conn, $rowSql(intval($cfg['user_company']), $mineMark));
+        mysqli_query($conn, $rowSql(intval($cfg['other_company']), $otherMark));
+
+        // دخول فعلي بتبديل hash مؤقت مضمون الاسترجاع
+        $uid = intval($cfg['login_user']);
+        $u = $conn->query("SELECT username, password FROM users WHERE id={$uid}")->fetch_assoc();
+        $origHash = $u ? $u['password'] : '';
+        if (!$u || strlen($origHash) < 50) {
+            ok("شاشة {$screenPath}: مستخدم الدخول {$uid} صالح", false);
+            continue;
+        }
+        $temp = bin2hex(random_bytes(12));
+        $tmpHash = password_hash($temp, PASSWORD_BCRYPT);
+        $st = $conn->prepare("UPDATE users SET password=? WHERE id={$uid}");
+        $st->bind_param('s', $tmpHash); $st->execute(); $st->close();
+        try {
+            $jar = tempnam(sys_get_temp_dir(), 'lk7');
+            $req = function ($url, $post = null) use ($jar) {
+                $ch = curl_init($url);
+                curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true, CURLOPT_FOLLOWLOCATION=>true,
+                    CURLOPT_COOKIEJAR=>$jar, CURLOPT_COOKIEFILE=>$jar, CURLOPT_TIMEOUT=>40,
+                    CURLOPT_USERAGENT=>'EMS-LeakTest-T2']);
+                if ($post !== null) { curl_setopt($ch, CURLOPT_POST, true); curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post)); }
+                $b = curl_exec($ch); $i = curl_getinfo($ch); curl_close($ch);
+                return [$i['http_code'], $b === false ? '' : $b, $i['url']];
+            };
+            list(, $lb) = $req('http://localhost/ems/login.php');
+            preg_match('/name="csrf_token"\s+value="([^"]+)"/', $lb, $lm);
+            list(, , $lf) = $req('http://localhost/ems/login.php',
+                ['username' => $u['username'], 'password' => $temp, 'csrf_token' => $lm[1]]);
+            ok("شاشة {$screenPath}: الدخول نجح", strpos($lf, 'login.php') === false);
+            list($sc, $sb, $sf) = $req('http://localhost/ems/' . ltrim($screenPath, '/'));
+            ok("شاشة {$screenPath}: تُعرض (200 بلا طرد)", $sc === 200 && strpos($sf, 'login.php') === false);
+            ok("شاشة {$screenPath}: ترى علامة شركتها", strpos($sb, $mineMark) !== false);
+            ok("شاشة {$screenPath}: لا ترى علامة الشركة الأخرى إطلاقًا", strpos($sb, $otherMark) === false);
+        } finally {
+            $st = $conn->prepare("UPDATE users SET password=? WHERE id={$uid}");
+            $st->bind_param('s', $origHash); $st->execute(); $st->close();
+            $back = $conn->query("SELECT password FROM users WHERE id={$uid}")->fetch_row()[0];
+            ok("شاشة {$screenPath}: hash المستخدم أُعيد بايتًا ببايت", $back === $origHash);
+            mysqli_query($conn, $cfg['cleanup']);
+        }
     }
 }
 
