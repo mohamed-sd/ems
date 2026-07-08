@@ -66,29 +66,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
         header("Location: items_proc.php?msg=بيانات+غير+مكتملة+❌"); exit();
     }
 
-    if ($is_editing) {
-        $sql = "UPDATE proc_item SET name=?, category=?, material_nature=?, uom=?, is_critical=?, min_qty=?, max_qty=?,
-                lead_time_days=?, safety_stock=?, served_equipment_id=?, served_category=?, notes=?
-                WHERE id=? AND company_id=? AND COALESCE(is_deleted,0)=0";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'ssssiddidisiii', $name, $category, $material_nature, $uom, $is_critical,
-                $min_qty, $max_qty, $lead_time_days, $safety_stock, $served_equipment_id, $served_category, $notes,
-                $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    // K9-M1: الكتابة عبر البوابة
+    $data = array(
+        'name' => $name, 'category' => $category, 'material_nature' => $material_nature, 'uom' => $uom,
+        'is_critical' => $is_critical, 'min_qty' => $min_qty, 'max_qty' => $max_qty,
+        'lead_time_days' => $lead_time_days, 'safety_stock' => $safety_stock,
+        'served_equipment_id' => $served_equipment_id, 'served_category' => $served_category, 'notes' => $notes,
+    );
+    try {
+        if ($is_editing) {
+            proc_gate(false)->update('proc_item', $data, array('id' => $id, 'is_deleted' => 0));
+            header("Location: items_proc.php?msg=تم+تعديل+الصنف+بنجاح+✅"); exit();
+        } else {
+            $data['code'] = proc_gen_code($conn, 'proc_item', 'PRC-ITM', $company_id);
+            $data['created_by'] = $current_user_id;
+            proc_gate(false)->insert('proc_item', $data);
+            header("Location: items_proc.php?msg=تمت+إضافة+الصنف+بنجاح+✅"); exit();
         }
-        header("Location: items_proc.php?msg=تم+تعديل+الصنف+بنجاح+✅"); exit();
-    } else {
-        $code = proc_gen_code($conn, 'proc_item', 'PRC-ITM', $company_id);
-        $sql = "INSERT INTO proc_item (company_id, code, name, category, material_nature, uom, is_critical, min_qty, max_qty,
-                lead_time_days, safety_stock, served_equipment_id, served_category, notes, created_by)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'isssssiddidisii', $company_id, $code, $name, $category, $material_nature, $uom,
-                $is_critical, $min_qty, $max_qty, $lead_time_days, $safety_stock, $served_equipment_id, $served_category,
-                $notes, $current_user_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        }
-        header("Location: items_proc.php?msg=تمت+إضافة+الصنف+بنجاح+✅"); exit();
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('items_proc save refused: ' . $e->getMessage());
+        header("Location: items_proc.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
 }
 
@@ -96,10 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: items_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "UPDATE proc_item SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    try {
+        proc_gate(false)->softDelete('proc_item', $delete_id);
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('items_proc softDelete refused: ' . $e->getMessage());
     }
     header("Location: items_proc.php?msg=تم+حذف+الصنف+بنجاح+✅"); exit();
 }
@@ -243,10 +240,11 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT id, code, name, category, material_nature, uom, is_critical, min_qty, max_qty, safety_stock, lead_time_days
-                            FROM proc_item WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0 ORDER BY name ASC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    $item_rows = proc_gate($is_super_admin)->select('proc_item', array(
+                        'columns' => array('id', 'code', 'name', 'category', 'material_nature', 'uom', 'is_critical', 'min_qty', 'max_qty', 'safety_stock', 'lead_time_days'),
+                        'orderBy' => 'name ASC',
+                    ));
+                    { foreach ($item_rows as $row) {
                         $data_attrs =
                             "data-id='" . intval($row['id']) . "' " .
                             "data-name='" . htmlspecialchars((string)$row['name'], ENT_QUOTES) . "' " .
