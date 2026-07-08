@@ -47,17 +47,26 @@ if (!function_exists('proc_scope')) {
     }
 }
 
+if (!function_exists('proc_gate')) {
+    /**
+     * K9-M1: بوابة العزل للوحدة — سياق الجلسة؛ وis_super يمرّ عبر القناة
+     * الشرعية forAllTenants (يحفظ سلوكه القائم: رؤية عابرة مسجَّلة).
+     * وسائط $conn/$company_id في الدوال أدناه بقيت للتوافق أثناء الدفعة —
+     * البوابة مصدر الوصول الوحيد فعليًا.
+     */
+    function proc_gate($is_super = false)
+    {
+        $gate = ems_tenant_db();
+        return $is_super ? $gate->forAllTenants('proc helpers super view') : $gate;
+    }
+}
+
 if (!function_exists('proc_gen_code')) {
-    /** توليد كود تسلسلي بسيط لكل شركة، مثل PRC-ITM-0001. */
+    /** توليد كود تسلسلي بسيط لكل شركة، مثل PRC-ITM-0001 (عبر البوابة). */
     function proc_gen_code($conn, $table, $prefix, $company_id)
     {
-        $n = 0;
-        // اسم الجدول من قائمة بيضاء ثابتة (يُمرَّر من الكود لا من المستخدم)
-        $sql = "SELECT COUNT(*) AS c FROM `" . $table . "` WHERE company_id = " . intval($company_id);
-        if ($res = mysqli_query($conn, $sql)) {
-            $row = mysqli_fetch_assoc($res);
-            $n = intval($row['c']);
-        }
+        // includeDeleted يطابق العدّ الأصلي (كان يعدّ كل صفوف الشركة بما فيها المؤرشف)
+        $n = proc_gate(false)->count($table, array('includeDeleted' => true));
         return $prefix . '-' . str_pad((string)($n + 1), 4, '0', STR_PAD_LEFT);
     }
 }
@@ -78,93 +87,132 @@ if (!function_exists('proc_msg_banner')) {
 }
 
 if (!function_exists('proc_options_from_query')) {
-    /** بناء <option> من استعلام (id => label). */
+    /**
+     * ⚠ جسر توافقٍ مؤقت أثناء دفعة M1: ثلاث شاشات (orders/receipt/issue) تمرّر
+     * SQL خاصًا بها هنا — يتحول كلٌّ عند هجرة ملفه إلى صفوف بوابة، ثم تُزال هذه
+     * الدالة في ختام الدفعة (حينها T3=0 على الوحدة كلها).
+     */
     function proc_options_from_query($conn, $sql, $selected = 0, $placeholder = '— اختر —')
+    {
+        $rows = array();
+        if ($res = mysqli_query($conn, $sql)) {
+            while ($r = mysqli_fetch_assoc($res)) { $rows[] = $r; }
+        }
+        return proc_options_from_rows($rows, $selected, $placeholder);
+    }
+}
+
+if (!function_exists('proc_options_from_rows')) {
+    /** بناء <option> من صفوف (id + label جاهزان) — بديل التنفيذ بالنص الخام. */
+    function proc_options_from_rows(array $rows, $selected = 0, $placeholder = '— اختر —')
     {
         $out = '<option value="">' . htmlspecialchars($placeholder) . '</option>';
         $selected = intval($selected);
-        if ($res = mysqli_query($conn, $sql)) {
-            while ($r = mysqli_fetch_assoc($res)) {
-                $id  = intval($r['id']);
-                $lbl = isset($r['label']) ? (string)$r['label'] : '';
-                $sel = ($id === $selected) ? ' selected' : '';
-                $out .= '<option value="' . $id . '"' . $sel . '>' . htmlspecialchars($lbl) . '</option>';
-            }
+        foreach ($rows as $r) {
+            $id  = intval($r['id']);
+            $lbl = isset($r['label']) ? (string)$r['label'] : '';
+            $sel = ($id === $selected) ? ' selected' : '';
+            $out .= '<option value="' . $id . '"' . $sel . '>' . htmlspecialchars($lbl) . '</option>';
         }
         return $out;
     }
 }
 
 if (!function_exists('proc_items_options')) {
-    /** قائمة أصناف الكتالوج (proc_item). */
+    /** قائمة أصناف الكتالوج (proc_item) — عبر البوابة، والتسمية في PHP (مطابقة CONCAT الأصلية). */
     function proc_items_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = proc_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, CONCAT(COALESCE(NULLIF(code,''),''), CASE WHEN code IS NULL OR code='' THEN '' ELSE ' — ' END, name) AS label
-                FROM proc_item WHERE $scope AND COALESCE(is_deleted,0)=0 AND status=1 ORDER BY name ASC";
-        return proc_options_from_query($conn, $sql, $selected, '— اختر صنفاً —');
+        $rows = proc_gate($is_super)->select('proc_item', array(
+            'columns' => array('id', 'code', 'name'),
+            'where'   => array('status' => 1),
+            'orderBy' => 'name ASC',
+        ));
+        foreach ($rows as &$r) {
+            $code = (string) $r['code'];
+            $r['label'] = ($code === '' ? '' : $code . ' — ') . $r['name'];
+        }
+        unset($r);
+        return proc_options_from_rows($rows, $selected, '— اختر صنفاً —');
     }
 }
 
 if (!function_exists('proc_suppliers_options')) {
-    /** قائمة الموردين التشغيليين (proc_supplier). */
+    /** قائمة الموردين التشغيليين (proc_supplier) — عبر البوابة. */
     function proc_suppliers_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = proc_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, name AS label FROM proc_supplier
-                WHERE $scope AND COALESCE(is_deleted,0)=0 AND status=1 ORDER BY name ASC";
-        return proc_options_from_query($conn, $sql, $selected, '— اختر مورداً —');
+        $rows = proc_gate($is_super)->select('proc_supplier', array(
+            'columns' => array('id', 'name'),
+            'where'   => array('status' => 1),
+            'orderBy' => 'name ASC',
+        ));
+        foreach ($rows as &$r) { $r['label'] = $r['name']; }
+        unset($r);
+        return proc_options_from_rows($rows, $selected, '— اختر مورداً —');
     }
 }
 
 if (!function_exists('proc_warehouses_options')) {
-    /** قائمة المخازن (proc_warehouse). */
+    /** قائمة المخازن (proc_warehouse) — عبر البوابة. */
     function proc_warehouses_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = proc_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, CONCAT(name, ' (', type, ')') AS label FROM proc_warehouse
-                WHERE $scope AND COALESCE(is_deleted,0)=0 AND status=1 ORDER BY name ASC";
-        return proc_options_from_query($conn, $sql, $selected, '— اختر مخزناً —');
+        $rows = proc_gate($is_super)->select('proc_warehouse', array(
+            'columns' => array('id', 'name', 'type'),
+            'where'   => array('status' => 1),
+            'orderBy' => 'name ASC',
+        ));
+        foreach ($rows as &$r) { $r['label'] = $r['name'] . ' (' . $r['type'] . ')'; }
+        unset($r);
+        return proc_options_from_rows($rows, $selected, '— اختر مخزناً —');
     }
 }
 
 if (!function_exists('proc_lookup_names')) {
-    /** أسماء قيم مرجعية حسب النوع (proc_lookup). */
+    /** أسماء قيم مرجعية حسب النوع (proc_lookup) — عبر البوابة. */
     function proc_lookup_names($conn, $is_super, $company_id, $type)
     {
-        $scope = proc_scope('company_id', $is_super, $company_id);
-        $type  = mysqli_real_escape_string($conn, $type);
+        $rows = proc_gate($is_super)->select('proc_lookup', array(
+            'columns' => array('name'),
+            'where'   => array('type' => (string) $type, 'is_active' => 1),
+            'orderBy' => 'name ASC',
+        ));
         $out = array();
-        $sql = "SELECT name FROM proc_lookup WHERE $scope AND type='$type'
-                AND COALESCE(is_deleted,0)=0 AND is_active=1 ORDER BY name ASC";
-        if ($res = mysqli_query($conn, $sql)) {
-            while ($r = mysqli_fetch_assoc($res)) { $out[] = $r['name']; }
-        }
+        foreach ($rows as $r) { $out[] = $r['name']; }
         return $out;
     }
 }
 
 if (!function_exists('proc_equipment_options')) {
-    /** قائمة المعدات — قراءة فقط من equipments (لا كتابة). */
+    /** قائمة المعدات — قراءة فقط من equipments عبر البوابة (لا كتابة). */
     function proc_equipment_options($conn, $is_super, $company_id, $selected = 0)
     {
-        // ملاحظة: جدول equipments لا يحوي عمود is_deleted؛ يستخدم status (افتراضي 1).
-        $scope = $is_super ? '1=1' : ('company_id = ' . intval($company_id));
-        $del   = "AND COALESCE(status,1)=1";
-        $sql = "SELECT id, CONCAT(COALESCE(NULLIF(code,''),CONCAT('#',id)), CASE WHEN name IS NULL OR name='' THEN '' ELSE CONCAT(' — ', name) END) AS label
-                FROM equipments WHERE $scope $del ORDER BY id DESC";
-        return proc_options_from_query($conn, $sql, $selected, '— بلا معدة —');
+        // equipments بلا عمود is_deleted؛ يستخدم status (افتراضي 1) — كالأصل.
+        $rows = proc_gate($is_super)->select('equipments', array(
+            'columns'  => array('id', 'code', 'name'),
+            'whereRaw' => 'COALESCE(status,1)=1',
+            'orderBy'  => 'id DESC',
+        ));
+        foreach ($rows as &$r) {
+            $code = (string) $r['code'];
+            $base = ($code === '') ? ('#' . intval($r['id'])) : $code;
+            $name = (string) $r['name'];
+            $r['label'] = $base . ($name === '' ? '' : ' — ' . $name);
+        }
+        unset($r);
+        return proc_options_from_rows($rows, $selected, '— بلا معدة —');
     }
 }
 
 if (!function_exists('proc_project_options')) {
-    /** قائمة المشاريع — قراءة فقط من project (لا كتابة). */
+    /** قائمة المشاريع — قراءة فقط من project عبر البوابة (لا كتابة). */
     function proc_project_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = $is_super ? '1=1' : ('company_id = ' . intval($company_id));
-        $del   = "AND COALESCE(is_deleted,0)=0";
-        $sql = "SELECT id, name AS label FROM project WHERE $scope $del ORDER BY name ASC";
-        return proc_options_from_query($conn, $sql, $selected, '— بلا مشروع —');
+        $rows = proc_gate($is_super)->select('project', array(
+            'columns' => array('id', 'name'),
+            'orderBy' => 'name ASC',
+        ));
+        foreach ($rows as &$r) { $r['label'] = $r['name']; }
+        unset($r);
+        return proc_options_from_rows($rows, $selected, '— بلا مشروع —');
     }
 }
 
