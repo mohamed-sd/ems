@@ -82,17 +82,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($is_editing) {
             if (!trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_orders_list.php?msg=أمر+غير+موجود+❌"); exit(); }
-            $sql = "UPDATE transfer_orders SET transfer_type_id=?, direction=?, source_module=?, requested_by_user_id=?, project_id=?,
-                    from_location_id=?, to_location_id=?, request_date=?, planned_date=?, priority=?, vehicle_id=?, carrier_type=?,
-                    carrier_entity_id=?, driver_id=?, route=?, analytic_cost_center=?, project_days=?, cost_bearer=?, notes=?
-                    WHERE id=? AND company_id=?";
-            // 21 params: i s s i i i i s s s i s i i s s i s s i i
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'issiiii'.'sss'.'isii'.'ss'.'i'.'ss'.'ii',
-                $transfer_type_id, $direction, $source_module, $requested_by_user_id, $project_id, $from_location_id, $to_location_id,
-                $request_date, $planned_date, $priority, $vehicle_id, $carrier_type, $carrier_entity_id, $driver_id, $route,
-                $analytic_cost_center, $project_days, $cost_bearer, $notes, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+            trs_gate($is_super_admin)->update('transfer_orders', array(
+                'transfer_type_id' => $transfer_type_id, 'direction' => $direction, 'source_module' => $source_module,
+                'requested_by_user_id' => $requested_by_user_id, 'project_id' => $project_id,
+                'from_location_id' => $from_location_id, 'to_location_id' => $to_location_id,
+                'request_date' => $request_date, 'planned_date' => $planned_date, 'priority' => $priority,
+                'vehicle_id' => $vehicle_id, 'carrier_type' => $carrier_type, 'carrier_entity_id' => $carrier_entity_id,
+                'driver_id' => $driver_id, 'route' => $route, 'analytic_cost_center' => $analytic_cost_center,
+                'project_days' => $project_days, 'cost_bearer' => $cost_bearer, 'notes' => $notes,
+            ), array('id' => $id));
             trs_log_event($conn, $company_id, $id, 'note', 'تعديل رأس الأمر', null, null, $current_user_id, 'transport');
             header("Location: transfer_order_form.php?id=$id&msg=تم+حفظ+رأس+الأمر+✅"); exit();
         } else {
@@ -108,18 +106,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $order_no = trs_gen_order_no($conn, $company_id, $direction, $veh_code);
             $stage = 'request';
-            $sql = "INSERT INTO transfer_orders (company_id, order_no, transfer_type_id, direction, source_module, requested_by_user_id,
-                    project_id, from_location_id, to_location_id, request_date, planned_date, priority, vehicle_id, carrier_type,
-                    carrier_entity_id, driver_id, route, analytic_cost_center, project_days, cost_bearer, stage, notes, created_by)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            // 23 params: i s i s s i i i i s s s i s i i s s i s s s i
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'isissi'.'iii'.'sss'.'isii'.'ss'.'i'.'sss'.'i',
-                $company_id, $order_no, $transfer_type_id, $direction, $source_module, $requested_by_user_id,
-                $project_id, $from_location_id, $to_location_id, $request_date, $planned_date, $priority, $vehicle_id, $carrier_type,
-                $carrier_entity_id, $driver_id, $route, $analytic_cost_center, $project_days, $cost_bearer, $stage, $notes, $current_user_id);
-            mysqli_stmt_execute($stmt);
-            $new_id = mysqli_stmt_insert_id($stmt); mysqli_stmt_close($stmt);
+            $new_id = trs_gate($is_super_admin)->insert('transfer_orders', array(
+                'order_no' => $order_no, 'transfer_type_id' => $transfer_type_id, 'direction' => $direction,
+                'source_module' => $source_module, 'requested_by_user_id' => $requested_by_user_id,
+                'project_id' => $project_id, 'from_location_id' => $from_location_id, 'to_location_id' => $to_location_id,
+                'request_date' => $request_date, 'planned_date' => $planned_date, 'priority' => $priority,
+                'vehicle_id' => $vehicle_id, 'carrier_type' => $carrier_type, 'carrier_entity_id' => $carrier_entity_id,
+                'driver_id' => $driver_id, 'route' => $route, 'analytic_cost_center' => $analytic_cost_center,
+                'project_days' => $project_days, 'cost_bearer' => $cost_bearer, 'stage' => $stage,
+                'notes' => $notes, 'created_by' => $current_user_id,
+            ));
             trs_log_event($conn, $company_id, $new_id, 'system', "إنشاء أمر ترحيل ($order_no)", null, $stage, $current_user_id, 'transport');
             header("Location: transfer_order_form.php?id=$new_id&msg=تم+إنشاء+الأمر+($order_no)+✅"); exit();
         }
@@ -137,9 +133,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $quantity = ($_POST['quantity'] ?? '') !== '' ? (float)$_POST['quantity'] : null;
         $note = trim($_POST['line_note'] ?? '');
         if (!array_key_exists($item_type, trs_item_types())) { header("Location: transfer_order_form.php?id=$id&tab=lines&msg=نوع+عنصر+غير+صالح+❌"); exit(); }
-        $stmt = mysqli_prepare($conn, "INSERT INTO transfer_lines (company_id, order_id, item_type, equipment_id, attachment_ref, product_id, employee_id, quantity, note) VALUES (?,?,?,?,?,?,?,?,?)");
-        mysqli_stmt_bind_param($stmt, 'iisisiids', $company_id, $id, $item_type, $equipment_id, $attachment_ref, $product_id, $employee_id, $quantity, $note);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        trs_gate($is_super_admin)->insert('transfer_lines', array(
+            'order_id' => $id, 'item_type' => $item_type, 'equipment_id' => $equipment_id,
+            'attachment_ref' => $attachment_ref, 'product_id' => $product_id,
+            'employee_id' => $employee_id, 'quantity' => $quantity, 'note' => $note,
+        ));
         trs_log_event($conn, $company_id, $id, 'note', 'إضافة عنصر منقول', null, null, $current_user_id, 'transport');
         header("Location: transfer_order_form.php?id=$id&tab=lines&msg=تمت+إضافة+العنصر+✅"); exit();
     }
@@ -188,9 +186,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $expiry_date = ($_POST['expiry_date'] ?? '') !== '' ? trim($_POST['expiry_date']) : null;
         $state = trim($_POST['permit_state'] ?? 'issuing');
         if (!array_key_exists($permit_type, trs_permit_types()) || !array_key_exists($state, trs_permit_states())) { header("Location: transfer_order_form.php?id=$id&tab=permits&msg=بيانات+التصريح+غير+صالحة+❌"); exit(); }
-        $stmt = mysqli_prepare($conn, "INSERT INTO transfer_permits (company_id, order_id, permit_type, authority, issue_date, expiry_date, state) VALUES (?,?,?,?,?,?,?)");
-        mysqli_stmt_bind_param($stmt, 'iisssss', $company_id, $id, $permit_type, $authority, $issue_date, $expiry_date, $state);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        trs_gate($is_super_admin)->insert('transfer_permits', array(
+            'order_id' => $id, 'permit_type' => $permit_type, 'authority' => $authority,
+            'issue_date' => $issue_date, 'expiry_date' => $expiry_date, 'state' => $state,
+        ));
         trs_log_event($conn, $company_id, $id, 'note', 'إضافة تصريح', null, null, $current_user_id, 'transport');
         header("Location: transfer_order_form.php?id=$id&tab=permits&msg=تمت+إضافة+التصريح+✅"); exit();
     }
@@ -219,8 +218,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: transfer_order_form.php?id=$id&msg=المرحلة+الحالية+لا+تسمح+بهذا+الانتقال+❌"); exit();
         }
 
-        $err = '';        // رسالة الحارس إن فشل
-        $set_extra = '';   // أعمدة زمنية إضافية
+        $err = '';              // رسالة الحارس إن فشل
+        $set_extra = array();   // أعمدة زمنية إضافية (كانت NOW() نصية — الآن ساعة PHP لنفس المضيف)
         $company_of = intval($orow['company_id']);
 
         if ($trans === 'plan') {
@@ -243,12 +242,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($trans === 'confirm_departure') {
             $rel = trs_save_proof($conn, $company_of, $id, $_FILES['proof'] ?? null, 'departure_proof', $current_user_id);
             if (!$rel) { $err = 'تأكيد+المغادرة+يتطلب+إرفاق+إثبات+(صورة/PDF)'; }
-            else { $set_extra = ', departure_datetime = NOW()'; }
+            else { $set_extra = array('departure_datetime' => date('Y-m-d H:i:s')); }
         } elseif ($trans === 'confirm_arrival') {
             $rel = trs_save_proof($conn, $company_of, $id, $_FILES['proof'] ?? null, 'arrival_proof', $current_user_id,
                                   $_POST['gps_lat'] ?? null, $_POST['gps_lng'] ?? null);
             if (!$rel) { $err = 'تأكيد+الوصول+يتطلب+إرفاق+إثبات+(صورة/GPS/توقيع)'; }
-            else { $set_extra = ', arrival_datetime = NOW()'; }
+            else { $set_extra = array('arrival_datetime' => date('Y-m-d H:i:s')); }
         } elseif ($trans === 'close') {
             // لا إغلاق بلا مصدر تحميل: متحمِّل الأمر محدَّد + كل بند تكلفة له مركز (§7.6)
             $no_center = trs_gate($is_super_admin)->count('transfer_cost_lines', array(
@@ -263,7 +262,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($err !== '') { header("Location: transfer_order_form.php?id=$id&msg=$err+❌"); exit(); }
 
         $to = $t['to'];
-        mysqli_query($conn, "UPDATE transfer_orders SET stage='" . mysqli_real_escape_string($conn, $to) . "'" . $set_extra . " WHERE id=$id AND company_id=$company_of");
+        trs_gate($is_super_admin)->update('transfer_orders',
+            array_merge(array('stage' => $to), $set_extra), array('id' => $id));
         trs_log_event($conn, $company_of, $id, 'status_change', $t['label'], $t['from'], $to, $current_user_id, 'transport');
         header("Location: transfer_order_form.php?id=$id&msg=تم:+" . rawurlencode($t['label']) . "+✅"); exit();
     }
@@ -281,7 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: transfer_order_form.php?id=$id&msg=لا+يمكن+إلغاء+أمرٍ+مغلقٍ+أو+ملغى+❌"); exit();
         }
         $cof = intval($orow['company_id']);
-        mysqli_query($conn, "UPDATE transfer_orders SET stage='cancelled' WHERE id=$id AND company_id=$cof");
+        trs_gate($is_super_admin)->update('transfer_orders', array('stage' => 'cancelled'), array('id' => $id));
         trs_log_event($conn, $cof, $id, 'status_change', 'إلغاء الأمر — السبب: ' . $reason, $orow['stage'], 'cancelled', $current_user_id, 'transport');
         header("Location: transfer_order_form.php?id=$id&msg=تم+إلغاء+الأمر+✅"); exit();
     }
