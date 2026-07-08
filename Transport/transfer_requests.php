@@ -26,13 +26,11 @@ $srcs = trs_source_modules(); $prios = trs_priorities(); $states = trs_request_s
 
 /** كود طلب تسلسلي بسيط لكل شركة. */
 function trs_gen_req_code($conn, $company_id) {
-    $company_id = intval($company_id);
     $y = date('Y'); $m = date('m');
-    $like = $conn->real_escape_string("REQ-$y$m-%");
-    $n = 0;
-    if ($res = mysqli_query($conn, "SELECT COUNT(*) c FROM transfer_requests WHERE company_id=$company_id AND code LIKE '$like'")) {
-        $n = intval(mysqli_fetch_assoc($res)['c']);
-    }
+    $n = trs_gate(false)->count('transfer_requests', array(
+        'whereRaw' => 'code LIKE ?', 'params' => array("REQ-$y$m-%"),
+        'includeDeleted' => true, // كالعدّ الخام الأصلي
+    ));
     return "REQ-$y$m-" . str_pad((string)($n + 1), 4, '0', STR_PAD_LEFT);
 }
 
@@ -54,10 +52,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: transfer_requests.php?msg=بيانات+الطلب+غير+مكتملة+(النوع/المصدر/المبرّر)+❌"); exit();
         }
         $code = trs_gen_req_code($conn, $company_id);
-        $stmt = mysqli_prepare($conn, "INSERT INTO transfer_requests (company_id, code, transfer_type_id, source_module, requested_by_user_id, project_id, from_location_id, to_location_id, reason, priority, state, created_by)
-            VALUES (?,?,?,?,?,?,?,?,?,?, 'submitted', ?)");
-        mysqli_stmt_bind_param($stmt, 'isisiiisssi', $company_id, $code, $transfer_type_id, $source_module, $requested_by_user_id, $project_id, $from_location_id, $to_location_id, $reason, $priority, $current_user_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        try {
+            trs_gate(false)->insert('transfer_requests', array(
+                'code' => $code, 'transfer_type_id' => $transfer_type_id, 'source_module' => $source_module,
+                'requested_by_user_id' => $requested_by_user_id, 'project_id' => $project_id,
+                'from_location_id' => $from_location_id, 'to_location_id' => $to_location_id,
+                'reason' => $reason, 'priority' => $priority, 'state' => 'submitted',
+                'created_by' => $current_user_id,
+            ));
+        } catch (\App\Core\TenantGateException $e) {
+            error_log('transfer_requests create refused: ' . $e->getMessage());
+            header("Location: transfer_requests.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
+        }
         header("Location: transfer_requests.php?msg=تم+تقديم+الطلب+($code)+✅"); exit();
     }
 
@@ -66,9 +72,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$can_edit) { header("Location: transfer_requests.php?msg=لا+توجد+صلاحية+❌"); exit(); }
         $rid = intval($_POST['request_id'] ?? 0);
         $new_state = ($action === 'approve') ? 'approved' : 'rejected';
-        $stmt = mysqli_prepare($conn, "UPDATE transfer_requests SET state=? WHERE id=? AND company_id=? AND state='submitted'");
-        mysqli_stmt_bind_param($stmt, 'sii', $new_state, $rid, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        try {
+            trs_gate(false)->update('transfer_requests', array('state' => $new_state),
+                array('id' => $rid, 'state' => 'submitted')); // قفل تفاؤلي كالأصل
+        } catch (\App\Core\TenantGateException $e) {
+            error_log('transfer_requests state refused: ' . $e->getMessage());
+        }
         $msg = ($action === 'approve') ? 'تم+اعتماد+الطلب+✅' : 'تم+رفض+الطلب+✅';
         header("Location: transfer_requests.php?msg=$msg"); exit();
     }
@@ -79,12 +88,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $rid = intval($_POST['request_id'] ?? 0);
         $direction = trim($_POST['direction'] ?? '');
         if (!array_key_exists($direction, $dirs)) { header("Location: transfer_requests.php?msg=الاتجاه+إلزامي+لتحويل+الطلب+أمراً+❌"); exit(); }
-        // اجلب الطلب المعتمد
-        $cond = $is_super_admin ? '' : (' AND company_id=' . intval($company_id));
-        $res = mysqli_query($conn, "SELECT * FROM transfer_requests WHERE id=" . intval($rid) . " $cond AND state='approved' LIMIT 1");
-        $req = ($res && mysqli_num_rows($res)) ? mysqli_fetch_assoc($res) : null;
+        // اجلب الطلب المعتمد (عبر البوابة — الكتابة التالية بشركة السياق حصرًا،
+        // فالقراءة تُنطَّق بها أيضًا: تسدّ حافة super القديمة غير المتسقة)
+        $req = trs_gate(false)->selectOne('transfer_requests', array(
+            'where' => array('id' => $rid, 'state' => 'approved'),
+        ));
         if (!$req) { header("Location: transfer_requests.php?msg=الطلب+غير+معتمد+أو+غير+موجود+❌"); exit(); }
-        // المواقع إلزامية على الأمر — إن لم تكن بالطلب، تُستكمل لاحقاً بالأمر؛ نتحقق هنا
         $from_loc = intval($req['from_location_id'] ?? 0);
         $to_loc = intval($req['to_location_id'] ?? 0);
         if ($from_loc <= 0 || $to_loc <= 0) { header("Location: transfer_requests.php?msg=الطلب+بلا+موقعَي+انطلاق/وصول+—+أكملهما+أولاً+❌"); exit(); }
@@ -93,20 +102,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $project_days = trs_project_days($conn, $company_id, $project_id);
         $cost_bearer = trs_compute_bearer($conn, $company_id, $direction, $project_days);
         $order_no = trs_gen_order_no($conn, $company_id, $direction, '');
-        $req_date = date('Y-m-d');
         $stage = 'planned';
-        $type_id = intval($req['transfer_type_id']);
-        $src = (string)$req['source_module'];
-        $rby = ($req['requested_by_user_id'] !== null) ? intval($req['requested_by_user_id']) : null;
-        $prio = (string)$req['priority'];
 
-        $stmt = mysqli_prepare($conn, "INSERT INTO transfer_orders (company_id, order_no, request_id, transfer_type_id, direction, source_module, requested_by_user_id, project_id, from_location_id, to_location_id, request_date, priority, project_days, cost_bearer, stage, created_by)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        mysqli_stmt_bind_param($stmt, 'isiissiiiisisssi', $company_id, $order_no, $rid, $type_id, $direction, $src, $rby, $project_id, $from_loc, $to_loc, $req_date, $prio, $project_days, $cost_bearer, $stage, $current_user_id);
-        mysqli_stmt_execute($stmt);
-        $order_id = mysqli_stmt_insert_id($stmt); mysqli_stmt_close($stmt);
-
-        mysqli_query($conn, "UPDATE transfer_requests SET state='converted', order_id=" . intval($order_id) . " WHERE id=" . intval($rid) . " AND company_id=" . intval($company_id));
+        // كتابتان مترابطتان (إنشاء الأمر + وسم الطلب) — كانتا غير معامَلتين أصلًا
+        // (فجوة تناسقٍ كامنة): تُقوَّيان بمعاملةٍ مُدارة (عقد §9) دون مساسٍ بالمسار السعيد.
+        try {
+            $order_id = trs_gate(false)->runInTransaction(function ($g) use (
+                $order_no, $rid, $req, $direction, $project_id, $from_loc, $to_loc,
+                $project_days, $cost_bearer, $stage, $current_user_id
+            ) {
+                $oid = $g->insert('transfer_orders', array(
+                    'order_no' => $order_no, 'request_id' => $rid,
+                    'transfer_type_id' => intval($req['transfer_type_id']),
+                    'direction' => $direction, 'source_module' => (string)$req['source_module'],
+                    'requested_by_user_id' => ($req['requested_by_user_id'] !== null) ? intval($req['requested_by_user_id']) : null,
+                    'project_id' => $project_id, 'from_location_id' => $from_loc, 'to_location_id' => $to_loc,
+                    'request_date' => date('Y-m-d'), 'priority' => (string)$req['priority'],
+                    'project_days' => $project_days, 'cost_bearer' => $cost_bearer,
+                    'stage' => $stage, 'created_by' => $current_user_id,
+                ));
+                $g->update('transfer_requests', array('state' => 'converted', 'order_id' => $oid), array('id' => $rid));
+                return $oid;
+            }, 'convert request#' . $rid);
+        } catch (\App\Core\TenantGateException $e) {
+            error_log('transfer_requests convert rolled back: ' . $e->getMessage());
+            header("Location: transfer_requests.php?msg=تعذّر+التحويل+❌"); exit();
+        }
         trs_log_event($conn, $company_id, $order_id, 'system', "تحويل الطلب {$req['code']} إلى أمر ($order_no)", 'submitted', $stage, $current_user_id, 'transport');
         header("Location: transfer_order_form.php?id=$order_id&msg=تم+تحويل+الطلب+إلى+أمر+($order_no)+✅"); exit();
     }
@@ -161,13 +182,17 @@ include '../insidebar.php';
             <th>الإجراءات</th><th>الكود</th><th>النوع</th><th>المصدر</th><th>المشروع</th><th>المبرّر</th><th>الأولوية</th><th>الحالة</th>
         </tr></thead><tbody>
         <?php
-        $sql = "SELECT r.*, tt.name AS type_name, p.name AS project_name
-                FROM transfer_requests r
-                LEFT JOIN transfer_types tt ON tt.id = r.transfer_type_id
-                LEFT JOIN project p ON p.id = r.project_id
-                WHERE $scope ORDER BY r.id DESC";
-        $res = mysqli_query($conn, $sql);
-        if ($res) while ($row = mysqli_fetch_assoc($res)) {
+        // scopedQuery (عقد §10): النص الأصلي حرفيًا + الرمز؛ types/project إثراء LEFT
+        $req_rows = trs_gate($is_super_admin)->scopedQuery(
+            array('scope' => array('r' => 'transfer_requests'),
+                  'enrich' => array('tt' => 'transfer_types', 'p' => 'project')),
+            "SELECT r.*, tt.name AS type_name, p.name AS project_name
+             FROM transfer_requests r
+             LEFT JOIN transfer_types tt ON tt.id = r.transfer_type_id
+             LEFT JOIN project p ON p.id = r.project_id
+             WHERE {TENANT_SCOPE} ORDER BY r.id DESC"
+        );
+        foreach ($req_rows as $row) {
             $state = $row['state'];
             $src_ar = trs_label($srcs, $row['source_module']);
             $prio_ar = trs_label($prios, $row['priority']);
