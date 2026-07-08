@@ -319,6 +319,69 @@ ok('c5: كل استبدالٍ مسجَّل (tenant_gate_replace_children)',
     strpos(file_get_contents(dirname(__DIR__) . '/logs/security.log'), 'tenant_gate_replace_children') !== false);
 mysqli_query($conn, "DELETE FROM proc_order_line WHERE item_name LIKE 'LEAKTEST_%'");
 
+// ═════ 6د) runInTransaction — المعاملة المُدارة (شروط المستخدم الثلاثة) ═════
+echo "── 6د) runInTransaction (ذرّية مشتركة بحراسة كاملة) ──\n";
+
+// t1: النجاح + الترابط: أبٌ ثم سطران ثم صفٌّ يستعمل line_id الوليد — الكل يُرتكب معًا
+$txIds = $gateA->runInTransaction(function ($g) use ($MARK_A) {
+    $po = $g->insert('proc_order', array('code' => $MARK_A . '_TX'));
+    $l1 = $g->insert('proc_order_line', array('order_id' => $po, 'item_name' => $MARK_A . '_TXL1'));
+    // الترابط: اسم السطر الثاني يحمل line_id الوليد للأول (كنمط custody←line_id)
+    $l2 = $g->insert('proc_order_line', array('order_id' => $po, 'item_name' => $MARK_A . '_TXL2_of_' . $l1));
+    return array($po, $l1, $l2);
+}, 'leaktest t1');
+$cleanup[] = array('proc_order', $txIds[0]);
+$linked = $gateA->selectOne('proc_order_line', array('where' => array('id' => $txIds[2])));
+ok('t1: المعاملة ارتُكبت والترابط عمل (line_id الوليد مرئي داخلها)',
+    $txIds[1] > 0 && $linked !== null && $linked['item_name'] === $MARK_A . '_TXL2_of_' . $txIds[1]);
+
+// t2: فشل وسط الـcallable = تراجع الكل (الأب المدرَج أولًا يختفي)
+$t2_parent = null;
+expect_throw('t2a: فشلٌ في العملية الثانية يُرمى', function () use ($gateA, $MARK_A, &$t2_parent) {
+    $gateA->runInTransaction(function ($g) use ($MARK_A, &$t2_parent) {
+        $t2_parent = $g->insert('proc_order', array('code' => $MARK_A . '_TXFAIL'));
+        $g->insert('proc_order_line', array('order_id' => $t2_parent, 'no_such_column' => 'boom'));
+    }, 'leaktest t2');
+});
+$gone = intval($conn->query("SELECT COUNT(*) FROM proc_order WHERE id=" . intval($t2_parent))->fetch_row()[0]);
+ok('t2b: الأب المُدرَج قبل الفشل تراجع كليًا (ذرّية مشتركة)', $t2_parent > 0 && $gone === 0);
+
+// t3: الحراسة لا تتعلق داخل المعاملة: تزوير شركةٍ داخل tx يُرفض ويتراجع الكل
+$t3_parent = null;
+expect_throw('t3a: تزوير الهوية داخل المعاملة يُرفض (الحُرّاس أحياء)', function () use ($gateA, $COMPANY_B, $MARK_A, &$t3_parent) {
+    $gateA->runInTransaction(function ($g) use ($COMPANY_B, $MARK_A, &$t3_parent) {
+        $t3_parent = $g->insert('proc_order', array('code' => $MARK_A . '_TXFORGE'));
+        $g->insert('proc_order_line', array('order_id' => $t3_parent, 'item_name' => 'x', 'company_id' => $COMPANY_B));
+    }, 'leaktest t3');
+});
+$gone3 = intval($conn->query("SELECT COUNT(*) FROM proc_order WHERE id=" . intval($t3_parent))->fetch_row()[0]);
+ok('t3b: كل المعاملة تراجعت بعد رفض التزوير', $t3_parent > 0 && $gone3 === 0);
+
+// t4: replaceChildren داخل المعاملة تتبنّاها (لا commit ضمني متداخل):
+// استبدالٌ ناجح ثم فشلٌ بعده ⇒ حتى أثر الاستبدال يتراجع
+$before4 = array_map(function ($x) { return $x['item_name']; },
+    $gateA->select('proc_order_line', array('where' => array('order_id' => $txIds[0]))));
+expect_throw('t4a: فشلٌ بعد replaceChildren داخل المعاملة يُرمى', function () use ($gateA, $txIds, $MARK_A) {
+    $gateA->runInTransaction(function ($g) use ($txIds, $MARK_A) {
+        $g->replaceChildren('proc_order', $txIds[0], 'proc_order_line', 'order_id',
+            array(array('item_name' => $MARK_A . '_TXNEW')));
+        $g->insert('proc_order_line', array('order_id' => $txIds[0], 'no_such_column' => 'boom'));
+    }, 'leaktest t4');
+});
+$after4 = array_map(function ($x) { return $x['item_name']; },
+    $gateA->select('proc_order_line', array('where' => array('order_id' => $txIds[0]))));
+sort($before4); sort($after4);
+ok('t4b: أثر replaceChildren تراجع مع المعاملة (السطور الأصلية سليمة — لا commit ضمني)',
+    $before4 === $after4 && !in_array($MARK_A . '_TXNEW', $after4, true));
+
+// t5: التداخل مرفوض
+expect_throw('t5: runInTransaction داخل أخرى يُرفض', function () use ($gateA) {
+    $gateA->runInTransaction(function ($g) {
+        $g->runInTransaction(function ($g2) { return 1; });
+    });
+});
+mysqli_query($conn, "DELETE FROM proc_order_line WHERE item_name LIKE 'LEAKTEST_%'");
+
 // ═════ 7) الشاشات المُهاجَرة (HTTP — T2) ═════
 echo "── 7) الشاشات المُهاجَرة (زيارة فعلية بجلسة) ──\n";
 if (empty($MIGRATED_SCREENS)) {

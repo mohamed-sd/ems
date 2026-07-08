@@ -49,6 +49,8 @@ class TenantDb
     private $crossTenant;
     /** @var string 'enforce' | 'monitor' — من .env أو صريحًا للاختبارات */
     private $mode;
+    /** @var bool داخل معاملة مُدارة (runInTransaction) — القنوات الذرية الداخلية تتبنّاها بدل فتح معاملتها */
+    private $managedTx = false;
 
     public function __construct(\mysqli $conn, TenantContext $ctx, $crossTenant = false, $mode = null)
     {
@@ -224,7 +226,12 @@ class TenantDb
             $this->deny('replaceChildren: parent not owned by tenant', $parentTable . '#' . $parentId);
         }
 
-        $this->conn->begin_transaction();
+        // داخل معاملة مُدارة (runInTransaction): تُنفَّذ العمليات ضمنها ولا تُفتح
+        // معاملة متداخلة (begin متداخل في MySQL = commit ضمني يكسر ذرّية المدير).
+        $ownTx = !$this->managedTx;
+        if ($ownTx) {
+            $this->conn->begin_transaction();
+        }
         try {
             // النطاق 2: حذف الأبناء بالشرطين معًا إلزامًا (الأب + الشركة)
             $stmt = $this->conn->prepare(
@@ -249,9 +256,14 @@ class TenantDb
                 $this->insert($childTable, $row); // حقن الشركة وحراس التزوير كالمعتاد
                 $inserted++;
             }
-            $this->conn->commit();
+            if ($ownTx) {
+                $this->conn->commit();
+            }
         } catch (\Throwable $t) {
-            $this->conn->rollback(); // ذرّية: لا شيء يتغير عند أي فشل
+            if ($ownTx) {
+                $this->conn->rollback(); // ذرّية: لا شيء يتغير عند أي فشل
+            }
+            // داخل معاملة مُدارة: الرمي يكفي — المدير الخارجي يتراجع بالكل
             if ($t instanceof TenantGateException) {
                 throw $t;
             }
@@ -266,6 +278,60 @@ class TenantDb
                 . ($note !== '' ? ' note=' . substr($note, 0, 120) : ''));
         }
         return array('deleted' => $deleted, 'inserted' => $inserted);
+    }
+
+    /**
+     * معاملة مُدارة متعددة العمليات — runInTransaction (قرار المستخدم 2 · 2026-07-08)
+     * ───────────────────────────────────────────────────────────────────────
+     * للعمليات النطاقية المترابطة (مثل صرف المخزون: سطور ← حركات ← عهدة
+     * بترابط line_id الوليد) التي تتطلب ذرّيةً مشتركة: معاملةٌ واحدة تجري
+     * داخلها عمليات بوابةٍ متعددة.
+     *
+     * **شروط المستخدم الحاكمة**:
+     *   • الحراسة لا تتعلق: كل عمليةٍ داخل الـcallable هي نفس دوال البوابة
+     *     بحُرّاسها كاملةً (عزل الشركة/الملكية/التزوير) — فتحُ المعاملة لا
+     *     يمنح أي إعفاء، وأي رفضٍ داخلي = rollback الكل.
+     *   • الذرّية المشتركة: أي فشلٍ (استثناء) في أي نقطة = تراجعُ كل ما سبق.
+     *   • الترابط: insert() يعيد المعرّف الوليد فورًا — مرئيٌّ للعمليات
+     *     التالية داخل المعاملة نفسها (نفس الاتصال).
+     * القنوات الذرّية الداخلية (replaceChildren) تتبنّى هذه المعاملة تلقائيًا
+     * (لا begin متداخل). لا تداخل: استدعاءٌ داخل معاملةٍ مُدارة قائمة يُرفض.
+     * كل معاملةٍ تُسجَّل (tenant_gate_transaction) بنتيجتها.
+     *
+     * @param callable $work function(TenantDb $gate): mixed — عمليات البوابة حصرًا
+     * @return mixed ما يعيده الـcallable
+     */
+    public function runInTransaction(callable $work, $note = '')
+    {
+        if ($this->managedTx) {
+            $this->deny('nested runInTransaction refused', $note);
+        }
+        $this->conn->begin_transaction();
+        $this->managedTx = true;
+        try {
+            $result = $work($this);
+            $this->conn->commit();
+            $this->managedTx = false;
+            if (function_exists('log_security_event')) {
+                log_security_event('tenant_gate_transaction',
+                    'committed | user=' . $this->ctx->userId() . ' company=' . $this->ctx->companyId()
+                    . ($note !== '' ? ' note=' . substr($note, 0, 120) : ''));
+            }
+            return $result;
+        } catch (\Throwable $t) {
+            $this->conn->rollback();
+            $this->managedTx = false;
+            if (function_exists('log_security_event')) {
+                log_security_event('tenant_gate_transaction',
+                    'ROLLED BACK :: ' . substr($t->getMessage(), 0, 200)
+                    . ' | user=' . $this->ctx->userId() . ' company=' . $this->ctx->companyId()
+                    . ($note !== '' ? ' note=' . substr($note, 0, 120) : ''));
+            }
+            if ($t instanceof TenantGateException) {
+                throw $t;
+            }
+            throw new TenantGateException('transaction rolled back: ' . $t->getMessage());
+        }
     }
 
     /**
