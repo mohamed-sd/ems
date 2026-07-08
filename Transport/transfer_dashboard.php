@@ -21,70 +21,73 @@ if (!$is_super_admin && $company_id <= 0) {
 $perms = trs_page_perms($conn, 'Transport/transfer_dashboard.php', $is_super_admin);
 if (!$perms['can_view']) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+عرض+لوحة+الرحلات+❌"); exit(); }
 
-$scope = $is_super_admin ? '1=1' : ('o.company_id = ' . intval($company_id));
 $stages_ar = trs_stages();
 $dir_map   = trs_directions();
 $bearer_map = trs_bearers();
 
-/** استعلام قيمة مفردة. */
-function trs_scalar($conn, $sql, $default = 0) {
-    $r = mysqli_query($conn, $sql);
-    if ($r && ($x = mysqli_fetch_row($r))) { return $x[0]; }
+$trs_dash_gate = trs_gate($is_super_admin);
+
+/** قيمة مفردة عبر scopedQuery (عقد §10) — بديل trs_scalar الخام. */
+function trs_scoped_scalar($gate, $sql, array $params = array(), $default = 0) {
+    $rows = $gate->scopedQuery(array('scope' => array('o' => 'transfer_orders')), $sql, $params);
+    if ($rows && ($x = array_values($rows[0]))) { return $x[0]; }
     return $default;
 }
 
-// ── مؤشرات عليا ──
-$total_orders   = (int) trs_scalar($conn, "SELECT COUNT(*) FROM transfer_orders o WHERE $scope");
-$open_orders    = (int) trs_scalar($conn, "SELECT COUNT(*) FROM transfer_orders o WHERE $scope AND o.stage NOT IN('closed','cancelled')");
-$in_transit     = (int) trs_scalar($conn, "SELECT COUNT(*) FROM transfer_orders o WHERE $scope AND o.stage='in_transit'");
-$delayed        = (int) trs_scalar($conn, "SELECT COUNT(*) FROM transfer_orders o WHERE $scope AND o.planned_date IS NOT NULL AND o.planned_date < CURDATE() AND o.stage NOT IN('arrived','closed','cancelled')");
-$total_cost_usd = (float) trs_scalar($conn, "SELECT COALESCE(SUM(o.actual_cost_usd),0) FROM transfer_orders o WHERE $scope");
+// ── مؤشرات عليا — عدّادات عبر count والمجاميع عبر scopedQuery ──
+$total_orders   = (int) $trs_dash_gate->count('transfer_orders');
+$open_orders    = (int) $trs_dash_gate->count('transfer_orders', array('whereRaw' => "stage NOT IN('closed','cancelled')"));
+$in_transit     = (int) $trs_dash_gate->count('transfer_orders', array('whereRaw' => "stage = 'in_transit'"));
+$delayed        = (int) $trs_dash_gate->count('transfer_orders', array('whereRaw' => "planned_date IS NOT NULL AND planned_date < CURDATE() AND stage NOT IN('arrived','closed','cancelled')"));
+$total_cost_usd = (float) trs_scoped_scalar($trs_dash_gate, "SELECT COALESCE(SUM(o.actual_cost_usd),0) FROM transfer_orders o WHERE {TENANT_SCOPE}");
 
 // نسبة الوصول في الموعد (من الأوامر التي لها وصول فعلي وتاريخ مخطط)
-$arr_total = (int) trs_scalar($conn, "SELECT COUNT(*) FROM transfer_orders o WHERE $scope AND o.arrival_datetime IS NOT NULL AND o.planned_date IS NOT NULL");
-$arr_ontime = (int) trs_scalar($conn, "SELECT COUNT(*) FROM transfer_orders o WHERE $scope AND o.arrival_datetime IS NOT NULL AND o.planned_date IS NOT NULL AND DATE(o.arrival_datetime) <= o.planned_date");
+$arr_total = (int) $trs_dash_gate->count('transfer_orders', array('whereRaw' => "arrival_datetime IS NOT NULL AND planned_date IS NOT NULL"));
+$arr_ontime = (int) $trs_dash_gate->count('transfer_orders', array('whereRaw' => "arrival_datetime IS NOT NULL AND planned_date IS NOT NULL AND DATE(arrival_datetime) <= planned_date"));
 $ontime_pct = $arr_total > 0 ? round($arr_ontime * 100.0 / $arr_total) : null;
 
 // متوسّط زمن الترحيل (ساعات) للأوامر الواصلة
-$avg_hours = trs_scalar($conn, "SELECT ROUND(AVG(TIMESTAMPDIFF(HOUR, o.departure_datetime, o.arrival_datetime)),1)
-    FROM transfer_orders o WHERE $scope AND o.departure_datetime IS NOT NULL AND o.arrival_datetime IS NOT NULL", null);
+$avg_hours = trs_scoped_scalar($trs_dash_gate, "SELECT ROUND(AVG(TIMESTAMPDIFF(HOUR, o.departure_datetime, o.arrival_datetime)),1)
+    FROM transfer_orders o WHERE {TENANT_SCOPE} AND o.departure_datetime IS NOT NULL AND o.arrival_datetime IS NOT NULL", array(), null);
 
 // ── عدّاد حسب المرحلة (للكانبان) ──
 $stage_counts = array();
 foreach (array_keys($stages_ar) as $st) { $stage_counts[$st] = 0; }
-$r = mysqli_query($conn, "SELECT o.stage, COUNT(*) c FROM transfer_orders o WHERE $scope GROUP BY o.stage");
-if ($r) { while ($x = mysqli_fetch_assoc($r)) { $stage_counts[$x['stage']] = (int)$x['c']; } }
+$stage_rows = $trs_dash_gate->scopedQuery(array('scope' => array('o' => 'transfer_orders')),
+    "SELECT o.stage, COUNT(*) c FROM transfer_orders o WHERE {TENANT_SCOPE} GROUP BY o.stage");
+foreach ($stage_rows as $x) { $stage_counts[$x['stage']] = (int)$x['c']; }
 
 // ── تكلفة الترحيل لكل مشروع (أعلى 8) ──
-$by_project = array();
-$r = mysqli_query($conn, "SELECT COALESCE(p.name,'— بلا مشروع —') AS pname, COUNT(*) AS orders, COALESCE(SUM(o.actual_cost_usd),0) AS cost
-    FROM transfer_orders o LEFT JOIN project p ON p.id=o.project_id
-    WHERE $scope GROUP BY o.project_id ORDER BY cost DESC LIMIT 8");
-if ($r) { while ($x = mysqli_fetch_assoc($r)) { $by_project[] = $x; } }
+$by_project = $trs_dash_gate->scopedQuery(
+    array('scope' => array('o' => 'transfer_orders'), 'enrich' => array('p' => 'project')),
+    "SELECT COALESCE(p.name,'— بلا مشروع —') AS pname, COUNT(*) AS orders, COALESCE(SUM(o.actual_cost_usd),0) AS cost
+     FROM transfer_orders o LEFT JOIN project p ON p.id=o.project_id
+     WHERE {TENANT_SCOPE} GROUP BY o.project_id ORDER BY cost DESC LIMIT 8");
 $max_proj_cost = 0.0;
 foreach ($by_project as $bp) { if ((float)$bp['cost'] > $max_proj_cost) { $max_proj_cost = (float)$bp['cost']; } }
 
 // ── تكلفة حسب المتحمِّل ──
 $by_bearer = array('client' => 0.0, 'company' => 0.0, 'new_client' => 0.0);
-$r = mysqli_query($conn, "SELECT o.cost_bearer, COALESCE(SUM(o.actual_cost_usd),0) AS cost
-    FROM transfer_orders o WHERE $scope AND o.cost_bearer IS NOT NULL GROUP BY o.cost_bearer");
-if ($r) { while ($x = mysqli_fetch_assoc($r)) { $by_bearer[$x['cost_bearer']] = (float)$x['cost']; } }
+$bearer_rows = $trs_dash_gate->scopedQuery(array('scope' => array('o' => 'transfer_orders')),
+    "SELECT o.cost_bearer, COALESCE(SUM(o.actual_cost_usd),0) AS cost
+     FROM transfer_orders o WHERE {TENANT_SCOPE} AND o.cost_bearer IS NOT NULL GROUP BY o.cost_bearer");
+foreach ($bearer_rows as $x) { $by_bearer[$x['cost_bearer']] = (float)$x['cost']; }
 
 // ── الكانبان: آخر الأوامر لكل مرحلة نشِطة ──
 $kanban_stages = array('request', 'planned', 'ready', 'in_transit', 'arrived');
 $kanban = array();
 foreach ($kanban_stages as $st) {
-    $rows = array();
-    $q = mysqli_query($conn, "SELECT o.id, o.order_no, o.direction, o.planned_date, o.actual_cost_usd,
-            p.name AS pname, tl.name AS to_name,
-            (o.planned_date IS NOT NULL AND o.planned_date < CURDATE()) AS late
-        FROM transfer_orders o
-        LEFT JOIN project p ON p.id=o.project_id
-        LEFT JOIN trs_locations tl ON tl.id=o.to_location_id
-        WHERE $scope AND o.stage='" . mysqli_real_escape_string($conn, $st) . "'
-        ORDER BY o.id DESC LIMIT 12");
-    if ($q) { while ($x = mysqli_fetch_assoc($q)) { $rows[] = $x; } }
-    $kanban[$st] = $rows;
+    $kanban[$st] = $trs_dash_gate->scopedQuery(
+        array('scope' => array('o' => 'transfer_orders'),
+              'enrich' => array('p' => 'project', 'tl' => 'trs_locations')),
+        "SELECT o.id, o.order_no, o.direction, o.planned_date, o.actual_cost_usd,
+                p.name AS pname, tl.name AS to_name,
+                (o.planned_date IS NOT NULL AND o.planned_date < CURDATE()) AS late
+         FROM transfer_orders o
+         LEFT JOIN project p ON p.id=o.project_id
+         LEFT JOIN trs_locations tl ON tl.id=o.to_location_id
+         WHERE {TENANT_SCOPE} AND o.stage = ?
+         ORDER BY o.id DESC LIMIT 12", array($st));
 }
 
 $page_title = 'إيكوبيشن | لوحة الرحلات';
