@@ -53,38 +53,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     // المشروع يُربط فقط عندما يكون النوع مشروعاً
     if ($location_type !== 'project') { $project_id = null; }
 
-    if ($is_editing) {
-        $sql = "UPDATE trs_locations SET name=?, location_type=?, project_id=?, active=?
-                WHERE id=? AND company_id=?";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'ssiiii', $name, $location_type, $project_id, $active, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    try {
+        if ($is_editing) {
+            trs_gate(false)->update('trs_locations',
+                array('name' => $name, 'location_type' => $location_type, 'project_id' => $project_id, 'active' => $active),
+                array('id' => $id));
+            header("Location: trs_locations_config.php?msg=تم+تعديل+الموقع+بنجاح+✅"); exit();
+        } else {
+            trs_gate(false)->insert('trs_locations', array(
+                'code' => trs_gen_code($conn, 'trs_locations', 'LOC', $company_id),
+                'name' => $name, 'location_type' => $location_type,
+                'project_id' => $project_id, 'active' => $active,
+            ));
+            header("Location: trs_locations_config.php?msg=تمت+إضافة+الموقع+بنجاح+✅"); exit();
         }
-        header("Location: trs_locations_config.php?msg=تم+تعديل+الموقع+بنجاح+✅"); exit();
-    } else {
-        $code = trs_gen_code($conn, 'trs_locations', 'LOC', $company_id);
-        $sql = "INSERT INTO trs_locations (company_id, code, name, location_type, project_id, active)
-                VALUES (?,?,?,?,?,?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'isssii', $company_id, $code, $name, $location_type, $project_id, $active);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        }
-        header("Location: trs_locations_config.php?msg=تمت+إضافة+الموقع+بنجاح+✅"); exit();
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('trs_locations save refused: ' . $e->getMessage());
+        header("Location: trs_locations_config.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
 }
 
-// ── حذف (فعلي — لا سجلّات تشغيلية مربوطة بعد؛ FK RESTRICT يحمي من الحذف الخاطئ) ──
+// ── حذف — سياسة «الأرشفة لا الحذف» (نفس دلالة types الموثقة) ──
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: trs_locations_config.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "DELETE FROM trs_locations WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'ii', $delete_id, $company_id);
-        if (!mysqli_stmt_execute($stmt)) {
-            mysqli_stmt_close($stmt);
-            header("Location: trs_locations_config.php?msg=تعذّر+الحذف+—+الموقع+مستخدم+في+أوامر+ترحيل+❌"); exit();
-        }
-        mysqli_stmt_close($stmt);
+    try {
+        trs_gate(false)->softDelete('trs_locations', $delete_id);
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('trs_locations softDelete refused: ' . $e->getMessage());
+        header("Location: trs_locations_config.php?msg=تعذّر+الحذف+❌"); exit();
     }
     header("Location: trs_locations_config.php?msg=تم+حذف+الموقع+بنجاح+✅"); exit();
 }
@@ -174,14 +171,27 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $loc_scope = $is_super_admin ? '1=1' : ('l.company_id = ' . intval($company_id));
-                    $sql = "SELECT l.id, l.code, l.name, l.location_type, l.project_id, l.active, p.name AS project_name
-                            FROM trs_locations l
-                            LEFT JOIN project p ON p.id = l.project_id
-                            WHERE $loc_scope
-                            ORDER BY l.name ASC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    // ترطيب ثنائي: المواقع ثم أسماء المشاريع بجلبٍ واحد (دلالة LEFT JOIN)
+                    $gv = trs_gate($is_super_admin);
+                    $loc_rows = $gv->select('trs_locations', array(
+                        'columns' => array('id', 'code', 'name', 'location_type', 'project_id', 'active'),
+                        'orderBy' => 'name ASC',
+                    ));
+                    $proj_names = array();
+                    $pids = array();
+                    foreach ($loc_rows as $lr) {
+                        if ($lr['project_id'] !== null) { $pids[intval($lr['project_id'])] = true; }
+                    }
+                    if (!empty($pids)) {
+                        foreach ($gv->select('project', array(
+                            'columns' => array('id', 'name'),
+                            'whereRaw' => 'id IN (' . implode(',', array_keys($pids)) . ')',
+                            'includeDeleted' => true,
+                        )) as $pr) { $proj_names[intval($pr['id'])] = $pr['name']; }
+                    }
+                    { foreach ($loc_rows as $row) {
+                        $row['project_name'] = ($row['project_id'] !== null && isset($proj_names[intval($row['project_id'])]))
+                            ? $proj_names[intval($row['project_id'])] : null;
                         $type_ar = trs_label($loc_types, $row['location_type']);
                         $data_attrs =
                             "data-id='" . intval($row['id']) . "' " .
