@@ -28,7 +28,7 @@ if (!$perms['can_view']) {
     exit();
 }
 
-$scope = proc_scope('m.company_id', $is_super_admin, $company_id);
+// K9-M1 ذيل: القراءة التجميعية عبر قناة scopedQuery (عقد البوابة §10)
 
 $page_title = 'إيكوبيشن | المخزون التشغيلي';
 include '../inheader.php';
@@ -57,20 +57,25 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT
-                                COALESCE(it.name, CONCAT('#', m.item_id)) AS item_name,
-                                COALESCE(w.name, '—') AS wh_name,
-                                SUM(CASE WHEN m.move_type='استلام' THEN m.qty ELSE 0 END) AS q_in,
-                                SUM(CASE WHEN m.move_type='إرجاع' THEN m.qty ELSE 0 END) AS q_ret,
-                                SUM(CASE WHEN m.move_type='صرف' THEN m.qty ELSE 0 END) AS q_out
-                            FROM proc_stock_move m
-                            LEFT JOIN proc_item it ON it.id = m.item_id
-                            LEFT JOIN proc_warehouse w ON w.id = m.warehouse_id
-                            WHERE $scope
-                            GROUP BY m.item_id, m.warehouse_id, it.name, w.name
-                            ORDER BY item_name ASC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    $stock_rows = proc_gate($is_super_admin)->scopedQuery(
+                        array(
+                            'scope'  => array('m' => 'proc_stock_move'),
+                            'enrich' => array('it' => 'proc_item', 'w' => 'proc_warehouse'),
+                        ),
+                        "SELECT
+                             COALESCE(it.name, CONCAT('#', m.item_id)) AS item_name,
+                             COALESCE(w.name, '—') AS wh_name,
+                             SUM(CASE WHEN m.move_type='استلام' THEN m.qty ELSE 0 END) AS q_in,
+                             SUM(CASE WHEN m.move_type='إرجاع' THEN m.qty ELSE 0 END) AS q_ret,
+                             SUM(CASE WHEN m.move_type='صرف' THEN m.qty ELSE 0 END) AS q_out
+                         FROM proc_stock_move m
+                         LEFT JOIN proc_item it ON it.id = m.item_id
+                         LEFT JOIN proc_warehouse w ON w.id = m.warehouse_id
+                         WHERE {TENANT_SCOPE}
+                         GROUP BY m.item_id, m.warehouse_id, it.name, w.name
+                         ORDER BY item_name ASC"
+                    );
+                    { foreach ($stock_rows as $row) {
                         $in = (float)$row['q_in']; $ret = (float)$row['q_ret']; $out = (float)$row['q_out'];
                         $avail = $in + $ret - $out;
                         echo "<tr>";
