@@ -281,6 +281,134 @@ class TenantDb
     }
 
     /**
+     * الاستعلام المركّب المعزول — scopedQuery (K9-D · قرار المستخدم ب · 2026-07-08)
+     * ───────────────────────────────────────────────────────────────────────
+     * للقراءات التجميعية/المركّبة (GROUP BY/JOINs) التي تتجاوز CRUD والترطيب:
+     * المطوّر **يعلن** الجداول ويضع رمز {TENANT_SCOPE} — **البوابة تبني شروط
+     * العزل بنفسها** وتحقنها مكان الرمز؛ لا عزل يدويًا أبدًا.
+     *
+     * ضمانة «العزل النافذ لا النصي» (تدقيق المستخدم): لا يُكتفى بوجود الرمز —
+     * يُتحقق بنيويًا (مسحٌ بعمق الأقواس بعد تجريد النصوص المقتبسة) أن الرمز:
+     * مرةً واحدة، على العمق 0، بعد WHERE العلوية الوحيدة، وقبل أي
+     * GROUP BY/HAVING/ORDER BY/LIMIT علوي — أي في موضع ترشيح مصادر الصفوف
+     * قبل التجميع، لا بعده. UNION مرفوض كليًا (كتلٌ متعددة = استدعاءات متعددة).
+     * والبرهان التجريبي المكمِّل: اختبار تسرّبٍ لكل شاشةٍ مستهلِكة (§7).
+     *
+     * إعلان الجداول:
+     *   'scope'  => array('m' => 'proc_stock_move')   ← يُحقن m.company_id = ?
+     *   'enrich' => array('it' => 'proc_item', ...)   ← إثراء LEFT JOIN بمفتاحٍ من
+     *      صفوفٍ معزولة: لا شرط له (شرط WHERE يقلب LEFT إلى INNER)، ويُتحقق أن
+     *      كل ظهوره مسبوقٌ بLEFT JOIN حصرًا. عزله الفعلي عبر مفاتيح الصفوف
+     *      المعزولة + اختبار §7 للشاشة (قيد النسخة موثَّق في العقد §10).
+     * أي جدولٍ مستأجرٍ مسجَّلٍ يظهر كمصدر FROM/JOIN دون إعلانٍ = رفض.
+     * ذكر company_id في النص = رفض. SELECT فقط.
+     */
+    public function scopedQuery(array $decl, $sql, array $params = array())
+    {
+        $scope  = isset($decl['scope'])  && is_array($decl['scope'])  ? $decl['scope']  : array();
+        $enrich = isset($decl['enrich']) && is_array($decl['enrich']) ? $decl['enrich'] : array();
+        if (empty($scope)) {
+            $this->deny('scopedQuery: scope declaration required', substr($sql, 0, 120));
+        }
+        foreach (array_merge($scope, $enrich) as $alias => $table) {
+            $this->assertIdent($alias);
+            $this->requireTable($table, true); // مسجَّل، وبلا عبور مراقبة — قناة كودٍ جديد
+        }
+        if (stripos($sql, 'company_id') !== false) {
+            $this->deny('scopedQuery: manual company_id refused', 'العزل مسؤولية البوابة وحدها');
+        }
+
+        // ── تجريد النصوص المقتبسة ثم بناء نسخة عليا للمسح البنيوي ──
+        $stripped = preg_replace("/'(?:[^'\\\\]|\\\\.)*'/s", "''", $sql);
+        $upper = strtoupper($stripped);
+        if (!preg_match('/^\s*SELECT\b/', $upper)) {
+            $this->deny('scopedQuery: SELECT only', substr($sql, 0, 80));
+        }
+        if (substr_count($stripped, '{TENANT_SCOPE}') !== 1) {
+            $this->deny('scopedQuery: {TENANT_SCOPE} مطلوب مرةً واحدة بالضبط', substr($sql, 0, 120));
+        }
+
+        // مواضع العمق 0 للكلمات الحاكمة
+        $depth0 = function ($needle) use ($upper) {
+            $pos = array(); $d = 0; $len = strlen($upper); $nlen = strlen($needle);
+            for ($i = 0; $i < $len; $i++) {
+                $ch = $upper[$i];
+                if ($ch === '(') { $d++; } elseif ($ch === ')') { $d--; }
+                elseif ($d === 0 && $ch === $needle[0] && substr($upper, $i, $nlen) === $needle) { $pos[] = $i; }
+            }
+            return $pos;
+        };
+        if (!empty($depth0('UNION'))) {
+            $this->deny('scopedQuery: UNION refused (استدعاءات منفصلة)', '');
+        }
+        $wherePos = $depth0('WHERE');
+        if (count($wherePos) !== 1) {
+            $this->deny('scopedQuery: يلزم WHERE علوية واحدة بالضبط', 'found=' . count($wherePos));
+        }
+        $tokenPos = strpos($upper, '{TENANT_SCOPE}');
+        if ($tokenPos < $wherePos[0]) {
+            $this->deny('scopedQuery: الرمز قبل WHERE — موضعٌ لا يعزل', '');
+        }
+        foreach (array('GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT') as $kw) {
+            $kp = $depth0($kw);
+            if (!empty($kp) && $tokenPos > $kp[0]) {
+                $this->deny('scopedQuery: الرمز بعد ' . $kw . ' — العزل غير نافذٍ على مصادر الصفوف', '');
+            }
+        }
+
+        // كل جدولٍ مستأجرٍ مسجَّلٍ يظهر مصدرًا يجب إعلانه؛ وenrich = LEFT JOIN حصرًا
+        $declaredTables = array_map('strtoupper', array_values(array_merge($scope, $enrich)));
+        if (preg_match_all('/\b(FROM|JOIN)\s+`?([A-Za-z0-9_]+)`?/', $upper, $mm, PREG_SET_ORDER)) {
+            foreach ($mm as $m) {
+                $tname = $m[2];
+                $def = TenantRegistry::get(strtolower($tname));
+                if ($def !== null && $def['type'] !== TenantRegistry::T_GLOBAL
+                    && !in_array($tname, $declaredTables, true)) {
+                    $this->deny('scopedQuery: جدولٌ مستأجرٌ غير معلَن', strtolower($tname));
+                }
+            }
+        }
+        foreach ($enrich as $alias => $table) {
+            $tU = strtoupper($table);
+            if (preg_match_all('/(\S+\s+)?JOIN\s+`?' . preg_quote($tU, '/') . '`?/', $upper, $jm, PREG_SET_ORDER)) {
+                foreach ($jm as $j) {
+                    if (stripos($j[0], 'LEFT') === false) {
+                        $this->deny('scopedQuery: جدول الإثراء يُربط LEFT JOIN حصرًا', $table);
+                    }
+                }
+            }
+        }
+
+        // ── بناء شروط العزل وحقنها + ترتيب المعاملات حول الرمز ──
+        $conds = array(); $scopeParams = array();
+        foreach ($scope as $alias => $table) {
+            if ($this->crossTenant) {
+                $conds[] = '1=1';
+            } else {
+                $this->requireTenant($table);
+                $conds[] = '`' . $alias . '`.`company_id` = ?';
+                $scopeParams[] = $this->ctx->companyId();
+            }
+        }
+        $scopeSqlFrag = '(' . implode(' AND ', $conds) . ')';
+        $rawToken = strpos($sql, '{TENANT_SCOPE}');
+        $before = substr($sql, 0, $rawToken);
+        $after  = substr($sql, $rawToken + strlen('{TENANT_SCOPE}'));
+        $nBefore = substr_count(preg_replace("/'(?:[^'\\\\]|\\\\.)*'/s", "''", $before), '?');
+        $finalSql = $before . $scopeSqlFrag . $after;
+        $finalParams = array_merge(
+            array_slice($params, 0, $nBefore),
+            $scopeParams,
+            array_slice($params, $nBefore)
+        );
+        $res = $this->run($finalSql, $finalParams);
+        if (!($res instanceof \mysqli_result)) {
+            $this->deny('scopedQuery: non-result outcome', '');
+        }
+        return $res->fetch_all(MYSQLI_ASSOC);
+    }
+
+    /**
      * معاملة مُدارة متعددة العمليات — runInTransaction (قرار المستخدم 2 · 2026-07-08)
      * ───────────────────────────────────────────────────────────────────────
      * للعمليات النطاقية المترابطة (مثل صرف المخزون: سطور ← حركات ← عهدة

@@ -382,6 +382,57 @@ expect_throw('t5: runInTransaction داخل أخرى يُرفض', function () us
 });
 mysqli_query($conn, "DELETE FROM proc_order_line WHERE item_name LIKE 'LEAKTEST_%'");
 
+// ═════ 6هـ) scopedQuery — الاستعلام المركّب المعزول (K9-D) ═════
+echo "── 6هـ) scopedQuery (العزل النافذ بنيويًا وتجريبيًا) ──\n";
+// بذور تجميع لشركتين: حركتا مخزونٍ لكلٍّ
+$it_a = $gateA->insert('proc_item', array('name' => $MARK_A . '_SQI'));
+$cleanup[] = array('proc_item', $it_a);
+$it_b = $gateB->insert('proc_item', array('name' => $MARK_B . '_SQI'));
+$cleanup[] = array('proc_item', $it_b);
+foreach (array(array($gateA, $it_a, 5), array($gateA, $it_a, 3), array($gateB, $it_b, 70)) as $seed) {
+    $seed[0]->insert('proc_stock_move', array('item_id' => $seed[1], 'move_type' => 'استلام', 'qty' => $seed[2], 'ref_type' => 'leaktest', 'ref_id' => 0));
+}
+
+// e1: تجميع GROUP BY حقيقي عبر شركتين — لا يظهر إلا مجموع شركتي
+$agg = $gateA->scopedQuery(
+    array('scope' => array('m' => 'proc_stock_move'), 'enrich' => array('it' => 'proc_item')),
+    "SELECT it.name AS iname, SUM(m.qty) AS q
+     FROM proc_stock_move m
+     LEFT JOIN proc_item it ON it.id = m.item_id
+     WHERE {TENANT_SCOPE} AND m.ref_type = ?
+     GROUP BY m.item_id, it.name ORDER BY iname",
+    array('leaktest')
+);
+ok('e1: التجميع معزول (صنف A بمجموع 8، وB غائب كليًا)',
+    count($agg) === 1 && floatval($agg[0]['q']) === 8.0 && $agg[0]['iname'] === $MARK_A . '_SQI');
+
+// e2..e6: ضمانات «النافذ لا النصي»
+expect_throw('e2: بلا رمز = رفض', function () use ($gateA) {
+    $gateA->scopedQuery(array('scope' => array('m' => 'proc_stock_move')),
+        "SELECT COUNT(*) c FROM proc_stock_move m WHERE m.ref_type='x'");
+});
+expect_throw('e3: الرمز بعد GROUP BY = رفض (لا يعزل المصادر)', function () use ($gateA) {
+    $gateA->scopedQuery(array('scope' => array('m' => 'proc_stock_move')),
+        "SELECT m.item_id, COUNT(*) c FROM proc_stock_move m WHERE m.ref_type='x' GROUP BY m.item_id HAVING {TENANT_SCOPE}");
+});
+expect_throw('e4: company_id يدوي = رفض', function () use ($gateA) {
+    $gateA->scopedQuery(array('scope' => array('m' => 'proc_stock_move')),
+        "SELECT COUNT(*) c FROM proc_stock_move m WHERE {TENANT_SCOPE} AND m.company_id = 1");
+});
+expect_throw('e5: جدول مستأجر غير معلَن = رفض', function () use ($gateA) {
+    $gateA->scopedQuery(array('scope' => array('m' => 'proc_stock_move')),
+        "SELECT COUNT(*) c FROM proc_stock_move m JOIN proc_item it ON it.id=m.item_id WHERE {TENANT_SCOPE}");
+});
+expect_throw('e6: جدول إثراء بغير LEFT JOIN = رفض', function () use ($gateA) {
+    $gateA->scopedQuery(array('scope' => array('m' => 'proc_stock_move'), 'enrich' => array('it' => 'proc_item')),
+        "SELECT COUNT(*) c FROM proc_stock_move m INNER JOIN proc_item it ON it.id=m.item_id WHERE {TENANT_SCOPE}");
+});
+expect_throw('e7: UNION = رفض', function () use ($gateA) {
+    $gateA->scopedQuery(array('scope' => array('m' => 'proc_stock_move')),
+        "SELECT m.id FROM proc_stock_move m WHERE {TENANT_SCOPE} UNION SELECT 1");
+});
+mysqli_query($conn, "DELETE FROM proc_stock_move WHERE ref_type='leaktest'");
+
 // ═════ 7) الشاشات المُهاجَرة (HTTP — T2) ═════
 echo "── 7) الشاشات المُهاجَرة (زيارة فعلية بجلسة) ──\n";
 if (empty($MIGRATED_SCREENS)) {
