@@ -46,16 +46,21 @@ if (!function_exists('trs_scope')) {
     }
 }
 
+
+if (!function_exists("trs_gate")) {
+    /** K9-M2b: بوابة العزل للوحدة — سياق الجلسة؛ is_super عبر forAllTenants المسجلة. */
+    function trs_gate($is_super = false)
+    {
+        $gate = ems_tenant_db();
+        return $is_super ? $gate->forAllTenants("trs helpers super view") : $gate;
+    }
+}
 if (!function_exists('trs_gen_code')) {
     /** توليد كود تسلسلي بسيط لكل شركة، مثل LOC-0001. اسم الجدول من قائمة بيضاء بالكود. */
     function trs_gen_code($conn, $table, $prefix, $company_id)
     {
-        $n = 0;
-        $sql = "SELECT COUNT(*) AS c FROM `" . $table . "` WHERE company_id = " . intval($company_id);
-        if ($res = mysqli_query($conn, $sql)) {
-            $row = mysqli_fetch_assoc($res);
-            $n = intval($row['c']);
-        }
+        // K9-M2b: عبر البوابة — includeDeleted يطابق العدّ الخام الأصلي
+        $n = trs_gate(false)->count($table, array('includeDeleted' => true));
         return $prefix . '-' . str_pad((string)($n + 1), 4, '0', STR_PAD_LEFT);
     }
 }
@@ -75,19 +80,18 @@ if (!function_exists('trs_msg_banner')) {
     }
 }
 
-if (!function_exists('trs_options_from_query')) {
-    /** بناء <option> من استعلام (id => label). */
-    function trs_options_from_query($conn, $sql, $selected = 0, $placeholder = '— اختر —')
+if (!function_exists('trs_options_from_rows')) {
+    /** K9-M2b: بناء <option> من صفوف بوابة (id + label جاهزان) — لا تنفيذ نص خام
+     *  (لا مستدعي خارجيًا لسلف هذه الدالة — أزيلت بلا جسر، درس M1). */
+    function trs_options_from_rows(array $rows, $selected = 0, $placeholder = '— اختر —')
     {
         $out = '<option value="">' . htmlspecialchars($placeholder) . '</option>';
         $selected = intval($selected);
-        if ($res = mysqli_query($conn, $sql)) {
-            while ($r = mysqli_fetch_assoc($res)) {
-                $id  = intval($r['id']);
-                $lbl = isset($r['label']) ? (string)$r['label'] : '';
-                $sel = ($id === $selected) ? ' selected' : '';
-                $out .= '<option value="' . $id . '"' . $sel . '>' . htmlspecialchars($lbl) . '</option>';
-            }
+        foreach ($rows as $r) {
+            $id  = intval($r['id']);
+            $lbl = isset($r['label']) ? (string)$r['label'] : '';
+            $sel = ($id === $selected) ? ' selected' : '';
+            $out .= '<option value="' . $id . '"' . $sel . '>' . htmlspecialchars($lbl) . '</option>';
         }
         return $out;
     }
@@ -97,9 +101,10 @@ if (!function_exists('trs_project_options')) {
     /** قائمة المشاريع — قراءة فقط من project (لا كتابة). */
     function trs_project_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = $is_super ? '1=1' : ('company_id = ' . intval($company_id));
-        $sql = "SELECT id, name AS label FROM project WHERE $scope AND COALESCE(is_deleted,0)=0 ORDER BY name ASC";
-        return trs_options_from_query($conn, $sql, $selected, '— بلا مشروع —');
+        $rows = trs_gate($is_super)->select('project', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC'));
+        foreach ($rows as &$r) { $r['label'] = $r['name']; }
+        unset($r);
+        return trs_options_from_rows($rows, $selected, '— بلا مشروع —');
     }
 }
 
@@ -107,10 +112,14 @@ if (!function_exists('trs_location_options')) {
     /** قائمة المواقع (trs_locations) الخاصة بالوحدة. */
     function trs_location_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = trs_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, CONCAT(name, ' (', code, ')') AS label FROM trs_locations
-                WHERE $scope AND active=1 ORDER BY name ASC";
-        return trs_options_from_query($conn, $sql, $selected, '— اختر موقعاً —');
+        $rows = trs_gate($is_super)->select('trs_locations', array(
+            'columns' => array('id', 'name', 'code'),
+            'where'   => array('active' => 1),
+            'orderBy' => 'name ASC',
+        ));
+        foreach ($rows as &$r) { $r['label'] = $r['name'] . ' (' . $r['code'] . ')'; }
+        unset($r);
+        return trs_options_from_rows($rows, $selected, '— اختر موقعاً —');
     }
 }
 
@@ -118,9 +127,14 @@ if (!function_exists('trs_type_options')) {
     /** قائمة أنواع الترحيل (transfer_types). */
     function trs_type_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = trs_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, name AS label FROM transfer_types WHERE $scope AND active=1 ORDER BY id ASC";
-        return trs_options_from_query($conn, $sql, $selected, '— اختر نوعاً —');
+        $rows = trs_gate($is_super)->select('transfer_types', array(
+            'columns' => array('id', 'name'),
+            'where'   => array('active' => 1),
+            'orderBy' => 'id ASC',
+        ));
+        foreach ($rows as &$r) { $r['label'] = $r['name']; }
+        unset($r);
+        return trs_options_from_rows($rows, $selected, '— اختر نوعاً —');
     }
 }
 
@@ -128,10 +142,19 @@ if (!function_exists('trs_equipment_options')) {
     /** قائمة المعدات/المركبات — قراءة فقط من equipments. */
     function trs_equipment_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = $is_super ? '1=1' : ('company_id = ' . intval($company_id));
-        $sql = "SELECT id, CONCAT(COALESCE(NULLIF(code,''),CONCAT('#',id)), CASE WHEN name IS NULL OR name='' THEN '' ELSE CONCAT(' — ', name) END) AS label
-                FROM equipments WHERE $scope AND COALESCE(status,1)=1 ORDER BY id DESC";
-        return trs_options_from_query($conn, $sql, $selected, '— اختر معدة —');
+        $rows = trs_gate($is_super)->select('equipments', array(
+            'columns'  => array('id', 'code', 'name'),
+            'whereRaw' => 'COALESCE(status,1)=1',
+            'orderBy'  => 'id DESC',
+        ));
+        foreach ($rows as &$r) {
+            $code = (string) $r['code'];
+            $base = ($code === '') ? ('#' . intval($r['id'])) : $code;
+            $name = (string) $r['name'];
+            $r['label'] = $base . ($name === '' ? '' : ' — ' . $name);
+        }
+        unset($r);
+        return trs_options_from_rows($rows, $selected, '— اختر معدة —');
     }
 }
 
@@ -139,9 +162,10 @@ if (!function_exists('trs_employee_options')) {
     /** قائمة الموظفين — قراءة فقط من employees. */
     function trs_employee_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = $is_super ? '1=1' : ('company_id = ' . intval($company_id));
-        $sql = "SELECT id, name AS label FROM employees WHERE $scope ORDER BY name ASC";
-        return trs_options_from_query($conn, $sql, $selected, '— اختر موظفاً —');
+        $rows = trs_gate($is_super)->select('employees', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC'));
+        foreach ($rows as &$r) { $r['label'] = $r['name']; }
+        unset($r);
+        return trs_options_from_rows($rows, $selected, '— اختر موظفاً —');
     }
 }
 
@@ -149,9 +173,14 @@ if (!function_exists('trs_supplier_options')) {
     /** قائمة الموردين — قراءة فقط من suppliers (المقاول الناقل). */
     function trs_supplier_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = $is_super ? '1=1' : ('company_id = ' . intval($company_id));
-        $sql = "SELECT id, name AS label FROM suppliers WHERE $scope ORDER BY name ASC";
-        return trs_options_from_query($conn, $sql, $selected, '— اختر مقاولاً ناقلاً —');
+        // includeDeleted للوفاء الحرفي: الأصل يعرض الكل (يوجد موردان مؤرشفان فعلاً)؛
+        // إخفاء المؤرشف قرار سياسة لمالكي الوحدة لاحقًا، لا أثر هجرةٍ صامت.
+        $rows = trs_gate($is_super)->select('suppliers', array(
+            'columns' => array('id', 'name'), 'orderBy' => 'name ASC', 'includeDeleted' => true,
+        ));
+        foreach ($rows as &$r) { $r['label'] = $r['name']; }
+        unset($r);
+        return trs_options_from_rows($rows, $selected, '— اختر مقاولاً ناقلاً —');
     }
 }
 
@@ -159,9 +188,10 @@ if (!function_exists('trs_item_options')) {
     /** قائمة الأصناف — قراءة فقط من proc_item (المخزون). */
     function trs_item_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = $is_super ? '1=1' : ('company_id = ' . intval($company_id));
-        $sql = "SELECT id, name AS label FROM proc_item WHERE $scope AND COALESCE(is_deleted,0)=0 ORDER BY name ASC";
-        return trs_options_from_query($conn, $sql, $selected, '— اختر صنفاً —');
+        $rows = trs_gate($is_super)->select('proc_item', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC'));
+        foreach ($rows as &$r) { $r['label'] = $r['name']; }
+        unset($r);
+        return trs_options_from_rows($rows, $selected, '— اختر صنفاً —');
     }
 }
 
@@ -169,9 +199,10 @@ if (!function_exists('trs_user_options')) {
     /** قائمة المستخدمين (الجهة الطالبة) — قراءة فقط من users. */
     function trs_user_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = $is_super ? '1=1' : ('company_id = ' . intval($company_id));
-        $sql = "SELECT id, name AS label FROM users WHERE $scope AND COALESCE(is_deleted,0)=0 ORDER BY name ASC";
-        return trs_options_from_query($conn, $sql, $selected, '— الجهة الطالبة —');
+        $rows = trs_gate($is_super)->select('users', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC'));
+        foreach ($rows as &$r) { $r['label'] = $r['name']; }
+        unset($r);
+        return trs_options_from_rows($rows, $selected, '— الجهة الطالبة —');
     }
 }
 
@@ -185,15 +216,16 @@ if (!function_exists('trs_project_days')) {
     {
         $project_id = intval($project_id);
         if ($project_id <= 0) { return null; }
-        $company_id = intval($company_id);
-        $sql = "SELECT contract_duration_days FROM contracts
-                WHERE company_id = $company_id AND project_id = $project_id AND status = 1
-                  AND COALESCE(deleted_at, '') = ''
-                ORDER BY actual_start DESC, id DESC LIMIT 1";
-        if ($res = mysqli_query($conn, $sql)) {
-            if ($row = mysqli_fetch_assoc($res)) {
-                return ($row['contract_duration_days'] !== null) ? intval($row['contract_duration_days']) : null;
-            }
+        // وفاء حرفي لفلتر الأصل (deleted_at لا is_deleted) — includeDeleted+whereRaw
+        $row = trs_gate(false)->selectOne('contracts', array(
+            'columns'  => array('contract_duration_days'),
+            'where'    => array('project_id' => $project_id, 'status' => 1),
+            'whereRaw' => "COALESCE(deleted_at, '') = ''",
+            'includeDeleted' => true,
+            'orderBy'  => 'actual_start DESC, id DESC',
+        ));
+        if ($row) {
+            return ($row['contract_duration_days'] !== null) ? intval($row['contract_duration_days']) : null;
         }
         return null;
     }
@@ -207,22 +239,28 @@ if (!function_exists('trs_compute_bearer')) {
      */
     function trs_compute_bearer($conn, $company_id, $movement_type, $project_days = null)
     {
-        $company_id = intval($company_id);
-        $movement_type = mysqli_real_escape_string($conn, $movement_type);
-        $pd = ($project_days === null) ? 'NULL' : intval($project_days);
-        $cond_specific = ($project_days === null)
-            ? "duration_operator = 'any'"
-            : "(duration_operator = 'any'
-                OR (duration_operator = 'lt'  AND $pd <  duration_threshold_days)
-                OR (duration_operator = 'gte' AND $pd >= duration_threshold_days))";
-        $sql = "SELECT default_bearer FROM transfer_cost_rules
-                WHERE company_id = $company_id AND movement_type = '$movement_type' AND active = 1
-                  AND ($cond_specific)
-                ORDER BY (duration_operator = 'any') ASC, id ASC LIMIT 1";
-        if ($res = mysqli_query($conn, $sql)) {
-            if ($row = mysqli_fetch_assoc($res)) { return $row['default_bearer']; }
+        $pd = ($project_days === null) ? null : intval($project_days);
+        // القواعد المرشّحة عبر البوابة، والانتقاء بأفضلية (المحدّدة قبل any) في PHP
+        // (ORDER BY التعبيري خارج صرامة معرّفات البوابة — النتيجة مطابقة للأصل)
+        $rules = trs_gate(false)->select('transfer_cost_rules', array(
+            'columns' => array('id', 'duration_operator', 'duration_threshold_days', 'default_bearer'),
+            'where'   => array('movement_type' => (string) $movement_type, 'active' => 1),
+            'orderBy' => 'id ASC',
+        ));
+        $anyBearer = null;
+        foreach ($rules as $r) {
+            $op = $r['duration_operator'];
+            if ($op === 'any') {
+                if ($anyBearer === null) { $anyBearer = $r['default_bearer']; }
+                continue;
+            }
+            if ($pd === null) { continue; }
+            $thr = intval($r['duration_threshold_days']);
+            if (($op === 'lt' && $pd < $thr) || ($op === 'gte' && $pd >= $thr)) {
+                return $r['default_bearer']; // أول قاعدةٍ محدّدةٍ مطابقة (id ASC) — كالأصل
+            }
         }
-        return null;
+        return $anyBearer;
     }
 }
 
@@ -238,10 +276,10 @@ if (!function_exists('trs_gen_order_no')) {
         $dir = strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $direction), 0, 8));
         $veh = trim((string)$equipment_code);
         $veh = ($veh === '') ? 'TRP' : strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', $veh));
-        $like = $conn->real_escape_string("%-$y-$m-%");
-        $n = 0;
-        $sql = "SELECT COUNT(*) AS c FROM transfer_orders WHERE company_id = $company_id AND order_no LIKE '$like'";
-        if ($res = mysqli_query($conn, $sql)) { $n = intval(mysqli_fetch_assoc($res)['c']); }
+        $n = trs_gate(false)->count('transfer_orders', array(
+            'whereRaw' => 'order_no LIKE ?', 'params' => array("%-$y-$m-%"),
+            'includeDeleted' => true, // كالعدّ الخام الأصلي
+        ));
         return $veh . '-' . $dir . '-' . $y . '-' . $m . '-' . str_pad((string)($n + 1), 4, '0', STR_PAD_LEFT);
     }
 }
@@ -250,11 +288,16 @@ if (!function_exists('trs_log_event')) {
     /** إضافة حدث إلى سجلّ الأمر (إلحاقي فقط). */
     function trs_log_event($conn, $company_id, $order_id, $event_type, $body, $old = null, $new = null, $actor_user_id = null, $actor_dept = null)
     {
-        $sql = "INSERT INTO transfer_events (company_id, order_id, event_type, actor_user_id, actor_dept, body, old_value, new_value)
-                VALUES (?,?,?,?,?,?,?,?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'iisissss', $company_id, $order_id, $event_type, $actor_user_id, $actor_dept, $body, $old, $new);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        // عبر البوابة — الشركة تُحقن من سياقها (وسيط $company_id باقٍ للتوافق؛
+        // تحت forSystem($cid) في الـcron يطابق سياق الدورة)
+        try {
+            trs_gate(false)->insert('transfer_events', array(
+                'order_id' => $order_id, 'event_type' => $event_type,
+                'actor_user_id' => $actor_user_id, 'actor_dept' => $actor_dept,
+                'body' => $body, 'old_value' => $old, 'new_value' => $new,
+            ));
+        } catch (\App\Core\TenantGateException $e) {
+            error_log('trs_log_event refused: ' . $e->getMessage());
         }
     }
 }
