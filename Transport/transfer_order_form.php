@@ -33,12 +33,22 @@ function trs_order_owned($conn, $order_id, $is_super, $company_id) {
     )) > 0;
 }
 
-/** إعادة حساب actual_cost_usd = Σ بنود التكلفة. */
-function trs_recompute_actual($conn, $order_id, $company_id) {
-    $order_id = intval($order_id); $company_id = intval($company_id);
-    mysqli_query($conn, "UPDATE transfer_orders o
-        SET o.actual_cost_usd = (SELECT COALESCE(SUM(amount_usd),0) FROM transfer_cost_lines c WHERE c.order_id = $order_id)
-        WHERE o.id = $order_id AND o.company_id = $company_id");
+/**
+ * إعادة حساب actual_cost_usd = Σ بنود التكلفة — عبر البوابة على خطوتين.
+ * SUM مفلتر soft عمدًا (سياسة الأرشفة): البند المؤرشف يسقط من القائمة
+ * والمجموع معًا — الأصل كان subquery خامًا قبل وجود الأرشفة أصلًا.
+ * تُستدعى داخل معاملة مُدارة حصرًا (الزوج الذرّي مع إدراج/أرشفة البند).
+ */
+function trs_recompute_actual($gate, $order_id) {
+    $order_id = intval($order_id);
+    // فلتر soft صريح في النص: رمز {TENANT_SCOPE} يحقن عزل الشركة فقط —
+    // وبدونه يبقى المؤرشف في المجموع بينما القائمة (select المفلتر) تخفيه
+    $rows = $gate->scopedQuery(array('scope' => array('c' => 'transfer_cost_lines')),
+        "SELECT COALESCE(SUM(c.amount_usd),0) AS total FROM transfer_cost_lines c
+         WHERE {TENANT_SCOPE} AND c.order_id = ? AND COALESCE(c.is_deleted, 0) = 0",
+        array($order_id));
+    $total = $rows ? (float)$rows[0]['total'] : 0.0;
+    $gate->update('transfer_orders', array('actual_cost_usd' => $total), array('id' => $order_id));
 }
 
 // ════════════════ معالجة POST ════════════════
@@ -144,7 +154,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'del_line') {
         $id = intval($_POST['id'] ?? 0); $line_id = intval($_POST['line_id'] ?? 0);
         if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
-        mysqli_query($conn, "DELETE FROM transfer_lines WHERE id=" . $line_id . " AND order_id=" . $id . " AND company_id=" . intval($company_id));
+        // أرشفة لا حذف (السياسة)؛ تحقّق الربط أولًا: السطر ينتمي لهذا الأمر
+        // المملوك — يسدّ أرشفة سطرٍ عبر أمرٍ آخر (القناة id-only)
+        $linked = trs_gate($is_super_admin)->selectOne('transfer_lines', array(
+            'columns' => array('id'), 'where' => array('id' => $line_id, 'order_id' => $id)));
+        if ($linked) { trs_gate($is_super_admin)->softDelete('transfer_lines', $line_id); }
         header("Location: transfer_order_form.php?id=$id&tab=lines&msg=تم+حذف+العنصر+✅"); exit();
     }
 
@@ -161,18 +175,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!array_key_exists($cost_type, trs_cost_types()) || !array_key_exists($cost_bearer, trs_bearers())) { header("Location: transfer_order_form.php?id=$id&tab=costs&msg=بيانات+التكلفة+غير+صالحة+❌"); exit(); }
         // amount_usd = amount_local × fx_rate (أو المبلغ نفسه إن كانت العملة USD)
         $amount_usd = ($currency === 'USD') ? $amount_local : ($fx_rate ? $amount_local * $fx_rate : 0);
-        $stmt = mysqli_prepare($conn, "INSERT INTO transfer_cost_lines (company_id, order_id, cost_type, amount_local, currency, fx_rate, amount_usd, cost_bearer, analytic_cost_center) VALUES (?,?,?,?,?,?,?,?,?)");
-        mysqli_stmt_bind_param($stmt, 'iisdsddss', $company_id, $id, $cost_type, $amount_local, $currency, $fx_rate, $amount_usd, $cost_bearer, $analytic_cost_center);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        trs_recompute_actual($conn, $id, $company_id);
+        // الزوج الذرّي (عقد §9): البند + المجموع المشتق لا ينفصلان — الأصل
+        // كتابتان غير معاملتين؛ تقوية مسار الفشل فقط، المسار السعيد مطابق
+        trs_gate($is_super_admin)->runInTransaction(function ($g) use ($id, $cost_type, $amount_local, $currency, $fx_rate, $amount_usd, $cost_bearer, $analytic_cost_center) {
+            $g->insert('transfer_cost_lines', array(
+                'order_id' => $id, 'cost_type' => $cost_type, 'amount_local' => $amount_local,
+                'currency' => $currency, 'fx_rate' => $fx_rate, 'amount_usd' => $amount_usd,
+                'cost_bearer' => $cost_bearer, 'analytic_cost_center' => $analytic_cost_center,
+            ));
+            trs_recompute_actual($g, $id);
+        }, 'transfer_order add_cost');
         trs_log_event($conn, $company_id, $id, 'note', 'إضافة بند تكلفة', null, null, $current_user_id, 'transport');
         header("Location: transfer_order_form.php?id=$id&tab=costs&msg=تمت+إضافة+بند+التكلفة+✅"); exit();
     }
     if ($action === 'del_cost') {
         $id = intval($_POST['id'] ?? 0); $cid = intval($_POST['cost_id'] ?? 0);
         if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
-        mysqli_query($conn, "DELETE FROM transfer_cost_lines WHERE id=" . $cid . " AND order_id=" . $id . " AND company_id=" . intval($company_id));
-        trs_recompute_actual($conn, $id, $company_id);
+        // أرشفة لا حذف (السياسة) + الزوج الذرّي مع المجموع المشتق (عقد §9)؛
+        // تحقّق الربط داخل المعاملة: البند ينتمي لهذا الأمر المملوك (القناة
+        // id-only — الشرط الثلاثي الأصلي يُستوفى بالفحص لا بتوسيع القناة)
+        trs_gate($is_super_admin)->runInTransaction(function ($g) use ($id, $cid) {
+            $linked = $g->selectOne('transfer_cost_lines', array(
+                'columns' => array('id'), 'where' => array('id' => $cid, 'order_id' => $id)));
+            if ($linked) {
+                $g->softDelete('transfer_cost_lines', $cid);
+                trs_recompute_actual($g, $id);
+            }
+        }, 'transfer_order del_cost');
         header("Location: transfer_order_form.php?id=$id&tab=costs&msg=تم+حذف+بند+التكلفة+✅"); exit();
     }
 
@@ -196,7 +225,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'del_permit') {
         $id = intval($_POST['id'] ?? 0); $pid = intval($_POST['permit_id'] ?? 0);
         if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { header("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
-        mysqli_query($conn, "DELETE FROM transfer_permits WHERE id=" . $pid . " AND order_id=" . $id . " AND company_id=" . intval($company_id));
+        // أرشفة لا حذف (السياسة)؛ تحقّق الربط كنمط del_line
+        $linked = trs_gate($is_super_admin)->selectOne('transfer_permits', array(
+            'columns' => array('id'), 'where' => array('id' => $pid, 'order_id' => $id)));
+        if ($linked) { trs_gate($is_super_admin)->softDelete('transfer_permits', $pid); }
         header("Location: transfer_order_form.php?id=$id&tab=permits&msg=تم+حذف+التصريح+✅"); exit();
     }
 
