@@ -134,6 +134,16 @@ if ($action === 'approve') {
              VALUES ($ts_id, $company_id, $my_level, $user_id, '$escaped_name')"
         );
         if ($ins) $approved++;
+
+        // ── K5 (ADR-10) · إضافة معزولة — لا تمسّ منطق الموافقات الأربع ──
+        // تُستدعى بعد نجاح إدراج الموافقة الرابعة الأخيرة حصرًا؛ خلف علَم
+        // EMS_EVENT_HOOKS (off افتراضًا = صفر أثر)؛ تبتلع كل أخطائها داخلها —
+        // الاعتماد يكتمل دائمًا مهما جرى للنشر (خطة K5 §8.2 المُقرّة).
+        if ($ins && $my_level === 4) {
+            $__k5_gen = intval($conn->insert_id);
+            require_once __DIR__ . '/../includes/timesheet_event_hook.php';
+            ems_timesheet_event_hook($conn, $ts_id, $__k5_gen, $user_id);
+        }
     }
 
     echo json_encode([
