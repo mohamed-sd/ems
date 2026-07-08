@@ -64,57 +64,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['need_source'])) {
     if (!in_array($state, $states, true)) { $state = 'مسودة'; }
     if (!in_array($fin_state, $fin_states, true)) { $fin_state = 'بانتظار'; }
 
-    mysqli_begin_transaction($conn);
+    // K9-M1: الأب عبر البوابة والسطور عبر replaceChildren (النمط المبرَّر §8)
+    $parent = array(
+        'need_source' => $need_source, 'source_ref' => $source_ref,
+        'op_classification' => $op_classification, 'requesting_dept' => $requesting_dept,
+        'equipment_id' => $equipment_id, 'project_id' => $project_id,
+        'priority' => $priority, 'fin_approval_state' => $fin_state,
+        'state' => $state, 'notes' => $notes,
+    );
+    $item_ids = $_POST['line_item_id'] ?? array();
+    $item_names = $_POST['line_item_name'] ?? array();
+    $qtys = $_POST['line_qty'] ?? array();
+    $classes = $_POST['line_class'] ?? array();
+    $lnotes = $_POST['line_note'] ?? array();
+    $line_rows = array();
+    for ($i = 0; $i < count($item_names); $i++) {
+        $iname = trim($item_names[$i] ?? '');
+        if ($iname === '') { continue; }
+        $cls = trim($classes[$i] ?? '');
+        if (!in_array($cls, $classifications, true)) { $cls = $op_classification; }
+        $line_rows[] = array(
+            'item_id' => (isset($item_ids[$i]) && $item_ids[$i] !== '') ? intval($item_ids[$i]) : null,
+            'item_name' => $iname,
+            'qty' => (float)($qtys[$i] ?? 1),
+            'op_classification' => $cls,
+            'note' => trim($lnotes[$i] ?? ''),
+        );
+    }
     try {
+        $g = proc_gate(false);
         if ($is_editing) {
-            $sql = "UPDATE proc_request SET need_source=?, source_ref=?, op_classification=?, requesting_dept=?,
-                    equipment_id=?, project_id=?, priority=?, fin_approval_state=?, state=?, notes=?
-                    WHERE id=? AND company_id=? AND COALESCE(is_deleted,0)=0";
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'ssssiisssssii', $need_source, $source_ref, $op_classification, $requesting_dept,
-                $equipment_id, $project_id, $priority, $fin_state, $state, $notes, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+            $g->update('proc_request', $parent, array('id' => $id, 'is_deleted' => 0));
             $req_id = $id;
-            // حذف السطور القديمة (مقيّد بالشركة) ثم إعادة الإدراج
-            $d = mysqli_prepare($conn, "DELETE FROM proc_request_line WHERE request_id=? AND company_id=?");
-            mysqli_stmt_bind_param($d, 'ii', $req_id, $company_id);
-            mysqli_stmt_execute($d); mysqli_stmt_close($d);
         } else {
-            $code = proc_gen_code($conn, 'proc_request', 'PRC-REQ', $company_id);
-            $sql = "INSERT INTO proc_request (company_id, code, need_source, source_ref, op_classification, requesting_dept,
-                    equipment_id, project_id, priority, fin_approval_state, state, notes, created_by)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'isssssiissssi', $company_id, $code, $need_source, $source_ref, $op_classification,
-                $requesting_dept, $equipment_id, $project_id, $priority, $fin_state, $state, $notes, $current_user_id);
-            mysqli_stmt_execute($stmt);
-            $req_id = mysqli_insert_id($conn);
-            mysqli_stmt_close($stmt);
+            $parent['code'] = proc_gen_code($conn, 'proc_request', 'PRC-REQ', $company_id);
+            $parent['created_by'] = $current_user_id;
+            $req_id = $g->insert('proc_request', $parent);
         }
-
-        // إدراج السطور
-        $item_ids = $_POST['line_item_id'] ?? array();
-        $item_names = $_POST['line_item_name'] ?? array();
-        $qtys = $_POST['line_qty'] ?? array();
-        $classes = $_POST['line_class'] ?? array();
-        $lnotes = $_POST['line_note'] ?? array();
-        $ln = mysqli_prepare($conn, "INSERT INTO proc_request_line (company_id, request_id, item_id, item_name, qty, op_classification, note)
-                                     VALUES (?,?,?,?,?,?,?)");
-        for ($i = 0; $i < count($item_names); $i++) {
-            $iname = trim($item_names[$i] ?? '');
-            if ($iname === '') { continue; }
-            $iid = (isset($item_ids[$i]) && $item_ids[$i] !== '') ? intval($item_ids[$i]) : null;
-            $qty = (float)($qtys[$i] ?? 1);
-            $cls = trim($classes[$i] ?? '');
-            if (!in_array($cls, $classifications, true)) { $cls = $op_classification; }
-            $lnote = trim($lnotes[$i] ?? '');
-            mysqli_stmt_bind_param($ln, 'iissdss', $company_id, $req_id, $iid, $iname, $qty, $cls, $lnote);
-            mysqli_stmt_execute($ln);
-        }
-        mysqli_stmt_close($ln);
-        mysqli_commit($conn);
+        $g->replaceChildren('proc_request', $req_id, 'proc_request_line', 'request_id', $line_rows, 'request lines rewrite');
     } catch (\Throwable $e) {
-        mysqli_rollback($conn);
+        error_log('requests_proc save refused: ' . $e->getMessage());
         header("Location: requests_proc.php?msg=تعذّر+الحفظ+❌"); exit();
     }
     header("Location: requests_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الطلب+بنجاح+✅' : 'تمت+إضافة+الطلب+بنجاح+✅')); exit();
@@ -124,10 +113,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['need_source'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: requests_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "UPDATE proc_request SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    try {
+        proc_gate(false)->softDelete('proc_request', $delete_id);
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('requests_proc softDelete refused: ' . $e->getMessage());
     }
     header("Location: requests_proc.php?msg=تم+حذف+الطلب+بنجاح+✅"); exit();
 }
@@ -136,19 +125,11 @@ if (isset($_GET['delete_id'])) {
 $edit = null; $edit_lines = array();
 if (isset($_GET['edit_id']) && $can_edit) {
     $eid = intval($_GET['edit_id']);
-    $q = mysqli_prepare($conn, "SELECT * FROM proc_request WHERE id=? AND " . proc_scope('company_id', $is_super_admin, $company_id) . " AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    mysqli_stmt_bind_param($q, 'i', $eid);
-    mysqli_stmt_execute($q);
-    $r = mysqli_stmt_get_result($q);
-    $edit = $r ? mysqli_fetch_assoc($r) : null;
-    mysqli_stmt_close($q);
+    $edit = proc_gate($is_super_admin)->selectOne('proc_request', array('where' => array('id' => $eid)));
     if ($edit) {
-        $lq = mysqli_prepare($conn, "SELECT * FROM proc_request_line WHERE request_id=? ORDER BY id ASC");
-        mysqli_stmt_bind_param($lq, 'i', $eid);
-        mysqli_stmt_execute($lq);
-        $lr = mysqli_stmt_get_result($lq);
-        while ($lr && ($lrow = mysqli_fetch_assoc($lr))) { $edit_lines[] = $lrow; }
-        mysqli_stmt_close($lq);
+        $edit_lines = proc_gate($is_super_admin)->select('proc_request_line', array(
+            'where' => array('request_id' => $eid), 'orderBy' => 'id ASC',
+        ));
     }
 }
 
@@ -298,12 +279,26 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT r.id, r.code, r.need_source, r.op_classification, r.priority, r.state, r.fin_approval_state, r.created_at,
-                            (SELECT COUNT(*) FROM proc_request_line l WHERE l.request_id=r.id) AS line_count
-                            FROM proc_request r WHERE " . proc_scope('r.company_id', $is_super_admin, $company_id) . "
-                            AND COALESCE(r.is_deleted,0)=0 ORDER BY r.id DESC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    // ترطيب ثنائي: الطلبات ثم عدّ سطورها بجلبٍ واحد
+                    $gv = proc_gate($is_super_admin);
+                    $request_rows = $gv->select('proc_request', array(
+                        'columns' => array('id', 'code', 'need_source', 'op_classification', 'priority', 'state', 'fin_approval_state', 'created_at'),
+                        'orderBy' => 'id DESC',
+                    ));
+                    $line_counts = array();
+                    if (!empty($request_rows)) {
+                        $rids = array();
+                        foreach ($request_rows as $rr) { $rids[] = intval($rr['id']); }
+                        foreach ($gv->select('proc_request_line', array(
+                            'columns' => array('request_id'),
+                            'whereRaw' => 'request_id IN (' . implode(',', $rids) . ')',
+                        )) as $lr) {
+                            $lrid = intval($lr['request_id']);
+                            $line_counts[$lrid] = ($line_counts[$lrid] ?? 0) + 1;
+                        }
+                    }
+                    { foreach ($request_rows as $row) {
+                        $row['line_count'] = $line_counts[intval($row['id'])] ?? 0;
                         echo "<tr>";
                         echo "<td><div class='action-btns'>";
                         if ($can_edit) {
