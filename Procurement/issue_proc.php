@@ -38,10 +38,16 @@ $company_scope_sql = proc_scope('company_id', $is_super_admin, $company_id);
 $states     = proc_issue_states();
 $maint_types = array('وقائية', 'تصحيحية', 'رأسمالية');
 
-// خيارات أوامر الصيانة (قراءة فقط من mnt_order)
-$mo_scope = $is_super_admin ? '1=1' : ('company_id = ' . intval($company_id));
-$mnt_orders_sql = "SELECT id, CONCAT(COALESCE(NULLIF(code,''),CONCAT('#',id))) AS label
-                   FROM mnt_order WHERE $mo_scope AND COALESCE(is_deleted,0)=0 ORDER BY id DESC";
+// خيارات أوامر الصيانة (قراءة فقط من mnt_order) — عبر البوابة والتسمية في PHP
+$mnt_order_option_rows = proc_gate($is_super_admin)->select('mnt_order', array(
+    'columns' => array('id', 'code'),
+    'orderBy' => 'id DESC',
+));
+foreach ($mnt_order_option_rows as &$mor) {
+    $mc = (string) $mor['code'];
+    $mor['label'] = ($mc === '') ? ('#' . intval($mor['id'])) : $mc;
+}
+unset($mor);
 
 // ── حفظ (إضافة/تعديل) ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
@@ -82,80 +88,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
         $total += ((float)($qtys[$i] ?? 0)) * ((float)($costs[$i] ?? 0));
     }
 
-    mysqli_begin_transaction($conn);
+    // K9-M1: العملية النطاقية المترابطة كاملةً في معاملةٍ مُدارةٍ واحدة
+    // (runInTransaction — عقد البوابة §9): أب + مسح ثلاثيّ الأبناء عبر
+    // replaceChildren (تتبنّى المعاملة) + إدراج سطر←حركة←عهدة بترابط line_id
+    // الوليد — ذرّية مشتركة وحُرّاس أحياء في كل عملية.
+    // ملاحظة stock_move: المسح بref_id+الشركة (القناة أحادية عمود الأب)؛
+    // الثابت الكودي: هذه الشاشة هي الكاتب الوحيد للجدول وref_type دائمًا
+    // 'proc_issue' — عند ظهور كاتبٍ بنوعٍ آخر يلزم توسيع القناة بشرطٍ معلن.
+    $parent = array(
+        'warehouse_id' => $warehouse_id, 'holder_name' => $holder_name, 'issue_date' => $issue_date,
+        'equipment_id' => $equipment_id, 'project_id' => $project_id,
+        'maintenance_order_id' => $maintenance_order_id, 'maint_type' => $maint_type,
+        'contract_id' => $contract_id, 'supplier_id' => $supplier_id,
+        'total_cost' => $total, 'state' => $state, 'notes' => $notes,
+    );
     try {
-        if ($is_editing) {
-            $sql = "UPDATE proc_issue SET warehouse_id=?, holder_name=?, issue_date=?, equipment_id=?, project_id=?,
-                    maintenance_order_id=?, maint_type=?, contract_id=?, supplier_id=?, total_cost=?, state=?, notes=?
-                    WHERE id=? AND company_id=? AND COALESCE(is_deleted,0)=0";
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'issiiisiidssii', $warehouse_id, $holder_name, $issue_date, $equipment_id, $project_id,
-                $maintenance_order_id, $maint_type, $contract_id, $supplier_id, $total, $state, $notes, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-            $issue_id = $id;
-            // نظّف السطور والحركات والعهدة السابقة لهذا الصرف (مقيّد بالشركة)
-            foreach (array('proc_issue_line' => 'issue_id', 'proc_custody' => 'issue_id') as $tbl => $col) {
-                $d = mysqli_prepare($conn, "DELETE FROM $tbl WHERE $col=? AND company_id=?");
-                mysqli_stmt_bind_param($d, 'ii', $issue_id, $company_id);
-                mysqli_stmt_execute($d); mysqli_stmt_close($d);
+        proc_gate(false)->runInTransaction(function ($g) use (
+            $is_editing, $id, $parent, $company_id, $current_user_id, $conn,
+            $item_ids, $item_names, $qtys, $costs,
+            $warehouse_id, $holder_name, $issue_date, $equipment_id, $project_id, $maintenance_order_id
+        ) {
+            if ($is_editing) {
+                $g->update('proc_issue', $parent, array('id' => $id, 'is_deleted' => 0));
+                $issue_id = $id;
+            } else {
+                $parent['code'] = proc_gen_code($conn, 'proc_issue', 'PRC-ISS', $company_id);
+                $parent['created_by'] = $current_user_id;
+                $issue_id = $g->insert('proc_issue', $parent);
             }
-            $dm = mysqli_prepare($conn, "DELETE FROM proc_stock_move WHERE ref_type='proc_issue' AND ref_id=? AND company_id=?");
-            mysqli_stmt_bind_param($dm, 'ii', $issue_id, $company_id);
-            mysqli_stmt_execute($dm); mysqli_stmt_close($dm);
-        } else {
-            $code = proc_gen_code($conn, 'proc_issue', 'PRC-ISS', $company_id);
-            $sql = "INSERT INTO proc_issue (company_id, code, warehouse_id, holder_name, issue_date, equipment_id, project_id,
-                    maintenance_order_id, maint_type, contract_id, supplier_id, total_cost, state, notes, created_by)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'isissiiisiidssi', $company_id, $code, $warehouse_id, $holder_name, $issue_date,
-                $equipment_id, $project_id, $maintenance_order_id, $maint_type, $contract_id, $supplier_id, $total, $state,
-                $notes, $current_user_id);
-            mysqli_stmt_execute($stmt);
-            $issue_id = mysqli_insert_id($conn);
-            mysqli_stmt_close($stmt);
-        }
+            // مسح الأبناء الثلاثة (تتبنّى معاملة المدير — لا commit ضمني)
+            $g->replaceChildren('proc_issue', $issue_id, 'proc_issue_line', 'issue_id', array(), 'issue lines clear');
+            $g->replaceChildren('proc_issue', $issue_id, 'proc_custody', 'issue_id', array(), 'issue custody clear');
+            $g->replaceChildren('proc_issue', $issue_id, 'proc_stock_move', 'ref_id', array(), 'issue moves clear');
 
-        // أدرج السطور + حركة مخزون صرف + عهدة صرف لكل سطر
-        $ln = mysqli_prepare($conn, "INSERT INTO proc_issue_line (company_id, issue_id, item_id, item_name, qty, unit_cost, subtotal)
-                                     VALUES (?,?,?,?,?,?,?)");
-        $mv = mysqli_prepare($conn, "INSERT INTO proc_stock_move (company_id, item_id, warehouse_id, move_type, qty, ref_type, ref_id, note, created_by)
-                                     VALUES (?,?,?,'صرف',?,'proc_issue',?,?,?)");
-        $cu = mysqli_prepare($conn, "INSERT INTO proc_custody (company_id, issue_id, issue_line_id, item_id, item_name, holder_name,
-                                     transfer_date, equipment_id, project_id, maintenance_order_id, qty_issued, qty_returned, qty_consumed, state, created_by)
-                                     VALUES (?,?,?,?,?,?,?,?,?,?,?,0,?,'مصروفة',?)");
-        for ($i = 0; $i < count($item_names); $i++) {
-            $iname = trim($item_names[$i] ?? '');
-            if ($iname === '') { continue; }
-            $iid = (isset($item_ids[$i]) && $item_ids[$i] !== '') ? intval($item_ids[$i]) : null;
-            $qty = (float)($qtys[$i] ?? 1);
-            $cost = (float)($costs[$i] ?? 0);
-            $sub = $qty * $cost;
+            // سطر ← حركة (إن ارتبط بصنف) ← عهدة بline_id الوليد
+            for ($i = 0; $i < count($item_names); $i++) {
+                $iname = trim($item_names[$i] ?? '');
+                if ($iname === '') { continue; }
+                $iid = (isset($item_ids[$i]) && $item_ids[$i] !== '') ? intval($item_ids[$i]) : null;
+                $qty = (float)($qtys[$i] ?? 1);
+                $cost = (float)($costs[$i] ?? 0);
 
-            mysqli_stmt_bind_param($ln, 'iissddd', $company_id, $issue_id, $iid, $iname, $qty, $cost, $sub);
-            mysqli_stmt_execute($ln);
-            $line_id = mysqli_insert_id($conn);
-
-            // حركة مخزون صرف (فقط لو ارتبط السطر بصنف كتالوج ومخزن)
-            if ($iid !== null) {
-                $mv_note = 'صرف ' . $iname;
-                // ترتيب الربط: company_id, item_id, warehouse_id, qty, ref_id, note, created_by
-                mysqli_stmt_bind_param($mv, 'iiidisi', $company_id, $iid, $warehouse_id, $qty, $issue_id, $mv_note, $current_user_id);
-                mysqli_stmt_execute($mv);
+                $line_id = $g->insert('proc_issue_line', array(
+                    'issue_id' => $issue_id, 'item_id' => $iid, 'item_name' => $iname,
+                    'qty' => $qty, 'unit_cost' => $cost, 'subtotal' => $qty * $cost,
+                ));
+                if ($iid !== null) {
+                    $g->insert('proc_stock_move', array(
+                        'item_id' => $iid, 'warehouse_id' => $warehouse_id,
+                        'move_type' => 'صرف', 'qty' => $qty,
+                        'ref_type' => 'proc_issue', 'ref_id' => $issue_id,
+                        'note' => 'صرف ' . $iname, 'created_by' => $current_user_id,
+                    ));
+                }
+                $g->insert('proc_custody', array(
+                    'issue_id' => $issue_id, 'issue_line_id' => $line_id,
+                    'item_id' => $iid, 'item_name' => $iname, 'holder_name' => $holder_name,
+                    'transfer_date' => $issue_date, 'equipment_id' => $equipment_id,
+                    'project_id' => $project_id, 'maintenance_order_id' => $maintenance_order_id,
+                    'qty_issued' => $qty, 'qty_returned' => 0, 'qty_consumed' => $qty,
+                    'state' => 'مصروفة', 'created_by' => $current_user_id,
+                ));
             }
-
-            // عهدة صرف تحمل الأبعاد
-            $qc = $qty; // المستهلك مبدئياً = المصروف (يُعدّل عند الإرجاع)
-            mysqli_stmt_bind_param($cu, 'iiiisssiiiddi', $company_id, $issue_id, $line_id, $iid, $iname, $holder_name,
-                $issue_date, $equipment_id, $project_id, $maintenance_order_id, $qty, $qc, $current_user_id);
-            mysqli_stmt_execute($cu);
-        }
-        mysqli_stmt_close($ln);
-        mysqli_stmt_close($mv);
-        mysqli_stmt_close($cu);
-        mysqli_commit($conn);
+            return $issue_id;
+        }, 'issue save ' . ($is_editing ? 'edit#' . $id : 'new'));
     } catch (\Throwable $e) {
-        mysqli_rollback($conn);
+        error_log('issue_proc save rolled back: ' . $e->getMessage());
         header("Location: issue_proc.php?msg=تعذّر+الحفظ+❌"); exit();
     }
     header("Location: issue_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الصرف+بنجاح+✅' : 'تم+الصرف+بنجاح+✅')); exit();
@@ -165,21 +163,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: issue_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    mysqli_begin_transaction($conn);
     try {
-        $sql = "UPDATE proc_issue SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?";
-        $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        // اعكس أثر المخزون والعهدة لهذا الصرف
-        $dm = mysqli_prepare($conn, "DELETE FROM proc_stock_move WHERE ref_type='proc_issue' AND ref_id=? AND company_id=?");
-        mysqli_stmt_bind_param($dm, 'ii', $delete_id, $company_id);
-        mysqli_stmt_execute($dm); mysqli_stmt_close($dm);
-        $dc = mysqli_prepare($conn, "DELETE FROM proc_custody WHERE issue_id=? AND company_id=?");
-        mysqli_stmt_bind_param($dc, 'ii', $delete_id, $company_id);
-        mysqli_stmt_execute($dc); mysqli_stmt_close($dc);
-        mysqli_commit($conn);
-    } catch (\Throwable $e) { mysqli_rollback($conn); }
+        proc_gate(false)->runInTransaction(function ($g) use ($delete_id) {
+            $g->softDelete('proc_issue', $delete_id);
+            // اعكس أثر المخزون والعهدة لهذا الصرف — ذرّيًا مع الحذف الناعم
+            $g->replaceChildren('proc_issue', $delete_id, 'proc_stock_move', 'ref_id', array(), 'issue delete: moves reversal');
+            $g->replaceChildren('proc_issue', $delete_id, 'proc_custody', 'issue_id', array(), 'issue delete: custody reversal');
+        }, 'issue delete#' . $delete_id);
+    } catch (\Throwable $e) {
+        error_log('issue_proc delete rolled back: ' . $e->getMessage());
+    }
     header("Location: issue_proc.php?msg=تم+حذف+الصرف+بنجاح+✅"); exit();
 }
 
@@ -187,19 +180,11 @@ if (isset($_GET['delete_id'])) {
 $edit = null; $edit_lines = array();
 if (isset($_GET['edit_id']) && $can_edit) {
     $eid = intval($_GET['edit_id']);
-    $q = mysqli_prepare($conn, "SELECT * FROM proc_issue WHERE id=? AND " . proc_scope('company_id', $is_super_admin, $company_id) . " AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    mysqli_stmt_bind_param($q, 'i', $eid);
-    mysqli_stmt_execute($q);
-    $r = mysqli_stmt_get_result($q);
-    $edit = $r ? mysqli_fetch_assoc($r) : null;
-    mysqli_stmt_close($q);
+    $edit = proc_gate($is_super_admin)->selectOne('proc_issue', array('where' => array('id' => $eid)));
     if ($edit) {
-        $lq = mysqli_prepare($conn, "SELECT * FROM proc_issue_line WHERE issue_id=? ORDER BY id ASC");
-        mysqli_stmt_bind_param($lq, 'i', $eid);
-        mysqli_stmt_execute($lq);
-        $lr = mysqli_stmt_get_result($lq);
-        while ($lr && ($lrow = mysqli_fetch_assoc($lr))) { $edit_lines[] = $lrow; }
-        mysqli_stmt_close($lq);
+        $edit_lines = proc_gate($is_super_admin)->select('proc_issue_line', array(
+            'where' => array('issue_id' => $eid), 'orderBy' => 'id ASC',
+        ));
     }
 }
 
@@ -267,7 +252,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                     </div>
                     <div class="form-group">
                         <label>أمر الصيانة <small>(بُعد تكلفة)</small></label>
-                        <select name="maintenance_order_id"><?php echo proc_options_from_query($conn, $mnt_orders_sql, $edit ? intval($edit['maintenance_order_id']) : 0, '— بلا أمر صيانة —'); ?></select>
+                        <select name="maintenance_order_id"><?php echo proc_options_from_rows($mnt_order_option_rows, $edit ? intval($edit['maintenance_order_id']) : 0, '— بلا أمر صيانة —'); ?></select>
                     </div>
                     <div class="form-group">
                         <label>نوع الصيانة</label>
@@ -337,14 +322,39 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT i.id, i.code, i.holder_name, i.issue_date, i.maint_type, i.total_cost, i.state, i.equipment_id,
-                            e.code AS equip_code, e.name AS equip_name,
-                            (SELECT COUNT(*) FROM proc_issue_line l WHERE l.issue_id=i.id) AS line_count
-                            FROM proc_issue i LEFT JOIN equipments e ON e.id=i.equipment_id
-                            WHERE " . proc_scope('i.company_id', $is_super_admin, $company_id) . " AND COALESCE(i.is_deleted,0)=0
-                            ORDER BY i.id DESC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    // ترطيب ثنائي: الصرفيات ثم بيانات المعدات وعدّ السطور بجلبٍ واحد لكلٍّ
+                    $gv = proc_gate($is_super_admin);
+                    $issue_rows = $gv->select('proc_issue', array(
+                        'columns' => array('id', 'code', 'holder_name', 'issue_date', 'maint_type', 'total_cost', 'state', 'equipment_id'),
+                        'orderBy' => 'id DESC',
+                    ));
+                    $eq_map = array(); $line_counts = array();
+                    if (!empty($issue_rows)) {
+                        $eids = array(); $iids = array();
+                        foreach ($issue_rows as $ir) {
+                            if ($ir['equipment_id'] !== null) { $eids[intval($ir['equipment_id'])] = true; }
+                            $iids[] = intval($ir['id']);
+                        }
+                        if (!empty($eids)) {
+                            foreach ($gv->select('equipments', array(
+                                'columns' => array('id', 'code', 'name'),
+                                'whereRaw' => 'id IN (' . implode(',', array_keys($eids)) . ')',
+                            )) as $er) { $eq_map[intval($er['id'])] = $er; }
+                        }
+                        foreach ($gv->select('proc_issue_line', array(
+                            'columns' => array('issue_id'),
+                            'whereRaw' => 'issue_id IN (' . implode(',', $iids) . ')',
+                        )) as $lr) {
+                            $liid = intval($lr['issue_id']);
+                            $line_counts[$liid] = ($line_counts[$liid] ?? 0) + 1;
+                        }
+                    }
+                    { foreach ($issue_rows as $row) {
+                        $eq = ($row['equipment_id'] !== null && isset($eq_map[intval($row['equipment_id'])]))
+                            ? $eq_map[intval($row['equipment_id'])] : null;
+                        $row['equip_code'] = $eq ? $eq['code'] : null;
+                        $row['equip_name'] = $eq ? $eq['name'] : null;
+                        $row['line_count'] = $line_counts[intval($row['id'])] ?? 0;
                         $equip = trim((string)($row['equip_code'] ?? '') . ' ' . (string)($row['equip_name'] ?? ''));
                         echo "<tr>";
                         echo "<td><div class='action-btns'>";
