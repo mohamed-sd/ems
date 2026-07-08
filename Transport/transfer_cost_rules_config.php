@@ -55,33 +55,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['movement_type'])) {
     }
     if ($duration_operator === 'any') { $duration_threshold_days = null; }
 
-    if ($is_editing) {
-        $sql = "UPDATE transfer_cost_rules SET movement_type=?, duration_operator=?, duration_threshold_days=?, default_bearer=?, basis_note=?, active=?
-                WHERE id=? AND company_id=?";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'ssisiii', $movement_type, $duration_operator, $duration_threshold_days, $default_bearer, $basis_note, $active, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    $data = array(
+        'movement_type' => $movement_type, 'duration_operator' => $duration_operator,
+        'duration_threshold_days' => $duration_threshold_days, 'default_bearer' => $default_bearer,
+        'basis_note' => $basis_note, 'active' => $active,
+    );
+    try {
+        if ($is_editing) {
+            trs_gate(false)->update('transfer_cost_rules', $data, array('id' => $id));
+            header("Location: transfer_cost_rules_config.php?msg=تم+تعديل+القاعدة+بنجاح+✅"); exit();
+        } else {
+            trs_gate(false)->insert('transfer_cost_rules', $data);
+            header("Location: transfer_cost_rules_config.php?msg=تمت+إضافة+القاعدة+بنجاح+✅"); exit();
         }
-        header("Location: transfer_cost_rules_config.php?msg=تم+تعديل+القاعدة+بنجاح+✅"); exit();
-    } else {
-        $sql = "INSERT INTO transfer_cost_rules (company_id, movement_type, duration_operator, duration_threshold_days, default_bearer, basis_note, active)
-                VALUES (?,?,?,?,?,?,?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'isssssi', $company_id, $movement_type, $duration_operator, $duration_threshold_days, $default_bearer, $basis_note, $active);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        }
-        header("Location: transfer_cost_rules_config.php?msg=تمت+إضافة+القاعدة+بنجاح+✅"); exit();
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('cost_rules save refused: ' . $e->getMessage());
+        header("Location: transfer_cost_rules_config.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
 }
 
-// ── حذف فعلي ──
+// ── حذف — سياسة «الأرشفة لا الحذف» (نفس دلالة types الموثقة) ──
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: transfer_cost_rules_config.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "DELETE FROM transfer_cost_rules WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'ii', $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    try {
+        trs_gate(false)->softDelete('transfer_cost_rules', $delete_id);
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('cost_rules softDelete refused: ' . $e->getMessage());
+        header("Location: transfer_cost_rules_config.php?msg=تعذّر+الحذف+❌"); exit();
     }
     header("Location: transfer_cost_rules_config.php?msg=تم+حذف+القاعدة+بنجاح+✅"); exit();
 }
@@ -169,11 +170,11 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $scope = $is_super_admin ? '1=1' : ('company_id = ' . intval($company_id));
-                    $sql = "SELECT id, movement_type, duration_operator, duration_threshold_days, default_bearer, basis_note, active
-                            FROM transfer_cost_rules WHERE $scope ORDER BY movement_type ASC, duration_operator ASC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    $rule_rows = trs_gate($is_super_admin)->select('transfer_cost_rules', array(
+                        'columns' => array('id', 'movement_type', 'duration_operator', 'duration_threshold_days', 'default_bearer', 'basis_note', 'active'),
+                        'orderBy' => 'movement_type ASC, duration_operator ASC',
+                    ));
+                    { foreach ($rule_rows as $row) {
                         $mv_ar = trs_label($movement_types, $row['movement_type']);
                         $op_ar = trs_label($operators, $row['duration_operator']);
                         $bearer_ar = trs_label($bearers, $row['default_bearer']);
