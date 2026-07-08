@@ -25,11 +25,19 @@ if (!$IS_CLI) {
     header('Content-Type: text/plain; charset=UTF-8');
 }
 
+// K9-M2b: القناة الخامسة forSystem (عقد §11) — حلقة شركاتٍ ببوابةٍ معزولةٍ لكل دورة.
+// التفويض: CLI أو مفتاح cron المتحقق أعلاه (hash_equals ضد مفتاح .env غير الفارغ).
+require_once __DIR__ . '/../app/Core/TenantGateException.php';
+require_once __DIR__ . '/../app/Core/TenantRegistry.php';
+require_once __DIR__ . '/../app/Core/TenantContext.php';
+require_once __DIR__ . '/../app/Core/TenantDb.php';
+
 $today = date('Y-m-d');
 $MGR_ROLE = 23;      // مدير النقل والترحيل (الجهة المُخطَرة الأساسية حاليًّا)
 $n_delayed = $n_noarr = $n_permit = $n_sixty = 0;
+$SYS_AUTH = true;    // بلغنا هذه النقطة = CLI أو المفتاح تحقق (الحارس أعلاه fail-closed)
 
-/** يسجّل حدث تنبيه على الأمر مرّة واحدة يوميًّا (يتبع نفس مفتاح المنع). */
+/** يسجّل حدث تنبيه على الأمر مرّة واحدة يوميًّا (عبر بوابة الدورة المحقونة). */
 function trs_alert(&$counter, $conn, $cid, $order_id, $type, $title, $body, $link, $dedupe) {
     if (trs_notify($conn, $cid, $type, $title, $body, $order_id, $GLOBALS['MGR_ROLE'], $link, $dedupe)) {
         $counter++;
@@ -37,60 +45,94 @@ function trs_alert(&$counter, $conn, $cid, $order_id, $type, $title, $body, $lin
     }
 }
 
-// 1) تأخّر الرحلة
-$r = mysqli_query($conn, "SELECT id, company_id, order_no, planned_date FROM transfer_orders
-    WHERE planned_date IS NOT NULL AND planned_date < '$today' AND stage NOT IN('arrived','closed','cancelled')");
-if ($r) { while ($o = mysqli_fetch_assoc($r)) {
-    $cid = (int)$o['company_id']; $oid = (int)$o['id'];
-    trs_alert($n_delayed, $conn, $cid, $oid, 'delayed',
-        'رحلة متأخّرة: ' . $o['order_no'],
-        'تجاوزت التاريخ المخطط (' . $o['planned_date'] . ')',
-        'transfer_order_form.php?id=' . $oid,
-        'delayed:' . $oid . ':' . $today);
-} }
+// تعداد الشركات ذات الأوامر: سياق نظامٍ super + forAllTenants المسجَّلة (لا خام)
+$enumGate = new \App\Core\TenantDb($conn,
+    \App\Core\TenantContext::forSystem(0, 0, defined('EMS_ROLE_SUPER_ADMIN') ? EMS_ROLE_SUPER_ADMIN : '-1', $SYS_AUTH),
+    false, 'enforce');
+$company_ids = array();
+foreach ($enumGate->forAllTenants('transport cron company enumeration')
+             ->select('transfer_orders', array('columns' => array('company_id'), 'includeDeleted' => true)) as $row) {
+    $company_ids[intval($row['company_id'])] = true;
+}
 
-// 2) عدم تأكيد الوصول (مضى على المغادرة أكثر من يومين وما زالت قيد الرحلة)
-$r = mysqli_query($conn, "SELECT id, company_id, order_no, departure_datetime FROM transfer_orders
-    WHERE stage='in_transit' AND departure_datetime IS NOT NULL AND departure_datetime < (NOW() - INTERVAL 2 DAY)");
-if ($r) { while ($o = mysqli_fetch_assoc($r)) {
-    $cid = (int)$o['company_id']; $oid = (int)$o['id'];
-    trs_alert($n_noarr, $conn, $cid, $oid, 'no_arrival',
-        'وصول غير مؤكَّد: ' . $o['order_no'],
-        'مغادرة منذ ' . $o['departure_datetime'] . ' دون تأكيد وصول',
-        'transfer_order_form.php?id=' . $oid,
-        'no_arrival:' . $oid . ':' . $today);
-} }
+foreach (array_keys($company_ids) as $cid) {
+    // بوابة دورةٍ معزولة بشركةٍ واحدة صريحة — تُحقن في helpers الوحدة
+    $cycleGate = new \App\Core\TenantDb($conn,
+        \App\Core\TenantContext::forSystem($cid, 0, '', $SYS_AUTH), false, 'enforce');
+    trs_gate_override($cycleGate);
 
-// 3) قرب انتهاء التصريح (خلال 7 أيام)
-$r = mysqli_query($conn, "SELECT pm.id AS pid, pm.order_id, pm.company_id, pm.permit_type, pm.expiry_date, o.order_no
-    FROM transfer_permits pm JOIN transfer_orders o ON o.id = pm.order_id
-    WHERE pm.expiry_date IS NOT NULL AND pm.state <> 'expired'
-      AND pm.expiry_date BETWEEN '$today' AND DATE_ADD('$today', INTERVAL 7 DAY)
-      AND o.stage NOT IN('closed','cancelled')");
-if ($r) { while ($p = mysqli_fetch_assoc($r)) {
-    $cid = (int)$p['company_id']; $oid = (int)$p['order_id'];
-    $ptypes = trs_permit_types();
-    trs_alert($n_permit, $conn, $cid, $oid, 'permit_expiry',
-        'تصريح يقارب الانتهاء: ' . $p['order_no'],
-        trs_label($ptypes, $p['permit_type']) . ' — ينتهي في ' . $p['expiry_date'],
-        'transfer_order_form.php?id=' . $oid . '&tab=permits',
-        'permit_expiry:' . (int)$p['pid'] . ':' . $today);
-} }
-
-// 4) عتبة الستين يومًا — أوامر مفتوحة ذات مشروعٍ بلغت مدته 60 يومًا فأكثر
-$r = mysqli_query($conn, "SELECT id, company_id, order_no, project_id, direction FROM transfer_orders
-    WHERE project_id IS NOT NULL AND stage NOT IN('closed','cancelled')");
-if ($r) { while ($o = mysqli_fetch_assoc($r)) {
-    $cid = (int)$o['company_id']; $oid = (int)$o['id'];
-    $pd = trs_project_days($conn, $cid, (int)$o['project_id']);
-    if ($pd !== null && $pd >= 60) {
-        trs_alert($n_sixty, $conn, $cid, $oid, 'sixty_day',
-            'بلوغ عتبة الستين يومًا: ' . $o['order_no'],
-            'مدة المشروع ' . $pd . ' يوم — راجع متحمِّل العودة (تحوّل محتمل إلى الشركة)',
+    // 1) تأخّر الرحلة
+    foreach ($cycleGate->select('transfer_orders', array(
+        'columns' => array('id', 'order_no', 'planned_date'),
+        'whereRaw' => "planned_date IS NOT NULL AND planned_date < ? AND stage NOT IN ('arrived','closed','cancelled')",
+        'params' => array($today),
+    )) as $o) {
+        $oid = (int)$o['id'];
+        trs_alert($n_delayed, $conn, $cid, $oid, 'delayed',
+            'رحلة متأخّرة: ' . $o['order_no'],
+            'تجاوزت التاريخ المخطط (' . $o['planned_date'] . ')',
             'transfer_order_form.php?id=' . $oid,
-            'sixty_day:' . $oid . ':' . $today);
+            'delayed:' . $oid . ':' . $today);
     }
-} }
+
+    // 2) عدم تأكيد الوصول (مغادرة > يومين وما زالت قيد الرحلة)
+    foreach ($cycleGate->select('transfer_orders', array(
+        'columns' => array('id', 'order_no', 'departure_datetime'),
+        'whereRaw' => "stage='in_transit' AND departure_datetime IS NOT NULL AND departure_datetime < (NOW() - INTERVAL 2 DAY)",
+    )) as $o) {
+        $oid = (int)$o['id'];
+        trs_alert($n_noarr, $conn, $cid, $oid, 'no_arrival',
+            'وصول غير مؤكَّد: ' . $o['order_no'],
+            'مغادرة منذ ' . $o['departure_datetime'] . ' دون تأكيد وصول',
+            'transfer_order_form.php?id=' . $oid,
+            'no_arrival:' . $oid . ':' . $today);
+    }
+
+    // 3) قرب انتهاء التصريح (خلال 7 أيام) — ترطيبٌ ثنائي بدل JOIN
+    $permits = $cycleGate->select('transfer_permits', array(
+        'columns' => array('id', 'order_id', 'permit_type', 'expiry_date'),
+        'whereRaw' => "expiry_date IS NOT NULL AND state <> 'expired' AND expiry_date BETWEEN ? AND DATE_ADD(?, INTERVAL 7 DAY)",
+        'params' => array($today, $today),
+    ));
+    if (!empty($permits)) {
+        $ord_ids = array();
+        foreach ($permits as $p) { $ord_ids[intval($p['order_id'])] = true; }
+        $orders_map = array();
+        foreach ($cycleGate->select('transfer_orders', array(
+            'columns' => array('id', 'order_no', 'stage'),
+            'whereRaw' => 'id IN (' . implode(',', array_map('intval', array_keys($ord_ids))) . ')',
+        )) as $om) { $orders_map[intval($om['id'])] = $om; }
+        $ptypes = trs_permit_types();
+        foreach ($permits as $p) {
+            $oid = (int)$p['order_id'];
+            $om = isset($orders_map[$oid]) ? $orders_map[$oid] : null;
+            if ($om === null || in_array($om['stage'], array('closed', 'cancelled'), true)) { continue; }
+            trs_alert($n_permit, $conn, $cid, $oid, 'permit_expiry',
+                'تصريح يقارب الانتهاء: ' . $om['order_no'],
+                trs_label($ptypes, $p['permit_type']) . ' — ينتهي في ' . $p['expiry_date'],
+                'transfer_order_form.php?id=' . $oid . '&tab=permits',
+                'permit_expiry:' . (int)$p['id'] . ':' . $today);
+        }
+    }
+
+    // 4) عتبة الستين يومًا
+    foreach ($cycleGate->select('transfer_orders', array(
+        'columns' => array('id', 'order_no', 'project_id'),
+        'whereRaw' => "project_id IS NOT NULL AND stage NOT IN ('closed','cancelled')",
+    )) as $o) {
+        $oid = (int)$o['id'];
+        $pd = trs_project_days($conn, $cid, (int)$o['project_id']);
+        if ($pd !== null && $pd >= 60) {
+            trs_alert($n_sixty, $conn, $cid, $oid, 'sixty_day',
+                'بلوغ عتبة الستين يومًا: ' . $o['order_no'],
+                'مدة المشروع ' . $pd . ' يوم — راجع متحمِّل العودة (تحوّل محتمل إلى الشركة)',
+                'transfer_order_form.php?id=' . $oid,
+                'sixty_day:' . $oid . ':' . $today);
+        }
+    }
+
+    trs_gate_override(null); // نهاية الدورة — لا بوابة معلّقة بين الشركات
+}
 
 $out = "[transport-cron $today] delayed=$n_delayed no_arrival=$n_noarr permit_expiry=$n_permit sixty_day=$n_sixty\n";
 echo $out;

@@ -48,11 +48,24 @@ if (!function_exists('trs_scope')) {
 
 
 if (!function_exists("trs_gate")) {
-    /** K9-M2b: بوابة العزل للوحدة — سياق الجلسة؛ is_super عبر forAllTenants المسجلة. */
+    /**
+     * K9-M2b: بوابة العزل للوحدة — سياق الجلسة افتراضًا؛ is_super عبر
+     * forAllTenants المسجلة. وفي سياق النظام (cron): الدورة تركّب بوابتها
+     * forSystem($cid) وتحقنها عبر trs_gate_override فتتبعها كل الدوال هنا.
+     */
     function trs_gate($is_super = false)
     {
+        if (isset($GLOBALS['__trs_gate_override']) && $GLOBALS['__trs_gate_override'] instanceof \App\Core\TenantDb) {
+            return $GLOBALS['__trs_gate_override'];
+        }
         $gate = ems_tenant_db();
         return $is_super ? $gate->forAllTenants("trs helpers super view") : $gate;
+    }
+
+    /** حقن بوابة دورة النظام (null = العودة لسياق الجلسة). */
+    function trs_gate_override($gate)
+    {
+        $GLOBALS['__trs_gate_override'] = $gate;
     }
 }
 if (!function_exists('trs_gen_code')) {
@@ -463,19 +476,25 @@ if (!function_exists('trs_notify')) {
      * لا يكتب في أي جدول إشعارات قائم (fin_*) — صفر تداخل.
      */
     function trs_notify($conn, $company_id, $notif_type, $title, $body, $order_id, $target_role, $link_url, $dedupe_key) {
-        $sql = "INSERT IGNORE INTO trs_notifications
-                (company_id, order_id, notif_type, target_role, title, body, link_url, dedupe_key)
-                VALUES (?,?,?,?,?,?,?,?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            $oid = ($order_id === null) ? null : intval($order_id);
-            $trg = ($target_role === null) ? null : intval($target_role);
-            mysqli_stmt_bind_param($stmt, 'iisissss', $company_id, $oid, $notif_type, $trg, $title, $body, $link_url, $dedupe_key);
-            mysqli_stmt_execute($stmt);
-            $ok = mysqli_stmt_affected_rows($stmt) > 0;
-            mysqli_stmt_close($stmt);
-            return $ok;
+        // K9-M2b: عبر بوابة السياق الحالي (في الـcron = بوابة forSystem للدورة).
+        // dedupe بالتقاط التكرار قناتيًا (ترجيح المستخدم — نمط idempotency في K3،
+        // لا سباق «عدّ قبل إدراج»): dedupe_key فريد ⇒ التكرار = false كسلوك IGNORE.
+        try {
+            trs_gate(false)->insert('trs_notifications', array(
+                'order_id' => ($order_id === null) ? null : intval($order_id),
+                'notif_type' => $notif_type,
+                'target_role' => ($target_role === null) ? null : intval($target_role),
+                'title' => $title, 'body' => $body,
+                'link_url' => $link_url, 'dedupe_key' => $dedupe_key,
+            ));
+            return true;
+        } catch (\App\Core\TenantGateException $e) {
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                return false; // مكرر اليوم — دلالة INSERT IGNORE الأصلية حرفيًا
+            }
+            error_log('trs_notify refused: ' . $e->getMessage());
+            return false;
         }
-        return false;
     }
 }
 
