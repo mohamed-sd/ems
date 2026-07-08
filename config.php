@@ -165,17 +165,36 @@ if (function_exists('mysqli_report')) {
     mysqli_report(MYSQLI_REPORT_OFF);
 }
 
-// بيانات الاتصال من .env حصريًا (ADR-04) — لا تُكتب أي قيمة اتصالٍ هنا.
-// fallback مؤقت لقيم التطوير المحلية: غياب .env لا يكسر البيئة المحلية،
-// ويُسجَّل تحذير حتى تُنشأ من القالب .env.example (على الإنتاج .env إلزامي).
-if (!ems_env_loaded()) {
-    error_log('EMS WARNING [ADR-04]: .env missing — running on local dev fallback credentials. Create it from .env.example');
+// بيانات الاتصال من .env حصريًا (ADR-04 · P0-4 2026-07-08): لا قيمة اتصالٍ في
+// الكود إطلاقًا، ولا fallback صامت — أُزيل root كهدفٍ افتراضيٍّ نهائيًّا (السقوط
+// الصامت إليه كان يُلغي مكاسب المرحلة 0 كلها عند أي خللٍ في تحميل .env).
+// غياب/تلف .env أو نقص مفاتيح الاتصال = فشلٌ فوريٌّ واضح (Fail-Fast) في كل
+// مسارات الدخول: الويب (500 + صفحة عامة) والـ CLI (STDERR + exit 1).
+if (!function_exists('ems_db_config_fail')) {
+    function ems_db_config_fail($reason)
+    {
+        error_log('EMS FATAL [ADR-04/P0-4]: ' . $reason);
+        if (PHP_SAPI === 'cli') {
+            fwrite(STDERR, "[EMS] FATAL [ADR-04/P0-4]: " . $reason . "\n");
+            exit(1);
+        }
+        http_response_code(500);
+        die('<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>خطأ في إعدادات النظام</title><style>body{font-family:Cairo,Arial;text-align:center;padding:50px;background:#f5f5f5}.error{background:#fff;padding:40px;border-radius:10px;max-width:500px;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.1)}h1{color:#dc2626}</style></head><body><div class="error"><h1>⚠️ خطأ في إعدادات النظام</h1><p>تعذّر تحميل إعدادات الاتصال. يرجى إبلاغ مسؤول النظام.</p></div></body></html>');
+    }
 }
 
-$host = ems_env('DB_HOST', 'localhost');
-$user = ems_env('DB_USER', 'root');
-$pass = ems_env('DB_PASS', '');
-$db   = ems_env('DB_NAME', 'equipation_manage');
+if (!ems_env_loaded()) {
+    ems_db_config_fail('.env مفقود أو غير مقروء — أنشئه من القالب .env.example (لا fallback بعد P0-4)');
+}
+
+$host = ems_env('DB_HOST');
+$user = ems_env('DB_USER');
+$pass = ems_env('DB_PASS'); // يجوز أن تكون فارغةً صراحةً (خيار مشغّلٍ مقصود) — لا افتراض كود
+$db   = ems_env('DB_NAME');
+
+if ($host === null || $host === '' || $user === null || $user === '' || $db === null || $db === '' || $pass === null) {
+    ems_db_config_fail('مفاتيح الاتصال ناقصة في .env — المطلوب: DB_HOST وDB_USER وDB_PASS (ولو فارغة) وDB_NAME');
+}
 
 // Establish Secure Connection
 $conn = new mysqli($host, $user, $pass, $db);
@@ -471,7 +490,10 @@ function db_table_has_column($conn, $tableName, $columnName) {
 // يُقلَب إلى true بعد أسبوع مراقبةٍ خالٍ من RUNTIME_DDL_EXECUTED.
 // ═══════════════════════════════════════════════════════════════════════════
 if (!defined('EMS_DDL_FREEZE')) {
-    define('EMS_DDL_FREEZE', false);
+    // ADR-03 · المرحلة 0 (قُلب 2026-07-08): يُقرأ من .env قابلًا للتراجع — الافتراض false
+    // (fail-safe: لا حجب إن غاب المفتاح/الملف). القلب إلى true بعد إثبات تحييد الـ21
+    // (تدقيق ساكن: كل نداء no-op على المخطّط الحالي). Rollback: EMS_DDL_FREEZE=false في .env.
+    define('EMS_DDL_FREEZE', ems_env('EMS_DDL_FREEZE', 'false') === 'true');
 }
 
 /**

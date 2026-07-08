@@ -16,7 +16,13 @@
  * ═══════════════════════════════════════════════════════════════════════════
  */
 mysqli_report(MYSQLI_REPORT_OFF);
-$DB = ['localhost','root','','equipation_manage'];
+// P0-4 (ADR-04): أُزيل root المضمّن — الاعتماد من .env حصرًا (زوج المُرحِّل أولًا؛
+// هذا سكربت DDL تاريخي مطبَّق 2026-06-27، تعديل الاتصال فقط دون مساس بمنطقه).
+require_once dirname(__DIR__, 2) . '/includes/env.php';
+$mu = ems_env('DB_MIGRATOR_USER'); $mp = ems_env('DB_MIGRATOR_PASS');
+if ($mu === null || $mu === '' || $mp === null || $mp === '') { die("FATAL [P0-4]: DB_MIGRATOR_USER/PASS مطلوبان في .env لتشغيل سكربت DDL.\n"); }
+$DB = [ems_env('DB_HOST'), $mu, $mp, ems_env('DB_NAME')];
+if ($DB[0] === null || $DB[0] === '' || $DB[3] === null || $DB[3] === '') { die("FATAL [P0-4]: DB_HOST/DB_NAME مطلوبان في .env.\n"); }
 $conn = new mysqli($DB[0],$DB[1],$DB[2],$DB[3]);
 if ($conn->connect_error) { die("CONN FAIL: ".$conn->connect_error."\n"); }
 $conn->set_charset("utf8mb4");

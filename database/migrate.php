@@ -47,6 +47,22 @@ if (!isset($conn) || !($conn instanceof mysqli)) {
     exit(1);
 }
 
+// P0-2ب (ADR-04 · فصل المسارين): اتصال التطبيق صار DML-only (ems_app)، والمُشغِّل
+// يحتاج DDL — إن وُجد زوج DB_MIGRATOR_* في .env يُستبدل الاتصال باتصال المُرحِّل
+// (صلاحياته على قاعدة EMS حصرًا). غيابه = البقاء على اتصال config (توافق رجعي).
+$migUser = ems_env('DB_MIGRATOR_USER');
+$migPass = ems_env('DB_MIGRATOR_PASS');
+if ($migUser !== null && $migUser !== '' && $migPass !== null && $migPass !== '') {
+    $migConn = @new mysqli(ems_env('DB_HOST', 'localhost'), $migUser, $migPass, ems_env('DB_NAME', 'equipation_manage'));
+    if ($migConn->connect_error) {
+        fwrite(STDERR, "[migrate] FATAL: فشل اتصال المُرحِّل (DB_MIGRATOR_USER=$migUser): " . $migConn->connect_error . "\n");
+        exit(1);
+    }
+    $conn->close();
+    $conn = $migConn;
+    fwrite(STDOUT, "[migrate] الاتصال: $migUser (مسار الترحيلات المنفصل — DDL)\n");
+}
+
 // تأكيد صريح للترميز حتى لو تغيّر config.php مستقبلًا — شرط سلامة العربية في DDL.
 if ($conn->character_set_name() !== 'utf8mb4') {
     $conn->set_charset('utf8mb4');
