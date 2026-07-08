@@ -54,24 +54,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['item_id'])) {
         header("Location: reordering_proc.php?msg=بيانات+غير+مكتملة+❌"); exit();
     }
 
-    if ($is_editing) {
-        $sql = "UPDATE proc_orderpoint SET item_id=?, warehouse_id=?, min_qty=?, max_qty=?, trigger_qty=?, safety_stock=?, mode=?
-                WHERE id=? AND company_id=? AND COALESCE(is_deleted,0)=0";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'iiddddsii', $item_id, $warehouse_id, $min_qty, $max_qty, $trigger_qty,
-                $safety_stock, $mode, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    // K9-M1 ذيل: الكتابة عبر البوابة
+    $data = array(
+        'item_id' => $item_id, 'warehouse_id' => $warehouse_id,
+        'min_qty' => $min_qty, 'max_qty' => $max_qty, 'trigger_qty' => $trigger_qty,
+        'safety_stock' => $safety_stock, 'mode' => $mode,
+    );
+    try {
+        if ($is_editing) {
+            proc_gate(false)->update('proc_orderpoint', $data, array('id' => $id, 'is_deleted' => 0));
+            header("Location: reordering_proc.php?msg=تم+تعديل+قاعدة+إعادة+الطلب+بنجاح+✅"); exit();
+        } else {
+            $data['created_by'] = $current_user_id;
+            proc_gate(false)->insert('proc_orderpoint', $data);
+            header("Location: reordering_proc.php?msg=تمت+إضافة+قاعدة+إعادة+الطلب+بنجاح+✅"); exit();
         }
-        header("Location: reordering_proc.php?msg=تم+تعديل+قاعدة+إعادة+الطلب+بنجاح+✅"); exit();
-    } else {
-        $sql = "INSERT INTO proc_orderpoint (company_id, item_id, warehouse_id, min_qty, max_qty, trigger_qty, safety_stock, mode, created_by)
-                VALUES (?,?,?,?,?,?,?,?,?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'iiiddddsi', $company_id, $item_id, $warehouse_id, $min_qty, $max_qty,
-                $trigger_qty, $safety_stock, $mode, $current_user_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        }
-        header("Location: reordering_proc.php?msg=تمت+إضافة+قاعدة+إعادة+الطلب+بنجاح+✅"); exit();
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('reordering save refused: ' . $e->getMessage());
+        header("Location: reordering_proc.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
 }
 
@@ -79,11 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['item_id'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: reordering_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "UPDATE proc_orderpoint SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    try { proc_gate(false)->softDelete('proc_orderpoint', $delete_id); }
+    catch (\App\Core\TenantGateException $e) { error_log('reordering softDelete refused: ' . $e->getMessage()); }
     header("Location: reordering_proc.php?msg=تم+حذف+قاعدة+إعادة+الطلب+بنجاح+✅"); exit();
 }
 
@@ -91,15 +88,10 @@ if (isset($_GET['delete_id'])) {
 $edit_row = null;
 if (isset($_GET['edit_id'])) {
     $edit_id = intval($_GET['edit_id']);
-    $sql = "SELECT id, item_id, warehouse_id, min_qty, max_qty, trigger_qty, safety_stock, mode
-            FROM proc_orderpoint WHERE id=? AND $company_scope_sql AND COALESCE(is_deleted,0)=0 LIMIT 1";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'i', $edit_id);
-        mysqli_stmt_execute($stmt);
-        $res = mysqli_stmt_get_result($stmt);
-        $edit_row = $res ? mysqli_fetch_assoc($res) : null;
-        mysqli_stmt_close($stmt);
-    }
+    $edit_row = proc_gate($is_super_admin)->selectOne('proc_orderpoint', array(
+        'columns' => array('id', 'item_id', 'warehouse_id', 'min_qty', 'max_qty', 'trigger_qty', 'safety_stock', 'mode'),
+        'where'   => array('id' => $edit_id),
+    ));
 }
 
 $sel_item      = $edit_row ? intval($edit_row['item_id']) : 0;
@@ -189,15 +181,21 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT op.id, op.min_qty, op.max_qty, op.trigger_qty, op.safety_stock, op.mode,
-                                   i.name AS item_name, w.name AS warehouse_name
-                            FROM proc_orderpoint op
-                            LEFT JOIN proc_item i ON i.id = op.item_id
-                            LEFT JOIN proc_warehouse w ON w.id = op.warehouse_id
-                            WHERE " . proc_scope('op.company_id', $is_super_admin, $company_id) . " AND COALESCE(op.is_deleted,0)=0
-                            ORDER BY i.name ASC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    // القراءة المركّبة عبر scopedQuery (عقد §10) — النص الأصلي حرفيًا + الرمز
+                    $rop_rows = proc_gate($is_super_admin)->scopedQuery(
+                        array(
+                            'scope'  => array('op' => 'proc_orderpoint'),
+                            'enrich' => array('i' => 'proc_item', 'w' => 'proc_warehouse'),
+                        ),
+                        "SELECT op.id, op.min_qty, op.max_qty, op.trigger_qty, op.safety_stock, op.mode,
+                                i.name AS item_name, w.name AS warehouse_name
+                         FROM proc_orderpoint op
+                         LEFT JOIN proc_item i ON i.id = op.item_id
+                         LEFT JOIN proc_warehouse w ON w.id = op.warehouse_id
+                         WHERE {TENANT_SCOPE} AND COALESCE(op.is_deleted,0)=0
+                         ORDER BY i.name ASC"
+                    );
+                    { foreach ($rop_rows as $row) {
                         echo "<tr>";
                         echo "<td><div class='action-btns'>";
                         if ($can_edit) {
