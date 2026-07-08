@@ -131,17 +131,17 @@ class TenantRegistry
         'timesheet_approval_notes' => array('type' => self::T_TENANT, 'soft' => false),
         'timesheet_approvals' => array('type' => self::T_TENANT, 'soft' => false),
         'timesheet_failure_hours' => array('type' => self::T_TENANT, 'soft' => false),
-        'transfer_attachments' => array('type' => self::T_TENANT, 'soft' => false),
-        'transfer_cost_lines' => array('type' => self::T_TENANT, 'soft' => false),
-        'transfer_cost_rules' => array('type' => self::T_TENANT, 'soft' => false),
-        'transfer_events' => array('type' => self::T_TENANT, 'soft' => false),
-        'transfer_lines' => array('type' => self::T_TENANT, 'soft' => false),
-        'transfer_orders' => array('type' => self::T_TENANT, 'soft' => false),
-        'transfer_permits' => array('type' => self::T_TENANT, 'soft' => false),
-        'transfer_requests' => array('type' => self::T_TENANT, 'soft' => false),
-        'transfer_types' => array('type' => self::T_TENANT, 'soft' => false),
-        'trs_locations' => array('type' => self::T_TENANT, 'soft' => false),
-        'trs_notifications' => array('type' => self::T_TENANT, 'soft' => false),
+        'transfer_attachments' => array('type' => self::T_TENANT, 'soft' => true),
+        'transfer_cost_lines' => array('type' => self::T_TENANT, 'soft' => true),
+        'transfer_cost_rules' => array('type' => self::T_TENANT, 'soft' => true),
+        'transfer_events' => array('type' => self::T_TENANT, 'soft' => true),
+        'transfer_lines' => array('type' => self::T_TENANT, 'soft' => true),
+        'transfer_orders' => array('type' => self::T_TENANT, 'soft' => true),
+        'transfer_permits' => array('type' => self::T_TENANT, 'soft' => true),
+        'transfer_requests' => array('type' => self::T_TENANT, 'soft' => true),
+        'transfer_types' => array('type' => self::T_TENANT, 'soft' => true),
+        'trs_locations' => array('type' => self::T_TENANT, 'soft' => true),
+        'trs_notifications' => array('type' => self::T_TENANT, 'soft' => true),
         'units_of_measure' => array('type' => self::T_TENANT, 'soft' => true),
         'users' => array('type' => self::T_TENANT, 'soft' => true),
         'worker_backup' => array('type' => self::T_TENANT, 'soft' => false),
@@ -179,6 +179,12 @@ class TenantRegistry
         'company_user_password_resets' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'api_tokens' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'schema_migrations' => array('type' => self::T_RESTRICTED, 'soft' => false),
+        'ems_sequences' => array('type' => self::T_RESTRICTED, 'soft' => false), // K8: بنية ترقيم خادمية — الوصول عبر ServerId حصرًا لا الشاشات
+        'ems_event_consumers' => array('type' => self::T_RESTRICTED, 'soft' => false), // K4: بنية الموزّع — عبر EventDispatcher حصرًا
+        'ems_event_deliveries' => array('type' => self::T_RESTRICTED, 'soft' => false), // K4
+        'ems_event_dead_letter' => array('type' => self::T_RESTRICTED, 'soft' => false), // K4
+        'positions' => array('type' => self::T_TENANT, 'soft' => true), // K6/ADR-07: جسر المنصب — معزول بالشركة، جاهز للبوابة من يومه الأول
+        'ems_state_transitions' => array('type' => self::T_RESTRICTED, 'soft' => false), // K7: سجل تدقيق المحرك — append-only عبر StateMachine حصرًا
         'approval_requests' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'approval_steps' => array('type' => self::T_RESTRICTED, 'soft' => false),
         'approval_workflow_rules' => array('type' => self::T_RESTRICTED, 'soft' => false),
