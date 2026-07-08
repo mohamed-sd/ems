@@ -47,6 +47,38 @@ $MIGRATED_SCREENS = array(
         },
         'cleanup' => "DELETE FROM opportunities WHERE opp_code LIKE 'LEAKTEST_%'",
     ),
+    'Procurement/items_proc.php' => array(
+        'login_user' => 71, 'user_company' => 4, 'other_company' => 1,
+        'table' => 'proc_item',
+        'row' => function ($companyId, $mark) {
+            return "INSERT INTO proc_item (company_id, name, code) VALUES ({$companyId}, '{$mark}', '{$mark}')";
+        },
+        'cleanup' => "DELETE FROM proc_item WHERE name LIKE 'LEAKTEST_%'",
+    ),
+    'Procurement/suppliers_proc.php' => array(
+        'login_user' => 71, 'user_company' => 4, 'other_company' => 1,
+        'table' => 'proc_supplier',
+        'row' => function ($companyId, $mark) {
+            return "INSERT INTO proc_supplier (company_id, name, code) VALUES ({$companyId}, '{$mark}', '{$mark}')";
+        },
+        'cleanup' => "DELETE FROM proc_supplier WHERE name LIKE 'LEAKTEST_%'",
+    ),
+    'Procurement/orders_proc.php' => array(
+        'login_user' => 71, 'user_company' => 4, 'other_company' => 1,
+        'table' => 'proc_order',
+        'row' => function ($companyId, $mark) {
+            return "INSERT INTO proc_order (company_id, code) VALUES ({$companyId}, '{$mark}')";
+        },
+        'cleanup' => "DELETE FROM proc_order WHERE code LIKE 'LEAKTEST_%'",
+    ),
+    'Procurement/requests_proc.php' => array(
+        'login_user' => 71, 'user_company' => 4, 'other_company' => 1,
+        'table' => 'proc_request',
+        'row' => function ($companyId, $mark) {
+            return "INSERT INTO proc_request (company_id, code, need_source, op_classification) VALUES ({$companyId}, '{$mark}', 'سوق', 'استهلاكية')";
+        },
+        'cleanup' => "DELETE FROM proc_request WHERE code LIKE 'LEAKTEST_%'",
+    ),
 );
 
 // ── عدّة التقرير ─────────────────────────────────────────────────────────────
