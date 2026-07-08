@@ -55,27 +55,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
         header("Location: suppliers_proc.php?msg=بيانات+غير+مكتملة+❌"); exit();
     }
 
-    if ($is_editing) {
-        $sql = "UPDATE proc_supplier SET name=?, supply_role=?, dealing_nature=?, contact_person=?, phone=?, email=?,
-                payment_terms=?, address=?, notes=?
-                WHERE id=? AND company_id=? AND COALESCE(is_deleted,0)=0";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'sssssssssii', $name, $supply_role, $dealing_nature, $contact_person, $phone,
-                $email, $payment_terms, $address, $notes, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    // K9-M1: الكتابة عبر البوابة (عزل الشركة والحذف الناعم مسؤوليتها)
+    $data = array(
+        'name' => $name, 'supply_role' => $supply_role, 'dealing_nature' => $dealing_nature,
+        'contact_person' => $contact_person, 'phone' => $phone, 'email' => $email,
+        'payment_terms' => $payment_terms, 'address' => $address, 'notes' => $notes,
+    );
+    try {
+        if ($is_editing) {
+            proc_gate(false)->update('proc_supplier', $data, array('id' => $id, 'is_deleted' => 0));
+            header("Location: suppliers_proc.php?msg=تم+تعديل+المورد+بنجاح+✅"); exit();
+        } else {
+            $data['code'] = proc_gen_code($conn, 'proc_supplier', 'PRC-SUP', $company_id);
+            $data['created_by'] = $current_user_id;
+            proc_gate(false)->insert('proc_supplier', $data);
+            header("Location: suppliers_proc.php?msg=تمت+إضافة+المورد+بنجاح+✅"); exit();
         }
-        header("Location: suppliers_proc.php?msg=تم+تعديل+المورد+بنجاح+✅"); exit();
-    } else {
-        $code = proc_gen_code($conn, 'proc_supplier', 'PRC-SUP', $company_id);
-        $sql = "INSERT INTO proc_supplier (company_id, code, name, supply_role, dealing_nature, contact_person, phone, email,
-                payment_terms, address, notes, created_by)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'issssssssssi', $company_id, $code, $name, $supply_role, $dealing_nature,
-                $contact_person, $phone, $email, $payment_terms, $address, $notes, $current_user_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        }
-        header("Location: suppliers_proc.php?msg=تمت+إضافة+المورد+بنجاح+✅"); exit();
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('suppliers_proc gate refused: ' . $e->getMessage());
+        header("Location: suppliers_proc.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
 }
 
@@ -83,10 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: suppliers_proc.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "UPDATE proc_supplier SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    try {
+        proc_gate(false)->softDelete('proc_supplier', $delete_id);
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('suppliers_proc softDelete refused: ' . $e->getMessage());
     }
     header("Location: suppliers_proc.php?msg=تم+حذف+المورد+بنجاح+✅"); exit();
 }
@@ -167,10 +165,11 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $sql = "SELECT id, code, name, dealing_nature, contact_person, phone, email, payment_terms, address, notes
-                            FROM proc_supplier WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0 ORDER BY name ASC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    $supplier_rows = proc_gate($is_super_admin)->select('proc_supplier', array(
+                        'columns' => array('id', 'code', 'name', 'dealing_nature', 'contact_person', 'phone', 'email', 'payment_terms', 'address', 'notes'),
+                        'orderBy' => 'name ASC',
+                    ));
+                    { foreach ($supplier_rows as $row) {
                         $data_attrs =
                             "data-id='" . intval($row['id']) . "' " .
                             "data-name='" . htmlspecialchars((string)$row['name'], ENT_QUOTES) . "' " .
