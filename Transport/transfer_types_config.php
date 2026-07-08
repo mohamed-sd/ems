@@ -51,40 +51,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
         header("Location: transfer_types_config.php?msg=بيانات+غير+مكتملة+❌"); exit();
     }
 
-    if ($is_editing) {
-        $sql = "UPDATE transfer_types SET name=?, operational_category=?, default_bearer=?, active=?
-                WHERE id=? AND company_id=?";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'sssiii', $name, $operational_category, $default_bearer, $active, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    try {
+        if ($is_editing) {
+            trs_gate(false)->update('transfer_types',
+                array('name' => $name, 'operational_category' => $operational_category, 'default_bearer' => $default_bearer, 'active' => $active),
+                array('id' => $id));
+            header("Location: transfer_types_config.php?msg=تم+تعديل+النوع+بنجاح+✅"); exit();
+        } else {
+            // كود تقني بسيط للأنواع المُضافة يدوياً
+            $code = 'custom_' . trs_gen_code($conn, 'transfer_types', 'T', $company_id);
+            $code = strtolower(str_replace('-', '', $code));
+            trs_gate(false)->insert('transfer_types', array(
+                'code' => $code, 'name' => $name, 'operational_category' => $operational_category,
+                'default_bearer' => $default_bearer, 'active' => $active,
+            ));
+            header("Location: transfer_types_config.php?msg=تمت+إضافة+النوع+بنجاح+✅"); exit();
         }
-        header("Location: transfer_types_config.php?msg=تم+تعديل+النوع+بنجاح+✅"); exit();
-    } else {
-        // كود تقني بسيط للأنواع المُضافة يدوياً
-        $code = 'custom_' . trs_gen_code($conn, 'transfer_types', 'T', $company_id);
-        $code = strtolower(str_replace('-', '', $code));
-        $sql = "INSERT INTO transfer_types (company_id, code, name, operational_category, default_bearer, active)
-                VALUES (?,?,?,?,?,?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'issssi', $company_id, $code, $name, $operational_category, $default_bearer, $active);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        }
-        header("Location: transfer_types_config.php?msg=تمت+إضافة+النوع+بنجاح+✅"); exit();
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('transfer_types save refused: ' . $e->getMessage());
+        header("Location: transfer_types_config.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
 }
 
-// ── حذف (فعلي؛ FK RESTRICT يمنع حذف نوع مستخدم في أوامر/طلبات) ──
+// ── حذف — سياسة «الأرشفة لا الحذف» (K9-M2b · أول تطبيقٍ على master):
+//    كان DELETE صلبًا يفشل بFK RESTRICT إن كان النوع مستعملًا؛ الأرشفة تنجح
+//    دائمًا: يختفي من القوائم (فلترة البوابة) وتبقى مراجع الأوامر التاريخية
+//    سليمة — فرقٌ دلاليٌّ مقصودٌ بالسياسة، موثَّق. ──
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: transfer_types_config.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "DELETE FROM transfer_types WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'ii', $delete_id, $company_id);
-        if (!mysqli_stmt_execute($stmt)) {
-            mysqli_stmt_close($stmt);
-            header("Location: transfer_types_config.php?msg=تعذّر+الحذف+—+النوع+مستخدم+في+أوامر+ترحيل+❌"); exit();
-        }
-        mysqli_stmt_close($stmt);
+    try {
+        trs_gate(false)->softDelete('transfer_types', $delete_id);
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('transfer_types softDelete refused: ' . $e->getMessage());
+        header("Location: transfer_types_config.php?msg=تعذّر+الحذف+❌"); exit();
     }
     header("Location: transfer_types_config.php?msg=تم+حذف+النوع+بنجاح+✅"); exit();
 }
@@ -155,11 +155,11 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $scope = $is_super_admin ? '1=1' : ('company_id = ' . intval($company_id));
-                    $sql = "SELECT id, code, name, operational_category, default_bearer, active
-                            FROM transfer_types WHERE $scope ORDER BY id ASC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    $type_rows = trs_gate($is_super_admin)->select('transfer_types', array(
+                        'columns' => array('id', 'code', 'name', 'operational_category', 'default_bearer', 'active'),
+                        'orderBy' => 'id ASC',
+                    ));
+                    { foreach ($type_rows as $row) {
                         $cat_ar = trs_label($categories, $row['operational_category']);
                         $bearer_ar = trs_label($bearers, $row['default_bearer']);
                         $data_attrs =
