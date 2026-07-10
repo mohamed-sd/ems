@@ -403,11 +403,15 @@ function get_module_id_by_script_path($conn, $script_path = null) {
         : ltrim($normalized, '/');
     $basename = basename($relative_path);
 
+    // المطابقة بحدود المسار حصرًا: مسار نسبي تام، أو اسم ملف تام، أو ذيل
+    // مسبوق بـ«/». النمط الفضفاض السابق '%basename%' كان يأسر صفحاتٍ لموديولات
+    // مشابهة الاسم (main/dashboard.php أسرها Transport/transfer_dashboard.php
+    // فحُجبت اللوحة عن كل الأدوار عدا النقل — حادثة 2026-07-10). صفحة بلا
+    // موديول مسجَّل = null = شفافة الصلاحية (السلوك التاريخي المقصود).
     $stmt = $conn->prepare(
-        "SELECT id FROM modules 
-         WHERE code = ? 
-            OR code = ? 
-            OR code LIKE ?
+        "SELECT id FROM modules
+         WHERE code = ?
+            OR code = ?
             OR code LIKE ?
          LIMIT 1"
     );
@@ -417,8 +421,7 @@ function get_module_id_by_script_path($conn, $script_path = null) {
     }
 
     $pattern1 = '%/' . $basename;
-    $pattern2 = '%' . $basename . '%';
-    $stmt->bind_param("ssss", $relative_path, $basename, $pattern1, $pattern2);
+    $stmt->bind_param("sss", $relative_path, $basename, $pattern1);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
 
@@ -474,6 +477,13 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
     $relative_script = function_exists('ems_relative_path')
         ? ems_relative_path($script_name)
         : ltrim(str_replace('\\', '/', $script_name), '/');
+
+    // لوحة التحكم هي صفحة الهبوط **وهدف التحويل الافتراضي لهذا المُنفِذ نفسه**:
+    // حجبها = حلقة تحويل لا نهائية لكل دورٍ محجوب (حادثة 2026-07-10). هدف
+    // التحويل لا يجوز أن يحوّل — إعفاء صريح بنمط إعفاءات المراسلات/البلاغات.
+    if (strpos($relative_script, 'main/dashboard.php') !== false) {
+        return;
+    }
 
     // صفحات المراسلات متاحة لجميع المستخدمين المسجّلين دخولهم
     if (strpos($relative_script, 'chats/') !== false) {
