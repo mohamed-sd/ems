@@ -19,34 +19,42 @@ $perms = fin_page_perms($conn, 'Finance/cfo_daily_board_fin.php', $is_super_admi
 if (!$perms['can_view']) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+العرض+❌"); exit(); }
 $cid = intval($company_id);
 fin_handle_notif_read($conn, $company_id, 'cfo_daily_board_fin.php');
-$W = $is_super_admin ? "company_id > 0" : "company_id = $cid";
-function cfoV($conn, $sql) { $r = mysqli_query($conn, $sql); return ($r && ($x = mysqli_fetch_assoc($r))) ? (float)array_values($x)[0] : 0; }
+// قياس مُعزَّل مفرد الجدول عبر scopedQuery (§10) — بديل cfoV الخام
+$cfoScoped = function ($alias, $table, $sql, $params = array()) use ($is_super_admin) {
+    $r = fin_gate($is_super_admin)->scopedQuery(array('scope' => array($alias => $table)), $sql, $params);
+    return $r ? (float) array_values($r[0])[0] : 0.0;
+};
 
 $today = date('Y-m-d'); $yesterday = date('Y-m-d', strtotime('-1 day'));
 $week = date('Y-m-d', strtotime('+7 days')); $month = date('Y-m');
 
-// ① النقد المتاح (أرصدة البنوك: افتتاحي + إيداعات − سحوبات)
-$cash = cfoV($conn, "SELECT COALESCE(SUM(a.opening_balance),0)
-        + COALESCE((SELECT SUM(CASE WHEN l.direction='deposit' THEN l.amount ELSE -l.amount END)
-                    FROM fin_bank_statement_lines l WHERE l.$W),0)
-        FROM fin_bank_accounts a WHERE a.$W AND COALESCE(a.is_deleted,0)=0");
+// ① النقد المتاح = افتتاحي البنوك + صافي حركة الكشوف (قراءتان مُعزَّلتان تُجمعان — بديل الاستعلام المتداخل المُعزَّل مرتين)
+$cash = $cfoScoped('a', 'fin_bank_accounts',
+            "SELECT COALESCE(SUM(a.opening_balance),0) FROM fin_bank_accounts a WHERE {TENANT_SCOPE} AND COALESCE(a.is_deleted,0)=0")
+      + $cfoScoped('l', 'fin_bank_statement_lines',
+            "SELECT COALESCE(SUM(CASE WHEN l.direction='deposit' THEN l.amount ELSE -l.amount END),0) FROM fin_bank_statement_lines l WHERE {TENANT_SCOPE}");
 // ② متحصّلات اليوم  ③ مدفوعات اليوم
-$in_today  = cfoV($conn, "SELECT COALESCE(SUM(amount),0) FROM fin_payments WHERE $W AND COALESCE(is_deleted,0)=0 AND direction='collection'  AND state IN('executed','reconciled') AND DATE(COALESCE(paid_at,created_at))='$today'");
-$out_today = cfoV($conn, "SELECT COALESCE(SUM(amount),0) FROM fin_payments WHERE $W AND COALESCE(is_deleted,0)=0 AND direction='disbursement' AND state IN('executed','reconciled') AND DATE(COALESCE(paid_at,created_at))='$today'");
+$in_today  = $cfoScoped('p', 'fin_payments', "SELECT COALESCE(SUM(p.amount),0) FROM fin_payments p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0 AND p.direction='collection'  AND p.state IN('executed','reconciled') AND DATE(COALESCE(p.paid_at,p.created_at))=?", array($today));
+$out_today = $cfoScoped('p', 'fin_payments', "SELECT COALESCE(SUM(p.amount),0) FROM fin_payments p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0 AND p.direction='disbursement' AND p.state IN('executed','reconciled') AND DATE(COALESCE(p.paid_at,p.created_at))=?", array($today));
 // ④ صافي الأسبوع المتوقّع = ذمم تستحق خلال 7 أيام − (مستحقات معلّقة + أقساط 7 أيام)
-$wk_in  = cfoV($conn, "SELECT COALESCE(SUM(outstanding),0) FROM fin_receivables WHERE $W AND COALESCE(is_deleted,0)=0 AND outstanding>0 AND due_date IS NOT NULL AND due_date<='$week'");
-$wk_out = cfoV($conn, "SELECT COALESCE(SUM(amount),0) FROM fin_dues WHERE $W AND COALESCE(is_deleted,0)=0 AND direction='credit' AND settlement_state='pending'")
-        + cfoV($conn, "SELECT COALESCE(SUM(total_due-paid_amount),0) FROM fin_funding_schedules WHERE $W AND state<>'paid' AND due_date<='$week'");
+$wk_in  = $cfoScoped('r', 'fin_receivables', "SELECT COALESCE(SUM(r.outstanding),0) FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0 AND r.due_date IS NOT NULL AND r.due_date<=?", array($week));
+$wk_out = $cfoScoped('d', 'fin_dues', "SELECT COALESCE(SUM(d.amount),0) FROM fin_dues d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.direction='credit' AND d.settlement_state='pending'")
+        + $cfoScoped('f', 'fin_funding_schedules', "SELECT COALESCE(SUM(f.total_due-f.paid_amount),0) FROM fin_funding_schedules f WHERE {TENANT_SCOPE} AND f.state<>'paid' AND f.due_date<=?", array($week));
 $wk_net = $wk_in - $wk_out;
 // ⑤ وحدات أمس المعتمدة  ⑥ هامش الوحدة الجاري (هذا الشهر)
-$units_yday = cfoV($conn, "SELECT COALESCE(SUM(approved_qty),0) FROM fin_unit_records WHERE $W AND COALESCE(is_deleted,0)=0 AND match_state='approved' AND record_date='$yesterday'");
-$margin_mo  = cfoV($conn, "SELECT COALESCE(SUM(unit_margin),0) FROM fin_unit_records WHERE $W AND COALESCE(is_deleted,0)=0 AND match_state='approved' AND DATE_FORMAT(record_date,'%Y-%m')='$month'");
+$units_yday = $cfoScoped('u', 'fin_unit_records', "SELECT COALESCE(SUM(u.approved_qty),0) FROM fin_unit_records u WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 AND u.match_state='approved' AND u.record_date=?", array($yesterday));
+$margin_mo  = $cfoScoped('u', 'fin_unit_records', "SELECT COALESCE(SUM(u.unit_margin),0) FROM fin_unit_records u WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 AND u.match_state='approved' AND DATE_FORMAT(u.record_date,'%Y-%m')=?", array($month));
 // ⑦ الذمم المتأخرة  ⑧ المسوّى الجاهز للصرف
-$overdue = cfoV($conn, "SELECT COALESCE(SUM(outstanding),0) FROM fin_receivables WHERE $W AND COALESCE(is_deleted,0)=0 AND outstanding>0 AND due_date IS NOT NULL AND due_date<'$today'");
-$settled_ready = cfoV($conn, "SELECT COALESCE(SUM(amount),0) FROM fin_dues WHERE $W AND COALESCE(is_deleted,0)=0 AND direction='credit' AND settlement_state='settled'");
-// ⑨ الانحرافات فوق الحدّ (10%)  ⑩ أقساط التمويل خلال 7 أيام
-$var_over = cfoV($conn, "SELECT COUNT(*) FROM fin_budget_lines l JOIN fin_budgets b ON b.id=l.budget_id WHERE b.$W AND COALESCE(b.is_deleted,0)=0 AND l.variance_pct IS NOT NULL AND ABS(l.variance_pct)>10");
-$inst7 = cfoV($conn, "SELECT COALESCE(SUM(total_due-paid_amount),0) FROM fin_funding_schedules WHERE $W AND state<>'paid' AND due_date BETWEEN '$today' AND '$week'");
+$overdue = $cfoScoped('r', 'fin_receivables', "SELECT COALESCE(SUM(r.outstanding),0) FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0 AND r.due_date IS NOT NULL AND r.due_date<?", array($today));
+$settled_ready = $cfoScoped('d', 'fin_dues', "SELECT COALESCE(SUM(d.amount),0) FROM fin_dues d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.direction='credit' AND d.settlement_state='settled'");
+// ⑨ الانحرافات فوق الحدّ (10%) — تكافؤ INNER→LEFT، العزل على السطور (نفس شركة الموازنة)
+$var_rows = fin_gate($is_super_admin)->scopedQuery(
+    array('scope' => array('l' => 'fin_budget_lines'), 'enrich' => array('b' => 'fin_budgets')),
+    "SELECT COUNT(*) c FROM fin_budget_lines l LEFT JOIN fin_budgets b ON b.id=l.budget_id
+     WHERE {TENANT_SCOPE} AND b.id IS NOT NULL AND COALESCE(b.is_deleted,0)=0 AND l.variance_pct IS NOT NULL AND ABS(l.variance_pct)>10");
+$var_over = $var_rows ? (float) array_values($var_rows[0])[0] : 0.0;
+// ⑩ أقساط التمويل خلال 7 أيام
+$inst7 = $cfoScoped('f', 'fin_funding_schedules', "SELECT COALESCE(SUM(f.total_due-f.paid_amount),0) FROM fin_funding_schedules f WHERE {TENANT_SCOPE} AND f.state<>'paid' AND f.due_date BETWEEN ? AND ?", array($today, $week));
 
 $cards = array(
   array('fa-wallet',            number_format($cash, 0),        'النقد المتاح (البنوك)',        $cash >= 0 ? 'ok' : 'err',  'bank_reconciliation_fin.php'),
