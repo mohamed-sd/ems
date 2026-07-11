@@ -66,13 +66,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
     if (!in_array($currency, $currencies, true)) { $currency = 'SDG'; }
 
     if ($is_editing) {
-        $sql = "UPDATE fin_financial_events SET event_type=?, source_module=?, source_ref=?, amount=?, currency=?,
-                fx_rate=?, project_id=?, supplier_entity_id=?, equipment_id=?, notes=?
-                WHERE id=? AND company_id=? AND COALESCE(is_deleted,0)=0";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'sssdsdiiisii', $event_type, $source_module, $source_ref, $amount, $currency,
-                $fx_rate, $project_id, $supplier_id, $equipment_id, $notes, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+        // A0 · عبر البوابة المحصَّنة (§12): تعديل حدثٍ منشورٍ على الناقل مرفوض؛
+        // القيود اليدوية تُعدَّل كالمعتاد. سعة السوبر محفوظة بforAllTenants.
+        try {
+            $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('finance super edit event') : ems_tenant_db();
+            $gate->update('fin_financial_events', array(
+                'event_type' => $event_type, 'source_module' => $source_module, 'source_ref' => $source_ref,
+                'amount' => $amount, 'currency' => $currency, 'fx_rate' => $fx_rate,
+                'project_id' => $project_id, 'supplier_entity_id' => $supplier_id,
+                'equipment_id' => $equipment_id, 'notes' => $notes,
+            ), array('id' => $id), 'COALESCE(is_deleted,0)=0');
+        } catch (\App\Core\TenantGateException $e) {
+            error_log('events_list edit refused: ' . $e->getMessage());
+            header("Location: events_list_fin.php?msg=لا+يجوز+تعديل+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
         }
         header("Location: events_list_fin.php?msg=تم+تعديل+الحدث+المالي+بنجاح+✅"); exit();
     } else {
@@ -93,10 +99,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "UPDATE fin_financial_events SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
+    // A0 · حذف ناعم عبر البوابة المحصَّنة (§12): حذف حدثٍ منشورٍ مرفوض.
+    try {
+        $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('finance super delete event') : ems_tenant_db();
+        $gate->softDelete('fin_financial_events', $delete_id);
+    } catch (\App\Core\TenantGateException $e) {
+        error_log('events_list delete refused: ' . $e->getMessage());
+        header("Location: events_list_fin.php?msg=لا+يجوز+حذف+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
     }
     header("Location: events_list_fin.php?msg=تم+حذف+الحدث+المالي+بنجاح+✅"); exit();
 }
@@ -106,8 +115,13 @@ if (isset($_GET['advance_id'])) {
     if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+الاعتماد+❌"); exit(); }
     $aid = intval($_GET['advance_id']);
     $flow = fin_event_flow();
-    $er = mysqli_query($conn, "SELECT state FROM fin_financial_events WHERE id=$aid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    $cur = ($er && ($e = mysqli_fetch_assoc($er))) ? $e['state'] : null;
+    // A0 · تشديد الحصانة (§12): حدثٌ منشورٌ على الناقل لا تُغيَّر حالته يدويًا (دورته بالناقل)
+    $er = mysqli_query($conn, "SELECT state, idempotency_key FROM fin_financial_events WHERE id=$aid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
+    $erow = ($er ? mysqli_fetch_assoc($er) : null);
+    if ($erow && $erow['idempotency_key'] !== null && $erow['idempotency_key'] !== '') {
+        header("Location: events_list_fin.php?msg=لا+يجوز+تغيير+حالة+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
+    }
+    $cur = $erow ? $erow['state'] : null;
     if ($cur !== null && isset($flow[$cur])) {
         list($next, $lbl, $level) = $flow[$cur];
         // فصل الواجبات: هذا الانتقال يخصّ مستواه فقط
@@ -157,8 +171,13 @@ if (isset($_GET['advance_id'])) {
 if (isset($_GET['reject_id'])) {
     if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+الرفض+❌"); exit(); }
     $rid = intval($_GET['reject_id']);
-    $er = mysqli_query($conn, "SELECT state FROM fin_financial_events WHERE id=$rid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    $cur = ($er && ($e = mysqli_fetch_assoc($er))) ? $e['state'] : null;
+    // A0 · تشديد الحصانة (§12): الحدث المنشور لا يُرفَض يدويًا
+    $er = mysqli_query($conn, "SELECT state, idempotency_key FROM fin_financial_events WHERE id=$rid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
+    $erow = ($er ? mysqli_fetch_assoc($er) : null);
+    if ($erow && $erow['idempotency_key'] !== null && $erow['idempotency_key'] !== '') {
+        header("Location: events_list_fin.php?msg=لا+يجوز+رفض+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
+    }
+    $cur = $erow ? $erow['state'] : null;
     if ($cur !== null && !in_array($cur, array('posted','settled','closed','rejected'), true)) {
         mysqli_query($conn, "UPDATE fin_financial_events SET state='rejected' WHERE id=$rid AND company_id=$company_id");
         fin_log_approval($conn, $company_id, $rid, $cur, 'rejected', 'reject', null, $current_user_id, 'رفض/إعادة');
@@ -172,8 +191,13 @@ if (isset($_GET['reject_id'])) {
 if (isset($_GET['resume_id'])) {
     if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
     $rid = intval($_GET['resume_id']);
-    $er = mysqli_query($conn, "SELECT state FROM fin_financial_events WHERE id=$rid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    $cur = ($er && ($e = mysqli_fetch_assoc($er))) ? $e['state'] : null;
+    // A0 · تشديد الحصانة (§12): الحدث المنشور لا يُعاد يدويًا للدورة
+    $er = mysqli_query($conn, "SELECT state, idempotency_key FROM fin_financial_events WHERE id=$rid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
+    $erow = ($er ? mysqli_fetch_assoc($er) : null);
+    if ($erow && $erow['idempotency_key'] !== null && $erow['idempotency_key'] !== '') {
+        header("Location: events_list_fin.php?msg=لا+يجوز+تعديل+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
+    }
+    $cur = $erow ? $erow['state'] : null;
     if ($cur === 'rejected') {
         mysqli_query($conn, "UPDATE fin_financial_events SET state='draft' WHERE id=$rid AND company_id=$company_id AND state='rejected'");
         fin_log_approval($conn, $company_id, $rid, 'rejected', 'draft', 'advance', 'dept_accountant', $current_user_id, 'إعادة للدورة');
