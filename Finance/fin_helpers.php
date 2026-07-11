@@ -140,6 +140,15 @@ if (!function_exists('fin_scope')) {
     }
 }
 
+if (!function_exists('fin_gate')) {
+    /** بوابة العزل لسياق الجلسة (نمط trs_gate). $is_super=true ⇒ رؤية عابرة محروسة. */
+    function fin_gate($is_super = false)
+    {
+        $gate = ems_tenant_db();
+        return $is_super ? $gate->forAllTenants('fin helpers super view') : $gate;
+    }
+}
+
 if (!function_exists('fin_gen_code')) {
     /** كود تسلسلي لكل شركة، مثل FIN-EV-0001. اسم الجدول من قائمة بيضاء في الكود. */
     function fin_gen_code($conn, $table, $prefix, $company_id)

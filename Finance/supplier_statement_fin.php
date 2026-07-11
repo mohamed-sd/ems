@@ -23,16 +23,39 @@ $sel_period = isset($_GET['period']) && preg_match('/^\d{4}-\d{2}$/', $_GET['per
 $due_types = fin_due_types(); $settle_states = fin_settlement_states(); $work_models = fin_work_models();
 
 $sup_name = ''; $credit_sum = 0; $debit_sum = 0; $paid_sum = 0; $units_sum = 0;
+// مجموعٌ مُعزَّلٌ عبر scopedQuery (§10): الرمز يحقن company_id، والفلاتر بمعاملات ?
+$fin_ssum = function ($alias, $table, $sql, $params) use ($is_super_admin) {
+    $rows = fin_gate($is_super_admin)->scopedQuery(array('scope' => array($alias => $table)), $sql, $params);
+    return $rows ? (float) $rows[0]['v'] : 0.0;
+};
 if ($sel_sup > 0) {
-    $sn = mysqli_query($conn, "SELECT name FROM suppliers WHERE id=$sel_sup LIMIT 1");
-    $sup_name = ($sn && ($x = mysqli_fetch_assoc($sn))) ? $x['name'] : ('#' . $sel_sup);
-    // بنود الفترة: period_ref يطابق الشهر أو أُنشئ خلاله
-    $PW = "company_id=$cid AND party_type='supplier' AND party_ref=$sel_sup AND COALESCE(is_deleted,0)=0
-           AND (period_ref='$sel_period' OR DATE_FORMAT(created_at,'%Y-%m')='$sel_period')";
-    $credit_sum = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(amount),0) v FROM fin_dues WHERE $PW AND direction='credit'")->fetch_assoc()['v'] ?? 0);
-    $debit_sum  = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(amount),0) v FROM fin_dues WHERE $PW AND direction='debit'")->fetch_assoc()['v'] ?? 0);
-    $paid_sum   = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(amount),0) v FROM fin_payments WHERE company_id=$cid AND party_type='supplier' AND party_ref=$sel_sup AND direction='disbursement' AND state IN('executed','reconciled') AND COALESCE(is_deleted,0)=0 AND DATE_FORMAT(COALESCE(paid_at,created_at),'%Y-%m')='$sel_period'")->fetch_assoc()['v'] ?? 0);
-    $units_sum  = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(approved_qty),0) v FROM fin_unit_records WHERE company_id=$cid AND supplier_entity_id=$sel_sup AND match_state='approved' AND COALESCE(is_deleted,0)=0 AND DATE_FORMAT(record_date,'%Y-%m')='$sel_period'")->fetch_assoc()['v'] ?? 0);
+    // قراءة الاسم عبر البوابة: includeDeleted لأن الأصل بلا فلتر soft (يعرض اسم
+    // المورد المؤرشف — وفاءٌ ذهبي للسلوك، درس الموردين المؤرشفين في M2b). العزل
+    // بالشركة تشديدٌ موثَّق (كان بلا فلتر شركة).
+    $svrow = fin_gate($is_super_admin)->selectOne('suppliers', array(
+        'columns' => array('name'), 'where' => array('id' => $sel_sup), 'includeDeleted' => true));
+    $sup_name = $svrow ? $svrow['name'] : ('#' . $sel_sup);
+    $credit_sum = $fin_ssum('d', 'fin_dues',
+        "SELECT COALESCE(SUM(d.amount),0) v FROM fin_dues d WHERE {TENANT_SCOPE}
+         AND d.party_type='supplier' AND d.party_ref=? AND COALESCE(d.is_deleted,0)=0 AND d.direction='credit'
+         AND (d.period_ref=? OR DATE_FORMAT(d.created_at,'%Y-%m')=?)",
+        array($sel_sup, $sel_period, $sel_period));
+    $debit_sum = $fin_ssum('d', 'fin_dues',
+        "SELECT COALESCE(SUM(d.amount),0) v FROM fin_dues d WHERE {TENANT_SCOPE}
+         AND d.party_type='supplier' AND d.party_ref=? AND COALESCE(d.is_deleted,0)=0 AND d.direction='debit'
+         AND (d.period_ref=? OR DATE_FORMAT(d.created_at,'%Y-%m')=?)",
+        array($sel_sup, $sel_period, $sel_period));
+    $paid_sum = $fin_ssum('p', 'fin_payments',
+        "SELECT COALESCE(SUM(p.amount),0) v FROM fin_payments p WHERE {TENANT_SCOPE}
+         AND p.party_type='supplier' AND p.party_ref=? AND p.direction='disbursement'
+         AND p.state IN('executed','reconciled') AND COALESCE(p.is_deleted,0)=0
+         AND DATE_FORMAT(COALESCE(p.paid_at,p.created_at),'%Y-%m')=?",
+        array($sel_sup, $sel_period));
+    $units_sum = $fin_ssum('u', 'fin_unit_records',
+        "SELECT COALESCE(SUM(u.approved_qty),0) v FROM fin_unit_records u WHERE {TENANT_SCOPE}
+         AND u.supplier_entity_id=? AND u.match_state='approved' AND COALESCE(u.is_deleted,0)=0
+         AND DATE_FORMAT(u.record_date,'%Y-%m')=?",
+        array($sel_sup, $sel_period));
 }
 $net = $credit_sum - $debit_sum;
 
@@ -74,10 +97,14 @@ include '../insidebar.php';
                 <thead><tr><th>التاريخ</th><th>النوع</th><th>الاتجاه</th><th>المبلغ</th><th>التسوية</th><th>الفترة</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT * FROM fin_dues WHERE company_id=$cid AND party_type='supplier' AND party_ref=$sel_sup
-                        AND COALESCE(is_deleted,0)=0 AND (period_ref='$sel_period' OR DATE_FORMAT(created_at,'%Y-%m')='$sel_period')
-                        ORDER BY id DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                // القائمة عبر البوابة: العزل آلي + فلتر soft آلي (يطابق COALESCE الأصلي)
+                $due_rows = fin_gate($is_super_admin)->select('fin_dues', array(
+                    'where' => array('party_type' => 'supplier', 'party_ref' => $sel_sup),
+                    'whereRaw' => "(period_ref = ? OR DATE_FORMAT(created_at,'%Y-%m') = ?)",
+                    'params' => array($sel_period, $sel_period),
+                    'orderBy' => 'id DESC',
+                ));
+                { foreach ($due_rows as $row) {
                     $ss = (string)$row['settlement_state'];
                     $tone = $ss === 'paid' ? 'success' : ($ss === 'settled' ? 'primary' : 'secondary');
                     echo "<tr>";
@@ -100,10 +127,13 @@ include '../insidebar.php';
                 <thead><tr><th>الرقم</th><th>التاريخ</th><th>النموذج</th><th>الكمية المعتمدة</th><th>سعر عقده</th><th>قيمة مستحقه</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT * FROM fin_unit_records WHERE company_id=$cid AND supplier_entity_id=$sel_sup
-                        AND match_state='approved' AND COALESCE(is_deleted,0)=0 AND DATE_FORMAT(record_date,'%Y-%m')='$sel_period'
-                        ORDER BY record_date DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $ur_rows = fin_gate($is_super_admin)->select('fin_unit_records', array(
+                    'where' => array('supplier_entity_id' => $sel_sup, 'match_state' => 'approved'),
+                    'whereRaw' => "DATE_FORMAT(record_date,'%Y-%m') = ?",
+                    'params' => array($sel_period),
+                    'orderBy' => 'record_date DESC',
+                ));
+                { foreach ($ur_rows as $row) {
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars((string)$row['record_no']) . "</td>";
                     echo "<td>" . htmlspecialchars((string)$row['record_date']) . "</td>";
