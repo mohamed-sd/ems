@@ -1,5 +1,13 @@
 # MIGRATION_PROGRESS — سجلّ تقدّم الهجرة المعمارية (Checkpoint & Resume)
 
+> ## 🔖 نقطة الاستئناف (حُفظت 2026-07-11 مساءً — «سأكمل غدًا»)
+> **عند «أكمل»**: (0) فحص K10 التلقائي: `grep 'mode=enforce kind=denied' logs/security.log` مستثنيًا المجسات الموثقة (سجل UTC = المحلي −3س). ثم:
+> 1. **مواصلة F2 (كتّاب المالية، أُنجز 1/13)**: التالي بالترتيب: cost_report → accountants → budget_form → dues → management_accounting → assets → cash_forecast → funding → tax → payments → periods → bank_reconciliation. **النمط المستنسخ من accounts_fin (2ab08ca)**: بوابة (update/insert/softDelete، 1062 عبر TenantGateException، قوائم عبر select/scopedQuery) + golden قبل/بعد بـgit stash + **إثبات أثر حي لكل كتابة** (نمط `f2_accounts_proof.php` في scratchpad) + commit مستقل + الحزمة 123.
+> 2. **قراران مالك معلَّقان**: (أ) عزل الحدثين 54+55 (softDelete قابل للعكس — يفتح executive_dashboard؛ المصنّف رفض تنفيذه بلا نص صريح)؛ (ب) fin_helpers فيه دوال خام باقية تُحوَّل مع مستدعيها (fin_notify/recalc مع cron — درس M2b).
+> 3. **F3 (events_list + journal_form + unit_records + import_events)**: لا تُفتح إلا بمراجعة مستقلة بشروطها الخمسة (رسالة المالك: خط أحمر على كود الناشر/المستهلك، golden الناقل ev/dl/dlq/cursor قبل/بعد كل commit، E2E ختامية، عزل مباشر، commit+rollback لكل شاشة).
+> **تنبيه بيئة**: `CSRF_ENFORCE_PATHS=/Finance/` تغيير .env محلي (git يتجاهله) — لا تفقده؛ Rollback = تفريغه.
+> **درس جلسة اليوم (مهم)**: وردت رسائل قبول لأعمال لم تقع (F1/F2/F3 «مكتملة») — القاعدة: تحقَّق من git/T3 قبل البناء على أي «مكتمل».
+
 > ملف حالة دائم. يُحدَّث **بعد كل بند**. إن انقطع العمل: اقرأ هذا الملف أولًا، اعرض سطر
 > «توقفنا عند [المرحلة/البند] — الخطوة التالية [كذا] — هل أكمل؟» ثم تابع من نفس النقطة.
 > الكود هو الحقيقة؛ لا تفترض حالة بندٍ اعتمادًا على آخر.
