@@ -10,10 +10,12 @@ include '../config.php';
 // معالجة نموذج تغيير كلمة السر
 // ══════════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // ملاحظة: لا نُمرّر كلمة المرور عبر mysqli_real_escape_string لأن ذلك يغيّر النص الخام
+    // المطلوب لـ password_verify()/password_hash()؛ الحماية من الحقن تتم بالعبارات المُجهّزة.
     $user_id          = intval($_SESSION['user']['id']);
-    $old_password     = mysqli_real_escape_string($conn, trim($_POST['old_password']));
-    $new_password     = mysqli_real_escape_string($conn, trim($_POST['new_password']));
-    $confirm_password = mysqli_real_escape_string($conn, trim($_POST['confirm_password']));
+    $old_password     = isset($_POST['old_password'])     ? trim($_POST['old_password'])     : '';
+    $new_password     = isset($_POST['new_password'])     ? trim($_POST['new_password'])     : '';
+    $confirm_password = isset($_POST['confirm_password']) ? trim($_POST['confirm_password']) : '';
 
     // التحقق من طول كلمة السر الجديدة
     if (strlen($new_password) < 6) {
@@ -23,22 +25,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "كلمة السر الجديدة غير متطابقة!";
 
     } else {
-        // جلب كلمة السر القديمة من قاعدة البيانات
-        $query  = "SELECT password FROM users WHERE id = $user_id";
-        $result = mysqli_query($conn, $query);
-        $row    = mysqli_fetch_assoc($result);
+        // جلب هاش كلمة السر القديمة من قاعدة البيانات (عبارة مُجهّزة)
+        $row  = null;
+        $stmt = mysqli_prepare($conn, "SELECT password FROM users WHERE id = ? LIMIT 1");
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "i", $user_id);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            $row    = $result ? mysqli_fetch_assoc($result) : null;
+            mysqli_stmt_close($stmt);
+        }
 
-        if (!$row || $old_password != $row['password']) {
+        // التحقق من كلمة السر القديمة بـ bcrypt (مطابقٌ لـ login.php)
+        if (!$row || !password_verify($old_password, $row['password'])) {
             $error = "كلمة السر القديمة غير صحيحة!";
         } else {
-            // تحديث كلمة السر
-            $update_query = "UPDATE users SET password = '$new_password', updated_at = NOW() WHERE id = $user_id";
-            if (mysqli_query($conn, $update_query)) {
-                $success = "تم تغيير كلمة السر بنجاح 🎉";
-                // تحديث كلمة السر في الجلسة إذا كانت مخزنة
-                if (isset($_SESSION['user']['password'])) {
-                    $_SESSION['user']['password'] = $new_password;
+            // تخزين كلمة السر الجديدة مُشفّرة (bcrypt) — مطابقٌ لـ main/users.php
+            $new_hash = password_hash($new_password, PASSWORD_DEFAULT);
+            $update   = mysqli_prepare($conn, "UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?");
+            if ($update) {
+                mysqli_stmt_bind_param($update, "si", $new_hash, $user_id);
+                if (mysqli_stmt_execute($update)) {
+                    $success = "تم تغيير كلمة السر بنجاح 🎉";
+                    // تحديث الهاش في الجلسة إذا كان مخزناً
+                    if (isset($_SESSION['user']['password'])) {
+                        $_SESSION['user']['password'] = $new_hash;
+                    }
+                } else {
+                    $error = "حدث خطأ أثناء تحديث كلمة السر!";
                 }
+                mysqli_stmt_close($update);
             } else {
                 $error = "حدث خطأ أثناء تحديث كلمة السر!";
             }
