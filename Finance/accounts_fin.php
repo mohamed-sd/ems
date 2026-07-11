@@ -55,24 +55,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
     if ($is_editing && $parent_id === $id) { $parent_id = null; }
 
     if ($is_editing) {
-        $sql = "UPDATE fin_chart_of_accounts SET code=?, name=?, account_type=?, parent_id=?, is_postable=?
-                WHERE id=? AND company_id=? AND COALESCE(is_deleted,0)=0";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'sssiiii', $code, $name, $account_type, $parent_id, $is_postable, $id, $company_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        }
+        fin_gate($is_super_admin)->update('fin_chart_of_accounts', array(
+            'code' => $code, 'name' => $name, 'account_type' => $account_type,
+            'parent_id' => $parent_id, 'is_postable' => $is_postable,
+        ), array('id' => $id), "COALESCE(is_deleted,0)=0");
         header("Location: accounts_fin.php?msg=تم+تعديل+الحساب+بنجاح+✅"); exit();
     } else {
-        $sql = "INSERT INTO fin_chart_of_accounts (company_id, code, name, account_type, parent_id, is_postable, created_by)
-                VALUES (?,?,?,?,?,?,?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'isssiii', $company_id, $code, $name, $account_type, $parent_id, $is_postable, $current_user_id);
-            mysqli_stmt_execute($stmt);
-            if (mysqli_errno($conn) === 1062) {
-                mysqli_stmt_close($stmt);
+        // insert عبر البوابة؛ التكرار 1062 يظهر TenantGateException (نمط trs_notify)
+        try {
+            fin_gate($is_super_admin)->insert('fin_chart_of_accounts', array(
+                'code' => $code, 'name' => $name, 'account_type' => $account_type,
+                'parent_id' => $parent_id, 'is_postable' => $is_postable, 'created_by' => $current_user_id,
+            ));
+        } catch (\App\Core\TenantGateException $e) {
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
                 header("Location: accounts_fin.php?msg=رقم+الحساب+مكرر+في+الشركة+❌"); exit();
             }
-            mysqli_stmt_close($stmt);
+            error_log('accounts_fin insert refused: ' . $e->getMessage());
+            header("Location: accounts_fin.php?msg=تعذّرت+الإضافة+❌"); exit();
         }
         header("Location: accounts_fin.php?msg=تمت+إضافة+الحساب+بنجاح+✅"); exit();
     }
@@ -82,11 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: accounts_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $delete_id = intval($_GET['delete_id']);
-    $sql = "UPDATE fin_chart_of_accounts SET is_deleted=1, deleted_at=NOW(), deleted_by=? WHERE id=? AND company_id=?";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iii', $current_user_id, $delete_id, $company_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    try { fin_gate($is_super_admin)->softDelete('fin_chart_of_accounts', $delete_id); }
+    catch (\App\Core\TenantGateException $e) { error_log('accounts_fin softDelete refused: ' . $e->getMessage()); }
     header("Location: accounts_fin.php?msg=تم+حذف+الحساب+بنجاح+✅"); exit();
 }
 
@@ -155,13 +152,15 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $scope_a = fin_scope('a.company_id', $is_super_admin, $company_id);
-                    $sql = "SELECT a.*, pa.code AS parent_code, pa.name AS parent_name
-                            FROM fin_chart_of_accounts a
-                            LEFT JOIN fin_chart_of_accounts pa ON pa.id = a.parent_id
-                            WHERE $scope_a AND COALESCE(a.is_deleted,0)=0 ORDER BY a.code ASC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    // scopedQuery (§10): self-JOIN للأب عبر إثراء LEFT بنفس الجدول
+                    $acc_rows = fin_gate($is_super_admin)->scopedQuery(
+                        array('scope' => array('a' => 'fin_chart_of_accounts'),
+                              'enrich' => array('pa' => 'fin_chart_of_accounts')),
+                        "SELECT a.*, pa.code AS parent_code, pa.name AS parent_name
+                         FROM fin_chart_of_accounts a
+                         LEFT JOIN fin_chart_of_accounts pa ON pa.id = a.parent_id
+                         WHERE {TENANT_SCOPE} AND COALESCE(a.is_deleted,0)=0 ORDER BY a.code ASC");
+                    { foreach ($acc_rows as $row) {
                         $t = (string)$row['account_type'];
                         $parent_lbl = $row['parent_code'] ? ($row['parent_code'] . ' — ' . $row['parent_name']) : '—';
                         $data_attrs =
