@@ -168,6 +168,22 @@ class TenantDb
             '__strictTenant' => true, // كتابة تعديلية: لا تمرير مراقبةٍ لغياب الشركة أبدًا
         ));
 
+        // حارس الحصانة (§12 · A0): جدولٌ ذو immutable_key = دفترُ أحداثٍ — أيُّ صفٍّ
+        // يحمل المفتاح (حدثٌ منشورٌ على الناقل) لا يُعدَّل ولا يُحذَف عبر البوابة
+        // (عقيدة اللاتعديل؛ يحرس كلَّ كاتبٍ يعبر البوابة اليوم ومستقبلًا). يسري
+        // حتى على السوبر — الحصانة عن التعديل لا عن العزل. softDelete يمرّ بهذا لأنه يستدعي update.
+        if (!empty($def['immutable_key'])) {
+            $ik = $def['immutable_key'];
+            $this->assertIdent($ik);
+            $guardSql = 'SELECT COUNT(*) FROM `' . $table . '` WHERE ' . $cond
+                      . ' AND `' . $ik . '` IS NOT NULL AND `' . $ik . '` <> ?';
+            $guardParams = array_merge($condParams, array(''));
+            $hit = intval($this->run($guardSql, $guardParams)->fetch_row()[0]);
+            if ($hit > 0) {
+                $this->deny('immutable published-event mutation refused', $table . ' :: ' . $ik . ' present');
+            }
+        }
+
         $sql = 'UPDATE `' . $table . '` SET ' . implode(', ', $sets) . ' WHERE ' . $cond;
         return (int) $this->run($sql, array_merge($params, $condParams));
     }

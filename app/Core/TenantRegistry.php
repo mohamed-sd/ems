@@ -66,7 +66,10 @@ class TenantRegistry
         'fin_cost_records' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_depreciation' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_dues' => array('type' => self::T_TENANT, 'soft' => true),
-        'fin_financial_events' => array('type' => self::T_TENANT, 'soft' => true),
+        // immutable_key: صفٌّ يحمل هذا العمود غيرَ فارغٍ = حدثُ ناقلٍ منشور —
+        // البوابة ترفض تعديله/حذفه (عقيدة اللاتعديل · حارس الحصانة §12 · A0).
+        // القيود اليدوية (idempotency_key = NULL) تبقى قابلةً للإدارة.
+        'fin_financial_events' => array('type' => self::T_TENANT, 'soft' => true, 'immutable_key' => 'idempotency_key'),
         'fin_financial_periods' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_funding_facilities' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_funding_schedules' => array('type' => self::T_TENANT, 'soft' => false),

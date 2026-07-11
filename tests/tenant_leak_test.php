@@ -572,6 +572,40 @@ if (empty($MIGRATED_SCREENS)) {
     }
 }
 
+// ═════ 6ز) حارس الحصانة — دفتر الأحداث (§12 · A0) ═════
+echo "── 6ز) حارس الحصانة: الحدث المنشور لا يُعدَّل/يُحذَف عبر البوابة ──\n";
+// (ز1) حدثٌ يدوي (idempotency_key = NULL) — قابلٌ للتعديل والحذف الناعم عبر البوابة
+$manId = $gateA->insert('fin_financial_events', array(
+    'event_no' => $MARK_A . '_MAN', 'event_type' => 'expense', 'source_module' => 'finance',
+    'source_ref' => $MARK_A, 'amount' => 100.00, 'currency' => 'SDG', 'state' => 'draft', 'created_by' => 999901,
+));
+$cleanup[] = array('fin_financial_events', $manId);
+$aff = $gateA->update('fin_financial_events', array('amount' => 150.00), array('id' => $manId));
+ok('ز1: الحدث اليدوي (بلا مفتاح) قابلٌ للتعديل عبر البوابة', $aff === 1
+    && floatval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT amount FROM fin_financial_events WHERE id=$manId"))['amount']) === 150.00);
+$aff2 = $gateA->softDelete('fin_financial_events', $manId);
+ok('ز1: الحدث اليدوي قابلٌ للحذف الناعم عبر البوابة', $aff2 === 1
+    && intval(mysqli_fetch_assoc(mysqli_query($conn, "SELECT is_deleted FROM fin_financial_events WHERE id=$manId"))['is_deleted']) === 1);
+
+// (ز2) حدثُ ناقلٍ منشور (idempotency_key موسوم) — التعديل والحذف مرفوضان
+mysqli_query($conn, "INSERT INTO fin_financial_events (company_id, event_no, event_type, source_module, source_ref, amount, currency, state, created_by, idempotency_key, correlation_id)
+    VALUES ({$COMPANY_A}, '{$MARK_A}_BUS', 'expense', 'finance', '{$MARK_A}', 50.00, 'SDG', 'draft', 999901, 'equipment.hour_logged:timesheet:999999:a999999', '01LEAKTESTCORRELATIONXXXXXX')");
+$busId = intval($conn->insert_id);
+$cleanup[] = array('fin_financial_events', $busId);
+expect_throw('ز2: تعديل حدثٍ منشورٍ مرفوض (حصانة §12)', function () use ($gateA, $busId) {
+    $gateA->update('fin_financial_events', array('amount' => 9999.00), array('id' => $busId));
+});
+expect_throw('ز2: حذف حدثٍ منشورٍ مرفوض (حصانة §12)', function () use ($gateA, $busId) {
+    $gateA->softDelete('fin_financial_events', $busId);
+});
+$busRow = mysqli_fetch_assoc(mysqli_query($conn, "SELECT amount, is_deleted FROM fin_financial_events WHERE id=$busId"));
+ok('ز2: الحدث المنشور بقي سليمًا (المبلغ 50، غير محذوف)',
+    floatval($busRow['amount']) === 50.00 && intval($busRow['is_deleted']) === 0);
+// (ز3) الحصانة تسري حتى على السوبر (عن التعديل لا عن العزل)
+expect_throw('ز3: السوبر أيضًا يُرفض تعديله للحدث المنشور', function () use ($gateSuper, $busId) {
+    $gateSuper->update('fin_financial_events', array('amount' => 1.00), array('id' => $busId));
+});
+
 } catch (\Throwable $e) {
     $FAIL++;
     echo "  ✘ استثناء غير متوقع: " . $e->getMessage() . "\n";
