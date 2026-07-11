@@ -19,26 +19,30 @@ $perms = fin_page_perms($conn, 'Finance/financial_statements_fin.php', $is_super
 if (!$perms['can_view']) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+العرض+❌"); exit(); }
 
 $cid = intval($company_id);
-$JW = $is_super_admin ? "jl.company_id > 0" : "jl.company_id = $cid";
 
-/** أرصدة الحسابات من القيود المرحّلة، حسب النوع والحساب. */
-function fin_ledger_balances($conn, $jw)
+/**
+ * أرصدة الحسابات من القيود المرحّلة عبر scopedQuery (§10).
+ * تكافؤ SQL مقصود: الأصل INNER JOIN بدلالة فلترة في ON → هنا LEFT JOIN + الفلاتر
+ * في WHERE (je.state='posted' يستبعد صفوف je=NULL، a.id IS NOT NULL يستبعد بلا حساب)
+ * = نفس النتيجة حرفيًا، ويوافق شرط البوابة «الإثراء LEFT حصرًا». العزل على jl.
+ */
+function fin_ledger_balances($is_super)
 {
-    $sql = "SELECT a.id, a.code, a.name, a.account_type,
-                   COALESCE(SUM(jl.debit),0) AS dr, COALESCE(SUM(jl.credit),0) AS cr
-            FROM fin_journal_lines jl
-            JOIN fin_journal_entries je ON je.id = jl.entry_id AND je.state='posted' AND COALESCE(je.is_deleted,0)=0
-            JOIN fin_chart_of_accounts a ON a.id = jl.account_id
-            WHERE $jw
-            GROUP BY a.id, a.code, a.name, a.account_type
-            HAVING dr <> 0 OR cr <> 0
-            ORDER BY a.code ASC";
-    $rows = array();
-    if ($r = mysqli_query($conn, $sql)) { while ($x = mysqli_fetch_assoc($r)) { $rows[] = $x; } }
-    return $rows;
+    return fin_gate($is_super)->scopedQuery(
+        array('scope' => array('jl' => 'fin_journal_lines'),
+              'enrich' => array('je' => 'fin_journal_entries', 'a' => 'fin_chart_of_accounts')),
+        "SELECT a.id, a.code, a.name, a.account_type,
+                COALESCE(SUM(jl.debit),0) AS dr, COALESCE(SUM(jl.credit),0) AS cr
+         FROM fin_journal_lines jl
+         LEFT JOIN fin_journal_entries je ON je.id = jl.entry_id
+         LEFT JOIN fin_chart_of_accounts a ON a.id = jl.account_id
+         WHERE {TENANT_SCOPE} AND je.state='posted' AND COALESCE(je.is_deleted,0)=0 AND a.id IS NOT NULL
+         GROUP BY a.id, a.code, a.name, a.account_type
+         HAVING dr <> 0 OR cr <> 0
+         ORDER BY a.code ASC");
 }
 
-$bal = fin_ledger_balances($conn, $JW);
+$bal = fin_ledger_balances($is_super_admin);
 // تجميع حسب النوع (رصيد طبيعي)
 $T = array('asset' => 0, 'liability' => 0, 'equity' => 0, 'revenue' => 0, 'expense' => 0);
 $byType = array('asset' => array(), 'liability' => array(), 'equity' => array(), 'revenue' => array(), 'expense' => array());
@@ -53,10 +57,16 @@ $total_assets = $T['asset'];
 $total_liab_equity = $T['liability'] + $T['equity'] + $net_profit; // صافي الربح ضمن حقوق الملكية (أرباح محتجزة)
 $balanced = (round($total_assets, 2) === round($total_liab_equity, 2));
 
-// التدفق النقدي (مبسّط) من المدفوعات المنفّذة
-$PW = $is_super_admin ? "company_id > 0" : "company_id = $cid";
-$inflow  = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(amount),0) v FROM fin_payments WHERE $PW AND COALESCE(is_deleted,0)=0 AND state IN('executed','reconciled') AND direction='collection'")->fetch_assoc()['v'] ?? 0);
-$outflow = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(amount),0) v FROM fin_payments WHERE $PW AND COALESCE(is_deleted,0)=0 AND state IN('executed','reconciled') AND direction='disbursement'")->fetch_assoc()['v'] ?? 0);
+// التدفق النقدي (مبسّط) من المدفوعات المنفّذة — مجاميع مُعزَّلة عبر scopedQuery
+$fin_pay_sum = function ($dir) use ($is_super_admin) {
+    $r = fin_gate($is_super_admin)->scopedQuery(array('scope' => array('p' => 'fin_payments')),
+        "SELECT COALESCE(SUM(p.amount),0) v FROM fin_payments p WHERE {TENANT_SCOPE}
+         AND COALESCE(p.is_deleted,0)=0 AND p.state IN('executed','reconciled') AND p.direction=?",
+        array($dir));
+    return $r ? (float) $r[0]['v'] : 0.0;
+};
+$inflow  = $fin_pay_sum('collection');
+$outflow = $fin_pay_sum('disbursement');
 $net_cash = $inflow - $outflow;
 
 $type_lbl = fin_account_types();
