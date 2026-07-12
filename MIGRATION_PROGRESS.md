@@ -1,12 +1,13 @@
 # MIGRATION_PROGRESS — سجلّ تقدّم الهجرة المعمارية (Checkpoint & Resume)
 
-> ## 🔖 نقطة الاستئناف (حُفظت 2026-07-11 مساءً — «سأكمل غدًا»)
+> ## 🔖 نقطة الاستئناف (حُدِّثت 2026-07-12 — F2 مغلقة 13/13)
 > **عند «أكمل»**: (0) فحص K10 التلقائي: `grep 'mode=enforce kind=denied' logs/security.log` مستثنيًا المجسات الموثقة (سجل UTC = المحلي −3س). ثم:
-> 1. **مواصلة F2 (كتّاب المالية، أُنجز 1/13)**: التالي بالترتيب: cost_report → accountants → budget_form → dues → management_accounting → assets → cash_forecast → funding → tax → payments → periods → bank_reconciliation. **النمط المستنسخ من accounts_fin (2ab08ca)**: بوابة (update/insert/softDelete، 1062 عبر TenantGateException، قوائم عبر select/scopedQuery) + golden قبل/بعد بـgit stash + **إثبات أثر حي لكل كتابة** (نمط `f2_accounts_proof.php` في scratchpad) + commit مستقل + الحزمة 123.
-> 2. **قراران مالك معلَّقان**: (أ) عزل الحدثين 54+55 (softDelete قابل للعكس — يفتح executive_dashboard؛ المصنّف رفض تنفيذه بلا نص صريح)؛ (ب) fin_helpers فيه دوال خام باقية تُحوَّل مع مستدعيها (fin_notify/recalc مع cron — درس M2b).
-> 3. **F3 (events_list + journal_form + unit_records + import_events)**: لا تُفتح إلا بمراجعة مستقلة بشروطها الخمسة (رسالة المالك: خط أحمر على كود الناشر/المستهلك، golden الناقل ev/dl/dlq/cursor قبل/بعد كل commit، E2E ختامية، عزل مباشر، commit+rollback لكل شاشة).
+> 1. ✅ **F2 مغلقة كاملةً — 13/13 كتّاب المالية عبر البوابة** (accounts→bank_reconciliation، آخرها ff8a869): T3=0 + golden قبل/بعد مطابق + إثبات أثر حي مستقل + commit مستقل لكلٍّ. **خلف البوابة 37 ملفًا** (21 مرحلة 1 + 3 قرائية F1 + 13 كاتبة F2).
+> 2. **التالي المتاح بلا قرار مالك**: بنية المالية المشتركة (`fin_helpers.php` دواله الخام + `cron_finance_fin.php` بنمط forSystem) — تُحوَّل معًا كوحدة (نمط M2b/cron النقل: مستدعٍ+مُستدعى في commit، 1062 عبر التقاط، forSystem للـcron). بعدها تُغلق طبقة المالية عدا F3.
+> 3. **قراران مالك معلَّقان (لا تُنفَّذ بلا نص صريح)**: (أ) عزل الحدثين 54+55 (softDelete قابل للعكس — يفتح `executive_dashboard_fin`؛ المصنّف رفض تنفيذه سابقًا بلا إذن)؛ (ب) هجرة events_list_fin الكاملة (M3c).
+> 4. **F3 (events_list + journal_form + unit_records + import_events)**: لا تُفتح إلا بمراجعة مستقلة بشروطها الخمسة (خط أحمر على كود الناشر/المستهلك، golden الناقل ev/dl/dlq/cursor قبل/بعد كل commit، E2E ختامية، عزل مباشر، commit+rollback لكل شاشة).
 > **تنبيه بيئة**: `CSRF_ENFORCE_PATHS=/Finance/` تغيير .env محلي (git يتجاهله) — لا تفقده؛ Rollback = تفريغه.
-> **درس جلسة اليوم (مهم)**: وردت رسائل قبول لأعمال لم تقع (F1/F2/F3 «مكتملة») — القاعدة: تحقَّق من git/T3 قبل البناء على أي «مكتمل».
+> **درس محفوظ**: وردت سابقًا رسائل قبول لأعمال لم تقع — القاعدة: تحقَّق من git/T3 قبل البناء على أي «مكتمل» (F2 هنا مُتحقَّقة بـ13 commit فعليًّا).
 
 > ملف حالة دائم. يُحدَّث **بعد كل بند**. إن انقطع العمل: اقرأ هذا الملف أولًا، اعرض سطر
 > «توقفنا عند [المرحلة/البند] — الخطوة التالية [كذا] — هل أكمل؟» ثم تابع من نفس النقطة.
@@ -57,10 +58,11 @@
   - **درس مؤكَّد**: الـINNER-JOIN بدلالة فلترة والاستعلام المتداخل **ليسا قناة جديدة** — بل صياغةٌ مكافئة تُثبتها golden. لا توسيع قناة.
 - 🟡 **`executive_dashboard`** (الشاشة القرائية الرابعة): تقرأ الدفتر فتُظهر 54+55 → **مؤجَّلة حتى عزل الحدثين** (قرار مالك، softDelete رُفض سابقًا).
 - ✅ **CSRF مُغلَق لمسار المالية** (تغيير .env محلي — .env مُتجاهَل من git، يوثَّق هنا): `CSRF_ENFORCE_PATHS=/Finance/`. **تحقق حي**: POST بلا توكن → 403 محجوب + قيد مسجَّل؛ بتوكن صحيح → 200 يمرّ + صفر قيد. الفورمات تحمل التوكن آليًا (ems_inject_csrf_fields) فلا كسر. **Rollback**: حذف `/Finance/` من .env. F2 مفتوحة.
-- 🟢 **F2 جارية (1/13)**: `accounts_fin` (2ab08ca) — أول كاتبة: update/insert/softDelete عبر البوابة، 1062 عبر TenantGateException، self-JOIN عبر scopedQuery؛ T3=0؛ golden 35118 مطابق؛ **إثبات أثر حي 6/6** (إنشاء بحقن آلي · تعديل · 1062 · CSRF يحجب بلا توكن · soft-delete · تنظيف). **النمط الكاتب مُثبَت end-to-end.**
-- ⬜ **F2 المتبقية (12)**: cost_report · accountants · budget_form · dues · management_accounting · assets · cash_forecast · funding · tax · payments · periods · bank_reconciliation — بنفس النمط (بوابة + golden + إثبات أثر حي لكلٍّ).
-- ⬜ **F3 (ناقل حي، 2)**: بمراجعة مستقلة بخطوطها الحمراء (لا يُمسّ كود الناشر/المستهلك؛ golden الناقل قبل/بعد؛ E2E ختامية).
-- **خلف البوابة الآن: 25 ملفًا** (21 مرحلة 1 + 4 مالية: supplier_statement/financial_statements/cfo/accounts).
+- ✅ **F2 مغلقة كاملةً — 13/13 كتّاب المالية عبر البوابة (2026-07-12)**: accounts (2ab08ca) · cost_report (c88269e) · accountants (be66aa1) · budget_form (47ad05d، head+lines §9) · dues (a72c92f) · management_accounting (0a5d6dd) · assets (bc8189c، إهلاك ذرّي §9) · cash_forecast (99f5512، 3 مجاميع scopedQuery) · funding (c942958، facility+schedule §9) · tax (decbf21) · payments (7edf622، execute+effect §9 + فصل واجبات) · periods (cc04385، آلة حالة + close-guard عبر count() + إنشاء+بذر §9) · bank_reconciliation (ff8a869، automatch: NOT EXISTS مزدوج النطاق→قراءتان معزولتان + زوج ذرّي §9). **لكلٍّ: T3=0 + golden قبل/بعد مطابق حرفيًا + إثبات أثر حي مستقل (u72) + commit مستقل.** أنماط مثبتة: 1062 عبر TenantGateException · INNER→LEFT+WHERE مكافئ · متداخل/مزدوج-النطاق→قراءتان تُجمعان في PHP · تعبيرات SQL تُحسب PHP-side · حراس whereRaw للحالة · scopedQuery للمجاميع + {TENANT_SCOPE}.
+- ⬜ **بنية مشتركة باقية (2)**: `fin_helpers.php` (دوال خام داخلية تُحوَّل مع مستدعيها — نمط M2b) + `cron_finance_fin.php` (نمط forSystem كـcron النقل). خارج عدّاد الكتّاب الـ13.
+- 🟡 **`executive_dashboard_fin`** (الشاشة القرائية الرابعة): مؤجَّلة حتى عزل الحدثين 54+55 (قرار مالك — softDelete رُفض سابقًا).
+- ⬜ **F3 (مكوّنات ناقل حية، 4)**: events_list_fin · unit_records_fin · import_events_fin · journal_form_fin — بمراجعة مستقلة بخطوطها الحمراء الخمسة (لا يُمسّ كود الناشر/المستهلك؛ golden الناقل ev/dl/dlq/cursor قبل/بعد؛ E2E ختامية؛ عزل مباشر؛ commit+rollback لكل شاشة).
+- **خلف البوابة الآن: 37 ملفًا** (21 مرحلة 1 + 3 قرائية F1: supplier_statement/financial_statements/cfo + 13 كاتبة F2).
 ### المرحلة 3 · الخطوة 2 — الإطار المثبَّت (2026-07-11)
 - **القيود الأربعة (أسوار)**: لا بطاقة على استعلام خام · لا مستهلك جديد قبل العكسي والعطالة المعمَّمة · لا شاشة Fail-Open · لا منح صلاحية يدوي.
 - **المساران منفصلان في السجل**: (أ) الأساسات = بطاقات C* أدناه · (ب) الهجرة = M3-Finance فالترتيب المعتمد. عزل متغيرات كامل.
