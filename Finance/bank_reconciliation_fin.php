@@ -24,25 +24,42 @@ $sel_acct = isset($_GET['acct']) ? intval($_GET['acct']) : 0;
 if (isset($_GET['automatch']) && $sel_acct > 0) {
     if (!$can_edit) { header("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=لا+توجد+صلاحية+❌"); exit(); }
     if (!fin_verify_action_token()) { header("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=رمز+الحماية+غير+صالح+❌"); exit(); }
+    // المطابقة الآلية: قراءتان معزولتان (بنود غير مطابَقة + مدفوعات مرشَّحة) تُدمجان
+    // في PHP بدل NOT EXISTS مزدوج النطاق — كل قراءة عبر البوابة، وكل زوجٍ مطابَق ذرّي §9.
+    $g = fin_gate($is_super_admin);
     $matched = 0;
-    $lines = mysqli_query($conn, "SELECT id, direction, amount FROM fin_bank_statement_lines
-                                  WHERE company_id=$company_id AND bank_account_id=$sel_acct AND reconciled=0 ORDER BY id");
-    if ($lines) { while ($ln = mysqli_fetch_assoc($lines)) {
+    $lines = $g->select('fin_bank_statement_lines', array(
+        'columns' => array('id', 'direction', 'amount'),
+        'where'   => array('bank_account_id' => $sel_acct, 'reconciled' => 0),
+        'orderBy' => 'id',
+    ));
+    // مدفوعات منفّذة/مطابَقة مرشَّحة (الحذف الناعم يُستبعَد آليًا) + مجموعة المطابَق سلفًا (شركة كاملة)
+    $cands = $g->select('fin_payments', array(
+        'columns'  => array('id', 'direction', 'amount'),
+        'whereRaw' => "state IN('executed','reconciled')",
+        'orderBy'  => 'id',
+    ));
+    $usedRows = $g->select('fin_bank_statement_lines', array(
+        'columns'  => array('matched_payment_id'),
+        'whereRaw' => 'matched_payment_id IS NOT NULL',
+    ));
+    $used = array();
+    foreach ($usedRows as $ur) { $used[intval($ur['matched_payment_id'])] = true; }
+    foreach ($lines as $ln) {
         $want = $ln['direction'] === 'deposit' ? 'collection' : 'disbursement';
         $amt = (float)$ln['amount'];
-        // دفعة منفّذة بالمبلغ نفسه لم تُطابَق بعد
-        $pq = mysqli_query($conn, "SELECT p.id FROM fin_payments p
-            WHERE p.company_id=$company_id AND COALESCE(p.is_deleted,0)=0 AND p.state IN('executed','reconciled')
-              AND p.direction='$want' AND ABS(p.amount - $amt) < 0.01
-              AND NOT EXISTS (SELECT 1 FROM fin_bank_statement_lines b WHERE b.company_id=$company_id AND b.matched_payment_id=p.id)
-            ORDER BY p.id LIMIT 1");
-        if ($pq && ($p = mysqli_fetch_assoc($pq))) {
-            $pid = intval($p['id']);
-            mysqli_query($conn, "UPDATE fin_bank_statement_lines SET matched_payment_id=$pid, reconciled=1 WHERE id=" . intval($ln['id']) . " AND company_id=$company_id");
-            mysqli_query($conn, "UPDATE fin_payments SET state='reconciled' WHERE id=$pid AND company_id=$company_id AND state='executed'");
+        foreach ($cands as $c) {
+            $cid = intval($c['id']);
+            if (isset($used[$cid]) || $c['direction'] !== $want || abs((float)$c['amount'] - $amt) >= 0.01) { continue; }
+            $g->runInTransaction(function ($gate) use ($cid, $ln) {
+                $gate->update('fin_bank_statement_lines', array('matched_payment_id' => $cid, 'reconciled' => 1), array('id' => intval($ln['id'])));
+                $gate->update('fin_payments', array('state' => 'reconciled'), array('id' => $cid), "state='executed'");
+            }, 'bank recon: automatch pair');
+            $used[$cid] = true;
             $matched++;
+            break;
         }
-    } }
+    }
     header("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=تمت+مطابقة+$matched+بند+آليًا+✅"); exit();
 }
 
@@ -50,9 +67,13 @@ if (isset($_GET['automatch']) && $sel_acct > 0) {
 if (isset($_GET['unmatch_line'])) {
     if (!$can_edit) { header("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=لا+توجد+صلاحية+❌"); exit(); }
     $lid = intval($_GET['unmatch_line']);
-    $pid = (int) (mysqli_query($conn, "SELECT matched_payment_id FROM fin_bank_statement_lines WHERE id=$lid AND company_id=$company_id")->fetch_assoc()['matched_payment_id'] ?? 0);
-    mysqli_query($conn, "UPDATE fin_bank_statement_lines SET matched_payment_id=NULL, reconciled=0 WHERE id=$lid AND company_id=$company_id");
-    if ($pid > 0) mysqli_query($conn, "UPDATE fin_payments SET state='executed' WHERE id=$pid AND company_id=$company_id AND state='reconciled'");
+    $g = fin_gate($is_super_admin);
+    $lineRow = $g->selectOne('fin_bank_statement_lines', array('columns' => array('matched_payment_id'), 'where' => array('id' => $lid)));
+    $pid = $lineRow ? intval($lineRow['matched_payment_id']) : 0;
+    $g->runInTransaction(function ($gate) use ($lid, $pid) {
+        $gate->update('fin_bank_statement_lines', array('matched_payment_id' => null, 'reconciled' => 0), array('id' => $lid));
+        if ($pid > 0) { $gate->update('fin_payments', array('state' => 'executed'), array('id' => $pid), "state='reconciled'"); }
+    }, 'bank recon: unmatch line');
     header("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=تم+إلغاء+المطابقة+✅"); exit();
 }
 
@@ -62,11 +83,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bank_name'])) {
     $name = trim($_POST['acct_name'] ?? ''); $bank = trim($_POST['bank_name'] ?? '');
     $accno = trim($_POST['account_number'] ?? ''); $open = round(floatval($_POST['opening_balance'] ?? 0), 2);
     if ($name === '') { header("Location: bank_reconciliation_fin.php?msg=اسم+الحساب+مطلوب+❌"); exit(); }
-    $sql = "INSERT INTO fin_bank_accounts (company_id, name, bank_name, account_number, opening_balance, created_by) VALUES (?,?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'isssdi', $company_id, $name, $bank, $accno, $open, $current_user_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    fin_gate($is_super_admin)->insert('fin_bank_accounts', array(
+        'name' => $name, 'bank_name' => $bank, 'account_number' => $accno,
+        'opening_balance' => $open, 'created_by' => $current_user_id,
+    ));
     header("Location: bank_reconciliation_fin.php?msg=تمت+إضافة+الحساب+البنكي+✅"); exit();
 }
 
@@ -79,33 +99,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
     $desc = trim($_POST['description'] ?? '');
     $amt = round(floatval($_POST['amount'] ?? 0), 2);
     if ($ba <= 0 || $amt <= 0) { header("Location: bank_reconciliation_fin.php?acct=$ba&msg=بيانات+البند+غير+صحيحة+❌"); exit(); }
-    $sql = "INSERT INTO fin_bank_statement_lines (company_id, bank_account_id, txn_date, description, direction, amount, created_by) VALUES (?,?,?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iisssdi', $company_id, $ba, $date, $desc, $dir, $amt, $current_user_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    fin_gate($is_super_admin)->insert('fin_bank_statement_lines', array(
+        'bank_account_id' => $ba, 'txn_date' => $date, 'description' => $desc,
+        'direction' => $dir, 'amount' => $amt, 'created_by' => $current_user_id,
+    ));
     header("Location: bank_reconciliation_fin.php?acct=$ba&msg=تمت+إضافة+البند+✅"); exit();
 }
 
 if (isset($_GET['del_acct'])) {
     if (!$can_delete) { header("Location: bank_reconciliation_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
-    mysqli_query($conn, "UPDATE fin_bank_accounts SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=" . intval($_GET['del_acct']) . " AND company_id=$company_id");
+    fin_gate($is_super_admin)->softDelete('fin_bank_accounts', intval($_GET['del_acct']));
     header("Location: bank_reconciliation_fin.php?msg=تم+حذف+الحساب+✅"); exit();
 }
 
 // ملخّص المطابقة للحساب المختار
 $bank_balance = 0; $book_movement = 0; $unrec_lines = 0; $unmatched_pay = 0; $rec_lines = 0;
 if ($sel_acct > 0) {
-    $acc = mysqli_query($conn, "SELECT * FROM fin_bank_accounts WHERE id=$sel_acct AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    $acc = $acc ? mysqli_fetch_assoc($acc) : null;
+    $g = fin_gate($is_super_admin);
+    $acc = $g->selectOne('fin_bank_accounts', array('where' => array('id' => $sel_acct)));
     if ($acc) {
         $opening = (float)$acc['opening_balance'];
-        $dep = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(amount),0) v FROM fin_bank_statement_lines WHERE company_id=$company_id AND bank_account_id=$sel_acct AND direction='deposit'")->fetch_assoc()['v'] ?? 0);
-        $wd  = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(amount),0) v FROM fin_bank_statement_lines WHERE company_id=$company_id AND bank_account_id=$sel_acct AND direction='withdrawal'")->fetch_assoc()['v'] ?? 0);
+        $ssum = function ($dir) use ($g, $sel_acct) {
+            $r = $g->scopedQuery(array('scope' => array('l' => 'fin_bank_statement_lines')),
+                "SELECT COALESCE(SUM(l.amount),0) v FROM fin_bank_statement_lines l WHERE {TENANT_SCOPE} AND l.bank_account_id=? AND l.direction=?",
+                array($sel_acct, $dir));
+            return $r ? (float)$r[0]['v'] : 0.0;
+        };
+        $dep = $ssum('deposit');
+        $wd  = $ssum('withdrawal');
         $bank_balance = $opening + $dep - $wd;
-        $rec_lines   = (int) (mysqli_query($conn, "SELECT COUNT(*) c FROM fin_bank_statement_lines WHERE company_id=$company_id AND bank_account_id=$sel_acct AND reconciled=1")->fetch_assoc()['c'] ?? 0);
-        $unrec_lines = (int) (mysqli_query($conn, "SELECT COUNT(*) c FROM fin_bank_statement_lines WHERE company_id=$company_id AND bank_account_id=$sel_acct AND reconciled=0")->fetch_assoc()['c'] ?? 0);
-        $unmatched_pay = (int) (mysqli_query($conn, "SELECT COUNT(*) c FROM fin_payments p WHERE p.company_id=$company_id AND COALESCE(p.is_deleted,0)=0 AND p.state IN('executed','reconciled') AND NOT EXISTS (SELECT 1 FROM fin_bank_statement_lines b WHERE b.company_id=$company_id AND b.matched_payment_id=p.id)")->fetch_assoc()['c'] ?? 0);
+        $rec_lines   = $g->count('fin_bank_statement_lines', array('where' => array('bank_account_id' => $sel_acct, 'reconciled' => 1)));
+        $unrec_lines = $g->count('fin_bank_statement_lines', array('where' => array('bank_account_id' => $sel_acct, 'reconciled' => 0)));
+        // مدفوعات غير مطابَقة (شركة كاملة) = مرشَّحة ليست ضمن مجموعة المطابَق — قراءتان معزولتان بدل NOT EXISTS
+        $candIds  = $g->select('fin_payments', array('columns' => array('id'), 'whereRaw' => "state IN('executed','reconciled')"));
+        $usedRows = $g->select('fin_bank_statement_lines', array('columns' => array('matched_payment_id'), 'whereRaw' => 'matched_payment_id IS NOT NULL'));
+        $usedSet = array();
+        foreach ($usedRows as $ur) { $usedSet[intval($ur['matched_payment_id'])] = true; }
+        $unmatched_pay = 0;
+        foreach ($candIds as $cp) { if (!isset($usedSet[intval($cp['id'])])) { $unmatched_pay++; } }
     }
 }
 
@@ -179,8 +210,9 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>التاريخ</th><th>الوصف</th><th>النوع</th><th>المبلغ</th><th>المطابقة</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT * FROM fin_bank_statement_lines WHERE company_id=$company_id AND bank_account_id=$sel_acct ORDER BY txn_date ASC, id ASC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $line_rows = fin_gate($is_super_admin)->select('fin_bank_statement_lines', array(
+                    'where' => array('bank_account_id' => $sel_acct), 'orderBy' => 'txn_date ASC, id ASC'));
+                foreach ($line_rows as $row) {
                     $rec = intval($row['reconciled']) === 1;
                     echo "<tr><td><div class='action-btns'>";
                     if ($can_edit && $rec) echo "<a href='?acct=$sel_acct&unmatch_line=" . intval($row['id']) . "' class='action-btn delete' title='إلغاء المطابقة' onclick='return confirm(\"إلغاء المطابقة؟\")'><i class='fas fa-link-slash'></i></a>";
@@ -191,7 +223,7 @@ include '../insidebar.php';
                     echo "<td>" . number_format((float)$row['amount'], 2) . "</td>";
                     echo "<td>" . ($rec ? "<span class='badge badge-success'>مُطابَق #" . intval($row['matched_payment_id']) . "</span>" : "<span class='badge badge-danger'>غير مُطابَق</span>") . "</td>";
                     echo "</tr>";
-                } }
+                }
                 ?>
                 </tbody>
             </table>
