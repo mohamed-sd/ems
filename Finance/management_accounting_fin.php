@@ -31,13 +31,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['center_code'])) {
     if ($code === '' || $name === '') { header("Location: management_accounting_fin.php?msg=بيانات+المركز+غير+مكتملة+❌"); exit(); }
     // حساب المستوى من الأب
     $level = 0;
-    if ($parent) { $pr = mysqli_query($conn, "SELECT level FROM fin_cost_centers WHERE id=$parent AND company_id=$company_id"); if ($pr && ($p = mysqli_fetch_assoc($pr))) $level = intval($p['level']) + 1; }
-    $sql = "INSERT INTO fin_cost_centers (company_id, code, name, center_type, parent_id, owner_module, level, created_by) VALUES (?,?,?,?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'isssisii', $company_id, $code, $name, $ctype, $parent, $owner, $level, $current_user_id);
-        mysqli_stmt_execute($stmt);
-        if (mysqli_errno($conn) === 1062) { mysqli_stmt_close($stmt); header("Location: management_accounting_fin.php?msg=كود+المركز+مكرر+❌"); exit(); }
-        mysqli_stmt_close($stmt);
+    if ($parent) {
+        $pc = fin_gate($is_super_admin)->selectOne('fin_cost_centers', array('columns' => array('level'), 'where' => array('id' => $parent)));
+        if ($pc) { $level = intval($pc['level']) + 1; }
+    }
+    try {
+        fin_gate($is_super_admin)->insert('fin_cost_centers', array(
+            'code' => $code, 'name' => $name, 'center_type' => $ctype, 'parent_id' => $parent,
+            'owner_module' => $owner, 'level' => $level, 'created_by' => $current_user_id,
+        ));
+    } catch (\App\Core\TenantGateException $e) {
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: management_accounting_fin.php?msg=كود+المركز+مكرر+❌"); exit(); }
+        error_log('fin_cost_centers insert refused: ' . $e->getMessage());
+        header("Location: management_accounting_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
     header("Location: management_accounting_fin.php?msg=تمت+إضافة+المركز+✅"); exit();
 }
@@ -51,11 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['alloc_type'])) {
     $basis= trim($_POST['basis'] ?? '');
     $amount = round(floatval($_POST['amount'] ?? 0), 2);
     if ($amount <= 0) { header("Location: management_accounting_fin.php?msg=مبلغ+غير+صحيح+❌"); exit(); }
-    $sql = "INSERT INTO fin_internal_allocations (company_id, alloc_type, from_center_id, to_center_id, basis, amount, state, created_by) VALUES (?,?,?,?,?,?, 'draft', ?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'isiisdi', $company_id, $atype, $from, $to, $basis, $amount, $current_user_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    fin_gate($is_super_admin)->insert('fin_internal_allocations', array(
+        'alloc_type' => $atype, 'from_center_id' => $from, 'to_center_id' => $to,
+        'basis' => $basis, 'amount' => $amount, 'state' => 'draft', 'created_by' => $current_user_id,
+    ));
     header("Location: management_accounting_fin.php?msg=تمت+إضافة+الحركة+✅"); exit();
 }
 
@@ -63,13 +68,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['alloc_type'])) {
 if (isset($_GET['del_center'])) {
     if (!$can_delete) { header("Location: management_accounting_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['del_center']);
-    mysqli_query($conn, "UPDATE fin_cost_centers SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    fin_gate($is_super_admin)->softDelete('fin_cost_centers', $d);
     header("Location: management_accounting_fin.php?msg=تم+حذف+المركز+✅"); exit();
 }
 if (isset($_GET['del_alloc'])) {
     if (!$can_delete) { header("Location: management_accounting_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['del_alloc']);
-    mysqli_query($conn, "UPDATE fin_internal_allocations SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    fin_gate($is_super_admin)->softDelete('fin_internal_allocations', $d);
     header("Location: management_accounting_fin.php?msg=تم+حذف+الحركة+✅"); exit();
 }
 
@@ -125,11 +130,13 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>النوع</th><th>الأب</th><th>الإدارة</th><th>المستوى</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT cc.*, pc.name AS parent_name FROM fin_cost_centers cc
-                        LEFT JOIN fin_cost_centers pc ON pc.id = cc.parent_id
-                        WHERE cc.company_id" . ($is_super_admin ? " > 0" : " = " . intval($company_id)) . " AND COALESCE(cc.is_deleted,0)=0
-                        ORDER BY cc.code ASC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $cc_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('cc' => 'fin_cost_centers'), 'enrich' => array('pc' => 'fin_cost_centers')),
+                    "SELECT cc.*, pc.name AS parent_name FROM fin_cost_centers cc
+                     LEFT JOIN fin_cost_centers pc ON pc.id = cc.parent_id
+                     WHERE {TENANT_SCOPE} AND COALESCE(cc.is_deleted,0)=0
+                     ORDER BY cc.code ASC");
+                { foreach ($cc_rows as $row) {
                     $t = (string)$row['center_type'];
                     echo "<tr><td><div class='action-btns'>";
                     if ($can_delete) echo "<a href='?del_center=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
@@ -153,12 +160,15 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>النوع</th><th>من</th><th>إلى</th><th>الأساس</th><th>المبلغ</th><th>الحالة</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT ia.*, fc.name AS from_name, tc.name AS to_name FROM fin_internal_allocations ia
-                        LEFT JOIN fin_cost_centers fc ON fc.id = ia.from_center_id
-                        LEFT JOIN fin_cost_centers tc ON tc.id = ia.to_center_id
-                        WHERE ia.company_id" . ($is_super_admin ? " > 0" : " = " . intval($company_id)) . " AND COALESCE(ia.is_deleted,0)=0
-                        ORDER BY ia.id DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $ia_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('ia' => 'fin_internal_allocations'),
+                          'enrich' => array('fc' => 'fin_cost_centers', 'tc' => 'fin_cost_centers')),
+                    "SELECT ia.*, fc.name AS from_name, tc.name AS to_name FROM fin_internal_allocations ia
+                     LEFT JOIN fin_cost_centers fc ON fc.id = ia.from_center_id
+                     LEFT JOIN fin_cost_centers tc ON tc.id = ia.to_center_id
+                     WHERE {TENANT_SCOPE} AND COALESCE(ia.is_deleted,0)=0
+                     ORDER BY ia.id DESC");
+                { foreach ($ia_rows as $row) {
                     echo "<tr><td><div class='action-btns'>";
                     if ($can_delete) echo "<a href='?del_alloc=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
                     echo "</div></td>";
