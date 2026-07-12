@@ -26,12 +26,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unit_code'])) {
     if (!$can_add) { header("Location: accountants_fin.php?msg=لا+توجد+صلاحية+إضافة+❌"); exit(); }
     $code = trim($_POST['unit_code'] ?? ''); $name = trim($_POST['unit_name'] ?? ''); $note = trim($_POST['role_note'] ?? '');
     if ($code === '' || $name === '') { header("Location: accountants_fin.php?msg=بيانات+الوحدة+غير+مكتملة+❌"); exit(); }
-    $sql = "INSERT INTO fin_units (company_id, code, name, role_note, created_by) VALUES (?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'isssi', $company_id, $code, $name, $note, $current_user_id);
-        mysqli_stmt_execute($stmt);
-        if (mysqli_errno($conn) === 1062) { mysqli_stmt_close($stmt); header("Location: accountants_fin.php?msg=كود+الوحدة+مكرر+❌"); exit(); }
-        mysqli_stmt_close($stmt);
+    try {
+        fin_gate($is_super_admin)->insert('fin_units', array(
+            'code' => $code, 'name' => $name, 'role_note' => $note, 'created_by' => $current_user_id,
+        ));
+    } catch (\App\Core\TenantGateException $e) {
+        // نمط 1062 المعتمد (M2b): التكرار برسالته، وغيره يُسجَّل
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: accountants_fin.php?msg=كود+الوحدة+مكرر+❌"); exit(); }
+        error_log('fin_units insert refused: ' . $e->getMessage());
+        header("Location: accountants_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
     header("Location: accountants_fin.php?msg=تمت+إضافة+الوحدة+✅"); exit();
 }
@@ -45,12 +48,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_module'])) {
     $spec = trim($_POST['specialization'] ?? '');
     $limit = ($_POST['review_limit_usd'] ?? '') === '' ? null : round(floatval($_POST['review_limit_usd']), 2);
     if ($emp <= 0 || $mod === '' || $unit <= 0) { header("Location: accountants_fin.php?msg=بيانات+المحاسب+غير+مكتملة+❌"); exit(); }
-    $sql = "INSERT INTO fin_accountants (company_id, employee_id, admin_module, finance_unit_id, specialization, review_limit_usd, created_by) VALUES (?,?,?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iisisdi', $company_id, $emp, $mod, $unit, $spec, $limit, $current_user_id);
-        mysqli_stmt_execute($stmt);
-        if (mysqli_errno($conn) === 1062) { mysqli_stmt_close($stmt); header("Location: accountants_fin.php?msg=المحاسب+مُسنَد+لهذه+الإدارة+مسبقاً+❌"); exit(); }
-        mysqli_stmt_close($stmt);
+    try {
+        fin_gate($is_super_admin)->insert('fin_accountants', array(
+            'employee_id' => $emp, 'admin_module' => $mod, 'finance_unit_id' => $unit,
+            'specialization' => $spec, 'review_limit_usd' => $limit, 'created_by' => $current_user_id,
+        ));
+    } catch (\App\Core\TenantGateException $e) {
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: accountants_fin.php?msg=المحاسب+مُسنَد+لهذه+الإدارة+مسبقاً+❌"); exit(); }
+        error_log('fin_accountants insert refused: ' . $e->getMessage());
+        header("Location: accountants_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
     header("Location: accountants_fin.php?msg=تمت+إضافة+المحاسب+✅"); exit();
 }
@@ -59,13 +65,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_module'])) {
 if (isset($_GET['del_unit'])) {
     if (!$can_delete) { header("Location: accountants_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['del_unit']);
-    mysqli_query($conn, "UPDATE fin_units SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    fin_gate($is_super_admin)->softDelete('fin_units', $d);
     header("Location: accountants_fin.php?msg=تم+حذف+الوحدة+✅"); exit();
 }
 if (isset($_GET['del_acct'])) {
     if (!$can_delete) { header("Location: accountants_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['del_acct']);
-    mysqli_query($conn, "UPDATE fin_accountants SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    fin_gate($is_super_admin)->softDelete('fin_accountants', $d);
     header("Location: accountants_fin.php?msg=تم+حذف+المحاسب+✅"); exit();
 }
 
@@ -119,8 +125,8 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>الدور</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT * FROM fin_units WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0 ORDER BY code ASC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $unit_rows = fin_gate($is_super_admin)->select('fin_units', array('orderBy' => 'code ASC'));
+                { foreach ($unit_rows as $row) {
                     echo "<tr><td><div class='action-btns'>";
                     if ($can_delete) echo "<a href='?del_unit=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
                     echo "</div></td>";
@@ -140,13 +146,16 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>المحاسب</th><th>الإدارة المتبوعة</th><th>الوحدة المالية</th><th>التخصص</th><th>حد المراجعة</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT a.*, e.name AS emp_name, u.code AS unit_code, u.name AS unit_name
-                        FROM fin_accountants a
-                        LEFT JOIN employees e ON e.id = a.employee_id
-                        LEFT JOIN fin_units u ON u.id = a.finance_unit_id
-                        WHERE a.company_id" . ($is_super_admin ? " > 0" : " = " . intval($company_id)) . " AND COALESCE(a.is_deleted,0)=0
-                        ORDER BY a.admin_module ASC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $acct_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('a' => 'fin_accountants'),
+                          'enrich' => array('e' => 'employees', 'u' => 'fin_units')),
+                    "SELECT a.*, e.name AS emp_name, u.code AS unit_code, u.name AS unit_name
+                     FROM fin_accountants a
+                     LEFT JOIN employees e ON e.id = a.employee_id
+                     LEFT JOIN fin_units u ON u.id = a.finance_unit_id
+                     WHERE {TENANT_SCOPE} AND COALESCE(a.is_deleted,0)=0
+                     ORDER BY a.admin_module ASC");
+                { foreach ($acct_rows as $row) {
                     echo "<tr><td><div class='action-btns'>";
                     if ($can_delete) echo "<a href='?del_acct=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
                     echo "</div></td>";
