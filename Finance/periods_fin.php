@@ -26,24 +26,26 @@ $closing_steps = fin_closing_steps();
 if (isset($_GET['action']) && isset($_GET['pid'])) {
     if (!$can_edit) { header("Location: periods_fin.php?msg=لا+توجد+صلاحية+الإجراء+❌"); exit(); }
     $pid = intval($_GET['pid']); $act = $_GET['action'];
+    // انتقالات الحالة عبر البوابة — حراسة الحالة عبر whereRaw، والعزل يُحقن تلقائيًّا.
+    $g = fin_gate($is_super_admin);
+    $now = date('Y-m-d H:i:s');
     if ($act === 'open') {
-        mysqli_query($conn, "UPDATE fin_financial_periods SET state='open', posting_allowed=1 WHERE id=$pid AND company_id=$company_id AND state IN('planned','reopened')");
+        $g->update('fin_financial_periods', array('state'=>'open','posting_allowed'=>1), array('id'=>$pid), "state IN('planned','reopened')");
         header("Location: periods_fin.php?msg=تم+فتح+الفترة+✅"); exit();
     } elseif ($act === 'soft_close') {
-        mysqli_query($conn, "UPDATE fin_financial_periods SET state='soft_closed', posting_allowed=0, soft_closed_at=NOW() WHERE id=$pid AND company_id=$company_id AND state='open'");
+        $g->update('fin_financial_periods', array('state'=>'soft_closed','posting_allowed'=>0,'soft_closed_at'=>$now), array('id'=>$pid), "state='open'");
         header("Location: periods_fin.php?msg=تم+الإقفال+المرحلي+✅"); exit();
     } elseif ($act === 'close') {
         // قاعدة الإقفال: كل البنود الإلزامية يجب أن تكون منجَزة
-        $chk = mysqli_query($conn, "SELECT COUNT(*) AS n FROM fin_closing_items WHERE period_id=$pid AND company_id=$company_id AND required=1 AND item_state='pending'");
-        $n = ($chk && ($r = mysqli_fetch_assoc($chk))) ? intval($r['n']) : 0;
+        $n = $g->count('fin_closing_items', array('where'=>array('period_id'=>$pid,'required'=>1,'item_state'=>'pending')));
         if ($n > 0) { header("Location: periods_fin.php?pid=$pid&msg=لا+إقفال:+بنود+إلزامية+غير+منجَزة+($n)+❌"); exit(); }
-        mysqli_query($conn, "UPDATE fin_financial_periods SET state='closed', posting_allowed=0, closed_at=NOW() WHERE id=$pid AND company_id=$company_id AND state IN('open','soft_closed')");
+        $g->update('fin_financial_periods', array('state'=>'closed','posting_allowed'=>0,'closed_at'=>$now), array('id'=>$pid), "state IN('open','soft_closed')");
         header("Location: periods_fin.php?msg=تم+إقفال+الفترة+✅"); exit();
     } elseif ($act === 'lock') {
-        mysqli_query($conn, "UPDATE fin_financial_periods SET state='locked', locked_at=NOW() WHERE id=$pid AND company_id=$company_id AND state='closed'");
+        $g->update('fin_financial_periods', array('state'=>'locked','locked_at'=>$now), array('id'=>$pid), "state='closed'");
         header("Location: periods_fin.php?msg=تم+القفل+النهائي+✅"); exit();
     } elseif ($act === 'reopen') {
-        mysqli_query($conn, "UPDATE fin_financial_periods SET state='reopened', posting_allowed=1, reopen_reason='فتح استثنائي', reopened_by=$current_user_id WHERE id=$pid AND company_id=$company_id AND state IN('closed','soft_closed')");
+        $g->update('fin_financial_periods', array('state'=>'reopened','posting_allowed'=>1,'reopen_reason'=>'فتح استثنائي','reopened_by'=>$current_user_id), array('id'=>$pid), "state IN('closed','soft_closed')");
         header("Location: periods_fin.php?msg=تم+الفتح+الاستثنائي+✅"); exit();
     }
 }
@@ -52,7 +54,7 @@ if (isset($_GET['action']) && isset($_GET['pid'])) {
 if (isset($_GET['done_item'])) {
     if (!$can_edit) { header("Location: periods_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
     $it = intval($_GET['done_item']); $pid = intval($_GET['pid'] ?? 0);
-    mysqli_query($conn, "UPDATE fin_closing_items SET item_state='done', done_by=$current_user_id, done_at=NOW() WHERE id=$it AND company_id=$company_id");
+    fin_gate($is_super_admin)->update('fin_closing_items', array('item_state'=>'done','done_by'=>$current_user_id,'done_at'=>date('Y-m-d H:i:s')), array('id'=>$it));
     header("Location: periods_fin.php?pid=$pid&msg=تم+إنجاز+البند+✅"); exit();
 }
 
@@ -66,24 +68,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fiscal_year'])) {
     if ($ptype === 'year') { $start = "$fy-01-01"; $end = "$fy-12-31"; }
     else { $start = date('Y-m-01', mktime(0, 0, 0, $pno, 1, $fy)); $end = date('Y-m-t', mktime(0, 0, 0, $pno, 1, $fy)); }
 
-    $sql = "INSERT INTO fin_financial_periods (company_id, fiscal_year, period_type, period_no, start_date, end_date, state, created_by)
-            VALUES (?,?,?,?,?,?, 'planned', ?)";
+    // إنشاء الفترة + بذر بنود إقفالها زوجٌ مترابط → معاملة ذرّية عبر §9؛ العزل يُحقن تلقائيًّا.
     $pid = 0;
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'iisissi', $company_id, $fy, $ptype, $pno, $start, $end, $current_user_id);
-        mysqli_stmt_execute($stmt);
-        if (mysqli_errno($conn) === 1062) { mysqli_stmt_close($stmt); header("Location: periods_fin.php?msg=الفترة+موجودة+مسبقاً+❌"); exit(); }
-        $pid = mysqli_insert_id($conn);
-        mysqli_stmt_close($stmt);
-    }
-    // بذر بنود قائمة الإقفال الإلزامية
-    if ($pid > 0) {
-        $ci = mysqli_prepare($conn, "INSERT INTO fin_closing_items (company_id, period_id, step, required) VALUES (?,?,?,1)");
-        foreach (array_keys($closing_steps) as $step) {
-            mysqli_stmt_bind_param($ci, 'iis', $company_id, $pid, $step);
-            mysqli_stmt_execute($ci);
+    try {
+        $pid = fin_gate($is_super_admin)->runInTransaction(function ($gate) use ($fy, $ptype, $pno, $start, $end, $current_user_id, $closing_steps) {
+            $newId = $gate->insert('fin_financial_periods', array(
+                'fiscal_year' => $fy,
+                'period_type' => $ptype,
+                'period_no'   => $pno,
+                'start_date'  => $start,
+                'end_date'    => $end,
+                'state'       => 'planned',
+                'created_by'  => $current_user_id,
+            ));
+            foreach (array_keys($closing_steps) as $step) {
+                $gate->insert('fin_closing_items', array(
+                    'period_id' => $newId,
+                    'step'      => $step,
+                    'required'  => 1,
+                ));
+            }
+            return $newId;
+        }, 'periods: create period + seed closing items');
+    } catch (\App\Core\TenantGateException $e) {
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+            header("Location: periods_fin.php?msg=الفترة+موجودة+مسبقاً+❌"); exit();
         }
-        mysqli_stmt_close($ci);
+        throw $e;
     }
     header("Location: periods_fin.php?pid=$pid&msg=تم+إنشاء+الفترة+وقائمة+إقفالها+✅"); exit();
 }
@@ -124,9 +135,8 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>السنة</th><th>النوع</th><th>من</th><th>إلى</th><th>القيد مسموح</th><th>الحالة</th></tr></thead>
                 <tbody>
                 <?php
-                $scope_p = fin_scope('company_id', $is_super_admin, $company_id);
-                $sql = "SELECT * FROM fin_financial_periods WHERE $scope_p ORDER BY fiscal_year DESC, period_type ASC, period_no ASC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $period_rows = fin_gate($is_super_admin)->select('fin_financial_periods', array('orderBy' => 'fiscal_year DESC, period_type ASC, period_no ASC'));
+                foreach ($period_rows as $row) {
                     $st = (string)$row['state']; $id = intval($row['id']);
                     $tone = in_array($st, array('open','reopened')) ? 'success' : ($st === 'planned' ? 'secondary' : ($st === 'locked' ? 'dark' : 'primary'));
                     echo "<tr><td><div class='action-btns'>";
@@ -146,7 +156,7 @@ include '../insidebar.php';
                     echo "<td>" . ($row['posting_allowed'] ? "<span class='badge badge-success'>نعم</span>" : "<span class='badge badge-secondary'>لا</span>") . "</td>";
                     echo "<td><span class='badge badge-" . $tone . "'>" . htmlspecialchars($period_states[$st] ?? $st) . "</span></td>";
                     echo "</tr>";
-                } }
+                }
                 ?>
                 </tbody>
             </table>
@@ -160,8 +170,8 @@ include '../insidebar.php';
                 <tbody>
                 <?php
                 $done = 0; $total = 0;
-                $cq = mysqli_query($conn, "SELECT * FROM fin_closing_items WHERE period_id=$sel_pid AND company_id=$company_id ORDER BY id ASC");
-                if ($cq) { while ($it = mysqli_fetch_assoc($cq)) {
+                $closing_rows = fin_gate($is_super_admin)->select('fin_closing_items', array('where' => array('period_id' => $sel_pid), 'orderBy' => 'id ASC'));
+                foreach ($closing_rows as $it) {
                     $total++; if ($it['item_state'] === 'done') $done++;
                     $tone = $it['item_state'] === 'done' ? 'success' : ($it['item_state'] === 'na' ? 'secondary' : 'warn');
                     $lbl = array('pending' => 'معلّق', 'done' => 'منجَز', 'na' => 'لا ينطبق');
@@ -172,7 +182,7 @@ include '../insidebar.php';
                     echo "<td>";
                     if ($can_edit && $it['item_state'] === 'pending') echo "<a href='?done_item=" . intval($it['id']) . "&pid=$sel_pid' class='action-btn edit' title='إنجاز'><i class='fas fa-check'></i></a>";
                     echo "</td></tr>";
-                } }
+                }
                 $pct = $total > 0 ? round($done / $total * 100) : 0;
                 ?>
                 </tbody>
