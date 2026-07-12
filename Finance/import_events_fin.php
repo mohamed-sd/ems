@@ -19,48 +19,76 @@ $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 if (!$can_view) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+الاستيراد+❌"); exit(); }
 $cid = intval($company_id);
 
-/** أحداث المشتريات غير المستوردة (proc_order → مصروف). READ ONLY على proc_order. */
-function fin_import_proc($conn, $cid, $uid)
+/**
+ * مرشّحو الاستيراد لمصدرٍ ما: أوامرُ بمبلغٍ موجب وكودٍ غير فارغ لم يُولَّد لها حدثٌ بعد.
+ * NOT EXISTS المترابط الأصلي (مزدوج النطاق على جدولين مستأجرين) → قراءتان معزولتان
+ * عبر البوابة تُطابَقان في PHP (نمط bank_reconciliation المثبَت). القراءتان تُحقنان
+ * company_id تلقائيًّا وتستبعدان is_deleted (يوافق po.company_id=fe.company_id=$cid
+ * وCOALESCE(is_deleted,0)=0 الأصليَّين — الحدث المؤرشَف لا يمنع إعادة التوليد).
+ */
+function fin_pending_import($gate, $srcTable, $amtCol, $module)
 {
-    $sql = "INSERT INTO fin_financial_events
-              (company_id, event_no, event_type, source_module, source_ref, amount, currency, state, notes, created_by)
-            SELECT po.company_id, CONCAT('FIN-EV-IMP-', po.id), 'expense', 'procurement', po.code,
-                   po.total_amount, COALESCE(po.currency,'SDG'), 'draft', CONCAT('استيراد آلي من أمر شراء ', po.code), $uid
-            FROM proc_order po
-            WHERE po.company_id = $cid AND COALESCE(po.is_deleted,0) = 0 AND COALESCE(po.total_amount,0) > 0
-              AND po.code IS NOT NULL AND po.code <> ''
-              AND NOT EXISTS (SELECT 1 FROM fin_financial_events fe
-                              WHERE fe.company_id = po.company_id AND fe.source_module='procurement'
-                                AND fe.source_ref = po.code AND COALESCE(fe.is_deleted,0)=0)";
-    mysqli_query($conn, $sql);
-    return mysqli_affected_rows($conn);
+    $cands = $gate->select($srcTable, array('whereRaw' => "COALESCE(`$amtCol`,0) > 0 AND `code` IS NOT NULL AND `code` <> ''"));
+    $used  = $gate->select('fin_financial_events', array('columns' => array('source_ref'), 'where' => array('source_module' => $module)));
+    $usedSet = array();
+    foreach ($used as $u) { $usedSet[(string)$u['source_ref']] = true; }
+    $out = array();
+    foreach ($cands as $c) { if (!isset($usedSet[(string)$c['code']])) { $out[] = $c; } }
+    return $out;
 }
 
-/** أحداث الصيانة غير المستوردة (mnt_order → مصروف بأبعاده). READ ONLY على mnt_order. */
-function fin_import_mnt($conn, $cid, $uid)
+/** أحداث المشتريات غير المستوردة (proc_order → مصروف). قراءة فقط على proc_order. */
+function fin_import_proc($gate, $uid)
 {
-    $sql = "INSERT INTO fin_financial_events
-              (company_id, event_no, event_type, source_module, source_ref, amount, currency, equipment_id, project_id, state, notes, created_by)
-            SELECT mo.company_id, CONCAT('FIN-EV-IMM-', mo.id), 'expense', 'maintenance', mo.code,
-                   mo.total_cost, 'SDG', mo.equipment_id, mo.project_id, 'draft', CONCAT('استيراد آلي من أمر صيانة ', mo.code), $uid
-            FROM mnt_order mo
-            WHERE mo.company_id = $cid AND COALESCE(mo.is_deleted,0) = 0 AND COALESCE(mo.total_cost,0) > 0
-              AND mo.code IS NOT NULL AND mo.code <> ''
-              AND NOT EXISTS (SELECT 1 FROM fin_financial_events fe
-                              WHERE fe.company_id = mo.company_id AND fe.source_module='maintenance'
-                                AND fe.source_ref = mo.code AND COALESCE(fe.is_deleted,0)=0)";
-    mysqli_query($conn, $sql);
-    return mysqli_affected_rows($conn);
+    $n = 0;
+    foreach (fin_pending_import($gate, 'proc_order', 'total_amount', 'procurement') as $po) {
+        $gate->insert('fin_financial_events', array(
+            'event_no'      => 'FIN-EV-IMP-' . intval($po['id']),
+            'event_type'    => 'expense',
+            'source_module' => 'procurement',
+            'source_ref'    => $po['code'],
+            'amount'        => $po['total_amount'],
+            'currency'      => ($po['currency'] !== null && $po['currency'] !== '') ? $po['currency'] : 'SDG',
+            'state'         => 'draft',
+            'notes'         => 'استيراد آلي من أمر شراء ' . $po['code'],
+            'created_by'    => $uid,
+        ));
+        $n++;
+    }
+    return $n;
+}
+
+/** أحداث الصيانة غير المستوردة (mnt_order → مصروف بأبعاده). قراءة فقط على mnt_order. */
+function fin_import_mnt($gate, $uid)
+{
+    $n = 0;
+    foreach (fin_pending_import($gate, 'mnt_order', 'total_cost', 'maintenance') as $mo) {
+        $gate->insert('fin_financial_events', array(
+            'event_no'      => 'FIN-EV-IMM-' . intval($mo['id']),
+            'event_type'    => 'expense',
+            'source_module' => 'maintenance',
+            'source_ref'    => $mo['code'],
+            'amount'        => $mo['total_cost'],
+            'currency'      => 'SDG',
+            'equipment_id'  => $mo['equipment_id'],
+            'project_id'    => $mo['project_id'],
+            'state'         => 'draft',
+            'notes'         => 'استيراد آلي من أمر صيانة ' . $mo['code'],
+            'created_by'    => $uid,
+        ));
+        $n++;
+    }
+    return $n;
 }
 
 if (isset($_GET['gen_proc'])) {
     if (!$can_add) { header("Location: import_events_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-    $n = fin_import_proc($conn, $cid, $current_user_id);
+    $n = fin_import_proc(ems_tenant_db(), $current_user_id);
     header("Location: import_events_fin.php?msg=تم+توليد+$n+حدث+من+المشتريات+✅"); exit();
 }
 if (isset($_GET['gen_mnt'])) {
     if (!$can_add) { header("Location: import_events_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
-    $n = fin_import_mnt($conn, $cid, $current_user_id);
+    $n = fin_import_mnt(ems_tenant_db(), $current_user_id);
     header("Location: import_events_fin.php?msg=تم+توليد+$n+حدث+من+الصيانة+✅"); exit();
 }
 
@@ -68,9 +96,9 @@ $page_title = 'إيكوبيشن | استيراد أحداث الإدارات';
 include '../inheader.php';
 include '../insidebar.php';
 
-// عدّادات المرشّحين (قراءة فقط)
-$proc_pending = (int) (mysqli_query($conn, "SELECT COUNT(*) c FROM proc_order po WHERE po.company_id=$cid AND COALESCE(po.is_deleted,0)=0 AND COALESCE(po.total_amount,0)>0 AND po.code IS NOT NULL AND po.code<>'' AND NOT EXISTS (SELECT 1 FROM fin_financial_events fe WHERE fe.company_id=po.company_id AND fe.source_module='procurement' AND fe.source_ref=po.code AND COALESCE(fe.is_deleted,0)=0)")->fetch_assoc()['c'] ?? 0);
-$mnt_pending  = (int) (mysqli_query($conn, "SELECT COUNT(*) c FROM mnt_order mo WHERE mo.company_id=$cid AND COALESCE(mo.is_deleted,0)=0 AND COALESCE(mo.total_cost,0)>0 AND mo.code IS NOT NULL AND mo.code<>'' AND NOT EXISTS (SELECT 1 FROM fin_financial_events fe WHERE fe.company_id=mo.company_id AND fe.source_module='maintenance' AND fe.source_ref=mo.code AND COALESCE(fe.is_deleted,0)=0)")->fetch_assoc()['c'] ?? 0);
+// عدّادات المرشّحين (قراءة فقط) — نفس منطق قراءتَي fin_pending_import عبر البوابة
+$proc_pending = count(fin_pending_import(ems_tenant_db(), 'proc_order', 'total_amount', 'procurement'));
+$mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_cost', 'maintenance'));
 ?>
 <div class="main fin-import-main ems-unified-page-shell">
     <?php
@@ -120,11 +148,13 @@ $mnt_pending  = (int) (mysqli_query($conn, "SELECT COUNT(*) c FROM mnt_order mo 
                 <thead><tr><th>رقم الحدث</th><th>المصدر</th><th>المرجع</th><th>المبلغ</th><th>الحالة</th><th>ملاحظة</th></tr></thead>
                 <tbody>
                 <?php
-                $scope = fin_scope('company_id', $is_super_admin, $company_id);
                 $states = fin_event_states(); $mods = fin_source_modules();
-                $sql = "SELECT * FROM fin_financial_events WHERE $scope AND COALESCE(is_deleted,0)=0
-                        AND source_module IN('procurement','maintenance') AND event_no LIKE 'FIN-EV-IM%' ORDER BY id DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                // العزل عبر البوابة (super→كل الشركات via forAllTenants، يوافق fin_scope '1=1')
+                $imported = fin_gate($is_super_admin)->select('fin_financial_events', array(
+                    'whereRaw' => "source_module IN('procurement','maintenance') AND event_no LIKE 'FIN-EV-IM%'",
+                    'orderBy'  => 'id DESC',
+                ));
+                foreach ($imported as $row) {
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars((string)$row['event_no']) . "</td>";
                     echo "<td><span class='badge badge-primary'>" . htmlspecialchars($mods[$row['source_module']] ?? $row['source_module']) . "</span></td>";
@@ -133,7 +163,7 @@ $mnt_pending  = (int) (mysqli_query($conn, "SELECT COUNT(*) c FROM mnt_order mo 
                     echo "<td><span class='badge badge-" . fin_state_tone($row['state']) . "'>" . htmlspecialchars($states[$row['state']] ?? $row['state']) . "</span></td>";
                     echo "<td>" . htmlspecialchars((string)($row['notes'] ?? '')) . "</td>";
                     echo "</tr>";
-                } }
+                }
                 ?>
                 </tbody>
             </table>
