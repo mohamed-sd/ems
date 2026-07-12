@@ -41,26 +41,35 @@ if (isset($_GET['generate'])) {
     $days = $win[$horizon];
     $until = date('Y-m-d', strtotime("+$days days"));
 
-    $inflow = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(outstanding),0) v FROM fin_receivables WHERE company_id=$company_id AND COALESCE(is_deleted,0)=0 AND outstanding>0 AND (due_date IS NULL OR due_date<='$until')")->fetch_assoc()['v'] ?? 0);
-    $out_dues = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(amount),0) v FROM fin_dues WHERE company_id=$company_id AND direction='credit' AND settlement_state<>'paid' AND COALESCE(is_deleted,0)=0")->fetch_assoc()['v'] ?? 0);
-    $out_fund = (float) (mysqli_query($conn, "SELECT COALESCE(SUM(total_due-paid_amount),0) v FROM fin_funding_schedules WHERE company_id=$company_id AND state<>'paid' AND due_date<='$until'")->fetch_assoc()['v'] ?? 0);
+    $gate = fin_gate($is_super_admin);
+    $ssum = function ($alias, $table, $sql, $params) use ($gate) {
+        $r = $gate->scopedQuery(array('scope' => array($alias => $table)), $sql, $params);
+        return $r ? (float) $r[0]['v'] : 0.0;
+    };
+    $inflow = $ssum('r', 'fin_receivables',
+        "SELECT COALESCE(SUM(r.outstanding),0) v FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0 AND (r.due_date IS NULL OR r.due_date<=?)",
+        array($until));
+    $out_dues = $ssum('d', 'fin_dues',
+        "SELECT COALESCE(SUM(d.amount),0) v FROM fin_dues d WHERE {TENANT_SCOPE} AND d.direction='credit' AND d.settlement_state<>'paid' AND COALESCE(d.is_deleted,0)=0", array());
+    $out_fund = $ssum('f', 'fin_funding_schedules',
+        "SELECT COALESCE(SUM(f.total_due-f.paid_amount),0) v FROM fin_funding_schedules f WHERE {TENANT_SCOPE} AND f.state<>'paid' AND f.due_date<=?",
+        array($until));
     $outflow = round($out_dues + $out_fund, 2);
 
     // نقد افتتاحي = آخر وضع متوقّع سابق أو قيمة تجريبية
-    $prev = mysqli_query($conn, "SELECT expected_position FROM fin_cash_forecasts WHERE company_id=$company_id AND COALESCE(is_deleted,0)=0 ORDER BY id DESC LIMIT 1");
-    $opening = ($prev && ($p = mysqli_fetch_assoc($prev))) ? (float)$p['expected_position'] : 10000000.00;
+    $prev = $gate->selectOne('fin_cash_forecasts', array('columns' => array('expected_position'), 'orderBy' => 'id DESC'));
+    $opening = $prev ? (float) $prev['expected_position'] : 10000000.00;
     $min_required = 5000000.00;
     $position = $opening + $inflow - $outflow;
     list($gap, $prio) = fin_gap_and_priority($position, $min_required);
     $today = date('Y-m-d');
 
-    $sql2 = "INSERT INTO fin_cash_forecasts (company_id, forecast_date, horizon_type, opening_cash, expected_inflow, expected_outflow, min_required, funding_gap, cash_priority, source, note, created_by)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sql2)) {
-        $note = 'توليد آلي من البيانات الحية'; $source = 'manual';
-        mysqli_stmt_bind_param($stmt, 'issddddssssi', $company_id, $today, $horizon, $opening, $inflow, $outflow, $min_required, $gap, $prio, $source, $note, $current_user_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    $gate->insert('fin_cash_forecasts', array(
+        'forecast_date' => $today, 'horizon_type' => $horizon, 'opening_cash' => $opening,
+        'expected_inflow' => $inflow, 'expected_outflow' => $outflow, 'min_required' => $min_required,
+        'funding_gap' => $gap, 'cash_priority' => $prio, 'source' => 'manual',
+        'note' => 'توليد آلي من البيانات الحية', 'created_by' => $current_user_id,
+    ));
     header("Location: cash_forecast_fin.php?msg=تم+توليد+تنبؤ+$horizon+(الوضع=" . number_format($position, 0) . ")+✅"); exit();
 }
 
@@ -68,7 +77,7 @@ if (isset($_GET['generate'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: cash_forecast_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['delete_id']);
-    mysqli_query($conn, "UPDATE fin_cash_forecasts SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    fin_gate($is_super_admin)->softDelete('fin_cash_forecasts', $d);
     header("Location: cash_forecast_fin.php?msg=تم+حذف+التنبؤ+✅"); exit();
 }
 
@@ -84,13 +93,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['horizon_type'])) {
     $position = $opening + $inflow - $outflow;
     list($gap, $prio) = fin_gap_and_priority($position, $minreq);
 
-    $sqlm = "INSERT INTO fin_cash_forecasts (company_id, forecast_date, horizon_type, opening_cash, expected_inflow, expected_outflow, min_required, funding_gap, cash_priority, source, note, created_by)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sqlm)) {
-        $note = trim($_POST['note'] ?? ''); $source = 'manual';
-        mysqli_stmt_bind_param($stmt, 'issddddssssi', $company_id, $fdate, $horizon, $opening, $inflow, $outflow, $minreq, $gap, $prio, $source, $note, $current_user_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    fin_gate($is_super_admin)->insert('fin_cash_forecasts', array(
+        'forecast_date' => $fdate, 'horizon_type' => $horizon, 'opening_cash' => $opening,
+        'expected_inflow' => $inflow, 'expected_outflow' => $outflow, 'min_required' => $minreq,
+        'funding_gap' => $gap, 'cash_priority' => $prio, 'source' => 'manual',
+        'note' => trim($_POST['note'] ?? ''), 'created_by' => $current_user_id,
+    ));
     header("Location: cash_forecast_fin.php?msg=تم+حفظ+التنبؤ+✅"); exit();
 }
 
@@ -134,9 +142,8 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>التاريخ</th><th>الأفق</th><th>افتتاحي</th><th>داخل</th><th>خارج</th><th>الوضع المتوقّع</th><th>فجوة التمويل</th><th>الأولوية</th></tr></thead>
                 <tbody>
                 <?php
-                $scope_c = fin_scope('company_id', $is_super_admin, $company_id);
-                $sql = "SELECT * FROM fin_cash_forecasts WHERE $scope_c AND COALESCE(is_deleted,0)=0 ORDER BY id DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $fc_rows = fin_gate($is_super_admin)->select('fin_cash_forecasts', array('orderBy' => 'id DESC'));
+                { foreach ($fc_rows as $row) {
                     $pos = (float)$row['expected_position']; $gap = (float)($row['funding_gap'] ?? 0);
                     $prio = (string)($row['cash_priority'] ?? 'normal');
                     $pos_tone = $pos < 0 ? 'danger' : ($pos < (float)($row['min_required'] ?? 0) ? 'warn' : 'success');
