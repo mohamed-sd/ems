@@ -32,8 +32,9 @@ if (!function_exists('fin_user_level')) {
     {
         if ((string)$role_id === EMS_ROLE_SUPER_ADMIN) { return 'all'; }
         $rid = intval($role_id);
-        $r = mysqli_query($conn, "SELECT name FROM roles WHERE id = $rid LIMIT 1");
-        $name = ($r && ($x = mysqli_fetch_assoc($r))) ? trim($x['name']) : '';
+        // roles جدولٌ عالمي (T_GLOBAL) — قراءةٌ بلا نطاقٍ عبر البوابة
+        $row = ems_tenant_db()->selectOne('roles', array('columns' => array('name'), 'where' => array('id' => $rid)));
+        $name = $row ? trim($row['name']) : '';
         $map = fin_role_level_map();
         return isset($map[$name]) ? $map[$name] : 'none';
     }
@@ -95,15 +96,15 @@ if (!function_exists('fin_period_posting_open')) {
      */
     function fin_period_posting_open($conn, $company_id, $date)
     {
-        $company_id = intval($company_id);
-        $date = mysqli_real_escape_string($conn, $date);
-        $sql = "SELECT posting_allowed, state FROM fin_financial_periods
-                WHERE company_id = $company_id AND period_type = 'month'
-                  AND '$date' BETWEEN start_date AND end_date
-                ORDER BY id DESC LIMIT 1";
-        $r = mysqli_query($conn, $sql);
-        if (!$r || mysqli_num_rows($r) === 0) { return true; } // لا فترة معرّفة ⇒ يُسمح (توافق)
-        $row = mysqli_fetch_assoc($r);
+        // البوابة تعزل الشركة؛ نطاق التاريخ عبر معامِلٍ مربوط (لا فلتر حذف — الجدول soft=false)
+        $row = fin_gate(false)->selectOne('fin_financial_periods', array(
+            'columns'  => array('posting_allowed', 'state'),
+            'where'    => array('period_type' => 'month'),
+            'whereRaw' => '? BETWEEN start_date AND end_date',
+            'params'   => array($date),
+            'orderBy'  => 'id DESC',
+        ));
+        if (!$row) { return true; } // لا فترة معرّفة ⇒ يُسمح (توافق)
         return intval($row['posting_allowed']) === 1;
     }
 }
@@ -141,11 +142,24 @@ if (!function_exists('fin_scope')) {
 }
 
 if (!function_exists('fin_gate')) {
-    /** بوابة العزل لسياق الجلسة (نمط trs_gate). $is_super=true ⇒ رؤية عابرة محروسة. */
+    /**
+     * بوابة العزل لسياق الجلسة (نمط trs_gate). $is_super=true ⇒ رؤية عابرة محروسة.
+     * في سياق النظام (cron بلا جلسة): الدورة تركّب بوابتها forSystem($cid) وتحقنها
+     * عبر fin_gate_override فتتبعها كل دوال fin_helpers هنا (نمط trs_gate_override).
+     */
     function fin_gate($is_super = false)
     {
+        if (isset($GLOBALS['__fin_gate_override']) && $GLOBALS['__fin_gate_override'] instanceof \App\Core\TenantDb) {
+            return $GLOBALS['__fin_gate_override'];
+        }
         $gate = ems_tenant_db();
         return $is_super ? $gate->forAllTenants('fin helpers super view') : $gate;
+    }
+
+    /** حقن بوابة دورة النظام (null = العودة لسياق الجلسة). */
+    function fin_gate_override($gate)
+    {
+        $GLOBALS['__fin_gate_override'] = $gate;
     }
 }
 
@@ -153,12 +167,8 @@ if (!function_exists('fin_gen_code')) {
     /** كود تسلسلي لكل شركة، مثل FIN-EV-0001. اسم الجدول من قائمة بيضاء في الكود. */
     function fin_gen_code($conn, $table, $prefix, $company_id)
     {
-        $n = 0;
-        $sql = "SELECT COUNT(*) AS c FROM `" . $table . "` WHERE company_id = " . intval($company_id);
-        if ($res = mysqli_query($conn, $sql)) {
-            $row = mysqli_fetch_assoc($res);
-            $n = intval($row['c']);
-        }
+        // عدٌّ شامل للمحذوف عبر البوابة (يطابق COUNT(*) WHERE company_id=X الأصلي، بلا فلتر حذف)
+        $n = ems_tenant_db()->count($table, array('includeDeleted' => true));
         return $prefix . '-' . str_pad((string)($n + 1), 4, '0', STR_PAD_LEFT);
     }
 }
@@ -177,18 +187,17 @@ if (!function_exists('fin_msg_banner')) {
     }
 }
 
-if (!function_exists('fin_options_from_query')) {
-    function fin_options_from_query($conn, $sql, $selected = 0, $placeholder = '— اختر —')
+if (!function_exists('fin_options_from_rows')) {
+    /** تنسيق خيارات <option> من صفوفٍ قُرئت عبر البوابة (كل صف: id + label جاهز PHP-side). */
+    function fin_options_from_rows(array $rows, $selected = 0, $placeholder = '— اختر —')
     {
         $out = '<option value="">' . htmlspecialchars($placeholder) . '</option>';
         $selected = intval($selected);
-        if ($res = mysqli_query($conn, $sql)) {
-            while ($r = mysqli_fetch_assoc($res)) {
-                $id  = intval($r['id']);
-                $lbl = isset($r['label']) ? (string)$r['label'] : '';
-                $sel = ($id === $selected) ? ' selected' : '';
-                $out .= '<option value="' . $id . '"' . $sel . '>' . htmlspecialchars($lbl) . '</option>';
-            }
+        foreach ($rows as $r) {
+            $id  = intval($r['id']);
+            $lbl = isset($r['label']) ? (string)$r['label'] : '';
+            $sel = ($id === $selected) ? ' selected' : '';
+            $out .= '<option value="' . $id . '"' . $sel . '>' . htmlspecialchars($lbl) . '</option>';
         }
         return $out;
     }
@@ -198,35 +207,39 @@ if (!function_exists('fin_options_from_query')) {
 if (!function_exists('fin_supplier_options')) {
     function fin_supplier_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = fin_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, name AS label FROM suppliers WHERE $scope ORDER BY name ASC";
-        return fin_options_from_query($conn, $sql, $selected, '— بلا مورد —');
+        // الأصل بلا فلتر حذف (يعرض حتى المؤرشف) → includeDeleted وفاءً ذهبيًّا
+        $rows = fin_gate($is_super)->select('suppliers', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC', 'includeDeleted' => true));
+        foreach ($rows as &$r) { $r['label'] = $r['name']; } unset($r);
+        return fin_options_from_rows($rows, $selected, '— بلا مورد —');
     }
 }
 if (!function_exists('fin_client_options')) {
     function fin_client_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = fin_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, client_name AS label FROM clients WHERE $scope ORDER BY client_name ASC";
-        return fin_options_from_query($conn, $sql, $selected, '— بلا عميل —');
+        $rows = fin_gate($is_super)->select('clients', array('columns' => array('id', 'client_name'), 'orderBy' => 'client_name ASC', 'includeDeleted' => true));
+        foreach ($rows as &$r) { $r['label'] = $r['client_name']; } unset($r);
+        return fin_options_from_rows($rows, $selected, '— بلا عميل —');
     }
 }
 if (!function_exists('fin_project_options')) {
     function fin_project_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = fin_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, name AS label FROM project WHERE $scope AND COALESCE(is_deleted,0)=0 ORDER BY name ASC";
-        return fin_options_from_query($conn, $sql, $selected, '— بلا مشروع —');
+        // project soft=true؛ الأصل يفلتر is_deleted=0 → البوابة تفعله افتراضيًّا
+        $rows = fin_gate($is_super)->select('project', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC'));
+        foreach ($rows as &$r) { $r['label'] = $r['name']; } unset($r);
+        return fin_options_from_rows($rows, $selected, '— بلا مشروع —');
     }
 }
 if (!function_exists('fin_equipment_options')) {
     function fin_equipment_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = fin_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, CONCAT(COALESCE(NULLIF(code,''),CONCAT('#',id)),
-                CASE WHEN name IS NULL OR name='' THEN '' ELSE CONCAT(' — ', name) END) AS label
-                FROM equipments WHERE $scope ORDER BY id DESC";
-        return fin_options_from_query($conn, $sql, $selected, '— بلا معدة —');
+        // equipments soft=false؛ التسمية CONCAT(code|#id [ — name]) تُحسب PHP-side
+        $rows = fin_gate($is_super)->select('equipments', array('columns' => array('id', 'code', 'name'), 'orderBy' => 'id DESC'));
+        foreach ($rows as &$r) {
+            $code = ($r['code'] !== null && $r['code'] !== '') ? $r['code'] : ('#' . $r['id']);
+            $r['label'] = $code . (($r['name'] === null || $r['name'] === '') ? '' : (' — ' . $r['name']));
+        } unset($r);
+        return fin_options_from_rows($rows, $selected, '— بلا معدة —');
     }
 }
 
@@ -296,26 +309,27 @@ if (!function_exists('fin_log_approval')) {
     /** قيد إلحاقي في سجلّ الاعتماد (لا يُمحى). */
     function fin_log_approval($conn, $company_id, $entity_id, $from, $to, $action, $level, $actor, $note = '')
     {
-        $sql = "INSERT INTO fin_approvals (company_id, entity_type, entity_id, from_state, to_state, action, level, actor_id, note)
-                VALUES (?, 'financial_event', ?, ?, ?, ?, ?, ?, ?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'iissssss', $company_id, $entity_id, $from, $to, $action, $level, $actor, $note);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        }
+        fin_gate(false)->insert('fin_approvals', array(
+            'entity_type' => 'financial_event', 'entity_id' => $entity_id,
+            'from_state' => $from, 'to_state' => $to, 'action' => $action,
+            'level' => $level, 'actor_id' => $actor, 'note' => $note,
+        ));
     }
 }
 if (!function_exists('fin_required_level')) {
     /** المستوى المطلوب لاعتماد مبلغٍ من المصفوفة (للعرض/الحوكمة). */
     function fin_required_level($conn, $company_id, $event_type, $amount)
     {
-        $company_id = intval($company_id); $amount = (float)$amount;
-        $et = mysqli_real_escape_string($conn, $event_type);
-        $sql = "SELECT required_level FROM fin_approval_matrix
-                WHERE company_id=$company_id AND active=1 AND (event_type='$et' OR event_type='any')
-                  AND min_amount <= $amount AND (max_amount IS NULL OR max_amount > $amount)
-                ORDER BY (event_type='any') ASC, sequence DESC LIMIT 1";
-        $r = mysqli_query($conn, $sql);
-        return ($r && ($row = mysqli_fetch_assoc($r))) ? $row['required_level'] : null;
+        $amount = (float)$amount;
+        // ORDER BY بتعبيرٍ (event_type='any') → scopedQuery (البوابة تعزل company_id)
+        $rows = fin_gate(false)->scopedQuery(
+            array('scope' => array('m' => 'fin_approval_matrix')),
+            "SELECT m.required_level FROM fin_approval_matrix m
+             WHERE {TENANT_SCOPE} AND m.active=1 AND (m.event_type=? OR m.event_type='any')
+               AND m.min_amount <= ? AND (m.max_amount IS NULL OR m.max_amount > ?)
+             ORDER BY (m.event_type='any') ASC, m.sequence DESC LIMIT 1",
+            array($event_type, $amount, $amount));
+        return $rows ? $rows[0]['required_level'] : null;
     }
 }
 if (!function_exists('fin_level_labels')) {
@@ -352,10 +366,9 @@ if (!function_exists('fin_alloc_types')) {
 if (!function_exists('fin_center_options')) {
     function fin_center_options($conn, $is_super, $company_id, $selected = 0, $placeholder = '— بلا —')
     {
-        $scope = fin_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, CONCAT(code, ' — ', name) AS label FROM fin_cost_centers
-                WHERE $scope AND COALESCE(is_deleted,0)=0 ORDER BY code ASC";
-        return fin_options_from_query($conn, $sql, $selected, $placeholder);
+        $rows = fin_gate($is_super)->select('fin_cost_centers', array('columns' => array('id', 'code', 'name'), 'orderBy' => 'code ASC'));
+        foreach ($rows as &$r) { $r['label'] = $r['code'] . ' — ' . $r['name']; } unset($r);
+        return fin_options_from_rows($rows, $selected, $placeholder);
     }
 }
 
@@ -400,13 +413,12 @@ if (!function_exists('fin_account_by_code')) {
     /** حساب بالكود، وإلا أول حساب قابل للقيد من النوع المطلوب (احتياط). */
     function fin_account_by_code($conn, $company_id, $code, $fallback_type)
     {
-        $company_id = intval($company_id);
-        $code = mysqli_real_escape_string($conn, $code);
-        $r = mysqli_query($conn, "SELECT id FROM fin_chart_of_accounts WHERE company_id=$company_id AND code='$code' AND is_postable=1 AND COALESCE(is_deleted,0)=0 LIMIT 1");
-        if ($r && ($x = mysqli_fetch_assoc($r))) { return intval($x['id']); }
-        $ft = mysqli_real_escape_string($conn, $fallback_type);
-        $r = mysqli_query($conn, "SELECT id FROM fin_chart_of_accounts WHERE company_id=$company_id AND account_type='$ft' AND is_postable=1 AND COALESCE(is_deleted,0)=0 ORDER BY code LIMIT 1");
-        return ($r && ($x = mysqli_fetch_assoc($r))) ? intval($x['id']) : 0;
+        $gate = fin_gate(false);
+        // البوابة تعزل الشركة وتستبعد المحذوف تلقائيًّا (fin_chart_of_accounts soft=true)
+        $row = $gate->selectOne('fin_chart_of_accounts', array('columns' => array('id'), 'where' => array('code' => $code, 'is_postable' => 1)));
+        if ($row) { return intval($row['id']); }
+        $row = $gate->selectOne('fin_chart_of_accounts', array('columns' => array('id'), 'where' => array('account_type' => $fallback_type, 'is_postable' => 1), 'orderBy' => 'code'));
+        return $row ? intval($row['id']) : 0;
     }
 }
 if (!function_exists('fin_auto_journal')) {
@@ -443,21 +455,25 @@ if (!function_exists('fin_auto_journal')) {
         $entry_no = fin_gen_code($conn, 'fin_journal_entries', 'FIN-JV', $company_id);
         $eid = intval($event['id']); $today = date('Y-m-d');
         $memo = 'قيد آلي من الحدث ' . $event['event_no'];
-        $sql = "INSERT INTO fin_journal_entries (company_id, entry_no, event_id, posting_date, total_debit, total_credit, memo, state, created_by)
-                VALUES (?,?,?,?,?,?,?, 'draft', ?)";
+        $pid = intval($event['project_id'] ?? 0) ?: null;
+        $eqid = intval($event['equipment_id'] ?? 0) ?: null;
+        // رأس + سطران متوازنان = زوجٌ ذرّي (§9) عبر البوابة
         $entry_id = 0;
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'isisddsi', $company_id, $entry_no, $eid, $today, $amount, $amount, $memo, $user_id);
-            mysqli_stmt_execute($stmt); $entry_id = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
-        }
-        if ($entry_id > 0) {
-            $pid = intval($event['project_id'] ?? 0) ?: 'NULL';
-            $eqid = intval($event['equipment_id'] ?? 0) ?: 'NULL';
-            $m = mysqli_real_escape_string($conn, $memo);
-            mysqli_query($conn, "INSERT INTO fin_journal_lines (company_id, entry_id, account_id, debit, credit, project_id, equipment_id, memo)
-                VALUES ($company_id, $entry_id, $debit, $amount, 0, $pid, $eqid, '$m'),
-                       ($company_id, $entry_id, $credit, 0, $amount, $pid, $eqid, '$m')");
-        }
+        fin_gate(false)->runInTransaction(function ($g) use (&$entry_id, $entry_no, $eid, $today, $amount, $memo, $user_id, $debit, $credit, $pid, $eqid) {
+            $entry_id = $g->insert('fin_journal_entries', array(
+                'entry_no' => $entry_no, 'event_id' => $eid, 'posting_date' => $today,
+                'total_debit' => $amount, 'total_credit' => $amount, 'memo' => $memo,
+                'state' => 'draft', 'created_by' => $user_id,
+            ));
+            $g->insert('fin_journal_lines', array(
+                'entry_id' => $entry_id, 'account_id' => $debit, 'debit' => $amount, 'credit' => 0,
+                'project_id' => $pid, 'equipment_id' => $eqid, 'memo' => $memo,
+            ));
+            $g->insert('fin_journal_lines', array(
+                'entry_id' => $entry_id, 'account_id' => $credit, 'debit' => 0, 'credit' => $amount,
+                'project_id' => $pid, 'equipment_id' => $eqid, 'memo' => $memo,
+            ));
+        }, 'auto journal from approved event');
         return $entry_id;
     }
 }
@@ -471,23 +487,32 @@ if (!function_exists('fin_recalc_budget_actuals')) {
      */
     function fin_recalc_budget_actuals($conn, $company_id)
     {
-        $cid = intval($company_id); $n = 0;
-        $bl = mysqli_query($conn, "SELECT l.id, l.account_id, l.line_kind, b.fiscal_year, b.period_type, b.period_no
-                                   FROM fin_budget_lines l JOIN fin_budgets b ON b.id = l.budget_id
-                                   WHERE l.company_id=$cid AND l.account_id IS NOT NULL
-                                     AND b.state IN('approved','active') AND COALESCE(b.is_deleted,0)=0");
-        if (!$bl) { return 0; }
-        while ($L = mysqli_fetch_assoc($bl)) {
+        $n = 0;
+        $gate = fin_gate(false);
+        // بنود الموازنات المعتمدة/النشطة — INNER JOIN budgets → LEFT + b.id IS NOT NULL (تكافؤ)
+        $lines = $gate->scopedQuery(
+            array('scope' => array('l' => 'fin_budget_lines'), 'enrich' => array('b' => 'fin_budgets')),
+            "SELECT l.id, l.account_id, l.line_kind, b.fiscal_year, b.period_type, b.period_no
+             FROM fin_budget_lines l LEFT JOIN fin_budgets b ON b.id = l.budget_id
+             WHERE {TENANT_SCOPE} AND b.id IS NOT NULL AND l.account_id IS NOT NULL
+               AND b.state IN('approved','active') AND COALESCE(b.is_deleted,0)=0");
+        foreach ($lines as $L) {
             $acc = intval($L['account_id']); $fy = intval($L['fiscal_year']);
-            $win = "YEAR(je.posting_date)=$fy";
-            if ($L['period_type'] === 'monthly' && $L['period_no'])   { $win .= " AND MONTH(je.posting_date)=" . intval($L['period_no']); }
-            if ($L['period_type'] === 'quarterly' && $L['period_no']) { $win .= " AND QUARTER(je.posting_date)=" . intval($L['period_no']); }
+            // نافذة الفترة على posting_date عبر معامِلاتٍ مربوطة
+            $win = "YEAR(je.posting_date)=?"; $winParams = array($fy);
+            if ($L['period_type'] === 'monthly' && $L['period_no'])   { $win .= " AND MONTH(je.posting_date)=?"; $winParams[] = intval($L['period_no']); }
+            if ($L['period_type'] === 'quarterly' && $L['period_no']) { $win .= " AND QUARTER(je.posting_date)=?"; $winParams[] = intval($L['period_no']); }
             $natural = $L['line_kind'] === 'revenue' ? "jl.credit - jl.debit" : "jl.debit - jl.credit";
-            $r = mysqli_query($conn, "SELECT COALESCE(SUM($natural),0) v FROM fin_journal_lines jl
-                                      JOIN fin_journal_entries je ON je.id=jl.entry_id AND je.state='posted' AND COALESCE(je.is_deleted,0)=0
-                                      WHERE jl.company_id=$cid AND jl.account_id=$acc AND $win");
-            $v = ($r && ($x = mysqli_fetch_assoc($r))) ? round((float)$x['v'], 2) : 0;
-            mysqli_query($conn, "UPDATE fin_budget_lines SET actual_amount=$v WHERE id=" . intval($L['id']) . " AND company_id=$cid");
+            // المجموع المرحَّل — INNER JOIN المرحَّل → LEFT + je.id IS NOT NULL + شروط WHERE
+            $sum = $gate->scopedQuery(
+                array('scope' => array('jl' => 'fin_journal_lines'), 'enrich' => array('je' => 'fin_journal_entries')),
+                "SELECT COALESCE(SUM($natural),0) v FROM fin_journal_lines jl
+                 LEFT JOIN fin_journal_entries je ON je.id=jl.entry_id
+                 WHERE {TENANT_SCOPE} AND je.id IS NOT NULL AND je.state='posted' AND COALESCE(je.is_deleted,0)=0
+                   AND jl.account_id=? AND " . $win,
+                array_merge(array($acc), $winParams));
+            $v = $sum ? round((float)$sum[0]['v'], 2) : 0;
+            $gate->update('fin_budget_lines', array('actual_amount' => $v), array('id' => intval($L['id'])));
             $n++;
         }
         return $n;
@@ -499,13 +524,16 @@ if (!function_exists('fin_notify')) {
     /** إشعار لمستوى دور (أو للجميع). مع منع تكرار نفس العنوان في نفس اليوم. */
     function fin_notify($conn, $company_id, $target_level, $title, $link = null)
     {
-        $cid = intval($company_id);
-        $lvl = mysqli_real_escape_string($conn, $target_level);
-        $t = mysqli_real_escape_string($conn, mb_substr($title, 0, 200));
-        $chk = mysqli_query($conn, "SELECT 1 FROM fin_notifications WHERE company_id=$cid AND target_level='$lvl' AND title='$t' AND DATE(created_at)=CURDATE() LIMIT 1");
-        if ($chk && mysqli_num_rows($chk) > 0) { return; }
-        $l = $link === null ? 'NULL' : "'" . mysqli_real_escape_string($conn, $link) . "'";
-        mysqli_query($conn, "INSERT INTO fin_notifications (company_id, target_level, title, link) VALUES ($cid, '$lvl', '$t', $l)");
+        $title = mb_substr($title, 0, 200);
+        $gate = fin_gate(false);
+        // منع تكرار نفس العنوان لنفس المستوى في نفس اليوم (البوابة تعزل الشركة)
+        $dup = $gate->count('fin_notifications', array(
+            'where' => array('target_level' => $target_level, 'title' => $title),
+            'whereRaw' => 'DATE(created_at)=CURDATE()'));
+        if ($dup > 0) { return; }
+        $gate->insert('fin_notifications', array(
+            'target_level' => $target_level, 'title' => $title, 'link' => $link,
+        ));
     }
 }
 if (!function_exists('fin_handle_notif_read')) {
@@ -513,12 +541,11 @@ if (!function_exists('fin_handle_notif_read')) {
     function fin_handle_notif_read($conn, $company_id, $redirect)
     {
         if (!isset($_GET['notif_read'])) { return; }
-        $cid = intval($company_id);
+        $gate = fin_gate(false);
         if (($_GET['notif_read'] ?? '') === 'all') {
-            mysqli_query($conn, "UPDATE fin_notifications SET is_read=1 WHERE company_id=$cid");
+            $gate->update('fin_notifications', array('is_read' => 1), array(), '1=1'); // كل إشعارات الشركة
         } else {
-            $id = intval($_GET['notif_read']);
-            mysqli_query($conn, "UPDATE fin_notifications SET is_read=1 WHERE id=$id AND company_id=$cid");
+            $gate->update('fin_notifications', array('is_read' => 1), array('id' => intval($_GET['notif_read'])));
         }
         header("Location: $redirect"); exit();
     }
@@ -527,18 +554,21 @@ if (!function_exists('fin_notifications_panel')) {
     /** لوحة الإشعارات غير المقروءة لمستوى المستخدم الحالي (تُضمَّن أعلى الشاشة). */
     function fin_notifications_panel($conn, $ctx, $self_url)
     {
-        $cid = intval($ctx['company_id']);
         $lvl = fin_user_level($conn, $ctx['role']);
         if ($lvl === 'none') { return; }
-        $where = $lvl === 'all' ? "1=1" : "(target_level='" . mysqli_real_escape_string($conn, $lvl) . "' OR target_level='all')";
-        $r = mysqli_query($conn, "SELECT * FROM fin_notifications WHERE company_id=$cid AND is_read=0 AND $where ORDER BY id DESC LIMIT 8");
-        if (!$r || mysqli_num_rows($r) === 0) { return; }
+        $opts = array('where' => array('is_read' => 0), 'orderBy' => 'id DESC', 'limit' => 8);
+        if ($lvl !== 'all') {
+            $opts['whereRaw'] = "(target_level=? OR target_level='all')";
+            $opts['params']   = array($lvl);
+        }
+        $notifs = fin_gate(false)->select('fin_notifications', $opts);
+        if (empty($notifs)) { return; }
         $sep = strpos($self_url, '?') === false ? '?' : '&';
         echo '<div class="card"><div class="card-body" style="padding:10px 14px">';
         echo '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
-        echo '<strong><i class="fas fa-bell"></i> تنبيهاتك (' . mysqli_num_rows($r) . ')</strong>';
+        echo '<strong><i class="fas fa-bell"></i> تنبيهاتك (' . count($notifs) . ')</strong>';
         echo '<a href="' . htmlspecialchars($self_url . $sep . 'notif_read=all') . '" class="badge badge-secondary" style="text-decoration:none">تعليم الكل مقروءًا</a></div>';
-        while ($nf = mysqli_fetch_assoc($r)) {
+        foreach ($notifs as $nf) {
             echo '<div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px dashed #e5e7eb">';
             echo '<span style="font-size:13px">🔔 ' . htmlspecialchars($nf['title'])
                . ($nf['link'] ? ' — <a href="' . htmlspecialchars($nf['link']) . '">فتح</a>' : '') . '</span>';
@@ -590,10 +620,11 @@ if (!function_exists('fin_compute_match_state')) {
 if (!function_exists('fin_bank_account_options')) {
     function fin_bank_account_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = fin_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, CONCAT(name, CASE WHEN bank_name IS NULL OR bank_name='' THEN '' ELSE CONCAT(' — ', bank_name) END) AS label
-                FROM fin_bank_accounts WHERE $scope AND COALESCE(is_deleted,0)=0 ORDER BY name ASC";
-        return fin_options_from_query($conn, $sql, $selected, '— اختر حساباً بنكياً —');
+        $rows = fin_gate($is_super)->select('fin_bank_accounts', array('columns' => array('id', 'name', 'bank_name'), 'orderBy' => 'name ASC'));
+        foreach ($rows as &$r) {
+            $r['label'] = $r['name'] . (($r['bank_name'] === null || $r['bank_name'] === '') ? '' : (' — ' . $r['bank_name']));
+        } unset($r);
+        return fin_options_from_rows($rows, $selected, '— اختر حساباً بنكياً —');
     }
 }
 
@@ -670,10 +701,10 @@ if (!function_exists('fin_cost_types')) {
 if (!function_exists('fin_employee_options')) {
     function fin_employee_options($conn, $is_super, $company_id, $selected = 0)
     {
-        // ملاحظة: جدول employees لا يحوي is_deleted (يستخدم status/employee_status).
-        $scope = fin_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, name AS label FROM employees WHERE $scope ORDER BY name ASC";
-        return fin_options_from_query($conn, $sql, $selected, '— اختر موظفاً —');
+        // ملاحظة: جدول employees لا يحوي is_deleted (soft=false) — قراءةٌ معزولة بالشركة
+        $rows = fin_gate($is_super)->select('employees', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC'));
+        foreach ($rows as &$r) { $r['label'] = $r['name']; } unset($r);
+        return fin_options_from_rows($rows, $selected, '— اختر موظفاً —');
     }
 }
 if (!function_exists('fin_due_types')) {
@@ -716,15 +747,17 @@ if (!function_exists('fin_supplier_net')) {
     /** محرك التسوية: صافي مستحق المورد = Σ(له) − Σ(عليه) على المستحقات غير المصروفة. */
     function fin_supplier_net($conn, $company_id, $supplier_id)
     {
-        $company_id = intval($company_id); $supplier_id = intval($supplier_id);
-        $sql = "SELECT
-                  COALESCE(SUM(CASE WHEN direction='credit' THEN amount ELSE 0 END),0) AS credit_sum,
-                  COALESCE(SUM(CASE WHEN direction='debit'  THEN amount ELSE 0 END),0) AS debit_sum
-                FROM fin_dues
-                WHERE company_id=$company_id AND party_type='supplier' AND party_ref=$supplier_id
-                  AND COALESCE(is_deleted,0)=0 AND settlement_state<>'paid'";
-        $r = mysqli_query($conn, $sql);
-        $row = $r ? mysqli_fetch_assoc($r) : array('credit_sum' => 0, 'debit_sum' => 0);
+        $supplier_id = intval($supplier_id);
+        // مجاميع CASE مُعزَّلة عبر scopedQuery (البوابة تحقن company_id)
+        $rows = fin_gate(false)->scopedQuery(
+            array('scope' => array('d' => 'fin_dues')),
+            "SELECT COALESCE(SUM(CASE WHEN d.direction='credit' THEN d.amount ELSE 0 END),0) AS credit_sum,
+                    COALESCE(SUM(CASE WHEN d.direction='debit'  THEN d.amount ELSE 0 END),0) AS debit_sum
+             FROM fin_dues d
+             WHERE {TENANT_SCOPE} AND d.party_type='supplier' AND d.party_ref=?
+               AND COALESCE(d.is_deleted,0)=0 AND d.settlement_state<>'paid'",
+            array($supplier_id));
+        $row = $rows ? $rows[0] : array('credit_sum' => 0, 'debit_sum' => 0);
         return (float)$row['credit_sum'] - (float)$row['debit_sum'];
     }
 }
@@ -767,10 +800,9 @@ if (!function_exists('fin_budget_categories')) {
 if (!function_exists('fin_unit_options')) {
     function fin_unit_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = fin_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, CONCAT(code, ' — ', name) AS label FROM fin_units
-                WHERE $scope AND COALESCE(is_deleted,0)=0 ORDER BY code ASC";
-        return fin_options_from_query($conn, $sql, $selected, '— اختر وحدة —');
+        $rows = fin_gate($is_super)->select('fin_units', array('columns' => array('id', 'code', 'name'), 'orderBy' => 'code ASC'));
+        foreach ($rows as &$r) { $r['label'] = $r['code'] . ' — ' . $r['name']; } unset($r);
+        return fin_options_from_rows($rows, $selected, '— اختر وحدة —');
     }
 }
 
@@ -799,19 +831,17 @@ if (!function_exists('fin_postable_account_options')) {
     /** الحسابات التي تقبل القيد المباشر (is_postable=1). */
     function fin_postable_account_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = fin_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, CONCAT(code, ' — ', name) AS label FROM fin_chart_of_accounts
-                WHERE $scope AND COALESCE(is_deleted,0)=0 AND is_postable=1 ORDER BY code ASC";
-        return fin_options_from_query($conn, $sql, $selected, '— اختر حساباً —');
+        $rows = fin_gate($is_super)->select('fin_chart_of_accounts', array('columns' => array('id', 'code', 'name'), 'whereRaw' => 'is_postable=1', 'orderBy' => 'code ASC'));
+        foreach ($rows as &$r) { $r['label'] = $r['code'] . ' — ' . $r['name']; } unset($r);
+        return fin_options_from_rows($rows, $selected, '— اختر حساباً —');
     }
 }
 if (!function_exists('fin_account_parent_options')) {
     /** حسابات هذه الشركة كآباء محتملين (fin_chart_of_accounts). */
     function fin_account_parent_options($conn, $is_super, $company_id, $selected = 0)
     {
-        $scope = fin_scope('company_id', $is_super, $company_id);
-        $sql = "SELECT id, CONCAT(code, ' — ', name) AS label FROM fin_chart_of_accounts
-                WHERE $scope AND COALESCE(is_deleted,0)=0 ORDER BY code ASC";
-        return fin_options_from_query($conn, $sql, $selected, '— بلا أب (جذر) —');
+        $rows = fin_gate($is_super)->select('fin_chart_of_accounts', array('columns' => array('id', 'code', 'name'), 'orderBy' => 'code ASC'));
+        foreach ($rows as &$r) { $r['label'] = $r['code'] . ' — ' . $r['name']; } unset($r);
+        return fin_options_from_rows($rows, $selected, '— بلا أب (جذر) —');
     }
 }
