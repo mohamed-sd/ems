@@ -27,15 +27,16 @@ if (isset($_GET['execute_id'])) {
     if (!fin_verify_action_token()) { header("Location: payments_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); } // إصلاح #2
     if (!fin_can_perform($conn, $ctx['role'], 'treasurer')) { header("Location: payments_fin.php?msg=الصرف/التحصيل+يخصّ+أمين+الخزينة+فقط+❌"); exit(); } // فصل الواجبات
     $pid = intval($_GET['execute_id']);
-    $pr = mysqli_query($conn, "SELECT * FROM fin_payments WHERE id=$pid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    $pay = $pr ? mysqli_fetch_assoc($pr) : null;
+    $gate = fin_gate($is_super_admin);
+    $pay = $gate->selectOne('fin_payments', array('where' => array('id' => $pid)));
     if (!$pay || $pay['state'] !== 'draft') { header("Location: payments_fin.php?msg=لا+يمكن+تنفيذ+هذا+الدفع+❌"); exit(); }
 
     // إصلاح #9: لا يتجاوز التحصيل المتبقّي على الذمّة
+    $recv = null;
     if ($pay['direction'] === 'collection' && intval($pay['receivable_id']) > 0) {
         $rid = intval($pay['receivable_id']);
-        $orow = mysqli_query($conn, "SELECT outstanding FROM fin_receivables WHERE id=$rid AND company_id=$company_id LIMIT 1");
-        $out = ($orow && ($o = mysqli_fetch_assoc($orow))) ? (float)$o['outstanding'] : 0;
+        $recv = $gate->selectOne('fin_receivables', array('columns' => array('outstanding', 'collected', 'amount'), 'where' => array('id' => $rid)));
+        $out = $recv ? (float) $recv['outstanding'] : 0;
         if ((float)$pay['amount'] > $out + 0.01) {
             header("Location: payments_fin.php?msg=لا+تنفيذ:+المبلغ+يتجاوز+المتبقّي+على+الذمّة+(" . number_format($out, 2) . ")+❌"); exit();
         }
@@ -44,26 +45,25 @@ if (isset($_GET['execute_id'])) {
     // حارس: لا صرفَ لموردٍ قبل تسوية مستحقاته كاملةً
     if ($pay['direction'] === 'disbursement' && $pay['party_type'] === 'supplier') {
         $sref = intval($pay['party_ref']);
-        $chk = mysqli_query($conn, "SELECT COUNT(*) AS n FROM fin_dues
-                                    WHERE company_id=$company_id AND party_type='supplier' AND party_ref=$sref
-                                      AND settlement_state='pending' AND COALESCE(is_deleted,0)=0");
-        $n = ($chk && ($r = mysqli_fetch_assoc($chk))) ? intval($r['n']) : 0;
+        $n = $gate->count('fin_dues', array('where' => array('party_type' => 'supplier', 'party_ref' => $sref, 'settlement_state' => 'pending')));
         if ($n > 0) { header("Location: payments_fin.php?msg=لا+صرف:+للمورد+مستحقات+غير+مُسوّاة+($n)+❌"); exit(); }
     }
 
-    mysqli_query($conn, "UPDATE fin_payments SET state='executed', paid_at=NOW(), executed_by=$current_user_id WHERE id=$pid AND company_id=$company_id");
-    // أثر: صرف لمورد ⇒ مستحقاته المسوّاة تصبح مصروفة؛ تحصيل مرتبط بذمّة ⇒ تحديث المحصّل
-    if ($pay['direction'] === 'disbursement' && $pay['party_type'] === 'supplier') {
-        $sref = intval($pay['party_ref']);
-        mysqli_query($conn, "UPDATE fin_dues SET settlement_state='paid' WHERE company_id=$company_id AND party_type='supplier' AND party_ref=$sref AND settlement_state='settled'");
-    }
-    if ($pay['direction'] === 'collection' && intval($pay['receivable_id']) > 0) {
-        $rid = intval($pay['receivable_id']); $amt = (float)$pay['amount'];
-        // ملاحظة: SET تُقيَّم يسارًا→يمينًا في MySQL، فـ collected في الشرط هي القيمة المحدَّثة
-        mysqli_query($conn, "UPDATE fin_receivables SET collected = LEAST(amount, collected + $amt),
-                             state = CASE WHEN collected >= amount THEN 'collected' ELSE 'partial' END
-                             WHERE id=$rid AND company_id=$company_id");
-    }
+    // التنفيذ + أثره ذرّيًا (§9): الدفع + (تسوية المورد أو تحديث الذمّة) معًا
+    $gate->runInTransaction(function ($g) use ($pid, $current_user_id, $pay, $recv) {
+        $g->update('fin_payments', array('state' => 'executed', 'paid_at' => date('Y-m-d H:i:s'), 'executed_by' => $current_user_id), array('id' => $pid));
+        if ($pay['direction'] === 'disbursement' && $pay['party_type'] === 'supplier') {
+            $g->update('fin_dues', array('settlement_state' => 'paid'),
+                array('party_type' => 'supplier', 'party_ref' => intval($pay['party_ref']), 'settlement_state' => 'settled'));
+        }
+        if ($pay['direction'] === 'collection' && intval($pay['receivable_id']) > 0 && $recv) {
+            // تعبيرا LEAST/CASE محسوبان PHP-side (نفس نتيجة MySQL يسارًا→يمينًا)
+            $amt = (float) $pay['amount']; $amount = (float) $recv['amount'];
+            $new_collected = min($amount, (float) $recv['collected'] + $amt);
+            $new_state = ($new_collected >= $amount) ? 'collected' : 'partial';
+            $g->update('fin_receivables', array('collected' => $new_collected, 'state' => $new_state), array('id' => intval($pay['receivable_id'])));
+        }
+    }, 'payment execute + effect');
     // (فجوة 4) إشعار المدير المالي بحركة الخزينة
     $dir_lbl = $pay['direction'] === 'collection' ? 'تحصيل' : 'صرف';
     fin_notify($conn, $company_id, 'finance_manager', 'نُفِّذ ' . $dir_lbl . ' ' . $pay['payment_no'] . ' بمبلغ ' . number_format((float)$pay['amount'], 0), 'payments_fin.php');
@@ -74,7 +74,9 @@ if (isset($_GET['execute_id'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: payments_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['delete_id']);
-    mysqli_query($conn, "UPDATE fin_payments SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id AND state='draft'");
+    fin_gate($is_super_admin)->update('fin_payments',
+        array('is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $current_user_id),
+        array('id' => $d), "state='draft'");
     header("Location: payments_fin.php?msg=تم+حذف+الحركة+✅"); exit();
 }
 
@@ -91,12 +93,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
     if ($amount <= 0) { header("Location: payments_fin.php?msg=المبلغ+غير+صحيح+❌"); exit(); }
 
     $payment_no = fin_gen_code($conn, 'fin_payments', 'FIN-PY', $company_id);
-    $sql = "INSERT INTO fin_payments (company_id, payment_no, direction, party_type, party_ref, method, amount, receivable_id, memo, state, created_by)
-            VALUES (?,?,?,?,?,?,?,?,?, 'draft', ?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'isssisdisi', $company_id, $payment_no, $direction, $party_type, $party_ref, $method, $amount, $receivable_id, $memo, $current_user_id);
-        mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-    }
+    fin_gate($is_super_admin)->insert('fin_payments', array(
+        'payment_no' => $payment_no, 'direction' => $direction, 'party_type' => $party_type,
+        'party_ref' => $party_ref, 'method' => $method, 'amount' => $amount,
+        'receivable_id' => $receivable_id, 'memo' => $memo, 'state' => 'draft', 'created_by' => $current_user_id,
+    ));
     header("Location: payments_fin.php?msg=تم+حفظ+الحركة+(مسودة)+✅"); exit();
 }
 
@@ -128,8 +129,10 @@ include '../insidebar.php';
             <div class="form-group"><label>ذمّة عميل (للتحصيل)</label>
                 <select name="receivable_id"><option value="">— بلا —</option>
                 <?php
-                $rq = mysqli_query($conn, "SELECT id, CONCAT(COALESCE(doc_ref,CONCAT('ذمّة #',id)),' — متبقّي ',outstanding) AS label FROM fin_receivables WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0 AND outstanding>0 ORDER BY id DESC");
-                if ($rq) { while ($x = mysqli_fetch_assoc($rq)) echo "<option value='" . intval($x['id']) . "'>" . htmlspecialchars($x['label']) . "</option>"; }
+                $recv_opts = fin_gate($is_super_admin)->scopedQuery(array('scope' => array('r' => 'fin_receivables')),
+                    "SELECT r.id, CONCAT(COALESCE(r.doc_ref,CONCAT('ذمّة #',r.id)),' — متبقّي ',r.outstanding) AS label
+                     FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0 ORDER BY r.id DESC");
+                foreach ($recv_opts as $x) { echo "<option value='" . intval($x['id']) . "'>" . htmlspecialchars($x['label']) . "</option>"; }
                 ?></select></div>
             <div class="form-group" style="grid-column:1/-1"><label>بيان</label><input type="text" name="memo"></div>
         </div></div>
@@ -144,9 +147,8 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>الرقم</th><th>الاتجاه</th><th>الطرف</th><th>الطريقة</th><th>المبلغ</th><th>البيان</th><th>الحالة</th></tr></thead>
                 <tbody>
                 <?php
-                $scope_p = fin_scope('company_id', $is_super_admin, $company_id);
-                $sql = "SELECT * FROM fin_payments WHERE $scope_p AND COALESCE(is_deleted,0)=0 ORDER BY id DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $pay_rows = fin_gate($is_super_admin)->select('fin_payments', array('orderBy' => 'id DESC'));
+                { foreach ($pay_rows as $row) {
                     $st = (string)$row['state'];
                     $st_lbl = array('draft' => 'مسودة', 'approved' => 'معتمدة', 'executed' => 'منفّذة', 'reconciled' => 'مطابَقة');
                     $st_tone = $st === 'executed' ? 'success' : ($st === 'reconciled' ? 'dark' : 'secondary');
