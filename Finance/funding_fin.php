@@ -25,8 +25,8 @@ $ftypes = fin_facility_types(); $purposes = fin_facility_purposes(); $fstates = 
 if (isset($_GET['action']) && isset($_GET['fid'])) {
     if (!$can_edit) { header("Location: funding_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
     $fid = intval($_GET['fid']); $act = $_GET['action'];
-    if ($act === 'activate') mysqli_query($conn, "UPDATE fin_funding_facilities SET state='active' WHERE id=$fid AND company_id=$company_id AND state IN('draft','approved')");
-    elseif ($act === 'settle') mysqli_query($conn, "UPDATE fin_funding_facilities SET state='settled' WHERE id=$fid AND company_id=$company_id AND state='active'");
+    if ($act === 'activate') fin_gate($is_super_admin)->update('fin_funding_facilities', array('state' => 'active'), array('id' => $fid), "state IN('draft','approved')");
+    elseif ($act === 'settle') fin_gate($is_super_admin)->update('fin_funding_facilities', array('state' => 'settled'), array('id' => $fid), "state='active'");
     header("Location: funding_fin.php?fid=$fid&msg=تم+تحديث+حالة+التمويل+✅"); exit();
 }
 
@@ -34,7 +34,12 @@ if (isset($_GET['action']) && isset($_GET['fid'])) {
 if (isset($_GET['pay_inst'])) {
     if (!$can_edit) { header("Location: funding_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
     $iid = intval($_GET['pay_inst']); $fid = intval($_GET['fid'] ?? 0);
-    mysqli_query($conn, "UPDATE fin_funding_schedules SET paid_amount=total_due, state='paid' WHERE id=$iid AND company_id=$company_id");
+    // paid_amount=total_due تعبيرٌ عمودي: نقرأ القسط ثم نضع القيمة (نفس النتيجة)
+    $inst = fin_gate($is_super_admin)->selectOne('fin_funding_schedules', array('columns' => array('total_due'), 'where' => array('id' => $iid)));
+    if ($inst) {
+        fin_gate($is_super_admin)->update('fin_funding_schedules',
+            array('paid_amount' => $inst['total_due'], 'state' => 'paid'), array('id' => $iid));
+    }
     header("Location: funding_fin.php?fid=$fid&msg=تم+تسجيل+سداد+القسط+✅"); exit();
 }
 
@@ -42,7 +47,9 @@ if (isset($_GET['pay_inst'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: funding_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['delete_id']);
-    mysqli_query($conn, "UPDATE fin_funding_facilities SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id AND state='draft'");
+    fin_gate($is_super_admin)->update('fin_funding_facilities',
+        array('is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $current_user_id),
+        array('id' => $d), "state='draft'");
     header("Location: funding_fin.php?msg=تم+حذف+التمويل+✅"); exit();
 }
 
@@ -63,26 +70,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['facility_type'])) {
     }
     $end = date('Y-m-d', strtotime("$start +$insts months"));
     $facility_no = fin_gen_code($conn, 'fin_funding_facilities', 'FIN-FN', $company_id);
-    $sql = "INSERT INTO fin_funding_facilities (company_id, facility_no, facility_type, purpose, lender_name, principal, profit_rate, currency, start_date, end_date, state, created_by)
-            VALUES (?,?,?,?,?,?,?,?,?,?, 'draft', ?)";
-    $fid = 0;
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'issssddsssi', $company_id, $facility_no, $ftype, $purpose, $lender, $principal, $rate, $currency, $start, $end, $current_user_id);
-        mysqli_stmt_execute($stmt); $fid = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
-    }
-    // توليد جدول السداد: أصل موزّع بالتساوي + فائدة موزّعة على كامل الأصل بالتساوي
-    if ($fid > 0) {
-        $princ_per = round($principal / $insts, 2);
-        $total_profit = $rate !== null ? round($principal * ($rate / 100.0), 2) : 0;
-        $profit_per = round($total_profit / $insts, 2);
-        $ss = mysqli_prepare($conn, "INSERT INTO fin_funding_schedules (company_id, facility_id, installment_no, due_date, principal_due, profit_due) VALUES (?,?,?,?,?,?)");
+    $princ_per = round($principal / $insts, 2);
+    $total_profit = $rate !== null ? round($principal * ($rate / 100.0), 2) : 0;
+    $profit_per = round($total_profit / $insts, 2);
+    // التمويل + جدول أقساطه زوجٌ مترابط ذرّيًا (تمويلٌ بلا جدول = التزامٌ مكسور) — معاملة §9
+    $fid = fin_gate($is_super_admin)->runInTransaction(function ($g) use ($facility_no, $ftype, $purpose, $lender, $principal, $rate, $currency, $start, $end, $current_user_id, $insts, $princ_per, $profit_per) {
+        $fid = $g->insert('fin_funding_facilities', array(
+            'facility_no' => $facility_no, 'facility_type' => $ftype, 'purpose' => $purpose,
+            'lender_name' => $lender, 'principal' => $principal, 'profit_rate' => $rate,
+            'currency' => $currency, 'start_date' => $start, 'end_date' => $end,
+            'state' => 'draft', 'created_by' => $current_user_id,
+        ));
         for ($i = 1; $i <= $insts; $i++) {
-            $due = date('Y-m-d', strtotime("$start +$i months"));
-            mysqli_stmt_bind_param($ss, 'iiisdd', $company_id, $fid, $i, $due, $princ_per, $profit_per);
-            mysqli_stmt_execute($ss);
+            $g->insert('fin_funding_schedules', array(
+                'facility_id' => $fid, 'installment_no' => $i,
+                'due_date' => date('Y-m-d', strtotime("$start +$i months")),
+                'principal_due' => $princ_per, 'profit_due' => $profit_per,
+            ));
         }
-        mysqli_stmt_close($ss);
-    }
+        return $fid;
+    }, 'funding facility + schedule');
     header("Location: funding_fin.php?fid=$fid&msg=تم+إنشاء+التمويل+وجدول+سداده+($insts+قسط)+✅"); exit();
 }
 
@@ -128,9 +135,8 @@ include '../insidebar.php';
                 <thead><tr><th>الإجراءات</th><th>الرقم</th><th>النوع</th><th>الغرض</th><th>الممول</th><th>الأصل</th><th>الهامش %</th><th>الحالة</th></tr></thead>
                 <tbody>
                 <?php
-                $scope_f = fin_scope('company_id', $is_super_admin, $company_id);
-                $sql = "SELECT * FROM fin_funding_facilities WHERE $scope_f AND COALESCE(is_deleted,0)=0 ORDER BY id DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $fac_rows = fin_gate($is_super_admin)->select('fin_funding_facilities', array('orderBy' => 'id DESC'));
+                { foreach ($fac_rows as $row) {
                     $st = (string)$row['state']; $id = intval($row['id']);
                     $tone = $st === 'active' ? 'success' : ($st === 'settled' ? 'primary' : ($st === 'closed' ? 'dark' : 'secondary'));
                     echo "<tr><td><div class='action-btns'>";
@@ -161,8 +167,9 @@ include '../insidebar.php';
                 <tbody>
                 <?php
                 $today = date('Y-m-d'); $sum_total = 0; $sum_paid = 0;
-                $sq = mysqli_query($conn, "SELECT * FROM fin_funding_schedules WHERE facility_id=$sel_fid AND company_id=$company_id ORDER BY installment_no ASC");
-                if ($sq) { while ($s = mysqli_fetch_assoc($sq)) {
+                $sched_rows = fin_gate($is_super_admin)->select('fin_funding_schedules', array(
+                    'where' => array('facility_id' => $sel_fid), 'orderBy' => 'installment_no ASC'));
+                { foreach ($sched_rows as $s) {
                     $sum_total += (float)$s['total_due']; $sum_paid += (float)$s['paid_amount'];
                     $overdue = ($s['state'] !== 'paid' && $s['due_date'] < $today);
                     $st = $overdue ? 'overdue' : (string)$s['state'];
