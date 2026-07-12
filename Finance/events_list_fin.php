@@ -83,14 +83,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
         header("Location: events_list_fin.php?msg=تم+تعديل+الحدث+المالي+بنجاح+✅"); exit();
     } else {
         $event_no = fin_gen_code($conn, 'fin_financial_events', 'FIN-EV', $company_id);
-        $sql = "INSERT INTO fin_financial_events (company_id, event_no, event_type, source_module, source_ref, amount,
-                currency, fx_rate, project_id, supplier_entity_id, equipment_id, notes, state, created_by)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?, 'draft', ?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'issssdsdiiisi', $company_id, $event_no, $event_type, $source_module, $source_ref,
-                $amount, $currency, $fx_rate, $project_id, $supplier_id, $equipment_id, $notes, $current_user_id);
-            mysqli_stmt_execute($stmt); mysqli_stmt_close($stmt);
-        }
+        ems_tenant_db()->insert('fin_financial_events', array(
+            'event_no' => $event_no, 'event_type' => $event_type, 'source_module' => $source_module,
+            'source_ref' => $source_ref, 'amount' => $amount, 'currency' => $currency, 'fx_rate' => $fx_rate,
+            'project_id' => $project_id, 'supplier_entity_id' => $supplier_id, 'equipment_id' => $equipment_id,
+            'notes' => $notes, 'state' => 'draft', 'created_by' => $current_user_id,
+        ));
         header("Location: events_list_fin.php?msg=تمت+إضافة+الحدث+المالي+بنجاح+✅"); exit();
     }
 }
@@ -115,21 +113,19 @@ if (isset($_GET['advance_id'])) {
     if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+الاعتماد+❌"); exit(); }
     $aid = intval($_GET['advance_id']);
     $flow = fin_event_flow();
-    // A0 · تشديد الحصانة (§12): حدثٌ منشورٌ على الناقل لا تُغيَّر حالته يدويًا (دورته بالناقل)
-    $er = mysqli_query($conn, "SELECT state, idempotency_key FROM fin_financial_events WHERE id=$aid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    $erow = ($er ? mysqli_fetch_assoc($er) : null);
-    if ($erow && $erow['idempotency_key'] !== null && $erow['idempotency_key'] !== '') {
+    // A0 · تشديد الحصانة (§12): حدثٌ منشورٌ على الناقل لا تُغيَّر حالته يدويًا (دورته بالناقل).
+    // قراءةٌ واحدة للحدث كاملًا عبر البوابة (تحقن is_deleted=0) تخدم فحص الحصانة والمصفوفة والقيد.
+    $event = ems_tenant_db()->selectOne('fin_financial_events', array('where' => array('id' => $aid)));
+    if ($event && $event['idempotency_key'] !== null && $event['idempotency_key'] !== '') {
         header("Location: events_list_fin.php?msg=لا+يجوز+تغيير+حالة+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
     }
-    $cur = $erow ? $erow['state'] : null;
+    $cur = $event ? $event['state'] : null;
     if ($cur !== null && isset($flow[$cur])) {
         list($next, $lbl, $level) = $flow[$cur];
         // فصل الواجبات: هذا الانتقال يخصّ مستواه فقط
         if (!fin_can_perform($conn, $ctx['role'], $level)) {
             header("Location: events_list_fin.php?msg=هذا+الإجراء+(" . urlencode($lbl) . ")+يخصّ+" . urlencode(fin_level_owner_label($level)) . "+❌"); exit();
         }
-        $evr = mysqli_query($conn, "SELECT * FROM fin_financial_events WHERE id=$aid AND company_id=$company_id LIMIT 1");
-        $event = $evr ? mysqli_fetch_assoc($evr) : null;
 
         // (فجوة 1) الاعتماد النهائي يخضع لمصفوفة الاعتماد بالمبلغ
         if ($next === 'approved' && $event) {
@@ -141,7 +137,8 @@ if (isset($_GET['advance_id'])) {
             }
         }
 
-        mysqli_query($conn, "UPDATE fin_financial_events SET state='$next' WHERE id=$aid AND company_id=$company_id AND state='$cur'");
+        // نقل الحالة عبر البوابة (حارس تفاؤلي state=? + حصانة §12) — للحدث اليدوي يمرّ؛ للمنشور يُرفض
+        ems_tenant_db()->update('fin_financial_events', array('state' => $next), array('id' => $aid), "state=?", array($cur));
         fin_log_approval($conn, $company_id, $aid, $cur, $next, 'advance', $level, $current_user_id, $lbl);
 
         // (فجوة 4) إشعار صاحب الخطوة التالية
@@ -156,8 +153,8 @@ if (isset($_GET['advance_id'])) {
         if ($next === 'approved' && $event) {
             $jid = fin_auto_journal($conn, $company_id, $event, $current_user_id);
             if ($jid > 0) {
-                $jr = mysqli_query($conn, "SELECT entry_no FROM fin_journal_entries WHERE id=$jid");
-                $jno = ($jr && ($j = mysqli_fetch_assoc($jr))) ? $j['entry_no'] : ('#' . $jid);
+                $jrow = ems_tenant_db()->selectOne('fin_journal_entries', array('columns' => array('entry_no'), 'where' => array('id' => $jid)));
+                $jno = $jrow ? $jrow['entry_no'] : ('#' . $jid);
                 $auto_msg = '+وتولّد+القيد+' . urlencode($jno) . '+آليًا';
                 fin_notify($conn, $company_id, 'finance_manager', 'قيد آلي ' . $jno . ' جاهز للترحيل (من ' . $event['event_no'] . ')', 'journal_form_fin.php');
             }
@@ -172,14 +169,13 @@ if (isset($_GET['reject_id'])) {
     if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+الرفض+❌"); exit(); }
     $rid = intval($_GET['reject_id']);
     // A0 · تشديد الحصانة (§12): الحدث المنشور لا يُرفَض يدويًا
-    $er = mysqli_query($conn, "SELECT state, idempotency_key FROM fin_financial_events WHERE id=$rid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    $erow = ($er ? mysqli_fetch_assoc($er) : null);
+    $erow = ems_tenant_db()->selectOne('fin_financial_events', array('columns' => array('state', 'idempotency_key'), 'where' => array('id' => $rid)));
     if ($erow && $erow['idempotency_key'] !== null && $erow['idempotency_key'] !== '') {
         header("Location: events_list_fin.php?msg=لا+يجوز+رفض+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
     }
     $cur = $erow ? $erow['state'] : null;
     if ($cur !== null && !in_array($cur, array('posted','settled','closed','rejected'), true)) {
-        mysqli_query($conn, "UPDATE fin_financial_events SET state='rejected' WHERE id=$rid AND company_id=$company_id");
+        ems_tenant_db()->update('fin_financial_events', array('state' => 'rejected'), array('id' => $rid));
         fin_log_approval($conn, $company_id, $rid, $cur, 'rejected', 'reject', null, $current_user_id, 'رفض/إعادة');
         fin_notify($conn, $company_id, 'dept_accountant', 'حدث مرفوض أُعيد إليك للتصحيح', 'events_list_fin.php?fstate=rejected');
         header("Location: events_list_fin.php?msg=تم+رفض+الحدث+✅"); exit();
@@ -192,14 +188,13 @@ if (isset($_GET['resume_id'])) {
     if (!$can_edit) { header("Location: events_list_fin.php?msg=لا+توجد+صلاحية+❌"); exit(); }
     $rid = intval($_GET['resume_id']);
     // A0 · تشديد الحصانة (§12): الحدث المنشور لا يُعاد يدويًا للدورة
-    $er = mysqli_query($conn, "SELECT state, idempotency_key FROM fin_financial_events WHERE id=$rid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    $erow = ($er ? mysqli_fetch_assoc($er) : null);
+    $erow = ems_tenant_db()->selectOne('fin_financial_events', array('columns' => array('state', 'idempotency_key'), 'where' => array('id' => $rid)));
     if ($erow && $erow['idempotency_key'] !== null && $erow['idempotency_key'] !== '') {
         header("Location: events_list_fin.php?msg=لا+يجوز+تعديل+حدثٍ+منشورٍ+على+الناقل+❌"); exit();
     }
     $cur = $erow ? $erow['state'] : null;
     if ($cur === 'rejected') {
-        mysqli_query($conn, "UPDATE fin_financial_events SET state='draft' WHERE id=$rid AND company_id=$company_id AND state='rejected'");
+        ems_tenant_db()->update('fin_financial_events', array('state' => 'draft'), array('id' => $rid), "state='rejected'");
         fin_log_approval($conn, $company_id, $rid, 'rejected', 'draft', 'advance', 'dept_accountant', $current_user_id, 'إعادة للدورة');
         header("Location: events_list_fin.php?msg=تمت+إعادة+الحدث+للدورة+(مسودة)+✅"); exit();
     }
@@ -310,17 +305,22 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                     <?php
-                    $scope_e = fin_scope('e.company_id', $is_super_admin, $company_id);
                     $filter_state = (isset($_GET['fstate']) && isset($event_states[$_GET['fstate']])) ? $_GET['fstate'] : '';
-                    $state_where = $filter_state !== '' ? " AND e.state='" . mysqli_real_escape_string($conn, $filter_state) . "'" : '';
                     $flow = fin_event_flow();
-                    $sql = "SELECT e.*, p.name AS project_name, s.name AS supplier_name
-                            FROM fin_financial_events e
-                            LEFT JOIN project p ON p.id = e.project_id
-                            LEFT JOIN suppliers s ON s.id = e.supplier_entity_id
-                            WHERE $scope_e AND COALESCE(e.is_deleted,0)=0 $state_where ORDER BY e.id DESC";
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) { while ($row = mysqli_fetch_assoc($result)) {
+                    // إثراء المشروع/المورد LEFT JOIN عبر scopedQuery (العزل على e، super→كل الشركات)؛
+                    // تصفية الحالة الاختيارية بمعامِلٍ مربوط (لا حقن)
+                    $ev_whereRaw = "COALESCE(e.is_deleted,0)=0";
+                    $ev_params = array();
+                    if ($filter_state !== '') { $ev_whereRaw .= " AND e.state=?"; $ev_params[] = $filter_state; }
+                    $event_rows = fin_gate($is_super_admin)->scopedQuery(
+                        array('scope' => array('e' => 'fin_financial_events'), 'enrich' => array('p' => 'project', 's' => 'suppliers')),
+                        "SELECT e.*, p.name AS project_name, s.name AS supplier_name
+                         FROM fin_financial_events e
+                         LEFT JOIN project p ON p.id = e.project_id
+                         LEFT JOIN suppliers s ON s.id = e.supplier_entity_id
+                         WHERE {TENANT_SCOPE} AND " . $ev_whereRaw . " ORDER BY e.id DESC",
+                        $ev_params);
+                    foreach ($event_rows as $row) {
                         $st   = (string)$row['state'];
                         $dim  = $row['project_name'] ?: ($row['supplier_name'] ?: '—');
                         $data_attrs =
@@ -363,7 +363,7 @@ include '../insidebar.php';
                         echo "<td>" . htmlspecialchars((string)$dim) . "</td>";
                         echo "<td><span class='badge badge-" . fin_state_tone($st) . "'>" . htmlspecialchars($event_states[$st] ?? $st) . "</span></td>";
                         echo "</tr>";
-                    } }
+                    }
                     ?>
                 </tbody>
             </table>
