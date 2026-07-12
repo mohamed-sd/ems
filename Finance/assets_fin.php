@@ -24,26 +24,34 @@ if (isset($_GET['run_dep'])) {
     if (!$can_edit) { header("Location: assets_fin.php?msg=لا+توجد+صلاحية+الاحتساب+❌"); exit(); }
     if (!fin_verify_action_token()) { header("Location: assets_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
     $period = date('Y-m'); $today = date('Y-m-d'); $n = 0; $sum = 0;
-    $res = mysqli_query($conn, "SELECT id, acquisition_cost, salvage_value, useful_life_months, accumulated_depreciation
-                                FROM fin_assets WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0 AND state='active'");
-    if ($res) { while ($a = mysqli_fetch_assoc($res)) {
+    $gate = fin_gate($is_super_admin);
+    $active = $gate->select('fin_assets', array(
+        'columns' => array('id', 'acquisition_cost', 'salvage_value', 'useful_life_months', 'accumulated_depreciation', 'state'),
+        'where' => array('state' => 'active'),
+    ));
+    foreach ($active as $a) {
         $aid = intval($a['id']);
         // تخطّي إن كان الشهر محتسبًا (فريد على asset+period)
-        $ex = mysqli_query($conn, "SELECT 1 FROM fin_depreciation WHERE company_id=$company_id AND asset_id=$aid AND period_ref='$period' LIMIT 1");
-        if ($ex && mysqli_num_rows($ex) > 0) { continue; }
+        if ($gate->count('fin_depreciation', array('where' => array('asset_id' => $aid, 'period_ref' => $period))) > 0) { continue; }
         $life = max(1, intval($a['useful_life_months']));
         $depreciable = (float)$a['acquisition_cost'] - (float)$a['salvage_value'];
         $monthly = round($depreciable / $life, 2);
         $remaining = round($depreciable - (float)$a['accumulated_depreciation'], 2);
         $dep = min($monthly, max(0, $remaining));
         if ($dep <= 0) { continue; }
-        mysqli_query($conn, "INSERT INTO fin_depreciation (company_id, asset_id, period_ref, depreciation_amount, run_date, created_by)
-                             VALUES ($company_id, $aid, '$period', $dep, '$today', $current_user_id)");
-        mysqli_query($conn, "UPDATE fin_assets SET accumulated_depreciation = accumulated_depreciation + $dep,
-                             state = CASE WHEN (accumulated_depreciation + $dep) >= ($depreciable) THEN 'fully_depreciated' ELSE state END
-                             WHERE id=$aid AND company_id=$company_id");
+        // القيمُ محسوبةٌ PHP-side (التعبير accumulated+dep والحالة) — نفس نتيجة الأصل
+        $new_acc = round((float)$a['accumulated_depreciation'] + $dep, 2);
+        $new_state = ($new_acc >= round($depreciable, 2)) ? 'fully_depreciated' : (string)$a['state'];
+        // الزوج الذرّي (§9): قيد الإهلاك + تحديث مجمّع الأصل معًا (الأصل كتابتان غير معاملتين)
+        $gate->runInTransaction(function ($g) use ($aid, $period, $dep, $today, $current_user_id, $new_acc, $new_state) {
+            $g->insert('fin_depreciation', array(
+                'asset_id' => $aid, 'period_ref' => $period, 'depreciation_amount' => $dep,
+                'run_date' => $today, 'created_by' => $current_user_id,
+            ));
+            $g->update('fin_assets', array('accumulated_depreciation' => $new_acc, 'state' => $new_state), array('id' => $aid));
+        }, 'assets depreciation run');
         $n++; $sum += $dep;
-    } }
+    }
     header("Location: assets_fin.php?msg=تم+احتساب+إهلاك+$period+لعدد+$n+أصل+(إجمالي+" . number_format($sum, 0) . ")+✅"); exit();
 }
 
@@ -57,13 +65,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
     $salv = round(floatval($_POST['salvage_value'] ?? 0), 2);
     $life = max(1, intval($_POST['useful_life_months'] ?? 60));
     if ($code === '' || $name === '' || $cost <= 0) { header("Location: assets_fin.php?msg=بيانات+الأصل+غير+مكتملة+❌"); exit(); }
-    $sql = "INSERT INTO fin_assets (company_id, code, name, category, equipment_id, acquisition_date, acquisition_cost, salvage_value, useful_life_months, created_by)
-            VALUES (?,?,?,?,?,?,?,?,?,?)";
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'isssisddii', $company_id, $code, $name, $cat, $eqid, $adate, $cost, $salv, $life, $current_user_id);
-        mysqli_stmt_execute($stmt);
-        if (mysqli_errno($conn) === 1062) { mysqli_stmt_close($stmt); header("Location: assets_fin.php?msg=كود+الأصل+مكرر+❌"); exit(); }
-        mysqli_stmt_close($stmt);
+    try {
+        fin_gate($is_super_admin)->insert('fin_assets', array(
+            'code' => $code, 'name' => $name, 'category' => $cat, 'equipment_id' => $eqid,
+            'acquisition_date' => $adate, 'acquisition_cost' => $cost, 'salvage_value' => $salv,
+            'useful_life_months' => $life, 'created_by' => $current_user_id,
+        ));
+    } catch (\App\Core\TenantGateException $e) {
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { header("Location: assets_fin.php?msg=كود+الأصل+مكرر+❌"); exit(); }
+        error_log('fin_assets insert refused: ' . $e->getMessage());
+        header("Location: assets_fin.php?msg=حدث+خطأ+أثناء+الحفظ+❌"); exit();
     }
     header("Location: assets_fin.php?msg=تمت+إضافة+الأصل+✅"); exit();
 }
@@ -72,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: assets_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['delete_id']);
-    mysqli_query($conn, "UPDATE fin_assets SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id");
+    fin_gate($is_super_admin)->softDelete('fin_assets', $d);
     header("Location: assets_fin.php?msg=تم+حذف+الأصل+✅"); exit();
 }
 
@@ -116,8 +127,8 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
                 <thead><tr><th>الإجراءات</th><th>الكود</th><th>الأصل</th><th>الفئة</th><th>التكلفة</th><th>مجمّع الإهلاك</th><th>القيمة الدفترية</th><th>العمر(شهر)</th><th>الحالة</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT * FROM fin_assets WHERE $company_scope_sql AND COALESCE(is_deleted,0)=0 ORDER BY code ASC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $asset_rows = fin_gate($is_super_admin)->select('fin_assets', array('orderBy' => 'code ASC'));
+                { foreach ($asset_rows as $row) {
                     $st = (string)$row['state'];
                     $tone = $st === 'active' ? 'success' : ($st === 'fully_depreciated' ? 'secondary' : 'dark');
                     echo "<tr><td><div class='action-btns'>";
@@ -144,10 +155,12 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
                 <thead><tr><th>الأصل</th><th>الفترة</th><th>مبلغ الإهلاك</th><th>تاريخ الاحتساب</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT d.*, a.name AS asset_name FROM fin_depreciation d
-                        LEFT JOIN fin_assets a ON a.id=d.asset_id
-                        WHERE d.company_id" . ($is_super_admin ? " > 0" : " = " . intval($company_id)) . " ORDER BY d.id DESC LIMIT 200";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                $dep_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('d' => 'fin_depreciation'), 'enrich' => array('a' => 'fin_assets')),
+                    "SELECT d.*, a.name AS asset_name FROM fin_depreciation d
+                     LEFT JOIN fin_assets a ON a.id=d.asset_id
+                     WHERE {TENANT_SCOPE} ORDER BY d.id DESC LIMIT 200");
+                { foreach ($dep_rows as $row) {
                     echo "<tr><td>" . htmlspecialchars((string)($row['asset_name'] ?? '')) . "</td>";
                     echo "<td>" . htmlspecialchars((string)$row['period_ref']) . "</td>";
                     echo "<td>" . number_format((float)$row['depreciation_amount'], 2) . "</td>";
