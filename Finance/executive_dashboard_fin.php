@@ -3,6 +3,11 @@
  * Finance/executive_dashboard_fin.php — اللوحة التنفيذية المالية (§18).
  * ★ قراءة فقط بالكامل ★ — تجميع من جداول fin_ القائمة (لا كتابة، لا جداول جديدة).
  * ربحية · سيولة · ذمم وأعمارها · انحراف · تمويل · خط الاعتماد.
+ *
+ * مُهاجَرة خلف بوابة العزل (§10 scopedQuery حصرًا — الشاشة تجميعية قرائية):
+ * كل عزل company_id مسؤولية البوابة عبر {TENANT_SCOPE}؛ استعلام الموازنة
+ * INNER→LEFT + b.id IS NOT NULL بعزلٍ على السطور (نمط cfo_daily_board المثبَت،
+ * والتطابق مقيس: صفر سطر موازنة عابر للشركات).
  */
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
@@ -17,23 +22,30 @@ if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php?msg=�
 $perms = fin_page_perms($conn, 'Finance/executive_dashboard_fin.php', $is_super_admin);
 if (!$perms['can_view']) { header("Location: ../main/dashboard.php?msg=لا+توجد+صلاحية+العرض+❌"); exit(); }
 
-$cid = intval($company_id);
-$W = $is_super_admin ? "company_id > 0" : "company_id = $cid";
-function finx($conn, $sql) { $r = mysqli_query($conn, $sql); return ($r && ($x = mysqli_fetch_assoc($r))) ? array_values($x)[0] : 0; }
+// قياس مُعزَّل مفرد الجدول عبر scopedQuery (§10) — بديل finx الخام (نمط cfo_daily_board)
+$exScoped = function ($alias, $table, $sql, $params = array()) use ($is_super_admin) {
+    $r = fin_gate($is_super_admin)->scopedQuery(array('scope' => array($alias => $table)), $sql, $params);
+    return $r ? (float) array_values($r[0])[0] : 0.0;
+};
 
 // KPIs (قراءة فقط)
 // إصلاح #1: توحيد العملة لعملة الأساس (SDG) لمنع خلط SDG/USD في التجميع
-$B = fin_base_amount();
-$revenue = (float) finx($conn, "SELECT COALESCE(SUM($B),0) FROM fin_financial_events WHERE $W AND COALESCE(is_deleted,0)=0 AND event_type='revenue' AND state IN('approved','posted','settled','closed')");
-$expense = (float) finx($conn, "SELECT COALESCE(SUM($B),0) FROM fin_financial_events WHERE $W AND COALESCE(is_deleted,0)=0 AND event_type IN('expense','payable','payroll') AND state IN('approved','posted','settled','closed')");
-$profit  = (float) finx($conn, "SELECT COALESCE(SUM(profit),0) FROM fin_cost_records WHERE $W AND COALESCE(is_deleted,0)=0");
-$cashpos = (float) finx($conn, "SELECT COALESCE(expected_position,0) FROM fin_cash_forecasts WHERE $W AND COALESCE(is_deleted,0)=0 ORDER BY id DESC LIMIT 1");
-$recv_out= (float) finx($conn, "SELECT COALESCE(SUM(outstanding),0) FROM fin_receivables WHERE $W AND COALESCE(is_deleted,0)=0 AND outstanding>0");
-$recv_od = (int)   finx($conn, "SELECT COUNT(*) FROM fin_receivables WHERE $W AND COALESCE(is_deleted,0)=0 AND outstanding>0 AND due_date IS NOT NULL AND due_date < CURDATE()");
-$dues_pend=(float) finx($conn, "SELECT COALESCE(SUM(amount),0) FROM fin_dues WHERE $W AND COALESCE(is_deleted,0)=0 AND direction='credit' AND settlement_state='pending'");
-$var_open= (int)   finx($conn, "SELECT COUNT(*) FROM fin_budget_lines l JOIN fin_budgets b ON b.id=l.budget_id WHERE b." . ($is_super_admin ? "company_id>0" : "company_id=$cid") . " AND COALESCE(b.is_deleted,0)=0 AND l.variance <> 0");
-$fund_due= (float) finx($conn, "SELECT COALESCE(SUM(total_due-paid_amount),0) FROM fin_funding_schedules WHERE $W AND state<>'paid'");
-$pending_appr = (int) finx($conn, "SELECT COUNT(*) FROM fin_financial_events WHERE $W AND COALESCE(is_deleted,0)=0 AND state IN('dept_review','dept_approved','fin_review','audited')");
+$B = fin_base_amount('e.amount', 'e.currency', 'e.fx_rate');
+$revenue = $exScoped('e', 'fin_financial_events', "SELECT COALESCE(SUM($B),0) FROM fin_financial_events e WHERE {TENANT_SCOPE} AND COALESCE(e.is_deleted,0)=0 AND e.event_type='revenue' AND e.state IN('approved','posted','settled','closed')");
+$expense = $exScoped('e', 'fin_financial_events', "SELECT COALESCE(SUM($B),0) FROM fin_financial_events e WHERE {TENANT_SCOPE} AND COALESCE(e.is_deleted,0)=0 AND e.event_type IN('expense','payable','payroll') AND e.state IN('approved','posted','settled','closed')");
+$profit  = $exScoped('cr', 'fin_cost_records', "SELECT COALESCE(SUM(cr.profit),0) FROM fin_cost_records cr WHERE {TENANT_SCOPE} AND COALESCE(cr.is_deleted,0)=0");
+$cashpos = $exScoped('cf', 'fin_cash_forecasts', "SELECT COALESCE(cf.expected_position,0) FROM fin_cash_forecasts cf WHERE {TENANT_SCOPE} AND COALESCE(cf.is_deleted,0)=0 ORDER BY cf.id DESC LIMIT 1");
+$recv_out= $exScoped('r', 'fin_receivables', "SELECT COALESCE(SUM(r.outstanding),0) FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0");
+$recv_od = (int) $exScoped('r', 'fin_receivables', "SELECT COUNT(*) FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0 AND r.due_date IS NOT NULL AND r.due_date < CURDATE()");
+$dues_pend= $exScoped('d', 'fin_dues', "SELECT COALESCE(SUM(d.amount),0) FROM fin_dues d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.direction='credit' AND d.settlement_state='pending'");
+// انحرافات الموازنة: تكافؤ INNER→LEFT + b.id IS NOT NULL، والعزل على السطور (نفس شركة الموازنة)
+$var_rows = fin_gate($is_super_admin)->scopedQuery(
+    array('scope' => array('l' => 'fin_budget_lines'), 'enrich' => array('b' => 'fin_budgets')),
+    "SELECT COUNT(*) c FROM fin_budget_lines l LEFT JOIN fin_budgets b ON b.id=l.budget_id
+     WHERE {TENANT_SCOPE} AND b.id IS NOT NULL AND COALESCE(b.is_deleted,0)=0 AND l.variance <> 0");
+$var_open = $var_rows ? (int) $var_rows[0]['c'] : 0;
+$fund_due = $exScoped('f', 'fin_funding_schedules', "SELECT COALESCE(SUM(f.total_due-f.paid_amount),0) FROM fin_funding_schedules f WHERE {TENANT_SCOPE} AND f.state<>'paid'");
+$pending_appr = (int) $exScoped('e', 'fin_financial_events', "SELECT COUNT(*) FROM fin_financial_events e WHERE {TENANT_SCOPE} AND COALESCE(e.is_deleted,0)=0 AND e.state IN('dept_review','dept_approved','fin_review','audited')");
 
 $cards = array(
   array('fa-arrow-trend-up', number_format($revenue, 0), 'الإيراد المعتمد', 'ok'),
@@ -79,13 +91,15 @@ $states = fin_event_states();
                 <thead><tr><th>الحالة</th><th>العدد</th><th>الإجمالي</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT state, COUNT(*) c, COALESCE(SUM(" . fin_base_amount() . "),0) t FROM fin_financial_events
-                        WHERE $W AND COALESCE(is_deleted,0)=0 GROUP BY state
-                        ORDER BY FIELD(state,'draft','dept_review','dept_approved','fin_review','audited','approved','posted','settled','rejected','closed')";
-                if ($r = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($r)) {
+                $state_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('e' => 'fin_financial_events')),
+                    "SELECT e.state, COUNT(*) c, COALESCE(SUM(" . fin_base_amount('e.amount', 'e.currency', 'e.fx_rate') . "),0) t FROM fin_financial_events e
+                     WHERE {TENANT_SCOPE} AND COALESCE(e.is_deleted,0)=0 GROUP BY e.state
+                     ORDER BY FIELD(e.state,'draft','dept_review','dept_approved','fin_review','audited','approved','posted','settled','rejected','closed')");
+                foreach ($state_rows as $row) {
                     echo "<tr><td><span class='badge badge-" . fin_state_tone($row['state']) . "'>" . htmlspecialchars($states[$row['state']] ?? $row['state']) . "</span></td>";
                     echo "<td>" . intval($row['c']) . "</td><td>" . number_format((float)$row['t'], 2) . "</td></tr>";
-                } }
+                }
                 ?>
                 </tbody>
             </table>
@@ -97,16 +111,18 @@ $states = fin_event_states();
                 <thead><tr><th>المشروع</th><th>التكلفة</th><th>الإيراد</th><th>الربحية</th></tr></thead>
                 <tbody>
                 <?php
-                $sql = "SELECT p.name pn, COALESCE(SUM(cr.total_cost),0) tc, COALESCE(SUM(cr.revenue),0) tr,
-                               COALESCE(SUM(cr.revenue),0)-COALESCE(SUM(cr.total_cost),0) pf
-                        FROM fin_cost_records cr LEFT JOIN project p ON p.id=cr.project_id
-                        WHERE cr.$W AND COALESCE(cr.is_deleted,0)=0 GROUP BY cr.project_id, p.name ORDER BY pf DESC LIMIT 8";
-                if ($r = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($r)) {
+                $prof_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('cr' => 'fin_cost_records'), 'enrich' => array('p' => 'project')),
+                    "SELECT p.name pn, COALESCE(SUM(cr.total_cost),0) tc, COALESCE(SUM(cr.revenue),0) tr,
+                            COALESCE(SUM(cr.revenue),0)-COALESCE(SUM(cr.total_cost),0) pf
+                     FROM fin_cost_records cr LEFT JOIN project p ON p.id=cr.project_id
+                     WHERE {TENANT_SCOPE} AND COALESCE(cr.is_deleted,0)=0 GROUP BY cr.project_id, p.name ORDER BY pf DESC LIMIT 8");
+                foreach ($prof_rows as $row) {
                     $pf = (float)$row['pf'];
                     echo "<tr><td>" . htmlspecialchars((string)($row['pn'] ?? 'بلا مشروع')) . "</td>";
                     echo "<td>" . number_format((float)$row['tc'], 2) . "</td><td>" . number_format((float)$row['tr'], 2) . "</td>";
                     echo "<td><span class='badge badge-" . ($pf >= 0 ? 'success' : 'danger') . "'>" . number_format($pf, 2) . "</span></td></tr>";
-                } }
+                }
                 ?>
                 </tbody>
             </table>
@@ -125,8 +141,10 @@ $states = fin_event_states();
                   'متأخرة +90 يوم' => "due_date < DATE_SUB(CURDATE(), INTERVAL 90 DAY)",
                 );
                 foreach ($buckets as $lbl => $cond) {
-                    $r = mysqli_query($conn, "SELECT COUNT(*) c, COALESCE(SUM(outstanding),0) t FROM fin_receivables WHERE $W AND COALESCE(is_deleted,0)=0 AND outstanding>0 AND ($cond)");
-                    $row = $r ? mysqli_fetch_assoc($r) : array('c' => 0, 't' => 0);
+                    $age_rows = fin_gate($is_super_admin)->scopedQuery(
+                        array('scope' => array('r' => 'fin_receivables')),
+                        "SELECT COUNT(*) c, COALESCE(SUM(r.outstanding),0) t FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0 AND ($cond)");
+                    $row = $age_rows ? $age_rows[0] : array('c' => 0, 't' => 0);
                     echo "<tr><td>" . htmlspecialchars($lbl) . "</td><td>" . intval($row['c']) . "</td><td>" . number_format((float)$row['t'], 2) . "</td></tr>";
                 }
                 ?>
