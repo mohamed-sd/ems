@@ -29,8 +29,7 @@ if (isset($_GET['approve_id'])) {
     if (!fin_verify_action_token()) { header("Location: unit_records_fin.php?msg=رمز+الحماية+غير+صالح+❌"); exit(); }
     if (!fin_can_perform($conn, $ctx['role'], 'finance_manager')) { header("Location: unit_records_fin.php?msg=اعتماد+التطابق+يخصّ+المدير+المالي+فقط+❌"); exit(); }
     $rid = intval($_GET['approve_id']);
-    $rr = mysqli_query($conn, "SELECT * FROM fin_unit_records WHERE id=$rid AND company_id=$company_id AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    $rec = $rr ? mysqli_fetch_assoc($rr) : null;
+    $rec = ems_tenant_db()->selectOne('fin_unit_records', array('where' => array('id' => $rid)));
     if (!$rec) { header("Location: unit_records_fin.php?msg=السجل+غير+موجود+❌"); exit(); }
     // قاعدة التطابق الثلاثي: لا اعتماد إلا لسجل متطابق
     if ($rec['match_state'] !== 'matched') { header("Location: unit_records_fin.php?msg=لا+اعتماد:+الكميات+الثلاث+غير+متطابقة+❌"); exit(); }
@@ -45,31 +44,36 @@ if (isset($_GET['approve_id'])) {
     $sup = intval($rec['supplier_entity_id']) ?: null;
     $rno = $rec['record_no'];
 
-    // التوأم 1: حدث إيراد على العميل (يدخل دورة الاعتماد كمسودة)
+    // التوأمان + ختم السجل = ثلاث كتابات ذرّية (§9): حدث إيراد العميل + مستحق المورد
+    // بالوحدة نفسها + وسم السجل «معتمد» وربط التوأمين — إمّا الكل أو لا شيء (لا توأم يتيم).
     $event_no = fin_gen_code($conn, 'fin_financial_events', 'FIN-EV', $company_id);
     $note = 'توأم إيراد من كشف وحدات ' . $rno;
-    $sql = "INSERT INTO fin_financial_events (company_id, event_no, event_type, source_module, source_ref, amount, currency, project_id, equipment_id, notes, state, created_by)
-            VALUES (?,?, 'revenue', 'projects', ?, ?, 'SDG', ?, ?, ?, 'draft', ?)";
-    $rev_id = 0;
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, 'issdiisi', $company_id, $event_no, $rno, $rev_amount, $pid, $eqid, $note, $current_user_id);
-        mysqli_stmt_execute($stmt); $rev_id = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
-    }
-    // التوأم 2: مستحق مورد بالوحدة نفسها (إن وُجد شريك إنتاج)
-    $due_id = null;
-    if ($sup) {
-        $due_type = fin_unit_due_type($rec['work_model']);
-        $per = date('Y-m', strtotime($rec['record_date']));
-        $sql = "INSERT INTO fin_dues (company_id, party_type, party_ref, due_type, direction, amount, period_ref, event_id, created_by)
-                VALUES (?, 'supplier', ?, ?, 'credit', ?, ?, ?, ?)";
-        if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, 'iisdsii', $company_id, $sup, $due_type, $due_amount, $per, $rev_id, $current_user_id);
-            mysqli_stmt_execute($stmt); $due_id = mysqli_insert_id($conn); mysqli_stmt_close($stmt);
+    $due_type = fin_unit_due_type($rec['work_model']);
+    $per = date('Y-m', strtotime($rec['record_date']));
+    $twins = array('rev_id' => 0, 'due_id' => null);
+    ems_tenant_db()->runInTransaction(function ($g) use (&$twins, $event_no, $rno, $note, $rev_amount, $due_amount, $due_type, $per, $pid, $eqid, $sup, $qty, $rid, $current_user_id) {
+        // التوأم 1: حدث إيراد على العميل (مسودة تدخل دورة الاعتماد)
+        $twins['rev_id'] = $g->insert('fin_financial_events', array(
+            'event_no' => $event_no, 'event_type' => 'revenue', 'source_module' => 'projects',
+            'source_ref' => $rno, 'amount' => $rev_amount, 'currency' => 'SDG',
+            'project_id' => $pid, 'equipment_id' => $eqid, 'notes' => $note,
+            'state' => 'draft', 'created_by' => $current_user_id,
+        ));
+        // التوأم 2: مستحق مورد بالوحدة نفسها (إن وُجد شريك إنتاج)
+        if ($sup) {
+            $twins['due_id'] = $g->insert('fin_dues', array(
+                'party_type' => 'supplier', 'party_ref' => $sup, 'due_type' => $due_type,
+                'direction' => 'credit', 'amount' => $due_amount, 'period_ref' => $per,
+                'event_id' => $twins['rev_id'], 'created_by' => $current_user_id,
+            ));
         }
-    }
-    mysqli_query($conn, "UPDATE fin_unit_records SET match_state='approved', approved_qty=$qty,
-                         revenue_event_id=" . intval($rev_id) . ", supplier_due_id=" . ($due_id ? intval($due_id) : "NULL") . "
-                         WHERE id=$rid AND company_id=$company_id");
+        // ختم السجل: معتمد + ربط التوأمين
+        $g->update('fin_unit_records', array(
+            'match_state' => 'approved', 'approved_qty' => $qty,
+            'revenue_event_id' => $twins['rev_id'], 'supplier_due_id' => $twins['due_id'],
+        ), array('id' => $rid));
+    }, 'approve unit match + twin events');
+    $rev_id = $twins['rev_id']; $due_id = $twins['due_id'];
     fin_log_approval($conn, $company_id, $rid, 'matched', 'approved', 'advance', 'finance_manager', $current_user_id, 'اعتماد تطابق ' . $rno . ' وتوليد التوأمين');
     // (فجوة 4) إشعارات التوأمين
     fin_notify($conn, $company_id, 'dept_accountant', 'توأم إيراد ' . $event_no . ' من ' . $rno . ' بانتظار رفعه للدورة', 'events_list_fin.php?fstate=draft');
@@ -82,7 +86,10 @@ if (isset($_GET['approve_id'])) {
 if (isset($_GET['delete_id'])) {
     if (!$can_delete) { header("Location: unit_records_fin.php?msg=لا+توجد+صلاحية+حذف+❌"); exit(); }
     $d = intval($_GET['delete_id']);
-    mysqli_query($conn, "UPDATE fin_unit_records SET is_deleted=1, deleted_at=NOW(), deleted_by=$current_user_id WHERE id=$d AND company_id=$company_id AND match_state<>'approved'");
+    // حذف ناعم لغير المعتمد فقط → update بحارس whereRaw (softDelete بالـid لا يحمل شرط الحالة)
+    ems_tenant_db()->update('fin_unit_records',
+        array('is_deleted' => 1, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => $current_user_id),
+        array('id' => $d), "match_state<>'approved'");
     header("Location: unit_records_fin.php?msg=تم+حذف+السجل+✅"); exit();
 }
 
@@ -112,36 +119,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['work_model'])) {
     if ($dh !== null && $dh > 0 && $dc === null) { header("Location: unit_records_fin.php?msg=قاعدة+السبب:+لا+توقف+بلا+سبب+مصنَّف+❌"); exit(); }
     $mstate = fin_compute_match_state($ops, $cq, $sq);
 
+    // بيانات السجل المشتركة (إنشاء/تعديل) — القيم كما هي، والعزل والترميز مسؤولية البوابة
+    $data = array(
+        'record_date' => $rdate, 'project_id' => $pid,
+        'equipment_id' => $eqid, 'supplier_entity_id' => $sup,
+        'work_model' => $wm, 'ops_qty' => $ops,
+        'client_qty' => $cq, 'supplier_qty' => $sq,
+        'client_unit_price' => $cp, 'supplier_unit_price' => $sp,
+        'downtime_hours' => $dh, 'downtime_cause' => $dc,
+        'variance_note' => $vn, 'source_ref' => $ref, 'match_state' => $mstate,
+    );
     if ($is_editing) {
-        // لا تعديل على المعتمد
-        $cur = mysqli_query($conn, "SELECT match_state FROM fin_unit_records WHERE id=$id AND company_id=$company_id LIMIT 1");
-        $c = $cur ? mysqli_fetch_assoc($cur) : null;
-        if (!$c || $c['match_state'] === 'approved') { header("Location: unit_records_fin.php?msg=لا+تعديل+على+سجل+معتمد+❌"); exit(); }
-        // تحديث بقيم مؤمَّنة (الأرقام عبر intval/round والنصوص عبر escape)
-        $set = "record_date='" . mysqli_real_escape_string($conn, $rdate) . "', project_id=$pid,"
-             . " equipment_id=" . ($eqid ?: "NULL") . ", supplier_entity_id=" . ($sup ?: "NULL") . ","
-             . " work_model='" . mysqli_real_escape_string($conn, $wm) . "', ops_qty=$ops,"
-             . " client_qty=" . ($cq === null ? "NULL" : $cq) . ", supplier_qty=" . ($sq === null ? "NULL" : $sq) . ","
-             . " client_unit_price=" . ($cp === null ? "NULL" : $cp) . ", supplier_unit_price=" . ($sp === null ? "NULL" : $sp) . ","
-             . " downtime_hours=" . ($dh === null ? "NULL" : $dh) . ","
-             . " downtime_cause=" . ($dc === null ? "NULL" : "'" . mysqli_real_escape_string($conn, $dc) . "'") . ","
-             . " variance_note='" . mysqli_real_escape_string($conn, $vn) . "', source_ref='" . mysqli_real_escape_string($conn, $ref) . "',"
-             . " match_state='" . mysqli_real_escape_string($conn, $mstate) . "'";
-        mysqli_query($conn, "UPDATE fin_unit_records SET $set WHERE id=$id AND company_id=$company_id AND match_state<>'approved'");
+        // لا تعديل على المعتمد (حارس حالة عبر whereRaw — والقراءة تُبقي رفض السجل المفقود)
+        $cur = ems_tenant_db()->selectOne('fin_unit_records', array('columns' => array('match_state'), 'where' => array('id' => $id)));
+        if (!$cur || $cur['match_state'] === 'approved') { header("Location: unit_records_fin.php?msg=لا+تعديل+على+سجل+معتمد+❌"); exit(); }
+        ems_tenant_db()->update('fin_unit_records', $data, array('id' => $id), "match_state<>'approved'");
         header("Location: unit_records_fin.php?msg=تم+تعديل+السجل+(الحالة:+" . urlencode($match_states[$mstate]) . ")+✅"); exit();
     } else {
-        $record_no = fin_gen_code($conn, 'fin_unit_records', 'FIN-UR', $company_id);
-        $cols = "company_id, record_no, record_date, project_id, equipment_id, supplier_entity_id, work_model, ops_qty,
-                 client_qty, supplier_qty, client_unit_price, supplier_unit_price, downtime_hours, downtime_cause,
-                 variance_note, source_ref, match_state, created_by";
-        $vals = "$company_id, '" . mysqli_real_escape_string($conn, $record_no) . "', '" . mysqli_real_escape_string($conn, $rdate) . "', $pid, "
-              . ($eqid ?: "NULL") . ", " . ($sup ?: "NULL") . ", '" . mysqli_real_escape_string($conn, $wm) . "', $ops, "
-              . ($cq === null ? "NULL" : $cq) . ", " . ($sq === null ? "NULL" : $sq) . ", "
-              . ($cp === null ? "NULL" : $cp) . ", " . ($sp === null ? "NULL" : $sp) . ", "
-              . ($dh === null ? "NULL" : $dh) . ", " . ($dc === null ? "NULL" : "'" . mysqli_real_escape_string($conn, $dc) . "'") . ", "
-              . "'" . mysqli_real_escape_string($conn, $vn) . "', '" . mysqli_real_escape_string($conn, $ref) . "', '"
-              . mysqli_real_escape_string($conn, $mstate) . "', $current_user_id";
-        mysqli_query($conn, "INSERT INTO fin_unit_records ($cols) VALUES ($vals)");
+        $data['record_no'] = fin_gen_code($conn, 'fin_unit_records', 'FIN-UR', $company_id);
+        $data['created_by'] = $current_user_id;
+        ems_tenant_db()->insert('fin_unit_records', $data);
         header("Location: unit_records_fin.php?msg=أُنشئ+السجل+(الحالة:+" . urlencode($match_states[$mstate]) . ")+✅"); exit();
     }
 }
@@ -200,11 +197,13 @@ include '../insidebar.php';
                 </tr></thead>
                 <tbody>
                 <?php
-                $scope_u = fin_scope('u.company_id', $is_super_admin, $company_id);
-                $sql = "SELECT u.*, p.name AS project_name FROM fin_unit_records u
-                        LEFT JOIN project p ON p.id = u.project_id
-                        WHERE $scope_u AND COALESCE(u.is_deleted,0)=0 ORDER BY u.record_date DESC, u.id DESC";
-                if ($res = mysqli_query($conn, $sql)) { while ($row = mysqli_fetch_assoc($res)) {
+                // إثراء اسم المشروع LEFT JOIN عبر scopedQuery (العزل على u، super→كل الشركات)
+                $unit_rows = fin_gate($is_super_admin)->scopedQuery(
+                    array('scope' => array('u' => 'fin_unit_records'), 'enrich' => array('p' => 'project')),
+                    "SELECT u.*, p.name AS project_name FROM fin_unit_records u
+                     LEFT JOIN project p ON p.id = u.project_id
+                     WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 ORDER BY u.record_date DESC, u.id DESC");
+                foreach ($unit_rows as $row) {
                     $ms = (string)$row['match_state'];
                     $tone = $ms === 'approved' ? 'success' : ($ms === 'matched' ? 'primary' : ($ms === 'variance' ? 'danger' : 'secondary'));
                     $data =
@@ -241,7 +240,7 @@ include '../insidebar.php';
                             ? number_format((float)$row['downtime_hours'], 1) . ' س (' . htmlspecialchars($downtime_causes[$row['downtime_cause']] ?? '') . ')'
                             : '—') . "</td>";
                     echo "</tr>";
-                } }
+                }
                 ?>
                 </tbody>
             </table>
